@@ -1,5 +1,5 @@
 # IRremote ESP8266 Library
-This library enables you to send and receive using infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
+This library enables you to send infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
 
 # This library is based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
 I just made it run on ESP8266.
