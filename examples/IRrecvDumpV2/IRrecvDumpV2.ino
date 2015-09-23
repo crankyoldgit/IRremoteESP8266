@@ -24,7 +24,7 @@ void  ircode (decode_results *results)
 {
   // Panasonic has an Address
   if (results->decode_type == PANASONIC) {
-    Serial.print(results->address, HEX);
+    Serial.print(results->panasonicAddress, HEX);
     Serial.print(":");
   }
 
@@ -54,7 +54,6 @@ void  encoding (decode_results *results)
     case WHYNTER:      Serial.print("WHYNTER");       break ;
     case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break ;
     case PANASONIC:    Serial.print("PANASONIC");     break ;
-    case DENON:        Serial.print("Denon");         break ;
   }
 }
 
@@ -63,12 +62,6 @@ void  encoding (decode_results *results)
 //
 void  dumpInfo (decode_results *results)
 {
-  // Check if the buffer overflowed
-  if (results->overflow) {
-    Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWLEN");
-    return;
-  }
-
   // Show Encoding standard
   Serial.print("Encoding  : ");
   encoding(results);
@@ -148,7 +141,7 @@ void  dumpCode (decode_results *results)
     // Some protocols have an address
     if (results->decode_type == PANASONIC) {
       Serial.print("unsigned int  addr = 0x");
-      Serial.print(results->address, HEX);
+      Serial.print(results->panasonicAddress, HEX);
       Serial.println(";");
     }
 
