@@ -1,8 +1,12 @@
 # IRremote ESP8266 Library
-This library enables you to send infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
 
-# This library is based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
-I just made it run on ESP8266.
+This library enables you to **send and receive** infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
+
+This library is based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
+
+[Mark Szabo](https://github.com/markszabo/IRremoteESP8266) has updated the IRsend class to work on ESP8266 and [Sebastien Warin](https://github.com/sebastienwarin/IRremoteESP8266) the receiving & decoding part (IRrecv class).
+
+Seb's notes : I also changed the pulse parameters for Samsung, update the Panasonic and Samsung decoders and remove the SANYO decoders. The IR decoder was successfully tested with Panasonic and Samsung remote controls.
 
 ## Installation
 1. Click "Download ZIP" 

@@ -1,6 +1,8 @@
-/*
- * IRremote
- * Version 0.1 July, 2009
+ /***************************************************
+ * IRremote for ESP8266
+ *
+ * Based on the IRremote library for Arduino by Ken Shirriff 
+ * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
  *
@@ -12,7 +14,11 @@
  *
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * Whynter A/C ARC-110WD added by Francesco Meschia
- */
+ *
+ * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200 
+ *
+ *  GPL license, all text above must be included in any redistribution
+ ****************************************************/
 
 #ifndef IRremoteint_h
 #define IRremoteint_h
@@ -110,13 +116,22 @@
 #define LG_ZERO_SPACE 550
 #define LG_RPT_LENGTH 60000
 
+/*
 #define SAMSUNG_HDR_MARK  5000
 #define SAMSUNG_HDR_SPACE 5000
 #define SAMSUNG_BIT_MARK  560
 #define SAMSUNG_ONE_SPACE 1600
 #define SAMSUNG_ZERO_SPACE  560
 #define SAMSUNG_RPT_SPACE 2250
+*/
 
+// Update by Sebastien Warin for my EU46D6200
+#define SAMSUNG_HDR_MARK  4500
+#define SAMSUNG_HDR_SPACE 4500
+#define SAMSUNG_BIT_MARK  590
+#define SAMSUNG_ONE_SPACE 1690
+#define SAMSUNG_ZERO_SPACE  590
+#define SAMSUNG_RPT_SPACE 2250
 
 #define SHARP_BITS 15
 #define DISH_BITS 16
@@ -136,6 +151,22 @@
 #define STATE_MARK     3
 #define STATE_SPACE    4
 #define STATE_STOP     5
+
+#define ERR 0
+#define DECODED 1
+
+// information for the interrupt handler
+typedef struct {
+  uint8_t recvpin;           // pin for IR data from detector
+  uint8_t rcvstate;          // state machine
+  unsigned int timer;     // state timer, counts 50uS ticks.
+  unsigned int rawbuf[RAWBUF]; // raw data
+  uint8_t rawlen;         // counter of entries in rawbuf
+} 
+irparams_t;
+
+// Defined in IRremote.cpp
+extern volatile irparams_t irparams;
 
 // IR detector output is active low
 #define MARK  0

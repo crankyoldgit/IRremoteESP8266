@@ -1,5 +1,6 @@
 ## Contributors of this project
-Sofar only [me] (https://github.com/markszabo/), but feel free to join :)
+- [Mark Szabo](https://github.com/markszabo/) : IR sending on ESP8266
+- [Sébastien Warin](https://github.com/sebastienwarin/) (http://sebastien.warin.fr) : IR receiving on ESP8266
 
 ## Contributors of the original project (https://github.com/shirriff/Arduino-IRremote/)
 These are the active contributors of this project that you may contact if there is anything you need help with or if you have suggestions. 

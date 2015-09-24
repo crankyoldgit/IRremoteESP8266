@@ -5,7 +5,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/markszabo/ESP8266-IRremote.git"
+    "url": "https://github.com/sebastienwarin/IRremoteESP8266.git"
   },
   "frameworks": "arduino",
   "platforms": "esp8266"
