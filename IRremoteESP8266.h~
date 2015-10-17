@@ -125,7 +125,6 @@ public:
   void begin();
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits);
-  void sendLG(unsigned long data, int nbits);
   void sendSony(unsigned long data, int nbits);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);

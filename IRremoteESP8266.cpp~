@@ -108,24 +108,6 @@ void IRsend::sendNEC(unsigned long data, int nbits)
   space(0);
 }
 
-void IRsend::sendLG (unsigned long data, int nbits)
-{
-	enableIROut(38);
-	mark(LG_HDR_MARK);
-	space(LG_HDR_SPACE);
-	mark(LG_BIT_MARK);
-	for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-		if (data & mask) {
-			space(LG_ONE_SPACE);
-			mark(LG_BIT_MARK);
-		} else {
-			space(LG_ZERO_SPACE);
-			mark(LG_BIT_MARK);
-		}
-	}
-	space(0);
-}
-
 void IRsend::sendWhynter(unsigned long data, int nbits) {
 	enableIROut(38);
 	mark(WHYNTER_ZERO_MARK);
