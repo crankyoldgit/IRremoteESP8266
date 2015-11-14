@@ -428,7 +428,8 @@ static void ICACHE_FLASH_ATTR gpio_intr(void *arg) {
     static uint32_t start = 0;
     uint32_t now = system_get_time();
 	if (irparams.rcvstate == STATE_IDLE) {
-		irparams.rcvstate = STATE_MARK;	
+		irparams.rcvstate = STATE_MARK;
+		irparams.rawbuf[irparams.rawlen++] = 20;		
 	}
     else if (irparams.rawlen < RAWBUF) {
 		irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
