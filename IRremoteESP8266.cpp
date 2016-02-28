@@ -1000,10 +1000,10 @@ long IRrecv::decodeRC6(decode_results *results) {
 long IRrecv::decodePanasonic(decode_results *results) {
     unsigned long long data = 0;
 	int offset = 1;  // Dont skip first space    
-    /*if (!MATCH_MARK(results->rawbuf[offset], PANASONIC_HDR_MARK)) {
+    if (!MATCH_MARK(results->rawbuf[offset], PANASONIC_HDR_MARK)) {
         return ERR;
     }
-    offset++;*/		
+    offset++;		
     if (!MATCH_MARK(results->rawbuf[offset], PANASONIC_HDR_SPACE)) {
         return ERR;
     }
