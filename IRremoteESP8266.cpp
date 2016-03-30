@@ -18,6 +18,7 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * LG added by Darryl Smith (based on the JVC protocol)
  * Whynter A/C ARC-110WD added by Francesco Meschia
+ * Global Cache IR format sender added by Hisham Khalifa (http://www.hishamkhalifa.com)
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
@@ -177,6 +178,52 @@ void IRsend::sendRaw(unsigned int buf[], int len, int hz)
     }
   }
   space(0); // Just to be sure
+}
+
+// Global Cache format w/o emitter ID or request ID. Starts from hertz, 
+// followed by number of times to emit (1 = 0 repeats, fires only once),
+// followed by offset if repeat is >= 2, otherwise code immediately follows.
+void IRsend::sendGC(unsigned int buf[], int len)
+{
+  enableIROut(buf[0]/1000); // GC data starts with frequency in Hz.
+  int repeat = buf[1];
+
+  if (repeat == 1) {
+    for (int i = 2; i < len; i++) {
+      if (i & 1) {
+        space(buf[i] * GCFACTOR);
+      }
+      else {
+        mark(buf[i] * GCFACTOR);
+      }
+    }
+  }
+
+  if (repeat > 1) {
+    for (int i = 3; i < len; i++) {
+      if (i & 1) {
+        space(buf[i] * GCFACTOR);
+      }
+      else {
+        mark(buf[i] * GCFACTOR);
+      }
+    }
+
+    int offset = buf[2] + 2; // Will be odd value since timing pattern is always mark/space pair.
+ 
+    for (int r = 1; r < repeat; r++) { // Repeats without preamble if specified by offset.
+      for (int i = offset; i < len; i++) {
+        if (i & 1) {
+          space(buf[i] * GCFACTOR);
+        }
+        else {
+          mark(buf[i] * GCFACTOR);
+        }
+      }
+    }
+  }
+
+  space(0);
 }
 
 // Note: first bit must be a one (start bit)
