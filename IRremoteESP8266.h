@@ -85,9 +85,6 @@ public:
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
-// Global Cache timing pattern scaling factor. So far in testing 27 seems to be the right match. Tested with Apple TV and Samsung TV codes from GC's Control Tower IR database.
-#define GCFACTOR 27
-
 // main class for receiving IR
 class IRrecv
 {

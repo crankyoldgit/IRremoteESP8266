@@ -9,10 +9,9 @@
 
 // Codes are in Global Cache format less the emitter ID and request ID. These codes can be found in GC's Control Tower database.
 
-unsigned int Apple_menu[75] = {38000,1,69,341,172,21,21,21,65,21,65,21,65,21,21,21,65,21,65,21,65,21,65,21,65,21,65,21,21,21,21,21,21,21,21,21,65,21,65,21,65,21,21,21,21,21,21,21,21,21,21,21,21,21,65,21,65,21,21,21,21,21,21,21,65,21,21,21,21,21,1508,341,85,21,3648};
-unsigned int Apple_menu_repeat_three_times[76] = {38000,3,1,69,341,172,21,21,21,65,21,65,21,65,21,21,21,65,21,65,21,65,21,65,21,65,21,65,21,21,21,21,21,21,21,21,21,65,21,65,21,65,21,21,21,21,21,21,21,21,21,21,21,21,21,65,21,65,21,21,21,21,21,21,21,65,21,21,21,21,21,1508,341,85,21,3648};
+unsigned int Samsung_power_toggle[71] = {38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,63,20,63,20,63,20,1798};
 
-IRsend irsend(4); //an IR led is connected to GPIO pin 4
+IRsend irsend(4); //an IR emitter led is connected to GPIO pin 4
 
 void setup()
 {
@@ -21,10 +20,7 @@ void setup()
 }
 
 void loop() {
-  Serial.println("Apple TV menu");
-  irsend.sendGC(Apple_menu, 75);
-  delay(2000);
-  Serial.println("Apple TV menu repeated three times");
-  irsend.sendGC(Apple_menu_repeat_three_times, 76);
-  delay(2000);
+  Serial.println("Toggling power");
+  irsend.sendGC(Samsung_power_toggle, 71);
+  delay(10000);
 }

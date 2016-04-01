@@ -181,48 +181,27 @@ void IRsend::sendRaw(unsigned int buf[], int len, int hz)
 }
 
 // Global Cache format w/o emitter ID or request ID. Starts from hertz, 
-// followed by number of times to emit (1 = 0 repeats, fires only once),
-// followed by offset if repeat is >= 2, otherwise code immediately follows.
+// followed by number of times to emit (count),
+// followed by offset for repeats, followed by code as units of periodic time.
 void IRsend::sendGC(unsigned int buf[], int len)
 {
-  enableIROut(buf[0]/1000); // GC data starts with frequency in Hz.
-  int repeat = buf[1];
+  int khz = buf[0]/1000; // GC data starts with frequency in Hz.
+  enableIROut(khz); 
+  int periodic_time = 1000/khz;
+  int count = buf[1]; // Max 50 as per GC.
 
-  if (repeat == 1) {
-    for (int i = 2; i < len; i++) {
-      if (i & 1) {
-        space(buf[i] * GCFACTOR);
+  for (int i = 0; i < count; i++) {
+    int j = i > 0 ? buf[2] + 2 : 3; // Account for offset if we're repeating, otherwise start at index 3.
+    for (; j < len; j++) {
+      int microseconds = buf[j] * periodic_time; // Convert periodic units to microseconds. Minimum is 80 for actual GC units.
+      if (j & 1) {
+        mark(microseconds); // Our codes start at an odd index (not even as with sendRaw).
       }
       else {
-        mark(buf[i] * GCFACTOR);
+        space(microseconds);
       }
     }
   }
-
-  if (repeat > 1) {
-    for (int i = 3; i < len; i++) {
-      if (i & 1) {
-        space(buf[i] * GCFACTOR);
-      }
-      else {
-        mark(buf[i] * GCFACTOR);
-      }
-    }
-
-    int offset = buf[2] + 2; // Will be odd value since timing pattern is always mark/space pair.
- 
-    for (int r = 1; r < repeat; r++) { // Repeats without preamble if specified by offset.
-      for (int i = offset; i < len; i++) {
-        if (i & 1) {
-          space(buf[i] * GCFACTOR);
-        }
-        else {
-          mark(buf[i] * GCFACTOR);
-        }
-      }
-    }
-  }
-
   space(0);
 }
 
