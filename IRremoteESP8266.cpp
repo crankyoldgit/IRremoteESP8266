@@ -1154,7 +1154,7 @@ long IRrecv::decodeJVC(decode_results *results) {
 // SAMSUNGs have a repeat only 4 items long
 long IRrecv::decodeSAMSUNG(decode_results *results) {
   long data = 0;
-  int offset = 0;  // Dont skip first space
+  int offset = 1;  // Dont skip first space
   // Initial mark
   if (!MATCH_MARK(results->rawbuf[offset], SAMSUNG_HDR_MARK)) {
     return ERR;
