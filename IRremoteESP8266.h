@@ -112,7 +112,7 @@ public:
   long decodeSAMSUNG(decode_results *results);
   long decodeWhynter(decode_results *results);
   long decodeHash(decode_results *results);
-  // COOLIX decode is implemented yet
+  // COOLIX decode is not implemented yet
   //  long decodeCOOLIX(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
