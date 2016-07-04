@@ -19,6 +19,7 @@
  * LG added by Darryl Smith (based on the JVC protocol)
  * Whynter A/C ARC-110WD added by Francesco Meschia
  * Global Cache IR format sender added by Hisham Khalifa (http://www.hishamkhalifa.com)
+ * Coolix A/C / heatpump added by bakrus
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
@@ -87,6 +88,36 @@ IRsend::IRsend(int IRsendPin)
 void IRsend::begin()
 {
 	pinMode(IRpin, OUTPUT);
+}
+
+void IRsend::sendCOOLIX(unsigned long data, int nbits)
+{
+  enableIROut(38);
+  mark(COOLIX_HDR_MARK);
+  space(COOLIX_HDR_SPACE);
+
+  // Sending 3 bytes of data. Each byte first beeing sendt straight, then followed by an inverted version.
+  unsigned long COOLIXmask;
+  bool invert = 0;  // Initializing
+  for (int j = 0; j < COOLIX_NBYTES * 2; j++) {
+    for (int i = nbits; i > nbits-8; i--) {
+      COOLIXmask = (unsigned long) 1 << (i-1);  // Type cast necessary to perform correct for the one byte above 16bit
+      if (data & COOLIXmask) {
+        mark(COOLIX_BIT_MARK);
+        space(COOLIX_ONE_SPACE);
+      }
+      else {
+        mark(COOLIX_BIT_MARK);
+        space(COOLIX_ZERO_SPACE);
+      }
+    }
+    data ^= 0xFFFFFFFF;       // Inverts all of the data each time we need to send an inverted byte
+    invert = !invert;
+    nbits -= invert ? 0 : 8;  // Subtract 8 from nbits each time we switch to a new byte.
+  }
+  mark(COOLIX_BIT_MARK);
+  space(COOLIX_ZERO_SPACE);   // Stop bit (0)
+  space(COOLIX_HDR_SPACE);    // Pause before repeating
 }
 
 void IRsend::sendNEC(unsigned long data, int nbits)

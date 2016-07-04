@@ -15,11 +15,12 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * LG added by Darryl Smith (based on the JVC protocol)
  * Whynter A/C ARC-110WD added by Francesco Meschia
+ * Coolix A/C / heatpump added by bakrus
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
- * GPL license, all text above must be included in any redistribution
+ *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
 #ifndef IRremote_h
@@ -48,6 +49,7 @@ enum decode_type_t {
   LG = 12,
   WHYNTER = 13,
   AIWA_RC_T501 = 14,
+  COOLIX = 15,
 
   UNKNOWN = -1
 };
@@ -80,6 +82,7 @@ public:
 #define SAMSUNG 11
 #define LG 12
 #define WHYNTER 13
+#define COOLIX 15
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -109,6 +112,8 @@ public:
   long decodeSAMSUNG(decode_results *results);
   long decodeWhynter(decode_results *results);
   long decodeHash(decode_results *results);
+  // COOLIX decode is not implemented yet
+  //  long decodeCOOLIX(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
@@ -123,6 +128,7 @@ class IRsend
 public:
   IRsend(int IRsendPin);
   void begin();
+  void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits);
   void sendLG(unsigned long data, int nbits);

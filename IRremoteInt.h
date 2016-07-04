@@ -14,6 +14,7 @@
  *
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * Whynter A/C ARC-110WD added by Francesco Meschia
+ * Coolix A/C / heatpump added by bakrus
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200 
  *
@@ -32,6 +33,12 @@
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
 // pulse parameters in usec
+#define COOLIX_BIT_MARK	560       // Approximately 21 cycles at 38kHz
+#define COOLIX_ONE_SPACE	COOLIX_BIT_MARK * 3
+#define COOLIX_ZERO_SPACE	COOLIX_BIT_MARK * 1
+#define COOLIX_HDR_MARK	COOLIX_BIT_MARK * 8
+#define COOLIX_HDR_SPACE	COOLIX_BIT_MARK * 8
+
 #define WHYNTER_HDR_MARK	2850
 #define WHYNTER_HDR_SPACE	2850
 #define WHYNTER_BIT_MARK	750
@@ -52,14 +59,14 @@
 #define SONY_ONE_MARK	1200
 #define SONY_ZERO_MARK	600
 #define SONY_RPT_LENGTH 45000
-#define SONY_DOUBLE_SPACE_USECS  500  // usually ssee 713 - not using ticks as get number wrapround
+#define SONY_DOUBLE_SPACE_USECS  500  // usually see 713 - not using ticks as get number wrapround
 
 // SA 8650B
 #define SANYO_HDR_MARK	3500  // seen range 3500
 #define SANYO_HDR_SPACE	950 //  seen 950
 #define SANYO_ONE_MARK	2400 // seen 2400  
 #define SANYO_ZERO_MARK 700 //  seen 700
-#define SANYO_DOUBLE_SPACE_USECS  800  // usually ssee 713 - not using ticks as get number wrapround
+#define SANYO_DOUBLE_SPACE_USECS  800  // usually see 713 - not using ticks as get number wrapround
 #define SANYO_RPT_LENGTH 45000
 
 // Mitsubishi RM 75501
@@ -185,5 +192,6 @@ extern volatile irparams_t irparams;
 #define LG_BITS 28
 #define SAMSUNG_BITS 32
 #define WHYNTER_BITS 32
+#define COOLIX_NBYTES 3
 
 #endif
