@@ -475,7 +475,7 @@ static void ICACHE_FLASH_ATTR read_timeout(void *arg) {
 	os_intr_unlock();
 }
 
-static void ICACHE_FLASH_ATTR gpio_intr(void *arg) {
+static void ICACHE_FLASH_ATTR gpio_intr() {
     uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
     GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 
@@ -508,25 +508,13 @@ void IRrecv::enableIRIn() {
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
 
-  // set pin modes  
-  //PIN_FUNC_SELECT(IR_IN_MUX, IR_IN_FUNC);
-  GPIO_DIS_OUTPUT(irparams.recvpin);
-  
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, &timer);
   
-  // ESP Attach Interrupt
-  ETS_GPIO_INTR_DISABLE();
-  ETS_GPIO_INTR_ATTACH(gpio_intr, NULL);
-  gpio_pin_intr_state_set(GPIO_ID_PIN(irparams.recvpin), GPIO_PIN_INTR_ANYEDGE);
-  ETS_GPIO_INTR_ENABLE();
-  //ETS_INTR_UNLOCK();  
-  
-  //attachInterrupt(irparams.recvpin, readIR, CHANGE);  
-  //irReadTimer.initializeUs(USECPERTICK, readIR).start();
-  //os_timer_arm_us(&irReadTimer, USECPERTICK, 1);
-  //ets_timer_arm_new(&irReadTimer, USECPERTICK, 1, 0);
+  // Attach Interrupt
+  attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
+
 }
 
 void IRrecv::disableIRIn() {
