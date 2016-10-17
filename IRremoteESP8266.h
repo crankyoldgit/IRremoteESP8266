@@ -88,6 +88,17 @@ public:
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
+#define SEND_PROTOCOL_NEC     case NEC: sendNEC(data, nbits); break;
+#define SEND_PROTOCOL_SONY    case SONY: sendSony(data, nbits); break;
+#define SEND_PROTOCOL_RC5     case RC5: sendRC5(data, nbits); break;
+#define SEND_PROTOCOL_RC6     case RC6: sendRC6(data, nbits); break;
+#define SEND_PROTOCOL_DISH    case DISH: sendDISH(data, nbits); break;
+#define SEND_PROTOCOL_JVC     case JVC: sendJVC(data, nbits, 0); break;
+#define SEND_PROTOCOL_SAMSUNG case SAMSUNG: sendSAMSUNG(data, nbits); break;
+#define SEND_PROTOCOL_LG      case LG: sendLG(data, nbits); break;
+#define SEND_PROTOCOL_WHYNTER case WHYNTER: sendWhynter(data, nbits); break;
+#define SEND_PROTOCOL_COOLIX  case COOLIX: sendCOOLIX(data, nbits); break;
+
 // main class for receiving IR
 class IRrecv
 {
@@ -128,6 +139,20 @@ class IRsend
 public:
   IRsend(int IRsendPin);
   void begin();
+  void send(int type, unsigned long data, int nbits) {
+    switch (type) {
+        SEND_PROTOCOL_NEC
+        SEND_PROTOCOL_SONY
+        SEND_PROTOCOL_RC5
+        SEND_PROTOCOL_RC6
+        SEND_PROTOCOL_DISH
+        SEND_PROTOCOL_JVC
+        SEND_PROTOCOL_SAMSUNG
+        SEND_PROTOCOL_LG
+        SEND_PROTOCOL_WHYNTER
+        SEND_PROTOCOL_COOLIX
+      }
+  };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits);
