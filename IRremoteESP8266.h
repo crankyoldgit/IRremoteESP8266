@@ -1,7 +1,7 @@
  /***************************************************
  * IRremote for ESP8266
- * 
- * Based on the IRremote library for Arduino by Ken Shirriff 
+ *
+ * Based on the IRremote library for Arduino by Ken Shirriff
  * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
@@ -34,24 +34,29 @@
 //#define DEBUG
 //#define TEST
 
+/*
+ * Always add to the end of the list and should never remove entries
+ * or change order. Projects may save the type number for later usage
+ * so numbering should always stay the same.
+ */
 enum decode_type_t {
-  NEC = 1,
-  SONY = 2,
-  RC5 = 3,
-  RC6 = 4,
-  DISH = 5,
-  SHARP = 6,
-  PANASONIC = 7,
-  JVC = 8,
-  SANYO = 9,
-  MITSUBISHI = 10,
-  SAMSUNG = 11,
-  LG = 12,
-  WHYNTER = 13,
-  AIWA_RC_T501 = 14,
-  COOLIX = 15,
-
-  UNKNOWN = -1
+  UNKNOWN = -1,
+  UNUSED = 0,
+  RC5,
+  RC6,
+  NEC,
+  SONY,
+  PANASONIC,
+  JVC,
+  SAMSUNG,
+  WHYNTER,
+  AIWA_RC_T501,
+  LG,
+  SANYO,
+  MITSUBISHI,
+  DISH,
+  SHARP,
+  COOLIX,
 };
 
 // Results returned from the decoder
