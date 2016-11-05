@@ -1,7 +1,7 @@
  /***************************************************
  * IRremote for ESP8266
- *
- * Based on the IRremote library for Arduino by Ken Shirriff
+ * 
+ * Based on the IRremote library for Arduino by Ken Shirriff 
  * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
@@ -20,9 +20,8 @@
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
- *  GPL license, all text above must be included in any redistribution
+ * GPL license, all text above must be included in any redistribution
  ****************************************************/
-
 #ifndef IRremote_h
 #define IRremote_h
 
@@ -67,28 +66,30 @@ public:
     unsigned int panasonicAddress;
     unsigned int sharpAddress;
   };
-  unsigned long value; // Decoded value
-  int bits; // Number of bits in decoded value
-  volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
-  int rawlen; // Number of records in rawbuf.
+  unsigned long value;            // Decoded value
+  int device;                     // Decoded device address
+  int command;                    // Decoded command    
+  int bits;                       // Number of bits in decoded value
+  volatile unsigned int *rawbuf;  // Raw intervals in .5 us ticks
+  int rawlen;                     // Number of records in rawbuf.
 };
 
 // Values for decode_type
-#define NEC 1
-#define SONY 2
-#define RC5 3
-#define RC6 4
-#define DISH 5
-#define SHARP 6
-#define PANASONIC 7
-#define JVC 8
-#define SANYO 9
+#define NEC         1
+#define SONY        2
+#define RC5         3
+#define RC6         4
+#define DISH        5
+#define SHARP       6
+#define PANASONIC   7
+#define JVC         8
+#define SANYO       9
 #define MITSUBISHI 10
-#define SAMSUNG 11
-#define LG 12
-#define WHYNTER 13
-#define COOLIX 15
-#define UNKNOWN -1
+#define SAMSUNG    11
+#define LG         12
+#define WHYNTER    13
+#define COOLIX     15
+#define UNKNOWN    -1
 
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
@@ -179,17 +180,16 @@ public:
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(int usec);
-private:
-  int halfPeriodicTime;
+  private:
+  int timeHigh;
+  int PeriodicTime;
   int IRpin;
 } ;
 
 // Some useful constants
-#define USECPERTICK 50  // microseconds per clock interrupt tick
-#define RAWBUF 100 // Length of raw duration buffer
-
-// Marks tend to be 100us too long, and spaces 100us too short
-// when received due to sensor lag.
-#define MARK_EXCESS 100
-
+#define RAWBUF       100  // Max Length of raw duration buffer
+ 
+// Absolute difference See LIRC eaps Marks tend to be 100us too long ,  and spaces 100us too short 
+// when received due to sensor lag 
+#define MARK_EXCESS     100
 #endif
