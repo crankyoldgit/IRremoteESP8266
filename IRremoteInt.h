@@ -143,6 +143,15 @@
 #define SHARP_BITS 15
 #define DISH_BITS 16
 
+// Dakin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+#define DAIKIN_HDR_MARK	    3650 //DAIKIN_ZERO_MARK*8
+#define DAIKIN_HDR_SPACE	1623 //DAIKIN_ZERO_MARK*4
+#define DAIKIN_ONE_SPACE	1280 
+#define DAIKIN_ONE_MARK	    428
+#define DAIKIN_ZERO_MARK	428
+#define DAIKIN_ZERO_SPACE 428
+
+
 #define TOLERANCE 25  // percent tolerance in measurements
 #define LTOL (1.0 - TOLERANCE/100.) 
 #define UTOL (1.0 + TOLERANCE/100.) 
@@ -193,5 +202,6 @@ extern volatile irparams_t irparams;
 #define SAMSUNG_BITS 32
 #define WHYNTER_BITS 32
 #define COOLIX_NBYTES 3
+#define DAIKIN_BITS 99
 
 #endif

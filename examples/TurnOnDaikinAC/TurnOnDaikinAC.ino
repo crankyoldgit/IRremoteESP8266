@@ -1,5 +1,5 @@
 
-#include <ESPIRDaikinESP.h>
+#include <IRDaikinESP.h>
 
 IRDaikinESP dakinir(D1);
 
