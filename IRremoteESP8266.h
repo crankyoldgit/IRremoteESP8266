@@ -20,6 +20,9 @@
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
+ *  Updated by sillyfrog for Daikin, adopted from
+ * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
+ *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -57,6 +60,7 @@ enum decode_type_t {
   DISH,
   SHARP,
   COOLIX,
+  DAIKIN,
 };
 
 // Results returned from the decoder
@@ -88,6 +92,7 @@ public:
 #define LG 12
 #define WHYNTER 13
 #define COOLIX 15
+#define DAIKIN 16
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -130,6 +135,7 @@ public:
   long decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
   //  long decodeCOOLIX(decode_results *results);
+  long decodeDaikin(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
@@ -176,6 +182,8 @@ public:
   void sendPanasonic(unsigned int address, unsigned long data);
   void sendJVC(unsigned long data, int nbits, int repeat); // *Note instead of sending the REPEAT constant if you want the JVC repeat signal sent, send the original code value and change the repeat argument from 0 to 1. JVC protocol repeats by skipping the header NOT by sending a separate code value like NEC does.
   void sendSAMSUNG(unsigned long data, int nbits);
+  void sendDaikin(unsigned char daikin[]);
+  void sendDaikinChunk(unsigned char buf[], int len, int start);
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(int usec);

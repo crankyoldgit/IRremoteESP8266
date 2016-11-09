@@ -453,7 +453,39 @@ void IRsend::sendDISH(unsigned long data, int nbits) {
     data <<= 1;
   }
 } 
- 
+
+// From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+void IRsend::sendDaikin(unsigned char daikin[]) {
+  sendDaikinChunk(daikin, 8,0);
+  delay(29);
+  sendDaikinChunk(daikin, 19,8);
+}
+
+void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
+  int data2;
+  enableIROut(38);
+
+  mark(DAIKIN_HDR_MARK);
+  space(DAIKIN_HDR_SPACE);
+
+  for (int i = start; i < start+len; i++) {
+    data2=buf[i];
+
+    for (int j = 0; j < 8; j++) {
+      if ((1 << j & data2)) {
+        mark(DAIKIN_ONE_MARK);
+        space(DAIKIN_ONE_SPACE);
+      }
+      else {
+        mark(DAIKIN_ZERO_MARK);
+        space(DAIKIN_ZERO_SPACE);
+      }
+    }
+  }
+  mark(DAIKIN_ONE_MARK);
+  space(DAIKIN_ZERO_SPACE);
+}
+
 // ---------------------------------------------------------------
   
 
@@ -1218,6 +1250,96 @@ long IRrecv::decodeSAMSUNG(decode_results *results) {
   results->decode_type = SAMSUNG;
   return DECODED;
 }
+
+// From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+// decoding not actually tested
+long IRrecv::decodeDaikin(decode_results *results) {
+  long data = 0;
+  int offset = 1; // Skip first space
+
+  if (irparams.rawlen < 2 * DAIKIN_BITS + 4) {
+    //return ERR;
+  }
+
+  // Initial mark
+  if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_HDR_MARK)) {
+      return ERR;
+  }
+  offset++;
+
+  if (!MATCH_SPACE(results->rawbuf[offset], DAIKIN_HDR_SPACE)) {
+      return ERR;
+  }
+  offset++;
+
+  for (int i = 0; i < 32; i++) {
+    if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
+
+    return ERR;
+    }
+    offset++;
+    if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
+      data = (data << 1) | 1;
+    }
+    else if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
+      data <<= 1;
+    }
+    else {
+      return ERR;
+    }
+    offset++;
+  }
+
+unsigned long number = data ; // some number...
+int bits = 32 ; // nr of bits in some number
+unsigned long reversed = 0;
+for ( int b=0 ; b < bits ; b++ ) reversed = ( reversed << 1 ) | ( 0x0001 & ( number >> b ) );
+
+ Serial.print ("Code ");
+      Serial.println (reversed,  HEX);
+
+ //==========
+
+  for (int i = 0; i < 32; i++) {
+    if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
+
+    return ERR;
+    }
+    offset++;
+    if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
+      data = (data << 1) | 1;
+    }
+    else if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
+      data <<= 1;
+    }
+    else {
+      return ERR;
+    }
+    offset++;
+  }
+
+  number = data ; // some number...
+  bits = 32 ; // nr of bits in some number
+  reversed = 0;
+  for ( int b=0 ; b < bits ; b++ ) reversed = ( reversed << 1 ) | ( 0x0001 & ( number >> b ) );
+
+ //Serial.print ("Code2 ");
+      //Serial.println (reversed,  HEX);
+
+ //===========
+ if (!MATCH_SPACE(results->rawbuf[offset], 29000)) {
+      //Serial.println ("no gap");
+	  return ERR;
+  }
+  offset++;
+
+  // Success
+  results->bits = DAIKIN_BITS;
+  results->value = reversed;
+  results->decode_type = DAIKIN;
+  return DECODED;
+}
+
 
 /* -----------------------------------------------------------------------
  * hashdecode - decode an arbitrary IR code.
