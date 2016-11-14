@@ -36,7 +36,7 @@
 #define COOLIX_BIT_MARK	560       // Approximately 21 cycles at 38kHz
 #define COOLIX_ONE_SPACE	COOLIX_BIT_MARK * 3
 #define COOLIX_ZERO_SPACE	COOLIX_BIT_MARK * 1
-#define COOLIX_HDR_MARK	        COOLIX_BIT_MARK * 8
+#define COOLIX_HDR_MARK	    COOLIX_BIT_MARK * 8
 #define COOLIX_HDR_SPACE	COOLIX_BIT_MARK * 8
 
 #define WHYNTER_HDR_MARK	2850
@@ -61,10 +61,10 @@
 #define SONY_RPT_LENGTH        45000
 
 // SA 8650B
-#define SANYO_HDR_MARK	        3500 
-#define SANYO_HDR_SPACE	         950 
-#define SANYO_ONE_MARK	        2400 
-#define SANYO_ZERO_MARK          700 
+#define SANYO_HDR_MARK	        3500
+#define SANYO_HDR_SPACE	         950
+#define SANYO_ONE_MARK	        2400
+#define SANYO_ZERO_MARK          700
 #define SANYO_DOUBLE_SPACE_USECS 800  // usually see 713 - not using ticks as get number wrapround
 #define SANYO_RPT_LENGTH 45000
 
@@ -79,12 +79,12 @@
 // #define MITSUBISHI_RPT_LENGTH   45000
 
 
-#define RC5_T1		         889
+#define RC5_T1		             889
 #define RC5_RPT_LENGTH	       46000
 
 #define RC6_HDR_MARK	        2666
 #define RC6_HDR_SPACE 	         889
-#define RC6_T1		         444
+#define RC6_T1		             444
 #define RC6_RPT_LENGTH	       46000
 
 #define SHARP_BIT_MARK           245
@@ -139,14 +139,26 @@
 #define SAMSUNG_ZERO_SPACE       590
 #define SAMSUNG_RPT_SPACE       2250
 
+#define SHARP_BITS 15
+#define DISH_BITS 16
 
-#define TOLERANCE 30    // moved to LIRC default 30%
+// Dakin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+#define DAIKIN_HDR_MARK	        3650 //DAIKIN_ZERO_MARK*8
+#define DAIKIN_HDR_SPACE	    1623 //DAIKIN_ZERO_MARK*4
+#define DAIKIN_ONE_SPACE	    1280 
+#define DAIKIN_ONE_MARK	         428
+#define DAIKIN_ZERO_MARK	     428
+#define DAIKIN_ZERO_SPACE        428
+
+
+#define TOLERANCE 30    //  LIRC default 30%
 #define LTOL (1.0 - TOLERANCE/100.) 
 #define UTOL (1.0 + TOLERANCE/100.) 
 
 
-#define TICKS_LOW(us) (int) (((us)*LTOL))
-#define TICKS_HIGH(us) (int) (((us)*UTOL))
+#define TICKS_LOW(us) (int) (((us)*LTOL/USECPERTICK))
+#define TICKS_HIGH(us) (int) (((us)*UTOL/USECPERTICK))
+
 // receiver states
 #define STATE_IDLE     2
 #define STATE_MARK     3
@@ -162,7 +174,6 @@ typedef struct {
   uint8_t rcvstate;            // state machine
   unsigned int timer;          // state timer, counts ticks.
   unsigned int rawbuf[RAWBUF]; // raw data
-  unsigned int state[RAWBUF];  // raw data
   uint8_t rawlen;              // counter of entries in rawbuf
 } 
 irparams_t;
@@ -177,6 +188,7 @@ extern volatile irparams_t irparams;
 #define TOPBIT 0x80000000
 
 #define NEC_BITS        32
+#define SONY_MIN_BITS   12
 #define SANYO_BITS      12
 #define MITSUBISHI_BITS 16
 #define MIN_RC5_SAMPLES 11
@@ -186,9 +198,8 @@ extern volatile irparams_t irparams;
 #define LG_BITS         28
 #define SAMSUNG_BITS    32
 #define WHYNTER_BITS    32
-//#define SHARP_BITS      15
-//#define DISH_BITS       16
 #define COOLIX_NBYTES    3
+#define DAIKIN_BITS     99
 
 
 #endif

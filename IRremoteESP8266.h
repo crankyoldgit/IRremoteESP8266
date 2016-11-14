@@ -1,7 +1,7 @@
  /***************************************************
  * IRremote for ESP8266
- * 
- * Based on the IRremote library for Arduino by Ken Shirriff 
+ *
+ * Based on the IRremote library for Arduino by Ken Shirriff
  * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
@@ -20,8 +20,12 @@
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
- * GPL license, all text above must be included in any redistribution
+ *  Updated by sillyfrog for Daikin, adopted from
+ * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
+ *
+ *  GPL license, all text above must be included in any redistribution
  ****************************************************/
+
 #ifndef IRremote_h
 #define IRremote_h
 
@@ -56,12 +60,13 @@ enum decode_type_t {
   DISH,
   SHARP,
   COOLIX,
+  DAIKIN,
 };
 
 // Results returned from the decoder
 class decode_results {
 public:
-  int decode_type; // NEC, SONY, RC5, UNKNOWN
+  int decode_type; // NEC, SONY, RC5, UNKNOWN ...
   union { // This is used for decoding Panasonic and Sharp data
     unsigned int panasonicAddress;
     unsigned int sharpAddress;
@@ -89,6 +94,7 @@ public:
 #define LG         12
 #define WHYNTER    13
 #define COOLIX     15
+#define DAIKIN     16
 #define UNKNOWN    -1
 
 // Decoded value for NEC when a repeat code is received
@@ -110,6 +116,7 @@ class IRrecv
 {
 public:
   IRrecv(int recvpin);
+  int decodeESP8266(decode_results *results);
   int decode(decode_results *results);
   void enableIRIn();
   void disableIRIn();
@@ -131,6 +138,7 @@ public:
   long decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
   //  long decodeCOOLIX(decode_results *results);
+  long decodeDaikin(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
@@ -177,6 +185,8 @@ public:
   void sendPanasonic(unsigned int address, unsigned long data);
   void sendJVC(unsigned long data, int nbits, int repeat); // *Note instead of sending the REPEAT constant if you want the JVC repeat signal sent, send the original code value and change the repeat argument from 0 to 1. JVC protocol repeats by skipping the header NOT by sending a separate code value like NEC does.
   void sendSAMSUNG(unsigned long data, int nbits);
+  void sendDaikin(unsigned char daikin[]);
+  void sendDaikinChunk(unsigned char buf[], int len, int start);
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(int usec);
@@ -187,9 +197,11 @@ public:
 } ;
 
 // Some useful constants
-#define RAWBUF       100  // Max Length of raw duration buffer
- 
-// Absolute difference See LIRC eaps Marks tend to be 100us too long ,  and spaces 100us too short 
-// when received due to sensor lag 
-#define MARK_EXCESS     100
+#define USECPERTICK 1  // microseconds per clock interrupt tick
+#define RAWBUF 100 // Length of raw duration buffer
+
+// Marks tend to be 100us too long, and spaces 100us too short
+// when received due to sensor lag.
+#define MARK_EXCESS 100
+
 #endif
