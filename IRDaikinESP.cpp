@@ -1,3 +1,5 @@
+#include "IRremote.h"
+#include "IRremoteInt.h"
 /*
 An Arduino sketch to emulate IR Daikin ARC433** remote control unit
 Read more on http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
