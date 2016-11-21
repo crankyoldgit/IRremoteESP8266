@@ -1,7 +1,7 @@
 ## Contributors of this project
 - [Mark Szabo](https://github.com/markszabo/) : IR sending on ESP8266
 - [Sébastien Warin](https://github.com/sebastienwarin/) (http://sebastien.warin.fr) : IR receiving on ESP8266
-
+- [Marcos Marinho](https://github.com/marcosamarinho/) : new merge with z30 and many improvements at IR send and receive 
 ## Contributors of the original project (https://github.com/shirriff/Arduino-IRremote/)
 These are the active contributors of this project that you may contact if there is anything you need help with or if you have suggestions. 
 
