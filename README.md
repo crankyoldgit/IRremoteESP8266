@@ -8,7 +8,7 @@ This library is based on Ken Shirriff's work (https://github.com/shirriff/Arduin
 
 Seb's notes : I also changed the pulse parameters for Samsung, update the Panasonic and Samsung decoders and remove the SANYO decoders. The IR decoder was successfully tested with Panasonic and Samsung remote controls.
 
-Marcos Marinho's notes :Many improvements and changes are done at this version,  see changelog.md here . (changelog.md)  . 
+Marcos Marinho's notes :Many improvements and changes are done at this version,  Check.  [changelog.md](changelog.md)
 
 To avoid changes use new functions so send IR . 
 
