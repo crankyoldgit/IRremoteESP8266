@@ -13,10 +13,10 @@ Marcos Marinho's notes :Many improvements and changes are done at this version, 
 To avoid changes use new functions so send IR . 
 
 
-Use for 32 bits  larger protocol  . 
+Use for 32 bits  larger protocols  . 
 
      send_address("PANASONIC",0x4004,0x100bcbd); 
-     send_address("SANYO",0x1FC0,0x00); hangelog.md
+     send_address("SANYO",0x1FC0,0x00); 
 
 Others .
 
