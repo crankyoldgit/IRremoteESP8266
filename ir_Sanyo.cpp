@@ -11,7 +11,7 @@
 //==============================================================================
 
   /*
-  * Nov2016 marcosamarinho as the old implementation was specifc and had errors ,so not testd yet on real devices  . 
+  * Nov2016 marcosamarinho as the old implementation was specifc and had errors  
   *
   *  changed based on  http://slydiman.narod.ru/scr/kb/sanyo.htm 
   * This protocol uses the NEC protocol timings. However, data is formatted as:
@@ -42,7 +42,7 @@
 bool IRrecv::decodeSanyo(decode_results *results) {
  if (irparams.rawlen < 2 * SANYO_BITS + 1+OFFSET_START) return false;
   unsigned long long data = 0; // 48 bits need long long
-  int offset = OFFSET_START; // Skip first space 
+  int offset = OFFSET_START;   // Skip first space 
    
   // Header
   if (!MATCH_MARK( results->rawbuf[offset++], SANYO_HDR_MARK))   return false; 

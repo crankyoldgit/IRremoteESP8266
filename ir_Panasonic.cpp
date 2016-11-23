@@ -46,7 +46,7 @@ void IRsend::sendPanasonic(unsigned int address, unsigned int command) {
 
 //+=============================================================================
 #if DECODE_PANASONIC
-// implemented just panasonic 48 bits  
+// implemented just panasonic 48 bits  there is others protocols 
 bool IRrecv::decodePanasonic(decode_results *results) {
   unsigned long long  data  = 0;
   int                offset = OFFSET_START;   // Skip first space 

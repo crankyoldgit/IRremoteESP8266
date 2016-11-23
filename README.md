@@ -8,6 +8,23 @@ This library is based on Ken Shirriff's work (https://github.com/shirriff/Arduin
 
 Seb's notes : I also changed the pulse parameters for Samsung, update the Panasonic and Samsung decoders and remove the SANYO decoders. The IR decoder was successfully tested with Panasonic and Samsung remote controls.
 
+Marcos Marinho's notes :Many improvements and changes are done at this version,  see changelog.md . 
+
+To avoid changes use new functions so send IR . 
+
+
+Use 32 bits  larger protocol use for while . 
+
+     send_address("PANASONIC",0x4004,0x100bcbd); 
+     send_address("SANYO",0x1FC0,0x00); 
+
+Others  : 
+     send_raw("NEC",0xc53a9966,32) ; 
+     send_raw("SONY",0x090,12) ; 
+
+And the protocol is decoded to String at results->protocol. 
+
+
 ## Installation
 1. Click "Download ZIP" 
 2. Extract the downloaded zip file 

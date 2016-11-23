@@ -16,7 +16,7 @@
 #define SONY_ONE_MARK             1200
 #define SONY_ZERO_MARK             600
 #define SONY_RPT_LENGTH          25000
-#define SONY_DOUBLE_SPACE_USECS    500  // usually ssee 713 - not using ticks as get number wrapround
+//#define SONY_DOUBLE_SPACE_USECS    500  // usually ssee 713 - not using ticks as get number wrapround
 #define MIN_REPEAT                   2
 
 //+=============================================================================

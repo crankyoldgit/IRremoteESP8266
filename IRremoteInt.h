@@ -29,9 +29,11 @@
 #else
 #include <WProgram.h>
 #endif
-// Length of raw duration buffer
-#define RAWBUF 140     
 
+// Length of raw duration buffer increased to fit REPEAT lik SONY 
+#define RAWBUF 140 
+
+    
 // information for the interrupt handler
 typedef struct {
   uint8_t recvpin;              // pin for IR data from detector
@@ -40,10 +42,13 @@ typedef struct {
   unsigned int rawbuf[RAWBUF];  // raw data
   uint8_t rawlen;               // counter of entries in rawbuf
 } 
+
 irparams_t;
 
 // Defined in IRremote.cpp
 extern volatile irparams_t irparams;
+
+
 //-------------------------------------------------------
 
 // Useful constants
@@ -51,19 +56,22 @@ extern volatile irparams_t irparams;
 #define USECPERTICK 1  
 
  //  Relative match LIRC default 30%
-#define TOLERANCE 30   
+#define TOLERANCE 30  
+ 
 #define LTOL (1.0 - TOLERANCE/100.) 
 #define UTOL (1.0 + TOLERANCE/100.) 
+
 // pulse parameters in usec
 // Absolute match 
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
+// TODO move this to a variable for not be a generic parameter as LIRC does 
 #define MARK_EXCESS 100
-
+// calculates upper and lower limits 
 #define TICKS_LOW(us)  (int) (((us)*LTOL/USECPERTICK))
 #define TICKS_HIGH(us) (int) (((us)*UTOL/USECPERTICK))
 
-// receiver states
+// Receiver states
 #define STATE_IDLE     2
 #define STATE_MARK     3
 #define STATE_SPACE    4
@@ -76,6 +84,6 @@ extern volatile irparams_t irparams;
 //This was created to avoid include an initial fake value at the rawbuf[]
 //This was created to keep compatibility with IRRemote 
 // TODO fix RC5/RC6 and review examples , and document to allow move it to 0 
-#define OFFSET_START 1 
+#define OFFSET_START 0
 
 #endif

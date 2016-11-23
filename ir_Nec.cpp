@@ -17,10 +17,9 @@
 #define NEC_ONE_SPACE   1690 //3T
 #define NEC_ZERO_SPACE   560 //1T
 #define NEC_RPT_SPACE  40000 
-//#define NEC_RPT_MARK    2000 
 
 // Calculate data based on  address and commnd .  
-unsigned long IRsend::hashNEC(unsigned int address ,unsigned  int command ) {
+unsigned long IRsend::rawNEC(unsigned int address ,unsigned  int command ) {
    return ( address << 24) + ((address ^ 0xFF) << 16) + ( command <<  8) + (command ^ 0xFF); 
 }
 
@@ -87,8 +86,8 @@ bool IRrecv::decodeNEC(decode_results *results) {
   results->address     = address ; 
   results->decode_type = NEC;
   
-  // Decode address,command to use latter 
-  //Serial.println(String(hashNEC(address,command),HEX)); 
+  //Decode address,command to use latter as send input 
+  //Serial.println(String(rawNEC(address,command),HEX)); 
  
   return true;
 }

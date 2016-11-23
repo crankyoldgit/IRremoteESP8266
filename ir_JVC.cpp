@@ -23,31 +23,19 @@
 
 
 
-//+=============================================================================
-// JVC does NOT repeat by sending a separate code (like NEC does).
-// The JVC protocol repeats by skipping the header.
-// To send a JVC repeat signal, send the original code value
-//   and set 'repeat' to true
-//
+
 #if SEND_JVC
 
-// DEPRECATED please use another signature 
-////void  IRsend::sendJVC (unsigned long data,  int nbits, bool repeat ){
-
- //   IRsend::sendJVC ( data, nbits);
-//{
-
-void  IRsend::sendJVC (unsigned long data,  int nbits){
-  //left repeat for now just to keep compatibility 
- // Set IR carrier frequency
+// DEPRECATED repeat please use just two parameters and send just a time  
+void  IRsend::sendJVC (unsigned long data,  int nbits ){
   enableIROut(38);
-  // Only send the Header if this is NOT a repeat command
-
-  //if (!repeat){
+  // Header 
+  //+=============================================================================
+  // JVC does NOT repeat by sending a separate code (like NEC does).
+  // The JVC protocol repeats by skipping the header.
   mark( JVC_HDR_MARK );
   space(JVC_HDR_SPACE);
-  //}
-  for (int j = 0; j < MIN_REPEAT; j++) { 
+  for  (int j = 0; j < MIN_REPEAT; j++) { 
     // Data
     for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
       mark( JVC_BIT_MARK );
@@ -70,7 +58,7 @@ bool IRrecv::decodeJVC(decode_results *results) {
   if (irparams.rawlen < 2 * JVC_BITS + OFFSET_START)  return false;
   
   // Header  
-  if (!MATCH_MARK(results->rawbuf[offset++],  JVC_HDR_MARK))  return false;
+  if (!MATCH_MARK( results->rawbuf[offset++], JVC_HDR_MARK))  return false;
   if (!MATCH_SPACE(results->rawbuf[offset++], JVC_HDR_SPACE)) return false;
   
   // Data

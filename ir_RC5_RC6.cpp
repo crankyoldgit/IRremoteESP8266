@@ -20,7 +20,7 @@ int  IRrecv::getRClevel (decode_results *results,  int *offset,  int *used,  int
 
 	if (*offset >= results->rawlen)  return SPACE ;  // After end of recorded buffer, assume SPACE.
 	width      = results->rawbuf[*offset];
-	val        = ((*offset) % 2) ? MARK : SPACE;
+	val        = ((*offset+(1-OFFSET_START)) % 2) ? MARK : SPACE;
         if (val ==MARK) {
 	  if      (match_mark_nolog(width,   t1 ))  avail = 1 ;
 	  else if (match_mark_nolog(width, 2*t1 ))  avail = 2 ;

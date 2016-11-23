@@ -24,8 +24,9 @@
 //------------------------------------------------------------------------------
 // The ISR header contains several useful macros the user may wish to use
 //
+//------------------------------------------------------------------------------
 #include "IRremoteInt.h"
-#include "IRremoteESP8266.h"
+
 //------------------------------------------------------------------------------
 // Supported IR protocols
 // Each protocol you include costs memory and, during decode, costs time
@@ -58,7 +59,7 @@
 #define DECODE_AIWA_RC_T501  0  // it can use SANYO instead that uses the same protocol 
 #define SEND_AIWA_RC_T501    1  // better remove it as a hardcoded to a specific device 
 
-#define DECODE_LG_32         1 //msrcosamarinho
+#define DECODE_LG_32         1  //marcosamarinho
 #define DECODE_LG            1  
 #define SEND_LG              1
 
@@ -74,7 +75,7 @@
 #define DECODE_SHARP         1 //marcosamarinho
 #define SEND_SHARP           1
 
-#define DECODE_DENON         1  //Sound be the same as SHARP 
+#define DECODE_DENON         1  //Sound be the same as SHARP TODO check it 
 #define SEND_DENON           1
 
 #define DECODE_PRONTO        0 // This function doe not logically make sense
@@ -85,10 +86,13 @@
 // ESP8266
 #define DECODE_COOLIX        0 
 #define SEND_COOLIX          1
+
 #define DECODE_DAIKIN        1 
 #define SEND_DAIKIN          1
+
 #define SEND_GC              1
-#define DECODE_HASH          1 
+
+#define DECODE_HASH          1 // Create a hash if 
  
 //------------------------------------------------------------------------------
 // When sending a Pronto code we request to send either the "once" code
@@ -183,14 +187,15 @@ decode_type_t;
 // Results returned from the decoder
 class decode_results {
 public:
-  int decode_type;                 // UNKNOWN, NEC, SONY, RC5, ...
+  int decode_type;                 // number of  UNKNOWN, NEC, SONY, RC5, ...
+  String protocol;                 // UNKNOWN, NEC, SONY, RC5, ..
   unsigned long long value;        // Decoded value
   int address;                     // Decoded Device Address
   int command;                     // Decoded command    
   int bits;                        // Number of bits in decoded value
   volatile unsigned int *rawbuf;  // Raw intervals in .5 us ticks
   int rawlen;                      // Number of records in rawbuf.
-  //int                    overflow;     // true iff IR raw code too long
+ // int overflow;                    // true iff IR raw code too long TODO implement 
 };
 
 //------------------------------------------------------------------------------
@@ -206,9 +211,9 @@ class IRrecv
 {
 	public:
 		IRrecv (int recvpin) ;
-		//IRrecv (int recvpin, int blinkpin);
+		//IRrecv (int recvpin, int blinkpin); // TODO implement 
 		//void  blink13  (int blinkflag) ;
-		//bool  isIdle   () ;
+		bool  isIdle   () ;
 		int   decode     (decode_results *results) ;
 		int   decodeESP8266(decode_results *results);
 		void  enableIRIn () ;
@@ -345,8 +350,14 @@ int IRpin;
 		void  mark_encode               (bool bit,int timeH,int timeL ) ; 
 		void  addBit                    (unsigned long long  &data,bool  bit) ; 
   		void  sendRaw     		 (const unsigned int buf[],  unsigned int len,  unsigned int hz) ;
-
-
+		void  sendRaw                    (unsigned int buf[], int len, int hz);
+                // new generic ones to be used at client to allow new protocols without change code nt void IRsend::protocol2id (String protocol)      
+      
+		int protocol2id  (String protocol); 
+                bool send_raw    (String protocol, long long rawData, int IrBits) ; 
+		bool send_raw    (int id         , long long rawData, int bits); 
+		bool send_address(String protocol, int address       , int command); 
+		bool send_address(int id         , int address       , int command);  
 		//......................................................................
 #		if SEND_RC5
 			void  sendRC5        (unsigned long data,  int nbits) ;
@@ -356,7 +367,7 @@ int IRpin;
 #		endif
 		//......................................................................
 #		if SEND_NEC
-			unsigned long hashNEC(unsigned int address ,unsigned  int command ); 
+			unsigned long rawNEC(unsigned int address ,unsigned  int command ); 
 			void  sendNEC        (unsigned long data,  int nbits) ;
 #		endif
 		//......................................................................
@@ -364,24 +375,8 @@ int IRpin;
 			void  sendSony       (unsigned long data,  int nbits) ;
 #		endif
 		//......................................................................
-#		if SEND_PANASONIC
-			void  sendPanasonic  (unsigned int address,  unsigned int command) ;
-#		endif
-		//......................................................................
-#		if SEND_SANYO
-			void  sendSanyo      (unsigned int address,  unsigned int command) ; // NOT WRITTEN
-#		endif
-		//......................................................................
 #		if SEND_JVC
-			// JVC does NOT repeat by sending a separate code (like NEC does).
-			// The JVC protocol repeats by skipping the header.
-			// To send a JVC repeat signal, send the original code value
-			//   and set 'repeat' to true
-                        // DEPRECATED PLEASE USE ANOTHER SIGNATURE 
-                        // this already loop two times same as sony 
-			//void  sendJVC        (unsigned long data,  int nbits,  bool repeat = true) ;
                         void  sendJVC        (unsigned long data,  int nbits) ;
-
 #		endif
 		//......................................................................
 #		if SEND_SAMSUNG
@@ -390,10 +385,6 @@ int IRpin;
 		//......................................................................
 #		if SEND_WHYNTER
 			void  sendWhynter    (unsigned long data,  int nbits) ;
-#		endif
-		//......................................................................
-#		if SEND_AIWA_RC_T501
-			void  sendAiwaRCT501 (int code) ;
 #		endif
 		//......................................................................
 #		if SEND_LG
@@ -408,13 +399,25 @@ int IRpin;
 			void  sendDISH       (unsigned long data,  int nbits) ;
 #		endif
 		//......................................................................
+#		if SEND_DENON
+			void  sendDenon      (unsigned long data,  int nbits) ;
+#		endif
+		//......................................................................
 #		if SEND_SHARP
 			void  sendSharpRaw   (unsigned long data,  int nbits) ;     
 			void  sendSharp      (unsigned int address,  unsigned int command) ;  
 #		endif
+
+#		if SEND_AIWA_RC_T501
+			void  sendAiwaRCT501 (int code) ; // this sonds be te same as SAYO better take it out as it is an specific hardcoded control 
+#		endif
 		//......................................................................
-#		if SEND_DENON
-			void  sendDenon      (unsigned long data,  int nbits) ;
+#		if SEND_PANASONIC
+			void  sendPanasonic  (unsigned int address,  unsigned int command) ;
+#		endif
+		//......................................................................
+#		if SEND_SANYO
+			void  sendSanyo      (unsigned int address,  unsigned int command) ; 
 #		endif
 		//......................................................................
 #		if SEND_PRONTO
@@ -431,12 +434,12 @@ int IRpin;
 #		endif
 #		if SEND_COOLIX
 			void sendCOOLIX(unsigned long data, int nbits)  ;
- 		
 #		endif
 #		if SEND_GC
 			void sendGC(unsigned int buf[], int len);
 #		endif
-                void sendRaw(unsigned int buf[], int len, int hz);
+              
+
 } ;
 
 #endif

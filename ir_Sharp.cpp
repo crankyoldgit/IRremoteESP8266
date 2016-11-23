@@ -22,22 +22,12 @@
 // oscilloscope:
 //   Sharp LCD TV:
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
-/*
-#define SHARP_BITS             15
-#define SHARP_BIT_MARK        245
-#define SHARP_ONE_SPACE      1805
-#define SHARP_ZERO_SPACE      795
-#define SHARP_GAP          600000
-#define SHARP_RPT_SPACE      3000
-*/
+
 #define SHARP_BITS              15
 #define SHARP_BIT_MARK         320
 #define SHARP_ONE_SPACE       1650
 #define SHARP_ZERO_SPACE       650
 #define SHARP_RPT_SPACE      46000
-
-
-
 
 #define SHARP_TOGGLE_MASK  0x3FF
 
@@ -89,8 +79,6 @@ bool IRrecv::decodeSharp(decode_results *results) {
   // TODO check the inverted value post repeat to check integrity 
   // Success
   results->bits        = SHARP_BITS; 
-  //results->address     = data >> 12; 
-  //results->command     = data & 0xFF; 
   results->value       = data;
   results->decode_type = SHARP;
   return true;
