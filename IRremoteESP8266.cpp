@@ -28,7 +28,7 @@
  ****************************************************/
 
 #include "IRremoteESP8266.h"
-#include "IRremoteInt.h" 
+#include "IRremoteInt.h"
 
 // These versions of MATCH, MATCH_MARK, and MATCH_SPACE are only for debugging.
 // To use them, set DEBUG in IRremoteInt.h
