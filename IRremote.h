@@ -140,7 +140,7 @@ decode_type_t;
 //------------------------------------------------------------------------------
 // Uncomment  DEBUG for lots of lovely debug output
 // Now it is returning the dump too !!!
-#define DEBUG  1
+// #define DEBUG  1
 
 
 //------------------------------------------------------------------------------
