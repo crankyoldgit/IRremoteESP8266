@@ -320,7 +320,7 @@ int IRpin;
 			void  sendRC5        (unsigned long data,  int nbits) ;
 #		endif
 #		if SEND_RC6
-			void  sendRC6        (unsigned long data,  int nbits) ;
+			void  sendRC6        (unsigned long long data,  int nbits) ;
 #		endif
 		//......................................................................
 #		if SEND_NEC

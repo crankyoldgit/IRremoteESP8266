@@ -5,7 +5,7 @@
 - Fix NEC and implement check integrity. 
 - Fix SHARP .
 - Fix SANYO ,now AIWA can be decoded too , AIWA_RC_T501 was disabled in IRremote.h as it is a so specific control .
-- RC5/RC6 Clean up Debug and include VERBOSE as optional.
+- RC5/RC6 Clean up Debug and include VERBOSE as optional , rc6 changed to long long to accepts larger then 32 bits . 
 - PANASONIC 48 bits works now  see LONG LONG data Rawdata. 
 - Implemented LG 32 bits and changed SAMSUNG to have the right decode based on Repeat times .
 - Implemented dutycycle as variable see IRsend::enableIROut(int khz,int dutycycle)  .
