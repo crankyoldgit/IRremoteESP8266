@@ -76,6 +76,10 @@ bool IRrecv::decodeLG(decode_results *results) {
    if (!space_decode(data,results->rawbuf[offset++],LG_ONE_SPACE,LG_ZERO_SPACE)) return false;
    if (!MATCH_MARK(results->rawbuf[offset++], LG_BIT_MARK)) return false;
   }
+   // Forced decode repetition to avoid Sanyo that have same times  
+  if (!MATCH_SPACE(results->rawbuf[offset++], LG_RPT_LENGTH)) return false;
+  if (!MATCH_MARK( results->rawbuf[offset++], LG_HDR_MARK  )) return false;
+
   // Success
   results->bits        = LG_BITS;
   results->value       = data;
@@ -104,7 +108,7 @@ void IRsend::sendLG (unsigned long data, int nbits) {
     // forced decode footer  for not take Samsung that have the same times 
     space(LG_RPT_LENGTH_32); 
     mark( LG_HDR_MARK_32  ); 
-    space(0); //force low 
+    space(LG_HDR_SPACE_32); //force low 
  
   } else { 
     //28 bits 
@@ -114,9 +118,11 @@ void IRsend::sendLG (unsigned long data, int nbits) {
     // Data bits 
     for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
       space_encode(data & mask,LG_ONE_SPACE,LG_ZERO_SPACE);
-      mark(LG_BIT_MARK_32);
+      mark(LG_BIT_MARK);
     }
     space(LG_RPT_LENGTH);  
+    mark( LG_HDR_MARK );
+    space(LG_HDR_SPACE); 
   }
 }
 

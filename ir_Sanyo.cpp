@@ -59,10 +59,16 @@ bool IRrecv::decodeSanyo(decode_results *results) {
   int address ; 
   int not_command ; 
   int not_address ; 
-  not_command = data & 0xFFLL; 
-  command     = data>>(     8) & 0xFFLL; 
   address     = data>>(13+8+8);
   not_address = data>>(   8+8) & 0x1FFF ; 
+  command     = data>>(     8) & 0xFF; 
+  not_command = data           & 0xFF; 
+
+  Serial.println(address,HEX); 
+  Serial.println(not_address,HEX);
+  Serial.println(command,HEX); 
+  Serial.println(not_command,HEX); 
+  
   // Checksum
   if (!(command ^ 0xFF == not_command) || !(address ^ 0x1FFF == not_address)) {
     Serial.println(" *** SANYO checksum error:") ; 
@@ -79,24 +85,30 @@ bool IRrecv::decodeSanyo(decode_results *results) {
 #endif
 #if SEND_SANYO
 
-void IRsend::sendSanyo(unsigned int address , unsigned int  command) {
+void IRsend::sendSanyo(unsigned int address , unsigned int command) {
   enableIROut(38,3); //dutycycle 33% ; 
   // Header 
   mark(SANYO_HDR_MARK);
   space(SANYO_HDR_SPACE);
-  unsigned long long rawData=0; 
-  // Address 
-  for (unsigned long  mask = 1UL << (13 - 1); mask;  mask >>= 1)  addBit(rawData,address & mask  );  
-   // NOT Address 
-  for (unsigned long  mask = 1UL << (13 - 1); mask;  mask >>= 1) addBit(rawData,!(address & mask));
-  // Command 
-  for (unsigned long  mask = 1UL << (8 - 1);  mask;  mask >>= 1) addBit(rawData,address & mask   );
-  // NOT Command 
-  for (unsigned long  mask = 1UL << (8 - 1);  mask;  mask >>= 1) addBit(rawData,!(address & mask)); 
-  // Send rawData
-  for (unsigned long long mask = 1ULL << (SANYO_BITS - 1); mask;  mask >>= 1)  {
+   // Address 
+  for (unsigned long  mask = 1UL << (13 - 1); mask;  mask >>= 1) {
     mark(SANYO_BIT_MARK); 
-    space_encode(rawData,SANYO_ONE_SPACE,SANYO_ZERO_SPACE); 
+    space_encode(address &mask,SANYO_ONE_SPACE,SANYO_ZERO_SPACE); 
+  } 
+   // NOT Address 
+  for (unsigned long  mask = 1UL << (13 - 1); mask;  mask >>= 1) {
+    mark(SANYO_BIT_MARK); 
+    space_encode(!(address &mask),SANYO_ONE_SPACE,SANYO_ZERO_SPACE); 
+  }
+  // Command 
+  for (unsigned long  mask = 1UL << (8 - 1);  mask;  mask >>= 1) {
+    mark(SANYO_BIT_MARK); 
+    space_encode(command,SANYO_ONE_SPACE,SANYO_ZERO_SPACE); 
+  }
+  // NOT Command 
+  for (unsigned long  mask = 1UL << (8 - 1);  mask;  mask >>= 1) {
+    mark(SANYO_BIT_MARK); 
+    space_encode(!(command &mask),SANYO_ONE_SPACE,SANYO_ZERO_SPACE); 
   }
   // Footer 
   mark(SANYO_BIT_MARK);        

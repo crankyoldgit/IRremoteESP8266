@@ -1,27 +1,44 @@
-## 2.0.0 - 2016/11/
--- Fix protocols SHARP , changed data to LONG LONG to allow return 48 bits 
--- Fix SONY  and included repeatsee MIN_REPEAT and now decoding command and address 
--- Fix NEC and implement check integrity 
--- Fix SHARP 
--- Fix SANYO 
--- RC5/RC6 Clean up Debug and include VERBOSE .
--- PANASONIC 48 bits works now  check long long data Rawdata 
-, SONY, NEC, MITSUBISH and review the code 
--- Implemented LG 32 bits and changed SAMSUNG to have the right decode 
--- Changed to to take all times to allow check repeat times 
--- Implemented allow change dutycycle
--- changed all debug messages DEBUG to behavior as error to have a clear output 
--- Included dump when DEBUG 
--- JVC included the loop as default see MIN_REPEAT and changed signature to (unsigned long data,  int nbits)  
--- SONY  included the loop as default see MIN_REPEAT 
--- Include the address and comand at decode process to all protocos we know . 
--- Changed Rawdata decode to long long to allow decode larger numbers  
--- Split files and take changes from z30t0 
--- Changed USECPERTICK  to 1 
--- Created generic functions to be used at client to allow no changes when implementing new protocols 
--- Please use it ....
---   bool send_raw    (String protocol, long long rawData, int IrBits) ; 
---   bool send_raw    (int id         , long long rawData, int bits); 
---   bool send_address(String protocol, int address       , int command); 
---   bool send_address(integer id     , int address       , int command);  
+## 2.0.0 - 2016/11/25
+- Marcos Marinho marcosamarinho
+- Fix SHARP ,changed results->data to LONG LONG to allow return 48 bits. 
+- Fix SONY and included automatic repeat see MIN_REPEAT and now decoding command and address .
+- Fix NEC and implement check integrity. 
+- Fix SHARP .
+- Fix SANYO ,now AIWA can be decoded too , AIWA_RC_T501 was disabled in IRremote.h as it is a so specific control .
+- RC5/RC6 Clean up Debug and include VERBOSE as optional.
+- PANASONIC 48 bits works now  see LONG LONG data Rawdata. 
+- Implemented LG 32 bits and changed SAMSUNG to have the right decode based on Repeat times .
+- Implemented dutycycle as variable see IRsend::enableIROut(int khz,int dutycycle)  .
+- Changed all  DEBUG ,messages  to behavior as error to have a clear and nice output. 
+- Included dump of ir times when DEBUG to easier troubleshooting .
+- Changed the wait time to 80 miliseconds at timer to allow REPEAT treatment.
+- Include the address and comand at decode process to all protocos we know . 
+- Changed Rawdata decode to long long to allow decode larger numbers . 
+- Split files as z30t0/IRremote and merge changes . 
+- Created internal functions to simplify the code and to allow the code reuse. 
+- Changed USECPERTICK  to 1 to allow have times in microseconds without trunc on integer .
+- Created OFFSET_START to allow take the fake read value and keep compatibility with IRRemote
+- Created generic functions to be used at client to allow no changes when implementing new protocols '
+- Please change your code to use it as String to allow new protocols ...
+-    bool send_raw    (String protocol, long long rawData, int bits) .  
+-    bool send_address(String protocol, int address, int command, int bits). 
+## 1.0.0  
+- Based on the IRremote library for Arduino by Ken Shirriff 
+- Version 0.11 August, 2009
+- Copyright 2009 Ken Shirriff
+- For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
+- Modified by Paul Stoffregen <paul@pjrc.com> to support other boards and timers
+- Modified  by Mitra Ardron <mitra@mitra.biz> 
+- Added Sanyo and Mitsubishi controllers
+- Modified Sony to spot the repeat codes that some Sony's send
+- Interrupt code based on NECIRrcv by Joe Knapp
+- http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1210243556
+- Also influenced by http://zovirl.com/2008/11/12/building-a-universal-remote-with-an-arduino/
+- JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
+- LG added by Darryl Smith (based on the JVC protocol)
+- Whynter A/C ARC-110WD added by Francesco Meschia
+- Global Cache IR format sender added by Hisham Khalifa (http://www.hishamkhalifa.com)
+- Coolix A/C / heatpump added by bakrus
+- Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
+- Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
 

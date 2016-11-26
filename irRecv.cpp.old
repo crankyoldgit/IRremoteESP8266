@@ -1,9 +1,3 @@
-#include "IRremote.h"
-#include "IRremoteInt.h"
-
-#include <string>
-using std::string;
-
  /***************************************************
  * IRremote for ESP8266
  *
@@ -34,6 +28,10 @@ using std::string;
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
+#include "IRremote.h"
+#include "IRremoteInt.h"
+#include <string>
+using std::string;
 
 void id2protocol (int id,String& protocol) {
   switch (id) {
@@ -155,7 +153,8 @@ void  printDecoded(decode_results *results) {
 } 
 
 #ifdef DEBUG
-void  dump(decode_results *results) {
+void  dump(decode_results *results)
+{
   Serial.println("IR Received dump.");
   Serial.print("Results:");
   Serial.print(results->rawlen-OFFSET_START,  DEC);
@@ -274,116 +273,6 @@ bool IRrecv::space_decode(unsigned long long &data,int val, int timeOne, int tim
 } 
 
 
-//+=============================================================================
-// Decodes the received IR message
-// Returns 0 if no data ready, 1 if data ready.
-// Results of decoding are stored in results
-//
-int IRrecv::decode_protocols(decode_results *results) {
- #if DECODE_NEC
-  DBG_PRINTLN("Attempting NEC decode");
-  if (decodeNEC(results))  return true;
-#endif
-#if DECODE_SONY
-  DBG_PRINTLN("Attempting Sony decode");
-  if (decodeSony(results)) return true;
-#endif
-#if DECODE_SANYO
-  DBG_PRINTLN("Attempting Sanyo decode");
-  if (decodeSanyo(results))  return true;  
-#endif
-#if DECODE_MITSUBISHI
-  DBG_PRINTLN("Attempting Mitsubishi decode");
-  if (decodeMitsubishi(results)) return true;
-  #endif
-#if DECODE_RC5
-  DBG_PRINTLN("Attempting RC5 decode");
-  if (decodeRC5(results))  return true;
-#endif
-#if DECODE_RC6
-  DBG_PRINTLN("Attempting RC6 decode");
-  if (decodeRC6(results))  return true;
-#endif
-#if DECODE_PANASONIC
-  DBG_PRINTLN("Attempting Panasonic decode");
-  if (decodePanasonic(results)) return true;
-#endif
-#if DECODE_LG_32
-  DBG_PRINTLN("Attempting LG 32 bits decode");
-  if (decodeLG_32(results)) return true;
-#endif
-#if DECODE_LG 
-  DBG_PRINTLN("Attempting LG 28 bits decode");
-  if (decodeLG(results)) return true;
-#endif
-#if DECODE_JVC
-  DBG_PRINTLN("Attempting JVC decode");
-  if (decodeJVC(results))  return true;
-#endif
-#if DECODE_SAMSUNG
-  DBG_PRINTLN("Attempting SAMSUNG decode");
-  if (decodeSAMSUNG(results)) return true;
-#endif
-#if DECODE_SHARP
-  DBG_PRINTLN("Attempting SHARP decode");
-  if (decodeSharp(results)) return true;
-#endif
-#if DECODE_WHYNTER
-   DBG_PRINTLN("Attempting Whynter decode");
-   if (decodeWhynter(results))  return true;
-#endif
-#if DECODE_AIWA_RC_T501
-  DBG_PRINTLN("Attempting Aiwa RC-T501 decode");
-  if (decodeAiwaRCT501(results))  return true ;
-#endif
-#if DECODE_DENON
-  DBG_PRINTLN("Attempting Denon decode");
-  if (decodeDenon(results))  return true ;
-#endif
-#if DECODE_LEGO_PF
-  DBG_PRINTLN("Attempting Lego Power Functions");
-  if (decodeLegoPowerFunctions(results))  return true ;
-#endif
-
-  // decodeHash returns a hash on any input.
-  // Thus, it needs to be last in the list.
-  // If you add any decodes, add them before this.
-  #if DECODE_HASH
-  DBG_PRINTLN("Attempting HASH decode");
-  if (decodeHash(results))  return true ;
-  #endif
-  return false;
-}  
- 
-// Decodes the received IR message
-// Returns 0 if no data ready, 1 if data ready.
-// Results of decoding are stored in results
-int IRrecv::decode(decode_results *results) {
-  if (irparams.rcvstate != STATE_STOP) return false;
-  if (irparams.rawlen <15) {
-    resume(); 
-    return false; 
-  } 
-  results->rawbuf      = irparams.rawbuf;
-  results->rawlen       = irparams.rawlen;
-  // results->overflow    = irparams.overflow; 
-  results->command     = -1;  
-  results->address     = -1; 
-  #ifdef DEBUG
-  dump(results) ; 
-  #endif 
-  if ( decode_protocols(results) ) { 
-    id2protocol(results->decode_type, results->protocol) ; 
-    #ifdef DEBUG
-    printDecoded(results) ; 
-    #endif  
-    return true ; 
-  } 
-  // Throw away and start over
-  resume();
-  return false;
-}
-
 extern "C" {
 	#include "user_interface.h"
 	#include "gpio.h"
@@ -401,28 +290,37 @@ static void ICACHE_FLASH_ATTR read_timeout(void *arg) {
 }
 
 
+// resume 
+void IRrecv::resume() {
+  irparams.rcvstate = STATE_IDLE;
+  irparams.rawlen = 0;
+}
+
+bool  IRrecv::isIdle() {
+  return irparams.rcvstate == STATE_IDLE;
+}
+
+IRrecv::IRrecv(int recvpin) {
+  irparams.recvpin = recvpin;
+}
 
 static void ICACHE_FLASH_ATTR gpio_intr() {
   uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
   if (irparams.rcvstate == STATE_STOP) {
     return;
-  }
-	
+  }	
   static uint32_t start = 0;
   uint32_t now = system_get_time();
   if  (irparams.rcvstate == STATE_IDLE) {
     irparams.rcvstate = STATE_MARK;
-    // if OFFSET_START==1 Include an fake initial value to keep compatible with IR-Remote . 
+    // if OFFSET_START==1 Include an fake initial space to keep compatible with IR-Remote . 
     if ( OFFSET_START==1)    irparams.rawbuf[irparams.rawlen++] = 20 ; 
   } else { 
-    if (irparams.rcvstate == STATE_MARK) irparams.rcvstate = STATE_SPACE;
-    else                                  irparams.rcvstate = STATE_MARK;
-
     if (irparams.rawlen < RAWBUF) {
       irparams.rawbuf[irparams.rawlen++] = (now-start)/USECPERTICK ;
     } else { 
-      irparams.overflow = true; 
+      irparams.overflow= true; 
     }  
   }
   start = now;
@@ -432,37 +330,12 @@ static void ICACHE_FLASH_ATTR gpio_intr() {
 }
 
 
-void IRrecv::disableIRIn() {
-  //irReadTimer.stop();
-  //os_timer_disarm(&irReadTimer);   
-   ETS_INTR_LOCK();
-   ETS_GPIO_INTR_DISABLE();
-}
-
-//+=============================================================================
-
-IRrecv::IRrecv(int recvpin) {
-  irparams.recvpin = recvpin;
-  irparams.blinkflag = 0;
-}
-
-IRrecv::IRrecv (int recvpin, int blinkpin){
-	irparams.recvpin = recvpin;
-	irparams.blinkpin = blinkpin;
-	pinMode(blinkpin, OUTPUT);
-	irparams.blinkflag = 0;
-}
-
-
-//+=============================================================================
 // initialization
-//
 void IRrecv::enableIRIn() {
-
   // initialize state machine variables
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
-  
+  irparams.overflow = false; 
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, &timer);
@@ -470,68 +343,182 @@ void IRrecv::enableIRIn() {
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
 }
 
-/*
-//+=============================================================================
-// Enable/disable blinking of pin 13 on IR processing
-//
-void  IRrecv::blink13 (int blinkflag)
-{
-	irparams.blinkflag = blinkflag;
-	if (blinkflag)  pinMode(BLINKLED, OUTPUT) ;
-}
-*/
-
-//+=============================================================================
-// Return if receiving new IR signals
-//
-bool  IRrecv::isIdle ( )
-{
- return (irparams.rcvstate == STATE_IDLE || irparams.rcvstate == STATE_STOP) ? true : false;
+void IRrecv::disableIRIn() {
+  //irReadTimer.stop();
+  //os_timer_disarm(&irReadTimer);   
+   ETS_INTR_LOCK();
+   ETS_GPIO_INTR_DISABLE();
 }
 
-//+=============================================================================
-// Restart the ISR state machine
-//
-void  IRrecv::resume ( )
-{
-	irparams.rcvstate = STATE_IDLE;
-	irparams.rawlen = 0;
+
+int IRrecv::decodeESP8266(decode_results *results) {
+#if DECODE_NEC
+  #ifdef DEBUG
+    Serial.println("Attempting NEC decode");
+  #endif
+  if (decodeNEC(results))  return true;
+#endif
+#if DECODE_SONY
+  #ifdef DEBUG
+   Serial.println("Attempting Sony decode");
+  #endif
+  if (decodeSony(results)) return true;
+#endif
+#if DECODE_SANYO
+  #ifdef DEBUG
+    Serial.println("Attempting Sanyo decode");
+  #endif
+  if (decodeSanyo(results))  return true;  
+#endif
+#if DECODE_MITSUBISHI
+  #ifdef DEBUG
+    Serial.println("Attempting Mitsubishi decode");
+  #endif
+    if (decodeMitsubishi(results)) return true;
+  #endif
+#if DECODE_RC5
+  #ifdef DEBUG
+    Serial.println("Attempting RC5 decode");
+  #endif  
+  if (decodeRC5(results))  return true;
+#endif
+#if DECODE_RC6
+  #ifdef DEBUG
+    Serial.println("Attempting RC6 decode");
+  #endif 
+  if (decodeRC6(results))  return true;
+#endif
+#if DECODE_PANASONIC
+  #ifdef DEBUG
+    Serial.println("Attempting Panasonic decode");
+  #endif 
+  if (decodePanasonic(results)) return true;
+#endif
+#if DECODE_LG_32
+  #ifdef DEBUG
+    Serial.println("Attempting LG 32 bits decode");
+  #endif 
+  if (decodeLG_32(results)) return true;
+#endif
+#if DECODE_LG 
+  #ifdef DEBUG
+    Serial.println("Attempting LG 28 bits decode");
+  #endif 
+  if (decodeLG(results)) return true;
+#endif
+#if DECODE_JVC
+  #ifdef DEBUG
+    Serial.println("Attempting JVC decode");
+  #endif 
+  if (decodeJVC(results))  return true;
+#endif
+#if DECODE_SAMSUNG
+  #ifdef DEBUG
+    Serial.println("Attempting SAMSUNG decode");
+  #endif
+  if (decodeSAMSUNG(results)) return true;
+#endif
+#if DECODE_SHARP
+  #ifdef DEBUG
+    Serial.println("Attempting SHARP decode");
+  #endif
+  if (decodeSharp(results)) return true;
+#endif
+#if DECODE_WHYNTER
+  #ifdef DEBUG
+    Serial.println("Attempting Whynter decode");
+  #endif
+  if (decodeWhynter(results))  return true;
+#endif
+#if DECODE_AIWA_RC_T501
+  #ifdef DEBUG
+    Serial.println("Attempting Aiwa RC-T501 decode");
+  #endif
+  if (decodeAiwaRCT501(results))  return true ;
+#endif
+#if DECODE_DENON
+  #ifdef DEBUG
+    Serial.println("Attempting Denon decode");
+  #endif
+  if (decodeDenon(results))  return true ;
+#endif
+#if DECODE_LEGO_PF
+  #ifdef DEBUG
+    Serial.println("Attempting Lego Power Functions");
+  #endif
+  if (decodeLegoPowerFunctions(results))  return true ;
+#endif
+  // decodeHash returns a hash on any input.
+  // Thus, it needs to be last in the list.
+  // If you add any decodes, add them before this.
+#if DECODE_HASH
+  if (decodeHash(results))  return true;
+#endif 
+return false;
+}  
+ 
+// Decodes the received IR message
+// Returns 0 if no data ready, 1 if data ready.
+// Results of decoding are stored in results
+int IRrecv::decode(decode_results *results) {
+  if (irparams.rcvstate != STATE_STOP) return false;
+  results->rawbuf      = irparams.rawbuf;
+  results->rawlen      = irparams.rawlen;
+  results->overflow    = irparams.overflow; 
+  results->command     = -1;  
+  results->address     = -1; 
+  #ifdef DEBUG
+  dump(results) ; 
+  #endif 
+  if ( decodeESP8266(results) && (results->bits!=0)) { 
+    #ifdef DEBUG
+    printDecoded(results) ; 
+    #endif  
+    id2protocol(results->decode_type, results->protocol) ; 
+    return true ; 
+  } 
+  resume();
+  return false;
 }
 
-//+=============================================================================
-// hashdecode - decode an arbitrary IR code.
-// Instead of decoding using a standard encoding scheme
-// (e.g. Sony, NEC, RC5), the code is hashed to a 32-bit value.
-//
-// The algorithm: look at the sequence of MARK signals, and see if each one
-// is shorter (0), the same length (1), or longer (2) than the previous.
-// Do the same with the SPACE signals.  Hash the resulting sequence of 0's,
-// 1's, and 2's to a 32-bit value.  This will give a unique value for each
-// different code (probably), for most code systems.
-//
-// http://arcfn.com/2010/01/using-arbitrary-remotes-with-arduino.html
-//
+
+/* -----------------------------------------------------------------------
+ * hashdecode - decode an arbitrary IR code.
+ * Instead of decoding using a standard encoding scheme
+ * (e.g. Sony, NEC, RC5), the code is hashed to a 32-bit value.
+ *
+ * The algorithm: look at the sequence of MARK signals, and see if each one
+ * is shorter (0), the same length (1), or longer (2) than the previous.
+ * Do the same with the SPACE signals.  Hszh the resulting sequence of 0's,
+ * 1's, and 2's to a 32-bit value.  This will give a unique value for each
+ * different code (probably), for most code systems.
+ *
+ * http://arcfn.com/2010/01/using-arbitrary-remotes-with-arduino.html
+ */
+
 // Compare two tick values, returning 0 if newval is shorter,
 // 1 if newval is equal, and 2 if newval is longer
 // Use a tolerance of 20%
-//
-int  IRrecv::compare (unsigned int oldval,  unsigned int newval)
-{
-	if      (newval < oldval * .8)  return 0 ;
-	else if (oldval < newval * .8)  return 2 ;
-	else                            return 1 ;
+int IRrecv::compare(unsigned int oldval, unsigned int newval) {
+  if (newval < oldval * .8) {
+    return 0;
+  } else if ( oldval < newval * .8) {
+    return 2;
+  } else {
+    return 1;
+  }
 }
 
-//+=============================================================================
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
-// Converts the raw code values into a 32-bit hash code.
-// Hopefully this code is unique for each button.
-// This isn't a "real" decoding, just an arbitrary value.
-//
 #define FNV_PRIME_32 16777619
 #define FNV_BASIS_32 2166136261
 
- bool IRrecv::decodeHash(decode_results *results) {
+/* Converts the raw code values into a 32-bit hash code.
+ * Hopefully this code is unique for each button.
+ * This isn't a "real" decoding, just an arbitrary value.
+ */
+
+bool IRrecv::decodeHash(decode_results *results) {
   // take the dirt out when it is a noise 
   if (results->rawlen < 20+ OFFSET_START)  return false;
   long hash = FNV_BASIS_32;
