@@ -22,7 +22,8 @@
 - Please change your code to use it as String to allow new protocols ...
 -    bool send_raw    (String protocol, long long rawData, int bits) .  
 -    bool send_address(String protocol, int address, int command, int bits). 
-## 1.0.0  
+
+## 1.0.0  - 
 - Based on the IRremote library for Arduino by Ken Shirriff 
 - Version 0.11 August, 2009
 - Copyright 2009 Ken Shirriff

@@ -18,14 +18,12 @@
 #define NEC_ZERO_SPACE   560 //1T
 #define NEC_RPT_SPACE  40000 
 
-// Calculate data based on  address and commnd .  
-unsigned long IRsend::rawNEC(unsigned int address ,unsigned  int command ) {
-   return ( address << 24) + ((address ^ 0xFF) << 16) + ( command <<  8) + (command ^ 0xFF); 
-}
 
 //+=============================================================================
 #if SEND_NEC
-void IRsend::sendNEC(unsigned long data, int nbits) {
+
+void IRsend::sendNEC(unsigned long data, int nbits) { 
+
   // Set IR carrier frequency
   enableIROut(38);
   // Header
@@ -43,6 +41,16 @@ void IRsend::sendNEC(unsigned long data, int nbits) {
   mark( NEC_HDR_MARK  );
   space(NEC_ZERO_SPACE);
 }
+
+// Calculate data based on  address and commnd .  
+unsigned long IRsend::encodeNEC(unsigned int address ,unsigned  int command ) {
+   return ( address << 24) + ((address ^ 0xFF) << 16) + ( command <<  8) + (command ^ 0xFF); 
+}
+
+void IRsend::send_addressNEC(unsigned int address ,unsigned  int command,int nbits) { 
+  return sendNEC(encodeNEC( address, command ), nbits) ; 
+} 
+
 #endif
 //+=============================================================================
 // NECs have a repeat only 4 items long

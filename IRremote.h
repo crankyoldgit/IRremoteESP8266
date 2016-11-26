@@ -324,9 +324,10 @@ int IRpin;
 #		endif
 		//......................................................................
 #		if SEND_NEC
-			unsigned long rawNEC(unsigned int address ,unsigned  int command );
-			void  sendNEC        (unsigned long data,  int nbits) ;
-#		endif
+			void          sendNEC         (unsigned long data,  int nbits) ; //send_raw 
+			unsigned long encodeNEC       (unsigned int  address ,unsigned  int command );
+			void          send_addressNEC (unsigned int  address ,unsigned  int command, int nbits ); 
+ #		endif
 		//......................................................................
 #		if SEND_SONY
 			void  sendSony       (unsigned long data,  int nbits) ;

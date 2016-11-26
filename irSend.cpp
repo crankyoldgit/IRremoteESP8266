@@ -189,11 +189,14 @@ bool IRsend::send_address(String protocol, int address, int command, int bits) {
 
 bool IRsend::send_address(int id , int address, int command, int bits ) {  
   switch (id) {
-  #if SEND_NEC  
-  case PANASONIC : sendPanasonic   (address, command);  return true;  
+  #if SEND_PANASONIC  
+  case PANASONIC : sendPanasonic    (address, command     ); return true;  
   #endif 
-  #if SEND_SONY   
-  case SANYO     : sendSanyo       (address, command);  return true;  
+  #if SEND_SANYO   
+  case SANYO     : sendSanyo        (address, command     );  return true;  
+  #endif
+  #if SEND_NEC   
+  case NEC       : send_addressNEC  (address, command,bits); return true;  
   #endif
   }
   return false ; 

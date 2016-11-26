@@ -13,14 +13,15 @@ Marcos Marinho's notes :Many improvements and changes are done at this version, 
 To avoid changes use new functions so send IR . 
 
 
-Use for 32 bits  larger protocols  . 
+Use for 32 bits  larger protocols , need bits to allow generic protocols  . 
 
-     send_address("PANASONIC",0x4004,0x100bcbd); 
-     send_address("SANYO",0x1FC0,0x00); 
+     send_address("PANASONIC",0x4004,0x100bcbd,48); 
+     send_address("SANYO",0x1FC0,0x00,42); 
+
+     send_address("NEC",0x20,0x10,32); 
 
 Others .
-
-     send_raw("NEC",0xc53a9966,32) ; 
+     send_raw("NEC",0x20DF10EF,32) ; 
      send_raw("SONY",0x090,12) ; 
 
 Protocol is decoded to String at results->protocol. 
