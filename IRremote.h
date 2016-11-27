@@ -65,7 +65,7 @@
 #define DECODE_MITSUBISHI    1
 #define SEND_MITSUBISHI      1
 
-#define DECODE_DISH          0 // NOT WRITTEN
+#define DECODE_DISH          1 
 #define SEND_DISH            1
 
 #define DECODE_SHARP         1 
@@ -82,8 +82,8 @@
 
 // ESP8266 Specific
 
-#define DECODE_COOLIX        0  // Decoded as SAMSUNG . 
-#define SEND_COOLIX          1  // TODO as it is decoded as SAMSUNG check if is not the same protocol to disable it 
+#define DECODE_COOLIX        0  // Decoded as SAMSUNG . TODO fix decode to have the inversion protocol 
+#define SEND_COOLIX          1  // 
 
 #define DECODE_DAIKIN        1 
 #define SEND_DAIKIN          1
@@ -283,6 +283,10 @@ class IRrecv
 		//......................................................................
 #		if DECODE_DAIKIN
 			 bool decodeDaikin    (decode_results *results);
+#		endif
+		//......................................................................
+#		if DECODE_DISH
+			 bool decodeDISH     (decode_results *results);
 #		endif
 
 } ;

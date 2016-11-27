@@ -344,6 +344,10 @@ int IRrecv::decode_protocols(decode_results *results) {
   DBG_PRINTLN("Attempting Lego Power Functions");
   if (decodeLegoPowerFunctions(results))  return true ;
 #endif
+#if DECODE_DISH
+  DBG_PRINTLN("Attempting DISH decode");
+  if (decodeDISH(results))  return true ;
+#endif
 
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

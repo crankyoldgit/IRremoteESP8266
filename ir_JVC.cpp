@@ -67,7 +67,7 @@ bool IRrecv::decodeJVC(decode_results *results) {
     if (!space_decode(data,results->rawbuf[offset++],JVC_ONE_SPACE,JVC_ZERO_SPACE) )  return false;
   }
   if (!MATCH_MARK(results->rawbuf[offset++], JVC_BIT_MARK)) return false;
-  if (!(results->rawbuf[offset] > JVC_RPT_SPACE*.7))        return false;  // found JVC_RPT_SPACE
+  if (!(results->rawbuf[offset] > JVC_RPT_SPACE*.7))         return false;  // found JVC_RPT_SPACE
   // Success
   results->bits        = JVC_BITS;
   results->command     = data & 0xFF;

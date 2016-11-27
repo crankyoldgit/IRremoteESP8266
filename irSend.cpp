@@ -175,6 +175,9 @@ bool IRsend::send_raw(int id , long long rawData, int bits) {
     #if SEND_AIWA_RC_T501   
     case  AIWA_RC_T501 : sendAiwaRCT501 (rawData      ); return true;  
     #endif
+    #if SEND_DISH   
+    case  DISH         : sendDISH       (rawData, bits); return true;  
+    #endif
   }
   return false ; 
 }

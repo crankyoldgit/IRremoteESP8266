@@ -28,22 +28,55 @@
 #define DISH_ONE_SPACE   1700
 #define DISH_ZERO_SPACE  2800
 #define DISH_RPT_SPACE   6200
+#define MIN_REPEAT          4
 
 //+=============================================================================
 #if SEND_DISH
 void  IRsend::sendDISH (unsigned long data,  int nbits)
 {
-	// Set IR carrier frequency
-	enableIROut(56);
-
-	mark(DISH_HDR_MARK);
-	space(DISH_HDR_SPACE);
-
-	for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-                mark(DISH_BIT_MARK);
-		space_encode(data & mask,DISH_ONE_SPACE,DISH_ZERO_SPACE);
-	}
-	mark(DISH_HDR_MARK); //added 26th March 2016, by AnalysIR ( https://www.AnalysIR.com )
+ // Set IR carrier frequency
+  enableIROut(56);
+  for (int i=0 ; i<MIN_REPEAT; i++) {
+    // Header
+    mark(DISH_HDR_MARK);
+    space(DISH_HDR_SPACE);
+    // Data
+    for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
+       mark(DISH_BIT_MARK);
+       space_encode(data & mask,DISH_ONE_SPACE,DISH_ZERO_SPACE);
+    }
+    // Footer
+    mark( DISH_HDR_MARK); //added 26th March 2016, by AnalysIR ( https://www.AnalysIR.com )
+    space(DISH_RPT_SPACE);  
+  }
+       
+}
+#endif
+#if DECODE_DISH
+bool IRrecv::decodeDISH(decode_results *results) {
+  if (irparams.rawlen < 2 * DISH_BITS + 1 + OFFSET_START) return false;
+ 
+  unsigned   long data = 0;
+  int offset = OFFSET_START;  // Skip first space
+  
+  // Header   
+  if (!MATCH_MARK( results->rawbuf[offset++], DISH_HDR_MARK))  return false;
+  if (!MATCH_SPACE(results->rawbuf[offset++], DISH_HDR_SPACE)) return false;
+  
+  // Data bits 
+  for (int i = 0; i < DISH_BITS ; i++) {
+    if (!MATCH_MARK(results->rawbuf[offset++], DISH_BIT_MARK)) return false;
+    if (!space_decode(data,results->rawbuf[offset++],DISH_ONE_SPACE,DISH_ZERO_SPACE))  return false;
+  }
+  // Footer
+  if (!MATCH_MARK( results->rawbuf[offset++], DISH_HDR_MARK )) return false;
+  if (!MATCH_SPACE(results->rawbuf[offset++], DISH_RPT_SPACE)) return false;
+  
+  // Success
+  results->bits        = DISH_BITS ;
+  results->value       = data;
+  results->decode_type = DISH;
+  return true;
 }
 #endif
 
