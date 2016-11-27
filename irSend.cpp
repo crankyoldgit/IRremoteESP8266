@@ -107,9 +107,9 @@ void IRsend::addBit(unsigned long long &data,bool  bit) {
 
 //Convert hex string to long long 64bits  
 long long s16toll(String hex_value) {
-  long long ll = 0;
-  for (int i = hex_value.length() - 1; i >= 0; i--) {
-    char ch = hex_value.charAt(i);
+ long long ll = 0;
+ for (int i =0; i<hex_value.length() ; i++) {
+   char ch = hex_value.charAt(i);
     int val = int(ch);
     if (ch >= '0' && ch <= '9') {
        val -= 48;  // '0' -> 48

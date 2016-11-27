@@ -26,6 +26,10 @@ Others protocols use send_raw .
    
      send_raw("SONY",0x090,12) ;
      send_raw("JVC",0xf900,16) ;
+     or
+     send_raw("SONY","090",12) ;
+     Note , thid signature as String allows larger 32bits  raw data,and easy conversion to long long 
+     
              
 Protocol number is decoded to String at results->protocol. 
 
