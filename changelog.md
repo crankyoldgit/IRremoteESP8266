@@ -20,8 +20,10 @@
 - Created OFFSET_START to allow take the fake read value and keep compatibility with IRRemote
 - Created generic functions to be used at client to allow no changes when implementing new protocols '
 - Please change your code to use it as String to allow new protocols ...
--    bool send_raw    (String protocol, long long rawData, int bits) .  
--    bool send_address(String protocol, int address, int command, int bits). 
+-    bool     send_raw    (String protocol, String  hexRawData, int bits) // this allows easy input rawData larger 32 bits  
+-    or  bool send_raw    (String protocol, long long rawData , int bits) .  
+-    To send alreacy decoded Device address and command 
+-    bool     send_address(String protocol, int address, int command, int bits). 
 
 ## 1.0.0  - 
 - Based on the IRremote library for Arduino by Ken Shirriff 

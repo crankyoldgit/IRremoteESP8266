@@ -103,14 +103,36 @@ void IRsend::addBit(unsigned long long &data,bool  bit) {
   } else {
     data <<= 1; 
   } 
-} 
+}
 
+//Convert hex string to long long 64bits  
+long long s16toll(String hex_value) {
+  long long ll = 0;
+  for (int i = hex_value.length() - 1; i >= 0; i--) {
+    char ch = hex_value.charAt(i);
+    int val = int(ch);
+    if (ch >= '0' && ch <= '9') {
+       val -= 48;  // '0' -> 48
+    } else if (ch >= 'A' && ch <= 'F') {
+       val -= 55;  // 'A' 65   65-10 = 55 
+    } else if (ch >= 'a' && ch <= 'f') {
+       val -= 87;  // 'A' 97   97-10 = 87 
+    }
+    ll = ll << 4 | val ;
+  }
+  return ll;
+}
+
+// Created to simplify client implementation and allow long long conversion 
+bool IRsend::send_raw(String protocol, String hexRawData, int bits) {  
+  return send_raw(protocol,(long long ) s16toll(hexRawData),bits) ; 
+}  
 
 // Created to simplify client implementation . 
 bool IRsend::send_raw(String protocol, long long rawData, int bits) {  
   return send_raw(protocol2id(protocol), rawData, bits) ; 
 }
-
+  
 bool IRsend::send_raw(int id , long long rawData, int bits) {  
   switch (id) {
     // default:
@@ -154,7 +176,7 @@ bool IRsend::send_raw(int id , long long rawData, int bits) {
     case  AIWA_RC_T501 : sendAiwaRCT501 (rawData      ); return true;  
     #endif
   }
-  return false ; 
+  return false ; r
 }
 
 int  IRsend::protocol2id(String protocol) {
@@ -181,22 +203,24 @@ int  IRsend::protocol2id(String protocol) {
   else if (protocol.equalsIgnoreCase("GC"          )) return  GC;  
   else return UNKNOWN; 
 }
-  
-     
+
 bool IRsend::send_address(String protocol, int address, int command, int bits) {  
   return send_address(protocol2id(protocol), address, command,bits); 
 }
 
+// Note: forced bits to allow generic protocols with different bits 
 bool IRsend::send_address(int id , int address, int command, int bits ) {  
+  // larger then 32 bits  
   switch (id) {
   #if SEND_PANASONIC  
-  case PANASONIC : sendPanasonic    (address, command     ); return true;  
+  case PANASONIC : sendPanasonic    (address, command      ); return true;  
   #endif 
   #if SEND_SANYO   
-  case SANYO     : sendSanyo        (address, command     );  return true;  
+  case SANYO     : sendSanyo        (address, command      );  return true;  
   #endif
+  // Others   
   #if SEND_NEC   
-  case NEC       : send_addressNEC  (address, command,bits); return true;  
+  case NEC       : send_addressNEC  (address, command, bits); return true;  
   #endif
   }
   return false ; 

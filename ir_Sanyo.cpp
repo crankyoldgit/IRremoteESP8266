@@ -63,12 +63,6 @@ bool IRrecv::decodeSanyo(decode_results *results) {
   not_address = data>>(   8+8) & 0x1FFF ; 
   command     = data>>(     8) & 0xFF; 
   not_command = data           & 0xFF; 
-
-  Serial.println(address,HEX); 
-  Serial.println(not_address,HEX);
-  Serial.println(command,HEX); 
-  Serial.println(not_command,HEX); 
-  
   // Checksum
   if (!(command ^ 0xFF == not_command) || !(address ^ 0x1FFF == not_address)) {
     Serial.println(" *** SANYO checksum error:") ; 
