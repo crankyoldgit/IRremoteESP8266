@@ -83,13 +83,13 @@
 // ESP8266 Specific
 
 #define DECODE_COOLIX        0  // Decoded as SAMSUNG . TODO fix decode to have the inversion protocol 
-#define SEND_COOLIX          1  // 
+#define SEND_COOLIX          1  
 
 #define DECODE_DAIKIN        1 
 #define SEND_DAIKIN          1
 
 #define SEND_GC              1
-#define DECODE_HASH          1 // Create a hash if 
+#define DECODE_HASH          1  // Create a hash if 
  
 //------------------------------------------------------------------------------
 // When sending a Pronto code we request to send either the "once" code

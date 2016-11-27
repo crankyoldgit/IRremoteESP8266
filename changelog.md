@@ -8,6 +8,7 @@
 - RC5/RC6 Clean up Debug and include VERBOSE as optional , rc6 changed to long long to accepts larger then 32 bits . 
 - PANASONIC 48 bits works now  see LONG LONG data Rawdata. 
 - Implemented LG 32 bits and changed SAMSUNG to have the right decode based on Repeat times .
+- Implemented DISH decode . 
 - Implemented dutycycle as variable see IRsend::enableIROut(int khz,int dutycycle)  .
 - Changed all  DEBUG ,messages  to behavior as error to have a clear and nice output. 
 - Included dump of ir times when DEBUG to easier troubleshooting .
@@ -24,6 +25,7 @@
 -    or  bool send_raw    (String protocol, long long rawData , int bits) .  
 -    To send alreacy decoded Device address and command 
 -    bool     send_address(String protocol, int address, int command, int bits). 
+
 
 ## 1.0.0  - 
 - Based on the IRremote library for Arduino by Ken Shirriff 

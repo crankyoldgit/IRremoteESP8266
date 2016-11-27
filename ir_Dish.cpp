@@ -11,7 +11,7 @@
 
 // Sharp and DISH support by Todd Treece ( http://unionbridge.org/design/ircommand )
 //
-// The sned function needs to be repeated 4 times
+// The send function needs to be repeated 4 times
 //
 // Only send the last for characters of the hex.
 // I.E.  Use 0x1C10 instead of 0x0000000000001C10 as listed in the LIRC file.
@@ -60,10 +60,10 @@ bool IRrecv::decodeDISH(decode_results *results) {
   int offset = OFFSET_START;  // Skip first space
   
   // Header   
-  if (!MATCH_MARK( results->rawbuf[offset++], DISH_HDR_MARK))  return false;
+  if (!MATCH_MARK( results->rawbuf[offset++], DISH_HDR_MARK )) return false;
   if (!MATCH_SPACE(results->rawbuf[offset++], DISH_HDR_SPACE)) return false;
   
-  // Data bits 
+  // Data 
   for (int i = 0; i < DISH_BITS ; i++) {
     if (!MATCH_MARK(results->rawbuf[offset++], DISH_BIT_MARK)) return false;
     if (!space_decode(data,results->rawbuf[offset++],DISH_ONE_SPACE,DISH_ZERO_SPACE))  return false;
