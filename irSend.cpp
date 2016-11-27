@@ -176,7 +176,7 @@ bool IRsend::send_raw(int id , long long rawData, int bits) {
     case  AIWA_RC_T501 : sendAiwaRCT501 (rawData      ); return true;  
     #endif
   }
-  return false ; r
+  return false ; 
 }
 
 int  IRsend::protocol2id(String protocol) {

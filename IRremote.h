@@ -311,10 +311,11 @@ int IRpin;
   		void  sendRaw     		 (const unsigned int buf[],  unsigned int len,  unsigned int hz) ;
 		void  sendRaw                    (unsigned int buf[], int len, int hz);
 		int   protocol2id  (String protocol); 
-                bool send_raw    (String protocol, long long rawData, int bits) ; 
-		bool send_raw    (int id         , long long rawData, int bits); 
-		bool send_address(String protocol, int address       , int command, int bits);  
-		bool send_address(int id         , int address       , int command, int bits);  
+ 		bool  send_raw    (String protocol, String     hexRawData, int bits) ; // use this to allow simplify imput long long as hex String 
+                bool  send_raw    (String protocol, long long rawData   , int bits) ; 
+		bool  send_raw    (int id         , long long rawData   , int bits); 
+		bool  send_address(String protocol, int address         , int command, int bits);  
+		bool  send_address(int id         , int address         , int command, int bits);  
 		//......................................................................
 #		if SEND_RC5
 			void  sendRC5        (unsigned long data,  int nbits) ;
