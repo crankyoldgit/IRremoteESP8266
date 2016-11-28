@@ -266,7 +266,7 @@ class IRrecv
 #		endif
 		//......................................................................
 #		if DECODE_DISH
-			bool  decodeDish       (decode_results *results) ; // NOT WRITTEN
+			bool  decodeDish       (decode_results *results) ; 
 #		endif
 		//......................................................................
 #		if DECODE_SHARP
@@ -309,17 +309,16 @@ int IRpin;
 		void  enableIROut 		(int khz, int dutycycle=2 ) ;  // 2 meaning 1/2 -> 50% ,  3 to 33%,  4 to 25%. 
 		void  mark        		(unsigned int usec) ;
 		void  space       		(unsigned int usec) ;
-		void  space_encode              (bool bit,int timeH,int timeL ) ; 
-		void  mark_encode               (bool bit,int timeH,int timeL ) ; 
-		void  addBit                    (unsigned long long  &data,bool  bit) ; 
+		void  space_encode              (bool         bit, int timeH, int timeL ) ; 
+		void  mark_encode               (bool         bit, int timeH, int timeL ) ; 
+		void  addBit                    (unsigned long long    &data, bool  bit) ; 
   		void  sendRaw     		 (const unsigned int buf[],  unsigned int len,  unsigned int hz) ;
-		void  sendRaw                    (unsigned int buf[], int len, int hz);
 		int   protocol2id  (String protocol); 
- 		bool  send_raw    (String protocol, String     hexRawData, int bits) ; // use this to allow simplify imput long long as hex String 
+ 		bool  send_raw    (String protocol, String     hexRawData, int bits) ; // use this to allow simplify input long long as hex String 
                 bool  send_raw    (String protocol, long long rawData   , int bits) ; 
 		bool  send_raw    (int id         , long long rawData   , int bits); 
-		bool  send_address(String protocol, int address         , int command, int bits);  
-		bool  send_address(int id         , int address         , int command, int bits);  
+		bool  send_address(String protocol, int        address   , int command, int bits);  
+		bool  send_address(int id         , int        address   , int command, int bits);  
 		//......................................................................
 #		if SEND_RC5
 			void  sendRC5        (unsigned long data,  int nbits) ;
