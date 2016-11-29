@@ -187,7 +187,8 @@ int  IRsend::protocol2id(String protocol) {
   else if (protocol.equalsIgnoreCase("RC5"         )) return  RC5;  
   else if (protocol.equalsIgnoreCase("RC6"         )) return  RC6;  
   else if (protocol.equalsIgnoreCase("NEC"         )) return  NEC;   
-  else if (protocol.equalsIgnoreCase("SONY"        )) return  SONY;  
+// use protocol if exists see https://www.mikrocontroller.net/articles/IRMP_-_english#SIRCS
+  else if (protocol.equalsIgnoreCase("SIRCS"       )) return  SONY;  
   else if (protocol.equalsIgnoreCase("JVC"         )) return  JVC;   
   else if (protocol.equalsIgnoreCase("PANASONIC"   )) return  PANASONIC;    
   else if (protocol.equalsIgnoreCase("SAMSUNG"     )) return  SAMSUNG;  

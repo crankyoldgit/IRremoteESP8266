@@ -14,10 +14,13 @@
 #define NEC_HDR_MARK    9000
 #define NEC_HDR_SPACE   4500
 #define NEC_BIT_MARK     560
-#define NEC_ONE_SPACE   1690 //3T
-#define NEC_ZERO_SPACE   560 //1T
+#define NEC_ONE_SPACE   1690 // 3T
+#define NEC_ZERO_SPACE   560 // 1T
 #define NEC_RPT_SPACE  40000 
 
+// [Data NEC] 	   8 address bits + 8 inverted address bits + 8 command bits + 8 inverted command bits
+// [Extended NEC] 16 address bits + 8 command bits + 8 inverted command bits
+// NEC, Pioneer, JVC, Toshiba, NoName etc. 
 
 //+=============================================================================
 #if SEND_NEC
@@ -42,9 +45,13 @@ void IRsend::sendNEC(unsigned long data, int nbits) {
   space(NEC_ZERO_SPACE);
 }
 
-// Calculate data based on  address and commnd .  
+// Calculate Raw data based on  address and commnd .  
 unsigned long IRsend::encodeNEC(unsigned int address ,unsigned  int command ) {
-   return ( address << 24) + ((address ^ 0xFF) << 16) + ( command <<  8) + (command ^ 0xFF); 
+   if ( address>0xFF ) {
+      // Extended NEC 
+      return (address << 16) + (command <<  8) + (command ^ 0xFF); 
+   }
+   return    (address << 24) + ((address ^ 0xFF) << 16) + (command <<  8) + (command ^ 0xFF); 
 }
 
 void IRsend::send_addressNEC(unsigned int address ,unsigned  int command,int nbits) { 
@@ -69,34 +76,32 @@ bool IRrecv::decodeNEC(decode_results *results) {
     if (!MATCH_MARK(results->rawbuf[offset++], NEC_BIT_MARK))                        return false;
     if (!space_decode(data,results->rawbuf[offset++],NEC_ONE_SPACE,NEC_ZERO_SPACE))  return false;
   }
-  // Full Stop 
+  // Footer 
   if (!MATCH_MARK( results->rawbuf[offset++], NEC_BIT_MARK  ))  return false;
   if (!MATCH_SPACE(results->rawbuf[offset++], NEC_RPT_SPACE ))  return false;
-  // Repeat optional 
+  // Repeat check optional sometimes 
   //if (!MATCH_MARK( results->rawbuf[offset++], NEC_HDR_MARK  ))  
   //if (!MATCH_SPACE(results->rawbuf[offset++], NEC_ZERO_SPACE))  
-  unsigned  int address =0; 
-  unsigned  int command =0; 
-  address = (data & 0xFF000000) >> 24;  // Most significant  two bytes 
-  command = (data & 0xFF00)     >>  8;  // byte 4 and 3 
-  // integrity check command ,  address and command is sent twice , one as plain and other inverted .  
-  if ( !( address ^ 0xFF == ((data & 0xFF0000) >> 16) ) ||!( command ^ 0xFF == (data & 0xFF) ))  {
-    #ifdef DEBUG
-    Serial.println("NEC Integrity fails, it is not a true NEC  ") ; 
-    #endif 
+  unsigned  int address = (data & 0xFF000000) >> 24;  // Most significant  two bytes if [ Data NEC ]
+  unsigned  int command = (data & 0xFF00)     >>  8;  
+  
+  // Integrity check command , command is sent twice , one as plain and other inverted .  
+  if (!(((unsigned  int ) command ^ 0xFF ) == ((unsigned  int )(data & 0xFF )))) {
+    DBG_PRINTLN("NEC Integrity fails, it is not NEC protocol ") ; 
     return false;
   } 
-  if (!MATCH_MARK(results->rawbuf[offset++], NEC_BIT_MARK))  
+  if ( !(((unsigned  int ) address ^ 0xFF ) == ((unsigned  int )((data & 0xFF0000) >> 16))))  {
+    // [Extended NEC] 
+    address = (data & 0xFFFF0000) >> 16;  // Most significant four bytes 
+    DBG_PRINTLN("NEC Extended"); 
+  } 
+ 
   // Success
   results->bits        = NEC_BITS;
   results->value       = data;
   results->command     = command ; 
   results->address     = address ; 
   results->decode_type = NEC;
-  
-  //Decode address,command to use latter as send input 
-  //Serial.println(String(rawNEC(address,command),HEX)); 
- 
   return true;
 }
 #endif

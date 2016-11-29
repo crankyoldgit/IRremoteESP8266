@@ -166,13 +166,13 @@ class decode_results {
 	public:
 		decode_type_t          decode_type;  // number of  UNKNOWN, NEC, SONY, RC5, ...
 		int                    address;      // Decoded Device Address
-		unsigned long long     value;        // Decoded value
+		unsigned long long     value;        // Decoded Raw value
 		int                    bits;         // Number of bits in decoded value
-		volatile unsigned int  *rawbuf;      // Raw intervals in .5 us ticks
+		volatile unsigned int  *rawbuf;     // Raw intervals in .5 us ticks
 		int                    rawlen;       // Number of records in rawbuf.
-		int                    overflow;     // true iff IR raw code too long 
+		int                    overflow;     // true if IR raw code too long 
 		int                    command;      // Decoded command    
-		String                 protocol;     // UNKNOWN, NEC, SONY, RC5, ..
+		String                 protocol;     // "UNKNOWN", "NEC", "SONY", "RC5", ..
 };
 
 //------------------------------------------------------------------------------
@@ -204,14 +204,14 @@ class IRrecv
 		int  MATCH_MARK       (int measured, int desired) ;
 		int  MATCH_SPACE      (int measured, int desired) ;
 		int  match_mark_nolog (int measured, int desired) ; 
-		int  match_space_nolog(int measured, int desired); 
-		bool mark_decode      (unsigned long &data,int val, int timeOne, int timeZero) ;  
-		bool space_decode     (unsigned long &data,int val, int timeOne, int timeZero) ;
-		bool mark_decode      (unsigned long long &data,int val, int timeOne, int timeZero) ;  
-		bool space_decode     (unsigned long long &data,int val, int timeOne, int timeZero) ; 
-		void addBit           (unsigned int       &data,bool bit) ;
-		void addBit           (unsigned long      &data,bool bit) ;
-		void addBit           (unsigned long long &data,bool bit) ;
+		int  match_space_nolog(int measured, int desired) ; 
+		bool mark_decode      (unsigned long      &data, int  val, int timeOne, int timeZero) ;  
+		bool mark_decode      (unsigned long long &data, int  val, int timeOne, int timeZero) ;  
+		bool space_decode     (unsigned long      &data, int  val, int timeOne, int timeZero) ;
+		bool space_decode     (unsigned long long &data, int  val, int timeOne, int timeZero) ; 
+		void addBit           (unsigned int       &data, bool bit) ;
+		void addBit           (unsigned long      &data, bool bit) ;
+		void addBit           (unsigned long long &data, bool bit) ;
 		//......................................................................
 #		if (DECODE_RC5 || DECODE_RC6)
 			// This helper function is shared by RC5 and RC6

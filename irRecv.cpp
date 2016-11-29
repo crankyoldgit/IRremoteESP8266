@@ -41,8 +41,9 @@ void id2protocol (int id,String& protocol) {
   case UNKNOWN:       protocol="UNKNOWN";     break;
   case RC5:           protocol="RC5";         break;       
   case RC6:           protocol="RC6";         break;    
-  case NEC:           protocol="NEC";         break;    
-  case SONY:          protocol="SONY";        break;  
+  case NEC:           protocol="NEC";         break; 
+  // use protocol Name if exists see https://www.mikrocontroller.net/articles/IRMP_-_english#SIRCS   
+  case SONY:          protocol="SIRCS";        break;  
   case PANASONIC:     protocol="PANASONIC";   break;  
   case JVC:           protocol="JVC";         break;   
   case SAMSUNG:       protocol="SAMSUNG";     break; 
@@ -124,9 +125,9 @@ int   IRrecv::MATCH_SPACE(int measured_ticks, int desired) {
 #endif
 
 void  printDecoded(decode_results *results) {
-  Serial.print("IR DECODED Type:") ; 
+  Serial.print("IR DECODED ID:") ; 
   Serial.print(results->decode_type);
-  Serial.print(" Name:") ; 
+  Serial.print(" Protocol:") ; 
   String sir; 
   Serial.print(results->protocol); 
   Serial.print(" RawData:") ;
@@ -177,7 +178,6 @@ void  dump(decode_results *results) {
   }
   Serial.println("");                   
 }
-
 #endif
 
 void IRrecv::addBit(unsigned long long  &data,bool  bit) {

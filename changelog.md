@@ -1,19 +1,19 @@
 ## 2.0.0 - 2016/11/25
 - Marcos Marinho marcosamarinho
 - Fix SHARP ,changed results->data to LONG LONG to allow return 48 bits. 
-- Fix SONY and included automatic repeat see MIN_REPEAT and now decoding command and address .
-- Fix NEC and implement check integrity. 
+- Fix SONY and included automatic repeat see MIN_REPEAT and now decoding command and address , the protocol string name is SIRCS .
+- Fix NEC and implement check integrity, and decoded command and addres for usual and extended nec 32 bits 
 - Fix SHARP .
 - Fix SANYO ,now AIWA can be decoded too , AIWA_RC_T501 was disabled in IRremote.h as it is a so specific control .
-- RC5/RC6 Clean up Debug and include VERBOSE as optional , rc6 changed to long long to accepts larger then 32 bits . 
+- RC5/RC6 Clean up Debug and include VERBOSE as optional , RC6 changed to long long to accepts larger then 32 bits . 
 - PANASONIC 48 bits works now  see LONG LONG data Rawdata. 
 - Implemented LG 32 bits and changed SAMSUNG to have the right decode based on Repeat times .
 - Implemented DISH decode . 
 - Implemented dutycycle as variable see IRsend::enableIROut(int khz,int dutycycle)  .
 - Changed all  DEBUG ,messages  to behavior as error to have a clear and nice output. 
 - Included dump of ir times when DEBUG to easier troubleshooting .
-- Changed the wait time to 80 miliseconds at timer to allow REPEAT treatment.
-- Include the address and comand at decode process to all protocos we know . 
+- Changed the wait time to 80 miliseconds at timer to allow dump , REPEAT treatment .
+- Include the address and comand at decode process to know protocos  . 
 - Changed Rawdata decode to long long to allow decode larger numbers . 
 - Split files as z30t0/IRremote and merge changes . 
 - Created internal functions to simplify the code and to allow the code reuse. 
