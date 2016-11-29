@@ -24,7 +24,7 @@ This two commands allows the same result.
 
 Others protocols use send_raw .
    
-     send_raw("SONY",0x090,12) ;
+     send_raw("SIRCS",0x090,12) ;  // SONY uses SIRCS protocol 
      send_raw("JVC",0xf900,16) ;
      or
      send_raw("SONY","090",12) ;
