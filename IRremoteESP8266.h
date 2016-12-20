@@ -16,7 +16,8 @@
  * LG added by Darryl Smith (based on the JVC protocol)
  * Whynter A/C ARC-110WD added by Francesco Meschia
  * Coolix A/C / heatpump added by bakrus
- *
+ * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
+          (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
@@ -61,6 +62,7 @@ enum decode_type_t {
   SHARP,
   COOLIX,
   DAIKIN,
+  DENON,
 };
 
 // Results returned from the decoder
@@ -93,6 +95,7 @@ public:
 #define WHYNTER 13
 #define COOLIX 15
 #define DAIKIN 16
+#define DENON 17
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -108,6 +111,7 @@ public:
 #define SEND_PROTOCOL_LG      case LG: sendLG(data, nbits); break;
 #define SEND_PROTOCOL_WHYNTER case WHYNTER: sendWhynter(data, nbits); break;
 #define SEND_PROTOCOL_COOLIX  case COOLIX: sendCOOLIX(data, nbits); break;
+#define SEND_PROTOCOL_DENON  case DENON: sendDenon(data, nbits); break;
 
 // main class for receiving IR
 class IRrecv
@@ -136,6 +140,7 @@ public:
   // COOLIX decode is not implemented yet
   //  long decodeCOOLIX(decode_results *results);
   long decodeDaikin(decode_results *results);
+  long decodeDenon(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
@@ -162,6 +167,7 @@ public:
         SEND_PROTOCOL_LG
         SEND_PROTOCOL_WHYNTER
         SEND_PROTOCOL_COOLIX
+        SEND_PROTOCOL_DENON
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
@@ -184,6 +190,7 @@ public:
   void sendSAMSUNG(unsigned long data, int nbits);
   void sendDaikin(unsigned char daikin[]);
   void sendDaikinChunk(unsigned char buf[], int len, int start);
+  void sendDenon(unsigned long data, int nbits);
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(int usec);

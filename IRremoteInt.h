@@ -15,6 +15,8 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * Whynter A/C ARC-110WD added by Francesco Meschia
  * Coolix A/C / heatpump added by bakrus
+ * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
+          (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200 
  *
@@ -151,6 +153,13 @@
 #define DAIKIN_ZERO_MARK	428
 #define DAIKIN_ZERO_SPACE 428
 
+//Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+#define DENON_BITS          14  // The number of bits in the command
+#define DENON_HDR_MARK     300  // The length of the Header:Mark
+#define DENON_HDR_SPACE    750  // The lenght of the Header:Space
+#define DENON_BIT_MARK     300  // The length of a Bit:Mark
+#define DENON_ONE_SPACE   1800  // The length of a Bit:Space for 1's
+#define DENON_ZERO_SPACE   750  // The length of a Bit:Space for 0's
 
 #define TOLERANCE 25  // percent tolerance in measurements
 #define LTOL (1.0 - TOLERANCE/100.) 

@@ -20,6 +20,8 @@
  * Whynter A/C ARC-110WD added by Francesco Meschia
  * Global Cache IR format sender added by Hisham Khalifa (http://www.hishamkhalifa.com)
  * Coolix A/C / heatpump added by bakrus
+ * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
+          (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
@@ -357,6 +359,32 @@ void IRsend::sendSAMSUNG(unsigned long data, int nbits)
   }
   mark(SAMSUNG_BIT_MARK);
   space(0);
+}
+
+// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+void IRsend::sendDenon (unsigned long data,  int nbits)
+{
+	// Set IR carrier frequency
+	enableIROut(38);
+
+	// Header
+	mark (DENON_HDR_MARK);
+	space(DENON_HDR_SPACE);
+
+	// Data
+	for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
+		if (data & mask) {
+			mark (DENON_BIT_MARK);
+			space(DENON_ONE_SPACE);
+		} else {
+			mark (DENON_BIT_MARK);
+			space(DENON_ZERO_SPACE);
+		}
+	}
+
+	// Footer
+	mark(DENON_BIT_MARK);
+    space(0);  // Always end with the LED off
 }
 
 void IRsend::mark(int time) {
@@ -1338,6 +1366,39 @@ for ( int b=0 ; b < bits ; b++ ) reversed = ( reversed << 1 ) | ( 0x0001 & ( num
   results->value = reversed;
   results->decode_type = DAIKIN;
   return DECODED;
+}
+
+// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+long IRrecv::decodeDenon (decode_results *results)
+{
+	unsigned long  data   = 0;  // Somewhere to build our code
+	int            offset = 1;  // Skip the Gap reading
+
+	// Check we have the right amount of data
+	if (irparams.rawlen != 1 + 2 + (2 * DENON_BITS) + 1)  return false ;
+
+	// Check initial Mark+Space match
+	if (!MATCH_MARK (results->rawbuf[offset++], DENON_HDR_MARK ))  return false ;
+	if (!MATCH_SPACE(results->rawbuf[offset++], DENON_HDR_SPACE))  return false ;
+
+	// Read the bits in
+	for (int i = 0;  i < DENON_BITS;  i++) {
+		// Each bit looks like: DENON_MARK + DENON_SPACE_1 -> 1
+		//                 or : DENON_MARK + DENON_SPACE_0 -> 0
+		if (!MATCH_MARK(results->rawbuf[offset++], DENON_BIT_MARK))  return false ;
+
+		// IR data is big-endian, so we shuffle it in from the right:
+		if      (MATCH_SPACE(results->rawbuf[offset], DENON_ONE_SPACE))   data = (data << 1) | 1 ;
+		else if (MATCH_SPACE(results->rawbuf[offset], DENON_ZERO_SPACE))  data = (data << 1) | 0 ;
+		else                                                        return false ;
+		offset++;
+	}
+
+	// Success
+	results->bits        = DENON_BITS;
+	results->value       = data;
+	results->decode_type = DENON;
+	return DECODED;
 }
 
 
