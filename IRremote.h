@@ -52,10 +52,10 @@
 #define DECODE_WHYNTER       1
 #define SEND_WHYNTER         1
 
-#define DECODE_AIWA_RC_T501  0  // Decoded as SANYO now that uses the same protocol 
-#define SEND_AIWA_RC_T501    0  // removed as it is hardcoded to a so specific device !
+#define DECODE_AIWA_RC_T501  0  // Decoded as SANYO as the same protocol 
+#define SEND_AIWA_RC_T501    0  // Disabled as it is hardcoded to a so specific device,  please use SANYO instead !
 
-#define DECODE_LG_32         1
+#define DECODE_LG_32         1  
 #define DECODE_LG            1
 #define SEND_LG              1
 
@@ -71,7 +71,7 @@
 #define DECODE_SHARP         1 
 #define SEND_SHARP           1
 
-#define DECODE_DENON         1 // Sound be the same as SHARP TODO check it 
+#define DECODE_DENON         1 // Almost same as  SHARP TODO check it 
 #define SEND_DENON           1
 
 #define DECODE_PRONTO        0 // This function does not logically make sense
@@ -140,7 +140,7 @@ decode_type_t;
 //------------------------------------------------------------------------------
 // Uncomment  DEBUG for lots of lovely debug output
 // Now it is returning the dump too !!!
-// #define DEBUG  1
+ #define DEBUG  1
 
 
 //------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ int IRpin;
 		//......................................................................
 #		if SEND_SHARP
 			void  sendSharpRaw   (unsigned long data,  int nbits) ;     
-			void  sendSharp      (unsigned int address,  unsigned int command) ;  
+			void  sendSharp      (unsigned int address,  unsigned int command, int bits) ;  
 #		endif
 
 #		if SEND_AIWA_RC_T501

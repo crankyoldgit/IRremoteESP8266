@@ -25,10 +25,12 @@
  *
  *  GPL license, all text above must be included in any redistribution
  *  Nov2016 marcosamarinho 
- *  Note : with the changes to allow spare files to update from IRRemote 
- * the things are moved to the include IRRemote.h 
+ *  Note :Changes allow spare  ir_ files by protocol using the same includes as original files 
+ * , just left here the additional ones to keep  compatibility .
+ * Things are moved to the IRRemote.h , them you can move your scripts to use that  . 
+ * use generic send functions explained at  README.md  to simplify the code and reduce change your code at new versions . 
  ****************************************************/
-
+#include "IRremote.h"
 #ifndef IRremote_h
 #define IRremote_h
 
@@ -44,10 +46,8 @@
 #define SEND_PROTOCOL_COOLIX  case COOLIX:  sendCOOLIX(data, nbits); break;
 // The following are compile-time library options.
 // If you change them, recompile the library.
-// If DEBUG is defined, a lot of debugging output will be printed during decoding.
 // TEST must be defined for the IRtest unittests to work.  It will make some
 // methods virtual, which will be slightly slower, which is why it is optional.
-//#define DEBUG
 //#define TEST
 
  //Only used for testing; can remove virtual for shorter code

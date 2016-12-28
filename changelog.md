@@ -1,26 +1,26 @@
-## 2.0.0 - 2016/11/25
+## 2.0.0 - 2016/12/28
 - Marcos Marinho marcosamarinho
-- Fix SHARP ,changed results->data to LONG LONG to allow return 48 bits. 
+- Fix SHARP times and allow send_address function. 
+- Changed results->data to LONG LONG to allow return 48 bits. 
 - Fix SONY and included automatic repeat see MIN_REPEAT and now decoding command and address , the protocol string name is SIRCS .
 - Fix NEC and implement check integrity, and decoded command and addres for usual and extended nec 32 bits 
-- Fix SHARP .
-- Fix SANYO ,now AIWA can be decoded too , AIWA_RC_T501 was disabled in IRremote.h as it is a so specific control .
+- Fix SANYO ,now AIWA can be decoded too , AIWA_RC_T501 was disabled in IRremote.h as it is a so specific control that can use SANYO instead  .
 - RC5/RC6 Clean up Debug and include VERBOSE as optional , RC6 changed to long long to accepts larger then 32 bits . 
 - PANASONIC 48 bits works now  see LONG LONG data Rawdata. 
 - Implemented LG 32 bits and changed SAMSUNG to have the right decode based on Repeat times .
 - Implemented DISH decode . 
 - Implemented dutycycle as variable see IRsend::enableIROut(int khz,int dutycycle)  .
 - Changed all  DEBUG ,messages  to behavior as error to have a clear and nice output. 
-- Included dump of ir times when DEBUG to easier troubleshooting .
+- Included dump of ir times when DEBUG is on to easier troubleshooting .
 - Changed the wait time to 80 miliseconds at timer to allow dump , REPEAT treatment .
 - Include the address and comand at decode process to know protocos  . 
 - Changed Rawdata decode to long long to allow decode larger numbers . 
 - Split files as z30t0/IRremote and merge changes . 
 - Created internal functions to simplify the code and to allow the code reuse. 
-- Changed USECPERTICK  to 1 to allow have times in microseconds without trunc on integer .
-- Created OFFSET_START to allow take the fake read value and keep compatibility with IRRemote
-- Created generic functions to be used at client to allow no changes when implementing new protocols '
-- Please change your code to use it as String to allow new protocols ...
+- Changed USECPERTICK  to 1 to allow have times in microseconds and reduce trunc on integer and the calc during the decode.
+- Created OFFSET_START to allow take the fake first value out and to keep compatibility with IRRemote for while 
+- Created generic functions to be used at client to allow fast way to implement new protocols without changes on client code . 
+- Please change your code to use it as String to allow it see functions below ...
 -    bool     send_raw    (String protocol, String  hexRawData, int bits) // this allows easy input rawData larger 32 bits  
 -    or  bool send_raw    (String protocol, long long rawData , int bits) .  
 -    To send alreacy decoded Device address and command 

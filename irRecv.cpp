@@ -157,26 +157,25 @@ void  printDecoded(decode_results *results) {
 
 #ifdef DEBUG
 void  dump(decode_results *results) {
-  Serial.println("IR Received dump.");
+  Serial.println("IR Received DUMP:  (microseconds)");
   Serial.print("Results:");
-  Serial.print(results->rawlen-OFFSET_START,  DEC);
-  Serial.println(" Timing in us ");
+  Serial.println(results->rawlen-OFFSET_START,  DEC);
   for (int i = OFFSET_START;  i < results->rawlen;  i++) {
-    unsigned long  x = results->rawbuf[i] * USECPERTICK;
+    unsigned long  x = results->rawbuf[i] ;
+    if (!(i % (8+OFFSET_START)))  Serial.println();
     if (x < 10000)  Serial.print(" ") ;
     if (x < 1000)   Serial.print(" ") ;
     if (x < 100)    Serial.print(" ") ;
-    Serial.print("  ");
-    if (!(i & 1)) {  // even
-      Serial.print("-");
-      Serial.print(x, DEC);
-    } else {  // odd
-      Serial.print("  +");
-      Serial.print(x, DEC);
+    Serial.print(" ");
+    if ((i & 1-OFFSET_START)) {  // even
+      Serial.print(" -");
+    } else {                     // odd
+      Serial.print(" +");
     }
-    if (!(i % 8))  Serial.println("");
+    Serial.print(x, DEC);
   }
-  Serial.println("");                   
+  Serial.println();                   
+  Serial.println();                   
 }
 #endif
 
@@ -369,7 +368,7 @@ int IRrecv::decode(decode_results *results) {
     return false; 
   } 
   results->rawbuf      = irparams.rawbuf;
-  results->rawlen       = irparams.rawlen;
+  results->rawlen      = irparams.rawlen;
   // results->overflow    = irparams.overflow; 
   results->command     = -1;  
   results->address     = -1; 
@@ -396,7 +395,7 @@ extern "C" {
 static ETSTimer timer;
 volatile irparams_t irparams;
 
-static void ICACHE_FLASH_ATTR read_timeout(void *arg) {
+static void ICACHE_RAM_ATTR read_timeout(void *arg) {
   os_intr_lock();
   if (irparams.rawlen) {
     irparams.rcvstate = STATE_STOP;
@@ -406,15 +405,16 @@ static void ICACHE_FLASH_ATTR read_timeout(void *arg) {
 
 
 
-static void ICACHE_FLASH_ATTR gpio_intr() {
+static void ICACHE_RAM_ATTR gpio_intr() {
   uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
+
   if (irparams.rcvstate == STATE_STOP) {
     return;
   }
 	
   static uint32_t start = 0;
-  uint32_t now = system_get_time();
+  uint32_t        now = system_get_time();
   if  (irparams.rcvstate == STATE_IDLE) {
     irparams.rcvstate = STATE_MARK;
     // if OFFSET_START==1 Include an fake initial value to keep compatible with IR-Remote . 
@@ -432,7 +432,7 @@ static void ICACHE_FLASH_ATTR gpio_intr() {
   start = now;
   os_timer_disarm(&timer);
   // This time need to be larger tham the larger repetition time, to allow full REPEAT decode . 
-  os_timer_arm(&timer, 80, 0);  
+  os_timer_arm(&timer, 80,0);  
 }
 
 
@@ -447,11 +447,13 @@ void IRrecv::disableIRIn() {
 
 IRrecv::IRrecv(int recvpin) {
   irparams.recvpin = recvpin;
+  pinMode(irparams.recvpin, INPUT);  
   irparams.blinkflag = 0;
 }
 
 IRrecv::IRrecv (int recvpin, int blinkpin){
 	irparams.recvpin = recvpin;
+        pinMode(irparams.recvpin, INPUT);  
 	irparams.blinkpin = blinkpin;
 	pinMode(blinkpin, OUTPUT);
 	irparams.blinkflag = 0;
@@ -466,7 +468,6 @@ void IRrecv::enableIRIn() {
   // initialize state machine variables
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
-  
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, &timer);
@@ -482,7 +483,7 @@ void  IRrecv::blink13 (int blinkflag)
 {
 	irparams.blinkflag = blinkflag;
 	if (blinkflag)  pinMode(BLINKLED, OUTPUT) ;
-}
+} 
 */
 
 //+=============================================================================

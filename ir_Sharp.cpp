@@ -51,15 +51,12 @@ void  IRsend::sendSharpRaw (unsigned long data,  int nbits) {
 }
 
 
-#endif
-
-#if SEND_SHARP
-void  IRsend::sendSharp (unsigned int address,  unsigned int command)
-{
-   sendSharpRaw((address << 10) | (command << 2) | 2, SHARP_BITS);
+void  IRsend::sendSharp (unsigned int address,  unsigned int command, int bits){
+   sendSharpRaw((address << 10) | (command << 2) | 2, bits);
 }
 #endif
 
+#if DECODE_SHARP
 bool IRrecv::decodeSharp(decode_results *results) {
   // Check we have the right amount of data
   if (irparams.rawlen < 2 * SHARP_BITS + 3 + OFFSET_START) return false; 
@@ -81,6 +78,9 @@ bool IRrecv::decodeSharp(decode_results *results) {
   results->bits        = SHARP_BITS; 
   results->value       = data;
   results->decode_type = SHARP;
+  results->command = (unsigned int) data >>2 & 0xFF; 
+  results->address = (unsigned int) data >>10      ; 
   return true;
 }
+#endif
 

@@ -20,14 +20,12 @@
 //==============================================================================
 
 #define BITS          14  // The number of bits in the command
-
 #define HDR_MARK     300  // The length of the Header:Mark
 #define HDR_SPACE    750  // The lenght of the Header:Space
-
 #define BIT_MARK     300  // The length of a Bit:Mark
 #define ONE_SPACE   1800  // The length of a Bit:Space for 1's
 #define ZERO_SPACE   750  // The length of a Bit:Space for 0's
-// TODO check if is the same as SHARP 
+// Same as SHARP with first bit on 
 
 //+=============================================================================
 //

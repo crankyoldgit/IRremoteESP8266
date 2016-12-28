@@ -98,7 +98,8 @@ extern volatile irparams_t irparams;
 //                                   Spaces tend to be 100us too short
 #define MARK_EXCESS    100
 
-#define USECPERTICK      1
+#define USECPERTICK     1
+
 // Upper and Lower percentage tolerances in measurements 30 % is LIRC default
 #define TOLERANCE       30
 #define LTOL            (1.0 - (TOLERANCE/100.))
@@ -108,8 +109,8 @@ extern volatile irparams_t irparams;
 //#define _GAP            5000
 //#define GAP_TICKS       (_GAP/USECPERTICK)
 // calculates upper and lower limits 
-#define TICKS_LOW(us)   ((int)(((us)*LTOL/USECPERTICK)))
-#define TICKS_HIGH(us)  ((int)(((us)*UTOL/USECPERTICK)))
+#define TICKS_LOW(us)   ((int)(((us)*LTOL)))
+#define TICKS_HIGH(us)  ((int)(((us)*UTOL)))
 
 //------------------------------------------------------------------------------
 // IR detector output is active low

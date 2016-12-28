@@ -76,6 +76,7 @@ IRsend::IRsend(int IRsendPin)
 void IRsend::begin()
 {
   pinMode(IRpin, OUTPUT);
+  digitalWrite(IRpin, LOW);
 }
 
 
@@ -214,13 +215,16 @@ bool IRsend::send_address(String protocol, int address, int command, int bits) {
 
 // Note: forced bits to allow generic protocols with different bits 
 bool IRsend::send_address(int id , int address, int command, int bits ) {  
-  // larger then 32 bits  
   switch (id) {
+  // larger 32 bits 
   #if SEND_PANASONIC  
   case PANASONIC : sendPanasonic    (address, command      ); return true;  
   #endif 
   #if SEND_SANYO   
-  case SANYO     : sendSanyo        (address, command      );  return true;  
+  case SANYO     : sendSanyo        (address, command      ); return true;  
+  #endif
+  #if SEND_SHARP   
+  case SHARP     : sendSharp        (address, command, bits); return true;  
   #endif
   // Others   
   #if SEND_NEC   
