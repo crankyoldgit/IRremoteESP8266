@@ -38,6 +38,7 @@
 /*
 	Kelvinator AC map
 
+  (header mark and space)
   byte 0 = Basic Modes
     b2-0 = Modes
       Modes:
@@ -82,6 +83,7 @@
     b3-0 = Unknown (Used in Timer mode)
     b7-4 = checksum of the previous bytes (0-6)
   (gap of 40ms)
+  (header mark and space)
   byte 8 = Repeat of byte 0
   byte 9 = Repeat of byte 1
   byte 10 = Repeat of byte 2
@@ -123,22 +125,18 @@ class IRKelvinatorAC
         void begin();
         void on();
         void off();
+        void setPower(bool state);
         bool getPower();
-
         void setTemp(uint8_t temp);
         uint8_t getTemp();
-
         void setFan(uint8_t fan);
         uint8_t getFan();
-
-        uint8_t getMode();
         void setMode(uint8_t mode);
-
+        uint8_t getMode();
         void setSwingVertical(bool state);
         bool getSwingVertical();
         void setSwingHorizontal(bool state);
         bool getSwingHorizontal();
-
         void setQuiet(bool state);
         bool getQuiet();
         void setIonFilter(bool state);

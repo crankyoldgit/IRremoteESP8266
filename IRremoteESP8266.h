@@ -98,7 +98,7 @@ public:
 #define COOLIX 15
 #define DAIKIN 16
 #define DENON 17
-#define KELVINATOR 17
+#define KELVINATOR 18  // Currently not implemented
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received

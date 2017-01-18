@@ -1,6 +1,6 @@
 /*
 Code to emulate IR Kelvinator YALIF remote control unit, which should control
-the following Kelvinator A/C units:
+at least the following Kelvinator A/C units:
   KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC,
   KSV70HRC, KSV80HRC.
 
@@ -8,7 +8,7 @@ Note:
   * Unsupported:
     - All Sleep modes.
     - All Timer modes.
-    - "I Feel" button/mode.
+    - "I Feel" button & mode.
     - Energy Saving mode.
     - Low Heat mode.
     - Farenheit.
@@ -78,6 +78,13 @@ void IRKelvinatorAC::off() {
     //state = OFF;
     remote_state[0] &= ~KELVINATOR_POWER;
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
+}
+
+void IRKelvinatorAC::setPower(bool state) {
+  if (state)
+    on();
+  else
+    off();
 }
 
 bool IRKelvinatorAC::getPower() {
