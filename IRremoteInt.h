@@ -1,7 +1,7 @@
  /***************************************************
  * IRremote for ESP8266
  *
- * Based on the IRremote library for Arduino by Ken Shirriff 
+ * Based on the IRremote library for Arduino by Ken Shirriff
  * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
@@ -17,8 +17,9 @@
  * Coolix A/C / heatpump added by bakrus
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
+ * Kelvinator A/C added by crankyoldgit
  *
- * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200 
+ * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
@@ -66,13 +67,13 @@
 // SA 8650B
 #define SANYO_HDR_MARK	3500  // seen range 3500
 #define SANYO_HDR_SPACE	950 //  seen 950
-#define SANYO_ONE_MARK	2400 // seen 2400  
+#define SANYO_ONE_MARK	2400 // seen 2400
 #define SANYO_ZERO_MARK 700 //  seen 700
 #define SANYO_DOUBLE_SPACE_USECS  800  // usually see 713 - not using ticks as get number wrapround
 #define SANYO_RPT_LENGTH 45000
 
 // Mitsubishi RM 75501
-// 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7 
+// 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
 
 // #define MITSUBISHI_HDR_MARK	250  // seen range 3500
 #define MITSUBISHI_HDR_SPACE	350 //  7*50+100
@@ -145,10 +146,10 @@
 #define SHARP_BITS 15
 #define DISH_BITS 16
 
-// Dakin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+// Daikin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 #define DAIKIN_HDR_MARK	    3650 //DAIKIN_ZERO_MARK*8
 #define DAIKIN_HDR_SPACE	1623 //DAIKIN_ZERO_MARK*4
-#define DAIKIN_ONE_SPACE	1280 
+#define DAIKIN_ONE_SPACE	1280
 #define DAIKIN_ONE_MARK	    428
 #define DAIKIN_ZERO_MARK	428
 #define DAIKIN_ZERO_SPACE 428
@@ -161,9 +162,17 @@
 #define DENON_ONE_SPACE   1800  // The length of a Bit:Space for 1's
 #define DENON_ZERO_SPACE   750  // The length of a Bit:Space for 0's
 
+#define KELVINATOR_HDR_MARK	  9000U
+#define KELVINATOR_HDR_SPACE	4500U
+#define KELVINATOR_BIT_MARK	  650U
+#define KELVINATOR_ONE_SPACE	1650U
+#define KELVINATOR_ZERO_SPACE	525U
+#define KELVINATOR_GAP_SPACE	19950U
+#define KELVINATOR_CMD_FOOTER	2U
+
 #define TOLERANCE 25  // percent tolerance in measurements
-#define LTOL (1.0 - TOLERANCE/100.) 
-#define UTOL (1.0 + TOLERANCE/100.) 
+#define LTOL (1.0 - TOLERANCE/100.)
+#define UTOL (1.0 + TOLERANCE/100.)
 
 #define _GAP 5000 // Minimum map between transmissions
 #define GAP_TICKS (_GAP/USECPERTICK)
@@ -187,7 +196,7 @@ typedef struct {
   unsigned int timer;     // state timer, counts 50uS ticks.
   unsigned int rawbuf[RAWBUF]; // raw data
   uint8_t rawlen;         // counter of entries in rawbuf
-} 
+}
 irparams_t;
 
 // Defined in IRremote.cpp
