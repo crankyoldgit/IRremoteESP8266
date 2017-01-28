@@ -27,7 +27,7 @@
  * Coolix A/C / heatpump added by bakrus
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
- * Kelvinator A/C added by crankyoldgit
+ * Kelvinator A/C and Sherwood added by crankyoldgit
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
  *   sending IR code on ESP8266
@@ -157,6 +157,20 @@ void IRsend::sendNEC (unsigned long data, int nbits) {
   // Footer
   mark(NEC_BIT_MARK);
   space(0);  // Always end with the LED off
+}
+
+void IRsend::sendNECRepeat(unsigned long time_us, int repeats) {
+  // NEC Repeat code.
+
+  // Set IR carrier frequency
+  enableIROut(38);
+  space(time_us);
+  for (int i = 0; i < repeats; i++) {
+    mark(NEC_HDR_MARK);
+    space(NEC_RPT_SPACE);
+    mark(NEC_BIT_MARK);
+    space(NEC_RPT_FOOTER);  // Always end with the LED off.
+  }
 }
 
 void IRsend::sendLG (unsigned long data, int nbits) {
@@ -424,11 +438,18 @@ void IRsend::mark(int time) {
 }
 
 /* Leave pin off for time (given in microseconds) */
-void IRsend::space(int time) {
+void IRsend::space(unsigned long time) {
   // Sends an IR space for the specified number of microseconds.
   // A space is no output, so the PWM output is disabled.
   digitalWrite(IRpin, LOW);
-  if (time > 0) delayMicroseconds(time);
+  if (time == 0) return;
+  if (time <= 16383)  // delayMicroseconds is only accurate to 16383us.
+    delayMicroseconds(time);
+  else {
+    // Invoke a delay(), where possible, to avoid triggering the WDT.
+    delay(time / 1000UL);  // Delay for as many whole ms as we can.
+    delayMicroseconds((int) time % 1000UL); // Delay the remainder.
+  }
 }
 
 void IRsend::enableIROut(int khz) {
@@ -601,6 +622,18 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Footer
   mark(KELVINATOR_BIT_MARK);
   space(0);  // Make sure we end with the led off.
+}
+
+void IRsend::sendSherwood(unsigned long data, int nbits, int repeats) {
+  // Sherwood remote codes appear to be NEC codes with a manditory repeat code.
+  sendNEC(data, nbits);
+  // An NEC code can start every 108ms. Typically a NEC code is about 67.5ms.
+  // So 67.5ms + NEC_CODE_TO_RPT_SPACE = ~108ms.
+  sendNECRepeat(NEC_CODE_TO_RPT_SPACE, repeats);
+}
+
+void IRsend::sendSherwood(unsigned long data, int nbits) {
+  sendSherwood(data, nbits, 1);
 }
 
 // ---------------------------------------------------------------
