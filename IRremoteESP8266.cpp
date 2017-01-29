@@ -575,11 +575,11 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
-  // Data (opt1)
-  // Send the 1st option data (4 bytes).
+  // Data (options)
+  // Send the 1st option chunk of data (4 bytes).
   for(i = 4; i < 8; i++)
     sendKelvinatorChunk(data[i], 8);
-  // Send a double data gap to signify we are starting a new sequence.
+  // Send a double data gap to signify we are starting a new command sequence.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE * 2);
   // Header #2
@@ -587,6 +587,7 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   space(KELVINATOR_HDR_SPACE);
   // Data (command)
   // Send the 2nd command data (4 bytes).
+  // Basically an almost identical repeat of the earlier command data.
   for(i = 8; i < 12; i++)
     sendKelvinatorChunk(data[i], 8);
   // Send Footer for the command data (3 bits (010))
@@ -594,8 +595,9 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
-  // Data (opt2)
-  // Send the 2nd option data (4 bytes).
+  // Data (options)
+  // Send the 2nd option chunk of data (4 bytes).
+  // Definately not a repeat of the earlier option data.
   for(i = 12; i < 16; i++)
     sendKelvinatorChunk(data[i], 8);
   // Footer
