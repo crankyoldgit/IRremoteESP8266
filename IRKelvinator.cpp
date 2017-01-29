@@ -51,7 +51,7 @@ uint8_t* IRKelvinatorAC::getRaw() {
 // Many Bothans died to bring us this information.
 void IRKelvinatorAC::checksum() {
   // For each command + options block.
-  for (uint8_t offset = 0; offset < 16; offset += 8) {
+  for (uint8_t offset = 0; offset < KELVINATOR_STATE_LENGTH; offset += 8) {
     uint8_t sum = KELVINATOR_CHECKSUM_START;
     // Sum the lower half of the first 4 bytes of this block.
     for(uint8_t i = 0; i < 4; i++) {
@@ -91,7 +91,7 @@ bool IRKelvinatorAC::getPower() {
     return ((remote_state[0] & KELVINATOR_POWER) != 0);
 }
 
-// Set the temp in deg C
+// Set the temp. in deg C
 void IRKelvinatorAC::setTemp(uint8_t temp) {
     temp = max(KELVINATOR_MIN_TEMP, temp);
     temp = min(KELVINATOR_MAX_TEMP, temp);
@@ -99,7 +99,7 @@ void IRKelvinatorAC::setTemp(uint8_t temp) {
     remote_state[9] = remote_state[1];  // Duplicate to the 2nd command chunk.
 }
 
-// Return the sey temp in deg C
+// Return the set temp. in deg C
 uint8_t IRKelvinatorAC::getTemp() {
     return ((remote_state[1] & 0xFU) + KELVINATOR_MIN_TEMP);
 }
