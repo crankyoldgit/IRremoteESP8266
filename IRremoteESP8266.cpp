@@ -164,7 +164,7 @@ void IRsend::sendNECRepeat(unsigned long time_us, int repeats) {
 
   // Set IR carrier frequency
   enableIROut(38);
-  space(time_us);
+  space(time_us);  // Gap between previous IR code and the repeat code.
   for (int i = 0; i < repeats; i++) {
     mark(NEC_HDR_MARK);
     space(NEC_RPT_SPACE);
@@ -448,7 +448,7 @@ void IRsend::space(unsigned long time) {
   else {
     // Invoke a delay(), where possible, to avoid triggering the WDT.
     delay(time / 1000UL);  // Delay for as many whole ms as we can.
-    delayMicroseconds((int) time % 1000UL); // Delay the remainder.
+    delayMicroseconds((int) time % 1000UL);  // Delay the remaining sub-msecond.
   }
 }
 
