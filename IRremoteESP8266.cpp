@@ -548,11 +548,14 @@ void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
 
 void IRsend::sendKelvinatorChunk(uint8_t data, uint8_t nbits) {
   // send a chunk of Kelvinator data
+
+  if (nbits > 8)
+    nbits = 8;  // Can't have more bits than exist in a uint8_t.
   for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1) {
-    if (data & B1) {
+    if (data & B1) {  // 1
       mark(KELVINATOR_BIT_MARK);
       space(KELVINATOR_ONE_SPACE);
-    } else {
+    } else {  // 0
       mark(KELVINATOR_BIT_MARK);
       space(KELVINATOR_ZERO_SPACE);
     }
@@ -570,7 +573,7 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send the first command data (4 bytes)
   for (; i < 4; i++)
     sendKelvinatorChunk(data[i], 8);
-  // Send Footer for the command data (3 bits (010))
+  // Send Footer for the command data (3 bits (B010))
   sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
@@ -590,14 +593,14 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Basically an almost identical repeat of the earlier command data.
   for (; i < 12; i++)
     sendKelvinatorChunk(data[i], 8);
-  // Send Footer for the command data (3 bits (010))
+  // Send Footer for the command data (3 bits (B010))
   sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
   // Data (options)
   // Send the 2nd option chunk of data (4 bytes).
-  // Definately not a repeat of the earlier option data.
+  // Unlike the commands, definately not a repeat of the earlier option data.
   for (; i < KELVINATOR_STATE_LENGTH; i++)
     sendKelvinatorChunk(data[i], 8);
   // Footer
