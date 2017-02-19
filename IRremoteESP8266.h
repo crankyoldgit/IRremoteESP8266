@@ -18,7 +18,7 @@
  * Coolix A/C / heatpump added by bakrus
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
- * Kelvinator A/C added by crankyoldgit
+ * Kelvinator A/C and Sherwood added by crankyoldgit
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
@@ -65,6 +65,7 @@ enum decode_type_t {
   DAIKIN,
   DENON,
   KELVINATOR,
+  SHERWOOD
 };
 
 // Results returned from the decoder
@@ -99,6 +100,7 @@ public:
 #define DAIKIN 16
 #define DENON 17
 #define KELVINATOR 18  // Currently not implemented
+#define SHERWOOD 19   // Not implemented. It decodes as an NEC code.
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -115,6 +117,7 @@ public:
 #define SEND_PROTOCOL_WHYNTER case WHYNTER: sendWhynter(data, nbits); break;
 #define SEND_PROTOCOL_COOLIX  case COOLIX: sendCOOLIX(data, nbits); break;
 #define SEND_PROTOCOL_DENON  case DENON: sendDenon(data, nbits); break;
+#define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
 
 // main class for receiving IR
 class IRrecv
@@ -171,11 +174,13 @@ public:
         SEND_PROTOCOL_WHYNTER
         SEND_PROTOCOL_COOLIX
         SEND_PROTOCOL_DENON
+        SEND_PROTOCOL_SHERWOOD
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits);
+  void sendNECRepeat(unsigned long time_us, int repeats);
   void sendLG(unsigned long data, int nbits);
   void sendSony(unsigned long data, int nbits);
   // Neither Sanyo nor Mitsubishi send is implemented yet
@@ -195,9 +200,11 @@ public:
   void sendDaikinChunk(unsigned char buf[], int len, int start);
   void sendDenon(unsigned long data, int nbits);
   void sendKelvinator(unsigned char data[]);
+  void sendSherwood(unsigned long data, int nbits);
+  void sendSherwood(unsigned long data, int nbits, int repeats);
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
-  VIRTUAL void space(int usec);
+  VIRTUAL void space(unsigned long usec);
 private:
   int halfPeriodicTime;
   int IRpin;
