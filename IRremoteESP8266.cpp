@@ -27,6 +27,7 @@
  * Coolix A/C / heatpump added by bakrus
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
+ * Kelvinator A/C added by crankyoldgit
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
  *   sending IR code on ESP8266
@@ -545,8 +546,70 @@ void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
   space(DAIKIN_ZERO_SPACE);
 }
 
+void IRsend::sendKelvinatorChunk(uint8_t data, uint8_t nbits) {
+  // send a chunk of Kelvinator data
+
+  if (nbits > 8)
+    nbits = 8;  // Can't have more bits than exist in a uint8_t.
+  for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1) {
+    if (data & B1) {  // 1
+      mark(KELVINATOR_BIT_MARK);
+      space(KELVINATOR_ONE_SPACE);
+    } else {  // 0
+      mark(KELVINATOR_BIT_MARK);
+      space(KELVINATOR_ZERO_SPACE);
+    }
+  }
+}
+
+void IRsend::sendKelvinator(unsigned char data[]) {
+  uint8_t i = 0;
+  // Set IR carrier frequency
+  enableIROut(38);
+  // Header #1
+  mark(KELVINATOR_HDR_MARK);
+  space(KELVINATOR_HDR_SPACE);
+  // Data (command)
+  // Send the first command data (4 bytes)
+  for (; i < 4; i++)
+    sendKelvinatorChunk(data[i], 8);
+  // Send Footer for the command data (3 bits (B010))
+  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  // Send an interdata gap.
+  mark(KELVINATOR_BIT_MARK);
+  space(KELVINATOR_GAP_SPACE);
+  // Data (options)
+  // Send the 1st option chunk of data (4 bytes).
+  for (; i < 8; i++)
+    sendKelvinatorChunk(data[i], 8);
+  // Send a double data gap to signify we are starting a new command sequence.
+  mark(KELVINATOR_BIT_MARK);
+  space(KELVINATOR_GAP_SPACE * 2);
+  // Header #2
+  mark(KELVINATOR_HDR_MARK);
+  space(KELVINATOR_HDR_SPACE);
+  // Data (command)
+  // Send the 2nd command data (4 bytes).
+  // Basically an almost identical repeat of the earlier command data.
+  for (; i < 12; i++)
+    sendKelvinatorChunk(data[i], 8);
+  // Send Footer for the command data (3 bits (B010))
+  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  // Send an interdata gap.
+  mark(KELVINATOR_BIT_MARK);
+  space(KELVINATOR_GAP_SPACE);
+  // Data (options)
+  // Send the 2nd option chunk of data (4 bytes).
+  // Unlike the commands, definately not a repeat of the earlier option data.
+  for (; i < KELVINATOR_STATE_LENGTH; i++)
+    sendKelvinatorChunk(data[i], 8);
+  // Footer
+  mark(KELVINATOR_BIT_MARK);
+  space(0);  // Make sure we end with the led off.
+}
+
 // ---------------------------------------------------------------
-  
+
 
 //IRRecv------------------------------------------------------
 
@@ -593,7 +656,7 @@ IRrecv::IRrecv(int recvpin) {
 
 // initialization
 void IRrecv::enableIRIn() {
-	
+
   // initialize state machine variables
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
@@ -601,7 +664,7 @@ void IRrecv::enableIRIn() {
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, &timer);
-  
+
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
 }
@@ -806,11 +869,11 @@ long IRrecv::decodeSony(decode_results *results) {
 
 long IRrecv::decodeWhynter(decode_results *results) {
   long data = 0;
-  
+
   if (irparams.rawlen < 2 * WHYNTER_BITS + 6) {
      return ERR;
   }
-  
+
   int offset = 1; // Skip first space
 
 
@@ -849,7 +912,7 @@ long IRrecv::decodeWhynter(decode_results *results) {
     }
     offset++;
   }
-  
+
   // trailing mark
   if (!MATCH_MARK(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
     return ERR;
@@ -870,7 +933,7 @@ long IRrecv::decodeSanyo(decode_results *results) {
   }
   int offset = 1; // Skip first space
 
-  
+
   // Initial space
   /* Put this back in for debugging - note can't use #DEBUG as if Debug on we don't see the repeat cos of the delay
   Serial.print("IR Gap: ");
@@ -1151,7 +1214,7 @@ long IRrecv::decodePanasonic(decode_results *results) {
 long IRrecv::decodeLG(decode_results *results) {
   long data = 0;
 	int offset = 1; // Skip first space
-  
+
   // Initial mark
   if (!MATCH_MARK(results->rawbuf[offset], LG_HDR_MARK)) {
     return ERR;
