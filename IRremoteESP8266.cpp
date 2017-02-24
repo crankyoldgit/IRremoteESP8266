@@ -223,6 +223,7 @@ void IRsend::sendSony(unsigned long data, int nbits) {
   enableIROut(40);
   // Header
   mark(SONY_HDR_MARK);
+  space(SONY_HDR_SPACE);
   // Data
   for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
     if (data & mask) {  // 1
