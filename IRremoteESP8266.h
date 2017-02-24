@@ -96,6 +96,7 @@ public:
 #define SAMSUNG 11
 #define LG 12
 #define WHYNTER 13
+#define AIWA_RC_T501 14
 #define COOLIX 15
 #define DAIKIN 16
 #define DENON 17
