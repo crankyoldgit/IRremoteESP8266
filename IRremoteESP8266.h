@@ -65,7 +65,8 @@ enum decode_type_t {
   DAIKIN,
   DENON,
   KELVINATOR,
-  SHERWOOD
+  SHERWOOD,
+  MITSUBISHI_AC
 };
 
 // Results returned from the decoder
@@ -102,6 +103,7 @@ public:
 #define DENON 17
 #define KELVINATOR 18  // Currently not implemented
 #define SHERWOOD 19   // Not implemented. It decodes as an NEC code.
+#define MITSUBISHI_AC 20  // Not implemented.
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -203,6 +205,7 @@ public:
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits);
   void sendSherwood(unsigned long data, int nbits, int repeats);
+  void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(unsigned long usec);
@@ -210,6 +213,7 @@ private:
   int halfPeriodicTime;
   int IRpin;
   void sendKelvinatorChunk(unsigned char data, unsigned char nbits);
+  void sendMitsubishiACChunk(unsigned char data);
 } ;
 
 // Some useful constants

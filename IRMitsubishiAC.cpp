@@ -10,7 +10,7 @@ IRMitsubishiAC::IRMitsubishiAC(int pin) : _irsend(pin) {
 }
 
 void IRMitsubishiAC::stateReset() {
-  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
     remote_state[i] = known_good_state[i];
   checksum();  // Calculate the checksum
 }
@@ -62,7 +62,7 @@ bool IRMitsubishiAC::getPower() {
 // Set the temp. in deg C
 void IRMitsubishiAC::setTemp(uint8_t temp) {
     temp = max(MITSUBISHI_AC_MIN_TEMP, temp);
-    temp = min(MITSUBISHI_AC_TEMP, temp);
+    temp = min(MITSUBISHI_AC_MAX_TEMP, temp);
     remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
 }
 

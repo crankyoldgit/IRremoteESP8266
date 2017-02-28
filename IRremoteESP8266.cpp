@@ -28,6 +28,8 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * Mitsubishi A/C added by crankyoldgit
+ *     (based on https://github.com/r45635/HVAC-IR-Control)
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
  *   sending IR code on ESP8266
@@ -40,6 +42,7 @@
 #include "IRremoteESP8266.h"
 #include "IRremoteInt.h"
 #include "IRKelvinator.h"
+#include "IRMitsubishiAC.h"
 
 // These versions of MATCH, MATCH_MARK, and MATCH_SPACE are only for debugging.
 // To use them, set DEBUG in IRremoteInt.h
@@ -647,6 +650,35 @@ void IRsend::sendSherwood(unsigned long data, int nbits) {
   sendSherwood(data, nbits, 1);
 }
 
+void IRsend::sendMitsubishiACChunk(uint8_t data) {
+  // send a chunk(byte) of Mitsubishi AC data
+  for (uint8_t bit = 0; bit < 8; bit++, data >>= 1) {
+    if (data & B1) {  // 1
+      mark(MITSUBISHI_AC_BIT_MARK);
+      space(MITSUBISHI_AC_ONE_SPACE);
+    } else {  // 0
+      mark(MITSUBISHI_AC_BIT_MARK);
+      space(MITSUBISHI_AC_ZERO_SPACE);
+    }
+  }
+}
+
+void IRsend::sendMitsubishiAC(unsigned char data[]) {
+  // Set IR carrier frequency
+  enableIROut(38);
+  // Mitsubishi AC remote sends the packet twice.
+  for (uint8_t count = 0; count < 2; count++) {
+    // Header
+    mark(MITSUBISHI_AC_HDR_MARK);
+    space(MITSUBISHI_AC_HDR_SPACE);
+    // Data
+    for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
+      sendMitsubishiACChunk(data[i]);
+    // Footer
+    mark(MITSUBISHI_AC_RPT_MARK);
+    space(MITSUBISHI_AC_RPT_SPACE);
+  }
+}
 // ---------------------------------------------------------------
 
 

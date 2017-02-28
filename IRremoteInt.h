@@ -18,6 +18,8 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C added by crankyoldgit
+ * Mitsubishi A/C added by crankyoldgit
+ *     (based on https://github.com/r45635/HVAC-IR-Control)
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200
  *
@@ -83,6 +85,15 @@
 #define MITSUBISHI_ZERO_MARK  750 // 17*50-100
 // #define MITSUBISHI_DOUBLE_SPACE_USECS  800  // usually ssee 713 - not using ticks as get number wrapround
 // #define MITSUBISHI_RPT_LENGTH 45000
+
+// Mitsubishi A/C
+#define MITSUBISHI_AC_HDR_MARK    3400
+#define MITSUBISHI_AC_HDR_SPACE   1750
+#define MITSUBISHI_AC_BIT_MARK    450
+#define MITSUBISHI_AC_ONE_SPACE   1300
+#define MITSUBISHI_AC_ZERO_SPACE  420
+#define MITSUBISHI_AC_RPT_MARK    440
+#define MITSUBISHI_AC_RPT_SPACE   17100L
 
 
 #define RC5_T1		889
