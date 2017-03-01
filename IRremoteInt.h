@@ -87,6 +87,8 @@
 // #define MITSUBISHI_RPT_LENGTH 45000
 
 // Mitsubishi A/C
+// Values were initially obtained from:
+//   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L84
 #define MITSUBISHI_AC_HDR_MARK    3400
 #define MITSUBISHI_AC_HDR_SPACE   1750
 #define MITSUBISHI_AC_BIT_MARK    450

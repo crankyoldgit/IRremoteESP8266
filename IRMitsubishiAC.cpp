@@ -1,34 +1,46 @@
 /*
 Code to emulate Mitsubishi A/C IR remote control unit.
-Inspired and derived from https://github.com/r45635/HVAC-IR-Control
+Inspired and derived from the work done at:
+  https://github.com/r45635/HVAC-IR-Control
+
+Warning: Consider this very alpha code. Seems to work, but not validated.
+
+Equipment it seems compatible with:
+  * <Add models (A/C & remotes) you've gotten it working with here>
 */
 
 #include <IRMitsubishiAC.h>
 
+// Initialise the object.
 IRMitsubishiAC::IRMitsubishiAC(int pin) : _irsend(pin) {
   stateReset();
 }
 
+// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiAC::stateReset() {
   for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
     remote_state[i] = known_good_state[i];
   checksum();  // Calculate the checksum
 }
 
+// Configure the pin for output.
 void IRMitsubishiAC::begin() {
     _irsend.begin();
 }
 
+// Send the current desired state to the IR LED.
 void IRMitsubishiAC::send() {
   checksum();   // Ensure correct checksum before sending.
   _irsend.sendMitsubishiAC(remote_state);
 }
 
+// Return a pointer to the internal state date of the remote.
 uint8_t* IRMitsubishiAC::getRaw() {
   checksum();
   return remote_state;
 }
 
+// Calculate the checksum for the current internal state of the remote.
 void IRMitsubishiAC::checksum() {
   uint8_t sum = 0;
   // Checksum is simple addition of all previous bytes stored
@@ -38,16 +50,19 @@ void IRMitsubishiAC::checksum() {
   remote_state[17] = sum & 0xFFU;
 }
 
+// Set the requested power state of the A/C to off.
 void IRMitsubishiAC::on() {
     //state = ON;
     remote_state[5] |= MITSUBISHI_AC_POWER;
 }
 
+// Set the requested power state of the A/C to off.
 void IRMitsubishiAC::off() {
     //state = OFF;
     remote_state[5] &= ~MITSUBISHI_AC_POWER;
 }
 
+// Set the requested power state of the A/C.
 void IRMitsubishiAC::setPower(bool state) {
   if (state)
     on();
@@ -55,6 +70,7 @@ void IRMitsubishiAC::setPower(bool state) {
     off();
 }
 
+// Return the requested power state of the A/C.
 bool IRMitsubishiAC::getPower() {
     return((remote_state[5] & MITSUBISHI_AC_POWER) != 0);
 }
@@ -86,6 +102,7 @@ void IRMitsubishiAC::setFan(uint8_t fan) {
   remote_state[9] |= fan;
 }
 
+// Return the requested state of the unit's fan.
 uint8_t IRMitsubishiAC::getFan() {
     uint8_t fan = remote_state[9] & B111;
     if (fan == MITSUBISHI_AC_FAN_MAX)
@@ -93,6 +110,7 @@ uint8_t IRMitsubishiAC::getFan() {
     return fan;
 }
 
+// Return the requested climate operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getMode() {
   /*
   MITSUBISHI_AC_AUTO
@@ -103,6 +121,7 @@ uint8_t IRMitsubishiAC::getMode() {
     return(remote_state[6]);
 }
 
+// Set the requested climate operation mode of the a/c unit.
 void IRMitsubishiAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
@@ -115,6 +134,7 @@ void IRMitsubishiAC::setMode(uint8_t mode) {
   remote_state[6] = mode;
 }
 
+// Set the requested vane operation mode of the a/c unit.
 void IRMitsubishiAC::setVane(uint8_t mode) {
   mode = max(mode, B111);  // bounds check
   mode |= B1000;
@@ -122,6 +142,7 @@ void IRMitsubishiAC::setVane(uint8_t mode) {
   remote_state[9] |= mode;
 }
 
+// Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getVane() {
   return ((remote_state[9] & B00111000) >> 3);
 }

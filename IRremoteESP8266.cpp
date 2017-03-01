@@ -29,7 +29,7 @@
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
- *     (based on https://github.com/r45635/HVAC-IR-Control)
+ *     (derived from https://github.com/r45635/HVAC-IR-Control)
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
  *   sending IR code on ESP8266
