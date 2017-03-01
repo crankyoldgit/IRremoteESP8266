@@ -22,8 +22,7 @@ void setup(){
   Serial.begin(115200);
   delay(200);
 
-  // Set up what we want to send. See IRKelvinator.cpp for all the options.
-  // Most things default to off.
+  // Set up what we want to send. See IRMitsubishiAC.cpp for all the options.
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
