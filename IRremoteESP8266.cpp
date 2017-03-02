@@ -701,24 +701,31 @@ static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
 }
 
 static void ICACHE_RAM_ATTR gpio_intr() {
-  uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
-  GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
-
-	if (irparams.rcvstate == STATE_STOP) {
-		return;
-	}
-  static uint32_t start = 0;
   uint32_t now = system_get_time();
-	if (irparams.rcvstate == STATE_IDLE) {
-		irparams.rcvstate = STATE_MARK;
-		irparams.rawbuf[irparams.rawlen++] = 20;
-	} else if (irparams.rawlen < RAWBUF) {
-		irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
-  }
-  start = now;
+  uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
+  static uint32_t start = 0;
 
   os_timer_disarm(&timer);
-  os_timer_arm(&timer, 15, 0);
+  GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
+
+  if (irparams.rawlen >= RAWBUF) {
+    irparams.rcvstate = STATE_STOP;
+  }
+
+  if (irparams.rcvstate == STATE_STOP) {
+    return;
+  }
+
+  if (irparams.rcvstate == STATE_IDLE) {
+    irparams.rcvstate = STATE_MARK;
+    irparams.rawbuf[irparams.rawlen++] = 1;
+  } else {
+    irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
+  }
+
+  start = now;
+  #define ONCE 0
+  os_timer_arm(&timer, 15, ONCE);
 }
 
 IRrecv::IRrecv(int recvpin) {
@@ -727,7 +734,6 @@ IRrecv::IRrecv(int recvpin) {
 
 // initialization
 void IRrecv::enableIRIn() {
-
   // initialize state machine variables
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
