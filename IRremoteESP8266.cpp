@@ -734,17 +734,15 @@ void IRrecv::enableIRIn() {
 
   // Initialize timer
   os_timer_disarm(&timer);
-  os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, &timer);
+  os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, NULL);
 
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
 }
 
 void IRrecv::disableIRIn() {
-  // irReadTimer.stop();
-  // os_timer_disarm(&irReadTimer);
-  ETS_INTR_LOCK();
-  ETS_GPIO_INTR_DISABLE();
+  os_timer_disarm(&timer);
+  detachInterrupt(irparams.recvpin);
 }
 
 void IRrecv::resume() {
