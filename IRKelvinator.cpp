@@ -139,7 +139,7 @@ uint8_t IRKelvinatorAC::getMode() {
 
 void IRKelvinatorAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
-  if (mode < KELVINATOR_AUTO || mode > KELVINATOR_HEAT) mode = KELVINATOR_AUTO;
+  if (mode > KELVINATOR_HEAT) mode = KELVINATOR_AUTO;
   remote_state[0] = (remote_state[0] & KELVINATOR_MODE_MASK) | mode;
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
   if (mode == KELVINATOR_AUTO)

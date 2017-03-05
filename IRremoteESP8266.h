@@ -207,7 +207,7 @@ public:
   void sendSherwood(unsigned long data, int nbits, int repeats);
   void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(int khz);
-  VIRTUAL void mark(int usec);
+  VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);
 private:
   int halfPeriodicTime;

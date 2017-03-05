@@ -429,7 +429,7 @@ void IRsend::sendDenon (unsigned long data,  int nbits) {
   space(0);  // Always end with the LED off
 }
 
-void IRsend::mark(int time) {
+void IRsend::mark(unsigned int time) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
   unsigned long beginning = micros();
