@@ -692,7 +692,7 @@ extern "C" {
 static ETSTimer timer;
 volatile irparams_t irparams;
 
-static void ICACHE_RAM_ATTR read_timeout(void *arg) {
+static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
   if (irparams.rawlen) {
     irparams.rcvstate = STATE_STOP;
