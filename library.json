@@ -6,7 +6,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/markszabo/IRremoteESP8266"
+    "url": "https://github.com/markszabo/IRremoteESP8266.git"
   },
   "authors": [
     {
@@ -15,13 +15,19 @@
     },
     {
       "name": "Mark Szabo",
-      "url": "http://nomartini-noparty.blogspot.com/"
+      "url": "http://nomartini-noparty.blogspot.com/",
+      "maintainer": true
     },
     {
       "name": "Sebastien Warin",
       "url": "http://sebastien.warin.fr",
       "maintainer": true
-    }
+    },
+    {
+      "name": "David Conran",
+      "url": "https://plus.google.com/+davidconran",
+      "maintainer": true
+    },
   ],
   "frameworks": "arduino",
   "platforms": "espressif8266"
