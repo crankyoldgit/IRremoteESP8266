@@ -211,6 +211,7 @@ typedef struct {
   unsigned int timer;     // state timer, counts 50uS ticks.
   unsigned int rawbuf[RAWBUF]; // raw data
   uint8_t rawlen;         // counter of entries in rawbuf
+  uint8_t overflow;
 }
 irparams_t;
 

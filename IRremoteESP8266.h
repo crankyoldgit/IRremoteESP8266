@@ -81,6 +81,7 @@ public:
   int bits; // Number of bits in decoded value
   volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
   int rawlen; // Number of records in rawbuf.
+  bool overflow;
 };
 
 // Values for decode_type

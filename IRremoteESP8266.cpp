@@ -709,6 +709,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 
   if (irparams.rawlen >= RAWBUF) {
+    irparams.overflow = true;
     irparams.rcvstate = STATE_STOP;
   }
 
@@ -717,6 +718,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   }
 
   if (irparams.rcvstate == STATE_IDLE) {
+    irparams.overflow = false;
     irparams.rcvstate = STATE_MARK;
     irparams.rawbuf[irparams.rawlen++] = 1;
   } else {
@@ -762,9 +764,12 @@ void IRrecv::resume() {
 int IRrecv::decode(decode_results *results) {
   results->rawbuf = irparams.rawbuf;
   results->rawlen = irparams.rawlen;
+  results->overflow = irparams.overflow;
+
   if (irparams.rcvstate != STATE_STOP) {
     return ERR;
   }
+
 #ifdef DEBUG
   Serial.println("Attempting NEC decode");
 #endif
