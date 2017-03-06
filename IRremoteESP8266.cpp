@@ -201,7 +201,6 @@ void IRsend::sendLG (unsigned long data, int nbits) {
   // Header
   mark(LG_HDR_MARK);
   space(LG_HDR_SPACE);
-  mark(LG_BIT_MARK);
   // Data
   sendData(LG_BIT_MARK, LG_ONE_SPACE, LG_BIT_MARK, LG_ZERO_SPACE,
            data, nbits, true);
