@@ -201,9 +201,6 @@
 #define STATE_SPACE    4
 #define STATE_STOP     5
 
-#define ERR 0
-#define DECODED 1
-
 // information for the interrupt handler
 typedef struct {
   uint8_t recvpin;           // pin for IR data from detector
