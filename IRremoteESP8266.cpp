@@ -856,7 +856,7 @@ long IRrecv::decodeNEC(decode_results *results) {
     results->decode_type = NEC;
     return DECODED;
   }
-  if (irparams.rawlen < 2 * NEC_BITS + 2 ) { // buf len is rawlen=67 and not 2*32+4
+  if (irparams.rawlen < 2 * NEC_BITS + 2 ) { // buf len is 64+(2)+1? and not 2*32+4
     return ERR;
   }
   // Initial space
