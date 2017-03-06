@@ -128,29 +128,29 @@ class IRrecv
 {
 public:
   IRrecv(int recvpin);
-  int decode(decode_results *results);
+  bool decode(decode_results *results);
   void enableIRIn();
   void disableIRIn();
   void resume();
   private:
   // These are called by decode
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
-  long decodeNEC(decode_results *results);
-  long decodeSony(decode_results *results);
-  long decodeSanyo(decode_results *results);
-  long decodeMitsubishi(decode_results *results);
-  long decodeRC5(decode_results *results);
-  long decodeRC6(decode_results *results);
-  long decodePanasonic(decode_results *results);
-  long decodeLG(decode_results *results);
-  long decodeJVC(decode_results *results);
-  long decodeSAMSUNG(decode_results *results);
-  long decodeWhynter(decode_results *results);
-  long decodeHash(decode_results *results);
+  bool decodeNEC(decode_results *results);
+  bool decodeSony(decode_results *results);
+  bool decodeSanyo(decode_results *results);
+  bool decodeMitsubishi(decode_results *results);
+  bool decodeRC5(decode_results *results);
+  bool decodeRC6(decode_results *results);
+  bool decodePanasonic(decode_results *results);
+  bool decodeLG(decode_results *results);
+  bool decodeJVC(decode_results *results);
+  bool decodeSAMSUNG(decode_results *results);
+  bool decodeWhynter(decode_results *results);
+  bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
-  //  long decodeCOOLIX(decode_results *results);
-  long decodeDaikin(decode_results *results);
-  long decodeDenon(decode_results *results);
+  //  bool decodeCOOLIX(decode_results *results);
+  bool decodeDaikin(decode_results *results);
+  bool decodeDenon(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
