@@ -722,7 +722,10 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rcvstate = STATE_MARK;
     irparams.rawbuf[irparams.rawlen++] = 1;
   } else {
-    irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
+    if (now < start)
+      irparams.rawbuf[irparams.rawlen++] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
+    else
+      irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
   }
 
   start = now;
