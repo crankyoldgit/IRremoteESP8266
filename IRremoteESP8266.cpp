@@ -841,7 +841,7 @@ int IRrecv::decode(decode_results *results) {
 // NECs have a repeat only 4 items long
 long IRrecv::decodeNEC(decode_results *results) {
   long data = 0;
-  int offset = 0; // Skip initial space leading mark is 9ms or 9000
+  int offset = 1; // Skip initial space leading mark is 9ms or 9000
   // Initial mark
   if (!MATCH_MARK(results->rawbuf[offset], NEC_HDR_MARK)) {
     return ERR;
