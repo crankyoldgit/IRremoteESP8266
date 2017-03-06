@@ -107,6 +107,31 @@ void IRsend::begin() {
 	pinMode(IRpin, OUTPUT);
 }
 
+// Generic method for sending data that is common to most protocols.
+// Default to transmitting the Most Significant Bit (MSB) first.
+void IRsend::sendData(unsigned int onemark, unsigned long onespace,
+                      unsigned int zeromark, unsigned long zerospace,
+                      uint32_t data, uint8_t nbits, bool MSBfirst = true) {
+  if (MSBfirst)  // Send the MSB first.
+    for (uint32_t mask = 1UL << (nbits - 1);  mask;  mask >>= 1)
+      if (data & mask) {  // 1
+        mark(onemark);
+        space(onespace);
+      } else {  // 0
+        mark(zeromark);
+        space(zerospace);
+      }
+  else {  // Send the Least Significant Bit (LSB) first / MSB last.
+    for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1)
+      if (data & B1) {  // 1
+        mark(onemark);
+        space(onespace);
+      } else {  // 0
+        mark(zeromark);
+        space(zerospace);
+      }
+    }
+}
 void IRsend::sendCOOLIX(unsigned long data, int nbits) {
   // Set IR carrier frequency
   enableIROut(38);
@@ -149,15 +174,8 @@ void IRsend::sendNEC (unsigned long data, int nbits) {
   mark(NEC_HDR_MARK);
   space(NEC_HDR_SPACE);
   // Data
-  for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(NEC_BIT_MARK);
-      space(NEC_ONE_SPACE);
-    } else {  // 0
-      mark(NEC_BIT_MARK);
-      space(NEC_ZERO_SPACE);
-    }
-  }
+  sendData(NEC_BIT_MARK, NEC_ONE_SPACE, NEC_BIT_MARK, NEC_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   mark(NEC_BIT_MARK);
   space(0);  // Always end with the LED off
@@ -185,16 +203,10 @@ void IRsend::sendLG (unsigned long data, int nbits) {
   space(LG_HDR_SPACE);
   mark(LG_BIT_MARK);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      space(LG_ONE_SPACE);
-      mark(LG_BIT_MARK);
-    } else {  // 0
-      space(LG_ZERO_SPACE);
-      mark(LG_BIT_MARK);
-    }
-  }
+  sendData(LG_BIT_MARK, LG_ONE_SPACE, LG_BIT_MARK, LG_ZERO_SPACE,
+           data, nbits, true);
   // Footer
+  mark(LG_BIT_MARK);
   space(0);  // Always end with the LED off
 }
 
@@ -207,15 +219,8 @@ void IRsend::sendWhynter(unsigned long data, int nbits) {
   mark(WHYNTER_HDR_MARK);
   space(WHYNTER_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(WHYNTER_ONE_MARK);
-      space(WHYNTER_ONE_SPACE);
-    } else {  // 0
-      mark(WHYNTER_ZERO_MARK);
-      space(WHYNTER_ZERO_SPACE);
-    }
-  }
+  sendData(WHYNTER_ONE_MARK, WHYNTER_ONE_SPACE, WHYNTER_ZERO_MARK,
+           WHYNTER_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(WHYNTER_ZERO_MARK);
   space(WHYNTER_ZERO_SPACE);
@@ -228,16 +233,9 @@ void IRsend::sendSony(unsigned long data, int nbits) {
   mark(SONY_HDR_MARK);
   space(SONY_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(SONY_ONE_MARK);
-      space(SONY_HDR_SPACE);
-    } else {  // 0
-      mark(SONY_ZERO_MARK);
-      space(SONY_HDR_SPACE);
-    }
-  }
-  // Footer
+  sendData(SONY_ONE_MARK, SONY_HDR_SPACE, SONY_ZERO_MARK, SONY_HDR_SPACE,
+           data, nbits, true);
+  // Footer.
 }
 
 void IRsend::sendRaw(unsigned int buf[], int len, int hz) {
@@ -341,23 +339,11 @@ void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
   mark(PANASONIC_HDR_MARK);
   space(PANASONIC_HDR_SPACE);
   // Address (16 bits)
-  for (unsigned long mask = 1UL << (16 - 1); mask; mask >>= 1) {
-    mark(PANASONIC_BIT_MARK);
-    if (address & mask) {  // 1
-      space(PANASONIC_ONE_SPACE);
-    } else {  // 0
-      space(PANASONIC_ZERO_SPACE);
-    }
-  }
+  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE, PANASONIC_BIT_MARK,
+           PANASONIC_ZERO_SPACE, address, 16, true);
   // Data (32 bits)
-  for (unsigned long mask = 1UL << (32 - 1); mask; mask >>= 1) {
-    mark(PANASONIC_BIT_MARK);
-    if (data & mask) {  // 1
-      space(PANASONIC_ONE_SPACE);
-    } else {  // 0
-      space(PANASONIC_ZERO_SPACE);
-    }
-  }
+  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE, PANASONIC_BIT_MARK,
+           PANASONIC_ZERO_SPACE, data, 32, true);
   // Footer
   mark(PANASONIC_BIT_MARK);
   space(0);  // Always end with the LED off
@@ -372,15 +358,8 @@ void IRsend::sendJVC(unsigned long data, int nbits, int repeat) {
     space(JVC_HDR_SPACE);
   }
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-       mark(JVC_BIT_MARK);
-       space(JVC_ONE_SPACE);
-    } else {  // 0
-       mark(JVC_BIT_MARK);
-       space(JVC_ZERO_SPACE);
-    }
-  }
+  sendData(JVC_BIT_MARK, JVC_ONE_SPACE, JVC_BIT_MARK, JVC_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   mark(JVC_BIT_MARK);
   space(0);  // Always end with the LED off
@@ -393,15 +372,8 @@ void IRsend::sendSAMSUNG(unsigned long data, int nbits) {
   mark(SAMSUNG_HDR_MARK);
   space(SAMSUNG_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(SAMSUNG_BIT_MARK);
-      space(SAMSUNG_ONE_SPACE);
-    } else { // 0
-      mark(SAMSUNG_BIT_MARK);
-      space(SAMSUNG_ZERO_SPACE);
-    }
-  }
+  sendData(SAMSUNG_BIT_MARK, SAMSUNG_ONE_SPACE, SAMSUNG_BIT_MARK,
+           SAMSUNG_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(SAMSUNG_BIT_MARK);
   space(0);  // Always end with the LED off
@@ -415,15 +387,8 @@ void IRsend::sendDenon (unsigned long data,  int nbits) {
   mark(DENON_HDR_MARK);
   space(DENON_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-    if (data & mask) {  // 1
-      mark (DENON_BIT_MARK);
-      space(DENON_ONE_SPACE);
-    } else {  // 0
-      mark (DENON_BIT_MARK);
-      space(DENON_ZERO_SPACE);
-    }
-  }
+  sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   mark(DENON_BIT_MARK);
   space(0);  // Always end with the LED off
@@ -500,15 +465,8 @@ void IRsend::sendSharpRaw(unsigned long data, int nbits) {
   // much more reliable. That's the exact behaviour of CD-S6470 remote control.
   for (int n = 0; n < 3; n++) {
     // Data
-    for (unsigned long mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-      if (data & mask) {  // 1
-        mark(SHARP_BIT_MARK);
-        space(SHARP_ONE_SPACE);
-      } else {  // 0
-        mark(SHARP_BIT_MARK);
-        space(SHARP_ZERO_SPACE);
-      }
-    }
+    sendData(SHARP_BIT_MARK, SHARP_ONE_SPACE, SHARP_BIT_MARK, SHARP_ZERO_SPACE,
+             data, nbits, true);
     // Footer
     mark(SHARP_BIT_MARK);
     space(SHARP_ZERO_SPACE);
@@ -529,67 +487,38 @@ void IRsend::sendDISH(unsigned long data, int nbits) {
   // Header
   mark(DISH_HDR_MARK);
   space(DISH_HDR_SPACE);
-  for (int i = 0; i < nbits; i++) {
-    if (data & DISH_TOP_BIT) {
-      mark(DISH_BIT_MARK);
-      space(DISH_ONE_SPACE);
-    } else {
-      mark(DISH_BIT_MARK);
-      space(DISH_ZERO_SPACE);
-    }
-    data <<= 1;
-  }
+  // Data
+  sendData(DISH_BIT_MARK, DISH_ONE_SPACE, DISH_BIT_MARK, DISH_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   space(0);  // Always end with the LED off
 }
 
 // From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-void IRsend::sendDaikin(unsigned char daikin[]) {
-  sendDaikinChunk(daikin, 8,0);
-  delay(29);
-  sendDaikinChunk(daikin, 19,8);
-}
-
-void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
-  int data2;
+void IRsend::sendDaikin(unsigned char data[]) {
   // Set IR carrier frequency
   enableIROut(38);
   // Header
   mark(DAIKIN_HDR_MARK);
   space(DAIKIN_HDR_SPACE);
   // Data
-  for (int i = start; i < start+len; i++) {
-    data2=buf[i];
-
-    for (int j = 0; j < 8; j++) {
-      if ((1 << j & data2)) {
-        mark(DAIKIN_ONE_MARK);
-        space(DAIKIN_ONE_SPACE);
-      } else {
-        mark(DAIKIN_ZERO_MARK);
-        space(DAIKIN_ZERO_SPACE);
-      }
-    }
-  }
+  for (uint8_t i = 0; i < 8; i++)
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, data[i], 8, false);
   // Footer
   mark(DAIKIN_ONE_MARK);
   space(DAIKIN_ZERO_SPACE);
-}
-
-void IRsend::sendKelvinatorChunk(uint8_t data, uint8_t nbits) {
-  // send a chunk of Kelvinator data
-
-  if (nbits > 8)
-    nbits = 8;  // Can't have more bits than exist in a uint8_t.
-  for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1) {
-    if (data & B1) {  // 1
-      mark(KELVINATOR_BIT_MARK);
-      space(KELVINATOR_ONE_SPACE);
-    } else {  // 0
-      mark(KELVINATOR_BIT_MARK);
-      space(KELVINATOR_ZERO_SPACE);
-    }
-  }
+  delay(29);
+  // Header
+  mark(DAIKIN_HDR_MARK);
+  space(DAIKIN_HDR_SPACE);
+  // Data
+  for (uint8_t i = 8; i < 19; i++)
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, data[i], 8, false);
+  // Footer
+  mark(DAIKIN_ONE_MARK);
+  space(DAIKIN_ZERO_SPACE);
 }
 
 void IRsend::sendKelvinator(unsigned char data[]) {
@@ -602,16 +531,19 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Data (command)
   // Send the first command data (4 bytes)
   for (; i < 4; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send Footer for the command data (3 bits (B010))
-  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+           KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
   // Data (options)
   // Send the 1st option chunk of data (4 bytes).
   for (; i < 8; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send a double data gap to signify we are starting a new command sequence.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE * 2);
@@ -622,9 +554,11 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send the 2nd command data (4 bytes).
   // Basically an almost identical repeat of the earlier command data.
   for (; i < 12; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send Footer for the command data (3 bits (B010))
-  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+           KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
@@ -632,35 +566,19 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send the 2nd option chunk of data (4 bytes).
   // Unlike the commands, definately not a repeat of the earlier option data.
   for (; i < KELVINATOR_STATE_LENGTH; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Footer
   mark(KELVINATOR_BIT_MARK);
   space(0);  // Make sure we end with the led off.
 }
 
-void IRsend::sendSherwood(unsigned long data, int nbits, int repeats) {
+void IRsend::sendSherwood(unsigned long data, int nbits, int repeats = 1) {
   // Sherwood remote codes appear to be NEC codes with a manditory repeat code.
   sendNEC(data, nbits);
   // An NEC code can start every 108ms. Typically a NEC code is about 67.5ms.
   // So 67.5ms + NEC_CODE_TO_RPT_SPACE = ~108ms.
   sendNECRepeat(NEC_CODE_TO_RPT_SPACE, repeats);
-}
-
-void IRsend::sendSherwood(unsigned long data, int nbits) {
-  sendSherwood(data, nbits, 1);
-}
-
-void IRsend::sendMitsubishiACChunk(uint8_t data) {
-  // send a chunk(byte) of Mitsubishi AC data
-  for (uint8_t bit = 0; bit < 8; bit++, data >>= 1) {
-    if (data & B1) {  // 1
-      mark(MITSUBISHI_AC_BIT_MARK);
-      space(MITSUBISHI_AC_ONE_SPACE);
-    } else {  // 0
-      mark(MITSUBISHI_AC_BIT_MARK);
-      space(MITSUBISHI_AC_ZERO_SPACE);
-    }
-  }
 }
 
 void IRsend::sendMitsubishiAC(unsigned char data[]) {
@@ -673,7 +591,9 @@ void IRsend::sendMitsubishiAC(unsigned char data[]) {
     space(MITSUBISHI_AC_HDR_SPACE);
     // Data
     for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
-      sendMitsubishiACChunk(data[i]);
+      sendData(MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+               MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
+               data[i], 8, false);
     // Footer
     mark(MITSUBISHI_AC_RPT_MARK);
     space(MITSUBISHI_AC_RPT_SPACE);

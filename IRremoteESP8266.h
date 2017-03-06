@@ -31,6 +31,10 @@
 #ifndef IRremote_h
 #define IRremote_h
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include <Arduino.h>
+#endif
+
 // The following are compile-time library options.
 // If you change them, recompile the library.
 // If DEBUG is defined, a lot of debugging output will be printed during decoding.
@@ -201,7 +205,6 @@ public:
   void sendJVC(unsigned long data, int nbits, int repeat); // *Note instead of sending the REPEAT constant if you want the JVC repeat signal sent, send the original code value and change the repeat argument from 0 to 1. JVC protocol repeats by skipping the header NOT by sending a separate code value like NEC does.
   void sendSAMSUNG(unsigned long data, int nbits);
   void sendDaikin(unsigned char daikin[]);
-  void sendDaikinChunk(unsigned char buf[], int len, int start);
   void sendDenon(unsigned long data, int nbits);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits);
@@ -213,8 +216,9 @@ public:
 private:
   int halfPeriodicTime;
   int IRpin;
-  void sendKelvinatorChunk(unsigned char data, unsigned char nbits);
-  void sendMitsubishiACChunk(unsigned char data);
+  void sendData(unsigned int onemark, unsigned long onespace,
+                unsigned int zeromark, unsigned long zerospace,
+                uint32_t data, uint8_t nbits, bool MSBfirst);
 } ;
 
 // Some useful constants
