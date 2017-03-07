@@ -28,6 +28,11 @@
       "url": "https://plus.google.com/+davidconran",
       "maintainer": true
     },
+    {
+      "name": "Roi Dayan",
+      "url": "https://github.com/roidayan/",
+      "maintainer": true
+    },
   ],
   "frameworks": "arduino",
   "platforms": "espressif8266"
