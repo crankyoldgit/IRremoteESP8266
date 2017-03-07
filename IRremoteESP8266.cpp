@@ -108,10 +108,9 @@ void IRsend::begin() {
 }
 
 // Generic method for sending data that is common to most protocols.
-// Default to transmitting the Most Significant Bit (MSB) first.
 void IRsend::sendData(unsigned int onemark, unsigned long onespace,
                       unsigned int zeromark, unsigned long zerospace,
-                      uint32_t data, uint8_t nbits, bool MSBfirst = true) {
+                      uint32_t data, uint8_t nbits, bool MSBfirst) {
   if (MSBfirst)  // Send the MSB first.
     for (uint32_t mask = 1UL << (nbits - 1);  mask;  mask >>= 1)
       if (data & mask) {  // 1
@@ -572,7 +571,7 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   space(0);  // Make sure we end with the led off.
 }
 
-void IRsend::sendSherwood(unsigned long data, int nbits, int repeats = 1) {
+void IRsend::sendSherwood(unsigned long data, int nbits, int repeats) {
   // Sherwood remote codes appear to be NEC codes with a manditory repeat code.
   sendNEC(data, nbits);
   // An NEC code can start every 108ms. Typically a NEC code is about 67.5ms.

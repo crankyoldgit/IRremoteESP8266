@@ -207,8 +207,7 @@ public:
   void sendDaikin(unsigned char daikin[]);
   void sendDenon(unsigned long data, int nbits);
   void sendKelvinator(unsigned char data[]);
-  void sendSherwood(unsigned long data, int nbits);
-  void sendSherwood(unsigned long data, int nbits, int repeats);
+  void sendSherwood(unsigned long data, int nbits, int repeats=1);
   void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(int khz);
   VIRTUAL void mark(unsigned int usec);
@@ -218,7 +217,7 @@ private:
   int IRpin;
   void sendData(unsigned int onemark, unsigned long onespace,
                 unsigned int zeromark, unsigned long zerospace,
-                uint32_t data, uint8_t nbits, bool MSBfirst);
+                uint32_t data, uint8_t nbits, bool MSBfirst=true);
 } ;
 
 // Some useful constants
