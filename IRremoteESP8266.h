@@ -84,29 +84,6 @@ public:
   bool overflow;
 };
 
-// Values for decode_type
-#define NEC 1
-#define SONY 2
-#define RC5 3
-#define RC6 4
-#define DISH 5
-#define SHARP 6
-#define PANASONIC 7
-#define JVC 8
-#define SANYO 9
-#define MITSUBISHI 10
-#define SAMSUNG 11
-#define LG 12
-#define WHYNTER 13
-#define AIWA_RC_T501 14
-#define COOLIX 15
-#define DAIKIN 16
-#define DENON 17
-#define KELVINATOR 18  // Currently not implemented
-#define SHERWOOD 19   // Not implemented. It decodes as an NEC code.
-#define MITSUBISHI_AC 20  // Not implemented.
-#define UNKNOWN -1
-
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
