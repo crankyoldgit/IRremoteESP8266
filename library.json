@@ -32,7 +32,7 @@
       "name": "Roi Dayan",
       "url": "https://github.com/roidayan/",
       "maintainer": true
-    },
+    }
   ],
   "frameworks": "arduino",
   "platforms": "espressif8266"
