@@ -221,23 +221,35 @@ void IRsend::sendWhynter(unsigned long data, int nbits) {
   space(WHYNTER_ZERO_SPACE);
 }
 
-void IRsend::sendSony(unsigned long data, int nbits) {
+// sendSony() should typically be called with repeat=3 as Sony devices
+// expect the code to be sent at least 3 times.
+// Timings and details are taken from:
+//   http://www.sbprojects.com/knowledge/ir/sirc.php
+void IRsend::sendSony(unsigned long data, int nbits, unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(40);
-  // Header
-  mark(SONY_HDR_MARK);
-  space(SONY_HDR_SPACE);
-  // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(SONY_ONE_MARK);
-      space(SONY_HDR_SPACE);
-    } else {  // 0
-      mark(SONY_ZERO_MARK);
-      space(SONY_HDR_SPACE);
+  for (uint16_t i = 0; i < repeat; i++) {  // Typically loop 3 or more times.
+    // Header
+    mark(SONY_HDR_MARK);
+    space(SONY_HDR_SPACE);
+    uint32_t usecs_so_far = SONY_HDR_MARK + SONY_HDR_SPACE;
+    // Data
+    for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
+      if (data & mask) {  // 1
+        mark(SONY_ONE_MARK);
+        space(SONY_HDR_SPACE);
+        usecs_so_far += SONY_ONE_MARK + SONY_HDR_SPACE;
+      } else {  // 0
+        mark(SONY_ZERO_MARK);
+        space(SONY_HDR_SPACE);
+        usecs_so_far += SONY_ZERO_MARK + SONY_HDR_SPACE;
+      }
     }
+    // Footer
+    // The Sony protocol requires us to wait 45ms from start of a code to the
+    // start of the next one. A 10ms minimum gap is also required.
+    space(max(10000, 45000 - usecs_so_far));
   }
-  // Footer
 }
 
 void IRsend::sendRaw(unsigned int buf[], int len, int hz) {

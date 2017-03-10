@@ -186,7 +186,11 @@ public:
   void sendNEC(unsigned long data, int nbits);
   void sendNECRepeat(unsigned long time_us, int repeats);
   void sendLG(unsigned long data, int nbits);
-  void sendSony(unsigned long data, int nbits);
+  // sendSony() should typically be called with repeat=3 as Sony devices
+  // expect the code to be sent at least 3 times.
+  // As the legacy use of this procedure was only to send a single code
+  // it defaults to repeat=1 for backward compatiblity.
+  void sendSony(unsigned long data, int nbits, unsigned int repeat=1);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
   //  void sendMitsubishi(unsigned long data, int nbits);
