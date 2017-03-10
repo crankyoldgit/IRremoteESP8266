@@ -31,6 +31,8 @@
 #ifndef IRremote_h
 #define IRremote_h
 
+#include <stdint.h>
+
 // The following are compile-time library options.
 // If you change them, recompile the library.
 // If DEBUG is defined, a lot of debugging output will be printed during decoding.
@@ -192,6 +194,9 @@ private:
   int IRpin;
   void sendKelvinatorChunk(unsigned char data, unsigned char nbits);
   void sendMitsubishiACChunk(unsigned char data);
+  void sendData(uint16_t onemark, uint32_t onespace,
+                uint16_t zeromark, uint32_t zerospace,
+                uint32_t data, uint8_t nbits, bool MSBfirst=true);
 } ;
 
 // Some useful constants
