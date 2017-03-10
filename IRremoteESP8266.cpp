@@ -106,6 +106,31 @@ IRsend::IRsend(int IRsendPin) {
 void IRsend::begin() {
 	pinMode(IRpin, OUTPUT);
 }
+// Generic method for sending data that is common to most protocols.
+// Default to transmitting the Most Significant Bit (MSB) first.
+void IRsend::sendData(uint16_t onemark, uint32_t onespace,
+                      uint16_t zeromark, uint32_t zerospace,
+                      uint32_t data, uint8_t nbits, bool MSBfirst) {
+  if (MSBfirst)  // Send the MSB first.
+    for (uint32_t mask = 1UL << (nbits - 1);  mask;  mask >>= 1)
+      if (data & mask) {  // 1
+        mark(onemark);
+        space(onespace);
+      } else {  // 0
+        mark(zeromark);
+        space(zerospace);
+      }
+  else {  // Send the Least Significant Bit (LSB) first / MSB last.
+    for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1)
+      if (data & 1) {  // 1
+        mark(onemark);
+        space(onespace);
+      } else {  // 0
+        mark(zeromark);
+        space(zerospace);
+      }
+  }
+}
 
 void IRsend::sendCOOLIX(unsigned long data, int nbits) {
   // Set IR carrier frequency
