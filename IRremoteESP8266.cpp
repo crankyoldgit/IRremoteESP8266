@@ -234,7 +234,7 @@ void IRsend::sendLG (unsigned long data, int nbits) {
     }
   }
   // Footer
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 void IRsend::sendWhynter(unsigned long data, int nbits) {
@@ -289,7 +289,7 @@ void IRsend::sendRaw(unsigned int buf[], int len, int hz) {
       mark(buf[i]);
     }
   }
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 // Global Cache format w/o emitter ID or request ID. Starts from hertz,
@@ -317,7 +317,7 @@ void IRsend::sendGC(unsigned int buf[], int len) {
     }
   }
   // Footer
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 // Note: first bit must be a one (start bit)
@@ -339,7 +339,7 @@ void IRsend::sendRC5(unsigned long data, int nbits) {
     }
   }
   // Footer
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 // Caller needs to take care of flipping the toggle bit
@@ -370,7 +370,7 @@ void IRsend::sendRC6(unsigned long data, int nbits) {
     }
   }
   // Footer
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
@@ -399,7 +399,7 @@ void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
   }
   // Footer
   mark(PANASONIC_BIT_MARK);
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 void IRsend::sendJVC(unsigned long data, int nbits, int repeat) {
@@ -422,7 +422,7 @@ void IRsend::sendJVC(unsigned long data, int nbits, int repeat) {
   }
   // Footer
   mark(JVC_BIT_MARK);
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 void IRsend::sendSAMSUNG(unsigned long data, int nbits) {
@@ -443,7 +443,7 @@ void IRsend::sendSAMSUNG(unsigned long data, int nbits) {
   }
   // Footer
   mark(SAMSUNG_BIT_MARK);
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 // Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
@@ -465,31 +465,31 @@ void IRsend::sendDenon (unsigned long data,  int nbits) {
   }
   // Footer
   mark(DENON_BIT_MARK);
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 void IRsend::mark(unsigned int time) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
-  unsigned long beginning = micros();
-  unsigned long current = beginning;
-  while (current - beginning < time) {
+  IRtimer usecs = IRtimer();
+  while (usecs.elapsed() < time) {
     digitalWrite(IRpin, HIGH);
     delayMicroseconds(halfPeriodicTime);
     digitalWrite(IRpin, LOW);
     // 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
     delayMicroseconds(halfPeriodicTime);
-    current = micros();
-    if (current < beginning)  // Handle when micros() wraps.
-      beginning = current;
   }
+}
+
+void IRsend::ledOff() {
+  digitalWrite(IRpin, LOW);
 }
 
 /* Leave pin off for time (given in microseconds) */
 void IRsend::space(unsigned long time) {
   // Sends an IR space for the specified number of microseconds.
   // A space is no output, so the PWM output is disabled.
-  digitalWrite(IRpin, LOW);
+  ledOff();
   if (time == 0) return;
   if (time <= 16383)  // delayMicroseconds is only accurate to 16383us.
     delayMicroseconds(time);
@@ -579,7 +579,7 @@ void IRsend::sendDISH(unsigned long data, int nbits) {
     data <<= 1;
   }
   // Footer
-  space(0);  // Always end with the LED off
+  ledOff();  // Always end with the LED off
 }
 
 // From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -664,7 +664,7 @@ void IRsend::sendKelvinator(unsigned char data[]) {
              KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Footer
   mark(KELVINATOR_BIT_MARK);
-  space(0);  // Make sure we end with the led off.
+  ledOff();  // Make sure we end with the led off.
 }
 
 void IRsend::sendSherwood(unsigned long data, int nbits, unsigned int repeat) {
