@@ -97,6 +97,26 @@ int MATCH_SPACE(int measured_ticks, int desired_us)
 // Debugging versions are in IRremote.cpp
 #endif
 
+// IRtimer ---------------------------------------------------------------------
+// This class performs a simple time in useconds since instantiated.
+// Handles when the system timer wraps around (once).
+
+IRtimer::IRtimer() {
+  reset();
+}
+
+void IRtimer::reset() {
+  start = micros();
+}
+
+uint32_t IRtimer::elapsed() {
+  uint32_t now = micros();
+  if (start < now)  // Check if the system timer has wrapped.
+    return (now - start);  // No wrap.
+  else
+    return (0xFFFFFFFF - start + now);  // Has wrapped.
+}
+
 // IRsend ----------------------------------------------------------------------
 
 IRsend::IRsend(int IRsendPin) {
@@ -167,38 +187,32 @@ void IRsend::sendCOOLIX(unsigned long data, int nbits) {
   space(COOLIX_HDR_SPACE);    // Pause before repeating
 }
 
-void IRsend::sendNEC (unsigned long data, int nbits) {
+void IRsend::sendNEC (unsigned long data, int nbits, unsigned int repeat) {
+  // Details about timings can be found at:
+  //   http://www.sbprojects.com/knowledge/ir/nec.php
+
   // Set IR carrier frequency
   enableIROut(38);
+  IRtimer usecs = IRtimer();
   // Header
   mark(NEC_HDR_MARK);
   space(NEC_HDR_SPACE);
   // Data
-  for (unsigned long  mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(NEC_BIT_MARK);
-      space(NEC_ONE_SPACE);
-    } else {  // 0
-      mark(NEC_BIT_MARK);
-      space(NEC_ZERO_SPACE);
-    }
-  }
+  sendData(NEC_BIT_MARK, NEC_ONE_SPACE, NEC_BIT_MARK, NEC_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   mark(NEC_BIT_MARK);
-  space(0);  // Always end with the LED off
-}
+  // Gap to next command.
+  space(NEC_MIN_COMMAND_LENGTH - usecs.elapsed());
 
-void IRsend::sendNECRepeat(unsigned long time_us, int repeats) {
-  // NEC Repeat code.
-
-  // Set IR carrier frequency
-  enableIROut(38);
-  space(time_us);  // Gap between previous IR code and the repeat code.
-  for (int i = 0; i < repeats; i++) {
+  // Optional command repeat sequence.
+  for (unsigned int i = 0; i < repeat; i++) {
+    usecs.reset();
     mark(NEC_HDR_MARK);
     space(NEC_RPT_SPACE);
     mark(NEC_BIT_MARK);
-    space(NEC_RPT_FOOTER);  // Always end with the LED off.
+    // Gap till next command.
+    space(NEC_MIN_COMMAND_LENGTH - usecs.elapsed());
   }
 }
 
@@ -601,22 +615,6 @@ void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
   space(DAIKIN_ZERO_SPACE);
 }
 
-void IRsend::sendKelvinatorChunk(uint8_t data, uint8_t nbits) {
-  // send a chunk of Kelvinator data
-
-  if (nbits > 8)
-    nbits = 8;  // Can't have more bits than exist in a uint8_t.
-  for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1) {
-    if (data & B1) {  // 1
-      mark(KELVINATOR_BIT_MARK);
-      space(KELVINATOR_ONE_SPACE);
-    } else {  // 0
-      mark(KELVINATOR_BIT_MARK);
-      space(KELVINATOR_ZERO_SPACE);
-    }
-  }
-}
-
 void IRsend::sendKelvinator(unsigned char data[]) {
   uint8_t i = 0;
   // Set IR carrier frequency
@@ -627,16 +625,19 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Data (command)
   // Send the first command data (4 bytes)
   for (; i < 4; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send Footer for the command data (3 bits (B010))
-  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+           KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
   // Data (options)
   // Send the 1st option chunk of data (4 bytes).
   for (; i < 8; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send a double data gap to signify we are starting a new command sequence.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE * 2);
@@ -647,9 +648,11 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send the 2nd command data (4 bytes).
   // Basically an almost identical repeat of the earlier command data.
   for (; i < 12; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Send Footer for the command data (3 bits (B010))
-  sendKelvinatorChunk(KELVINATOR_CMD_FOOTER, 3);
+  sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+           KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
   // Send an interdata gap.
   mark(KELVINATOR_BIT_MARK);
   space(KELVINATOR_GAP_SPACE);
@@ -657,22 +660,17 @@ void IRsend::sendKelvinator(unsigned char data[]) {
   // Send the 2nd option chunk of data (4 bytes).
   // Unlike the commands, definately not a repeat of the earlier option data.
   for (; i < KELVINATOR_STATE_LENGTH; i++)
-    sendKelvinatorChunk(data[i], 8);
+    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
+             KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Footer
   mark(KELVINATOR_BIT_MARK);
   space(0);  // Make sure we end with the led off.
 }
 
-void IRsend::sendSherwood(unsigned long data, int nbits, int repeats) {
+void IRsend::sendSherwood(unsigned long data, int nbits, unsigned int repeat) {
   // Sherwood remote codes appear to be NEC codes with a manditory repeat code.
-  sendNEC(data, nbits);
-  // An NEC code can start every 108ms. Typically a NEC code is about 67.5ms.
-  // So 67.5ms + NEC_CODE_TO_RPT_SPACE = ~108ms.
-  sendNECRepeat(NEC_CODE_TO_RPT_SPACE, repeats);
-}
-
-void IRsend::sendSherwood(unsigned long data, int nbits) {
-  sendSherwood(data, nbits, 1);
+  // i.e. repeat should be >= 1.
+  sendNEC(data, nbits, max(1, repeat));
 }
 
 void IRsend::sendMitsubishiACChunk(uint8_t data) {
