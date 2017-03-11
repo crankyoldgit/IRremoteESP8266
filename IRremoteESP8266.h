@@ -162,8 +162,7 @@ public:
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
-  void sendNEC(unsigned long data, int nbits);
-  void sendNECRepeat(unsigned long time_us, int repeats);
+  void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
   void sendLG(unsigned long data, int nbits);
   void sendSony(unsigned long data, int nbits);
   // Neither Sanyo nor Mitsubishi send is implemented yet
@@ -183,8 +182,7 @@ public:
   void sendDaikinChunk(unsigned char buf[], int len, int start);
   void sendDenon(unsigned long data, int nbits);
   void sendKelvinator(unsigned char data[]);
-  void sendSherwood(unsigned long data, int nbits);
-  void sendSherwood(unsigned long data, int nbits, int repeats);
+  void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(int khz);
   VIRTUAL void mark(unsigned int usec);
@@ -192,12 +190,20 @@ public:
 private:
   int halfPeriodicTime;
   int IRpin;
-  void sendKelvinatorChunk(unsigned char data, unsigned char nbits);
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
                 uint32_t data, uint8_t nbits, bool MSBfirst=true);
 } ;
+
+class IRtimer {
+public:
+  IRtimer();
+  void reset();
+  uint32_t elapsed();
+private:
+  uint32_t start;
+};
 
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
