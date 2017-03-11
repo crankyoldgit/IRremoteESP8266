@@ -194,6 +194,7 @@ public:
 private:
   int halfPeriodicTime;
   int IRpin;
+  void ledOff();
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
