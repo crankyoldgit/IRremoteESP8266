@@ -7,7 +7,6 @@
 - [Marcos de Alcântara Marinho](https://github.com/marcosamarinho/)
 - [pintomax](https://github.com/pintomax/)
 - [Darsh Patel](https://github.com/darshkpatel/)
-- [Massimiliano Pinto](https://github.com/pintomax/)
 
 All contributors can be found on the [contributors site](https://github.com/markszabo/IRremoteESP8266/graphs/contributors). 
 
