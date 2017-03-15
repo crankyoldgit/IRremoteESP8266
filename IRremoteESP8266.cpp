@@ -749,10 +749,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rcvstate = STATE_MARK;
     irparams.rawbuf[irparams.rawlen++] = 1;
   } else {
-    if (now < start)
-      irparams.rawbuf[irparams.rawlen++] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
-    else
-      irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
+    irparams.rawbuf[irparams.rawlen++] = now - start;
   }
 
   start = now;
@@ -798,6 +795,13 @@ bool IRrecv::decode(decode_results *results) {
 
   if (irparams.rcvstate != STATE_STOP) {
     return false;
+  }
+
+  for (int i = 0; i < irparams.rawlen; i++) {
+    if (irparams.rawbuf[i] < 0)
+      irparams.rawbuf[i] = (0xFFFFFFFF + irparams.rawbuf[i]) / USECPERTICK + 1;
+    else
+      irparams.rawbuf[i] = irparams.rawbuf[i] / USECPERTICK + 1;
   }
 
 #ifdef DEBUG
