@@ -32,6 +32,11 @@
       "name": "Roi Dayan",
       "url": "https://github.com/roidayan/",
       "maintainer": true
+    },
+    {
+      "name": "Massimiliano Pinto",
+      "url": "https://github.com/pintomax/",
+      "maintainer": true
     }
   ],
   "frameworks": "arduino",
