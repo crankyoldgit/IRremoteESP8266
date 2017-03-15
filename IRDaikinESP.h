@@ -49,7 +49,7 @@
 			1111 = Swing left/right on
 	byte 21=Aux  -> Powerful (bit 1), Silent (bit 5)
 	byte 24=Aux2 -> Intelligent eye on (bit 7)
-	byte 26= checksum of the second part 
+	byte 26= checksum of the second part
 */
 
 #define DAIKIN_COMMAND_LENGTH 27
@@ -94,8 +94,7 @@ class IRDaikinESP
         0xB0,0x00,0x00,0x00,0x00,0x00,0x00,0xC0,0x00,0x00,0xE3 };
         //16  17    18  19   20    21   22  23   24   25   26
 
-        uint8_t checksum();
+        void checksum();
 
         IRsend _irsend;
 };
-

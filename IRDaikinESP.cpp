@@ -19,7 +19,7 @@ void IRDaikinESP::send()
   _irsend.sendDaikin(daikin);
 }
 
-uint8_t IRDaikinESP::checksum()
+void IRDaikinESP::checksum()
 {
     uint8_t sum = 0;
     uint8_t i;
@@ -70,7 +70,7 @@ uint8_t IRDaikinESP::getAux(){
 // Set the temp in deg C
 void IRDaikinESP::setTemp(uint8_t temp)
 {
-    if (temp < 18) 
+    if (temp < 18)
         temp = 18;
     else if (temp > 32)
         temp = 32;
@@ -150,4 +150,3 @@ uint8_t IRDaikinESP::getSwingHorizontal()
 {
     return (daikin[17])&0x01;
 }
-

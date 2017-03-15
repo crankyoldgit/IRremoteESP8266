@@ -18,6 +18,7 @@
  * Coolix A/C / heatpump added by bakrus
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
+ * Kelvinator A/C and Sherwood added by crankyoldgit
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
@@ -29,6 +30,8 @@
 
 #ifndef IRremote_h
 #define IRremote_h
+
+#include <stdint.h>
 
 // The following are compile-time library options.
 // If you change them, recompile the library.
@@ -63,6 +66,9 @@ enum decode_type_t {
   COOLIX,
   DAIKIN,
   DENON,
+  KELVINATOR,
+  SHERWOOD,
+  MITSUBISHI_AC
 };
 
 // Results returned from the decoder
@@ -77,26 +83,8 @@ public:
   int bits; // Number of bits in decoded value
   volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
   int rawlen; // Number of records in rawbuf.
+  bool overflow;
 };
-
-// Values for decode_type
-#define NEC 1
-#define SONY 2
-#define RC5 3
-#define RC6 4
-#define DISH 5
-#define SHARP 6
-#define PANASONIC 7
-#define JVC 8
-#define SANYO 9
-#define MITSUBISHI 10
-#define SAMSUNG 11
-#define LG 12
-#define WHYNTER 13
-#define COOLIX 15
-#define DAIKIN 16
-#define DENON 17
-#define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
@@ -112,35 +100,36 @@ public:
 #define SEND_PROTOCOL_WHYNTER case WHYNTER: sendWhynter(data, nbits); break;
 #define SEND_PROTOCOL_COOLIX  case COOLIX: sendCOOLIX(data, nbits); break;
 #define SEND_PROTOCOL_DENON  case DENON: sendDenon(data, nbits); break;
+#define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
 
 // main class for receiving IR
 class IRrecv
 {
 public:
   IRrecv(int recvpin);
-  int decode(decode_results *results);
+  bool decode(decode_results *results);
   void enableIRIn();
   void disableIRIn();
   void resume();
   private:
   // These are called by decode
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
-  long decodeNEC(decode_results *results);
-  long decodeSony(decode_results *results);
-  long decodeSanyo(decode_results *results);
-  long decodeMitsubishi(decode_results *results);
-  long decodeRC5(decode_results *results);
-  long decodeRC6(decode_results *results);
-  long decodePanasonic(decode_results *results);
-  long decodeLG(decode_results *results);
-  long decodeJVC(decode_results *results);
-  long decodeSAMSUNG(decode_results *results);
-  long decodeWhynter(decode_results *results);
-  long decodeHash(decode_results *results);
+  bool decodeNEC(decode_results *results);
+  bool decodeSony(decode_results *results);
+  bool decodeSanyo(decode_results *results);
+  bool decodeMitsubishi(decode_results *results);
+  bool decodeRC5(decode_results *results);
+  bool decodeRC6(decode_results *results);
+  bool decodePanasonic(decode_results *results);
+  bool decodeLG(decode_results *results);
+  bool decodeJVC(decode_results *results);
+  bool decodeSAMSUNG(decode_results *results);
+  bool decodeWhynter(decode_results *results);
+  bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
-  //  long decodeCOOLIX(decode_results *results);
-  long decodeDaikin(decode_results *results);
-  long decodeDenon(decode_results *results);
+  //  bool decodeCOOLIX(decode_results *results);
+  bool decodeDaikin(decode_results *results);
+  bool decodeDenon(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 };
 
@@ -168,13 +157,18 @@ public:
         SEND_PROTOCOL_WHYNTER
         SEND_PROTOCOL_COOLIX
         SEND_PROTOCOL_DENON
+        SEND_PROTOCOL_SHERWOOD
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
-  void sendNEC(unsigned long data, int nbits);
+  void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
   void sendLG(unsigned long data, int nbits);
-  void sendSony(unsigned long data, int nbits);
+  // sendSony() should typically be called with repeat=3 as Sony devices
+  // expect the code to be sent at least 3 times.
+  // As the legacy use of this procedure was only to send a single code
+  // it defaults to repeat=1 for backward compatiblity.
+  void sendSony(unsigned long data, int nbits, unsigned int repeat=1);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
   //  void sendMitsubishi(unsigned long data, int nbits);
@@ -191,13 +185,30 @@ public:
   void sendDaikin(unsigned char daikin[]);
   void sendDaikinChunk(unsigned char buf[], int len, int start);
   void sendDenon(unsigned long data, int nbits);
+  void sendKelvinator(unsigned char data[]);
+  void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
+  void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(int khz);
-  VIRTUAL void mark(int usec);
-  VIRTUAL void space(int usec);
+  VIRTUAL void mark(unsigned int usec);
+  VIRTUAL void space(unsigned long usec);
 private:
   int halfPeriodicTime;
   int IRpin;
+  void sendMitsubishiACChunk(unsigned char data);
+  void sendData(uint16_t onemark, uint32_t onespace,
+                uint16_t zeromark, uint32_t zerospace,
+                uint32_t data, uint8_t nbits, bool MSBfirst=true);
+  void ledOff();
 } ;
+
+class IRtimer {
+public:
+  IRtimer();
+  void reset();
+  uint32_t elapsed();
+private:
+  uint32_t start;
+};
 
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
