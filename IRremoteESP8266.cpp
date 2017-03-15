@@ -668,7 +668,7 @@ void IRsend::sendKelvinator(unsigned char data[]) {
              KELVINATOR_ZERO_SPACE, data[i], 8, false);
   // Footer
   mark(KELVINATOR_BIT_MARK);
-  ledOff();  // Make sure we end with the led off.
+  ledOff();
 }
 
 void IRsend::sendSherwood(unsigned long data, int nbits, unsigned int repeat) {
