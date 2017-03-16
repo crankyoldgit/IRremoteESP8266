@@ -246,15 +246,8 @@ void IRsend::sendWhynter(unsigned long data, int nbits) {
   mark(WHYNTER_HDR_MARK);
   space(WHYNTER_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(WHYNTER_ONE_MARK);
-      space(WHYNTER_ONE_SPACE);
-    } else {  // 0
-      mark(WHYNTER_ZERO_MARK);
-      space(WHYNTER_ZERO_SPACE);
-    }
-  }
+  sendData(WHYNTER_ONE_MARK, WHYNTER_ONE_SPACE, WHYNTER_ZERO_MARK,
+           WHYNTER_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(WHYNTER_ZERO_MARK);
   space(WHYNTER_ZERO_SPACE);
