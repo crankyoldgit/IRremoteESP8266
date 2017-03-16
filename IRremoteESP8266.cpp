@@ -384,23 +384,13 @@ void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
   mark(PANASONIC_HDR_MARK);
   space(PANASONIC_HDR_SPACE);
   // Address (16 bits)
-  for (unsigned long mask = 1UL << (16 - 1); mask; mask >>= 1) {
-    mark(PANASONIC_BIT_MARK);
-    if (address & mask) {  // 1
-      space(PANASONIC_ONE_SPACE);
-    } else {  // 0
-      space(PANASONIC_ZERO_SPACE);
-    }
-  }
+  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
+           PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
+           address, 16, true);
   // Data (32 bits)
-  for (unsigned long mask = 1UL << (32 - 1); mask; mask >>= 1) {
-    mark(PANASONIC_BIT_MARK);
-    if (data & mask) {  // 1
-      space(PANASONIC_ONE_SPACE);
-    } else {  // 0
-      space(PANASONIC_ZERO_SPACE);
-    }
-  }
+  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
+           PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
+           data, 32, true);
   // Footer
   mark(PANASONIC_BIT_MARK);
   ledOff();
