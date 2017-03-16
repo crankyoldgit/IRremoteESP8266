@@ -667,19 +667,6 @@ void IRsend::sendSherwood(unsigned long data, int nbits, unsigned int repeat) {
   sendNEC(data, nbits, max(1, repeat));
 }
 
-void IRsend::sendMitsubishiACChunk(uint8_t data) {
-  // send a chunk(byte) of Mitsubishi AC data
-  for (uint8_t bit = 0; bit < 8; bit++, data >>= 1) {
-    if (data & B1) {  // 1
-      mark(MITSUBISHI_AC_BIT_MARK);
-      space(MITSUBISHI_AC_ONE_SPACE);
-    } else {  // 0
-      mark(MITSUBISHI_AC_BIT_MARK);
-      space(MITSUBISHI_AC_ZERO_SPACE);
-    }
-  }
-}
-
 void IRsend::sendMitsubishiAC(unsigned char data[]) {
   // Set IR carrier frequency
   enableIROut(38);
@@ -690,11 +677,14 @@ void IRsend::sendMitsubishiAC(unsigned char data[]) {
     space(MITSUBISHI_AC_HDR_SPACE);
     // Data
     for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
-      sendMitsubishiACChunk(data[i]);
+      sendData(MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+               MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
+               data[i], 8, false);
     // Footer
     mark(MITSUBISHI_AC_RPT_MARK);
     space(MITSUBISHI_AC_RPT_SPACE);
   }
+  // A space() is always performed last, so no need to turn off the LED.
 }
 // ---------------------------------------------------------------
 
