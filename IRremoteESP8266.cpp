@@ -260,15 +260,24 @@ void IRsend::sendWhynter(unsigned long data, int nbits) {
   space(WHYNTER_ZERO_SPACE);
 }
 
-// sendSony() should typically be called with repeat=3 as Sony devices
-// expect the code to be sent at least 3 times.
-// Timings and details are taken from:
-//   http://www.sbprojects.com/knowledge/ir/sirc.php
 void IRsend::sendSony(unsigned long data, int nbits, unsigned int repeat) {
-  // Set IR carrier frequency
-  enableIROut(40);
+  // Send an IR command to a compatible Sony device.
+  //
+  // Args:
+  //   data: IR command to be sent.
+  //   nbits: Nr. of bits of the IR command to be sent.
+  //   repeat: Nr. of additional times the IR command is to be sent.
+  //
+  // sendSony() should typically be called with repeat=2 as Sony devices
+  // expect the code to be sent at least 3 times.
+  //
+  // Timings and details are taken from:
+  //   http://www.sbprojects.com/knowledge/ir/sirc.php
+
+  enableIROut(40);  // Sony devices use a 40kHz IR carrier frequency.
   IRtimer usecs = IRtimer();
-  for (uint16_t i = 0; i < repeat; i++) {  // Typically loop 3 or more times.
+
+  for (uint16_t i = 0; i <= repeat; i++) {  // Typically loop 3 or more times.
     usecs.reset();
     // Header
     mark(SONY_HDR_MARK);
@@ -281,6 +290,7 @@ void IRsend::sendSony(unsigned long data, int nbits, unsigned int repeat) {
     // start of the next one. A 10ms minimum gap is also required.
     space(max(10000, 45000 - usecs.elapsed()));
   }
+  // A space() is always performed last, so no need to turn off the LED.
 }
 
 void IRsend::sendRaw(unsigned int buf[], int len, int hz) {
