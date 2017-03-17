@@ -462,20 +462,16 @@ void IRsend::sendDenon (unsigned long data,  int nbits) {
   ledOff();
 }
 
-void IRsend::mark(unsigned int time) {
+void IRsend::mark(unsigned int usec) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
-  unsigned long beginning = micros();
-  unsigned long current = beginning;
-  while (current - beginning < time) {
+  IRtimer usecTimer = IRtimer();
+  while (usecTimer.elapsed() < usec) {
     digitalWrite(IRpin, HIGH);
     delayMicroseconds(halfPeriodicTime);
     digitalWrite(IRpin, LOW);
-    // 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
+    // e.g. 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
     delayMicroseconds(halfPeriodicTime);
-    current = micros();
-    if (current < beginning)  // Handle when micros() wraps.
-      beginning = current;
   }
 }
 
