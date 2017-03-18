@@ -388,6 +388,40 @@ void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long data, int nbits) {
   ledOff();
 }
 
+// Send a Philips RC-MM packet.
+// Based on http://www.sbprojects.com/knowledge/ir/rcmm.php
+// Args:
+//   data: The data we want to send. MSB first.
+//   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
+// Status:  ALPHA (untested and unconfirmed.)
+void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
+  // Set IR carrier frequency
+  enableIROut(36);
+  IRtimer usecs = IRtimer();
+
+  // Header
+  mark(RCMM_HDR_MARK);
+  space(RCMM_HDR_SPACE);
+  // Data
+  uint32_t mask = B11 << (nbits - 2);
+  // RC-MM sends data 2 bits at a time.
+  for (uint8_t i = nbits; i > 0; i -= 2) {
+    mark(RCMM_BIT_MARK);
+    // Grab the next Most Significant Bits to send.
+    switch ((data & mask) >> (i - 2)) {
+      case B00: space(RCMM_BIT_SPACE_0); break;
+      case B01: space(RCMM_BIT_SPACE_1); break;
+      case B10: space(RCMM_BIT_SPACE_2); break;
+      case B11: space(RCMM_BIT_SPACE_3); break;
+    }
+    mask >>= 2;
+  }
+  // Footer
+  mark(RCMM_BIT_MARK);
+  // Protocol requires us to wait RCMM_RPT_LENGTH usecs from the start.
+  space(RCMM_RPT_LENGTH - usecs.elapsed());
+}
+
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
                                              unsigned long data) {
   // Set IR carrier frequency
@@ -817,6 +851,12 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results) {
   Serial.println("Attempting RC6 decode");
 #endif
   if (decodeRC6(results)) {
+    return true;
+  }
+#ifdef DEBUG
+  Serial.println("Attempting RC-MM decode");
+#endif
+  if (decodeRCMM(results)) {
     return true;
   }
 #ifdef DEBUG
@@ -1273,6 +1313,53 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
   results->bits = nbits;
   results->value = data;
   results->decode_type = RC6;
+  return true;
+}
+
+// Decode a Philips RC-MM packet (between 12 & 32 bits) if possible.
+// Places successful decode information in the results pointer.
+// Returns:
+//   The decode success status.
+// Based on http://www.sbprojects.com/knowledge/ir/rcmm.php
+// Status:  ALPHA (untested and unconfirmed.)
+bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
+  uint32_t data = 0;
+  unsigned int offset = 1;  // Skip the leading space.
+
+  int bitSize = results->rawlen - 4;
+  if (bitSize < 12 || bitSize > 32)
+    return false;
+  // Header decode
+  if (!MATCH_MARK(results->rawbuf[offset++], RCMM_HDR_MARK))
+    return false;
+  if (!MATCH_MARK(results->rawbuf[offset++], RCMM_HDR_SPACE))
+    return false;
+  // Data decode
+  // RC-MM has two bits of data per mark/space pair.
+  for (int i = 0; i < bitSize; i += 2) {
+    data <<= 2;
+    if (!MATCH(results->rawbuf[offset++], RCMM_BIT_MARK))
+      return false;
+    if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_0))
+      data += 0;
+    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_1))
+      data += 1;
+    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_2))
+      data += 2;
+    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_3))
+      data += 3;
+    else
+      return false;
+    offset++;
+  }
+  // Footer decode
+  if (!MATCH(results->rawbuf[offset], RCMM_BIT_MARK))
+    return false;
+
+  // Success
+  results->value = (unsigned long) data;
+  results->decode_type = RCMM;
+  results->bits = bitSize;
   return true;
 }
 

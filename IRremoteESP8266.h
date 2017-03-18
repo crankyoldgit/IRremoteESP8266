@@ -68,7 +68,8 @@ enum decode_type_t {
   DENON,
   KELVINATOR,
   SHERWOOD,
-  MITSUBISHI_AC
+  MITSUBISHI_AC,
+  RCMM
 };
 
 // Results returned from the decoder
@@ -89,18 +90,20 @@ public:
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
-#define SEND_PROTOCOL_NEC     case NEC: sendNEC(data, nbits); break;
-#define SEND_PROTOCOL_SONY    case SONY: sendSony(data, nbits); break;
-#define SEND_PROTOCOL_RC5     case RC5: sendRC5(data, nbits); break;
-#define SEND_PROTOCOL_RC6     case RC6: sendRC6(data, nbits); break;
-#define SEND_PROTOCOL_DISH    case DISH: sendDISH(data, nbits); break;
-#define SEND_PROTOCOL_JVC     case JVC: sendJVC(data, nbits, 0); break;
-#define SEND_PROTOCOL_SAMSUNG case SAMSUNG: sendSAMSUNG(data, nbits); break;
-#define SEND_PROTOCOL_LG      case LG: sendLG(data, nbits); break;
-#define SEND_PROTOCOL_WHYNTER case WHYNTER: sendWhynter(data, nbits); break;
-#define SEND_PROTOCOL_COOLIX  case COOLIX: sendCOOLIX(data, nbits); break;
-#define SEND_PROTOCOL_DENON  case DENON: sendDenon(data, nbits); break;
+#define SEND_PROTOCOL_NEC      case NEC: sendNEC(data, nbits); break;
+#define SEND_PROTOCOL_SONY     case SONY: sendSony(data, nbits); break;
+#define SEND_PROTOCOL_RC5      case RC5: sendRC5(data, nbits); break;
+#define SEND_PROTOCOL_RC6      case RC6: sendRC6(data, nbits); break;
+#define SEND_PROTOCOL_DISH     case DISH: sendDISH(data, nbits); break;
+#define SEND_PROTOCOL_JVC      case JVC: sendJVC(data, nbits, 0); break;
+#define SEND_PROTOCOL_SAMSUNG  case SAMSUNG: sendSAMSUNG(data, nbits); break;
+#define SEND_PROTOCOL_LG       case LG: sendLG(data, nbits); break;
+#define SEND_PROTOCOL_WHYNTER  case WHYNTER: sendWhynter(data, nbits); break;
+#define SEND_PROTOCOL_COOLIX   case COOLIX: sendCOOLIX(data, nbits); break;
+#define SEND_PROTOCOL_DENON    case DENON: sendDenon(data, nbits); break;
 #define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
+#define SEND_PROTOCOL_RCMM     case RCMM: sendRCMM(data, nbits); break;
+
 
 // main class for receiving IR
 class IRrecv
@@ -120,6 +123,7 @@ public:
   bool decodeMitsubishi(decode_results *results);
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
+  bool decodeRCMM(decode_results *results);
   bool decodePanasonic(decode_results *results);
   bool decodeLG(decode_results *results);
   bool decodeJVC(decode_results *results);
@@ -158,6 +162,7 @@ public:
         SEND_PROTOCOL_COOLIX
         SEND_PROTOCOL_DENON
         SEND_PROTOCOL_SHERWOOD
+        SEND_PROTOCOL_RCMM
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
@@ -176,6 +181,7 @@ public:
   void sendGC(unsigned int buf[], int len);
   void sendRC5(unsigned long data, int nbits);
   void sendRC6(unsigned long data, int nbits);
+  void sendRCMM(uint32_t data, uint8_t nbits=24);
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
   // As the legacy use of this procedure was only to send a single code

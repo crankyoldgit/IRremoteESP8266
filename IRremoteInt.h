@@ -106,6 +106,16 @@
 #define RC6_T1		444
 #define RC6_RPT_LENGTH	46000
 
+// http://www.sbprojects.com/knowledge/ir/rcmm.php
+#define RCMM_HDR_MARK 416
+#define RCMM_HDR_SPACE 277
+#define RCMM_BIT_MARK 166
+#define RCMM_BIT_SPACE_0 177
+#define RCMM_BIT_SPACE_1 444
+#define RCMM_BIT_SPACE_2 611
+#define RCMM_BIT_SPACE_3 777
+#define RCMM_RPT_LENGTH 27778
+
 #define SHARP_BIT_MARK 245
 #define SHARP_ONE_SPACE 1805
 #define SHARP_ZERO_SPACE 795
