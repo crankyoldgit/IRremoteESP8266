@@ -60,10 +60,11 @@
 #define NEC_RPT_SPACE	2250
 #define NEC_MIN_COMMAND_LENGTH 108000UL
 
+// Timings based on http://www.sbprojects.com/knowledge/ir/sirc.php
 #define SONY_HDR_MARK	2400
 #define SONY_HDR_SPACE	600
-#define SONY_ONE_MARK	1200
-#define SONY_ZERO_MARK	600
+#define SONY_ONE_MARK	1250  // Experiments suggest +50 to spec is better.
+#define SONY_ZERO_MARK	650  // Experiments suggest +50 to spec is better.
 #define SONY_RPT_LENGTH 45000
 #define SONY_DOUBLE_SPACE_USECS  500  // usually see 713 - not using ticks as get number wrapround
 
