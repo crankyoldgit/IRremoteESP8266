@@ -164,11 +164,11 @@ public:
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
   void sendLG(unsigned long data, int nbits);
-  // sendSony() should typically be called with repeat=3 as Sony devices
-  // expect the code to be sent at least 3 times.
+  // sendSony() should typically be called with repeat=2 as Sony devices
+  // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=1 for backward compatiblity.
-  void sendSony(unsigned long data, int nbits, unsigned int repeat=1);
+  // it defaults to repeat=0 for backward compatiblity.
+  void sendSony(unsigned long data, int nbits, unsigned int repeat=0);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
   //  void sendMitsubishi(unsigned long data, int nbits);
