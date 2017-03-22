@@ -851,6 +851,12 @@ bool IRrecv::decode(decode_results *results) {
   if (decodeWhynter(results)) {
     return true;
   }
+#ifdef DEBUG
+  Serial.println("Attempting Denon decode");
+#endif
+  if (decodeDenon(results)) {
+    return true;
+  }
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
