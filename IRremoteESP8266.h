@@ -184,7 +184,7 @@ public:
   void sendSAMSUNG(unsigned long data, int nbits);
   void sendDaikin(unsigned char daikin[]);
   void sendDaikinChunk(unsigned char buf[], int len, int start);
-  void sendDenon(unsigned long data, int nbits);
+  void sendDenon(unsigned long data, int nbits=14);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
