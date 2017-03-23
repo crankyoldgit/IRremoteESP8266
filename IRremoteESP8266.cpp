@@ -429,15 +429,8 @@ void IRsend::sendSAMSUNG(unsigned long data, int nbits) {
   mark(SAMSUNG_HDR_MARK);
   space(SAMSUNG_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      mark(SAMSUNG_BIT_MARK);
-      space(SAMSUNG_ONE_SPACE);
-    } else { // 0
-      mark(SAMSUNG_BIT_MARK);
-      space(SAMSUNG_ZERO_SPACE);
-    }
-  }
+  sendData(SAMSUNG_BIT_MARK, SAMSUNG_ONE_SPACE, SAMSUNG_BIT_MARK,
+           SAMSUNG_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(SAMSUNG_BIT_MARK);
   ledOff();
