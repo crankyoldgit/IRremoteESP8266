@@ -216,25 +216,28 @@ void IRsend::sendNEC (unsigned long data, int nbits, unsigned int repeat) {
   }
 }
 
-void IRsend::sendLG (unsigned long data, int nbits) {
+void IRsend::sendLG (unsigned long data, int nbits, unsigned int repeat) {
+  // Args:
+  //   data:   The contents of the command you want to send.
+  //   nbits:  The bit size of the command being sent.
+  //   repeat: The number of times you want the command to be repeated.
+
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
-  mark(LG_HDR_MARK);
-  space(LG_HDR_SPACE);
-  mark(LG_BIT_MARK);
-  // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-      space(LG_ONE_SPACE);
-      mark(LG_BIT_MARK);
-    } else {  // 0
-      space(LG_ZERO_SPACE);
-      mark(LG_BIT_MARK);
-    }
+  IRtimer usecs = IRtimer();
+  // We always send a command, even for repeat=0, hence '<= repeat'.
+  for (unsigned int i = 0; i <= repeat; i++) {
+    // Header
+    mark(LG_HDR_MARK);
+    space(LG_HDR_SPACE);
+    // Data
+    sendData(LG_BIT_MARK, LG_ONE_SPACE, LG_BIT_MARK, LG_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(LG_BIT_MARK);
+    space(LG_RPT_LENGTH - usecs.elapsed());
+    usecs.reset();
   }
-  // Footer
-  ledOff();
 }
 
 void IRsend::sendWhynter(unsigned long data, int nbits) {

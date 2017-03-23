@@ -163,7 +163,7 @@ public:
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
   void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
-  void sendLG(unsigned long data, int nbits);
+  void sendLG(unsigned long data, int nbits=28, unsigned int repeat=0);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // As the legacy use of this procedure was only to send a single code
