@@ -399,27 +399,34 @@ void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
   ledOff();
 }
 
-void IRsend::sendJVC(unsigned long data, int nbits, int repeat) {
+void IRsend::sendJVC(unsigned long data, int nbits, unsigned int repeat) {
+  // Args:
+  //   data:   The contents of the command you want to send.
+  //   nbits:  The bit size of the command being sent.
+  //   repeat: The number of times you want the command to be repeated.
+  //
+  // Based on information at: http://www.sbprojects.com/knowledge/ir/jvc.php
+
   // Set IR carrier frequency
   enableIROut(38);
+
+  IRtimer usecs = IRtimer();
   // Header
-  if (!repeat) {
-    mark(JVC_HDR_MARK);
-    space(JVC_HDR_SPACE);
+  mark(JVC_HDR_MARK);
+  space(JVC_HDR_SPACE);
+
+  // We always send the data & footer at least once, hence '<= repeat'.
+  for (unsigned int i = 0; i <= repeat; i++) {
+    // Data
+    sendData(JVC_BIT_MARK, JVC_ONE_SPACE, JVC_BIT_MARK, JVC_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(JVC_BIT_MARK);
+    // Wait till the end of the repeat time window before we send another code.
+    space(JVC_RPT_LENGTH - usecs.elapsed());
+    usecs.reset();
   }
-  // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (data & mask) {  // 1
-       mark(JVC_BIT_MARK);
-       space(JVC_ONE_SPACE);
-    } else {  // 0
-       mark(JVC_BIT_MARK);
-       space(JVC_ZERO_SPACE);
-    }
-  }
-  // Footer
-  mark(JVC_BIT_MARK);
-  ledOff();
+  // No need to turn off the LED as we will always end with a space().
 }
 
 void IRsend::sendSAMSUNG(unsigned long data, int nbits) {
