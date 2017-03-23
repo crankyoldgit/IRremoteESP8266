@@ -458,15 +458,8 @@ void IRsend::sendDenon (unsigned long data,  int nbits) {
   mark(DENON_HDR_MARK);
   space(DENON_HDR_SPACE);
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-    if (data & mask) {  // 1
-      mark (DENON_BIT_MARK);
-      space(DENON_ONE_SPACE);
-    } else {  // 0
-      mark (DENON_BIT_MARK);
-      space(DENON_ZERO_SPACE);
-    }
-  }
+  sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
+           data, nbits, true);
   // Footer
   mark(DENON_BIT_MARK);
   ledOff();
