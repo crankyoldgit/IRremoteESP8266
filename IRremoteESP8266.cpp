@@ -41,6 +41,7 @@
 
 #include "IRremoteESP8266.h"
 #include "IRremoteInt.h"
+#include "IRDaikinESP.h"
 #include "IRKelvinator.h"
 #include "IRMitsubishiAC.h"
 
@@ -576,34 +577,31 @@ void IRsend::sendDISH(unsigned long data, int nbits) {
 }
 
 // From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-void IRsend::sendDaikin(unsigned char daikin[]) {
-  sendDaikinChunk(daikin, 8,0);
-  delay(29);
-  sendDaikinChunk(daikin, 19,8);
-}
+void IRsend::sendDaikin(unsigned char data[]) {
+  // Args:
+  //   data: An array of DAIKIN_COMMAND_LENGTH bytes containing the IR command.
 
-void IRsend::sendDaikinChunk(unsigned char buf[], int len, int start) {
-  int data2;
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
+  // Header #1
   mark(DAIKIN_HDR_MARK);
   space(DAIKIN_HDR_SPACE);
-  // Data
-  for (int i = start; i < start+len; i++) {
-    data2=buf[i];
+  // Data #1
+  for (uint8_t i = 0; i < 8; i++)
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, data[i], 8, false);
+  // Footer #1
+  mark(DAIKIN_ONE_MARK);
+  space(DAIKIN_ZERO_SPACE + 29000);
 
-    for (int j = 0; j < 8; j++) {
-      if ((1 << j & data2)) {
-        mark(DAIKIN_ONE_MARK);
-        space(DAIKIN_ONE_SPACE);
-      } else {
-        mark(DAIKIN_ZERO_MARK);
-        space(DAIKIN_ZERO_SPACE);
-      }
-    }
-  }
-  // Footer
+  // Header #2
+  mark(DAIKIN_HDR_MARK);
+  space(DAIKIN_HDR_SPACE);
+  // Data #2
+  for (uint8_t i = 8; i < DAIKIN_COMMAND_LENGTH; i++)
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, data[i], 8, false);
+  // Footer #2
   mark(DAIKIN_ONE_MARK);
   space(DAIKIN_ZERO_SPACE);
 }

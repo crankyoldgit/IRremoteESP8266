@@ -182,8 +182,7 @@ public:
   void sendPanasonic(unsigned int address, unsigned long data);
   void sendJVC(unsigned long data, int nbits, unsigned int repeat=0);
   void sendSAMSUNG(unsigned long data, int nbits=32);
-  void sendDaikin(unsigned char daikin[]);
-  void sendDaikinChunk(unsigned char buf[], int len, int start);
+  void sendDaikin(unsigned char data[]);
   void sendDenon(unsigned long data, int nbits=14);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
