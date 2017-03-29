@@ -176,7 +176,11 @@ public:
   void sendGC(unsigned int buf[], int len);
   void sendRC5(unsigned long data, int nbits);
   void sendRC6(unsigned long data, int nbits);
-  void sendDISH(unsigned long data, int nbits);
+  // sendDISH() should typically be called with repeat=3 as DISH devices
+  // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
+  // As the legacy use of this procedure was only to send a single code
+  // it defaults to repeat=0 for backward compatiblity.
+  void sendDISH(unsigned long data, int nbits, unsigned int repeat=0);
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
   void sendPanasonic(unsigned int address, unsigned long data);
