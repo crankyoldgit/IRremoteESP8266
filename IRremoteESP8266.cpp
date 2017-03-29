@@ -556,24 +556,27 @@ void IRsend::sendSharp(unsigned int address, unsigned int command) {
   sendSharpRaw((address << 10) | (command << 2) | 2, 15);
 }
 
-void IRsend::sendDISH(unsigned long data, int nbits) {
+// Send an IR command to a DISH device.
+// Note: Typically a DISH device needs to get a command a total of at least 4
+//       times to accept it.
+// Args:
+//   data:   The contents of the command you want to send.
+//   nbits:  The bit size of the command being sent.
+//   repeat: The number of times you want the command to be repeated.
+void IRsend::sendDISH(unsigned long data, int nbits, unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(56);
-  // Header
-  mark(DISH_HDR_MARK);
-  space(DISH_HDR_SPACE);
-  for (int i = 0; i < nbits; i++) {
-    if (data & DISH_TOP_BIT) {
-      mark(DISH_BIT_MARK);
-      space(DISH_ONE_SPACE);
-    } else {
-      mark(DISH_BIT_MARK);
-      space(DISH_ZERO_SPACE);
-    }
-    data <<= 1;
+  // We always send a command, even for repeat=0, hence '<= repeat'.
+  for (unsigned int i = 0; i <= repeat; i++) {
+    // Header
+    mark(DISH_HDR_MARK);
+    space(DISH_HDR_SPACE);
+    // Data
+    sendData(DISH_BIT_MARK, DISH_ONE_SPACE, DISH_BIT_MARK, DISH_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    space(DISH_RPT_SPACE);
   }
-  // Footer
-  ledOff();
 }
 
 // From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
