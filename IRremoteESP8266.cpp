@@ -533,19 +533,11 @@ void IRsend::sendSharpRaw(unsigned long data, int nbits) {
   // much more reliable. That's the exact behaviour of CD-S6470 remote control.
   for (int n = 0; n < 3; n++) {
     // Data
-    for (unsigned long mask = 1UL << (nbits - 1);  mask;  mask >>= 1) {
-      if (data & mask) {  // 1
-        mark(SHARP_BIT_MARK);
-        space(SHARP_ONE_SPACE);
-      } else {  // 0
-        mark(SHARP_BIT_MARK);
-        space(SHARP_ZERO_SPACE);
-      }
-    }
+    sendData(SHARP_BIT_MARK, SHARP_ONE_SPACE, SHARP_BIT_MARK, SHARP_ZERO_SPACE,
+             data, nbits, true);
     // Footer
     mark(SHARP_BIT_MARK);
-    space(SHARP_ZERO_SPACE);
-    delay(40);
+    space(SHARP_ZERO_SPACE + 40000);
 
     data = data ^ SHARP_TOGGLE_MASK;
   }
