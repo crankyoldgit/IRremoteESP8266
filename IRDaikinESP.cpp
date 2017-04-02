@@ -9,17 +9,17 @@ IRDaikinESP::IRDaikinESP(int pin) : _irsend(pin)
 {
 }
 
-void IRDaikinESP::begin()
+void ICACHE_FLASH_ATTR IRDaikinESP::begin()
 {
     _irsend.begin();
 }
 
-void IRDaikinESP::send()
+void ICACHE_FLASH_ATTR IRDaikinESP::send()
 {
   _irsend.sendDaikin(daikin);
 }
 
-void IRDaikinESP::checksum()
+void ICACHE_FLASH_ATTR IRDaikinESP::checksum()
 {
     uint8_t sum = 0;
     uint8_t i;
@@ -36,39 +36,39 @@ void IRDaikinESP::checksum()
     daikin[26] = sum &0xFF;
 }
 
-void IRDaikinESP::on()
+void ICACHE_FLASH_ATTR IRDaikinESP::on()
 {
     //state = ON;
     daikin[13] |= 0x01;
     checksum();
 }
 
-void IRDaikinESP::off()
+void ICACHE_FLASH_ATTR IRDaikinESP::off()
 {
     //state = OFF;
     daikin[13] &= 0xFE;
     checksum();
 }
 
-uint8_t IRDaikinESP::getPower()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getPower()
 {
     return (daikin[13])&0x01;
 }
 
 // DAIKIN_SILENT or DAIKIN_POWERFUL
-void IRDaikinESP::setAux(uint8_t aux)
+void ICACHE_FLASH_ATTR IRDaikinESP::setAux(uint8_t aux)
 {
     daikin[21] = aux;
     checksum();
 }
 
-uint8_t IRDaikinESP::getAux(){
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getAux(){
     return daikin[21];
 }
 
 
 // Set the temp in deg C
-void IRDaikinESP::setTemp(uint8_t temp)
+void ICACHE_FLASH_ATTR IRDaikinESP::setTemp(uint8_t temp)
 {
     if (temp < 18)
         temp = 18;
@@ -78,13 +78,13 @@ void IRDaikinESP::setTemp(uint8_t temp)
     checksum();
 }
 
-uint8_t IRDaikinESP::getTemp()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getTemp()
 {
     return (daikin[14])/2;
 }
 
 // Set the speed of the fan, 0-5, 0 is auto, 1-5 is the speed
-void IRDaikinESP::setFan(uint8_t fan)
+void ICACHE_FLASH_ATTR IRDaikinESP::setFan(uint8_t fan)
 {
     // Set the fan speed bits, leave low 4 bits alone
     uint8_t fanset;
@@ -97,7 +97,7 @@ void IRDaikinESP::setFan(uint8_t fan)
     checksum();
 }
 
-uint8_t IRDaikinESP::getFan()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getFan()
 {
     uint8_t fan = daikin[16] >> 4;
     fan = fan - 2;
@@ -106,7 +106,7 @@ uint8_t IRDaikinESP::getFan()
     return fan;
 }
 
-uint8_t IRDaikinESP::getMode()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getMode()
 {/*
   DAIKIN_COOL
   DAIKIN_HEAT
@@ -117,13 +117,13 @@ uint8_t IRDaikinESP::getMode()
     return (daikin[13])>>4;
 }
 
-void IRDaikinESP::setMode(uint8_t mode)
+void ICACHE_FLASH_ATTR IRDaikinESP::setMode(uint8_t mode)
 {
     daikin[13]=mode<<4 | getPower();
     checksum();
 }
 
-void IRDaikinESP::setSwingVertical(uint8_t swing)
+void ICACHE_FLASH_ATTR IRDaikinESP::setSwingVertical(uint8_t swing)
 {
     if (swing)
         daikin[16] = daikin[16] | 0x0F;
@@ -132,12 +132,12 @@ void IRDaikinESP::setSwingVertical(uint8_t swing)
     checksum();
 }
 
-uint8_t IRDaikinESP::getSwingVertical()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getSwingVertical()
 {
     return (daikin[16])&0x01;
 }
 
-void IRDaikinESP::setSwingHorizontal(uint8_t swing)
+void ICACHE_FLASH_ATTR IRDaikinESP::setSwingHorizontal(uint8_t swing)
 {
     if (swing)
         daikin[17] = daikin[17] | 0x0F;
@@ -146,7 +146,7 @@ void IRDaikinESP::setSwingHorizontal(uint8_t swing)
     checksum();
 }
 
-uint8_t IRDaikinESP::getSwingHorizontal()
+uint8_t ICACHE_FLASH_ATTR IRDaikinESP::getSwingHorizontal()
 {
     return (daikin[17])&0x01;
 }
