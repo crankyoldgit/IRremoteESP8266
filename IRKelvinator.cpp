@@ -20,36 +20,36 @@ IRKelvinatorAC::IRKelvinatorAC(int pin) : _irsend(pin) {
   stateReset();
 }
 
-void IRKelvinatorAC::stateReset() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::stateReset() {
   for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
     remote_state[i] = 0x0;
   remote_state[3] = 0x50;
   remote_state[11] = 0x70;
 }
 
-void IRKelvinatorAC::begin() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::begin() {
     _irsend.begin();
 }
 
-void IRKelvinatorAC::fixup() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::fixup() {
   // X-Fan mode is only valid in COOL or DRY modes.
   if (getMode() != KELVINATOR_COOL && getMode() != KELVINATOR_DRY)
     setXFan(false);
   checksum();  // Calculate the checksums
 }
 
-void IRKelvinatorAC::send() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::send() {
   fixup();   // Ensure correct settings before sending.
   _irsend.sendKelvinator(remote_state);
 }
 
-uint8_t* IRKelvinatorAC::getRaw() {
+uint8_t* ICACHE_FLASH_ATTR IRKelvinatorAC::getRaw() {
   fixup();   // Ensure correct settings before sending.
   return remote_state;
 }
 
 // Many Bothans died to bring us this information.
-void IRKelvinatorAC::checksum() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::checksum() {
   // For each command + options block.
   for (uint8_t offset = 0; offset < KELVINATOR_STATE_LENGTH; offset += 8) {
     uint8_t sum = KELVINATOR_CHECKSUM_START;
@@ -68,31 +68,31 @@ void IRKelvinatorAC::checksum() {
   }
 }
 
-void IRKelvinatorAC::on() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::on() {
     //state = ON;
     remote_state[0] |= KELVINATOR_POWER;
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
-void IRKelvinatorAC::off() {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::off() {
     //state = OFF;
     remote_state[0] &= ~KELVINATOR_POWER;
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
-void IRKelvinatorAC::setPower(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setPower(bool state) {
   if (state)
     on();
   else
     off();
 }
 
-bool IRKelvinatorAC::getPower() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getPower() {
     return ((remote_state[0] & KELVINATOR_POWER) != 0);
 }
 
 // Set the temp. in deg C
-void IRKelvinatorAC::setTemp(uint8_t temp) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setTemp(uint8_t temp) {
     temp = max(KELVINATOR_MIN_TEMP, temp);
     temp = min(KELVINATOR_MAX_TEMP, temp);
     remote_state[1] = (remote_state[1] & 0xF0U) | (temp - KELVINATOR_MIN_TEMP);
@@ -100,12 +100,12 @@ void IRKelvinatorAC::setTemp(uint8_t temp) {
 }
 
 // Return the set temp. in deg C
-uint8_t IRKelvinatorAC::getTemp() {
+uint8_t ICACHE_FLASH_ATTR IRKelvinatorAC::getTemp() {
     return ((remote_state[1] & 0xFU) + KELVINATOR_MIN_TEMP);
 }
 
 // Set the speed of the fan, 0-5, 0 is auto, 1-5 is the speed
-void IRKelvinatorAC::setFan(uint8_t fan) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setFan(uint8_t fan) {
   fan = min(KELVINATOR_FAN_MAX, fan);  // Bounds check
 
   // Only change things if we need to.
@@ -122,11 +122,11 @@ void IRKelvinatorAC::setFan(uint8_t fan) {
   }
 }
 
-uint8_t IRKelvinatorAC::getFan() {
+uint8_t ICACHE_FLASH_ATTR IRKelvinatorAC::getFan() {
     return ((remote_state[14] & ~KELVINATOR_FAN_MASK) >> KELVINATOR_FAN_OFFSET);
 }
 
-uint8_t IRKelvinatorAC::getMode() {
+uint8_t ICACHE_FLASH_ATTR IRKelvinatorAC::getMode() {
   /*
   KELVINATOR_AUTO
   KELVINATOR_COOL
@@ -137,7 +137,7 @@ uint8_t IRKelvinatorAC::getMode() {
     return (remote_state[0] & ~KELVINATOR_MODE_MASK);
 }
 
-void IRKelvinatorAC::setMode(uint8_t mode) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   if (mode > KELVINATOR_HEAT) mode = KELVINATOR_AUTO;
   remote_state[0] = (remote_state[0] & KELVINATOR_MODE_MASK) | mode;
@@ -147,7 +147,7 @@ void IRKelvinatorAC::setMode(uint8_t mode) {
     setTemp(KELVINATOR_AUTO_TEMP);
 }
 
-void IRKelvinatorAC::setSwingVertical(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setSwingVertical(bool state) {
   if (state) {
     remote_state[0] |= KELVINATOR_VENT_SWING;
     remote_state[4] |= KELVINATOR_VENT_SWING_V;
@@ -160,11 +160,11 @@ void IRKelvinatorAC::setSwingVertical(bool state) {
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getSwingVertical() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getSwingVertical() {
   return ((remote_state[4] & KELVINATOR_VENT_SWING_V) != 0);
 }
 
-void IRKelvinatorAC::setSwingHorizontal(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setSwingHorizontal(bool state) {
   if (state) {
     remote_state[0] |= KELVINATOR_VENT_SWING;
     remote_state[4] |= KELVINATOR_VENT_SWING_H;
@@ -177,57 +177,57 @@ void IRKelvinatorAC::setSwingHorizontal(bool state) {
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getSwingHorizontal() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getSwingHorizontal() {
   return ((remote_state[4] & KELVINATOR_VENT_SWING_H) != 0);
 }
 
-void IRKelvinatorAC::setQuiet(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setQuiet(bool state) {
   remote_state[12] &= ~KELVINATOR_QUIET;
   remote_state[12] |= (state << KELVINATOR_QUIET_OFFSET);
 }
 
-bool IRKelvinatorAC::getQuiet() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getQuiet() {
   return ((remote_state[12] & KELVINATOR_QUIET) != 0);
 }
 
-void IRKelvinatorAC::setIonFilter(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setIonFilter(bool state) {
   remote_state[2] &= ~KELVINATOR_ION_FILTER;
   remote_state[2] |= (state << KELVINATOR_ION_FILTER_OFFSET);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getIonFilter() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getIonFilter() {
   return ((remote_state[2] & KELVINATOR_ION_FILTER) != 0);
 }
 
-void IRKelvinatorAC::setLight(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setLight(bool state) {
   remote_state[2] &= ~KELVINATOR_LIGHT;
   remote_state[2] |= (state << KELVINATOR_LIGHT_OFFSET);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getLight() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getLight() {
   return ((remote_state[2] & KELVINATOR_LIGHT) != 0);
 }
 
 // Note: XFan mode is only valid in Cool or Dry mode.
-void IRKelvinatorAC::setXFan(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setXFan(bool state) {
   remote_state[2] &= ~KELVINATOR_XFAN;
   remote_state[2] |= (state << KELVINATOR_XFAN_OFFSET);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getXFan() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getXFan() {
   return ((remote_state[2] & KELVINATOR_XFAN) != 0);
 }
 
 // Note: Turbo mode is turned off if the fan speed is changed.
-void IRKelvinatorAC::setTurbo(bool state) {
+void ICACHE_FLASH_ATTR IRKelvinatorAC::setTurbo(bool state) {
   remote_state[2] &= ~KELVINATOR_TURBO;
   remote_state[2] |= (state << KELVINATOR_TURBO_OFFSET);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
-bool IRKelvinatorAC::getTurbo() {
+bool ICACHE_FLASH_ATTR IRKelvinatorAC::getTurbo() {
   return ((remote_state[2] & KELVINATOR_TURBO) != 0);
 }

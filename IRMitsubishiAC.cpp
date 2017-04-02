@@ -17,31 +17,31 @@ IRMitsubishiAC::IRMitsubishiAC(int pin) : _irsend(pin) {
 }
 
 // Reset the state of the remote to a known good state/sequence.
-void IRMitsubishiAC::stateReset() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::stateReset() {
   for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
     remote_state[i] = known_good_state[i];
   checksum();  // Calculate the checksum
 }
 
 // Configure the pin for output.
-void IRMitsubishiAC::begin() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::begin() {
     _irsend.begin();
 }
 
 // Send the current desired state to the IR LED.
-void IRMitsubishiAC::send() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::send() {
   checksum();   // Ensure correct checksum before sending.
   _irsend.sendMitsubishiAC(remote_state);
 }
 
 // Return a pointer to the internal state date of the remote.
-uint8_t* IRMitsubishiAC::getRaw() {
+uint8_t* ICACHE_FLASH_ATTR IRMitsubishiAC::getRaw() {
   checksum();
   return remote_state;
 }
 
 // Calculate the checksum for the current internal state of the remote.
-void IRMitsubishiAC::checksum() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::checksum() {
   uint8_t sum = 0;
   // Checksum is simple addition of all previous bytes stored
   // as a 8 bit value.
@@ -51,19 +51,19 @@ void IRMitsubishiAC::checksum() {
 }
 
 // Set the requested power state of the A/C to off.
-void IRMitsubishiAC::on() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::on() {
     //state = ON;
     remote_state[5] |= MITSUBISHI_AC_POWER;
 }
 
 // Set the requested power state of the A/C to off.
-void IRMitsubishiAC::off() {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::off() {
     //state = OFF;
     remote_state[5] &= ~MITSUBISHI_AC_POWER;
 }
 
 // Set the requested power state of the A/C.
-void IRMitsubishiAC::setPower(bool state) {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::setPower(bool state) {
   if (state)
     on();
   else
@@ -71,25 +71,25 @@ void IRMitsubishiAC::setPower(bool state) {
 }
 
 // Return the requested power state of the A/C.
-bool IRMitsubishiAC::getPower() {
+bool ICACHE_FLASH_ATTR IRMitsubishiAC::getPower() {
     return((remote_state[5] & MITSUBISHI_AC_POWER) != 0);
 }
 
 // Set the temp. in deg C
-void IRMitsubishiAC::setTemp(uint8_t temp) {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::setTemp(uint8_t temp) {
     temp = max(MITSUBISHI_AC_MIN_TEMP, temp);
     temp = min(MITSUBISHI_AC_MAX_TEMP, temp);
     remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
 }
 
 // Return the set temp. in deg C
-uint8_t IRMitsubishiAC::getTemp() {
+uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getTemp() {
     return(remote_state[7] + MITSUBISHI_AC_MIN_TEMP);
 }
 
 // Set the speed of the fan, 0-6.
 // 0 is auto, 1-5 is the speed, 6 is silent.
-void IRMitsubishiAC::setFan(uint8_t fan) {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::setFan(uint8_t fan) {
   // Bounds check
   if (fan > MITSUBISHI_AC_FAN_SILENT)
     fan = MITSUBISHI_AC_FAN_MAX;  // Set the fan to maximum if out of range.
@@ -103,7 +103,7 @@ void IRMitsubishiAC::setFan(uint8_t fan) {
 }
 
 // Return the requested state of the unit's fan.
-uint8_t IRMitsubishiAC::getFan() {
+uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getFan() {
     uint8_t fan = remote_state[9] & B111;
     if (fan == MITSUBISHI_AC_FAN_MAX)
       return MITSUBISHI_AC_FAN_SILENT;
@@ -111,7 +111,7 @@ uint8_t IRMitsubishiAC::getFan() {
 }
 
 // Return the requested climate operation mode of the a/c unit.
-uint8_t IRMitsubishiAC::getMode() {
+uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getMode() {
   /*
   MITSUBISHI_AC_AUTO
   MITSUBISHI_AC_COOL
@@ -122,7 +122,7 @@ uint8_t IRMitsubishiAC::getMode() {
 }
 
 // Set the requested climate operation mode of the a/c unit.
-void IRMitsubishiAC::setMode(uint8_t mode) {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
     case MITSUBISHI_AC_AUTO: break;
@@ -135,7 +135,7 @@ void IRMitsubishiAC::setMode(uint8_t mode) {
 }
 
 // Set the requested vane operation mode of the a/c unit.
-void IRMitsubishiAC::setVane(uint8_t mode) {
+void ICACHE_FLASH_ATTR IRMitsubishiAC::setVane(uint8_t mode) {
   mode = max(mode, B111);  // bounds check
   mode |= B1000;
   mode <<= 3;
@@ -143,6 +143,6 @@ void IRMitsubishiAC::setVane(uint8_t mode) {
 }
 
 // Return the requested vane operation mode of the a/c unit.
-uint8_t IRMitsubishiAC::getVane() {
+uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getVane() {
   return ((remote_state[9] & B00111000) >> 3);
 }
