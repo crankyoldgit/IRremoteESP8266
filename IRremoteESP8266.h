@@ -32,6 +32,7 @@
 #define IRremote_h
 
 #include <stdint.h>
+#include "IRremoteInt.h"
 
 // The following are compile-time library options.
 // If you change them, recompile the library.
@@ -135,6 +136,14 @@ public:
   bool decodeDaikin(decode_results *results);
   bool decodeDenon(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
+  uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
+  uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
+  bool match(uint32_t measured_ticks, uint32_t desired_us,
+             uint8_t tolerance=TOLERANCE);
+  bool matchMark(uint32_t measured_ticks, uint32_t desired_us,
+                 uint8_t tolerance=TOLERANCE, int excess=MARK_EXCESS);
+  bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,
+                  uint8_t tolerance=TOLERANCE, int excess=MARK_EXCESS);
 };
 
 // Only used for testing; can remove virtual for shorter code
@@ -143,6 +152,7 @@ public:
 #else
 #define VIRTUAL
 #endif
+
 class IRsend
 {
 public:
@@ -218,13 +228,5 @@ public:
 private:
   uint32_t start;
 };
-
-// Some useful constants
-#define USECPERTICK 50  // microseconds per clock interrupt tick
-#define RAWBUF 100 // Length of raw duration buffer
-
-// Marks tend to be 100us too long, and spaces 100us too short
-// when received due to sensor lag.
-#define MARK_EXCESS 100
 
 #endif
