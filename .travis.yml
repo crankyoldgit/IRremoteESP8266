@@ -25,7 +25,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/JVCPanasonicSendDemo/JVCPanasonicSendDemo.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnMitsubishiAC.ino
+  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
 
 notifications:
   email:
