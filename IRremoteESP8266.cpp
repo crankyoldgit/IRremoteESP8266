@@ -736,9 +736,8 @@ volatile irparams_t irparams;
 
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
-  if (irparams.rawlen) {
+  if (irparams.rawlen)
     irparams.rcvstate = STATE_STOP;
-  }
 	os_intr_unlock();
 }
 
@@ -750,25 +749,32 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   os_timer_disarm(&timer);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 
-  if (irparams.rawlen >= RAWBUF) {
+  // Grab a local copy of rawlen to reduce instructions used in IRAM.
+  // This is an ugly premature optimisation code-wise, but we do everything we
+  // can to save IRAM.
+  // It seems referencing the value via the structure uses more instructions.
+  // Less instructions means faster and less IRAM used.
+  // N.B. It saves about 13 bytes of IRAM.
+  uint16_t rawlen = irparams.rawlen;
+
+  if (rawlen >= RAWBUF) {
     irparams.overflow = true;
     irparams.rcvstate = STATE_STOP;
   }
 
-  if (irparams.rcvstate == STATE_STOP) {
+  if (irparams.rcvstate == STATE_STOP)
     return;
-  }
 
   if (irparams.rcvstate == STATE_IDLE) {
-    irparams.overflow = false;
     irparams.rcvstate = STATE_MARK;
-    irparams.rawbuf[irparams.rawlen++] = 1;
+    irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[irparams.rawlen++] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
     else
-      irparams.rawbuf[irparams.rawlen++] = (now - start) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = (now - start) / USECPERTICK + 1;
   }
+  irparams.rawlen++;
 
   start = now;
   #define ONCE 0
@@ -782,8 +788,7 @@ IRrecv::IRrecv(int recvpin) {
 // initialization
 void ICACHE_FLASH_ATTR IRrecv::enableIRIn() {
   // initialize state machine variables
-  irparams.rcvstate = STATE_IDLE;
-  irparams.rawlen = 0;
+  resume();
 
   // Initialize timer
   os_timer_disarm(&timer);
@@ -801,6 +806,7 @@ void ICACHE_FLASH_ATTR IRrecv::disableIRIn() {
 void ICACHE_FLASH_ATTR IRrecv::resume() {
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
+  irparams.overflow = false;
 }
 
 // Decodes the received IR message
