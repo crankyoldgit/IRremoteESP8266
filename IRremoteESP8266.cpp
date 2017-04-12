@@ -228,7 +228,6 @@ void ICACHE_FLASH_ATTR IRsend::sendLG (unsigned long data, int nbits,
 
   // Set IR carrier frequency
   enableIROut(38);
-  IRtimer usecs = IRtimer();
   // We always send a command, even for repeat=0, hence '<= repeat'.
   for (unsigned int i = 0; i <= repeat; i++) {
     // Header
@@ -239,8 +238,7 @@ void ICACHE_FLASH_ATTR IRsend::sendLG (unsigned long data, int nbits,
              data, nbits, true);
     // Footer
     mark(LG_BIT_MARK);
-    space(LG_RPT_LENGTH - usecs.elapsed());
-    usecs.reset();
+    space(LG_RPT_LENGTH);
   }
 }
 
