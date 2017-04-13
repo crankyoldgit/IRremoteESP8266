@@ -355,35 +355,47 @@ void ICACHE_FLASH_ATTR IRsend::sendRC5(unsigned long data, int nbits) {
   ledOff();
 }
 
-// Caller needs to take care of flipping the toggle bit
-void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long data, int nbits) {
+// Send a Philips RC-6 packet.
+// Note: Caller needs to take care of flipping the toggle bit (The 4th Most
+//   Significant Bit). That bit differentiates between key press & key release.
+// Based on http://www.sbprojects.com/knowledge/ir/rc6.php
+// Args:
+//   data:    The code you wish to send.
+//   nbits:   Bit size of the protocol you want to send.
+//   repeat:  Nr. of extra times the data will be sent.
+void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long long data,
+                                       unsigned int nbits,
+                                       unsigned int repeat) {
+  // Check we can send the number of bits requested.
+  if (nbits > sizeof(data) * 8)
+    return;
   // Set IR carrier frequency
   enableIROut(36);
-  // Header
-  mark(RC6_HDR_MARK);
-  space(RC6_HDR_SPACE);
-  mark(RC6_T1);  // Start bit
-  space(RC6_T1);
-  int t;
-  // Data
-  for (unsigned long i = 0, mask = 1UL << (nbits - 1); mask; i++, mask >>= 1) {
-    // The fourth bit we send is a "double width trailer bit".
-    if (i == 3) {
-      // double-wide trailer bit
-      t = 2 * RC6_T1;
-    } else {
-      t = RC6_T1;
+  for (unsigned int r = 0; r <= repeat; r++) {
+    // Header
+    mark(RC6_HDR_MARK);
+    space(RC6_HDR_SPACE);
+    mark(RC6_T1);  // Start bit
+    space(RC6_T1);
+    uint16_t t;
+    // Data
+    for (uint64_t i = 0, mask = 1ULL << (nbits - 1); mask; i++, mask >>= 1) {
+      // The fourth bit we send is a "double width trailer bit".
+      if (i == 3)
+        t = 2 * RC6_T1;  // double-wide trailer bit
+      else
+        t = RC6_T1;
+      if (data & mask) {  // 1
+        mark(t);
+        space(t);
+      } else {  // 0
+        space(t);
+        mark(t);
+      }
     }
-    if (data & mask) {  // 1
-      mark(t);
-      space(t);
-    } else {  // 0
-      space(t);
-      mark(t);
-    }
+    // Footer
+    space(RC6_RPT_LENGTH);
   }
-  // Footer
-  ledOff();
 }
 
 // Send a Philips RC-MM packet.
