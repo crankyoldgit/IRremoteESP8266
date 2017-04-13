@@ -95,6 +95,8 @@ void dumpRaw(decode_results *results) {
   Serial.println("]: ");
 
   for (int i = 1;  i < results->rawlen;  i++) {
+    if (i % 100 == 0)
+      yield();  // Preemptive yield every 100th entry to feed the WDT.
     unsigned long  x = results->rawbuf[i] * USECPERTICK;
     if (!(i & 1)) {  // even
       Serial.print("-");

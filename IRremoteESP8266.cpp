@@ -1757,7 +1757,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDenon (decode_results *results) {
 	}
 
 	// Success
-	results->bits = DENON_BITS;
+  results->bits = DENON_BITS;
 	results->value = data;
 	results->decode_type = DENON;
 	return true;
