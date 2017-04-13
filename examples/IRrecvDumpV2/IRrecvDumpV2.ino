@@ -3,7 +3,10 @@
  * An IR detector/demodulator must be connected to the input RECV_PIN.
  * Example circuit diagram:
  *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
- * Version 0.1 Sept, 2015
+ * Changes:
+ *   Version 0.2 April, 2017
+ *     - Decode from a copy of the data so we can start capturing faster thus
+ *       reduce the likelihood of miscaptures.
  * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009, Copyright 2009 Ken Shirriff, http://arcfn.com
  */
 
@@ -13,6 +16,9 @@
 int RECV_PIN = 14;
 
 IRrecv irrecv(RECV_PIN);
+
+decode_results results; // Somewhere to store the results
+irparams_t save;        // A place to copy the interrupt state while decoding.
 
 void setup() {
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);  // Status message will be sent to the PC at 115200 baud
@@ -53,6 +59,7 @@ void encoding(decode_results *results) {
     case WHYNTER:      Serial.print("WHYNTER");       break ;
     case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break ;
     case PANASONIC:    Serial.print("PANASONIC");     break ;
+    case DENON:        Serial.print("DENON");         break ;
   }
 }
 
@@ -125,7 +132,7 @@ void dumpCode (decode_results *results) {
   }
 
   // End declaration
-  Serial.print("};");  // 
+  Serial.print("};");  //
 
   // Comment
   Serial.print("  // ");
@@ -156,13 +163,11 @@ void dumpCode (decode_results *results) {
 // The repeating section of the code
 //
 void loop() {
-  decode_results  results;        // Somewhere to store the results
-
-  if (irrecv.decode(&results)) {  // Grab an IR code
+  // Check if the IR code has been received.
+  if (irrecv.decode(&results, &save)) {
     dumpInfo(&results);           // Output the results
     dumpRaw(&results);            // Output the results in RAW format
     dumpCode(&results);           // Output the results as source code
     Serial.println("");           // Blank line between entries
-    irrecv.resume();              // Prepare for the next value
   }
 }

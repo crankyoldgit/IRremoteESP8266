@@ -32,6 +32,7 @@
 #define IRremote_h
 
 #include <stdint.h>
+#include "IRremoteInt.h"
 
 // The following are compile-time library options.
 // If you change them, recompile the library.
@@ -110,12 +111,13 @@ class IRrecv
 {
 public:
   IRrecv(int recvpin);
-  bool decode(decode_results *results);
+  bool decode(decode_results *results, irparams_t *save=NULL);
   void enableIRIn();
   void disableIRIn();
   void resume();
   private:
   // These are called by decode
+  void copyIrParams(irparams_t *dest);
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
   bool decodeNEC(decode_results *results);
   bool decodeSony(decode_results *results);
@@ -221,7 +223,6 @@ private:
 
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
-#define RAWBUF 100 // Length of raw duration buffer
 
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
