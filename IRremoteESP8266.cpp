@@ -45,59 +45,6 @@
 #include "IRKelvinator.h"
 #include "IRMitsubishiAC.h"
 
-// These versions of MATCH, MATCH_MARK, and MATCH_SPACE are only for debugging.
-// To use them, set DEBUG in IRremoteInt.h
-// Normally macros are used for efficiency
-#ifdef DEBUG
-int MATCH(int measured, int desired) {
-  Serial.print("Testing: ");
-  Serial.print(TICKS_LOW(desired), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired), DEC);
-  return measured >= TICKS_LOW(desired) && measured <= TICKS_HIGH(desired);
-}
-
-int MATCH_MARK(int measured_ticks, int desired_us) {
-  Serial.print("Testing mark ");
-  Serial.print(measured_ticks * USECPERTICK, DEC);
-  Serial.print(" vs ");
-  Serial.print(desired_us, DEC);
-  Serial.print(": ");
-  Serial.print(TICKS_LOW(desired_us + MARK_EXCESS), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured_ticks, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired_us + MARK_EXCESS), DEC);
-  return measured_ticks >= TICKS_LOW(desired_us + MARK_EXCESS) &&
-      measured_ticks <= TICKS_HIGH(desired_us + MARK_EXCESS);
-}
-
-int MATCH_SPACE(int measured_ticks, int desired_us) {
-  Serial.print("Testing space ");
-  Serial.print(measured_ticks * USECPERTICK, DEC);
-  Serial.print(" vs ");
-  Serial.print(desired_us, DEC);
-  Serial.print(": ");
-  Serial.print(TICKS_LOW(desired_us - MARK_EXCESS), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured_ticks, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired_us - MARK_EXCESS), DEC);
-  return measured_ticks >= TICKS_LOW(desired_us - MARK_EXCESS) &&
-      measured_ticks <= TICKS_HIGH(desired_us - MARK_EXCESS);
-}
-#else
-int ICACHE_FLASH_ATTR MATCH(int measured, int desired) {return measured >= TICKS_LOW(desired) &&
-    measured <= TICKS_HIGH(desired);}
-int ICACHE_FLASH_ATTR MATCH_MARK(int measured_ticks, int desired_us)
-    {return MATCH(measured_ticks, (desired_us + MARK_EXCESS));}
-int ICACHE_FLASH_ATTR MATCH_SPACE(int measured_ticks, int desired_us)
-    {return MATCH(measured_ticks, (desired_us - MARK_EXCESS));}
-// Debugging versions are in IRremote.cpp
-#endif
-
 // IRtimer ---------------------------------------------------------------------
 // This class performs a simple time in useconds since instantiated.
 // Handles when the system timer wraps around (once).
@@ -416,8 +363,10 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
   }
   // Footer
   mark(RCMM_BIT_MARK);
-  // Protocol requires us to wait RCMM_RPT_LENGTH usecs from the start.
-  space(max(0,RCMM_RPT_LENGTH - usecs.elapsed()));
+  // Protocol requires us to wait at least RCMM_RPT_LENGTH usecs from the start
+  // or RCMM_MIN_GAP usecs.
+  space(max(RCMM_RPT_LENGTH - usecs.elapsed(), RCMM_MIN_GAP));
+
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
@@ -952,19 +901,114 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
   return false;
 }
 
+// Calculate the lower bound of the nr. of ticks.
+//
+// Args:
+//   usecs:  Nr. of uSeconds.
+//   tolerance:  Percent as an integer. e.g. 10 is 10%
+// Returns:
+//   Nr. of ticks.
+uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
+  // max() used to ensure the result can't drop below 0 before the cast.
+  return((uint32_t) max(usecs * (1.0 - tolerance/100.)/USECPERTICK, 0));
+}
+
+// Calculate the upper bound of the nr. of ticks.
+//
+// Args:
+//   usecs:  Nr. of uSeconds.
+//   tolerance:  Percent as an integer. e.g. 10 is 10%
+// Returns:
+//   Nr. of ticks.
+uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
+  return((uint32_t) usecs * (1.0 + tolerance/100.)/USECPERTICK + 1);
+}
+
+// Check if we match a pulse(measured_ticks) with the desired_us within
+// +/-tolerance percent.
+//
+// Args:
+//   measured_ticks:  The recorded period of the signal pulse.
+//   desired_us:  The expected period (in useconds) we are matching against.
+//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//
+// Returns:
+//   Boolean: true if it matches, false if it doesn't.
+bool ICACHE_FLASH_ATTR IRrecv::match(uint32_t measured_ticks,
+                                     uint32_t desired_us,
+                                     uint8_t tolerance) {
+  #ifdef DEBUG
+    Serial.print("Matching: ");
+    Serial.print(ticksLow(desired_us, tolerance), DEC);
+    Serial.print(" <= ");
+    Serial.print(measured_ticks, DEC);
+    Serial.print(" <= ");
+    Serial.println(ticksHigh(desired_us, tolerance), DEC);
+  #endif
+  return (measured_ticks >= ticksLow(desired_us, tolerance) &&
+          measured_ticks <= ticksHigh(desired_us, tolerance));
+}
+
+// Check if we match a mark signal(measured_ticks) with the desired_us within
+// +/-tolerance percent, after an expected is excess is added.
+//
+// Args:
+//   measured_ticks:  The recorded period of the signal pulse.
+//   desired_us:  The expected period (in useconds) we are matching against.
+//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//   excess:  Nr. of useconds.
+//
+// Returns:
+//   Boolean: true if it matches, false if it doesn't.
+bool ICACHE_FLASH_ATTR IRrecv::matchMark(uint32_t measured_ticks,
+                                         uint32_t desired_us,
+                                         uint8_t tolerance, int excess) {
+  #ifdef DEBUG
+    Serial.print("Matching MARK ");
+    Serial.print(measured_ticks * USECPERTICK, DEC);
+    Serial.print(" vs ");
+    Serial.print(desired_us, DEC);
+    Serial.print(". ");
+  #endif
+  return match(measured_ticks, desired_us + excess, tolerance);
+}
+// Check if we match a space signal(measured_ticks) with the desired_us within
+// +/-tolerance percent, after an expected is excess is removed.
+//
+// Args:
+//   measured_ticks:  The recorded period of the signal pulse.
+//   desired_us:  The expected period (in useconds) we are matching against.
+//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//   excess:  Nr. of useconds.
+//
+// Returns:
+//   Boolean: true if it matches, false if it doesn't.
+bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
+                                          uint32_t desired_us,
+                                          uint8_t tolerance, int excess) {
+  #ifdef DEBUG
+    Serial.print("Matching SPACE ");
+    Serial.print(measured_ticks * USECPERTICK, DEC);
+    Serial.print(" vs ");
+    Serial.print(desired_us, DEC);
+    Serial.print(". ");
+  #endif
+  return match(measured_ticks, desired_us - excess, tolerance);
+}
+
 // NECs have a repeat only 4 items long
 bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results) {
   long data = 0;
   int offset = 1; // Skip initial space
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], NEC_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], NEC_HDR_MARK)) {
     return false;
   }
   offset++;
   // Check for repeat
-  if (results->rawlen == 4 &&
-    MATCH_SPACE(results->rawbuf[offset], NEC_RPT_SPACE) &&
-    MATCH_MARK(results->rawbuf[offset+1], NEC_BIT_MARK)) {
+  if (irparams.rawlen == 4 &&
+      matchSpace(results->rawbuf[offset], NEC_RPT_SPACE) &&
+      matchMark(results->rawbuf[offset+1], NEC_BIT_MARK)) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = NEC;
@@ -974,18 +1018,18 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results) {
     return false;
   }
   // Initial space
-  if (!MATCH_SPACE(results->rawbuf[offset], NEC_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], NEC_HDR_SPACE)) {
     return false;
   }
   offset++;
   for (int i = 0; i < NEC_BITS; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], NEC_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset], NEC_BIT_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], NEC_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], NEC_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], NEC_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1019,19 +1063,20 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results) {
   offset++;
 
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], SONY_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK)) {
     return false;
   }
   offset++;
 
-  while (offset + 1 < results->rawlen) {
-    if (!MATCH_SPACE(results->rawbuf[offset], SONY_HDR_SPACE)) {
+  while (offset + 1 < irparams.rawlen) {
+    if (!matchSpace(results->rawbuf[offset], SONY_HDR_SPACE)) {
+
       break;
     }
     offset++;
-    if (MATCH_MARK(results->rawbuf[offset], SONY_ONE_MARK)) {
+    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK)) {
       data = (data << 1) | 1;
-    } else if (MATCH_MARK(results->rawbuf[offset], SONY_ZERO_MARK)) {
+    } else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK)) {
       data <<= 1;
     } else {
       return false;
@@ -1061,34 +1106,34 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results) {
 
 
   // sequence begins with a bit mark and a zero space
-  if (!MATCH_MARK(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
     return false;
   }
   offset++;
-  if (!MATCH_SPACE(results->rawbuf[offset], WHYNTER_ZERO_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], WHYNTER_ZERO_SPACE)) {
     return false;
   }
   offset++;
 
   // header mark and space
-  if (!MATCH_MARK(results->rawbuf[offset], WHYNTER_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], WHYNTER_HDR_MARK)) {
     return false;
   }
   offset++;
-  if (!MATCH_SPACE(results->rawbuf[offset], WHYNTER_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], WHYNTER_HDR_SPACE)) {
     return false;
   }
   offset++;
 
   // data bits
   for (int i = 0; i < WHYNTER_BITS; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], WHYNTER_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], WHYNTER_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset],WHYNTER_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset],WHYNTER_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1097,7 +1142,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results) {
   }
 
   // trailing mark
-  if (!MATCH_MARK(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
     return false;
   }
   // Success
@@ -1135,25 +1180,25 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results) {
   offset++;
 
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], SANYO_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], SANYO_HDR_MARK)) {
     return false;
   }
   offset++;
 
   // Skip Second Mark
-  if (!MATCH_MARK(results->rawbuf[offset], SANYO_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], SANYO_HDR_MARK)) {
     return false;
   }
   offset++;
 
-  while (offset + 1 < results->rawlen) {
-    if (!MATCH_SPACE(results->rawbuf[offset], SANYO_HDR_SPACE)) {
+  while (offset + 1 < irparams.rawlen) {
+    if (!matchSpace(results->rawbuf[offset], SANYO_HDR_SPACE)) {
       break;
     }
     offset++;
-    if (MATCH_MARK(results->rawbuf[offset], SANYO_ONE_MARK)) {
+    if (matchMark(results->rawbuf[offset], SANYO_ONE_MARK)) {
       data = (data << 1) | 1;
-    } else if (MATCH_MARK(results->rawbuf[offset], SANYO_ZERO_MARK)) {
+    } else if (matchMark(results->rawbuf[offset], SANYO_ZERO_MARK)) {
       data <<= 1;
     } else {
       return false;
@@ -1205,21 +1250,22 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results) {
   // 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
 
   // Initial Space
-  if (!MATCH_MARK(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
+  if (!matchMark(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
     return false;
   }
   offset++;
-  while (offset + 1 < results->rawlen) {
-    if (MATCH_MARK(results->rawbuf[offset], MITSUBISHI_ONE_MARK)) {
+  while (offset + 1 < irparams.rawlen) {
+    if (matchMark(results->rawbuf[offset], MITSUBISHI_ONE_MARK)) {
+
       data = (data << 1) | 1;
-    } else if (MATCH_MARK(results->rawbuf[offset], MITSUBISHI_ZERO_MARK)) {
+    } else if (matchMark(results->rawbuf[offset], MITSUBISHI_ZERO_MARK)) {
       data <<= 1;
     } else {
       // Serial.println("A"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
       return false;
     }
     offset++;
-    if (!MATCH_SPACE(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
+    if (!matchSpace(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
       // Serial.println("B"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
       break;
     }
@@ -1255,11 +1301,11 @@ int ICACHE_FLASH_ATTR IRrecv::getRClevel(decode_results *results, int *offset,
   int correction = (val == MARK) ? MARK_EXCESS : - MARK_EXCESS;
 
   int avail;
-  if (MATCH(width, t1 + correction)) {
+  if (match(width, t1 + correction)) {
     avail = 1;
-  } else if (MATCH(width, 2*t1 + correction)) {
+  } else if (match(width, 2*t1 + correction)) {
     avail = 2;
-  } else if (MATCH(width, 3*t1 + correction)) {
+  } else if (match(width, 3*t1 + correction)) {
     avail = 3;
   } else {
     return -1;
@@ -1319,11 +1365,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
   }
   int offset = 1; // Skip first space
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], RC6_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) {
     return false;
   }
   offset++;
-  if (!MATCH_SPACE(results->rawbuf[offset], RC6_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], RC6_HDR_SPACE)) {
     return false;
   }
   offset++;
@@ -1376,30 +1422,36 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
   if (bitSize < 12 || bitSize > 32)
     return false;
   // Header decode
-  if (!MATCH_MARK(results->rawbuf[offset++], RCMM_HDR_MARK))
+  if (!matchMark(results->rawbuf[offset++], RCMM_HDR_MARK))
     return false;
-  if (!MATCH_MARK(results->rawbuf[offset++], RCMM_HDR_SPACE))
+  if (!matchSpace(results->rawbuf[offset++], RCMM_HDR_SPACE))
     return false;
   // Data decode
   // RC-MM has two bits of data per mark/space pair.
   for (int i = 0; i < bitSize; i += 2) {
     data <<= 2;
-    if (!MATCH(results->rawbuf[offset++], RCMM_BIT_MARK))
+    // Use non-default tolerance & excess for matching some of the spaces as the
+    // defaults are too generous and causes mis-matches in some cases.
+    if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK, RCMM_TOLERANCE))
       return false;
-    if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_0))
+    if (matchSpace(results->rawbuf[offset],
+                   RCMM_BIT_SPACE_0, TOLERANCE, RCMM_EXCESS))
       data += 0;
-    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_1))
+    else if (matchSpace(results->rawbuf[offset],
+                        RCMM_BIT_SPACE_1, TOLERANCE, RCMM_EXCESS))
       data += 1;
-    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_2))
+    else if (matchSpace(results->rawbuf[offset],
+                        RCMM_BIT_SPACE_2, RCMM_TOLERANCE, RCMM_EXCESS))
       data += 2;
-    else if (MATCH(results->rawbuf[offset], RCMM_BIT_SPACE_3))
+    else if (matchSpace(results->rawbuf[offset],
+                        RCMM_BIT_SPACE_3, RCMM_TOLERANCE, RCMM_EXCESS))
       data += 3;
     else
       return false;
     offset++;
   }
   // Footer decode
-  if (!MATCH(results->rawbuf[offset], RCMM_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset], RCMM_BIT_MARK))
     return false;
 
   // Success
@@ -1412,22 +1464,22 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
 bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results) {
   unsigned long long data = 0;
 	int offset = 1;  // Dont skip first space
-  if (!MATCH_MARK(results->rawbuf[offset], PANASONIC_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) {
     return false;
   }
   offset++;
-  if (!MATCH_MARK(results->rawbuf[offset], PANASONIC_HDR_SPACE)) {
+  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_SPACE)) {
     return false;
   }
   offset++;
   // decode address
   for (int i = 0; i < PANASONIC_BITS; i++) {
-    if (!MATCH(results->rawbuf[offset++], PANASONIC_BIT_MARK)) {
+    if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK)) {
       return false;
     }
-    if (MATCH(results->rawbuf[offset],PANASONIC_ONE_SPACE)) {
+    if (match(results->rawbuf[offset],PANASONIC_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH(results->rawbuf[offset],PANASONIC_ZERO_SPACE)) {
+    } else if (match(results->rawbuf[offset],PANASONIC_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1446,7 +1498,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results) {
 	int offset = 1; // Skip first space
 
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], LG_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], LG_HDR_MARK)) {
     return false;
   }
   offset++;
@@ -1454,18 +1506,18 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results) {
     return false;
   }
   // Initial space
-  if (!MATCH_SPACE(results->rawbuf[offset], LG_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE)) {
     return false;
   }
   offset++;
   for (int i = 0; i < LG_BITS; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], LG_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset], LG_BIT_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], LG_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], LG_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], LG_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], LG_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1473,7 +1525,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results) {
     offset++;
   }
   //Stop bit
-  if (!MATCH_MARK(results->rawbuf[offset], LG_BIT_MARK)){
+  if (!matchMark(results->rawbuf[offset], LG_BIT_MARK)){
     return false;
   }
   // Success
@@ -1487,16 +1539,16 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results) {
   long data = 0;
 	int offset = 1; // Skip first space
   // Check for repeat
-  if (results->rawlen - 1 == 33 &&
-      MATCH_MARK(results->rawbuf[offset], JVC_BIT_MARK) &&
-      MATCH_MARK(results->rawbuf[results->rawlen-1], JVC_BIT_MARK)) {
+  if (irparams.rawlen - 1 == 33 &&
+      matchMark(results->rawbuf[offset], JVC_BIT_MARK) &&
+      matchMark(results->rawbuf[irparams.rawlen-1], JVC_BIT_MARK)) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = JVC;
     return true;
   }
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], JVC_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], JVC_HDR_MARK)) {
     return false;
   }
   offset++;
@@ -1504,18 +1556,18 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results) {
     return false;
   }
   // Initial space
-  if (!MATCH_SPACE(results->rawbuf[offset], JVC_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], JVC_HDR_SPACE)) {
     return false;
   }
   offset++;
   for (int i = 0; i < JVC_BITS; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], JVC_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], JVC_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], JVC_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], JVC_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], JVC_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1523,7 +1575,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results) {
     offset++;
   }
   //Stop bit
-  if (!MATCH_MARK(results->rawbuf[offset], JVC_BIT_MARK)) {
+  if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK)) {
     return false;
   }
   // Success
@@ -1538,14 +1590,14 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSAMSUNG(decode_results *results) {
   long data = 0;
   int offset = 1;  // Dont skip first space
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], SAMSUNG_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], SAMSUNG_HDR_MARK)) {
     return false;
   }
   offset++;
   // Check for repeat
-  if (results->rawlen == 4 &&
-      MATCH_SPACE(results->rawbuf[offset], SAMSUNG_RPT_SPACE) &&
-      MATCH_MARK(results->rawbuf[offset+1], SAMSUNG_BIT_MARK)) {
+  if (irparams.rawlen == 4 &&
+      matchSpace(results->rawbuf[offset], SAMSUNG_RPT_SPACE) &&
+      matchMark(results->rawbuf[offset+1], SAMSUNG_BIT_MARK)) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = SAMSUNG;
@@ -1555,18 +1607,18 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSAMSUNG(decode_results *results) {
     return false;
   }
   // Initial space
-  if (!MATCH_SPACE(results->rawbuf[offset], SAMSUNG_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], SAMSUNG_HDR_SPACE)) {
     return false;
   }
   offset++;
   for (int i = 0; i < SAMSUNG_BITS; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], SAMSUNG_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset], SAMSUNG_BIT_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], SAMSUNG_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], SAMSUNG_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], SAMSUNG_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], SAMSUNG_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1591,24 +1643,24 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDaikin(decode_results *results) {
   }
 
   // Initial mark
-  if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset], DAIKIN_HDR_MARK)) {
       return false;
   }
   offset++;
 
-  if (!MATCH_SPACE(results->rawbuf[offset], DAIKIN_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset], DAIKIN_HDR_SPACE)) {
       return false;
   }
   offset++;
 
   for (int i = 0; i < 32; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
+    if (!matchMark(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1629,13 +1681,13 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDaikin(decode_results *results) {
   //==========
 
   for (int i = 0; i < 32; i++) {
-    if (!MATCH_MARK(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
+    if (!matchMark(results->rawbuf[offset], DAIKIN_ONE_MARK)) {
       return false;
     }
     offset++;
-    if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE)) {
       data = (data << 1) | 1;
-    } else if (MATCH_SPACE(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
+    } else if (matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE)) {
       data <<= 1;
     } else {
       return false;
@@ -1654,7 +1706,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDaikin(decode_results *results) {
   //Serial.println (reversed,  HEX);
 
   //===========
-  if (!MATCH_SPACE(results->rawbuf[offset], 29000)) {
+  if (!matchSpace(results->rawbuf[offset], 29000)) {
     //Serial.println ("no gap");
 	  return false;
   }
@@ -1678,10 +1730,10 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDenon (decode_results *results) {
 	}
 
 	// Check initial Mark+Space match
-	if (!MATCH_MARK (results->rawbuf[offset++], DENON_HDR_MARK )) {
+	if (!matchMark (results->rawbuf[offset++], DENON_HDR_MARK )) {
 	  return false;
 	}
-	if (!MATCH_SPACE(results->rawbuf[offset++], DENON_HDR_SPACE)) {
+	if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE)) {
 	  return false;
 	}
 
@@ -1689,14 +1741,14 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDenon (decode_results *results) {
 	for (int i = 0;  i < DENON_BITS;  i++) {
 		// Each bit looks like: DENON_MARK + DENON_SPACE_1 -> 1
 		//                 or : DENON_MARK + DENON_SPACE_0 -> 0
-		if (!MATCH_MARK(results->rawbuf[offset++], DENON_BIT_MARK)) {
+		if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK)) {
 		  return false;
 		}
 
 		// IR data is big-endian, so we shuffle it in from the right:
-		if (MATCH_SPACE(results->rawbuf[offset], DENON_ONE_SPACE)) {
+		if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE)) {
 		  data = (data << 1) | 1;
-		} else if (MATCH_SPACE(results->rawbuf[offset], DENON_ZERO_SPACE)) {
+		} else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE)) {
 		  data = (data << 1) | 0;
 		} else {
 		  return false;
