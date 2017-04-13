@@ -206,7 +206,7 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC (unsigned long data, int nbits,
   // Footer
   mark(NEC_BIT_MARK);
   // Gap to next command.
-  space(NEC_MIN_COMMAND_LENGTH - usecs.elapsed());
+  space(max(0, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
 
   // Optional command repeat sequence.
   for (unsigned int i = 0; i < repeat; i++) {
@@ -215,7 +215,7 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC (unsigned long data, int nbits,
     space(NEC_RPT_SPACE);
     mark(NEC_BIT_MARK);
     // Gap till next command.
-    space(NEC_MIN_COMMAND_LENGTH - usecs.elapsed());
+    space(max(0, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
   }
 }
 
@@ -417,7 +417,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
   // Footer
   mark(RCMM_BIT_MARK);
   // Protocol requires us to wait RCMM_RPT_LENGTH usecs from the start.
-  space(RCMM_RPT_LENGTH - usecs.elapsed());
+  space(max(0,RCMM_RPT_LENGTH - usecs.elapsed()));
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
@@ -465,7 +465,7 @@ void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long data, int nbits,
     // Footer
     mark(JVC_BIT_MARK);
     // Wait till the end of the repeat time window before we send another code.
-    space(JVC_RPT_LENGTH - usecs.elapsed());
+    space(max(0, JVC_RPT_LENGTH - usecs.elapsed()));
     usecs.reset();
   }
   // No need to turn off the LED as we will always end with a space().
