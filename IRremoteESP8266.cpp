@@ -205,21 +205,21 @@ void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long data, int nbits) {
   space(WHYNTER_ZERO_SPACE);
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long data, int nbits,
+// Send a Sony/SIRC(Serial Infra-Red Control) message.
+//
+// Args:
+//   data: message to be sent.
+//   nbits: Nr. of bits of the mesageto be sent.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// sendSony() should typically be called with repeat=2 as Sony devices
+// expect the message to be sent at least 3 times.
+//
+// Timings and details are taken from:
+//   http://www.sbprojects.com/knowledge/ir/sirc.php
+void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long long data,
+                                        unsigned int nbits,
                                         unsigned int repeat) {
-  // Send an IR command to a compatible Sony device.
-  //
-  // Args:
-  //   data: IR command to be sent.
-  //   nbits: Nr. of bits of the IR command to be sent.
-  //   repeat: Nr. of additional times the IR command is to be sent.
-  //
-  // sendSony() should typically be called with repeat=2 as Sony devices
-  // expect the code to be sent at least 3 times.
-  //
-  // Timings and details are taken from:
-  //   http://www.sbprojects.com/knowledge/ir/sirc.php
-
   enableIROut(40);  // Sony devices use a 40kHz IR carrier frequency.
   IRtimer usecs = IRtimer();
 
@@ -227,16 +227,45 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long data, int nbits,
     usecs.reset();
     // Header
     mark(SONY_HDR_MARK);
-    space(SONY_HDR_SPACE);
+    space(SONY_SPACE);
     // Data
-    sendData(SONY_ONE_MARK, SONY_HDR_SPACE, SONY_ZERO_MARK, SONY_HDR_SPACE,
+    sendData(SONY_ONE_MARK, SONY_SPACE, SONY_ZERO_MARK, SONY_SPACE,
              data, nbits, true);
     // Footer
     // The Sony protocol requires us to wait 45ms from start of a code to the
     // start of the next one. A 10ms minimum gap is also required.
-    space(max(10000, 45000 - usecs.elapsed()));
+    space(max(SONY_MIN_GAP, SONY_RPT_LENGTH - usecs.elapsed()));
   }
   // A space() is always performed last, so no need to turn off the LED.
+}
+
+// Convert Sony/SIRC command, address, & extended bits into sendSony format.
+// Args:
+//   nbits:    Sony protocol bit size.
+//   command:  Sony command bits.
+//   address:  Sony address bits.
+//   extended: Sony extended bits.
+// Returns:
+//   A sendSony compatible data message.
+unsigned long encodeSony(unsigned int nbits, unsigned int command,
+                         unsigned int address, unsigned int extended) {
+  unsigned long result = 0;
+  switch (nbits) {
+    case 12:  // 5 address bits.
+      result = address & 0x1F;
+      break;
+    case 15:  // 8 address bits.
+      result = address & 0xFF;
+      break;
+    case 20:  // 5 address bits, 8 extended bits.
+      result = address & 0x1F;
+      result |= (extended & 0xFF) << 5;
+      break;
+    default:
+      return 0;  // This is not an expected Sony bit size/protocol.
+  }
+  result = (result << 7) | (command & 0x7F);  // All sizes have 7 command bits.
+  return reverseBits(result, nbits);  // sendSony uses reverse ordered bits.
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], int len, int hz) {
@@ -1059,55 +1088,70 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results) {
   return true;
 }
 
+// Decode the supplied Sony/SIRC message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// SONY protocol, SIRC (Serial Infra-Red Control) can be 12,15,20 bits long.
+// Based on: http://www.sbprojects.com/knowledge/ir/sirc.php
 bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results) {
-  long data = 0;
-  if (results->rawlen < 2 * SONY_BITS + 2) {
+  if (results->rawlen < 2 * SONY_MIN_BITS + 2)
+    return false;  // Can't possibly be a Sony code if it is this small.
+
+  uint32_t data = 0;
+  uint16_t offset = 1;
+  uint16_t nbits = 0;
+  uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
+
+  // Header
+  timeSoFar += results->rawbuf[offset] * USECPERTICK;
+  if (!matchMark(results->rawbuf[offset++], SONY_HDR_MARK))
     return false;
-  }
-  int offset = 0; // Dont skip first space, check its size
-
-  /*
-  // Some Sony's deliver repeats fast after first
-  // unfortunately can't spot difference from of repeat from two fast clicks
-  if (results->rawbuf[offset] < SONY_DOUBLE_SPACE_USECS) {
-    // Serial.print("IR Gap found: ");
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = SANYO;
-    return true;
-  }*/
-  offset++;
-
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK)) {
-    return false;
-  }
-  offset++;
-
-  while (offset + 1 < irparams.rawlen) {
-    if (!matchSpace(results->rawbuf[offset], SONY_HDR_SPACE)) {
-
-      break;
-    }
-    offset++;
-    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK)) {
-      data = (data << 1) | 1;
-    } else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK)) {
-      data <<= 1;
-    } else {
+  // Data
+  for (; offset+1 < results->rawlen; nbits++) {
+    // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
+    //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
+    if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP) ||
+        matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
+      break;  // Found a repeat space.
+    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    if (!matchSpace(results->rawbuf[offset++], SONY_SPACE))
       return false;
-    }
+    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK))
+      data = (data << 1) | 1;
+    else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK))
+      data <<= 1;
+    else
+      return false;
     offset++;
   }
+  // No Footer for Sony.
 
   // Success
-  results->bits = (offset - 1) / 2;
-  if (results->bits < 12) {
-    results->bits = 0;
-    return false;
-  }
+  results->bits = nbits;
   results->value = data;
   results->decode_type = SONY;
+  // Message comes in LSB first. Convert ot MSB first.
+  data = reverseBits(data, nbits);
+  // Decode the address & command from raw decode value.
+  switch (nbits) {
+    case 12:  // 7 command bits, 5 address bits.
+    case 15:  // 7 command bits, 8 address bits.
+      results->command = data & 0x7F;  // Bits 0-6
+      results->address = data >> 7;  // Bits 7-14
+      break;
+    case 20:  // 7 command bits, 5 address bits, 8 extended (command) bits.
+      results->command = (data & 0x7F) + ((data >> 12) << 7);  // Bits 0-6,12-19
+      results->address = (data >> 7) & 0x1F;  // Bits 7-11
+      break;
+    default:  // Shouldn't happen, but just in case.
+      results->address = 0;
+      results->command = 0;
+  }
   return true;
 }
 

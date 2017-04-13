@@ -186,9 +186,13 @@ public:
   void sendLG(unsigned long data, int nbits=28, unsigned int repeat=0);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
-  // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=0 for backward compatiblity.
-  void sendSony(unsigned long data, int nbits, unsigned int repeat=0);
+  // Legacy use of this procedure was to only send a single code so call it with
+  // repeat=0 for backward compatiblity. As of v2.0 it defaults to sending
+  // a Sony command that will be accepted be a device.
+  void sendSony(unsigned long long data, unsigned int nbits=20,
+                unsigned int repeat=2);
+  unsigned long encodeSony(unsigned int nbits, unsigned int command,
+                           unsigned int address, unsigned int extended=0);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
   //  void sendMitsubishi(unsigned long data, int nbits);
