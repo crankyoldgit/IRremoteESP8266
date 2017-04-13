@@ -206,7 +206,7 @@ private:
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
-                uint32_t data, uint8_t nbits, bool MSBfirst=true);
+                uint64_t data, uint16_t nbits, bool MSBfirst=true);
   void ledOff();
 } ;
 
