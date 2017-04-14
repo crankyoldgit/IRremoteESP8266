@@ -90,6 +90,8 @@ public:
   unsigned long command;  // Decoded command.
 };
 
+uint64_t reverseBits(uint64_t input, uint16_t nbits=64);
+
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
