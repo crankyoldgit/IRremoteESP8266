@@ -86,6 +86,8 @@ public:
   volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
   int rawlen; // Number of records in rawbuf.
   bool overflow;
+  unsigned long address;  // Decoded device address.
+  unsigned long command;  // Decoded command.
 };
 
 // Decoded value for NEC when a repeat code is received
