@@ -548,19 +548,36 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
          (customer << 8) | customer);
 }
 
-// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-void ICACHE_FLASH_ATTR IRsend::sendDenon (unsigned long data,  int nbits) {
-  // Set IR carrier frequency
-  enableIROut(38);
-  // Header
-  mark(DENON_HDR_MARK);
-  space(DENON_HDR_SPACE);
-  // Data
-  sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
-           data, nbits, true);
-  // Footer
-  mark(DENON_BIT_MARK);
-  ledOff();
+// Send a Denon message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically DENON_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Notes:
+//   Some Denon devices use a Kaseikyo/Panasonic 48-bit format.
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+//   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
+void ICACHE_FLASH_ATTR IRsend::sendDenon(unsigned long long data,
+                                         unsigned int nbits,
+                                         unsigned int repeat) {
+  enableIROut(38);  // Set IR carrier frequency
+  IRtimer usecTimer = IRtimer();
+
+  for (unsigned int i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(DENON_HDR_MARK);
+    space(DENON_HDR_SPACE);
+    // Data
+    sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(DENON_BIT_MARK);
+    space(max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(), DENON_MIN_GAP));
+  }
 }
 
 void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
@@ -1026,9 +1043,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Denon decode");
 #endif
-  if (decodeDenon(results)) {
+  if (decodeDenon(results))
     return true;
-  }
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -1955,48 +1971,55 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDaikin(decode_results *results) {
   return true;
 }
 
-// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-bool ICACHE_FLASH_ATTR IRrecv::decodeDenon (decode_results *results) {
-	unsigned long data   = 0;  // Somewhere to build our code
-	int offset = 1;  // Skip the Gap reading
+// Decode a Denon message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Expected nr. of data bits. (Typically DENON_BITS)
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Ref: https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+bool ICACHE_FLASH_ATTR IRrecv::decodeDenon(decode_results *results,
+                                           uint16_t nbits,
+                                           bool strict) {
+  // Check we have enough data
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    return false;
+  if (strict && nbits != DENON_BITS)
+    return false;
 
-	// Check we have the right amount of data
-	if (results->rawlen != 1 + 2 + (2 * DENON_BITS) + 1) {
-	  return false;
-	}
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
 
-	// Check initial Mark+Space match
-	if (!matchMark (results->rawbuf[offset++], DENON_HDR_MARK )) {
-	  return false;
-	}
-	if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE)) {
-	  return false;
-	}
+  // Header
+  if (!matchMark(results->rawbuf[offset++], DENON_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
+    return false;
+  // Data
+  for (int i = 0; i < nbits; i++) {
+    if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE))
+      data = (data << 1);  // 0
+    else
+      return false;
+    offset++;
+  }
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+    return false;
 
-	// Read the bits in
-	for (int i = 0;  i < DENON_BITS;  i++) {
-		// Each bit looks like: DENON_MARK + DENON_SPACE_1 -> 1
-		//                 or : DENON_MARK + DENON_SPACE_0 -> 0
-		if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK)) {
-		  return false;
-		}
-
-		// IR data is big-endian, so we shuffle it in from the right:
-		if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE)) {
-		  data = (data << 1) | 1;
-		} else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE)) {
-		  data = (data << 1) | 0;
-		} else {
-		  return false;
-		}
-		offset++;
-	}
-
-	// Success
-  results->bits = DENON_BITS;
-	results->value = data;
-	results->decode_type = DENON;
-	return true;
+  // Success
+  results->bits = nbits;
+  results->value = data;
+  results->decode_type = DENON;
+  results->address = 0;
+  results->command = 0;
+  return true;
 }
 
 
