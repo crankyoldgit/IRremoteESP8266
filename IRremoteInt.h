@@ -148,29 +148,25 @@
 #define JVC_ZERO_SPACE 550
 #define JVC_RPT_LENGTH 60000
 
-#define LG_HDR_MARK 8000
-#define LG_HDR_SPACE 4000
-#define LG_BIT_MARK 600
-#define LG_ONE_SPACE 1600
-#define LG_ZERO_SPACE 550
-#define LG_RPT_LENGTH 60000
+#define LG_HDR_MARK    8000
+#define LG_HDR_SPACE   4000
+#define LG_BIT_MARK     600
+#define LG_ONE_SPACE   1600
+#define LG_ZERO_SPACE   550
+#define LG_RPT_SPACE   2250
+#define LG_MIN_GAP    20000  // Completely made up figure.
+#define LG_MIN_MESSAGE_LENGTH 108000UL
+#define LG32_HDR_MARK  4500
 
-/*
-#define SAMSUNG_HDR_MARK  5000
-#define SAMSUNG_HDR_SPACE 5000
-#define SAMSUNG_BIT_MARK  560
-#define SAMSUNG_ONE_SPACE 1600
+// Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+#define SAMSUNG_HDR_MARK   4500
+#define SAMSUNG_HDR_SPACE  4500
+#define SAMSUNG_BIT_MARK    560
+#define SAMSUNG_ONE_SPACE  1690
 #define SAMSUNG_ZERO_SPACE  560
-#define SAMSUNG_RPT_SPACE 2250
-*/
-
-// Update by Sebastien Warin for my EU46D6200
-#define SAMSUNG_HDR_MARK  4500
-#define SAMSUNG_HDR_SPACE 4500
-#define SAMSUNG_BIT_MARK  590
-#define SAMSUNG_ONE_SPACE 1690
-#define SAMSUNG_ZERO_SPACE  590
-#define SAMSUNG_RPT_SPACE 2250
+#define SAMSUNG_RPT_SPACE  2250
+#define SAMSUNG_MIN_GAP   20000  // Completely made up figure.
+#define SAMSUNG_MIN_MESSAGE_LENGTH 108000UL
 
 #define SHARP_BITS 15
 #define DISH_BITS 16

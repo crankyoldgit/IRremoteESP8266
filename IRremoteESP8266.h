@@ -91,6 +91,7 @@ public:
 };
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits=64);
+uint8_t calcLGChecksum(uint16_t data);
 
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
@@ -131,9 +132,11 @@ public:
   bool decodeRC6(decode_results *results);
   bool decodeRCMM(decode_results *results);
   bool decodePanasonic(decode_results *results);
-  bool decodeLG(decode_results *results);
+  bool decodeLG(decode_results *results, uint16_t nbits=LG_BITS,
+                bool strict=false);
   bool decodeJVC(decode_results *results);
-  bool decodeSAMSUNG(decode_results *results);
+  bool decodeSAMSUNG(decode_results *results, uint16_t nbits=SAMSUNG_BITS,
+                     bool strict=false);
   bool decodeWhynter(decode_results *results);
   bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
@@ -185,7 +188,9 @@ public:
   void sendNEC(unsigned long long data, unsigned int nbits=32,
                unsigned int repeat=0);
   unsigned long encodeNEC(unsigned int address, unsigned int command);
-  void sendLG(unsigned long data, int nbits=28, unsigned int repeat=0);
+  void sendLG(unsigned long long data, unsigned int nbits=28,
+              unsigned int repeat=0);
+  unsigned long encodeLG(uint8_t address, uint16_t command);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // As the legacy use of this procedure was only to send a single code
@@ -208,7 +213,9 @@ public:
   void sendSharpRaw(unsigned long data, int nbits);
   void sendPanasonic(unsigned int address, unsigned long data);
   void sendJVC(unsigned long data, int nbits, unsigned int repeat=0);
-  void sendSAMSUNG(unsigned long data, int nbits=32);
+  void sendSAMSUNG(unsigned long long data, unsigned int nbits=32,
+                   unsigned int repeat=0);
+  unsigned long encodeSAMSUNG(uint8_t customer, uint8_t command);
   void sendDaikin(unsigned char data[]);
   void sendDenon(unsigned long data, int nbits=14);
   void sendKelvinator(unsigned char data[]);
