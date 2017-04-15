@@ -59,6 +59,7 @@
 #define NEC_ZERO_SPACE	560
 #define NEC_RPT_SPACE	2250
 #define NEC_MIN_COMMAND_LENGTH 108000UL
+#define NEC_MIN_GAP 10000  // Not official, just a made up value.
 
 // Timings based on http://www.sbprojects.com/knowledge/ir/sirc.php
 #define SONY_HDR_MARK	2400

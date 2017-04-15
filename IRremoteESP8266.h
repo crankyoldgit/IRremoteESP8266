@@ -123,7 +123,7 @@ public:
   // These are called by decode
   void copyIrParams(irparams_t *dest);
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
-  bool decodeNEC(decode_results *results);
+  bool decodeNEC(decode_results *results, bool strict=false);
   bool decodeSony(decode_results *results);
   bool decodeSanyo(decode_results *results);
   bool decodeMitsubishi(decode_results *results);
@@ -182,7 +182,9 @@ public:
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
-  void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
+  void sendNEC(unsigned long long data, unsigned int nbits=32,
+               unsigned int repeat=0);
+  unsigned long encodeNEC(unsigned int address, unsigned int command);
   void sendLG(unsigned long data, int nbits=28, unsigned int repeat=0);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
