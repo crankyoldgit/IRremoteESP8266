@@ -136,11 +136,17 @@ void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long data, int nbits) {
   space(COOLIX_HDR_SPACE);    // Pause before repeating
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendNEC (unsigned long data, int nbits,
-                                        unsigned int repeat) {
-  // Details about timings can be found at:
-  //   http://www.sbprojects.com/knowledge/ir/nec.php
-
+// Send a raw NEC(Renesas) formatted message.
+//
+// Args:
+//   data:   The message to be sent.
+//   nbits:  The number of bits of the message to be sent. Typically 32.
+//   repeat: The number of times the command is to be repeated.
+//
+// Ref: http://www.sbprojects.com/knowledge/ir/nec.php
+void ICACHE_FLASH_ATTR IRsend::sendNEC(unsigned long long data,
+                                       unsigned int nbits,
+                                       unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(38);
   IRtimer usecs = IRtimer();
@@ -153,7 +159,7 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC (unsigned long data, int nbits,
   // Footer
   mark(NEC_BIT_MARK);
   // Gap to next command.
-  space(max(0, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
+  space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
 
   // Optional command repeat sequence.
   for (unsigned int i = 0; i < repeat; i++) {
@@ -162,8 +168,25 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC (unsigned long data, int nbits,
     space(NEC_RPT_SPACE);
     mark(NEC_BIT_MARK);
     // Gap till next command.
-    space(max(0, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
+    space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
   }
+}
+
+// Calculate the raw NEC data based on address and command.
+// Args:
+//   address: An address value.
+//   command: An 8-bit command value.
+// Returns:
+//   A raw 32-bit NEC message.
+// Ref: http://www.sbprojects.com/knowledge/ir/nec.php
+unsigned long ICACHE_FLASH_ATTR IRsend::encodeNEC(unsigned int address,
+                                                  unsigned int command) {
+  command &= 0xFF;  // We only want the least significant byte of command.
+  command = (command <<  8) + (command ^ 0xFF);  // Calculate the new command.
+  if (address > 0xFF) // Is it Extended NEC?
+    return (address << 16) + command;  // Extended.
+  else
+    return (address << 24) + ((address ^ 0xFF) << 16) + command; // Normal.
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendLG (unsigned long data, int nbits,
@@ -1012,50 +1035,79 @@ bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
   return match(measured_ticks, desired_us - excess, tolerance);
 }
 
-// NECs have a repeat only 4 items long
-bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results) {
-  long data = 0;
-  int offset = 1; // Skip initial space
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], NEC_HDR_MARK)) {
+// Decode the supplied NEC message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// NEC protocol has three varients/forms.
+//   Normal:   a 8 bit address & a 8 bit command in 32 bit data form.
+//             i.e. address + inverted(address) + command + inverted(command)
+//   Extended: a 16 bit address & a 8 bit command in 32 bit data form.
+//             i.e. address + command + inverted(command)
+//   Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
+//
+// Ref: http://www.sbprojects.com/knowledge/ir/nec.php
+bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results, bool strict) {
+  if (results->rawlen < 2 * NEC_BITS + 4 && results->rawlen != 4)
+    return false;  // Can't possibly be a valid NEC message.
+
+  uint32_t data = 0;
+  uint16_t offset = 1; // Skip initial space
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], NEC_HDR_MARK))
     return false;
-  }
-  offset++;
-  // Check for repeat
-  if (irparams.rawlen == 4 &&
+  // Check if it is a repeat code.
+  if (results->rawlen == 4 &&
       matchSpace(results->rawbuf[offset], NEC_RPT_SPACE) &&
       matchMark(results->rawbuf[offset+1], NEC_BIT_MARK)) {
-    results->bits = 0;
     results->value = REPEAT;
     results->decode_type = NEC;
+    results->bits = 0;
+    results->address = 0;
+    results->command = 0;
     return true;
   }
-  if (results->rawlen < 2 * NEC_BITS + 4) {
-    return false;
-  }
-  // Initial space
-  if (!matchSpace(results->rawbuf[offset], NEC_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
+  // Header (cont.)
+  if (!matchSpace(results->rawbuf[offset++], NEC_HDR_SPACE))
+      return false;
+  // Data
   for (int i = 0; i < NEC_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], NEC_BIT_MARK)) {
+    if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE)) {
+    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE))
       data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset], NEC_ZERO_SPACE)) {
+    else if (matchSpace(results->rawbuf[offset], NEC_ZERO_SPACE))
       data <<= 1;
-    } else {
+    else
       return false;
-    }
     offset++;
   }
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
+      return false;
+  // Calculate command and optionally enforce integrity checking.
+  uint8_t command = (data & 0xFF00) >>  8;
+  // Command is sent twice, once as plain and then inverted .
+  if (strict && (command ^ 0xFF) != (data & 0xFF))
+    return false;  // Command integrity failed.
+
   // Success
   results->bits = NEC_BITS;
   results->value = data;
   results->decode_type = NEC;
+  results->command = command;
+  // Normal NEC protocol has an 8 bit address sent, followed by it inverted.
+  uint8_t address = (data & 0xFF000000) >> 24;
+  uint8_t address_inverted = (data & 0x00FF0000) >> 16;
+  if (address == (address_inverted ^ 0xFF))
+    results->address = address;  // Inverted, so it is normal NEC protocol.
+  else  // Not inverted, so must be Extended NEC protocol, thus 16 bit address.
+    results->address = data >> 16;  // Most significant four bytes.
   return true;
 }
 
