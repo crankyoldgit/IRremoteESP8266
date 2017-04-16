@@ -135,11 +135,17 @@
 #define DISH_ZERO_SPACE 2800
 #define DISH_RPT_SPACE 6200
 
-#define PANASONIC_HDR_MARK 3502
-#define PANASONIC_HDR_SPACE 1750
-#define PANASONIC_BIT_MARK 502
-#define PANASONIC_ONE_SPACE 1244
-#define PANASONIC_ZERO_SPACE 400
+// Ref: http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
+#define PANASONIC_HDR_MARK             3456
+#define PANASONIC_HDR_SPACE            1728
+#define PANASONIC_BIT_MARK              432
+#define PANASONIC_ONE_SPACE            1296
+#define PANASONIC_ZERO_SPACE            432
+#define PANASONIC_MIN_COMMAND_LENGTH 130000UL
+// 130000 - 3456 - 1728 - 48*(432+1296) - 432 = 41440
+#define PANASONIC_MIN_GAP             41440
+#define PANASONIC_MANUFACTURER       0x2002ULL
+
 
 // Ref: http://www.sbprojects.com/knowledge/ir/jvc.php
 #define JVC_HDR_MARK    8400
