@@ -447,20 +447,26 @@ void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
   ledOff();
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long data, int nbits,
+// Send a JVC message.
+//
+// Args:
+//   data:   The contents of the command you want to send.
+//   nbits:  The bit size of the command being sent. (JVC_BITS)
+//   repeat: The number of times you want the command to be repeated.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/jvc.php
+// TODO:
+//   Use a 1/3->1/4 duty cycle.
+void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long long data,
+                                       unsigned int nbits,
                                        unsigned int repeat) {
-  // Args:
-  //   data:   The contents of the command you want to send.
-  //   nbits:  The bit size of the command being sent.
-  //   repeat: The number of times you want the command to be repeated.
-  //
-  // Based on information at: http://www.sbprojects.com/knowledge/ir/jvc.php
-
   // Set IR carrier frequency
   enableIROut(38);
 
   IRtimer usecs = IRtimer();
   // Header
+  // Only sent for the first message.
   mark(JVC_HDR_MARK);
   space(JVC_HDR_SPACE);
 
@@ -472,10 +478,24 @@ void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long data, int nbits,
     // Footer
     mark(JVC_BIT_MARK);
     // Wait till the end of the repeat time window before we send another code.
-    space(max(0, JVC_RPT_LENGTH - usecs.elapsed()));
+    space(max(JVC_MIN_GAP, JVC_RPT_LENGTH - usecs.elapsed()));
     usecs.reset();
   }
-  // No need to turn off the LED as we will always end with a space().
+}
+
+// Calculate the raw JVC data based on address and command.
+//
+// Args:
+//   address: An 8-bit address value.
+//   command: An 8-bit command value.
+// Returns:
+//   A raw JVC message.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/jvc.php
+unsigned int ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address,
+                                                 uint8_t command) {
+  return reverseBits(((command << 8) | address), 16);
 }
 
 // Send a Samsung formatted message.
@@ -989,9 +1009,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting JVC decode");
 #endif
-  if (decodeJVC(results)) {
+  if (decodeJVC(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting SAMSUNG decode");
 #endif
@@ -1709,53 +1728,71 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
   return true;
 }
 
-bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results) {
-  long data = 0;
-	int offset = 1; // Skip first space
-  // Check for repeat
-  if (irparams.rawlen - 1 == 33 &&
-      matchMark(results->rawbuf[offset], JVC_BIT_MARK) &&
-      matchMark(results->rawbuf[irparams.rawlen-1], JVC_BIT_MARK)) {
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = JVC;
-    return true;
-  }
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], JVC_HDR_MARK)) {
-    return false;
-  }
-  offset++;
-  if (results->rawlen < 2 * JVC_BITS + 1 ) {
-    return false;
-  }
-  // Initial space
-  if (!matchSpace(results->rawbuf[offset], JVC_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
-  for (int i = 0; i < JVC_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK)) {
-      return false;
-    }
+// Decode the supplied JVC message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits of data to expect. Typically JVC_BITS.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Note:
+//   JVC repeat codes don't have a header.
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/jvc.php
+// TODO:
+//   Report that it is a repeat code and still record the value.
+bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
+                                         uint16_t nbits,
+                                         bool strict) {
+  if (strict && nbits != JVC_BITS)
+    return false;  // Must be called with the correct nr. of bits.
+  if (results->rawlen < 2 * nbits + 2)
+    return false;  // Can't possibly be a valid JVC message.
+
+  uint64_t data = 0;
+  uint16_t offset = 1;
+  bool isRepeat = true;
+
+  // Header
+  // (Optional as repeat codes don't have the header)
+  if (matchMark(results->rawbuf[offset], JVC_HDR_MARK)) {
+    isRepeat = false;
     offset++;
-    if (matchSpace(results->rawbuf[offset], JVC_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset], JVC_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (results->rawlen < 2 * nbits + 4)
+      return false;  // Can't possibly be a valid JVC message with a header.
+    if (!matchSpace(results->rawbuf[offset++], JVC_HDR_SPACE))
       return false;
-    }
+  }
+
+  // Data
+  for (int i = 0; i < nbits; i++) {
+    if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], JVC_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], JVC_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
+      return false;
     offset++;
   }
-  //Stop bit
-  if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK)) {
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK))
     return false;
-  }
+
   // Success
-  results->bits = JVC_BITS;
-  results->value = data;
   results->decode_type = JVC;
+  results->bits = nbits;
+  // command & address are transmitted LSB first, so we need to reverse them.
+  results->command = reverseBits(data >> 8, 8);  // The first 8 bits sent.
+  results->address = reverseBits(data & 0xFF, 8);  // The last 8 bits sent.
+  if (isRepeat)
+    results->value = REPEAT;
+  else
+    results->value = data;
   return true;
 }
 

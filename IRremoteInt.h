@@ -141,12 +141,14 @@
 #define PANASONIC_ONE_SPACE 1244
 #define PANASONIC_ZERO_SPACE 400
 
-#define JVC_HDR_MARK 8000
-#define JVC_HDR_SPACE 4000
-#define JVC_BIT_MARK 600
-#define JVC_ONE_SPACE 1600
-#define JVC_ZERO_SPACE 550
+// Ref: http://www.sbprojects.com/knowledge/ir/jvc.php
+#define JVC_HDR_MARK    8400
+#define JVC_HDR_SPACE   4200
+#define JVC_BIT_MARK     525
+#define JVC_ONE_SPACE   1725
+#define JVC_ZERO_SPACE   525
 #define JVC_RPT_LENGTH 60000
+#define JVC_MIN_GAP    11400  // 60000 - 16 * (1725 + 525) - 8400 - 4200
 
 #define LG_HDR_MARK    8000
 #define LG_HDR_SPACE   4000

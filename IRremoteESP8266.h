@@ -101,7 +101,7 @@ uint8_t calcLGChecksum(uint16_t data);
 #define SEND_PROTOCOL_RC5      case RC5: sendRC5(data, nbits); break;
 #define SEND_PROTOCOL_RC6      case RC6: sendRC6(data, nbits); break;
 #define SEND_PROTOCOL_DISH     case DISH: sendDISH(data, nbits); break;
-#define SEND_PROTOCOL_JVC      case JVC: sendJVC(data, nbits, 0); break;
+#define SEND_PROTOCOL_JVC      case JVC: sendJVC(data, nbits); break;
 #define SEND_PROTOCOL_SAMSUNG  case SAMSUNG: sendSAMSUNG(data, nbits); break;
 #define SEND_PROTOCOL_LG       case LG: sendLG(data, nbits); break;
 #define SEND_PROTOCOL_WHYNTER  case WHYNTER: sendWhynter(data, nbits); break;
@@ -134,7 +134,8 @@ public:
   bool decodePanasonic(decode_results *results);
   bool decodeLG(decode_results *results, uint16_t nbits=LG_BITS,
                 bool strict=false);
-  bool decodeJVC(decode_results *results);
+  bool decodeJVC(decode_results *results, uint16_t nbits=JVC_BITS,
+                 bool strict=true);
   bool decodeSAMSUNG(decode_results *results, uint16_t nbits=SAMSUNG_BITS,
                      bool strict=false);
   bool decodeWhynter(decode_results *results);
@@ -212,7 +213,9 @@ public:
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
   void sendPanasonic(unsigned int address, unsigned long data);
-  void sendJVC(unsigned long data, int nbits, unsigned int repeat=0);
+  void sendJVC(unsigned long long data, unsigned int nbits=JVC_BITS,
+               unsigned int repeat=0);
+  unsigned int encodeJVC(uint8_t address, uint8_t command);
   void sendSAMSUNG(unsigned long long data, unsigned int nbits=32,
                    unsigned int repeat=0);
   unsigned long encodeSAMSUNG(uint8_t customer, uint8_t command);
