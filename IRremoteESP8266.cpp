@@ -189,18 +189,31 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeNEC(unsigned int address,
     return (address << 24) + ((address ^ 0xFF) << 16) + command; // Normal.
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendLG (unsigned long data, int nbits,
-                                       unsigned int repeat) {
-  // Args:
-  //   data:   The contents of the command you want to send.
-  //   nbits:  The bit size of the command being sent.
-  //   repeat: The number of times you want the command to be repeated.
-
+// Send an LG formatted message.
+// LG has a separate message to indicate a repeat, like NEC does.
+//
+// Args:
+//   data:   The contents of the message you want to send.
+//   nbits:  The bit size of the message being sent. Typically LG_BITS.
+//   repeat: The number of times you want the message to be repeated.
+void ICACHE_FLASH_ATTR IRsend::sendLG(unsigned long long data,
+                                      unsigned int nbits,
+                                      unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(38);
-  // We always send a command, even for repeat=0, hence '<= repeat'.
-  for (unsigned int i = 0; i <= repeat; i++) {
+
+  uint16_t repeatHeaderMark = 0;
+  IRtimer usecTimer = IRtimer();
+
+  if (nbits >= 32) {
+    // LG 32bit protocol is near identical to Samsung except for repeats.
+    sendSAMSUNG(data, nbits, 0);  // Send it as a single Samsung message.
+    repeatHeaderMark = LG32_HDR_MARK;
+  } else {
+    // LG (28-bit) protocol.
+    repeatHeaderMark = LG_HDR_MARK;
     // Header
+    usecTimer.reset();
     mark(LG_HDR_MARK);
     space(LG_HDR_SPACE);
     // Data
@@ -208,8 +221,30 @@ void ICACHE_FLASH_ATTR IRsend::sendLG (unsigned long data, int nbits,
              data, nbits, true);
     // Footer
     mark(LG_BIT_MARK);
-    space(LG_RPT_LENGTH);
+    space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
   }
+  // Repeat
+  for (unsigned int i = 0; i < repeat; i++) {
+    usecTimer.reset();
+    mark(repeatHeaderMark);
+    space(LG_RPT_SPACE);
+    mark(LG_BIT_MARK);
+    space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
+  }
+}
+
+// Construct a raw 28-bit LG message from the supplied address & command.
+// e.g. Sequence of bits = address + command + checksum.
+//
+// Args:
+//   address: The address code.
+//   command: The command code.
+// Returns:
+//   A raw 28-bit LG message suitable for sendLG().
+unsigned long ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address,
+                                                 uint16_t command) {
+  return ((address << 20) | (command << 4) | calcLGChecksum(command));
+
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long data, int nbits) {
@@ -463,18 +498,54 @@ unsigned int ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address,
   return reverseBits(((command << 8) | address), 16);
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long data, int nbits) {
+// Send a Samsung formatted message.
+// Samsung has a separate message to indicate a repeat, like NEC does.
+// TODO: Confirm that is actually how Samsung sends a repeat.
+//       The refdoc doesn't indicate it is true.
+//
+// Args:
+//   data:   The message to be sent.
+//   nbits:  The bit size of the message being sent. typically SAMSUNG_BITS.
+//   repeat: The number of times the message is to be repeated.
+//
+// Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+// TODO: Transmit with a 1/3 duty cycle.
+void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long long data,
+                                           unsigned int nbits,
+                                           unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
-  mark(SAMSUNG_HDR_MARK);
-  space(SAMSUNG_HDR_SPACE);
-  // Data
-  sendData(SAMSUNG_BIT_MARK, SAMSUNG_ONE_SPACE, SAMSUNG_BIT_MARK,
-           SAMSUNG_ZERO_SPACE, data, nbits, true);
-  // Footer
-  mark(SAMSUNG_BIT_MARK);
-  ledOff();
+  IRtimer usecTimer = IRtimer();
+  // We always send a message, even for repeat=0, hence '<= repeat'.
+  for (uint16_t i=0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(SAMSUNG_HDR_MARK);
+    space(SAMSUNG_HDR_SPACE);
+    // Data
+    sendData(SAMSUNG_BIT_MARK, SAMSUNG_ONE_SPACE, SAMSUNG_BIT_MARK,
+             SAMSUNG_ZERO_SPACE, data, nbits, true);
+    // Footer
+    mark(SAMSUNG_BIT_MARK);
+    space(max(SAMSUNG_MIN_GAP,
+              SAMSUNG_MIN_MESSAGE_LENGTH - usecTimer.elapsed()));
+  }
+}
+
+// Construct a raw Samsung message from the supplied customer(address) &
+// command.
+//
+// Args:
+//   customer: The customer code. (aka. Address)
+//   command:  The command code.
+// Returns:
+//   A raw 32-bit Samsung message suitable for sendSAMSUNG().
+unsigned long ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
+                                                      uint8_t command) {
+  customer = reverseBits(customer, sizeof(customer));
+  command = reverseBits(command, sizeof(command));
+  return(((command ^ 0xFF) << 24) | (command << 16) |
+         (customer << 8) | customer);
 }
 
 // Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
@@ -785,6 +856,17 @@ uint64_t reverseBits(uint64_t input, uint16_t nbits) {
         output |= (input & 1);
     }
     return output;
+}
+
+// Calculate the rolling 4-bit wide checksum over all of the data.
+//
+//  Args:
+//    data: The value to be checksum'ed.
+//  Returns:
+//    A 4-bit checksum.
+uint8_t ICACHE_FLASH_ATTR calcLGChecksum(uint16_t data) {
+  return(((data >> 12) + ((data >> 8) & 0xF) + ((data >> 4) & 0xF) +
+         (data & 0xF)) & 0xF);
 }
 
 IRrecv::IRrecv(int recvpin) {
@@ -1580,45 +1662,69 @@ bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results) {
-  long data = 0;
-	int offset = 1; // Skip first space
+// Decode the supplied LG message.
+// LG protocol has a repeat code which is 4 items long.
+// Even though the protocol has 28 bits of data, only 16 bits are distinct.
+// In transmission order, the 28 bits are constructed as follows:
+//   8 bits of address + 16 bits of command + 4 bits of checksum.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. Typically LG_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Note:
+//   LG 32bit protocol appears near identical to the Samsung protocol.
+//   They differ on their compliance criteria and how they repeat.
+// Ref:
+//   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
+bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
+                                        uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + 4 && results->rawlen != 4)
+    return false;  // Can't possibly be a valid LG message.
+  if (strict && nbits != LG_BITS)
+    return false;  // Doesn't comply with expected LG protocol.
 
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], LG_HDR_MARK)) {
+  uint64_t data = 0;
+  uint16_t offset = 1;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], LG_HDR_MARK))
     return false;
-  }
-  offset++;
-  if (results->rawlen < 2 * LG_BITS + 1 ) {
+  if (!matchSpace(results->rawbuf[offset++], LG_HDR_SPACE))
     return false;
-  }
-  // Initial space
-  if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
-  for (int i = 0; i < LG_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], LG_BIT_MARK)) {
+  // Data
+  for (int i = 0; i < nbits; i++) {
+    if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (matchSpace(results->rawbuf[offset], LG_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset], LG_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (matchSpace(results->rawbuf[offset], LG_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], LG_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       return false;
-    }
     offset++;
   }
-  //Stop bit
-  if (!matchMark(results->rawbuf[offset], LG_BIT_MARK)){
+  // Footer
+  if (!matchMark(results->rawbuf[offset], LG_BIT_MARK))
     return false;
-  }
+
+  // Compliance
+
+  uint8_t address = (data >> 16) & 0xFF;  // Address is the first 8 bits sent.
+  uint16_t command = (data >> 4) & 0xFFFF;  // Command is the next 16 bits sent.
+  // The last 4 bits sent are the expected checksum.
+  if (strict && (data & 0xF) != calcLGChecksum(command))
+    return false;
+
   // Success
-  results->bits = LG_BITS;
+  results->bits = nbits;
   results->value = data;
   results->decode_type = LG;
+  results->address = address;
+  results->command = command;
   return true;
 }
 
@@ -1690,50 +1796,75 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
   return true;
 }
 
-// SAMSUNGs have a repeat only 4 items long
-bool ICACHE_FLASH_ATTR IRrecv::decodeSAMSUNG(decode_results *results) {
-  long data = 0;
-  int offset = 1;  // Dont skip first space
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], SAMSUNG_HDR_MARK)) {
+// Decode the supplied Samsung message.
+// Samsung messages whilst 32 bits in size, only contain 16 bits of distinct
+// data. e.g. In transmition order:
+//   customer_byte + customer_byte(same) + address_byte + invert(address_byte)
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. Typically SAMSUNG_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Note:
+//   LG 32bit protocol appears near identical to the Samsung protocol.
+//   They differ on their compliance criteria and how they repeat.
+// Ref:
+//  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+bool ICACHE_FLASH_ATTR IRrecv::decodeSAMSUNG(decode_results *results,
+                                             uint16_t nbits,
+                                             bool strict) {
+  if (results->rawlen < 2 * nbits + 4)
+    return false;  // Can't possibly be a valid Samsung message.
+  if (strict && nbits != SAMSUNG_BITS)
+    return false;  // We expect Samsung to be 32 bits of message.
+
+  uint64_t data = 0;
+  uint16_t offset = 1;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], SAMSUNG_HDR_MARK))
     return false;
-  }
-  offset++;
-  // Check for repeat
-  if (irparams.rawlen == 4 &&
-      matchSpace(results->rawbuf[offset], SAMSUNG_RPT_SPACE) &&
-      matchMark(results->rawbuf[offset+1], SAMSUNG_BIT_MARK)) {
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = SAMSUNG;
-    return true;
-  }
-  if (results->rawlen < 2 * SAMSUNG_BITS + 2) {
+  if (!matchSpace(results->rawbuf[offset++], SAMSUNG_HDR_SPACE))
     return false;
-  }
-  // Initial space
-  if (!matchSpace(results->rawbuf[offset], SAMSUNG_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
-  for (int i = 0; i < SAMSUNG_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], SAMSUNG_BIT_MARK)) {
+  // Data
+  for (int i = 0; i < nbits; i++) {
+    if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (matchSpace(results->rawbuf[offset], SAMSUNG_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset], SAMSUNG_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (matchSpace(results->rawbuf[offset], SAMSUNG_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], SAMSUNG_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       return false;
-    }
     offset++;
   }
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK))
+    return false;
+
+  // Compliance
+
+  // According to the spec, the customer (address) code is the first 8
+  // transmitted bits. It's then repeated. Check for that.
+  uint8_t address = data >> 24;
+  if (strict && address != ((data >> 16) & 0xFF))
+    return false;
+  // Spec says the command code is the 3rd block of transmitted 8-bits,
+  // followed by the inverted command code.
+  uint8_t command = (data & 0xFF00) >> 8;
+  if (strict && command != ((data & 0xFF) ^ 0xFF))
+    return false;
+
   // Success
-  results->bits = SAMSUNG_BITS;
+  results->bits = nbits;
   results->value = data;
   results->decode_type = SAMSUNG;
+  // command & address need to be reversed as they are transmitted LSB first,
+  results->command = reverseBits(command, sizeof(command));
+  results->address = reverseBits(address, sizeof(address));
   return true;
 }
 
