@@ -200,6 +200,9 @@
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
 #define RAWBUF 100 // Length of raw duration buffer
+#define HEADER 2  // Usual nr. of header entries.
+#define FOOTER 2  // Usual nr. of footer (stop bits) entries.
+#define OFFSET_START 1  // Usual rawbuf entry to start processing from.
 
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
@@ -215,8 +218,6 @@
 #define STATE_MARK     3
 #define STATE_SPACE    4
 #define STATE_STOP     5
-
-#define RAWBUF 100 // Length of raw duration buffer
 
 // information for the interrupt handler
 typedef struct {
