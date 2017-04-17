@@ -131,7 +131,8 @@ public:
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
   bool decodeRCMM(decode_results *results);
-  bool decodePanasonic(decode_results *results);
+  bool decodePanasonic(decode_results *results, uint16_t nbits=PANASONIC_BITS,
+                       bool strict=false);
   bool decodeLG(decode_results *results, uint16_t nbits=LG_BITS,
                 bool strict=false);
   bool decodeJVC(decode_results *results, uint16_t nbits=JVC_BITS,
@@ -212,7 +213,13 @@ public:
   void sendDISH(unsigned long data, int nbits, unsigned int repeat=0);
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
-  void sendPanasonic(unsigned int address, unsigned long data);
+  void sendPanasonic64(unsigned long long data,
+                       unsigned int nbits=PANASONIC_BITS,
+                       unsigned int repeat=0);
+  void sendPanasonic(unsigned int address, unsigned long data,
+                     unsigned int nbits=PANASONIC_BITS, unsigned int repeat=0);
+  unsigned long long encodePanasonic(uint8_t device, uint8_t subdevice,
+                                   uint8_t function);
   void sendJVC(unsigned long long data, unsigned int nbits=JVC_BITS,
                unsigned int repeat=0);
   unsigned int encodeJVC(uint8_t address, uint8_t command);

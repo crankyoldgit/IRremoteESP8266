@@ -427,24 +427,76 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
 
 }
 
+// Send a Panasonic formatted message.
+//
+// Args:
+//   data:   The message to be sent.
+//   nbits:  The number of bits of the message to be sent. (PANASONIC_BITS).
+//   repeat: The number of times the command is to be repeated.
+//
+// Note:
+//   This protocol is a modified version of Kaseikyo.
+void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
+                                               unsigned int nbits,
+                                               unsigned int repeat) {
+  enableIROut(37);  // Set IR carrier frequency
+  IRtimer usecTimer = IRtimer();
+
+  for (uint16_t i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(PANASONIC_HDR_MARK);
+    space(PANASONIC_HDR_SPACE);
+    // Data
+    sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
+             PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(PANASONIC_BIT_MARK);
+    space(max(PANASONIC_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              PANASONIC_MIN_GAP));
+  }
+}
+
+// Send a Panasonic formatted message.
+//
+// Args:
+//   address: The manufacturer code.
+//   data:    The data portion to be sent.
+//   nbits:   The number of bits of the message to be sent. (PANASONIC_BITS).
+//   repeat:  The number of times the command is to be repeated.
+//
+// Note:
+//   This protocol is a modified version of Kaseikyo.
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
-                                             unsigned long data) {
-  // Set IR carrier frequency
-  enableIROut(35);
-  // Header
-  mark(PANASONIC_HDR_MARK);
-  space(PANASONIC_HDR_SPACE);
-  // Address (16 bits)
-  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
-           PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
-           address, 16, true);
-  // Data (32 bits)
-  sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
-           PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
-           data, 32, true);
-  // Footer
-  mark(PANASONIC_BIT_MARK);
-  ledOff();
+                                             unsigned long data,
+                                             unsigned int nbits,
+                                             unsigned int repeat) {
+  sendPanasonic64(((uint64_t) address << 32) | (uint64_t) data, nbits, repeat);
+}
+
+// Calculate the raw Panasonic data based on device, subdevice, & function.
+//
+// Args:
+//   device:    An 8-bit code.
+//   subdevice: An 8-bit code.
+//   function:  An 8-bit code.
+// Returns:
+//   A raw uint64_t Panasonic message.
+//
+// Note:
+//   Panasonic 48-bit protocol is a modified version of Kaseikyo.
+// Ref:
+//   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
+unsigned long long ICACHE_FLASH_ATTR IRsend::encodePanasonic(uint8_t device,
+                                                             uint8_t subdevice,
+                                                             uint8_t function) {
+  uint8_t checksum = device ^ subdevice ^ function;
+  return (((uint64_t) PANASONIC_MANUFACTURER << 32) |
+          ((uint64_t) device << 24) |
+          ((uint64_t) subdevice << 16) |
+          ((uint64_t) function << 8) |
+          checksum);
 }
 
 // Send a JVC message.
@@ -997,9 +1049,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Panasonic decode");
 #endif
-  if (decodePanasonic(results)) {
+  if (decodePanasonic(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting LG decode");
 #endif
@@ -1630,35 +1681,73 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results) {
+// Decode the supplied Panasonic message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Note:
+//   Panasonic 48-bit protocol is a modified version of Kaseikyo.
+// Ref:
+//   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
+//   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
+bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results,
+                                               uint16_t nbits,
+                                               bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    return false;  // Not enough entries to be a Panasonic message.
+  if (strict && nbits != PANASONIC_BITS)
+    return false;  // Request is out of spec.
+
   unsigned long long data = 0;
-	int offset = 1;  // Dont skip first space
-  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) {
+	int offset = OFFSET_START;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], PANASONIC_HDR_MARK))
     return false;
-  }
-  offset++;
-  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_SPACE)) {
+  if (!matchMark(results->rawbuf[offset++], PANASONIC_HDR_SPACE))
     return false;
-  }
-  offset++;
-  // decode address
-  for (int i = 0; i < PANASONIC_BITS; i++) {
-    if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK)) {
+
+  // Data
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
       return false;
-    }
-    if (match(results->rawbuf[offset],PANASONIC_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (match(results->rawbuf[offset],PANASONIC_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (match(results->rawbuf[offset],PANASONIC_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (match(results->rawbuf[offset],PANASONIC_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       return false;
-    }
-    offset++;
   }
-  results->value = (unsigned long)data;
-  results->panasonicAddress = (unsigned int)(data >> 32);
+  // Footer
+  if (!match(results->rawbuf[offset], PANASONIC_BIT_MARK))
+    return false;
+
+  // Compliance
+  uint32_t address = data >> 32;
+  uint32_t command = data & 0xFFFFFFFF;
+  if (strict) {
+    if (address != PANASONIC_MANUFACTURER)  // Verify the Manufacturer code.
+      return false;
+    // Verify the checksum.
+    uint8_t checksumOrig = data & 0xFF;
+    uint8_t checksumCalc = (data >> 24) ^ ((data >> 16) & 0xFF) ^
+                           ((data >> 8) & 0xFF);
+    if (checksumOrig != checksumCalc)
+      return false;
+  }
+
+  // Success
+  results->value = data;
+  results->panasonicAddress = (unsigned int) address;
+  results->address = address;
+  results->command = command;
   results->decode_type = PANASONIC;
-  results->bits = PANASONIC_BITS;
+  results->bits = nbits;
   return true;
 }
 
