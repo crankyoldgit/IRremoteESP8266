@@ -74,27 +74,45 @@ IRsend::IRsend(int IRsendPin) {
 void ICACHE_FLASH_ATTR IRsend::begin() {
 	pinMode(IRpin, OUTPUT);
 }
+
 // Generic method for sending data that is common to most protocols.
-// Default to transmitting the Most Significant Bit (MSB) first.
+// Will send leading or trailing 0's if the nbits is larger than the number
+// of bits in data.
+//
+// Args:
+//   onemark:    Nr. of usecs for the led to be pulsed for a '1' bit.
+//   onespace:   Nr. of usecs for the led to be fully off for a '1' bit.
+//   zeromark:   Nr. of usecs for the led to be pulsed for a '0' bit.
+//   zerospace:  Nr. of usecs for the led to be fully off for a '0' bit.
+//   data:       The data to be transmitted.
+//   nbits:      Nr. of bits of data to be sent.
+//   MSBfirst:   Flag for bit transmission order. Defaults to MSB->LSB order.
 void ICACHE_FLASH_ATTR IRsend::sendData(uint16_t onemark, uint32_t onespace,
                                         uint16_t zeromark, uint32_t zerospace,
-                                        uint32_t data, uint8_t nbits,
+                                        uint64_t data, uint16_t nbits,
                                         bool MSBfirst) {
-  if (MSBfirst)  // Send the MSB first.
-    for (uint32_t mask = 1UL << (nbits - 1);  mask;  mask >>= 1)
-      if (data & mask) {  // 1
+  if (MSBfirst) {  // Send the MSB first.
+    // Send 0's until we get down to a bit size we can actually manage.
+    while (nbits > sizeof(data) * 8) {
+      mark(zeromark);
+      space(zerospace);
+      nbits--;
+    }
+    // Send the supplied data.
+    for (uint64_t mask = 1ULL << (nbits - 1);  mask;  mask >>= 1)
+      if (data & mask) {  // Send a 1
         mark(onemark);
         space(onespace);
-      } else {  // 0
+      } else {  // Send a 0
         mark(zeromark);
         space(zerospace);
       }
-  else {  // Send the Least Significant Bit (LSB) first / MSB last.
-    for (uint8_t bit = 0; bit < nbits; bit++, data >>= 1)
-      if (data & 1) {  // 1
+  } else {  // Send the Least Significant Bit (LSB) first / MSB last.
+    for (uint16_t bit = 0; bit < nbits; bit++, data >>= 1)
+      if (data & 1) {  // Send a 1
         mark(onemark);
         space(onespace);
-      } else {  // 0
+      } else {  // Send a 0
         mark(zeromark);
         space(zerospace);
       }
