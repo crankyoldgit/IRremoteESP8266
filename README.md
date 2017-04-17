@@ -23,7 +23,7 @@ Seb's notes : I also changed the pulse parameters for Samsung, update the Panaso
 `git clone https://github.com/markszabo/IRremoteESP8266.git
 `
 **_ To Update to the latest version of the library  _**
-`cd ~/Arduino/libraries`
+`cd ~/Arduino/libraries/IRremoteESP8266`
 `git pull
 `
 ## Contributing
