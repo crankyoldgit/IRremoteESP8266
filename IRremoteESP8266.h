@@ -124,7 +124,8 @@ public:
   // These are called by decode
   void copyIrParams(irparams_t *dest);
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
-  bool decodeNEC(decode_results *results, bool strict=false);
+  bool decodeNEC(decode_results *results, uint16_t nbits=NEC_BITS,
+                 bool strict=false);
   bool decodeSony(decode_results *results);
   bool decodeSanyo(decode_results *results);
   bool decodeMitsubishi(decode_results *results);
@@ -186,7 +187,7 @@ public:
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
-  void sendNEC(unsigned long long data, unsigned int nbits=32,
+  void sendNEC(unsigned long long data, unsigned int nbits=NEC_BITS,
                unsigned int repeat=0);
   unsigned long encodeNEC(unsigned int address, unsigned int command);
   void sendLG(unsigned long long data, unsigned int nbits=28,

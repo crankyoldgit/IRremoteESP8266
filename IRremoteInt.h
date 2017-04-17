@@ -52,14 +52,15 @@
 #define WHYNTER_ZERO_MARK	750
 #define WHYNTER_ZERO_SPACE	750
 
-#define NEC_HDR_MARK	9000
-#define NEC_HDR_SPACE	4500
-#define NEC_BIT_MARK	560
-#define NEC_ONE_SPACE	1690
-#define NEC_ZERO_SPACE	560
-#define NEC_RPT_SPACE	2250
+#define NEC_HDR_MARK             9000
+#define NEC_HDR_SPACE            4500
+#define NEC_BIT_MARK              560
+#define NEC_ONE_SPACE            1690
+#define NEC_ZERO_SPACE            560
+#define NEC_RPT_SPACE            2250
+#define NEC_RPT_LENGTH              4
 #define NEC_MIN_COMMAND_LENGTH 108000UL
-#define NEC_MIN_GAP 10000  // Not official, just a made up value.
+#define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - NEC_HDR_MARK - NEC_HDR_SPACE - NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) + NEC_BIT_MARK
 
 // Timings based on http://www.sbprojects.com/knowledge/ir/sirc.php
 #define SONY_HDR_MARK	2400

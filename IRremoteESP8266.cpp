@@ -140,7 +140,7 @@ void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long data, int nbits) {
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically 32.
+//   nbits:  The number of bits of the message to be sent. Typically NEC_BITS.
 //   repeat: The number of times the command is to be repeated.
 //
 // Ref: http://www.sbprojects.com/knowledge/ir/nec.php
@@ -953,10 +953,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting NEC decode");
 #endif
-  if (decodeNEC(results)) {
+  if (decodeNEC(results))
     return true;
-  }
-
 #ifdef DEBUG
   Serial.println("Attempting Sony decode");
 #endif
@@ -1140,6 +1138,7 @@ bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically NEC_BITS.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -1151,19 +1150,24 @@ bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
 //             i.e. address + command + inverted(command)
 //   Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
 //
-// Ref: http://www.sbprojects.com/knowledge/ir/nec.php
-bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results, bool strict) {
-  if (results->rawlen < 2 * NEC_BITS + 4 && results->rawlen != 4)
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/nec.php
+bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results,
+                                         uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER &&
+      results->rawlen != NEC_RPT_LENGTH)
     return false;  // Can't possibly be a valid NEC message.
+  if (strict && nbits != NEC_BITS)
+    return false;  // Not strictly an NEC message.
 
-  uint32_t data = 0;
-  uint16_t offset = 1; // Skip initial space
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
 
   // Header
   if (!matchMark(results->rawbuf[offset++], NEC_HDR_MARK))
     return false;
   // Check if it is a repeat code.
-  if (results->rawlen == 4 &&
+  if (results->rawlen == NEC_RPT_LENGTH &&
       matchSpace(results->rawbuf[offset], NEC_RPT_SPACE) &&
       matchMark(results->rawbuf[offset+1], NEC_BIT_MARK)) {
     results->value = REPEAT;
@@ -1173,11 +1177,12 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results, bool strict) {
     results->command = 0;
     return true;
   }
+
   // Header (cont.)
   if (!matchSpace(results->rawbuf[offset++], NEC_HDR_SPACE))
-      return false;
+    return false;
   // Data
-  for (int i = 0; i < NEC_BITS; i++) {
+  for (int i = 0; i < nbits; i++, offset++) {
     if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE))
@@ -1186,11 +1191,12 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results, bool strict) {
       data <<= 1;
     else
       return false;
-    offset++;
   }
   // Footer
-  if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset], NEC_BIT_MARK))
       return false;
+
+  // Compliance
   // Calculate command and optionally enforce integrity checking.
   uint8_t command = (data & 0xFF00) >>  8;
   // Command is sent twice, once as plain and then inverted .
@@ -1198,7 +1204,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results, bool strict) {
     return false;  // Command integrity failed.
 
   // Success
-  results->bits = NEC_BITS;
+  results->bits = nbits;
   results->value = data;
   results->decode_type = NEC;
   results->command = command;
