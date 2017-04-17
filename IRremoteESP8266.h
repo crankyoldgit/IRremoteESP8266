@@ -76,15 +76,15 @@ enum decode_type_t {
 // Results returned from the decoder
 class decode_results {
 public:
-  int decode_type; // NEC, SONY, RC5, UNKNOWN
+  decode_type_t decode_type; // NEC, SONY, RC5, UNKNOWN
   union { // This is used for decoding Panasonic and Sharp data
     unsigned int panasonicAddress;
     unsigned int sharpAddress;
   };
-  unsigned long value; // Decoded value
-  int bits; // Number of bits in decoded value
+  unsigned long long value; // Decoded value
+  unsigned int bits; // Number of bits in decoded value
   volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
-  int rawlen; // Number of records in rawbuf.
+  unsigned int rawlen; // Number of records in rawbuf.
   bool overflow;
   unsigned long address;  // Decoded device address.
   unsigned long command;  // Decoded command.

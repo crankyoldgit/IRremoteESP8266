@@ -35,7 +35,11 @@ void ircode(decode_results *results) {
     Serial.print(":");
   }
   // Print Code
-  Serial.print(results->value, HEX);
+  //   print() & println() can't handle printing long longs. (uint64_t)
+  //   So we have to print the top and bottom halves separately.
+  if (results->value >> 32)
+    Serial.print((unsigned long) (results->value >> 32), HEX);
+  Serial.println((unsigned long) (results->value & 0xFFFFFFFF), HEX);
 }
 
 //+=============================================================================
@@ -156,7 +160,11 @@ void dumpCode (decode_results *results) {
 
     // All protocols have data
     Serial.print("unsigned int  data = 0x");
-    Serial.print(results->value, HEX);
+    //   print() & println() can't handle printing long longs. (uint64_t)
+    //   So we have to print the top and bottom halves separately.
+    if (results->value >> 32)
+      Serial.print((unsigned long) (results->value >> 32), HEX);
+    Serial.print((unsigned long) (results->value & 0xFFFFFFFF), HEX);
     Serial.println(";");
   }
 }

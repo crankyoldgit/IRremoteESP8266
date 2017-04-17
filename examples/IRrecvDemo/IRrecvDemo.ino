@@ -21,7 +21,11 @@ void setup()
 
 void loop() {
   if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
+    // print() & println() can't handle printing long longs. (uint64_t)
+    // So we have to print the top and bottom halves separately.
+    if (results.value >> 32)
+      Serial.print((unsigned long) (results.value >> 32), HEX);
+    Serial.println((unsigned long) (results.value & 0xFFFFFFFF), HEX);
     irrecv.resume(); // Receive the next value
   }
   delay(100);
