@@ -19,12 +19,12 @@ Seb's notes : I also changed the pulse parameters for Samsung, update the Panaso
 6. Check out the examples
 
 ###### Using Git to install library ( Linux )
-`cd ~/Arduino/libraries`
-`git clone https://github.com/markszabo/IRremoteESP8266.git
+`cd ~/Arduino/libraries
+git clone https://github.com/markszabo/IRremoteESP8266.git
 `
 **_ To Update to the latest version of the library  _**
-`cd ~/Arduino/libraries/IRremoteESP8266`
-`git pull
+`cd ~/Arduino/libraries/IRremoteESP8266
+git pull
 `
 ## Contributing
 If you want to contribute to this project:
