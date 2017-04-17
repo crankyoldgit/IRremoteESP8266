@@ -423,7 +423,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
                                              unsigned long data) {
   // Set IR carrier frequency
-  enableIROut(35);
+  enableIROut(37);
   // Header
   mark(PANASONIC_HDR_MARK);
   space(PANASONIC_HDR_SPACE);
