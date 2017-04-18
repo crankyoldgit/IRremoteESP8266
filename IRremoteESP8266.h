@@ -232,18 +232,19 @@ public:
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
-  void enableIROut(int khz);
+  void enableIROut(unsigned int khz, uint8_t duty=50);
   VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);
 private:
-  int halfPeriodicTime;
+  uint16_t onTimePeriod;
+  uint16_t offTimePeriod;
   int IRpin;
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
                 uint64_t data, uint16_t nbits, bool MSBfirst=true);
   void ledOff();
-} ;
+};
 
 class IRtimer {
 public:

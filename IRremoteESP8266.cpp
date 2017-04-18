@@ -633,16 +633,37 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon (unsigned long data,  int nbits) {
   ledOff();
 }
 
+// Modulate the IR LED for the given period (usec) and at the duty cycle set.
+//
+// Args:
+//   usec: The period of time to modulate the IR LED for, in microseconds.
+//
+// Note:
+//   The ESP8266 has no good way to do hardware PWM, so we have to do it all
+//   in software. There is a horrible kludge/brilliant hack to use the second
+//   serial TX line to do fairly accurate hardware PWM, but it is only
+//   available on a single specific GPIO and only available on some modules.
+//   e.g. It's not available on the ESP-01 module.
+//   Hence, for greater compatiblity & choice, we don't use that method.
+// Ref:
+//   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
-  // Sends an IR mark for the specified number of microseconds.
-  // The mark output is modulated at the PWM frequency.
   IRtimer usecTimer = IRtimer();
-  while (usecTimer.elapsed() < usec) {
-    digitalWrite(IRpin, HIGH);
-    delayMicroseconds(halfPeriodicTime);
-    digitalWrite(IRpin, LOW);
-    // e.g. 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
-    delayMicroseconds(halfPeriodicTime);
+  // Cache the time taken so far. This saves us calling time, and we can be
+  // assured that we can't have odd math problems. i.e. unsigned under/overflow.
+  uint32_t elapsed = usecTimer.elapsed();
+
+  while (elapsed < usec) {  // Loop until we've met/exceeded our required time.
+    digitalWrite(IRpin, HIGH);  // Turn the LED on.
+    // Calculate how long we should pulse on for.
+    // e.g. Are we to close to the end of our requested mark time (usec)?
+    delayMicroseconds(min(onTimePeriod, usec - elapsed));
+    digitalWrite(IRpin, LOW);  // Turn the LED off.
+    if (elapsed + onTimePeriod >= usec)
+      return;  // LED is now off & we've passed our allotted time. Safe to stop.
+    // Wait for the lesser of the rest of the duty cycle, or the time remaining.
+    delayMicroseconds(min(usec - elapsed - onTimePeriod, offTimePeriod));
+    elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
 }
 
@@ -665,12 +686,26 @@ void ICACHE_FLASH_ATTR IRsend::space(unsigned long time) {
   }
 }
 
-void ICACHE_FLASH_ATTR IRsend::enableIROut(int khz) {
-  // Enables IR output.
-  // The khz value controls the modulation frequency in kilohertz.
+// Set the output frequency modulation and duty cycle.
+//
+// Args:
+//   khz: How many kilohertz we want to modulate in. e.g. 38 = 38kHz.
+//   duty: Percentage duty cycle of the LED. e.g. 50 = 50% = half on, half off.
+//
+// Note:
+//   Integer timing functions & math mean we can't do fractions of
+//   microseconds timing. Thus minor changes to the khz & duty values may have
+//   limited effect. You've been warned.
+void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned int khz, uint8_t duty) {
+  duty = min(duty, 100);  // Can't have more than 100% duty cycle.
 
-  // T = 1/f but we need T/2 in microsecond and f is in kHz
-  halfPeriodicTime = 500/khz;
+  // T = 1/f but we need microsecond and f is in kHz, so use 1000 instead.
+  // Also using T = (1+f)/f for better integer rounding.
+
+  // Nr. of uSeconds the LED will be on per pulse.
+  onTimePeriod = ((1000 + khz) * duty) / (khz * 100);
+  // Nr. of uSeconds the LED will be off per pulse.
+  offTimePeriod = ((1000 + khz) / khz) - onTimePeriod;
 }
 
 
