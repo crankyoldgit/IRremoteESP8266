@@ -165,8 +165,8 @@ void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long data, int nbits) {
 void ICACHE_FLASH_ATTR IRsend::sendNEC(unsigned long long data,
                                        unsigned int nbits,
                                        unsigned int repeat) {
-  // Set IR carrier frequency
-  enableIROut(38);
+  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(38, 33);
   IRtimer usecs = IRtimer();
   // Header
   mark(NEC_HDR_MARK);
@@ -296,7 +296,8 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long data, int nbits,
   // Timings and details are taken from:
   //   http://www.sbprojects.com/knowledge/ir/sirc.php
 
-  enableIROut(40);  // Sony devices use a 40kHz IR carrier frequency.
+  // Sony devices use a 40kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(40, 33);
   IRtimer usecs = IRtimer();
 
   for (uint16_t i = 0; i <= repeat; i++) {  // Typically loop 3 or more times.
@@ -358,8 +359,8 @@ void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], int len) {
 
 // Note: first bit must be a one (start bit)
 void ICACHE_FLASH_ATTR IRsend::sendRC5(unsigned long data, int nbits) {
-  // Set IR carrier frequency
-  enableIROut(36);
+  // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(36, 33);
   // Header
   mark(RC5_T1);  // First start bit
   space(RC5_T1);  // Second start bit
@@ -392,8 +393,8 @@ void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long long data,
   // Check we can send the number of bits requested.
   if (nbits > sizeof(data) * 8)
     return;
-  // Set IR carrier frequency
-  enableIROut(36);
+  // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(36, 33);
   for (unsigned int r = 0; r <= repeat; r++) {
     // Header
     mark(RC6_HDR_MARK);
@@ -428,8 +429,8 @@ void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long long data,
 //   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
 // Status:  ALPHA (untested and unconfirmed.)
 void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
-  // Set IR carrier frequency
-  enableIROut(36);
+  // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(36, 33);
   IRtimer usecs = IRtimer();
 
   // Header
@@ -538,13 +539,11 @@ unsigned long long ICACHE_FLASH_ATTR IRsend::encodePanasonic(uint8_t device,
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-// TODO:
-//   Use a 1/3->1/4 duty cycle.
 void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long long data,
                                        unsigned int nbits,
                                        unsigned int repeat) {
-  // Set IR carrier frequency
-  enableIROut(38);
+  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(38, 33);
 
   IRtimer usecs = IRtimer();
   // Header
@@ -591,12 +590,11 @@ unsigned int ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address,
 //   repeat: The number of times the message is to be repeated.
 //
 // Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-// TODO: Transmit with a 1/3 duty cycle.
 void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long long data,
                                            unsigned int nbits,
                                            unsigned int repeat) {
-  // Set IR carrier frequency
-  enableIROut(38);
+  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(38, 33);
   IRtimer usecTimer = IRtimer();
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t i=0; i <= repeat; i++) {
