@@ -19,6 +19,7 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * DISH decode by marcosamarinho
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
@@ -146,6 +147,8 @@ public:
   //  bool decodeCOOLIX(decode_results *results);
   bool decodeDaikin(decode_results *results);
   bool decodeDenon(decode_results *results);
+  bool decodeDISH(decode_results *results, uint16_t nbits=DISH_BITS,
+                  bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
@@ -209,9 +212,10 @@ public:
   void sendRCMM(uint32_t data, uint8_t nbits=24);
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
-  // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=0 for backward compatiblity.
-  void sendDISH(unsigned long data, int nbits, unsigned int repeat=0);
+  // Legacy use of this procedure was only to send a single code
+  // so use repeat=0 for backward compatiblity.
+  void sendDISH(unsigned long long data, unsigned int nbits=DISH_BITS,
+                unsigned int repeat=DISH_MIN_REPEAT);
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
   void sendPanasonic64(unsigned long long data,

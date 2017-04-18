@@ -20,6 +20,7 @@
  * Kelvinator A/C added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
  *     (based on https://github.com/r45635/HVAC-IR-Control)
+ * DISH decode by marcosamarinho
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200
  *
@@ -129,12 +130,16 @@
 #define SHARP_TOGGLE_MASK 0x3FF
 #define SHARP_RPT_SPACE 3000
 
-#define DISH_HDR_MARK 400
-#define DISH_HDR_SPACE 6100
-#define DISH_BIT_MARK 400
-#define DISH_ONE_SPACE 1700
+// Ref:
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
+//   http://www.hifi-remote.com/wiki/index.php?title=Dish
+#define DISH_HDR_MARK    400
+#define DISH_HDR_SPACE  6100
+#define DISH_BIT_MARK    400
+#define DISH_ONE_SPACE  1700
 #define DISH_ZERO_SPACE 2800
-#define DISH_RPT_SPACE 6200
+#define DISH_RPT_SPACE  6200
+#define DISH_MIN_REPEAT    3
 
 // Ref: http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
 #define PANASONIC_HDR_MARK             3456
