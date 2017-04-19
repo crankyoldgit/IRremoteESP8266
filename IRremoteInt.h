@@ -63,12 +63,12 @@
 #define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - NEC_HDR_MARK - NEC_HDR_SPACE - NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) + NEC_BIT_MARK
 
 // Timings based on http://www.sbprojects.com/knowledge/ir/sirc.php
-#define SONY_HDR_MARK	2400
-#define SONY_HDR_SPACE	600
-#define SONY_ONE_MARK	1250  // Experiments suggest +50 to spec is better.
-#define SONY_ZERO_MARK	650  // Experiments suggest +50 to spec is better.
+#define SONY_HDR_MARK	  2400
+#define SONY_SPACE      600
+#define SONY_ONE_MARK	  1200 + 50  // Experiments suggest +50 to spec is better.
+#define SONY_ZERO_MARK	600 + 50  // Experiments suggest +50 to spec is better.
 #define SONY_RPT_LENGTH 45000
-#define SONY_DOUBLE_SPACE_USECS  500  // usually see 713 - not using ticks as get number wrapround
+#define SONY_MIN_GAP    10000
 
 // SA 8650B
 #define SANYO_HDR_MARK	3500  // seen range 3500
@@ -251,7 +251,7 @@ extern volatile irparams_t irparams;
 #define TOPBIT 0x80000000
 
 #define NEC_BITS 32
-#define SONY_BITS 12
+#define SONY_MIN_BITS 12
 #define SANYO_BITS 12
 #define MITSUBISHI_BITS 16
 #define MIN_RC5_SAMPLES 11
