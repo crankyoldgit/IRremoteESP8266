@@ -52,13 +52,15 @@
 #define WHYNTER_ZERO_MARK	750
 #define WHYNTER_ZERO_SPACE	750
 
-#define NEC_HDR_MARK	9000
-#define NEC_HDR_SPACE	4500
-#define NEC_BIT_MARK	560
-#define NEC_ONE_SPACE	1690
-#define NEC_ZERO_SPACE	560
-#define NEC_RPT_SPACE	2250
+#define NEC_HDR_MARK             9000
+#define NEC_HDR_SPACE            4500
+#define NEC_BIT_MARK              560
+#define NEC_ONE_SPACE            1690
+#define NEC_ZERO_SPACE            560
+#define NEC_RPT_SPACE            2250
+#define NEC_RPT_LENGTH              4
 #define NEC_MIN_COMMAND_LENGTH 108000UL
+#define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - NEC_HDR_MARK - NEC_HDR_SPACE - NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) + NEC_BIT_MARK
 
 // Timings based on http://www.sbprojects.com/knowledge/ir/sirc.php
 #define SONY_HDR_MARK	  2400
@@ -134,42 +136,46 @@
 #define DISH_ZERO_SPACE 2800
 #define DISH_RPT_SPACE 6200
 
-#define PANASONIC_HDR_MARK 3502
-#define PANASONIC_HDR_SPACE 1750
-#define PANASONIC_BIT_MARK 502
-#define PANASONIC_ONE_SPACE 1244
-#define PANASONIC_ZERO_SPACE 400
+// Ref: http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
+#define PANASONIC_HDR_MARK             3456
+#define PANASONIC_HDR_SPACE            1728
+#define PANASONIC_BIT_MARK              432
+#define PANASONIC_ONE_SPACE            1296
+#define PANASONIC_ZERO_SPACE            432
+#define PANASONIC_MIN_COMMAND_LENGTH 130000UL
+// 130000 - 3456 - 1728 - 48*(432+1296) - 432 = 41440
+#define PANASONIC_MIN_GAP             41440
+#define PANASONIC_MANUFACTURER       0x2002ULL
 
-#define JVC_HDR_MARK 8000
-#define JVC_HDR_SPACE 4000
-#define JVC_BIT_MARK 600
-#define JVC_ONE_SPACE 1600
-#define JVC_ZERO_SPACE 550
+
+// Ref: http://www.sbprojects.com/knowledge/ir/jvc.php
+#define JVC_HDR_MARK    8400
+#define JVC_HDR_SPACE   4200
+#define JVC_BIT_MARK     525
+#define JVC_ONE_SPACE   1725
+#define JVC_ZERO_SPACE   525
 #define JVC_RPT_LENGTH 60000
+#define JVC_MIN_GAP    11400  // 60000 - 16 * (1725 + 525) - 8400 - 4200
 
-#define LG_HDR_MARK 8000
-#define LG_HDR_SPACE 4000
-#define LG_BIT_MARK 600
-#define LG_ONE_SPACE 1600
-#define LG_ZERO_SPACE 550
-#define LG_RPT_LENGTH 60000
+#define LG_HDR_MARK    8000
+#define LG_HDR_SPACE   4000
+#define LG_BIT_MARK     600
+#define LG_ONE_SPACE   1600
+#define LG_ZERO_SPACE   550
+#define LG_RPT_SPACE   2250
+#define LG_MIN_GAP    20000  // Completely made up figure.
+#define LG_MIN_MESSAGE_LENGTH 108000UL
+#define LG32_HDR_MARK  4500
 
-/*
-#define SAMSUNG_HDR_MARK  5000
-#define SAMSUNG_HDR_SPACE 5000
-#define SAMSUNG_BIT_MARK  560
-#define SAMSUNG_ONE_SPACE 1600
+// Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+#define SAMSUNG_HDR_MARK   4500
+#define SAMSUNG_HDR_SPACE  4500
+#define SAMSUNG_BIT_MARK    560
+#define SAMSUNG_ONE_SPACE  1690
 #define SAMSUNG_ZERO_SPACE  560
-#define SAMSUNG_RPT_SPACE 2250
-*/
-
-// Update by Sebastien Warin for my EU46D6200
-#define SAMSUNG_HDR_MARK  4500
-#define SAMSUNG_HDR_SPACE 4500
-#define SAMSUNG_BIT_MARK  590
-#define SAMSUNG_ONE_SPACE 1690
-#define SAMSUNG_ZERO_SPACE  590
-#define SAMSUNG_RPT_SPACE 2250
+#define SAMSUNG_RPT_SPACE  2250
+#define SAMSUNG_MIN_GAP   20000  // Completely made up figure.
+#define SAMSUNG_MIN_MESSAGE_LENGTH 108000UL
 
 #define SHARP_BITS 15
 #define DISH_BITS 16
@@ -183,12 +189,14 @@
 #define DAIKIN_ZERO_SPACE 428
 
 //Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-#define DENON_BITS          14  // The number of bits in the command
-#define DENON_HDR_MARK     300  // The length of the Header:Mark
-#define DENON_HDR_SPACE    750  // The lenght of the Header:Space
-#define DENON_BIT_MARK     300  // The length of a Bit:Mark
-#define DENON_ONE_SPACE   1800  // The length of a Bit:Space for 1's
-#define DENON_ZERO_SPACE   750  // The length of a Bit:Space for 0's
+#define DENON_BITS                   14  // The number of bits in the command
+#define DENON_HDR_MARK              263  // The length of the Header:Mark
+#define DENON_HDR_SPACE             789  // The lenght of the Header:Space
+#define DENON_BIT_MARK              263  // The length of a Bit:Mark
+#define DENON_ONE_SPACE            1842  // The length of a Bit:Space for 1's
+#define DENON_ZERO_SPACE            789  // The length of a Bit:Space for 0's
+#define DENON_MIN_COMMAND_LENGTH 134052UL
+#define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - DENON_HDR_MARK - DENON_HDR_SPACE - DENON_BITS * (DENON_BIT_MARK + DENON_ONE_SPACE) - DENON_BIT_MARK
 
 #define KELVINATOR_HDR_MARK	  8990U
 #define KELVINATOR_HDR_SPACE	4490U
@@ -201,6 +209,9 @@
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
 #define RAWBUF 100 // Length of raw duration buffer
+#define HEADER 2  // Usual nr. of header entries.
+#define FOOTER 2  // Usual nr. of footer (stop bits) entries.
+#define OFFSET_START 1  // Usual rawbuf entry to start processing from.
 
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
@@ -216,8 +227,6 @@
 #define STATE_MARK     3
 #define STATE_SPACE    4
 #define STATE_STOP     5
-
-#define RAWBUF 100 // Length of raw duration buffer
 
 // information for the interrupt handler
 typedef struct {

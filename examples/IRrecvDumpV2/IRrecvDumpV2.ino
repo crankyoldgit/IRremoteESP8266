@@ -35,7 +35,11 @@ void ircode(decode_results *results) {
     Serial.print(":");
   }
   // Print Code
-  Serial.print(results->value, HEX);
+  //   print() & println() can't handle printing long longs. (uint64_t)
+  //   So we have to print the top and bottom halves separately.
+  if (results->value >> 32)
+    Serial.print((unsigned long) (results->value >> 32), HEX);
+  Serial.println((unsigned long) (results->value & 0xFFFFFFFF), HEX);
 }
 
 //+=============================================================================
@@ -95,6 +99,8 @@ void dumpRaw(decode_results *results) {
   Serial.println("]: ");
 
   for (int i = 1;  i < results->rawlen;  i++) {
+    if (i % 100 == 0)
+      yield();  // Preemptive yield every 100th entry to feed the WDT.
     unsigned long  x = results->rawbuf[i] * USECPERTICK;
     if (!(i & 1)) {  // even
       Serial.print("-");
@@ -154,7 +160,11 @@ void dumpCode (decode_results *results) {
 
     // All protocols have data
     Serial.print("unsigned int  data = 0x");
-    Serial.print(results->value, HEX);
+    //   print() & println() can't handle printing long longs. (uint64_t)
+    //   So we have to print the top and bottom halves separately.
+    if (results->value >> 32)
+      Serial.print((unsigned long) (results->value >> 32), HEX);
+    Serial.print((unsigned long) (results->value & 0xFFFFFFFF), HEX);
     Serial.println(";");
   }
 }

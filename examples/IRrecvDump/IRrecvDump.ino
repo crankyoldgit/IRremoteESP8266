@@ -17,7 +17,7 @@ decode_results results;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   irrecv.enableIRIn(); // Start the receiver
 }
 
@@ -68,6 +68,8 @@ void dump(decode_results *results) {
   Serial.print("): ");
 
   for (int i = 1; i < count; i++) {
+    if (i % 100 == 0)
+      yield();  // Preemptive yield every 100th entry to feed the WDT.
     if (i & 1) {
       Serial.print(results->rawbuf[i]*USECPERTICK, DEC);
     }
@@ -82,7 +84,11 @@ void dump(decode_results *results) {
 
 void loop() {
   if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
+    // print() & println() can't handle printing long longs. (uint64_t)
+    // So we have to print the top and bottom halves separately.
+    if (results.value >> 32)
+      Serial.print((unsigned long) (results.value >> 32), HEX);
+    Serial.println((unsigned long) (results.value & 0xFFFFFFFF), HEX);
     dump(&results);
     irrecv.resume(); // Receive the next value
   }

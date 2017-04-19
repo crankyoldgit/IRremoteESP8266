@@ -76,21 +76,22 @@ enum decode_type_t {
 // Results returned from the decoder
 class decode_results {
 public:
-  int decode_type; // NEC, SONY, RC5, UNKNOWN
+  decode_type_t decode_type; // NEC, SONY, RC5, UNKNOWN
   union { // This is used for decoding Panasonic and Sharp data
     unsigned int panasonicAddress;
     unsigned int sharpAddress;
   };
-  unsigned long value; // Decoded value
-  int bits; // Number of bits in decoded value
+  unsigned long long value; // Decoded value
+  unsigned int bits; // Number of bits in decoded value
   volatile unsigned int *rawbuf; // Raw intervals in .5 us ticks
-  int rawlen; // Number of records in rawbuf.
+  unsigned int rawlen; // Number of records in rawbuf.
   bool overflow;
   unsigned long address;  // Decoded device address.
   unsigned long command;  // Decoded command.
 };
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits=64);
+uint8_t calcLGChecksum(uint16_t data);
 
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
@@ -100,7 +101,7 @@ uint64_t reverseBits(uint64_t input, uint16_t nbits=64);
 #define SEND_PROTOCOL_RC5      case RC5: sendRC5(data, nbits); break;
 #define SEND_PROTOCOL_RC6      case RC6: sendRC6(data, nbits); break;
 #define SEND_PROTOCOL_DISH     case DISH: sendDISH(data, nbits); break;
-#define SEND_PROTOCOL_JVC      case JVC: sendJVC(data, nbits, 0); break;
+#define SEND_PROTOCOL_JVC      case JVC: sendJVC(data, nbits); break;
 #define SEND_PROTOCOL_SAMSUNG  case SAMSUNG: sendSAMSUNG(data, nbits); break;
 #define SEND_PROTOCOL_LG       case LG: sendLG(data, nbits); break;
 #define SEND_PROTOCOL_WHYNTER  case WHYNTER: sendWhynter(data, nbits); break;
@@ -123,23 +124,29 @@ public:
   // These are called by decode
   void copyIrParams(irparams_t *dest);
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
-  bool decodeNEC(decode_results *results);
+  bool decodeNEC(decode_results *results, uint16_t nbits=NEC_BITS,
+                 bool strict=false);
   bool decodeSony(decode_results *results);
   bool decodeSanyo(decode_results *results);
   bool decodeMitsubishi(decode_results *results);
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
   bool decodeRCMM(decode_results *results);
-  bool decodePanasonic(decode_results *results);
-  bool decodeLG(decode_results *results);
-  bool decodeJVC(decode_results *results);
-  bool decodeSAMSUNG(decode_results *results);
+  bool decodePanasonic(decode_results *results, uint16_t nbits=PANASONIC_BITS,
+                       bool strict=false);
+  bool decodeLG(decode_results *results, uint16_t nbits=LG_BITS,
+                bool strict=false);
+  bool decodeJVC(decode_results *results, uint16_t nbits=JVC_BITS,
+                 bool strict=true);
+  bool decodeSAMSUNG(decode_results *results, uint16_t nbits=SAMSUNG_BITS,
+                     bool strict=false);
   bool decodeWhynter(decode_results *results);
   bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
   //  bool decodeCOOLIX(decode_results *results);
   bool decodeDaikin(decode_results *results);
-  bool decodeDenon(decode_results *results);
+  bool decodeDenon(decode_results *results, uint16_t nbits=DENON_BITS,
+                   bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
@@ -182,8 +189,12 @@ public:
   };
   void sendCOOLIX(unsigned long data, int nbits);
   void sendWhynter(unsigned long data, int nbits);
-  void sendNEC(unsigned long data, int nbits=32, unsigned int repeat=0);
-  void sendLG(unsigned long data, int nbits=28, unsigned int repeat=0);
+  void sendNEC(unsigned long long data, unsigned int nbits=NEC_BITS,
+               unsigned int repeat=0);
+  unsigned long encodeNEC(unsigned int address, unsigned int command);
+  void sendLG(unsigned long long data, unsigned int nbits=28,
+              unsigned int repeat=0);
+  unsigned long encodeLG(uint8_t address, uint16_t command);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // Legacy use of this procedure was to only send a single code so call it with
@@ -199,7 +210,7 @@ public:
   void sendRaw(unsigned int buf[], int len, int hz);
   void sendGC(unsigned int buf[], int len);
   void sendRC5(unsigned long data, int nbits);
-  void sendRC6(unsigned long data, int nbits);
+  void sendRC6(unsigned long long data, unsigned int nbits, unsigned int repeat=0);
   void sendRCMM(uint32_t data, uint8_t nbits=24);
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
@@ -208,26 +219,38 @@ public:
   void sendDISH(unsigned long data, int nbits, unsigned int repeat=0);
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
-  void sendPanasonic(unsigned int address, unsigned long data);
-  void sendJVC(unsigned long data, int nbits, unsigned int repeat=0);
-  void sendSAMSUNG(unsigned long data, int nbits=32);
+  void sendPanasonic64(unsigned long long data,
+                       unsigned int nbits=PANASONIC_BITS,
+                       unsigned int repeat=0);
+  void sendPanasonic(unsigned int address, unsigned long data,
+                     unsigned int nbits=PANASONIC_BITS, unsigned int repeat=0);
+  unsigned long long encodePanasonic(uint8_t device, uint8_t subdevice,
+                                   uint8_t function);
+  void sendJVC(unsigned long long data, unsigned int nbits=JVC_BITS,
+               unsigned int repeat=0);
+  unsigned int encodeJVC(uint8_t address, uint8_t command);
+  void sendSAMSUNG(unsigned long long data, unsigned int nbits=32,
+                   unsigned int repeat=0);
+  unsigned long encodeSAMSUNG(uint8_t customer, uint8_t command);
   void sendDaikin(unsigned char data[]);
-  void sendDenon(unsigned long data, int nbits=14);
+  void sendDenon(unsigned long long data, unsigned int nbits=DENON_BITS,
+                 unsigned int repeat=0);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
-  void enableIROut(int khz);
+  void enableIROut(unsigned int khz, uint8_t duty=50);
   VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);
 private:
-  int halfPeriodicTime;
+  uint16_t onTimePeriod;
+  uint16_t offTimePeriod;
   int IRpin;
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
-                uint32_t data, uint8_t nbits, bool MSBfirst=true);
+                uint64_t data, uint16_t nbits, bool MSBfirst=true);
   void ledOff();
-} ;
+};
 
 class IRtimer {
 public:
