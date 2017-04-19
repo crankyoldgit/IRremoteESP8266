@@ -126,7 +126,9 @@ IRsend::IRsend(int IRsendPin) {
 
 void ICACHE_FLASH_ATTR IRsend::begin() {
 	pinMode(IRpin, OUTPUT);
+  ledOff();  // Turn off the IR LED just to be safe.
 }
+
 // Generic method for sending data that is common to most protocols.
 // Default to transmitting the Most Significant Bit (MSB) first.
 void ICACHE_FLASH_ATTR IRsend::sendData(uint16_t onemark, uint32_t onespace,
