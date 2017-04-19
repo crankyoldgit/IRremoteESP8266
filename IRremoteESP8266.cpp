@@ -333,9 +333,9 @@ void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], int len, int hz) {
 // followed by number of times to emit (count),
 // followed by offset for repeats, followed by code as units of periodic time.
 void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], int len) {
-  int khz = buf[0]/1000; // GC data starts with frequency in Hz.
-  enableIROut(khz);
-  int periodic_time = 1000/khz;
+  unsigned int hz = buf[0]; // GC data starts with frequency in Hz.
+  enableIROut(hz);
+  uint32_t periodic_time = calcUSecPeriod(hz);
   int count = buf[1]; // Max 50 as per GC.
   // Data
   for (int i = 0; i < count; i++) {
@@ -470,7 +470,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
                                                unsigned int nbits,
                                                unsigned int repeat) {
-  enableIROut(37);  // Set IR carrier frequency
+  enableIROut(36700U);  // Set IR carrier frequency of 36.7kHz.
   IRtimer usecTimer = IRtimer();
 
   for (uint16_t i = 0; i <= repeat; i++) {
@@ -713,26 +713,35 @@ void ICACHE_FLASH_ATTR IRsend::space(unsigned long time) {
   }
 }
 
+// Calculate the period for a given frequency. (T = 1/f)
+//
+// Args:
+//   freq: Frequency in Hz.
+// Returns:
+//   nr. of uSeconds.
+uint32_t ICACHE_FLASH_ATTR IRsend::calcUSecPeriod(uint32_t hz) {
+  return (1000000UL + hz/2) / hz;  // round(1000000/hz).
+}
+
 // Set the output frequency modulation and duty cycle.
 //
 // Args:
-//   khz: How many kilohertz we want to modulate in. e.g. 38 = 38kHz.
-//   duty: Percentage duty cycle of the LED. e.g. 50 = 50% = half on, half off.
+//   freq: The freq we want to modulate at. Assumes < 1000 means kHz else Hz.
+//   duty: Percentage duty cycle of the LED. e.g. 25 = 25% = 1/4 on, 3/4 off.
 //
 // Note:
 //   Integer timing functions & math mean we can't do fractions of
-//   microseconds timing. Thus minor changes to the khz & duty values may have
+//   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
-void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned int khz, uint8_t duty) {
+void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned long freq, uint8_t duty) {
   duty = min(duty, 100);  // Can't have more than 100% duty cycle.
-
-  // T = 1/f but we need microsecond and f is in kHz, so use 1000 instead.
-  // Also using T = (1+f)/f for better integer rounding.
-
+  if (freq < 1000) // Were we given kHz? Supports the old call usage.
+    freq *= 1000;
+  uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
-  onTimePeriod = ((1000 + khz) * duty) / (khz * 100);
+  onTimePeriod = (period * duty) / 100;
   // Nr. of uSeconds the LED will be off per pulse.
-  offTimePeriod = ((1000 + khz) / khz) - onTimePeriod;
+  offTimePeriod = period - onTimePeriod;
 }
 
 
