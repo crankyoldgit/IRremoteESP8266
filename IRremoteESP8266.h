@@ -145,7 +145,8 @@ public:
   // COOLIX decode is not implemented yet
   //  bool decodeCOOLIX(decode_results *results);
   bool decodeDaikin(decode_results *results);
-  bool decodeDenon(decode_results *results);
+  bool decodeDenon(decode_results *results, uint16_t nbits=DENON_BITS,
+                   bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
@@ -228,7 +229,8 @@ public:
                    unsigned int repeat=0);
   unsigned long encodeSAMSUNG(uint8_t customer, uint8_t command);
   void sendDaikin(unsigned char data[]);
-  void sendDenon(unsigned long data, int nbits=14);
+  void sendDenon(unsigned long long data, unsigned int nbits=DENON_BITS,
+                 unsigned int repeat=0);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);

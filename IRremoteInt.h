@@ -189,12 +189,14 @@
 #define DAIKIN_ZERO_SPACE 428
 
 //Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-#define DENON_BITS          14  // The number of bits in the command
-#define DENON_HDR_MARK     300  // The length of the Header:Mark
-#define DENON_HDR_SPACE    750  // The lenght of the Header:Space
-#define DENON_BIT_MARK     300  // The length of a Bit:Mark
-#define DENON_ONE_SPACE   1800  // The length of a Bit:Space for 1's
-#define DENON_ZERO_SPACE   750  // The length of a Bit:Space for 0's
+#define DENON_BITS                   14  // The number of bits in the command
+#define DENON_HDR_MARK              263  // The length of the Header:Mark
+#define DENON_HDR_SPACE             789  // The lenght of the Header:Space
+#define DENON_BIT_MARK              263  // The length of a Bit:Mark
+#define DENON_ONE_SPACE            1842  // The length of a Bit:Space for 1's
+#define DENON_ZERO_SPACE            789  // The length of a Bit:Space for 0's
+#define DENON_MIN_COMMAND_LENGTH 134052UL
+#define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - DENON_HDR_MARK - DENON_HDR_SPACE - DENON_BITS * (DENON_BIT_MARK + DENON_ONE_SPACE) - DENON_BIT_MARK
 
 #define KELVINATOR_HDR_MARK	  8990U
 #define KELVINATOR_HDR_SPACE	4490U
