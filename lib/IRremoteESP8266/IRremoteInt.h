@@ -142,14 +142,21 @@
 #define MITSUBISHI_AC_RPT_MARK     440U
 #define MITSUBISHI_AC_RPT_SPACE  17100UL
 
+// Ref:
+//   https://en.wikipedia.org/wiki/RC-5
+//   http://www.sbprojects.com/knowledge/ir/rc5.php
+#define RC5_RAW_BITS               14U
+#define RC5_T1                    889U
+#define RC5_MIN_COMMAND_LENGTH 113778UL
+#define RC5_MIN_GAP RC5_MIN_COMMAND_LENGTH - RC5_RAW_BITS * (2 * RC5_T1)
 
-#define RC5_T1           889U
-#define RC5_RPT_LENGTH 46000U
-
-#define RC6_HDR_MARK    2666U
-#define RC6_HDR_SPACE    889U
-#define RC6_T1           444U
-#define RC6_RPT_LENGTH 46000U
+// Ref:
+//   https://en.wikipedia.org/wiki/RC-6
+//   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
+#define RC6_HDR_MARK             2666U
+#define RC6_HDR_SPACE             889U
+#define RC6_T1                    444U
+#define RC6_RPT_LENGTH          83000UL
 
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php
@@ -162,6 +169,7 @@
 #define RCMM_BIT_SPACE_3   777U
 #define RCMM_RPT_LENGTH  27778U
 #define RCMM_MIN_GAP      3360U
+
 // Use a tolerance of +/-10% when matching some data spaces.
 #define RCMM_TOLERANCE      10U
 #define RCMM_EXCESS         50U
@@ -319,6 +327,10 @@ extern volatile irparams_t irparams;
 #define MITSUBISHI_BITS    16U
 #define MIN_RC5_SAMPLES    11U
 #define MIN_RC6_SAMPLES     1U
+#define RC5_BITS           RC5_RAW_BITS - 2U
+#define RC5X_BITS          RC5_RAW_BITS - 1U
+#define RC6_MODE0_BITS     20U  // Excludes the 'start' bit.
+#define RC6_36_BITS        36U  // Excludes the 'start' bit.
 #define PANASONIC_BITS     48U
 #define JVC_BITS           16U
 #define LG_BITS            28U

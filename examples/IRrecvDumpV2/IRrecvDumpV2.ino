@@ -27,7 +27,6 @@ void setup() {
   irrecv.enableIRIn();  // Start the receiver
 }
 
-//+=============================================================================
 // Print a uint64_t in Hex, to the Serial interface.
 //
 void serialPrintUint64Hex(uint64_t value) {
@@ -38,7 +37,6 @@ void serialPrintUint64Hex(uint64_t value) {
   Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
 
-//+=============================================================================
 // Display encoding type
 //
 void encoding(decode_results *results) {
@@ -66,7 +64,6 @@ void encoding(decode_results *results) {
   if (results->repeat) Serial.print(" (Repeat)");
 }
 
-//+=============================================================================
 // Dump out the decode_results structure.
 //
 void dumpInfo(decode_results *results) {
@@ -88,7 +85,6 @@ void dumpInfo(decode_results *results) {
   Serial.println(" bits)");
 }
 
-//+=============================================================================
 // Dump out the decode_results structure.
 //
 void dumpRaw(decode_results *results) {
@@ -120,7 +116,6 @@ void dumpRaw(decode_results *results) {
   Serial.println("");  // Newline
 }
 
-//+=============================================================================
 // Dump out the decode_results structure.
 //
 void dumpCode(decode_results *results) {
@@ -171,7 +166,6 @@ void dumpCode(decode_results *results) {
   }
 }
 
-//+=============================================================================
 // The repeating section of the code
 //
 void loop() {
