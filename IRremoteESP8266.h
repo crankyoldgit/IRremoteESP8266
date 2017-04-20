@@ -238,13 +238,14 @@ public:
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
-  void enableIROut(unsigned int khz, uint8_t duty=50);
+  void enableIROut(unsigned long freq, uint8_t duty=50);
   VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);
 private:
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
   int IRpin;
+  uint32_t calcUSecPeriod(uint32_t hz);
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
