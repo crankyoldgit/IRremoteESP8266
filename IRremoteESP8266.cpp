@@ -282,21 +282,21 @@ void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long data, int nbits) {
   space(WHYNTER_ZERO_SPACE);
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long data, int nbits,
+// Send a Sony/SIRC(Serial Infra-Red Control) message.
+//
+// Args:
+//   data: message to be sent.
+//   nbits: Nr. of bits of the mesageto be sent.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// sendSony() should typically be called with repeat=2 as Sony devices
+// expect the message to be sent at least 3 times.
+//
+// Timings and details are taken from:
+//   http://www.sbprojects.com/knowledge/ir/sirc.php
+void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long long data,
+                                        unsigned int nbits,
                                         unsigned int repeat) {
-  // Send an IR command to a compatible Sony device.
-  //
-  // Args:
-  //   data: IR command to be sent.
-  //   nbits: Nr. of bits of the IR command to be sent.
-  //   repeat: Nr. of additional times the IR command is to be sent.
-  //
-  // sendSony() should typically be called with repeat=2 as Sony devices
-  // expect the code to be sent at least 3 times.
-  //
-  // Timings and details are taken from:
-  //   http://www.sbprojects.com/knowledge/ir/sirc.php
-
   // Sony devices use a 40kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(40, 33);
   IRtimer usecs = IRtimer();
@@ -305,16 +305,45 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long data, int nbits,
     usecs.reset();
     // Header
     mark(SONY_HDR_MARK);
-    space(SONY_HDR_SPACE);
+    space(SONY_SPACE);
     // Data
-    sendData(SONY_ONE_MARK, SONY_HDR_SPACE, SONY_ZERO_MARK, SONY_HDR_SPACE,
+    sendData(SONY_ONE_MARK, SONY_SPACE, SONY_ZERO_MARK, SONY_SPACE,
              data, nbits, true);
     // Footer
     // The Sony protocol requires us to wait 45ms from start of a code to the
     // start of the next one. A 10ms minimum gap is also required.
-    space(max(10000, 45000 - usecs.elapsed()));
+    space(max(SONY_MIN_GAP, SONY_RPT_LENGTH - usecs.elapsed()));
   }
   // A space() is always performed last, so no need to turn off the LED.
+}
+
+// Convert Sony/SIRC command, address, & extended bits into sendSony format.
+// Args:
+//   nbits:    Sony protocol bit size.
+//   command:  Sony command bits.
+//   address:  Sony address bits.
+//   extended: Sony extended bits.
+// Returns:
+//   A sendSony compatible data message.
+unsigned long encodeSony(unsigned int nbits, unsigned int command,
+                         unsigned int address, unsigned int extended) {
+  unsigned long result = 0;
+  switch (nbits) {
+    case 12:  // 5 address bits.
+      result = address & 0x1F;
+      break;
+    case 15:  // 8 address bits.
+      result = address & 0xFF;
+      break;
+    case 20:  // 5 address bits, 8 extended bits.
+      result = address & 0x1F;
+      result |= (extended & 0xFF) << 5;
+      break;
+    default:
+      return 0;  // This is not an expected Sony bit size/protocol.
+  }
+  result = (result << 7) | (command & 0x7F);  // All sizes have 7 command bits.
+  return reverseBits(result, nbits);  // sendSony uses reverse ordered bits.
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], int len, int hz) {
@@ -334,9 +363,9 @@ void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], int len, int hz) {
 // followed by number of times to emit (count),
 // followed by offset for repeats, followed by code as units of periodic time.
 void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], int len) {
-  int khz = buf[0]/1000; // GC data starts with frequency in Hz.
-  enableIROut(khz);
-  int periodic_time = 1000/khz;
+  unsigned int hz = buf[0]; // GC data starts with frequency in Hz.
+  enableIROut(hz);
+  uint32_t periodic_time = calcUSecPeriod(hz);
   int count = buf[1]; // Max 50 as per GC.
   // Data
   for (int i = 0; i < count; i++) {
@@ -471,7 +500,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
 void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
                                                unsigned int nbits,
                                                unsigned int repeat) {
-  enableIROut(37);  // Set IR carrier frequency
+  enableIROut(36700U);  // Set IR carrier frequency of 36.7kHz.
   IRtimer usecTimer = IRtimer();
 
   for (uint16_t i = 0; i <= repeat; i++) {
@@ -629,19 +658,36 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
          (customer << 8) | customer);
 }
 
-// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-void ICACHE_FLASH_ATTR IRsend::sendDenon (unsigned long data,  int nbits) {
-  // Set IR carrier frequency
-  enableIROut(38);
-  // Header
-  mark(DENON_HDR_MARK);
-  space(DENON_HDR_SPACE);
-  // Data
-  sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
-           data, nbits, true);
-  // Footer
-  mark(DENON_BIT_MARK);
-  ledOff();
+// Send a Denon message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically DENON_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Notes:
+//   Some Denon devices use a Kaseikyo/Panasonic 48-bit format.
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+//   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
+void ICACHE_FLASH_ATTR IRsend::sendDenon(unsigned long long data,
+                                         unsigned int nbits,
+                                         unsigned int repeat) {
+  enableIROut(38);  // Set IR carrier frequency
+  IRtimer usecTimer = IRtimer();
+
+  for (unsigned int i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(DENON_HDR_MARK);
+    space(DENON_HDR_SPACE);
+    // Data
+    sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(DENON_BIT_MARK);
+    space(max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(), DENON_MIN_GAP));
+  }
 }
 
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
@@ -697,26 +743,35 @@ void ICACHE_FLASH_ATTR IRsend::space(unsigned long time) {
   }
 }
 
+// Calculate the period for a given frequency. (T = 1/f)
+//
+// Args:
+//   freq: Frequency in Hz.
+// Returns:
+//   nr. of uSeconds.
+uint32_t ICACHE_FLASH_ATTR IRsend::calcUSecPeriod(uint32_t hz) {
+  return (1000000UL + hz/2) / hz;  // round(1000000/hz).
+}
+
 // Set the output frequency modulation and duty cycle.
 //
 // Args:
-//   khz: How many kilohertz we want to modulate in. e.g. 38 = 38kHz.
-//   duty: Percentage duty cycle of the LED. e.g. 50 = 50% = half on, half off.
+//   freq: The freq we want to modulate at. Assumes < 1000 means kHz else Hz.
+//   duty: Percentage duty cycle of the LED. e.g. 25 = 25% = 1/4 on, 3/4 off.
 //
 // Note:
 //   Integer timing functions & math mean we can't do fractions of
-//   microseconds timing. Thus minor changes to the khz & duty values may have
+//   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
-void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned int khz, uint8_t duty) {
+void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned long freq, uint8_t duty) {
   duty = min(duty, 100);  // Can't have more than 100% duty cycle.
-
-  // T = 1/f but we need microsecond and f is in kHz, so use 1000 instead.
-  // Also using T = (1+f)/f for better integer rounding.
-
+  if (freq < 1000) // Were we given kHz? Supports the old call usage.
+    freq *= 1000;
+  uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
-  onTimePeriod = ((1000 + khz) * duty) / (khz * 100);
+  onTimePeriod = (period * duty) / 100;
   // Nr. of uSeconds the LED will be off per pulse.
-  offTimePeriod = ((1000 + khz) / khz) - onTimePeriod;
+  offTimePeriod = period - onTimePeriod;
 }
 
 
@@ -1160,8 +1215,9 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting DISH decode");
 #endif
-  if (decodeDISH(results))
+  if (decodeDISH(results)) {
     return true;
+  }
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -1353,55 +1409,70 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results,
   return true;
 }
 
+// Decode the supplied Sony/SIRC message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// SONY protocol, SIRC (Serial Infra-Red Control) can be 12,15,20 bits long.
+// Based on: http://www.sbprojects.com/knowledge/ir/sirc.php
 bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results) {
-  long data = 0;
-  if (results->rawlen < 2 * SONY_BITS + 2) {
+  if (results->rawlen < 2 * SONY_MIN_BITS + 2)
+    return false;  // Can't possibly be a Sony code if it is this small.
+
+  uint32_t data = 0;
+  uint16_t offset = 1;
+  uint16_t nbits = 0;
+  uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
+
+  // Header
+  timeSoFar += results->rawbuf[offset] * USECPERTICK;
+  if (!matchMark(results->rawbuf[offset++], SONY_HDR_MARK))
     return false;
-  }
-  int offset = 0; // Dont skip first space, check its size
-
-  /*
-  // Some Sony's deliver repeats fast after first
-  // unfortunately can't spot difference from of repeat from two fast clicks
-  if (results->rawbuf[offset] < SONY_DOUBLE_SPACE_USECS) {
-    // Serial.print("IR Gap found: ");
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = SANYO;
-    return true;
-  }*/
-  offset++;
-
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK)) {
-    return false;
-  }
-  offset++;
-
-  while (offset + 1 < irparams.rawlen) {
-    if (!matchSpace(results->rawbuf[offset], SONY_HDR_SPACE)) {
-
-      break;
-    }
-    offset++;
-    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK)) {
-      data = (data << 1) | 1;
-    } else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK)) {
-      data <<= 1;
-    } else {
+  // Data
+  for (; offset+1 < results->rawlen; nbits++) {
+    // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
+    //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
+    if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP) ||
+        matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
+      break;  // Found a repeat space.
+    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    if (!matchSpace(results->rawbuf[offset++], SONY_SPACE))
       return false;
-    }
+    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK))
+      data = (data << 1) | 1;
+    else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK))
+      data <<= 1;
+    else
+      return false;
     offset++;
   }
+  // No Footer for Sony.
 
   // Success
-  results->bits = (offset - 1) / 2;
-  if (results->bits < 12) {
-    results->bits = 0;
-    return false;
-  }
+  results->bits = nbits;
   results->value = data;
   results->decode_type = SONY;
+  // Message comes in LSB first. Convert ot MSB first.
+  data = reverseBits(data, nbits);
+  // Decode the address & command from raw decode value.
+  switch (nbits) {
+    case 12:  // 7 command bits, 5 address bits.
+    case 15:  // 7 command bits, 8 address bits.
+      results->command = data & 0x7F;  // Bits 0-6
+      results->address = data >> 7;  // Bits 7-14
+      break;
+    case 20:  // 7 command bits, 5 address bits, 8 extended (command) bits.
+      results->command = (data & 0x7F) + ((data >> 12) << 7);  // Bits 0-6,12-19
+      results->address = (data >> 7) & 0x1F;  // Bits 7-11
+      break;
+    default:  // Shouldn't happen, but just in case.
+      results->address = 0;
+      results->command = 0;
+  }
   return true;
 }
 
@@ -2134,48 +2205,55 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDaikin(decode_results *results) {
   return true;
 }
 
-// Denon, from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-bool ICACHE_FLASH_ATTR IRrecv::decodeDenon (decode_results *results) {
-	unsigned long data   = 0;  // Somewhere to build our code
-	int offset = 1;  // Skip the Gap reading
+// Decode a Denon message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Expected nr. of data bits. (Typically DENON_BITS)
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Ref: https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+bool ICACHE_FLASH_ATTR IRrecv::decodeDenon(decode_results *results,
+                                           uint16_t nbits,
+                                           bool strict) {
+  // Check we have enough data
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    return false;
+  if (strict && nbits != DENON_BITS)
+    return false;
 
-	// Check we have the right amount of data
-	if (results->rawlen != 1 + 2 + (2 * DENON_BITS) + 1) {
-	  return false;
-	}
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
 
-	// Check initial Mark+Space match
-	if (!matchMark (results->rawbuf[offset++], DENON_HDR_MARK )) {
-	  return false;
-	}
-	if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE)) {
-	  return false;
-	}
+  // Header
+  if (!matchMark(results->rawbuf[offset++], DENON_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
+    return false;
+  // Data
+  for (int i = 0; i < nbits; i++) {
+    if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE))
+      data = (data << 1);  // 0
+    else
+      return false;
+    offset++;
+  }
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+    return false;
 
-	// Read the bits in
-	for (int i = 0;  i < DENON_BITS;  i++) {
-		// Each bit looks like: DENON_MARK + DENON_SPACE_1 -> 1
-		//                 or : DENON_MARK + DENON_SPACE_0 -> 0
-		if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK)) {
-		  return false;
-		}
-
-		// IR data is big-endian, so we shuffle it in from the right:
-		if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE)) {
-		  data = (data << 1) | 1;
-		} else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE)) {
-		  data = (data << 1) | 0;
-		} else {
-		  return false;
-		}
-		offset++;
-	}
-
-	// Success
-  results->bits = DENON_BITS;
-	results->value = data;
-	results->decode_type = DENON;
-	return true;
+  // Success
+  results->bits = nbits;
+  results->value = data;
+  results->decode_type = DENON;
+  results->address = 0;
+  results->command = 0;
+  return true;
 }
 
 // Decode the supplied DISH NETWORK message.

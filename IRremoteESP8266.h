@@ -146,7 +146,8 @@ public:
   // COOLIX decode is not implemented yet
   //  bool decodeCOOLIX(decode_results *results);
   bool decodeDaikin(decode_results *results);
-  bool decodeDenon(decode_results *results);
+  bool decodeDenon(decode_results *results, uint16_t nbits=DENON_BITS,
+                   bool strict=true);
   bool decodeDISH(decode_results *results, uint16_t nbits=DISH_BITS,
                   bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
@@ -199,9 +200,13 @@ public:
   unsigned long encodeLG(uint8_t address, uint16_t command);
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
-  // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=0 for backward compatiblity.
-  void sendSony(unsigned long data, int nbits, unsigned int repeat=0);
+  // Legacy use of this procedure was to only send a single code so call it with
+  // repeat=0 for backward compatiblity. As of v2.0 it defaults to sending
+  // a Sony command that will be accepted be a device.
+  void sendSony(unsigned long long data, unsigned int nbits=20,
+                unsigned int repeat=2);
+  unsigned long encodeSony(unsigned int nbits, unsigned int command,
+                           unsigned int address, unsigned int extended=0);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
   //  void sendMitsubishi(unsigned long data, int nbits);
@@ -232,17 +237,19 @@ public:
                    unsigned int repeat=0);
   unsigned long encodeSAMSUNG(uint8_t customer, uint8_t command);
   void sendDaikin(unsigned char data[]);
-  void sendDenon(unsigned long data, int nbits=14);
+  void sendDenon(unsigned long long data, unsigned int nbits=DENON_BITS,
+                 unsigned int repeat=0);
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
-  void enableIROut(unsigned int khz, uint8_t duty=50);
+  void enableIROut(unsigned long freq, uint8_t duty=50);
   VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);
 private:
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
   int IRpin;
+  uint32_t calcUSecPeriod(uint32_t hz);
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace,
                 uint16_t zeromark, uint32_t zerospace,
