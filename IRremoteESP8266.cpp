@@ -30,6 +30,7 @@
  * Kelvinator A/C and Sherwood added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
+ * DISH decode by marcosamarinho
  *
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
  *   sending IR code on ESP8266
@@ -820,19 +821,33 @@ void ICACHE_FLASH_ATTR IRsend::sendSharp(unsigned int address,
   sendSharpRaw((address << 10) | (command << 2) | 2, 15);
 }
 
-// Send an IR command to a DISH device.
-// Note: Typically a DISH device needs to get a command a total of at least 4
-//       times to accept it.
+// Send an IR command to a DISH NETWORK device.
+//
 // Args:
 //   data:   The contents of the command you want to send.
 //   nbits:  The bit size of the command being sent.
 //   repeat: The number of times you want the command to be repeated.
-void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long data, int nbits,
+//
+// Note:
+//   Dishplayer is a different protocol.
+//   Typically a DISH device needs to get a command a total of at least 4
+//   times to accept it. e.g. repeat=3
+//   DISH support by Todd Treece (http://unionbridge.org/design/ircommand)
+//
+//   Here is the LIRC file I found that seems to match the remote codes from the
+//   oscilloscope:
+//     DISH NETWORK (echostar 301):
+//     http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
+//
+// Ref:
+//   http://www.hifi-remote.com/wiki/index.php?title=Dish
+void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long long data,
+                                        unsigned int nbits,
                                         unsigned int repeat) {
-  // Set IR carrier frequency
-  enableIROut(56);
+  // Set 57.6kHz IR carrier frequency, duty cycle is unknown.
+  enableIROut(58);
   // We always send a command, even for repeat=0, hence '<= repeat'.
-  for (unsigned int i = 0; i <= repeat; i++) {
+  for (uint16_t i = 0; i <= repeat; i++) {
     // Header
     mark(DISH_HDR_MARK);
     space(DISH_HDR_SPACE);
@@ -840,6 +855,7 @@ void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long data, int nbits,
     sendData(DISH_BIT_MARK, DISH_ONE_SPACE, DISH_BIT_MARK, DISH_ZERO_SPACE,
              data, nbits, true);
     // Footer
+    mark(DISH_BIT_MARK);
     space(DISH_RPT_SPACE);
   }
 }
@@ -1193,8 +1209,15 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Denon decode");
 #endif
-  if (decodeDenon(results))
+  if (decodeDenon(results)) {
     return true;
+  }
+#ifdef DEBUG
+  Serial.println("Attempting DISH decode");
+#endif
+  if (decodeDISH(results)) {
+    return true;
+  }
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -2233,6 +2256,69 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDenon(decode_results *results,
   return true;
 }
 
+// Decode the supplied DISH NETWORK message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. Typically DISH_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status:  ALPHA (untested and unconfirmed.)
+//
+// Note:
+//   Dishplayer is a different protocol.
+//   Typically a DISH device needs to get a command a total of at least 4
+//   times to accept it.
+// Ref:
+//   http://www.hifi-remote.com/wiki/index.php?title=Dish
+//   http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
+bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    return false;  // Not enough entries to be valid.
+  if (strict && nbits != DISH_BITS)
+    return false;  // Not strictly compliant.
+
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], DISH_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], DISH_HDR_SPACE))
+    return false;
+
+  // Data
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], DISH_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], DISH_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], DISH_ZERO_SPACE))
+      data = data << 1;  // 0
+    else
+      return false;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], DISH_HDR_MARK))
+    return false;
+  // The DISH protocol calls for a repeated message, so strictly speaking
+  // there should be a code following this. Only require it if we are set to
+  // strict matching.
+  if (strict && !matchSpace(results->rawbuf[offset], DISH_RPT_SPACE))
+    return false;
+
+  // Success
+  results->decode_type = DISH;
+  results->bits = nbits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
 
 /* -----------------------------------------------------------------------
  * hashdecode - decode an arbitrary IR code.
