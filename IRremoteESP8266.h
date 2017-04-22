@@ -71,7 +71,8 @@ enum decode_type_t {
   KELVINATOR,
   SHERWOOD,
   MITSUBISHI_AC,
-  RCMM
+  RCMM,
+  SANYO_LC7461
 };
 
 // Results returned from the decoder
@@ -128,7 +129,10 @@ public:
   bool decodeNEC(decode_results *results, uint16_t nbits=NEC_BITS,
                  bool strict=false);
   bool decodeSony(decode_results *results);
-  bool decodeSanyo(decode_results *results);
+  bool decodeSanyo(decode_results *results, uint16_t nbits=SANYO_SA8650B_BITS,
+                   bool strict=false);
+  bool decodeSanyoLC7461(decode_results *results,
+                         uint16_t nbits=SANYO_LC7461_BITS, bool strict=true);
   bool decodeMitsubishi(decode_results *results);
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
@@ -207,8 +211,12 @@ public:
                 unsigned int repeat=2);
   unsigned long encodeSony(unsigned int nbits, unsigned int command,
                            unsigned int address, unsigned int extended=0);
-  // Neither Sanyo nor Mitsubishi send is implemented yet
-  //  void sendSanyo(unsigned long data, int nbits);
+  unsigned long long encodeSanyoLC7461(unsigned int address,
+                                       unsigned int command);
+  void sendSanyoLC7461(unsigned long long data,
+                       unsigned int nbits=SANYO_LC7461_BITS,
+                       unsigned int repeat=0);
+  // Mitsubishi send is not implemented yet
   //  void sendMitsubishi(unsigned long data, int nbits);
   void sendRaw(unsigned int buf[], int len, int hz);
   void sendGC(unsigned int buf[], int len);
