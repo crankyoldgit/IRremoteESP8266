@@ -266,27 +266,44 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address,
 
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long data, int nbits) {
+// Send a Whynter message.
+//
+// Args:
+//   data: message to be sent.
+//   nbits: Nr. of bits of the message to be sent.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long long data,
+                                           unsigned int nbits,
+                                           unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
-  mark(WHYNTER_ZERO_MARK);
-  space(WHYNTER_ZERO_SPACE);
-  mark(WHYNTER_HDR_MARK);
-  space(WHYNTER_HDR_SPACE);
-  // Data
-  sendData(WHYNTER_ONE_MARK, WHYNTER_ONE_SPACE, WHYNTER_ZERO_MARK,
-           WHYNTER_ZERO_SPACE, data, nbits, true);
-  // Footer
-  mark(WHYNTER_ZERO_MARK);
-  space(WHYNTER_ZERO_SPACE);
+  IRtimer usecTimer = IRtimer();
+
+  for (uint16_t i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(WHYNTER_BIT_MARK);
+    space(WHYNTER_ZERO_SPACE);
+    mark(WHYNTER_HDR_MARK);
+    space(WHYNTER_HDR_SPACE);
+    // Data
+    sendData(WHYNTER_BIT_MARK, WHYNTER_ONE_SPACE, WHYNTER_BIT_MARK,
+             WHYNTER_ZERO_SPACE, data, nbits, true);
+    // Footer
+    mark(WHYNTER_BIT_MARK);
+    space(max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              WHYNTER_MIN_GAP));
+  }
 }
 
 // Send a Sony/SIRC(Serial Infra-Red Control) message.
 //
 // Args:
 //   data: message to be sent.
-//   nbits: Nr. of bits of the mesageto be sent.
+//   nbits: Nr. of bits of the message to be sent.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // sendSony() should typically be called with repeat=2 as Sony devices
@@ -1203,9 +1220,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Whynter decode");
 #endif
-  if (decodeWhynter(results)) {
+  if (decodeWhynter(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting Denon decode");
 #endif
@@ -1476,60 +1492,63 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results) {
-  long data = 0;
+// Decode the supplied Whynter message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results,
+                                             uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + 2 * HEADER + FOOTER)
+     return false;  // We don't have enough entries to possibly match.
 
-  if (results->rawlen < 2 * WHYNTER_BITS + 6) {
-     return false;
-  }
+  // Compliance
+  if (strict && nbits != WHYNTER_BITS)
+    return false;  // Incorrect nr. of bits per spec.
 
-  int offset = 1; // Skip first space
+  uint16_t offset = OFFSET_START;
 
-
-  // sequence begins with a bit mark and a zero space
-  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Header
+  // Sequence begins with a bit mark and a zero space
+  if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
     return false;
-  }
-  offset++;
-  if (!matchSpace(results->rawbuf[offset], WHYNTER_ZERO_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset++], WHYNTER_ZERO_SPACE))
     return false;
-  }
-  offset++;
-
   // header mark and space
-  if (!matchMark(results->rawbuf[offset], WHYNTER_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset++], WHYNTER_HDR_MARK))
     return false;
-  }
-  offset++;
-  if (!matchSpace(results->rawbuf[offset], WHYNTER_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset++], WHYNTER_HDR_SPACE))
     return false;
-  }
-  offset++;
 
-  // data bits
-  for (int i = 0; i < WHYNTER_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Data
+  uint64_t data = 0;
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (matchSpace(results->rawbuf[offset], WHYNTER_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset],WHYNTER_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (matchSpace(results->rawbuf[offset], WHYNTER_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], WHYNTER_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       return false;
-    }
-    offset++;
   }
 
-  // trailing mark
-  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Footer
+  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK))
     return false;
-  }
+
   // Success
-  results->bits = WHYNTER_BITS;
-  results->value = data;
   results->decode_type = WHYNTER;
+  results->bits = nbits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
