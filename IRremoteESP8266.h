@@ -141,7 +141,8 @@ public:
                  bool strict=true);
   bool decodeSAMSUNG(decode_results *results, uint16_t nbits=SAMSUNG_BITS,
                      bool strict=false);
-  bool decodeWhynter(decode_results *results);
+  bool decodeWhynter(decode_results *results, uint16_t nbits=WHYNTER_BITS,
+                     bool strict=true);
   bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
   //  bool decodeCOOLIX(decode_results *results);
@@ -191,7 +192,8 @@ public:
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
-  void sendWhynter(unsigned long data, int nbits);
+  void sendWhynter(unsigned long long data, unsigned int nbits=WHYNTER_BITS,
+                   unsigned int repeat=0);
   void sendNEC(unsigned long long data, unsigned int nbits=NEC_BITS,
                unsigned int repeat=0);
   unsigned long encodeNEC(unsigned int address, unsigned int command);
