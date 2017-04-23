@@ -123,12 +123,21 @@
 #define RCMM_TOLERANCE 10
 #define RCMM_EXCESS 50
 
-#define SHARP_BIT_MARK 245
-#define SHARP_ONE_SPACE 1805
-#define SHARP_ZERO_SPACE 795
-#define SHARP_GAP 600000
-#define SHARP_TOGGLE_MASK 0x3FF
-#define SHARP_RPT_SPACE 3000
+// Sharp period time = 1/38000Hz = 26.316 microseconds.
+// Ref:
+//   GlobalCache's IR Control Tower data.
+//   http://www.sbprojects.com/knowledge/ir/sharp.php
+#define SHARP_ADDRESS_BITS     5U
+#define SHARP_COMMAND_BITS     8U
+#define SHARP_BIT_MARK       316U  // 12 * T
+#define SHARP_ONE_SPACE     1684U  // 64 * T
+#define SHARP_ZERO_SPACE     684U  // 26 * T
+#define SHARP_GAP          43606U  // 1657 * T
+// Address(5) + Command(8) + Expansion(1) + Check(1)
+#define SHARP_BITS         SHARP_ADDRESS_BITS + SHARP_COMMAND_BITS + 2
+#define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
+#define SHARP_ADDRESS_MASK ((1 << SHARP_ADDRESS_BITS) - 1)
+#define SHARP_COMMAND_MASK ((1 << SHARP_COMMAND_BITS) - 1)
 
 // Ref:
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
@@ -182,7 +191,6 @@
 #define SAMSUNG_MIN_GAP   20000  // Completely made up figure.
 #define SAMSUNG_MIN_MESSAGE_LENGTH 108000UL
 
-#define SHARP_BITS 15
 #define DISH_BITS 16
 
 // Daikin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
