@@ -111,12 +111,13 @@ class IRrecv
 {
 public:
   IRrecv(int recvpin);
-  bool decode(decode_results *results);
+  bool decode(decode_results *results, irparams_t *save=NULL);
   void enableIRIn();
   void disableIRIn();
   void resume();
   private:
   // These are called by decode
+  void copyIrParams(irparams_t *dest);
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
   bool decodeNEC(decode_results *results);
   bool decodeSony(decode_results *results);
