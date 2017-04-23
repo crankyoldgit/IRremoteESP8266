@@ -19,6 +19,9 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
+ * Mitsubishi A/C added by crankyoldgit
+ *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
@@ -110,6 +113,7 @@ uint8_t calcLGChecksum(uint16_t data);
 #define SEND_PROTOCOL_DENON    case DENON: sendDenon(data, nbits); break;
 #define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
 #define SEND_PROTOCOL_RCMM     case RCMM: sendRCMM(data, nbits); break;
+#define SEND_PROTOCOL_MITSUBISHI case MITSUBISHI: sendMitsubishi(data, nbits); break;
 
 
 // main class for receiving IR
@@ -129,7 +133,8 @@ public:
                  bool strict=false);
   bool decodeSony(decode_results *results);
   bool decodeSanyo(decode_results *results);
-  bool decodeMitsubishi(decode_results *results);
+  bool decodeMitsubishi(decode_results *results, uint16_t nbits=MITSUBISHI_BITS,
+                        bool strict=false);
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
   bool decodeRCMM(decode_results *results);
@@ -174,7 +179,7 @@ class IRsend
 public:
   IRsend(int IRsendPin);
   void begin();
-  void send(int type, unsigned long data, int nbits) {
+  void send(unsigned int type, unsigned long long data, unsigned int nbits) {
     switch (type) {
         SEND_PROTOCOL_NEC
         SEND_PROTOCOL_SONY
@@ -189,6 +194,7 @@ public:
         SEND_PROTOCOL_DENON
         SEND_PROTOCOL_SHERWOOD
         SEND_PROTOCOL_RCMM
+        SEND_PROTOCOL_MITSUBISHI
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
@@ -209,9 +215,11 @@ public:
                 unsigned int repeat=2);
   unsigned long encodeSony(unsigned int nbits, unsigned int command,
                            unsigned int address, unsigned int extended=0);
-  // Neither Sanyo nor Mitsubishi send is implemented yet
+  // Sanyo send is not implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
-  //  void sendMitsubishi(unsigned long data, int nbits);
+  void sendMitsubishi(unsigned long long data,
+                      unsigned int nbits=MITSUBISHI_BITS,
+                      unsigned int repeat=MITSUBISHI_MIN_REPEAT);
   void sendRaw(unsigned int buf[], int len, int hz);
   void sendGC(unsigned int buf[], int len);
   void sendRC5(unsigned long data, int nbits);
