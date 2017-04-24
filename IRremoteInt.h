@@ -18,8 +18,9 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
- *     (based on https://github.com/r45635/HVAC-IR-Control)
+ *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200
@@ -79,15 +80,17 @@
 #define SANYO_DOUBLE_SPACE_USECS  800  // usually see 713 - not using ticks as get number wrapround
 #define SANYO_RPT_LENGTH 45000
 
-// Mitsubishi RM 75501
-// 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
-
-// #define MITSUBISHI_HDR_MARK	250  // seen range 3500
-#define MITSUBISHI_HDR_SPACE	350 //  7*50+100
-#define MITSUBISHI_ONE_MARK	1950 // 41*50-100
-#define MITSUBISHI_ZERO_MARK  750 // 17*50-100
-// #define MITSUBISHI_DOUBLE_SPACE_USECS  800  // usually ssee 713 - not using ticks as get number wrapround
-// #define MITSUBISHI_RPT_LENGTH 45000
+// Mitsubishi period time is 1/33000Hz = 30.303 uSeconds (T)
+// Ref:
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
+#define MITSUBISHI_BIT_MARK             303U  // T * 10
+#define MITSUBISHI_ONE_SPACE           2121U  // T * 70
+#define MITSUBISHI_ZERO_SPACE           909U  // T * 30
+#define MITSUBISHI_MIN_COMMAND_LENGTH 54121U  // T * 1786
+#define MITSUBISHI_MIN_GAP            28364U  // T * 936
+// TODO: Verify that the repeat is really needed.
+#define MITSUBISHI_MIN_REPEAT             1U  // Based on marcosamarinho's code.
 
 // Mitsubishi A/C
 // Values were initially obtained from:

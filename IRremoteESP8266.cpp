@@ -28,6 +28,7 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
@@ -1044,6 +1045,41 @@ void ICACHE_FLASH_ATTR IRsend::sendSherwood(unsigned long data, int nbits,
   sendNEC(data, nbits, max(1, repeat));
 }
 
+// Send a Mitsubishi message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically MITSUBISHI_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Status: ALPHA / untested.
+//
+// Notes:
+//   This protocol appears to have no header.
+// Ref:
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(unsigned long long data,
+                                              unsigned int nbits,
+                                              unsigned int repeat) {
+  enableIROut(33);  // Set IR carrier frequency
+  IRtimer usecTimer = IRtimer();
+
+  for (unsigned int i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // No header
+
+    // Data
+    sendData(MITSUBISHI_BIT_MARK, MITSUBISHI_ONE_SPACE,
+             MITSUBISHI_BIT_MARK, MITSUBISHI_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(MITSUBISHI_BIT_MARK);
+    space(max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              MITSUBISHI_MIN_GAP));
+  }
+}
+
 void ICACHE_FLASH_ATTR IRsend::sendMitsubishiAC(unsigned char data[]) {
   // Set IR carrier frequency
   enableIROut(38);
@@ -1252,9 +1288,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Mitsubishi decode");
 #endif
-  if (decodeMitsubishi(results)) {
+  if (decodeMitsubishi(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting RC5 decode");
 #endif
@@ -1700,69 +1735,59 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results) {
   return true;
 }
 
-// Looks like Sony except for timings, 48 chars of data and time/space different
-bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results) {
-  // Serial.print("?!? decoding Mitsubishi:");Serial.print(results->rawlen);
-  // Serial.print(" want "); Serial.println( 2 * MITSUBISHI_BITS + 2);
-  long data = 0;
-  if (results->rawlen < 2 * MITSUBISHI_BITS + 2) {
-    return false;
-  }
-  int offset = 1; // Skip first space
-  // Initial space
-  /* Put this back in for debugging - note can't use #DEBUG as if Debug on we
-     don't see the repeat cos of the delay
-  Serial.print("IR Gap: ");
-  Serial.println( results->rawbuf[offset]);
-  Serial.println( "test against:");
-  Serial.println(results->rawbuf[offset]);
-  */
-  /* Not seeing double keys from Mitsubishi
-  if (results->rawbuf[offset] < MITSUBISHI_DOUBLE_SPACE_USECS) {
-    // Serial.print("IR Gap found: ");
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = MITSUBISHI;
-    return true;
-  }
-  */
+// Decode the supplied Mitsubishi message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / previously working.
+//
+// Notes:
+//   This protocol appears to have no header.
+//
+// Ref:
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results,
+                                                uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + FOOTER)
+    return false;  // Shorter than shortest possibly expected.
+  if (strict && nbits != MITSUBISHI_BITS)
+    return false;  // Request is out of spec.
 
-  offset++;
+  uint16_t offset = OFFSET_START;
+  uint64_t data = 0;
 
-  // Typical
-  // 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
+  // No Header
 
-  // Initial Space
-  if (!matchMark(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
-  while (offset + 1 < irparams.rawlen) {
-    if (matchMark(results->rawbuf[offset], MITSUBISHI_ONE_MARK)) {
-
-      data = (data << 1) | 1;
-    } else if (matchMark(results->rawbuf[offset], MITSUBISHI_ZERO_MARK)) {
-      data <<= 1;
-    } else {
-      // Serial.println("A"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
+  // Data
+  uint16_t actualBits;
+  for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (!matchSpace(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
-      // Serial.println("B"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
+    if (matchSpace(results->rawbuf[offset], MITSUBISHI_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], MITSUBISHI_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       break;
-    }
-    offset++;
   }
+
+  // Footer is matched by the last iteration of the data loop.
+
+  // Compliance
+  if (strict && actualBits != nbits)
+    return false;  // Not as we expected.
 
   // Success
-  results->bits = (offset - 1) / 2;
-  if (results->bits < MITSUBISHI_BITS) {
-    results->bits = 0;
-    return false;
-  }
-  results->value = data;
   results->decode_type = MITSUBISHI;
+  results->bits = actualBits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
