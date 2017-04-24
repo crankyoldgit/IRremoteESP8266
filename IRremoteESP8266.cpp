@@ -24,7 +24,7 @@
  * Whynter A/C ARC-110WD added by Francesco Meschia
  * Global Cache IR format sender added by Hisham Khalifa
  *   (http://www.hishamkhalifa.com)
- * Coolix A/C / heatpump added by bakrus
+ * Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
@@ -120,39 +120,52 @@ void ICACHE_FLASH_ATTR IRsend::sendData(uint16_t onemark, uint32_t onespace,
   }
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long data, int nbits) {
+// Send a Coolix message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically COOLIX_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Status: BETA / Probably works.
+//
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp
+// TODO: Verify repeat functionality against a real unit.
+void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long long data,
+                                          unsigned int nbits,
+                                          unsigned int repeat) {
+  if (nbits % 8 != 0)
+    return;  // nbits is required to be a multiple of 8.
+
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
-  mark(COOLIX_HDR_MARK);
-  space(COOLIX_HDR_SPACE);
-  // Data
-  // Sending 3 bytes of data. Each byte first being sent straight, then followed
-  // by an inverted version.
-  unsigned long COOLIXmask;
-  bool invert = 0;  // Initializing
-  for (int j = 0; j < COOLIX_NBYTES * 2; j++) {
-    for (int i = nbits; i > nbits-8; i--) {
-      // Type cast necessary to perform correct for the one byte above 16bit
-      COOLIXmask = (unsigned long) 1 << (i-1);
-      if (data & COOLIXmask) {  // 1
-        mark(COOLIX_BIT_MARK);
-        space(COOLIX_ONE_SPACE);
-      } else {  // 0
-        mark(COOLIX_BIT_MARK);
-        space(COOLIX_ZERO_SPACE);
-      }
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Header
+    mark(COOLIX_HDR_MARK);
+    space(COOLIX_HDR_SPACE);
+
+    // Data
+    //   Break data into byte segments, starting at the Most Significant
+    //   Byte. Each byte then being sent normal, then followed inverted.
+    for (uint16_t i = 8; i <= nbits; i += 8) {
+      // Grab a bytes worth of data.
+      uint8_t segment = (data >> (nbits - i)) & 0xFF;
+      // Normal
+      sendData(COOLIX_BIT_MARK, COOLIX_ONE_SPACE,
+               COOLIX_BIT_MARK, COOLIX_ZERO_SPACE,
+               segment, 8, true);
+      // Inverted.
+      sendData(COOLIX_BIT_MARK, COOLIX_ONE_SPACE,
+               COOLIX_BIT_MARK, COOLIX_ZERO_SPACE,
+               segment ^ 0xFF, 8, true);
     }
-    // Inverts all of the data each time we need to send an inverted byte
-    data ^= 0xFFFFFFFF;
-    invert = !invert;
-    // Subtract 8 from nbits each time we switch to a new byte.
-    nbits -= invert ? 0 : 8;
+
+    // Footer
+    mark(COOLIX_BIT_MARK);
+    space(COOLIX_MIN_GAP);  // Pause before repeating
   }
-  // Footer
-  mark(COOLIX_BIT_MARK);
-  space(COOLIX_ZERO_SPACE);   // Stop bit (0)
-  space(COOLIX_HDR_SPACE);    // Pause before repeating
 }
 
 // Send a raw NEC(Renesas) formatted message.
@@ -1317,6 +1330,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #endif
   if (decodeSharp(results))
     return true;
+#ifdef DEBUG
+  Serial.println("Attempting Coolix decode");
+#endif
+  if (decodeCOOLIX(results))
+    return true;
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -1505,6 +1523,79 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results,
     results->address = address;  // Inverted, so it is normal NEC protocol.
   else  // Not inverted, so must be Extended NEC protocol, thus 16 bit address.
     results->address = data >> 16;  // Most significant four bytes.
+  return true;
+}
+
+// Decode the supplied Coolix message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically COOLIX_BITS.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / untested.
+bool ICACHE_FLASH_ATTR IRrecv::decodeCOOLIX(decode_results *results,
+                                            uint16_t nbits,
+                                            bool strict) {
+  // The protocol sends the data normal + inverted, alternating on
+  // each byte. Hence twice the number of expected data bits.
+  if (results->rawlen < 2 * 2 * nbits + HEADER + FOOTER)
+    return false;  // Can't possibly be a valid COOLIX message.
+  if (strict && nbits != COOLIX_BITS)
+    return false;  // Not strictly an COOLIX message.
+  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
+    return false;
+
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
+
+  if (nbits * 2 > sizeof(data) * 8)
+    return false;  // We can't possibly capture a Coolix packet that big.
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], COOLIX_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], COOLIX_HDR_SPACE))
+    return false;
+
+  // Data
+  // Twice as many bits as there are normal plus inverted bits.
+  for (uint16_t i = 0; i < nbits * 2; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], COOLIX_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
+      return false;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset], COOLIX_BIT_MARK))
+      return false;
+
+  // Data should now be (MSB to LSB) byte1,!byte1,byte2,!byte2,byte3,!byte3
+  // Decode, and verify if needed.
+  uint64_t result = 0;  // Build a new result for we destroy the existing data.
+  for (uint16_t i = 0; i < nbits; i += 8) {
+    uint8_t inverted = (data & 0xFF) ^ 0xFF;  // Un-invert the byte.
+    data >>= 8;
+    uint8_t normal = data & 0xFF;
+    data >>= 8;
+    if (strict && data != inverted)  // Compliance
+      return false; // The message doesn't verify.
+    result |= (normal << i);  // Add the byte in front of the previous result.
+  }
+
+  // Success
+  results->decode_type = COOLIX;
+  results->bits = nbits;
+  results->value = result;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
