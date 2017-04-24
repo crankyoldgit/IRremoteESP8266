@@ -114,7 +114,7 @@ uint8_t calcLGChecksum(uint16_t data);
 #define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
 #define SEND_PROTOCOL_RCMM     case RCMM: sendRCMM(data, nbits); break;
 #define SEND_PROTOCOL_MITSUBISHI case MITSUBISHI: sendMitsubishi(data, nbits); break;
-
+#define SEND_PROTOCOL_SHARP    case SHARP: sendSharpRaw(data, nbits); break;
 
 // main class for receiving IR
 class IRrecv
@@ -156,6 +156,8 @@ public:
                    bool strict=true);
   bool decodeDISH(decode_results *results, uint16_t nbits=DISH_BITS,
                   bool strict=true);
+  bool decodeSharp(decode_results *results, uint16_t nbits=SHARP_BITS,
+                   bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
@@ -195,6 +197,7 @@ public:
         SEND_PROTOCOL_SHERWOOD
         SEND_PROTOCOL_RCMM
         SEND_PROTOCOL_MITSUBISHI
+        SEND_PROTOCOL_SHARP
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
@@ -231,8 +234,14 @@ public:
   // so use repeat=0 for backward compatiblity.
   void sendDISH(unsigned long long data, unsigned int nbits=DISH_BITS,
                 unsigned int repeat=DISH_MIN_REPEAT);
-  void sendSharp(unsigned int address, unsigned int command);
-  void sendSharpRaw(unsigned long data, int nbits);
+  unsigned long encodeSharp(unsigned int address, unsigned int command,
+                            unsigned int expansion=1, unsigned int check=0,
+                            bool MSBfirst=false);
+  void sendSharp(unsigned int address, unsigned int command,
+                 unsigned int nbits=SHARP_BITS,
+                 unsigned int repeat=0);
+  void sendSharpRaw(unsigned long long data, unsigned int nbits=SHARP_BITS,
+                    unsigned int repeat=0);
   void sendPanasonic64(unsigned long long data,
                        unsigned int nbits=PANASONIC_BITS,
                        unsigned int repeat=0);
