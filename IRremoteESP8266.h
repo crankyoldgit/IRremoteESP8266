@@ -132,7 +132,8 @@ public:
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
   bool decodeNEC(decode_results *results, uint16_t nbits=NEC_BITS,
                  bool strict=false);
-  bool decodeSony(decode_results *results);
+  bool decodeSony(decode_results *results, uint16_t nbits=SONY_MIN_BITS,
+                  bool strict=false);
   bool decodeSanyo(decode_results *results, uint16_t nbits=SANYO_SA8650B_BITS,
                    bool strict=false);
   bool decodeSanyoLC7461(decode_results *results,
@@ -155,7 +156,10 @@ public:
   bool decodeHash(decode_results *results);
   bool decodeCOOLIX(decode_results *results, uint16_t nbits=COOLIX_BITS,
                     bool strict=true);
-  bool decodeDaikin(decode_results *results);
+  /* DISABLED: This is not even finished code.
+  bool decodeDaikin(decode_results *results, uint16_t nbits=DAIKIN_BITS,
+                    bool strict=false);
+  */
   bool decodeDenon(decode_results *results, uint16_t nbits=DENON_BITS,
                    bool strict=true);
   bool decodeDISH(decode_results *results, uint16_t nbits=DISH_BITS,
@@ -231,8 +235,8 @@ public:
   void sendMitsubishi(unsigned long long data,
                       unsigned int nbits=MITSUBISHI_BITS,
                       unsigned int repeat=MITSUBISHI_MIN_REPEAT);
-  void sendRaw(unsigned int buf[], int len, int hz);
-  void sendGC(unsigned int buf[], int len);
+  void sendRaw(unsigned int buf[], unsigned int len, unsigned int hz);
+  void sendGC(unsigned int buf[], unsigned int len);
   void sendRC5(unsigned long data, int nbits);
   void sendRC6(unsigned long long data, unsigned int nbits, unsigned int repeat=0);
   void sendRCMM(uint32_t data, uint8_t nbits=24);
@@ -267,7 +271,8 @@ public:
   void sendDenon(unsigned long long data, unsigned int nbits=DENON_BITS,
                  unsigned int repeat=0);
   void sendKelvinator(unsigned char data[]);
-  void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
+  void sendSherwood(unsigned long long data, unsigned int nbits=SHERWOOD_BITS,
+                    unsigned int repeat=SHERWOOD_MIN_REPEAT);
   void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(unsigned long freq, uint8_t duty=50);
   VIRTUAL void mark(unsigned int usec);
