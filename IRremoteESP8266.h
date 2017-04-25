@@ -15,7 +15,7 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * LG added by Darryl Smith (based on the JVC protocol)
  * Whynter A/C ARC-110WD added by Francesco Meschia
- * Coolix A/C / heatpump added by bakrus
+ * Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
@@ -153,8 +153,8 @@ public:
   bool decodeWhynter(decode_results *results, uint16_t nbits=WHYNTER_BITS,
                      bool strict=true);
   bool decodeHash(decode_results *results);
-  // COOLIX decode is not implemented yet
-  //  bool decodeCOOLIX(decode_results *results);
+  bool decodeCOOLIX(decode_results *results, uint16_t nbits=COOLIX_BITS,
+                    bool strict=true);
   bool decodeDaikin(decode_results *results);
   bool decodeDenon(decode_results *results, uint16_t nbits=DENON_BITS,
                    bool strict=true);
@@ -204,7 +204,8 @@ public:
         SEND_PROTOCOL_SHARP
       }
   };
-  void sendCOOLIX(unsigned long data, int nbits);
+  void sendCOOLIX(unsigned long long data, unsigned int nbits=COOLIX_BITS,
+                  unsigned int repeat=0);
   void sendWhynter(unsigned long long data, unsigned int nbits=WHYNTER_BITS,
                    unsigned int repeat=0);
   void sendNEC(unsigned long long data, unsigned int nbits=NEC_BITS,

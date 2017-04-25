@@ -14,7 +14,7 @@
  *
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  * Whynter A/C ARC-110WD added by Francesco Meschia
- * Coolix A/C / heatpump added by bakrus
+ * Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C added by crankyoldgit
@@ -40,11 +40,12 @@
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
 // pulse parameters in usec
-#define COOLIX_BIT_MARK	560       // Approximately 21 cycles at 38kHz
-#define COOLIX_ONE_SPACE	COOLIX_BIT_MARK * 3
-#define COOLIX_ZERO_SPACE	COOLIX_BIT_MARK * 1
-#define COOLIX_HDR_MARK	COOLIX_BIT_MARK * 8
-#define COOLIX_HDR_SPACE	COOLIX_BIT_MARK * 8
+#define COOLIX_BIT_MARK   560U  // Approximately 21 cycles at 38kHz
+#define COOLIX_ONE_SPACE  COOLIX_BIT_MARK * 3
+#define COOLIX_ZERO_SPACE COOLIX_BIT_MARK * 1
+#define COOLIX_HDR_MARK   COOLIX_BIT_MARK * 8
+#define COOLIX_HDR_SPACE  COOLIX_BIT_MARK * 8
+#define COOLIX_MIN_GAP    COOLIX_HDR_SPACE + COOLIX_ZERO_SPACE
 
 #define WHYNTER_HDR_MARK             2850U
 #define WHYNTER_HDR_SPACE            2850U
@@ -296,7 +297,7 @@ extern volatile irparams_t irparams;
 #define LG_BITS 28
 #define SAMSUNG_BITS 32
 #define WHYNTER_BITS 32U
-#define COOLIX_NBYTES 3
+#define COOLIX_BITS 24
 #define DAIKIN_BITS 99
 
 #endif
