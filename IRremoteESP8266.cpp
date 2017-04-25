@@ -956,6 +956,89 @@ void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long long data,
   }
 }
 
+// Construct a Sanyo LC7461 message.
+//
+// Args:
+//   address: The 13 bit value of the address(Custom) portion of the protocol.
+//   command: The 8 bit value of the command(Key) portion of the protocol.
+// Returns:
+//   An unsigned long long with the encoded raw 42 bit Sanyo LC7461 data value.
+//
+// Notes:
+//   This protocol uses the NEC protocol timings. However, data is
+//   formatted as : address(13 bits), !address, command (8 bits), !command.
+//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+unsigned long long encodeSanyoLC7461(unsigned int address,
+                                     unsigned int command) {
+  // Mask our input values to ensure the correct bit sizes.
+  address &= SANYO_LC7461_ADDRESS_MASK;
+  command &= SANYO_LC7461_COMMAND_MASK;
+
+  unsigned long long data = address;
+  address ^= SANYO_LC7461_ADDRESS_MASK;  // Invert the 13 LSBs.
+  // Append the now inverted address.
+  data = (data << SANYO_LC7461_ADDRESS_BITS) | address;
+  // Append the command.
+  data = (data << SANYO_LC7461_COMMAND_BITS) | command;
+  command ^= SANYO_LC7461_COMMAND_MASK;  // Invert the command.
+  // Append the now inverted command.
+  data = (data << SANYO_LC7461_COMMAND_BITS) | command;
+
+  return data;
+}
+
+// Send a Sanyo LC7461 message.
+//
+// Args:
+//   data:   The contents of the command you want to send.
+//   nbits:  The bit size of the command being sent.
+//   repeat: The number of times you want the command to be repeated.
+//
+// Status: ALPHA / untested.
+//
+// Notes:
+//   Based on @marcosamarinho's work.
+//   This protocol uses the NEC protocol timings. However, data is
+//   formatted as : address(13 bits), !address, command (8 bits), !command.
+//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+//   Information for this protocol is available at the Sanyo LC7461 datasheet.
+//   Repeats are performed similar to the NEC method of sending a special
+//   repeat message, rather than duplicating the entire message.
+// Ref:
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+void IRsend::sendSanyoLC7461(unsigned long long data, unsigned int nbits,
+                             unsigned int repeat) {
+  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(38, 33);
+  IRtimer usecTimer = IRtimer();
+
+  // Header
+  mark(SANYO_LC7461_HDR_MARK);
+  space(SANYO_LC7461_HDR_SPACE);
+  // Data
+  sendData(SANYO_LC7461_BIT_MARK, SANYO_LC7461_ONE_SPACE,
+           SANYO_LC7461_BIT_MARK, SANYO_LC7461_ZERO_SPACE, data, nbits, true);
+  // Footer
+  mark(SANYO_LC7461_BIT_MARK);
+  space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+            SANYO_LC7461_MIN_GAP));
+
+  // Repeat
+  // Similar to the NEC protocol, sending a special repeat message to indicate
+  // a repeat, rather than duplicating the entire message.
+  for (uint16_t i = 0; i < repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(SANYO_LC7461_HDR_MARK);
+    space(SANYO_LC7461_HDR_SPACE);
+    // Footer
+    mark(SANYO_LC7461_BIT_MARK);
+    space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              SANYO_LC7461_MIN_GAP));
+  }
+}
+
 // From https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 void ICACHE_FLASH_ATTR IRsend::sendDaikin(unsigned char data[]) {
   // Args:
@@ -1250,7 +1333,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
     return false;
   }
 
-  bool resummed = false;  // Flag indicating if we have resummed.
+  bool resumed = false;  // Flag indicating if we have resumed.
 
   if (save == NULL) {
     // We haven't been asked to copy it so use the existing memory.
@@ -1260,13 +1343,22 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
   } else {
     copyIrParams(save);  // Duplicate the interrupt's memory.
     resume();  // It's now safe to rearm. The IR message won't be overridden.
-    resummed = true;
+    resumed = true;
     // Point the results at the saved copy.
     results->rawbuf = save->rawbuf;
     results->rawlen = save->rawlen;
     results->overflow = save->overflow;
   }
 
+#ifdef DEBUG
+  Serial.println("Attempting Sanyo LC7461 decode");
+#endif
+  // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
+  // similar in timings & structure, but the Sanyo one is much longer than the
+  // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
+  // reduce false detection as a NEC packet.
+  if (decodeSanyoLC7461(results))
+    return true;
 #ifdef DEBUG
   Serial.println("Attempting NEC decode");
 #endif
@@ -1278,13 +1370,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
   if (decodeSony(results)) {
     return true;
   }
-  /*
 #ifdef DEBUG
-  Serial.println("Attempting Sanyo decode");
+  Serial.println("Attempting Sanyo SA8650B decode");
 #endif
-  if (decodeSanyo(results)) {
+  if (decodeSanyo(results))
     return true;
-  }*/
 #ifdef DEBUG
   Serial.println("Attempting Mitsubishi decode");
 #endif
@@ -1359,7 +1449,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
     return true;
   }
   // Throw away and start over
-  if (!resummed)  // Check if we have already resummed.
+  if (!resumed)  // Check if we have already resumed.
     resume();
   return false;
 }
@@ -1670,68 +1760,155 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results,
   return true;
 }
 
-// I think this is a Sanyo decoder - serial = SA 8650B
-// Looks like Sony except for timings, 48 chars of data and time/space different
-bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results) {
-  long data = 0;
-  if (results->rawlen < 2 * SANYO_BITS + 2) {
+// Decode the supplied SANYO LC7461 message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / untested.
+//
+// Notes:
+//   Based on @marcosamarinho's work.
+//   This protocol uses the NEC protocol timings. However, data is
+//   formatted as : address(13 bits), !address, command (8 bits), !command.
+//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+//   Information for this protocol is available at the Sanyo LC7461 datasheet.
+// Ref:
+//   http://slydiman.narod.ru/scr/kb/sanyo.htm
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+bool ICACHE_FLASH_ATTR IRrecv::decodeSanyoLC7461(decode_results *results,
+                                                 uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    return false;  // Shorter than the shortest expected.
+  if (strict && nbits != SANYO_LC7461_BITS)
+    return false;  // Not strictly in spec.
+
+  uint16_t offset = OFFSET_START;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], SANYO_LC7461_HDR_MARK))
     return false;
-  }
-  int offset = 1; // Skip first space
-
-
-  // Initial space
-  /* Put this back in for debugging - note can't use #DEBUG as if Debug on we don't see the repeat cos of the delay
-  Serial.print("IR Gap: ");
-  Serial.println( results->rawbuf[offset]);
-  Serial.println( "test against:");
-  Serial.println(results->rawbuf[offset]);
-  */
-
-  if (results->rawbuf[offset] < SANYO_DOUBLE_SPACE_USECS) {
-    // Serial.print("IR Gap found: ");
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = SANYO;
-    return true;
-  }
-  offset++;
-
-  // Initial mark
-  if (!matchMark(results->rawbuf[offset], SANYO_HDR_MARK)) {
+  if (!matchSpace(results->rawbuf[offset++], SANYO_LC7461_HDR_SPACE))
     return false;
-  }
-  offset++;
 
-  // Skip Second Mark
-  if (!matchMark(results->rawbuf[offset], SANYO_HDR_MARK)) {
-    return false;
-  }
-  offset++;
-
-  while (offset + 1 < irparams.rawlen) {
-    if (!matchSpace(results->rawbuf[offset], SANYO_HDR_SPACE)) {
-      break;
-    }
-    offset++;
-    if (matchMark(results->rawbuf[offset], SANYO_ONE_MARK)) {
-      data = (data << 1) | 1;
-    } else if (matchMark(results->rawbuf[offset], SANYO_ZERO_MARK)) {
-      data <<= 1;
-    } else {
+  // Data
+  uint64_t data = 0;
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], SANYO_LC7461_BIT_MARK))
       return false;
-    }
-    offset++;
+    if (matchSpace(results->rawbuf[offset], SANYO_LC7461_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], SANYO_LC7461_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
+      return false;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset], SANYO_LC7461_BIT_MARK))
+    return false;
+
+  // Bits 30 to 42+.
+  uint16_t address = data >> (SANYO_LC7461_BITS - SANYO_LC7461_ADDRESS_BITS);
+  // Bits 9 to 16.
+  uint8_t command = (data >> SANYO_LC7461_COMMAND_BITS) &
+                    SANYO_LC7461_COMMAND_MASK;
+
+  if (strict) {  // Compliance
+    uint16_t inverted_address = (data >> (SANYO_LC7461_COMMAND_BITS * 2)) &
+                                SANYO_LC7461_ADDRESS_MASK;  // Bits 17 to 29.
+    uint8_t inverted_command = data & SANYO_LC7461_COMMAND_MASK;  // Bits 1-8.
+    if ((results->address ^ SANYO_LC7461_ADDRESS_MASK) != inverted_address)
+      return false;  // Address integrity check failed.
+    if ((results->command ^ SANYO_LC7461_COMMAND_MASK) != inverted_command)
+      return false;  // Command integrity check failed.
   }
 
   // Success
-  results->bits = (offset - 1) / 2;
-  if (results->bits < 12) {
-    results->bits = 0;
-    return false;
-  }
+  results->decode_type = SANYO_LC7461;
+  results->bits = nbits;
   results->value = data;
+  results->address = address;
+  results->command = command;
+  return true;
+}
+
+// Decode the supplied Sanyo SA 8650B message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: Depricated.
+//
+// Note:
+//   I think this is a Sanyo decoder - serial = SA 8650B
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
+//
+// TODO: This decoder looks like rubbish. Only keeping it for compatiblity
+//       with the Arduino IRremote library. Seriously, don't trust it.
+//       If someone has a device that this is supposed to be for, please log an
+//       Issue on github with a rawData dump please. We should probably remove
+//       it.
+bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
+                                           uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER)
+    return false;  // Shorter than shortest possible.
+  if (strict && nbits != SANYO_SA8650B_BITS)
+    return false;  // Doesn't match the spec.
+
+  uint16_t offset = 0;
+
+  // TODO: This repeat code looks like garbage, it should never match or if
+  //       it does, it won't be reliable. We should probably just remove it.
+  if (results->rawbuf[offset++] < SANYO_SA8650B_DOUBLE_SPACE_USECS) {
+    results->bits = 0;
+    results->value = REPEAT;
+    results->decode_type = SANYO;
+    results->address = 0;
+    results->command = 0;
+    return true;
+  }
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], SANYO_SA8650B_HDR_MARK))
+    return false;
+  // TODO: These next two lines look very wrong. Treat as suspect.
+  if (!matchMark(results->rawbuf[offset++], SANYO_SA8650B_HDR_MARK))
+    return false;
+  // Data
+  uint64_t data = 0;
+  while (offset + 1 < results->rawlen) {
+    if (!matchSpace(results->rawbuf[offset], SANYO_SA8650B_HDR_SPACE))
+      break;
+    offset++;
+    if (matchMark(results->rawbuf[offset], SANYO_SA8650B_ONE_MARK))
+      data = (data << 1) | 1;  // 1
+    else if (matchMark(results->rawbuf[offset], SANYO_SA8650B_ZERO_MARK))
+      data <<= 1;  // 0
+    else
+      return false;
+    offset++;
+  }
+
+  if (strict && SANYO_SA8650B_BITS > (offset - 1) / 2 )
+    return false;
+
+  // Success
+  results->bits = (offset - 1) / 2;
   results->decode_type = SANYO;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 

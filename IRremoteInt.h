@@ -72,13 +72,32 @@
 #define SONY_RPT_LENGTH 45000
 #define SONY_MIN_GAP    10000
 
-// SA 8650B
-#define SANYO_HDR_MARK	3500  // seen range 3500
-#define SANYO_HDR_SPACE	950 //  seen 950
-#define SANYO_ONE_MARK	2400 // seen 2400
-#define SANYO_ZERO_MARK 700 //  seen 700
-#define SANYO_DOUBLE_SPACE_USECS  800  // usually see 713 - not using ticks as get number wrapround
-#define SANYO_RPT_LENGTH 45000
+// Sanyo SA 8650B
+// Ref: https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
+#define SANYO_SA8650B_HDR_MARK          3500U  // seen range 3500
+#define SANYO_SA8650B_HDR_SPACE          950U  // seen 950
+#define SANYO_SA8650B_ONE_MARK          2400U  // seen 2400
+#define SANYO_SA8650B_ZERO_MARK          700U  // seen 700
+#define SANYO_SA8650B_DOUBLE_SPACE_USECS 800U  // usually see 713 - not using ticks as get number wrapround
+#define SANYO_SA8650B_RPT_LENGTH       45000U
+
+// Sanyo LC7461
+// Ref:
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+//   http://slydiman.narod.ru/scr/kb/sanyo.htm
+//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+#define SANYO_LC7461_ADDRESS_BITS           13U
+#define SANYO_LC7461_COMMAND_BITS            8U
+#define SANYO_LC7461_BITS ((SANYO_LC7461_ADDRESS_BITS + SANYO_LC7461_COMMAND_BITS) * 2)
+#define SANYO_LC7461_ADDRESS_MASK ((1 << SANYO_LC7461_ADDRESS_BITS) - 1)
+#define SANYO_LC7461_COMMAND_MASK ((1 << SANYO_LC7461_COMMAND_BITS) - 1)
+#define SANYO_LC7461_HDR_MARK             9000U
+#define SANYO_LC7461_HDR_SPACE            4500U
+#define SANYO_LC7461_BIT_MARK              560U  // 1T
+#define SANYO_LC7461_ONE_SPACE            1690U  // 3T
+#define SANYO_LC7461_ZERO_SPACE            560U  // 1T
+#define SANYO_LC7461_MIN_COMMAND_LENGTH 108000UL
+#define SANYO_LC7461_MIN_GAP SANYO_LC7461_MIN_COMMAND_LENGTH - (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + SANYO_LC7461_BITS * (SANYO_LC7461_BIT_MARK + (SANYO_LC7461_ONE_SPACE + SANYO_LC7461_ZERO_SPACE) / 2) + SANYO_LC7461_BIT_MARK)
 
 // Mitsubishi period time is 1/33000Hz = 30.303 uSeconds (T)
 // Ref:
@@ -223,11 +242,11 @@
 #define KELVINATOR_CMD_FOOTER	2U
 
 // Some useful constants
-#define USECPERTICK 50  // microseconds per clock interrupt tick
-#define RAWBUF 100 // Length of raw duration buffer
-#define HEADER 2  // Usual nr. of header entries.
-#define FOOTER 2  // Usual nr. of footer (stop bits) entries.
-#define OFFSET_START 1  // Usual rawbuf entry to start processing from.
+#define USECPERTICK 50U  // microseconds per clock interrupt tick
+#define RAWBUF 100U // Length of raw duration buffer
+#define HEADER 2U  // Usual nr. of header entries.
+#define FOOTER 2U  // Usual nr. of footer (stop bits) entries.
+#define OFFSET_START 1U  // Usual rawbuf entry to start processing from.
 
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
@@ -268,7 +287,7 @@ extern volatile irparams_t irparams;
 
 #define NEC_BITS 32
 #define SONY_MIN_BITS 12
-#define SANYO_BITS 12
+#define SANYO_SA8650B_BITS 12U
 #define MITSUBISHI_BITS 16
 #define MIN_RC5_SAMPLES 11
 #define MIN_RC6_SAMPLES 1

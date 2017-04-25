@@ -57,6 +57,7 @@ void encoding(decode_results *results) {
     case SHARP:        Serial.print("SHARP");         break ;
     case JVC:          Serial.print("JVC");           break ;
     case SANYO:        Serial.print("SANYO");         break ;
+    case SANYO_LC7461: Serial.print("SANYO_LC7461");  break ;
     case MITSUBISHI:   Serial.print("MITSUBISHI");    break ;
     case SAMSUNG:      Serial.print("SAMSUNG");       break ;
     case LG:           Serial.print("LG");            break ;
