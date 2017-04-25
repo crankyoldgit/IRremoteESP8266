@@ -19,6 +19,9 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
+ * Mitsubishi A/C added by crankyoldgit
+ *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
@@ -111,7 +114,8 @@ uint8_t calcLGChecksum(uint16_t data);
 #define SEND_PROTOCOL_DENON    case DENON: sendDenon(data, nbits); break;
 #define SEND_PROTOCOL_SHERWOOD case SHERWOOD: sendSherwood(data, nbits); break;
 #define SEND_PROTOCOL_RCMM     case RCMM: sendRCMM(data, nbits); break;
-
+#define SEND_PROTOCOL_MITSUBISHI case MITSUBISHI: sendMitsubishi(data, nbits); break;
+#define SEND_PROTOCOL_SHARP    case SHARP: sendSharpRaw(data, nbits); break;
 
 // main class for receiving IR
 class IRrecv
@@ -133,7 +137,8 @@ public:
                    bool strict=false);
   bool decodeSanyoLC7461(decode_results *results,
                          uint16_t nbits=SANYO_LC7461_BITS, bool strict=true);
-  bool decodeMitsubishi(decode_results *results);
+  bool decodeMitsubishi(decode_results *results, uint16_t nbits=MITSUBISHI_BITS,
+                        bool strict=false);
   bool decodeRC5(decode_results *results);
   bool decodeRC6(decode_results *results);
   bool decodeRCMM(decode_results *results);
@@ -145,7 +150,8 @@ public:
                  bool strict=true);
   bool decodeSAMSUNG(decode_results *results, uint16_t nbits=SAMSUNG_BITS,
                      bool strict=false);
-  bool decodeWhynter(decode_results *results);
+  bool decodeWhynter(decode_results *results, uint16_t nbits=WHYNTER_BITS,
+                     bool strict=true);
   bool decodeHash(decode_results *results);
   // COOLIX decode is not implemented yet
   //  bool decodeCOOLIX(decode_results *results);
@@ -154,6 +160,8 @@ public:
                    bool strict=true);
   bool decodeDISH(decode_results *results, uint16_t nbits=DISH_BITS,
                   bool strict=true);
+  bool decodeSharp(decode_results *results, uint16_t nbits=SHARP_BITS,
+                   bool strict=true);
   int compare(unsigned int oldval, unsigned int newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance=TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance=TOLERANCE);
@@ -177,7 +185,7 @@ class IRsend
 public:
   IRsend(int IRsendPin);
   void begin();
-  void send(int type, unsigned long data, int nbits) {
+  void send(unsigned int type, unsigned long long data, unsigned int nbits) {
     switch (type) {
         SEND_PROTOCOL_NEC
         SEND_PROTOCOL_SONY
@@ -192,10 +200,13 @@ public:
         SEND_PROTOCOL_DENON
         SEND_PROTOCOL_SHERWOOD
         SEND_PROTOCOL_RCMM
+        SEND_PROTOCOL_MITSUBISHI
+        SEND_PROTOCOL_SHARP
       }
   };
   void sendCOOLIX(unsigned long data, int nbits);
-  void sendWhynter(unsigned long data, int nbits);
+  void sendWhynter(unsigned long long data, unsigned int nbits=WHYNTER_BITS,
+                   unsigned int repeat=0);
   void sendNEC(unsigned long long data, unsigned int nbits=NEC_BITS,
                unsigned int repeat=0);
   unsigned long encodeNEC(unsigned int address, unsigned int command);
@@ -216,8 +227,9 @@ public:
   void sendSanyoLC7461(unsigned long long data,
                        unsigned int nbits=SANYO_LC7461_BITS,
                        unsigned int repeat=0);
-  // Mitsubishi send is not implemented yet
-  //  void sendMitsubishi(unsigned long data, int nbits);
+  void sendMitsubishi(unsigned long long data,
+                      unsigned int nbits=MITSUBISHI_BITS,
+                      unsigned int repeat=MITSUBISHI_MIN_REPEAT);
   void sendRaw(unsigned int buf[], int len, int hz);
   void sendGC(unsigned int buf[], int len);
   void sendRC5(unsigned long data, int nbits);
@@ -229,8 +241,14 @@ public:
   // so use repeat=0 for backward compatiblity.
   void sendDISH(unsigned long long data, unsigned int nbits=DISH_BITS,
                 unsigned int repeat=DISH_MIN_REPEAT);
-  void sendSharp(unsigned int address, unsigned int command);
-  void sendSharpRaw(unsigned long data, int nbits);
+  unsigned long encodeSharp(unsigned int address, unsigned int command,
+                            unsigned int expansion=1, unsigned int check=0,
+                            bool MSBfirst=false);
+  void sendSharp(unsigned int address, unsigned int command,
+                 unsigned int nbits=SHARP_BITS,
+                 unsigned int repeat=0);
+  void sendSharpRaw(unsigned long long data, unsigned int nbits=SHARP_BITS,
+                    unsigned int repeat=0);
   void sendPanasonic64(unsigned long long data,
                        unsigned int nbits=PANASONIC_BITS,
                        unsigned int repeat=0);

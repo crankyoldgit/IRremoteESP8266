@@ -18,8 +18,9 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
- *     (based on https://github.com/r45635/HVAC-IR-Control)
+ *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
  *
  * 09/23/2015 : Samsung pulse parameters updated by Sebastien Warin to be compatible with EUxxD6200
@@ -45,13 +46,13 @@
 #define COOLIX_HDR_MARK	COOLIX_BIT_MARK * 8
 #define COOLIX_HDR_SPACE	COOLIX_BIT_MARK * 8
 
-#define WHYNTER_HDR_MARK	2850
-#define WHYNTER_HDR_SPACE	2850
-#define WHYNTER_BIT_MARK	750
-#define WHYNTER_ONE_MARK	750
-#define WHYNTER_ONE_SPACE	2150
-#define WHYNTER_ZERO_MARK	750
-#define WHYNTER_ZERO_SPACE	750
+#define WHYNTER_HDR_MARK             2850U
+#define WHYNTER_HDR_SPACE            2850U
+#define WHYNTER_BIT_MARK              750U
+#define WHYNTER_ONE_SPACE            2150U
+#define WHYNTER_ZERO_SPACE            750U
+#define WHYNTER_MIN_COMMAND_LENGTH 108000UL  // Completely made up value.
+#define WHYNTER_MIN_GAP WHYNTER_MIN_COMMAND_LENGTH - 2 * (WHYNTER_BIT_MARK + WHYNTER_ZERO_SPACE) - WHYNTER_BITS * (WHYNTER_BIT_MARK + WHYNTER_ONE_SPACE)
 
 #define NEC_HDR_MARK             9000
 #define NEC_HDR_SPACE            4500
@@ -98,15 +99,17 @@
 #define SANYO_LC7461_MIN_COMMAND_LENGTH 108000UL
 #define SANYO_LC7461_MIN_GAP SANYO_LC7461_MIN_COMMAND_LENGTH - (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + SANYO_LC7461_BITS * (SANYO_LC7461_BIT_MARK + (SANYO_LC7461_ONE_SPACE + SANYO_LC7461_ZERO_SPACE) / 2) + SANYO_LC7461_BIT_MARK)
 
-// Mitsubishi RM 75501
-// 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
-
-// #define MITSUBISHI_HDR_MARK	250  // seen range 3500
-#define MITSUBISHI_HDR_SPACE	350 //  7*50+100
-#define MITSUBISHI_ONE_MARK	1950 // 41*50-100
-#define MITSUBISHI_ZERO_MARK  750 // 17*50-100
-// #define MITSUBISHI_DOUBLE_SPACE_USECS  800  // usually ssee 713 - not using ticks as get number wrapround
-// #define MITSUBISHI_RPT_LENGTH 45000
+// Mitsubishi period time is 1/33000Hz = 30.303 uSeconds (T)
+// Ref:
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
+#define MITSUBISHI_BIT_MARK             303U  // T * 10
+#define MITSUBISHI_ONE_SPACE           2121U  // T * 70
+#define MITSUBISHI_ZERO_SPACE           909U  // T * 30
+#define MITSUBISHI_MIN_COMMAND_LENGTH 54121U  // T * 1786
+#define MITSUBISHI_MIN_GAP            28364U  // T * 936
+// TODO: Verify that the repeat is really needed.
+#define MITSUBISHI_MIN_REPEAT             1U  // Based on marcosamarinho's code.
 
 // Mitsubishi A/C
 // Values were initially obtained from:
@@ -142,12 +145,21 @@
 #define RCMM_TOLERANCE 10
 #define RCMM_EXCESS 50
 
-#define SHARP_BIT_MARK 245
-#define SHARP_ONE_SPACE 1805
-#define SHARP_ZERO_SPACE 795
-#define SHARP_GAP 600000
-#define SHARP_TOGGLE_MASK 0x3FF
-#define SHARP_RPT_SPACE 3000
+// Sharp period time = 1/38000Hz = 26.316 microseconds.
+// Ref:
+//   GlobalCache's IR Control Tower data.
+//   http://www.sbprojects.com/knowledge/ir/sharp.php
+#define SHARP_ADDRESS_BITS     5U
+#define SHARP_COMMAND_BITS     8U
+#define SHARP_BIT_MARK       316U  // 12 * T
+#define SHARP_ONE_SPACE     1684U  // 64 * T
+#define SHARP_ZERO_SPACE     684U  // 26 * T
+#define SHARP_GAP          43606U  // 1657 * T
+// Address(5) + Command(8) + Expansion(1) + Check(1)
+#define SHARP_BITS         SHARP_ADDRESS_BITS + SHARP_COMMAND_BITS + 2
+#define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
+#define SHARP_ADDRESS_MASK ((1 << SHARP_ADDRESS_BITS) - 1)
+#define SHARP_COMMAND_MASK ((1 << SHARP_COMMAND_BITS) - 1)
 
 // Ref:
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
@@ -201,7 +213,6 @@
 #define SAMSUNG_MIN_GAP   20000  // Completely made up figure.
 #define SAMSUNG_MIN_MESSAGE_LENGTH 108000UL
 
-#define SHARP_BITS 15
 #define DISH_BITS 16
 
 // Daikin, from https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -284,7 +295,7 @@ extern volatile irparams_t irparams;
 #define JVC_BITS 16
 #define LG_BITS 28
 #define SAMSUNG_BITS 32
-#define WHYNTER_BITS 32
+#define WHYNTER_BITS 32U
 #define COOLIX_NBYTES 3
 #define DAIKIN_BITS 99
 

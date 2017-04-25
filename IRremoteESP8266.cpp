@@ -28,6 +28,7 @@
  * Denon: sendDenon, decodeDenon added by Massimiliano Pinto
  *   (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
+ * Mitsubishi (TV) sending added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
@@ -266,27 +267,44 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address,
 
 }
 
-void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long data, int nbits) {
+// Send a Whynter message.
+//
+// Args:
+//   data: message to be sent.
+//   nbits: Nr. of bits of the message to be sent.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long long data,
+                                           unsigned int nbits,
+                                           unsigned int repeat) {
   // Set IR carrier frequency
   enableIROut(38);
-  // Header
-  mark(WHYNTER_ZERO_MARK);
-  space(WHYNTER_ZERO_SPACE);
-  mark(WHYNTER_HDR_MARK);
-  space(WHYNTER_HDR_SPACE);
-  // Data
-  sendData(WHYNTER_ONE_MARK, WHYNTER_ONE_SPACE, WHYNTER_ZERO_MARK,
-           WHYNTER_ZERO_SPACE, data, nbits, true);
-  // Footer
-  mark(WHYNTER_ZERO_MARK);
-  space(WHYNTER_ZERO_SPACE);
+  IRtimer usecTimer = IRtimer();
+
+  for (uint16_t i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // Header
+    mark(WHYNTER_BIT_MARK);
+    space(WHYNTER_ZERO_SPACE);
+    mark(WHYNTER_HDR_MARK);
+    space(WHYNTER_HDR_SPACE);
+    // Data
+    sendData(WHYNTER_BIT_MARK, WHYNTER_ONE_SPACE, WHYNTER_BIT_MARK,
+             WHYNTER_ZERO_SPACE, data, nbits, true);
+    // Footer
+    mark(WHYNTER_BIT_MARK);
+    space(max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              WHYNTER_MIN_GAP));
+  }
 }
 
 // Send a Sony/SIRC(Serial Infra-Red Control) message.
 //
 // Args:
 //   data: message to be sent.
-//   nbits: Nr. of bits of the mesageto be sent.
+//   nbits: Nr. of bits of the message to be sent.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // sendSony() should typically be called with repeat=2 as Sony devices
@@ -774,51 +792,129 @@ void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned long freq, uint8_t duty) {
   offTimePeriod = period - onTimePeriod;
 }
 
+// Send a (raw) Sharp message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically SHARP_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Status: Beta / Previously working fine.
+//
+// Notes:
+//   This procedure handles the inversion of bits required per protocol.
+//   The protocol spec says to send the LSB first, but legacy code & usage
+//   has us sending the MSB first. Grrrr. Normal invocation of encodeSharp()
+//   handles this for you, assuming you are using the correct/standard values.
+//   e.g. sendSharpRaw(encodeSharp(address, command));
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/sharp.htm
+//   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
+//   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
+//   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
+void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(unsigned long long data,
+                                            unsigned int nbits,
+                                            unsigned int repeat) {
+  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
+  enableIROut(38, 33);
 
-/* Sharp and DISH support by Todd Treece
-( http://unionbridge.org/design/ircommand )
+  for (uint16_t i = 0; i <= repeat; i++) {
+    // Protocol demands that the data be sent twice; once normally,
+    // then with all but the address bits inverted.
+    // Note: Previously this used to be performed 3 times (normal, inverted,
+    //       normal), however all data points to that being incorrect.
+    for (uint8_t n = 0; n < 2; n++) {
+      // No Header
 
-The Dish send function needs to be repeated 4 times, and the Sharp function
-has the necessary repeat built in because of the need to invert the signal.
+      // Data
+      sendData(SHARP_BIT_MARK, SHARP_ONE_SPACE,
+               SHARP_BIT_MARK, SHARP_ZERO_SPACE,
+               data, nbits, true);
+      // Footer
+      mark(SHARP_BIT_MARK);
+      space(SHARP_GAP);
 
-Sharp protocol documentation:
-http://www.sbprojects.com/knowledge/ir/sharp.htm
-
-Here are the LIRC files that I found that seem to match the remote codes
-from the oscilloscope:
-
-Sharp LCD TV:
-http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
-
-DISH NETWORK (echostar 301):
-http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
-
-For the DISH codes, only send the last for characters of the hex.
-i.e. use 0x1C10 instead of 0x0000000000001C10 which is listed in the
-linked LIRC file.
-*/
-
-void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(unsigned long data, int nbits) {
-  // Set IR carrier frequency
-  enableIROut(38);
-  // Sending codes in bursts of 3 (normal, inverted, normal) makes transmission
-  // much more reliable. That's the exact behaviour of CD-S6470 remote control.
-  for (int n = 0; n < 3; n++) {
-    // Data
-    sendData(SHARP_BIT_MARK, SHARP_ONE_SPACE, SHARP_BIT_MARK, SHARP_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(SHARP_BIT_MARK);
-    space(SHARP_ZERO_SPACE + 40000);
-
-    data = data ^ SHARP_TOGGLE_MASK;
+      // Invert the data per protocol. This is always called twice, so it's
+      // retured to original upon exiting the inner loop.
+      data ^= SHARP_TOGGLE_MASK;
+    }
   }
 }
 
-// Sharp send compatible with data obtained through decodeSharp
+// Encode a (raw) Sharp message from it's components.
+//
+// Args:
+//   address:   The value of the address to be sent.
+//   command:   The value of the address to be sent. (8 bits)
+//   expansion: The value of the expansion bit to use. (0 or 1, typically 1)
+//   check:     The value of the check bit to use. (0 or 1, typically 0)
+//   MSBfirst:  Flag indicating MSB first or LSB first order. (Default: false)
+// Returns:
+//   An unsigned long containing the raw Sharp message for sendSharpRaw().
+//
+// Status: ALPHA / Untested
+//
+// Notes:
+//   Assumes the standard Sharp bit sizes.
+//   Historically sendSharp() sends address & command in
+//     MSB first order. This is actually incorrect. It should be sent in LSB
+//     order. The behaviour of sendSharp() hasn't been changed to maintain
+//     backward compatiblity.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/sharp.htm
+//   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
+//   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
+unsigned long ICACHE_FLASH_ATTR IRsend::encodeSharp(unsigned int address,
+                                                    unsigned int command,
+                                                    unsigned int expansion,
+                                                    unsigned int check,
+                                                    bool MSBfirst) {
+  // Mask any unexpected bits.
+  address &= ((1 << SHARP_ADDRESS_BITS) - 1);
+  command &= ((1 << SHARP_COMMAND_BITS) - 1);
+  expansion &= 1;
+  check &= 1;
+
+  if (!MSBfirst) {  // Correct bit order if needed.
+    address = reverseBits(address, SHARP_ADDRESS_BITS);
+    command = reverseBits(command, SHARP_COMMAND_BITS);
+  }
+  // Concatinate all the bits.
+  return (unsigned long) ((address << (SHARP_COMMAND_BITS + 2)) |
+                          (command << 2) | (expansion << 1) | check);
+}
+
+// Send a Sharp message
+//
+// Args:
+//   address:  Address value to be sent.
+//   command:  Command value to be sent.
+//   nbits:    Nr. of bits of data to be sent. Typically SHARP_BITS.
+//   repeat:   Nr. of additional times the message is to be sent.
+//
+// Status:  DEPRICATED / Previously working fine.
+//
+// Notes:
+//   This procedure has a non-standard invocation style compared to similar
+//     sendProtocol() routines. This is due to legacy, compatiblity, & historic
+//     reasons. Normally the calling syntax version is like sendSharpRaw().
+//   This procedure transmits the address & command in MSB first order, which is
+//     incorrect. This behaviour is left as-is to maintain backward
+//     compatiblity with legacy code.
+//   In short, you should use sendSharpRaw(), encodeSharp(), and the correct
+//     values of address & command instead of using this, & the wrong values.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/sharp.htm
+//   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
+//   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 void ICACHE_FLASH_ATTR IRsend::sendSharp(unsigned int address,
-                                         unsigned int command) {
-  sendSharpRaw((address << 10) | (command << 2) | 2, 15);
+                                         unsigned int command,
+                                         unsigned int nbits,
+                                         unsigned int repeat) {
+  sendSharpRaw(encodeSharp(address, command, 1, 0, true), nbits, repeat);
 }
 
 // Send an IR command to a DISH NETWORK device.
@@ -1030,6 +1126,41 @@ void ICACHE_FLASH_ATTR IRsend::sendSherwood(unsigned long data, int nbits,
   // Sherwood remote codes appear to be NEC codes with a manditory repeat code.
   // i.e. repeat should be >= 1.
   sendNEC(data, nbits, max(1, repeat));
+}
+
+// Send a Mitsubishi message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically MITSUBISHI_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Status: ALPHA / untested.
+//
+// Notes:
+//   This protocol appears to have no header.
+// Ref:
+//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(unsigned long long data,
+                                              unsigned int nbits,
+                                              unsigned int repeat) {
+  enableIROut(33);  // Set IR carrier frequency
+  IRtimer usecTimer = IRtimer();
+
+  for (unsigned int i = 0; i <= repeat; i++) {
+    usecTimer.reset();
+    // No header
+
+    // Data
+    sendData(MITSUBISHI_BIT_MARK, MITSUBISHI_ONE_SPACE,
+             MITSUBISHI_BIT_MARK, MITSUBISHI_ZERO_SPACE,
+             data, nbits, true);
+    // Footer
+    mark(MITSUBISHI_BIT_MARK);
+    space(max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+              MITSUBISHI_MIN_GAP));
+  }
 }
 
 void ICACHE_FLASH_ATTR IRsend::sendMitsubishiAC(unsigned char data[]) {
@@ -1247,9 +1378,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Mitsubishi decode");
 #endif
-  if (decodeMitsubishi(results)) {
+  if (decodeMitsubishi(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting RC5 decode");
 #endif
@@ -1293,9 +1423,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #ifdef DEBUG
   Serial.println("Attempting Whynter decode");
 #endif
-  if (decodeWhynter(results)) {
+  if (decodeWhynter(results))
     return true;
-  }
 #ifdef DEBUG
   Serial.println("Attempting Denon decode");
 #endif
@@ -1308,6 +1437,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
   if (decodeDISH(results)) {
     return true;
   }
+#ifdef DEBUG
+  Serial.println("Attempting Sharp decode");
+#endif
+  if (decodeSharp(results))
+    return true;
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -1566,60 +1700,63 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results) {
-  long data = 0;
+// Decode the supplied Whynter message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+bool ICACHE_FLASH_ATTR IRrecv::decodeWhynter(decode_results *results,
+                                             uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + 2 * HEADER + FOOTER)
+     return false;  // We don't have enough entries to possibly match.
 
-  if (results->rawlen < 2 * WHYNTER_BITS + 6) {
-     return false;
-  }
+  // Compliance
+  if (strict && nbits != WHYNTER_BITS)
+    return false;  // Incorrect nr. of bits per spec.
 
-  int offset = 1; // Skip first space
+  uint16_t offset = OFFSET_START;
 
-
-  // sequence begins with a bit mark and a zero space
-  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Header
+  // Sequence begins with a bit mark and a zero space
+  if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
     return false;
-  }
-  offset++;
-  if (!matchSpace(results->rawbuf[offset], WHYNTER_ZERO_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset++], WHYNTER_ZERO_SPACE))
     return false;
-  }
-  offset++;
-
   // header mark and space
-  if (!matchMark(results->rawbuf[offset], WHYNTER_HDR_MARK)) {
+  if (!matchMark(results->rawbuf[offset++], WHYNTER_HDR_MARK))
     return false;
-  }
-  offset++;
-  if (!matchSpace(results->rawbuf[offset], WHYNTER_HDR_SPACE)) {
+  if (!matchSpace(results->rawbuf[offset++], WHYNTER_HDR_SPACE))
     return false;
-  }
-  offset++;
 
-  // data bits
-  for (int i = 0; i < WHYNTER_BITS; i++) {
-    if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Data
+  uint64_t data = 0;
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (matchSpace(results->rawbuf[offset], WHYNTER_ONE_SPACE)) {
-      data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset],WHYNTER_ZERO_SPACE)) {
-      data <<= 1;
-    } else {
+    if (matchSpace(results->rawbuf[offset], WHYNTER_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], WHYNTER_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       return false;
-    }
-    offset++;
   }
 
-  // trailing mark
-  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK)) {
+  // Footer
+  if (!matchMark(results->rawbuf[offset], WHYNTER_BIT_MARK))
     return false;
-  }
+
   // Success
-  results->bits = WHYNTER_BITS;
-  results->value = data;
   results->decode_type = WHYNTER;
+  results->bits = nbits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
@@ -1775,69 +1912,59 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
   return true;
 }
 
-// Looks like Sony except for timings, 48 chars of data and time/space different
-bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results) {
-  // Serial.print("?!? decoding Mitsubishi:");Serial.print(results->rawlen);
-  // Serial.print(" want "); Serial.println( 2 * MITSUBISHI_BITS + 2);
-  long data = 0;
-  if (results->rawlen < 2 * MITSUBISHI_BITS + 2) {
-    return false;
-  }
-  int offset = 1; // Skip first space
-  // Initial space
-  /* Put this back in for debugging - note can't use #DEBUG as if Debug on we
-     don't see the repeat cos of the delay
-  Serial.print("IR Gap: ");
-  Serial.println( results->rawbuf[offset]);
-  Serial.println( "test against:");
-  Serial.println(results->rawbuf[offset]);
-  */
-  /* Not seeing double keys from Mitsubishi
-  if (results->rawbuf[offset] < MITSUBISHI_DOUBLE_SPACE_USECS) {
-    // Serial.print("IR Gap found: ");
-    results->bits = 0;
-    results->value = REPEAT;
-    results->decode_type = MITSUBISHI;
-    return true;
-  }
-  */
+// Decode the supplied Mitsubishi message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / previously working.
+//
+// Notes:
+//   This protocol appears to have no header.
+//
+// Ref:
+//   GlobalCache's Control Tower's Mitsubishi TV data.
+bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results,
+                                                uint16_t nbits, bool strict) {
+  if (results->rawlen < 2 * nbits + FOOTER)
+    return false;  // Shorter than shortest possibly expected.
+  if (strict && nbits != MITSUBISHI_BITS)
+    return false;  // Request is out of spec.
 
-  offset++;
+  uint16_t offset = OFFSET_START;
+  uint64_t data = 0;
 
-  // Typical
-  // 14200 7 41 7 42 7 42 7 17 7 17 7 18 7 41 7 18 7 17 7 17 7 18 7 41 8 17 7 17 7 18 7 17 7
+  // No Header
 
-  // Initial Space
-  if (!matchMark(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
-    return false;
-  }
-  offset++;
-  while (offset + 1 < irparams.rawlen) {
-    if (matchMark(results->rawbuf[offset], MITSUBISHI_ONE_MARK)) {
-
-      data = (data << 1) | 1;
-    } else if (matchMark(results->rawbuf[offset], MITSUBISHI_ZERO_MARK)) {
-      data <<= 1;
-    } else {
-      // Serial.println("A"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
+  // Data
+  uint16_t actualBits;
+  for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK))
       return false;
-    }
-    offset++;
-    if (!matchSpace(results->rawbuf[offset], MITSUBISHI_HDR_SPACE)) {
-      // Serial.println("B"); Serial.println(offset); Serial.println(results->rawbuf[offset]);
+    if (matchSpace(results->rawbuf[offset], MITSUBISHI_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], MITSUBISHI_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
       break;
-    }
-    offset++;
   }
+
+  // Footer is matched by the last iteration of the data loop.
+
+  // Compliance
+  if (strict && actualBits != nbits)
+    return false;  // Not as we expected.
 
   // Success
-  results->bits = (offset - 1) / 2;
-  if (results->bits < MITSUBISHI_BITS) {
-    results->bits = 0;
-    return false;
-  }
-  results->value = data;
   results->decode_type = MITSUBISHI;
+  results->bits = actualBits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
@@ -2016,6 +2143,112 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
   results->value = (unsigned long) data;
   results->decode_type = RCMM;
   results->bits = bitSize;
+  return true;
+}
+
+// Decode the supplied Sharp message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect. Typically SHARP_BITS.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Untested.
+// Note:
+//   This procedure returns a value suitable for use in sendSharpRaw().
+// TODO:
+//   Need to ensure capture of the inverted message as it can be missed
+//   due to the interrupt timeout used to detect an end of message.
+//   Several compliance checks are disabled until that is resolved.
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/sharp.php
+//   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
+//   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
+bool ICACHE_FLASH_ATTR IRrecv::decodeSharp(decode_results *results,
+                                           uint16_t nbits,
+                                           bool strict) {
+  if (results->rawlen < 2 * nbits + FOOTER)
+    return false;  // Not enough entries to be a Sharp message.
+  // Compliance
+  if (strict) {
+    if (nbits != SHARP_BITS)
+      return false;  // Request is out of spec.
+    /* DISABLED - See TODO
+    // An in spec message has the data sent normally, then inverted. So we
+    // expect twice as many entries than to just get the results.
+    if (results->rawlen < 2 * (2 * nbits + FOOTER))
+      return false;
+    */
+  }
+
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
+
+  // No header
+
+  // Data
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
+    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK))
+      return false;
+    if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
+      data = (data << 1) | 1;  // 1
+    else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE))
+      data <<= 1;  // 0
+    else
+      return false;
+  }
+
+  // Footer
+  if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
+    return false;
+
+
+  // Compliance
+  if (strict) {
+    // We expect the expansion bit to be set, and the check bit cleared
+    // in a normal message.
+    if ((data & B11) != B10)
+      return false;
+    /* DISABLED - See TODO
+    // Grab the second copy of the data (i.e. inverted)
+    // Header
+    // i.e. The inter-data/command repeat gap.
+    if (!matchSpace(results->rawbuf[offset++], SHARP_GAP))
+      return false;
+
+    // Data
+    uint64_t second_data = 0;
+    for (uint16_t i = 0; i < nbits; i++, offset++) {
+      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK))
+        return false;
+      if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
+        second_data = (second_data << 1) | 1;  // 1
+      else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE))
+        second_data <<= 1;  // 0
+      else
+        return false;
+    }
+    // Footer
+    if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
+      return false;
+
+    // Check that second_data has been inverted correctly.
+    if (data != (second_data ^ SHARP_TOGGLE_MASK))
+      return false;
+    */
+  }
+
+  // Success
+  results->decode_type = SHARP;
+  results->bits = nbits;
+  results->value = data;
+  // Address & command are actually transmitted in LSB first order.
+  results->address = reverseBits(data, nbits) & SHARP_ADDRESS_MASK;
+  results->sharpAddress = results->address;
+  results->command = reverseBits((data >> 2) & SHARP_COMMAND_MASK,
+                                 SHARP_COMMAND_BITS);
   return true;
 }
 
