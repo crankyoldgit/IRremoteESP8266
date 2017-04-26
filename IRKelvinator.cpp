@@ -1,22 +1,23 @@
-/*
-Code to emulate IR Kelvinator YALIF remote control unit, which should control
-at least the following Kelvinator A/C units:
-  KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC,
-  KSV70HRC, KSV80HRC.
-
-Note:
-  * Unsupported:
-    - All Sleep modes.
-    - All Timer modes.
-    - "I Feel" button & mode.
-    - Energy Saving mode.
-    - Low Heat mode.
-    - Farenheit.
+/* Copyright 2016 David Conran
+ *
+ * Code to emulate IR Kelvinator YALIF remote control unit, which should control
+ * at least the following Kelvinator A/C units:
+ * KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC,
+ * KSV70HRC, KSV80HRC.
+ *
+ * Note:
+ * * Unsupported:
+ *    - All Sleep modes.
+ *    - All Timer modes.
+ *    - "I Feel" button & mode.
+ *    - Energy Saving mode.
+ *    - Low Heat mode.
+ *   - Farenheit.
 */
 
 #include <IRKelvinator.h>
 
-IRKelvinatorAC::IRKelvinatorAC(int pin) : _irsend(pin) {
+IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
 
@@ -54,11 +55,11 @@ void ICACHE_FLASH_ATTR IRKelvinatorAC::checksum() {
   for (uint8_t offset = 0; offset < KELVINATOR_STATE_LENGTH; offset += 8) {
     uint8_t sum = KELVINATOR_CHECKSUM_START;
     // Sum the lower half of the first 4 bytes of this block.
-    for(uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++) {
       sum += (remote_state[i + offset] & 0xFU);
     }
     // then sum the upper half of the next 3 bytes.
-    for(uint8_t i = 4; i < 7; i++) {
+    for (uint8_t i = 4; i < 7; i++) {
       sum += (remote_state[i + offset] >> 4);
     }
     // Trim it down to fit into the 4 bits allowed. i.e. Mod 16.
@@ -69,13 +70,13 @@ void ICACHE_FLASH_ATTR IRKelvinatorAC::checksum() {
 }
 
 void ICACHE_FLASH_ATTR IRKelvinatorAC::on() {
-    //state = ON;
+    // state = ON;
     remote_state[0] |= KELVINATOR_POWER;
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
 void ICACHE_FLASH_ATTR IRKelvinatorAC::off() {
-    //state = OFF;
+    // state = OFF;
     remote_state[0] &= ~KELVINATOR_POWER;
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
@@ -111,6 +112,7 @@ void ICACHE_FLASH_ATTR IRKelvinatorAC::setFan(uint8_t fan) {
   // Only change things if we need to.
   if (fan != getFan()) {
     // Set the basic fan values.
+    // NOLINTNEXTLINE(build/include_what_you_use)
     uint8_t fan_basic = min(KELVINATOR_BASIC_FAN_MAX, fan);
     remote_state[0] = (remote_state[0] & KELVINATOR_BASIC_FAN_MASK) |
         (fan_basic << KELVINATOR_FAN_OFFSET);
@@ -151,10 +153,9 @@ void ICACHE_FLASH_ATTR IRKelvinatorAC::setSwingVertical(bool state) {
   if (state) {
     remote_state[0] |= KELVINATOR_VENT_SWING;
     remote_state[4] |= KELVINATOR_VENT_SWING_V;
-  }
-  else {
+  } else {
     remote_state[4] &= ~KELVINATOR_VENT_SWING_V;
-    if (! getSwingHorizontal())
+    if (!getSwingHorizontal())
       remote_state[0] &= ~KELVINATOR_VENT_SWING;
   }
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
@@ -168,10 +169,9 @@ void ICACHE_FLASH_ATTR IRKelvinatorAC::setSwingHorizontal(bool state) {
   if (state) {
     remote_state[0] |= KELVINATOR_VENT_SWING;
     remote_state[4] |= KELVINATOR_VENT_SWING_H;
-  }
-  else {
+  } else {
     remote_state[4] &= ~KELVINATOR_VENT_SWING_H;
-    if (! getSwingVertical())
+    if (!getSwingVertical())
       remote_state[0] &= ~KELVINATOR_VENT_SWING;
   }
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.

@@ -1,3 +1,4 @@
+/* Copyright 2017 David Conran */
 
 #include <IRMitsubishiAC.h>
 
@@ -6,18 +7,19 @@ IRMitsubishiAC mitsubir(D1);  // IR led controlled by Pin D1.
 void printState() {
   // Display the settings.
   Serial.println("Mitsubishi A/C remote is in the following state:");
-  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d, Vane Mode: %d\n",
+  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d," \
+                    " Vane Mode: %d\n",
                 mitsubir.getPower(), mitsubir.getMode(), mitsubir.getTemp(),
                 mitsubir.getFan(), mitsubir.getVane());
   // Display the encoded IR sequence.
   unsigned char* ir_code = mitsubir.getRaw();
   Serial.print("IR Code: 0x");
-  for (int i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }
 
-void setup(){
+void setup() {
   mitsubir.begin();
   Serial.begin(115200);
   delay(200);

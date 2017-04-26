@@ -69,12 +69,12 @@ uint32_t ICACHE_FLASH_ATTR IRtimer::elapsed() {
 
 // IRsend ----------------------------------------------------------------------
 
-IRsend::IRsend(int IRsendPin) {
-	IRpin = IRsendPin;
+IRsend::IRsend(uint16_t IRsendPin) {
+  IRpin = IRsendPin;
 }
 
 void ICACHE_FLASH_ATTR IRsend::begin() {
-	pinMode(IRpin, OUTPUT);
+  pinMode(IRpin, OUTPUT);
 }
 
 // Generic method for sending data that is common to most protocols.
@@ -132,10 +132,9 @@ void ICACHE_FLASH_ATTR IRsend::sendData(uint16_t onemark, uint32_t onespace,
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp
-// TODO: Verify repeat functionality against a real unit.
-void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long long data,
-                                          unsigned int nbits,
-                                          unsigned int repeat) {
+// TODO(anyone): Verify repeat functionality against a real unit.
+void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(uint64_t data, uint16_t nbits,
+                                          uint16_t repeat) {
   if (nbits % 8 != 0)
     return;  // nbits is required to be a multiple of 8.
 
@@ -180,9 +179,8 @@ void ICACHE_FLASH_ATTR IRsend::sendCOOLIX(unsigned long long data,
 //
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
-void ICACHE_FLASH_ATTR IRsend::sendNEC(unsigned long long data,
-                                       unsigned int nbits,
-                                       unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendNEC(uint64_t data, uint16_t nbits,
+                                       uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
   IRtimer usecs = IRtimer();
@@ -195,15 +193,17 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC(unsigned long long data,
   // Footer
   mark(NEC_BIT_MARK);
   // Gap to next command.
+  // NOLINTNEXTLINE(build/include_what_you_use)
   space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
 
   // Optional command repeat sequence.
-  for (unsigned int i = 0; i < repeat; i++) {
+  for (uint16_t i = 0; i < repeat; i++) {
     usecs.reset();
     mark(NEC_HDR_MARK);
     space(NEC_RPT_SPACE);
     mark(NEC_BIT_MARK);
     // Gap till next command.
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
   }
 }
@@ -219,14 +219,14 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC(unsigned long long data,
 //
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
-unsigned long ICACHE_FLASH_ATTR IRsend::encodeNEC(unsigned int address,
-                                                  unsigned int command) {
+uint32_t ICACHE_FLASH_ATTR IRsend::encodeNEC(uint16_t address,
+                                             uint16_t command) {
   command &= 0xFF;  // We only want the least significant byte of command.
   command = (command <<  8) + (command ^ 0xFF);  // Calculate the new command.
-  if (address > 0xFF) // Is it Extended NEC?
+  if (address > 0xFF)  // Is it Extended NEC?
     return (address << 16) + command;  // Extended.
   else
-    return (address << 24) + ((address ^ 0xFF) << 16) + command; // Normal.
+    return (address << 24) + ((address ^ 0xFF) << 16) + command;  // Normal.
 }
 
 // Send an LG formatted message.
@@ -240,9 +240,9 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeNEC(unsigned int address,
 //
 // Notes:
 //   LG has a separate message to indicate a repeat, like NEC does.
-void ICACHE_FLASH_ATTR IRsend::sendLG(unsigned long long data,
-                                      unsigned int nbits,
-                                      unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendLG(uint64_t data,
+                                      uint16_t nbits,
+                                      uint16_t repeat) {
   // Set IR carrier frequency
   enableIROut(38);
 
@@ -265,14 +265,16 @@ void ICACHE_FLASH_ATTR IRsend::sendLG(unsigned long long data,
              data, nbits, true);
     // Footer
     mark(LG_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
   }
   // Repeat
-  for (unsigned int i = 0; i < repeat; i++) {
+  for (uint16_t i = 0; i < repeat; i++) {
     usecTimer.reset();
     mark(repeatHeaderMark);
     space(LG_RPT_SPACE);
     mark(LG_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
   }
 }
@@ -289,10 +291,8 @@ void ICACHE_FLASH_ATTR IRsend::sendLG(unsigned long long data,
 //
 // Notes:
 //   e.g. Sequence of bits = address + command + checksum.
-unsigned long ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address,
-                                                 uint16_t command) {
+uint32_t ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address, uint16_t command) {
   return ((address << 20) | (command << 4) | calcLGChecksum(command));
-
 }
 
 // Send a Whynter message.
@@ -306,9 +306,8 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeLG(uint8_t address,
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
-void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long long data,
-                                           unsigned int nbits,
-                                           unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendWhynter(uint64_t data, uint16_t nbits,
+                                           uint16_t repeat) {
   // Set IR carrier frequency
   enableIROut(38);
   IRtimer usecTimer = IRtimer();
@@ -325,6 +324,7 @@ void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long long data,
              WHYNTER_ZERO_SPACE, data, nbits, true);
     // Footer
     mark(WHYNTER_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
               WHYNTER_MIN_GAP));
   }
@@ -345,9 +345,8 @@ void ICACHE_FLASH_ATTR IRsend::sendWhynter(unsigned long long data,
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
-void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long long data,
-                                        unsigned int nbits,
-                                        unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendSony(uint64_t data, uint16_t nbits,
+                                        uint16_t repeat) {
   // Sony devices use a 40kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(40, 33);
   IRtimer usecs = IRtimer();
@@ -363,6 +362,7 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long long data,
     // Footer
     // The Sony protocol requires us to wait 45ms from start of a code to the
     // start of the next one. A 10ms minimum gap is also required.
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(SONY_MIN_GAP, SONY_RPT_LENGTH - usecs.elapsed()));
   }
   // A space() is always performed last, so no need to turn off the LED.
@@ -378,9 +378,10 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(unsigned long long data,
 //   A sendSony compatible data message.
 //
 // Status: ALPHA / Untested.
-unsigned long encodeSony(unsigned int nbits, unsigned int command,
-                         unsigned int address, unsigned int extended) {
-  unsigned long result = 0;
+uint32_t ICACHE_FLASH_ATTR IRsend::encodeSony(uint16_t nbits, uint16_t command,
+                                              uint16_t address,
+                                              uint16_t extended) {
+  uint32_t result = 0;
   switch (nbits) {
     case 12:  // 5 address bits.
       result = address & 0x1F;
@@ -413,12 +414,12 @@ unsigned long encodeSony(unsigned int nbits, unsigned int command,
 //
 // Ref:
 //   examples/IRrecvDumpV2/IRrecvDumpV2.ino
-void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], unsigned int len,
-                                       unsigned int hz) {
+void ICACHE_FLASH_ATTR IRsend::sendRaw(uint16_t buf[], uint16_t len,
+                                       uint16_t hz) {
   // Set IR carrier frequency
   enableIROut(hz);
   for (uint16_t i = 0; i < len; i++) {
-    if (i & 1) { // Odd bit.
+    if (i & 1) {  // Odd bit.
       space(buf[i]);
     } else {  // Even bit.
       mark(buf[i]);
@@ -444,10 +445,11 @@ void ICACHE_FLASH_ATTR IRsend::sendRaw(unsigned int buf[], unsigned int len,
 //   e.g. sendir,1:1,1,38000,1,1,9,70,9,30,9,... -> 38000,1,1,9,70,9,30,9,...
 // Ref:
 //   https://irdb.globalcache.com/Home/Database
-void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], unsigned int len) {
+void ICACHE_FLASH_ATTR IRsend::sendGC(uint16_t buf[], uint16_t len) {
   uint16_t hz = buf[GLOBALCACHE_FREQ_INDEX];  // GC frequency is in Hz.
   enableIROut(hz);
   uint32_t periodic_time = calcUSecPeriod(hz);
+  // NOLINTNEXTLINE(build/include_what_you_use)
   uint8_t emits = min(buf[GLOBALCACHE_RPT_INDEX], GLOBALCACHE_MAX_REPEAT);
   // Repeat
   for (uint8_t repeat = 0; repeat < emits; repeat++) {
@@ -460,6 +462,7 @@ void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], unsigned int len) {
     for (; offset < len; offset++) {
       // Convert periodic units to microseconds.
       // Minimum is GLOBALCACHE_MIN_USEC for actual GC units.
+      // NOLINTNEXTLINE(build/include_what_you_use)
       uint32_t microseconds = max(buf[offset] * periodic_time,
                                   GLOBALCACHE_MIN_USEC);
       // These codes start at an odd index (not even as with sendRaw).
@@ -474,7 +477,7 @@ void ICACHE_FLASH_ATTR IRsend::sendGC(unsigned int buf[], unsigned int len) {
 }
 
 // Note: first bit must be a one (start bit)
-void ICACHE_FLASH_ATTR IRsend::sendRC5(unsigned long data, int nbits) {
+void ICACHE_FLASH_ATTR IRsend::sendRC5(uint32_t data, uint16_t nbits) {
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(36, 33);
   // Header
@@ -482,7 +485,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRC5(unsigned long data, int nbits) {
   space(RC5_T1);  // Second start bit
   mark(RC5_T1);  // Second start bit
   // Data
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
+  for (uint32_t mask = 1UL << (nbits - 1); mask; mask >>= 1) {
     if (data & mask) {  // 1
       space(RC5_T1);  // 1 is space, then mark
       mark(RC5_T1);
@@ -503,15 +506,14 @@ void ICACHE_FLASH_ATTR IRsend::sendRC5(unsigned long data, int nbits) {
 //   data:    The code you wish to send.
 //   nbits:   Bit size of the protocol you want to send.
 //   repeat:  Nr. of extra times the data will be sent.
-void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long long data,
-                                       unsigned int nbits,
-                                       unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendRC6(uint64_t data, uint16_t nbits,
+                                       uint16_t repeat) {
   // Check we can send the number of bits requested.
   if (nbits > sizeof(data) * 8)
     return;
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(36, 33);
-  for (unsigned int r = 0; r <= repeat; r++) {
+  for (uint16_t r = 0; r <= repeat; r++) {
     // Header
     mark(RC6_HDR_MARK);
     space(RC6_HDR_SPACE);
@@ -545,7 +547,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRC6(unsigned long long data,
 //   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
 //
 // Status:  ALPHA (untested and unconfirmed.)
-void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
+void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint16_t nbits) {
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(36, 33);
   IRtimer usecs = IRtimer();
@@ -571,8 +573,8 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
   mark(RCMM_BIT_MARK);
   // Protocol requires us to wait at least RCMM_RPT_LENGTH usecs from the start
   // or RCMM_MIN_GAP usecs.
+  // NOLINTNEXTLINE(build/include_what_you_use)
   space(max(RCMM_RPT_LENGTH - usecs.elapsed(), RCMM_MIN_GAP));
-
 }
 
 // Send a Panasonic formatted message.
@@ -586,9 +588,8 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint8_t nbits) {
 //
 // Note:
 //   This protocol is a modified version of Kaseikyo.
-void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
-                                               unsigned int nbits,
-                                               unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(uint64_t data, uint16_t nbits,
+                                               uint16_t repeat) {
   enableIROut(36700U);  // Set IR carrier frequency of 36.7kHz.
   IRtimer usecTimer = IRtimer();
 
@@ -603,6 +604,7 @@ void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
              data, nbits, true);
     // Footer
     mark(PANASONIC_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(PANASONIC_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
               PANASONIC_MIN_GAP));
   }
@@ -620,10 +622,8 @@ void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(unsigned long long data,
 //
 // Note:
 //   This protocol is a modified version of Kaseikyo.
-void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
-                                             unsigned long data,
-                                             unsigned int nbits,
-                                             unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendPanasonic(uint16_t address, uint32_t data,
+                                             uint16_t nbits, uint16_t repeat) {
   sendPanasonic64(((uint64_t) address << 32) | (uint64_t) data, nbits, repeat);
 }
 
@@ -642,9 +642,9 @@ void ICACHE_FLASH_ATTR IRsend::sendPanasonic(unsigned int address,
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
-unsigned long long ICACHE_FLASH_ATTR IRsend::encodePanasonic(uint8_t device,
-                                                             uint8_t subdevice,
-                                                             uint8_t function) {
+uint64_t ICACHE_FLASH_ATTR IRsend::encodePanasonic(uint8_t device,
+                                                   uint8_t subdevice,
+                                                   uint8_t function) {
   uint8_t checksum = device ^ subdevice ^ function;
   return (((uint64_t) PANASONIC_MANUFACTURER << 32) |
           ((uint64_t) device << 24) |
@@ -664,9 +664,8 @@ unsigned long long ICACHE_FLASH_ATTR IRsend::encodePanasonic(uint8_t device,
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long long data,
-                                       unsigned int nbits,
-                                       unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendJVC(uint64_t data, uint16_t nbits,
+                                       uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
 
@@ -677,13 +676,14 @@ void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long long data,
   space(JVC_HDR_SPACE);
 
   // We always send the data & footer at least once, hence '<= repeat'.
-  for (unsigned int i = 0; i <= repeat; i++) {
+  for (uint16_t i = 0; i <= repeat; i++) {
     // Data
     sendData(JVC_BIT_MARK, JVC_ONE_SPACE, JVC_BIT_MARK, JVC_ZERO_SPACE,
              data, nbits, true);
     // Footer
     mark(JVC_BIT_MARK);
     // Wait till the end of the repeat time window before we send another code.
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(JVC_MIN_GAP, JVC_RPT_LENGTH - usecs.elapsed()));
     usecs.reset();
   }
@@ -701,15 +701,14 @@ void ICACHE_FLASH_ATTR IRsend::sendJVC(unsigned long long data,
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-unsigned int ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address,
-                                                 uint8_t command) {
-  return reverseBits(((command << 8) | address), 16);
+uint16_t ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address, uint8_t command) {
+  return reverseBits((command << 8) | address, 16);
 }
 
 // Send a Samsung formatted message.
 // Samsung has a separate message to indicate a repeat, like NEC does.
-// TODO: Confirm that is actually how Samsung sends a repeat.
-//       The refdoc doesn't indicate it is true.
+// TODO(crankyoldgit): Confirm that is actually how Samsung sends a repeat.
+//                     The refdoc doesn't indicate it is true.
 //
 // Args:
 //   data:   The message to be sent.
@@ -719,9 +718,8 @@ unsigned int ICACHE_FLASH_ATTR IRsend::encodeJVC(uint8_t address,
 // Status: BETA / Should be working.
 //
 // Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long long data,
-                                           unsigned int nbits,
-                                           unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits,
+                                           uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
   IRtimer usecTimer = IRtimer();
@@ -736,6 +734,7 @@ void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long long data,
              SAMSUNG_ZERO_SPACE, data, nbits, true);
     // Footer
     mark(SAMSUNG_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(SAMSUNG_MIN_GAP,
               SAMSUNG_MIN_MESSAGE_LENGTH - usecTimer.elapsed()));
   }
@@ -751,8 +750,8 @@ void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(unsigned long long data,
 //   A raw 32-bit Samsung message suitable for sendSAMSUNG().
 //
 // Status: BETA / Should be working.
-unsigned long ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
-                                                      uint8_t command) {
+uint32_t ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
+                                                 uint8_t command) {
   customer = reverseBits(customer, sizeof(customer));
   command = reverseBits(command, sizeof(command));
   return(((command ^ 0xFF) << 24) | (command << 16) |
@@ -773,13 +772,12 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeSAMSUNG(uint8_t customer,
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 //   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
-void ICACHE_FLASH_ATTR IRsend::sendDenon(unsigned long long data,
-                                         unsigned int nbits,
-                                         unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendDenon(uint64_t data, uint16_t nbits,
+                                         uint16_t repeat) {
   enableIROut(38);  // Set IR carrier frequency
   IRtimer usecTimer = IRtimer();
 
-  for (unsigned int i = 0; i <= repeat; i++) {
+  for (uint16_t i = 0; i <= repeat; i++) {
     usecTimer.reset();
     // Header
     mark(DENON_HDR_MARK);
@@ -789,6 +787,7 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon(unsigned long long data,
              data, nbits, true);
     // Footer
     mark(DENON_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(), DENON_MIN_GAP));
   }
 }
@@ -807,7 +806,7 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon(unsigned long long data,
 //   Hence, for greater compatiblity & choice, we don't use that method.
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
-void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
+void ICACHE_FLASH_ATTR IRsend::mark(uint16_t usec) {
   IRtimer usecTimer = IRtimer();
   // Cache the time taken so far. This saves us calling time, and we can be
   // assured that we can't have odd math problems. i.e. unsigned under/overflow.
@@ -817,11 +816,13 @@ void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
     digitalWrite(IRpin, HIGH);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
+    // NOLINTNEXTLINE(build/include_what_you_use)
     delayMicroseconds(min(onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, LOW);  // Turn the LED off.
     if (elapsed + onTimePeriod >= usec)
       return;  // LED is now off & we've passed our allotted time. Safe to stop.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
+    // NOLINTNEXTLINE(build/include_what_you_use)
     delayMicroseconds(min(usec - elapsed - onTimePeriod, offTimePeriod));
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
@@ -837,16 +838,18 @@ void ICACHE_FLASH_ATTR IRsend::ledOff() {
 //
 // Args:
 //   time: Time in microseconds (us).
-void ICACHE_FLASH_ATTR IRsend::space(unsigned long time) {
-
+void ICACHE_FLASH_ATTR IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
-  if (time <= 16383)  // delayMicroseconds is only accurate to 16383us.
+  // delayMicroseconds is only accurate to 16383us.
+  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
+  if (time <= 16383) {
     delayMicroseconds(time);
-  else {
+  } else {
     // Invoke a delay(), where possible, to avoid triggering the WDT.
-    delay(time / 1000UL);  // Delay for as many whole ms as we can.
-    delayMicroseconds((int) time % 1000UL);  // Delay the remaining sub-msecond.
+    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
+    // Delay the remaining sub-millisecond.
+    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
   }
 }
 
@@ -870,9 +873,10 @@ uint32_t ICACHE_FLASH_ATTR IRsend::calcUSecPeriod(uint32_t hz) {
 //   Integer timing functions & math mean we can't do fractions of
 //   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
-void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned long freq, uint8_t duty) {
+void ICACHE_FLASH_ATTR IRsend::enableIROut(uint32_t freq, uint8_t duty) {
+  // NOLINTNEXTLINE(build/include_what_you_use)
   duty = min(duty, 100);  // Can't have more than 100% duty cycle.
-  if (freq < 1000) // Were we given kHz? Supports the old call usage.
+  if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
   uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
@@ -902,9 +906,8 @@ void ICACHE_FLASH_ATTR IRsend::enableIROut(unsigned long freq, uint8_t duty) {
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
-void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(unsigned long long data,
-                                            unsigned int nbits,
-                                            unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(uint64_t data, uint16_t nbits,
+                                            uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
 
@@ -940,7 +943,7 @@ void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(unsigned long long data,
 //   check:     The value of the check bit to use. (0 or 1, typically 0)
 //   MSBfirst:  Flag indicating MSB first or LSB first order. (Default: false)
 // Returns:
-//   An unsigned long containing the raw Sharp message for sendSharpRaw().
+//   An uint32_t containing the raw Sharp message for sendSharpRaw().
 //
 // Status: ALPHA / Untested
 //
@@ -955,11 +958,11 @@ void ICACHE_FLASH_ATTR IRsend::sendSharpRaw(unsigned long long data,
 //   http://www.sbprojects.com/knowledge/ir/sharp.htm
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
-unsigned long ICACHE_FLASH_ATTR IRsend::encodeSharp(unsigned int address,
-                                                    unsigned int command,
-                                                    unsigned int expansion,
-                                                    unsigned int check,
-                                                    bool MSBfirst) {
+uint32_t ICACHE_FLASH_ATTR IRsend::encodeSharp(uint16_t address,
+                                               uint16_t command,
+                                               uint16_t expansion,
+                                               uint16_t check,
+                                               bool MSBfirst) {
   // Mask any unexpected bits.
   address &= ((1 << SHARP_ADDRESS_BITS) - 1);
   command &= ((1 << SHARP_COMMAND_BITS) - 1);
@@ -971,8 +974,8 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeSharp(unsigned int address,
     command = reverseBits(command, SHARP_COMMAND_BITS);
   }
   // Concatinate all the bits.
-  return (unsigned long) ((address << (SHARP_COMMAND_BITS + 2)) |
-                          (command << 2) | (expansion << 1) | check);
+  return (address << (SHARP_COMMAND_BITS + 2)) | (command << 2) |
+         (expansion << 1) | check;
 }
 
 // Send a Sharp message
@@ -999,10 +1002,8 @@ unsigned long ICACHE_FLASH_ATTR IRsend::encodeSharp(unsigned int address,
 //   http://www.sbprojects.com/knowledge/ir/sharp.htm
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
-void ICACHE_FLASH_ATTR IRsend::sendSharp(unsigned int address,
-                                         unsigned int command,
-                                         unsigned int nbits,
-                                         unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendSharp(uint16_t address, uint16_t command,
+                                         uint16_t nbits, uint16_t repeat) {
   sendSharpRaw(encodeSharp(address, command, 1, 0, true), nbits, repeat);
 }
 
@@ -1028,9 +1029,8 @@ void ICACHE_FLASH_ATTR IRsend::sendSharp(unsigned int address,
 //
 // Ref:
 //   http://www.hifi-remote.com/wiki/index.php?title=Dish
-void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long long data,
-                                        unsigned int nbits,
-                                        unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendDISH(uint64_t data, uint16_t nbits,
+                                        uint16_t repeat) {
   // Set 57.6kHz IR carrier frequency, duty cycle is unknown.
   enableIROut(57600);
   // We always send a command, even for repeat=0, hence '<= repeat'.
@@ -1053,19 +1053,19 @@ void ICACHE_FLASH_ATTR IRsend::sendDISH(unsigned long long data,
 //   address: The 13 bit value of the address(Custom) portion of the protocol.
 //   command: The 8 bit value of the command(Key) portion of the protocol.
 // Returns:
-//   An unsigned long long with the encoded raw 42 bit Sanyo LC7461 data value.
+//   An uint64_t with the encoded raw 42 bit Sanyo LC7461 data value.
 //
 // Notes:
 //   This protocol uses the NEC protocol timings. However, data is
-//   formatted as : address(13 bits), !address, command (8 bits), !command.
+//   formatted as : address(13 bits), !address, command(8 bits), !command.
 //   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
-unsigned long long encodeSanyoLC7461(unsigned int address,
-                                     unsigned int command) {
+uint64_t ICACHE_FLASH_ATTR IRsend::encodeSanyoLC7461(uint16_t address,
+                                                     uint16_t command) {
   // Mask our input values to ensure the correct bit sizes.
   address &= SANYO_LC7461_ADDRESS_MASK;
   command &= SANYO_LC7461_COMMAND_MASK;
 
-  unsigned long long data = address;
+  uint64_t data = address;
   address ^= SANYO_LC7461_ADDRESS_MASK;  // Invert the 13 LSBs.
   // Append the now inverted address.
   data = (data << SANYO_LC7461_ADDRESS_BITS) | address;
@@ -1098,8 +1098,7 @@ unsigned long long encodeSanyoLC7461(unsigned int address,
 // Ref:
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
-void IRsend::sendSanyoLC7461(unsigned long long data, unsigned int nbits,
-                             unsigned int repeat) {
+void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
   IRtimer usecTimer = IRtimer();
@@ -1112,6 +1111,7 @@ void IRsend::sendSanyoLC7461(unsigned long long data, unsigned int nbits,
            SANYO_LC7461_BIT_MARK, SANYO_LC7461_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(SANYO_LC7461_BIT_MARK);
+  // NOLINTNEXTLINE(build/include_what_you_use)
   space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
             SANYO_LC7461_MIN_GAP));
 
@@ -1125,6 +1125,7 @@ void IRsend::sendSanyoLC7461(unsigned long long data, unsigned int nbits,
     space(SANYO_LC7461_HDR_SPACE);
     // Footer
     mark(SANYO_LC7461_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
               SANYO_LC7461_MIN_GAP));
   }
@@ -1239,9 +1240,9 @@ void ICACHE_FLASH_ATTR IRsend::sendKelvinator(unsigned char data[]) {
 // Note:
 //   Sherwood remote codes appear to be NEC codes with a manditory repeat code.
 //   i.e. repeat should be >= SHERWOOD_MIN_REPEAT (1).
-void ICACHE_FLASH_ATTR IRsend::sendSherwood(unsigned long long data,
-                                            unsigned int nbits,
-                                            unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendSherwood(uint64_t data, uint16_t nbits,
+                                            uint16_t repeat) {
+  // NOLINTNEXTLINE(build/include_what_you_use)
   sendNEC(data, nbits, max(SHERWOOD_MIN_REPEAT, repeat));
 }
 
@@ -1259,13 +1260,12 @@ void ICACHE_FLASH_ATTR IRsend::sendSherwood(unsigned long long data,
 // Ref:
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
 //   GlobalCache's Control Tower's Mitsubishi TV data.
-void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(unsigned long long data,
-                                              unsigned int nbits,
-                                              unsigned int repeat) {
+void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(uint64_t data, uint16_t nbits,
+                                              uint16_t repeat) {
   enableIROut(33);  // Set IR carrier frequency
   IRtimer usecTimer = IRtimer();
 
-  for (unsigned int i = 0; i <= repeat; i++) {
+  for (uint16_t i = 0; i <= repeat; i++) {
     usecTimer.reset();
     // No header
 
@@ -1275,6 +1275,7 @@ void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(unsigned long long data,
              data, nbits, true);
     // Footer
     mark(MITSUBISHI_BIT_MARK);
+    // NOLINTNEXTLINE(build/include_what_you_use)
     space(max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
               MITSUBISHI_MIN_GAP));
   }
@@ -1310,11 +1311,11 @@ void ICACHE_FLASH_ATTR IRsend::sendMitsubishiAC(unsigned char data[]) {
 // ---------------------------------------------------------------
 
 
-//IRRecv------------------------------------------------------
+// IRRecv------------------------------------------------------
 
 extern "C" {
-	#include "user_interface.h"
-	#include "gpio.h"
+  #include "user_interface.h"  // NOLINT(build/include)
+  #include "gpio.h"
 }
 
 static ETSTimer timer;
@@ -1324,7 +1325,7 @@ static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
   if (irparams.rawlen)
     irparams.rcvstate = STATE_STOP;
-	os_intr_unlock();
+  os_intr_unlock();
 }
 
 static void ICACHE_RAM_ATTR gpio_intr() {
@@ -1375,6 +1376,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 //   The reversed bit pattern.
 uint64_t reverseBits(uint64_t input, uint16_t nbits) {
     uint64_t output = input;
+    // NOLINTNEXTLINE(build/include_what_you_use)
     for (uint16_t i = 1; i < min(nbits, sizeof(input) * 8); i++) {
         output <<= 1;
         input  >>= 1;
@@ -1393,7 +1395,7 @@ uint8_t ICACHE_FLASH_ATTR calcLGChecksum(uint16_t data) {
          (data & 0xF)) & 0xF);
 }
 
-IRrecv::IRrecv(int recvpin) {
+IRrecv::IRrecv(uint16_t recvpin) {
   irparams.recvpin = recvpin;
 }
 
@@ -1404,7 +1406,8 @@ void ICACHE_FLASH_ATTR IRrecv::enableIRIn() {
 
   // Initialize timer
   os_timer_disarm(&timer);
-  os_timer_setfn(&timer, (os_timer_func_t *)read_timeout, NULL);
+  os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
+                 NULL);
 
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
@@ -1430,8 +1433,8 @@ void ICACHE_FLASH_ATTR IRrecv::resume() {
 //   dest: Pointer to an irparams_t structure to copy to.
 void ICACHE_FLASH_ATTR IRrecv::copyIrParams(irparams_t *dest) {
   // Typecast src and dest addresses to (char *)
-  char *csrc = (char *)&irparams;
-  char *cdest = (char *)dest;
+  char *csrc = (char *) (&irparams);  // NOLINT(readability/casting)
+  char *cdest = (char *) dest;  // NOLINT(readability/casting)
 
   // Copy contents of src[] to dest[]
   for (uint16_t i=0; i < sizeof(irparams_t); i++)
@@ -1583,6 +1586,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 //   Nr. of ticks.
 uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
   // max() used to ensure the result can't drop below 0 before the cast.
+  // NOLINTNEXTLINE(build/include_what_you_use)
   return((uint32_t) max(usecs * (1.0 - tolerance/100.0) / USECPERTICK, 0));
 }
 
@@ -1635,7 +1639,7 @@ bool ICACHE_FLASH_ATTR IRrecv::match(uint32_t measured_ticks,
 //   Boolean: true if it matches, false if it doesn't.
 bool ICACHE_FLASH_ATTR IRrecv::matchMark(uint32_t measured_ticks,
                                          uint32_t desired_us,
-                                         uint8_t tolerance, int excess) {
+                                         uint8_t tolerance, int16_t excess) {
   #ifdef DEBUG
     Serial.print("Matching MARK ");
     Serial.print(measured_ticks * USECPERTICK, DEC);
@@ -1659,7 +1663,7 @@ bool ICACHE_FLASH_ATTR IRrecv::matchMark(uint32_t measured_ticks,
 //   Boolean: true if it matches, false if it doesn't.
 bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
                                           uint32_t desired_us,
-                                          uint8_t tolerance, int excess) {
+                                          uint8_t tolerance, int16_t excess) {
   #ifdef DEBUG
     Serial.print("Matching SPACE ");
     Serial.print(measured_ticks * USECPERTICK, DEC);
@@ -1721,7 +1725,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results,
   if (!matchSpace(results->rawbuf[offset++], NEC_HDR_SPACE))
     return false;
   // Data
-  for (int i = 0; i < nbits; i++, offset++) {
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
     if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE))
@@ -1817,7 +1821,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeCOOLIX(decode_results *results,
     uint8_t normal = data & 0xFF;
     data >>= 8;
     if (strict && data != inverted)  // Compliance
-      return false; // The message doesn't verify.
+      return false;  // The message doesn't verify.
     result |= (normal << i);  // Add the byte in front of the previous result.
   }
 
@@ -1851,15 +1855,16 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSony(decode_results *results,
     return false;  // Message is smaller than we expected.
 
   // Compliance
-  if (strict)
+  if (strict) {
     switch (nbits) {  // Check we've been called with a correct bit size.
       case 12:
       case 15:
       case 20:
         break;
       default:
-        return false; // The request doesn't strictly match the protocol defn.
+        return false;  // The request doesn't strictly match the protocol defn.
     }
+  }
 
   uint32_t data = 0;
   uint16_t offset = OFFSET_START;
@@ -2069,16 +2074,13 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyoLC7461(decode_results *results,
 //
 // Status: Depricated.
 //
-// Note:
-//   I think this is a Sanyo decoder - serial = SA 8650B
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
-//
-// TODO: This decoder looks like rubbish. Only keeping it for compatiblity
+// NOTE: This decoder looks like rubbish. Only keeping it for compatiblity
 //       with the Arduino IRremote library. Seriously, don't trust it.
 //       If someone has a device that this is supposed to be for, please log an
 //       Issue on github with a rawData dump please. We should probably remove
-//       it.
+//       it. We think this is a Sanyo decoder - serial = SA 8650B
+// Ref:
+//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
 bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
                                            uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + HEADER)
@@ -2088,8 +2090,9 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
 
   uint16_t offset = 0;
 
-  // TODO: This repeat code looks like garbage, it should never match or if
-  //       it does, it won't be reliable. We should probably just remove it.
+  // TODO(crankyoldgit): This repeat code looks like garbage, it should never
+  //   match or if it does, it won't be reliable. We should probably just
+  //   remove it.
   if (results->rawbuf[offset++] < SANYO_SA8650B_DOUBLE_SPACE_USECS) {
     results->bits = 0;
     results->value = REPEAT;
@@ -2102,7 +2105,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
   // Header
   if (!matchMark(results->rawbuf[offset++], SANYO_SA8650B_HDR_MARK))
     return false;
-  // TODO: These next two lines look very wrong. Treat as suspect.
+  // NOTE: These next two lines look very wrong. Treat as suspect.
   if (!matchMark(results->rawbuf[offset++], SANYO_SA8650B_HDR_MARK))
     return false;
   // Data
@@ -2120,7 +2123,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
     offset++;
   }
 
-  if (strict && SANYO_SA8650B_BITS > (offset - 1) / 2 )
+  if (strict && SANYO_SA8650B_BITS > (offset - 1U) / 2U)
     return false;
 
   // Success
@@ -2195,8 +2198,9 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeMitsubishi(decode_results *results,
 // offset and used are updated to keep track of the current position.
 // t1 is the time interval for a single bit in microseconds.
 // Returns -1 for error (measured time interval is not a multiple of t1).
-int ICACHE_FLASH_ATTR IRrecv::getRClevel(decode_results *results, int *offset,
-                                         int *used, int t1) {
+int16_t ICACHE_FLASH_ATTR IRrecv::getRClevel(decode_results *results,
+                                             int *offset, int *used,
+                                             uint16_t t1) {
   if (*offset >= results->rawlen) {
     // After end of recorded buffer, assume SPACE.
     return SPACE;
@@ -2235,8 +2239,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC5(decode_results *results) {
   if (results->rawlen < MIN_RC5_SAMPLES + 2) {
     return false;
   }
-  int offset = 1; // Skip gap space
-  long data = 0;
+  int offset = 1;  // Skip gap space
+  uint32_t data = 0;
   int used = 0;
   // Get start bits
   if (getRClevel(results, &offset, &used, RC5_T1) != MARK) return false;
@@ -2268,7 +2272,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
   if (results->rawlen < MIN_RC6_SAMPLES) {
     return false;
   }
-  int offset = 1; // Skip first space
+  int offset = 1;  // Skip first space
   // Initial mark
   if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) {
     return false;
@@ -2278,14 +2282,14 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
     return false;
   }
   offset++;
-  long data = 0;
+  int32_t data = 0;
   int used = 0;
   // Get start bit (1)
   if (getRClevel(results, &offset, &used, RC6_T1) != MARK) return false;
   if (getRClevel(results, &offset, &used, RC6_T1) != SPACE) return false;
   int nbits;
   for (nbits = 0; offset < results->rawlen; nbits++) {
-    int levelA, levelB; // Next two levels
+    int levelA, levelB;  // Next two levels
     levelA = getRClevel(results, &offset, &used, RC6_T1);
     if (nbits == 3) {
       // T bit is double wide; make sure second half matches
@@ -2296,14 +2300,14 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
       // T bit is double wide; make sure second half matches
       if (levelB != getRClevel(results, &offset, &used, RC6_T1)) return false;
     }
-    if (levelA == MARK && levelB == SPACE) { // reversed compared to RC5
+    if (levelA == MARK && levelB == SPACE) {  // reversed compared to RC5
       // 1 bit
       data = (data << 1) | 1;
     } else if (levelA == SPACE && levelB == MARK) {
       // zero bit
       data <<= 1;
     } else {
-      return false; // Error
+      return false;  // Error
     }
   }
   // Success
@@ -2323,9 +2327,9 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRC6(decode_results *results) {
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php
 bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
   uint32_t data = 0;
-  unsigned int offset = OFFSET_START;
+  uint16_t offset = OFFSET_START;
 
-  int bitSize = results->rawlen - 4;
+  int16_t bitSize = results->rawlen - 4;
   if (bitSize < 12 || bitSize > 32)
     return false;
   // Header decode
@@ -2335,7 +2339,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
     return false;
   // Data decode
   // RC-MM has two bits of data per mark/space pair.
-  for (int i = 0; i < bitSize; i += 2, offset++) {
+  for (uint16_t i = 0; i < bitSize; i += 2, offset++) {
     data <<= 2;
     // Use non-default tolerance & excess for matching some of the spaces as the
     // defaults are too generous and causes mis-matches in some cases.
@@ -2361,9 +2365,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
     return false;
 
   // Success
-  results->value = (unsigned long) data;
+  results->value = data;
   results->decode_type = RCMM;
   results->bits = bitSize;
+  results->address = 0;
+  results->command = 0;
   return true;
 }
 
@@ -2380,9 +2386,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeRCMM(decode_results *results) {
 //
 // Note:
 //   This procedure returns a value suitable for use in sendSharpRaw().
-// TODO:
-//   Need to ensure capture of the inverted message as it can be missed
-//   due to the interrupt timeout used to detect an end of message.
+// TODO(crankyoldgit): Need to ensure capture of the inverted message as it can
+//   be missed due to the interrupt timeout used to detect an end of message.
 //   Several compliance checks are disabled until that is resolved.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
@@ -2497,8 +2502,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results,
   if (strict && nbits != PANASONIC_BITS)
     return false;  // Request is out of spec.
 
-  unsigned long long data = 0;
-	int offset = OFFSET_START;
+  uint64_t data = 0;
+  uint16_t offset = OFFSET_START;
 
   // Header
   if (!matchMark(results->rawbuf[offset++], PANASONIC_HDR_MARK))
@@ -2510,9 +2515,9 @@ bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results,
   for (uint16_t i = 0; i < nbits; i++, offset++) {
     if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
       return false;
-    if (match(results->rawbuf[offset],PANASONIC_ONE_SPACE))
+    if (match(results->rawbuf[offset], PANASONIC_ONE_SPACE))
       data = (data << 1) | 1;  // 1
-    else if (match(results->rawbuf[offset],PANASONIC_ZERO_SPACE))
+    else if (match(results->rawbuf[offset], PANASONIC_ZERO_SPACE))
       data <<= 1;  // 0
     else
       return false;
@@ -2537,7 +2542,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results,
 
   // Success
   results->value = data;
-  results->panasonicAddress = (unsigned int) address;
+  results->panasonicAddress = (uint16_t) address;
   results->address = address;
   results->command = command;
   results->decode_type = PANASONIC;
@@ -2581,7 +2586,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
   if (!matchSpace(results->rawbuf[offset++], LG_HDR_SPACE))
     return false;
   // Data
-  for (int i = 0; i < nbits; i++, offset++) {
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
     if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], LG_ONE_SPACE))
@@ -2627,7 +2632,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
 //   JVC repeat codes don't have a header.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-// TODO:
+// TODO(crankyoldgit):
 //   Report that it is a repeat code and still record the value.
 bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
                                          uint16_t nbits,
@@ -2653,7 +2658,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
   }
 
   // Data
-  for (int i = 0; i < nbits; i++) {
+  for (uint16_t i = 0; i < nbits; i++) {
     if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], JVC_ONE_SPACE))
@@ -2718,7 +2723,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSAMSUNG(decode_results *results,
   if (!matchSpace(results->rawbuf[offset++], SAMSUNG_HDR_SPACE))
     return false;
   // Data
-  for (int i = 0; i < nbits; i++, offset++) {
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
     if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], SAMSUNG_ONE_SPACE))
@@ -2874,7 +2879,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeDenon(decode_results *results,
   if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
     return false;
   // Data
-  for (int i = 0; i < nbits; i++, offset++) {
+  for (uint16_t i = 0; i < nbits; i++, offset++) {
     if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
@@ -2978,8 +2983,7 @@ bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
 // Compare two tick values, returning 0 if newval is shorter,
 // 1 if newval is equal, and 2 if newval is longer
 // Use a tolerance of 20%
-int ICACHE_FLASH_ATTR IRrecv::compare(unsigned int oldval,
-                                      unsigned int newval) {
+int16_t ICACHE_FLASH_ATTR IRrecv::compare(uint16_t oldval, uint16_t newval) {
   if (newval < oldval * 0.8)
     return 0;
   else if (oldval < newval * 0.8)
@@ -3000,13 +3004,13 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeHash(decode_results *results) {
   // Require at least 6 samples to prevent triggering on noise
   if (results->rawlen < 6)
     return false;
-  long hash = FNV_BASIS_32;
+  int32_t hash = FNV_BASIS_32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
   // however it is left this way for compatiblity with previously captured
   // values.
   for (uint16_t i = 1; i < results->rawlen - 2; i++) {
-    int value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
+    int16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
     // Add value into the hash
     hash = (hash * FNV_PRIME_32) ^ value;
   }

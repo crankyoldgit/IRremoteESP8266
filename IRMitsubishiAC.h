@@ -1,3 +1,7 @@
+/* Copyright 2017 David Conran */
+
+#ifndef IRMITSUBISHIAC_H_
+#define IRMITSUBISHIAC_H_
 
 #include <IRremoteESP8266.h>
 #include <Arduino.h>
@@ -16,37 +20,37 @@
 #define MITSUBISHI_AC_VANE_AUTO_MOVE 7U
 #define MITSUBISHI_AC_STATE_LENGTH 18
 
-class IRMitsubishiAC
-{
-    public:
-        IRMitsubishiAC(int pin);
+class IRMitsubishiAC {
+ public:
+  explicit IRMitsubishiAC(uint16_t pin);
 
-        void stateReset();
-        void send();
+  void stateReset();
+  void send();
+  void begin();
+  void on();
+  void off();
+  void setPower(bool state);
+  bool getPower();
+  void setTemp(uint8_t temp);
+  uint8_t getTemp();
+  void setFan(uint8_t fan);
+  uint8_t getFan();
+  void setMode(uint8_t mode);
+  uint8_t getMode();
+  void setVane(uint8_t mode);
+  uint8_t getVane();
+  uint8_t* getRaw();
 
-        void begin();
-        void on();
-        void off();
-        void setPower(bool state);
-        bool getPower();
-        void setTemp(uint8_t temp);
-        uint8_t getTemp();
-        void setFan(uint8_t fan);
-        uint8_t getFan();
-        void setMode(uint8_t mode);
-        uint8_t getMode();
-        void setVane(uint8_t mode);
-        uint8_t getVane();
-        uint8_t* getRaw();
-
-
-    private:
-        // The state of the IR remote in IR code form.
-        // Known good state obtained from:
-        //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
-        uint8_t known_good_state[MITSUBISHI_AC_STATE_LENGTH] = { 0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F };
-        uint8_t remote_state[MITSUBISHI_AC_STATE_LENGTH];
-
-        void checksum();
-        IRsend _irsend;
+ private:
+  // The state of the IR remote in IR code form.
+  // Known good state obtained from:
+  //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
+  uint8_t known_good_state[MITSUBISHI_AC_STATE_LENGTH] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
+  uint8_t remote_state[MITSUBISHI_AC_STATE_LENGTH];
+  void checksum();
+  IRsend _irsend;
 };
+
+#endif  // IRMITSUBISHIAC_H_

@@ -28,8 +28,8 @@
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
-#ifndef IRremoteint_h
-#define IRremoteint_h
+#ifndef IRREMOTEINT_H_
+#define IRREMOTEINT_H_
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
@@ -47,13 +47,16 @@
 #define COOLIX_HDR_SPACE  COOLIX_BIT_MARK * 8U
 #define COOLIX_MIN_GAP    COOLIX_HDR_SPACE + COOLIX_ZERO_SPACE
 
+#define WHYNTER_BITS                   32U
 #define WHYNTER_HDR_MARK             2850U
 #define WHYNTER_HDR_SPACE            2850U
 #define WHYNTER_BIT_MARK              750U
 #define WHYNTER_ONE_SPACE            2150U
 #define WHYNTER_ZERO_SPACE            750U
 #define WHYNTER_MIN_COMMAND_LENGTH 108000UL  // Completely made up value.
-#define WHYNTER_MIN_GAP WHYNTER_MIN_COMMAND_LENGTH - 2 * (WHYNTER_BIT_MARK + WHYNTER_ZERO_SPACE) - WHYNTER_BITS * (WHYNTER_BIT_MARK + WHYNTER_ONE_SPACE)
+#define WHYNTER_MIN_GAP WHYNTER_MIN_COMMAND_LENGTH - \
+    (2 * (WHYNTER_BIT_MARK + WHYNTER_ZERO_SPACE) + \
+     WHYNTER_BITS * (WHYNTER_BIT_MARK + WHYNTER_ONE_SPACE))
 
 #define NEC_HDR_MARK             9000U
 #define NEC_HDR_SPACE            4500U
@@ -63,7 +66,9 @@
 #define NEC_RPT_SPACE            2250U
 #define NEC_RPT_LENGTH              4U
 #define NEC_MIN_COMMAND_LENGTH 108000UL
-#define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - NEC_HDR_MARK - NEC_HDR_SPACE - NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) + NEC_BIT_MARK
+#define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - \
+    (NEC_HDR_MARK + NEC_HDR_SPACE + NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) \
+     + NEC_BIT_MARK)
 
 #define SHERWOOD_MIN_REPEAT 1U
 
@@ -78,6 +83,7 @@
 #define SONY_12_BITS            12U
 #define SONY_15_BITS            15U
 #define SONY_20_BITS            20U
+#define SONY_MIN_REPEAT          2U
 
 // Sanyo SA 8650B
 // Ref:
@@ -86,7 +92,8 @@
 #define SANYO_SA8650B_HDR_SPACE          950U  // seen 950
 #define SANYO_SA8650B_ONE_MARK          2400U  // seen 2400
 #define SANYO_SA8650B_ZERO_MARK          700U  // seen 700
-#define SANYO_SA8650B_DOUBLE_SPACE_USECS 800U  // usually see 713 - not using ticks as get number wrapround
+// usually see 713 - not using ticks as get number wrapround
+#define SANYO_SA8650B_DOUBLE_SPACE_USECS 800U
 #define SANYO_SA8650B_RPT_LENGTH       45000U
 
 // Sanyo LC7461
@@ -96,7 +103,8 @@
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 #define SANYO_LC7461_ADDRESS_BITS           13U
 #define SANYO_LC7461_COMMAND_BITS            8U
-#define SANYO_LC7461_BITS ((SANYO_LC7461_ADDRESS_BITS + SANYO_LC7461_COMMAND_BITS) * 2)
+#define SANYO_LC7461_BITS ((SANYO_LC7461_ADDRESS_BITS + \
+                            SANYO_LC7461_COMMAND_BITS) * 2)
 #define SANYO_LC7461_ADDRESS_MASK ((1 << SANYO_LC7461_ADDRESS_BITS) - 1)
 #define SANYO_LC7461_COMMAND_MASK ((1 << SANYO_LC7461_COMMAND_BITS) - 1)
 #define SANYO_LC7461_HDR_MARK             9000U
@@ -105,7 +113,11 @@
 #define SANYO_LC7461_ONE_SPACE            1690U  // 3T
 #define SANYO_LC7461_ZERO_SPACE            560U  // 1T
 #define SANYO_LC7461_MIN_COMMAND_LENGTH 108000UL
-#define SANYO_LC7461_MIN_GAP SANYO_LC7461_MIN_COMMAND_LENGTH - (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + SANYO_LC7461_BITS * (SANYO_LC7461_BIT_MARK + (SANYO_LC7461_ONE_SPACE + SANYO_LC7461_ZERO_SPACE) / 2) + SANYO_LC7461_BIT_MARK)
+#define SANYO_LC7461_MIN_GAP SANYO_LC7461_MIN_COMMAND_LENGTH - \
+    (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + SANYO_LC7461_BITS * \
+     (SANYO_LC7461_BIT_MARK + (SANYO_LC7461_ONE_SPACE + \
+                               SANYO_LC7461_ZERO_SPACE) / 2) \
+     + SANYO_LC7461_BIT_MARK)
 
 // Mitsubishi period time is 1/33000Hz = 30.303 uSeconds (T)
 // Ref:
@@ -116,7 +128,7 @@
 #define MITSUBISHI_ZERO_SPACE           909U  // T * 30
 #define MITSUBISHI_MIN_COMMAND_LENGTH 54121U  // T * 1786
 #define MITSUBISHI_MIN_GAP            28364U  // T * 936
-// TODO: Verify that the repeat is really needed.
+// TODO(anyone): Verify that the repeat is really needed.
 #define MITSUBISHI_MIN_REPEAT             1U  // Based on marcosamarinho's code.
 
 // Mitsubishi A/C
@@ -246,7 +258,9 @@
 #define DENON_ONE_SPACE            1842U  // The length of a Bit:Space for 1's
 #define DENON_ZERO_SPACE            789U  // The length of a Bit:Space for 0's
 #define DENON_MIN_COMMAND_LENGTH 134052UL
-#define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - DENON_HDR_MARK - DENON_HDR_SPACE - DENON_BITS * (DENON_BIT_MARK + DENON_ONE_SPACE) - DENON_BIT_MARK
+#define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - \
+    (DENON_HDR_MARK + DENON_HDR_SPACE + DENON_BITS * \
+     (DENON_BIT_MARK + DENON_ONE_SPACE) + DENON_BIT_MARK)
 
 #define KELVINATOR_HDR_MARK    8990U
 #define KELVINATOR_HDR_SPACE   4490U
@@ -265,7 +279,7 @@
 
 // Some useful constants
 #define USECPERTICK  50U  // microseconds per clock interrupt tick
-#define RAWBUF      100U // Length of raw duration buffer
+#define RAWBUF      100U  // Length of raw duration buffer
 #define HEADER        2U  // Usual nr. of header entries.
 #define FOOTER        2U  // Usual nr. of footer (stop bits) entries.
 #define OFFSET_START  1U  // Usual rawbuf entry to start processing from.
@@ -283,8 +297,8 @@
 typedef struct {
   uint8_t recvpin;              // pin for IR data from detector
   uint8_t rcvstate;             // state machine
-  unsigned int timer;           // state timer, counts 50uS ticks.
-  unsigned int rawbuf[RAWBUF];  // raw data
+  uint16_t timer;               // state timer, counts 50uS ticks.
+  uint16_t rawbuf[RAWBUF];      // raw data
   // uint16_t is used for rawlen as it saves 3 bytes of iram in the interrupt
   // handler. Don't ask why, I don't know. It just does.
   uint16_t rawlen;              // counter of entries in rawbuf.
@@ -309,8 +323,8 @@ extern volatile irparams_t irparams;
 #define JVC_BITS           16U
 #define LG_BITS            28U
 #define SAMSUNG_BITS       32U
-#define WHYNTER_BITS       32U
 #define COOLIX_BITS        24U
 #define DAIKIN_BITS        99U
+#define RCMM_BITS          24U
 
-#endif
+#endif  // IRREMOTEINT_H_

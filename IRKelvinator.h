@@ -1,4 +1,11 @@
+/***************************************************
+* Kelvinator A/C
+*
+* Copyright 2016 David Conran
+***************************************************/
 
+#ifndef IRKELVINATOR_H_
+#define IRKELVINATOR_H_
 #include <IRremoteESP8266.h>
 #include <Arduino.h>
 
@@ -113,48 +120,45 @@
 
 #define KELVINATOR_STATE_LENGTH 16
 
-class IRKelvinatorAC
-{
-    public:
-        IRKelvinatorAC(int pin);
-        //: IRsend(pin){};
+class IRKelvinatorAC {
+ public:
+  explicit IRKelvinatorAC(uint16_t pin);
 
-        void stateReset();
-        void send();
+  void stateReset();
+  void send();
+  void begin();
+  void on();
+  void off();
+  void setPower(bool state);
+  bool getPower();
+  void setTemp(uint8_t temp);
+  uint8_t getTemp();
+  void setFan(uint8_t fan);
+  uint8_t getFan();
+  void setMode(uint8_t mode);
+  uint8_t getMode();
+  void setSwingVertical(bool state);
+  bool getSwingVertical();
+  void setSwingHorizontal(bool state);
+  bool getSwingHorizontal();
+  void setQuiet(bool state);
+  bool getQuiet();
+  void setIonFilter(bool state);
+  bool getIonFilter();
+  void setLight(bool state);
+  bool getLight();
+  void setXFan(bool state);
+  bool getXFan();
+  void setTurbo(bool state);
+  bool getTurbo();
+  uint8_t* getRaw();
 
-        void begin();
-        void on();
-        void off();
-        void setPower(bool state);
-        bool getPower();
-        void setTemp(uint8_t temp);
-        uint8_t getTemp();
-        void setFan(uint8_t fan);
-        uint8_t getFan();
-        void setMode(uint8_t mode);
-        uint8_t getMode();
-        void setSwingVertical(bool state);
-        bool getSwingVertical();
-        void setSwingHorizontal(bool state);
-        bool getSwingHorizontal();
-        void setQuiet(bool state);
-        bool getQuiet();
-        void setIonFilter(bool state);
-        bool getIonFilter();
-        void setLight(bool state);
-        bool getLight();
-        void setXFan(bool state);
-        bool getXFan();
-        void setTurbo(bool state);
-        bool getTurbo();
-        uint8_t* getRaw();
-
-
-    private:
-        // The state of the IR remote in IR code form.
-        uint8_t remote_state[KELVINATOR_STATE_LENGTH];
-
-        void checksum();
-        void fixup();
-        IRsend _irsend;
+ private:
+  // The state of the IR remote in IR code form.
+  uint8_t remote_state[KELVINATOR_STATE_LENGTH];
+  void checksum();
+  void fixup();
+  IRsend _irsend;
 };
+
+#endif  // IRKELVINATOR_H_

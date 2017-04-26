@@ -1,15 +1,15 @@
-
+/* Copyright 2016 sillyfrog */
 #include <IRDaikinESP.h>
 
 IRDaikinESP dakinir(D1);
 
-void setup(){
+void setup() {
   dakinir.begin();
   Serial.begin(115200);
 }
 
 
-void loop(){
+void loop() {
   Serial.println("Sending...");
 
   // Set up what we want to send. See IRDaikinESP.cpp for all the options.
