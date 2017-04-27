@@ -1,0 +1,19 @@
+#----------------------------------------#
+# .gitingore for IRremoteESP8266 library #
+#----------------------------------------#
+
+### Files to ignore.
+
+## Editors
+# vi/vim
+**/*.swp
+
+## Build environments
+# Platformio
+**/.pioenvs/
+**/.piolibdeps/
+**/.clang_complete
+**/.gcc-flags.json
+
+# GCC pre-compiled headers.
+**/*.gch
