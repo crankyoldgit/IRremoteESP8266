@@ -1,4 +1,4 @@
-/*
+/* Copyright 2017 David Conran
 Code to emulate Mitsubishi A/C IR remote control unit.
 Inspired and derived from the work done at:
   https://github.com/r45635/HVAC-IR-Control
@@ -12,7 +12,7 @@ Equipment it seems compatible with:
 #include <IRMitsubishiAC.h>
 
 // Initialise the object.
-IRMitsubishiAC::IRMitsubishiAC(int pin) : _irsend(pin) {
+IRMitsubishiAC::IRMitsubishiAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
 
@@ -52,14 +52,14 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::checksum() {
 
 // Set the requested power state of the A/C to off.
 void ICACHE_FLASH_ATTR IRMitsubishiAC::on() {
-    //state = ON;
-    remote_state[5] |= MITSUBISHI_AC_POWER;
+  // state = ON;
+  remote_state[5] |= MITSUBISHI_AC_POWER;
 }
 
 // Set the requested power state of the A/C to off.
 void ICACHE_FLASH_ATTR IRMitsubishiAC::off() {
-    //state = OFF;
-    remote_state[5] &= ~MITSUBISHI_AC_POWER;
+  // state = OFF;
+  remote_state[5] &= ~MITSUBISHI_AC_POWER;
 }
 
 // Set the requested power state of the A/C.
@@ -72,19 +72,19 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setPower(bool state) {
 
 // Return the requested power state of the A/C.
 bool ICACHE_FLASH_ATTR IRMitsubishiAC::getPower() {
-    return((remote_state[5] & MITSUBISHI_AC_POWER) != 0);
+  return((remote_state[5] & MITSUBISHI_AC_POWER) != 0);
 }
 
 // Set the temp. in deg C
 void ICACHE_FLASH_ATTR IRMitsubishiAC::setTemp(uint8_t temp) {
-    temp = max(MITSUBISHI_AC_MIN_TEMP, temp);
-    temp = min(MITSUBISHI_AC_MAX_TEMP, temp);
-    remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
+  temp = max(MITSUBISHI_AC_MIN_TEMP, temp);
+  temp = min(MITSUBISHI_AC_MAX_TEMP, temp);
+  remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
 }
 
 // Return the set temp. in deg C
 uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getTemp() {
-    return(remote_state[7] + MITSUBISHI_AC_MIN_TEMP);
+  return(remote_state[7] + MITSUBISHI_AC_MIN_TEMP);
 }
 
 // Set the speed of the fan, 0-6.
@@ -104,10 +104,10 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setFan(uint8_t fan) {
 
 // Return the requested state of the unit's fan.
 uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getFan() {
-    uint8_t fan = remote_state[9] & B111;
-    if (fan == MITSUBISHI_AC_FAN_MAX)
-      return MITSUBISHI_AC_FAN_SILENT;
-    return fan;
+  uint8_t fan = remote_state[9] & B111;
+  if (fan == MITSUBISHI_AC_FAN_MAX)
+    return MITSUBISHI_AC_FAN_SILENT;
+  return fan;
 }
 
 // Return the requested climate operation mode of the a/c unit.
@@ -118,7 +118,7 @@ uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getMode() {
   MITSUBISHI_AC_DRY
   MITSUBISHI_AC_HEAT
   */
-    return(remote_state[6]);
+  return(remote_state[6]);
 }
 
 // Set the requested climate operation mode of the a/c unit.
@@ -136,6 +136,7 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setMode(uint8_t mode) {
 
 // Set the requested vane operation mode of the a/c unit.
 void ICACHE_FLASH_ATTR IRMitsubishiAC::setVane(uint8_t mode) {
+  // NOLINTNEXTLINE(build/include_what_you_use)
   mode = max(mode, B111);  // bounds check
   mode |= B1000;
   mode <<= 3;

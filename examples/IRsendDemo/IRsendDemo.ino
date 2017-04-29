@@ -1,10 +1,13 @@
-/*
- * IRremoteESP8266: IRsendDemo - demonstrates sending IR codes with IRsend.
+/* IRremoteESP8266: IRsendDemo - demonstrates sending IR codes with IRsend.
+ *
+ * Version 1.0 April, 2017
+ * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009,
+ * Copyright 2009 Ken Shirriff, http://arcfn.com
  *
  * An IR LED circuit *MUST* be connected to ESP8266 pin 4 (D2).
  *
  * TL;DR: The IR LED needs to be driven by a transistor for a good result.
- * 
+ *
  * Suggested circuit:
  *     https://github.com/markszabo/IRremoteESP8266/wiki#ir-sending
  *
@@ -22,17 +25,13 @@
  *     * Pin 3/RX/RXD0: Any serial transmissions to the ESP8266 will interfere.
  *   * ESP-01 modules are tricky. We suggest you use a module with more GPIOs
  *     for your first time. e.g. ESP-12 etc.
- *
- * Version 1.0 April, 2017
- * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009, Copyright 2009 Ken Shirriff, http://arcfn.com
  */
 
 #include <IRremoteESP8266.h>
 
-IRsend irsend(4); //an IR led is connected to GPIO pin 4 (D2)
+IRsend irsend(4);  // an IR led is connected to GPIO pin 4 (D2)
 
-void setup()
-{
+void setup() {
   irsend.begin();
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
 }

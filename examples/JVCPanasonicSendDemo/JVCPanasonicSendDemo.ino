@@ -6,24 +6,25 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  */
 #include <IRremoteESP8266.h>
- 
-#define PanasonicAddress      0x4004     // Panasonic address (Pre data) 
+
+#define PanasonicAddress      0x4004     // Panasonic address (Pre data)
 #define PanasonicPower        0x100BCBD  // Panasonic Power button
 
 #define JVCPower              0xC5E8
 
-IRsend irsend(0); //an IR led is connected to GPIO pin 0
+IRsend irsend(0);  // an IR led is connected to GPIO pin 0
 
-void setup()
-{
-   irsend.begin();
+void setup() {
+  irsend.begin();
 }
 
 void loop() {
-  irsend.sendPanasonic(PanasonicAddress,PanasonicPower); // This should turn your TV on and off
-  
-  irsend.sendJVC(JVCPower, 16,0); // hex value, 16 bits, no repeat
-  delayMicroseconds(50); // see http://www.sbprojects.com/knowledge/ir/jvc.php for information
-  irsend.sendJVC(JVCPower, 16,1); // hex value, 16 bits, repeat
+  // This should turn your TV on and off
+  irsend.sendPanasonic(PanasonicAddress, PanasonicPower);
+
+  irsend.sendJVC(JVCPower, 16, 0);  // hex value, 16 bits, no repeat
+  // see http://www.sbprojects.com/knowledge/ir/jvc.php for information
+  delayMicroseconds(50);
+  irsend.sendJVC(JVCPower, 16, 1);  // hex value, 16 bits, repeat
   delayMicroseconds(50);
 }

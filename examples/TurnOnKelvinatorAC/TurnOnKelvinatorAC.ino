@@ -1,4 +1,4 @@
-
+/* Copyright 2016 David Conran */
 #include <IRKelvinator.h>
 
 IRKelvinatorAC kelvir(D1);  // IR led controlled by Pin D1.
@@ -17,12 +17,12 @@ void printState() {
   // Display the encoded IR sequence.
   unsigned char* ir_code = kelvir.getRaw();
   Serial.print("IR Code: 0x");
-  for (int i = 0; i < KELVINATOR_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }
 
-void setup(){
+void setup() {
   kelvir.begin();
   Serial.begin(115200);
   delay(200);

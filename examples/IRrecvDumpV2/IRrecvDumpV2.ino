@@ -12,16 +12,18 @@
 
 #include <IRremoteESP8266.h>
 
-// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU board).
-int RECV_PIN = 14;
+// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
+// board).
+uint16_t RECV_PIN = 14;
 
 IRrecv irrecv(RECV_PIN);
 
-decode_results results; // Somewhere to store the results
-irparams_t save;        // A place to copy the interrupt state while decoding.
+decode_results results;  // Somewhere to store the results
+irparams_t save;         // A place to copy the interrupt state while decoding.
 
 void setup() {
-  Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);  // Status message will be sent to the PC at 115200 baud
+  // Status message will be sent to the PC at 115200 baud
+  Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
   irrecv.enableIRIn();  // Start the receiver
 }
 
@@ -38,8 +40,8 @@ void ircode(decode_results *results) {
   //   print() & println() can't handle printing long longs. (uint64_t)
   //   So we have to print the top and bottom halves separately.
   if (results->value >> 32)
-    Serial.print((unsigned long) (results->value >> 32), HEX);
-  Serial.println((unsigned long) (results->value & 0xFFFFFFFF), HEX);
+    Serial.print((uint32_t) (results->value >> 32), HEX);
+  Serial.println((uint32_t) (results->value & 0xFFFFFFFF), HEX);
 }
 
 //+=============================================================================
@@ -48,31 +50,31 @@ void ircode(decode_results *results) {
 void encoding(decode_results *results) {
   switch (results->decode_type) {
     default:
-    case UNKNOWN:      Serial.print("UNKNOWN");       break ;
-    case NEC:          Serial.print("NEC");           break ;
-    case SONY:         Serial.print("SONY");          break ;
-    case RC5:          Serial.print("RC5");           break ;
-    case RC6:          Serial.print("RC6");           break ;
-    case DISH:         Serial.print("DISH");          break ;
-    case SHARP:        Serial.print("SHARP");         break ;
-    case JVC:          Serial.print("JVC");           break ;
-    case SANYO:        Serial.print("SANYO");         break ;
-    case SANYO_LC7461: Serial.print("SANYO_LC7461");  break ;
-    case MITSUBISHI:   Serial.print("MITSUBISHI");    break ;
-    case SAMSUNG:      Serial.print("SAMSUNG");       break ;
-    case LG:           Serial.print("LG");            break ;
-    case WHYNTER:      Serial.print("WHYNTER");       break ;
-    case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break ;
-    case PANASONIC:    Serial.print("PANASONIC");     break ;
-    case DENON:        Serial.print("DENON");         break ;
-    case COOLIX:       Serial.print("COOLIX");        break ;
+    case UNKNOWN:      Serial.print("UNKNOWN");       break;
+    case NEC:          Serial.print("NEC");           break;
+    case SONY:         Serial.print("SONY");          break;
+    case RC5:          Serial.print("RC5");           break;
+    case RC6:          Serial.print("RC6");           break;
+    case DISH:         Serial.print("DISH");          break;
+    case SHARP:        Serial.print("SHARP");         break;
+    case JVC:          Serial.print("JVC");           break;
+    case SANYO:        Serial.print("SANYO");         break;
+    case SANYO_LC7461: Serial.print("SANYO_LC7461");  break;
+    case MITSUBISHI:   Serial.print("MITSUBISHI");    break;
+    case SAMSUNG:      Serial.print("SAMSUNG");       break;
+    case LG:           Serial.print("LG");            break;
+    case WHYNTER:      Serial.print("WHYNTER");       break;
+    case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break;
+    case PANASONIC:    Serial.print("PANASONIC");     break;
+    case DENON:        Serial.print("DENON");         break;
+    case COOLIX:       Serial.print("COOLIX");        break;
   }
 }
 
 //+=============================================================================
 // Dump out the decode_results structure.
 //
-void dumpInfo (decode_results *results) {
+void dumpInfo(decode_results *results) {
   if (results->overflow) {
     Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
     return;
@@ -97,46 +99,48 @@ void dumpInfo (decode_results *results) {
 void dumpRaw(decode_results *results) {
   // Print Raw data
   Serial.print("Timing[");
-  Serial.print(results->rawlen-1, DEC);
+  Serial.print(results->rawlen - 1, DEC);
   Serial.println("]: ");
 
-  for (int i = 1;  i < results->rawlen;  i++) {
+  for (uint16_t i = 1;  i < results->rawlen;  i++) {
     if (i % 100 == 0)
       yield();  // Preemptive yield every 100th entry to feed the WDT.
-    unsigned long  x = results->rawbuf[i] * USECPERTICK;
+    uint32_t x = results->rawbuf[i] * USECPERTICK;
     if (!(i & 1)) {  // even
       Serial.print("-");
-      if (x < 1000)  Serial.print(" ") ;
-      if (x < 100)   Serial.print(" ") ;
+      if (x < 1000) Serial.print(" ");
+      if (x < 100) Serial.print(" ");
       Serial.print(x, DEC);
     } else {  // odd
       Serial.print("     ");
       Serial.print("+");
-      if (x < 1000)  Serial.print(" ") ;
-      if (x < 100)   Serial.print(" ") ;
+      if (x < 1000) Serial.print(" ");
+      if (x < 100) Serial.print(" ");
       Serial.print(x, DEC);
-      if (i < results->rawlen-1) Serial.print(", "); //',' not needed for last one
+      if (i < results->rawlen - 1)
+        Serial.print(", ");  // ',' not needed for last one
     }
-    if (!(i % 8))  Serial.println("");
+    if (!(i % 8)) Serial.println("");
   }
-  Serial.println("");                    // Newline
+  Serial.println("");  // Newline
 }
 
 //+=============================================================================
 // Dump out the decode_results structure.
 //
-void dumpCode (decode_results *results) {
+void dumpCode(decode_results *results) {
   // Start declaration
-  Serial.print("unsigned int  ");          // variable type
+  Serial.print("uint16_t  ");              // variable type
   Serial.print("rawData[");                // array name
   Serial.print(results->rawlen - 1, DEC);  // array size
   Serial.print("] = {");                   // Start declaration
 
   // Dump data
-  for (int i = 1;  i < results->rawlen;  i++) {
+  for (uint16_t i = 1; i < results->rawlen; i++) {
     Serial.print(results->rawbuf[i] * USECPERTICK, DEC);
-    if ( i < results->rawlen-1 ) Serial.print(","); // ',' not needed on last one
-    if (!(i & 1))  Serial.print(" ");
+    if (i < results->rawlen - 1)
+      Serial.print(",");  // ',' not needed on last one
+    if (!(i & 1)) Serial.print(" ");
   }
 
   // End declaration
@@ -155,18 +159,18 @@ void dumpCode (decode_results *results) {
   if (results->decode_type != UNKNOWN) {
     // Some protocols have an address
     if (results->decode_type == PANASONIC) {
-      Serial.print("unsigned int  addr = 0x");
+      Serial.print("uint16_t  addr = 0x");
       Serial.print(results->panasonicAddress, HEX);
       Serial.println(";");
     }
 
     // All protocols have data
-    Serial.print("unsigned int  data = 0x");
-    //   print() & println() can't handle printing long longs. (uint64_t)
-    //   So we have to print the top and bottom halves separately.
+    Serial.print("uint64_t  data = 0x");
+    // print() & println() can't handle printing long longs. (uint64_t)
+    // So we have to print the top and bottom halves separately.
     if (results->value >> 32)
-      Serial.print((unsigned long) (results->value >> 32), HEX);
-    Serial.print((unsigned long) (results->value & 0xFFFFFFFF), HEX);
+      Serial.print((uint32_t) (results->value >> 32), HEX);
+    Serial.print((uint32_t) (results->value & 0xFFFFFFFF), HEX);
     Serial.println(";");
   }
 }
