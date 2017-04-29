@@ -222,12 +222,14 @@
 
 // information for the interrupt handler
 typedef struct {
-  uint8_t recvpin;           // pin for IR data from detector
-  uint8_t rcvstate;          // state machine
-  unsigned int timer;     // state timer, counts 50uS ticks.
-  unsigned int rawbuf[RAWBUF]; // raw data
-  uint8_t rawlen;         // counter of entries in rawbuf
-  uint8_t overflow;
+  uint8_t recvpin;              // pin for IR data from detector
+  uint8_t rcvstate;             // state machine
+  unsigned int timer;           // state timer, counts 50uS ticks.
+  unsigned int rawbuf[RAWBUF];  // raw data
+  // uint16_t is used for rawlen as it saves 3 bytes of iram in the interrupt
+  // handler. Don't ask why, I don't know. It just does.
+  uint16_t rawlen;              // counter of entries in rawbuf.
+  uint8_t overflow;             // Buffer overflow indicator.
 }
 irparams_t;
 
