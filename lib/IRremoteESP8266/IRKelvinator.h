@@ -6,6 +6,7 @@
 
 #ifndef IRKELVINATOR_H_
 #define IRKELVINATOR_H_
+
 #include <IRremoteESP8266.h>
 #include <Arduino.h>
 
@@ -79,7 +80,7 @@
     b7 = X-Fan (Fan runs for a while after power off) (1 = On, 0 = Off)
   byte 3 = Section Indicator
     b3-0 = Unused (Typically 0)
-    b5-4 = Unknown (possibly timer related) (Typically B01)
+    b5-4 = Unknown (possibly timer related) (Typically 0b01)
     b7-6 = End of command block (B01)
   (B010 marker and a gap of 20ms)
   byte 4 = Extended options
@@ -96,25 +97,25 @@
   byte 10 = Repeat of byte 2
   byte 11 = Section Indicator
     b3-0 = Unused (Typically 0)
-    b5-4 = Unknown (possibly timer related) (Typically B11)
+    b5-4 = Unknown (possibly timer related) (Typically 0b11)
     b7-6 = End of command block (B01)
   (B010 marker and a gap of 20ms)
   byte 12 = Extended options
     b0 = Sleep mode 2 (1 = On, 0=Off)
-    b6-1 = Unknown (Used in Sleep Mode 3, Typically B000000)
+    b6-1 = Unknown (Used in Sleep Mode 3, Typically 0b000000)
     b7 = Quiet Mode (1 = On, 0=Off)
   byte 13 = Unknown (Sleep Mode 3 related, Typically 0x00)
   byte 14 = Fan control
-    b3-0 = Unknown (Sleep Mode 3 related, Typically B0000)
+    b3-0 = Unknown (Sleep Mode 3 related, Typically 0b0000)
     b6-4 = Fan speed
-       B000 (0) = Automatic
-       B001 (1) = Fan 1
-       B010 (2) = Fan 2
-       B011 (3) = Fan 3
-       B100 (4) = Fan 4
-       B101 (5) = Fan 5
+       0b000 (0) = Automatic
+       0b001 (1) = Fan 1
+       0b010 (2) = Fan 2
+       0b011 (3) = Fan 3
+       0b100 (4) = Fan 4
+       0b101 (5) = Fan 5
   byte 15 = checksum
-    b3-0 = Unknown (Typically B0000)
+    b3-0 = Unknown (Typically 0b0000)
     b7-4 = checksum of the previous bytes (8-14)
 */
 

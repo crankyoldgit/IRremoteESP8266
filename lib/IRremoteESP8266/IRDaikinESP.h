@@ -5,14 +5,14 @@
 #include <IRremoteESP8266.h>
 #include <Arduino.h>
 
-#define DAIKIN_COOL B011
-#define DAIKIN_HEAT B100
-#define DAIKIN_FAN B110
-#define DAIKIN_AUTO B000
-#define DAIKIN_DRY B010
+#define DAIKIN_COOL 0b011
+#define DAIKIN_HEAT 0b100
+#define DAIKIN_FAN  0b110
+#define DAIKIN_AUTO 0b000
+#define DAIKIN_DRY  0b010
 
-#define DAIKIN_POWERFUL B00000010
-#define DAIKIN_SILENT   B00100000
+#define DAIKIN_POWERFUL 0b00000010
+#define DAIKIN_SILENT   0b00100000
 
 /*
 	Daikin AC map

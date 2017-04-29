@@ -40,12 +40,16 @@
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
-
-#include "IRremoteESP8266.h"
-#include "IRremoteInt.h"
-#include "IRDaikinESP.h"
-#include "IRKelvinator.h"
-#include "IRMitsubishiAC.h"
+#include <IRremoteESP8266.h>
+extern "C" {
+  #include <gpio.h>
+  #include <user_interface.h>
+}
+#include <algorithm>
+#include <IRremoteInt.h>
+#include <IRDaikinESP.h>
+#include <IRKelvinator.h>
+#include <IRMitsubishiAC.h>
 
 // IRtimer ---------------------------------------------------------------------
 // This class performs a simple time in useconds since instantiated.
@@ -193,8 +197,7 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC(uint64_t data, uint16_t nbits,
   // Footer
   mark(NEC_BIT_MARK);
   // Gap to next command.
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
+  space(std::max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
 
   // Optional command repeat sequence.
   for (uint16_t i = 0; i < repeat; i++) {
@@ -203,8 +206,7 @@ void ICACHE_FLASH_ATTR IRsend::sendNEC(uint64_t data, uint16_t nbits,
     space(NEC_RPT_SPACE);
     mark(NEC_BIT_MARK);
     // Gap till next command.
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
+    space(std::max(NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH - usecs.elapsed()));
   }
 }
 
@@ -265,8 +267,8 @@ void ICACHE_FLASH_ATTR IRsend::sendLG(uint64_t data,
              data, nbits, true);
     // Footer
     mark(LG_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
+    space(std::max((uint32_t) (LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed()),
+                   (uint32_t) LG_MIN_GAP));
   }
   // Repeat
   for (uint16_t i = 0; i < repeat; i++) {
@@ -274,8 +276,8 @@ void ICACHE_FLASH_ATTR IRsend::sendLG(uint64_t data,
     mark(repeatHeaderMark);
     space(LG_RPT_SPACE);
     mark(LG_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(), LG_MIN_GAP));
+    space(std::max((uint32_t) LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(),
+                   (uint32_t) LG_MIN_GAP));
   }
 }
 
@@ -324,9 +326,8 @@ void ICACHE_FLASH_ATTR IRsend::sendWhynter(uint64_t data, uint16_t nbits,
              WHYNTER_ZERO_SPACE, data, nbits, true);
     // Footer
     mark(WHYNTER_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-              WHYNTER_MIN_GAP));
+    space(std::max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+                   WHYNTER_MIN_GAP));
   }
 }
 
@@ -362,8 +363,7 @@ void ICACHE_FLASH_ATTR IRsend::sendSony(uint64_t data, uint16_t nbits,
     // Footer
     // The Sony protocol requires us to wait 45ms from start of a code to the
     // start of the next one. A 10ms minimum gap is also required.
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(SONY_MIN_GAP, SONY_RPT_LENGTH - usecs.elapsed()));
+    space(std::max(SONY_MIN_GAP, SONY_RPT_LENGTH - usecs.elapsed()));
   }
   // A space() is always performed last, so no need to turn off the LED.
 }
@@ -449,8 +449,8 @@ void ICACHE_FLASH_ATTR IRsend::sendGC(uint16_t buf[], uint16_t len) {
   uint16_t hz = buf[GLOBALCACHE_FREQ_INDEX];  // GC frequency is in Hz.
   enableIROut(hz);
   uint32_t periodic_time = calcUSecPeriod(hz);
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  uint8_t emits = min(buf[GLOBALCACHE_RPT_INDEX], GLOBALCACHE_MAX_REPEAT);
+  uint8_t emits = std::min(buf[GLOBALCACHE_RPT_INDEX],
+                           (uint16_t) GLOBALCACHE_MAX_REPEAT);
   // Repeat
   for (uint8_t repeat = 0; repeat < emits; repeat++) {
     // First time through, start at the beginning (GLOBALCACHE_START_INDEX),
@@ -462,9 +462,8 @@ void ICACHE_FLASH_ATTR IRsend::sendGC(uint16_t buf[], uint16_t len) {
     for (; offset < len; offset++) {
       // Convert periodic units to microseconds.
       // Minimum is GLOBALCACHE_MIN_USEC for actual GC units.
-      // NOLINTNEXTLINE(build/include_what_you_use)
-      uint32_t microseconds = max(buf[offset] * periodic_time,
-                                  GLOBALCACHE_MIN_USEC);
+      uint32_t microseconds = std::max(buf[offset] * periodic_time,
+                                       GLOBALCACHE_MIN_USEC);
       // These codes start at an odd index (not even as with sendRaw).
       if (offset & 1)  // Odd bit.
         mark(microseconds);
@@ -556,16 +555,16 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint16_t nbits) {
   mark(RCMM_HDR_MARK);
   space(RCMM_HDR_SPACE);
   // Data
-  uint32_t mask = B11 << (nbits - 2);
+  uint32_t mask = 0b11 << (nbits - 2);
   // RC-MM sends data 2 bits at a time.
   for (uint8_t i = nbits; i > 0; i -= 2) {
     mark(RCMM_BIT_MARK);
     // Grab the next Most Significant Bits to send.
     switch ((data & mask) >> (i - 2)) {
-      case B00: space(RCMM_BIT_SPACE_0); break;
-      case B01: space(RCMM_BIT_SPACE_1); break;
-      case B10: space(RCMM_BIT_SPACE_2); break;
-      case B11: space(RCMM_BIT_SPACE_3); break;
+      case 0b00: space(RCMM_BIT_SPACE_0); break;
+      case 0b01: space(RCMM_BIT_SPACE_1); break;
+      case 0b10: space(RCMM_BIT_SPACE_2); break;
+      case 0b11: space(RCMM_BIT_SPACE_3); break;
     }
     mask >>= 2;
   }
@@ -573,8 +572,7 @@ void ICACHE_FLASH_ATTR IRsend::sendRCMM(uint32_t data, uint16_t nbits) {
   mark(RCMM_BIT_MARK);
   // Protocol requires us to wait at least RCMM_RPT_LENGTH usecs from the start
   // or RCMM_MIN_GAP usecs.
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  space(max(RCMM_RPT_LENGTH - usecs.elapsed(), RCMM_MIN_GAP));
+  space(std::max(RCMM_RPT_LENGTH - usecs.elapsed(), RCMM_MIN_GAP));
 }
 
 // Send a Panasonic formatted message.
@@ -604,9 +602,9 @@ void ICACHE_FLASH_ATTR IRsend::sendPanasonic64(uint64_t data, uint16_t nbits,
              data, nbits, true);
     // Footer
     mark(PANASONIC_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(PANASONIC_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-              PANASONIC_MIN_GAP));
+    space(std::max((uint32_t) PANASONIC_MIN_COMMAND_LENGTH -
+                       usecTimer.elapsed(),
+                   PANASONIC_MIN_GAP));
   }
 }
 
@@ -683,8 +681,7 @@ void ICACHE_FLASH_ATTR IRsend::sendJVC(uint64_t data, uint16_t nbits,
     // Footer
     mark(JVC_BIT_MARK);
     // Wait till the end of the repeat time window before we send another code.
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(JVC_MIN_GAP, JVC_RPT_LENGTH - usecs.elapsed()));
+    space(std::max(JVC_MIN_GAP, JVC_RPT_LENGTH - usecs.elapsed()));
     usecs.reset();
   }
 }
@@ -734,9 +731,9 @@ void ICACHE_FLASH_ATTR IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits,
              SAMSUNG_ZERO_SPACE, data, nbits, true);
     // Footer
     mark(SAMSUNG_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(SAMSUNG_MIN_GAP,
-              SAMSUNG_MIN_MESSAGE_LENGTH - usecTimer.elapsed()));
+    space(std::max((uint32_t) SAMSUNG_MIN_GAP,
+                   (uint32_t) (SAMSUNG_MIN_MESSAGE_LENGTH -
+                               usecTimer.elapsed())));
   }
 }
 
@@ -787,8 +784,8 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon(uint64_t data, uint16_t nbits,
              data, nbits, true);
     // Footer
     mark(DENON_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(), DENON_MIN_GAP));
+    space(std::max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+                   DENON_MIN_GAP));
   }
 }
 
@@ -816,14 +813,13 @@ void ICACHE_FLASH_ATTR IRsend::mark(uint16_t usec) {
     digitalWrite(IRpin, HIGH);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    delayMicroseconds(min(onTimePeriod, usec - elapsed));
+    delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, LOW);  // Turn the LED off.
     if (elapsed + onTimePeriod >= usec)
       return;  // LED is now off & we've passed our allotted time. Safe to stop.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    delayMicroseconds(min(usec - elapsed - onTimePeriod, offTimePeriod));
+    delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
+                               (uint32_t) offTimePeriod));
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
 }
@@ -874,8 +870,8 @@ uint32_t ICACHE_FLASH_ATTR IRsend::calcUSecPeriod(uint32_t hz) {
 //   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
 void ICACHE_FLASH_ATTR IRsend::enableIROut(uint32_t freq, uint8_t duty) {
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  duty = min(duty, 100);  // Can't have more than 100% duty cycle.
+  duty = std::min(duty,
+                  (uint8_t) 100);  // Can't have more than 100% duty cycle.
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
   uint32_t period = calcUSecPeriod(freq);
@@ -1111,9 +1107,8 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
            SANYO_LC7461_BIT_MARK, SANYO_LC7461_ZERO_SPACE, data, nbits, true);
   // Footer
   mark(SANYO_LC7461_BIT_MARK);
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-            SANYO_LC7461_MIN_GAP));
+  space(std::max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+                 SANYO_LC7461_MIN_GAP));
 
   // Repeat
   // Similar to the NEC protocol, sending a special repeat message to indicate
@@ -1125,9 +1120,8 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
     space(SANYO_LC7461_HDR_SPACE);
     // Footer
     mark(SANYO_LC7461_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-              SANYO_LC7461_MIN_GAP));
+    space(std::max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+                   SANYO_LC7461_MIN_GAP));
   }
 }
 
@@ -1242,8 +1236,7 @@ void ICACHE_FLASH_ATTR IRsend::sendKelvinator(unsigned char data[]) {
 //   i.e. repeat should be >= SHERWOOD_MIN_REPEAT (1).
 void ICACHE_FLASH_ATTR IRsend::sendSherwood(uint64_t data, uint16_t nbits,
                                             uint16_t repeat) {
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  sendNEC(data, nbits, max(SHERWOOD_MIN_REPEAT, repeat));
+  sendNEC(data, nbits, std::max((uint16_t) SHERWOOD_MIN_REPEAT, repeat));
 }
 
 // Send a Mitsubishi message
@@ -1275,9 +1268,8 @@ void ICACHE_FLASH_ATTR IRsend::sendMitsubishi(uint64_t data, uint16_t nbits,
              data, nbits, true);
     // Footer
     mark(MITSUBISHI_BIT_MARK);
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    space(max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-              MITSUBISHI_MIN_GAP));
+    space(std::max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
+                   MITSUBISHI_MIN_GAP));
   }
 }
 
@@ -1312,11 +1304,6 @@ void ICACHE_FLASH_ATTR IRsend::sendMitsubishiAC(unsigned char data[]) {
 
 
 // IRRecv------------------------------------------------------
-
-extern "C" {
-  #include "user_interface.h"  // NOLINT(build/include)
-  #include "gpio.h"
-}
 
 static ETSTimer timer;
 volatile irparams_t irparams;
@@ -1375,14 +1362,15 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 // Returns:
 //   The reversed bit pattern.
 uint64_t reverseBits(uint64_t input, uint16_t nbits) {
-    uint64_t output = input;
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    for (uint16_t i = 1; i < min(nbits, sizeof(input) * 8); i++) {
-        output <<= 1;
-        input  >>= 1;
-        output |= (input & 1);
-    }
-    return output;
+  uint64_t output = input;
+  for (uint16_t i = 1;
+       i < std::min(nbits, (uint16_t) (sizeof(input) * 8));
+       i++) {
+    output <<= 1;
+    input  >>= 1;
+    output |= (input & 1);
+  }
+  return output;
 }
 
 // Calculate the rolling 4-bit wide checksum over all of the data.
@@ -1586,8 +1574,8 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 //   Nr. of ticks.
 uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  return((uint32_t) max(usecs * (1.0 - tolerance/100.0) / USECPERTICK, 0));
+  return((uint32_t) std::max((int32_t) (
+      usecs * (1.0 - tolerance/100.0) / USECPERTICK), 0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -2436,7 +2424,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSharp(decode_results *results,
   if (strict) {
     // We expect the expansion bit to be set, and the check bit cleared
     // in a normal message.
-    if ((data & B11) != B10)
+    if ((data & 0b11) != 0b10)
       return false;
     /* DISABLED - See TODO
     // Grab the second copy of the data (i.e. inverted)
