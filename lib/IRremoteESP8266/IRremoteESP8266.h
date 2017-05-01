@@ -134,7 +134,7 @@ class IRrecv {
   int16_t getRClevel(decode_results *results, int *offset, int *used,
                      uint16_t t1);
   bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
-                 bool strict = false);
+                 bool strict = true);
   bool decodeSony(decode_results *results, uint16_t nbits = SONY_MIN_BITS,
                   bool strict = false);
   bool decodeSanyo(decode_results *results, uint16_t nbits = SANYO_SA8650B_BITS,
@@ -155,7 +155,7 @@ class IRrecv {
   bool decodeJVC(decode_results *results, uint16_t nbits = JVC_BITS,
                  bool strict = true);
   bool decodeSAMSUNG(decode_results *results, uint16_t nbits = SAMSUNG_BITS,
-                     bool strict = false);
+                     bool strict = true);
   bool decodeWhynter(decode_results *results, uint16_t nbits = WHYNTER_BITS,
                      bool strict = true);
   bool decodeHash(decode_results *results);
