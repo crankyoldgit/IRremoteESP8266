@@ -40,6 +40,7 @@
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
+
 #include <IRremoteESP8266.h>
 extern "C" {
   #include <gpio.h>
@@ -1484,11 +1485,6 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
   if (decodeSony(results))
     return true;
 #ifdef DEBUG
-  Serial.println("Attempting Sanyo SA8650B decode");
-#endif
-  if (decodeSanyo(results))
-    return true;
-#ifdef DEBUG
   Serial.println("Attempting Mitsubishi decode");
 #endif
   if (decodeMitsubishi(results))
@@ -1553,6 +1549,16 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
 #endif
   if (decodeCOOLIX(results))
     return true;
+  // The Sanyo S866500B decoder is very poor quality & depricated.
+  // *IF* you are going to enable it, do it near last to avoid false positive
+  // matches.
+  /*********** DISABLED & DEPRICATED **********
+#ifdef DEBUG
+  Serial.println("Attempting Sanyo SA8650B decode");
+#endif
+  if (decodeSanyo(results))
+    return true;
+  ********** DISABLED & DEPRICATED ***********/
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
@@ -1671,7 +1677,7 @@ bool ICACHE_FLASH_ATTR IRrecv::matchSpace(uint32_t measured_ticks,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: STABLE / Known good. strict mode is ALPHA / Untested.
+// Status: STABLE / Known good.
 //
 // Notes:
 //   NEC protocol has three varients/forms.
@@ -2614,7 +2620,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: STABLE  Strict mode is ALPHA / Untested.
+// Status: STABLE
 //
 // Note:
 //   JVC repeat codes don't have a header.
@@ -2687,7 +2693,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: STABLE  Strict mode is ALPHA / Untested.
+// Status: STABLE
 //
 // Note:
 //   LG 32bit protocol appears near identical to the Samsung protocol.
@@ -3002,7 +3008,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeHash(decode_results *results) {
     // Add value into the hash
     hash = (hash * FNV_PRIME_32) ^ value;
   }
-  results->value = hash;
+  results->value = hash & 0xFFFFFFFF;
   results->bits = results->rawlen / 2;
   results->address = 0;
   results->command = 0;
