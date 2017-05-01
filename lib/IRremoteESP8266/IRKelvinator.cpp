@@ -1,4 +1,5 @@
-/* Copyright 2016 David Conran
+/******************************************************************************
+ * Copyright 2016 David Conran
  *
  * Code to emulate IR Kelvinator YALIF remote control unit, which should control
  * at least the following Kelvinator A/C units:
@@ -15,6 +16,7 @@
  *   - Farenheit.
 */
 
+#include <algorithm>
 #include <IRKelvinator.h>
 
 IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
@@ -94,8 +96,8 @@ bool ICACHE_FLASH_ATTR IRKelvinatorAC::getPower() {
 
 // Set the temp. in deg C
 void ICACHE_FLASH_ATTR IRKelvinatorAC::setTemp(uint8_t temp) {
-    temp = max(KELVINATOR_MIN_TEMP, temp);
-    temp = min(KELVINATOR_MAX_TEMP, temp);
+    temp = std::max((uint8_t) KELVINATOR_MIN_TEMP, temp);
+    temp = std::min((uint8_t) KELVINATOR_MAX_TEMP, temp);
     remote_state[1] = (remote_state[1] & 0xF0U) | (temp - KELVINATOR_MIN_TEMP);
     remote_state[9] = remote_state[1];  // Duplicate to the 2nd command chunk.
 }
@@ -107,13 +109,12 @@ uint8_t ICACHE_FLASH_ATTR IRKelvinatorAC::getTemp() {
 
 // Set the speed of the fan, 0-5, 0 is auto, 1-5 is the speed
 void ICACHE_FLASH_ATTR IRKelvinatorAC::setFan(uint8_t fan) {
-  fan = min(KELVINATOR_FAN_MAX, fan);  // Bounds check
+  fan = std::min((uint8_t) KELVINATOR_FAN_MAX, fan);  // Bounds check
 
   // Only change things if we need to.
   if (fan != getFan()) {
     // Set the basic fan values.
-    // NOLINTNEXTLINE(build/include_what_you_use)
-    uint8_t fan_basic = min(KELVINATOR_BASIC_FAN_MAX, fan);
+    uint8_t fan_basic = std::min((uint8_t) KELVINATOR_BASIC_FAN_MAX, fan);
     remote_state[0] = (remote_state[0] & KELVINATOR_BASIC_FAN_MASK) |
         (fan_basic << KELVINATOR_FAN_OFFSET);
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.

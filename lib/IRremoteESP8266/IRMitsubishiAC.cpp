@@ -9,6 +9,7 @@ Equipment it seems compatible with:
   * <Add models (A/C & remotes) you've gotten it working with here>
 */
 
+#include <algorithm>
 #include <IRMitsubishiAC.h>
 
 // Initialise the object.
@@ -77,8 +78,8 @@ bool ICACHE_FLASH_ATTR IRMitsubishiAC::getPower() {
 
 // Set the temp. in deg C
 void ICACHE_FLASH_ATTR IRMitsubishiAC::setTemp(uint8_t temp) {
-  temp = max(MITSUBISHI_AC_MIN_TEMP, temp);
-  temp = min(MITSUBISHI_AC_MAX_TEMP, temp);
+  temp = std::max((uint8_t) MITSUBISHI_AC_MIN_TEMP, temp);
+  temp = std::min((uint8_t) MITSUBISHI_AC_MAX_TEMP, temp);
   remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
 }
 
@@ -94,7 +95,7 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setFan(uint8_t fan) {
   if (fan > MITSUBISHI_AC_FAN_SILENT)
     fan = MITSUBISHI_AC_FAN_MAX;  // Set the fan to maximum if out of range.
   if (fan == MITSUBISHI_AC_FAN_AUTO) {   // Automatic is a special case.
-    remote_state[9] = B10000000 | (remote_state[9] & B01111000);
+    remote_state[9] = 0b10000000 | (remote_state[9] & 0b01111000);
     return;
   } else if (fan >= MITSUBISHI_AC_FAN_MAX) {
     fan--;  // There is no spoon^H^H^Heed 5 (max), pretend it doesn't exist.
@@ -104,7 +105,7 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setFan(uint8_t fan) {
 
 // Return the requested state of the unit's fan.
 uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getFan() {
-  uint8_t fan = remote_state[9] & B111;
+  uint8_t fan = remote_state[9] & 0b111;
   if (fan == MITSUBISHI_AC_FAN_MAX)
     return MITSUBISHI_AC_FAN_SILENT;
   return fan;
@@ -136,14 +137,13 @@ void ICACHE_FLASH_ATTR IRMitsubishiAC::setMode(uint8_t mode) {
 
 // Set the requested vane operation mode of the a/c unit.
 void ICACHE_FLASH_ATTR IRMitsubishiAC::setVane(uint8_t mode) {
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  mode = max(mode, B111);  // bounds check
-  mode |= B1000;
+  mode = std::max(mode, (uint8_t) 0b111);  // bounds check
+  mode |= 0b1000;
   mode <<= 3;
   remote_state[9] |= mode;
 }
 
 // Return the requested vane operation mode of the a/c unit.
 uint8_t ICACHE_FLASH_ATTR IRMitsubishiAC::getVane() {
-  return ((remote_state[9] & B00111000) >> 3);
+  return ((remote_state[9] & 0b00111000) >> 3);
 }

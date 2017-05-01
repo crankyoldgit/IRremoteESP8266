@@ -36,7 +36,7 @@
 #define IRREMOTEESP8266_H_
 
 #include <stdint.h>
-#include "IRremoteInt.h"
+#include <IRremoteInt.h>
 
 // The following are compile-time library options.
 // If you change them, recompile the library.
