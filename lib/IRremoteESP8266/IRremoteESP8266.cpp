@@ -1465,6 +1465,14 @@ bool ICACHE_FLASH_ATTR IRrecv::decode(decode_results *results,
     results->overflow = save->overflow;
   }
 
+  // Reset any previously partially processed results.
+  results->decode_type = UNKNOWN;
+  results->bits = 0;
+  results->value = 0;
+  results->address = 0;
+  results->command = 0;
+  results->repeat = false;
+
 #ifdef DEBUG
   Serial.println("Attempting Sanyo LC7461 decode");
 #endif
@@ -1712,6 +1720,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeNEC(decode_results *results,
     results->bits = 0;
     results->address = 0;
     results->command = 0;
+    results->repeat = true;
     return true;
   }
 
@@ -2093,6 +2102,7 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSanyo(decode_results *results,
     results->decode_type = SANYO;
     results->address = 0;
     results->command = 0;
+    results->repeat = true;
     return true;
   }
 
@@ -2425,7 +2435,6 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSharp(decode_results *results,
   if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
     return false;
 
-
   // Compliance
   if (strict) {
     // We expect the expansion bit to be set, and the check bit cleared
@@ -2467,7 +2476,6 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeSharp(decode_results *results,
   results->value = data;
   // Address & command are actually transmitted in LSB first order.
   results->address = reverseBits(data, nbits) & SHARP_ADDRESS_MASK;
-  results->sharpAddress = results->address;
   results->command = reverseBits((data >> 2) & SHARP_COMMAND_MASK,
                                  SHARP_COMMAND_BITS);
   return true;
@@ -2536,7 +2544,6 @@ bool ICACHE_FLASH_ATTR IRrecv::decodePanasonic(decode_results *results,
 
   // Success
   results->value = data;
-  results->panasonicAddress = (uint16_t) address;
   results->address = address;
   results->command = command;
   results->decode_type = PANASONIC;
@@ -2626,8 +2633,6 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeLG(decode_results *results,
 //   JVC repeat codes don't have a header.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-// TODO(crankyoldgit):
-//   Report that it is a repeat code and still record the value.
 bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
                                          uint16_t nbits,
                                          bool strict) {
@@ -2671,13 +2676,11 @@ bool ICACHE_FLASH_ATTR IRrecv::decodeJVC(decode_results *results,
   // Success
   results->decode_type = JVC;
   results->bits = nbits;
+  results->value = data;
   // command & address are transmitted LSB first, so we need to reverse them.
   results->command = reverseBits(data >> 8, 8);  // The first 8 bits sent.
   results->address = reverseBits(data & 0xFF, 8);  // The last 8 bits sent.
-  if (isRepeat)
-    results->value = REPEAT;
-  else
-    results->value = data;
+  results->repeat = isRepeat;
   return true;
 }
 

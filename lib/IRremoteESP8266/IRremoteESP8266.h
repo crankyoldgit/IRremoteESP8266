@@ -83,15 +83,12 @@ enum decode_type_t {
 class decode_results {
  public:
   decode_type_t decode_type;  // NEC, SONY, RC5, UNKNOWN
-  union {  // This is used for decoding Panasonic and Sharp data
-    uint16_t panasonicAddress;
-    uint16_t sharpAddress;
-  };
   uint64_t value;  // Decoded value
   uint16_t bits;  // Number of bits in decoded value
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks
   uint16_t rawlen;  // Number of records in rawbuf.
   bool overflow;
+  bool repeat;  // Is the result a repeat code?
   uint32_t address;  // Decoded device address.
   uint32_t command;  // Decoded command.
 };
