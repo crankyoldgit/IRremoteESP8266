@@ -193,6 +193,7 @@ class IRsend {
  public:
   explicit IRsend(uint16_t IRsendPin);
   void begin();
+  void calibrate(uint16_t hz = 38000U);
   void send(uint16_t type, uint64_t data, uint16_t nbits) {
     switch (type) {
         SEND_PROTOCOL_NEC
@@ -271,13 +272,14 @@ class IRsend {
                     uint16_t repeat = SHERWOOD_MIN_REPEAT);
   void sendMitsubishiAC(unsigned char data[]);
   void enableIROut(uint32_t freq, uint8_t duty = 50);
-  VIRTUAL void mark(uint16_t usec);
+  VIRTUAL uint16_t mark(uint16_t usec);
   VIRTUAL void space(uint32_t usec);
 
  private:
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
   uint16_t IRpin;
+  int8_t periodOffset;
   uint32_t calcUSecPeriod(uint32_t hz);
   void sendMitsubishiACChunk(unsigned char data);
   void sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,

@@ -76,10 +76,48 @@ uint32_t ICACHE_FLASH_ATTR IRtimer::elapsed() {
 
 IRsend::IRsend(uint16_t IRsendPin) {
   IRpin = IRsendPin;
+  periodOffset = PERIOD_OFFSET;
 }
 
 void ICACHE_FLASH_ATTR IRsend::begin() {
   pinMode(IRpin, OUTPUT);
+}
+
+// Calculate & set any offsets to account for execution times.
+//
+// Args:
+//   hz: The frequency to calibrate at >= 1000Hz. Default is 38000Hz.
+//
+// Status:  ALPHA / Untested.
+//
+// NOTE:
+//   This will generate an 65535us mark() IR LED signal.
+//   This only needs to be called once, if at all.
+void ICACHE_FLASH_ATTR IRsend::calibrate(uint16_t hz) {
+  if (hz < 1000)  // Were we given kHz? Supports the old call usage.
+    hz *= 1000;
+  periodOffset = 0;  // Turn off any existing offset while we calibrate.
+  enableIROut(hz);
+  IRtimer usecTimer = IRtimer();  // Start a timer *just* before we do the call.
+  uint16_t pulses = mark(UINT16_MAX);  // Generate a PWM of 65,535 us. (Max.)
+  uint32_t timeTaken = usecTimer.elapsed();  // Record the time it took.
+  // While it shouldn't be neccesary, assume at least 1 pulse, to avoid a
+  // divide by 0 situation.
+  pulses = std::max(pulses, (uint16_t) 1U);
+  uint32_t calcPeriod = calcUSecPeriod(hz);  // e.g. @38kHz it should be 26us.
+  // Assuming 38kHz for the example calculations:
+  // In a 65535us pulse, we should have 2520.5769 pulses @ 26us periods.
+  // e.g. 65535.0us / 26us = 2520.5769
+  // This should have caused approx 2520 loops through the main loop in mark().
+  // The average over that many interations should give us a reasonable
+  // approximation at what offset we need to use to account for instruction
+  // execution times.
+  //
+  // Calculate the actual period from the actual time & the actual pulses
+  // generated.
+  double_t actualPeriod = (double_t) timeTaken / (double_t) pulses;
+  // Store the difference between the actual time per period vs. calculated.
+  periodOffset = (int8_t) ((double_t) calcPeriod - actualPeriod);
 }
 
 // Generic method for sending data that is common to most protocols.
@@ -847,6 +885,8 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon(uint64_t data, uint16_t nbits,
 //
 // Args:
 //   usec: The period of time to modulate the IR LED for, in microseconds.
+// Returns:
+//   Nr. of pulses actually sent.
 //
 // Note:
 //   The ESP8266 has no good way to do hardware PWM, so we have to do it all
@@ -857,7 +897,8 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon(uint64_t data, uint16_t nbits,
 //   Hence, for greater compatiblity & choice, we don't use that method.
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
-void ICACHE_FLASH_ATTR IRsend::mark(uint16_t usec) {
+uint16_t ICACHE_FLASH_ATTR IRsend::mark(uint16_t usec) {
+  uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
   // Cache the time taken so far. This saves us calling time, and we can be
   // assured that we can't have odd math problems. i.e. unsigned under/overflow.
@@ -869,13 +910,15 @@ void ICACHE_FLASH_ATTR IRsend::mark(uint16_t usec) {
     // e.g. Are we to close to the end of our requested mark time (usec)?
     delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, LOW);  // Turn the LED off.
+    counter++;
     if (elapsed + onTimePeriod >= usec)
-      return;  // LED is now off & we've passed our allotted time. Safe to stop.
+      return counter;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
     delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
                                (uint32_t) offTimePeriod));
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
+  return counter;
 }
 
 void ICACHE_FLASH_ATTR IRsend::ledOff() {
@@ -910,7 +953,10 @@ void ICACHE_FLASH_ATTR IRsend::space(uint32_t time) {
 // Returns:
 //   nr. of uSeconds.
 uint32_t ICACHE_FLASH_ATTR IRsend::calcUSecPeriod(uint32_t hz) {
-  return (1000000UL + hz/2) / hz;  // round(1000000/hz).
+  if (hz == 0) hz = 1;  // Avoid Zero hz. Divide by Zero is nasty.
+  uint32_t period = (1000000UL + hz/2) / hz;  // The equiv of round(1000000/hz).
+  // Apply the offset and ensure we don't result in a <= 0 value.
+  return std::max((uint32_t) 1, period + periodOffset);
 }
 
 // Set the output frequency modulation and duty cycle.
