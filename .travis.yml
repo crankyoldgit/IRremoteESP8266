@@ -10,6 +10,7 @@ before_install:
   - tar xf arduino-1.8.2-linux64.tar.xz
   - sudo mv arduino-1.8.2 /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+  - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
 install:
   - ln -s $PWD/lib/IRremoteESP8266 /usr/local/share/arduino/libraries/
   - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
@@ -27,6 +28,9 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
+  - shopt -s nullglob
+  - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {lib,examples}/*/*.{h,c,cc,cpp,hpp,ino}
+  - shopt -u nullglob
 
 notifications:
   email:
