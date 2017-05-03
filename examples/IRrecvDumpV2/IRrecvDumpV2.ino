@@ -28,20 +28,14 @@ void setup() {
 }
 
 //+=============================================================================
-// Display IR code
+// Print a uint64_t in Hex, to the Serial interface.
 //
-void ircode(decode_results *results) {
-  // Panasonic has an Address
-  if (results->decode_type == PANASONIC) {
-    Serial.print(results->panasonicAddress, HEX);
-    Serial.print(":");
-  }
-  // Print Code
-  //   print() & println() can't handle printing long longs. (uint64_t)
-  //   So we have to print the top and bottom halves separately.
-  if (results->value >> 32)
-    Serial.print((uint32_t) (results->value >> 32), HEX);
-  Serial.println((uint32_t) (results->value & 0xFFFFFFFF), HEX);
+void serialPrintUint64Hex(uint64_t value) {
+  // Serial.print() can't handle printing long longs. (uint64_t)
+  // So we have to print the top and bottom halves separately.
+  if (value >> 32)
+    Serial.print((uint32_t) (value >> 32), HEX);
+  Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
 
 //+=============================================================================
@@ -69,6 +63,7 @@ void encoding(decode_results *results) {
     case DENON:        Serial.print("DENON");         break;
     case COOLIX:       Serial.print("COOLIX");        break;
   }
+  if (results->repeat) Serial.print(" (Repeat)");
 }
 
 //+=============================================================================
@@ -87,7 +82,7 @@ void dumpInfo(decode_results *results) {
 
   // Show Code & length
   Serial.print("Code      : ");
-  ircode(results);
+  serialPrintUint64Hex(results->value);
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -150,27 +145,28 @@ void dumpCode(decode_results *results) {
   Serial.print("  // ");
   encoding(results);
   Serial.print(" ");
-  ircode(results);
+  serialPrintUint64Hex(results->value);
 
   // Newline
   Serial.println("");
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
-    // Some protocols have an address
-    if (results->decode_type == PANASONIC) {
-      Serial.print("uint16_t  addr = 0x");
-      Serial.print(results->panasonicAddress, HEX);
+    // Some protocols have an address &/or command.
+    // NOTE: It will ignore the atypical case when a message has been decoded
+    // but the address & the command are both 0.
+    if (results->address > 0 || results->command > 0) {
+      Serial.print("uint32_t  address = 0x");
+      Serial.print(results->address, HEX);
+      Serial.println(";");
+      Serial.print("uint32_t  command = 0x");
+      Serial.print(results->command, HEX);
       Serial.println(";");
     }
 
     // All protocols have data
     Serial.print("uint64_t  data = 0x");
-    // print() & println() can't handle printing long longs. (uint64_t)
-    // So we have to print the top and bottom halves separately.
-    if (results->value >> 32)
-      Serial.print((uint32_t) (results->value >> 32), HEX);
-    Serial.print((uint32_t) (results->value & 0xFFFFFFFF), HEX);
+    serialPrintUint64Hex(results->value);
     Serial.println(";");
   }
 }

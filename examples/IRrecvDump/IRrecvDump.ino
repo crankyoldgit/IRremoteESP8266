@@ -23,6 +23,13 @@ void setup() {
   irrecv.enableIRIn();  // Start the receiver
 }
 
+void serialPrintUint64Hex(uint64_t value) {
+  // Serial.print() can't handle printing long longs. (uint64_t)
+  // So we have to print the top and bottom halves separately.
+  if (value >> 32)
+    Serial.print((uint32_t) (value >> 32), HEX);
+  Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
+}
 
 void dump(decode_results *results) {
   // Dumps out the decode_results structure.
@@ -40,7 +47,7 @@ void dump(decode_results *results) {
     Serial.print("Decoded RC6: ");
   } else if (results->decode_type == PANASONIC) {
     Serial.print("Decoded PANASONIC - Address: ");
-    Serial.print(results->panasonicAddress, HEX);
+    Serial.print(results->address, HEX);
     Serial.print(" Value: ");
   } else if (results->decode_type == LG) {
     Serial.print("Decoded LG: ");
@@ -51,7 +58,7 @@ void dump(decode_results *results) {
   } else if (results->decode_type == WHYNTER) {
     Serial.print("Decoded Whynter: ");
   }
-  Serial.print(results->value, HEX);
+  serialPrintUint64Hex(results->value);
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -75,11 +82,7 @@ void dump(decode_results *results) {
 
 void loop() {
   if (irrecv.decode(&results)) {
-    // print() & println() can't handle printing long longs. (uint64_t)
-    // So we have to print the top and bottom halves separately.
-    if (results.value >> 32)
-      Serial.print((uint32_t) (results.value >> 32), HEX);
-    Serial.println((uint32_t) (results.value & 0xFFFFFFFF), HEX);
+    serialPrintUint64Hex(results.value);
     dump(&results);
     irrecv.resume();  // Receive the next value
   }
