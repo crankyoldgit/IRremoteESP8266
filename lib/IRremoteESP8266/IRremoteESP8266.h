@@ -76,7 +76,8 @@ enum decode_type_t {
   SHERWOOD,
   MITSUBISHI_AC,
   RCMM,
-  SANYO_LC7461
+  SANYO_LC7461,
+  RC5X
 };
 
 // Results returned from the decoder
@@ -128,8 +129,8 @@ class IRrecv {
  private:
   // These are called by decode
   void copyIrParams(irparams_t *dest);
-  int16_t getRClevel(decode_results *results, int *offset, int *used,
-                     uint16_t t1);
+  int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
+                     uint16_t bitTime);
   bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
                  bool strict = true);
   bool decodeSony(decode_results *results, uint16_t nbits = SONY_MIN_BITS,
@@ -142,8 +143,10 @@ class IRrecv {
   bool decodeMitsubishi(decode_results *results,
                         uint16_t nbits = MITSUBISHI_BITS,
                         bool strict = false);
-  bool decodeRC5(decode_results *results);
-  bool decodeRC6(decode_results *results);
+  bool decodeRC5(decode_results *results, uint16_t nbits = RC5X_BITS,
+                 bool strict = false);
+  bool decodeRC6(decode_results *results, uint16_t nbits = RC6_MODE0_BITS,
+                 bool strict = false);
   bool decodeRCMM(decode_results *results);
   bool decodePanasonic(decode_results *results, uint16_t nbits = PANASONIC_BITS,
                        bool strict = false);
@@ -233,9 +236,10 @@ class IRsend {
                       uint16_t repeat = MITSUBISHI_MIN_REPEAT);
   void sendRaw(uint16_t buf[], uint16_t len, uint16_t hz);
   void sendGC(uint16_t buf[], uint16_t len);
-  void sendRC5(uint32_t data, uint16_t nbits);
-  void sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat = 0);
-  void sendRCMM(uint32_t data, uint16_t nbits = RCMM_BITS);
+  void sendRC5(uint64_t data, uint16_t nbits = RC5X_BITS, uint16_t repeat = 0);
+  void sendRC6(uint64_t data, uint16_t nbits = RC6_MODE0_BITS,
+               uint16_t repeat = 0);
+  void sendRCMM(uint32_t data, uint8_t nbits = RCMM_BITS);
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
   // Legacy use of this procedure was only to send a single code
