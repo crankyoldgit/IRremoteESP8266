@@ -295,6 +295,10 @@
 // when received due to sensor lag.
 #define MARK_EXCESS 100U
 #define TOLERANCE    25U  // default percent tolerance in measurements
+// Offset (in microseconds) to use in Period time calculations to account for
+// code excution time in producing the software PWM signal.
+// Value determined in https://github.com/markszabo/IRremoteESP8266/issues/62
+#define PERIOD_OFFSET -3
 // receiver states
 #define STATE_IDLE    2U
 #define STATE_MARK    3U
