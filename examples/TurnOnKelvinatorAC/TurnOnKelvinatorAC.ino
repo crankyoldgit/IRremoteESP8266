@@ -1,5 +1,6 @@
 /* Copyright 2016 David Conran */
-#include <IRKelvinator.h>
+#include <IRsend.h>
+#include <ir_Kelvinator.h>
 
 IRKelvinatorAC kelvir(D1);  // IR led controlled by Pin D1.
 
@@ -27,7 +28,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
 
-  // Set up what we want to send. See IRKelvinator.cpp for all the options.
+  // Set up what we want to send. See ir_Kelvinator.cpp for all the options.
   // Most things default to off.
   Serial.println("Default state of the remote.");
   printState();

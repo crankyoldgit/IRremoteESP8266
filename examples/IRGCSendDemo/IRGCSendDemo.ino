@@ -10,7 +10,7 @@
  * http://arcfn.com
  */
 
-#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 // Codes are in Global Cache format less the emitter ID and request ID.
 // These codes can be found in GC's Control Tower database.

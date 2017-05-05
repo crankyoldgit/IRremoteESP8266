@@ -5,7 +5,7 @@
  * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009, Copyright 2009 Ken Shirriff, http://arcfn.com
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  */
-#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 #define PanasonicAddress      0x4004     // Panasonic address (Pre data)
 #define PanasonicPower        0x100BCBD  // Panasonic Power button

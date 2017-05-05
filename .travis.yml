@@ -12,7 +12,7 @@ before_install:
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
   - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
 install:
-  - ln -s $PWD/lib/IRremoteESP8266 /usr/local/share/arduino/libraries/
+  - ln -s $PWD /usr/local/share/arduino/libraries/
   - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
   - arduino --install-boards esp8266:esp8266
   - arduino --board $BD --save-prefs

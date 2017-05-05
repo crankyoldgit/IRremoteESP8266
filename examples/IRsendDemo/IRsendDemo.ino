@@ -27,7 +27,7 @@
  *     for your first time. e.g. ESP-12 etc.
  */
 
-#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 IRsend irsend(4);  // an IR led is connected to GPIO pin 4 (D2)
 

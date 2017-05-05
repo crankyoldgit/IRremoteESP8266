@@ -1,6 +1,6 @@
 /* Copyright 2017 David Conran */
-
-#include <IRMitsubishiAC.h>
+#include <IRsend.h>
+#include <ir_Mitsubishi.h>
 
 IRMitsubishiAC mitsubir(D1);  // IR led controlled by Pin D1.
 
@@ -24,7 +24,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
 
-  // Set up what we want to send. See IRMitsubishiAC.cpp for all the options.
+  // Set up what we want to send. See ir_Mitsubishi.cpp for all the options.
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");

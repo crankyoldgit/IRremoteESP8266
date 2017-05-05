@@ -1,47 +1,32 @@
-/***************************************************
-* Kelvinator A/C
-*
-* Copyright 2016 David Conran
-***************************************************/
+// Kelvinator A/C
+//
+// Copyright 2016 David Conran
 
-#ifndef IRKELVINATOR_H_
-#define IRKELVINATOR_H_
+#ifndef IR_KELVINATOR_H_
+#define IR_KELVINATOR_H_
 
-#include <IRremoteESP8266.h>
-#include <Arduino.h>
+#include <stdint.h>
+#include "IRremoteESP8266.h"
+#include "IRsend.h"
 
-#define KELVINATOR_AUTO 0U
-#define KELVINATOR_COOL 1U
-#define KELVINATOR_DRY 2U
-#define KELVINATOR_FAN 3U
-#define KELVINATOR_HEAT 4U
-#define KELVINATOR_MODE_MASK 0xF8U
-#define KELVINATOR_POWER 8U
-#define KELVINATOR_FAN_OFFSET 4U
-#define KELVINATOR_BASIC_FAN_MAX 3U
-#define KELVINATOR_BASIC_FAN_MASK uint8_t(0xFFU ^ (3U << KELVINATOR_FAN_OFFSET))
-#define KELVINATOR_FAN_MASK uint8_t(0xFFU ^ (7U << KELVINATOR_FAN_OFFSET))
-#define KELVINATOR_FAN_MAX 5U
-#define KELVINATOR_VENT_SWING_OFFSET 6U
-#define KELVINATOR_VENT_SWING uint8_t(1U << KELVINATOR_VENT_SWING_OFFSET)
-#define KELVINATOR_VENT_SWING_V uint8_t(1U)
-#define KELVINATOR_VENT_SWING_H uint8_t(1U << 4)
-#define KELVINATOR_SLEEP_1_AND_3 uint8_t(1U << 7)
-#define KELVINATOR_MIN_TEMP 16U  // 16C
-#define KELVINATOR_MAX_TEMP 30U  // 30C
-#define KELVINATOR_AUTO_TEMP 25U  // 25C
-#define KELVINATOR_CHECKSUM_START 10U
-#define KELVINATOR_QUIET_OFFSET 7U
-#define KELVINATOR_QUIET uint8_t(1U << KELVINATOR_QUIET_OFFSET)
-#define KELVINATOR_ION_FILTER_OFFSET 6U
-#define KELVINATOR_ION_FILTER uint8_t(1U << KELVINATOR_ION_FILTER_OFFSET)
-#define KELVINATOR_LIGHT_OFFSET 5U
-#define KELVINATOR_LIGHT uint8_t(1U << KELVINATOR_LIGHT_OFFSET)
-#define KELVINATOR_XFAN_OFFSET 7U
-#define KELVINATOR_XFAN uint8_t(1U << KELVINATOR_XFAN_OFFSET)
-#define KELVINATOR_TURBO_OFFSET 4U
-#define KELVINATOR_TURBO uint8_t(1U << KELVINATOR_TURBO_OFFSET)
+// KK  KK EEEEEEE LL     VV     VV IIIII NN   NN   AAA   TTTTTTT  OOOOO  RRRRRR
+// KK KK  EE      LL     VV     VV  III  NNN  NN  AAAAA    TTT   OO   OO RR   RR
+// KKKK   EEEEE   LL      VV   VV   III  NN N NN AA   AA   TTT   OO   OO RRRRRR
+// KK KK  EE      LL       VV VV    III  NN  NNN AAAAAAA   TTT   OO   OO RR  RR
+// KK  KK EEEEEEE LLLLLLL   VVV    IIIII NN   NN AA   AA   TTT    OOOO0  RR   RR
 
+// Constants
+#define KELVINATOR_AUTO                        0U
+#define KELVINATOR_COOL                        1U
+#define KELVINATOR_DRY                         2U
+#define KELVINATOR_FAN                         3U
+#define KELVINATOR_HEAT                        4U
+#define KELVINATOR_POWER                       8U
+#define KELVINATOR_BASIC_FAN_MAX               3U
+#define KELVINATOR_FAN_MAX                     5U
+#define KELVINATOR_MIN_TEMP                   16U  // 16C
+#define KELVINATOR_MAX_TEMP                   30U  // 30C
+#define KELVINATOR_AUTO_TEMP                  25U  // 25C
 
 /*
 	Kelvinator AC map
@@ -119,8 +104,9 @@
     b7-4 = checksum of the previous bytes (8-14)
 */
 
-#define KELVINATOR_STATE_LENGTH 16
+#if SEND_KELVINATOR
 
+// Classes
 class IRKelvinatorAC {
  public:
   explicit IRKelvinatorAC(uint16_t pin);
@@ -161,5 +147,6 @@ class IRKelvinatorAC {
   void fixup();
   IRsend _irsend;
 };
+#endif
 
-#endif  // IRKELVINATOR_H_
+#endif  // IR_KELVINATOR_H_
