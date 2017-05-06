@@ -141,6 +141,7 @@ enum decode_type_t {
 };
 
 // Message lengths & required repeat values
+#define AIWA_RC_T501_BITS           15U
 #define COOLIX_BITS                 24U
 #define DAIKIN_BITS                 99U
 #define DAIKIN_COMMAND_LENGTH       27U

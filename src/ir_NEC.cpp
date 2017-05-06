@@ -29,7 +29,7 @@
     (NEC_HDR_MARK + NEC_HDR_SPACE + NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) \
      + NEC_BIT_MARK)
 
-#if (SEND_NEC || SEND_SHERWOOD)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501)
 // Send a raw NEC(Renesas) formatted message.
 //
 // Args:
@@ -88,7 +88,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 }
 #endif
 
-#if (DECODE_NEC || DECODE_SHERWOOD)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501)
 // Decode the supplied NEC message.
 //
 // Args:

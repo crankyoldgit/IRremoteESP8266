@@ -82,7 +82,7 @@ class IRrecv {
   bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,
                   uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   bool decodeHash(decode_results *results);
-#if (DECODE_NEC || DECODE_SHERWOOD)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501)
   bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
                  bool strict = true);
 #endif
@@ -152,6 +152,10 @@ class IRrecv {
 #if DECODE_SHARP
   bool decodeSharp(decode_results *results, uint16_t nbits = SHARP_BITS,
                    bool strict = true);
+#endif
+#if DECODE_AIWA_RC_T501
+  bool decodeAiwaRCT501(decode_results *results,
+                        uint16_t nbits = AIWA_RC_T501_BITS, bool strict = true);
 #endif
 };
 
