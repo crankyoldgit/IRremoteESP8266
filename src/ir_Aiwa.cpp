@@ -43,11 +43,7 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
   nbits += AIWA_RC_T501_PRE_BITS + AIWA_RC_T501_POST_BITS;
   if (nbits > sizeof(new_data) * 8)
     return;  // We are overflowing. Abort, and don't send.
-  // We will repeat by sending the entire message, instead of using
-  // NEC's repeat method, as it isn't known how this protocol repeats yet.
-  // So we play it safe.
-  for (uint16_t i=0; i <= repeat; i++)
-    sendNEC(new_data, nbits, 0);
+  sendNEC(new_data, nbits, repeat);
 }
 #endif
 
