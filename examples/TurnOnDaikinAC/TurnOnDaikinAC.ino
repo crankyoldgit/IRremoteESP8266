@@ -1,5 +1,6 @@
 /* Copyright 2016 sillyfrog */
-#include <IRDaikinESP.h>
+#include <IRsend.h>
+#include <ir_Daikin.h>
 
 IRDaikinESP dakinir(D1);
 
@@ -12,7 +13,7 @@ void setup() {
 void loop() {
   Serial.println("Sending...");
 
-  // Set up what we want to send. See IRDaikinESP.cpp for all the options.
+  // Set up what we want to send. See ir_Daikin.cpp for all the options.
   dakinir.on();
   dakinir.setFan(1);
   dakinir.setMode(DAIKIN_COOL);

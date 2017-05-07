@@ -9,7 +9,7 @@
  * LG added by Darryl Smith (based on the JVC protocol)
  */
 
-#include <IRremoteESP8266.h>
+#include <IRrecv.h>
 
 // an IR detector/demodulator is connected to GPIO pin 2
 uint16_t RECV_PIN = 2;

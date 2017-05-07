@@ -7,10 +7,8 @@
  * Example command - Samsung TV power toggle: 38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,63,20,63,20,63,20,1798\r\n
  */
 
-#include <IRremoteESP8266.h>
-#include <IRremoteInt.h>
-
 #include <ESP8266WiFi.h>
+#include <IRsend.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 

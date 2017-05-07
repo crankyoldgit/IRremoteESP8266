@@ -1,18 +1,15 @@
 /* Copyright 2016 sillyfrog */
-#ifndef IRDAIKINESP_H_
-#define IRDAIKINESP_H_
+#ifndef IR_DAIKIN_H_
+#define IR_DAIKIN_H_
 
-#include <IRremoteESP8266.h>
-#include <Arduino.h>
+#include "IRremoteESP8266.h"
+#include "IRsend.h"
 
-#define DAIKIN_COOL 0b011
-#define DAIKIN_HEAT 0b100
-#define DAIKIN_FAN  0b110
-#define DAIKIN_AUTO 0b000
-#define DAIKIN_DRY  0b010
-
-#define DAIKIN_POWERFUL 0b00000010
-#define DAIKIN_SILENT   0b00100000
+//                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
+//                DD  DD   AAAAA   III  KK KK   III  NNN  NN
+//                DD   DD AA   AA  III  KKKK    III  NN N NN
+//                DD   DD AAAAAAA  III  KK KK   III  NN  NNN
+//                DDDDDD  AA   AA IIIII KK  KK IIIII NN   NN
 
 /*
 	Daikin AC map
@@ -55,8 +52,16 @@
 	byte 26= checksum of the second part
 */
 
-#define DAIKIN_COMMAND_LENGTH 27
+// Constants
+#define DAIKIN_COOL                0b011
+#define DAIKIN_HEAT                0b100
+#define DAIKIN_FAN                 0b110
+#define DAIKIN_AUTO                0b000
+#define DAIKIN_DRY                 0b010
+#define DAIKIN_POWERFUL       0b00000010
+#define DAIKIN_SILENT         0b00100000
 
+#if SEND_DAIKIN
 class IRDaikinESP {
  public:
   explicit IRDaikinESP(uint16_t pin);
@@ -91,5 +96,6 @@ class IRDaikinESP {
   void checksum();
   IRsend _irsend;
 };
+#endif
 
-#endif  // IRDAIKINESP_H_
+#endif  // IR_DAIKIN_H_

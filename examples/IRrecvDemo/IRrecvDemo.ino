@@ -7,7 +7,7 @@
  * Copyright 2009 Ken Shirriff, http://arcfn.com
  */
 
-#include <IRremoteESP8266.h>
+#include <IRrecv.h>
 
 // an IR detector/demodulator is connected to GPIO pin 2
 uint16_t RECV_PIN = 2;
