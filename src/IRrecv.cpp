@@ -155,6 +155,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   results->command = 0;
   results->repeat = false;
 
+#if DECODE_AIWA_RC_T501
+#ifdef DEBUG
+  Serial.println("Attempting Aiwa RC T501 decode");
+#endif
+  // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
+  // because the protocols are similar. This protocol is more specific than
+  // those ones, so should got before them.
+  if (decodeAiwaRCT501(results))
+    return true;
+#endif
 #if DECODE_SANYO
 #ifdef DEBUG
   Serial.println("Attempting Sanyo LC7461 decode");
