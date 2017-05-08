@@ -3,7 +3,9 @@
 // Copyright 2017 David Conran
 
 #include "IRsend.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
 #include <algorithm>
 #include "IRtimer.h"
 

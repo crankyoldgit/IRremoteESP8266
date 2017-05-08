@@ -8,6 +8,9 @@ extern "C" {
   #include <gpio.h>
   #include <user_interface.h>
 }
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#endif
 #include <algorithm>
 
 // Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code

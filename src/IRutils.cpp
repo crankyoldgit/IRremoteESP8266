@@ -1,7 +1,9 @@
 // Copyright 2017 David Conran
 
 #include "IRutils.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
 #include <stdint.h>
 #include <algorithm>
 

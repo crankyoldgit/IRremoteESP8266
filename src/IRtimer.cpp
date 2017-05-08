@@ -1,7 +1,9 @@
 // Copyright 2017 David Conran
 
 #include "IRtimer.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
 
 // This class performs a simple time in useconds since instantiated.
 // Handles when the system timer wraps around (once).

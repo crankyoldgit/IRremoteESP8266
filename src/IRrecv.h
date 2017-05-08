@@ -6,7 +6,9 @@
 #ifndef IRRECV_H_
 #define IRRECV_H_
 
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
