@@ -11,7 +11,7 @@ TEST(ReverseBitsTest, TypicalUse) {
   EXPECT_EQ(0xFFFF, reverseBits(0xFFFF0000, 32));
   EXPECT_EQ(0x555500005555FFFF, reverseBits(0xFFFFAAAA0000AAAA, 64));
   EXPECT_EQ(0, reverseBits(0, 64));
-  EXPECT_EQ(UINT64_MAX, reverseBits(UINT64_MAX, 64));
+  EXPECT_EQ(0xFFFFFFFFFFFFFFFF, reverseBits(0xFFFFFFFFFFFFFFFF, 64));
 }
 
 // Tests reverseBits for bit size values <= 1
@@ -23,7 +23,7 @@ TEST(ReverseBitsTest, LessThanTwoBitsReversed) {
 // Tests reverseBits for bit size larger than a uint64_t.
 TEST(ReverseBitsTest, LargerThan64BitsReversed) {
   EXPECT_EQ(0, reverseBits(0, 65));
-  EXPECT_EQ(UINT64_MAX, reverseBits(UINT64_MAX, 100));
+  EXPECT_EQ(0xFFFFFFFFFFFFFFFF, reverseBits(0xFFFFFFFFFFFFFFFF, 100));
   EXPECT_EQ(0x555500005555FFFF, reverseBits(0xFFFFAAAA0000AAAA, 3000));
 }
 
