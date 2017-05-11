@@ -25,7 +25,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = IRutils_test
+TESTS = IRutils_test IRsend_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -74,4 +74,16 @@ IRutils_test.o : IRutils_test.cpp $(USER_DIR)/IRutils.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c IRutils_test.cpp
 
 IRutils_test : IRutils.o IRutils_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRtimer.cpp
+
+IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRsend.cpp
+
+IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c IRsend_test.cpp
+
+IRsend_test : IRsend.o IRtimer.o IRsend_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

@@ -13,11 +13,17 @@ IRtimer::IRtimer() {
 }
 
 void IRtimer::reset() {
+#ifndef UNIT_TEST
   start = micros();
+#endif
 }
 
 uint32_t IRtimer::elapsed() {
+#ifndef UNIT_TEST
   uint32_t now = micros();
+#else
+  uint32_t now = 0;
+#endif
   if (start <= now)  // Check if the system timer has wrapped.
     return now - start;  // No wrap.
   else
