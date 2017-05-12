@@ -25,7 +25,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = IRutils_test IRsend_test
+TESTS = IRutils_test IRsend_test ir_NEC_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -82,8 +82,20 @@ IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h $(GTEST_HEADERS)
 IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRsend.cpp
 
-IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h $(GTEST_HEADERS)
+IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c IRsend_test.cpp
 
 IRsend_test : IRsend.o IRtimer.o IRsend_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+IRrecv.o : $(USER_DIR)/IRrecv.cpp $(USER_DIR)/IRrecv.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRrecv.cpp
+
+ir_NEC.o : $(USER_DIR)/ir_NEC.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_NEC.cpp
+
+ir_NEC_test.o : ir_NEC_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_NEC_test.cpp
+
+ir_NEC_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_NEC.o ir_NEC_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

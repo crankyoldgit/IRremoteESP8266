@@ -4,24 +4,32 @@
 // Copyright 2017 David Conran
 
 #include "IRrecv.h"
+#include <stddef.h>
+#ifndef UNIT_TEST
 extern "C" {
   #include <gpio.h>
   #include <user_interface.h>
 }
-#ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
 #include <algorithm>
 
+#ifdef UNIT_TEST
+#undef ICACHE_RAM_ATTR
+#define ICACHE_RAM_ATTR
+#endif
 // Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code
 // on ESP8266
 // Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
 // sending IR code on ESP8266
 
 // Globals
+#ifndef UNIT_TEST
 static ETSTimer timer;
+#endif
 volatile irparams_t irparams;
 
+#ifndef UNIT_TEST
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
   if (irparams.rawlen)
@@ -68,6 +76,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   #define ONCE 0
   os_timer_arm(&timer, 15, ONCE);
 }
+#endif  // UNIT_TEST
 
 // Start of IRrecv class -------------------
 IRrecv::IRrecv(uint16_t recvpin) {
@@ -79,6 +88,7 @@ void IRrecv::enableIRIn() {
   // initialize state machine variables
   resume();
 
+#ifndef UNIT_TEST
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
@@ -86,11 +96,14 @@ void IRrecv::enableIRIn() {
 
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
+#endif
 }
 
 void IRrecv::disableIRIn() {
+#ifndef UNIT_TEST
   os_timer_disarm(&timer);
   detachInterrupt(irparams.recvpin);
+#endif
 }
 
 void IRrecv::resume() {
@@ -158,6 +171,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   results->command = 0;
   results->repeat = false;
 
+#ifndef UNIT_TEST
 #if DECODE_AIWA_RC_T501
 #ifdef DEBUG
   Serial.println("Attempting Aiwa RC T501 decode");
@@ -294,6 +308,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeSanyo(results))
     return true;
 #endif
+#endif  // UNIT_TEST
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.

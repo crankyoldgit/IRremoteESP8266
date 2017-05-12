@@ -15,6 +15,8 @@ IRtimer::IRtimer() {
 void IRtimer::reset() {
 #ifndef UNIT_TEST
   start = micros();
+#else
+  start = 0;
 #endif
 }
 

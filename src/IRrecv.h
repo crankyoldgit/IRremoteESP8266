@@ -9,6 +9,7 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
+#include <stddef.h>
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
