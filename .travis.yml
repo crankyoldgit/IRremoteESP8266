@@ -18,6 +18,7 @@ install:
   - arduino --board $BD --save-prefs
   - arduino --pref "compiler.warning_level=all" --save-prefs
 script:
+  # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
   - arduino --verify --board $BD $PWD/examples/IRGCSendDemo/IRGCSendDemo.ino
   - arduino --verify --board $BD $PWD/examples/IRGCTCPServer/IRGCTCPServer.ino
@@ -28,9 +29,15 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
+  # Check for lint issues.
   - shopt -s nullglob
   - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {lib,examples}/*/*.{h,c,cc,cpp,hpp,ino}
   - shopt -u nullglob
+  # Build and run the unit tests.
+  - (cd test; make)
+  - test/IRutils_test
+  - test/IRsend_test
+  - test/ir_NEC_test
 
 notifications:
   email:

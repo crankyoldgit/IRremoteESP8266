@@ -14,6 +14,15 @@
 **/.piolibdeps/
 **/.clang_complete
 **/.gcc-flags.json
+examples/**/lib
+examples/**/.travis.yml
+examples/**/.gitignore
+lib/readme.txt
 
 # GCC pre-compiled headers.
 **/*.gch
+
+# Unit Test builds
+test/*.o
+test/*.a
+test/*_test

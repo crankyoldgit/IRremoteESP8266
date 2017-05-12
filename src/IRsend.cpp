@@ -3,8 +3,16 @@
 // Copyright 2017 David Conran
 
 #include "IRsend.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#else
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+#endif
 #include <algorithm>
+#ifdef UNIT_TEST
+#include <cmath>
+#endif
 #include "IRtimer.h"
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
@@ -20,12 +28,16 @@ IRsend::IRsend(uint16_t IRsendPin) {
 
 // Enable the pin for output.
 void IRsend::begin() {
+#ifndef UNIT_TEST
   pinMode(IRpin, OUTPUT);
+#endif
 }
 
 // Turn off the IR LED.
 void IRsend::ledOff() {
+#ifndef UNIT_TEST
   digitalWrite(IRpin, LOW);
+#endif
 }
 
 // Calculate the period for a given frequency. (T = 1/f)
@@ -87,17 +99,21 @@ uint16_t IRsend::mark(uint16_t usec) {
   uint32_t elapsed = usecTimer.elapsed();
 
   while (elapsed < usec) {  // Loop until we've met/exceeded our required time.
+#ifndef UNIT_TEST
     digitalWrite(IRpin, HIGH);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
     delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, LOW);  // Turn the LED off.
+#endif
     counter++;
     if (elapsed + onTimePeriod >= usec)
       return counter;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
+#ifndef UNIT_TEST
     delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
                                (uint32_t) offTimePeriod));
+#endif
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
@@ -112,6 +128,7 @@ uint16_t IRsend::mark(uint16_t usec) {
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
+#ifndef UNIT_TEST
   // delayMicroseconds is only accurate to 16383us.
   // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
   if (time <= 16383) {
@@ -122,6 +139,7 @@ void IRsend::space(uint32_t time) {
     // Delay the remaining sub-millisecond.
     delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
   }
+#endif
 }
 
 // Calculate & set any offsets to account for execution times.
@@ -176,6 +194,8 @@ void IRsend::calibrate(uint16_t hz) {
 void IRsend::sendData(uint16_t onemark, uint32_t onespace,
                       uint16_t zeromark, uint32_t zerospace,
                       uint64_t data, uint16_t nbits, bool MSBfirst) {
+  if (nbits == 0)  // If we are asked to send nothing, just return.
+    return;
   if (MSBfirst) {  // Send the MSB first.
     // Send 0's until we get down to a bit size we can actually manage.
     while (nbits > sizeof(data) * 8) {
@@ -231,6 +251,7 @@ void IRsend::sendRaw(uint16_t buf[], uint16_t len, uint16_t hz) {
   ledOff();  // We potentially have ended with a mark(), so turn of the LED.
 }
 
+#ifndef UNIT_TEST
 void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
   switch (type) {
 #if SEND_NEC
@@ -283,3 +304,4 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #endif
   }
 }
+#endif

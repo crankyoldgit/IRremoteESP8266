@@ -4,6 +4,7 @@
 #ifndef IRSEND_H_
 #define IRSEND_H_
 
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
@@ -11,7 +12,7 @@
 // Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
 // sending IR code on ESP8266
 
-#ifdef TEST
+#if TEST || UNIT_TEST
 #define VIRTUAL virtual
 #else
 #define VIRTUAL

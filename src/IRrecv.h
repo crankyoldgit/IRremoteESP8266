@@ -6,7 +6,11 @@
 #ifndef IRRECV_H_
 #define IRRECV_H_
 
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
+#include <stddef.h>
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
@@ -69,7 +73,10 @@ class IRrecv {
   void disableIRIn();
   void resume();
 
+#ifndef UNIT_TEST
+
  private:
+#endif
   // These are called by decode
   void copyIrParams(irparams_t *dest);
   int16_t compare(uint16_t oldval, uint16_t newval);

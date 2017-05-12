@@ -1,7 +1,10 @@
 // Copyright 2017 David Conran
 
 #include "IRutils.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <algorithm>
 
