@@ -5,6 +5,9 @@
 #include "IRsend.h"
 #ifndef UNIT_TEST
 #include <Arduino.h>
+#else
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
 #endif
 #include <algorithm>
 #ifdef UNIT_TEST

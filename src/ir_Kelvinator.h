@@ -5,6 +5,7 @@
 #ifndef IR_KELVINATOR_H_
 #define IR_KELVINATOR_H_
 
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 #include "IRsend.h"

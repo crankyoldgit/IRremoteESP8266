@@ -87,3 +87,134 @@ TEST(TestEncodeNEC, CommandTrimmedTo8Bits) {
   EXPECT_EQ(irsend.encodeNEC(0x1, 0x2), irsend.encodeNEC(0x1, 0xF02));
   EXPECT_EQ(irsend.encodeNEC(0xFFF0, 0x2), irsend.encodeNEC(0xFFF0, 0xF02));
 }
+
+// Tests for decodeNEC().
+// Decode normal NEC messages.
+TEST(TestDecodeNEC, NormalNECDecodeWithStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Synthesised Normal NEC message.
+  irsend.reset();
+  irsend.sendNEC(irsend.encodeNEC(0x1, 0x2));
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x807F40BF, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x2, irsend.capture.command);
+
+  // Real-life Extended NEC code from an actual capture/decode.
+  irsend.reset();
+  irsend.sendNEC(0xC1A28877);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0xC1A28877, irsend.capture.value);
+  EXPECT_EQ(0x4583, irsend.capture.address);
+  EXPECT_EQ(0x11, irsend.capture.command);
+
+  // Test strict decoding rejects a NEC-like message.
+  irsend.reset();
+  irsend.sendNEC(0x0);
+  irsend.makeDecodeResult();
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture));
+
+  // Synthesised Normal NEC message with a repeat.
+  irsend.reset();
+  irsend.sendNEC(irsend.encodeNEC(0x1, 0x2), 32, 1);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x807F40BF, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x2, irsend.capture.command);
+}
+
+// NEC-like messages without strict mode.
+TEST(TestDecodeNEC, NormalNECDecodeWithoutStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendNEC(0x0);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+
+  irsend.reset();
+  irsend.sendNEC(0x12345678);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x12345678, irsend.capture.value);
+  EXPECT_EQ(0x2C48, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+}
+
+// Short NEC-like messages (without strict naturally)
+TEST(TestDecodeNEC, ShortNECDecodeWithoutStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendNEC(0x0, 16);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 16, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(16, irsend.capture.bits);
+  EXPECT_EQ(0, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+
+  // Expecting less than what was sent is valid.
+  irsend.reset();
+  irsend.sendNEC(0x0, 32);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 16, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(16, irsend.capture.bits);
+  EXPECT_EQ(0, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+
+  // Send 16 bits of data, but fail because we are expecting 17.
+  irsend.reset();
+  irsend.sendNEC(0x0, 16);
+  irsend.makeDecodeResult();
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 17, false));
+}
+
+// Longer NEC-like messages (without strict naturally)
+TEST(TestDecodeNEC, LongerNECDecodeWithoutStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendNEC(0x1234567890ABCDEF, 64);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 64, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(64, irsend.capture.bits);
+  EXPECT_EQ(0x1234567890ABCDEF, irsend.capture.value);
+  EXPECT_EQ(0xD509, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+
+  // Send 63 bits of data, but fail because we are expecting 64.
+  irsend.reset();
+  irsend.sendNEC(0x0, 63);
+  irsend.makeDecodeResult();
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 64, false));
+}

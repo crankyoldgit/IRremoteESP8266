@@ -3,15 +3,21 @@
 #ifndef TEST_IRSEND_TEST_H_
 #define TEST_IRSEND_TEST_H_
 
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
 #include <sstream>
 #include <string>
+#include "IRrecv.h"
 #include "IRsend.h"
 
 #define OUTPUT_BUF 1000U
+#define RAW_BUF 1000U
 class IRsendTest: public IRsend {
  public:
   uint32_t output[OUTPUT_BUF];
   uint16_t last;
+  uint16_t rawbuf[RAW_BUF];
+  decode_results capture;
 
   explicit IRsendTest(uint16_t x) : IRsend(x) {
     reset();
@@ -35,6 +41,22 @@ class IRsendTest: public IRsend {
     }
     reset();
     return result.str();
+  }
+
+  void makeDecodeResult() {
+    capture.decode_type = UNKNOWN;
+    capture.bits = 0;
+    capture.rawlen = last + 1;
+    capture.overflow = (last >= RAW_BUF);
+    capture.repeat = false;
+    capture.address = 0;
+    capture.command = 0;
+    capture.rawbuf = rawbuf;
+    for (uint16_t i = 0; (i < RAW_BUF -1 ) && (i < OUTPUT_BUF); i++)
+      if (output[i] > UINT16_MAX)
+        rawbuf[i + 1] = UINT16_MAX / USECPERTICK;
+      else
+        rawbuf[i + 1] = output[i] / USECPERTICK;
   }
 
  protected:

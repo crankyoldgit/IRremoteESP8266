@@ -3,6 +3,7 @@
 #ifndef IRTIMER_H_
 #define IRTIMER_H_
 
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 
 // Classes

@@ -36,6 +36,8 @@ script:
   # Build and run the unit tests.
   - (cd test; make)
   - test/IRutils_test
+  - test/IRsend_test
+  - test/ir_NEC_test
 
 notifications:
   email:
