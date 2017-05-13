@@ -22,8 +22,8 @@
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
 #define SONY_HDR_MARK          2400U
 #define SONY_SPACE              600U
-#define SONY_ONE_MARK    1200U + 50U  // Experiments suggest +50 is better.
-#define SONY_ZERO_MARK    600U + 50U  // Experiments suggest +50 is better.
+#define SONY_ONE_MARK          1200U
+#define SONY_ZERO_MARK          600U
 #define SONY_RPT_LENGTH       45000U
 #define SONY_MIN_GAP          10000U
 
@@ -35,7 +35,7 @@
 //   nbits: Nr. of bits of the message to be sent.
 //   repeat: Nr. of additional times the message is to be sent. (Default: 2)
 //
-// Status: BETA / Should work fine.
+// Status: STABLE / Known working.
 //
 // Notes:
 //   sendSony() should typically be called with repeat=2 as Sony devices
@@ -73,7 +73,7 @@ void IRsend::sendSony(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   A sendSony compatible data message.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Should be working.
 uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command,
                             uint16_t address, uint16_t extended) {
   uint32_t result = 0;
@@ -128,7 +128,7 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
     }
   }
 
-  uint32_t data = 0;
+  uint64_t data = 0;
   uint16_t offset = OFFSET_START;
   uint16_t actualBits;
   uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
@@ -142,6 +142,9 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
     // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
     //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
     if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP) ||
+  #ifdef UNIT_TEST
+        matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH) ||
+  #endif
         matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
       break;  // Found a repeat space.
     timeSoFar += results->rawbuf[offset] * USECPERTICK;

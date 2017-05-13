@@ -25,7 +25,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test ir_Sherwood_test
+TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test ir_Sherwood_test ir_Sony_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -116,4 +116,13 @@ ir_Sherwood_test.o : ir_Sherwood_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(G
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Sherwood_test.cpp
 
 ir_Sherwood_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_Sherwood_test.o ir_Sherwood.o ir_NEC.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Sony.o : $(USER_DIR)/ir_Sony.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sony.cpp
+
+ir_Sony_test.o : ir_Sony_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Sony_test.cpp
+
+ir_Sony_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Sony_test.o ir_Sony.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

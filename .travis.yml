@@ -40,6 +40,7 @@ script:
   - test/ir_NEC_test
   - test/ir_GlobalCache_test
   - test/ir_Sherwood_test
+  - test/ir_Sony_test
 
 notifications:
   email:
