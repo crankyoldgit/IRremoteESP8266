@@ -634,7 +634,7 @@ void ICACHE_FLASH_ATTR IRsend::sendKelvinator(unsigned char data[]) {
   space(KELVINATOR_GAP_SPACE);
   // Data (options)
   // Send the 2nd option chunk of data (4 bytes).
-  // Unlike the commands, definately not a repeat of the earlier option data.
+  // Unlike the commands, definitely not a repeat of the earlier option data.
   for (; i < KELVINATOR_STATE_LENGTH; i++)
     sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
              KELVINATOR_ZERO_SPACE, data[i], 8, false);

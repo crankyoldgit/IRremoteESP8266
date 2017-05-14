@@ -183,7 +183,7 @@ public:
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=0 for backward compatiblity.
+  // it defaults to repeat=0 for backward compatibility.
   void sendSony(unsigned long data, int nbits, unsigned int repeat=0);
   // Neither Sanyo nor Mitsubishi send is implemented yet
   //  void sendSanyo(unsigned long data, int nbits);
@@ -196,7 +196,7 @@ public:
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
   // As the legacy use of this procedure was only to send a single code
-  // it defaults to repeat=0 for backward compatiblity.
+  // it defaults to repeat=0 for backward compatibility.
   void sendDISH(unsigned long data, int nbits, unsigned int repeat=0);
   void sendSharp(unsigned int address, unsigned int command);
   void sendSharpRaw(unsigned long data, int nbits);
