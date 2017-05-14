@@ -220,7 +220,7 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
 //
 // Status: Depricated.
 //
-// NOTE: This decoder looks like rubbish. Only keeping it for compatiblity
+// NOTE: This decoder looks like rubbish. Only keeping it for compatibility
 //       with the Arduino IRremote library. Seriously, don't trust it.
 //       If someone has a device that this is supposed to be for, please log an
 //       Issue on github with a rawData dump please. We should probably remove

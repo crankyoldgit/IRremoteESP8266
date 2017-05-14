@@ -47,7 +47,7 @@ class IRsend {
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
   // Legacy use of this procedure was to only send a single code so call it with
-  // repeat=0 for backward compatiblity. As of v2.0 it defaults to sending
+  // repeat=0 for backward compatibility. As of v2.0 it defaults to sending
   // a Sony command that will be accepted be a device.
   void sendSony(uint64_t data, uint16_t nbits = SONY_20_BITS,
                 uint16_t repeat = SONY_MIN_REPEAT);
@@ -93,7 +93,7 @@ class IRsend {
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
   // Legacy use of this procedure was only to send a single code
-  // so use repeat=0 for backward compatiblity.
+  // so use repeat=0 for backward compatibility.
   void sendDISH(uint64_t data, uint16_t nbits = DISH_BITS,
                 uint16_t repeat = DISH_MIN_REPEAT);
 #endif

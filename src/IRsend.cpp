@@ -88,7 +88,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 //   serial TX line to do fairly accurate hardware PWM, but it is only
 //   available on a single specific GPIO and only available on some modules.
 //   e.g. It's not available on the ESP-01 module.
-//   Hence, for greater compatiblity & choice, we don't use that method.
+//   Hence, for greater compatibility & choice, we don't use that method.
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {

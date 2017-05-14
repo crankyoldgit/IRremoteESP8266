@@ -94,7 +94,7 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   Historically sendSharp() sends address & command in
 //     MSB first order. This is actually incorrect. It should be sent in LSB
 //     order. The behaviour of sendSharp() hasn't been changed to maintain
-//     backward compatiblity.
+//     backward compatibility.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sharp.htm
@@ -130,11 +130,11 @@ uint32_t IRsend::encodeSharp(uint16_t address, uint16_t command,
 //
 // Notes:
 //   This procedure has a non-standard invocation style compared to similar
-//     sendProtocol() routines. This is due to legacy, compatiblity, & historic
+//     sendProtocol() routines. This is due to legacy, compatibility, & historic
 //     reasons. Normally the calling syntax version is like sendSharpRaw().
 //   This procedure transmits the address & command in MSB first order, which is
 //     incorrect. This behaviour is left as-is to maintain backward
-//     compatiblity with legacy code.
+//     compatibility with legacy code.
 //   In short, you should use sendSharpRaw(), encodeSharp(), and the correct
 //     values of address & command instead of using this, & the wrong values.
 //

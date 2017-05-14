@@ -452,7 +452,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   int32_t hash = FNV_BASIS_32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
-  // however it is left this way for compatiblity with previously captured
+  // however it is left this way for compatibility with previously captured
   // values.
   for (uint16_t i = 1; i < results->rawlen - 2; i++) {
     int16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);

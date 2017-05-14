@@ -19,7 +19,7 @@
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 #define DENON_HDR_MARK              263U  // The length of the Header:Mark
-#define DENON_HDR_SPACE             789U  // The lenght of the Header:Space
+#define DENON_HDR_SPACE             789U  // The length of the Header:Space
 #define DENON_BIT_MARK              263U  // The length of a Bit:Mark
 #define DENON_ONE_SPACE            1842U  // The length of a Bit:Space for 1's
 #define DENON_ZERO_SPACE            789U  // The length of a Bit:Space for 0's
