@@ -11,7 +11,7 @@ Note:
     - "I Feel" button & mode.
     - Energy Saving mode.
     - Low Heat mode.
-    - Farenheit.
+    - Fahrenheit.
 */
 
 #include <IRKelvinator.h>
