@@ -73,10 +73,10 @@ void IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Status: BETA / Should be working.
 uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
-  customer = reverseBits(customer, sizeof(customer));
-  command = reverseBits(command, sizeof(command));
-  return(((command ^ 0xFF) << 24) | (command << 16) |
-         (customer << 8) | customer);
+  customer = reverseBits(customer, sizeof(customer) * 8);
+  command = reverseBits(command, sizeof(command) * 8);
+  return((command ^ 0xFF) | (command << 8) |
+         (customer << 16) | (customer << 24));
 }
 #endif
 
@@ -148,8 +148,8 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
   results->value = data;
   results->decode_type = SAMSUNG;
   // command & address need to be reversed as they are transmitted LSB first,
-  results->command = reverseBits(command, sizeof(command));
-  results->address = reverseBits(address, sizeof(address));
+  results->command = reverseBits(command, sizeof(command) * 8);
+  results->address = reverseBits(address, sizeof(address) * 8);
   return true;
 }
 #endif
