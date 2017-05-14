@@ -41,6 +41,7 @@ script:
   - test/ir_GlobalCache_test
   - test/ir_Sherwood_test
   - test/ir_Sony_test
+  - test/ir_Samsung_test
 
 notifications:
   email:
