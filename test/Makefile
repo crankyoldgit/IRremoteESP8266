@@ -26,7 +26,8 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
 TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
-        ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test
+        ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
+        ir_JVC_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -144,4 +145,13 @@ ir_Kelvinator_test.o : ir_Kelvinator_test.cpp $(USER_DIR)/ir_Kelvinator.h $(USER
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Kelvinator_test.cpp
 
 ir_Kelvinator_test : IRsend.o IRtimer.o IRutils.o ir_Kelvinator_test.o ir_Kelvinator.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_JVC.o : $(USER_DIR)/ir_JVC.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_JVC.cpp
+
+ir_JVC_test.o : ir_JVC_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_JVC_test.cpp
+
+ir_JVC_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_JVC_test.o ir_JVC.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

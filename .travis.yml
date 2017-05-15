@@ -43,6 +43,7 @@ script:
   - test/ir_Sony_test
   - test/ir_Samsung_test
   - test/ir_Kelvinator_test
+  - test/ir_JVC_test
 
 notifications:
   email:
