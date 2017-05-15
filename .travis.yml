@@ -42,6 +42,7 @@ script:
   - test/ir_Sherwood_test
   - test/ir_Sony_test
   - test/ir_Samsung_test
+  - test/ir_Kelvinator_test
 
 notifications:
   email:
