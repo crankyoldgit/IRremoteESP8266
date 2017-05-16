@@ -22,7 +22,6 @@
 #define KELVINATOR_DRY                         2U
 #define KELVINATOR_FAN                         3U
 #define KELVINATOR_HEAT                        4U
-#define KELVINATOR_POWER                       8U
 #define KELVINATOR_BASIC_FAN_MAX               3U
 #define KELVINATOR_FAN_MAX                     5U
 #define KELVINATOR_MIN_TEMP                   16U  // 16C

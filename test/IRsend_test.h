@@ -43,20 +43,22 @@ class IRsendTest: public IRsend {
     return result.str();
   }
 
-  void makeDecodeResult() {
+  void makeDecodeResult(uint16_t offset = 0) {
     capture.decode_type = UNKNOWN;
     capture.bits = 0;
-    capture.rawlen = last + 1;
-    capture.overflow = (last >= RAW_BUF);
+    capture.rawlen = last + 1 - offset;
+    capture.overflow = (last - offset >= (int16_t) RAW_BUF);
     capture.repeat = false;
     capture.address = 0;
     capture.command = 0;
     capture.rawbuf = rawbuf;
-    for (uint16_t i = 0; (i < RAW_BUF -1 ) && (i < OUTPUT_BUF); i++)
-      if (output[i] > UINT16_MAX)
+    for (uint16_t i = 0;
+         (i < RAW_BUF - 1) && (offset < OUTPUT_BUF);
+         i++, offset++)
+      if (output[offset] > UINT16_MAX)
         rawbuf[i + 1] = UINT16_MAX / USECPERTICK;
       else
-        rawbuf[i + 1] = output[i] / USECPERTICK;
+        rawbuf[i + 1] = output[offset] / USECPERTICK;
   }
 
  protected:

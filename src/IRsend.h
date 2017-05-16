@@ -133,7 +133,9 @@ class IRsend {
   void sendGC(uint16_t buf[], uint16_t len);
 #endif
 #if SEND_KELVINATOR
-  void sendKelvinator(unsigned char data[]);
+  void sendKelvinator(unsigned char data[],
+                      uint16_t nbytes = KELVINATOR_STATE_LENGTH,
+                      uint16_t repeat = 0);
 #endif
 #if SEND_DAIKIN
   void sendDaikin(unsigned char data[]);

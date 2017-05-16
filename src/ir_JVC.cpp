@@ -70,7 +70,7 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   A raw JVC message.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Should work fine.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
@@ -138,8 +138,8 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   results->bits = nbits;
   results->value = data;
   // command & address are transmitted LSB first, so we need to reverse them.
-  results->command = reverseBits(data >> 8, 8);  // The first 8 bits sent.
-  results->address = reverseBits(data & 0xFF, 8);  // The last 8 bits sent.
+  results->address = reverseBits(data >> 8, 8);  // The first 8 bits sent.
+  results->command = reverseBits(data & 0xFF, 8);  // The last 8 bits sent.
   results->repeat = isRepeat;
   return true;
 }
