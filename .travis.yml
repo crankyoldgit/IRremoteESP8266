@@ -44,6 +44,7 @@ script:
   - test/ir_Samsung_test
   - test/ir_Kelvinator_test
   - test/ir_JVC_test
+  - test/ir_RCMM_test
 
 notifications:
   email:

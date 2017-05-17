@@ -122,7 +122,8 @@ class IRrecv {
                  bool strict = false);
 #endif
 #if DECODE_RCMM
-  bool decodeRCMM(decode_results *results);
+  bool decodeRCMM(decode_results *results, uint16_t nbits = RCMM_BITS,
+                  bool strict = false);
 #endif
 #if DECODE_PANASONIC
   bool decodePanasonic(decode_results *results, uint16_t nbits = PANASONIC_BITS,

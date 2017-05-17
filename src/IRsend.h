@@ -112,7 +112,7 @@ class IRsend {
                uint16_t repeat = 0);
 #endif
 #if SEND_RCMM
-  void sendRCMM(uint32_t data, uint8_t nbits = RCMM_BITS);
+  void sendRCMM(uint64_t data, uint16_t nbits = RCMM_BITS, uint16_t repeat = 0);
 #endif
 #if SEND_COOLIX
   void sendCOOLIX(uint64_t data, uint16_t nbits = COOLIX_BITS,
