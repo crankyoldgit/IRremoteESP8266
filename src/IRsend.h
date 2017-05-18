@@ -65,7 +65,7 @@ class IRsend {
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = LG_BITS, uint16_t repeat = 0);
-  uint32_t encodeLG(uint8_t address, uint16_t command);
+  uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
 #if SEND_SHARP
   uint32_t encodeSharp(uint16_t address, uint16_t command,

@@ -244,9 +244,15 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_LG
 #ifdef DEBUG
-  Serial.println("Attempting LG decode");
+  Serial.println("Attempting LG (28-bit) decode");
 #endif
-  if (decodeLG(results))
+  if (decodeLG(results, LG_BITS, true))
+    return true;
+#ifdef DEBUG
+  Serial.println("Attempting LG (32-bit) decode");
+#endif
+  // LG32 should be tried before Samsung
+  if (decodeLG(results, LG32_BITS, true))
     return true;
 #endif
 #if DECODE_JVC

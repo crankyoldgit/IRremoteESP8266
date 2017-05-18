@@ -45,6 +45,7 @@ script:
   - test/ir_Kelvinator_test
   - test/ir_JVC_test
   - test/ir_RCMM_test
+  - test/ir_LG_test
 
 notifications:
   email:
