@@ -152,6 +152,7 @@ enum decode_type_t {
 #define JVC_BITS                    16U
 #define KELVINATOR_STATE_LENGTH     16U
 #define LG_BITS                     28U
+#define LG32_BITS                   32U
 #define MITSUBISHI_BITS             16U
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 #define MITSUBISHI_MIN_REPEAT        1U  // Based on marcosamarinho's code.

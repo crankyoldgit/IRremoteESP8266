@@ -27,7 +27,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 # created to the list.
 TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
-        ir_JVC_test ir_RCMM_test
+        ir_JVC_test ir_RCMM_test ir_LG_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -163,4 +163,13 @@ ir_RCMM_test.o : ir_RCMM_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEA
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_RCMM_test.cpp
 
 ir_RCMM_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_RCMM_test.o ir_RCMM.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_LG.o : $(USER_DIR)/ir_LG.h $(USER_DIR)/ir_LG.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_LG.cpp
+
+ir_LG_test.o : ir_LG_test.cpp $(USER_DIR)/ir_LG.h $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_LG_test.cpp
+
+ir_LG_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Samsung.o ir_LG_test.o ir_LG.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
