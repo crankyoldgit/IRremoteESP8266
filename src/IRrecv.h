@@ -107,7 +107,7 @@ class IRrecv {
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results,
                         uint16_t nbits = MITSUBISHI_BITS,
-                        bool strict = false);
+                        bool strict = true);
 #endif
 #if (DECODE_RC5 || DECODE_R6)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,

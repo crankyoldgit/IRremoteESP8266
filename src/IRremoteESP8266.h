@@ -157,6 +157,7 @@ enum decode_type_t {
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 #define MITSUBISHI_MIN_REPEAT        1U  // Based on marcosamarinho's code.
 #define MITSUBISHI_AC_STATE_LENGTH  18U
+#define MITSUBISHI_AC_MIN_REPEAT     1U
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
 #define RC5_RAW_BITS                14U

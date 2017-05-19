@@ -3,6 +3,7 @@
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
 
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -17,18 +18,19 @@
 // Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
 
 // Constants
-#define MITSUBISHI_AC_AUTO        0x20U
-#define MITSUBISHI_AC_COOL        0x18U
-#define MITSUBISHI_AC_DRY         0x10U
-#define MITSUBISHI_AC_HEAT        0x08U
-#define MITSUBISHI_AC_POWER       0x20U
-#define MITSUBISHI_AC_FAN_AUTO       0U
-#define MITSUBISHI_AC_FAN_MAX        5U
-#define MITSUBISHI_AC_FAN_SILENT     6U
-#define MITSUBISHI_AC_MIN_TEMP      16U  // 16C
-#define MITSUBISHI_AC_MAX_TEMP      31U  // 31C
-#define MITSUBISHI_AC_VANE_AUTO      0U
-#define MITSUBISHI_AC_VANE_AUTO_MOVE 7U
+#define MITSUBISHI_AC_AUTO           0x20U
+#define MITSUBISHI_AC_COOL           0x18U
+#define MITSUBISHI_AC_DRY            0x10U
+#define MITSUBISHI_AC_HEAT           0x08U
+#define MITSUBISHI_AC_POWER          0x20U
+#define MITSUBISHI_AC_FAN_AUTO          0U
+#define MITSUBISHI_AC_FAN_MAX           5U
+#define MITSUBISHI_AC_FAN_REAL_MAX      4U
+#define MITSUBISHI_AC_FAN_SILENT        6U
+#define MITSUBISHI_AC_MIN_TEMP         16U  // 16C
+#define MITSUBISHI_AC_MAX_TEMP         31U  // 31C
+#define MITSUBISHI_AC_VANE_AUTO         0U
+#define MITSUBISHI_AC_VANE_AUTO_MOVE    7U
 
 #if SEND_MITSUBISHI_AC
 class IRMitsubishiAC {
@@ -53,12 +55,6 @@ class IRMitsubishiAC {
   uint8_t* getRaw();
 
  private:
-  // The state of the IR remote in IR code form.
-  // Known good state obtained from:
-  //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
-  uint8_t known_good_state[MITSUBISHI_AC_STATE_LENGTH] = {
-      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
   uint8_t remote_state[MITSUBISHI_AC_STATE_LENGTH];
   void checksum();
   IRsend _irsend;
