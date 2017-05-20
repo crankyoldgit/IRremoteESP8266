@@ -49,9 +49,10 @@
 // Status: RC-5 (stable), RC-5X (alpha)
 //
 // Note:
-//   Caller needs to take care of flipping the toggle bit (3rd transmitted
-//   bit/Most Significant data bit). e.g. data ^= 1ULL<<(nbits-1).).
+//   Caller needs to take care of flipping the toggle bit.
 //   That bit differentiates between key press & key release.
+//   For RC-5 it is the MSB of the data.
+//   For RC-5X it is the 2nd MSB of the data.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
 //   https://en.wikipedia.org/wiki/RC-5
@@ -59,16 +60,17 @@
 // TODO(anyone):
 //   Testing of the RC-5X components.
 void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
+  if (nbits > sizeof(data) * 8)
+    return;  // We can't send something that big.
   bool skipSpace = true;
-  uint16_t field_bit = 1;
+  bool field_bit = true;
   // Set 36kHz IR carrier frequency & a 1/4 (25%) duty cycle.
   enableIROut(36, 25);
 
-  if (nbits == RC5X_BITS) {  // Is this a RC-5X message?
-    // For RC-5X, invert the 7th bit and send it as the field/2nd start bit.
-    field_bit = (data & (1 << (7-1))) ? 0 : 1;
-    // Cut out the 7th bit from data, as we send it as the field/2nd start bit.
-    data = ((data >> 7) << 6) | (data & ((1 << 7) - 1));
+  if (nbits >= RC5X_BITS) {  // Is this a RC-5X message?
+    // field bit is the inverted MSB of RC-5X data.
+    field_bit = ((data >> (nbits - 1)) ^ 1) & 1;
+    nbits--;
   }
 
   IRtimer usecTimer = IRtimer();
@@ -100,12 +102,57 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
         mark(RC5_T1);  // 0 is mark, then space.
         space(RC5_T1);
       }
-
     // Footer
     space(std::max(RC5_MIN_GAP, RC5_MIN_COMMAND_LENGTH - usecTimer.elapsed()));
   }
 }
-#endif
+
+// Encode a Philips RC-5 data message.
+//
+// Args:
+//   address:  The 5-bit address value for the message.
+//   command:  The 6-bit command value for the message.
+//   key_released:  Boolean flag indicating if the remote key has been released.
+//
+//  Returns:
+//    A data message suitable for use in sendRC5().
+//
+// Status: Beta / Should be working.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/rc5.php
+//   https://en.wikipedia.org/wiki/RC-5
+uint16_t IRsend::encodeRC5(uint8_t address, uint8_t command,
+                           bool key_released) {
+  return (key_released << (RC5_BITS - 1)) |
+         ((address & 0x1f) << 6) |
+         (command & 0x3F);
+}
+
+// Encode a Philips RC-5X data message.
+//
+// Args:
+//   address:  The 5-bit address value for the message.
+//   command:  The 7-bit command value for the message.
+//   key_released:  Boolean flag indicating if the remote key has been released.
+//
+//  Returns:
+//    A data message suitable for use in sendRC5().
+//
+// Status: Beta / Should be working.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/rc5.php
+//   https://en.wikipedia.org/wiki/RC-5
+uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
+                            bool key_released) {
+  // The 2nd start/field bit (MSB of the return value) is the value of the 7th
+  // command bit.
+  bool s2 = (command >> 6) & 1;
+  return ((uint16_t) s2 << (RC5X_BITS - 1)) |
+      encodeRC5(address, command, key_released);
+}
+#endif  // SEND_RC5
 
 #if SEND_RC6
 // Send a Philips RC-6 packet.
@@ -155,7 +202,7 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
     space(RC6_RPT_LENGTH);
   }
 }
-#endif
+#endif  // SEND_RC6
 
 #if (DECODE_RC5 || DECODE_RC6)
 // Gets one undecoded level at a time from the raw buffer.
@@ -206,10 +253,10 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
     Serial.println("MARK");
   else
     Serial.println("SPACE");
-#endif
+#endif  // DEBUG
   return val;
 }
-#endif
+#endif  // (DECODE_RC5 || DECODE_RC6)
 
 #if DECODE_RC5
 // Decode the supplied RC-5/RC5X message.
@@ -241,32 +288,27 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   uint16_t offset = OFFSET_START;
   uint16_t used = 0;
-  uint16_t field_bit;  // a.k.a. second start bit.
   bool is_rc5x = false;
-  if (nbits == RC5X_BITS) is_rc5x = true;
+  uint64_t data = 0;
 
   // Header
   // Get start bit #1.
   if (getRClevel(results, &offset, &used, RC5_T1) != MARK) return false;
   // Get field/start bit #2 (inverted bit-7 of the command if RC-5X protocol)
+  uint16_t actual_bits = 1;
   int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
   int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
-  if (levelA == SPACE && levelB == MARK) {
-    field_bit = 1;  // Matched a 1.
-  } else if (levelA == MARK && levelB == SPACE) {
-    field_bit = 0;  // Matched a 0.
+  if (levelA == SPACE && levelB == MARK) {  // Matched a 1.
+    is_rc5x = false;
+  } else if (levelA == MARK && levelB == SPACE) {  // Matched a 0.
+    if (nbits <= RC5_BITS) return false;  // Field bit must be '1' for RC5.
     is_rc5x = true;
-    if (strict && nbits == RC5_BITS)
-      return false;  // Can't strictly be RC-5X with only RC5_BITS.
+    data = 1;
   } else {
     return false;  // Not what we expected.
   }
 
-  uint16_t actual_bits = 0;
-  if (is_rc5x) actual_bits = 1;  // We've already have our first (field) bit.
-
   // Data
-  uint64_t data = 0;
   for (; offset < results->rawlen; actual_bits++) {
     int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
     int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
@@ -275,35 +317,31 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
     else if (levelA == MARK && levelB == SPACE)
       data <<= 1;  // 0
     else
-      return false;
+      break;
   }
   // Footer (None)
 
   // Compliance
-  if (strict) {
-    if (actual_bits != RC5_BITS && actual_bits != RC5X_BITS) return false;
-    if (actual_bits != nbits) return false;
-  }
+  if (actual_bits < nbits) return false;  // Less data than we expected.
+  if (strict && actual_bits != RC5_BITS &&
+                actual_bits != RC5X_BITS) return false;
 
   // Success
-  results->bits = actual_bits;
+  results->value = data;
+  results->address = (data >> 6) & 0x1F;
+  results->command = data & 0x3F;
+  results->repeat = false;
   if (is_rc5x) {
     results->decode_type = RC5X;
-    // Bit juggling. Insert a new 7th command bit.
-    data = ((data >> 6) << 7) | (data & ((1 << 7) - 1));
-    // Set the 7th bit to the value of the inverted field/2nd start bit.
-    data ^= (uint64_t) field_bit << (7 - 1);
-    results->address = data >> 7;
-    results->command = data & ((1 << 7) - 1);
+    results->command |= ((uint32_t) is_rc5x) << 6;
   } else {
     results->decode_type = RC5;
-    results->address = data >> 6;
-    results->command = data & ((1 << 6) - 1);
+    actual_bits--;  // RC5 doesn't count the field bit as data.
   }
-  results->value = data;
+  results->bits = actual_bits;
   return true;
 }
-#endif
+#endif  // DECODE_RC5
 
 #if DECODE_RC6
 // Decode the supplied RC6 message.
@@ -387,4 +425,4 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   results->command = data & ((1ULL << (actual_bits - 4)) - 1);  // The rest.
   return true;
 }
-#endif
+#endif  // DECODE_RC6

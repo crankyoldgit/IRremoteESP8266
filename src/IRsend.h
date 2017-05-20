@@ -106,6 +106,10 @@ class IRsend {
 #endif
 #if SEND_RC5
   void sendRC5(uint64_t data, uint16_t nbits = RC5X_BITS, uint16_t repeat = 0);
+  uint16_t encodeRC5(uint8_t address, uint8_t command,
+                     bool key_released = false);
+  uint16_t encodeRC5X(uint8_t address, uint8_t command,
+                      bool key_released = false);
 #endif
 #if SEND_RC6
   void sendRC6(uint64_t data, uint16_t nbits = RC6_MODE0_BITS,
