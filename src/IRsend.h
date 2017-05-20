@@ -67,7 +67,7 @@ class IRsend {
   void sendLG(uint64_t data, uint16_t nbits = LG_BITS, uint16_t repeat = 0);
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
-#if SEND_SHARP
+#if (SEND_SHARP || SEND_DENON)
   uint32_t encodeSharp(uint16_t address, uint16_t command,
                        uint16_t expansion = 1, uint16_t check = 0,
                        bool MSBfirst = false);
@@ -97,7 +97,7 @@ class IRsend {
   void sendDISH(uint64_t data, uint16_t nbits = DISH_BITS,
                 uint16_t repeat = DISH_MIN_REPEAT);
 #endif
-#if SEND_PANASONIC
+#if (SEND_PANASONIC || SEND_DENON)
   void sendPanasonic64(uint64_t data, uint16_t nbits = PANASONIC_BITS,
                        uint16_t repeat = 0);
   void sendPanasonic(uint16_t address, uint32_t data,

@@ -280,7 +280,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #ifdef DEBUG
   Serial.println("Attempting Denon decode");
 #endif
-  if (decodeDenon(results))
+  if (decodeDenon(results, DENON_48_BITS) ||
+      decodeDenon(results, DENON_BITS) ||
+      decodeDenon(results, DENON_LEGACY_BITS))
     return true;
 #endif
 #if DECODE_DISH

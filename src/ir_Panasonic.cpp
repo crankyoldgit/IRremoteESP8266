@@ -29,9 +29,8 @@
     (PANASONIC_HDR_MARK + PANASONIC_HDR_SPACE + \
      PANASONIC_BITS * (PANASONIC_BIT_MARK + PANASONIC_ONE_SPACE) + \
      PANASONIC_BIT_MARK)))
-#define PANASONIC_MANUFACTURER       0x4004ULL
 
-#if SEND_PANASONIC
+#if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
 //
 // Args:
@@ -108,9 +107,9 @@ uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
           ((uint64_t) function << 8) |
           checksum);
 }
-#endif  // SEND_PANASONIC
+#endif  // (SEND_PANASONIC || SEND_DENON)
 
-#if DECODE_PANASONIC
+#if (DECODE_PANASONIC || DECODE_DENON)
 // Decode the supplied Panasonic message.
 //
 // Args:
@@ -127,7 +126,7 @@ uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
-                             bool strict) {
+                             bool strict, uint32_t manufacturer) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER)
     return false;  // Not enough entries to be a Panasonic message.
   if (strict && nbits != PANASONIC_BITS)
@@ -161,7 +160,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   uint32_t address = data >> 32;
   uint32_t command = data & 0xFFFFFFFF;
   if (strict) {
-    if (address != PANASONIC_MANUFACTURER)  // Verify the Manufacturer code.
+    if (address != manufacturer)  // Verify the Manufacturer code.
       return false;
     // Verify the checksum.
     uint8_t checksumOrig = data & 0xFF;
@@ -178,4 +177,4 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   results->bits = nbits;
   return true;
 }
-#endif  // DECODE_PANASONIC
+#endif  // (DECODE_PANASONIC || DECODE_DENON)

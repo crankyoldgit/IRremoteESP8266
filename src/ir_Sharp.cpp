@@ -22,12 +22,13 @@
 #define SHARP_ONE_SPACE     1820U  // 70 * T
 #define SHARP_ZERO_SPACE     780U  // 30 * T
 #define SHARP_GAP          43605U  // 1657 * T
+
 // Address(5) + Command(8) + Expansion(1) + Check(1)
 #define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
 #define SHARP_ADDRESS_MASK ((1 << SHARP_ADDRESS_BITS) - 1)
 #define SHARP_COMMAND_MASK ((1 << SHARP_COMMAND_BITS) - 1)
 
-#if SEND_SHARP
+#if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
 //
 // Args:
@@ -87,7 +88,7 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   An uint32_t containing the raw Sharp message for sendSharpRaw().
 //
-// Status: ALPHA / Untested
+// Status: BETA / Should work okay.
 //
 // Notes:
 //   Assumes the standard Sharp bit sizes.
@@ -146,19 +147,20 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
                        uint16_t repeat) {
   sendSharpRaw(encodeSharp(address, command, 1, 0, true), nbits, repeat);
 }
-#endif
+#endif  // (SEND_SHARP || SEND_DENON)
 
-#if DECODE_SHARP
+#if (DECODE_SHARP || DECODE_DENON)
 // Decode the supplied Sharp message.
 //
 // Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of data bits to expect. Typically SHARP_BITS.
-//   strict:  Flag indicating if we should perform strict matching.
+//   results:   Ptr to the data to decode and where to store the decode result.
+//   nbits:     Nr. of data bits to expect. Typically SHARP_BITS.
+//   strict:    Flag indicating if we should perform strict matching.
+//   expansion: Should we expect the expansion bit to be set. Default is true.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Should work okay.
 //
 // Note:
 //   This procedure returns a value suitable for use in sendSharpRaw().
@@ -169,7 +171,8 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
-bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
+                         bool expansion) {
   if (results->rawlen < 2 * nbits + FOOTER)
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
@@ -209,9 +212,11 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
 
   // Compliance
   if (strict) {
-    // We expect the expansion bit to be set, and the check bit cleared
-    // in a normal message.
-    if ((data & 0b11) != 0b10)
+    // Check the state of the expansion bit is what we expect.
+    if ((data & 0b10) >> 1 != expansion)
+      return false;
+    // The check bit should be cleared in a normal message.
+    if (data & 0b1)
       return false;
     // DISABLED - See TODO
 #ifdef UNIT_TEST
@@ -241,7 +246,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
     // Check that second_data has been inverted correctly.
     if (data != (second_data ^ SHARP_TOGGLE_MASK))
       return false;
-#endif
+#endif  // UNIT_TEST
   }
 
   // Success
@@ -254,4 +259,4 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
                                  SHARP_COMMAND_BITS);
   return true;
 }
-#endif
+#endif  // (DECODE_SHARP || DECODE_DENON)
