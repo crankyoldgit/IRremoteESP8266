@@ -127,7 +127,9 @@ class IRsend {
                       uint16_t repeat = MITSUBISHI_MIN_REPEAT);
 #endif
 #if SEND_MITSUBISHI_AC
-  void sendMitsubishiAC(unsigned char data[]);
+  void sendMitsubishiAC(unsigned char data[],
+                        uint16_t nbytes = MITSUBISHI_AC_STATE_LENGTH,
+                        uint16_t repeat = MITSUBISHI_AC_MIN_REPEAT);
 #endif
 #if SEND_GLOBALCACHE
   void sendGC(uint16_t buf[], uint16_t len);

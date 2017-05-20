@@ -106,7 +106,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   // Data
   uint16_t actualBits;
   for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
       return false;
     if (matchSpace(results->rawbuf[offset], MITSUBISHI_ONE_SPACE))
       data = (data << 1) | 1;  // 1
@@ -119,6 +119,8 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   // Footer is matched by the last iteration of the data loop.
 
   // Compliance
+  if (actualBits < nbits)
+    return false;
   if (strict && actualBits != nbits)
     return false;  // Not as we expected.
 
@@ -136,20 +138,27 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 // Send a Mitsubishi A/C message.
 //
 // Args:
-//   data: Array of MITSUBISHI_AC_STATE_LENGTH bytes containing the IR command.
+//   data: An array of bytes containing the IR command.
+//   nbytes: Nr. of bytes of data in the array. (>=MITSUBISHI_AC_STATE_LENGTH)
+//   repeat: Nr. of times the message is to be repeated.
+//          (Default = MITSUBISHI_AC_MIN_REPEAT).
 //
 // Status: BETA / Appears to be working.
 //
-void IRsend::sendMitsubishiAC(unsigned char data[]) {
+void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
+                              uint16_t repeat) {
+  if (nbytes < MITSUBISHI_AC_STATE_LENGTH)
+    return;  // Not enough bytes to send a proper message.
+
   // Set IR carrier frequency
   enableIROut(38);
   // Mitsubishi AC remote sends the packet twice.
-  for (uint8_t count = 0; count < 2; count++) {
+  for (uint16_t r = 0; r <= repeat; r++) {
     // Header
     mark(MITSUBISHI_AC_HDR_MARK);
     space(MITSUBISHI_AC_HDR_SPACE);
     // Data
-    for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
+    for (uint16_t i = 0; i < nbytes; i++)
       sendData(MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
                MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
                data[i], 8, false);
@@ -174,8 +183,27 @@ IRMitsubishiAC::IRMitsubishiAC(uint16_t pin) : _irsend(pin) {
 
 // Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiAC::stateReset() {
-  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
-    remote_state[i] = known_good_state[i];
+  // The state of the IR remote in IR code form.
+  // Known good state obtained from:
+  //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
+  // Note: Can't use the following because it requires -std=c++11
+  // uint8_t known_good_state[MITSUBISHI_AC_STATE_LENGTH] = {
+  //    0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
+  //    0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
+  remote_state[0] = 0x23;
+  remote_state[1] = 0xCB;
+  remote_state[2] = 0x26;
+  remote_state[3] = 0x01;
+  remote_state[4] = 0x00;
+  remote_state[5] = 0x20;
+  remote_state[6] = 0x08;
+  remote_state[7] = 0x06;
+  remote_state[8] = 0x30;
+  remote_state[9] = 0x45;
+  remote_state[10] = 0x67;
+  for (uint8_t i = 11; i < MITSUBISHI_AC_STATE_LENGTH - 1; i++)
+    remote_state[i] = 0;
+  remote_state[MITSUBISHI_AC_STATE_LENGTH - 1] = 0x1F;
   checksum();  // Calculate the checksum
 }
 
@@ -255,6 +283,7 @@ void IRMitsubishiAC::setFan(uint8_t fan) {
   } else if (fan >= MITSUBISHI_AC_FAN_MAX) {
     fan--;  // There is no spoon^H^H^Heed 5 (max), pretend it doesn't exist.
   }
+  remote_state[9] &= 0b01111000;  // Clear the previous state
   remote_state[9] |= fan;
 }
 
@@ -268,12 +297,6 @@ uint8_t IRMitsubishiAC::getFan() {
 
 // Return the requested climate operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getMode() {
-  /*
-  MITSUBISHI_AC_AUTO
-  MITSUBISHI_AC_COOL
-  MITSUBISHI_AC_DRY
-  MITSUBISHI_AC_HEAT
-  */
   return(remote_state[6]);
 }
 
@@ -292,9 +315,10 @@ void IRMitsubishiAC::setMode(uint8_t mode) {
 
 // Set the requested vane operation mode of the a/c unit.
 void IRMitsubishiAC::setVane(uint8_t mode) {
-  mode = std::max(mode, (uint8_t) 0b111);  // bounds check
+  mode = std::min(mode, (uint8_t) 0b111);  // bounds check
   mode |= 0b1000;
   mode <<= 3;
+  remote_state[9] &= 0b11000111;  // Clear the previous setting.
   remote_state[9] |= mode;
 }
 
