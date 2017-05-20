@@ -31,7 +31,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
   # Check for lint issues.
   - shopt -s nullglob
-  - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {lib,examples}/*/*.{h,c,cc,cpp,hpp,ino}
+  - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
   - shopt -u nullglob
   # Build and run the unit tests.
   - (cd test; make)
