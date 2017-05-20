@@ -27,7 +27,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 # created to the list.
 TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
-        ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test
+        ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -81,7 +81,7 @@ IRutils_test : IRutils.o IRutils_test.o gtest_main.a
 IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRtimer.cpp
 
-IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(GTEST_HEADERS)
+IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRremoteESP8266.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRsend.cpp
 
 IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
@@ -181,4 +181,13 @@ ir_Mitsubishi_test.o : ir_Mitsubishi_test.cpp $(USER_DIR)/ir_Mitsubishi.h $(USER
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Mitsubishi_test.cpp
 
 ir_Mitsubishi_test : IRrecv.o IRsend.o IRtimer.o ir_GlobalCache.o ir_Mitsubishi_test.o ir_Mitsubishi.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Sharp.o : $(USER_DIR)/ir_Sharp.cpp $(USER_DIR)/IRremoteESP8266.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sharp.cpp
+
+ir_Sharp_test.o : ir_Sharp_test.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRremoteESP8266.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Sharp_test.cpp
+
+ir_Sharp_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Sharp_test.o ir_Sharp.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
