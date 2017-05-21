@@ -27,7 +27,8 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 # created to the list.
 TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
-        ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test
+        ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
+        ir_RC5_RC6_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -191,3 +192,12 @@ ir_Sharp_test.o : ir_Sharp_test.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRremoteESP
 
 ir_Sharp_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Sharp_test.o ir_Sharp.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_RC5_RC6.o : $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/ir_RC5_RC6.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_RC5_RC6.cpp
+
+ir_RC5_RC6_test.o : ir_RC5_RC6_test.cpp $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_RC5_RC6_test.cpp
+
+ir_RC5_RC6_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_RC5_RC6_test.o ir_RC5_RC6.o gtest_main.a
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

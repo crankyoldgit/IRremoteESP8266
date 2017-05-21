@@ -115,7 +115,7 @@ class IRrecv {
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t nbits = RC5X_BITS,
-                 bool strict = false);
+                 bool strict = true);
 #endif
 #if DECODE_RC6
   bool decodeRC6(decode_results *results, uint16_t nbits = RC6_MODE0_BITS,
