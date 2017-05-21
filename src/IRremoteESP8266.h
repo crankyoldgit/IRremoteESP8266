@@ -174,7 +174,7 @@ enum decode_type_t {
                                      SANYO_LC7461_COMMAND_BITS) * 2)
 #define SHARP_ADDRESS_BITS           5U
 #define SHARP_COMMAND_BITS           8U
-#define SHARP_BITS SHARP_ADDRESS_BITS + SHARP_COMMAND_BITS + 2
+#define SHARP_BITS (SHARP_ADDRESS_BITS + SHARP_COMMAND_BITS + 2)  // 15U
 #define SHERWOOD_BITS          NEC_BITS
 #define SHERWOOD_MIN_REPEAT          1U
 #define SONY_12_BITS                12U

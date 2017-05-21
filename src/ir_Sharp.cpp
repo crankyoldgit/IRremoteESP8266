@@ -18,10 +18,10 @@
 // Ref:
 //   GlobalCache's IR Control Tower data.
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
-#define SHARP_BIT_MARK       316U  // 12 * T
-#define SHARP_ONE_SPACE     1684U  // 64 * T
-#define SHARP_ZERO_SPACE     684U  // 26 * T
-#define SHARP_GAP          43606U  // 1657 * T
+#define SHARP_BIT_MARK       260U  // 10 * T
+#define SHARP_ONE_SPACE     1820U  // 70 * T
+#define SHARP_ZERO_SPACE     780U  // 30 * T
+#define SHARP_GAP          43605U  // 1657 * T
 // Address(5) + Command(8) + Expansion(1) + Check(1)
 #define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
 #define SHARP_ADDRESS_MASK ((1 << SHARP_ADDRESS_BITS) - 1)
@@ -176,12 +176,13 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
   if (strict) {
     if (nbits != SHARP_BITS)
       return false;  // Request is out of spec.
-    /* DISABLED - See TODO
+    // DISABLED - See TODO
+#ifdef UNIT_TEST
     // An in spec message has the data sent normally, then inverted. So we
     // expect twice as many entries than to just get the results.
     if (results->rawlen < 2 * (2 * nbits + FOOTER))
       return false;
-    */
+#endif
   }
 
   uint64_t data = 0;
@@ -191,7 +192,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
 
   // Data
   for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK))
+    // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
+    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK, 35))
       return false;
     if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
       data = (data << 1) | 1;  // 1
@@ -211,7 +213,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
     // in a normal message.
     if ((data & 0b11) != 0b10)
       return false;
-    /* DISABLED - See TODO
+    // DISABLED - See TODO
+#ifdef UNIT_TEST
     // Grab the second copy of the data (i.e. inverted)
     // Header
     // i.e. The inter-data/command repeat gap.
@@ -221,7 +224,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
     // Data
     uint64_t second_data = 0;
     for (uint16_t i = 0; i < nbits; i++, offset++) {
-      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK))
+      // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
+      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK, 35))
         return false;
       if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
         second_data = (second_data << 1) | 1;  // 1
@@ -237,7 +241,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict) {
     // Check that second_data has been inverted correctly.
     if (data != (second_data ^ SHARP_TOGGLE_MASK))
       return false;
-    */
+#endif
   }
 
   // Success

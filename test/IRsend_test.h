@@ -5,6 +5,7 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include "IRrecv.h"
@@ -51,6 +52,7 @@ class IRsendTest: public IRsend {
     capture.repeat = false;
     capture.address = 0;
     capture.command = 0;
+    capture.value = 0;
     capture.rawbuf = rawbuf;
     for (uint16_t i = 0;
          (i < RAW_BUF - 1) && (offset < OUTPUT_BUF);
@@ -59,6 +61,19 @@ class IRsendTest: public IRsend {
         rawbuf[i + 1] = UINT16_MAX / USECPERTICK;
       else
         rawbuf[i + 1] = output[offset] / USECPERTICK;
+  }
+
+  void dumpRawResult() {
+    std::cout << "uint16_t rawbuf["<< capture.rawlen << "] =\n";
+    for (uint16_t i = 0; i < capture.rawlen; i++) {
+      std::cout << capture.rawbuf[i];
+      std::cout << "(";
+      std::cout << capture.rawbuf[i] * USECPERTICK;
+      std::cout << "), ";
+      if (i % 8 == 7)
+        std::cout << "\n";
+    }
+    std::cout << "\n";
   }
 
  protected:
