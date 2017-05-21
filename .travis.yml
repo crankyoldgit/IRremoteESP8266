@@ -47,6 +47,7 @@ script:
   - test/ir_RCMM_test
   - test/ir_LG_test
   - test/ir_Mitsubishi_test
+  - test/ir_RC5_RC6_test
 
 notifications:
   email:
