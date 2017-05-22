@@ -25,9 +25,11 @@
 #define PANASONIC_ONE_SPACE            1296U
 #define PANASONIC_ZERO_SPACE            432U
 #define PANASONIC_MIN_COMMAND_LENGTH 130000UL
-// 130000 - 3456 - 1728 - 48*(432+1296) - 432 = 41440
-#define PANASONIC_MIN_GAP             41440U
-#define PANASONIC_MANUFACTURER       0x2002ULL
+#define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_COMMAND_LENGTH - \
+    (PANASONIC_HDR_MARK + PANASONIC_HDR_SPACE + \
+     PANASONIC_BITS * (PANASONIC_BIT_MARK + PANASONIC_ONE_SPACE) + \
+     PANASONIC_BIT_MARK)))
+#define PANASONIC_MANUFACTURER       0x4004ULL
 
 #if SEND_PANASONIC
 // Send a Panasonic formatted message.
@@ -70,7 +72,7 @@ void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   nbits:   The number of bits of the message to be sent. (PANASONIC_BITS).
 //   repeat:  The number of times the command is to be repeated.
 //
-// Status: BETA / Should be working.
+// Status: STABLE.
 //
 // Note:
 //   This protocol is a modified version of Kaseikyo.
@@ -82,28 +84,31 @@ void IRsend::sendPanasonic(uint16_t address, uint32_t data, uint16_t nbits,
 // Calculate the raw Panasonic data based on device, subdevice, & function.
 //
 // Args:
-//   device:    An 8-bit code.
-//   subdevice: An 8-bit code.
-//   function:  An 8-bit code.
+//   manufacturer: A 16-bit manufacturer code. e.g. 0x4004 is Panasonic.
+//   device:       An 8-bit code.
+//   subdevice:    An 8-bit code.
+//   function:     An 8-bit code.
 // Returns:
 //   A raw uint64_t Panasonic message.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Should be working..
 //
 // Note:
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
-uint64_t IRsend::encodePanasonic(uint8_t device, uint8_t subdevice,
+uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
+                                 uint8_t device,
+                                 uint8_t subdevice,
                                  uint8_t function) {
   uint8_t checksum = device ^ subdevice ^ function;
-  return (((uint64_t) PANASONIC_MANUFACTURER << 32) |
+  return (((uint64_t) manufacturer << 32) |
           ((uint64_t) device << 24) |
           ((uint64_t) subdevice << 16) |
           ((uint64_t) function << 8) |
           checksum);
 }
-#endif
+#endif  // SEND_PANASONIC
 
 #if DECODE_PANASONIC
 // Decode the supplied Panasonic message.
@@ -115,7 +120,7 @@ uint64_t IRsend::encodePanasonic(uint8_t device, uint8_t subdevice,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA  Strict mode is ALPHA / Untested.
+// Status: BETA / Should be working.
 // Note:
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
 // Ref:
@@ -160,8 +165,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
       return false;
     // Verify the checksum.
     uint8_t checksumOrig = data & 0xFF;
-    uint8_t checksumCalc = (data >> 24) ^ ((data >> 16) & 0xFF) ^
-                           ((data >> 8) & 0xFF);
+    uint8_t checksumCalc = ((data >> 24) ^ (data >> 16) ^ (data >> 8)) & 0xFF;
     if (checksumOrig != checksumCalc)
       return false;
   }
@@ -174,4 +178,4 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   results->bits = nbits;
   return true;
 }
-#endif
+#endif  // DECODE_PANASONIC
