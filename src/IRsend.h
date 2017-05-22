@@ -110,10 +110,14 @@ class IRsend {
                      bool key_released = false);
   uint16_t encodeRC5X(uint8_t address, uint8_t command,
                       bool key_released = false);
+  uint64_t toggleRC5(uint64_t data);
 #endif
 #if SEND_RC6
   void sendRC6(uint64_t data, uint16_t nbits = RC6_MODE0_BITS,
                uint16_t repeat = 0);
+  uint64_t encodeRC6(uint32_t address, uint8_t command,
+                     uint16_t mode = RC6_MODE0_BITS);
+  uint64_t toggleRC6(uint64_t data, uint16_t nbits = RC6_MODE0_BITS);
 #endif
 #if SEND_RCMM
   void sendRCMM(uint64_t data, uint16_t nbits = RCMM_BITS, uint16_t repeat = 0);
