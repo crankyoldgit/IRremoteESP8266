@@ -24,7 +24,8 @@
 #define MIN_RC6_SAMPLES             1U
 #define RC5_T1                    889U
 #define RC5_MIN_COMMAND_LENGTH 113778UL
-#define RC5_MIN_GAP RC5_MIN_COMMAND_LENGTH - RC5_RAW_BITS * (2 * RC5_T1)
+#define RC5_MIN_GAP (RC5_MIN_COMMAND_LENGTH - RC5_RAW_BITS * (2 * RC5_T1))
+#define RC5_TOGGLE_MASK         0x800U  // (The 12th bit)
 // RC-6
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-6
@@ -33,6 +34,9 @@
 #define RC6_HDR_SPACE             889U
 #define RC6_T1                    444U
 #define RC6_RPT_LENGTH          83000UL
+#define RC6_TOGGLE_MASK       0x10000UL  // (The 17th bit)
+#define RC6_36_TOGGLE_MASK     0x8000U  // (The 16th bit)
+
 // Common (getRClevel())
 #define MARK  0U
 #define SPACE 1U
@@ -152,9 +156,79 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
   return ((uint16_t) s2 << (RC5X_BITS - 1)) |
       encodeRC5(address, command, key_released);
 }
+
+// Flip the toggle bit of a Philips RC-5/RC-5X data message.
+// Used to indicate a change of remote button's state.
+//
+// Args:
+//   data:  The existing RC-5/RC-5X message.
+//
+//  Returns:
+//    A data message suitable for use in sendRC5() with the toggle bit flipped.
+//
+// Status: STABLE.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/rc5.php
+//   https://en.wikipedia.org/wiki/RC-5
+uint64_t IRsend::toggleRC5(uint64_t data) {
+  return data ^ RC5_TOGGLE_MASK;
+}
 #endif  // SEND_RC5
 
 #if SEND_RC6
+// Flip the toggle bit of a Philips RC-6 data message.
+// Used to indicate a change of remote button's state.
+// For RC-6 (20-bits), it is the 17th least significant bit.
+// for RC-6 (36-bits/Xbox-360), it is the 16th least significant bit.
+//
+// Args:
+//   data:  The existing RC-6 message.
+//   nbits:  Nr. of bits in the RC-6 protocol.
+//
+//  Returns:
+//    A data message suitable for use in sendRC6() with the toggle bit flipped.
+//
+// Status: BETA / Should work fine.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/rc6.php
+//   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
+uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
+  if (nbits == RC6_36_BITS)
+    return data ^ RC6_36_TOGGLE_MASK;
+  return data ^ RC6_TOGGLE_MASK;
+}
+
+// Encode a Philips RC-6 data message.
+//
+// Args:
+//   address:  The address (aka. control) value for the message.
+//             Includes the field/mode/toggle bits.
+//   command:  The 8-bit command value for the message. (aka. information)
+//   mode:     Which protocol to use. Defined by nr. of bits in the protocol.
+//
+//  Returns:
+//    A data message suitable for use in sendRC6().
+//
+// Status: Beta / Should be working.
+//
+// Ref:
+//   http://www.sbprojects.com/knowledge/ir/rc6.php
+//   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
+//   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
+uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command,
+                           uint16_t mode) {
+  switch (mode) {
+    case RC6_MODE0_BITS:
+      return ((address & 0xFFF) << 8) | (command & 0xFF);
+    case RC6_36_BITS:
+      return ((uint64_t) (address & 0xFFFFFFF) << 8) | (command & 0xFF);
+    default:
+      return 0;
+  }
+}
+
 // Send a Philips RC-6 packet.
 // Note: Caller needs to take care of flipping the toggle bit (The 4th Most
 //   Significant Bit). That bit differentiates between key press & key release.
@@ -228,16 +302,22 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   uint16_t width = results->rawbuf[*offset];
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
   uint16_t val = ((*offset) % 2) ? MARK : SPACE;
-  int16_t correction = (val == MARK) ? MARK_EXCESS : - MARK_EXCESS;
+  // Check to see if we have hit an inter-message gap (> 20ms).
+  if (val == SPACE && width * USECPERTICK > 20000)
+    return SPACE;
+  int16_t correction = (val == MARK) ? MARK_EXCESS : -MARK_EXCESS;
 
   // Calculate the look-ahead for our current position in the buffer.
   uint16_t avail;
-  if (match(width, bitTime + correction))
-    avail = 1;
+  // Note: We want to match in greedy order as the other way leads to
+  //       mismatches due to overlaps induced by the correction and tolerance
+  //       values.
+  if (match(width, 3 * bitTime + correction))
+    avail = 3;
   else if (match(width, 2 * bitTime + correction))
     avail = 2;
-  else if (match(width, 3 * bitTime + correction))
-    avail = 3;
+  else if (match(width, bitTime + correction))
+    avail = 1;
   else
     return -1;  // The width is not what we expected.
 
@@ -248,12 +328,6 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
     (*offset)++;
   }
 
-#ifdef DEBUG
-  if (val == MARK)
-    Serial.println("MARK");
-  else
-    Serial.println("SPACE");
-#endif  // DEBUG
   return val;
 }
 #endif  // (DECODE_RC5 || DECODE_RC6)
@@ -361,7 +435,7 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 // TODO(anyone):
 //   Testing of the strict compliance aspects.
 bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < HEADER + 2)  // Header + start bit.
+  if (results->rawlen < HEADER + 2 + 4)  // Up to the double-wide T bit.
     return false;  // Smaller than absolute smallest possible RC6 message.
 
   if (strict) {  // Compliance
@@ -373,8 +447,13 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     // remains as normal.
     if (results->rawlen < nbits + HEADER + 1)
       return false;  // Don't have enough entries/samples to be valid.
-    if (nbits != RC6_MODE0_BITS && nbits != RC6_36_BITS)
-      return false;  // Asking for the wrong number of bits.
+    switch (nbits) {
+      case RC6_MODE0_BITS:
+      case RC6_36_BITS:
+        break;
+      default:
+        return false;  // Asking for the wrong number of bits.
+    }
   }
 
   uint16_t offset = OFFSET_START;
@@ -410,7 +489,7 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     else if (levelA == SPACE && levelB == MARK)
       data <<= 1;  // 0
     else
-      return false;
+      break;
   }
 
   // More compliance
@@ -421,8 +500,8 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   results->decode_type = RC6;
   results->bits = actual_bits;
   results->value = data;
-  results->address = data >> (actual_bits - 4);  // Top four bits are the mode.
-  results->command = data & ((1ULL << (actual_bits - 4)) - 1);  // The rest.
+  results->address = data >> 8;
+  results->command = data & 0xFF;
   return true;
 }
 #endif  // DECODE_RC6

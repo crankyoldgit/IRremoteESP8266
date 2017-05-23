@@ -4,10 +4,16 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
-// Tests for encodeRC5().
+// RRRRRR   CCCCC          555555   RRRRRR   CCCCC          555555  XX    XX
+// RR   RR CC    C         55       RR   RR CC    C         55       XX  XX
+// RRRRRR  CC       _____  555555   RRRRRR  CC       _____  555555    XXXX
+// RR  RR  CC    C            5555  RR  RR  CC    C            5555  XX  XX
+// RR   RR  CCCCC          555555   RR   RR  CCCCC          555555  XX    XX
 
+// Tests for encodeRC5().
 TEST(TestEncodeRC5, NormalEncoding) {
   IRsendTest irsend(4);
+
   EXPECT_EQ(0x0, irsend.encodeRC5(0, 0));
   EXPECT_EQ(0x800, irsend.encodeRC5(0, 0, true));
   EXPECT_EQ(0x41, irsend.encodeRC5(1, 1));
@@ -23,6 +29,7 @@ TEST(TestEncodeRC5, NormalEncoding) {
 // Tests for encodeRC5X().
 TEST(TestEncodeRC5X, NormalEncoding) {
   IRsendTest irsend(4);
+
   EXPECT_EQ(0x0, irsend.encodeRC5X(0, 0));
   EXPECT_EQ(0x800, irsend.encodeRC5X(0, 0, true));
   EXPECT_EQ(0x41, irsend.encodeRC5X(1, 1));
@@ -49,6 +56,17 @@ TEST(TestEncodeRC5X, NormalEncoding) {
             irsend.encodeRC5(0x1F, 0x3F, true));
   EXPECT_NE(irsend.encodeRC5X(0x1F, 0x7F, true),
             irsend.encodeRC5(0x1F, 0x7F, true));
+}
+
+// Tests for toggleRC5().
+TEST(TestToggleRC5, GeneralUse) {
+  IRsendTest irsend(4);
+
+  EXPECT_EQ(0x800, irsend.toggleRC5(0x0));
+  EXPECT_EQ(0x0, irsend.toggleRC5(0x800));
+  EXPECT_EQ(0x0, irsend.toggleRC5(irsend.toggleRC5(0x0)));
+  EXPECT_EQ(irsend.encodeRC5(0x5, 0x35, false),
+            irsend.toggleRC5(irsend.encodeRC5(0x5, 0x35, true)));
 }
 
 // Tests for sendRC5().
@@ -235,7 +253,18 @@ TEST(TestDecodeRC5, NormalDecodeWithRepeatAndStrict) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  // Normal RC-5 12-bit message with one repeat.
+  // Normal RC-5 12-bit (even) message with one repeat.
+  irsend.reset();
+  irsend.sendRC5(0x174, RC5_BITS, 1);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, RC5_BITS, true));
+  EXPECT_EQ(RC5, irsend.capture.decode_type);
+  EXPECT_EQ(RC5_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x174, irsend.capture.value);
+  EXPECT_EQ(0x05, irsend.capture.address);
+  EXPECT_EQ(0x34, irsend.capture.command);
+
+  // Normal RC-5 12-bit (odd) message with one repeat.
   irsend.reset();
   irsend.sendRC5(0x175, RC5_BITS, 1);
   irsend.makeDecodeResult();
@@ -343,4 +372,502 @@ TEST(TestDecodeRC5, FailToDecodeNonRC5Example) {
 
   ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, RC5_BITS, false));
+}
+
+//                      RRRRRR   CCCCC            666
+//                      RR   RR CC    C          66
+//                      RRRRRR  CC       _____  666666
+//                      RR  RR  CC    C         66   66
+//                      RR   RR  CCCCC           66666
+
+// Tests for encodeRC6().
+TEST(TestEncodeRC6, Mode0Encoding) {
+  IRsendTest irsend(4);
+  EXPECT_EQ(0x0, irsend.encodeRC6(0, 0, RC6_MODE0_BITS));
+  EXPECT_EQ(0x1234, irsend.encodeRC6(0x12, 0x34, RC6_MODE0_BITS));
+  EXPECT_EQ(0x12345, irsend.encodeRC6(0x123, 0x45, RC6_MODE0_BITS));
+  EXPECT_EQ(0xFFFFF, irsend.encodeRC6(0xFFF, 0xFF, RC6_MODE0_BITS));
+  EXPECT_EQ(0xFFF00, irsend.encodeRC6(0xFFFF, 0x00, RC6_MODE0_BITS));
+  EXPECT_EQ(0xFF, irsend.encodeRC6(0x00, 0xFF, RC6_MODE0_BITS));
+}
+
+TEST(TestEncodeRC6, 36BitEncoding) {
+  IRsendTest irsend(4);
+  EXPECT_EQ(0x0, irsend.encodeRC6(0, 0, RC6_36_BITS));
+  EXPECT_EQ(0x1234, irsend.encodeRC6(0x12, 0x34, RC6_36_BITS));
+  EXPECT_EQ(0x123456789, irsend.encodeRC6(0x1234567, 0x89, RC6_36_BITS));
+  EXPECT_EQ(0xFFFFFFFFF, irsend.encodeRC6(0xFFFFFFF, 0xFF, RC6_36_BITS));
+  EXPECT_EQ(0xFFFFFFFFF, irsend.encodeRC6(0xFFFFFFFF, 0xFF, RC6_36_BITS));
+  EXPECT_EQ(0xFFFFFFF00, irsend.encodeRC6(0xFFFFFFF, 0x00, RC6_36_BITS));
+  EXPECT_EQ(0xFF, irsend.encodeRC6(0x0, 0xFF, RC6_36_BITS));
+  EXPECT_EQ(0xFFFFFFFFF, irsend.encodeRC6(0xFFFFFFFF, 0xFF, RC6_36_BITS));
+}
+
+// Tests for toggleRC6().
+
+// Normal use (RC-6 Mode 0)
+TEST(TestToggleRC6, Mode0) {
+  IRsendTest irsend(4);
+
+  EXPECT_EQ(0x10000, irsend.toggleRC6(0x0));
+  EXPECT_EQ(irsend.toggleRC6(0x0), irsend.toggleRC6(0x0, RC6_MODE0_BITS));
+  EXPECT_EQ(0x0, irsend.toggleRC6(0x10000));
+  EXPECT_EQ(0x0, irsend.toggleRC6(irsend.toggleRC6(0x0)));
+}
+
+// RC-6 36-bit use (Xbox 360)
+TEST(TestToggleRC6, 36BitUse) {
+  IRsendTest irsend(4);
+
+  EXPECT_EQ(0x8000, irsend.toggleRC6(0x0, RC6_36_BITS));
+  EXPECT_EQ(0x0, irsend.toggleRC6(0x8000, RC6_36_BITS));
+  EXPECT_EQ(0x0, irsend.toggleRC6(irsend.toggleRC6(0x0, RC6_36_BITS),
+                                  RC6_36_BITS));
+}
+
+// Tests for sendRC6().
+
+// Test sending typical RC-6 Mode-0 data only.
+TEST(TestSendRC6, SendMode0DataOnly) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendRC6(0x0);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444s888m888s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s83000", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x1FFFF);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m1332s888m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444"
+      "s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x15555);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m1332s1332m888s888m888s888"
+      "m888s888m888s888m888s888m888s888m888s888m888"
+      "s83444", irsend.outputStr());
+}
+
+// Test sending typical RC-6 36-bit data only.
+TEST(TestSendRC6, Send36BitDataOnly) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendRC6(0x0, RC6_36_BITS);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s83000", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0xFFFFFFFFF, RC6_36_BITS);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s444m444s444m444s444m444s444"
+      "m888s888"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
+      "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0xAAAAAAAAAA, RC6_36_BITS);
+  EXPECT_EQ(
+      "m2666s889m444s444m444s888m888"
+      "s1332m1332"
+      "s888m888s888m888s888m888s888m888s888m888s888m888s888m888s888m888s888m888"
+      "s888m888s888m888s888m888s888m888s888m888s888m888s888m444s83000",
+      irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0xC800F740C, RC6_36_BITS);  // Xbox 360 OnOff code
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s444m444s444m444s888m444"
+      "s888m1332"
+      "s888m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m888s444m444s444m444s444m444s888m888s444m444"
+      "s444m444s888m888s888m444s444m444s444m444s444m444s444m444s444m888"
+      "s444m444s888m444s444m444s83000", irsend.outputStr());
+  irsend.reset();
+  irsend.sendRC6(irsend.toggleRC6(0xC800F740C, RC6_36_BITS),
+                 RC6_36_BITS);  // Xbox 360 OnOff code (toggled)
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s444m444s444m444s888m444"
+      "s888m1332"
+      "s888m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m888s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s888m888s888m444s444m444s444m444s444m444s444m444"
+      "s444m888s444m444s888m444s444m444s83000", irsend.outputStr());
+}
+
+// Test sending RC-6 Mode 0 with different repeats.
+TEST(TestSendRC6, SendMode0WithRepeats) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_MODE0_BITS, 0);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_MODE0_BITS, 1);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_MODE0_BITS, 2);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+}
+
+// Test sending RC-6 36-bit with different repeats.
+TEST(TestSendRC6, Send36BitWithRepeats) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_36_BITS, 0);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_36_BITS, 1);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_36_BITS, 2);
+  EXPECT_EQ(
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444"
+      "m2666s889"
+      "m444s888m444s444m444s444m444"
+      "s888m888"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
+      "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
+      "s444m444s444m444s888m888s888m888s83444", irsend.outputStr());
+}
+
+// Tests for decodeRC6().
+
+// Decode normal RC-6 Mode 0 messages.
+TEST(TestDecodeRC6, NormalMode0DecodeWithStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Normal RC-6 Mode 0 (20-bit) message.
+  irsend.reset();
+  irsend.sendRC6(0x175);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x175, irsend.capture.value);
+  EXPECT_EQ(0x01, irsend.capture.address);
+  EXPECT_EQ(0x75, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Normal Synthesised RC-6 Mode 0 (20-bit) message.
+  irsend.reset();
+  irsend.sendRC6(irsend.encodeRC6(0x1234567, 0x89, RC6_MODE0_BITS));
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x56789, irsend.capture.value);
+  EXPECT_EQ(0x567, irsend.capture.address);
+  EXPECT_EQ(0x89, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Same again, but encoded manually.
+  irsend.reset();
+  irsend.sendRC6(0x123456789, RC6_MODE0_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x56789, irsend.capture.value);
+  EXPECT_EQ(0x567, irsend.capture.address);
+  EXPECT_EQ(0x89, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+}
+
+// Decode normal RC-6 36-bit messages.
+TEST(TestDecodeRC6, Normal36BitDecodeWithStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Normal RC-6 36-bit message.
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_36_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x175, irsend.capture.value);
+  EXPECT_EQ(0x01, irsend.capture.address);
+  EXPECT_EQ(0x75, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Normal Synthesised RC-6 36-bit message.
+  irsend.reset();
+  irsend.sendRC6(irsend.encodeRC6(0x1234567, 0x89, RC6_36_BITS), RC6_36_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x123456789, irsend.capture.value);
+  EXPECT_EQ(0x1234567, irsend.capture.address);
+  EXPECT_EQ(0x89, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+}
+
+// Decode normal repeated RC6 Mode 0 messages.
+TEST(TestDecodeRC6, NormalMode0DecodeWithRepeatAndStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Normal RC-6 Mode 0 (20-bit) even message with one repeat.
+  irsend.reset();
+  irsend.sendRC6(0x174, RC6_MODE0_BITS, 1);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x174, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x74, irsend.capture.command);
+
+  // Normal RC-6 Mode 0 (20-bit) odd message with one repeat.
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_MODE0_BITS, 1);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x175, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x75, irsend.capture.command);
+}
+
+// Decode normal repeated RC6 36-bit messages.
+TEST(TestDecodeRC6, Normal36BitDecodeWithRepeatAndStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Normal RC-6 36-bit odd message with one repeat.
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_36_BITS, 1);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x175, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x75, irsend.capture.command);
+
+  // Normal RC-6 36-bit even message with one repeat.
+  irsend.reset();
+  irsend.sendRC6(0x174, RC6_36_BITS, 1);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x174, irsend.capture.value);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x74, irsend.capture.command);
+}
+
+// Decode RC-6 messages without strict.
+TEST(TestDecodeRC6, NormalDecodeWithoutStrict) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Normal RC-6 Mode 0 (20-bit) message.
+  irsend.reset();
+  irsend.sendRC6(0x175, RC6_MODE0_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x175, irsend.capture.value);
+  EXPECT_EQ(0x01, irsend.capture.address);
+  EXPECT_EQ(0x75, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Normal RC-6 Mode 0 (20-bit) message.
+  irsend.reset();
+  irsend.sendRC6(0x174, RC6_MODE0_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_MODE0_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x174, irsend.capture.value);
+  EXPECT_EQ(0x01, irsend.capture.address);
+  EXPECT_EQ(0x74, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Normal RC-6 36-bit message.
+  irsend.reset();
+  irsend.sendRC6(0x174, RC6_36_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x174, irsend.capture.value);
+  EXPECT_EQ(0x01, irsend.capture.address);
+  EXPECT_EQ(0x74, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  // Normal Synthesised RC-6 36-bit message.
+  irsend.reset();
+  irsend.sendRC6(irsend.encodeRC6(0x1234567, 0x89, RC6_36_BITS), RC6_36_BITS);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x123456789, irsend.capture.value);
+  EXPECT_EQ(0x1234567, irsend.capture.address);
+  EXPECT_EQ(0x89, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+}
+
+// Decode a 'real' example via GlobalCache
+TEST(TestDecodeRC6, Decode36BitGlobalCacheExample) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Xbox-360 Power On from Global Cache.
+  uint16_t gc_test[65] = {36000, 1, 1, 96, 32, 16, 16, 16, 16, 16, 32, 16, 32,
+                          48, 32, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+                          16, 16, 16, 16, 16, 16, 16, 16, 16, 32, 16, 16, 16,
+                          16, 16, 16, 32, 32, 16, 16, 16, 16, 32, 32, 32, 16,
+                          16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 16, 2476};
+  irsend.sendGC(gc_test, 65);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS));
+  EXPECT_EQ(RC6, irsend.capture.decode_type);
+  EXPECT_EQ(RC6_36_BITS, irsend.capture.bits);
+  EXPECT_EQ(0xC800F742A, irsend.capture.value);
+  EXPECT_EQ(0xC800F74, irsend.capture.address);
+  EXPECT_EQ(0x2A, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+}
+
+// Fail to decode a non-RC-6 example via GlobalCache
+TEST(TestDecodeRC5, FailToDecodeNonRC6Example) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
+                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
+                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  irsend.sendGC(gc_test, 39);
+  irsend.makeDecodeResult();
+
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, false));
+
+  irsend.reset();
+  irsend.sendRC5(0x0);
+  irsend.makeDecodeResult();
+
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_MODE0_BITS, false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, RC6_36_BITS, false));
 }
