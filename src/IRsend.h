@@ -102,7 +102,8 @@ class IRsend {
                        uint16_t repeat = 0);
   void sendPanasonic(uint16_t address, uint32_t data,
                      uint16_t nbits = PANASONIC_BITS, uint16_t repeat = 0);
-  uint64_t encodePanasonic(uint8_t device, uint8_t subdevice, uint8_t function);
+  uint64_t encodePanasonic(uint16_t manufacturer, uint8_t device,
+                           uint8_t subdevice, uint8_t function);
 #endif
 #if SEND_RC5
   void sendRC5(uint64_t data, uint16_t nbits = RC5X_BITS, uint16_t repeat = 0);

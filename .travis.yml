@@ -49,6 +49,7 @@ script:
   - test/ir_Mitsubishi_test
   - test/ir_Sharp_test
   - test/ir_RC5_RC6_test
+  - test/ir_Panasonic_test
 
 notifications:
   email:
