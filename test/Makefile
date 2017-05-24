@@ -28,7 +28,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
         ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
-        ir_RC5_RC6_test ir_Panasonic_test
+        ir_RC5_RC6_test ir_Panasonic_test ir_Whynter_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -209,4 +209,13 @@ ir_Panasonic_test.o : ir_Panasonic_test.cpp $(USER_DIR)/IRremoteESP8266.h $(USER
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Panasonic_test.cpp
 
 ir_Panasonic_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Panasonic_test.o ir_Panasonic.o gtest_main.a
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Whynter.o : $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/ir_Whynter.cpp $(GTEST_HEADERS)
+	  $(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Whynter.cpp
+
+ir_Whynter_test.o : ir_Whynter_test.cpp $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Whynter_test.cpp
+
+ir_Whynter_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_Whynter_test.o ir_Whynter.o gtest_main.a
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
