@@ -23,7 +23,7 @@
 #define DISH_BIT_MARK    400U
 #define DISH_ONE_SPACE  1700U
 #define DISH_ZERO_SPACE 2800U
-#define DISH_RPT_SPACE  6200U
+#define DISH_RPT_SPACE  DISH_HDR_SPACE
 
 #if SEND_DISH
 // Send an IR command to a DISH NETWORK device.
@@ -50,11 +50,11 @@
 void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set 57.6kHz IR carrier frequency, duty cycle is unknown.
   enableIROut(57600);
+  // Header
+  mark(DISH_HDR_MARK);
+  space(DISH_HDR_SPACE);
   // We always send a command, even for repeat=0, hence '<= repeat'.
   for (uint16_t i = 0; i <= repeat; i++) {
-    // Header
-    mark(DISH_HDR_MARK);
-    space(DISH_HDR_SPACE);
     // Data
     sendData(DISH_BIT_MARK, DISH_ONE_SPACE, DISH_BIT_MARK, DISH_ZERO_SPACE,
              data, nbits, true);
@@ -95,35 +95,42 @@ bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = OFFSET_START;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], DISH_HDR_MARK))
+  if (!match(results->rawbuf[offset++], DISH_HDR_MARK))
     return false;
   if (!matchSpace(results->rawbuf[offset++], DISH_HDR_SPACE))
     return false;
 
   // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], DISH_BIT_MARK))
+  uint16_t actual_bits;
+  for (actual_bits = 0; offset < results->rawlen; actual_bits++, offset++) {
+    if (!match(results->rawbuf[offset++], DISH_BIT_MARK))
       return false;
     if (matchSpace(results->rawbuf[offset], DISH_ONE_SPACE))
       data = (data << 1) | 1;  // 1
     else if (matchSpace(results->rawbuf[offset], DISH_ZERO_SPACE))
       data = data << 1;  // 0
     else
-      return false;
+      break;
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], DISH_HDR_MARK))
+  if (!match(results->rawbuf[offset - 1], DISH_BIT_MARK))
     return false;
-  // The DISH protocol calls for a repeated message, so strictly speaking
-  // there should be a code following this. Only require it if we are set to
-  // strict matching.
-  if (strict && !matchSpace(results->rawbuf[offset], DISH_RPT_SPACE))
-    return false;
+
+  // Compliance
+  if (strict) {
+    // The DISH protocol calls for a repeated message, so strictly speaking
+    // there should be a code following this. Only require it if we are set to
+    // strict matching.
+    if (!matchSpace(results->rawbuf[offset], DISH_RPT_SPACE))
+      return false;
+    if (actual_bits != nbits)
+      return false;  // We didn't get the same number of bits we asked for.
+  }
 
   // Success
   results->decode_type = DISH;
-  results->bits = nbits;
+  results->bits = actual_bits;
   results->value = data;
   results->address = 0;
   results->command = 0;
