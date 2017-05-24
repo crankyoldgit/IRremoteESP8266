@@ -51,6 +51,7 @@ script:
   - test/ir_RC5_RC6_test
   - test/ir_Panasonic_test
   - test/ir_Dish_test
+  - test/ir_Whynter_test
 
 notifications:
   email:
