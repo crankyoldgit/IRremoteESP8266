@@ -199,6 +199,14 @@
 #define KELVINATOR_GAP_SPACE	19950U
 #define KELVINATOR_CMD_FOOTER	2U
 
+// Gree, from https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.h
+#define GREE_HDR_MARK     9000
+#define GREE_HDR_SPACE    4000
+#define GREE_BIT_MARK      620
+#define GREE_ONE_SPACE    1600
+#define GREE_ZERO_SPACE    540
+#define GREE_MSG_SPACE   19000
+
 // Some useful constants
 #define USECPERTICK 50  // microseconds per clock interrupt tick
 #define RAWBUF 100 // Length of raw duration buffer
