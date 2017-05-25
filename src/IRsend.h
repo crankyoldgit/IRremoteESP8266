@@ -153,7 +153,7 @@ class IRsend {
 #endif
 #if SEND_AIWA_RC_T501
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
-                      uint16_t repeat = 0);
+                      uint16_t repeat = AIWA_RC_T501_MIN_REPEAT);
 #endif
 
  private:
