@@ -82,7 +82,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / untested.
+// Status: BETA / Probably working.
 bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
                           bool strict) {
   // The protocol sends the data normal + inverted, alternating on
@@ -95,9 +95,10 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
     return false;
 
   uint64_t data = 0;
+  uint64_t inverted = 0;
   uint16_t offset = OFFSET_START;
 
-  if (nbits * 2 > sizeof(data) * 8)
+  if (nbits > sizeof(data) * 8)
     return false;  // We can't possibly capture a Coolix packet that big.
 
   // Header
@@ -109,37 +110,40 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   // Data
   // Twice as many bits as there are normal plus inverted bits.
   for (uint16_t i = 0; i < nbits * 2; i++, offset++) {
+    bool flip = (i / 8) % 2;
     if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK))
       return false;
-    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], COOLIX_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
+    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE)) {  // 1
+      if (flip)
+        inverted = (inverted << 1) | 1;
+      else
+        data = (data << 1) | 1;
+    } else if (matchSpace(results->rawbuf[offset], COOLIX_ZERO_SPACE)) {  // 0
+      if (flip)
+        inverted <<= 1;
+      else
+        data <<= 1;
+    } else {
       return false;
+    }
   }
 
   // Footer
   if (!matchMark(results->rawbuf[offset], COOLIX_BIT_MARK))
       return false;
 
-  // Data should now be (MSB to LSB) byte1,!byte1,byte2,!byte2,byte3,!byte3
-  // Decode, and verify if needed.
-  uint64_t result = 0;  // Build a new result for we destroy the existing data.
-  for (uint16_t i = 0; i < nbits; i += 8) {
-    uint8_t inverted = (data & 0xFF) ^ 0xFF;  // Un-invert the byte.
-    data >>= 8;
-    uint8_t normal = data & 0xFF;
-    data >>= 8;
-    if (strict && data != inverted)  // Compliance
-      return false;  // The message doesn't verify.
-    result |= (normal << i);  // Add the byte in front of the previous result.
+  // Compliance
+  uint64_t orig = data;  // Save a copy of the data.
+  if (strict) {
+    for (uint16_t i = 0; i < nbits; i += 8, data >>= 8, inverted >>= 8)
+      if ((data & 0xFF) != ((inverted & 0xFF) ^ 0xFF))
+        return false;
   }
 
   // Success
   results->decode_type = COOLIX;
   results->bits = nbits;
-  results->value = result;
+  results->value = orig;
   results->address = 0;
   results->command = 0;
   return true;
