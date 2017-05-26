@@ -208,6 +208,7 @@ public:
   void sendKelvinator(unsigned char data[]);
   void sendSherwood(unsigned long data, int nbits=32, unsigned int repeat=1);
   void sendMitsubishiAC(unsigned char data[]);
+  void sendGree(unsigned char data[]);
   void enableIROut(int khz);
   VIRTUAL void mark(unsigned int usec);
   VIRTUAL void space(unsigned long usec);

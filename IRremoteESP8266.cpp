@@ -450,6 +450,43 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon (unsigned long data,  int nbits) {
   ledOff();
 }
 
+// Gree protocol compatible heat pump carrying the "Ultimate" brand name.
+// Added by Ville Skyttä (scop)
+// Ref:
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
+void ICACHE_FLASH_ATTR IRsend::sendGree(unsigned char data[]) {
+  uint8_t i = 0;
+
+  // Set IR carrier frequency
+  enableIROut(38);
+
+  // Header #1
+  mark(GREE_HDR_MARK);
+  space(GREE_HDR_SPACE);
+
+  // Data #1
+  for (; i < 4; i++)
+    sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
+             data[i], 8, false);
+
+  // Footer #2 (010)
+  sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
+           0x2, 3);
+
+  // Header #2
+  mark(GREE_BIT_MARK);
+  space(GREE_MSG_SPACE);
+
+  // Data #2
+  for (; i < GREE_STATE_LENGTH; i++)
+    sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
+             data[i], 8, false);
+
+  // Footer #2
+  mark(GREE_BIT_MARK);
+  space(GREE_MSG_SPACE);
+}
+
 void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
