@@ -480,7 +480,7 @@ void ICACHE_FLASH_ATTR IRsend::sendGree(unsigned char data[]) {
   space(GREE_MSG_SPACE);
 
   // Data #2
-  for (; i < 8; i++)
+  for (; i < GREE_STATE_LENGTH; i++)
     sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
              data[i], 8, false);
 
