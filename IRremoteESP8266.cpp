@@ -450,9 +450,11 @@ void ICACHE_FLASH_ATTR IRsend::sendDenon (unsigned long data,  int nbits) {
   ledOff();
 }
 
-// Gree, from https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
+// Gree protocol compatible heat pump carrying the "Ultimate" brand name.
+// Added by Ville Skyttä (scop)
+// Ref:
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
 void ICACHE_FLASH_ATTR IRsend::sendGree(unsigned char data[]) {
-
   uint8_t i = 0;
 
   // Set IR carrier frequency
