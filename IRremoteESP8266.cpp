@@ -482,7 +482,7 @@ void ICACHE_FLASH_ATTR IRsend::sendGree(unsigned char data[]) {
 
   // Footer #2
   mark(GREE_BIT_MARK);
-  ledOff();
+  space(GREE_MSG_SPACE);
 }
 
 void ICACHE_FLASH_ATTR IRsend::mark(unsigned int usec) {
