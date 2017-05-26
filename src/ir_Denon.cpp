@@ -27,6 +27,7 @@
 #define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - \
     (DENON_HDR_MARK + DENON_HDR_SPACE + DENON_BITS * \
      (DENON_BIT_MARK + DENON_ONE_SPACE) + DENON_BIT_MARK)
+#define DENON_MANUFACTURER       0x2A4CULL
 
 #if SEND_DENON
 // Send a Denon message
@@ -39,27 +40,19 @@
 // Status: BETA / Should be working.
 //
 // Notes:
-//   Some Denon devices use a Kaseikyo/Panasonic 48-bit format.
+//   Some Denon devices use a Kaseikyo/Panasonic 48-bit format
+//   Others use the Sharp protocol.
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 //   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
 void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  enableIROut(38);  // Set IR carrier frequency
-  IRtimer usecTimer = IRtimer();
-
-  for (uint16_t i = 0; i <= repeat; i++) {
-    usecTimer.reset();
-    // Header
-    mark(DENON_HDR_MARK);
-    space(DENON_HDR_SPACE);
-    // Data
-    sendData(DENON_BIT_MARK, DENON_ONE_SPACE, DENON_BIT_MARK, DENON_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(DENON_BIT_MARK);
-    space(std::max(DENON_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-                   DENON_MIN_GAP));
-  }
+  if (nbits >= PANASONIC_BITS)  // Is this really Panasonic?
+    sendPanasonic64(data, nbits, repeat);
+  else if (nbits == DENON_LEGACY_BITS)
+    // Support legacy (broken) calls of sendDenon().
+    sendSharpRaw(data & (~0x2000ULL), nbits + 1, repeat);
+  else
+    sendSharpRaw(data, nbits, repeat);
 }
 #endif
 
@@ -72,47 +65,77 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: STABLE
-//
+// Status: BETA / Should work fine.
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
-  // Check we have enough data
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
-    return false;
-  if (strict && nbits != DENON_BITS)
-    return false;
+  // Compliance
+  if (strict) {
+    switch (nbits) {
+      case DENON_BITS:
+      case DENON_48_BITS:
+      case DENON_LEGACY_BITS:
+        break;
+      default:
+        return false;
+    }
+  }
 
-  uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  // Denon uses the Sharp & Panasonic(Kaseikyo) protocol for some
+  // devices, so check for those first.
+  // It is not exactly like Sharp's protocols, but close enough.
+  // e.g. The expansion bit is not set for Denon vs. set for Sharp.
+  // Ditto for Panasonic, it's the same except for a different
+  // manufacturer code.
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], DENON_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
-    return false;
-  // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
+  if (!decodeSharp(results, nbits, true, false) &&
+      !decodePanasonic(results, nbits, true, DENON_MANUFACTURER)) {
+    // We couldn't decode it as expected, so try the old legacy method.
+    // NOTE: I don't this following protocol actually exists.
+    //       Looks like a partial version of the Sharp protocol.
+    // Check we have enough data
+    if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+      return false;
+    if (strict && nbits != DENON_LEGACY_BITS)
+      return false;
+
+    uint64_t data = 0;
+    uint16_t offset = OFFSET_START;
+
+    // Header
+    if (!matchMark(results->rawbuf[offset++], DENON_HDR_MARK))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
+      return false;
+    // Data
+    for (uint16_t i = 0; i < nbits; i++, offset++) {
+      if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+        return false;
+      if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
+        data = (data << 1) | 1;  // 1
+      else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE))
+        data = (data << 1);  // 0
+      else
+        return false;
+    }
+
+    // Footer
     if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
       return false;
-    if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE))
-      data = (data << 1);  // 0
-    else
-      return false;
-  }
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
-    return false;
+
+    // Success
+    results->bits = nbits;
+    results->value = data;
+    results->address = 0;
+    results->command = 0;
+  }  // Legacy decode.
+
+  // Compliance
+  if (strict && nbits != results->bits) return false;
 
   // Success
-  results->bits = nbits;
-  results->value = data;
   results->decode_type = DENON;
-  results->address = 0;
-  results->command = 0;
   return true;
 }
 #endif

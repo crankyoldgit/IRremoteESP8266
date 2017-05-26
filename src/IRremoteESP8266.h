@@ -147,7 +147,9 @@ enum decode_type_t {
 #define COOLIX_BITS                 24U
 #define DAIKIN_BITS                 99U
 #define DAIKIN_COMMAND_LENGTH       27U
-#define DENON_BITS                  14U
+#define DENON_BITS                  SHARP_BITS
+#define DENON_48_BITS               PANASONIC_BITS
+#define DENON_LEGACY_BITS           14U
 #define DISH_BITS                   16U
 #define DISH_MIN_REPEAT              3U
 #define JVC_BITS                    16U
@@ -161,6 +163,7 @@ enum decode_type_t {
 #define MITSUBISHI_AC_MIN_REPEAT     1U
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
+#define PANASONIC_MANUFACTURER   0x4004ULL
 #define RC5_RAW_BITS                14U
 #define RC5_BITS      RC5_RAW_BITS - 2U
 #define RC5X_BITS     RC5_RAW_BITS - 1U

@@ -53,6 +53,7 @@ script:
   - test/ir_Dish_test
   - test/ir_Whynter_test
   - test/ir_Aiwa_test
+  - test/ir_Denon_test
 
 notifications:
   email:
