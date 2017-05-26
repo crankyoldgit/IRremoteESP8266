@@ -157,6 +157,11 @@ class IRsend {
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
                       uint16_t repeat = AIWA_RC_T501_MIN_REPEAT);
 #endif
+#if SEND_GREE
+  void sendGree(uint64_t data, uint16_t nbits = GREE_BITS, uint16_t repeat = 0);
+  void sendGree(uint8_t data[], uint16_t nbytes = GREE_STATE_LENGTH,
+                uint16_t repeat = 0);
+#endif
 
  private:
   uint16_t onTimePeriod;

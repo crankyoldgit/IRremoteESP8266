@@ -29,7 +29,8 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
         ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
-				ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test
+				ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
+				ir_Gree_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -274,3 +275,12 @@ ir_Daikin_test.o : ir_Daikin_test.cpp $(USER_DIR)/ir_Daikin.h $(USER_DIR)/IRsend
 
 ir_Daikin_test : IRsend.o IRtimer.o IRutils.o ir_Daikin_test.o ir_Daikin.o gtest_main.a
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Gree.o : $(USER_DIR)/ir_Gree.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Gree.cpp
+
+ir_Gree_test.o : ir_Gree_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Gree_test.cpp
+
+ir_Gree_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_Gree_test.o ir_Gree.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
