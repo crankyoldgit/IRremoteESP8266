@@ -468,12 +468,8 @@ void ICACHE_FLASH_ATTR IRsend::sendGree(unsigned char data[]) {
              data[i], 8, false);
 
   // Footer #2 (010)
-  mark(GREE_BIT_MARK);
-  space(GREE_ZERO_SPACE);
-  mark(GREE_BIT_MARK);
-  space(GREE_ONE_SPACE);
-  mark(GREE_BIT_MARK);
-  space(GREE_ZERO_SPACE);
+  sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
+           0x2, 3);
 
   // Header #2
   mark(GREE_BIT_MARK);
