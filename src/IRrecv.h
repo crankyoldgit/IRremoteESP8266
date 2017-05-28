@@ -89,7 +89,7 @@ class IRrecv {
   bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,
                   uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   bool decodeHash(decode_results *results);
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
                  bool strict = true);
 #endif
@@ -98,8 +98,10 @@ class IRrecv {
                   bool strict = false);
 #endif
 #if DECODE_SANYO
-  bool decodeSanyo(decode_results *results, uint16_t nbits = SANYO_SA8650B_BITS,
-                   bool strict = false);
+  // DISABLED due to poor quality.
+  // bool decodeSanyo(decode_results *results,
+  //                  uint16_t nbits = SANYO_SA8650B_BITS,
+  //                  bool strict = false);
   bool decodeSanyoLC7461(decode_results *results,
                          uint16_t nbits = SANYO_LC7461_BITS,
                          bool strict = true);
@@ -125,9 +127,10 @@ class IRrecv {
   bool decodeRCMM(decode_results *results, uint16_t nbits = RCMM_BITS,
                   bool strict = false);
 #endif
-#if DECODE_PANASONIC
+#if (DECODE_PANASONIC || DECODE_DENON)
   bool decodePanasonic(decode_results *results, uint16_t nbits = PANASONIC_BITS,
-                       bool strict = false);
+                       bool strict = false,
+                       uint32_t manufacturer = PANASONIC_MANUFACTURER);
 #endif
 #if DECODE_LG
   bool decodeLG(decode_results *results, uint16_t nbits = LG_BITS,
@@ -157,9 +160,9 @@ class IRrecv {
   bool decodeDISH(decode_results *results, uint16_t nbits = DISH_BITS,
                   bool strict = true);
 #endif
-#if DECODE_SHARP
+#if (DECODE_SHARP || DECODE_DENON)
   bool decodeSharp(decode_results *results, uint16_t nbits = SHARP_BITS,
-                   bool strict = true);
+                   bool strict = true, bool expansion = true);
 #endif
 #if DECODE_AIWA_RC_T501
   bool decodeAiwaRCT501(decode_results *results,

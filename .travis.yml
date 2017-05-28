@@ -53,6 +53,10 @@ script:
   - test/ir_Dish_test
   - test/ir_Whynter_test
   - test/ir_Coolix_test
+  - test/ir_Aiwa_test
+  - test/ir_Denon_test
+  - test/ir_Sanyo_test
+  - test/ir_Daikin_test
 
 notifications:
   email:

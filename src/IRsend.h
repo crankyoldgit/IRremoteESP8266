@@ -39,7 +39,7 @@ class IRsend {
                 uint32_t zerospace, uint64_t data, uint16_t nbits,
                 bool MSBfirst = true);
   void send(uint16_t type, uint64_t data, uint16_t nbits);
-#if (SEND_NEC || SEND_SHERWOOD)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
   void sendNEC(uint64_t data, uint16_t nbits = NEC_BITS, uint16_t repeat = 0);
   uint32_t encodeNEC(uint16_t address, uint16_t command);
 #endif
@@ -67,7 +67,7 @@ class IRsend {
   void sendLG(uint64_t data, uint16_t nbits = LG_BITS, uint16_t repeat = 0);
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
-#if SEND_SHARP
+#if (SEND_SHARP || SEND_DENON)
   uint32_t encodeSharp(uint16_t address, uint16_t command,
                        uint16_t expansion = 1, uint16_t check = 0,
                        bool MSBfirst = false);
@@ -85,7 +85,7 @@ class IRsend {
                  uint16_t repeat = 0);
 #endif
 #if SEND_SANYO
-  uint64_t encodeSanyoLC7461(uint16_t address, uint16_t command);
+  uint64_t encodeSanyoLC7461(uint16_t address, uint8_t command);
   void sendSanyoLC7461(uint64_t data, uint16_t nbits = SANYO_LC7461_BITS,
                        uint16_t repeat = 0);
 #endif
@@ -97,7 +97,7 @@ class IRsend {
   void sendDISH(uint64_t data, uint16_t nbits = DISH_BITS,
                 uint16_t repeat = DISH_MIN_REPEAT);
 #endif
-#if SEND_PANASONIC
+#if (SEND_PANASONIC || SEND_DENON)
   void sendPanasonic64(uint64_t data, uint16_t nbits = PANASONIC_BITS,
                        uint16_t repeat = 0);
   void sendPanasonic(uint16_t address, uint32_t data,
@@ -149,11 +149,13 @@ class IRsend {
                       uint16_t repeat = 0);
 #endif
 #if SEND_DAIKIN
-  void sendDaikin(unsigned char data[]);
+  void sendDaikin(unsigned char data[],
+                  uint16_t nbytes = DAIKIN_COMMAND_LENGTH,
+                  uint16_t repeat = 0);
 #endif
 #if SEND_AIWA_RC_T501
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
-                      uint16_t repeat = 0);
+                      uint16_t repeat = AIWA_RC_T501_MIN_REPEAT);
 #endif
 
  private:
