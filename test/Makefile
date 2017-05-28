@@ -29,7 +29,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
         ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
-				ir_Aiwa_test ir_Denon_test ir_Sanyo_test
+				ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -255,4 +255,13 @@ ir_Sanyo_test.o : ir_Sanyo_test.cpp $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/IR
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Sanyo_test.cpp
 
 ir_Sanyo_test : IRrecv.o IRsend.o IRtimer.o IRutils.o ir_GlobalCache.o ir_NEC.o ir_Sanyo_test.o ir_Sanyo.o gtest_main.a
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Daikin.o : $(USER_DIR)/ir_Daikin.cpp $(USER_DIR)/ir_Daikin.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRrecv.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Daikin.cpp
+
+ir_Daikin_test.o : ir_Daikin_test.cpp $(USER_DIR)/ir_Daikin.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRrecv.h IRsend_test.h $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Daikin_test.cpp
+
+ir_Daikin_test : IRsend.o IRtimer.o IRutils.o ir_Daikin_test.o ir_Daikin.o gtest_main.a
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

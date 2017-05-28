@@ -60,6 +60,11 @@
 #define DAIKIN_DRY                 0b010
 #define DAIKIN_POWERFUL       0b00000010
 #define DAIKIN_SILENT         0b00100000
+#define DAIKIN_MIN_TEMP               18U  // Celsius
+#define DAIKIN_MAX_TEMP               32U  // Celsius
+#define DAIKIN_FAN_AUTO      (uint8_t) 0U
+#define DAIKIN_FAN_MIN       (uint8_t) 1U
+#define DAIKIN_FAN_MAX       (uint8_t) 5U
 
 #if SEND_DAIKIN
 class IRDaikinESP {
@@ -70,6 +75,7 @@ class IRDaikinESP {
   void begin();
   void on();
   void off();
+  void setPower(bool state);
   uint8_t getPower();
   void setAux(uint8_t aux);
   uint8_t getAux();
@@ -79,20 +85,20 @@ class IRDaikinESP {
   uint8_t getFan();
   uint8_t getMode();
   void setMode(uint8_t mode);
-  void setSwingVertical(uint8_t swing);
-  uint8_t getSwingVertical();
-  void setSwingHorizontal(uint8_t swing);
-  uint8_t getSwingHorizontal();
+  void setSwingVertical(bool state);
+  bool getSwingVertical();
+  void setSwingHorizontal(bool state);
+  bool getSwingHorizontal();
+  bool getQuiet();
+  void setQuiet(bool state);
+  bool getPowerful();
+  void setPowerful(bool state);
+  uint8_t* getRaw();
 
  private:
   // # of bytes per command
-  unsigned char daikin[DAIKIN_COMMAND_LENGTH] = {
-      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
-      // 0     1     2     3     4     5     6     7
-      0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
-      // 8     9    10    11    12    13    14    15
-      0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3};
-      // 16   17    18    19    20    21    22    23    24    25    26
+  uint8_t daikin[DAIKIN_COMMAND_LENGTH];
+  void stateReset();
   void checksum();
   IRsend _irsend;
 };

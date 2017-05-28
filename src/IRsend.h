@@ -149,7 +149,9 @@ class IRsend {
                       uint16_t repeat = 0);
 #endif
 #if SEND_DAIKIN
-  void sendDaikin(unsigned char data[]);
+  void sendDaikin(unsigned char data[],
+                  uint16_t nbytes = DAIKIN_COMMAND_LENGTH,
+                  uint16_t repeat = 0);
 #endif
 #if SEND_AIWA_RC_T501
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
