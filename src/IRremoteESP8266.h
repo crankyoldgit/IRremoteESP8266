@@ -78,7 +78,7 @@
 #define DECODE_LG            true
 #define SEND_LG              true
 
-#define DECODE_SANYO         false  // Broken.
+#define DECODE_SANYO         true
 #define SEND_SANYO           true
 
 #define DECODE_MITSUBISHI    true

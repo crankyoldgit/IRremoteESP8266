@@ -306,6 +306,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeCOOLIX(results))
     return true;
 #endif
+/* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
   // The Sanyo S866500B decoder is very poor quality & depricated.
   // *IF* you are going to enable it, do it near last to avoid false positive
@@ -316,6 +317,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeSanyo(results))
     return true;
 #endif
+*/
 #endif  // UNIT_TEST
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

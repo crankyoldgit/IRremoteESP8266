@@ -39,7 +39,7 @@ class IRsend {
                 uint32_t zerospace, uint64_t data, uint16_t nbits,
                 bool MSBfirst = true);
   void send(uint16_t type, uint64_t data, uint16_t nbits);
-#if (SEND_NEC || SEND_SHERWOOD)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
   void sendNEC(uint64_t data, uint16_t nbits = NEC_BITS, uint16_t repeat = 0);
   uint32_t encodeNEC(uint16_t address, uint16_t command);
 #endif
@@ -85,7 +85,7 @@ class IRsend {
                  uint16_t repeat = 0);
 #endif
 #if SEND_SANYO
-  uint64_t encodeSanyoLC7461(uint16_t address, uint16_t command);
+  uint64_t encodeSanyoLC7461(uint16_t address, uint8_t command);
   void sendSanyoLC7461(uint64_t data, uint16_t nbits = SANYO_LC7461_BITS,
                        uint16_t repeat = 0);
 #endif

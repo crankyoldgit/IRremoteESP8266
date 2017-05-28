@@ -60,7 +60,7 @@
 //   This protocol uses the NEC protocol timings. However, data is
 //   formatted as : address(13 bits), !address, command(8 bits), !command.
 //   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
-uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint16_t command) {
+uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint8_t command) {
   // Mask our input values to ensure the correct bit sizes.
   address &= SANYO_LC7461_ADDRESS_MASK;
   command &= SANYO_LC7461_COMMAND_MASK;
@@ -85,7 +85,7 @@ uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint16_t command) {
 //   nbits:  The bit size of the command being sent.
 //   repeat: The number of times you want the command to be repeated.
 //
-// Status: ALPHA / untested.
+// Status: BETA / Probably works.
 //
 // Notes:
 //   Based on @marcosamarinho's work.
@@ -99,36 +99,10 @@ uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint16_t command) {
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
-  enableIROut(38, 33);
-  IRtimer usecTimer = IRtimer();
-
-  // Header
-  mark(SANYO_LC7461_HDR_MARK);
-  space(SANYO_LC7461_HDR_SPACE);
-  // Data
-  sendData(SANYO_LC7461_BIT_MARK, SANYO_LC7461_ONE_SPACE,
-           SANYO_LC7461_BIT_MARK, SANYO_LC7461_ZERO_SPACE, data, nbits, true);
-  // Footer
-  mark(SANYO_LC7461_BIT_MARK);
-  space(std::max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-                 SANYO_LC7461_MIN_GAP));
-
-  // Repeat
-  // Similar to the NEC protocol, sending a special repeat message to indicate
-  // a repeat, rather than duplicating the entire message.
-  for (uint16_t i = 0; i < repeat; i++) {
-    usecTimer.reset();
-    // Header
-    mark(SANYO_LC7461_HDR_MARK);
-    space(SANYO_LC7461_HDR_SPACE);
-    // Footer
-    mark(SANYO_LC7461_BIT_MARK);
-    space(std::max(SANYO_LC7461_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-                   SANYO_LC7461_MIN_GAP));
-  }
+  // This protocol appears to be another 42-bit varient of the NEC protcol.
+  sendNEC(data, nbits, repeat);
 }
-#endif
+#endif  // SEND_SANYO
 
 #if DECODE_SANYO
 // Decode the supplied SANYO LC7461 message.
@@ -140,11 +114,11 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / untested.
+// Status: BETA / Probably works.
 //
 // Notes:
 //   Based on @marcosamarinho's work.
-//   This protocol uses the NEC protocol timings. However, data is
+//   This protocol uses the NEC protocol. However, data is
 //   formatted as : address(13 bits), !address, command (8 bits), !command.
 //   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
 //   Information for this protocol is available at the Sanyo LC7461 datasheet.
@@ -154,61 +128,42 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
                                bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
-    return false;  // Shorter than the shortest expected.
   if (strict && nbits != SANYO_LC7461_BITS)
     return false;  // Not strictly in spec.
-
-  uint16_t offset = OFFSET_START;
-
-  // Header
-  if (!matchMark(results->rawbuf[offset++], SANYO_LC7461_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], SANYO_LC7461_HDR_SPACE))
-    return false;
-
-  // Data
-  uint64_t data = 0;
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], SANYO_LC7461_BIT_MARK))
-      return false;
-    if (matchSpace(results->rawbuf[offset], SANYO_LC7461_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], SANYO_LC7461_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
-      return false;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset], SANYO_LC7461_BIT_MARK))
-    return false;
+  // This protocol is basically a 42-bit varient of the NEC protocol.
+  if (!decodeNEC(results, nbits, false))
+    return false;  // Didn't match a NEC format (without strict)
 
   // Bits 30 to 42+.
-  uint16_t address = data >> (SANYO_LC7461_BITS - SANYO_LC7461_ADDRESS_BITS);
+  uint16_t address = results->value >> (SANYO_LC7461_BITS -
+                                        SANYO_LC7461_ADDRESS_BITS);
   // Bits 9 to 16.
-  uint8_t command = (data >> SANYO_LC7461_COMMAND_BITS) &
-                    SANYO_LC7461_COMMAND_MASK;
-
-  if (strict) {  // Compliance
-    uint16_t inverted_address = (data >> (SANYO_LC7461_COMMAND_BITS * 2)) &
-                                SANYO_LC7461_ADDRESS_MASK;  // Bits 17 to 29.
-    uint8_t inverted_command = data & SANYO_LC7461_COMMAND_MASK;  // Bits 1-8.
-    if ((results->address ^ SANYO_LC7461_ADDRESS_MASK) != inverted_address)
+  uint8_t command = (results->value >> SANYO_LC7461_COMMAND_BITS) &
+      SANYO_LC7461_COMMAND_MASK;
+  // Compliance
+  if (strict) {
+    if (results->bits != nbits)
+      return false;
+    // Bits 17 to 29.
+    uint16_t inverted_address =
+        (results->value >> (SANYO_LC7461_COMMAND_BITS * 2)) &
+        SANYO_LC7461_ADDRESS_MASK;
+    // Bits 1-8.
+    uint8_t inverted_command = results->value & SANYO_LC7461_COMMAND_MASK;
+    if ((address ^ SANYO_LC7461_ADDRESS_MASK) != inverted_address)
       return false;  // Address integrity check failed.
-    if ((results->command ^ SANYO_LC7461_COMMAND_MASK) != inverted_command)
+    if ((command ^ SANYO_LC7461_COMMAND_MASK) != inverted_command)
       return false;  // Command integrity check failed.
   }
 
   // Success
   results->decode_type = SANYO_LC7461;
-  results->bits = nbits;
-  results->value = data;
   results->address = address;
   results->command = command;
   return true;
 }
 
+/* NOTE: Disabled due to poor quality.
 // Decode the supplied Sanyo SA 8650B message.
 //
 // Args:
@@ -280,4 +235,5 @@ bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
   results->command = 0;
   return true;
 }
-#endif
+*/
+#endif  // DECODE_SANYO
