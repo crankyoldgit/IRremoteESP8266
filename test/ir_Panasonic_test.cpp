@@ -327,13 +327,8 @@ TEST(TestDecodePanasonic, DecodeWithNonStrictSize) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
-  // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
-  EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x4004010203, irsend.capture.value);
-  EXPECT_EQ(0x40, irsend.capture.address);
-  EXPECT_EQ(0x04010203, irsend.capture.command);
+  // Shouldn't pass if strict off and wrong bit size.
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
   // Re-decode with correct bit size.
   ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, 56, true));
   ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, 56, false));

@@ -30,6 +30,7 @@
 #define STATE_STOP     5U
 #define TOLERANCE     25U  // default percent tolerance in measurements
 #define USECPERTICK   50U  // microseconds per clock interrupt tick
+#define TIMEOUT_MS    15U  // How long before we give up wait for more data.
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
 #define FNV_PRIME_32 16777619UL
@@ -84,6 +85,8 @@ class IRrecv {
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);
   bool match(uint32_t measured_ticks, uint32_t desired_us,
              uint8_t tolerance = TOLERANCE);
+  bool matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
+                    uint8_t tolerance = TOLERANCE);
   bool matchMark(uint32_t measured_ticks, uint32_t desired_us,
                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,

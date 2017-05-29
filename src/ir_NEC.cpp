@@ -159,8 +159,10 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
       return false;
   }
   // Footer
-  if (!matchMark(results->rawbuf[offset], NEC_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
       return false;
+  if (!matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP))
+    return false;
 
   // Compliance
   // Calculate command and optionally enforce integrity checking.

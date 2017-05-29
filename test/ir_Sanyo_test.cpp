@@ -168,13 +168,8 @@ TEST(TestDecodeSanyoLC7461, DecodeWithNonStrictValues) {
   EXPECT_EQ(0x91A, irsend.capture.address);
   EXPECT_EQ(0x89, irsend.capture.command);
 
-  // Should pass if strict off and looking for a smaller size.
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, 34, false));
-  EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
-  EXPECT_EQ(34, irsend.capture.bits);
-  EXPECT_EQ(0x123456789, irsend.capture.value);
-  EXPECT_EQ(0x09, irsend.capture.address);
-  EXPECT_EQ(0x67, irsend.capture.command);
+  // Shouldn't pass if strict off and looking for a smaller size.
+  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, 34, false));
 }
 
 // Decode (non-standard) 64-bit messages.

@@ -178,16 +178,11 @@ TEST(TestDecodeNEC, ShortNECDecodeWithoutStrict) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 
-  // Expecting less than what was sent is valid.
+  // Expecting less than what was sent is not valid.
   irsend.reset();
   irsend.sendNEC(0x0, 32);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 16, false));
-  EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(16, irsend.capture.bits);
-  EXPECT_EQ(0, irsend.capture.value);
-  EXPECT_EQ(0, irsend.capture.address);
-  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 16, false));
 
   // Send 16 bits of data, but fail because we are expecting 17.
   irsend.reset();
