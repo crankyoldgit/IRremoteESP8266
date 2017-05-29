@@ -28,7 +28,7 @@
 // Classes
 class IRsend {
  public:
-  explicit IRsend(uint16_t IRsendPin);
+  explicit IRsend(uint16_t IRsendPin, bool inverted = false);
   void begin();
   void enableIROut(uint32_t freq, uint8_t duty = DUTY_DEFAULT);
   VIRTUAL uint16_t mark(uint16_t usec);
@@ -157,6 +157,18 @@ class IRsend {
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
                       uint16_t repeat = AIWA_RC_T501_MIN_REPEAT);
 #endif
+
+ protected:
+#ifdef UNIT_TEST
+#ifndef HIGH
+#define HIGH 0x1
+#endif
+#ifndef LOW
+#define LOW 0x0
+#endif
+#endif  // UNIT_TEST
+  uint8_t outputOn;
+  uint8_t outputOff;
 
  private:
   uint16_t onTimePeriod;

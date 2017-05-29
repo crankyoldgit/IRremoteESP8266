@@ -20,10 +20,27 @@
 // sending IR code on ESP8266
 
 // IRsend ----------------------------------------------------------------------
-
-IRsend::IRsend(uint16_t IRsendPin) {
+// Create an IRsend object.
+//
+// Args:
+//   IRsendPin:  Which GPIO pin to use when sending an IR command.
+//   inverted:   *DANGER* Optional flag to invert the output. (default = false)
+//               e.g. LED is illuminated when GPIO is LOW rather than HIGH.
+//               Setting this to something other than the default could
+//               easily destroy your IR LED if you are overdriving it.
+//               Unless you *REALLY* know what you are doing, don't change this.
+// Returns:
+//   An IRsend object.
+IRsend::IRsend(uint16_t IRsendPin, bool inverted) {
   IRpin = IRsendPin;
   periodOffset = PERIOD_OFFSET;
+  if (inverted) {
+    outputOn = LOW;
+    outputOff = HIGH;
+  } else {
+    outputOn = HIGH;
+    outputOff = LOW;
+  }
 }
 
 // Enable the pin for output.
@@ -36,7 +53,7 @@ void IRsend::begin() {
 // Turn off the IR LED.
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
-  digitalWrite(IRpin, LOW);
+  digitalWrite(IRpin, outputOff);
 #endif
 }
 
@@ -100,11 +117,11 @@ uint16_t IRsend::mark(uint16_t usec) {
 
   while (elapsed < usec) {  // Loop until we've met/exceeded our required time.
 #ifndef UNIT_TEST
-    digitalWrite(IRpin, HIGH);  // Turn the LED on.
+    digitalWrite(IRpin, outputOn);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
     delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
-    digitalWrite(IRpin, LOW);  // Turn the LED off.
+    digitalWrite(IRpin, outputOff);  // Turn the LED off.
 #endif
     counter++;
     if (elapsed + onTimePeriod >= usec)
