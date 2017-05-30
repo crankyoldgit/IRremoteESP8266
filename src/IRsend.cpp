@@ -21,9 +21,8 @@
 
 // IRsend ----------------------------------------------------------------------
 
-IRsend::IRsend(uint16_t IRsendPin) {
-  IRpin = IRsendPin;
-  periodOffset = PERIOD_OFFSET;
+IRsend::IRsend(uint16_t IRsendPin) : IRpin(IRsendPin),
+                                     periodOffset(PERIOD_OFFSET) {
 }
 
 // Enable the pin for output.
