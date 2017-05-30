@@ -86,10 +86,10 @@ IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h $(GTEST_HEADERS)
 IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRremoteESP8266.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRsend.cpp
 
-IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h IRsend_test.h $(GTEST_HEADERS)
+IRsend_test.o : IRsend_test.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRrecv.h IRsend_test.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c IRsend_test.cpp
 
-IRsend_test : IRsend.o IRtimer.o IRsend_test.o gtest_main.a
+IRsend_test : IRsend.o IRtimer.o IRsend_test.o IRrecv.o IRutils.o ir_NEC.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 IRrecv.o : $(USER_DIR)/IRrecv.cpp $(USER_DIR)/IRrecv.h $(GTEST_HEADERS)
