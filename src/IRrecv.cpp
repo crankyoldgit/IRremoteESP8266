@@ -13,6 +13,7 @@ extern "C" {
 #include <Arduino.h>
 #endif
 #include <algorithm>
+#include "IRremoteESP8266.h"
 
 #ifdef UNIT_TEST
 #undef ICACHE_RAM_ATTR
@@ -176,9 +177,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   results->repeat = false;
 
 #if DECODE_AIWA_RC_T501
-#ifdef DEBUG
-  Serial.println("Attempting Aiwa RC T501 decode");
-#endif
+  DPRINTLN("Attempting Aiwa RC T501 decode");
   // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
   // because the protocols are similar. This protocol is more specific than
   // those ones, so should got before them.
@@ -186,9 +185,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 #if DECODE_SANYO
-#ifdef DEBUG
-  Serial.println("Attempting Sanyo LC7461 decode");
-#endif
+  DPRINTLN("Attempting Sanyo LC7461 decode");
   // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
   // similar in timings & structure, but the Sanyo one is much longer than the
   // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
@@ -197,44 +194,32 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 #if DECODE_NEC
-#ifdef DEBUG
-  Serial.println("Attempting NEC decode");
-#endif
+  DPRINTLN("Attempting NEC decode");
   if (decodeNEC(results))
     return true;
 #endif
 #if DECODE_SONY
-#ifdef DEBUG
-  Serial.println("Attempting Sony decode");
-#endif
+  DPRINTLN("Attempting Sony decode");
   if (decodeSony(results))
     return true;
 #endif
 #if DECODE_MITSUBISHI
-#ifdef DEBUG
-  Serial.println("Attempting Mitsubishi decode");
-#endif
+  DPRINTLN("Attempting Mitsubishi decode");
   if (decodeMitsubishi(results))
     return true;
 #endif
 #if DECODE_RC5
-#ifdef DEBUG
-  Serial.println("Attempting RC5 decode");
-#endif
+  DPRINTLN("Attempting RC5 decode");
   if (decodeRC5(results))
     return true;
 #endif
 #if DECODE_RC6
-#ifdef DEBUG
-  Serial.println("Attempting RC6 decode");
-#endif
+  DPRINTLN("Attempting RC6 decode");
   if (decodeRC6(results))
     return true;
 #endif
 #if DECODE_RCMM
-#ifdef DEBUG
-  Serial.println("Attempting RC-MM decode");
-#endif
+  DPRINTLN("Attempting RC-MM decode");
   if (decodeRCMM(results))
     return true;
 #endif
@@ -249,64 +234,46 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 #if DECODE_PANASONIC
-#ifdef DEBUG
-  Serial.println("Attempting Panasonic decode");
-#endif
+  DPRINTLN("Attempting Panasonic decode");
   if (decodePanasonic(results))
     return true;
 #endif
 #if DECODE_LG
-#ifdef DEBUG
-  Serial.println("Attempting LG (28-bit) decode");
-#endif
+  DPRINTLN("Attempting LG (28-bit) decode");
   if (decodeLG(results, LG_BITS, true))
     return true;
-#ifdef DEBUG
-  Serial.println("Attempting LG (32-bit) decode");
-#endif
+  DPRINTLN("Attempting LG (32-bit) decode");
   // LG32 should be tried before Samsung
   if (decodeLG(results, LG32_BITS, true))
     return true;
 #endif
 #if DECODE_JVC
-#ifdef DEBUG
-  Serial.println("Attempting JVC decode");
-#endif
+  DPRINTLN("Attempting JVC decode");
   if (decodeJVC(results))
     return true;
 #endif
 #if DECODE_SAMSUNG
-#ifdef DEBUG
-  Serial.println("Attempting SAMSUNG decode");
-#endif
+  DPRINTLN("Attempting SAMSUNG decode");
   if (decodeSAMSUNG(results))
     return true;
 #endif
 #if DECODE_WHYNTER
-#ifdef DEBUG
-  Serial.println("Attempting Whynter decode");
-#endif
+  DPRINTLN("Attempting Whynter decode");
   if (decodeWhynter(results))
     return true;
 #endif
 #if DECODE_DISH
-#ifdef DEBUG
-  Serial.println("Attempting DISH decode");
-#endif
+  DPRINTLN("Attempting DISH decode");
   if (decodeDISH(results))
     return true;
 #endif
 #if DECODE_SHARP
-#ifdef DEBUG
-  Serial.println("Attempting Sharp decode");
-#endif
+  DPRINTLN("Attempting Sharp decode");
   if (decodeSharp(results))
     return true;
 #endif
 #if DECODE_COOLIX
-#ifdef DEBUG
-  Serial.println("Attempting Coolix decode");
-#endif
+  DPRINTLN("Attempting Coolix decode");
   if (decodeCOOLIX(results))
     return true;
 #endif
@@ -315,9 +282,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // The Sanyo S866500B decoder is very poor quality & depricated.
   // *IF* you are going to enable it, do it near last to avoid false positive
   // matches.
-#ifdef DEBUG
-  Serial.println("Attempting Sanyo SA8650B decode");
-#endif
+  DPRINTLN("Attempting Sanyo SA8650B decode");
   if (decodeSanyo(results))
     return true;
 #endif
@@ -370,14 +335,12 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
                    uint8_t tolerance) {
-  #ifdef DEBUG
-    Serial.print("Matching: ");
-    Serial.print(ticksLow(desired_us, tolerance), DEC);
-    Serial.print(" <= ");
-    Serial.print(measured_ticks, DEC);
-    Serial.print(" <= ");
-    Serial.println(ticksHigh(desired_us, tolerance), DEC);
-  #endif
+  DPRINT("Matching: ");
+  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(" <= ");
+  DPRINT(measured_ticks);
+  DPRINT(" <= ");
+  DPRINTLN(ticksHigh(desired_us, tolerance));
   return (measured_ticks >= ticksLow(desired_us, tolerance) &&
           measured_ticks <= ticksHigh(desired_us, tolerance));
 }
@@ -395,13 +358,11 @@ bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchMark(uint32_t measured_ticks, uint32_t desired_us,
                        uint8_t tolerance, int16_t excess) {
-  #ifdef DEBUG
-    Serial.print("Matching MARK ");
-    Serial.print(measured_ticks * USECPERTICK, DEC);
-    Serial.print(" vs ");
-    Serial.print(desired_us, DEC);
-    Serial.print(". ");
-  #endif
+  DPRINT("Matching MARK ");
+  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(" vs ");
+  DPRINT(desired_us);
+  DPRINT(". ");
   return match(measured_ticks, desired_us + excess, tolerance);
 }
 
@@ -418,13 +379,11 @@ bool IRrecv::matchMark(uint32_t measured_ticks, uint32_t desired_us,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchSpace(uint32_t measured_ticks, uint32_t desired_us,
                         uint8_t tolerance, int16_t excess) {
-  #ifdef DEBUG
-    Serial.print("Matching SPACE ");
-    Serial.print(measured_ticks * USECPERTICK, DEC);
-    Serial.print(" vs ");
-    Serial.print(desired_us, DEC);
-    Serial.print(". ");
-  #endif
+  DPRINT("Matching SPACE ");
+  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(" vs ");
+  DPRINT(desired_us);
+  DPRINT(". ");
   return match(measured_ticks, desired_us - excess, tolerance);
 }
 

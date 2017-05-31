@@ -6,8 +6,9 @@ http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 Copyright 2016 sillyfrog
 */
 
-#include <algorithm>
 #include "ir_Daikin.h"
+#include <algorithm>
+#include "IRremoteESP8266.h"
 #include "IRutils.h"
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
@@ -309,10 +310,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   uint32_t number = data;  // some number...
   uint32_t reversed = reverseBits(number, sizeof(number) * 8)
 
-#ifdef DEBUG
-  Serial.print("Code ");
-  Serial.println(reversed,  HEX);
-#endif
+  DPRINT("Code ");
+  DPRINTLN(reversed, HEX);
 
   // Data (#2)
   for (uint8_t i = 0; i < sizeof(data) * 8; i++, offset++) {
@@ -329,16 +328,13 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   number = data;  // some number...
   reversed = reverseBits(number, sizeof(number) * 8)
 
-#ifdef DEBUG
-  // Serial.print ("Code2 ");
-  // Serial.println (reversed,  HEX);
-#endif
+  DPRINT("Code2 ");
+  DPRINTLN(reversed, HEX);
 
-  if (!matchSpace(results->rawbuf[offset++], DAIKIN_GAP))
-#ifdef DEBUG
-    // Serial.println ("no gap");
-#endif
+  if (!matchSpace(results->rawbuf[offset++], DAIKIN_GAP)) {
+    DPRINTLN("no gap");
     return false;
+  }
 
   // Success
   results->bits = DAIKIN_BITS;
