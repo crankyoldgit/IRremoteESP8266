@@ -64,6 +64,16 @@ TEST(TestSendData, SendOverLargeData) {
             irsend.outputStr());
 }
 
+// Test inverting the output.
+TEST(TestIRSend, InvertedOutput) {
+  IRsendTest irsend(4, true);
+  irsend.begin();
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  EXPECT_EQ("s1m2", irsend.outputStr());
+  irsend.sendData(1, 2, 3, 4, 0b0, 1, true);
+  EXPECT_EQ("s3m4", irsend.outputStr());
+}
+
 // Test typical use of sendRaw().
 TEST(TestSendRaw, GeneralUse) {
   IRsendTest irsend(4);
