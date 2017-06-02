@@ -31,9 +31,8 @@
 //               Unless you *REALLY* know what you are doing, don't change this.
 // Returns:
 //   An IRsend object.
-IRsend::IRsend(uint16_t IRsendPin, bool inverted) {
-  IRpin = IRsendPin;
-  periodOffset = PERIOD_OFFSET;
+IRsend::IRsend(uint16_t IRsendPin, bool inverted) : IRpin(IRsendPin),
+    periodOffset(PERIOD_OFFSET) {
   if (inverted) {
     outputOn = LOW;
     outputOff = HIGH;

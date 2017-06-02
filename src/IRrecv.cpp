@@ -143,16 +143,20 @@ void IRrecv::copyIrParams(irparams_t *dest) {
 //   A boolean indicating if an IR message is ready or not.
 bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // Proceed only if an IR message been received.
+#ifndef UNIT_TEST
   if (irparams.rcvstate != STATE_STOP)
     return false;
+#endif
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
   if (save == NULL) {
     // We haven't been asked to copy it so use the existing memory.
+#ifndef UNIT_TEST
     results->rawbuf = irparams.rawbuf;
     results->rawlen = irparams.rawlen;
     results->overflow = irparams.overflow;
+#endif
   } else {
     copyIrParams(save);  // Duplicate the interrupt's memory.
     resume();  // It's now safe to rearm. The IR message won't be overridden.
@@ -171,7 +175,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   results->command = 0;
   results->repeat = false;
 
-#ifndef UNIT_TEST
 #if DECODE_AIWA_RC_T501
 #ifdef DEBUG
   Serial.println("Attempting Aiwa RC T501 decode");
@@ -235,6 +238,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeRCMM(results))
     return true;
 #endif
+#if DECODE_DENON
+  // Denon needs to preceed Panasonic as it is a special case of Panasonic.
+#ifdef DEBUG
+  Serial.println("Attempting Denon decode");
+#endif
+  if (decodeDenon(results, DENON_48_BITS) ||
+      decodeDenon(results, DENON_BITS) ||
+      decodeDenon(results, DENON_LEGACY_BITS))
+    return true;
+#endif
 #if DECODE_PANASONIC
 #ifdef DEBUG
   Serial.println("Attempting Panasonic decode");
@@ -276,15 +289,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeWhynter(results))
     return true;
 #endif
-#if DECODE_DENON
-#ifdef DEBUG
-  Serial.println("Attempting Denon decode");
-#endif
-  if (decodeDenon(results, DENON_48_BITS) ||
-      decodeDenon(results, DENON_BITS) ||
-      decodeDenon(results, DENON_LEGACY_BITS))
-    return true;
-#endif
 #if DECODE_DISH
 #ifdef DEBUG
   Serial.println("Attempting DISH decode");
@@ -318,7 +322,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 */
-#endif  // UNIT_TEST
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.

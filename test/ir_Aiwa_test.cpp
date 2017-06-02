@@ -114,7 +114,7 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  // Normal Aiwa 16-bit message.
+  // Normal Aiwa 15-bit(42bit) message.
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F);
   irsend.makeDecodeResult();

@@ -76,6 +76,10 @@ class IRsendTest: public IRsend {
     std::cout << "\n";
   }
 
+  void addGap(uint32_t usecs) {
+    space(usecs);
+  }
+
  protected:
   uint16_t mark(uint16_t usec) {
     if (last >= OUTPUT_BUF)
