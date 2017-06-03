@@ -37,6 +37,9 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifdef UNIT_TEST
+#include <iostream>
+#endif
 
 // Supported IR protocols
 // Each protocol you include costs memory and, during decode, costs time
@@ -187,5 +190,22 @@ enum decode_type_t {
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
 #define WHYNTER_BITS                32U
+
+// Turn on Debugging information by uncommenting the following line.
+// #define DEBUG 1
+
+#ifdef DEBUG
+#ifdef UNIT_TEST
+#define DPRINT(x) do { std::cout << x; } while (0)
+#define DPRINTLN(x) do { std::cout << x << std::endl; } while (0)
+#endif  // UNIT_TEST
+#ifdef ARDUINO
+#define DPRINT(x) do { Serial.print(x); } while (0)
+#define DPRINTLN(x) do { Serial.println(x); } while (0)
+#endif  // ARDUINO
+#else  // DEBUG
+#define DPRINT(x)
+#define DPRINTLN(x)
+#endif  // DEBUG
 
 #endif  // IRREMOTEESP8266_H_
