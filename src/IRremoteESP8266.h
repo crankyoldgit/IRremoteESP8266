@@ -23,6 +23,8 @@
  * Mitsubishi A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
+ * Gree Heatpump sending added by Ville Skyttä (scop)
+ *     (derived from https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp)
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
@@ -111,6 +113,8 @@
 #define DECODE_GLOBALCACHE   false  // Not written.
 #define SEND_GLOBALCACHE     true
 
+#define DECODE_GREE          false  // Not written.
+#define SEND_GREE            true
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -141,7 +145,8 @@ enum decode_type_t {
   MITSUBISHI_AC,
   RCMM,
   SANYO_LC7461,
-  RC5X
+  RC5X,
+  GREE
 };
 
 // Message lengths & required repeat values
@@ -155,6 +160,8 @@ enum decode_type_t {
 #define DENON_LEGACY_BITS           14U
 #define DISH_BITS                   16U
 #define DISH_MIN_REPEAT              3U
+#define GREE_STATE_LENGTH            8U
+#define GREE_BITS                   (GREE_STATE_LENGTH * 8)
 #define JVC_BITS                    16U
 #define KELVINATOR_STATE_LENGTH     16U
 #define LG_BITS                     28U

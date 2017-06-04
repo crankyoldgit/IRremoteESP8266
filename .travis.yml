@@ -57,6 +57,7 @@ script:
   - test/ir_Denon_test
   - test/ir_Sanyo_test
   - test/ir_Daikin_test
+  - test/ir_Gree_test
   - test/IRrecv_test
 
 notifications:
