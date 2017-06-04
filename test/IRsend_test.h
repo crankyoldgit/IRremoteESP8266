@@ -20,7 +20,7 @@ class IRsendTest: public IRsend {
   uint16_t rawbuf[RAW_BUF];
   decode_results capture;
 
-  explicit IRsendTest(uint16_t x) : IRsend(x) {
+  explicit IRsendTest(uint16_t x, bool i = false) : IRsend(x, i) {
     reset();
   }
 
@@ -34,7 +34,7 @@ class IRsendTest: public IRsend {
     if (last == 0 && output[0] == 0)
       return "";
     for (uint16_t i = 0; i <= last; i++) {
-      if (i & 1)  // Odd
+      if ((i & 1) != outputOff )  // Odd XOR outputOff
         result << "s";
       else
         result << "m";
@@ -74,6 +74,10 @@ class IRsendTest: public IRsend {
         std::cout << "\n";
     }
     std::cout << "\n";
+  }
+
+  void addGap(uint32_t usecs) {
+    space(usecs);
   }
 
  protected:
