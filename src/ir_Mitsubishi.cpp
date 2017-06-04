@@ -105,7 +105,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 
   // Data
   uint16_t actualBits;
-  for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
+  for (actualBits = 0; actualBits < nbits; actualBits++, offset++) {
     if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
       return false;
     if (matchSpace(results->rawbuf[offset], MITSUBISHI_ONE_SPACE))
@@ -116,7 +116,11 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
       break;
   }
 
-  // Footer is matched by the last iteration of the data loop.
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
+    return false;
+  if (!matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP))
+    return false;
 
   // Compliance
   if (actualBits < nbits)

@@ -194,8 +194,8 @@ TEST(TestDecodeWhynter, DecodeWithNonStrictSizes) {
   irsend.reset();
   irsend.sendWhynter(0x1234567890, 40);  // Illegal size Whynter 40-bit message.
   irsend.makeDecodeResult();
-  // Should pass with strict when we ask for less bits than we got.
-  ASSERT_TRUE(irrecv.decodeWhynter(&irsend.capture, WHYNTER_BITS, true));
+  // Shouldn't pass with strict when we ask for less bits than we got.
+  ASSERT_FALSE(irrecv.decodeWhynter(&irsend.capture, WHYNTER_BITS, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.

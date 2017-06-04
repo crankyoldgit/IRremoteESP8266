@@ -130,7 +130,9 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset], JVC_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
+    return false;
+  if (!matchAtLeast(results->rawbuf[offset], JVC_MIN_GAP))
     return false;
 
   // Success

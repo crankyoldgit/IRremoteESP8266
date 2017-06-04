@@ -101,7 +101,7 @@ TEST(TestSendRaw, GeneralUse) {
   irsend.reset();
   irsend.sendRaw(rawData, 67, 38);
   // Add some extra space at the end of the command to allow it to match.
-  irsend.addGap(10000);
+  irsend.addGap(22000);
   irsend.makeDecodeResult();
   EXPECT_EQ(
       "m8950s4500"
@@ -109,7 +109,7 @@ TEST(TestSendRaw, GeneralUse) {
       "m600s1650m600s1650m550s1700m550s550m600s550m550s550m600s500m600s550"
       "m550s1650m600s1650m600s1650m550s550m600s500m600s500m600s550m550s550"
       "m600s1650m550s1650m600s1650m600s500m650s1600m600s500m600s550m550s550"
-      "m600s10000", irsend.outputStr());
+      "m600s22000", irsend.outputStr());
   ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);

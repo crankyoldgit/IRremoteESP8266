@@ -235,13 +235,8 @@ TEST(TestDecodeMitsubishi, DecodeWithNonStrictValues) {
   EXPECT_EQ(0xFEDCBA9876543210, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, 8, false));
-  EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(64, irsend.capture.bits);
-  EXPECT_EQ(0xFEDCBA9876543210, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  // Should fail when we are after a shorter message than we got.
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 8, false));
 }
 
 // Decode a 'real' example via GlobalCache

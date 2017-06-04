@@ -209,6 +209,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   // Footer
   if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
     return false;
+  if (!matchAtLeast(results->rawbuf[offset], SHARP_GAP))
+    return false;
 
   // Compliance
   if (strict) {
@@ -241,6 +243,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     }
     // Footer
     if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
+      return false;
+    if (!matchAtLeast(results->rawbuf[offset], SHARP_GAP))
       return false;
 
     // Check that second_data has been inverted correctly.

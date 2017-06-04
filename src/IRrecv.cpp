@@ -75,7 +75,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 
   start = now;
   #define ONCE 0
-  os_timer_arm(&timer, 15, ONCE);
+  os_timer_arm(&timer, TIMEOUT_MS, ONCE);
 }
 #endif  // UNIT_TEST
 
@@ -343,6 +343,23 @@ bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
   DPRINTLN(ticksHigh(desired_us, tolerance));
   return (measured_ticks >= ticksLow(desired_us, tolerance) &&
           measured_ticks <= ticksHigh(desired_us, tolerance));
+}
+
+
+// Check if we match a pulse(measured_ticks) of at least desired_us within
+// +/-tolerance percent.
+//
+// Args:
+//   measured_ticks:  The recorded period of the signal pulse.
+//   desired_us:  The expected period (in useconds) we are matching against.
+//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//
+// Returns:
+//   Boolean: true if it matches, false if it doesn't.
+bool IRrecv::matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
+                          uint8_t tolerance) {
+  return measured_ticks >= ticksLow(std::min(desired_us, TIMEOUT_MS * 1000),
+                                    tolerance);
 }
 
 // Check if we match a mark signal(measured_ticks) with the desired_us within

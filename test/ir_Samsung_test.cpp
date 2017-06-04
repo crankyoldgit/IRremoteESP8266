@@ -176,13 +176,8 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   irsend.makeDecodeResult();
   // Should fail with strict on.
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, SAMSUNG_BITS, true));
-  // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, SAMSUNG_BITS, false));
-  EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
-  EXPECT_EQ(SAMSUNG_BITS, irsend.capture.bits);
-  EXPECT_EQ(0xF, irsend.capture.value);  // We told it to expect 4 bits less.
-  EXPECT_EQ(0x00, irsend.capture.address);
-  EXPECT_EQ(0x00, irsend.capture.command);
+  // Shouldn't pass if strict off and wrong expected bit size.
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, SAMSUNG_BITS, false));
   // Re-decode with correct bit size.
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, 36, true));
   ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 36, false));
@@ -201,7 +196,7 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   // And it should fail when we expect more bits.
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, SAMSUNG_BITS, false));
 
-  // Should pass if strict off if we ask for <= nr. of bits sent.
+  // Should pass if strict off if we ask for correct nr. of bits sent.
   ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 16, false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(16, irsend.capture.bits);
@@ -209,12 +204,8 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   EXPECT_EQ(0x00, irsend.capture.address);
   EXPECT_EQ(0x00, irsend.capture.command);
 
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 12, false));
-  EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
-  EXPECT_EQ(12, irsend.capture.bits);
-  EXPECT_EQ(0xF, irsend.capture.value);  // We told it to expect 8 bits less.
-  EXPECT_EQ(0x00, irsend.capture.address);
-  EXPECT_EQ(0x00, irsend.capture.command);
+  // Should fail as we are expecting less bits than there are.
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, 12, false));
 }
 
 // Decode (non-standard) 64-bit messages.

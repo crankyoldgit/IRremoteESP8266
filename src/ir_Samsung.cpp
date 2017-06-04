@@ -129,6 +129,8 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK))
     return false;
+  if (!matchAtLeast(results->rawbuf[offset], SAMSUNG_MIN_GAP))
+    return false;
 
   // Compliance
 

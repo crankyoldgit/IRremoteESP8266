@@ -235,8 +235,8 @@ TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
   irsend.reset();
   irsend.sendCOOLIX(0x12345678, 32);  // Illegal value Coolix 32-bit message.
   irsend.makeDecodeResult();
-  // Should pass with strict when we ask for less bits than we got.
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  // Shouldn't pass with strict when we ask for less bits than we got.
+  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.

@@ -244,13 +244,7 @@ TEST(TestDecodeLG, DecodeWithNonStrictValues) {
   irsend.reset();
   irsend.sendLG(0x1111111, LG32_BITS);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, LG_BITS, false));
-  EXPECT_EQ(LG, irsend.capture.decode_type);
-  EXPECT_EQ(LG_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x111111, irsend.capture.value);
-  EXPECT_EQ(0x1, irsend.capture.address);
-  EXPECT_EQ(0x1111, irsend.capture.command);
-  EXPECT_FALSE(irsend.capture.repeat);
+  ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, LG_BITS, false));
 }
 
 // Decode unsupported LG message sizes.
@@ -284,16 +278,9 @@ TEST(TestDecodeLG, DecodeWithNonStrictSizes) {
   irsend.makeDecodeResult();
   // Should fail when unexpected against different bit sizes.
   ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, LG_BITS, true));
+  ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, LG_BITS, false));
   ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, LG32_BITS, true));
   ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, LG32_BITS, false));
-
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, LG_BITS, false));
-  EXPECT_EQ(LG, irsend.capture.decode_type);
-  EXPECT_EQ(LG_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x1234567, irsend.capture.value);
-  EXPECT_EQ(0x12, irsend.capture.address);
-  EXPECT_EQ(0x3456, irsend.capture.command);
-  EXPECT_FALSE(irsend.capture.repeat);
 
   ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, 36, false));
   EXPECT_EQ(LG, irsend.capture.decode_type);

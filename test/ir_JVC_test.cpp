@@ -205,8 +205,8 @@ TEST(TestDecodeJVC, DecodeWithNonStrictValues) {
   irsend.reset();
   irsend.sendJVC(0x12345678, 32);  // Illegal value JVC 32-bit message.
   irsend.makeDecodeResult();
-  // Should pass with strict when we ask for less bits than we got.
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, JVC_BITS, true));
+  // Should not pass with strict when we ask for less bits than we got.
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, JVC_BITS, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -224,13 +224,9 @@ TEST(TestDecodeJVC, DecodeWithNonStrictValues) {
   irsend.sendJVC(irsend.encodeJVC(2, 3), 36);
   irsend.makeDecodeResult();
 
-  // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, JVC_BITS, false));
-  EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(JVC_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x0, irsend.capture.value);  // We told it to expect 20 bits less.
-  EXPECT_EQ(0x00, irsend.capture.address);
-  EXPECT_EQ(0x00, irsend.capture.command);
+  // Shouldn't pass if strict off and the wrong expected bits.
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, JVC_BITS, false));
+
   // Re-decode with correct bit size.
   ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, 36, true));
   ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, 36, false));
