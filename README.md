@@ -4,7 +4,12 @@
 
 This library enables you to **send and receive** infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
 
-The library was originally based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
+## v2.0.0 Now Available
+Version 2.0 of the library is now available. This is a large change to existing versions. You will need to change your pre-v2.0 code slightly to work with this version. You can read more about the changes on our [wiki](https://github.com/markszabo/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
+Please [report an issue](https://github.com/markszabo/IRremoteESP8266/issues/new) if you find any problems with the documentation or the library itself.
+
+## History
+This library was originally based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
 
 [Mark Szabo](https://github.com/markszabo/IRremoteESP8266) has updated the IRsend class to work on ESP8266 and [Sebastien Warin](https://github.com/sebastienwarin/IRremoteESP8266) the receiving & decoding part (IRrecv class).
 
@@ -15,6 +20,16 @@ The library was originally based on Ken Shirriff's work (https://github.com/shir
 4. Move this folder to your libraries directory (under windows: C:\Users\YOURNAME\Documents\Arduino\libraries\)
 5. Restart your Arduino ide
 6. Check out the examples
+
+###### Using Git to install library ( Linux )
+```
+cd ~/Arduino/libraries
+git clone https://github.com/markszabo/IRremoteESP8266.git
+```
+###### To Update to the latest version of the library
+`
+cd ~/Arduino/libraries/IRremoteESP8266 && git pull
+`
 
 ## Unit Tests
 The [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing) under the test/ directory are for a Unix machine, **not** the micro-controller (ESP8266).
@@ -27,9 +42,10 @@ Any Arduino/ESP8266 specific code needs to disabling using the following lines:
 <Arduino specific code ...>
 #endif
 ```
+
 This is not a perfect situation as we can not obvious emulate hardware specific features and differences. e.g. Interrupts, GPIOs, CPU instruction timing etc, etc.
 
-If you want to run the tests yourself, try the following:
+If you want to run all the tests yourself, try the following:
 ```
 $ cd test
 $ make
@@ -37,11 +53,11 @@ $ for UNITTEST in *_test; do if [ -x "./${UNITTEST}" ]; then ./${UNITTEST}; fi; 
 ```
 
 ## Contributing
-If you want to contribute to this project:
-- Report bugs and errors
+If you want to [contribute](.github/CONTRIBUTING.md#how-can-i-contribute) to this project, consider:
+- [Report](.github/CONTRIBUTING.md#reporting-bugs) bugs and errors
 - Ask for enhancements
-- Create issues and pull requests
+- [Create issues](.github/CONTRIBUTING.md#reporting-bugs) and [pull requests](.github/CONTRIBUTING.md#pull-requests)
 - Tell other people about this library
 
 ## Contributors
-Available [here](Contributors.md)
+Available [here](.github/Contributors.md)
