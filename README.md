@@ -36,14 +36,14 @@ The [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing) under the test/ dir
 This allows execution under Travis and on the developer's machine.
 We can do this from v2.0 of the library onwards, as everything now uses c98-style type definitions.
 e.g. uint16_t etc.
-Any Arduino/ESP8266 specific code needs to disabling using the following lines:
+Any Arduino/ESP8266 specific code needs to be disabled using something similar to the following lines:
 ```
 #ifndef UNIT_TEST
 <Arduino specific code ...>
 #endif
 ```
 
-This is not a perfect situation as we can not obvious emulate hardware specific features and differences. e.g. Interrupts, GPIOs, CPU instruction timing etc, etc.
+This is not a perfect situation as we can not obviously emulate hardware specific features and differences. e.g. Interrupts, GPIOs, CPU instruction timing etc, etc.
 
 If you want to run all the tests yourself, try the following:
 ```
