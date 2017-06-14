@@ -58,10 +58,9 @@ void encoding(decode_results *results) {
 // Dump out the decode_results structure.
 //
 void dumpInfo(decode_results *results) {
-  if (results->overflow) {
-    Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
-    return;
-  }
+  if (results->overflow)
+    Serial.println("WARNING: IR code too long."
+                   "Edit IRrecv.h and increase RAWBUF");
 
   // Show Encoding standard
   Serial.print("Encoding  : ");
