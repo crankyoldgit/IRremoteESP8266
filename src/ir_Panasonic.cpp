@@ -25,6 +25,7 @@
 #define PANASONIC_ONE_SPACE            1296U
 #define PANASONIC_ZERO_SPACE            432U
 #define PANASONIC_MIN_COMMAND_LENGTH 130000UL
+#define PANASONIC_END_GAP              5000U  // See issue #245
 #define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_COMMAND_LENGTH - \
     (PANASONIC_HDR_MARK + PANASONIC_HDR_SPACE + \
      PANASONIC_BITS * (PANASONIC_BIT_MARK + PANASONIC_ONE_SPACE) + \
@@ -156,7 +157,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
     return false;
   if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], PANASONIC_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], PANASONIC_END_GAP))
     return false;
 
   // Compliance

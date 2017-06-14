@@ -7,5 +7,6 @@
 #include <stdint.h>
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits);
+void serialPrintUint64(uint64_t input, uint8_t base);
 
 #endif  // IRUTILS_H_
