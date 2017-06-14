@@ -173,7 +173,7 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
 bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
                          bool expansion) {
-  if (results->rawlen < 2 * nbits + FOOTER)
+  if (results->rawlen < 2 * nbits + FOOTER - 1)
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
   if (strict) {
@@ -209,7 +209,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   // Footer
   if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], SHARP_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], SHARP_GAP))
     return false;
 
   // Compliance

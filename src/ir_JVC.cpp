@@ -98,7 +98,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   if (strict && nbits != JVC_BITS)
     return false;  // Must be called with the correct nr. of bits.
-  if (results->rawlen < 2 * nbits + 2)
+  if (results->rawlen < 2 * nbits + FOOTER - 1)
     return false;  // Can't possibly be a valid JVC message.
 
   uint64_t data = 0;
@@ -132,7 +132,8 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   // Footer
   if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], JVC_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], JVC_MIN_GAP))
     return false;
 
   // Success

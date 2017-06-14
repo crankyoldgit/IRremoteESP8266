@@ -113,7 +113,7 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command,
 // Ref:
 // http://www.sbprojects.com/knowledge/ir/sirc.php
 bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER)
+  if (results->rawlen < 2 * nbits + HEADER - 1)
     return false;  // Message is smaller than we expected.
 
   // Compliance

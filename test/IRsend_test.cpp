@@ -100,8 +100,6 @@ TEST(TestSendRaw, GeneralUse) {
 
   irsend.reset();
   irsend.sendRaw(rawData, 67, 38);
-  // Add some extra space at the end of the command to allow it to match.
-  irsend.addGap(22000);
   irsend.makeDecodeResult();
   EXPECT_EQ(
       "m8950s4500"
@@ -109,9 +107,33 @@ TEST(TestSendRaw, GeneralUse) {
       "m600s1650m600s1650m550s1700m550s550m600s550m550s550m600s500m600s550"
       "m550s1650m600s1650m600s1650m550s550m600s500m600s500m600s550m550s550"
       "m600s1650m550s1650m600s1650m600s500m650s1600m600s500m600s550m550s550"
-      "m600s22000", irsend.outputStr());
+      "m600", irsend.outputStr());
   ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0xC3E0E0E8, irsend.capture.value);
+}
+
+// Incorrect handling of decodes from Raw. i.e. There is no gap recorded at
+// the end of a command when using the interrupt code. sendRaw() best emulates
+// this for unit testing purposes. sendGC() and sendXXX() will add the trailing
+// gap. Users won't see this in normal use.
+TEST(TestSendRaw, NoTrailingGap) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+                          600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+                          600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+                          650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+                          650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+                          650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+                          650, 1650, 650, 1650, 650, 1650, 600};
+  irsend.sendRaw(rawData, 67, 38);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
 }

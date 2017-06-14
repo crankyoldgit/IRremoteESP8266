@@ -87,7 +87,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
                           bool strict) {
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
-  if (results->rawlen < 2 * 2 * nbits + HEADER + FOOTER)
+  if (results->rawlen < 2 * 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid COOLIX message.
   if (strict && nbits != COOLIX_BITS)
     return false;  // Not strictly an COOLIX message.
@@ -131,7 +131,8 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], COOLIX_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], COOLIX_MIN_GAP))
     return false;
 
   // Compliance

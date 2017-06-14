@@ -93,7 +93,7 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < 2 * nbits + FOOTER)
+  if (results->rawlen < 2 * nbits + FOOTER - 1)
     return false;  // Shorter than shortest possibly expected.
   if (strict && nbits != MITSUBISHI_BITS)
     return false;  // Request is out of spec.
@@ -119,7 +119,8 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP))
     return false;
 
   // Compliance

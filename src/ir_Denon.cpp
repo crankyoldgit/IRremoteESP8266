@@ -95,7 +95,7 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // NOTE: I don't this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     // Check we have enough data
-    if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+    if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
       return false;
     if (strict && nbits != DENON_LEGACY_BITS)
       return false;

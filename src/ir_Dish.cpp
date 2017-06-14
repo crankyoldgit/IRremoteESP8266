@@ -86,7 +86,7 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
 bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Not enough entries to be valid.
   if (strict && nbits != DISH_BITS)
     return false;  // Not strictly compliant.

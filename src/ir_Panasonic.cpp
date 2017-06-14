@@ -127,7 +127,7 @@ uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
                              bool strict, uint32_t manufacturer) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Not enough entries to be a Panasonic message.
   if (strict && nbits != PANASONIC_BITS)
     return false;  // Request is out of spec.
@@ -155,7 +155,8 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   // Footer
   if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], PANASONIC_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], PANASONIC_MIN_GAP))
     return false;
 
   // Compliance

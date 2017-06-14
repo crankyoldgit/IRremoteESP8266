@@ -141,7 +141,8 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
   // Footer decode
   if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], RCMM_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], RCMM_MIN_GAP))
     return false;
 
   // Compliance

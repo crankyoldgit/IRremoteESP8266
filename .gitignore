@@ -26,3 +26,7 @@ lib/readme.txt
 test/*.o
 test/*.a
 test/*_test
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
