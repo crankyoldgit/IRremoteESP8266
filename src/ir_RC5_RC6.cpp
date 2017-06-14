@@ -354,7 +354,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
 // TODO(anyone):
 //   Serious testing of the RC-5X and strict aspects needs to be done.
 bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < MIN_RC5_SAMPLES + HEADER) return false;
+  if (results->rawlen < MIN_RC5_SAMPLES + HEADER - 1) return false;
 
   // Compliance
   if (strict && nbits != RC5_BITS && nbits != RC5X_BITS)

@@ -183,7 +183,7 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
 bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER)
+  if (results->rawlen < 2 * nbits + HEADER - 1)
     return false;  // Shorter than shortest possible.
   if (strict && nbits != SANYO_SA8650B_BITS)
     return false;  // Doesn't match the spec.

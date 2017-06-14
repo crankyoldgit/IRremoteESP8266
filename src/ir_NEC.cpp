@@ -119,7 +119,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/nec.php
 bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER &&
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1 &&
       results->rawlen != NEC_RPT_LENGTH)
     return false;  // Can't possibly be a valid NEC message.
   if (strict && nbits != NEC_BITS)
@@ -161,7 +161,8 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Footer
   if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
       return false;
-  if (!matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP))
     return false;
 
   // Compliance

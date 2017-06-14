@@ -213,3 +213,39 @@ TEST(TestDecodeNEC, LongerNECDecodeWithoutStrict) {
   irsend.makeDecodeResult();
   EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 64, false));
 }
+
+// Incorrect decoding reported in Issue #243
+// Incorrect handling of decodes when there is no gap recorded at
+// the end of a command when using the interrupt code. sendRaw() best emulates
+// this for unit testing purposes. sendGC() and sendXXX() will add the trailing
+// gap. Users won't see this in normal use.
+TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+                          600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+                          600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+                          650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+                          650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+                          650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+                          650, 1650, 650, 1650, 650, 1650, 600};
+  irsend.sendRaw(rawData, 67, 38);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(0x6DD2, irsend.capture.address);
+  EXPECT_EQ(0x2, irsend.capture.command);
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 67, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+}

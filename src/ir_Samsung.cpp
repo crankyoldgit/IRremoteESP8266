@@ -102,7 +102,7 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * nbits + 4)
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid Samsung message.
   if (strict && nbits != SAMSUNG_BITS)
     return false;  // We expect Samsung to be 32 bits of message.
@@ -129,7 +129,8 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], SAMSUNG_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], SAMSUNG_MIN_GAP))
     return false;
 
   // Compliance

@@ -137,7 +137,7 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 // Ref:
 //   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
 bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + 4 && results->rawlen != 4)
+  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1 && results->rawlen != 4)
     return false;  // Can't possibly be a valid LG message.
   if (strict && nbits != LG_BITS && nbits != LG32_BITS)
     return false;  // Doesn't comply with expected LG protocol.
@@ -168,7 +168,8 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   // Footer
   if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
     return false;
 
   // Repeat

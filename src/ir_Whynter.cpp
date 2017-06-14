@@ -77,7 +77,7 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
 bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * nbits + 2 * HEADER + FOOTER)
+  if (results->rawlen < 2 * nbits + 2 * HEADER + FOOTER - 1)
      return false;  // We don't have enough entries to possibly match.
 
   // Compliance
@@ -114,7 +114,8 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
     return false;
-  if (!matchAtLeast(results->rawbuf[offset], WHYNTER_MIN_GAP))
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], WHYNTER_MIN_GAP))
     return false;
 
   // Success

@@ -226,7 +226,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_DENON
   // Denon needs to preceed Panasonic as it is a special case of Panasonic.
 #ifdef DEBUG
-  Serial.println("Attempting Denon decode");
+  DPRINTLN("Attempting Denon decode");
 #endif
   if (decodeDenon(results, DENON_48_BITS) ||
       decodeDenon(results, DENON_BITS) ||
