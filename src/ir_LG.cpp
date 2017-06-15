@@ -168,7 +168,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   // Footer
   if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
     return false;
-  if (offset <= results->rawlen &&
+  if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
     return false;
 
@@ -191,7 +191,8 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
       return false;
     if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
       return false;
-    if (!matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
+    if (offset < results->rawlen &&
+        !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
       return false;
   }
 

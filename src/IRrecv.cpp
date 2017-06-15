@@ -358,6 +358,22 @@ bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
                           uint8_t tolerance) {
+  DPRINT("Matching ATLEAST ");
+  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(" vs ");
+  DPRINT(desired_us);
+  DPRINT(". Matching: ");
+  DPRINT(measured_ticks);
+  DPRINT(" >= ");
+  DPRINT(ticksLow(std::min(desired_us, TIMEOUT_MS * 1000), tolerance));
+  DPRINT(" [min(");
+  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(", ");
+  DPRINT(ticksLow(TIMEOUT_MS * 1000, tolerance));
+  DPRINTLN(")]");
+  // We really should never get a value of 0, except as the last value
+  // in the buffer. If that is the case, then assume infinity and return true.
+  if (measured_ticks == 0) return true;
   return measured_ticks >= ticksLow(std::min(desired_us, TIMEOUT_MS * 1000),
                                     tolerance);
 }

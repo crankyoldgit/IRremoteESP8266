@@ -248,4 +248,13 @@ TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(NEC_BITS, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Add a zero length space to the message to test how it handles that as
+  // a end of command gap.
+  irsend.addGap(0);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 }
