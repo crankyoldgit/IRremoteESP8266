@@ -59,6 +59,7 @@ script:
   - test/ir_Daikin_test
   - test/ir_Gree_test
   - test/IRrecv_test
+  - test/ir_Pronto_test
 
 notifications:
   email:

@@ -20,6 +20,7 @@
           (from https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp)
  * Kelvinator A/C and Sherwood added by crankyoldgit
  * Mitsubishi (TV) sending added by crankyoldgit
+ * Pronto code sending added by crankyoldgit
  * Mitsubishi A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
@@ -115,6 +116,10 @@
 
 #define DECODE_GREE          false  // Not written.
 #define SEND_GREE            true
+
+#define DECODE_PRONTO        false  // Not written.
+#define SEND_PRONTO          true
+
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -146,7 +151,8 @@ enum decode_type_t {
   RCMM,
   SANYO_LC7461,
   RC5X,
-  GREE
+  GREE,
+  PRONTO
 };
 
 // Message lengths & required repeat values
@@ -174,6 +180,7 @@ enum decode_type_t {
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
 #define PANASONIC_MANUFACTURER   0x4004ULL
+#define PRONTO_MIN_LENGTH            6U
 #define RC5_RAW_BITS                14U
 #define RC5_BITS      RC5_RAW_BITS - 2U
 #define RC5X_BITS     RC5_RAW_BITS - 1U
