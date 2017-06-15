@@ -156,7 +156,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   // Footer
   if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
     return false;
-  if (offset <= results->rawlen &&
+  if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], PANASONIC_END_GAP))
     return false;
 
