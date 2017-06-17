@@ -44,6 +44,18 @@ all : $(TESTS)
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
 
+# Build and run all the tests.
+run : all
+	failed=""; \
+	for unittest in $(TESTS); do \
+	  ./$${unittest} || failed="$${failed} $${unittest}"; \
+	done; \
+	if [ -n "$${failed}" ]; then \
+	  echo "FAIL: :-( :-( Unit test(s)$${failed} failed! :-( :-("; exit 1; \
+	else \
+	  echo "PASS: \o/ \o/ All unit tests passed. \o/ \o/"; \
+	fi
+
 # Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
