@@ -17,6 +17,7 @@ install:
   - arduino --install-boards esp8266:esp8266
   - arduino --board $BD --save-prefs
   - arduino --pref "compiler.warning_level=all" --save-prefs
+  - sudo apt-get install jq
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
@@ -35,6 +36,10 @@ script:
   - shopt -u nullglob
   # Build and run the unit tests.
   - (cd test; make run)
+  # Check the version numbers match.
+  - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
+  - test ${LIB_VERSION} == "$(jq -r .version library.json)"
+  - grep -q "^version=${LIB_VERSION}$" library.properties
 
 notifications:
   email:
