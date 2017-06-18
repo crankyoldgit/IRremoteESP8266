@@ -48,8 +48,7 @@ This is not a perfect situation as we can not obvious emulate hardware specific 
 If you want to run all the tests yourself, try the following:
 ```
 $ cd test
-$ make
-$ for UNITTEST in *_test; do if [ -x "./${UNITTEST}" ]; then ./${UNITTEST}; fi; done
+$ make run
 ```
 
 ## Contributing
