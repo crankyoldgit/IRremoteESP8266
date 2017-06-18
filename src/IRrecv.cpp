@@ -126,7 +126,7 @@ void IRrecv::copyIrParams(irparams_t *dest) {
   char *cdest = (char *) dest;  // NOLINT(readability/casting)
 
   // Copy contents of src[] to dest[]
-  for (uint16_t i=0; i < sizeof(irparams_t); i++)
+  for (uint16_t i = 0; i < sizeof(irparams_t); i++)
     cdest[i] = csrc[i];
 }
 
@@ -148,6 +148,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (irparams.rcvstate != STATE_STOP)
     return false;
 #endif
+
+  // Clear the entry we are currently pointing to when we got the timeout.
+  // i.e. Stopped collecting IR data.
+  // It's junk as we never wrote an entry to it and can only confuse decoding.
+  // This is done here rather than logically the best place in read_timeout()
+  // as it saves a few bytes of ICACHE_RAM as that routine is bound to an
+  // interrupt. decode() is not stored in ICACHE_RAM.
+  // Another better option would be to zero the entire irparams.rawbuf[] on
+  // resume() but that is a much more expensive operation compare to this.
+  irparams.rawbuf[irparams.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
