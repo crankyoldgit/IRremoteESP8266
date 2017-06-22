@@ -10,6 +10,7 @@
  */
 
 #include <IRrecv.h>
+#include <IRutils.h>
 
 // an IR detector/demodulator is connected to GPIO pin 2
 uint16_t RECV_PIN = 2;
@@ -21,14 +22,6 @@ decode_results results;
 void setup() {
   Serial.begin(115200);
   irrecv.enableIRIn();  // Start the receiver
-}
-
-void serialPrintUint64Hex(uint64_t value) {
-  // Serial.print() can't handle printing long longs. (uint64_t)
-  // So we have to print the top and bottom halves separately.
-  if (value >> 32)
-    Serial.print((uint32_t) (value >> 32), HEX);
-  Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
 
 void dump(decode_results *results) {
@@ -60,7 +53,7 @@ void dump(decode_results *results) {
   } else if (results->decode_type == WHYNTER) {
     Serial.print("Decoded Whynter: ");
   }
-  serialPrintUint64Hex(results->value);
+  serialPrintUint64(results->value, 16);
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -84,7 +77,7 @@ void dump(decode_results *results) {
 
 void loop() {
   if (irrecv.decode(&results)) {
-    serialPrintUint64Hex(results.value);
+    serialPrintUint64(results.value, 16);
     dump(&results);
     irrecv.resume();  // Receive the next value
   }

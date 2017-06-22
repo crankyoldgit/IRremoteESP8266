@@ -126,7 +126,7 @@ void IRrecv::copyIrParams(irparams_t *dest) {
   char *cdest = (char *) dest;  // NOLINT(readability/casting)
 
   // Copy contents of src[] to dest[]
-  for (uint16_t i=0; i < sizeof(irparams_t); i++)
+  for (uint16_t i = 0; i < sizeof(irparams_t); i++)
     cdest[i] = csrc[i];
 }
 
@@ -148,6 +148,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (irparams.rcvstate != STATE_STOP)
     return false;
 #endif
+
+  // Clear the entry we are currently pointing to when we got the timeout.
+  // i.e. Stopped collecting IR data.
+  // It's junk as we never wrote an entry to it and can only confuse decoding.
+  // This is done here rather than logically the best place in read_timeout()
+  // as it saves a few bytes of ICACHE_RAM as that routine is bound to an
+  // interrupt. decode() is not stored in ICACHE_RAM.
+  // Another better option would be to zero the entire irparams.rawbuf[] on
+  // resume() but that is a much more expensive operation compare to this.
+  irparams.rawbuf[irparams.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
@@ -358,6 +368,22 @@ bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
                           uint8_t tolerance) {
+  DPRINT("Matching ATLEAST ");
+  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(" vs ");
+  DPRINT(desired_us);
+  DPRINT(". Matching: ");
+  DPRINT(measured_ticks);
+  DPRINT(" >= ");
+  DPRINT(ticksLow(std::min(desired_us, TIMEOUT_MS * 1000), tolerance));
+  DPRINT(" [min(");
+  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(", ");
+  DPRINT(ticksLow(TIMEOUT_MS * 1000, tolerance));
+  DPRINTLN(")]");
+  // We really should never get a value of 0, except as the last value
+  // in the buffer. If that is the case, then assume infinity and return true.
+  if (measured_ticks == 0) return true;
   return measured_ticks >= ticksLow(std::min(desired_us, TIMEOUT_MS * 1000),
                                     tolerance);
 }

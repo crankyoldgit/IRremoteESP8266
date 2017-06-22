@@ -11,6 +11,7 @@
  */
 
 #include <IRrecv.h>
+#include <IRutils.h>
 
 // An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
 // board).
@@ -25,16 +26,6 @@ void setup() {
   // Status message will be sent to the PC at 115200 baud
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
   irrecv.enableIRIn();  // Start the receiver
-}
-
-// Print a uint64_t in Hex, to the Serial interface.
-//
-void serialPrintUint64Hex(uint64_t value) {
-  // Serial.print() can't handle printing long longs. (uint64_t)
-  // So we have to print the top and bottom halves separately.
-  if (value >> 32)
-    Serial.print((uint32_t) (value >> 32), HEX);
-  Serial.print((uint32_t) (value & 0xFFFFFFFF), HEX);
 }
 
 // Display encoding type
@@ -67,10 +58,9 @@ void encoding(decode_results *results) {
 // Dump out the decode_results structure.
 //
 void dumpInfo(decode_results *results) {
-  if (results->overflow) {
-    Serial.println("IR code too long. Edit IRremoteInt.h and increase RAWBUF");
-    return;
-  }
+  if (results->overflow)
+    Serial.println("WARNING: IR code too long."
+                   "Edit IRrecv.h and increase RAWBUF");
 
   // Show Encoding standard
   Serial.print("Encoding  : ");
@@ -79,7 +69,7 @@ void dumpInfo(decode_results *results) {
 
   // Show Code & length
   Serial.print("Code      : ");
-  serialPrintUint64Hex(results->value);
+  serialPrintUint64(results->value, 16);
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -140,7 +130,7 @@ void dumpCode(decode_results *results) {
   Serial.print("  // ");
   encoding(results);
   Serial.print(" ");
-  serialPrintUint64Hex(results->value);
+  serialPrintUint64(results->value, 16);
 
   // Newline
   Serial.println("");
@@ -161,7 +151,7 @@ void dumpCode(decode_results *results) {
 
     // All protocols have data
     Serial.print("uint64_t  data = 0x");
-    serialPrintUint64Hex(results->value);
+    serialPrintUint64(results->value, 16);
     Serial.println(";");
   }
 }

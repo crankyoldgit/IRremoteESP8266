@@ -17,6 +17,7 @@ install:
   - arduino --install-boards esp8266:esp8266
   - arduino --board $BD --save-prefs
   - arduino --pref "compiler.warning_level=all" --save-prefs
+  - sudo apt-get install jq
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
@@ -35,32 +36,11 @@ script:
   - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
   - shopt -u nullglob
   # Build and run the unit tests.
-  - (cd test; make)
-  - test/IRutils_test
-  - test/IRsend_test
-  - test/ir_NEC_test
-  - test/ir_GlobalCache_test
-  - test/ir_Sherwood_test
-  - test/ir_Sony_test
-  - test/ir_Samsung_test
-  - test/ir_Kelvinator_test
-  - test/ir_JVC_test
-  - test/ir_RCMM_test
-  - test/ir_LG_test
-  - test/ir_Mitsubishi_test
-  - test/ir_Sharp_test
-  - test/ir_RC5_RC6_test
-  - test/ir_Panasonic_test
-  - test/ir_Dish_test
-  - test/ir_Whynter_test
-  - test/ir_Coolix_test
-  - test/ir_Aiwa_test
-  - test/ir_Denon_test
-  - test/ir_Sanyo_test
-  - test/ir_Daikin_test
-  - test/ir_Gree_test
-  - test/IRrecv_test
-  - test/ir_Pronto_test
+  - (cd test; make run)
+  # Check the version numbers match.
+  - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
+  - test ${LIB_VERSION} == "$(jq -r .version library.json)"
+  - grep -q "^version=${LIB_VERSION}$" library.properties
 
 notifications:
   email:

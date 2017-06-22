@@ -114,7 +114,7 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], WHYNTER_BIT_MARK))
     return false;
-  if (offset <= results->rawlen &&
+  if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], WHYNTER_MIN_GAP))
     return false;
 
