@@ -30,7 +30,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
 				ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
-				ir_Gree_test IRrecv_test
+				ir_Gree_test IRrecv_test ir_Pronto_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -66,7 +66,7 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_LG.o ir_Mitsubishi.o ir_Sharp.o ir_Sanyo.o ir_Denon.o ir_Dish.o \
 					  ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
-						ir_Kelvinator.o ir_Daikin.o ir_Gree.o
+						ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
              $(PROTOCOLS) gtest_main.a
@@ -315,4 +315,13 @@ ir_Gree_test.o : ir_Gree_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Gree_test.cpp
 
 ir_Gree_test : $(COMMON_OBJ) ir_Gree_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Pronto.o : $(USER_DIR)/ir_Pronto.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Pronto.cpp
+
+ir_Pronto_test.o : ir_Pronto_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Pronto_test.cpp
+
+ir_Pronto_test : $(COMMON_OBJ) ir_Pronto_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

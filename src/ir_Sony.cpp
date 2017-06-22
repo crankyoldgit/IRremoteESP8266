@@ -142,10 +142,7 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
     // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
     //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
     if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP) ||
-  #ifdef UNIT_TEST
-        matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH) ||
-  #endif
-        matchSpace(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
+        matchAtLeast(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
       break;  // Found a repeat space.
     timeSoFar += results->rawbuf[offset] * USECPERTICK;
     if (!matchSpace(results->rawbuf[offset++], SONY_SPACE))

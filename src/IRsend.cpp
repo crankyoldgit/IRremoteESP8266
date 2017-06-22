@@ -60,13 +60,17 @@ void IRsend::ledOff() {
 //
 // Args:
 //   freq: Frequency in Hz.
+//   use_offset: Should we use the calculated offset or not?
 // Returns:
 //   nr. of uSeconds.
-uint32_t IRsend::calcUSecPeriod(uint32_t hz) {
+uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
   if (hz == 0) hz = 1;  // Avoid Zero hz. Divide by Zero is nasty.
   uint32_t period = (1000000UL + hz/2) / hz;  // The equiv of round(1000000/hz).
   // Apply the offset and ensure we don't result in a <= 0 value.
-  return std::max((uint32_t) 1, period + periodOffset);
+  if (use_offset)
+    return std::max((uint32_t) 1, period + periodOffset);
+  else
+    return std::max((uint32_t) 1, period);
 }
 
 // Set the output frequency modulation and duty cycle.
