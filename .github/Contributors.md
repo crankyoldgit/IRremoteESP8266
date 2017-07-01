@@ -7,6 +7,7 @@
 - [Marcos de Alcântara Marinho](https://github.com/marcosamarinho/)
 - [Massimiliano Pinto](https://github.com/pintomax/)
 - [Darsh Patel](https://github.com/darshkpatel/)
+- [Jonny Graham](https://github.com/jonnygraham/)
 
 All contributors can be found on the [contributors site](https://github.com/markszabo/IRremoteESP8266/graphs/contributors). 
 
