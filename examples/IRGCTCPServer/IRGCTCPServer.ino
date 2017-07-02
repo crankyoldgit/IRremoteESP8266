@@ -37,7 +37,11 @@
  * can check your wifi router for it's address.
  */
 
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#endif
 #include <ESP8266WiFi.h>
+#include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
@@ -49,7 +53,7 @@ WiFiServer server(4998);  // Uses port 4998.
 WiFiClient client;
 
 uint16_t *code_array;
-IRsend irsend(4);  // an IR emitter led is connected to GPIO pin 4
+IRsend irsend(4);  // An IR LED is controlled by GPIO pin 4 (D2)
 
 void sendGCString(String str) {
   int16_t index;
