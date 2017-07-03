@@ -28,6 +28,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/IRsendDemo/IRsendDemo.ino
   - arduino --verify --board $BD $PWD/examples/JVCPanasonicSendDemo/JVCPanasonicSendDemo.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino
+  - arduino --verify --board $BD $PWD/examples/TurnOnFujitsuAC/TurnOnFujitsuAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
   - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino
