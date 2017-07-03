@@ -31,7 +31,7 @@
  *
  *  Updated by sillyfrog for Daikin, adopted from
  * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
- *
+ * Fujitsu A/C code added by jonnygraham
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -107,6 +107,9 @@
 #define DECODE_MITSUBISHI_AC false  // Not written.
 #define SEND_MITSUBISHI_AC   true
 
+#define DECODE_FUJITSU_AC false  // Not written.
+#define SEND_FUJITSU_AC   true
+
 #define DECODE_DAIKIN        false  // Not finished.
 #define SEND_DAIKIN          true
 
@@ -179,6 +182,7 @@ enum decode_type_t {
 #define MITSUBISHI_MIN_REPEAT        1U  // Based on marcosamarinho's code.
 #define MITSUBISHI_AC_STATE_LENGTH  18U
 #define MITSUBISHI_AC_MIN_REPEAT     1U
+#define FUJITSU_AC_MIN_REPEAT        0U
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
 #define PANASONIC_MANUFACTURER   0x4004ULL
