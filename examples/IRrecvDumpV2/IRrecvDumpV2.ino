@@ -39,6 +39,7 @@ void encoding(decode_results *results) {
     default:
     case UNKNOWN:      Serial.print("UNKNOWN");       break;
     case NEC:          Serial.print("NEC");           break;
+    case NEC_LIKE:     Serial.print("NEC (non-strict)");  break;
     case SONY:         Serial.print("SONY");          break;
     case RC5:          Serial.print("RC5");           break;
     case RC6:          Serial.print("RC6");           break;

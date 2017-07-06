@@ -258,3 +258,38 @@ TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
   EXPECT_EQ(NEC_BITS, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 }
+
+// Inconsistent decoding for unknown in Issue #264
+// Reported issues decoding an Apple Remote. Apple doesn't appear to respect
+// or use the command structure/checks in the NEC protocol.
+TEST(TestDecodeNEC, NonStrictNECDecode_Issue264) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Slightly modified example than reported due to poor timings that are too
+  // far out of spec.
+  uint16_t rawData[67] = {9150, 4650, 550, 600, 550, 1800, 600, 1750, 600, 1800,
+                          550, 600, 550, 1800, 550, 1750, 600, 1750, 600, 1750,
+                          600, 1750, 600, 1700, 600, 600, 600, 600, 550, 600,
+                          600, 600, 600, 1750, 600, 1750, 600, 600, 550, 1800,
+                          600, 600, 600, 600, 600, 600, 500, 600, 600, 600,
+                          600, 600, 600, 1750, 600, 600, 600, 550, 600, 600,
+                          600, 600, 600, 600, 600, 550, 600};
+
+  irsend.sendRaw(rawData, 67, 38);
+  irsend.makeDecodeResult();
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture));  // Not strictly NEC
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
+  EXPECT_EQ(0x77E1A040, irsend.capture.value);
+
+  // Do it all again, but with a normal decode.
+  irsend.reset();
+  irsend.sendRaw(rawData, 67, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(NEC_LIKE, irsend.capture.decode_type);
+  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x77E1A040, irsend.capture.value);
+}
