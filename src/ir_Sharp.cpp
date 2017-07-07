@@ -18,10 +18,15 @@
 // Ref:
 //   GlobalCache's IR Control Tower data.
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
-#define SHARP_BIT_MARK       260U  // 10 * T
-#define SHARP_ONE_SPACE     1820U  // 70 * T
-#define SHARP_ZERO_SPACE     780U  // 30 * T
-#define SHARP_GAP          43605U  // 1657 * T
+#define SHARP_TICK               26U
+#define SHARP_BIT_MARK_TICKS     10U
+#define SHARP_BIT_MARK         (SHARP_BIT_MARK_TICKS * SHARP_TICK)
+#define SHARP_ONE_SPACE_TICKS    70U
+#define SHARP_ONE_SPACE        (SHARP_ONE_SPACE_TICKS * SHARP_TICK)
+#define SHARP_ZERO_SPACE_TICKS   30U
+#define SHARP_ZERO_SPACE       (SHARP_ZERO_SPACE_TICKS * SHARP_TICK)
+#define SHARP_GAP_TICKS        1677U
+#define SHARP_GAP              (SHARP_GAP_TICKS * SHARP_TICK)
 
 // Address(5) + Command(8) + Expansion(1) + Check(1)
 #define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
@@ -192,25 +197,29 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   uint16_t offset = OFFSET_START;
 
   // No header
-
+  // But try to auto-calibrate off the initial mark signal.
+  if (!matchMark(results->rawbuf[offset], SHARP_BIT_MARK, 35)) return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t tick = calcTickTime(results->rawbuf[offset],
+                               SHARP_BIT_MARK_TICKS);
   // Data
   for (uint16_t i = 0; i < nbits; i++, offset++) {
     // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
-    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK, 35))
+    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick, 35))
       return false;
-    if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
+    if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE_TICKS * tick))
       data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE))
+    else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE_TICKS * tick))
       data <<= 1;  // 0
     else
       return false;
   }
 
   // Footer
-  if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
+  if (!match(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], SHARP_GAP))
+      !matchAtLeast(results->rawbuf[offset], SHARP_GAP_TICKS * tick))
     return false;
 
   // Compliance
@@ -226,27 +235,29 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     // Grab the second copy of the data (i.e. inverted)
     // Header
     // i.e. The inter-data/command repeat gap.
-    if (!matchSpace(results->rawbuf[offset++], SHARP_GAP))
+    if (!matchSpace(results->rawbuf[offset++], SHARP_GAP_TICKS * tick))
       return false;
 
     // Data
     uint64_t second_data = 0;
     for (uint16_t i = 0; i < nbits; i++, offset++) {
       // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
-      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK, 35))
+      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick,
+                     35))
         return false;
-      if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE))
+      if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE_TICKS * tick))
         second_data = (second_data << 1) | 1;  // 1
-      else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE))
+      else if (matchSpace(results->rawbuf[offset],
+                          SHARP_ZERO_SPACE_TICKS * tick))
         second_data <<= 1;  // 0
       else
         return false;
     }
     // Footer
-    if (!match(results->rawbuf[offset++], SHARP_BIT_MARK))
+    if (!match(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick))
       return false;
     if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], SHARP_GAP))
+        !matchAtLeast(results->rawbuf[offset], SHARP_GAP_TICKS * tick))
       return false;
 
     // Check that second_data has been inverted correctly.
