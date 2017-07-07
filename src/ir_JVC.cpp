@@ -19,13 +19,24 @@
 // Constants
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-#define JVC_HDR_MARK    8400U
-#define JVC_HDR_SPACE   4200U
-#define JVC_BIT_MARK     525U
-#define JVC_ONE_SPACE   1725U
-#define JVC_ZERO_SPACE   525U
-#define JVC_RPT_LENGTH 60000U
-#define JVC_MIN_GAP    11400U  // 60000 - 16 * (1725 + 525) - 8400 - 4200
+#define JVC_TICK              75U
+#define JVC_HDR_MARK_TICKS   112U
+#define JVC_HDR_MARK         (JVC_HDR_MARK_TICKS * JVC_TICK)
+#define JVC_HDR_SPACE_TICKS   56U
+#define JVC_HDR_SPACE        (JVC_HDR_SPACE_TICKS * JVC_TICK)
+#define JVC_BIT_MARK_TICKS     7U
+#define JVC_BIT_MARK         (JVC_BIT_MARK_TICKS * JVC_TICK)
+#define JVC_ONE_SPACE_TICKS   23U
+#define JVC_ONE_SPACE        (JVC_ONE_SPACE_TICKS * JVC_TICK)
+#define JVC_ZERO_SPACE_TICKS  7U
+#define JVC_ZERO_SPACE       (JVC_ZERO_SPACE_TICKS * JVC_TICK)
+#define JVC_RPT_LENGTH_TICKS 800U
+#define JVC_RPT_LENGTH       (JVC_RPT_LENGTH_TICKS * JVC_TICK)
+#define JVC_MIN_GAP_TICKS    (JVC_RPT_LENGTH_TICKS - \
+    (JVC_HDR_MARK_TICKS + JVC_HDR_SPACE_TICKS + \
+     JVC_BITS * (JVC_BIT_MARK_TICKS + JVC_ONE_SPACE_TICKS) + \
+     JVC_BIT_MARK_TICKS))
+#define JVC_MIN_GAP          (JVC_MIN_GAP_TICKS * JVC_TICK)
 
 #if SEND_JVC
 // Send a JVC message.
@@ -105,35 +116,40 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   uint16_t offset = OFFSET_START;
   bool isRepeat = true;
 
+  uint32_t m_tick;
+  uint32_t s_tick;
   // Header
   // (Optional as repeat codes don't have the header)
   if (matchMark(results->rawbuf[offset], JVC_HDR_MARK)) {
     isRepeat = false;
-    offset++;
+    m_tick = calcTickTime(results->rawbuf[offset++], JVC_HDR_MARK_TICKS);
     if (results->rawlen < 2 * nbits + 4)
       return false;  // Can't possibly be a valid JVC message with a header.
-    if (!matchSpace(results->rawbuf[offset++], JVC_HDR_SPACE))
+    if (!matchSpace(results->rawbuf[offset], JVC_HDR_SPACE))
       return false;
+    s_tick = calcTickTime(results->rawbuf[offset++], JVC_HDR_SPACE_TICKS);
+  } else {
+    // We can't easily auto-calibrate as there is no header, so assume
+    // the default tick time.
+    m_tick = JVC_TICK;
+    s_tick = JVC_TICK;
   }
 
   // Data
-  for (uint16_t i = 0; i < nbits; i++) {
-    if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
-      return false;
-    if (matchSpace(results->rawbuf[offset], JVC_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], JVC_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
-      return false;
-    offset++;
-  }
+  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                         JVC_BIT_MARK_TICKS * m_tick,
+                                         JVC_ONE_SPACE_TICKS * s_tick,
+                                         JVC_BIT_MARK_TICKS * m_tick,
+                                         JVC_ZERO_SPACE_TICKS * s_tick);
+  if (data_result.success == false) return false;
+  data = data_result.data;
+  offset += data_result.used;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], JVC_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], JVC_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], JVC_MIN_GAP_TICKS * s_tick))
     return false;
 
   // Success
