@@ -20,17 +20,29 @@
 // Constants
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
-#define NEC_HDR_MARK             9000U
-#define NEC_HDR_SPACE            4500U
-#define NEC_BIT_MARK              560U
-#define NEC_ONE_SPACE            1690U
-#define NEC_ZERO_SPACE            560U
-#define NEC_RPT_SPACE            2250U
-#define NEC_RPT_LENGTH              4U
-#define NEC_MIN_COMMAND_LENGTH 108000UL
-#define NEC_MIN_GAP NEC_MIN_COMMAND_LENGTH - \
+#define NEC_TICK                     560U
+#define NEC_HDR_MARK_TICKS            16U
+#define NEC_HDR_MARK                 (NEC_HDR_MARK_TICKS * NEC_TICK)
+#define NEC_HDR_SPACE_TICKS            8U
+#define NEC_HDR_SPACE                (NEC_HDR_SPACE_TICKS * NEC_TICK)
+#define NEC_BIT_MARK_TICKS             1U
+#define NEC_BIT_MARK                 (NEC_BIT_MARK_TICKS * NEC_TICK)
+#define NEC_ONE_SPACE_TICKS            3U
+#define NEC_ONE_SPACE                (NEC_TICK * NEC_ONE_SPACE_TICKS)
+#define NEC_ZERO_SPACE_TICKS           1U
+#define NEC_ZERO_SPACE               (NEC_TICK * NEC_ZERO_SPACE_TICKS)
+#define NEC_RPT_SPACE_TICKS            4U
+#define NEC_RPT_SPACE                (NEC_RPT_SPACE_TICKS * NEC_TICK)
+#define NEC_RPT_LENGTH                 4U
+#define NEC_MIN_COMMAND_LENGTH_TICKS 193U
+#define NEC_MIN_COMMAND_LENGTH       (NEC_MIN_COMMAND_LENGTH_TICKS * NEC_TICK)
+#define NEC_MIN_GAP (NEC_MIN_COMMAND_LENGTH - \
     (NEC_HDR_MARK + NEC_HDR_SPACE + NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) \
-     + NEC_BIT_MARK)
+     + NEC_BIT_MARK))
+#define NEC_MIN_GAP_TICKS (NEC_MIN_COMMAND_LENGTH_TICKS - \
+    (NEC_HDR_MARK_TICKS + NEC_HDR_SPACE_TICKS + \
+     NEC_BITS * (NEC_BIT_MARK_TICKS + NEC_ONE_SPACE_TICKS) + \
+     NEC_BIT_MARK_TICKS))
 
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
 // Send a raw NEC(Renesas) formatted message.
@@ -129,12 +141,14 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = OFFSET_START;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], NEC_HDR_MARK))
-    return false;
+  if (!matchMark(results->rawbuf[offset], NEC_HDR_MARK)) return false;
+  // Calculate how long the lowest tick time is based on the header mark.
+  uint32_t mark_tick = calcTickTime(results->rawbuf[offset++],
+                                    NEC_HDR_MARK_TICKS);
   // Check if it is a repeat code.
   if (results->rawlen == NEC_RPT_LENGTH &&
       matchSpace(results->rawbuf[offset], NEC_RPT_SPACE) &&
-      matchMark(results->rawbuf[offset + 1], NEC_BIT_MARK)) {
+      matchMark(results->rawbuf[offset + 1], NEC_BIT_MARK_TICKS * mark_tick)) {
     results->value = REPEAT;
     results->decode_type = NEC;
     results->bits = 0;
@@ -145,24 +159,27 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   }
 
   // Header (cont.)
-  if (!matchSpace(results->rawbuf[offset++], NEC_HDR_SPACE))
-    return false;
+  if (!matchSpace(results->rawbuf[offset], NEC_HDR_SPACE)) return false;
+  // Calculate how long the common tick time is based on the header space.
+  uint32_t space_tick = calcTickTime(results->rawbuf[offset++],
+                                     NEC_HDR_SPACE_TICKS);
   // Data
   for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK_TICKS * mark_tick))
       return false;
-    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE))
+    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE_TICKS * space_tick))
       data = (data << 1) | 1;
-    else if (matchSpace(results->rawbuf[offset], NEC_ZERO_SPACE))
+    else if (matchSpace(results->rawbuf[offset],
+             NEC_ZERO_SPACE_TICKS * space_tick))
       data <<= 1;
     else
       return false;
   }
   // Footer
-  if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK_TICKS * mark_tick))
       return false;
   if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP_TICKS * space_tick))
     return false;
 
   // Compliance
