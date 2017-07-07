@@ -493,4 +493,58 @@ bool IRrecv::decodeHash(decode_results *results) {
   results->decode_type = UNKNOWN;
   return true;
 }
+
+// Match & decode the typical data section of an IR message.
+// The data value constructed as the Most Significant Bit first.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//   nbits:     Nr. of data bits we expect.
+//   onemark:   Nr. of uSeconds in an expected mark signal for a '1' bit.
+//   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
+//   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
+//   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
+// Returns:
+//  A match_result_t structure containing the success (or not), the data value,
+//  and how many buffer entries were used.
+match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
+                                 uint16_t onemark, uint32_t onespace,
+                                 uint16_t zeromark, uint32_t zerospace) {
+  match_result_t result;
+  result.success = false;
+  result.data = 0;
+  if (onemark == zeromark) {  // Is this space encoded data format?
+    for (result.used = 0;
+         result.used < nbits * 2;
+         result.used += 2, data_ptr++) {
+      if (!matchMark(*data_ptr, onemark))
+        return result;  // Fail
+      data_ptr++;
+      if (matchSpace(*data_ptr, onespace))
+        result.data = (result.data << 1) | 1;
+      else if (matchSpace(*data_ptr, zerospace))
+        result.data <<= 1;
+      else
+        return result;  // Fail
+    }
+    result.success = true;
+  } else if (onespace == zerospace) {  // Is this mark encoded data format?
+    for (result.used = 0;
+         result.used < nbits * 2;
+         result.used += 2, data_ptr++) {
+      if (matchMark(*data_ptr, onemark))
+        result.data = (result.data << 1) | 1;
+      else if (matchMark(*data_ptr, zeromark))
+        result.data <<= 1;
+      else
+        return result;  // Fail
+      data_ptr++;
+      if (!matchSpace(*data_ptr, onespace))
+        return result;  // Fail
+    }
+    result.success = true;
+  }
+  return result;
+}
+
 // End of IRrecv class -------------------

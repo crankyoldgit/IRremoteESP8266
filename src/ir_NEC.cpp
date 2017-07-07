@@ -164,17 +164,15 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   uint32_t space_tick = calcTickTime(results->rawbuf[offset++],
                                      NEC_HDR_SPACE_TICKS);
   // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK_TICKS * mark_tick))
-      return false;
-    if (matchSpace(results->rawbuf[offset], NEC_ONE_SPACE_TICKS * space_tick))
-      data = (data << 1) | 1;
-    else if (matchSpace(results->rawbuf[offset],
-             NEC_ZERO_SPACE_TICKS * space_tick))
-      data <<= 1;
-    else
-      return false;
-  }
+  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                         NEC_BIT_MARK_TICKS * mark_tick,
+                                         NEC_ONE_SPACE_TICKS * space_tick,
+                                         NEC_BIT_MARK_TICKS * mark_tick,
+                                         NEC_ZERO_SPACE_TICKS * space_tick);
+  if (data_result.success == false) return false;
+  data = data_result.data;
+  offset += data_result.used;
+
   // Footer
   if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK_TICKS * mark_tick))
       return false;
