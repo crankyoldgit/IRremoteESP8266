@@ -5,6 +5,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //       PPPP    AAA   N   N   AAA    SSSS   OOO   N   N  IIIII   CCCC
 //       P   P  A   A  NN  N  A   A  S      O   O  NN  N    I    C
@@ -19,18 +20,26 @@
 // Constants
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-#define PANASONIC_HDR_MARK             3456U
-#define PANASONIC_HDR_SPACE            1728U
-#define PANASONIC_BIT_MARK              432U
-#define PANASONIC_ONE_SPACE            1296U
-#define PANASONIC_ZERO_SPACE            432U
-#define PANASONIC_MIN_COMMAND_LENGTH 130000UL
+#define PANASONIC_TICK                     432U
+#define PANASONIC_HDR_MARK_TICKS             8U
+#define PANASONIC_HDR_MARK         (PANASONIC_HDR_MARK_TICKS * PANASONIC_TICK)
+#define PANASONIC_HDR_SPACE_TICKS            4U
+#define PANASONIC_HDR_SPACE        (PANASONIC_HDR_SPACE_TICKS * PANASONIC_TICK)
+#define PANASONIC_BIT_MARK_TICKS             1U
+#define PANASONIC_BIT_MARK         (PANASONIC_BIT_MARK_TICKS * PANASONIC_TICK)
+#define PANASONIC_ONE_SPACE_TICKS            3U
+#define PANASONIC_ONE_SPACE        (PANASONIC_ONE_SPACE_TICKS * PANASONIC_TICK)
+#define PANASONIC_ZERO_SPACE_TICKS           1U
+#define PANASONIC_ZERO_SPACE       (PANASONIC_ZERO_SPACE_TICKS * PANASONIC_TICK)
+#define PANASONIC_MIN_COMMAND_LENGTH_TICKS 300UL
+#define PANASONIC_MIN_COMMAND_LENGTH (PANASONIC_MIN_COMMAND_LENGTH_TICKS * \
+                                      PANASONIC_TICK)
 #define PANASONIC_END_GAP              5000U  // See issue #245
-#define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_COMMAND_LENGTH - \
-    (PANASONIC_HDR_MARK + PANASONIC_HDR_SPACE + \
-     PANASONIC_BITS * (PANASONIC_BIT_MARK + PANASONIC_ONE_SPACE) + \
-     PANASONIC_BIT_MARK)))
-
+#define PANASONIC_MIN_GAP_TICKS (PANASONIC_MIN_COMMAND_LENGTH_TICKS - \
+    (PANASONIC_HDR_MARK_TICKS + PANASONIC_HDR_SPACE_TICKS + \
+     PANASONIC_BITS * (PANASONIC_BIT_MARK_TICKS + PANASONIC_ONE_SPACE_TICKS) + \
+     PANASONIC_BIT_MARK_TICKS))
+#define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_GAP_TICKS * PANASONIC_TICK))
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
 //
@@ -137,24 +146,27 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   uint16_t offset = OFFSET_START;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], PANASONIC_HDR_MARK))
-    return false;
-  if (!matchMark(results->rawbuf[offset++], PANASONIC_HDR_SPACE))
-    return false;
+  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
+                                 PANASONIC_HDR_MARK_TICKS);
+  if (!matchSpace(results->rawbuf[offset], PANASONIC_HDR_SPACE)) return false;
+  // Calculate how long the common tick time is based on the header space.
+  uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
+                                 PANASONIC_HDR_SPACE_TICKS);
 
   // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
-      return false;
-    if (match(results->rawbuf[offset], PANASONIC_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (match(results->rawbuf[offset], PANASONIC_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
-      return false;
-  }
+  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                         PANASONIC_BIT_MARK_TICKS * m_tick,
+                                         PANASONIC_ONE_SPACE_TICKS * s_tick,
+                                         PANASONIC_BIT_MARK_TICKS * m_tick,
+                                         PANASONIC_ZERO_SPACE_TICKS * s_tick);
+  if (data_result.success == false) return false;
+  data = data_result.data;
+  offset += data_result.used;
+
   // Footer
-  if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK))
+  if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], PANASONIC_END_GAP))

@@ -92,7 +92,7 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
   if (!decodeSharp(results, nbits, true, false) &&
       !decodePanasonic(results, nbits, true, DENON_MANUFACTURER)) {
     // We couldn't decode it as expected, so try the old legacy method.
-    // NOTE: I don't this following protocol actually exists.
+    // NOTE: I don't think this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     // Check we have enough data
     if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
