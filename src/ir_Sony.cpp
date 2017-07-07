@@ -20,12 +20,19 @@
 // Constants
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
-#define SONY_HDR_MARK          2400U
-#define SONY_SPACE              600U
-#define SONY_ONE_MARK          1200U
-#define SONY_ZERO_MARK          600U
-#define SONY_RPT_LENGTH       45000U
-#define SONY_MIN_GAP          10000U
+#define SONY_TICK               200U
+#define SONY_HDR_MARK_TICKS      12U
+#define SONY_HDR_MARK           (SONY_HDR_MARK_TICKS * SONY_TICK)
+#define SONY_SPACE_TICKS          3U
+#define SONY_SPACE              (SONY_SPACE_TICKS * SONY_TICK)
+#define SONY_ONE_MARK_TICKS       6U
+#define SONY_ONE_MARK           (SONY_ONE_MARK_TICKS * SONY_TICK)
+#define SONY_ZERO_MARK_TICKS      3U
+#define SONY_ZERO_MARK          (SONY_ZERO_MARK_TICKS * SONY_TICK)
+#define SONY_RPT_LENGTH_TICKS   225U
+#define SONY_RPT_LENGTH         (SONY_RPT_LENGTH_TICKS * SONY_TICK)
+#define SONY_MIN_GAP_TICKS       50U
+#define SONY_MIN_GAP            (SONY_MIN_GAP_TICKS * SONY_TICK)
 
 #if SEND_SONY
 // Send a Sony/SIRC(Serial Infra-Red Control) message.
@@ -135,22 +142,26 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
 
   // Header
   timeSoFar += results->rawbuf[offset] * USECPERTICK;
-  if (!matchMark(results->rawbuf[offset++], SONY_HDR_MARK))
+  if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK))
     return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t tick = calcTickTime(results->rawbuf[offset++],
+                               SONY_HDR_MARK_TICKS);
+
   // Data
   for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
     // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
     //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
-    if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP) ||
+    if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP_TICKS * tick) ||
         matchAtLeast(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
       break;  // Found a repeat space.
     timeSoFar += results->rawbuf[offset] * USECPERTICK;
-    if (!matchSpace(results->rawbuf[offset++], SONY_SPACE))
+    if (!matchSpace(results->rawbuf[offset++], SONY_SPACE_TICKS * tick))
       return false;
     timeSoFar += results->rawbuf[offset] * USECPERTICK;
-    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK))
+    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK_TICKS * tick))
       data = (data << 1) | 1;
-    else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK))
+    else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK_TICKS * tick))
       data <<= 1;
     else
       return false;
