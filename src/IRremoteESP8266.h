@@ -157,7 +157,8 @@ enum decode_type_t {
   SANYO_LC7461,
   RC5X,
   GREE,
-  PRONTO
+  PRONTO,
+  NEC_LIKE
 };
 
 // Message lengths & required repeat values

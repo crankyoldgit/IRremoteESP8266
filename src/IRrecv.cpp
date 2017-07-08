@@ -297,6 +297,18 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 */
+#if DECODE_NEC
+  // Some devices send NEC-like codes that don't follow the true NEC spec.
+  // This should detect those. e.g. Apple TV remote etc.
+  // This needs to be done after all other codes that use strict and some
+  // other protocols that are NEC-like as well, as turning off strict may
+  // cause this to match other valid protocols.
+  DPRINTLN("Attempting NEC (non-stict) decode");
+  if (decodeNEC(results, NEC_BITS, false)) {
+    results->decode_type = NEC_LIKE;
+    return true;
+  }
+#endif
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
