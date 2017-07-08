@@ -43,7 +43,7 @@
 void IRsend::sendGC(uint16_t buf[], uint16_t len) {
   uint16_t hz = buf[GLOBALCACHE_FREQ_INDEX];  // GC frequency is in Hz.
   enableIROut(hz);
-  uint32_t periodic_time = calcUSecPeriod(hz);
+  uint32_t periodic_time = calcUSecPeriod(hz, false);
   uint8_t emits = std::min(buf[GLOBALCACHE_RPT_INDEX],
                            (uint16_t) GLOBALCACHE_MAX_REPEAT);
   // Repeat
