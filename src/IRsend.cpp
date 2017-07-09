@@ -180,7 +180,7 @@ void IRsend::calibrate(uint16_t hz) {
   IRtimer usecTimer = IRtimer();  // Start a timer *just* before we do the call.
   uint16_t pulses = mark(UINT16_MAX);  // Generate a PWM of 65,535 us. (Max.)
   uint32_t timeTaken = usecTimer.elapsed();  // Record the time it took.
-  // While it shouldn't be neccesary, assume at least 1 pulse, to avoid a
+  // While it shouldn't be necessary, assume at least 1 pulse, to avoid a
   // divide by 0 situation.
   pulses = std::max(pulses, (uint16_t) 1U);
   uint32_t calcPeriod = calcUSecPeriod(hz);  // e.g. @38kHz it should be 26us.

@@ -153,7 +153,7 @@ TEST(TestDecodeRCMM, DecodeWithoutStrict) {
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 
-  // Illiegal RCMM 36-bit message.
+  // Illegal RCMM 36-bit message.
   irsend.reset();
   irsend.sendRCMM(0x123456789, 36);
   irsend.makeDecodeResult();
