@@ -234,7 +234,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 #if DECODE_DENON
-  // Denon needs to preceed Panasonic as it is a special case of Panasonic.
+  // Denon needs to precede Panasonic as it is a special case of Panasonic.
 #ifdef DEBUG
   DPRINTLN("Attempting Denon decode");
 #endif

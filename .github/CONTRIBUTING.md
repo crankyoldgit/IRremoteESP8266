@@ -53,7 +53,7 @@ Provide more context by answering these questions:
 
 * **Can you reproduce the problem in one of the code examples?**
 * **Did the problem start happening recently** (e.g. after updating to a new version of Arduino or the library) or was this always a problem?
-* If the problem started happening recently, **can you reproduce the problem in an older version of the libary?** What's the most recent version in which the problem doesn't happen? You can download older versions of the library from [the releases page](https://github.com/markszabo/IRremoteESP8266/releases).
+* If the problem started happening recently, **can you reproduce the problem in an older version of the library?** What's the most recent version in which the problem doesn't happen? You can download older versions of the library from [the releases page](https://github.com/markszabo/IRremoteESP8266/releases).
 * **Can you reliably reproduce the issue?** If not, provide details about how often the problem happens and under which conditions it normally happens.
 
 Include details about your configuration, circuit and environment:

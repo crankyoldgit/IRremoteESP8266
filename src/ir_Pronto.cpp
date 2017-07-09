@@ -29,7 +29,7 @@
 // Status: ALPHA / Not tested in the real world.
 //
 // Note:
-//   Pronto codes are typically represented in hexidecimal.
+//   Pronto codes are typically represented in hexadecimal.
 //   You will need to convert the code to an array of integers, and calculate
 //   it's length.
 //   e.g.

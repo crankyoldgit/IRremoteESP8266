@@ -11,7 +11,7 @@
 //                        D  D    I        S  H   H
 //                       DDDD   IIIII  SSSS   H   H
 
-// DISH support orginally by Todd Treece
+// DISH support originally by Todd Treece
 //   http://unionbridge.org/design/ircommand
 
 // Constants
