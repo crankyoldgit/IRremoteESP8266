@@ -6,6 +6,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
 //    M M M    I     T    S      U   U  B   B    I    S      H   H    I
@@ -22,11 +23,22 @@
 // Ref:
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
-#define MITSUBISHI_BIT_MARK             303U  // T * 10
-#define MITSUBISHI_ONE_SPACE           2121U  // T * 70
-#define MITSUBISHI_ZERO_SPACE           909U  // T * 30
-#define MITSUBISHI_MIN_COMMAND_LENGTH 54121U  // T * 1786
-#define MITSUBISHI_MIN_GAP            28364U  // T * 936
+#define MITSUBISHI_TICK                       30U
+#define MITSUBISHI_BIT_MARK_TICKS             10U
+#define MITSUBISHI_BIT_MARK           (MITSUBISHI_BIT_MARK_TICKS * \
+                                       MITSUBISHI_TICK)
+#define MITSUBISHI_ONE_SPACE_TICKS            70U
+#define MITSUBISHI_ONE_SPACE          (MITSUBISHI_ONE_SPACE_TICKS * \
+                                       MITSUBISHI_TICK)
+#define MITSUBISHI_ZERO_SPACE_TICKS           30U
+#define MITSUBISHI_ZERO_SPACE         (MITSUBISHI_ZERO_SPACE_TICKS * \
+                                       MITSUBISHI_TICK)
+#define MITSUBISHI_MIN_COMMAND_LENGTH_TICKS 1786U
+#define MITSUBISHI_MIN_COMMAND_LENGTH (MITSUBISHI_MIN_COMMAND_LENGTH_TICKS * \
+                                       MITSUBISHI_TICK)
+#define MITSUBISHI_MIN_GAP_TICKS             936U
+#define MITSUBISHI_MIN_GAP            (MITSUBISHI_MIN_GAP_TICKS * \
+                                       MITSUBISHI_TICK)
 
 // Mitsubishi A/C
 // Ref:
@@ -102,25 +114,29 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   uint64_t data = 0;
 
   // No Header
+  // But try to auto-calibrate off the initial mark signal.
+  if (!matchMark(results->rawbuf[offset], MITSUBISHI_BIT_MARK, 30))
+    return false;
+  // Calculate how long the common tick time is based on the initial mark.
+  uint32_t tick = calcTickTime(results->rawbuf[offset],
+                               MITSUBISHI_BIT_MARK_TICKS);
 
   // Data
-  uint16_t actualBits;
-  for (actualBits = 0; actualBits < nbits; actualBits++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
-      return false;
-    if (matchSpace(results->rawbuf[offset], MITSUBISHI_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], MITSUBISHI_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
-      break;
-  }
+  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                         MITSUBISHI_BIT_MARK_TICKS * tick,
+                                         MITSUBISHI_ONE_SPACE_TICKS * tick,
+                                         MITSUBISHI_BIT_MARK_TICKS * tick,
+                                         MITSUBISHI_ZERO_SPACE_TICKS * tick);
+  if (data_result.success == false) return false;
+  data = data_result.data;
+  offset += data_result.used;
+  uint16_t actualBits = data_result.used / 2;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK, 30))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK_TICKS * tick,
+                 30)) return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP_TICKS * tick))
     return false;
 
   // Compliance

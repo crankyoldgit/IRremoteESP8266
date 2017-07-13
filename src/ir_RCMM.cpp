@@ -4,6 +4,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //                RRRRRR   CCCCC          MM    MM MM    MM
 //                RR   RR CC    C         MMM  MMM MMM  MMM
@@ -16,15 +17,25 @@
 // Constants
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php
-#define RCMM_HDR_MARK      416U
-#define RCMM_HDR_SPACE     277U
-#define RCMM_BIT_MARK      166U
-#define RCMM_BIT_SPACE_0   277U
-#define RCMM_BIT_SPACE_1   444U
-#define RCMM_BIT_SPACE_2   611U
-#define RCMM_BIT_SPACE_3   777U
-#define RCMM_RPT_LENGTH  27778U
-#define RCMM_MIN_GAP      3360U
+#define RCMM_TICK                 28U  // Technically it would be 27.777*
+#define RCMM_HDR_MARK_TICKS       15U
+#define RCMM_HDR_MARK            416U
+#define RCMM_HDR_SPACE_TICKS      10U
+#define RCMM_HDR_SPACE           277U
+#define RCMM_BIT_MARK_TICKS        6U
+#define RCMM_BIT_MARK            166U
+#define RCMM_BIT_SPACE_0_TICKS    10U
+#define RCMM_BIT_SPACE_0         277U
+#define RCMM_BIT_SPACE_1_TICKS    16U
+#define RCMM_BIT_SPACE_1         444U
+#define RCMM_BIT_SPACE_2_TICKS    22U
+#define RCMM_BIT_SPACE_2         611U
+#define RCMM_BIT_SPACE_3_TICKS    28U
+#define RCMM_BIT_SPACE_3         777U
+#define RCMM_RPT_LENGTH_TICKS    992U
+#define RCMM_RPT_LENGTH        27778U
+#define RCMM_MIN_GAP_TICKS       120U
+#define RCMM_MIN_GAP            3360U
 // Use a tolerance of +/-10% when matching some data spaces.
 #define RCMM_TOLERANCE      10U
 #define RCMM_EXCESS         50U
@@ -109,40 +120,48 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
       return false;  // Short cut, we can never reach the expected nr. of bits.
   }
   // Header decode
-  if (!matchMark(results->rawbuf[offset++], RCMM_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], RCMM_HDR_SPACE))
-    return false;
+  if (!matchMark(results->rawbuf[offset], RCMM_HDR_MARK)) return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
+                                 RCMM_HDR_MARK_TICKS);
+  if (!matchSpace(results->rawbuf[offset], RCMM_HDR_SPACE)) return false;
+  // Calculate how long the common tick time is based on the header space.
+  uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
+                                 RCMM_HDR_SPACE_TICKS);
+
   // Data decode
   // RC-MM has two bits of data per mark/space pair.
   uint16_t actualBits;
   for (actualBits = 0; actualBits < maxBitSize; actualBits += 2, offset++) {
-    if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
       return false;
 
     data <<= 2;
     // Use non-default tolerance & excess for matching some of the spaces as the
     // defaults are too generous and causes mis-matches in some cases.
     if (matchSpace(results->rawbuf[offset],
-                   RCMM_BIT_SPACE_0, TOLERANCE, RCMM_EXCESS))
+                   RCMM_BIT_SPACE_0_TICKS * s_tick, TOLERANCE, RCMM_EXCESS))
       data += 0;
     else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_1, TOLERANCE, RCMM_EXCESS))
+                        RCMM_BIT_SPACE_1_TICKS * s_tick, TOLERANCE,
+                        RCMM_EXCESS))
       data += 1;
     else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_2, RCMM_TOLERANCE, RCMM_EXCESS))
+                        RCMM_BIT_SPACE_2_TICKS * s_tick, RCMM_TOLERANCE,
+                        RCMM_EXCESS))
       data += 2;
     else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_3, RCMM_TOLERANCE, RCMM_EXCESS))
+                        RCMM_BIT_SPACE_3_TICKS * s_tick, RCMM_TOLERANCE,
+                        RCMM_EXCESS))
       data += 3;
     else
       return false;
   }
   // Footer decode
-  if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], RCMM_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], RCMM_MIN_GAP_TICKS * s_tick))
     return false;
 
   // Compliance

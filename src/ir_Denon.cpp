@@ -5,6 +5,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //                    DDDD   EEEEE  N   N   OOO   N   N
 //                     D  D  E      NN  N  O   O  NN  N
@@ -18,15 +19,24 @@
 // Constants
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-#define DENON_HDR_MARK              263U  // The length of the Header:Mark
-#define DENON_HDR_SPACE             789U  // The length of the Header:Space
-#define DENON_BIT_MARK              263U  // The length of a Bit:Mark
-#define DENON_ONE_SPACE            1842U  // The length of a Bit:Space for 1's
-#define DENON_ZERO_SPACE            789U  // The length of a Bit:Space for 0's
-#define DENON_MIN_COMMAND_LENGTH 134052UL
-#define DENON_MIN_GAP DENON_MIN_COMMAND_LENGTH - \
-    (DENON_HDR_MARK + DENON_HDR_SPACE + DENON_BITS * \
-     (DENON_BIT_MARK + DENON_ONE_SPACE) + DENON_BIT_MARK)
+#define DENON_TICK                     263U
+#define DENON_HDR_MARK_TICKS             1U
+#define DENON_HDR_MARK            (DENON_HDR_MARK_TICKS * DENON_TICK)
+#define DENON_HDR_SPACE_TICKS            3U
+#define DENON_HDR_SPACE           (DENON_HDR_SPACE_TICKS * DENON_TICK)
+#define DENON_BIT_MARK_TICKS             1U
+#define DENON_BIT_MARK            (DENON_BIT_MARK_TICKS * DENON_TICK)
+#define DENON_ONE_SPACE_TICKS            7U
+#define DENON_ONE_SPACE           (DENON_ONE_SPACE_TICKS * DENON_TICK)
+#define DENON_ZERO_SPACE_TICKS           3U
+#define DENON_ZERO_SPACE          (DENON_ZERO_SPACE_TICKS * DENON_TICK)
+#define DENON_MIN_COMMAND_LENGTH_TICKS 510U
+#define DENON_MIN_COMMAND_LENGTH  (DENON_MIN_COMMAND_LENGTH_TICKS * DENON_TICK)
+#define DENON_MIN_GAP_TICKS       (DENON_MIN_COMMAND_LENGTH_TICKS - \
+    (DENON_HDR_MARK_TICKS + DENON_HDR_SPACE_TICKS + \
+     DENON_BITS * (DENON_BIT_MARK_TICKS + DENON_ONE_SPACE_TICKS) + \
+     DENON_BIT_MARK_TICKS))
+#define DENON_MIN_GAP             (DENON_MIN_GAP_TICKS * DENON_TICK)
 #define DENON_MANUFACTURER       0x2A4CULL
 
 #if SEND_DENON
@@ -92,7 +102,7 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
   if (!decodeSharp(results, nbits, true, false) &&
       !decodePanasonic(results, nbits, true, DENON_MANUFACTURER)) {
     // We couldn't decode it as expected, so try the old legacy method.
-    // NOTE: I don't this following protocol actually exists.
+    // NOTE: I don't think this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     // Check we have enough data
     if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
@@ -104,24 +114,26 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     uint16_t offset = OFFSET_START;
 
     // Header
-    if (!matchMark(results->rawbuf[offset++], DENON_HDR_MARK))
-      return false;
-    if (!matchSpace(results->rawbuf[offset++], DENON_HDR_SPACE))
-      return false;
+    if (!matchMark(results->rawbuf[offset], DENON_HDR_MARK)) return false;
+    // Calculate how long the common tick time is based on the header mark.
+    uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
+                                   DENON_HDR_MARK_TICKS);
+    if (!matchSpace(results->rawbuf[offset], DENON_HDR_SPACE)) return false;
+    uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
+                                   DENON_HDR_SPACE_TICKS);
+
     // Data
-    for (uint16_t i = 0; i < nbits; i++, offset++) {
-      if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
-        return false;
-      if (matchSpace(results->rawbuf[offset], DENON_ONE_SPACE))
-        data = (data << 1) | 1;  // 1
-      else if (matchSpace(results->rawbuf[offset], DENON_ZERO_SPACE))
-        data = (data << 1);  // 0
-      else
-        return false;
-    }
+    match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                           DENON_BIT_MARK_TICKS * m_tick,
+                                           DENON_ONE_SPACE_TICKS * s_tick,
+                                           DENON_BIT_MARK_TICKS * m_tick,
+                                           DENON_ZERO_SPACE_TICKS * s_tick);
+    if (data_result.success == false) return false;
+    data = data_result.data;
+    offset += data_result.used;
 
     // Footer
-    if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], DENON_BIT_MARK_TICKS * m_tick))
       return false;
 
     // Success

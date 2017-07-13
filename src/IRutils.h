@@ -8,5 +8,6 @@
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits);
 void serialPrintUint64(uint64_t input, uint8_t base);
+uint32_t calcTickTime(uint16_t input, uint16_t factor);
 
 #endif  // IRUTILS_H_

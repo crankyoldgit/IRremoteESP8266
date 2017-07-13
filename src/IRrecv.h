@@ -49,6 +49,13 @@ typedef struct {
   uint8_t overflow;             // Buffer overflow indicator.
 } irparams_t;
 
+// results from a data match
+typedef struct {
+  bool success;  // Was the match successful?
+  uint64_t data;  // The data found.
+  uint16_t used;  // How many buffer positions were used.
+} match_result_t;
+
 // Classes
 
 // Results returned from the decoder
@@ -91,6 +98,9 @@ class IRrecv {
                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,
                   uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
+  match_result_t matchData(volatile uint16_t *data_ptr, uint16_t nbits,
+                           uint16_t onemark, uint32_t onespace,
+                           uint16_t zeromark, uint32_t zerospace);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,

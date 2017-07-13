@@ -7,6 +7,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //                               L       GGGG
 //                               L      G
@@ -18,17 +19,29 @@
 // LG send originally added by https://github.com/chaeplin
 
 // Constants
-#define LG_HDR_MARK             8000U
-#define LG_HDR_SPACE            4000U
-#define LG_BIT_MARK              560U
-#define LG_ONE_SPACE            1690U
-#define LG_ZERO_SPACE            560U
-#define LG_RPT_SPACE            2250U
-#define LG_MIN_GAP             40000U
-#define LG_MIN_MESSAGE_LENGTH 108000UL
-#define LG32_HDR_MARK           4500U
-#define LG32_HDR_SPACE          4500U
-#define LG32_RPT_HDR_MARK       9000U
+#define LG_TICK                     560U
+#define LG_HDR_MARK_TICKS            14U
+#define LG_HDR_MARK                 (LG_HDR_MARK_TICKS * LG_TICK)
+#define LG_HDR_SPACE_TICKS            7U
+#define LG_HDR_SPACE                (LG_HDR_SPACE_TICKS * LG_TICK)
+#define LG_BIT_MARK_TICKS             1U
+#define LG_BIT_MARK                 (LG_BIT_MARK_TICKS * LG_TICK)
+#define LG_ONE_SPACE_TICKS            3U
+#define LG_ONE_SPACE                (LG_ONE_SPACE_TICKS * LG_TICK)
+#define LG_ZERO_SPACE_TICKS           1U
+#define LG_ZERO_SPACE               (LG_ZERO_SPACE_TICKS * LG_TICK)
+#define LG_RPT_SPACE_TICKS            4U
+#define LG_RPT_SPACE                (LG_RPT_SPACE_TICKS * LG_TICK)
+#define LG_MIN_GAP_TICKS             71U
+#define LG_MIN_GAP                  (LG_MIN_GAP_TICKS * LG_TICK)
+#define LG_MIN_MESSAGE_LENGTH_TICKS 193U
+#define LG_MIN_MESSAGE_LENGTH       (LG_MIN_MESSAGE_LENGTH_TICKS * LG_TICK)
+#define LG32_HDR_MARK_TICKS           8U
+#define LG32_HDR_MARK               (LG32_HDR_MARK_TICKS * LG_TICK)
+#define LG32_HDR_SPACE_TICKS          8U
+#define LG32_HDR_SPACE              (LG32_HDR_SPACE_TICKS * LG_TICK)
+#define LG32_RPT_HDR_MARK_TICKS      16U
+#define LG32_RPT_HDR_MARK           (LG32_RPT_HDR_MARK_TICKS * LG_TICK)
 
 #if (SEND_LG || DECODE_LG)
 // Calculate the rolling 4-bit wide checksum over all of the data.
@@ -147,29 +160,35 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
 
   // Header
   if (!matchMark(results->rawbuf[offset], LG_HDR_MARK) &&
-      !matchMark(results->rawbuf[offset], LG32_HDR_MARK))
-    return false;
-  offset++;
+      !matchMark(results->rawbuf[offset], LG32_HDR_MARK)) return false;
+  uint32_t m_tick;
+  if (matchMark(results->rawbuf[offset], LG_HDR_MARK))
+    m_tick = calcTickTime(results->rawbuf[offset++], LG_HDR_MARK_TICKS);
+  else
+    m_tick = calcTickTime(results->rawbuf[offset++], LG32_HDR_MARK_TICKS);
   if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE) &&
-      !matchMark(results->rawbuf[offset], LG32_HDR_SPACE))
-    return false;
-  offset++;
+      !matchSpace(results->rawbuf[offset], LG32_HDR_SPACE)) return false;
+  uint32_t s_tick;
+  if (matchSpace(results->rawbuf[offset], LG_HDR_SPACE))
+    s_tick = calcTickTime(results->rawbuf[offset++], LG_HDR_SPACE_TICKS);
+  else
+    s_tick = calcTickTime(results->rawbuf[offset++], LG32_HDR_SPACE_TICKS);
+
   // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
-      return false;
-    if (matchSpace(results->rawbuf[offset], LG_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], LG_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
-      return false;
-  }
+  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
+                                         LG_BIT_MARK_TICKS * m_tick,
+                                         LG_ONE_SPACE_TICKS * s_tick,
+                                         LG_BIT_MARK_TICKS * m_tick,
+                                         LG_ZERO_SPACE_TICKS * s_tick);
+  if (data_result.success == false) return false;
+  data = data_result.data;
+  offset += data_result.used;
+
   // Footer
-  if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
     return false;
 
   // Repeat
@@ -177,22 +196,23 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
     // If we are expecting the LG 32-bit protocol, there is always
     // a repeat message. So, check for it.
 #ifndef UNIT_TEST
-    if (!matchSpace(results->rawbuf[offset], LG_MIN_GAP))
+    if (!matchSpace(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
 #else
-    if (!(matchSpace(results->rawbuf[offset], LG_MIN_MESSAGE_LENGTH) ||
+    if (!(matchSpace(results->rawbuf[offset],
+                     LG_MIN_MESSAGE_LENGTH_TICKS * s_tick) ||
           matchSpace(results->rawbuf[offset], 65500) ||
-          matchSpace(results->rawbuf[offset], LG_MIN_GAP)))
+          matchSpace(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick)))
 #endif  // UNIT_TEST
       return false;
     offset++;
-    if (!matchMark(results->rawbuf[offset++], LG32_RPT_HDR_MARK))
+    if (!matchMark(results->rawbuf[offset++], LG32_RPT_HDR_MARK_TICKS * m_tick))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], LG_RPT_SPACE))
+    if (!matchSpace(results->rawbuf[offset++], LG_RPT_SPACE_TICKS * s_tick))
       return false;
-    if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK_TICKS * m_tick))
       return false;
     if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP))
+        !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
       return false;
   }
 

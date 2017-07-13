@@ -7,6 +7,7 @@
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <algorithm>
+#include "IRrecv.h"
 
 // Reverse the order of the requested least significant nr. of bits.
 // Args:
@@ -55,4 +56,15 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 #ifndef UNIT_TEST
   Serial.print(str);
 #endif
+}
+
+// Calculate the tick time in uSeconds based on the input time & factor.
+//
+// Args:
+//   input: Nr. of capture ticks.
+//   factor: Nr. of multiples of the common tick divisor the input should be.
+// Returns:
+//   A uint32_t containing the common tick time in uSeconds.
+uint32_t calcTickTime(uint16_t input, uint16_t factor) {
+  return (input * USECPERTICK) / factor;
 }

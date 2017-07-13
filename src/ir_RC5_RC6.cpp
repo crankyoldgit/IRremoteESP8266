@@ -5,6 +5,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 // RRRRRR   CCCCC          555555  XX    XX   RRRRRR   CCCCC            666
 // RR   RR CC    C         55       XX  XX    RR   RR CC    C          66
@@ -30,10 +31,13 @@
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-6
 //   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
-#define RC6_HDR_MARK             2666U
-#define RC6_HDR_SPACE             889U
-#define RC6_T1                    444U
-#define RC6_RPT_LENGTH          83000UL
+#define RC6_TICK                  444U
+#define RC6_HDR_MARK_TICKS          6U
+#define RC6_HDR_MARK             (RC6_HDR_MARK_TICKS * RC6_TICK)
+#define RC6_HDR_SPACE_TICKS         2U
+#define RC6_HDR_SPACE            (RC6_HDR_SPACE_TICKS * RC6_TICK)
+#define RC6_RPT_LENGTH_TICKS      187U
+#define RC6_RPT_LENGTH           (RC6_RPT_LENGTH_TICKS * RC6_TICK)
 #define RC6_TOGGLE_MASK       0x10000UL  // (The 17th bit)
 #define RC6_36_TOGGLE_MASK     0x8000U  // (The 16th bit)
 
@@ -255,15 +259,15 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
     mark(RC6_HDR_MARK);
     space(RC6_HDR_SPACE);
     // Start bit.
-    mark(RC6_T1);  // mark, then space == 0x1.
-    space(RC6_T1);
+    mark(RC6_TICK);  // mark, then space == 0x1.
+    space(RC6_TICK);
     // Data
     uint16_t bitTime;
     for (uint64_t i = 1, mask = 1ULL << (nbits - 1); mask; i++, mask >>= 1) {
       if (i == 4)  // The fourth bit we send is a "double width trailer bit".
-        bitTime = 2 * RC6_T1;  // double-wide trailer bit
+        bitTime = 2 * RC6_TICK;  // double-wide trailer bit
       else
-        bitTime = RC6_T1;  // Normal bit
+        bitTime = RC6_TICK;  // Normal bit
       if (data & mask) {  // 1
         mark(bitTime);
         space(bitTime);
@@ -459,14 +463,18 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = OFFSET_START;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], RC6_HDR_MARK)) return false;
-  if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE)) return false;
+  if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t tick = calcTickTime(results->rawbuf[offset++],
+                               RC6_HDR_MARK_TICKS);
+  if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE_TICKS * tick))
+    return false;
 
   uint16_t used = 0;
 
   // Get the start bit. e.g. 1.
-  if (getRClevel(results, &offset, &used, RC6_T1) != MARK) return false;
-  if (getRClevel(results, &offset, &used, RC6_T1) != SPACE) return false;
+  if (getRClevel(results, &offset, &used, tick) != MARK) return false;
+  if (getRClevel(results, &offset, &used, tick) != SPACE) return false;
 
   uint16_t actual_bits;
   uint64_t data = 0;
@@ -474,15 +482,15 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   // Data (Warning: Here be dragons^Wpointers!!)
   for (actual_bits = 0; offset < results->rawlen; actual_bits++) {
     int16_t levelA, levelB;  // Next two levels
-    levelA = getRClevel(results, &offset, &used, RC6_T1);
+    levelA = getRClevel(results, &offset, &used, tick);
     // T bit is double wide; make sure second half matches
     if (actual_bits == 3 &&
-        levelA != getRClevel(results, &offset, &used, RC6_T1))
+        levelA != getRClevel(results, &offset, &used, tick))
       return false;
-    levelB = getRClevel(results, &offset, &used, RC6_T1);
+    levelB = getRClevel(results, &offset, &used, tick);
     // T bit is double wide; make sure second half matches
     if (actual_bits == 3 &&
-        levelB != getRClevel(results, &offset, &used, RC6_T1))
+        levelB != getRClevel(results, &offset, &used, tick))
       return false;
     if (levelA == MARK && levelB == SPACE)  // reversed compared to RC5
       data = (data << 1) | 1;  // 1

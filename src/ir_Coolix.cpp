@@ -4,6 +4,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
+#include "IRutils.h"
 
 //             CCCCC   OOOOO   OOOOO  LL      IIIII XX    XX
 //            CC    C OO   OO OO   OO LL       III   XX  XX
@@ -17,12 +18,20 @@
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
 // pulse parameters in usec
-#define COOLIX_BIT_MARK   560U  // Approximately 21 cycles at 38kHz
-#define COOLIX_ONE_SPACE  COOLIX_BIT_MARK * 3U
-#define COOLIX_ZERO_SPACE COOLIX_BIT_MARK * 1U
-#define COOLIX_HDR_MARK   COOLIX_BIT_MARK * 8U
-#define COOLIX_HDR_SPACE  COOLIX_BIT_MARK * 8U
-#define COOLIX_MIN_GAP    COOLIX_HDR_SPACE + COOLIX_ZERO_SPACE
+#define COOLIX_TICK             560U  // Approximately 21 cycles at 38kHz
+#define COOLIX_BIT_MARK_TICKS     1U
+#define COOLIX_BIT_MARK         (COOLIX_BIT_MARK_TICKS * COOLIX_TICK)
+#define COOLIX_ONE_SPACE_TICKS    3U
+#define COOLIX_ONE_SPACE        (COOLIX_ONE_SPACE_TICKS * COOLIX_TICK)
+#define COOLIX_ZERO_SPACE_TICKS   1U
+#define COOLIX_ZERO_SPACE       (COOLIX_ZERO_SPACE_TICKS * COOLIX_TICK)
+#define COOLIX_HDR_MARK_TICKS     8U
+#define COOLIX_HDR_MARK         (COOLIX_HDR_MARK_TICKS * COOLIX_TICK)
+#define COOLIX_HDR_SPACE_TICKS    8U
+#define COOLIX_HDR_SPACE        (COOLIX_HDR_SPACE_TICKS * COOLIX_TICK)
+#define COOLIX_MIN_GAP_TICKS    (COOLIX_HDR_MARK_TICKS + \
+                                 COOLIX_ZERO_SPACE_TICKS)
+#define COOLIX_MIN_GAP          (COOLIX_MIN_GAP_TICKS * COOLIX_TICK)
 
 #if SEND_COOLIX
 // Send a Coolix message
@@ -102,23 +111,28 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
     return false;  // We can't possibly capture a Coolix packet that big.
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], COOLIX_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], COOLIX_HDR_SPACE))
-    return false;
+  if (!matchMark(results->rawbuf[offset], COOLIX_HDR_MARK)) return false;
+  // Calculate how long the common tick time is based on the header mark.
+  uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
+                                 COOLIX_HDR_MARK_TICKS);
+  if (!matchSpace(results->rawbuf[offset], COOLIX_HDR_SPACE)) return false;
+  // Calculate how long the common tick time is based on the header space.
+  uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
+                                 COOLIX_HDR_SPACE_TICKS);
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
   for (uint16_t i = 0; i < nbits * 2; i++, offset++) {
     bool flip = (i / 8) % 2;
-    if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK_TICKS * m_tick))
       return false;
-    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE)) {  // 1
+    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE_TICKS * s_tick)) {
       if (flip)
         inverted = (inverted << 1) | 1;
       else
         data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset], COOLIX_ZERO_SPACE)) {  // 0
+    } else if (matchSpace(results->rawbuf[offset],
+                          COOLIX_ZERO_SPACE_TICKS * s_tick)) {
       if (flip)
         inverted <<= 1;
       else
@@ -129,10 +143,10 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK))
+  if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], COOLIX_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], COOLIX_MIN_GAP_TICKS * s_tick))
     return false;
 
   // Compliance
