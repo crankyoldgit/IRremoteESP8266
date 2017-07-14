@@ -21,7 +21,7 @@
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
 #define MARK_EXCESS  100U
-#define RAWBUF       100U  // Length of raw duration buffer
+#define RAWBUF       100U  // Default length of raw capture buffer
 #define REPEAT UINT64_MAX
 // receiver states
 #define STATE_IDLE     2U
@@ -42,7 +42,8 @@ typedef struct {
   uint8_t recvpin;              // pin for IR data from detector
   uint8_t rcvstate;             // state machine
   uint16_t timer;               // state timer, counts 50uS ticks.
-  uint16_t rawbuf[RAWBUF];      // raw data
+  uint16_t bufsize;             // max. nr. of entries in the capture buffer.
+  uint16_t *rawbuf;             // raw data
   // uint16_t is used for rawlen as it saves 3 bytes of iram in the interrupt
   // handler. Don't ask why, I don't know. It just does.
   uint16_t rawlen;              // counter of entries in rawbuf.
@@ -75,7 +76,8 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
-  explicit IRrecv(uint16_t recvpin);
+  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF);  // Constructor
+  ~IRrecv();  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn();
   void disableIRIn();

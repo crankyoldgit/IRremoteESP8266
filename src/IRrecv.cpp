@@ -54,7 +54,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   // N.B. It saves about 13 bytes of IRAM.
   uint16_t rawlen = irparams.rawlen;
 
-  if (rawlen >= RAWBUF) {
+  if (rawlen >= irparams.bufsize) {
     irparams.overflow = true;
     irparams.rcvstate = STATE_STOP;
   }
@@ -80,8 +80,27 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 #endif  // UNIT_TEST
 
 // Start of IRrecv class -------------------
-IRrecv::IRrecv(uint16_t recvpin) {
+
+// Class constructor
+// Args:
+//   recvpin: GPIO pin the IR receiver module's data pin is connected to.
+//   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
+// Returns:
+//   A IRrecv class object.
+IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize) {
   irparams.recvpin = recvpin;
+  irparams.bufsize = bufsize;
+  irparams.rawbuf = new uint16_t[bufsize];
+  if (irparams.rawbuf == NULL) {
+#ifndef UNIT_TEST
+    ESP.restart();  // Mem alloc failure. Reboot.
+#endif
+  }
+}
+
+// Class destructor
+IRrecv::~IRrecv(void) {
+  delete [] irparams.rawbuf;
 }
 
 // initialization

@@ -20,8 +20,11 @@
 // An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
 // board).
 uint16_t RECV_PIN = 14;
+// As this program is a special purpose capture/decoder, let us use a larger
+// than normal buffer so we can handle Air Conditioner remote codes.
+uint16_t CAPTURE_BUFFER_SIZE = 1024;
 
-IRrecv irrecv(RECV_PIN);
+IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE);
 
 decode_results results;  // Somewhere to store the results
 irparams_t save;         // A place to copy the interrupt state while decoding.
@@ -64,8 +67,10 @@ void encoding(decode_results *results) {
 //
 void dumpInfo(decode_results *results) {
   if (results->overflow)
-    Serial.println("WARNING: IR code too long."
-                   "Edit IRrecv.h and increase RAWBUF");
+    Serial.printf("WARNING: IR code too big for buffer (>= %d). "
+                  "These results shouldn't be trusted until this is resolved. "
+                  "Edit & increase CAPTURE_BUFFER_SIZE.\n",
+                  CAPTURE_BUFFER_SIZE);
 
   // Show Encoding standard
   Serial.print("Encoding  : ");
