@@ -132,21 +132,41 @@ void IRrecv::resume() {
   irparams.overflow = false;
 }
 
-// Make a copy of the interrupt state/data.
+// Make a copy of the interrupt state & buffer data.
 // Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
 // Only call this when you know the interrupt handlers won't modify anything.
 // i.e. In STATE_STOP.
 //
 // Args:
-//   dest: Pointer to an irparams_t structure to copy to.
-void IRrecv::copyIrParams(irparams_t *dest) {
-  // Typecast src and dest addresses to (char *)
-  char *csrc = (char *) (&irparams);  // NOLINT(readability/casting)
-  char *cdest = (char *) dest;  // NOLINT(readability/casting)
+//   src: Pointer to an irparams_t structure to copy from.
+//   dst: Pointer to an irparams_t structure to copy to.
+void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
+  // Typecast src and dst addresses to (char *)
+  char *csrc = (char *) src;  // NOLINT(readability/casting)
+  char *cdst = (char *) dst;  // NOLINT(readability/casting)
 
-  // Copy contents of src[] to dest[]
+  // Save the pointer to the destination's rawbuf so we don't lose it as
+  // the for-loop/copy after this will overwrite it with src's rawbuf pointer.
+  // This isn't immediately obvious due to typecasting/different variable names.
+  uint16_t *dst_rawbuf_ptr;
+  dst_rawbuf_ptr = dst->rawbuf;
+
+  // Copy contents of src[] to dst[]
   for (uint16_t i = 0; i < sizeof(irparams_t); i++)
-    cdest[i] = csrc[i];
+    cdst[i] = csrc[i];
+
+  // Restore the buffer pointer
+  dst->rawbuf = dst_rawbuf_ptr;
+
+  // Copy the rawbuf
+  for (uint16_t i = 0; i < dst->bufsize; i++)
+    dst->rawbuf[i] = src->rawbuf[i];
+}
+
+// Obtain the maximum number of entries possible in the capture buffer.
+// i.e. It's size.
+uint16_t IRrecv::getBufSize() {
+  return irparams.bufsize;
 }
 
 // Decodes the received IR message.
@@ -188,7 +208,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     results->overflow = irparams.overflow;
 #endif
   } else {
-    copyIrParams(save);  // Duplicate the interrupt's memory.
+    copyIrParams(&irparams, save);  // Duplicate the interrupt's memory.
     resume();  // It's now safe to rearm. The IR message won't be overridden.
     resumed = true;
     // Point the results at the saved copy.
