@@ -171,6 +171,12 @@ class IRsend {
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = 0);
 #endif
 
+#if SEND_TROTEC
+  void sendTrotec(unsigned char data[],
+                  uint16_t nbytes = TROTEC_COMMAND_LENGTH,
+                  uint16_t repeat = 0);
+#endif
+
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH

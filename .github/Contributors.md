@@ -8,6 +8,7 @@
 - [Massimiliano Pinto](https://github.com/pintomax/)
 - [Darsh Patel](https://github.com/darshkpatel/)
 - [Jonny Graham](https://github.com/jonnygraham/)
+- [Stu Fisher](https://github.com/stufisher/)
 
 All contributors can be found on the [contributors site](https://github.com/markszabo/IRremoteESP8266/graphs/contributors). 
 
