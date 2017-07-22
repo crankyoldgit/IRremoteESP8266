@@ -170,7 +170,12 @@ class IRsend {
 #if SEND_PRONTO
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = 0);
 #endif
-
+#if SEND_ARGO
+  void sendArgo(unsigned char data[],
+                  uint16_t nbytes = ARGO_COMMAND_LENGTH,
+                  uint16_t repeat = 0);
+#endif
+ 
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH
