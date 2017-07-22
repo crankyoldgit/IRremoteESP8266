@@ -125,6 +125,9 @@
 #define DECODE_PRONTO        false  // Not written.
 #define SEND_PRONTO          true
 
+#define DECODE_ARGO         false //not written
+#define SEND_ARGO           true //adding
+
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -158,7 +161,8 @@ enum decode_type_t {
   RC5X,
   GREE,
   PRONTO,
-  NEC_LIKE
+  NEC_LIKE,
+  ARGO
 };
 
 // Message lengths & required repeat values
@@ -211,6 +215,7 @@ enum decode_type_t {
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
 #define WHYNTER_BITS                32U
+#define ARGO_COMMAND_LENGTH         12U
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1
