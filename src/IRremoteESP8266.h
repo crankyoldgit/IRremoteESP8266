@@ -125,8 +125,8 @@
 #define DECODE_PRONTO        false  // Not written.
 #define SEND_PRONTO          true
 
-#define DECODE_ARGO         false //not written
-#define SEND_ARGO           true //adding
+#define DECODE_ARGO          false  // Not written.
+#define SEND_ARGO            true
 
 /*
  * Always add to the end of the list and should never remove entries
