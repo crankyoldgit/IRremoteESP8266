@@ -32,6 +32,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
   - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino
+  - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino
   # Check for lint issues.
   - shopt -s nullglob
   - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}

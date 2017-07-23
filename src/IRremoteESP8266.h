@@ -32,6 +32,7 @@
  *  Updated by sillyfrog for Daikin, adopted from
  * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
  * Fujitsu A/C code added by jonnygraham
+ * Trotec AC code by stufisher
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -125,6 +126,9 @@
 #define DECODE_PRONTO        false  // Not written.
 #define SEND_PRONTO          true
 
+#define DECODE_TROTEC        false  // Not implemented.
+#define SEND_TROTEC          true
+
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -158,7 +162,8 @@ enum decode_type_t {
   RC5X,
   GREE,
   PRONTO,
-  NEC_LIKE
+  NEC_LIKE,
+  TROTEC
 };
 
 // Message lengths & required repeat values
@@ -210,6 +215,7 @@ enum decode_type_t {
 #define SONY_20_BITS                20U
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
+#define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U
 
 // Turn on Debugging information by uncommenting the following line.
