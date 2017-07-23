@@ -1,5 +1,6 @@
 /*
 Node MCU/ESP8266 Sketch to emulate Argo Ulisse 13 DCI remote
+Controls Argo Ulisse 13 DCI A/C
 Copyright 2017 Schmolders
 */
 
@@ -9,8 +10,6 @@ Copyright 2017 Schmolders
 #include "IRutils.h"
 #include <Arduino.h>
 
-
-//  ARgo
 
 // Constants
 // using SPACE modulation. MARK is always const 400u
@@ -58,7 +57,8 @@ void IRArgoESP::begin() {
 }
 
 void IRArgoESP::send() {
-  Serial.println("Sending IR code");
+  // Serial.println("Sending IR code"); // Only for Debug
+  checksum(); // Create valid checksum before sending
   _irsend.sendArgo(argo);
 }
 
@@ -96,12 +96,10 @@ void IRArgoESP::stateReset() {
   this->setRoomTemp(25);
   this->setCoolMode(ARGO_COOL_AUTO);
   this->setFan(ARGO_FAN_AUTO);
-
-  checksum();
 }
 
 uint8_t* IRArgoESP::getRaw() {
-  checksum();  // Ensure correct settings before sending.
+  checksum();  // Ensure correct bit array before returning
   return argo;
 }
 
@@ -111,7 +109,6 @@ void IRArgoESP::on() {
   // Bit 5 of byte 9 is on/off
   // in MSB first
   argo[9] = argo[9] | 0b00100000;  // Set ON/OFF bit to 1
-  checksum();
 }
 
 void IRArgoESP::off() {
@@ -120,7 +117,6 @@ void IRArgoESP::off() {
   // in MSB first
   // bit 5 of byte 9 to off
   argo[9] = argo[9] & 0b11011111;  // Set on/off bit to 0
-  checksum();
 }
 
 void IRArgoESP::setPower(bool state) {
@@ -140,7 +136,6 @@ void IRArgoESP::setMax(bool state) {
     argo[9] |= 0b00001000;
   else
     argo[9] &= 0b11110111;
-  checksum();
 }
 
 bool IRArgoESP::getMax() {
@@ -167,7 +162,6 @@ void IRArgoESP::setTemp(uint8_t temp) {
 
   argo[2] += temp << 6;  // append to bit 6,7
   argo[3] += temp >> 2;  // remove lowest to bits and append in 0-2
-  checksum();
 }
 
 uint8_t IRArgoESP::getTemp() {
@@ -182,7 +176,6 @@ void IRArgoESP::setFan(uint8_t fan) {
   argo[3] &= 0b11100111;
   // Set fan mode at bit positions
   argo[3] += fan << 3;
-  checksum();
 }
 
 uint8_t IRArgoESP::getFan() {
@@ -191,8 +184,7 @@ uint8_t IRArgoESP::getFan() {
 
 void IRArgoESP::setFlap(uint8_t flap) {
   flap_mode = flap;
-  // TODO(kaschmo):
-  checksum();
+  // TODO(kaschmo): set correct bits for flap mode
 }
 
 uint8_t IRArgoESP::getFlap() {
@@ -212,7 +204,6 @@ void IRArgoESP::setCoolMode(uint8_t mode) {
 
   // Set cool mode at bit positions
   argo[2] += mode << 3;
-  checksum();
 }
 
 uint8_t IRArgoESP::getCoolMode() {
@@ -228,7 +219,6 @@ void IRArgoESP::setHeatMode(uint8_t mode) {
   argo[2] |= 0b00100000;
   // Set cool mode at bit positions
   argo[2] += mode << 3;
-  checksum();
 }
 
 uint8_t IRArgoESP::getHeatMode() {
@@ -242,7 +232,6 @@ void IRArgoESP::setNight(bool state) {
     argo[9] |= 0b00000100;
   else
     argo[9] &= 0b11111011;
-  checksum();
 }
 
 bool IRArgoESP::getNight() {
@@ -256,7 +245,6 @@ void IRArgoESP::setiFeel(bool state) {
     argo[9] |= 0b10000000;
   else
     argo[9] &= 0b01111111;
-  checksum();
 }
 
 bool IRArgoESP::getiFeel() {
@@ -268,7 +256,6 @@ void IRArgoESP::setTime() {
 }
 
 void IRArgoESP::setRoomTemp(uint8_t temp) {
-  // Use function call from checksum to set room temp
   temp -= 4;
   // Mask out bits
   argo[3] &= 0b00011111;
@@ -276,6 +263,5 @@ void IRArgoESP::setRoomTemp(uint8_t temp) {
 
   argo[3] += temp << 5;  // Append to bit 5,6,7
   argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
-  checksum();
 }
 #endif  // SEND_ARGO
