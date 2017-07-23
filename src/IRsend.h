@@ -172,8 +172,8 @@ class IRsend {
 #endif
 #if SEND_ARGO
   void sendArgo(unsigned char data[],
-                  uint16_t nbytes = ARGO_COMMAND_LENGTH,
-                  uint16_t repeat = 0);
+                uint16_t nbytes = ARGO_COMMAND_LENGTH,
+                uint16_t repeat = 0);
 #endif
  
  protected:
