@@ -71,7 +71,7 @@ void IRArgoESP::checksum() {
   for (i = 0; i < 10; i++)
     sum += argo[i];
 
-  sum = sum % 256; // modulo 256
+  sum = sum % 256;  // modulo 256
   // Append sum to end of array
   // Set const part of checksum bit 10
   argo[10] = 0b00000010;
@@ -88,8 +88,8 @@ void IRArgoESP::stateReset() {
   argo[0] = 0b10101100;  // LSB first (as sent) 0b00110101; //const preamble
   argo[1] = 0b11110101;  // LSB first: 0b10101111; //const preamble
   // Keep payload 2-9 at zero
-  argo[10] = 0b00000010; // Const 01, checksum 6bit
-  argo[11] = 0b00000000; // Checksum 2bit
+  argo[10] = 0b00000010;  // Const 01, checksum 6bit
+  argo[11] = 0b00000000;  // Checksum 2bit
 
   this->off();
   this->setTemp(20);
@@ -110,7 +110,7 @@ void IRArgoESP::on() {
   ac_state=1;
   // Bit 5 of byte 9 is on/off
   // in MSB first
-  argo[9] = argo[9] | 0b00100000; //set ON/OFF bit to 1
+  argo[9] = argo[9] | 0b00100000;  // set ON/OFF bit to 1
 
   checksum();
 }
@@ -120,7 +120,7 @@ void IRArgoESP::off() {
   ac_state=0;
   //in MSB first
   //bit 5 of byte 9 to off
-  argo[9] = argo[9] & 0b11011111; //set on/off bit to 0
+  argo[9] = argo[9] & 0b11011111;  // set on/off bit to 0
   checksum();
 }
 
@@ -162,12 +162,12 @@ void IRArgoESP::setTemp(uint8_t temp) {
   temp -= 4;
   // Settemp = Bit 6,7 of byte 2, and bit 0-2 of byte 3
   // mask out bits
-  // argo[13] & 0x00000100; //mask out ON/OFF Bit
+  // argo[13] & 0x00000100;  // mask out ON/OFF Bit
   argo[2] &= 0b00111111;
   argo[3] &= 0b11111000;
 
-  argo[2] += temp << 6;  //append to bit 6,7
-  argo[3] += temp >> 2;  //remove lowest to bits and append in 0-2
+  argo[2] += temp << 6;  // append to bit 6,7
+  argo[3] += temp >> 2;  // remove lowest to bits and append in 0-2
   checksum();
 }
 
@@ -179,9 +179,9 @@ uint8_t IRArgoESP::getTemp() {
 void IRArgoESP::setFan(uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   fan_mode = fan;
-  //mask out bits
+  // Mask out bits
   argo[3] &= 0b11100111;
-  //set fan mode at bit positions
+  // Set fan mode at bit positions
   argo[3] += fan << 3;
   checksum();
 }
@@ -211,7 +211,7 @@ void IRArgoESP::setCoolMode(uint8_t mode) {
   // Mask out bits, also leave bit 5 on 0 for cooling
   argo[2] &= 0b11000111;
 
-  //set cool mode at bit positions
+  // Set cool mode at bit positions
   argo[2] += mode << 3;
   checksum();
 }
@@ -221,7 +221,7 @@ uint8_t IRArgoESP::getCoolMode() {
 }
 
 void IRArgoESP::setHeatMode(uint8_t mode) {
-  ac_mode = 1; // Set ac mode to heating
+  ac_mode = 1;  // Set ac mode to heating
   heat_mode = mode;
   // Mask out bits
   argo[2] &= 0b11000111;
@@ -253,7 +253,7 @@ bool IRArgoESP::getNight() {
 void IRArgoESP::setiFeel(bool state) {
   ifeel_mode = state;
   if (ifeel_mode)
-    //set bit at iFeel position: bit 7
+    // Set bit at iFeel position: bit 7
     argo[9] |= 0b10000000;
   else
     argo[9] &= 0b01111111;
@@ -265,7 +265,7 @@ bool IRArgoESP::getiFeel() {
 }
 
 void IRArgoESP::setTime() {
-  //TODO(kaschmo): use function call from checksum to set time first
+  // TODO(kaschmo): use function call from checksum to set time first
 }
 
 void IRArgoESP::setRoomTemp(uint8_t temp) {
@@ -275,8 +275,8 @@ void IRArgoESP::setRoomTemp(uint8_t temp) {
   argo[3] &= 0b00011111;
   argo[4] &= 0b11111100;
 
-  argo[3] += temp << 5; // Append to bit 5,6,7
-  argo[4] += temp >> 3; // Remove lowest 3 bits and append in 0,1
+  argo[3] += temp << 5;  // Append to bit 5,6,7
+  argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
   checksum();
 }
 
