@@ -29,32 +29,32 @@
 
 // Constants. Store MSB left.
 
-#define ARGO_COOL_ON              0U //0b000
-#define ARGO_COOL_OFF             3U //0b110
-#define ARGO_COOL_AUTO            2U //0b010
-#define ARGO_COOl_HUM             1U //0b100
+#define ARGO_COOL_ON              0U  // 0b000
+#define ARGO_COOL_OFF             3U  // 0b110
+#define ARGO_COOL_AUTO            2U  // 0b010
+#define ARGO_COOl_HUM             1U  // 0b100
 
-#define ARGO_HEAT_ON              0U //0b001
-#define ARGO_HEAT_AUTO            1U //0b101
-#define ARGO_HEAT_BLINK           2U //0b011 //??no idea what mode that is
+#define ARGO_HEAT_ON              0U  // 0b001
+#define ARGO_HEAT_AUTO            1U  // 0b101
+#define ARGO_HEAT_BLINK           2U  // 0b011  // ??no idea what mode that is
 
 
-#define ARGO_MIN_TEMP             10U //Celsius offset +4
-#define ARGO_MAX_TEMP             32U //Celsius
+#define ARGO_MIN_TEMP             10U  // Celsius offset +4
+#define ARGO_MAX_TEMP             32U  // Celsius
 
-#define ARGO_FAN_AUTO             0U //0b00
-#define ARGO_FAN_3                3U //0b11
-#define ARGO_FAN_2                2U //0b01
-#define ARGO_FAN_1                1U //0b10
+#define ARGO_FAN_AUTO             0U  // 0b00
+#define ARGO_FAN_3                3U  // 0b11
+#define ARGO_FAN_2                2U  // 0b01
+#define ARGO_FAN_1                1U  // 0b10
 
-#define ARGO_FLAP_AUTO            0U //0b000
-#define ARGO_FLAP_1               1U //0b100
-#define ARGO_FLAP_2               2U //0b010
-#define ARGO_FLAP_3               3U //0b110
-#define ARGO_FLAP_4               4U //0b001
-#define ARGO_FLAP_5               5U //0b101
-#define ARGO_FLAP_6               6U //0b011
-#define ARGO_FLAP_FULL            7U //0b111
+#define ARGO_FLAP_AUTO            0U  // 0b000
+#define ARGO_FLAP_1               1U  // 0b100
+#define ARGO_FLAP_2               2U  // 0b010
+#define ARGO_FLAP_3               3U  // 0b110
+#define ARGO_FLAP_4               4U  // 0b001
+#define ARGO_FLAP_5               5U  // 0b101
+#define ARGO_FLAP_6               6U  // 0b011
+#define ARGO_FLAP_FULL            7U  // 0b111
 
 
 #if SEND_ARGO
@@ -102,23 +102,23 @@ class IRArgoESP {
 
  private:
   // # of bytes per command
-  uint8_t argo[ARGO_COMMAND_LENGTH]; //defined in IPremoteESP8266
+  uint8_t argo[ARGO_COMMAND_LENGTH];  // Defined in IPremoteESP8266
   void stateReset();
   void checksum();
-  IRsend _irsend; //instance of the IR send class
+  IRsend _irsend;  // instance of the IR send class
 
-  //Attributes
+  // Attributes
   uint8_t set_temp;
   uint8_t fan_mode;
   uint8_t flap_mode;
   uint8_t ac_state;
-  uint8_t ac_mode; //heat 1, cool 0
+  uint8_t ac_mode;  // heat 1, cool 0
   uint8_t heat_mode;
   uint8_t cool_mode;
-  uint8_t night_mode; //on/off
-  uint8_t max_mode; //on/off
-  uint8_t ifeel_mode; //on/off
+  uint8_t night_mode;  // on/off
+  uint8_t max_mode;  // on/off
+  uint8_t ifeel_mode;  // on/off
 };
-#endif
-
 #endif  // SEND_ARGO
+
+#endif  // IR_ARGO_H_
