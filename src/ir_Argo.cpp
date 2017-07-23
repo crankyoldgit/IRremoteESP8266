@@ -14,8 +14,8 @@ Copyright 2017 Schmolders
 
 // Constants
 // using SPACE modulation. MARK is always const 400u
-#define ARGO_PREAMBLE_1           6400U  //Mark
-#define ARGO_PREAMBLE_2           3300U  //Space
+#define ARGO_PREAMBLE_1           6400U  // Mark
+#define ARGO_PREAMBLE_2           3300U  // Space
 #define ARGO_MARK                  400U
 #define ARGO_ONE_SPACE            2200U
 #define ARGO_ZERO_SPACE            900U
@@ -28,7 +28,7 @@ Copyright 2017 Schmolders
 //
 // Status: STABLE
 //
-//overloading the IRSend Function
+// Overloading the IRSend Function
 
 void IRsend::sendArgo(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
@@ -63,11 +63,11 @@ void IRArgoESP::send() {
 }
 
 void IRArgoESP::checksum() {
-  uint8_t sum = 2; //corresponts to byte 11 being constant 0b01
+  uint8_t sum = 2; // Corresponds to byte 11 being constant 0b01
   uint8_t i;
 
-  //only add up bytes to 9. byte 10 is 0b01 constant anyway.
-  //assume that argo array is MSB first (left)
+  // Only add up bytes to 9. byte 10 is 0b01 constant anyway.
+  // Assume that argo array is MSB first (left)
   for (i = 0; i < 10; i++)
     sum += argo[i];
 
@@ -110,7 +110,7 @@ void IRArgoESP::on() {
   ac_state=1;
   // Bit 5 of byte 9 is on/off
   // in MSB first
-  argo[9] = argo[9] | 0b00100000;  // set ON/OFF bit to 1
+  argo[9] = argo[9] | 0b00100000;  // Set ON/OFF bit to 1
 
   checksum();
 }
@@ -120,7 +120,7 @@ void IRArgoESP::off() {
   ac_state=0;
   //in MSB first
   //bit 5 of byte 9 to off
-  argo[9] = argo[9] & 0b11011111;  // set on/off bit to 0
+  argo[9] = argo[9] & 0b11011111;  // Set on/off bit to 0
   checksum();
 }
 
@@ -279,5 +279,4 @@ void IRArgoESP::setRoomTemp(uint8_t temp) {
   argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
   checksum();
 }
-
 #endif  // SEND_ARGO
