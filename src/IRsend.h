@@ -175,6 +175,7 @@ class IRsend {
                 uint16_t nbytes = ARGO_COMMAND_LENGTH,
                 uint16_t repeat = 0);
 #endif
+
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH
