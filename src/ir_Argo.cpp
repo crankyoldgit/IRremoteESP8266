@@ -58,7 +58,7 @@ void IRArgoESP::begin() {
 
 void IRArgoESP::send() {
   // Serial.println("Sending IR code"); // Only for Debug
-  checksum(); // Create valid checksum before sending
+  checksum();  // Create valid checksum before sending
   _irsend.sendArgo(argo);
 }
 
