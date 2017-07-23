@@ -63,7 +63,7 @@ void IRArgoESP::send() {
 }
 
 void IRArgoESP::checksum() {
-  uint8_t sum = 2; // Corresponds to byte 11 being constant 0b01
+  uint8_t sum = 2;  // Corresponds to byte 11 being constant 0b01
   uint8_t i;
 
   // Only add up bytes to 9. byte 10 is 0b01 constant anyway.
@@ -107,19 +107,18 @@ uint8_t* IRArgoESP::getRaw() {
 
 void IRArgoESP::on() {
   // state = ON;
-  ac_state=1;
+  ac_state = 1;
   // Bit 5 of byte 9 is on/off
   // in MSB first
   argo[9] = argo[9] | 0b00100000;  // Set ON/OFF bit to 1
-
   checksum();
 }
 
 void IRArgoESP::off() {
   // state = OFF;
-  ac_state=0;
-  //in MSB first
-  //bit 5 of byte 9 to off
+  ac_state = 0;
+  // in MSB first
+  // bit 5 of byte 9 to off
   argo[9] = argo[9] & 0b11011111;  // Set on/off bit to 0
   checksum();
 }
