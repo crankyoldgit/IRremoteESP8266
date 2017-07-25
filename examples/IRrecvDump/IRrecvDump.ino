@@ -44,6 +44,8 @@ void dump(decode_results *results) {
     Serial.print("Decoded RC5X: ");
   } else if (results->decode_type == RC6) {
     Serial.print("Decoded RC6: ");
+  } else if (results->decode_type == RCMM) {
+    Serial.print("Decoded RCMM: ");
   } else if (results->decode_type == PANASONIC) {
     Serial.print("Decoded PANASONIC - Address: ");
     Serial.print(results->address, HEX);
