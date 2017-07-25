@@ -45,7 +45,9 @@ void encoding(decode_results *results) {
     case NEC_LIKE:     Serial.print("NEC (non-strict)");  break;
     case SONY:         Serial.print("SONY");          break;
     case RC5:          Serial.print("RC5");           break;
+    case RC5X:         Serial.print("RC5X");          break;
     case RC6:          Serial.print("RC6");           break;
+    case RCMM:         Serial.print("RCMM");          break;
     case DISH:         Serial.print("DISH");          break;
     case SHARP:        Serial.print("SHARP");         break;
     case JVC:          Serial.print("JVC");           break;
