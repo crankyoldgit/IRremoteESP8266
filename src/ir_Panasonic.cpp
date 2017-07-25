@@ -148,12 +148,10 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   // Header
   if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
-                                 PANASONIC_HDR_MARK_TICKS);
+  uint32_t m_tick = results->rawbuf[offset++] / PANASONIC_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], PANASONIC_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
-                                 PANASONIC_HDR_SPACE_TICKS);
+  uint32_t s_tick = results->rawbuf[offset++] / PANASONIC_HDR_SPACE_TICKS;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

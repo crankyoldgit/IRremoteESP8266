@@ -163,16 +163,16 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
       !matchMark(results->rawbuf[offset], LG32_HDR_MARK)) return false;
   uint32_t m_tick;
   if (matchMark(results->rawbuf[offset], LG_HDR_MARK))
-    m_tick = calcTickTime(results->rawbuf[offset++], LG_HDR_MARK_TICKS);
+    m_tick = results->rawbuf[offset++] / LG_HDR_MARK_TICKS;
   else
-    m_tick = calcTickTime(results->rawbuf[offset++], LG32_HDR_MARK_TICKS);
+    m_tick = results->rawbuf[offset++] / LG32_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE) &&
       !matchSpace(results->rawbuf[offset], LG32_HDR_SPACE)) return false;
   uint32_t s_tick;
   if (matchSpace(results->rawbuf[offset], LG_HDR_SPACE))
-    s_tick = calcTickTime(results->rawbuf[offset++], LG_HDR_SPACE_TICKS);
+    s_tick = results->rawbuf[offset++] / LG_HDR_SPACE_TICKS;
   else
-    s_tick = calcTickTime(results->rawbuf[offset++], LG32_HDR_SPACE_TICKS);
+    s_tick = results->rawbuf[offset++] / LG32_HDR_SPACE_TICKS;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

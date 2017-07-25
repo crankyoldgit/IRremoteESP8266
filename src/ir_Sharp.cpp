@@ -200,8 +200,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   // But try to auto-calibrate off the initial mark signal.
   if (!matchMark(results->rawbuf[offset], SHARP_BIT_MARK, 35)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = calcTickTime(results->rawbuf[offset],
-                               SHARP_BIT_MARK_TICKS);
+  uint32_t tick = results->rawbuf[offset] / SHARP_BIT_MARK_TICKS;
   // Data
   for (uint16_t i = 0; i < nbits; i++, offset++) {
     // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.

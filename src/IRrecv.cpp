@@ -67,9 +67,9 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = 0xFFFFFFFF - start + now;
     else
-      irparams.rawbuf[rawlen] = (now - start) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = now - start;
   }
   irparams.rawlen++;
 
@@ -369,8 +369,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 //   Nr. of ticks.
 uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return((uint32_t) std::max((int32_t) (
-      usecs * (1.0 - tolerance/100.0) / USECPERTICK), 0));
+  return((uint32_t) std::max((int32_t) (usecs * (1.0 - tolerance / 100.0)), 0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -381,104 +380,108 @@ uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
 // Returns:
 //   Nr. of ticks.
 uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
-  return((uint32_t) usecs * (1.0 + tolerance/100.0) / USECPERTICK + 1);
+  return((uint32_t) (usecs * (1.0 + tolerance / 100.0)) + 1);
 }
 
-// Check if we match a pulse(measured_ticks) with the desired_us within
+// Check if we match a pulse(measured) with the desired within
 // +/-tolerance percent.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance) {
   DPRINT("Matching: ");
-  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(ticksLow(desired, tolerance));
   DPRINT(" <= ");
-  DPRINT(measured_ticks);
+  DPRINT(measured);
   DPRINT(" <= ");
-  DPRINTLN(ticksHigh(desired_us, tolerance));
-  return (measured_ticks >= ticksLow(desired_us, tolerance) &&
-          measured_ticks <= ticksHigh(desired_us, tolerance));
+  DPRINTLN(ticksHigh(desired, tolerance));
+  return (measured >= ticksLow(desired, tolerance) &&
+          measured <= ticksHigh(desired, tolerance));
 }
 
 
-// Check if we match a pulse(measured_ticks) of at least desired_us within
+// Check if we match a pulse(measured) of at least desired within
 // +/-tolerance percent.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance) {
   DPRINT("Matching ATLEAST ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
   DPRINT(". Matching: ");
-  DPRINT(measured_ticks);
+  DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired_us, TIMEOUT_MS * 1000), tolerance));
+  DPRINT(ticksLow(std::min(desired, TIMEOUT_MS * 1000), tolerance));
   DPRINT(" [min(");
-  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(ticksLow(desired, tolerance));
   DPRINT(", ");
   DPRINT(ticksLow(TIMEOUT_MS * 1000, tolerance));
   DPRINTLN(")]");
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
-  if (measured_ticks == 0) return true;
-  return measured_ticks >= ticksLow(std::min(desired_us, TIMEOUT_MS * 1000),
-                                    tolerance);
+  if (measured == 0) return true;
+  return measured >= ticksLow(std::min(desired, TIMEOUT_MS * 1000),
+                              tolerance);
 }
 
-// Check if we match a mark signal(measured_ticks) with the desired_us within
+// Check if we match a mark signal(measured) with the desired within
 // +/-tolerance percent, after an expected is excess is added.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //   excess:  Nr. of useconds.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchMark(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
   DPRINT("Matching MARK ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
+  DPRINT(" + ");
+  DPRINT(excess);
   DPRINT(". ");
-  return match(measured_ticks, desired_us + excess, tolerance);
+  return match(measured, desired + excess, tolerance);
 }
 
-// Check if we match a space signal(measured_ticks) with the desired_us within
+// Check if we match a space signal(measured) with the desired within
 // +/-tolerance percent, after an expected is excess is removed.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //   excess:  Nr. of useconds.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchSpace(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
   DPRINT("Matching SPACE ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
+  DPRINT(" - ");
+  DPRINT(excess);
   DPRINT(". ");
-  return match(measured_ticks, desired_us - excess, tolerance);
+  return match(measured, desired - excess, tolerance);
 }
 
 /* -----------------------------------------------------------------------

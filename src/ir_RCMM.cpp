@@ -122,43 +122,38 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
   // Header decode
   if (!matchMark(results->rawbuf[offset], RCMM_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
-                                 RCMM_HDR_MARK_TICKS);
+  uint32_t m_tick = results->rawbuf[offset++] / RCMM_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], RCMM_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
-                                 RCMM_HDR_SPACE_TICKS);
+  uint32_t s_tick = results->rawbuf[offset++] / RCMM_HDR_SPACE_TICKS;
 
   // Data decode
   // RC-MM has two bits of data per mark/space pair.
   uint16_t actualBits;
   for (actualBits = 0; actualBits < maxBitSize; actualBits += 2, offset++) {
-    if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
+    if (!match(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
       return false;
 
     data <<= 2;
     // Use non-default tolerance & excess for matching some of the spaces as the
     // defaults are too generous and causes mis-matches in some cases.
-    if (matchSpace(results->rawbuf[offset],
-                   RCMM_BIT_SPACE_0_TICKS * s_tick, TOLERANCE, RCMM_EXCESS))
+    if (match(results->rawbuf[offset], RCMM_BIT_SPACE_0_TICKS * s_tick,
+              TOLERANCE))
       data += 0;
-    else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_1_TICKS * s_tick, TOLERANCE,
-                        RCMM_EXCESS))
+    else if (match(results->rawbuf[offset], RCMM_BIT_SPACE_1_TICKS * s_tick,
+                   TOLERANCE))
       data += 1;
-    else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_2_TICKS * s_tick, RCMM_TOLERANCE,
-                        RCMM_EXCESS))
+    else if (match(results->rawbuf[offset], RCMM_BIT_SPACE_2_TICKS * s_tick,
+                   RCMM_TOLERANCE))
       data += 2;
-    else if (matchSpace(results->rawbuf[offset],
-                        RCMM_BIT_SPACE_3_TICKS * s_tick, RCMM_TOLERANCE,
-                        RCMM_EXCESS))
+    else if (match(results->rawbuf[offset], RCMM_BIT_SPACE_3_TICKS * s_tick,
+                   RCMM_TOLERANCE))
       data += 3;
     else
       return false;
   }
   // Footer decode
-  if (!matchMark(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
+  if (!match(results->rawbuf[offset++], RCMM_BIT_MARK_TICKS * m_tick))
     return false;
   if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], RCMM_MIN_GAP_TICKS * s_tick))

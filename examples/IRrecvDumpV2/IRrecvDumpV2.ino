@@ -108,7 +108,7 @@ void dumpRaw(decode_results *results) {
   for (uint16_t i = 1;  i < results->rawlen;  i++) {
     if (i % 100 == 0)
       yield();  // Preemptive yield every 100th entry to feed the WDT.
-    uint32_t x = results->rawbuf[i] * USECPERTICK;
+    uint32_t x = results->rawbuf[i];
     if (!(i & 1)) {  // even
       Serial.print("-");
       if (x < 1000) Serial.print(" ");
@@ -139,7 +139,7 @@ void dumpCode(decode_results *results) {
 
   // Dump data
   for (uint16_t i = 1; i < results->rawlen; i++) {
-    Serial.print(results->rawbuf[i] * USECPERTICK, DEC);
+    Serial.print(results->rawbuf[i], DEC);
     if (i < results->rawlen - 1)
       Serial.print(",");  // ',' not needed on last one
     if (!(i & 1)) Serial.print(" ");

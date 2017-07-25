@@ -20,7 +20,7 @@
 #define OFFSET_START   1U  // Usual rawbuf entry to start processing from.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
-#define MARK_EXCESS  100U
+#define MARK_EXCESS   50U
 #define RAWBUF       100U  // Default length of raw capture buffer
 #define REPEAT UINT64_MAX
 // receiver states
@@ -29,8 +29,10 @@
 #define STATE_SPACE    4U
 #define STATE_STOP     5U
 #define TOLERANCE     25U  // default percent tolerance in measurements
-#define USECPERTICK   50U  // microseconds per clock interrupt tick
-#define TIMEOUT_MS    15U  // How long before we give up wait for more data.
+// How long (ms) before we give up wait for more data?
+// Don't exceed 65ms without a good reason.
+// That is the capture buffers maximum value size. (uint16_t)
+#define TIMEOUT_MS    15U
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
 #define FNV_PRIME_32 16777619UL
@@ -93,13 +95,13 @@ class IRrecv {
   int16_t compare(uint16_t oldval, uint16_t newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);
-  bool match(uint32_t measured_ticks, uint32_t desired_us,
+  bool match(uint32_t measured, uint32_t desired,
              uint8_t tolerance = TOLERANCE);
-  bool matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
+  bool matchAtLeast(uint32_t measured, uint32_t desired,
                     uint8_t tolerance = TOLERANCE);
-  bool matchMark(uint32_t measured_ticks, uint32_t desired_us,
+  bool matchMark(uint32_t measured, uint32_t desired,
                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
-  bool matchSpace(uint32_t measured_ticks, uint32_t desired_us,
+  bool matchSpace(uint32_t measured, uint32_t desired,
                   uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   match_result_t matchData(volatile uint16_t *data_ptr, uint16_t nbits,
                            uint16_t onemark, uint32_t onespace,

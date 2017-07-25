@@ -307,7 +307,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
   uint16_t val = ((*offset) % 2) ? MARK : SPACE;
   // Check to see if we have hit an inter-message gap (> 20ms).
-  if (val == SPACE && width * USECPERTICK > 20000)
+  if (val == SPACE && width > 20000)
     return SPACE;
   int16_t correction = (val == MARK) ? MARK_EXCESS : -MARK_EXCESS;
 
@@ -465,8 +465,7 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   // Header
   if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = calcTickTime(results->rawbuf[offset++],
-                               RC6_HDR_MARK_TICKS);
+  uint32_t tick = results->rawbuf[offset++] / RC6_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE_TICKS * tick))
     return false;
 
