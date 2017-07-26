@@ -82,13 +82,14 @@ class IRrecv {
   void enableIRIn();
   void disableIRIn();
   void resume();
+  uint16_t getBufSize();
 
 #ifndef UNIT_TEST
 
  private:
 #endif
   // These are called by decode
-  void copyIrParams(irparams_t *dest);
+  void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
   uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE);
   uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);

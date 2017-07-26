@@ -6,7 +6,108 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
-// Tests decode().
+// Tests for the IRrecv object.
+TEST(TestIRrecv, DefaultBufferSize) {
+  IRrecv irrecv_default(1);
+  EXPECT_EQ(RAWBUF, irrecv_default.getBufSize());
+}
+
+TEST(TestIRrecv, LargeBufferSize) {
+  IRrecv irrecv_large(3, 1024);
+  EXPECT_EQ(1024, irrecv_large.getBufSize());
+}
+
+TEST(TestIRrecv, SmallBufferSize) {
+  IRrecv irrecv_small(4, 80);
+  EXPECT_EQ(80, irrecv_small.getBufSize());
+}
+
+TEST(TestIRrecv, MediumBufferSize) {
+  IRrecv irrecv_medium(4, 512);
+  EXPECT_EQ(512, irrecv_medium.getBufSize());
+}
+
+TEST(TestIRrecv, IRrecvDestructor) {
+  IRrecv *irrecv_ptr = new IRrecv(1);
+  EXPECT_EQ(RAWBUF, irrecv_ptr->getBufSize());
+
+  delete irrecv_ptr;
+  irrecv_ptr = new IRrecv(1, 1234);
+  EXPECT_EQ(1234, irrecv_ptr->getBufSize());
+  delete irrecv_ptr;
+
+  irrecv_ptr = new IRrecv(1, 123);
+  EXPECT_EQ(123, irrecv_ptr->getBufSize());
+  delete irrecv_ptr;
+}
+
+// Tests for copyIrParams()
+
+TEST(TestCopyIrParams, CopyEmpty) {
+  irparams_t src;
+  irparams_t dst;
+  uint16_t test_size = 1234;
+  src.bufsize = test_size;
+  src.rawlen = 0;
+  src.rawbuf = new uint16_t[test_size];
+  src.overflow = false;
+  dst.bufsize = 4567;
+  dst.rawlen = 123;
+  dst.rawbuf = new uint16_t[test_size];
+  dst.overflow = true;
+  // Confirm we are looking at different memory for the buffers.
+  ASSERT_NE(src.rawbuf, dst.rawbuf);
+
+  IRrecv irrecv(4);
+  irrecv.copyIrParams(&src, &dst);
+
+  ASSERT_EQ(src.bufsize, dst.bufsize);
+  ASSERT_EQ(src.rawlen, dst.rawlen);
+  ASSERT_NE(src.rawbuf, dst.rawbuf);  // Pointers, not content.
+  ASSERT_EQ(src.overflow, dst.overflow);
+  // Contents of the buffers needs to match.
+  EXPECT_EQ(0, memcmp(src.rawbuf, dst.rawbuf, src.bufsize * sizeof(uint16_t)));
+}
+
+TEST(TestCopyIrParams, CopyNonEmpty) {
+  irparams_t src;
+  irparams_t dst;
+  uint16_t test_size = 1234;
+  src.bufsize = test_size;
+  src.rawlen = 67;
+  src.rawbuf = new uint16_t[test_size];
+  src.rawbuf[0] = 0xF00D;
+  src.rawbuf[1] = 0xBEEF;
+  src.rawbuf[test_size - 1] = 0xDEAD;
+  src.overflow = true;
+  dst.bufsize = 0;
+  dst.rawlen = 0;
+  dst.rawbuf = new uint16_t[test_size];
+  dst.overflow = false;
+  // Confirm we are looking at different memory for the buffers.
+  ASSERT_NE(src.rawbuf, dst.rawbuf);
+  // and that they differ before we test.
+  EXPECT_NE(0, memcmp(src.rawbuf, dst.rawbuf, src.bufsize * sizeof(uint16_t)));
+
+  IRrecv irrecv(4);
+  irrecv.copyIrParams(&src, &dst);
+
+  ASSERT_EQ(src.bufsize, dst.bufsize);
+  EXPECT_EQ(test_size, dst.bufsize);
+  ASSERT_EQ(src.rawlen, dst.rawlen);
+  EXPECT_EQ(67, dst.rawlen);
+  ASSERT_EQ(src.overflow, dst.overflow);
+  EXPECT_TRUE(dst.overflow);
+  ASSERT_NE(src.rawbuf, dst.rawbuf);  // Pointers, not content.
+  // Contents of the buffers needs to match.
+  EXPECT_EQ(0, memcmp(src.rawbuf, dst.rawbuf, src.bufsize * sizeof(uint16_t)));
+  // Check the canary values.
+  EXPECT_EQ(0xF00D, dst.rawbuf[0]);
+  EXPECT_EQ(0xBEEF, dst.rawbuf[1]);
+  EXPECT_EQ(0xDEAD, dst.rawbuf[test_size - 1]);
+}
+
+// Tests for decode().
 
 // Test decode of a NEC message.
 TEST(TestDecode, DecodeNEC) {
