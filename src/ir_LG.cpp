@@ -19,29 +19,29 @@
 // LG send originally added by https://github.com/chaeplin
 
 // Constants
-#define LG_TICK                     560U
-#define LG_HDR_MARK_TICKS            14U
-#define LG_HDR_MARK                 (LG_HDR_MARK_TICKS * LG_TICK)
-#define LG_HDR_SPACE_TICKS            7U
-#define LG_HDR_SPACE                (LG_HDR_SPACE_TICKS * LG_TICK)
-#define LG_BIT_MARK_TICKS             1U
-#define LG_BIT_MARK                 (LG_BIT_MARK_TICKS * LG_TICK)
-#define LG_ONE_SPACE_TICKS            3U
-#define LG_ONE_SPACE                (LG_ONE_SPACE_TICKS * LG_TICK)
-#define LG_ZERO_SPACE_TICKS           1U
-#define LG_ZERO_SPACE               (LG_ZERO_SPACE_TICKS * LG_TICK)
-#define LG_RPT_SPACE_TICKS            4U
-#define LG_RPT_SPACE                (LG_RPT_SPACE_TICKS * LG_TICK)
-#define LG_MIN_GAP_TICKS             71U
-#define LG_MIN_GAP                  (LG_MIN_GAP_TICKS * LG_TICK)
-#define LG_MIN_MESSAGE_LENGTH_TICKS 193U
-#define LG_MIN_MESSAGE_LENGTH       (LG_MIN_MESSAGE_LENGTH_TICKS * LG_TICK)
-#define LG32_HDR_MARK_TICKS           8U
-#define LG32_HDR_MARK               (LG32_HDR_MARK_TICKS * LG_TICK)
-#define LG32_HDR_SPACE_TICKS          8U
-#define LG32_HDR_SPACE              (LG32_HDR_SPACE_TICKS * LG_TICK)
-#define LG32_RPT_HDR_MARK_TICKS      16U
-#define LG32_RPT_HDR_MARK           (LG32_RPT_HDR_MARK_TICKS * LG_TICK)
+#define LG_TICK                       50U
+#define LG_HDR_MARK_TICKS            160U
+#define LG_HDR_MARK                  (LG_HDR_MARK_TICKS * LG_TICK)
+#define LG_HDR_SPACE_TICKS            80U
+#define LG_HDR_SPACE                 (LG_HDR_SPACE_TICKS * LG_TICK)
+#define LG_BIT_MARK_TICKS             11U
+#define LG_BIT_MARK                  (LG_BIT_MARK_TICKS * LG_TICK)
+#define LG_ONE_SPACE_TICKS            32U
+#define LG_ONE_SPACE                 (LG_ONE_SPACE_TICKS * LG_TICK)
+#define LG_ZERO_SPACE_TICKS           11U
+#define LG_ZERO_SPACE                (LG_ZERO_SPACE_TICKS * LG_TICK)
+#define LG_RPT_SPACE_TICKS            45U
+#define LG_RPT_SPACE                 (LG_RPT_SPACE_TICKS * LG_TICK)
+#define LG_MIN_GAP_TICKS             795U
+#define LG_MIN_GAP                   (LG_MIN_GAP_TICKS * LG_TICK)
+#define LG_MIN_MESSAGE_LENGTH_TICKS 2161U
+#define LG_MIN_MESSAGE_LENGTH        (LG_MIN_MESSAGE_LENGTH_TICKS * LG_TICK)
+#define LG32_HDR_MARK_TICKS           90U
+#define LG32_HDR_MARK                (LG32_HDR_MARK_TICKS * LG_TICK)
+#define LG32_HDR_SPACE_TICKS          89U
+#define LG32_HDR_SPACE               (LG32_HDR_SPACE_TICKS * LG_TICK)
+#define LG32_RPT_HDR_MARK_TICKS      179U
+#define LG32_RPT_HDR_MARK            (LG32_RPT_HDR_MARK_TICKS * LG_TICK)
 
 #if (SEND_LG || DECODE_LG)
 // Calculate the rolling 4-bit wide checksum over all of the data.
