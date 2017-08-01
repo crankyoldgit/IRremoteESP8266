@@ -29,10 +29,14 @@
 #define STATE_SPACE    4U
 #define STATE_STOP     5U
 #define TOLERANCE     25U  // default percent tolerance in measurements
+#define RAWTICK        2U  // Capture tick to uSec factor.
 // How long (ms) before we give up wait for more data?
-// Don't exceed 65ms without a good reason.
-// That is the capture buffers maximum value size. (uint16_t)
-#define TIMEOUT_MS    15U
+// Don't exceed 130ms (RAWTICK * UINT16_MAX uSeconds) without a good reason.
+// That is the capture buffers maximum value size. (UINT16_MAX / RAWTICK)
+// Typically messages/protocols tend to repeat around the 100ms timeframe,
+// thus we should timeout before that to give us some time to try to decode
+// before we need to start capturing a possible new message.
+#define TIMEOUT_MS    90U  // In MilliSeconds. (Historic default was 15ms)
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
 #define FNV_PRIME_32 16777619UL

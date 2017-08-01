@@ -465,7 +465,7 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   // Header
   if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset++] / RC6_HDR_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset++] * RAWTICK / RC6_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE_TICKS * tick))
     return false;
 

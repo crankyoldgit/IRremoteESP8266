@@ -122,10 +122,10 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
   // Header decode
   if (!matchMark(results->rawbuf[offset], RCMM_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] / RCMM_HDR_MARK_TICKS;
+  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK / RCMM_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], RCMM_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] / RCMM_HDR_SPACE_TICKS;
+  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK / RCMM_HDR_SPACE_TICKS;
 
   // Data decode
   // RC-MM has two bits of data per mark/space pair.

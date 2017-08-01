@@ -118,7 +118,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   if (!matchMark(results->rawbuf[offset], MITSUBISHI_BIT_MARK, 30))
     return false;
   // Calculate how long the common tick time is based on the initial mark.
-  uint32_t tick = results->rawbuf[offset] / MITSUBISHI_BIT_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset] * RAWTICK / MITSUBISHI_BIT_MARK_TICKS;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

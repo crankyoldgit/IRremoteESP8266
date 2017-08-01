@@ -108,10 +108,12 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   // Main header mark and space
   if (!matchMark(results->rawbuf[offset], WHYNTER_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] / WHYNTER_HDR_MARK_TICKS;
+  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+      WHYNTER_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], WHYNTER_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] / WHYNTER_HDR_SPACE_TICKS;
+  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+      WHYNTER_HDR_SPACE_TICKS;
 
   // Data
   uint64_t data = 0;

@@ -67,9 +67,9 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = 0xFFFFFFFF - start + now;
+      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / RAWTICK;
     else
-      irparams.rawbuf[rawlen] = now - start;
+      irparams.rawbuf[rawlen] = (now - start) / RAWTICK;
   }
   irparams.rawlen++;
 
@@ -395,6 +395,7 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance) {
+  measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance));
   DPRINT(" <= ");
@@ -418,6 +419,7 @@ bool IRrecv::match(uint32_t measured, uint32_t desired,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance) {
+  measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching ATLEAST ");
   DPRINT(measured);
   DPRINT(" vs ");
@@ -452,7 +454,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
   DPRINT("Matching MARK ");
-  DPRINT(measured);
+  DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
@@ -475,7 +477,7 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
   DPRINT("Matching SPACE ");
-  DPRINT(measured);
+  DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
