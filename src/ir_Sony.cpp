@@ -141,12 +141,11 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
   uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
 
   // Header
-  timeSoFar += results->rawbuf[offset] * USECPERTICK;
+  timeSoFar += results->rawbuf[offset] * RAWTICK;
   if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK))
     return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = calcTickTime(results->rawbuf[offset++],
-                               SONY_HDR_MARK_TICKS);
+  uint32_t tick = results->rawbuf[offset++] * RAWTICK / SONY_HDR_MARK_TICKS;
 
   // Data
   for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
@@ -155,10 +154,10 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
     if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP_TICKS * tick) ||
         matchAtLeast(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
       break;  // Found a repeat space.
-    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    timeSoFar += results->rawbuf[offset] * RAWTICK;
     if (!matchSpace(results->rawbuf[offset++], SONY_SPACE_TICKS * tick))
       return false;
-    timeSoFar += results->rawbuf[offset] * USECPERTICK;
+    timeSoFar += results->rawbuf[offset] * RAWTICK;
     if (matchMark(results->rawbuf[offset], SONY_ONE_MARK_TICKS * tick))
       data = (data << 1) | 1;
     else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK_TICKS * tick))

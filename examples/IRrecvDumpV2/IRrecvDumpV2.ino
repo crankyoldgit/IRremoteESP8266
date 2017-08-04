@@ -97,6 +97,16 @@ void dumpInfo(decode_results *results) {
   Serial.println(" bits)");
 }
 
+uint16_t getCookedLength(decode_results *results) {
+  uint16_t length = results->rawlen - 1;
+  for (uint16_t i = 0; i < results->rawlen - 1; i++) {
+    uint32_t usecs = results->rawbuf[i] * RAWTICK;
+    // Add two extra entries for multiple larger than UINT16_MAX it is.
+    length += (usecs / UINT16_MAX) * 2;
+  }
+  return length;
+}
+
 // Dump out the decode_results structure.
 //
 void dumpRaw(decode_results *results) {
@@ -105,24 +115,17 @@ void dumpRaw(decode_results *results) {
   Serial.print(results->rawlen - 1, DEC);
   Serial.println("]: ");
 
-  for (uint16_t i = 1;  i < results->rawlen;  i++) {
+  for (uint16_t i = 1; i < results->rawlen; i++) {
     if (i % 100 == 0)
       yield();  // Preemptive yield every 100th entry to feed the WDT.
-    uint32_t x = results->rawbuf[i] * USECPERTICK;
-    if (!(i & 1)) {  // even
+    if (i % 2 == 0) {  // even
       Serial.print("-");
-      if (x < 1000) Serial.print(" ");
-      if (x < 100) Serial.print(" ");
-      Serial.print(x, DEC);
     } else {  // odd
-      Serial.print("     ");
-      Serial.print("+");
-      if (x < 1000) Serial.print(" ");
-      if (x < 100) Serial.print(" ");
-      Serial.print(x, DEC);
-      if (i < results->rawlen - 1)
-        Serial.print(", ");  // ',' not needed for last one
+      Serial.print("   +");
     }
+    Serial.printf("%6d", results->rawbuf[i] * RAWTICK);
+    if (i < results->rawlen - 1)
+      Serial.print(", ");  // ',' not needed for last one
     if (!(i % 8)) Serial.println("");
   }
   Serial.println("");  // Newline
@@ -132,17 +135,22 @@ void dumpRaw(decode_results *results) {
 //
 void dumpCode(decode_results *results) {
   // Start declaration
-  Serial.print("uint16_t  ");              // variable type
+  Serial.print("uint16_t ");               // variable type
   Serial.print("rawData[");                // array name
-  Serial.print(results->rawlen - 1, DEC);  // array size
+  Serial.print(getCookedLength(results), DEC);  // array size
   Serial.print("] = {");                   // Start declaration
 
   // Dump data
   for (uint16_t i = 1; i < results->rawlen; i++) {
-    Serial.print(results->rawbuf[i] * USECPERTICK, DEC);
+    uint32_t usecs;
+    for (usecs = results->rawbuf[i] * RAWTICK;
+         usecs > UINT16_MAX;
+         usecs -= UINT16_MAX)
+      Serial.printf("%d, 0", UINT16_MAX);
+    Serial.print(usecs, DEC);
     if (i < results->rawlen - 1)
-      Serial.print(",");  // ',' not needed on last one
-    if (!(i & 1)) Serial.print(" ");
+      Serial.print(", ");  // ',' not needed on last one
+    if (i % 2 == 0) Serial.print(" ");  // Extra if it was even.
   }
 
   // End declaration
@@ -152,7 +160,7 @@ void dumpCode(decode_results *results) {
   Serial.print("  // ");
   encoding(results);
   Serial.print(" ");
-  serialPrintUint64(results->value, 16);
+  serialPrintUint64(results->value, HEX);
 
   // Newline
   Serial.println("");
@@ -163,16 +171,16 @@ void dumpCode(decode_results *results) {
     // NOTE: It will ignore the atypical case when a message has been decoded
     // but the address & the command are both 0.
     if (results->address > 0 || results->command > 0) {
-      Serial.print("uint32_t  address = 0x");
+      Serial.print("uint32_t address = 0x");
       Serial.print(results->address, HEX);
       Serial.println(";");
-      Serial.print("uint32_t  command = 0x");
+      Serial.print("uint32_t command = 0x");
       Serial.print(results->command, HEX);
       Serial.println(";");
     }
 
     // All protocols have data
-    Serial.print("uint64_t  data = 0x");
+    Serial.print("uint64_t data = 0x");
     serialPrintUint64(results->value, 16);
     Serial.println(";");
   }

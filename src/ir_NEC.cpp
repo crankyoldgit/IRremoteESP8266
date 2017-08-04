@@ -143,8 +143,8 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Header
   if (!matchMark(results->rawbuf[offset], NEC_HDR_MARK)) return false;
   // Calculate how long the lowest tick time is based on the header mark.
-  uint32_t mark_tick = calcTickTime(results->rawbuf[offset++],
-                                    NEC_HDR_MARK_TICKS);
+  uint32_t mark_tick = results->rawbuf[offset++] * RAWTICK /
+      NEC_HDR_MARK_TICKS;
   // Check if it is a repeat code.
   if (results->rawlen == NEC_RPT_LENGTH &&
       matchSpace(results->rawbuf[offset], NEC_RPT_SPACE) &&
@@ -161,8 +161,8 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Header (cont.)
   if (!matchSpace(results->rawbuf[offset], NEC_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t space_tick = calcTickTime(results->rawbuf[offset++],
-                                     NEC_HDR_SPACE_TICKS);
+  uint32_t space_tick = results->rawbuf[offset++] * RAWTICK /
+      NEC_HDR_SPACE_TICKS;
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
                                          NEC_BIT_MARK_TICKS * mark_tick,
