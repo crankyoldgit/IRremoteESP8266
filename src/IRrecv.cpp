@@ -75,7 +75,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 
   start = now;
   #define ONCE 0
-  os_timer_arm(&timer, TIMEOUT_MS, ONCE);
+  os_timer_arm(&timer, irparams.timeout, ONCE);
 }
 #endif  // UNIT_TEST
 
@@ -85,11 +85,16 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 // Args:
 //   recvpin: GPIO pin the IR receiver module's data pin is connected to.
 //   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
+//   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
+//            (Default: TIMEOUT_MS)
 // Returns:
 //   A IRrecv class object.
-IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize) {
+IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout) {
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
+  // Ensure we are going to be able to store all possible values in the
+  // capture buffer.
+  irparams.timeout = std::min(timeout, (uint8_t) MAX_TIMEOUT_MS);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
 #ifndef UNIT_TEST
@@ -427,16 +432,16 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, TIMEOUT_MS * 1000), tolerance));
+  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)), tolerance));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance));
   DPRINT(", ");
-  DPRINT(ticksLow(TIMEOUT_MS * 1000, tolerance));
+  DPRINT(ticksLow(MS_TO_USEC(irparams.timeout), tolerance));
   DPRINTLN(")]");
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
-  return measured >= ticksLow(std::min(desired, TIMEOUT_MS * 1000),
+  return measured >= ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)),
                               tolerance);
 }
 

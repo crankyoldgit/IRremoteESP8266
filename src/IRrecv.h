@@ -18,6 +18,7 @@
 #define HEADER         2U  // Usual nr. of header entries.
 #define FOOTER         2U  // Usual nr. of footer (stop bits) entries.
 #define OFFSET_START   1U  // Usual rawbuf entry to start processing from.
+#define MS_TO_USEC(x)  (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
 #define MARK_EXCESS   50U
@@ -31,12 +32,15 @@
 #define TOLERANCE     25U  // default percent tolerance in measurements
 #define RAWTICK        2U  // Capture tick to uSec factor.
 // How long (ms) before we give up wait for more data?
-// Don't exceed 130ms (RAWTICK * UINT16_MAX uSeconds) without a good reason.
+// Don't exceed MAX_TIMEOUT_MS without a good reason.
 // That is the capture buffers maximum value size. (UINT16_MAX / RAWTICK)
 // Typically messages/protocols tend to repeat around the 100ms timeframe,
 // thus we should timeout before that to give us some time to try to decode
 // before we need to start capturing a possible new message.
-#define TIMEOUT_MS    90U  // In MilliSeconds. (Historic default was 15ms)
+// Typically 15ms suits most applications. However, some protocols demand a
+// higher value. e.g. 90ms for XMP-1 and some aircon units.
+#define TIMEOUT_MS    15U  // In MilliSeconds.
+#define MAX_TIMEOUT_MS (RAWTICK * UINT16_MAX / MS_TO_USEC(1))
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
 #define FNV_PRIME_32 16777619UL
@@ -54,6 +58,7 @@ typedef struct {
   // handler. Don't ask why, I don't know. It just does.
   uint16_t rawlen;              // counter of entries in rawbuf.
   uint8_t overflow;             // Buffer overflow indicator.
+  uint8_t timeout;              // Nr. of milliSeconds before we give up.
 } irparams_t;
 
 // results from a data match
@@ -82,7 +87,8 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
-  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF);  // Constructor
+  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF,
+                  uint8_t timeout = TIMEOUT_MS);  // Constructor
   ~IRrecv();  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn();

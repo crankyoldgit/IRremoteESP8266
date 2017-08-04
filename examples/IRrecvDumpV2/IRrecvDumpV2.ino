@@ -24,7 +24,14 @@ uint16_t RECV_PIN = 14;
 // than normal buffer so we can handle Air Conditioner remote codes.
 uint16_t CAPTURE_BUFFER_SIZE = 1024;
 
-IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE);
+// Nr. of milli-Seconds of no-more-data before we consider a message ended.
+// NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
+#define TIMEOUT 15U  // Suits most messages, while not swallowing repeats.
+// #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
+                        // units, but can accidently swallow repeated messages
+                        // in the rawData[] output.
+
+IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT);
 
 decode_results results;  // Somewhere to store the results
 irparams_t save;         // A place to copy the interrupt state while decoding.
