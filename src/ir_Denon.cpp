@@ -116,11 +116,11 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // Header
     if (!matchMark(results->rawbuf[offset], DENON_HDR_MARK)) return false;
     // Calculate how long the common tick time is based on the header mark.
-    uint32_t m_tick = calcTickTime(results->rawbuf[offset++],
-                                   DENON_HDR_MARK_TICKS);
+    uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+        DENON_HDR_MARK_TICKS;
     if (!matchSpace(results->rawbuf[offset], DENON_HDR_SPACE)) return false;
-    uint32_t s_tick = calcTickTime(results->rawbuf[offset++],
-                                   DENON_HDR_SPACE_TICKS);
+    uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+        DENON_HDR_SPACE_TICKS;
 
     // Data
     match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

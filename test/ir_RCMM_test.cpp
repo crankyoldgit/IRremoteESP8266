@@ -212,3 +212,28 @@ TEST(TestDecodeRCMM, FailToDecodeNonRCMMExample) {
   ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, RCMM_BITS, false));
 }
+
+// Issue 281 Debugging
+TEST(TestDecodeRCMM, DebugIssue281) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  // Data from Issue #281 (shortened version)
+  uint16_t rawData[36] = {448, 276, 150, 285, 164, 613, 163, 447, 162, 613,
+                          164, 445, 164, 776, 167, 278, 163, 280, 163, 280,
+                          162, 611, 168, 444, 163, 612, 164, 277, 168, 447,
+                          157, 282, 165, 276,
+                          165, 65535};  // Last value modified from 89729
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 36, 36);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(RCMM, irsend.capture.decode_type);
+  EXPECT_EQ(32, irsend.capture.bits);
+  EXPECT_EQ(0x26702610, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+}

@@ -67,15 +67,15 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = (0xFFFFFFFF - start + now) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / RAWTICK;
     else
-      irparams.rawbuf[rawlen] = (now - start) / USECPERTICK + 1;
+      irparams.rawbuf[rawlen] = (now - start) / RAWTICK;
   }
   irparams.rawlen++;
 
   start = now;
   #define ONCE 0
-  os_timer_arm(&timer, TIMEOUT_MS, ONCE);
+  os_timer_arm(&timer, irparams.timeout, ONCE);
 }
 #endif  // UNIT_TEST
 
@@ -85,11 +85,16 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 // Args:
 //   recvpin: GPIO pin the IR receiver module's data pin is connected to.
 //   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
+//   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
+//            (Default: TIMEOUT_MS)
 // Returns:
 //   A IRrecv class object.
-IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize) {
+IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout) {
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
+  // Ensure we are going to be able to store all possible values in the
+  // capture buffer.
+  irparams.timeout = std::min(timeout, (uint8_t) MAX_TIMEOUT_MS);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
 #ifndef UNIT_TEST
@@ -132,21 +137,41 @@ void IRrecv::resume() {
   irparams.overflow = false;
 }
 
-// Make a copy of the interrupt state/data.
+// Make a copy of the interrupt state & buffer data.
 // Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
 // Only call this when you know the interrupt handlers won't modify anything.
 // i.e. In STATE_STOP.
 //
 // Args:
-//   dest: Pointer to an irparams_t structure to copy to.
-void IRrecv::copyIrParams(irparams_t *dest) {
-  // Typecast src and dest addresses to (char *)
-  char *csrc = (char *) (&irparams);  // NOLINT(readability/casting)
-  char *cdest = (char *) dest;  // NOLINT(readability/casting)
+//   src: Pointer to an irparams_t structure to copy from.
+//   dst: Pointer to an irparams_t structure to copy to.
+void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
+  // Typecast src and dst addresses to (char *)
+  char *csrc = (char *) src;  // NOLINT(readability/casting)
+  char *cdst = (char *) dst;  // NOLINT(readability/casting)
 
-  // Copy contents of src[] to dest[]
+  // Save the pointer to the destination's rawbuf so we don't lose it as
+  // the for-loop/copy after this will overwrite it with src's rawbuf pointer.
+  // This isn't immediately obvious due to typecasting/different variable names.
+  uint16_t *dst_rawbuf_ptr;
+  dst_rawbuf_ptr = dst->rawbuf;
+
+  // Copy contents of src[] to dst[]
   for (uint16_t i = 0; i < sizeof(irparams_t); i++)
-    cdest[i] = csrc[i];
+    cdst[i] = csrc[i];
+
+  // Restore the buffer pointer
+  dst->rawbuf = dst_rawbuf_ptr;
+
+  // Copy the rawbuf
+  for (uint16_t i = 0; i < dst->bufsize; i++)
+    dst->rawbuf[i] = src->rawbuf[i];
+}
+
+// Obtain the maximum number of entries possible in the capture buffer.
+// i.e. It's size.
+uint16_t IRrecv::getBufSize() {
+  return irparams.bufsize;
 }
 
 // Decodes the received IR message.
@@ -188,7 +213,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     results->overflow = irparams.overflow;
 #endif
   } else {
-    copyIrParams(save);  // Duplicate the interrupt's memory.
+    copyIrParams(&irparams, save);  // Duplicate the interrupt's memory.
     resume();  // It's now safe to rearm. The IR message won't be overridden.
     resumed = true;
     // Point the results at the saved copy.
@@ -349,8 +374,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 //   Nr. of ticks.
 uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return((uint32_t) std::max((int32_t) (
-      usecs * (1.0 - tolerance/100.0) / USECPERTICK), 0));
+  return((uint32_t) std::max((int32_t) (usecs * (1.0 - tolerance / 100.0)), 0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -361,104 +385,110 @@ uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
 // Returns:
 //   Nr. of ticks.
 uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
-  return((uint32_t) usecs * (1.0 + tolerance/100.0) / USECPERTICK + 1);
+  return((uint32_t) (usecs * (1.0 + tolerance / 100.0)) + 1);
 }
 
-// Check if we match a pulse(measured_ticks) with the desired_us within
+// Check if we match a pulse(measured) with the desired within
 // +/-tolerance percent.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::match(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance) {
+  measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching: ");
-  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(ticksLow(desired, tolerance));
   DPRINT(" <= ");
-  DPRINT(measured_ticks);
+  DPRINT(measured);
   DPRINT(" <= ");
-  DPRINTLN(ticksHigh(desired_us, tolerance));
-  return (measured_ticks >= ticksLow(desired_us, tolerance) &&
-          measured_ticks <= ticksHigh(desired_us, tolerance));
+  DPRINTLN(ticksHigh(desired, tolerance));
+  return (measured >= ticksLow(desired, tolerance) &&
+          measured <= ticksHigh(desired, tolerance));
 }
 
 
-// Check if we match a pulse(measured_ticks) of at least desired_us within
+// Check if we match a pulse(measured) of at least desired within
 // +/-tolerance percent.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchAtLeast(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance) {
+  measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching ATLEAST ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
   DPRINT(". Matching: ");
-  DPRINT(measured_ticks);
+  DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired_us, TIMEOUT_MS * 1000), tolerance));
+  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)), tolerance));
   DPRINT(" [min(");
-  DPRINT(ticksLow(desired_us, tolerance));
+  DPRINT(ticksLow(desired, tolerance));
   DPRINT(", ");
-  DPRINT(ticksLow(TIMEOUT_MS * 1000, tolerance));
+  DPRINT(ticksLow(MS_TO_USEC(irparams.timeout), tolerance));
   DPRINTLN(")]");
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
-  if (measured_ticks == 0) return true;
-  return measured_ticks >= ticksLow(std::min(desired_us, TIMEOUT_MS * 1000),
-                                    tolerance);
+  if (measured == 0) return true;
+  return measured >= ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)),
+                              tolerance);
 }
 
-// Check if we match a mark signal(measured_ticks) with the desired_us within
+// Check if we match a mark signal(measured) with the desired within
 // +/-tolerance percent, after an expected is excess is added.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //   excess:  Nr. of useconds.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchMark(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
   DPRINT("Matching MARK ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
+  DPRINT(" + ");
+  DPRINT(excess);
   DPRINT(". ");
-  return match(measured_ticks, desired_us + excess, tolerance);
+  return match(measured, desired + excess, tolerance);
 }
 
-// Check if we match a space signal(measured_ticks) with the desired_us within
+// Check if we match a space signal(measured) with the desired within
 // +/-tolerance percent, after an expected is excess is removed.
 //
 // Args:
-//   measured_ticks:  The recorded period of the signal pulse.
-//   desired_us:  The expected period (in useconds) we are matching against.
+//   measured:  The recorded period of the signal pulse.
+//   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
 //   excess:  Nr. of useconds.
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchSpace(uint32_t measured_ticks, uint32_t desired_us,
+bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
   DPRINT("Matching SPACE ");
-  DPRINT(measured_ticks * USECPERTICK);
+  DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
-  DPRINT(desired_us);
+  DPRINT(desired);
+  DPRINT(" - ");
+  DPRINT(excess);
   DPRINT(". ");
-  return match(measured_ticks, desired_us - excess, tolerance);
+  return match(measured, desired - excess, tolerance);
 }
 
 /* -----------------------------------------------------------------------

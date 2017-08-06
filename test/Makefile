@@ -56,6 +56,9 @@ run : all
 	  echo "PASS: \o/ \o/ All unit tests passed. \o/ \o/"; \
 	fi
 
+install-googletest :
+	git clone https://github.com/google/googletest.git ../lib/googletest
+
 # Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
