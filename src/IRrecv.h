@@ -88,7 +88,8 @@ class decode_results {
 class IRrecv {
  public:
   explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF,
-                  uint8_t timeout = TIMEOUT_MS);  // Constructor
+                  uint8_t timeout = TIMEOUT_MS,
+                  bool save_buffer = false);  // Constructor
   ~IRrecv();  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn();
@@ -100,6 +101,7 @@ class IRrecv {
 
  private:
 #endif
+  irparams_t *irparams_save;
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);

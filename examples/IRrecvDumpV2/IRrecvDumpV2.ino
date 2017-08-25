@@ -31,23 +31,15 @@ uint16_t CAPTURE_BUFFER_SIZE = 1024;
                         // units, but can accidently swallow repeated messages
                         // in the rawData[] output.
 
-IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT);
+// Use turn on the save buffer feature for more complete capture coverage.
+IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT, true);
 
 decode_results results;  // Somewhere to store the results
-irparams_t save;         // A place to copy the interrupt state while decoding.
 
 void setup() {
   // Status message will be sent to the PC at 115200 baud
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
   delay(500);  // Wait a bit for the serial connection to be establised.
-  // Give the 'save' copy the same sized buffer.
-  save.rawbuf = new uint16_t[irrecv.getBufSize()];
-  if (save.rawbuf == NULL) {  // Check we allocated the memory successfully.
-    Serial.printf("Could not allocate a %d buffer size for the save buffer.\n"
-                  "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!",
-                  irrecv.getBufSize());
-    ESP.restart();
-  }
 
   irrecv.enableIRIn();  // Start the receiver
 }
@@ -197,7 +189,7 @@ void dumpCode(decode_results *results) {
 //
 void loop() {
   // Check if the IR code has been received.
-  if (irrecv.decode(&results, &save)) {
+  if (irrecv.decode(&results)) {
     dumpInfo(&results);           // Output the results
     dumpRaw(&results);            // Output the results in RAW format
     dumpCode(&results);           // Output the results as source code

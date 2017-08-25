@@ -29,6 +29,7 @@ extern "C" {
 static ETSTimer timer;
 #endif
 volatile irparams_t irparams;
+irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 
 #ifndef UNIT_TEST
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
@@ -87,9 +88,11 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 //   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
 //   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
 //            (Default: TIMEOUT_MS)
+//   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
 // Returns:
 //   A IRrecv class object.
-IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout) {
+IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
+               bool save_buffer) {
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
@@ -97,15 +100,36 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout) {
   irparams.timeout = std::min(timeout, (uint8_t) MAX_TIMEOUT_MS);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
+    DPRINTLN("Could not allocate memory for the primary IR buffer.\n"
+             "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
 #ifndef UNIT_TEST
     ESP.restart();  // Mem alloc failure. Reboot.
 #endif
+  }
+  // If we have been asked to use a save buffer (for decoding), then create one.
+  if (save_buffer) {
+    irparams_save = new irparams_t;
+    irparams_save->rawbuf = new uint16_t[bufsize];
+    // Check we allocated the memory successfully.
+    if (irparams_save->rawbuf == NULL) {
+      DPRINTLN("Could not allocate memory for the second IR buffer.\n"
+               "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
+#ifndef UNIT_TEST
+      ESP.restart();  // Mem alloc failure. Reboot.
+#endif
+    }
+  } else {
+    irparams_save = NULL;
   }
 }
 
 // Class destructor
 IRrecv::~IRrecv(void) {
   delete [] irparams.rawbuf;
+  if (irparams_save != NULL) {
+    delete [] irparams_save->rawbuf;
+    delete irparams_save;
+  }
 }
 
 // initialization
@@ -204,6 +228,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   irparams.rawbuf[irparams.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
+
+  // If we were requested to use a save buffer previously, do so.
+  if (save == NULL)
+    save = irparams_save;
 
   if (save == NULL) {
     // We haven't been asked to copy it so use the existing memory.
