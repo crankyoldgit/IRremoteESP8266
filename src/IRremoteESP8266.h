@@ -126,6 +126,9 @@
 #define DECODE_PRONTO        false  // Not written.
 #define SEND_PRONTO          true
 
+#define DECODE_ARGO          false  // Not written.
+#define SEND_ARGO            true
+
 #define DECODE_TROTEC        false  // Not implemented.
 #define SEND_TROTEC          true
 
@@ -163,6 +166,7 @@ enum decode_type_t {
   GREE,
   PRONTO,
   NEC_LIKE,
+  ARGO,
   TROTEC
 };
 
@@ -217,6 +221,7 @@ enum decode_type_t {
 #define SONY_MIN_REPEAT              2U
 #define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U
+#define ARGO_COMMAND_LENGTH         12U
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1
