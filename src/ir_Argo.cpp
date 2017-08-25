@@ -8,8 +8,6 @@ Copyright 2017 Schmolders
 #include <algorithm>
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
-#include <Arduino.h>
-
 
 // Constants
 // using SPACE modulation. MARK is always const 400u
@@ -25,14 +23,13 @@ Copyright 2017 Schmolders
 // Args:
 //   data: An array of ARGO_COMMAND_LENGTH bytes containing the IR command.
 //
-// Status: STABLE
+// Status: ALPHA / Untested.
 //
 // Overloading the IRSend Function
 
-void IRsend::sendArgo(unsigned char data[], uint16_t nbytes,
-                        uint16_t repeat) {
-  if (nbytes < ARGO_COMMAND_LENGTH)
-    return;  // Not enough bytes to send a proper message.
+void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
+  // Check if we have enough bytes to send a proper message.
+  if (nbytes < ARGO_COMMAND_LENGTH) return;
   // Set IR carrier frequency
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -48,21 +45,21 @@ void IRsend::sendArgo(unsigned char data[], uint16_t nbytes,
   }
 }
 
-IRArgoESP::IRArgoESP(uint16_t pin) : _irsend(pin) {
+IRArgoAC::IRArgoAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
 
-void IRArgoESP::begin() {
+void IRArgoAC::begin() {
   _irsend.begin();
 }
 
-void IRArgoESP::send() {
+void IRArgoAC::send() {
   // Serial.println("Sending IR code"); // Only for Debug
   checksum();  // Create valid checksum before sending
   _irsend.sendArgo(argo);
 }
 
-void IRArgoESP::checksum() {
+void IRArgoAC::checksum() {
   uint8_t sum = 2;  // Corresponds to byte 11 being constant 0b01
   uint8_t i;
 
@@ -79,7 +76,7 @@ void IRArgoESP::checksum() {
   argo[11] = sum >> 6;  // Shift down 6 bits and add in two LSBs of bit 11
 }
 
-void IRArgoESP::stateReset() {
+void IRArgoAC::stateReset() {
   for (uint8_t i = 0; i < ARGO_COMMAND_LENGTH; i++)
     argo[i] = 0x0;
 
@@ -98,12 +95,12 @@ void IRArgoESP::stateReset() {
   this->setFan(ARGO_FAN_AUTO);
 }
 
-uint8_t* IRArgoESP::getRaw() {
+uint8_t* IRArgoAC::getRaw() {
   checksum();  // Ensure correct bit array before returning
   return argo;
 }
 
-void IRArgoESP::on() {
+void IRArgoAC::on() {
   // state = ON;
   ac_state = 1;
   // Bit 5 of byte 9 is on/off
@@ -111,7 +108,7 @@ void IRArgoESP::on() {
   argo[9] = argo[9] | 0b00100000;  // Set ON/OFF bit to 1
 }
 
-void IRArgoESP::off() {
+void IRArgoAC::off() {
   // state = OFF;
   ac_state = 0;
   // in MSB first
@@ -119,18 +116,18 @@ void IRArgoESP::off() {
   argo[9] = argo[9] & 0b11011111;  // Set on/off bit to 0
 }
 
-void IRArgoESP::setPower(bool state) {
+void IRArgoAC::setPower(bool state) {
   if (state)
     on();
   else
     off();
 }
 
-uint8_t IRArgoESP::getPower() {
+uint8_t IRArgoAC::getPower() {
   return ac_state;
 }
 
-void IRArgoESP::setMax(bool state) {
+void IRArgoAC::setMax(bool state) {
   max_mode = state;
   if (max_mode)
     argo[9] |= 0b00001000;
@@ -138,13 +135,13 @@ void IRArgoESP::setMax(bool state) {
     argo[9] &= 0b11110111;
 }
 
-bool IRArgoESP::getMax() {
+bool IRArgoAC::getMax() {
   return max_mode;
 }
 
 // Set the temp in deg C
 // Sending 0 equals +4
-void IRArgoESP::setTemp(uint8_t temp) {
+void IRArgoAC::setTemp(uint8_t temp) {
   if (temp < ARGO_MIN_TEMP)
     temp = ARGO_MIN_TEMP;
   else if (temp > ARGO_MAX_TEMP)
@@ -164,12 +161,12 @@ void IRArgoESP::setTemp(uint8_t temp) {
   argo[3] += temp >> 2;  // remove lowest to bits and append in 0-2
 }
 
-uint8_t IRArgoESP::getTemp() {
+uint8_t IRArgoAC::getTemp() {
   return set_temp;
 }
 
 // Set the speed of the fan
-void IRArgoESP::setFan(uint8_t fan) {
+void IRArgoAC::setFan(uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   fan_mode = fan;
   // Mask out bits
@@ -178,25 +175,25 @@ void IRArgoESP::setFan(uint8_t fan) {
   argo[3] += fan << 3;
 }
 
-uint8_t IRArgoESP::getFan() {
+uint8_t IRArgoAC::getFan() {
   return fan_mode;
 }
 
-void IRArgoESP::setFlap(uint8_t flap) {
+void IRArgoAC::setFlap(uint8_t flap) {
   flap_mode = flap;
   // TODO(kaschmo): set correct bits for flap mode
 }
 
-uint8_t IRArgoESP::getFlap() {
+uint8_t IRArgoAC::getFlap() {
   return flap_mode;
 }
 
-uint8_t IRArgoESP::getMode() {
+uint8_t IRArgoAC::getMode() {
   // return cooling 0, heating 1
   return ac_mode;
 }
 
-void IRArgoESP::setCoolMode(uint8_t mode) {
+void IRArgoAC::setCoolMode(uint8_t mode) {
   ac_mode = 0;  // Set ac mode to cooling
   cool_mode = mode;
   // Mask out bits, also leave bit 5 on 0 for cooling
@@ -206,11 +203,11 @@ void IRArgoESP::setCoolMode(uint8_t mode) {
   argo[2] += mode << 3;
 }
 
-uint8_t IRArgoESP::getCoolMode() {
+uint8_t IRArgoAC::getCoolMode() {
   return cool_mode;
 }
 
-void IRArgoESP::setHeatMode(uint8_t mode) {
+void IRArgoAC::setHeatMode(uint8_t mode) {
   ac_mode = 1;  // Set ac mode to heating
   heat_mode = mode;
   // Mask out bits
@@ -221,11 +218,11 @@ void IRArgoESP::setHeatMode(uint8_t mode) {
   argo[2] += mode << 3;
 }
 
-uint8_t IRArgoESP::getHeatMode() {
+uint8_t IRArgoAC::getHeatMode() {
   return heat_mode;
 }
 
-void IRArgoESP::setNight(bool state) {
+void IRArgoAC::setNight(bool state) {
   night_mode = state;
   if (night_mode)
     // Set bit at night position: bit 2
@@ -234,11 +231,11 @@ void IRArgoESP::setNight(bool state) {
     argo[9] &= 0b11111011;
 }
 
-bool IRArgoESP::getNight() {
+bool IRArgoAC::getNight() {
   return night_mode;
 }
 
-void IRArgoESP::setiFeel(bool state) {
+void IRArgoAC::setiFeel(bool state) {
   ifeel_mode = state;
   if (ifeel_mode)
     // Set bit at iFeel position: bit 7
@@ -247,15 +244,15 @@ void IRArgoESP::setiFeel(bool state) {
     argo[9] &= 0b01111111;
 }
 
-bool IRArgoESP::getiFeel() {
+bool IRArgoAC::getiFeel() {
   return ifeel_mode;
 }
 
-void IRArgoESP::setTime() {
+void IRArgoAC::setTime() {
   // TODO(kaschmo): use function call from checksum to set time first
 }
 
-void IRArgoESP::setRoomTemp(uint8_t temp) {
+void IRArgoAC::setRoomTemp(uint8_t temp) {
   temp -= 4;
   // Mask out bits
   argo[3] &= 0b00011111;

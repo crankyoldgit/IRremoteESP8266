@@ -58,9 +58,9 @@
 
 
 #if SEND_ARGO
-class IRArgoESP {
+class IRArgoAC {
  public:
-  explicit IRArgoESP(uint16_t pin);
+  explicit IRArgoAC(uint16_t pin);
 
   void send();
   void begin();
@@ -102,7 +102,7 @@ class IRArgoESP {
 
  private:
   // # of bytes per command
-  uint8_t argo[ARGO_COMMAND_LENGTH];  // Defined in IPremoteESP8266
+  uint8_t argo[ARGO_COMMAND_LENGTH];  // Defined in IRremoteESP8266.h
   void stateReset();
   void checksum();
   IRsend _irsend;  // instance of the IR send class
