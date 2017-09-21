@@ -4,8 +4,11 @@
 
 This library enables you to **send and receive** infra-red signals on an ESP8266 using Arduino framework (https://github.com/esp8266/Arduino)
 
-## v2.1 Now Available
-Version 2.1 of the library is now available. This is a large change to existing versions. You will need to change your pre-v2.0 code slightly to work with this version. You can read more about the changes on our [wiki](https://github.com/markszabo/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
+## v2.2 Now Available
+Version 2.2 of the library is now available. This is a significant internal change to existing versions.
+
+## Upgrading from versions prior to v2.0
+You will need to change your pre-v2.0 code slightly to work with post-v2.0 versions of the library. You can read more about the changes on our [wiki](https://github.com/markszabo/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
 Please [report an issue](https://github.com/markszabo/IRremoteESP8266/issues/new) if you find any problems with the documentation or the library itself.
 
 ## Troubleshooting
