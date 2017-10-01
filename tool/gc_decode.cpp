@@ -26,11 +26,11 @@ int main (int argc, char * argv[]) {
 
 
     if (argc != 2) { 
-        cout << "Use main [global_code]" << endl;
+        cout << "Use gc_decode [global_code]" << endl;
 	return 0;
     }
 
-    uint16_t gc_test[150];
+    uint16_t gc_test[250];
     int index = 0;
 
     char * pch;
@@ -47,17 +47,16 @@ int main (int argc, char * argv[]) {
     irsend.begin();
     irsend.reset();
 
-
     irsend.sendGC(gc_test, index);
     irsend.makeDecodeResult();
     irrecv.decode(&irsend.capture);
 
-    cout << "length " << index << endl;
-    cout << "Code type " << irsend.capture.decode_type << endl;
-    cout << "Code bits " << irsend.capture.bits << endl;
-    cout << "Code value " << std::hex << irsend.capture.value << endl;
-    cout << "Code address " << irsend.capture.address << endl;
-    cout << "Code command " << irsend.capture.command << endl;
+    cout << "Code GC length " << index << endl;
+    cout << "Code type      " << irsend.capture.decode_type << endl;
+    cout << "Code bits      " << irsend.capture.bits << endl;
+    cout << "Code value     " << std::hex << irsend.capture.value << endl;
+    cout << "Code address   " << std::hex << irsend.capture.address << endl;
+    cout << "Code command   " << std::hex << irsend.capture.command << endl;
 
     return 0;
 }

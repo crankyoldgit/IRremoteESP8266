@@ -20,10 +20,10 @@ CPPFLAGS += -DUNIT_TEST
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
 
-all : main
+all : gc_decode
 
 clean :
-	rm -f  *.o main
+	rm -f  *.o gc_decode
 
 
 # All the IR protocol object files.
@@ -40,10 +40,10 @@ COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
 # Common test dependencies
 COMMON_TEST_DEPS = $(COMMON_DEPS) IRsend_test.h
 
-main.o : main.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR)  -c main.cpp
+gc_decode.o : gc_decode.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR)  -c gc_decode.cpp
 
-main : $(COMMON_OBJ) main.o
+gc_decode : $(COMMON_OBJ) gc_decode.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 
