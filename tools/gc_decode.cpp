@@ -1,8 +1,9 @@
 // Copyright 2017 Jorge Cisneros
 
-#include <string.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <string.h>
+#include <string>
 #include "IRsend.h"
 #include "IRsend_test.h"
 
