@@ -1,3 +1,4 @@
+// Quick and dirty tool to decode GlobalCache (GC) codes
 // Copyright 2017 Jorge Cisneros
 
 #include <errno.h>
@@ -48,7 +49,7 @@ std::string encoding(decode_results *results) {
 
 int main(int argc, char * argv[]) {
   if (argc != 2) {
-    std::cout << "Use gc_decode [global_code]" << std::endl;
+    std::cout << "Usage: gc_decode [global_code]" << std::endl;
     return 1;
   }
 
