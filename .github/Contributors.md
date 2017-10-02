@@ -9,6 +9,7 @@
 - [Darsh Patel](https://github.com/darshkpatel/)
 - [Jonny Graham](https://github.com/jonnygraham/)
 - [Stu Fisher](https://github.com/stufisher/)
+- [Jorge Cisneros](https://github.com/jorgecis/)
 
 All contributors can be found on the [contributors site](https://github.com/markszabo/IRremoteESP8266/graphs/contributors). 
 

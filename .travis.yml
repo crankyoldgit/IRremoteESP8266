@@ -35,9 +35,11 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino
   - arduino --verify --board $BD $PWD/examples/LGACSend/LGACSend.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnArgoAC/TurnOnArgoAC.ino
+  # Also check the tools programs compile.
+  - (cd tools; make all)
   # Check for lint issues.
   - shopt -s nullglob
-  - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
+  - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
   - shopt -u nullglob
   # Build and run the unit tests.
   - (cd test; make run)
