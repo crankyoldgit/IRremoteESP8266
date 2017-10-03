@@ -27,6 +27,12 @@ lib/googletest/**/*
 test/*.o
 test/*.a
 test/*_test
+
+# Tools builds
+tools/*.o
+tools/*.a
+tools/gc_decode
+
 .pioenvs
 .piolibdeps
 .clang_complete
