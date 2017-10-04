@@ -64,16 +64,18 @@ class IRsendTest: public IRsend {
   }
 
   void dumpRawResult() {
-    std::cout << "uint16_t rawbuf["<< capture.rawlen << "] =\n";
-    for (uint16_t i = 0; i < capture.rawlen; i++) {
+    std::cout << std::dec;
+    if (capture.rawlen == 0) return;
+    std::cout << "uint16_t rawbuf["<< capture.rawlen - 1 << "] = {";
+    for (uint16_t i = 1; i < capture.rawlen; i++) {
+      if (i % 8 == 1)
+        std::cout << std::endl << "    ";
       std::cout << (capture.rawbuf[i] * RAWTICK);
-      std::cout << "(";
-      std::cout << capture.rawbuf[i];
-      std::cout << "), ";
-      if (i % 8 == 7)
-        std::cout << "\n";
+      // std::cout << "(" << capture.rawbuf[i] << ")";
+      if (i < capture.rawlen - 1)
+        std::cout << ", ";
     }
-    std::cout << "\n";
+    std::cout << "};" << std::endl;
   }
 
   void addGap(uint32_t usecs) {

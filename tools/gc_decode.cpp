@@ -48,9 +48,25 @@ std::string encoding(decode_results *results) {
   }
 }
 
+void usage_error(char * name) {
+  std::cerr << "Usage: " << name << " [-raw] <global_code>" << std::endl;
+}
+
 int main(int argc, char * argv[]) {
-  if (argc != 2) {
-    std::cout << "Usage: gc_decode [global_code]" << std::endl;
+  int argv_offset = 1;
+  bool dumpraw = false;
+
+  // Check the invocation/calling usage.
+  if (argc < 2 || argc > 3) {
+    usage_error(argv[0]);
+    return 1;
+  }
+  if (strncmp("-raw", argv[argv_offset], 4) == 0) {
+    dumpraw = true;
+    argv_offset++;
+  }
+  if (argc - argv_offset != 1) {
+    usage_error(argv[0]);
     return 1;
   }
 
@@ -59,7 +75,7 @@ int main(int argc, char * argv[]) {
   char *pch;
   char *saveptr1;
 
-  pch = strtok_r(argv[1], ",", &saveptr1);
+  pch = strtok_r(argv[argv_offset], ",", &saveptr1);
   while (pch != NULL && index < MAX_GC_CODE_LENGHT) {
     str_to_uint16(pch, &gc_test[index]);
     pch = strtok_r(NULL, ",", &saveptr1);
@@ -77,11 +93,14 @@ int main(int argc, char * argv[]) {
 
   std::cout << "Code GC length " << index << std::endl
   << "Code type      " << irsend.capture.decode_type
-  << " " << encoding(&irsend.capture)  << std::endl
+  << " (" << encoding(&irsend.capture) << ")" << std::endl
   << "Code bits      " << irsend.capture.bits << std::endl
-  << "Code value     " << std::hex << irsend.capture.value << std::endl
-  << "Code address   " << std::hex << irsend.capture.address << std::endl
-  << "Code command   " << std::hex << irsend.capture.command << std::endl;
+  << "Code value     0x" << std::hex << irsend.capture.value << std::endl
+  << "Code address   0x" << std::hex << irsend.capture.address << std::endl
+  << "Code command   0x" << std::hex << irsend.capture.command << std::endl;
+
+  if (dumpraw || irsend.capture.decode_type == UNKNOWN)
+    irsend.dumpRawResult();
 
   return 0;
 }
