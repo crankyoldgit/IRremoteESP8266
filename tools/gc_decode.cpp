@@ -44,6 +44,7 @@ std::string encoding(decode_results *results) {
     case PANASONIC:    return "PANASONIC";     break;
     case DENON:        return "DENON";         break;
     case COOLIX:       return "COOLIX";        break;
+    case NIKAI:        return "NIKAI";         break;
   }
 }
 
