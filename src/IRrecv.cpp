@@ -359,6 +359,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeCOOLIX(results))
     return true;
 #endif
+#if DECODE_NIKAI
+  DPRINTLN("Attempting Nikai decode");
+  if (decodeNikai(results))
+    return true;
+#endif
 /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
   // The Sanyo S866500B decoder is very poor quality & depricated.

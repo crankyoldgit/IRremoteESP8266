@@ -198,6 +198,10 @@ class IRrecv {
   bool decodeAiwaRCT501(decode_results *results,
                         uint16_t nbits = AIWA_RC_T501_BITS, bool strict = true);
 #endif
+#if DECODE_NIKAI
+  bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
+                   bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

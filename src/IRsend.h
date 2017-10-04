@@ -175,11 +175,14 @@ class IRsend {
                 uint16_t nbytes = ARGO_COMMAND_LENGTH,
                 uint16_t repeat = 0);
 #endif
-
 #if SEND_TROTEC
   void sendTrotec(unsigned char data[],
                   uint16_t nbytes = TROTEC_COMMAND_LENGTH,
                   uint16_t repeat = 0);
+#endif
+#if SEND_NIKAI
+  void sendNikai(uint64_t data, uint16_t nbits = NIKAI_BITS,
+                 uint16_t repeat = 0);
 #endif
 
  protected:
