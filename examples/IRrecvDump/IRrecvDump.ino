@@ -58,6 +58,8 @@ void dump(decode_results *results) {
     Serial.print("Decoded AIWA RC T501: ");
   } else if (results->decode_type == WHYNTER) {
     Serial.print("Decoded Whynter: ");
+  } else if (results->decode_type == NIKAI) {
+    Serial.print("Decoded Nikai: ");
   }
   serialPrintUint64(results->value, 16);
   Serial.print(" (");
