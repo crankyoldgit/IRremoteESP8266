@@ -167,11 +167,13 @@ enum decode_type_t {
   SANYO_LC7461,
   RC5X,
   GREE,
-  PRONTO,
+  PRONTO,  // Technically not a protocol, but an encoding.
   NEC_LIKE,
   ARGO,
   TROTEC,
-  NIKAI
+  NIKAI,
+  RAW,  // Technically not a protocol, but an encoding.
+  GLOBALCACHE  // Technically not a protocol, but an encoding.
 };
 
 // Message lengths & required repeat values
