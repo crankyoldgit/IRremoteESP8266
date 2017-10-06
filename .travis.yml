@@ -35,6 +35,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino
   - arduino --verify --board $BD $PWD/examples/LGACSend/LGACSend.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnArgoAC/TurnOnArgoAC.ino
+  - arduino --verify --board $BD $PWD/examples/IRMQTTServer/IRMQTTServer.ino
   # Also check the tools programs compile.
   - (cd tools; make all)
   # Check for lint issues.
