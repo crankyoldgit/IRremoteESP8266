@@ -12,11 +12,15 @@
  *
  * ## Before First Boot (i.e. Compile time)
  * - Set the MQTT_SERVER define below to the address of your MQTT server.
- * - If you are using the Arduino IDE, you MUST change <PubSubClient.h> to have
- *   the following (or larger) value.
+ * - Arduino IDE:
+ *   o Install the following libraries via Library Manager
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager)
+ *     - PubSubClient (https://pubsubclient.knolleary.net/)
+ *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     #define MQTT_MAX_PACKET_SIZE 400
- *   If you are using the PlatformIO IDE, this has already been done for you in
- *   the accompanying platformio.ini file.
+ * - PlatformIO IDE:
+ *     If you are using PlatformIO, this should already been done for you in
+ *     the accompanying platformio.ini file.
  *
  * ## First Boot (Initial setup)
  * The ESP8266 board will boot into the WiFiManager's AP mode.
@@ -32,7 +36,7 @@
  *
  * ## Normal Use (After setup)
  * Enter 'http://<your_esp8266's_ip_address/' in your browser & follow the
- * instructions there to send IR codes via HTML.
+ * instructions there to send IR codes via HTTP/HTML.
  * You can send URLs like the following, with similar data type limitations as
  * the MQTT formating in the next section. e.g:
  *   http://<your_esp8266's_ip_address>/ir?type=7&code=E0E09966
@@ -66,7 +70,7 @@
  *
  * This server will send (back) what ever IR message it just transmitted to
  * the MQTT topic 'ir_server/sent' to confirm it has been performed. This works
- * for messages requested via MQTT or via HTML.
+ * for messages requested via MQTT or via HTTP.
  * Note: Other status messages are also sent to 'ir_server/sent' from time to
  * time.
  *   Unix command line usage example:
@@ -90,7 +94,6 @@
 #define MQTT_ENABLE  // Comment this out if you don't want to use MQTT at all.
 
 #include <Arduino.h>
-
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <DNSServer.h>
@@ -359,7 +362,7 @@ void handleIr() {
     if (server.argName(i) == argBits)
       nbits = atoi(server.arg(i).c_str());
   }
-  debug("New code received via HTML");
+  debug("New code received via HTTP");
   sendIRCode(ir_type, data, data_str.c_str(), nbits);
   handleRoot();
 }
