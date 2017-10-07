@@ -159,6 +159,9 @@ bool ir_lock = false;  // Primative locking for gating the IR LED.
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
 PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, callback, espClient);
+// Create a unique MQTT client id.
+const char* mqtt_clientid = String(MQTTprefix +
+                                   String(ESP.getChipId(), HEX)).c_str();
 #endif
 
 // Debug messages get sent to the serial port.
@@ -198,27 +201,27 @@ void handleRoot() {
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "Type: "
       "<select name='type'>"
-        "<option selected='selected' value='3'>NEC</option>"  // Default
-        "<option value='1'>RC-5</option>"
-        "<option value='23'>RC5-X</option>"
-        "<option value='2'>RC-6</option>"
-        "<option value='21'>RC-MM</option>"
-        "<option value='4'>Sony</option>"
-        "<option value='5'>Panasonic</option>"
-        "<option value='6'>JVC</option>"
-        "<option value='7'>Samsung</option>"
-        "<option value='8'>Whynter</option>"
         "<option value='9'>Aiwa RC T501</option>"
-        "<option value='10'>LG</option>"
-        "<option value='11'>SANYO</option>"
-        "<option value='12'>Mitsubishi</option>"
-        "<option value='13'>Dish</option>"
-        "<option value='14'>Sharp</option>"
         "<option value='15'>Coolix</option>"
         "<option value='17'>Denon</option>"
-        "<option value='19'>Sherwood</option>"
-        "<option value='22'>Sanyo LC7461</option>"
+        "<option value='13'>Dish</option>"
+        "<option value='6'>JVC</option>"
+        "<option value='10'>LG</option>"
+        "<option value='12'>Mitsubishi</option>"
+        "<option selected='selected' value='3'>NEC</option>"  // Default
         "<option value='29'>Nikai</option>"
+        "<option value='5'>Panasonic</option>"
+        "<option value='1'>RC-5</option>"
+        "<option value='23'>RC-5X</option>"
+        "<option value='2'>RC-6</option>"
+        "<option value='21'>RC-MM</option>"
+        "<option value='7'>Samsung</option>"
+        "<option value='11'>Sanyo</option>"
+        "<option value='22'>Sanyo LC7461</option>"
+        "<option value='14'>Sharp</option>"
+        "<option value='19'>Sherwood</option>"
+        "<option value='4'>Sony</option>"
+        "<option value='8'>Whynter</option>"
       "</select>"
       " Code: 0x<input type='text' name='code' min='0' value='0' size='16'"
         " maxlength='16'>"
@@ -261,11 +264,11 @@ void handleRoot() {
       "<input type='hidden' name='type' value='18'>"
       "State code: 0x<input type='text' name='code' size='32' maxlength='32'"
       " value='190B8050000000E0190B8070000010f0'>"
-      " <input type='submit' value='Send Kelv'>"
+      " <input type='submit' value='Send A/C State'>"
     "</form>"
     "<br><hr>"
     "<h3>Update IR Server firmware</h3><p>"
-    "<b><mark>Warning:</mark></b> "
+    "<b><mark>Warning:</mark></b><br> "
     "<i>Updating your firmware may screw up your access to the device. "
     "If you are going to use this, know what you are doing first "
     "(and you probably do).</i><br>"
@@ -431,7 +434,7 @@ void setup(void) {
 
   // Setup the root web page.
   server.on("/", handleRoot);
-  // Setup the page to hande web-based IR codes.
+  // Setup the page to handle web-based IR codes.
   server.on("/ir", handleIr);
   // Setup a reset page to cause WiFiManager information to be reset.
   server.on("/reset", handleReset);
@@ -492,10 +495,9 @@ bool reconnect() {
     // Attempt to connect
     debug("Attempting MQTT connection ... ");
     if (mqtt_user && mqtt_password)
-      connected = mqtt_client.connect(MQTTprefix,
-                                      mqtt_user, mqtt_password);
+      connected = mqtt_client.connect(mqtt_clientid, mqtt_user, mqtt_password);
     else
-      connected = mqtt_client.connect(MQTTprefix);
+      connected = mqtt_client.connect(mqtt_clientid);
     if (connected) {
     // Once connected, publish an announcement...
       mqtt_client.publish(MQTTack, "Connected");
