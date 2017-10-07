@@ -41,16 +41,21 @@
  * the MQTT formating in the next section. e.g:
  *   http://<your_esp8266's_ip_address>/ir?type=7&code=E0E09966
  *   http://<your_esp8266's_ip_address>/ir?type=4&code=0xf50&bits=12
- *   http://<your_esp8266's_ip_address>/ir?type=18&code=190B8050000000E0190B8070000010f0
+ *   http://<your_esp8266's_ip_address>/ir?code=C1A2E21D&repeats=8&type=19
  *   http://<your_esp8266's_ip_address>/ir?type=31&code=40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
+ *   http://<your_esp8266's_ip_address>/ir?type=18&code=190B8050000000E0190B8070000010f0
  *
  * or
  *
  * Send a MQTT message to the topic 'ir_server/send' using the following
- * format:
- *   protocol_num,hexcode  e.g. 7,E0E09966 which is Samsung(7), Power On code
- *   protocol_num,hexcode,bits  eg. 4,f50,12 which is Sony(4), Power Off code &
- *                               12 bits.
+ * format (Order is important):
+ *   protocol_num,hexcode  e.g. 7,E0E09966 which is Samsung(7), Power On code,
+ *                              default bit size, default nr. of repeats.
+ *   protocol_num,hexcode,bits  e.g. 4,f50,12 which is Sony(4), Power Off code,
+ *                               12 bits & default nr. of repeats.
+ *   protocol_num,hexcode,bits,repeats  e.g. 19,C1A2E21D,0,8 which is
+ *                                      Sherwood(19), Vol Up, default bit size &
+ *                                      repeated 8 times.
  *   31,code_string  e.g. 31,40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
  *                        GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
  *   18,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010f0
@@ -110,6 +115,7 @@
 // --------------------------------------------------------------------
 #include <PubSubClient.h>
 #endif
+#include <algorithm>
 #include <string>
 
 // Configuration paramters
@@ -134,6 +140,7 @@ const char* mqtt_password = "";
 #define argType "type"
 #define argData "code"
 #define argBits "bits"
+#define argRepeat "repeats"
 #define DEBUG True
 
 // Globals
@@ -232,6 +239,8 @@ void handleRoot() {
         "<option value='36'>36</option>"
         "<option value='48'>48</option>"
       "</select>"
+      " Repeats: <input type='number' name='repeats' min='0' max='99' value='0'"
+        "size='2' maxlength='2'>"
       " <input type='submit' value='Send IR'>"
     "</form>"
     "<br><hr>"
@@ -261,7 +270,7 @@ void handleRoot() {
     "If you are going to use this, know what you are doing first "
     "(and you probably do).</i><br>"
     "<form method='POST' action='/update' enctype='multipart/form-data'>"
-      "Firmware file to upload: <input type='file' name='update'>"
+      "Firmware to upload: <input type='file' name='update'>"
       "<input type='submit' value='Update'>"
     "</form>"
     "</body></html>");
@@ -353,6 +362,7 @@ void handleIr() {
   String data_str = "";
   int ir_type = 3;  // Default to NEC codes.
   uint16_t nbits = 0;
+  uint16_t repeat = 0;
 
   for (uint16_t i = 0; i < server.args(); i++) {
     if (server.argName(i) == argType)
@@ -363,9 +373,11 @@ void handleIr() {
     }
     if (server.argName(i) == argBits)
       nbits = atoi(server.arg(i).c_str());
+    if (server.argName(i) == argRepeat)
+      repeat = atoi(server.arg(i).c_str());
   }
   debug("New code received via HTTP");
-  sendIRCode(ir_type, data, data_str.c_str(), nbits);
+  sendIRCode(ir_type, data, data_str.c_str(), nbits, repeat);
   handleRoot();
 }
 
@@ -557,137 +569,123 @@ uint64_t getUInt64fromHex(char const *str) {
 //   code:     Numeric payload of the IR message. Most protocols use this.
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
 //   nbits:    Nr. of bits in the protocol. 0 means use the protocol's default.
-void sendIRCode(int const ir_type, uint64_t const code,
-                char const * code_str, uint16_t const nbits) {
+void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
+                uint16_t bits, uint16_t repeat) {
   // Create a pseudo-lock so we don't try to send two codes at the same time.
   while (ir_lock)
     delay(20);
   ir_lock = true;
-  // send received MQTT value by IR signal
+
+  // send the IR message.
   switch (ir_type) {
     case RC5:  // 1
-      if (nbits != 0)
-        irsend.sendRC5(code, nbits);
-      else
-        irsend.sendRC5(code);
+      if (bits == 0)
+        bits = RC5_BITS;
+      irsend.sendRC5(code, bits, repeat);
       break;
     case RC6:  // 2
-      if (nbits != 0)
-        irsend.sendRC6(code, nbits);
-      else
-        irsend.sendRC6(code);
+      if (bits == 0)
+        bits = RC6_MODE0_BITS;
+      irsend.sendRC6(code, bits, repeat);
       break;
     case NEC:  // 3
-      if (nbits != 0)
-        irsend.sendNEC(code, nbits);
-      else
-        irsend.sendNEC(code);
+      if (bits == 0)
+        bits = NEC_BITS;
+      irsend.sendNEC(code, bits, repeat);
       break;
     case SONY:  // 4
-      if (nbits != 0)
-        irsend.sendSony(code, nbits);
-      else
-        irsend.sendSony(code);
+      if (bits == 0)
+        bits = SONY_12_BITS;
+      repeat = std::max(repeat, (uint16_t) SONY_MIN_REPEAT);
+      irsend.sendSony(code, bits, repeat);
       break;
     case PANASONIC:  // 5
-      if (nbits != 0)
-        irsend.sendPanasonic64(code, nbits);
-      else
-        irsend.sendPanasonic64(code);
+      if (bits == 0)
+        bits = PANASONIC_BITS;
+      irsend.sendPanasonic64(code, bits, repeat);
       break;
     case JVC:  // 6
-      if (nbits != 0)
-        irsend.sendJVC(code, nbits);
-      else
-        irsend.sendJVC(code);
+      if (bits == 0)
+        bits = JVC_BITS;
+      irsend.sendJVC(code, bits, repeat);
       break;
     case SAMSUNG:  // 7
-      if (nbits != 0)
-        irsend.sendSAMSUNG(code, nbits);
-      else
-        irsend.sendSAMSUNG(code);
+      if (bits == 0)
+        bits = SAMSUNG_BITS;
+      irsend.sendSAMSUNG(code, bits, repeat);
       break;
     case WHYNTER:  // 8
-      if (nbits != 0)
-        irsend.sendWhynter(code, nbits);
-      else
-        irsend.sendWhynter(code);
+      if (bits == 0)
+        bits = WHYNTER_BITS;
+      irsend.sendWhynter(code, bits, repeat);
       break;
     case AIWA_RC_T501:  // 9
-      if (nbits != 0)
-        irsend.sendAiwaRCT501(code, nbits);
-      else
-        irsend.sendAiwaRCT501(code);
+      if (bits == 0)
+        bits = AIWA_RC_T501_BITS;
+      repeat = std::max(repeat, (uint16_t) AIWA_RC_T501_MIN_REPEAT);
+      irsend.sendAiwaRCT501(code, bits, repeat);
       break;
     case LG:  // 10
-      if (nbits != 0)
-        irsend.sendLG(code, nbits);
-      else
-        irsend.sendLG(code);
+      if (bits == 0)
+        bits = LG_BITS;
+      irsend.sendLG(code, bits, repeat);
       break;
     case MITSUBISHI:  // 12
-      if (nbits != 0)
-        irsend.sendMitsubishi(code, nbits);
-      else
-        irsend.sendMitsubishi(code);
+      if (bits == 0)
+        bits = MITSUBISHI_BITS;
+      repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
+      irsend.sendMitsubishi(code, bits, repeat);
       break;
     case DISH:  // 13
-      if (nbits != 0)
-        irsend.sendDISH(code, nbits);
-      else
-        irsend.sendDISH(code);
+      if (bits == 0)
+        bits = DISH_BITS;
+      repeat = std::max(repeat, (uint16_t) DISH_MIN_REPEAT);
+      irsend.sendDISH(code, bits, repeat);
       break;
     case SHARP:  // 14
-      if (nbits != 0)
-        irsend.sendSharpRaw(code, nbits);
-      else
-        irsend.sendSharpRaw(code);
+      if (bits == 0)
+        bits = SHARP_BITS;
+      irsend.sendSharpRaw(code, bits, repeat);
       break;
     case COOLIX:  // 15
-      if (nbits != 0)
-        irsend.sendCOOLIX(code, nbits);
-      else
-        irsend.sendCOOLIX(code);
+      if (bits == 0)
+        bits = COOLIX_BITS;
+      irsend.sendCOOLIX(code, bits, repeat);
       break;
     case DENON:  // 17
-      if (nbits != 0)
-        irsend.sendDenon(code, nbits);
-      else
-        irsend.sendDenon(code);
+      if (bits == 0)
+        bits = DENON_BITS;
+      irsend.sendDenon(code, bits, repeat);
       break;
     case KELVINATOR:  // 18
       parseStringAndSendKelv(code_str);
       break;
     case SHERWOOD:  // 19
-      if (nbits != 0)
-        irsend.sendSherwood(code, nbits);
-      else
-        irsend.sendSherwood(code);
+      if (bits == 0)
+        bits = SHERWOOD_BITS;
+      repeat = std::max(repeat, (uint16_t) SHERWOOD_MIN_REPEAT);
+      irsend.sendSherwood(code, bits, repeat);
       break;
     case RCMM:  // 21
-      if (nbits != 0)
-        irsend.sendRCMM(code, nbits);
-      else
-        irsend.sendRCMM(code);
+      if (bits == 0)
+        bits == RCMM_BITS;
+      irsend.sendRCMM(code, bits, repeat);
       break;
     case SANYO_LC7461:  // 22
-      if (nbits != 0)
-        irsend.sendSanyoLC7461(code, nbits);
-      else
-        irsend.sendSanyoLC7461(code);
+      if (bits == 0)
+        bits = SANYO_LC7461_BITS;
+      irsend.sendSanyoLC7461(code, bits, repeat);
       break;
     case RC5X:  // 23
-      if (nbits != 0)
-        irsend.sendRC5(code, nbits);
-      else
-        irsend.sendRC5(code, RC5X_BITS);
+      if (bits == 0)
+        bits = RC5X_BITS;
+      irsend.sendRC5(code, bits, repeat);
     case NIKAI:  // 29
-      if (nbits != 0)
-        irsend.sendNikai(code, nbits);
-      else
-        irsend.sendNikai(code);
+      if (bits == 0)
+        bits = NIKAI_BITS;
+      irsend.sendNikai(code, bits, repeat);
       break;
-    case 31:  // GlobalCache
+    case GLOBALCACHE:  // 31
       parseStringAndSendGC(code_str);
       break;
   }
@@ -713,16 +711,21 @@ void sendIRCode(int const ir_type, uint64_t const code,
       debug("Code: 0x" +
             String((uint32_t) (code >> 32), 16) +
             String((uint32_t) (code & UINT32_MAX), 16));
-      if (nbits) {
-        debug("Bits: " + String(nbits));
-      } else {
-        debug("Bits: 0 (default)");
-      }
+      debug("Bits: " + String(bits));
+      debug("Repeats: " + String(repeat));
+
 #ifdef MQTT_ENABLE
-      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    String((uint32_t) (code >> 32), 16) +
-                                    String((uint32_t) (code & UINT32_MAX), 16) +
-                                    "," + String(nbits)).c_str());
+      if (code >> 32)  // Are we dealing with a value larger than UINT32_MAX?
+        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                      String((uint32_t) (code >> 32), 16) +
+                                      String((uint32_t) (code & UINT32_MAX), 16)
+                                      + "," + String(bits) + "," +
+                                      String(repeat)).c_str());
+      else
+        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                      String((uint32_t) (code & UINT32_MAX), 16)
+                                      + "," + String(bits) + "," +
+                                      String(repeat)).c_str());
 #endif
   }
 }
@@ -732,6 +735,7 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   char* tok_ptr;
   uint64_t code = 0;
   uint16_t nbits = 0;
+  uint16_t repeat = 0;
 
   debug("Receiving data by MQTT topic " + topic_name);
 
@@ -746,15 +750,26 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   if (next != NULL) {
     code = getUInt64fromHex(next);
     next = strtok_r(NULL, ",", &tok_ptr);
+  } else {
+    // We require at least two value in the string. Give up.
+    return;
   }
   // If there is still string left, assume it is the bit size.
-  if (next != NULL)
+  if (next != NULL) {
     nbits = atoi(next);
+    next = strtok_r(NULL, ",", &tok_ptr);
+  }
+  // If there is still string left, assume it is the repeat count.
+  if (next != NULL)
+    repeat = atoi(next);
 
   free(callback_c_str);
 
+
   // send received MQTT value by IR signal
-  sendIRCode(ir_type, code, callback_str.c_str(), nbits);
+  sendIRCode(ir_type, code,
+             callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
+             nbits, repeat);
 }
 
 // Callback function, when the gateway receive an MQTT value on the topics
