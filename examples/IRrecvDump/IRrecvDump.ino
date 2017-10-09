@@ -92,7 +92,7 @@ void dump(decode_results *results) {
       Serial.print((uint32_t) results->rawbuf[i] * RAWTICK, DEC);
     }
   }
-  Serial.println("}");
+  Serial.println("};");
 }
 
 void loop() {
