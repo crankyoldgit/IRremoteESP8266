@@ -1,8 +1,8 @@
 // Copyright 2017 David Conran
 
 #include "IRutils.h"
-#include "gtest/gtest.h"
 #include <stdint.h>
+#include "gtest/gtest.h"
 
 // Tests reverseBits().
 
@@ -43,7 +43,7 @@ TEST(TestUint64ToString, TrivialCases) {
   EXPECT_EQ("0", uint64ToString(0, 8));  // Base-8
   EXPECT_EQ("0", uint64ToString(0, 10));  // Base-10
   EXPECT_EQ("0", uint64ToString(0, 16));  // Base-16
-  
+
   EXPECT_EQ("1", uint64ToString(1, 2));  // Base-2
   EXPECT_EQ("2", uint64ToString(2, 8));  // Base-8
   EXPECT_EQ("3", uint64ToString(3, 10));  // Base-10
@@ -52,7 +52,7 @@ TEST(TestUint64ToString, TrivialCases) {
 
 TEST(TestUint64ToString, NormalUse) {
   EXPECT_EQ("12345", uint64ToString(12345));
-  EXPECT_EQ("100", uint64ToString(4,2));
+  EXPECT_EQ("100", uint64ToString(4, 2));
   EXPECT_EQ("3039", uint64ToString(12345, 16));
   EXPECT_EQ("123456", uint64ToString(123456));
   EXPECT_EQ("1E240", uint64ToString(123456, 16));
