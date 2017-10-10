@@ -5,8 +5,10 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <string>
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits);
-void serialPrintUint64(uint64_t input, uint8_t base);
+std::string uint64ToString(uint64_t input, uint8_t base = 10);
+void serialPrintUint64(uint64_t input, uint8_t base = 10);
 
 #endif  // IRUTILS_H_

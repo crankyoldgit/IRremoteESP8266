@@ -4,9 +4,11 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
+
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <algorithm>
+#include <string>
 #include "IRrecv.h"
 
 // Reverse the order of the requested least significant nr. of bits.
@@ -30,30 +32,44 @@ uint64_t reverseBits(uint64_t input, uint16_t nbits) {
   return (input << nbits) | output;
 }
 
+// Convert a uint64_t (unsigned long long) to a string.
+// Arduino String/toInt/Serial.print() can't handle printing 64 bit values.
+//
+// Args:
+//   input: The value to print
+//   base:  The output base.
+// Returns:
+//   A std:string representation of the integer.
+// Note: Based on Arduino's Print::printNumber()
+std::string uint64ToString(uint64_t input, uint8_t base) {
+  std::string result = "";
+  // prevent issues if called with base <= 1
+  if (base < 2) base = 10;
+  // Check we have a base that we can actually print.
+  // i.e. [0-9A-Z] == 36
+  if (base > 36) base = 10;
+
+  do {
+    char c = input % base;
+    input /= base;
+
+    if (c < 10)
+      c +='0';
+    else
+      c += 'A' - 10;
+    result = c + result;
+  } while (input);
+  return result;
+}
+
+#ifdef ARDUINO
 // Print a uint64_t/unsigned long long to the Serial port
 // Serial.print() can't handle printing long longs. (uint64_t)
 //
 // Args:
 //   input: The value to print
 //   base: The output base.
-// Note: Based on Arduino's Print::printNumber()
 void serialPrintUint64(uint64_t input, uint8_t base) {
-  char buf[8 * sizeof(input) + 1];  // Assumes 8-bit chars plus zero byte.
-  char *str = &buf[sizeof(buf) - 1];
-
-  *str = '\0';
-
-  // prevent crash if called with base == 1
-  if (base < 2) base = 10;
-
-  do {
-    char c = input % base;
-    input /= base;
-
-    *--str = c < 10 ? c + '0' : c + 'A' - 10;
-  } while (input);
-
-#ifndef UNIT_TEST
-  Serial.print(str);
-#endif
+  Serial.print(uint63ToString(input, base));
 }
+#endif
