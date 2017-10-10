@@ -8,7 +8,9 @@
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <algorithm>
+#ifndef ARDUINO
 #include <string>
+#endif
 #include "IRrecv.h"
 
 // Reverse the order of the requested least significant nr. of bits.
@@ -39,10 +41,15 @@ uint64_t reverseBits(uint64_t input, uint16_t nbits) {
 //   input: The value to print
 //   base:  The output base.
 // Returns:
-//   A std:string representation of the integer.
+//   A string representation of the integer.
 // Note: Based on Arduino's Print::printNumber()
+#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
+String uint64ToString(uint64_t input, uint8_t base) {
+  String result = "";
+#else
 std::string uint64ToString(uint64_t input, uint8_t base) {
   std::string result = "";
+#endif
   // prevent issues if called with base <= 1
   if (base < 2) base = 10;
   // Check we have a base that we can actually print.
@@ -70,6 +77,6 @@ std::string uint64ToString(uint64_t input, uint8_t base) {
 //   input: The value to print
 //   base: The output base.
 void serialPrintUint64(uint64_t input, uint8_t base) {
-  Serial.print(uint63ToString(input, base));
+  Serial.print(uint64ToString(input, base));
 }
 #endif
