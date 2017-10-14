@@ -107,6 +107,7 @@
 #include <ESP8266mDNS.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
+#include <IRutils.h>
 #ifdef MQTT_ENABLE
 // --------------------------------------------------------------------
 // * * * IMPORTANT * * *
@@ -129,7 +130,7 @@
 // Set if your MQTT server requires a Username & Password to connect.
 const char* mqtt_user = "";
 const char* mqtt_password = "";
-#define MQTT_RECONNECT_TIME 5000  // Delay between reconnect tries.
+#define MQTT_RECONNECT_TIME 5000  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix "ir_server"
 #define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
@@ -710,24 +711,15 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
   #endif
       break;
     default:
-      debug("Code: 0x" +
-            String((uint32_t) (code >> 32), 16) +
-            String((uint32_t) (code & UINT32_MAX), 16));
+      debug("Code: 0x" + uint64ToString(code, 16));
       debug("Bits: " + String(bits));
       debug("Repeats: " + String(repeat));
 
 #ifdef MQTT_ENABLE
-      if (code >> 32)  // Are we dealing with a value larger than UINT32_MAX?
-        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                      String((uint32_t) (code >> 32), 16) +
-                                      String((uint32_t) (code & UINT32_MAX), 16)
-                                      + "," + String(bits) + "," +
-                                      String(repeat)).c_str());
-      else
-        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                      String((uint32_t) (code & UINT32_MAX), 16)
-                                      + "," + String(bits) + "," +
-                                      String(repeat)).c_str());
+      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                    uint64ToString(code, 16)
+                                    + "," + String(bits) + "," +
+                                    String(repeat)).c_str());
 #endif
   }
 }
