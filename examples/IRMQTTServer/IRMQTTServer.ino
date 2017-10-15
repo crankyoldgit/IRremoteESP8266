@@ -17,7 +17,7 @@
  *     - WiFiManager (https://github.com/tzapu/WiFiManager)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
- *     #define MQTT_MAX_PACKET_SIZE 400
+ *     #define MQTT_MAX_PACKET_SIZE 512
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
  *     the accompanying platformio.ini file.
@@ -56,6 +56,8 @@
  *   protocol_num,hexcode,bits,repeats  e.g. 19,C1A2E21D,0,8 which is
  *                                      Sherwood(19), Vol Up, default bit size &
  *                                      repeated 8 times.
+ *   30,frequency,raw_string  e.g. 30,38000,9000,4500,500,1500,500,750,500,750
+ *                             Raw (30) @ 38kHz with a raw code of "9000,4500,500,1500,500,750,500,750"
  *   31,code_string  e.g. 31,40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
  *                        GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
  *   18,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010f0
@@ -184,19 +186,20 @@ void handleRoot() {
       "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
       "21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,"
       "21,21,64,21,64,21,64,21,1600,341,85,21,3647&type=31\">"
-      "Sherwood Amp On</a></p>"
-    "<p><a href=\"ir?code=38000,1,69,340,171,21,64,21,64,21,21,21,21,21,21,21,"
-      "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
-      "21,21,21,64,21,64,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,"
-      "21,21,64,21,64,21,64,21,1600,340,85,21,3647&type=31\">"
-      "Sherwood Amp Off</a></p>"
+      "Sherwood Amp On (GlobalCache)</a></p>"
+    "<p><a href=\"ir?code=38000,8840,4446,546,1664,546,1664,546,546,546,546,"
+      "546,546,546,546,546,546,546,1664,546,1664,546,546,546,1664,546,546,546,"
+      "546,546,546,546,1664,546,546,546,1664,546,546,546,1664,546,1664,546,"
+      "1664,546,546,546,546,546,546,546,546,546,1664,546,546,546,546,546,546,"
+      "546,1664,546,1664,546,1664,546,41600,8840,2210,546&type=30\">"
+      "Sherwood Amp Off (Raw)</a></p>"
     "<p><a href=\"ir?code=38000,1,69,341,170,21,64,21,64,21,21,21,21,21,21,21,"
       "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,21,"
       "21,64,21,64,21,21,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,64,21,"
       "64,21,64,21,64,21,64,21,1600,341,85,21,3648&type=31\">"
-      "Sherwood Amp Input TAPE</a></p>"
-    "<p><a href=\"ir?type=7&code=E0E09966\">Samsung TV on</a></p>"
-    "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Sony Power Off</a></p>"
+      "Sherwood Amp Input TAPE (GlobalCache)</a></p>"
+    "<p><a href=\"ir?type=7&code=E0E09966\">TV on (Samsung)</a></p>"
+    "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Power Off (Sony 12bit)</a></p>"
     "<br><hr>"
     "<h3>Send a simple IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
@@ -248,15 +251,27 @@ void handleRoot() {
       " <input type='submit' value='Send IR'>"
     "</form>"
     "<br><hr>"
+    "<h3>Send an IRremote Raw IR message</h3><p>"
+    "<form method='POST' action='/ir' enctype='multipart/form-data'>"
+      "<input type='hidden' name='type' value='30'>"
+      "String: (freq,array data) <input type='text' name='code' size='132'"
+      " value='38000,4420,4420,520,1638,520,1638,520,1638,520,520,520,520,520,"
+          "520,520,520,520,520,520,1638,520,1638,520,1638,520,520,520,"
+          "520,520,520,520,520,520,520,520,520,520,1638,520,520,520,520,520,"
+          "520,520,520,520,520,520,520,520,1638,520,520,520,1638,520,1638,520,"
+          "1638,520,1638,520,1638,520,1638,520'>"
+      " <input type='submit' value='Send Raw'>"
+    "</form>"
+    "<br><hr>"
     "<h3>Send a <a href='https://irdb.globalcache.com/'>GlobalCache</a>"
       " IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='31'>"
       "String: 1:1,1,<input type='text' name='code' size='132'"
       " value='38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,"
-      "20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,"
-      "20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,63,20,63,20,"
-      "63,20,1798'>"
+          "20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,"
+          "20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,"
+          "63,20,63,20,63,20,1798'>"
       " <input type='submit' value='Send GlobalCache'>"
     "</form>"
     "<br><hr>"
@@ -358,6 +373,66 @@ void parseStringAndSendGC(const String str) {
 
   irsend.sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
+}
+
+// Parse a IRremote Raw Hex String/code and send it.
+// Args:
+//   str: A comma-separated String containing the freq and raw IR data.
+//        e.g. "38000,9000,4500,600,1450,600,900,650,1500,..."
+//        Requires at least two comma-separated values.
+//        First value is the transmission frequency in Hz or kHz.
+void parseStringAndSendRaw(const String str) {
+  int16_t index;
+  uint16_t count;
+  uint16_t freq = 38000;  // Default to 38kHz.
+  uint16_t *raw_array;
+
+  // Find out how many items there are in the string.
+  index = -1;
+  count = 1;
+  do {
+    index = str.indexOf(',', index + 1);
+    count++;
+  } while (index != -1);
+
+  // We expect the frequency as the first comma separated value, so we need at
+  // least two values. If not, bail out.
+  if (count < 2)
+    return;
+  count--;  // We don't count the frequency value as part of the raw array.
+
+  int16_t nextIndex = 0;
+  uint16_t rawLength = 0;
+  int16_t currentIndex = 0;
+
+  // Now we know how many there are, allocate the memory to store them all.
+  raw_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  // Check we malloc'ed successfully.
+  if (raw_array == NULL) {  // malloc failed, so give up.
+    Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
+                  count * sizeof(uint16_t), ESP.getFreeHeap());
+    Serial.println("Giving up & forcing a reboot.");
+    ESP.restart();  // Reboot.
+    delay(500);  // Wait for the restart to happen.
+    return;  // Should never get here, but just in case.
+  }
+
+  // Grab the first value from the string, as it is the frequency.
+  index = str.indexOf(',', 0);
+  freq = str.substring(0, index).toInt();
+  uint16_t start_from = index + 1;
+  // Rest of the string are values for the raw array.
+  // Now convert the strings to integers and place them in raw_array.
+  count = 0;
+  do {
+    index = str.indexOf(',', start_from);
+    raw_array[count] = str.substring(start_from, index).toInt();
+    start_from = index + 1;
+    count++;
+  } while (index != -1);
+
+  irsend.sendRaw(raw_array, count, freq);  // All done. Send it.
+  free(raw_array);  // Free up the memory allocated.
 }
 
 // Parse the URL args to find the IR code.
@@ -688,6 +763,9 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
         bits = NIKAI_BITS;
       irsend.sendNikai(code, bits, repeat);
       break;
+    case RAW:  // 30
+      parseStringAndSendRaw(code_str);
+      break;
     case GLOBALCACHE:  // 31
       parseStringAndSendGC(code_str);
       break;
@@ -701,7 +779,8 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
   debug("Type: " + String(ir_type));
   switch (ir_type) {
     case KELVINATOR:
-    case 31:  // GlobalCache
+    case RAW:
+    case GLOBALCACHE:
       debug("Code: ");
       debug(code_str);
       // Confirm what we were asked to send was sent.
