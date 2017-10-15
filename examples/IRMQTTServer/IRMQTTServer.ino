@@ -44,6 +44,7 @@
  *   http://<your_esp8266's_ip_address>/ir?code=C1A2E21D&repeats=8&type=19
  *   http://<your_esp8266's_ip_address>/ir?type=31&code=40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
  *   http://<your_esp8266's_ip_address>/ir?type=18&code=190B8050000000E0190B8070000010f0
+ *   http://<your_esp8266's_ip_address>/ir?repeats=1&type=25&code=0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040,0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40
  *
  * or
  *
@@ -60,6 +61,8 @@
  *                             Raw (30) @ 38kHz with a raw code of "9000,4500,500,1500,500,750,500,750"
  *   31,code_string  e.g. 31,40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
  *                        GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
+ *   25,Rrepeats,hex_code_string  e.g. 25,R1,0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040,0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40
+ *                               Pronto (25), 1 repeat, & "0000 006E 0022 0002 ..." (Sherwood Amp Tape Input)
  *   18,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010f0
  *                           Kelvinator (18) Air Con on, Low Fan, 25 deg etc.
  *   In short:
@@ -183,21 +186,24 @@ void handleRoot() {
     "<br><hr>"
     "<h3>Hardcoded examples</h3>"
     "<p><a href=\"ir?code=38000,1,69,341,171,21,64,21,64,21,21,21,21,21,21,21,"
-      "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
-      "21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,"
-      "21,21,64,21,64,21,64,21,1600,341,85,21,3647&type=31\">"
-      "Sherwood Amp On (GlobalCache)</a></p>"
+        "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
+        "21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,"
+        "21,21,64,21,64,21,64,21,1600,341,85,21,3647&type=31\">"
+        "Sherwood Amp On (GlobalCache)</a></p>"
     "<p><a href=\"ir?code=38000,8840,4446,546,1664,546,1664,546,546,546,546,"
-      "546,546,546,546,546,546,546,1664,546,1664,546,546,546,1664,546,546,546,"
-      "546,546,546,546,1664,546,546,546,1664,546,546,546,1664,546,1664,546,"
-      "1664,546,546,546,546,546,546,546,546,546,1664,546,546,546,546,546,546,"
-      "546,1664,546,1664,546,1664,546,41600,8840,2210,546&type=30\">"
-      "Sherwood Amp Off (Raw)</a></p>"
-    "<p><a href=\"ir?code=38000,1,69,341,170,21,64,21,64,21,21,21,21,21,21,21,"
-      "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,21,"
-      "21,64,21,64,21,21,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,64,21,"
-      "64,21,64,21,64,21,64,21,1600,341,85,21,3648&type=31\">"
-      "Sherwood Amp Input TAPE (GlobalCache)</a></p>"
+        "546,546,546,546,546,546,546,1664,546,1664,546,546,546,1664,546,546,"
+        "546,546,546,546,546,1664,546,546,546,1664,546,546,546,1664,546,1664,"
+        "546,1664,546,546,546,546,546,546,546,546,546,1664,546,546,546,546,546,"
+        "546,546,1664,546,1664,546,1664,546,41600,8840,2210,546&type=30\">"
+        "Sherwood Amp Off (Raw)</a></p>"
+    "<p><a href=\"ir?code=0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040"
+        ",0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040"
+        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015"
+        ",0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015"
+        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040"
+        ",0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40"
+        "&type=25&repeats=1\">"
+        "Sherwood Amp Input TAPE (Pronto)</a></p>"
     "<p><a href=\"ir?type=7&code=E0E09966\">TV on (Samsung)</a></p>"
     "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Power Off (Sony 12bit)</a></p>"
     "<br><hr>"
@@ -264,7 +270,7 @@ void handleRoot() {
     "</form>"
     "<br><hr>"
     "<h3>Send a <a href='https://irdb.globalcache.com/'>GlobalCache</a>"
-      " IR message</h3><p>"
+        " IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='31'>"
       "String: 1:1,1,<input type='text' name='code' size='132'"
@@ -273,6 +279,20 @@ void handleRoot() {
           "20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,"
           "63,20,63,20,63,20,1798'>"
       " <input type='submit' value='Send GlobalCache'>"
+    "</form>"
+    "<br><hr>"
+    "<h3>Send a <a href='http://www.remotecentral.com/cgi-bin/files/rcfiles.cgi"
+      "?area=pronto&db=discrete'>Pronto code</a> IR message</h3><p>"
+    "<form method='POST' action='/ir' enctype='multipart/form-data'>"
+      "<input type='hidden' name='type' value='25'>"
+      "String (comma separated): <input type='text' name='code' size='132'"
+      " value='0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,"
+          "0030,0018,0018,0018,0030,0018,0018,0018,0018,0018,0030,0018,0018,"
+          "0018,0030,0018,0030,0018,0030,0018,0018,0018,0018,0018,0030,0018,"
+          "0018,0018,0018,0018,0030,0018,0018,03f6'>"
+      " Repeats: <input type='number' name='repeats' min='0' max='99' value='0'"
+          "size='2' maxlength='2'>"
+      " <input type='submit' value='Send Pronto'>"
     "</form>"
     "<br><hr>"
     "<h3>Send a Kelvinator A/C IR message</h3><p>"
@@ -332,46 +352,133 @@ void parseStringAndSendKelv(const String str) {
   irsend.sendKelvinator(reinterpret_cast<uint8_t *>(codeArray));
 }
 
-void parseStringAndSendGC(const String str) {
-  int16_t index;
-  uint16_t count;
-  uint16_t *code_array;
-
-  // Find out how many items there are in the string.
-  index = -1;
-  count = 1;
+// Count how many values are in the String.
+// Args:
+//   str:  String containing the values.
+//   sep:  Character that separates the values.
+// Returns:
+//   The number of values found in the String.
+uint16_t countValuesInStr(const String str, char sep) {
+  int16_t index = -1;
+  uint16_t count = 1;
   do {
-    index = str.indexOf(',', index + 1);
+    index = str.indexOf(sep, index + 1);
     count++;
   } while (index != -1);
+  return count;
+}
 
-  int16_t nextIndex = 0;
-  uint16_t codeLength = 0;
-  int16_t currentIndex = 0;
+// Dynamically allocate an array of uint16_t's.
+// Args:
+//   size:  Nr. of uint16_t's need to be in the new array.
+// Returns:
+//   A Ptr to the new array. Restarts the ESP8266 if it fails.
+uint16_t * newCodeArray(const uint16_t size) {
+  uint16_t *result;
 
-  // Now we know how many there are, allocate the memory to store them all.
-  code_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
+  result = reinterpret_cast<uint16_t*>(malloc(size * sizeof(uint16_t)));
   // Check we malloc'ed successfully.
-  if (code_array == NULL) {  // malloc failed, so give up.
+  if (result == NULL) {  // malloc failed, so give up.
     Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
-                  count * sizeof(uint16_t), ESP.getFreeHeap());
+                  size * sizeof(uint16_t), ESP.getFreeHeap());
     Serial.println("Giving up & forcing a reboot.");
     ESP.restart();  // Reboot.
     delay(500);  // Wait for the restart to happen.
-    return;  // Should never get here, but just in case.
+    return result;  // Should never get here, but just in case.
   }
+  return result;
+}
+
+// Parse a GlobalCache String/code and send it.
+// Args:
+//   str: A GlobalCache formatted String of comma separated numbers.
+//        e.g. "38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,
+//              20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,
+//              20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,
+//              63,20,63,20,63,20,63,20,1798"
+//        Note: The leading "1:1,1," of normal GC codes should be removed.
+void parseStringAndSendGC(const String str) {
+  uint16_t count;
+  uint16_t *code_array;
+  String tmp_str;
+
+  // Remove the leading "1:1,1," if present.
+  if (str.startsWith("1:1,1,"))
+    tmp_str = str.substring(6);
+  else
+    tmp_str = str;
+
+  // Find out how many items there are in the string.
+  count = countValuesInStr(tmp_str, ',');
+
+  // Now we know how many there are, allocate the memory to store them all.
+  code_array = newCodeArray(count);
 
   // Now convert the strings to integers and place them in code_array.
   count = 0;
   uint16_t start_from = 0;
+  int16_t index = -1;
   do {
-    index = str.indexOf(',', start_from);
-    code_array[count] = str.substring(start_from, index).toInt();
+    index = tmp_str.indexOf(',', start_from);
+    code_array[count] = tmp_str.substring(start_from, index).toInt();
     start_from = index + 1;
     count++;
   } while (index != -1);
 
   irsend.sendGC(code_array, count);  // All done. Send it.
+  free(code_array);  // Free up the memory allocated.
+}
+
+// Parse a Pronto Hex String/code and send it.
+// Args:
+//   str: A comma-separated String of nr. of repeats, then hexidecimal numbers.
+//        e.g. "R1,0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,
+//              0030,0018,0018,0018,0030,0018,0018,0018,0018,0018,0030,0018,
+//              0018,0018,0030,0018,0030,0018,0030,0018,0018,0018,0018,0018,
+//              0030,0018,0018,0018,0018,0018,0030,0018,0018,03f6"
+//              or
+//              "0000,0067,0000,0015,0060,0018". i.e. without the Repeat value
+//        Requires at least PRONTO_MIN_LENGTH comma-separated values.
+//        sendPronto() only supports raw pronto code types, thus so does this.
+//   repeats:  Nr. of times the message is to be repeated.
+//             This value is ignored if an embeddd repeat is found in str.
+void parseStringAndSendPronto(const String str, uint16_t repeats) {
+  uint16_t count;
+  uint16_t *code_array;
+  int16_t index = -1;
+  uint16_t start_from = 0;
+
+  // Find out how many items there are in the string.
+  count = countValuesInStr(str, ',');
+
+  // Check if we have the optional embedded repeats value in the code string.
+  if (str.startsWith("R") || str.startsWith("r")) {
+    // Grab the first value from the string, as it is the nr. of repeats.
+    index = str.indexOf(',', start_from);
+    repeats = str.substring(start_from + 1, index).toInt();  // Skip the 'R'.
+    start_from = index + 1;
+    count--;  // We don't count the repeats value as part of the code array.
+  }
+
+  // We need at least PRONTO_MIN_LENGTH values for the code part.
+  if (count < PRONTO_MIN_LENGTH) return;
+
+  // Now we know how many there are, allocate the memory to store them all.
+  code_array = newCodeArray(count);
+
+  // Rest of the string are values for the code array.
+  // Now convert the hex strings to integers and place them in code_array.
+  count = 0;
+  do {
+    index = str.indexOf(',', start_from);
+    // Convert the hexidecimal value string to an unsigned integer.
+    code_array[count] = strtoul(str.substring(start_from, index).c_str(),
+                                NULL, 16);
+    start_from = index + 1;
+    count++;
+  } while (index != -1);
+
+  irsend.sendPronto(code_array, count, repeats);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
 }
 
@@ -382,43 +489,23 @@ void parseStringAndSendGC(const String str) {
 //        Requires at least two comma-separated values.
 //        First value is the transmission frequency in Hz or kHz.
 void parseStringAndSendRaw(const String str) {
-  int16_t index;
   uint16_t count;
   uint16_t freq = 38000;  // Default to 38kHz.
   uint16_t *raw_array;
 
   // Find out how many items there are in the string.
-  index = -1;
-  count = 1;
-  do {
-    index = str.indexOf(',', index + 1);
-    count++;
-  } while (index != -1);
+  count = countValuesInStr(str, ',');
 
   // We expect the frequency as the first comma separated value, so we need at
   // least two values. If not, bail out.
-  if (count < 2)
-    return;
+  if (count < 2) return;
   count--;  // We don't count the frequency value as part of the raw array.
 
-  int16_t nextIndex = 0;
-  uint16_t rawLength = 0;
-  int16_t currentIndex = 0;
-
   // Now we know how many there are, allocate the memory to store them all.
-  raw_array = reinterpret_cast<uint16_t*>(malloc(count * sizeof(uint16_t)));
-  // Check we malloc'ed successfully.
-  if (raw_array == NULL) {  // malloc failed, so give up.
-    Serial.printf("\nCan't allocate %d bytes. (%d bytes free)\n",
-                  count * sizeof(uint16_t), ESP.getFreeHeap());
-    Serial.println("Giving up & forcing a reboot.");
-    ESP.restart();  // Reboot.
-    delay(500);  // Wait for the restart to happen.
-    return;  // Should never get here, but just in case.
-  }
+  raw_array = newCodeArray(count);
 
   // Grab the first value from the string, as it is the frequency.
-  index = str.indexOf(',', 0);
+  int16_t index = str.indexOf(',', 0);
   freq = str.substring(0, index).toInt();
   uint16_t start_from = index + 1;
   // Rest of the string are values for the raw array.
@@ -646,7 +733,8 @@ uint64_t getUInt64fromHex(char const *str) {
 //   ir_type:  enum of the protocol to be sent.
 //   code:     Numeric payload of the IR message. Most protocols use this.
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
-//   nbits:    Nr. of bits in the protocol. 0 means use the protocol's default.
+//   bits:     Nr. of bits in the protocol. 0 means use the protocol's default.
+//   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
 void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
                 uint16_t bits, uint16_t repeat) {
   // Create a pseudo-lock so we don't try to send two codes at the same time.
@@ -758,6 +846,9 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = RC5X_BITS;
       irsend.sendRC5(code, bits, repeat);
+    case PRONTO:  // 25
+      parseStringAndSendPronto(code_str, repeat);
+      break;
     case NIKAI:  // 29
       if (bits == 0)
         bits = NIKAI_BITS;
@@ -779,14 +870,21 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
   debug("Type: " + String(ir_type));
   switch (ir_type) {
     case KELVINATOR:
+    case PRONTO:
     case RAW:
     case GLOBALCACHE:
       debug("Code: ");
       debug(code_str);
+      debug("Repeats: " + String(repeat));
       // Confirm what we were asked to send was sent.
   #ifdef MQTT_ENABLE
-      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    String(code_str)).c_str());
+      if (ir_type == PRONTO && repeat > 0)
+        mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
+                                      String(repeat) + "," +
+                                      String(code_str)).c_str());
+      else
+        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                      String(code_str)).c_str());
   #endif
       break;
     default:
