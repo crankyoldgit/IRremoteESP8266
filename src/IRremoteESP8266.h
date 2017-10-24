@@ -29,7 +29,7 @@
  * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
- *  Updated by sillyfrog for Daikin, adopted from
+ * Updated by sillyfrog for Daikin, adopted from
  * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
  * Fujitsu A/C code added by jonnygraham
  * Trotec AC code by stufisher
@@ -50,6 +50,7 @@
 // Supported IR protocols
 // Each protocol you include costs memory and, during decode, costs time
 // Disable (set to false) all the protocols you do not need/want!
+// The Air Conditioner protocols are the most expensive memory-wise.
 //
 #define DECODE_NEC           true
 #define SEND_NEC             true
@@ -102,7 +103,7 @@
 #define DECODE_DENON         true
 #define SEND_DENON           true
 
-#define DECODE_KELVINATOR    false  // Not written.
+#define DECODE_KELVINATOR    true
 #define SEND_KELVINATOR      true
 
 #define DECODE_MITSUBISHI_AC false  // Not written.
@@ -132,9 +133,15 @@
 #define DECODE_TROTEC        false  // Not implemented.
 #define SEND_TROTEC          true
 
-#define DECODE_NIKAI     true
-#define SEND_NIKAI       true
+#define DECODE_NIKAI         true
+#define SEND_NIKAI           true
 
+#if (DECODE_ARGO || DECODE_DAIKIN || DECODE_GREE || DECODE_KELVINATOR || \
+     DECODE_MITSUBISHI_AC || DECODE_TROTEC)
+#define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
+#else
+#define DECODE_AC false   // We don't need that infrastructure.
+#endif
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -191,6 +198,7 @@ enum decode_type_t {
 #define GREE_BITS                   (GREE_STATE_LENGTH * 8)
 #define JVC_BITS                    16U
 #define KELVINATOR_STATE_LENGTH     16U
+#define KELVINATOR_BITS             (KELVINATOR_STATE_LENGTH * 8)
 #define LG_BITS                     28U
 #define LG32_BITS                   32U
 #define MITSUBISHI_BITS             16U

@@ -147,6 +147,6 @@ class IRKelvinatorAC {
   void fixup();
   IRsend _irsend;
 };
-#endif
+#endif  // SEND_KELVINATOR
 
 #endif  // IR_KELVINATOR_H_

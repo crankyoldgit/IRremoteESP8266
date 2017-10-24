@@ -77,7 +77,7 @@ COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
               $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
 # Common test dependencies
-COMMON_TEST_DEPS = $(COMMON_DEPS) IRsend_test.h
+COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h
 
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
