@@ -4,6 +4,7 @@
 
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include <Arduino.h>
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -13,6 +14,9 @@
 
 /*
 	Daikin AC map
+	byte 5=Current time, mins past midnight, low bits
+	byte 6
+        b0-b3=Current time, mins past midnight, high bits
 	byte 7= checksum of the first part (and last byte before a 29ms pause)
 	byte 13=mode
 		b7 = 0
@@ -47,6 +51,11 @@
 			Swing control left/right:
 			0000 = Swing left/right off
 			1111 = Swing left/right on
+	byte 18=On timer mins past midnight, low bits
+	byte 19
+        b0-b3=On timer mins past midnight, high bits
+        b4-b7=Off timer mins past midnight, low bits
+	byte 20=Off timer mins past midnight, high bits
 	byte 21=Aux  -> Powerful (bit 1), Silent (bit 5)
 	byte 24=Aux2 -> Intelligent eye on (bit 7)
 	byte 26= checksum of the second part
@@ -58,7 +67,7 @@
 #define DAIKIN_FAN                 0b110
 #define DAIKIN_AUTO                0b000
 #define DAIKIN_DRY                 0b010
-#define DAIKIN_POWERFUL       0b00000010
+#define DAIKIN_POWERFUL       0b00000001
 #define DAIKIN_SILENT         0b00100000
 #define DAIKIN_MIN_TEMP               18U  // Celsius
 #define DAIKIN_MAX_TEMP               32U  // Celsius
@@ -89,11 +98,20 @@ class IRDaikinESP {
   bool getSwingVertical();
   void setSwingHorizontal(bool state);
   bool getSwingHorizontal();
+  void setEcono(bool state);
+  bool getEcono();
   bool getQuiet();
   void setQuiet(bool state);
   bool getPowerful();
   void setPowerful(bool state);
+  void enableOnTimer(uint16_t starttime);
+  void disableOnTimer();
+  uint16_t getOnTime();
+  bool getOnTimerEnabled();
   uint8_t* getRaw();
+  void setRaw(uint8_t new_code[]);
+  void printState();
+  String renderTime(uint16_t timemins);
 
  private:
   // # of bytes per command
