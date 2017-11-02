@@ -96,6 +96,12 @@ class IRrecv {
   void disableIRIn();
   void resume();
   uint16_t getBufSize();
+  static bool match(uint32_t measured, uint32_t desired,
+             uint8_t tolerance = TOLERANCE);
+  static bool matchMark(uint32_t measured, uint32_t desired,
+                 uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
+  static bool matchSpace(uint32_t measured, uint32_t desired,
+                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
 
 #ifndef UNIT_TEST
 
@@ -105,16 +111,10 @@ class IRrecv {
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
-  uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE);
-  uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);
-  bool match(uint32_t measured, uint32_t desired,
-             uint8_t tolerance = TOLERANCE);
+  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE);
+  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);
   bool matchAtLeast(uint32_t measured, uint32_t desired,
                     uint8_t tolerance = TOLERANCE);
-  bool matchMark(uint32_t measured, uint32_t desired,
-                 uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
-  bool matchSpace(uint32_t measured, uint32_t desired,
-                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   match_result_t matchData(volatile uint16_t *data_ptr, uint16_t nbits,
                            uint16_t onemark, uint32_t onespace,
                            uint16_t zeromark, uint32_t zerospace);
@@ -200,6 +200,10 @@ class IRrecv {
 #endif
 #if DECODE_NIKAI
   bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
+                   bool strict = true);
+#endif
+#if DECODE_DAIKIN
+  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_BITS,
                    bool strict = true);
 #endif
 };

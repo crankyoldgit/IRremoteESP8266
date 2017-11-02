@@ -10,6 +10,7 @@ Copyright 2016 sillyfrog
 #include <algorithm>
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
+#include "IRrecv.h"
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -120,6 +121,12 @@ void IRDaikinESP::stateReset() {
 uint8_t* IRDaikinESP::getRaw() {
   checksum();   // Ensure correct settings before sending.
   return daikin;
+}
+
+void IRDaikinESP::setRaw(uint8_t new_code[]) {
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
+    daikin[i] = new_code[i];
+  }
 }
 
 void IRDaikinESP::on() {
@@ -261,9 +268,203 @@ void IRDaikinESP::setSwingHorizontal(bool state) {
 bool IRDaikinESP::getSwingHorizontal() {
   return daikin[17] & 0x01;
 }
+
+void IRDaikinESP::setEcono(bool state) {
+  if (state)
+    daikin[24] |= 0x04;
+  else
+    daikin[24] &= 0xFB;
+  checksum();
+}
+
+bool IRDaikinESP::getEcono() {
+  return daikin[24] & 0x04;
+}
+
+// starttime: Number of minutes after midnight, in 10 minutes increments
+void IRDaikinESP::enableOnTimer(uint16_t starttime) {
+    daikin[13] |= 0b00000010;
+    uint16_t lopbits;
+    lopbits = starttime;
+    starttime &= 0xFF;
+    daikin[18] = lopbits;
+    starttime = starttime >> 8;
+    // only keep 4 bits
+    daikin[19] &= 0xF0;
+    daikin[19] |= starttime;
+}
+
+void IRDaikinESP::disableOnTimer() {
+    daikin[13] &= 0b11111101;
+    enableOnTimer(0x600);
+}
+
+uint16_t IRDaikinESP::getOnTime() {
+    uint16_t ret;
+    ret = daikin[19] & 0x0F;
+    ret = ret << 8;
+    ret += daikin[18];
+    return ret;
+}
+bool IRDaikinESP::getOnTimerEnabled() {
+    return daikin[13] & 0b00000010;
+}
+
+String IRDaikinESP::renderTime(uint16_t timemins) {
+    uint16_t hours, mins;
+    hours = timemins / 60;
+    mins = timemins - (hours * 60);
+    String ret = String(mins);
+    if (ret.length() == 1)
+        ret = "0" + ret;
+    ret = ":" + ret;
+    ret = String(hours) + ret;
+    return ret;
+}
+
+
+
+void IRDaikinESP::printState() {
+  uint8_t var;
+  Serial.print("Power: ");
+  Serial.println(getPower() ? "On" : "Off");
+
+  Serial.print("Temperature: ");
+  Serial.println(getTemp());
+
+  Serial.print("Quiet: ");
+  Serial.println(getQuiet() ? "On" : "Off");
+
+  Serial.print("Powerful: ");
+  Serial.println(getPowerful() ? "On" : "Off");
+
+  Serial.print("Econo: ");
+  Serial.println(getEcono() ? "On" : "Off");
+
+  Serial.print("Swing Vertical: ");
+  Serial.println(getSwingVertical() ? "On" : "Off");
+
+  Serial.print("Swing Horizontal: ");
+  Serial.println(getSwingHorizontal() ? "On" : "Off");
+
+  Serial.print("Fan Speed: ");
+  var = getFan();
+  if (var == DAIKIN_FAN_AUTO)
+    Serial.println("Auto");
+  else
+    Serial.println(var);
+
+  Serial.print("Mode: ");
+  switch (getMode()) {
+      case DAIKIN_COOL:
+          Serial.println("Cool");
+          break;
+      case DAIKIN_HEAT:
+          Serial.println("Heat");
+          break;
+      case DAIKIN_FAN:
+          Serial.println("Fan");
+          break;
+      case DAIKIN_AUTO:
+          Serial.println("Auto");
+          break;
+      case DAIKIN_DRY:
+          Serial.println("Dry");
+          break;
+  }
+
+  var = getOnTimerEnabled();
+  Serial.print("On Timer: ");
+  Serial.println(var ? "Enabled" : "Off");
+  if (var) {
+    Serial.print("On Time: ");
+    Serial.println(renderTime(getOnTime()));
+  }
+
+
+}
+
+
+
 #endif  // SEND_DAIKIN
 
 #if DECODE_DAIKIN
+
+#define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
+#define DAIKIN_CURINDEX DAIKIN_COMMAND_LENGTH+1
+#define OFFSET_ERR 65432
+
+#define DAIKIN_TOLERANCE 35
+#define DAIKIN_MARK_EXCESS MARK_EXCESS
+
+void addbit(bool val, unsigned char data[]) {
+    uint8_t curbit = data[DAIKIN_CURBIT];
+    uint8_t curindex = data[DAIKIN_CURINDEX];
+    if (val) {
+        unsigned char bit = 1;
+        bit = bit << curbit;
+        data[curindex] |= bit;
+    }
+    curbit++;
+    if (curbit == 8) {
+        curbit = 0;
+        curindex++;
+    }
+    data[DAIKIN_CURBIT] = curbit;
+    data[DAIKIN_CURINDEX] = curindex;
+}
+
+uint16_t checkheader(decode_results *results, uint16_t offset, unsigned char daikin_code[]) {
+  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return OFFSET_ERR;
+  if (!IRrecv::matchSpace(results->rawbuf[offset++], DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return OFFSET_ERR;
+  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_HDR_MARK,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return OFFSET_ERR;
+  if (!IRrecv::matchSpace(results->rawbuf[offset++], DAIKIN_HDR_SPACE,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return OFFSET_ERR;
+  /*
+  if (daikin_code[DAIKIN_CURBIT] != 0) {
+    daikin_code[DAIKIN_CURBIT] = 0;
+    daikin_code[DAIKIN_CURINDEX]++;
+  }
+  */
+  return offset;
+}
+
+uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin_code[], uint16_t countbits) {
+  Serial.print("countbits: ");
+  Serial.println(countbits);
+  Serial.println(results->rawlen-1);
+  Serial.println(offset < results->rawlen-1);
+  Serial.print("  offset: ");
+  Serial.println(offset);
+  for (uint16_t i = 0; i < countbits && offset < results->rawlen-1; i++, offset++) {
+  Serial.print(i);
+  Serial.print("  offset: ");
+  Serial.println(offset);
+  Serial.println(results->rawbuf[offset+1]);
+  Serial.println(results->rawbuf[offset+2]);
+    if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+      return OFFSET_ERR;
+    if (IRrecv::matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+      addbit(1, daikin_code);
+    else if (IRrecv::matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE,
+              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+      addbit(0, daikin_code);
+    else
+      return OFFSET_ERR;
+  }
+  Serial.println("out......");
+  return offset;
+}
+
 // TODO(crankyoldgit): NOT WORKING. This needs to be finished.
 // Decode the supplied Daikin A/C message. (NOT WORKING - DO NOT USE)
 // Args:
@@ -279,64 +480,130 @@ bool IRDaikinESP::getSwingHorizontal() {
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                           bool strict) {
+  Serial.print("rawlen: ");
+  Serial.println(results->rawlen);
   if (results->rawlen < 2 * nbits + HEADER + FOOTER)
     return false;
 
+  Serial.print("nbits: ");
+  Serial.println(nbits);
   // Compliance
   if (strict && nbits != DAIKIN_BITS)
     return false;
 
   uint32_t data = 0;
   uint16_t offset = OFFSET_START;
+  unsigned char daikin_code[DAIKIN_COMMAND_LENGTH + 2];
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
+    daikin_code[i] = 0;
+  uint8_t code_bit = 0;
+  uint8_t code_index = 0;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], DAIKIN_HDR_MARK))
-      return false;
-  if (!matchSpace(results->rawbuf[offset++], DAIKIN_HDR_SPACE))
-      return false;
-
-  // Data (#1)
-  for (uint8_t i = 0; i < sizeof(data) * 8; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK))
-      return false;
-    if (matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
+  Serial.println("GOT HERE 1");
+  Serial.println(matchMark(results->rawbuf[OFFSET_START+11], DAIKIN_GAP));
+  for (uint8_t i = 0; i < 10; i++) {
+  Serial.print("Raw buf 1: ");
+  Serial.println(results->rawbuf[offset]*RAWTICK);
+    if (!matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK))
       return false;
   }
+  // Daikin GAP
+  offset = checkheader(results, offset, daikin_code);
+  if (offset == OFFSET_ERR)
+      return false;
+
+  Serial.println("GOT HERE 2");
+  yield();
+  // Data (#1)
+
+
+
+  offset = readbits(results, offset, daikin_code, 8*8);
+  if (offset == OFFSET_ERR)
+      return false;
+
+  // Ignore everything that has just been captured as it is not needed.
+  // Some remotes may not send this portion, my remote did, but it's not required.
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
+    daikin_code[i] = 0;
+
+  Serial.println(data);
+  Serial.println("GOT HERE 3");
+  yield();
 
   uint32_t number = data;  // some number...
   uint32_t reversed = reverseBits(number, sizeof(number) * 8)
 
   DPRINT("Code ");
-  DPRINTLN(reversed, HEX);
+  DPRINTLN(reversed);
+
+  offset = checkheader(results, offset, daikin_code);
+  if (offset == OFFSET_ERR)
+      return false;
 
   // Data (#2)
-  for (uint8_t i = 0; i < sizeof(data) * 8; i++, offset++) {
-    if (!matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK))
+  offset = readbits(results, offset, daikin_code, 8*8);
+  if (offset == OFFSET_ERR)
       return false;
-    if (matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE))
-      data <<= 1;  // 0
-    else
+
+  Serial.println("GOT HERE 4");
+  yield();
+
+
+  offset = checkheader(results, offset, daikin_code);
+  if (offset == OFFSET_ERR)
       return false;
+
+  Serial.println("GOT HERE 4.1");
+  // Data (#3), read up everything else
+  offset = readbits(results, offset, daikin_code, (DAIKIN_COMMAND_LENGTH*8)-(8*8));
+  Serial.println(offset);
+  if (offset == OFFSET_ERR)
+      return false;
+
+
+  Serial.println("GOT HERE 5");
+  yield();
+
+
+
+
+  // Print what we have
+  Serial.println("BITS:::");
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
+      String strbits = String(daikin_code[i], BIN);
+      while (strbits.length() < 8)
+          strbits = String("0") + strbits;
+      //Serial.print(i, DEC);
+      //Serial.print(": ");
+      //Serial.println(strbits);
+      Serial.print(strbits);
+      Serial.print(" ");
   }
+  Serial.println("");
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
+      Serial.print(i);
+      Serial.print(":");
+      Serial.print(daikin_code[i], HEX);
+      Serial.print(" ");
+  }
+  Serial.println("");
+
+
+
+
 
   number = data;  // some number...
   reversed = reverseBits(number, sizeof(number) * 8)
 
   DPRINT("Code2 ");
-  DPRINTLN(reversed, HEX);
-
-  if (!matchSpace(results->rawbuf[offset++], DAIKIN_GAP)) {
-    DPRINTLN("no gap");
-    return false;
-  }
+  DPRINTLN(reversed);
 
   // Success
+  IRDaikinESP dako = IRDaikinESP(0);
+  dako.setRaw(daikin_code);
+  dako.printState();
+
   results->bits = DAIKIN_BITS;
   results->value = reversed;
   results->decode_type = DAIKIN;
