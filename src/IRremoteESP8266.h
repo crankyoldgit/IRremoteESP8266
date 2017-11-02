@@ -111,7 +111,7 @@
 #define DECODE_FUJITSU_AC false  // Not written.
 #define SEND_FUJITSU_AC   true
 
-#define DECODE_DAIKIN        false  // Not finished.
+#define DECODE_DAIKIN        true
 #define SEND_DAIKIN          true
 
 #define DECODE_COOLIX        true
