@@ -125,6 +125,8 @@ class IRDaikinESP {
   bool getSwingVertical();
   void setSwingHorizontal(bool state);
   bool getSwingHorizontal();
+  void setEcono(bool state);
+  bool getEcono();
   bool getQuiet();
   void setQuiet(bool state);
   bool getPowerful();

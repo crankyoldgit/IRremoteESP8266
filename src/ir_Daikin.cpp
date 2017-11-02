@@ -269,7 +269,6 @@ bool IRDaikinESP::getSwingHorizontal() {
   return daikin[17] & 0x01;
 }
 
-
 void IRDaikinESP::setQuiet(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
@@ -499,7 +498,6 @@ void IRDaikinESP::printState() {
   Serial.print("Mold: ");
   Serial.println(getMold() ? "On" : "Off");
 
-
   Serial.print("Swing Vertical: ");
   Serial.println(getSwingVertical() ? "On" : "Off");
 
@@ -517,21 +515,21 @@ void IRDaikinESP::printState() {
 
   Serial.print("Mode: ");
   switch (getMode()) {
-  case DAIKIN_COOL:
-    Serial.println("Cool");
-    break;
-  case DAIKIN_HEAT:
-    Serial.println("Heat");
-    break;
-  case DAIKIN_FAN:
-    Serial.println("Fan");
-    break;
-  case DAIKIN_AUTO:
-    Serial.println("Auto");
-    break;
-  case DAIKIN_DRY:
-    Serial.println("Dry");
-    break;
+    case DAIKIN_COOL:
+        Serial.println("Cool");
+        break;
+    case DAIKIN_HEAT:
+        Serial.println("Heat");
+        break;
+    case DAIKIN_FAN:
+        Serial.println("Fan");
+        break;
+    case DAIKIN_AUTO:
+        Serial.println("Auto");
+        break;
+    case DAIKIN_DRY:
+        Serial.println("Dry");
+        break;
   }
 
   var = getOnTimerEnabled();
@@ -721,6 +719,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (results->rawlen < DAIKIN_BITS)
     return false;
 
+  Serial.print("nbits: ");
+  Serial.println(nbits);
   // Compliance
   if (strict && nbits != DAIKIN_BITS)
     return false;
@@ -742,6 +742,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (offset == OFFSET_ERR)
       return false;
 
+  Serial.println("GOT HERE 2");
+  yield();
   // Data (#1)
   offset = readbits(results, offset, daikin_code, 8*8);
   if (offset == OFFSET_ERR)
