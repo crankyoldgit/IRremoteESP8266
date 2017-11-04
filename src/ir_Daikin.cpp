@@ -269,6 +269,7 @@ bool IRDaikinESP::getSwingHorizontal() {
   return daikin[17] & 0x01;
 }
 
+
 void IRDaikinESP::setQuiet(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
@@ -498,6 +499,7 @@ void IRDaikinESP::printState() {
   Serial.print("Mold: ");
   Serial.println(getMold() ? "On" : "Off");
 
+
   Serial.print("Swing Vertical: ");
   Serial.println(getSwingVertical() ? "On" : "Off");
 
@@ -719,8 +721,6 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (results->rawlen < DAIKIN_BITS)
     return false;
 
-  Serial.print("nbits: ");
-  Serial.println(nbits);
   // Compliance
   if (strict && nbits != DAIKIN_BITS)
     return false;
@@ -742,18 +742,18 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (offset == OFFSET_ERR)
       return false;
 
-  Serial.println("GOT HERE 2");
-  yield();
   // Data (#1)
   offset = readbits(results, offset, daikin_code, 8*8);
   if (offset == OFFSET_ERR)
       return false;
 
+  /*
   // Ignore everything that has just been captured as it is not needed.
   // Some remotes may not send this portion, my remote did, but it's not required.
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
 
+XXX */
   offset = checkheader(results, offset, daikin_code);
   if (offset == OFFSET_ERR)
       return false;

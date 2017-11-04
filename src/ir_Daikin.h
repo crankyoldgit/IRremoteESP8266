@@ -11,6 +11,9 @@
 // Option to disable the additional Daikin debug info to conserve memory
 #define DAIKIN_DEBUG 1
 
+// Option to disable the additional Daikin debug info to conserve memory
+#define DAIKIN_DEBUG 1
+
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
 //                DD   DD AA   AA  III  KKKK    III  NN N NN
@@ -125,8 +128,6 @@ class IRDaikinESP {
   bool getSwingVertical();
   void setSwingHorizontal(bool state);
   bool getSwingHorizontal();
-  void setEcono(bool state);
-  bool getEcono();
   bool getQuiet();
   void setQuiet(bool state);
   bool getPowerful();
