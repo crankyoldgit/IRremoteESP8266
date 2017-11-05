@@ -3,7 +3,7 @@ An Arduino sketch to emulate IR Daikin ARC433** remote control unit
 Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
-Copyright 2016 sillyfrog
+Copyright 2017 sillyfrog
 */
 
 #include "ir_Daikin.h"
@@ -21,6 +21,7 @@ Copyright 2016 sillyfrog
 // Constants
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+//   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
 
 
 
@@ -35,6 +36,9 @@ Copyright 2016 sillyfrog
 #define DAIKIN_GAP                29000U
 
 #if SEND_DAIKIN
+
+
+
 // Send a Daikin A/C message.
 //
 // Args:
@@ -49,9 +53,35 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
   if (nbytes < DAIKIN_COMMAND_LENGTH)
     return;  // Not enough bytes to send a proper message.
+  static uint8_t header1[DAIKIN_HEADER1_LENGTH];
+  header1[0] = 0b00010001;
+  header1[1] = 0b11011010;
+  header1[2] = 0b00100111;
+  header1[3] = 0b00000000;
+  header1[4] = 0b11000101;
+  header1[5] = 0b00000000;
+  header1[6] = 0b00000000;
+  header1[7] = 0b11010111;
   // Set IR carrier frequency
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
+    // Send the header, 5 * 0 bits
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, 0, 5, false);
+
+    mark(DAIKIN_ONE_MARK);
+    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
+    // Header #1
+    mark(DAIKIN_HDR_MARK);
+    space(DAIKIN_HDR_SPACE);
+    // Data #1
+    for (uint16_t i = 0; i < DAIKIN_HEADER1_LENGTH ; i++)
+      sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+               DAIKIN_ZERO_SPACE, header1[i], 8, false);
+
+
+    mark(DAIKIN_ONE_MARK);
+    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
     // Header #1
     mark(DAIKIN_HDR_MARK);
     space(DAIKIN_HDR_SPACE);
@@ -681,8 +711,7 @@ uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin
 }
 
 
-// TODO(crankyoldgit): NOT WORKING. This needs to be finished.
-// Decode the supplied Daikin A/C message. (NOT WORKING - DO NOT USE)
+// Decode the supplied Daikin A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   Nr. of bits to expect in the data portion. Typically SAMSUNG_BITS.
@@ -690,7 +719,8 @@ uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: UNFINISHED / Completely not working, not even vaguely.
+// Status: Working, return command is incomplete as there is too much data,
+//         if DAIKIN_DEBUG enabled, will print all the set options and values.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -725,12 +755,11 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (offset == OFFSET_ERR)
       return false;
 
-  /*
   // Ignore everything that has just been captured as it is not needed.
   // Some remotes may not send this portion, my remote did, but it's not required.
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
-XXX */
+
   offset = checkheader(results, offset, daikin_code);
   if (offset == OFFSET_ERR)
       return false;
@@ -745,21 +774,11 @@ XXX */
       return false;
 
   // Data (#3), read up everything else
-  offset = readbits(results, offset, daikin_code, (DAIKIN_COMMAND_LENGTH*8)-(8*16));
+  offset = readbits(results, offset, daikin_code, (DAIKIN_COMMAND_LENGTH*8)-(8*8));
   if (offset == OFFSET_ERR)
       return false;
 
   yield();
-  Serial.println("Real Raw Bits:");
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
-    String strbits = String(daikin_code[i], BIN);
-    while (strbits.length() < 8)
-      strbits = String("0") + strbits;
-    Serial.print(strbits);
-    Serial.print(" ");
-  }
-  Serial.println("");
-
 
   // Success
   IRDaikinESP dako = IRDaikinESP(0);
