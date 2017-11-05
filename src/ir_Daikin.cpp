@@ -790,7 +790,6 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   results->bits = DAIKIN_BITS;
   results->value = 0; // don't pretend to have all the data here
   results->decode_type = DAIKIN;
-  results->overflow = true; // We'll always overflow 64 bits
   results->address = 0;
   results->command = dako.getCommand(); // include the common options
   return true;
