@@ -105,6 +105,8 @@
 #define DAIKIN_BYTE_MOLD              25
 #define DAIKIN_BIT_MOLD       0b00000010
 
+#define DAIKIN_HEADER1_LENGTH          8
+
 #if SEND_DAIKIN
 class IRDaikinESP {
  public:
