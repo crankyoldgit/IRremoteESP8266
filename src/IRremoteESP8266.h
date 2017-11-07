@@ -21,7 +21,7 @@
  * Kelvinator A/C and Sherwood added by crankyoldgit
  * Mitsubishi (TV) sending added by crankyoldgit
  * Pronto code sending added by crankyoldgit
- * Mitsubishi A/C added by crankyoldgit
+ * Mitsubishi & Toshiba A/C added by crankyoldgit
  *     (derived from https://github.com/r45635/HVAC-IR-Control)
  * DISH decode by marcosamarinho
  * Gree Heatpump sending added by Ville Skyttä (scop)
