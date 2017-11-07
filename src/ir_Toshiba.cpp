@@ -69,6 +69,7 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
 // Warning: Consider this very alpha code. Seems to work, but not validated.
 //
 // Equipment it seems compatible with:
+//  * Toshiba RAS-B13N3KV2 / Akita EVO II
 //  * <Add models (A/C & remotes) you've gotten it working with here>
 // Initialise the object.
 IRToshibaAC::IRToshibaAC(uint16_t pin) : _irsend(pin) {
