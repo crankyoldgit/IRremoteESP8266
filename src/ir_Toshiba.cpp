@@ -91,6 +91,7 @@ void IRToshibaAC::stateReset() {
   remote_state[4] = 0x01;
   for (uint8_t i = 5; i < TOSHIBA_AC_STATE_LENGTH; i++)
     remote_state[i] = 0;
+  mode_state = remote_state[6] & 0b00000011;
   checksum();  // Calculate the checksum
 }
 
@@ -125,12 +126,13 @@ void IRToshibaAC::checksum() {
 void IRToshibaAC::on() {
   // state = ON;
   remote_state[6] &= ~TOSHIBA_AC_POWER;
+  setMode(mode_state);
 }
 
 // Set the requested power state of the A/C to off.
 void IRToshibaAC::off() {
   // state = OFF;
-  remote_state[6] |= TOSHIBA_AC_POWER;
+  remote_state[6] |= (TOSHIBA_AC_POWER | 0b00000011);
 }
 
 // Set the requested power state of the A/C.
@@ -178,7 +180,7 @@ uint8_t IRToshibaAC::getFan() {
 
 // Return the requested climate operation mode of the a/c unit.
 uint8_t IRToshibaAC::getMode() {
-  return(remote_state[6] & 0b00000011);
+  return(mode_state);
 }
 
 // Set the requested climate operation mode of the a/c unit.
@@ -191,7 +193,11 @@ void IRToshibaAC::setMode(uint8_t mode) {
     case TOSHIBA_AC_HEAT: break;
     default: mode = TOSHIBA_AC_AUTO;
   }
-  remote_state[6] &= 0b11111100;  // Clear the previous mode.
-  remote_state[6] |= mode;
+  mode_state = mode;
+  // Only adjust the remote_state if we have power set to on.
+  if (getPower()) {
+    remote_state[6] &= 0b11111100;  // Clear the previous mode.
+    remote_state[6] |= mode_state;
+  }
 }
 #endif  // SEND_TOSHIBA_AC

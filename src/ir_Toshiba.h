@@ -49,6 +49,7 @@ class IRToshibaAC {
  private:
   uint8_t remote_state[TOSHIBA_AC_STATE_LENGTH];
   void checksum();
+  uint8_t mode_state;
   IRsend _irsend;
 };
 
