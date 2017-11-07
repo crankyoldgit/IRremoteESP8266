@@ -136,6 +136,9 @@
 #define DECODE_NIKAI         true
 #define SEND_NIKAI           true
 
+#define DECODE_TOSHIBA_AC    false  // Not implemented.
+#define SEND_TOSHIBA_AC      true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_GREE || DECODE_KELVINATOR || \
      DECODE_MITSUBISHI_AC || DECODE_TROTEC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -180,7 +183,8 @@ enum decode_type_t {
   TROTEC,
   NIKAI,
   RAW,  // Technically not a protocol, but an encoding.
-  GLOBALCACHE  // Technically not a protocol, but an encoding.
+  GLOBALCACHE,  // Technically not a protocol, but an encoding.
+  TOSHIBA_AC
 };
 
 // Message lengths & required repeat values
@@ -233,6 +237,8 @@ enum decode_type_t {
 #define SONY_20_BITS                20U
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
+#define TOSHIBA_AC_STATE_LENGTH      9U
+#define TOSHIBA_AC_MIN_REPEAT        0U
 #define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
