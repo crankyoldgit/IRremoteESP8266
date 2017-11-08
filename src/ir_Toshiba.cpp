@@ -37,7 +37,7 @@
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = TOSHIBA_AC_MIN_REPEAT).
 //
-// Status: ALPHA / Untested.
+// Status: Beta / Appears to be working.
 //
 void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
