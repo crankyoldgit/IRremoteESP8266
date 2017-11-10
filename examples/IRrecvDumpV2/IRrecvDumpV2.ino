@@ -71,6 +71,7 @@ void encoding(decode_results *results) {
     case DENON:        Serial.print("DENON");         break;
     case COOLIX:       Serial.print("COOLIX");        break;
     case NIKAI:        Serial.print("NIKAI");         break;
+    case KELVINATOR:   Serial.print("KELVINATOR");    break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
 }
@@ -91,7 +92,16 @@ void dumpInfo(decode_results *results) {
 
   // Show Code & length
   Serial.print("Code      : ");
-  serialPrintUint64(results->value, 16);
+  switch (results->decode_type) {
+#if DECODE_AC
+    case KELVINATOR:
+      for (uint16_t i = 0; results->bits > i * 8; i++)
+        Serial.printf("%02X", results->state[i]);
+      break;
+#endif
+    default:
+      serialPrintUint64(results->value, HEX);
+  }
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -167,6 +177,7 @@ void dumpCode(decode_results *results) {
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
+    uint16_t nbytes;
     // Some protocols have an address &/or command.
     // NOTE: It will ignore the atypical case when a message has been decoded
     // but the address & the command are both 0.
@@ -179,10 +190,25 @@ void dumpCode(decode_results *results) {
       Serial.println(";");
     }
 
-    // All protocols have data
-    Serial.print("uint64_t data = 0x");
-    serialPrintUint64(results->value, 16);
-    Serial.println(";");
+    switch (results->decode_type) {
+#if DECODE_AC
+      case KELVINATOR:  // Complex protocols. e.g. Air Conditioners
+        nbytes = results->bits / 8;
+        Serial.printf("uint8_t state[%d] = {", nbytes);
+        for (uint16_t i = 0; i < nbytes; i++) {
+          Serial.printf("0x%02X", results->state[i]);
+          if (i < nbytes - 1)
+            Serial.print(", ");
+        }
+        Serial.println("};");
+        break;
+#endif  // DECODE_AC
+      default:  // Simple protocols
+        // Most protocols have data
+        Serial.print("uint64_t data = 0x");
+        serialPrintUint64(results->value, HEX);
+        Serial.println(";");
+    }
   }
 }
 
