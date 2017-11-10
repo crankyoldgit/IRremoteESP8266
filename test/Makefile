@@ -31,7 +31,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
         ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
         ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
-				ir_Toshiba_test
+        ir_Toshiba_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
