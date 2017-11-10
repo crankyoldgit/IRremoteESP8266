@@ -185,6 +185,11 @@ class IRsend {
   void sendNikai(uint64_t data, uint16_t nbits = NIKAI_BITS,
                  uint16_t repeat = 0);
 #endif
+#if SEND_TOSHIBA_AC
+  void sendToshibaAC(unsigned char data[],
+                     uint16_t nbytes = TOSHIBA_AC_STATE_LENGTH,
+                     uint16_t repeat = TOSHIBA_AC_MIN_REPEAT);
+#endif
 
  protected:
 #ifdef UNIT_TEST
