@@ -140,7 +140,7 @@
 #define SEND_TOSHIBA_AC      true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_GREE || DECODE_KELVINATOR || \
-     DECODE_MITSUBISHI_AC || DECODE_TROTEC)
+     DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || DECODE_TROTEC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.

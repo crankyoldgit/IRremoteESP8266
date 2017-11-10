@@ -52,7 +52,10 @@
                                  TROTEC_COMMAND_LENGTH, \
                                  MITSUBISHI_AC_STATE_LENGTH, \
                                  KELVINATOR_STATE_LENGTH), \
-                            MAX2(GREE_STATE_LENGTH, DAIKIN_COMMAND_LENGTH))
+                            MAX4(GREE_STATE_LENGTH, \
+                                 DAIKIN_COMMAND_LENGTH, \
+                                 TOSHIBA_AC_STATE_LENGTH, \
+                                 0))
 
 // Types
 // information for the interrupt handler
