@@ -63,7 +63,7 @@
  *                        GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
  *   25,Rrepeats,hex_code_string  e.g. 25,R1,0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040,0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40
  *                               Pronto (25), 1 repeat, & "0000 006E 0022 0002 ..." (Sherwood Amp Tape Input)
- *   18,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010f0
+ *   ac_protocol_num,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010F0
  *                           Kelvinator (18) Air Con on, Low Fan, 25 deg etc.
  *   In short:
  *     No spaces after/before commas.
@@ -111,6 +111,7 @@
 #include <WiFiManager.h>
 #include <ESP8266mDNS.h>
 #include <IRremoteESP8266.h>
+#include <IRrecv.h>
 #include <IRsend.h>
 #include <IRutils.h>
 #ifdef MQTT_ENABLE
@@ -299,7 +300,7 @@ void handleRoot() {
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='18'>"
       "State code: 0x<input type='text' name='code' size='32' maxlength='32'"
-      " value='190B8050000000E0190B8070000010f0'>"
+      " value='190B8050000000E0190B8070000010F0'>"
       " <input type='submit' value='Send A/C State'>"
     "</form>"
     "<br><hr>"
@@ -330,26 +331,103 @@ void handleReset() {
   delay(1000);
 }
 
-// Parse a Kelvinator A/C Hex String/code and send it.
-void parseStringAndSendKelv(const String str) {
-  // str should be a 32 digit hexidecimal string.
-  uint8_t offset = 0;
-  uint8_t codeArray[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+// Parse an Air Conditioner A/C Hex String/code and send it.
+// Args:
+//   irType: Nr. of the protocol we need to send.
+//   str: A hexidecimal string containing the state to be sent.
+void parseStringAndSendAirCon(const uint16_t irType, const String str) {
+  uint8_t strOffset = 0;
+  uint8_t state[STATE_SIZE_MAX] = {0};  // All array elements are set to 0.
+  uint16_t stateSize = 0;
+
   if (str.startsWith("0x") || str.startsWith("0X"))
-    offset = 2;
-  for (int i = 0; i < 32; i++) {
-    unsigned char c = tolower(str[i + offset]);
-    uint8_t entry = 0;
+    strOffset = 2;
+  // Calculate how many hexidecimal characters there are.
+  uint16_t inputLength = str.length() - strOffset;
+  if (inputLength == 0) {
+    debug("Zero length AirCon code encounterd. Ignored.");
+    return;  // No input. Abort.
+  }
+
+  switch (irType) {  // Get the correct state size for the protocol.
+    case KELVINATOR:
+      stateSize = KELVINATOR_STATE_LENGTH;
+      break;
+    case TOSHIBA_AC:
+      stateSize = TOSHIBA_AC_STATE_LENGTH;
+      break;
+    case DAIKIN:
+      stateSize = DAIKIN_COMMAND_LENGTH;
+      break;
+    case MITSUBISHI_AC:
+      stateSize = MITSUBISHI_AC_STATE_LENGTH;
+      break;
+    case TROTEC:
+      stateSize = TROTEC_COMMAND_LENGTH;
+      break;
+    case ARGO:
+      stateSize = ARGO_COMMAND_LENGTH;
+      break;
+    case GREE:
+      stateSize = GREE_STATE_LENGTH;
+      break;
+    default:  // Not a protocol we expected. Abort.
+      debug("Unexpected AirCon protocol detected. Ignoring.");
+      return;
+  }
+  if (inputLength > stateSize * 2) {
+    debug("AirCon code to large for the given protocol.");
+    return;
+  }
+
+  // Ptr to the least significant byte of the resulting state for this protocol.
+  uint8_t *statePtr = &state[stateSize - 1];
+
+  // Convert the string into a state array of the correct length.
+  for (uint16_t i = 0; i < inputLength; i++) {
+    // Grab the next least sigificant hexidecimal digit from the string.
+    uint8_t c = tolower(str[inputLength + strOffset - i - 1]);
     if (isxdigit(c)) {
       if (isdigit(c))
-        codeArray[i / 2] += c - '0';
+        c -= '0';
       else
-        codeArray[i / 2] += c - 'a' + 10;
+        c = c - 'a' + 10;
+    } else {
+      debug("Aborting! Non-hexidecimal char found in AirCon state: " + str);
+      return;
     }
-    if (i % 2 == 0)
-      codeArray[i / 2] <<= 4;
+    if (i % 2 == 1) {  // Odd: Upper half of the byte.
+      *statePtr += (c << 4);
+      statePtr--;  // Advance up to the next least significant byte of state.
+    } else {  // Even: Lower half of the byte.
+      *statePtr = c;
+    }
   }
-  irsend.sendKelvinator(reinterpret_cast<uint8_t *>(codeArray));
+
+  // Make the appropriate call for the protocol type.
+  switch (irType) {
+    case KELVINATOR:
+      irsend.sendKelvinator(reinterpret_cast<uint8_t *>(state));
+      break;
+    case TOSHIBA_AC:
+      irsend.sendToshibaAC(reinterpret_cast<uint8_t *>(state));
+      break;
+    case DAIKIN:
+      irsend.sendDaikin(reinterpret_cast<uint8_t *>(state));
+      break;
+    case MITSUBISHI_AC:
+      irsend.sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
+      break;
+    case TROTEC:
+      irsend.sendTrotec(reinterpret_cast<uint8_t *>(state));
+      break;
+    case ARGO:
+      irsend.sendArgo(reinterpret_cast<uint8_t *>(state));
+      break;
+    case GREE:
+      irsend.sendGree(reinterpret_cast<uint8_t *>(state));
+      break;
+  }
 }
 
 // Count how many values are in the String.
@@ -818,13 +896,19 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
         bits = COOLIX_BITS;
       irsend.sendCOOLIX(code, bits, repeat);
       break;
+    case DAIKIN:  // 16
+    case KELVINATOR:  // 18
+    case MITSUBISHI_AC:  // 20
+    case GREE:  // 24
+    case ARGO:  // 27
+    case TROTEC:  // 28
+    case TOSHIBA_AC:  // 32
+      parseStringAndSendAirCon(ir_type, code_str);
+      break;
     case DENON:  // 17
       if (bits == 0)
         bits = DENON_BITS;
       irsend.sendDenon(code, bits, repeat);
-      break;
-    case KELVINATOR:  // 18
-      parseStringAndSendKelv(code_str);
       break;
     case SHERWOOD:  // 19
       if (bits == 0)
