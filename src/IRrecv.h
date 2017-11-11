@@ -55,7 +55,7 @@
                             MAX4(GREE_STATE_LENGTH, \
                                  DAIKIN_COMMAND_LENGTH, \
                                  TOSHIBA_AC_STATE_LENGTH, \
-                                 0))
+                                 FUJITSU_AC_STATE_LENGTH))
 
 // Types
 // information for the interrupt handler
