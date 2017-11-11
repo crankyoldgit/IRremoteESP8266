@@ -174,7 +174,7 @@ const char* mqtt_clientid = String(MQTTprefix +
 void debug(String str) {
 #ifdef DEBUG
   uint32_t now = millis();
-  Serial.printf("%7u.%3u: %s\n", now / 1000, now % 1000, str.c_str());
+  Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
 #endif  // DEBUG
 }
 
