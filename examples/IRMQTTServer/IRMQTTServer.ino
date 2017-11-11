@@ -312,6 +312,7 @@ void handleRoot() {
       "<select name='type'>"
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin</option>"
+        "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
@@ -392,6 +393,14 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case GREE:
       stateSize = GREE_STATE_LENGTH;
       break;
+    case FUJITSU_AC:
+      // Fujitsu has two distinct & different size states, make a best guess
+      // which one we are being presented with.
+      if (inputLength / 2 <= FUJITSU_AC_STATE_LENGTH_SHORT)
+        stateSize = FUJITSU_AC_STATE_LENGTH_SHORT;
+      else
+        stateSize = FUJITSU_AC_STATE_LENGTH;
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return;
@@ -447,6 +456,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     case GREE:
       irsend.sendGree(reinterpret_cast<uint8_t *>(state));
+      break;
+    case FUJITSU_AC:
+      irsend.sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
   }
 }
@@ -928,6 +940,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case ARGO:  // 27
     case TROTEC:  // 28
     case TOSHIBA_AC:  // 32
+    case FUJITSU_AC:  // 33
       parseStringAndSendAirCon(ir_type, code_str);
       break;
     case DENON:  // 17

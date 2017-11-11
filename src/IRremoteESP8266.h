@@ -109,8 +109,8 @@
 #define DECODE_MITSUBISHI_AC false  // Not written.
 #define SEND_MITSUBISHI_AC   true
 
-#define DECODE_FUJITSU_AC false  // Not written.
-#define SEND_FUJITSU_AC   true
+#define DECODE_FUJITSU_AC    false  // Not written.
+#define SEND_FUJITSU_AC      true
 
 #define DECODE_DAIKIN        true
 #define SEND_DAIKIN          true
@@ -136,8 +136,12 @@
 #define DECODE_NIKAI         true
 #define SEND_NIKAI           true
 
-#if (DECODE_ARGO || DECODE_DAIKIN || DECODE_GREE || DECODE_KELVINATOR || \
-     DECODE_MITSUBISHI_AC || DECODE_TROTEC)
+#define DECODE_TOSHIBA_AC    false  // Not implemented.
+#define SEND_TOSHIBA_AC      true
+
+#if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
+     DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
+     DECODE_TROTEC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -180,7 +184,9 @@ enum decode_type_t {
   TROTEC,
   NIKAI,
   RAW,  // Technically not a protocol, but an encoding.
-  GLOBALCACHE  // Technically not a protocol, but an encoding.
+  GLOBALCACHE,  // Technically not a protocol, but an encoding.
+  TOSHIBA_AC,
+  FUJITSU_AC
 };
 
 // Message lengths & required repeat values
@@ -207,6 +213,8 @@ enum decode_type_t {
 #define MITSUBISHI_AC_STATE_LENGTH  18U
 #define MITSUBISHI_AC_MIN_REPEAT     1U
 #define FUJITSU_AC_MIN_REPEAT        0U
+#define FUJITSU_AC_STATE_LENGTH     16U
+#define FUJITSU_AC_STATE_LENGTH_SHORT 7U
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
 #define PANASONIC_MANUFACTURER   0x4004ULL
