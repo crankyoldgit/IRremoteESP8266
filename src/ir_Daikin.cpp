@@ -125,7 +125,6 @@ void IRDaikinESP::checksum() {
   daikin[26] = sum & 0xFF;
 }
 
-
 void IRDaikinESP::stateReset() {
   for (uint8_t i = 4; i < DAIKIN_COMMAND_LENGTH; i++)
     daikin[i] = 0x0;
@@ -178,7 +177,6 @@ void IRDaikinESP::setPower(bool state) {
 bool IRDaikinESP::getPower() {
   return (getBit(DAIKIN_BYTE_POWER, DAIKIN_BIT_POWER) > 0);
 }
-
 
 // Set the temp in deg C
 void IRDaikinESP::setTemp(uint8_t temp) {
@@ -271,7 +269,6 @@ bool IRDaikinESP::getSwingHorizontal() {
   return daikin[17] & 0x01;
 }
 
-
 void IRDaikinESP::setQuiet(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
@@ -282,7 +279,6 @@ void IRDaikinESP::setQuiet(bool state) {
 bool IRDaikinESP::getQuiet() {
   return (getBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT) > 0);
 }
-
 
 void IRDaikinESP::setPowerful(bool state) {
   if (state)
@@ -295,7 +291,6 @@ bool IRDaikinESP::getPowerful() {
   return (getBit(DAIKIN_BYTE_POWERFUL, DAIKIN_BIT_POWERFUL) > 0);
 }
 
-
 void IRDaikinESP::setSensor(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SENSOR, DAIKIN_BIT_SENSOR);
@@ -306,7 +301,6 @@ void IRDaikinESP::setSensor(bool state) {
 bool IRDaikinESP::getSensor() {
   return (getBit(DAIKIN_BYTE_SENSOR, DAIKIN_BIT_SENSOR) > 0);
 }
-
 
 void IRDaikinESP::setEcono(bool state) {
   if (state)
@@ -319,7 +313,6 @@ bool IRDaikinESP::getEcono() {
   return (getBit(DAIKIN_BYTE_ECONO, DAIKIN_BIT_ECONO) > 0);
 }
 
-
 void IRDaikinESP::setEye(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_EYE, DAIKIN_BIT_EYE);
@@ -330,7 +323,6 @@ void IRDaikinESP::setEye(bool state) {
 bool IRDaikinESP::getEye() {
   return (getBit(DAIKIN_BYTE_EYE, DAIKIN_BIT_EYE) > 0);
 }
-
 
 void IRDaikinESP::setMold(bool state) {
   if (state)
@@ -343,12 +335,10 @@ bool IRDaikinESP::getMold() {
   return (getBit(DAIKIN_BYTE_MOLD, DAIKIN_BIT_MOLD) > 0);
 }
 
-
 void IRDaikinESP::setBit(uint8_t byte, uint8_t bitmask) {
   daikin[byte] |= bitmask;
   checksum();
 }
-
 
 void IRDaikinESP::clearBit(uint8_t byte, uint8_t bitmask) {
   bitmask = ~bitmask;
@@ -389,6 +379,7 @@ uint16_t IRDaikinESP::getOnTime() {
   ret += daikin[18];
   return ret;
 }
+
 bool IRDaikinESP::getOnTimerEnabled() {
     return daikin[13] & 0b00000010;
 }
@@ -460,7 +451,6 @@ String IRDaikinESP::renderTime(uint16_t timemins) {
   return ret;
 }
 
-
 #if DAIKIN_DEBUG
 
 void IRDaikinESP::printState() {
@@ -500,7 +490,6 @@ void IRDaikinESP::printState() {
 
   Serial.print("Mold: ");
   Serial.println(getMold() ? "On" : "Off");
-
 
   Serial.print("Swing Vertical: ");
   Serial.println(getSwingVertical() ? "On" : "Off");
@@ -555,7 +544,6 @@ void IRDaikinESP::printState() {
   Serial.print("Current Time: ");
   Serial.println(renderTime(getCurrentTime()));
 }
-
 #endif  // DAIKIN_DEBUG
 
 /*
@@ -635,13 +623,12 @@ void IRDaikinESP::setCommand(uint32_t value) {
   value = value >> 20;
   setCurrentTime(value);
 }
-
 #endif  // SEND_DAIKIN
 
 #if DECODE_DAIKIN
 
 #define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
-#define DAIKIN_CURINDEX DAIKIN_COMMAND_LENGTH+1
+#define DAIKIN_CURINDEX (DAIKIN_COMMAND_LENGTH + 1)
 #define OFFSET_ERR 65432
 
 #define DAIKIN_TOLERANCE 35
@@ -690,7 +677,7 @@ uint16_t checkheader(decode_results *results, uint16_t offset,
 
 uint16_t readbits(decode_results *results, uint16_t offset,
                   unsigned char daikin_code[], uint16_t countbits) {
-  for (uint16_t i = 0; i < countbits && offset < results->rawlen-1;
+  for (uint16_t i = 0; i < countbits && offset < results->rawlen - 1;
        i++, offset++) {
     if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
@@ -707,11 +694,10 @@ uint16_t readbits(decode_results *results, uint16_t offset,
   return offset;
 }
 
-
 // Decode the supplied Daikin A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically SAMSUNG_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. Typically DAIKIN_BITS.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
