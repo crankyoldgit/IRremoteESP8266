@@ -199,8 +199,8 @@ void dumpCode(decode_results *results) {
 #endif  // DECODE_AC
       default:  // Simple protocols
         // Some protocols have an address &/or command.
-        // NOTE: It will ignore the atypical case when a message has been decoded
-        // but the address & the command are both 0.
+        // NOTE: It will ignore the atypical case when a message has been
+        // decoded but the address & the command are both 0.
         if (results->address > 0 || results->command > 0) {
           Serial.print("uint32_t address = 0x");
           Serial.print(results->address, HEX);

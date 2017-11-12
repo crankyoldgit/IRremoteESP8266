@@ -23,23 +23,7 @@ Copyright 2017 sillyfrog
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 //   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
 
-
-
-
-
-#define DAIKIN_HDR_MARK            3650U  // DAIKIN_ZERO_MARK * 8
-#define DAIKIN_HDR_SPACE           1623U  // DAIKIN_ZERO_MARK * 4
-#define DAIKIN_ONE_SPACE           1280U
-#define DAIKIN_ONE_MARK             428U
-#define DAIKIN_ZERO_MARK            428U
-#define DAIKIN_ZERO_SPACE           428U
-#define DAIKIN_GAP                29000U
-
 #if SEND_DAIKIN
-
-// Note bits in each octet swapped so can be sent as a single value
-#define FIRST_HEADER64 \
-    0b1101011100000000000000001100010100000000001001111101101000010001
 // Original header
 // static uint8_t header1[DAIKIN_HEADER1_LENGTH];
 // header1[0] = 0b00010001;
@@ -69,31 +53,31 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
     // Send the header, 0b00000
-    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+    sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
              DAIKIN_ZERO_SPACE, 0, 5, false);
     sendDaikinGapHeader();
     // Leading header
     // Do this as a constant to save RAM and keep in flash memory
-    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
-             DAIKIN_ZERO_SPACE, FIRST_HEADER64, 64, false);
+    sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
+             DAIKIN_ZERO_SPACE, DAIKIN_FIRST_HEADER64, 64, false);
     sendDaikinGapHeader();
     // Data #1
     for (uint16_t i = 0; i < 8 && i < nbytes; i++)
-      sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+      sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
                DAIKIN_ZERO_SPACE, data[i], 8, false);
     sendDaikinGapHeader();
     // Data #2
     for (uint16_t i = 8; i < nbytes; i++)
-      sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+      sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
                DAIKIN_ZERO_SPACE, data[i], 8, false);
     // Footer #2
-    mark(DAIKIN_ONE_MARK);
+    mark(DAIKIN_BIT_MARK);
     space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
   }
 }
 
 void IRsend::sendDaikinGapHeader() {
-  mark(DAIKIN_ONE_MARK);
+  mark(DAIKIN_BIT_MARK);
   space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
   mark(DAIKIN_HDR_MARK);
   space(DAIKIN_HDR_SPACE);
@@ -540,10 +524,9 @@ void IRDaikinESP::printState() {
 
   Serial.print("Current Time: ");
   Serial.println(renderTime(getCurrentTime()));
-
 }
-#endif // UNIT_TEST
-#endif // DAIKIN_DEBUG
+#endif  // UNIT_TEST
+#endif  // DAIKIN_DEBUG
 
 /*
  * Return most important bits to allow replay
@@ -625,13 +608,6 @@ void IRDaikinESP::setCommand(uint32_t value) {
 
 #if DECODE_DAIKIN
 
-#define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
-#define DAIKIN_CURINDEX (DAIKIN_COMMAND_LENGTH + 1)
-#define OFFSET_ERR 65432
-
-#define DAIKIN_TOLERANCE 35
-#define DAIKIN_MARK_EXCESS MARK_EXCESS
-
 void addbit(bool val, unsigned char data[]) {
   uint8_t curbit = data[DAIKIN_CURBIT];
   uint8_t curindex = data[DAIKIN_CURINDEX];
@@ -651,7 +627,7 @@ void addbit(bool val, unsigned char data[]) {
 
 uint16_t checkheader(decode_results *results, uint16_t offset,
                      unsigned char daikin_code[]) {
-  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK,
+  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
     return OFFSET_ERR;
   if (!IRrecv::matchSpace(results->rawbuf[offset++],
@@ -677,7 +653,7 @@ uint16_t readbits(decode_results *results, uint16_t offset,
                   unsigned char daikin_code[], uint16_t countbits) {
   for (uint16_t i = 0; i < countbits && offset < results->rawlen - 1;
        i++, offset++) {
-    if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK,
+    if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
       return OFFSET_ERR;
     if (IRrecv::matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE,
@@ -720,7 +696,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
     daikin_code[i] = 0;
 
   for (uint8_t i = 0; i < 10; i++) {
-    if (!matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK))
+    if (!matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK))
       return false;
   }
   // Daikin GAP

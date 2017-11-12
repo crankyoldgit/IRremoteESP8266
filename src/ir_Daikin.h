@@ -9,7 +9,7 @@
 #endif
 
 // Option to disable the additional Daikin debug info to conserve memory
-#define DAIKIN_DEBUG 1 // XXX
+#define DAIKIN_DEBUG 1  // XXX
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -105,6 +105,24 @@
 #define DAIKIN_BIT_OFF_TIMER  0b00000100
 #define DAIKIN_BYTE_ON_TIMER          13
 #define DAIKIN_BIT_ON_TIMER   0b00000010
+
+#define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
+#define DAIKIN_CURINDEX (DAIKIN_COMMAND_LENGTH + 1)
+#define OFFSET_ERR 65432
+
+#define DAIKIN_TOLERANCE 35
+#define DAIKIN_MARK_EXCESS MARK_EXCESS
+
+#define DAIKIN_HDR_MARK            3650U  // DAIKIN_BIT_MARK * 8
+#define DAIKIN_HDR_SPACE           1623U  // DAIKIN_BIT_MARK * 4
+#define DAIKIN_BIT_MARK             428U
+#define DAIKIN_ZERO_SPACE           428U
+#define DAIKIN_ONE_SPACE           1280U
+#define DAIKIN_GAP                29000U
+
+// Note bits in each octet swapped so can be sent as a single value
+#define DAIKIN_FIRST_HEADER64 \
+    0b1101011100000000000000001100010100000000001001111101101000010001
 
 #if SEND_DAIKIN
 class IRDaikinESP {
