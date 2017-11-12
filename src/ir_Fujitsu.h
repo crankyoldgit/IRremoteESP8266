@@ -38,9 +38,6 @@
 #define FUJITSU_AC_SWING_HORIZ    0x02U
 #define FUJITSU_AC_SWING_BOTH     0x03U
 
-#define FUJITSU_AC_STATE_LENGTH      16
-#define FUJITSU_AC_STATE_LENGTH_SHORT 7
-
 #if SEND_FUJITSU_AC
 class IRFujitsuAC {
  public:
