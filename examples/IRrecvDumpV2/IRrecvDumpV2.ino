@@ -27,7 +27,7 @@ uint16_t CAPTURE_BUFFER_SIZE = 1024;
 // Nr. of milli-Seconds of no-more-data before we consider a message ended.
 // NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
 #if DECODE_AC
-#define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
+#define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon 
                         // units, but can accidently swallow repeated messages
                         // in the rawData[] output.
 #else
