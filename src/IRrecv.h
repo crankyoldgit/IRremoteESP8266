@@ -223,14 +223,14 @@ class IRrecv {
   bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
                    bool strict = true);
 #endif
-#if DECODE_DAIKIN
-  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_BITS,
-                   bool strict = true);
-#endif
 #if DECODE_KELVINATOR
   bool decodeKelvinator(decode_results *results,
                         uint16_t nbits = KELVINATOR_BITS,
                         bool strict = true);
+#endif
+#if DECODE_DAIKIN
+  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_BITS,
+                    bool strict = true);
 #endif
 };
 

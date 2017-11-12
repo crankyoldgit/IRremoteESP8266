@@ -1058,7 +1058,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // as the orignal payload buffer will be overwritten whilst
   // constructing the PUBLISH packet.
   // Allocate the correct amount of memory for the payload copy
-  byte* payload_copy = reinterpret_cast<byte*>(malloc(length));
+  byte* payload_copy = reinterpret_cast<byte*>(malloc(length + 1));
   // Copy the payload to the new buffer
   memcpy(payload_copy, payload, length);
 

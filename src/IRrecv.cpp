@@ -364,14 +364,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeNikai(results))
     return true;
 #endif
-#if DECODE_DAIKIN
-  DPRINTLN("Attempting Daikin decode");
-  if (decodeDaikin(results))
-    return true;
-#endif
 #if DECODE_KELVINATOR
   DPRINTLN("Attempting Kelvinator decode");
   if (decodeKelvinator(results))
+    return true;
+#endif
+#if DECODE_DAIKIN
+  DPRINTLN("Attempting Daikin decode");
+  if (decodeDaikin(results))
     return true;
 #endif
 /* NOTE: Disabled due to poor quality.

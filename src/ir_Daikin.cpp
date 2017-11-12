@@ -3,7 +3,7 @@ An Arduino sketch to emulate IR Daikin ARC433** remote control unit
 Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
-Copyright 2016 sillyfrog
+Copyright 2017 sillyfrog
 */
 
 #include "ir_Daikin.h"
@@ -38,7 +38,8 @@ Copyright 2016 sillyfrog
 #if SEND_DAIKIN
 
 // Note bits in each octet swapped so can be sent as a single value
-#define FIRST_HEADER64 0b1101011100000000000000001100010100000000001001111101101000010001
+#define FIRST_HEADER64 \
+    0b1101011100000000000000001100010100000000001001111101101000010001
 // Original header
 // static uint8_t header1[DAIKIN_HEADER1_LENGTH];
 // header1[0] = 0b00010001;
@@ -125,7 +126,6 @@ void IRDaikinESP::checksum() {
   daikin[26] = sum & 0xFF;
 }
 
-
 void IRDaikinESP::stateReset() {
   for (uint8_t i = 4; i < DAIKIN_COMMAND_LENGTH; i++)
     daikin[i] = 0x0;
@@ -178,7 +178,6 @@ void IRDaikinESP::setPower(bool state) {
 bool IRDaikinESP::getPower() {
   return (getBit(DAIKIN_BYTE_POWER, DAIKIN_BIT_POWER) > 0);
 }
-
 
 // Set the temp in deg C
 void IRDaikinESP::setTemp(uint8_t temp) {
@@ -263,7 +262,6 @@ bool IRDaikinESP::getSwingHorizontal() {
   return daikin[17] & 0x01;
 }
 
-
 void IRDaikinESP::setQuiet(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
@@ -274,7 +272,6 @@ void IRDaikinESP::setQuiet(bool state) {
 bool IRDaikinESP::getQuiet() {
   return (getBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT) > 0);
 }
-
 
 void IRDaikinESP::setPowerful(bool state) {
   if (state)
@@ -287,7 +284,6 @@ bool IRDaikinESP::getPowerful() {
   return (getBit(DAIKIN_BYTE_POWERFUL, DAIKIN_BIT_POWERFUL) > 0);
 }
 
-
 void IRDaikinESP::setSensor(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_SENSOR, DAIKIN_BIT_SENSOR);
@@ -298,7 +294,6 @@ void IRDaikinESP::setSensor(bool state) {
 bool IRDaikinESP::getSensor() {
   return (getBit(DAIKIN_BYTE_SENSOR, DAIKIN_BIT_SENSOR) > 0);
 }
-
 
 void IRDaikinESP::setEcono(bool state) {
   if (state)
@@ -311,7 +306,6 @@ bool IRDaikinESP::getEcono() {
   return (getBit(DAIKIN_BYTE_ECONO, DAIKIN_BIT_ECONO) > 0);
 }
 
-
 void IRDaikinESP::setEye(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_EYE, DAIKIN_BIT_EYE);
@@ -323,7 +317,6 @@ bool IRDaikinESP::getEye() {
   return (getBit(DAIKIN_BYTE_EYE, DAIKIN_BIT_EYE) > 0);
 }
 
-
 void IRDaikinESP::setMold(bool state) {
   if (state)
     setBit(DAIKIN_BYTE_MOLD, DAIKIN_BIT_MOLD);
@@ -334,7 +327,6 @@ void IRDaikinESP::setMold(bool state) {
 bool IRDaikinESP::getMold() {
   return (getBit(DAIKIN_BYTE_MOLD, DAIKIN_BIT_MOLD) > 0);
 }
-
 
 void IRDaikinESP::setBit(uint8_t byte, uint8_t bitmask) {
   daikin[byte] |= bitmask;
@@ -496,7 +488,6 @@ void IRDaikinESP::printState() {
   Serial.print("Mold: ");
   Serial.println(getMold() ? "On" : "Off");
 
-
   Serial.print("Swing Vertical: ");
   Serial.println(getSwingVertical() ? "On" : "Off");
 
@@ -552,7 +543,6 @@ void IRDaikinESP::printState() {
 
 }
 #endif // UNIT_TEST
-
 #endif // DAIKIN_DEBUG
 
 /*
@@ -636,7 +626,7 @@ void IRDaikinESP::setCommand(uint32_t value) {
 #if DECODE_DAIKIN
 
 #define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
-#define DAIKIN_CURINDEX DAIKIN_COMMAND_LENGTH+1
+#define DAIKIN_CURINDEX (DAIKIN_COMMAND_LENGTH + 1)
 #define OFFSET_ERR 65432
 
 #define DAIKIN_TOLERANCE 35
@@ -659,12 +649,14 @@ void addbit(bool val, unsigned char data[]) {
   data[DAIKIN_CURINDEX] = curindex;
 }
 
-uint16_t checkheader(decode_results *results, uint16_t offset, unsigned char daikin_code[]) {
+uint16_t checkheader(decode_results *results, uint16_t offset,
+                     unsigned char daikin_code[]) {
   if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
     return OFFSET_ERR;
-  if (!IRrecv::matchSpace(results->rawbuf[offset++], DAIKIN_ZERO_SPACE + DAIKIN_GAP,
-              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+  if (!IRrecv::matchSpace(results->rawbuf[offset++],
+                          DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                          DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
     return OFFSET_ERR;
   if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_HDR_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
@@ -681,8 +673,10 @@ uint16_t checkheader(decode_results *results, uint16_t offset, unsigned char dai
   return offset;
 }
 
-uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin_code[], uint16_t countbits) {
-  for (uint16_t i = 0; i < countbits && offset < results->rawlen-1; i++, offset++) {
+uint16_t readbits(decode_results *results, uint16_t offset,
+                  unsigned char daikin_code[], uint16_t countbits) {
+  for (uint16_t i = 0; i < countbits && offset < results->rawlen - 1;
+       i++, offset++) {
     if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
       return OFFSET_ERR;
@@ -697,7 +691,6 @@ uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin
   }
   return offset;
 }
-
 
 // Decode the supplied Daikin A/C message.
 // Args:
@@ -721,13 +714,10 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (strict && nbits != DAIKIN_BITS)
     return false;
 
-  uint32_t data = 0;
   uint16_t offset = OFFSET_START;
   unsigned char daikin_code[DAIKIN_COMMAND_LENGTH + 2];
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
-  uint8_t code_bit = 0;
-  uint8_t code_index = 0;
 
   for (uint8_t i = 0; i < 10; i++) {
     if (!matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK))
@@ -744,7 +734,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
       return false;
 
   // Ignore everything that has just been captured as it is not needed.
-  // Some remotes may not send this portion, my remote did, but it's not required.
+  // Some remotes may not send this portion, my remote did, but it's not
+  // required.
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
 
@@ -762,7 +753,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
       return false;
 
   // Data (#3), read up everything else
-  offset = readbits(results, offset, daikin_code, (DAIKIN_COMMAND_LENGTH*8)-(8*8));
+  offset = readbits(results, offset, daikin_code,
+                    (DAIKIN_COMMAND_LENGTH * 8) - (8 * 8));
   if (offset == OFFSET_ERR)
       return false;
 
@@ -779,7 +771,6 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
     results->state[i] = daikin_code[i];
   results->bits = DAIKIN_COMMAND_LENGTH * 8;
   results->decode_type = DAIKIN;
-  //results->command = dako.getCommand(); // include the common options
   return true;
 }
 #endif  // DECODE_DAIKIN
