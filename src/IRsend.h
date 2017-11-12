@@ -157,6 +157,7 @@ class IRsend {
   void sendDaikin(unsigned char data[],
                   uint16_t nbytes = DAIKIN_COMMAND_LENGTH,
                   uint16_t repeat = 0);
+  void sendDaikinGapHeader();
 #endif
 #if SEND_AIWA_RC_T501
   void sendAiwaRCT501(uint64_t data, uint16_t nbits = AIWA_RC_T501_BITS,
