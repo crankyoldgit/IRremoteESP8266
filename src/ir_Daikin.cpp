@@ -37,7 +37,18 @@ Copyright 2017 sillyfrog
 
 #if SEND_DAIKIN
 
-
+// Note bits in each octet swapped so can be sent as a single value
+#define FIRST_HEADER64 0b1101011100000000000000001100010100000000001001111101101000010001
+// Original header
+// static uint8_t header1[DAIKIN_HEADER1_LENGTH];
+// header1[0] = 0b00010001;
+// header1[1] = 0b11011010;
+// header1[2] = 0b00100111;
+// header1[3] = 0b00000000;
+// header1[4] = 0b11000101;
+// header1[5] = 0b00000000;
+// header1[6] = 0b00000000;
+// header1[7] = 0b11010111;
 
 // Send a Daikin A/C message.
 //
@@ -53,49 +64,23 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
   if (nbytes < DAIKIN_COMMAND_LENGTH)
     return;  // Not enough bytes to send a proper message.
-  static uint8_t header1[DAIKIN_HEADER1_LENGTH];
-  header1[0] = 0b00010001;
-  header1[1] = 0b11011010;
-  header1[2] = 0b00100111;
-  header1[3] = 0b00000000;
-  header1[4] = 0b11000101;
-  header1[5] = 0b00000000;
-  header1[6] = 0b00000000;
-  header1[7] = 0b11010111;
   // Set IR carrier frequency
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
-    // Send the header, 5 * 0 bits
+    // Send the header, 0b00000
     sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
              DAIKIN_ZERO_SPACE, 0, 5, false);
-
-    mark(DAIKIN_ONE_MARK);
-    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
-    // Header #1
-    mark(DAIKIN_HDR_MARK);
-    space(DAIKIN_HDR_SPACE);
-    // Data #1
-    for (uint16_t i = 0; i < DAIKIN_HEADER1_LENGTH ; i++)
-      sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
-               DAIKIN_ZERO_SPACE, header1[i], 8, false);
-
-
-    mark(DAIKIN_ONE_MARK);
-    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
-    // Header #1
-    mark(DAIKIN_HDR_MARK);
-    space(DAIKIN_HDR_SPACE);
+    sendDaikinGapHeader();
+    // Leading header
+    // Do this as a constant to save RAM and keep in flash memory
+    sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
+             DAIKIN_ZERO_SPACE, FIRST_HEADER64, 64, false);
+    sendDaikinGapHeader();
     // Data #1
     for (uint16_t i = 0; i < 8 && i < nbytes; i++)
       sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
                DAIKIN_ZERO_SPACE, data[i], 8, false);
-    // Footer #1
-    mark(DAIKIN_ONE_MARK);
-    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
-
-    // Header #2
-    mark(DAIKIN_HDR_MARK);
-    space(DAIKIN_HDR_SPACE);
+    sendDaikinGapHeader();
     // Data #2
     for (uint16_t i = 8; i < nbytes; i++)
       sendData(DAIKIN_ONE_MARK, DAIKIN_ONE_SPACE, DAIKIN_ZERO_MARK,
@@ -104,6 +89,13 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
     mark(DAIKIN_ONE_MARK);
     space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
   }
+}
+
+void IRsend::sendDaikinGapHeader() {
+  mark(DAIKIN_ONE_MARK);
+  space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
+  mark(DAIKIN_HDR_MARK);
+  space(DAIKIN_HDR_SPACE);
 }
 
 IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) {
