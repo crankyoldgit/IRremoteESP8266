@@ -439,6 +439,8 @@ uint16_t IRDaikinESP::getCurrentTime() {
   return ret;
 }
 
+#if DAIKIN_DEBUG
+#ifdef ARDUINO
 String IRDaikinESP::renderTime(uint16_t timemins) {
   uint16_t hours, mins;
   hours = timemins / 60;
@@ -450,8 +452,6 @@ String IRDaikinESP::renderTime(uint16_t timemins) {
   ret = String(hours) + ret;
   return ret;
 }
-
-#if DAIKIN_DEBUG
 
 void IRDaikinESP::printState() {
   // Print what we have
@@ -544,6 +544,7 @@ void IRDaikinESP::printState() {
   Serial.print("Current Time: ");
   Serial.println(renderTime(getCurrentTime()));
 }
+#endif  // ARDUINO
 #endif  // DAIKIN_DEBUG
 
 /*
@@ -716,13 +717,10 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (strict && nbits != DAIKIN_BITS)
     return false;
 
-  uint32_t data = 0;
   uint16_t offset = OFFSET_START;
   unsigned char daikin_code[DAIKIN_COMMAND_LENGTH + 2];
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
-  uint8_t code_bit = 0;
-  uint8_t code_index = 0;
 
   for (uint8_t i = 0; i < 10; i++) {
     if (!matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK))
@@ -762,14 +760,17 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                     (DAIKIN_COMMAND_LENGTH * 8) - (8 * 8));
   if (offset == OFFSET_ERR)
       return false;
-
+#ifdef ARDUINO
   yield();
+#endif
 
   // Success
   IRDaikinESP dako = IRDaikinESP(0);
   dako.setRaw(daikin_code);
 #if DAIKIN_DEBUG
+#ifdef ARDUINO
   dako.printState();
+#endif
 #endif
 
   // Copy across the bits to state

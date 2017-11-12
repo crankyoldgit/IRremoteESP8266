@@ -148,10 +148,12 @@ class IRDaikinESP {
   uint16_t getCurrentTime();
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
-  String renderTime(uint16_t timemins);
 #if DAIKIN_DEBUG
+#ifdef ARDUINO
+  String renderTime(uint16_t timemins);
   void printState();
-#endif
+#endif  // ARDUINO
+#endif  // DAIKIN_DEBUG
   uint32_t getCommand();
   void setCommand(uint32_t value);
 
