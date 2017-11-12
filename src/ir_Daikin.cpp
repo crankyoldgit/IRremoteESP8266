@@ -718,7 +718,7 @@ uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                           bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER)
+  if (results->rawlen < DAIKIN_BITS)
     return false;
 
   // Compliance
@@ -779,11 +779,12 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   dako.printState();
 #endif
 
-  results->bits = DAIKIN_BITS;
-  results->value = 0; // don't pretend to have all the data here
+  // Copy across the bits to state
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
+    results->state[i] = daikin_code[i];
+  results->bits = DAIKIN_COMMAND_LENGTH * 8;
   results->decode_type = DAIKIN;
-  results->address = 0;
-  results->command = dako.getCommand(); // include the common options
+  //results->command = dako.getCommand(); // include the common options
   return true;
 }
 #endif  // DECODE_DAIKIN
