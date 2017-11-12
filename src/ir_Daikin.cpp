@@ -64,15 +64,6 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
   if (nbytes < DAIKIN_COMMAND_LENGTH)
     return;  // Not enough bytes to send a proper message.
-  static uint8_t header1[DAIKIN_HEADER1_LENGTH];
-  header1[0] = 0b00010001;
-  header1[1] = 0b11011010;
-  header1[2] = 0b00100111;
-  header1[3] = 0b00000000;
-  header1[4] = 0b11000101;
-  header1[5] = 0b00000000;
-  header1[6] = 0b00000000;
-  header1[7] = 0b11010111;
   // Set IR carrier frequency
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
