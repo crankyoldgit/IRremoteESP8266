@@ -9,7 +9,7 @@
 #endif
 
 // Option to disable the additional Daikin debug info to conserve memory
-#define DAIKIN_DEBUG 1
+#define DAIKIN_DEBUG 1 // XXX
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -101,6 +101,11 @@
 #define DAIKIN_BYTE_MOLD              25
 #define DAIKIN_BIT_MOLD       0b00000010
 
+#define DAIKIN_BYTE_OFF_TIMER         13
+#define DAIKIN_BIT_OFF_TIMER  0b00000100
+#define DAIKIN_BYTE_ON_TIMER          13
+#define DAIKIN_BIT_ON_TIMER   0b00000010
+
 #if SEND_DAIKIN
 class IRDaikinESP {
  public:
@@ -148,6 +153,11 @@ class IRDaikinESP {
   uint16_t getCurrentTime();
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
+#ifdef UNIT_TEST
+  uint16_t renderTime(uint16_t timemins);
+#else
+  String renderTime(uint16_t timemins);
+#endif
 #if DAIKIN_DEBUG
 #ifdef ARDUINO
   String renderTime(uint16_t timemins);

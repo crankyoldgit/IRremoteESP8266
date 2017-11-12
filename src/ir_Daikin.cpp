@@ -3,7 +3,7 @@ An Arduino sketch to emulate IR Daikin ARC433** remote control unit
 Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
-Copyright 2017 sillyfrog
+Copyright 2016 sillyfrog
 */
 
 #include "ir_Daikin.h"
@@ -108,6 +108,7 @@ void IRDaikinESP::begin() {
 }
 
 void IRDaikinESP::send() {
+  checksum();
   _irsend.sendDaikin(daikin);
 }
 
@@ -185,7 +186,6 @@ void IRDaikinESP::setTemp(uint8_t temp) {
   else if (temp > DAIKIN_MAX_TEMP)
     temp = DAIKIN_MAX_TEMP;
   daikin[14] = temp * 2;
-  checksum();
 }
 
 uint8_t IRDaikinESP::getTemp() {
@@ -205,16 +205,12 @@ void IRDaikinESP::setFan(uint8_t fan) {
   fanset = fanset << 4;
   daikin[16] &= 0x0F;
   daikin[16] |= fanset;
-  checksum();
 }
 
 uint8_t IRDaikinESP::getFan() {
   uint8_t fan = daikin[16] >> 4;
-  if (fan == DAIKIN_FAN_QUITE || fan == DAIKIN_FAN_AUTO) {
-    // pass
-  } else {
+  if (fan != DAIKIN_FAN_QUITE && fan != DAIKIN_FAN_AUTO)
     fan -= 2;
-  }
   return fan;
 }
 
@@ -239,10 +235,9 @@ void IRDaikinESP::setMode(uint8_t mode) {
     default:
       mode = DAIKIN_AUTO;
   }
-  mode = mode << 4;
+  mode <<= 4;
   daikin[13] &= 0b10001111;
   daikin[13] |= mode;
-  checksum();
 }
 
 void IRDaikinESP::setSwingVertical(bool state) {
@@ -250,7 +245,6 @@ void IRDaikinESP::setSwingVertical(bool state) {
     daikin[16] |= 0x0F;
   else
     daikin[16] &= 0xF0;
-  checksum();
 }
 
 bool IRDaikinESP::getSwingVertical() {
@@ -262,7 +256,6 @@ void IRDaikinESP::setSwingHorizontal(bool state) {
     daikin[17] |= 0x0F;
   else
     daikin[17] &= 0xF0;
-  checksum();
 }
 
 bool IRDaikinESP::getSwingHorizontal() {
@@ -337,39 +330,33 @@ bool IRDaikinESP::getMold() {
 
 void IRDaikinESP::setBit(uint8_t byte, uint8_t bitmask) {
   daikin[byte] |= bitmask;
-  checksum();
 }
 
 void IRDaikinESP::clearBit(uint8_t byte, uint8_t bitmask) {
   bitmask = ~bitmask;
   daikin[byte] &= bitmask;
-  checksum();
 }
 
 uint8_t IRDaikinESP::getBit(uint8_t byte, uint8_t bitmask) {
-  uint8_t ret;
-  ret = daikin[byte] & bitmask;
-  return ret;
+  return daikin[byte] & bitmask;
 }
 
 // starttime: Number of minutes after midnight, in 10 minutes increments
 void IRDaikinESP::enableOnTimer(uint16_t starttime) {
-  daikin[13] |= 0b00000010;
+  setBit(DAIKIN_BYTE_ON_TIMER, DAIKIN_BIT_ON_TIMER);
   uint16_t lopbits;
   lopbits = starttime;
   lopbits &= 0x00FF;
   daikin[18] = lopbits;
-  starttime = starttime >> 8;
+  starttime >>= 8;
   // only keep 4 bits
   daikin[19] &= 0xF0;
   daikin[19] |= starttime;
-  checksum();
 }
 
 void IRDaikinESP::disableOnTimer() {
   enableOnTimer(0x600);
-  daikin[13] &= 0b11111101;
-  checksum();
+  clearBit(DAIKIN_BYTE_ON_TIMER, DAIKIN_BIT_ON_TIMER);
 }
 
 uint16_t IRDaikinESP::getOnTime() {
@@ -381,42 +368,40 @@ uint16_t IRDaikinESP::getOnTime() {
 }
 
 bool IRDaikinESP::getOnTimerEnabled() {
-    return daikin[13] & 0b00000010;
+  return getBit(DAIKIN_BYTE_ON_TIMER, DAIKIN_BIT_ON_TIMER);
 }
 
 // endtime: Number of minutes after midnight, in 10 minutes increments
 void IRDaikinESP::enableOffTimer(uint16_t endtime) {
-  daikin[13] |= 0b00000100;
+  setBit(DAIKIN_BYTE_OFF_TIMER, DAIKIN_BIT_OFF_TIMER);
   uint16_t lopbits;
   lopbits = endtime;
   lopbits &= 0x0FF0;
-  lopbits = lopbits >> 4;
+  lopbits >>= 4;
   daikin[20] = lopbits;
   endtime &= 0x000F;
-  endtime = endtime << 4;
+  endtime <<= 4;
   daikin[19] &= 0x0F;
   daikin[19] |= endtime;
-  checksum();
 }
 
 void IRDaikinESP::disableOffTimer() {
   enableOffTimer(0x600);
-  daikin[13] &= 0b11111011;
-  checksum();
+  clearBit(DAIKIN_BYTE_OFF_TIMER, DAIKIN_BIT_OFF_TIMER);
 }
 
 uint16_t IRDaikinESP::getOffTime() {
   uint16_t ret, tmp;
   ret = daikin[20];
-  ret = ret << 4;
+  ret <<= 4;
   tmp = daikin[19] & 0xF0;
-  tmp = tmp >> 4;
+  tmp >>= 4;
   ret += tmp;
   return ret;
 }
 
 bool IRDaikinESP::getOffTimerEnabled() {
-  return daikin[13] & 0b00000100;
+  return getBit(DAIKIN_BYTE_OFF_TIMER, DAIKIN_BIT_OFF_TIMER);
 }
 
 void IRDaikinESP::setCurrentTime(uint16_t time) {
@@ -428,19 +413,21 @@ void IRDaikinESP::setCurrentTime(uint16_t time) {
   // only keep 4 bits
   daikin[6] &= 0xF0;
   daikin[6] |= time;
-  checksum();
 }
 
 uint16_t IRDaikinESP::getCurrentTime() {
   uint16_t ret;
   ret = daikin[6] & 0x0F;
-  ret = ret << 8;
+  ret <<= 8;
   ret += daikin[5];
   return ret;
 }
 
-#if DAIKIN_DEBUG
-#ifdef ARDUINO
+#ifdef UNIT_TEST
+uint16_t IRDaikinESP::renderTime(uint16_t timemins) {
+  return timemins;
+}
+#else
 String IRDaikinESP::renderTime(uint16_t timemins) {
   uint16_t hours, mins;
   hours = timemins / 60;
@@ -452,7 +439,15 @@ String IRDaikinESP::renderTime(uint16_t timemins) {
   ret = String(hours) + ret;
   return ret;
 }
+#endif
 
+#if DAIKIN_DEBUG
+
+#ifdef UNIT_TEST
+void IRDaikinESP::printState() {
+  // Pass for Unit Tests
+}
+#else
 void IRDaikinESP::printState() {
   // Print what we have
   Serial.println("Raw Bits:");
@@ -544,8 +539,9 @@ void IRDaikinESP::printState() {
   Serial.print("Current Time: ");
   Serial.println(renderTime(getCurrentTime()));
 }
-#endif  // ARDUINO
-#endif  // DAIKIN_DEBUG
+#endif // UNIT_TEST
+
+#endif // DAIKIN_DEBUG
 
 /*
  * Return most important bits to allow replay
@@ -571,11 +567,11 @@ uint32_t IRDaikinESP::getCommand() {
   ret |= tmp;
 
   tmp = getFan();
-  tmp = tmp << 4;
+  tmp <<= 4;
   ret |= tmp;
 
   tmp = getTemp();
-  tmp = tmp << 8;
+  tmp <<= 8;
   ret |= tmp;
 
   if (getEcono())
@@ -588,9 +584,7 @@ uint32_t IRDaikinESP::getCommand() {
     ret |= 0b00000000000001000000000000000000;
   if (getSwingVertical())
     ret |= 0b00000000000010000000000000000000;
-  uint32_t time = getCurrentTime();
-  time = time << 20;
-  ret |= time;
+  ret |= (getCurrentTime() << 20);
   return ret;
 }
 
@@ -599,15 +593,15 @@ void IRDaikinESP::setCommand(uint32_t value) {
   if (value & 0b00000000000000000000000000000001)
     setPower(true);
   tmp = value & 0b00000000000000000000000000001110;
-  tmp = tmp >> 1;
+  tmp >>= 1;
   setMode(tmp);
 
   tmp = value & 0b00000000000000000000000011110000;
-  tmp = tmp >> 4;
+  tmp >>= 4;
   setFan(tmp);
 
   tmp = value & 0b00000000000000000111111100000000;
-  tmp = tmp >> 8;
+  tmp >>= 8;
   setTemp(tmp);
 
   if (value & 0b00000000000000001000000000000000)
@@ -621,7 +615,7 @@ void IRDaikinESP::setCommand(uint32_t value) {
   if (value & 0b00000000000010000000000000000000)
     setSwingVertical(true);
 
-  value = value >> 20;
+  value >>= 20;
   setCurrentTime(value);
 }
 #endif  // SEND_DAIKIN
@@ -760,17 +754,13 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                     (DAIKIN_COMMAND_LENGTH * 8) - (8 * 8));
   if (offset == OFFSET_ERR)
       return false;
-#ifdef ARDUINO
-  yield();
-#endif
 
   // Success
   IRDaikinESP dako = IRDaikinESP(0);
   dako.setRaw(daikin_code);
 #if DAIKIN_DEBUG
-#ifdef ARDUINO
+  yield();
   dako.printState();
-#endif
 #endif
 
   // Copy across the bits to state
