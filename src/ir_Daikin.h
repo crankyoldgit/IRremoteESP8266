@@ -4,7 +4,9 @@
 
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifndef UNIT_TEST
 #include <Arduino.h>
+#endif
 
 // Option to disable the additional Daikin debug info to conserve memory
 #define DAIKIN_DEBUG 1
