@@ -38,7 +38,8 @@ Copyright 2017 sillyfrog
 #if SEND_DAIKIN
 
 // Note bits in each octet swapped so can be sent as a single value
-#define FIRST_HEADER64 0b1101011100000000000000001100010100000000001001111101101000010001
+#define FIRST_HEADER64 \
+    0b1101011100000000000000001100010100000000001001111101101000010001
 // Original header
 // static uint8_t header1[DAIKIN_HEADER1_LENGTH];
 // header1[0] = 0b00010001;
@@ -211,10 +212,11 @@ void IRDaikinESP::setFan(uint8_t fan) {
 
 uint8_t IRDaikinESP::getFan() {
   uint8_t fan = daikin[16] >> 4;
-  if (fan == DAIKIN_FAN_QUITE || fan == DAIKIN_FAN_AUTO)
-    {} // pass
-  else
+  if (fan == DAIKIN_FAN_QUITE || fan == DAIKIN_FAN_AUTO) {
+    // pass
+  } else {
     fan -= 2;
+  }
   return fan;
 }
 
@@ -552,10 +554,9 @@ void IRDaikinESP::printState() {
 
   Serial.print("Current Time: ");
   Serial.println(renderTime(getCurrentTime()));
-
 }
 
-#endif // DAIKIN_DEBUG
+#endif  // DAIKIN_DEBUG
 
 /*
  * Return most important bits to allow replay
@@ -663,12 +664,14 @@ void addbit(bool val, unsigned char data[]) {
   data[DAIKIN_CURINDEX] = curindex;
 }
 
-uint16_t checkheader(decode_results *results, uint16_t offset, unsigned char daikin_code[]) {
+uint16_t checkheader(decode_results *results, uint16_t offset,
+                     unsigned char daikin_code[]) {
   if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ZERO_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
     return OFFSET_ERR;
-  if (!IRrecv::matchSpace(results->rawbuf[offset++], DAIKIN_ZERO_SPACE + DAIKIN_GAP,
-              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+  if (!IRrecv::matchSpace(results->rawbuf[offset++],
+                          DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                          DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
     return OFFSET_ERR;
   if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_HDR_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
@@ -685,8 +688,10 @@ uint16_t checkheader(decode_results *results, uint16_t offset, unsigned char dai
   return offset;
 }
 
-uint16_t readbits(decode_results *results, uint16_t offset, unsigned char daikin_code[], uint16_t countbits) {
-  for (uint16_t i = 0; i < countbits && offset < results->rawlen-1; i++, offset++) {
+uint16_t readbits(decode_results *results, uint16_t offset,
+                  unsigned char daikin_code[], uint16_t countbits) {
+  for (uint16_t i = 0; i < countbits && offset < results->rawlen-1;
+       i++, offset++) {
     if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_ONE_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
       return OFFSET_ERR;
@@ -748,7 +753,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
       return false;
 
   // Ignore everything that has just been captured as it is not needed.
-  // Some remotes may not send this portion, my remote did, but it's not required.
+  // Some remotes may not send this portion, my remote did, but it's not
+  // required.
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
 
@@ -766,7 +772,8 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
       return false;
 
   // Data (#3), read up everything else
-  offset = readbits(results, offset, daikin_code, (DAIKIN_COMMAND_LENGTH*8)-(8*8));
+  offset = readbits(results, offset, daikin_code,
+                    (DAIKIN_COMMAND_LENGTH * 8) - (8 * 8));
   if (offset == OFFSET_ERR)
       return false;
 
@@ -784,7 +791,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
     results->state[i] = daikin_code[i];
   results->bits = DAIKIN_COMMAND_LENGTH * 8;
   results->decode_type = DAIKIN;
-  //results->command = dako.getCommand(); // include the common options
+  //  results->command = dako.getCommand(); // include the common options
   return true;
 }
 #endif  // DECODE_DAIKIN
