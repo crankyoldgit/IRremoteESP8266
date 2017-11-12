@@ -79,7 +79,6 @@
 #define DAIKIN_DRY                 0b010
 #define DAIKIN_MIN_TEMP               10U  // Celsius
 #define DAIKIN_MAX_TEMP               32U  // Celsius
-#define DAIKIN_FAN_AUTO      (uint8_t) 0U
 #define DAIKIN_FAN_MIN       (uint8_t) 1U
 #define DAIKIN_FAN_MAX       (uint8_t) 5U
 #define DAIKIN_FAN_AUTO      (uint8_t) 0b1010
