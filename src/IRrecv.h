@@ -46,6 +46,17 @@
 #define FNV_PRIME_32 16777619UL
 #define FNV_BASIS_32 2166136261UL
 
+#define MAX2(a, b) ((a > b)?(a):(b))
+#define MAX4(a, b, c, d) MAX2(MAX2(a, b), MAX2(c, d))
+#define STATE_SIZE_MAX MAX2(MAX4(ARGO_COMMAND_LENGTH, \
+                                 TROTEC_COMMAND_LENGTH, \
+                                 MITSUBISHI_AC_STATE_LENGTH, \
+                                 KELVINATOR_STATE_LENGTH), \
+                            MAX4(GREE_STATE_LENGTH, \
+                                 DAIKIN_COMMAND_LENGTH, \
+                                 TOSHIBA_AC_STATE_LENGTH, \
+                                 FUJITSU_AC_STATE_LENGTH))
+
 // Types
 // information for the interrupt handler
 typedef struct {
@@ -74,14 +85,24 @@ typedef struct {
 class decode_results {
  public:
   decode_type_t decode_type;  // NEC, SONY, RC5, UNKNOWN
-  uint64_t value;  // Decoded value
+  // value, address, & command are all mutually exclusive with state.
+  // i.e. They MUST NOT be used at the same time as state, so we can use a union
+  // structure to save us a handful of valuable bytes of memory.
+  union {
+    struct {
+      uint64_t value;  // Decoded value
+      uint32_t address;  // Decoded device address.
+      uint32_t command;  // Decoded command.
+    };
+#if DECODE_AC  // Only include state if we must. It's big.
+    uint8_t state[STATE_SIZE_MAX];  // Complex multi-byte A/C result.
+#endif
+  };
   uint16_t bits;  // Number of bits in decoded value
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks
   uint16_t rawlen;  // Number of records in rawbuf.
   bool overflow;
   bool repeat;  // Is the result a repeat code?
-  uint32_t address;  // Decoded device address.
-  uint32_t command;  // Decoded command.
 };
 
 // main class for receiving IR
@@ -205,6 +226,11 @@ class IRrecv {
 #if DECODE_DAIKIN
   bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_BITS,
                    bool strict = true);
+#endif
+#if DECODE_KELVINATOR
+  bool decodeKelvinator(decode_results *results,
+                        uint16_t nbits = KELVINATOR_BITS,
+                        bool strict = true);
 #endif
 };
 

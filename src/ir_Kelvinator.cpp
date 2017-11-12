@@ -16,6 +16,9 @@
 
 #include "ir_Kelvinator.h"
 #include <algorithm>
+#include "IRrecv.h"
+#include "IRsend.h"
+#include "IRutils.h"
 
 // KK  KK EEEEEEE LL     VV     VV IIIII NN   NN   AAA   TTTTTTT  OOOOO  RRRRRR
 // KK KK  EE      LL     VV     VV  III  NNN  NN  AAAAA    TTT   OO   OO RR   RR
@@ -24,13 +27,21 @@
 // KK  KK EEEEEEE LLLLLLL   VVV    IIIII NN   NN AA   AA   TTT    OOOO0  RR   RR
 
 // Constants
-#define KELVINATOR_HDR_MARK                 8990U
-#define KELVINATOR_HDR_SPACE                4490U
-#define KELVINATOR_BIT_MARK                  675U
-#define KELVINATOR_ONE_SPACE                1560U
-#define KELVINATOR_ZERO_SPACE                520U
-#define KELVINATOR_GAP_SPACE               19950U
+#define KELVINATOR_TICK                       85U
+#define KELVINATOR_HDR_MARK_TICKS            106U
+#define KELVINATOR_HDR_MARK      (KELVINATOR_HDR_MARK_TICKS * KELVINATOR_TICK)
+#define KELVINATOR_HDR_SPACE_TICKS            53U
+#define KELVINATOR_HDR_SPACE     (KELVINATOR_HDR_SPACE_TICKS * KELVINATOR_TICK)
+#define KELVINATOR_BIT_MARK_TICKS              8U
+#define KELVINATOR_BIT_MARK      (KELVINATOR_BIT_MARK_TICKS * KELVINATOR_TICK)
+#define KELVINATOR_ONE_SPACE_TICKS            18U
+#define KELVINATOR_ONE_SPACE     (KELVINATOR_ONE_SPACE_TICKS * KELVINATOR_TICK)
+#define KELVINATOR_ZERO_SPACE_TICKS            6U
+#define KELVINATOR_ZERO_SPACE    (KELVINATOR_ZERO_SPACE_TICKS * KELVINATOR_TICK)
+#define KELVINATOR_GAP_SPACE_TICKS           235U
+#define KELVINATOR_GAP_SPACE     (KELVINATOR_GAP_SPACE_TICKS * KELVINATOR_TICK)
 #define KELVINATOR_CMD_FOOTER                  2U
+#define KELVINATOR_CMD_FOOTER_BITS             3U
 
 #define KELVINATOR_POWER                       8U
 #define KELVINATOR_MODE_MASK                0xF8U
@@ -84,7 +95,8 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
                KELVINATOR_ZERO_SPACE, data[i], 8, false);
     // Send Footer for the command data (3 bits (0b010))
     sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
+             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER,
+             KELVINATOR_CMD_FOOTER_BITS, false);
     // Send an interdata gap.
     mark(KELVINATOR_BIT_MARK);
     space(KELVINATOR_GAP_SPACE);
@@ -107,7 +119,8 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
                KELVINATOR_ZERO_SPACE, data[i], 8, false);
     // Send Footer for the command data (3 bits (B010))
     sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER, 3, false);
+             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER,
+             KELVINATOR_CMD_FOOTER_BITS, false);
     // Send an interdata gap.
     mark(KELVINATOR_BIT_MARK);
     space(KELVINATOR_GAP_SPACE);
@@ -326,4 +339,125 @@ void IRKelvinatorAC::setTurbo(bool state) {
 bool IRKelvinatorAC::getTurbo() {
   return ((remote_state[2] & KELVINATOR_TURBO) != 0);
 }
-#endif
+#endif  // SEND_KELVINATOR
+
+#if DECODE_KELVINATOR
+// Decode the supplied Kelvinator message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically KELVINATOR_BITS.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Untested.
+bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
+                              bool strict) {
+  if (results->rawlen < 2 * (nbits + KELVINATOR_CMD_FOOTER_BITS) +
+                        (HEADER + FOOTER + 1) * 2 - 1)
+    return false;  // Can't possibly be a valid Kelvinator message.
+  if (strict && nbits != KELVINATOR_BITS)
+    return false;  // Not strictly a Kelvinator message.
+
+  uint32_t data;
+  uint16_t offset = OFFSET_START;
+
+  // There are two messages back-to-back in a full Kelvinator IR message
+  // sequence.
+  int8_t state_pos = 0;
+  for (uint8_t s = 0; s < 2; s++) {
+    match_result_t data_result;
+
+    // Header
+    if (!matchMark(results->rawbuf[offset], KELVINATOR_HDR_MARK)) return false;
+    // Calculate how long the lowest tick time is based on the header mark.
+    uint32_t mark_tick = results->rawbuf[offset++] * RAWTICK /
+        KELVINATOR_HDR_MARK_TICKS;
+    if (!matchSpace(results->rawbuf[offset], KELVINATOR_HDR_SPACE))
+      return false;
+    // Calculate how long the common tick time is based on the header space.
+    uint32_t space_tick = results->rawbuf[offset++] * RAWTICK /
+        KELVINATOR_HDR_SPACE_TICKS;
+
+    // Data (Command) (32 bits)
+    data_result = matchData(&(results->rawbuf[offset]), 32,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ONE_SPACE_TICKS * space_tick,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ZERO_SPACE_TICKS * space_tick);
+    if (data_result.success == false) return false;
+    data = data_result.data;
+    offset += data_result.used;
+
+    // Record command data in the state.
+    for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
+      results->state[i] = reverseBits(data & 0xFF, 8);
+    state_pos += 4;
+
+    // Command data footer (3 bits, B010)
+    data_result = matchData(&(results->rawbuf[offset]),
+                            KELVINATOR_CMD_FOOTER_BITS,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ONE_SPACE_TICKS * space_tick,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ZERO_SPACE_TICKS * space_tick);
+    if (data_result.success == false) return false;
+    if (data_result.data != KELVINATOR_CMD_FOOTER) return false;
+    offset += data_result.used;
+
+    // Interdata gap.
+    if (!matchMark(results->rawbuf[offset++],
+                   KELVINATOR_BIT_MARK_TICKS * mark_tick))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++],
+                    KELVINATOR_GAP_SPACE_TICKS * space_tick))
+      return false;
+
+    // Data (Options) (32 bits)
+    data_result = matchData(&(results->rawbuf[offset]), 32,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ONE_SPACE_TICKS * space_tick,
+                            KELVINATOR_BIT_MARK_TICKS * mark_tick,
+                            KELVINATOR_ZERO_SPACE_TICKS * space_tick);
+    if (data_result.success == false) return false;
+    data = data_result.data;
+    offset += data_result.used;
+
+    // Record option data in the state.
+    for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
+      results->state[i] = reverseBits(data & 0xFF, 8);
+    state_pos += 4;
+
+    // Inter-sequence gap. (Double length gap)
+    if (!matchMark(results->rawbuf[offset++],
+                   KELVINATOR_BIT_MARK_TICKS * mark_tick))
+      return false;
+    if (s == 0) {
+      if (!matchSpace(results->rawbuf[offset++],
+                      KELVINATOR_GAP_SPACE_TICKS * space_tick * 2))
+        return false;
+    } else {
+      if (offset <= results->rawlen &&
+          !matchAtLeast(results->rawbuf[offset],
+                        KELVINATOR_GAP_SPACE_TICKS * 2 * space_tick))
+        return false;
+    }
+  }
+
+  // Compliance
+  if (strict) {
+    // Correct size/length)
+    if (state_pos != KELVINATOR_STATE_LENGTH) return false;
+    // TODO(crankyoldgit): Add a checksum test.
+  }
+
+  // Success
+  results->decode_type = KELVINATOR;
+  results->bits = state_pos * 8;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_KELVINATOR
