@@ -307,6 +307,13 @@ TEST(TestDaikinClass, QuietMode) {
   irdaikin.setQuiet(true);
   EXPECT_TRUE(irdaikin.getQuiet());
 
+  // Setting Econo mode should NOT change out of quiet mode.
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getQuiet());
+  irdaikin.setEcono(false);
+  EXPECT_TRUE(irdaikin.getQuiet());
+
+  // But setting Powerful mode should exit out of quiet mode.
   irdaikin.setPowerful(true);
   EXPECT_FALSE(irdaikin.getQuiet());
 }
@@ -326,6 +333,34 @@ TEST(TestDaikinClass, PowerfulMode) {
 
   irdaikin.setQuiet(true);
   EXPECT_FALSE(irdaikin.getPowerful());
+
+  irdaikin.setPowerful(true);
+  irdaikin.setEcono(true);
+  EXPECT_FALSE(irdaikin.getPowerful());
+}
+
+TEST(TestDaikinClass, EconoMode) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  irdaikin.setEcono(false);
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  // Setting Quiet mode should NOT change out of Econo mode.
+  irdaikin.setQuiet(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+  irdaikin.setQuiet(false);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  // But setting Powerful mode should exit out of Econo mode.
+  irdaikin.setPowerful(true);
+  EXPECT_FALSE(irdaikin.getEcono());
 }
 
 TEST(TestDaikinClass, FanSpeed) {
