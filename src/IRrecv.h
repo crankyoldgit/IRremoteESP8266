@@ -229,7 +229,7 @@ class IRrecv {
                         bool strict = true);
 #endif
 #if DECODE_DAIKIN
-  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_BITS,
+  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_RAW_BITS,
                     bool strict = true);
 #endif
 };

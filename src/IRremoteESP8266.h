@@ -193,9 +193,10 @@ enum decode_type_t {
 #define AIWA_RC_T501_BITS           15U
 #define AIWA_RC_T501_MIN_REPEAT      1U
 #define COOLIX_BITS                 24U
-#define DAIKIN_COMMAND_LENGTH       27U
 // Daikin has a lot of static stuff that is discarded
-#define DAIKIN_BITS                 583U
+#define DAIKIN_RAW_BITS            583U
+#define DAIKIN_COMMAND_LENGTH       27U
+#define DAIKIN_BITS                 (DAIKIN_COMMAND_LENGTH * 8)
 #define DENON_BITS                  SHARP_BITS
 #define DENON_48_BITS               PANASONIC_BITS
 #define DENON_LEGACY_BITS           14U

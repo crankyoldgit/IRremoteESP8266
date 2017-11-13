@@ -622,53 +622,47 @@ void addbit(bool val, unsigned char data[]) {
   data[DAIKIN_CURINDEX] = curindex;
 }
 
-uint16_t checkheader(decode_results *results, uint16_t offset,
-                     unsigned char daikin_code[]) {
-  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK,
-              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
-    return OFFSET_ERR;
-  if (!IRrecv::matchSpace(results->rawbuf[offset++],
+bool checkheader(decode_results *results, uint16_t* offset) {
+  if (!IRrecv::matchMark(results->rawbuf[(*offset)++], DAIKIN_BIT_MARK,
+                         DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return false;
+  if (!IRrecv::matchSpace(results->rawbuf[(*offset)++],
                           DAIKIN_ZERO_SPACE + DAIKIN_GAP,
                           DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
-    return OFFSET_ERR;
-  if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_HDR_MARK,
-              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
-    return OFFSET_ERR;
-  if (!IRrecv::matchSpace(results->rawbuf[offset++], DAIKIN_HDR_SPACE,
-              DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
-    return OFFSET_ERR;
-  /*
-  if (daikin_code[DAIKIN_CURBIT] != 0) {
-    daikin_code[DAIKIN_CURBIT] = 0;
-    daikin_code[DAIKIN_CURINDEX]++;
-  }
-  */
-  return offset;
+    return false;
+  if (!IRrecv::matchMark(results->rawbuf[(*offset)++], DAIKIN_HDR_MARK,
+                         DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return false;
+  if (!IRrecv::matchSpace(results->rawbuf[(*offset)++], DAIKIN_HDR_SPACE,
+                          DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
+    return false;
+
+  return true;
 }
 
-uint16_t readbits(decode_results *results, uint16_t offset,
-                  unsigned char daikin_code[], uint16_t countbits) {
-  for (uint16_t i = 0; i < countbits && offset < results->rawlen - 1;
-       i++, offset++) {
-    if (!IRrecv::matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK,
+bool readbits(decode_results *results, uint16_t *offset,
+              unsigned char daikin_code[], uint16_t countbits) {
+  for (uint16_t i = 0; i < countbits && *offset < results->rawlen - 1;
+       i++, (*offset)++) {
+    if (!IRrecv::matchMark(results->rawbuf[(*offset)++], DAIKIN_BIT_MARK,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
-      return OFFSET_ERR;
-    if (IRrecv::matchSpace(results->rawbuf[offset], DAIKIN_ONE_SPACE,
+      return false;
+    if (IRrecv::matchSpace(results->rawbuf[*offset], DAIKIN_ONE_SPACE,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
       addbit(1, daikin_code);
-    else if (IRrecv::matchSpace(results->rawbuf[offset], DAIKIN_ZERO_SPACE,
+    else if (IRrecv::matchSpace(results->rawbuf[*offset], DAIKIN_ZERO_SPACE,
               DAIKIN_TOLERANCE, DAIKIN_MARK_EXCESS))
       addbit(0, daikin_code);
     else
-      return OFFSET_ERR;
+      return false;
   }
-  return offset;
+  return true;
 }
 
 // Decode the supplied Daikin A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically DAIKIN_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. (DAIKIN_RAW_BITS)
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -680,11 +674,11 @@ uint16_t readbits(decode_results *results, uint16_t offset,
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                           bool strict) {
-  if (results->rawlen < DAIKIN_BITS)
+  if (results->rawlen < DAIKIN_RAW_BITS)
     return false;
 
   // Compliance
-  if (strict && nbits != DAIKIN_BITS)
+  if (strict && nbits != DAIKIN_RAW_BITS)
     return false;
 
   uint16_t offset = OFFSET_START;
@@ -692,51 +686,53 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
     daikin_code[i] = 0;
 
+  // Header (#1)
   for (uint8_t i = 0; i < 10; i++) {
     if (!matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK))
       return false;
   }
-  // Daikin GAP
-  offset = checkheader(results, offset, daikin_code);
-  if (offset == OFFSET_ERR)
-      return false;
+  if (!checkheader(results, &offset)) return false;
 
   // Data (#1)
-  offset = readbits(results, offset, daikin_code, 8*8);
-  if (offset == OFFSET_ERR)
-      return false;
+  if (!readbits(results, &offset, daikin_code, 8 * 8)) return false;
 
   // Ignore everything that has just been captured as it is not needed.
   // Some remotes may not send this portion, my remote did, but it's not
   // required.
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH + 2; i++)
     daikin_code[i] = 0;
 
-  offset = checkheader(results, offset, daikin_code);
-  if (offset == OFFSET_ERR)
-      return false;
+  // Header (#2)
+  if (!checkheader(results, &offset)) return false;
 
   // Data (#2)
-  offset = readbits(results, offset, daikin_code, 8*8);
-  if (offset == OFFSET_ERR)
-      return false;
+  if (!readbits(results, &offset, daikin_code, 8 * 8)) return false;
 
-  offset = checkheader(results, offset, daikin_code);
-  if (offset == OFFSET_ERR)
-      return false;
+  // Header (#3)
+  if (!checkheader(results, &offset)) return false;
 
   // Data (#3), read up everything else
-  offset = readbits(results, offset, daikin_code,
-                    (DAIKIN_COMMAND_LENGTH * 8) - (8 * 8));
-  if (offset == OFFSET_ERR)
-      return false;
+  if (!readbits(results, &offset, daikin_code, DAIKIN_BITS - (8 * 8)))
+    return false;
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], DAIKIN_BIT_MARK))
+    return false;
+  if (offset <= results->rawlen && !matchAtLeast(results->rawbuf[offset],
+                                                 DAIKIN_GAP))
+    return false;
+
+  // Compliance
+  // TODO(crankyoldgit): Add a check to see if the checksums match.
 
   // Success
+#if DAIKIN_DEBUG
   IRDaikinESP dako = IRDaikinESP(0);
   dako.setRaw(daikin_code);
-#if DAIKIN_DEBUG
+#ifdef ARDUINO
   yield();
   dako.printState();
+#endif
 #endif
 
   // Copy across the bits to state
