@@ -98,14 +98,12 @@ void IRDaikinESP::send() {
 
 void IRDaikinESP::checksum() {
   uint8_t sum = 0;
-  uint8_t i;
-
-  for (i = 0; i <= 6; i++)
+  for (uint8_t i = 0; i <= 6; i++)
     sum += daikin[i];
-
   daikin[7] = sum & 0xFF;
+
   sum = 0;
-  for (i = 8; i <= 25; i++)
+  for (uint8_t i = 8; i <= 25; i++)
     sum += daikin[i];
   daikin[26] = sum & 0xFF;
 }
@@ -337,14 +335,10 @@ uint8_t IRDaikinESP::getBit(uint8_t byte, uint8_t bitmask) {
 // starttime: Number of minutes after midnight, in 10 minutes increments
 void IRDaikinESP::enableOnTimer(uint16_t starttime) {
   setBit(DAIKIN_BYTE_ON_TIMER, DAIKIN_BIT_ON_TIMER);
-  uint16_t lopbits;
-  lopbits = starttime;
-  lopbits &= 0x00FF;
-  daikin[18] = lopbits;
-  starttime >>= 8;
+  daikin[18] = (uint8_t) (starttime & 0x00FF);
   // only keep 4 bits
   daikin[19] &= 0xF0;
-  daikin[19] |= starttime;
+  daikin[19] |= (uint8_t) ((starttime >> 8) & 0x0F);
 }
 
 void IRDaikinESP::disableOnTimer() {
@@ -367,15 +361,9 @@ bool IRDaikinESP::getOnTimerEnabled() {
 // endtime: Number of minutes after midnight, in 10 minutes increments
 void IRDaikinESP::enableOffTimer(uint16_t endtime) {
   setBit(DAIKIN_BYTE_OFF_TIMER, DAIKIN_BIT_OFF_TIMER);
-  uint16_t lopbits;
-  lopbits = endtime;
-  lopbits &= 0x0FF0;
-  lopbits >>= 4;
-  daikin[20] = lopbits;
-  endtime &= 0x000F;
-  endtime <<= 4;
+  daikin[20] = (uint8_t)((endtime >> 4) & 0xFF);
   daikin[19] &= 0x0F;
-  daikin[19] |= endtime;
+  daikin[19] |= (uint8_t) ((endtime & 0x000F) << 4);
 }
 
 void IRDaikinESP::disableOffTimer() {
@@ -397,15 +385,12 @@ bool IRDaikinESP::getOffTimerEnabled() {
   return getBit(DAIKIN_BYTE_OFF_TIMER, DAIKIN_BIT_OFF_TIMER);
 }
 
-void IRDaikinESP::setCurrentTime(uint16_t time) {
-  uint16_t lopbits;
-  lopbits = time;
-  lopbits &= 0x00FF;
-  daikin[5] = lopbits;
-  time = time >> 8;
+void IRDaikinESP::setCurrentTime(uint16_t numMins) {
+  if (numMins > 24 * 60) numMins = 0;  // If > 23:59, set to 00:00
+  daikin[5] = (uint8_t) (numMins & 0x00FF);
   // only keep 4 bits
   daikin[6] &= 0xF0;
-  daikin[6] |= time;
+  daikin[6] |= (uint8_t) ((numMins >> 8) & 0x0F);
 }
 
 uint16_t IRDaikinESP::getCurrentTime() {

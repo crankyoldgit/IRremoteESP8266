@@ -9,7 +9,7 @@
 #endif
 
 // Option to disable the additional Daikin debug info to conserve memory
-#define DAIKIN_DEBUG 1  // XXX
+#define DAIKIN_DEBUG false
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
