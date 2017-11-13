@@ -247,10 +247,14 @@ bool IRDaikinESP::getSwingHorizontal() {
 }
 
 void IRDaikinESP::setQuiet(bool state) {
-  if (state)
+  if (state) {
     setBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
-  else
+    // Powerful, Quiet, & Econo mode being on are mutually exclusive.
+    setPowerful(false);
+    setEcono(false);
+  } else {
     clearBit(DAIKIN_BYTE_SILENT, DAIKIN_BIT_SILENT);
+  }
 }
 
 bool IRDaikinESP::getQuiet() {
@@ -258,10 +262,14 @@ bool IRDaikinESP::getQuiet() {
 }
 
 void IRDaikinESP::setPowerful(bool state) {
-  if (state)
+  if (state) {
     setBit(DAIKIN_BYTE_POWERFUL, DAIKIN_BIT_POWERFUL);
-  else
+    // Powerful, Quiet, & Econo mode being on are mutually exclusive.
+    setQuiet(false);
+    setEcono(false);
+  } else {
     clearBit(DAIKIN_BYTE_POWERFUL, DAIKIN_BIT_POWERFUL);
+  }
 }
 
 bool IRDaikinESP::getPowerful() {
@@ -280,10 +288,14 @@ bool IRDaikinESP::getSensor() {
 }
 
 void IRDaikinESP::setEcono(bool state) {
-  if (state)
+  if (state) {
     setBit(DAIKIN_BYTE_ECONO, DAIKIN_BIT_ECONO);
-  else
+    // Powerful, Quiet, & Econo mode being on are mutually exclusive.
+    setQuiet(false);
+    setPowerful(false);
+  } else {
     clearBit(DAIKIN_BYTE_ECONO, DAIKIN_BIT_ECONO);
+  }
 }
 
 bool IRDaikinESP::getEcono() {
