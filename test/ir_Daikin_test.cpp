@@ -332,17 +332,20 @@ TEST(TestDaikinClass, FanSpeed) {
   IRDaikinESP irdaikin(0);
   irdaikin.begin();
 
+  // Unexpected value should default to Auto.
   irdaikin.setFan(0);
-  EXPECT_EQ(0, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
+  // Unexpected value should default to Auto.
   irdaikin.setFan(255);
-  EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_MAX);
   EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
 
+  // Beyond Max should default to Auto.
   irdaikin.setFan(DAIKIN_FAN_MAX + 1);
-  EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_MAX - 1);
   EXPECT_EQ(DAIKIN_FAN_MAX - 1, irdaikin.getFan());
@@ -353,11 +356,18 @@ TEST(TestDaikinClass, FanSpeed) {
   irdaikin.setFan(DAIKIN_FAN_MIN + 1);
   EXPECT_EQ(DAIKIN_FAN_MIN + 1, irdaikin.getFan());
 
+  // Beyond Min should default to Auto.
+  irdaikin.setFan(DAIKIN_FAN_MIN - 1);
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+
   irdaikin.setFan(3);
   EXPECT_EQ(3, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_AUTO);
   EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+
+  irdaikin.setFan(DAIKIN_FAN_QUITE);
+  EXPECT_EQ(DAIKIN_FAN_QUITE, irdaikin.getFan());
 }
 
 TEST(TestDaikinClass, MessageConstuction) {

@@ -186,9 +186,8 @@ void IRDaikinESP::setFan(uint8_t fan) {
     fanset = DAIKIN_FAN_AUTO;
   else
     fanset = 2 + fan;
-  fanset = fanset << 4;
   daikin[16] &= 0x0F;
-  daikin[16] |= fanset;
+  daikin[16] |= (fanset << 4);
 }
 
 uint8_t IRDaikinESP::getFan() {
