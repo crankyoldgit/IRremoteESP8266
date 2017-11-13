@@ -441,6 +441,95 @@ TEST(TestDaikinClass, FanSpeed) {
   EXPECT_EQ(DAIKIN_FAN_QUITE, irdaikin.getFan());
 }
 
+TEST(TestDaikinClass, CurrentTime) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setCurrentTime(0);  // 00:00
+  EXPECT_EQ(0, irdaikin.getCurrentTime());
+
+  irdaikin.setCurrentTime(754);  // 12:34
+  EXPECT_EQ(754, irdaikin.getCurrentTime());
+
+  irdaikin.setCurrentTime(1439);  // 23:59
+  EXPECT_EQ(1439, irdaikin.getCurrentTime());
+}
+
+TEST(TestDaikinClass, OnOffTimers) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  // Both timers turned off.
+  irdaikin.disableOnTimer();
+  irdaikin.disableOffTimer();
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+
+  // Turn on just the On Timer.
+  irdaikin.enableOnTimer(123);
+  EXPECT_TRUE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(123, irdaikin.getOnTime());
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+
+  // Now turn on the Off Timer.
+  irdaikin.enableOffTimer(754);
+  EXPECT_TRUE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(754, irdaikin.getOffTime());
+  EXPECT_TRUE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(123, irdaikin.getOnTime());
+
+  // Turn off the just the On Timer.
+  irdaikin.disableOnTimer();
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_TRUE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(754, irdaikin.getOffTime());
+
+  // Now turn off the Off Timer.
+  irdaikin.disableOffTimer();
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+
+  // Use some canary values around the timers to ensure no accidental
+  // bit flips happen. i.e. Neighbouring bytes in the state.
+  // (Found some during testing on systems with different endian-ness)
+  // Tests here to make sure it never happens again.
+  irdaikin.setSwingHorizontal(true);
+  irdaikin.setPowerful(true);
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+  irdaikin.enableOnTimer(123);
+  irdaikin.enableOffTimer(456);
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+
+  irdaikin.setSwingHorizontal(false);
+  irdaikin.setPowerful(false);
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+  irdaikin.enableOnTimer(123);
+  irdaikin.enableOffTimer(456);
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+}
+
 TEST(TestDaikinClass, MessageConstuction) {
   IRDaikinESP irdaikin(0);
   IRsendTest irsend(4);
