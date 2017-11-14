@@ -530,6 +530,66 @@ TEST(TestDaikinClass, OnOffTimers) {
   ASSERT_FALSE(irdaikin.getPowerful());
 }
 
+// Test Eye mode.
+TEST(TestDaikinClass, EyeSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  // The Eye setting is stored in the same byte as Econo mode.
+  // Econo mode tests are there to make sure it isn't harmed and vice-versa.
+  irdaikin.setEcono(false);
+  irdaikin.setEye(false);
+  ASSERT_FALSE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEye(true);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(false);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(true);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  irdaikin.setEye(false);
+  ASSERT_FALSE(irdaikin.getEye());
+  EXPECT_TRUE(irdaikin.getEcono());
+}
+
+// Test Mold mode.
+TEST(TestDaikinClass, MoldSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setMold(false);
+  ASSERT_FALSE(irdaikin.getMold());
+
+  irdaikin.setMold(true);
+  ASSERT_TRUE(irdaikin.getMold());
+
+  irdaikin.setMold(false);
+  ASSERT_FALSE(irdaikin.getMold());
+}
+
+// Test Sensor mode.
+TEST(TestDaikinClass, SensorSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setSensor(false);
+  ASSERT_FALSE(irdaikin.getSensor());
+
+  irdaikin.setSensor(true);
+  ASSERT_TRUE(irdaikin.getSensor());
+
+  irdaikin.setSensor(false);
+  ASSERT_FALSE(irdaikin.getSensor());
+}
+
+// Test general message construction after tweaking some settings.
 TEST(TestDaikinClass, MessageConstuction) {
   IRDaikinESP irdaikin(0);
   IRsendTest irsend(4);
