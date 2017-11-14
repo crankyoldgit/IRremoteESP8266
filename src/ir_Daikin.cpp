@@ -109,7 +109,7 @@ void IRDaikinESP::checksum() {
 }
 
 void IRDaikinESP::stateReset() {
-  for (uint8_t i = 4; i < DAIKIN_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
     daikin[i] = 0x0;
 
   daikin[0] = 0x11;
