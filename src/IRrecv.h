@@ -232,6 +232,11 @@ class IRrecv {
   bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_RAW_BITS,
                     bool strict = true);
 #endif
+#if DECODE_TOSHIBA_AC
+  bool decodeToshibaAC(decode_results *results,
+                       uint16_t nbytes = TOSHIBA_AC_BITS,
+                       bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

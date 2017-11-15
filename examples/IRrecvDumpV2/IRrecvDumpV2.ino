@@ -79,6 +79,7 @@ void encoding(decode_results *results) {
     case NIKAI:        Serial.print("NIKAI");         break;
     case DAIKIN:       Serial.print("DAIKIN");        break;
     case KELVINATOR:   Serial.print("KELVINATOR");    break;
+    case TOSHIBA_AC:   Serial.print("TOSHIBA_AC");    break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
 }
@@ -103,6 +104,7 @@ void dumpInfo(decode_results *results) {
 #if DECODE_AC
     case DAIKIN:
     case KELVINATOR:
+    case TOSHIBA_AC:
       for (uint16_t i = 0; results->bits > i * 8; i++)
         Serial.printf("%02X", results->state[i]);
       break;

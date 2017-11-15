@@ -61,7 +61,9 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
     space(TOSHIBA_AC_RPT_SPACE);
   }
 }
+#endif  // SEND_TOSHIBA_AC
 
+#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 // Code to emulate Toshiba A/C IR remote control unit.
 // Inspired and derived from the work done at:
 //   https://github.com/r45635/HVAC-IR-Control
@@ -110,6 +112,14 @@ void IRToshibaAC::send() {
 uint8_t* IRToshibaAC::getRaw() {
   checksum();
   return remote_state;
+}
+
+// Override the internal state with the new state.
+void IRToshibaAC::setRaw(uint8_t newState[]) {
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+    remote_state[i] = newState[i];
+  }
+  mode_state = getMode(true);
 }
 
 // Calculate the checksum for the current internal state of the remote.
@@ -178,9 +188,16 @@ uint8_t IRToshibaAC::getFan() {
   return --fan;
 }
 
-// Return the requested climate operation mode of the a/c unit.
-uint8_t IRToshibaAC::getMode() {
-  return(mode_state);
+// Get the requested climate operation mode of the a/c unit.
+// Args:
+//   useRaw:  Indicate to get the mode from the state array. (Default: false)
+// Returns:
+//   A uint8_t containing the A/C mode.
+uint8_t IRToshibaAC::getMode(bool useRaw) {
+  if (useRaw)
+    return (remote_state[6] & 0b11111100);
+  else
+    return mode_state;
 }
 
 // Set the requested climate operation mode of the a/c unit.
@@ -200,4 +217,70 @@ void IRToshibaAC::setMode(uint8_t mode) {
     remote_state[6] |= mode_state;
   }
 }
-#endif  // SEND_TOSHIBA_AC
+#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
+
+#if DECODE_TOSHIBA_AC
+// Decode a Toshiba AC IR message if possible.
+// Places successful decode information in the results pointer.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically TOSHIBA_AC_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status:  BETA / Under development.
+//
+// Ref:
+//
+bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
+                             bool strict) {
+  uint16_t offset = OFFSET_START;
+  uint16_t dataBitsSoFar = 0;
+
+  // Have we got enough data to successfully decode?
+  if (results->rawlen < TOSHIBA_AC_BITS + HEADER + FOOTER - 1)
+    return false;  // Can't possibly be a valid message.
+
+
+  // Compliance
+  if (strict && nbits != TOSHIBA_AC_BITS)
+    return false;  // Must be called with the correct nr. of bytes.
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_HDR_SPACE))
+    return false;
+
+  // Data
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+    // Read a byte's worth of data.
+    match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
+                                           TOSHIBA_AC_BIT_MARK,
+                                           TOSHIBA_AC_ONE_SPACE,
+                                           TOSHIBA_AC_BIT_MARK,
+                                           TOSHIBA_AC_ZERO_SPACE);
+    if (data_result.success == false) return false;  // Fail
+    dataBitsSoFar += 8;
+    results->state[i] = (uint8_t) data_result.data;
+    offset += data_result.used;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_RPT_MARK)) return false;
+  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_RPT_SPACE))
+    return false;
+
+  // Compliance
+  // TODO(anyone): Validate checksum
+
+  // Success
+  results->decode_type = TOSHIBA_AC;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_TOSHIBA_AC

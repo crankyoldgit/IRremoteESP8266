@@ -136,7 +136,7 @@
 #define DECODE_NIKAI         true
 #define SEND_NIKAI           true
 
-#define DECODE_TOSHIBA_AC    false  // Not implemented.
+#define DECODE_TOSHIBA_AC    true
 #define SEND_TOSHIBA_AC      true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
@@ -244,6 +244,7 @@ enum decode_type_t {
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
 #define TOSHIBA_AC_STATE_LENGTH      9U
+#define TOSHIBA_AC_BITS              (TOSHIBA_AC_STATE_LENGTH * 8)
 #define TOSHIBA_AC_MIN_REPEAT        0U
 #define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U

@@ -33,9 +33,9 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o \
             ir_Denon.o ir_Dish.o ir_Panasonic.o ir_Whynter.o ir_Coolix.o \
             ir_Aiwa.o ir_Sherwood.o ir_Kelvinator.o ir_Daikin.o ir_Gree.o \
-            ir_Pronto.o ir_GlobalCache.o ir_Nikai.o
+            ir_Pronto.o ir_GlobalCache.o ir_Nikai.o ir_Toshiba.o
 # Common object files
-COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o $(PROTOCOLS) 
+COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o $(PROTOCOLS)
 
 # Common dependencies
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
@@ -134,3 +134,6 @@ ir_Pronto.o : $(USER_DIR)/ir_Pronto.cpp $(GTEST_HEADERS)
 
 ir_Nikai.o : $(USER_DIR)/ir_Nikai.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Nikai.cpp
+
+ir_Toshiba.o : $(USER_DIR)/ir_Toshiba.h $(USER_DIR)/ir_Toshiba.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Toshiba.cpp

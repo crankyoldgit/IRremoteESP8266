@@ -1,5 +1,6 @@
 // Copyright 2017 David Conran
-
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "ir_Toshiba.h"
@@ -230,6 +231,42 @@ TEST(TestToshibaACClass, FanSpeed) {
   EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
 }
 
+TEST(TestToshibaACClass, RawState) {
+  IRToshibaAC toshiba(0);
+  toshiba.begin();
+
+  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
+  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
+
+  // Verify the starting state.
+  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+  EXPECT_TRUE(toshiba.getPower());
+  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
+
+  // Change some settings.
+  toshiba.setMode(TOSHIBA_AC_COOL);
+  toshiba.setFan(TOSHIBA_AC_FAN_MAX);
+  toshiba.setTemp(TOSHIBA_AC_MIN_TEMP);
+  // Verify those were set.
+  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
+  EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
+  // Retrieve the modified state.
+  EXPECT_STATE_EQ(modified_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+
+  // Set it back to the initial state.
+  toshiba.setRaw(initial_state);
+
+  // Check the new state was set correctly.
+  EXPECT_TRUE(toshiba.getPower());
+  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
+  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+}
+
 TEST(TestToshibaACClass, MessageConstuction) {
   IRToshibaAC toshiba(0);
   IRsendTest irsend(4);
@@ -307,4 +344,22 @@ TEST(TestToshibaACClass, MessageConstuction) {
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s1623m543s1623m543s1623m543s472m543s472m543s472m543s472m543s472"
       "m440s7048", irsend.outputStr());
+}
+
+// Test decoding a message we entirely constructed based soley on a given state.
+TEST(TestDecodeToshibaAC, SyntheticExample) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  uint8_t expectedState[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
+
+  irsend.reset();
+  irsend.sendToshibaAC(expectedState);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
+  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

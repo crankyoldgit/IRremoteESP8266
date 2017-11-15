@@ -26,7 +26,7 @@
 #define TOSHIBA_AC_MIN_TEMP         17U  // 17C
 #define TOSHIBA_AC_MAX_TEMP         30U  // 30C
 
-#if SEND_TOSHIBA_AC
+#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 class IRToshibaAC {
  public:
   explicit IRToshibaAC(uint16_t pin);
@@ -43,7 +43,8 @@ class IRToshibaAC {
   void setFan(uint8_t fan);
   uint8_t getFan();
   void setMode(uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(bool useRaw = false);
+  void setRaw(uint8_t newState[]);
   uint8_t* getRaw();
 
  private:
@@ -53,6 +54,6 @@ class IRToshibaAC {
   IRsend _irsend;
 };
 
-#endif  // SEND_TOSHIBA_AC
+#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 
 #endif  // IR_TOSHIBA_H_
