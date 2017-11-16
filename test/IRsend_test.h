@@ -11,8 +11,8 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 
-#define OUTPUT_BUF 1000U
-#define RAW_BUF 1000U
+#define OUTPUT_BUF 10000U
+#define RAW_BUF 10000U
 class IRsendTest: public IRsend {
  public:
   uint32_t output[OUTPUT_BUF];

@@ -1,5 +1,6 @@
 // Copyright 2017 David Conran
-
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "ir_Daikin.h"
@@ -20,7 +21,17 @@ TEST(TestSendDaikin, SendDataOnly) {
   irsend.reset();
   irsend.sendDaikin(daikin_code);
   EXPECT_EQ(
-      "m3650s1623"
+      "m428s428m428s428m428s428m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s1280m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s1280m428s428m428s1280m428s428m428s1280m428s1280"
+      "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
       "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
       "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
@@ -29,8 +40,7 @@ TEST(TestSendDaikin, SendDataOnly) {
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
-      "m428s29428"
-      "m3650s1623"
+      "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
       "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
       "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
@@ -67,68 +77,86 @@ TEST(TestSendDaikin, SendWithRepeats) {
 
   irsend.sendDaikin(daikin_code, DAIKIN_COMMAND_LENGTH, 1);
   EXPECT_EQ(
-    "m3650s1623"
-    "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
-    "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
-    "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
-    "m428s29428"
-    "m3650s1623"
-    "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
-    "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
-    "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s1280m428s428m428s428m428s428m428s428m428s428m428s1280m428s428"
-    "m428s428m428s1280m428s1280m428s1280m428s1280m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s1280m428s1280m428s428m428s428m428s428m428s1280m428s1280m428s1280"
-    "m428s29428"
-    "m3650s1623"
-    "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
-    "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
-    "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
-    "m428s29428"
-    "m3650s1623"
-    "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
-    "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
-    "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s1280m428s428m428s428m428s428m428s428m428s428m428s1280m428s428"
-    "m428s428m428s1280m428s1280m428s1280m428s1280m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-    "m428s1280m428s1280m428s428m428s428m428s428m428s1280m428s1280m428s1280"
-    "m428s29428", irsend.outputStr());
+      "m428s428m428s428m428s428m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s1280m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s1280m428s428m428s1280m428s428m428s1280m428s1280"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s428m428s428m428s428m428s428m428s1280m428s428"
+      "m428s428m428s1280m428s1280m428s1280m428s1280m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s428m428s428m428s428m428s1280m428s1280m428s1280"
+      "m428s29428"
+      "m428s428m428s428m428s428m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s1280m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s1280m428s428m428s1280m428s428m428s1280m428s1280"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s428m428s428m428s428m428s428m428s1280m428s428"
+      "m428s428m428s1280m428s1280m428s1280m428s1280m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s428m428s428m428s428m428s1280m428s1280m428s1280"
+      "m428s29428", irsend.outputStr());
 }
 
 // Test sending atypical sizes.
@@ -152,7 +180,17 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendDaikin(daikin_long_code, DAIKIN_COMMAND_LENGTH + 1);
   ASSERT_EQ(
-      "m3650s1623"
+      "m428s428m428s428m428s428m428s428m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s1280m428s428m428s428m428s428m428s1280m428s1280"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s1280m428s428m428s1280m428s428m428s1280m428s1280"
+      "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
       "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
       "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
@@ -161,8 +199,7 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s1280m428s428m428s428"
-      "m428s29428"
-      "m3650s1623"
+      "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
       "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
       "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
@@ -306,6 +343,13 @@ TEST(TestDaikinClass, QuietMode) {
   irdaikin.setQuiet(true);
   EXPECT_TRUE(irdaikin.getQuiet());
 
+  // Setting Econo mode should NOT change out of quiet mode.
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getQuiet());
+  irdaikin.setEcono(false);
+  EXPECT_TRUE(irdaikin.getQuiet());
+
+  // But setting Powerful mode should exit out of quiet mode.
   irdaikin.setPowerful(true);
   EXPECT_FALSE(irdaikin.getQuiet());
 }
@@ -325,23 +369,54 @@ TEST(TestDaikinClass, PowerfulMode) {
 
   irdaikin.setQuiet(true);
   EXPECT_FALSE(irdaikin.getPowerful());
+
+  irdaikin.setPowerful(true);
+  irdaikin.setEcono(true);
+  EXPECT_FALSE(irdaikin.getPowerful());
+}
+
+TEST(TestDaikinClass, EconoMode) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  irdaikin.setEcono(false);
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  // Setting Quiet mode should NOT change out of Econo mode.
+  irdaikin.setQuiet(true);
+  EXPECT_TRUE(irdaikin.getEcono());
+  irdaikin.setQuiet(false);
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  // But setting Powerful mode should exit out of Econo mode.
+  irdaikin.setPowerful(true);
+  EXPECT_FALSE(irdaikin.getEcono());
 }
 
 TEST(TestDaikinClass, FanSpeed) {
   IRDaikinESP irdaikin(0);
   irdaikin.begin();
 
+  // Unexpected value should default to Auto.
   irdaikin.setFan(0);
-  EXPECT_EQ(0, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
+  // Unexpected value should default to Auto.
   irdaikin.setFan(255);
-  EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_MAX);
   EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
 
+  // Beyond Max should default to Auto.
   irdaikin.setFan(DAIKIN_FAN_MAX + 1);
-  EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_MAX - 1);
   EXPECT_EQ(DAIKIN_FAN_MAX - 1, irdaikin.getFan());
@@ -352,13 +427,169 @@ TEST(TestDaikinClass, FanSpeed) {
   irdaikin.setFan(DAIKIN_FAN_MIN + 1);
   EXPECT_EQ(DAIKIN_FAN_MIN + 1, irdaikin.getFan());
 
+  // Beyond Min should default to Auto.
+  irdaikin.setFan(DAIKIN_FAN_MIN - 1);
+  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+
   irdaikin.setFan(3);
   EXPECT_EQ(3, irdaikin.getFan());
 
   irdaikin.setFan(DAIKIN_FAN_AUTO);
   EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+
+  irdaikin.setFan(DAIKIN_FAN_QUITE);
+  EXPECT_EQ(DAIKIN_FAN_QUITE, irdaikin.getFan());
 }
 
+TEST(TestDaikinClass, CurrentTime) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setCurrentTime(0);  // 00:00
+  EXPECT_EQ(0, irdaikin.getCurrentTime());
+
+  irdaikin.setCurrentTime(754);  // 12:34
+  EXPECT_EQ(754, irdaikin.getCurrentTime());
+
+  irdaikin.setCurrentTime(1439);  // 23:59
+  EXPECT_EQ(1439, irdaikin.getCurrentTime());
+}
+
+TEST(TestDaikinClass, OnOffTimers) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  // Both timers turned off.
+  irdaikin.disableOnTimer();
+  irdaikin.disableOffTimer();
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+
+  // Turn on just the On Timer.
+  irdaikin.enableOnTimer(123);
+  EXPECT_TRUE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(123, irdaikin.getOnTime());
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+
+  // Now turn on the Off Timer.
+  irdaikin.enableOffTimer(754);
+  EXPECT_TRUE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(754, irdaikin.getOffTime());
+  EXPECT_TRUE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(123, irdaikin.getOnTime());
+
+  // Turn off the just the On Timer.
+  irdaikin.disableOnTimer();
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_TRUE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(754, irdaikin.getOffTime());
+
+  // Now turn off the Off Timer.
+  irdaikin.disableOffTimer();
+  EXPECT_FALSE(irdaikin.getOffTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOffTime());
+  EXPECT_FALSE(irdaikin.getOnTimerEnabled());
+  EXPECT_EQ(0x600, irdaikin.getOnTime());
+
+  // Use some canary values around the timers to ensure no accidental
+  // bit flips happen. i.e. Neighbouring bytes in the state.
+  // (Found some during testing on systems with different endian-ness)
+  // Tests here to make sure it never happens again.
+  irdaikin.setSwingHorizontal(true);
+  irdaikin.setPowerful(true);
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+  irdaikin.enableOnTimer(123);
+  irdaikin.enableOffTimer(456);
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_TRUE(irdaikin.getSwingHorizontal());
+  ASSERT_TRUE(irdaikin.getPowerful());
+
+  irdaikin.setSwingHorizontal(false);
+  irdaikin.setPowerful(false);
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+  irdaikin.enableOnTimer(123);
+  irdaikin.enableOffTimer(456);
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+  irdaikin.disableOffTimer();
+  irdaikin.disableOnTimer();
+  ASSERT_FALSE(irdaikin.getSwingHorizontal());
+  ASSERT_FALSE(irdaikin.getPowerful());
+}
+
+// Test Eye mode.
+TEST(TestDaikinClass, EyeSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  // The Eye setting is stored in the same byte as Econo mode.
+  // Econo mode tests are there to make sure it isn't harmed and vice-versa.
+  irdaikin.setEcono(false);
+  irdaikin.setEye(false);
+  ASSERT_FALSE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEye(true);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(false);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_FALSE(irdaikin.getEcono());
+
+  irdaikin.setEcono(true);
+  ASSERT_TRUE(irdaikin.getEye());
+  EXPECT_TRUE(irdaikin.getEcono());
+
+  irdaikin.setEye(false);
+  ASSERT_FALSE(irdaikin.getEye());
+  EXPECT_TRUE(irdaikin.getEcono());
+}
+
+// Test Mold mode.
+TEST(TestDaikinClass, MoldSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setMold(false);
+  ASSERT_FALSE(irdaikin.getMold());
+
+  irdaikin.setMold(true);
+  ASSERT_TRUE(irdaikin.getMold());
+
+  irdaikin.setMold(false);
+  ASSERT_FALSE(irdaikin.getMold());
+}
+
+// Test Sensor mode.
+TEST(TestDaikinClass, SensorSetting) {
+  IRDaikinESP irdaikin(0);
+  irdaikin.begin();
+
+  irdaikin.setSensor(false);
+  ASSERT_FALSE(irdaikin.getSensor());
+
+  irdaikin.setSensor(true);
+  ASSERT_TRUE(irdaikin.getSensor());
+
+  irdaikin.setSensor(false);
+  ASSERT_FALSE(irdaikin.getSensor());
+}
+
+// Test general message construction after tweaking some settings.
 TEST(TestDaikinClass, MessageConstuction) {
   IRDaikinESP irdaikin(0);
   IRsendTest irsend(4);
@@ -385,35 +616,138 @@ TEST(TestDaikinClass, MessageConstuction) {
   irsend.reset();
   irsend.sendDaikin(irdaikin.getRaw());
   EXPECT_EQ(
-      "m3650s1623"
-      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
-      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
-      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
-      "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280"
-      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s1280m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s29428"
-      "m3650s1623"
+      "m428s428m428s428m428s428m428s428m428s428"
+      "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
       "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
       "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s1280m428s428m428s428m428s428m428s1280m428s1280"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s1280m428s428m428s428m428s428m428s1280m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s1280m428s1280m428s428m428s1280m428s428m428s1280m428s1280"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s428m428s428m428s428m428s1280m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s1280m428s428m428s1280m428s428m428s1280m428s428"
+      "m428s29428m3650s1623"
+      "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
+      "m428s428m428s1280m428s428m428s1280m428s1280m428s428m428s1280m428s1280"
+      "m428s1280m428s1280m428s1280m428s428m428s428m428s1280m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s1280m428s428m428s428m428s1280m428s1280m428s1280m428s428m428s428"
       "m428s428m428s1280m428s1280m428s428m428s1280m428s1280m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428m428s428"
       "m428s1280m428s1280m428s1280m428s1280m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s1280m428s1280m428s428m428s428m428s428m428s428m428s428"
+      "m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s1280m428s1280"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
       "m428s428m428s428m428s428m428s428m428s428m428s428m428s428m428s428"
-      "m428s428m428s428m428s428m428s1280m428s1280m428s1280m428s1280m428s428"
+      "m428s428m428s1280m428s1280m428s428m428s428m428s1280m428s1280m428s1280"
       "m428s29428", irsend.outputStr());
+}
+
+// Tests for decodeDaikin().
+
+// Test decoding a message captured from a real IR remote.
+TEST(TestDecodeDaikin, RealExample) {
+  IRDaikinESP irdaikin(0);
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+      0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
+      0x00, 0x00, 0x32};
+  uint16_t rawData[DAIKIN_RAW_BITS] = {
+      416, 446,  416, 446,  416, 446,  418, 446,  416, 446,  416, 25434,
+      3436, 1768,  390, 1336,  390, 446,  416, 446,  416, 446,  416, 1336,
+      390, 446,  416, 446,  416, 446,  416, 446,  416, 1336,  390, 448,
+      416, 1336,  390, 1336,  390, 448,  416, 1336,  390, 1336,  390, 1338,
+      388, 1338,  390, 1336,  390, 446,  416, 446,  416, 1336,  390, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 446,  416, 448,
+      416, 446,  416, 446,  416, 446,  416, 1336,  390, 446,  416, 1336,
+      390, 448,  416, 446,  416, 446,  416, 1336,  390, 1336,  390, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 446,  416, 446,
+      416, 446,  416, 446,  416, 448,  416, 446,  416, 446,  416, 446,
+      416, 448,  414, 448,  416, 448,  416, 1336,  390, 1336,  390, 1336,
+      390, 446,  414, 1336,  390, 448,  414, 1336,  390, 1336,  390, 34878,
+      3436, 1768,  390, 1336,  390, 446,  416, 448,  416, 446,  416, 1336,
+      390, 446,  416, 448,  416, 446,  416, 446,  416, 1336,  390, 446,
+      416, 1336,  390, 1336,  390, 446,  416, 1336,  390, 1336,  390, 1336,
+      390, 1336,  390, 1336,  392, 446,  414, 448,  416, 1336,  390, 446,
+      416, 446,  416, 446,  416, 446,  414, 448,  416, 446,  416, 448,
+      414, 448,  416, 446,  416, 446,  416, 446,  414, 1336,  390, 448,
+      416, 446,  416, 446,  416, 448,  416, 1336,  390, 446,  416, 446,
+      416, 1336,  390, 446,  416, 1336,  390, 1336,  390, 1336,  390, 446,
+      416, 446,  414, 1338,  390, 446,  416, 1336,  390, 446,  416, 446,
+      416, 446,  416, 446,  416, 446,  416, 1336,  390, 1336,  390, 446,
+      416, 446,  416, 1336,  390, 446,  416, 446,  416, 1336,  390, 34876,
+      3436, 1768,  388, 1336,  390, 446,  416, 446,  416, 448,  416, 1336,
+      390, 446,  416, 446,  416, 446,  416, 448,  416, 1336,  390, 448,
+      414, 1336,  390, 1336,  390, 446,  416, 1336,  388, 1338,  388, 1336,
+      390, 1336,  390, 1336,  390, 446,  416, 446,  416, 1336,  390, 446,
+      420, 442,  416, 446,  416, 446,  416, 446,  416, 446,  416, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 446,  416, 448,
+      416, 446,  416, 448,  416, 446,  416, 448,  416, 446,  416, 1336,
+      390, 1336,  390, 1336,  388, 1338,  390, 1336,  390, 1336,  392, 446,
+      416, 446,  416, 448,  416, 1334,  390, 446,  416, 1338,  388, 1336,
+      390, 1336,  390, 446,  416, 446,  416, 448,  414, 446,  416, 446,
+      416, 446,  416, 448,  416, 446,  416, 446,  416, 446,  416, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 1336,  390, 446,
+      416, 1336,  390, 446,  414, 448,  416, 446,  416, 446,  416, 446,
+      416, 448,  416, 446,  416, 446,  416, 446,  416, 1336,  390, 446,
+      416, 1336,  390, 446,  416, 446,  416, 446,  416, 448,  416, 1338,
+      390, 444,  418, 1336,  390, 448,  416, 446,  416, 1336,  390, 446,
+      416, 446,  416, 1336,  390, 1336,  388, 1336,  390, 446,  416, 1336,
+      390, 448,  414, 448,  414, 448,  416, 1334,  390, 446,  416, 446,
+      416, 446,  416, 448,  416, 446,  416, 446,  416, 448,  416, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 446,  416, 446,
+      416, 446,  416, 446,  416, 446,  416, 446,  416, 446,  416, 446,
+      416, 448,  416, 1336,  390, 1336,  390, 446,  416, 446,  416, 446,
+      416, 446,  414, 446,  416, 448,  416, 446,  416, 448,  414, 446,
+      418, 446,  416, 446,  416, 448,  416, 446,  416, 448,  416, 446,
+      416, 448,  416, 446,  416, 1336,  390, 446,  416, 446,  416, 1338,
+      390, 1336,  390, 446,  416, 446,  416};  // Captured by @sillyfrog
+
+  irsend.reset();
+  irsend.sendRaw(rawData, DAIKIN_RAW_BITS, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
+  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// Test decoding a message we entirely constructed based soley on a given state.
+TEST(TestDecodeDaikin, SyntheticExample) {
+  IRDaikinESP irdaikin(0);
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+      0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
+      0x00, 0x00, 0x32};
+
+  irsend.reset();
+  irsend.sendDaikin(expectedState);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
+  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

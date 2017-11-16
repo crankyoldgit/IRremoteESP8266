@@ -2,6 +2,9 @@
 
 #include "ir_Toshiba.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
@@ -25,8 +28,7 @@
 #define TOSHIBA_AC_BIT_MARK     543U
 #define TOSHIBA_AC_ONE_SPACE   1623U
 #define TOSHIBA_AC_ZERO_SPACE   472U
-#define TOSHIBA_AC_RPT_MARK     440U
-#define TOSHIBA_AC_RPT_SPACE   7048U
+#define TOSHIBA_AC_MIN_GAP     7048U
 
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
@@ -57,11 +59,13 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ZERO_SPACE,
                data[i], 8, true);
     // Footer
-    mark(TOSHIBA_AC_RPT_MARK);
-    space(TOSHIBA_AC_RPT_SPACE);
+    mark(TOSHIBA_AC_BIT_MARK);
+    space(TOSHIBA_AC_MIN_GAP);
   }
 }
+#endif  // SEND_TOSHIBA_AC
 
+#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 // Code to emulate Toshiba A/C IR remote control unit.
 // Inspired and derived from the work done at:
 //   https://github.com/r45635/HVAC-IR-Control
@@ -112,14 +116,48 @@ uint8_t* IRToshibaAC::getRaw() {
   return remote_state;
 }
 
-// Calculate the checksum for the current internal state of the remote.
-void IRToshibaAC::checksum() {
+// Override the internal state with the new state.
+void IRToshibaAC::setRaw(uint8_t newState[]) {
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+    remote_state[i] = newState[i];
+  }
+  mode_state = getMode(true);
+}
+
+// Calculate the checksum for a given array.
+// Args:
+//   state:  The array to calculate the checksum over.
+//   length: The size of the array.
+// Returns:
+//   The 8 bit checksum value.
+uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
+                                  const uint16_t length) {
   uint8_t checksum = 0;
-  // Checksum is simple XOR of all previous bytes.
-  // Stored as an 8 bit value in the last byte.
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH - 1; i++)
-    checksum ^= remote_state[i];
-  remote_state[TOSHIBA_AC_STATE_LENGTH - 1] = checksum;
+  // Only calculate it for valid lengths.
+  if (length > 1) {
+    // Checksum is simple XOR of all bytes except the last one.
+    for (uint8_t i = 0; i < length - 1; i++)
+      checksum ^= state[i];
+  }
+  return checksum;
+}
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRToshibaAC::validChecksum(const uint8_t state[],
+                                const uint16_t length) {
+  return (length > 1 && state[length - 1] == calcChecksum(state, length));
+}
+
+// Calculate & set the checksum for the current internal state of the remote.
+void IRToshibaAC::checksum(const uint16_t length) {
+  // Stored the checksum value in the last byte.
+  if (length > 1)
+    remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 // Set the requested power state of the A/C to off.
@@ -178,9 +216,16 @@ uint8_t IRToshibaAC::getFan() {
   return --fan;
 }
 
-// Return the requested climate operation mode of the a/c unit.
-uint8_t IRToshibaAC::getMode() {
-  return(mode_state);
+// Get the requested climate operation mode of the a/c unit.
+// Args:
+//   useRaw:  Indicate to get the mode from the state array. (Default: false)
+// Returns:
+//   A uint8_t containing the A/C mode.
+uint8_t IRToshibaAC::getMode(bool useRaw) {
+  if (useRaw)
+    return (remote_state[6] & 0b00000011);
+  else
+    return mode_state;
 }
 
 // Set the requested climate operation mode of the a/c unit.
@@ -200,4 +245,115 @@ void IRToshibaAC::setMode(uint8_t mode) {
     remote_state[6] |= mode_state;
   }
 }
-#endif  // SEND_TOSHIBA_AC
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRToshibaAC::toString() {
+  String result = "";
+#else
+std::string IRToshibaAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case TOSHIBA_AC_AUTO:
+      result += " (AUTO)";
+      break;
+    case TOSHIBA_AC_COOL:
+      result += " (COOL)";
+      break;
+    case TOSHIBA_AC_HEAT:
+      result += " (HEAT)";
+      break;
+    case TOSHIBA_AC_DRY:
+      result += " (DRY)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case TOSHIBA_AC_FAN_AUTO:
+      result += " (AUTO)";
+      break;
+    case TOSHIBA_AC_FAN_MAX:
+      result += " (MAX)";
+      break;
+  }
+  return result;
+}
+#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
+
+#if DECODE_TOSHIBA_AC
+// Decode a Toshiba AC IR message if possible.
+// Places successful decode information in the results pointer.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically TOSHIBA_AC_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status:  BETA / Under development.
+//
+// Ref:
+//
+bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
+                             bool strict) {
+  uint16_t offset = OFFSET_START;
+  uint16_t dataBitsSoFar = 0;
+
+  // Have we got enough data to successfully decode?
+  if (results->rawlen < TOSHIBA_AC_BITS + HEADER + FOOTER - 1)
+    return false;  // Can't possibly be a valid message.
+
+
+  // Compliance
+  if (strict && nbits != TOSHIBA_AC_BITS)
+    return false;  // Must be called with the correct nr. of bytes.
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_HDR_SPACE))
+    return false;
+
+  // Data
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+    // Read a byte's worth of data.
+    match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
+                                           TOSHIBA_AC_BIT_MARK,
+                                           TOSHIBA_AC_ONE_SPACE,
+                                           TOSHIBA_AC_BIT_MARK,
+                                           TOSHIBA_AC_ZERO_SPACE);
+    if (data_result.success == false) return false;  // Fail
+    dataBitsSoFar += 8;
+    results->state[i] = (uint8_t) data_result.data;
+    offset += data_result.used;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_BIT_MARK)) return false;
+  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_MIN_GAP)) return false;
+
+  // Compliance
+  if (strict) {
+    // Check that the checksum of the message is correct.
+    if (!IRToshibaAC::validChecksum(results->state)) return false;
+  }
+
+  // Success
+  results->decode_type = TOSHIBA_AC;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_TOSHIBA_AC

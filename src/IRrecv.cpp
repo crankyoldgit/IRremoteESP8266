@@ -369,6 +369,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeKelvinator(results))
     return true;
 #endif
+#if DECODE_DAIKIN
+  DPRINTLN("Attempting Daikin decode");
+  if (decodeDaikin(results))
+    return true;
+#endif
+#if DECODE_TOSHIBA_AC
+  DPRINTLN("Attempting Toshiba AC decode");
+  if (decodeToshibaAC(results))
+    return true;
+#endif
 /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
   // The Sanyo S866500B decoder is very poor quality & depricated.
@@ -385,7 +395,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // This needs to be done after all other codes that use strict and some
   // other protocols that are NEC-like as well, as turning off strict may
   // cause this to match other valid protocols.
-  DPRINTLN("Attempting NEC (non-stict) decode");
+  DPRINTLN("Attempting NEC (non-strict) decode");
   if (decodeNEC(results, NEC_BITS, false)) {
     results->decode_type = NEC_LIKE;
     return true;

@@ -118,10 +118,10 @@
 // --------------------------------------------------------------------
 // * * * IMPORTANT * * *
 // You must change <PubSubClient.h> to have the following value.
-// #define MQTT_MAX_PACKET_SIZE 400
+// #define MQTT_MAX_PACKET_SIZE 512
 // --------------------------------------------------------------------
 #include <PubSubClient.h>
-#endif
+#endif  // MQTT_ENABLE
 #include <algorithm>
 #include <string>
 
@@ -141,7 +141,7 @@ const char* mqtt_password = "";
 #define MQTTprefix "ir_server"
 #define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
 #define MQTTcommand MQTTprefix "/send"  // Topic we get new commands from.
-#endif
+#endif  // MQTT_ENABLE
 
 // HTML arguments we will parse for IR code information.
 #define argType "type"
@@ -169,13 +169,14 @@ PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, callback, espClient);
 // Create a unique MQTT client id.
 const char* mqtt_clientid = String(MQTTprefix +
                                    String(ESP.getChipId(), HEX)).c_str();
-#endif
+#endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
 void debug(String str) {
 #ifdef DEBUG
-  Serial.println(str);
-#endif
+  uint32_t now = millis();
+  Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
+#endif  // DEBUG
 }
 
 // Root web page with example usage etc.
@@ -184,6 +185,15 @@ void handleRoot() {
     "<html><head><title>IR MQTT server</title></head>"
     "<body>"
     "<center><h1>ESP8266 IR MQTT Server</h1></center>"
+    "<br><hr>"
+    "<h3>Connection details</h3>"
+    "<p>IP address: " + WiFi.localIP().toString() + "</p>"
+#ifdef MQTT_ENABLE
+    "<p>MQTT server: " MQTT_SERVER ":" + String(MQTT_PORT) + " ("+
+    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")<br>"
+    "Command topic: " MQTTcommand "<br>"
+    "Acknowledgements topic: " MQTTack "</p>"
+#endif  // MQTT_ENABLE
     "<br><hr>"
     "<h3>Hardcoded examples</h3>"
     "<p><a href=\"ir?code=38000,1,69,341,171,21,64,21,64,21,21,21,21,21,21,21,"
@@ -668,7 +678,7 @@ void setup_wifi() {
 
   wifiManager.setTimeout(300);  // Time out after 5 mins.
   if (!wifiManager.autoConnect()) {
-    debug("Failed to connect and hit timeout.");
+    debug("Wifi failed to connect and hit timeout.");
     delay(3000);
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
     ESP.reset();
@@ -683,7 +693,7 @@ void setup(void) {
 
   #ifdef DEBUG
   Serial.begin(115200);
-  #endif
+  #endif  // DEBUG
 
   setup_wifi();
 
@@ -718,14 +728,14 @@ void setup(void) {
         if (!Update.begin(maxSketchSpace)) {  // start with max available size
 #ifdef DEBUG
           Update.printError(Serial);
-#endif
+#endif  // DEBUG
         }
       } else if (upload.status == UPLOAD_FILE_WRITE) {
         if (Update.write(upload.buf, upload.currentSize) !=
             upload.currentSize) {
 #ifdef DEBUG
           Update.printError(Serial);
-#endif
+#endif  // DEBUG
         }
       } else if (upload.status == UPLOAD_FILE_END) {
         if (Update.end(true)) {  // true to set the size to the current progress
@@ -753,11 +763,13 @@ void subscribing(const String topic_name) {
 }
 
 bool reconnect() {
-  // Loop until we're reconnected
-  while (!mqtt_client.connected()) {
+  // Loop a few times or until we're reconnected
+  uint16_t tries = 1;
+  while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
     // Attempt to connect
-    debug("Attempting MQTT connection ... ");
+    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(MQTT_PORT) +
+          "... ");
     if (mqtt_user && mqtt_password)
       connected = mqtt_client.connect(mqtt_clientid, mqtt_user, mqtt_password);
     else
@@ -766,18 +778,19 @@ bool reconnect() {
     // Once connected, publish an announcement...
       mqtt_client.publish(MQTTack, "Connected");
       debug("connected.");
-    // Subscribing to topic(s)
-    subscribing(MQTTcommand);
+      // Subscribing to topic(s)
+      subscribing(MQTTcommand);
     } else {
       debug("failed, rc=" + String(mqtt_client.state()) +
-            " try again in a bit.");
+            " Try again in a bit.");
       // Wait for a bit before retrying
-      delay(MQTT_RECONNECT_TIME);
+      delay(tries << 7);  // Linear increasing back-off (x128)
     }
+    tries++;
   }
   return mqtt_client.connected();
 }
-#endif
+#endif  // MQTT_ENABLE
 
 void loop(void) {
   server.handleClient();
@@ -786,6 +799,7 @@ void loop(void) {
   // MQTT client connection management
   if (!mqtt_client.connected()) {
     uint32_t now = millis();
+    // Reconnect if it's longer than MQTT_RECONNECT_TIME since we last tried.
     if (now - lastReconnectAttempt > MQTT_RECONNECT_TIME) {
       lastReconnectAttempt = now;
       debug("client mqtt not connected, trying to connect");
@@ -804,7 +818,7 @@ void loop(void) {
     // MQTT loop
     mqtt_client.loop();
   }
-#endif
+#endif  // MQTT_ENABLE
   delay(100);
 }
 
@@ -985,7 +999,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       debug(code_str);
       debug("Repeats: " + String(repeat));
       // Confirm what we were asked to send was sent.
-  #ifdef MQTT_ENABLE
+#ifdef MQTT_ENABLE
       if (ir_type == PRONTO && repeat > 0)
         mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
                                       String(repeat) + "," +
@@ -993,7 +1007,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       else
         mqtt_client.publish(MQTTack, (String(ir_type) + "," +
                                       String(code_str)).c_str());
-  #endif
+#endif  // MQTT_ENABLE
       break;
     default:
       debug("Code: 0x" + uint64ToString(code, 16));
@@ -1005,7 +1019,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
                                     uint64ToString(code, 16)
                                     + "," + String(bits) + "," +
                                     String(repeat)).c_str());
-#endif
+#endif  // MQTT_ENABLE
   }
 }
 
@@ -1073,4 +1087,4 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Free the memory
   free(payload_copy);
 }
-#endif
+#endif  // MQTT_ENABLE

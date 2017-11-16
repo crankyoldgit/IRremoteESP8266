@@ -112,7 +112,7 @@
 #define DECODE_FUJITSU_AC    false  // Not written.
 #define SEND_FUJITSU_AC      true
 
-#define DECODE_DAIKIN        false  // Not finished.
+#define DECODE_DAIKIN        true
 #define SEND_DAIKIN          true
 
 #define DECODE_COOLIX        true
@@ -136,7 +136,7 @@
 #define DECODE_NIKAI         true
 #define SEND_NIKAI           true
 
-#define DECODE_TOSHIBA_AC    false  // Not implemented.
+#define DECODE_TOSHIBA_AC    true
 #define SEND_TOSHIBA_AC      true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
@@ -193,8 +193,10 @@ enum decode_type_t {
 #define AIWA_RC_T501_BITS           15U
 #define AIWA_RC_T501_MIN_REPEAT      1U
 #define COOLIX_BITS                 24U
-#define DAIKIN_BITS                 99U
+// Daikin has a lot of static stuff that is discarded
+#define DAIKIN_RAW_BITS            583U
 #define DAIKIN_COMMAND_LENGTH       27U
+#define DAIKIN_BITS                 (DAIKIN_COMMAND_LENGTH * 8)
 #define DENON_BITS                  SHARP_BITS
 #define DENON_48_BITS               PANASONIC_BITS
 #define DENON_LEGACY_BITS           14U
@@ -242,7 +244,8 @@ enum decode_type_t {
 #define SONY_MIN_BITS      SONY_12_BITS
 #define SONY_MIN_REPEAT              2U
 #define TOSHIBA_AC_STATE_LENGTH      9U
-#define TOSHIBA_AC_MIN_REPEAT        0U
+#define TOSHIBA_AC_BITS              (TOSHIBA_AC_STATE_LENGTH * 8)
+#define TOSHIBA_AC_MIN_REPEAT        1U
 #define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
