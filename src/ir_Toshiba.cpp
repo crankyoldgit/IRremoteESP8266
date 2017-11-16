@@ -25,8 +25,7 @@
 #define TOSHIBA_AC_BIT_MARK     543U
 #define TOSHIBA_AC_ONE_SPACE   1623U
 #define TOSHIBA_AC_ZERO_SPACE   472U
-#define TOSHIBA_AC_RPT_MARK     440U
-#define TOSHIBA_AC_RPT_SPACE   7048U
+#define TOSHIBA_AC_MIN_GAP   7048U
 
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
@@ -57,8 +56,8 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ZERO_SPACE,
                data[i], 8, true);
     // Footer
-    mark(TOSHIBA_AC_RPT_MARK);
-    space(TOSHIBA_AC_RPT_SPACE);
+    mark(TOSHIBA_AC_BIT_MARK);
+    space(TOSHIBA_AC_MIN_GAP);
   }
 }
 #endif  // SEND_TOSHIBA_AC
@@ -268,9 +267,8 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_RPT_MARK)) return false;
-  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_RPT_SPACE))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_BIT_MARK)) return false;
+  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_MIN_GAP)) return false;
 
   // Compliance
   // TODO(anyone): Validate checksum

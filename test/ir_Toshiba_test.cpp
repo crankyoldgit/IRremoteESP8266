@@ -28,7 +28,7 @@ TEST(TestSendToshibaAC, SendDataOnly) {
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
-      "m440s7048", irsend.outputStr());
+      "m543s7048", irsend.outputStr());
 }
 
 // Test sending with repeats.
@@ -52,7 +52,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
-    "m440s7048", irsend.outputStr());
+    "m543s7048", irsend.outputStr());
 
   irsend.reset();
   irsend.sendToshibaAC(toshiba_code, TOSHIBA_AC_STATE_LENGTH, 2);
@@ -67,7 +67,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
-    "m440s7048"
+    "m543s7048"
     "m4400s4300"
     "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
     "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -78,7 +78,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
-    "m440s7048"
+    "m543s7048"
     "m4400s4300"
     "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
     "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -89,7 +89,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
     "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
-    "m440s7048", irsend.outputStr());
+    "m543s7048", irsend.outputStr());
 }
 
 // Test sending atypical sizes.
@@ -119,7 +119,7 @@ TEST(TestSendToshibaAC, SendUnexpectedSizes) {
       "m543s472m543s472m543s472m543s472m543s1623m543s472m543s472m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s472m543s472m543s1623"
       "m543s472m543s472m543s472m543s472m543s1623m543s472m543s1623m543s472"
-      "m440s7048", irsend.outputStr());
+      "m543s7048", irsend.outputStr());
 }
 
 // Tests for IRToshibaAC class.
@@ -297,7 +297,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
       "m543s472m543s1623m543s472m543s472m543s472m543s472m543s472m543s1623"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s1623m543s1623m543s1623m543s472m543s472m543s472m543s472m543s472"
-      "m440s7048", irsend.outputStr());
+      "m543s7048", irsend.outputStr());
 
   // Turn off the power and re-check.
   toshiba.setPower(false);
@@ -320,7 +320,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
       "m543s472m543s1623m543s472m543s472m543s472m543s1623m543s1623m543s1623"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s1623m543s472"
-      "m440s7048", irsend.outputStr());
+      "m543s7048", irsend.outputStr());
 
   // Turn the power back on, and check nothing changed.
   toshiba.on();
@@ -343,7 +343,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
       "m543s472m543s1623m543s472m543s472m543s472m543s472m543s472m543s1623"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s472"
       "m543s1623m543s1623m543s1623m543s472m543s472m543s472m543s472m543s472"
-      "m440s7048", irsend.outputStr());
+      "m543s7048", irsend.outputStr());
 }
 
 // Test decoding a message we entirely constructed based soley on a given state.
