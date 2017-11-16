@@ -139,10 +139,22 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
   return checksum;
 }
 
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRToshibaAC::validChecksum(const uint8_t state[],
+                                const uint16_t length) {
+  return (length > 1 && state[length - 1] == calcChecksum(state, length));
+}
+
 // Calculate & set the checksum for the current internal state of the remote.
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
-  remote_state[length - 1] = calcChecksum(remote_state, length);
+  if (length > 1)
+    remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 // Set the requested power state of the A/C to off.
@@ -286,10 +298,8 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
 
   // Compliance
   if (strict) {
-    // Check that the internal checksum of the message is correct.
-    if (results->state[TOSHIBA_AC_STATE_LENGTH - 1] !=
-        IRToshibaAC::calcChecksum(results->state, TOSHIBA_AC_STATE_LENGTH))
-      return false;
+    // Check that the checksum of the message is correct.
+    if (!IRToshibaAC::validChecksum(results->state)) return false;
   }
 
   // Success

@@ -276,7 +276,7 @@ TEST(TestToshibaACClass, RawState) {
   EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
 }
 
-TEST(TestToshibaACClass, CalcChecksum) {
+TEST(TestToshibaACClass, Checksums) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
@@ -284,6 +284,8 @@ TEST(TestToshibaACClass, CalcChecksum) {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
   uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
+  uint8_t invalid_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
 
   EXPECT_EQ(0x01, toshiba.calcChecksum(initial_state));
   EXPECT_EQ(0xC0, toshiba.calcChecksum(modified_state));
@@ -299,6 +301,14 @@ TEST(TestToshibaACClass, CalcChecksum) {
   // But test it anyway
   EXPECT_EQ(0x00, IRToshibaAC::calcChecksum(initial_state, 1));
   EXPECT_EQ(0x00, IRToshibaAC::calcChecksum(initial_state, 0));
+
+  // Validity tests.
+  EXPECT_TRUE(IRToshibaAC::validChecksum(initial_state));
+  EXPECT_TRUE(IRToshibaAC::validChecksum(modified_state));
+  EXPECT_FALSE(IRToshibaAC::validChecksum(invalid_state));
+  EXPECT_FALSE(IRToshibaAC::validChecksum(initial_state, 0));
+  EXPECT_FALSE(IRToshibaAC::validChecksum(initial_state, 1));
+  EXPECT_FALSE(IRToshibaAC::validChecksum(initial_state, 2));
 }
 
 TEST(TestToshibaACClass, MessageConstuction) {
