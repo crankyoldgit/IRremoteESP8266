@@ -197,6 +197,15 @@ TEST(TestToshibaACClass, OperatingMode) {
 
   toshiba.setMode(255);
   EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+
+  // Setting the power off changes the underlying mode in the state to heat.
+  toshiba.setPower(true);
+  toshiba.setMode(TOSHIBA_AC_COOL);
+  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode(true));
+  toshiba.setPower(false);
+  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(TOSHIBA_AC_HEAT, toshiba.getMode(true));
 }
 
 TEST(TestToshibaACClass, FanSpeed) {

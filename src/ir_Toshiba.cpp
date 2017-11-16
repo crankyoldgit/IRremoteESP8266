@@ -208,7 +208,7 @@ uint8_t IRToshibaAC::getFan() {
 //   A uint8_t containing the A/C mode.
 uint8_t IRToshibaAC::getMode(bool useRaw) {
   if (useRaw)
-    return (remote_state[6] & 0b11111100);
+    return (remote_state[6] & 0b00000011);
   else
     return mode_state;
 }
