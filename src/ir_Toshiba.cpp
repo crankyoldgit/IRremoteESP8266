@@ -2,6 +2,9 @@
 
 #include "ir_Toshiba.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
@@ -241,6 +244,49 @@ void IRToshibaAC::setMode(uint8_t mode) {
     remote_state[6] &= 0b11111100;  // Clear the previous mode.
     remote_state[6] |= mode_state;
   }
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRToshibaAC::toString() {
+  String result = "";
+#else
+std::string IRToshibaAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case TOSHIBA_AC_AUTO:
+      result += " (AUTO)";
+      break;
+    case TOSHIBA_AC_COOL:
+      result += " (COOL)";
+      break;
+    case TOSHIBA_AC_HEAT:
+      result += " (HEAT)";
+      break;
+    case TOSHIBA_AC_DRY:
+      result += " (DRY)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case TOSHIBA_AC_FAN_AUTO:
+      result += " (AUTO)";
+      break;
+    case TOSHIBA_AC_FAN_MAX:
+      result += " (MAX)";
+      break;
+  }
+  return result;
 }
 #endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 

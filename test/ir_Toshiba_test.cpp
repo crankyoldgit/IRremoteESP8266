@@ -334,6 +334,29 @@ TEST(TestToshibaACClass, Checksums) {
   EXPECT_FALSE(IRToshibaAC::validChecksum(initial_state, 2));
 }
 
+TEST(TestToshibaACClass, HumanReadableOutput) {
+  IRToshibaAC toshiba(0);
+  toshiba.begin();
+
+  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
+  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
+
+  toshiba.setRaw(initial_state);
+  EXPECT_EQ("Power: On, Mode: 0 (AUTO), Temp: 17C, Fan: 0 (AUTO)",
+            toshiba.toString());
+  toshiba.setRaw(modified_state);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 17C, Fan: 5 (MAX)",
+            toshiba.toString());
+  toshiba.off();
+  toshiba.setTemp(25);
+  toshiba.setFan(3);
+  toshiba.setMode(TOSHIBA_AC_DRY);
+  EXPECT_EQ("Power: Off, Mode: 2 (DRY), Temp: 25C, Fan: 3",
+            toshiba.toString());
+}
+
 TEST(TestToshibaACClass, MessageConstuction) {
   IRToshibaAC toshiba(0);
   IRsendTest irsend(4);

@@ -4,6 +4,11 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifdef ARDUINO
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 
@@ -48,6 +53,11 @@ class IRToshibaAC {
   uint8_t* getRaw();
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 #ifndef UNIT_TEST
 
  private:
