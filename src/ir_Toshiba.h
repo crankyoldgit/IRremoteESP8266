@@ -46,10 +46,12 @@ class IRToshibaAC {
   uint8_t getMode(bool useRaw = false);
   void setRaw(uint8_t newState[]);
   uint8_t* getRaw();
+  static uint8_t calcChecksum(const uint8_t state[],
+                              const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
 
  private:
   uint8_t remote_state[TOSHIBA_AC_STATE_LENGTH];
-  void checksum();
+  void checksum(const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
   uint8_t mode_state;
   IRsend _irsend;
 };

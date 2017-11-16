@@ -267,6 +267,31 @@ TEST(TestToshibaACClass, RawState) {
   EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
 }
 
+TEST(TestToshibaACClass, CalcChecksum) {
+  IRToshibaAC toshiba(0);
+  toshiba.begin();
+
+  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
+  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
+
+  EXPECT_EQ(0x01, toshiba.calcChecksum(initial_state));
+  EXPECT_EQ(0xC0, toshiba.calcChecksum(modified_state));
+  // Check we can call it without instantiating the object.
+  EXPECT_EQ(0x01, IRToshibaAC::calcChecksum(initial_state));
+  // Use different lengths.
+  EXPECT_EQ(0x01, IRToshibaAC::calcChecksum(initial_state,
+                                            TOSHIBA_AC_STATE_LENGTH - 1));
+  EXPECT_EQ(0xFF, IRToshibaAC::calcChecksum(initial_state, 3));
+  // Minimum length that actually means anything.
+  EXPECT_EQ(0xF2, IRToshibaAC::calcChecksum(initial_state, 2));
+  // Technically, there is no such thing as a checksum for a length of < 2
+  // But test it anyway
+  EXPECT_EQ(0x00, IRToshibaAC::calcChecksum(initial_state, 1));
+  EXPECT_EQ(0x00, IRToshibaAC::calcChecksum(initial_state, 0));
+}
+
 TEST(TestToshibaACClass, MessageConstuction) {
   IRToshibaAC toshiba(0);
   IRsendTest irsend(4);
@@ -353,7 +378,7 @@ TEST(TestDecodeToshibaAC, SyntheticExample) {
   irsend.begin();
 
   uint8_t expectedState[TOSHIBA_AC_STATE_LENGTH] = {
-      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
   irsend.sendToshibaAC(expectedState);

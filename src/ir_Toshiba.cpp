@@ -121,14 +121,28 @@ void IRToshibaAC::setRaw(uint8_t newState[]) {
   mode_state = getMode(true);
 }
 
-// Calculate the checksum for the current internal state of the remote.
-void IRToshibaAC::checksum() {
+// Calculate the checksum for a given array.
+// Args:
+//   state:  The array to calculate the checksum over.
+//   length: The size of the array.
+// Returns:
+//   The 8 bit checksum value.
+uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
+                                  const uint16_t length) {
   uint8_t checksum = 0;
-  // Checksum is simple XOR of all previous bytes.
-  // Stored as an 8 bit value in the last byte.
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH - 1; i++)
-    checksum ^= remote_state[i];
-  remote_state[TOSHIBA_AC_STATE_LENGTH - 1] = checksum;
+  // Only calculate it for valid lengths.
+  if (length > 1) {
+    // Checksum is simple XOR of all bytes except the last one.
+    for (uint8_t i = 0; i < length - 1; i++)
+      checksum ^= state[i];
+  }
+  return checksum;
+}
+
+// Calculate & set the checksum for the current internal state of the remote.
+void IRToshibaAC::checksum(const uint16_t length) {
+  // Stored the checksum value in the last byte.
+  remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 // Set the requested power state of the A/C to off.
@@ -271,7 +285,12 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_MIN_GAP)) return false;
 
   // Compliance
-  // TODO(anyone): Validate checksum
+  if (strict) {
+    // Check that the internal checksum of the message is correct.
+    if (results->state[TOSHIBA_AC_STATE_LENGTH - 1] !=
+        IRToshibaAC::calcChecksum(results->state, TOSHIBA_AC_STATE_LENGTH))
+      return false;
+  }
 
   // Success
   results->decode_type = TOSHIBA_AC;
