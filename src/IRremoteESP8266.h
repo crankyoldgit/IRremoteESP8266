@@ -245,7 +245,7 @@ enum decode_type_t {
 #define SONY_MIN_REPEAT              2U
 #define TOSHIBA_AC_STATE_LENGTH      9U
 #define TOSHIBA_AC_BITS              (TOSHIBA_AC_STATE_LENGTH * 8)
-#define TOSHIBA_AC_MIN_REPEAT        0U
+#define TOSHIBA_AC_MIN_REPEAT        1U
 #define TROTEC_COMMAND_LENGTH        9U
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
