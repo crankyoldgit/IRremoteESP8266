@@ -4,6 +4,11 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifdef ARDUINO
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 
@@ -26,7 +31,7 @@
 #define TOSHIBA_AC_MIN_TEMP         17U  // 17C
 #define TOSHIBA_AC_MAX_TEMP         30U  // 30C
 
-#if SEND_TOSHIBA_AC
+#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 class IRToshibaAC {
  public:
   explicit IRToshibaAC(uint16_t pin);
@@ -43,16 +48,28 @@ class IRToshibaAC {
   void setFan(uint8_t fan);
   uint8_t getFan();
   void setMode(uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(bool useRaw = false);
+  void setRaw(uint8_t newState[]);
   uint8_t* getRaw();
+  static bool validChecksum(const uint8_t state[],
+                            const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
+#ifndef UNIT_TEST
 
  private:
+#endif
   uint8_t remote_state[TOSHIBA_AC_STATE_LENGTH];
-  void checksum();
+  void checksum(const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+  static uint8_t calcChecksum(const uint8_t state[],
+                              const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
   uint8_t mode_state;
   IRsend _irsend;
 };
 
-#endif  // SEND_TOSHIBA_AC
+#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 
 #endif  // IR_TOSHIBA_H_
