@@ -28,7 +28,7 @@
 #define TOSHIBA_AC_BIT_MARK     543U
 #define TOSHIBA_AC_ONE_SPACE   1623U
 #define TOSHIBA_AC_ZERO_SPACE   472U
-#define TOSHIBA_AC_MIN_GAP   7048U
+#define TOSHIBA_AC_MIN_GAP     7048U
 
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
