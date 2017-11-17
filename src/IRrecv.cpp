@@ -121,6 +121,9 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
   } else {
     irparams_save = NULL;
   }
+#if DECODE_HASH
+  unknown_threshold = UNKNOWN_THRESHOLD;
+#endif  // DECODE_HASH
 }
 
 // Class destructor
@@ -197,6 +200,13 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
 uint16_t IRrecv::getBufSize() {
   return irparams.bufsize;
 }
+
+#if DECODE_HASH
+// Set the minimum length we will consider for reporting UNKNOWN message types.
+void IRrecv::setUnknownThreshold(uint16_t length) {
+  unknown_threshold = length;
+}
+#endif  // DECODE_HASH
 
 // Decodes the received IR message.
 // If the interrupt state is saved, we will immediately resume waiting
@@ -401,12 +411,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
   }
 #endif
+#if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
   if (decodeHash(results)) {
     return true;
   }
+#endif  // DECODE_HASH
   // Throw away and start over
   if (!resumed)  // Check if we have already resumed.
     resume();
@@ -565,13 +577,14 @@ int16_t IRrecv::compare(uint16_t oldval, uint16_t newval) {
     return 1;
 }
 
+#if DECODE_HASH
 /* Converts the raw code values into a 32-bit hash code.
  * Hopefully this code is unique for each button.
  * This isn't a "real" decoding, just an arbitrary value.
  */
 bool IRrecv::decodeHash(decode_results *results) {
-  // Require at least 6 samples to prevent triggering on noise
-  if (results->rawlen < 6)
+  // Require at least some samples to prevent triggering on noise
+  if (results->rawlen < unknown_threshold)
     return false;
   int32_t hash = FNV_BASIS_32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
@@ -590,6 +603,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   results->decode_type = UNKNOWN;
   return true;
 }
+#endif  // DECODE_HASH
 
 // Match & decode the typical data section of an IR message.
 // The data value constructed as the Most Significant Bit first.
