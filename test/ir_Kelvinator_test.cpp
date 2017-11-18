@@ -372,6 +372,66 @@ TEST(TestKelvinatorClass, FanSpeed) {
   EXPECT_EQ(3, irkelv.getFan());
 }
 
+TEST(TestKelvinatorClass, Checksums) {
+  uint8_t kelv_code[KELVINATOR_STATE_LENGTH] = {
+      0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
+      0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0};
+
+  EXPECT_TRUE(IRKelvinatorAC::validChecksum(kelv_code));
+  // Change the array so the checksum is invalid.
+  kelv_code[0] ^= 0xFF;
+  EXPECT_FALSE(IRKelvinatorAC::validChecksum(kelv_code));
+  // Restore the previous change, and change another byte.
+  kelv_code[0] ^= 0xFF;
+  kelv_code[4] ^= 0xFF;
+  EXPECT_FALSE(IRKelvinatorAC::validChecksum(kelv_code));
+  kelv_code[4] ^= 0xFF;
+  // Change something in the 2nd block.
+  kelv_code[10] ^= 0xFF;
+  EXPECT_FALSE(IRKelvinatorAC::validChecksum(kelv_code));
+  kelv_code[10] ^= 0xFF;
+  EXPECT_TRUE(IRKelvinatorAC::validChecksum(kelv_code));
+}
+
+TEST(TestKelvinatorClass, SetAndGetRaw) {
+  IRKelvinatorAC irkelv(0);
+  uint8_t initialState[KELVINATOR_STATE_LENGTH] = {
+      0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0xA0,
+      0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0xA0};
+  uint8_t expectedState[KELVINATOR_STATE_LENGTH] = {
+      0x08, 0x05, 0x20, 0x50, 0x00, 0x00, 0x00, 0x70,
+      0x08, 0x05, 0x20, 0x70, 0x00, 0x00, 0x00, 0x70};
+
+  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), KELVINATOR_BITS);
+  // toggle the power state.
+  irkelv.setPower(!irkelv.getPower());
+  irkelv.setTemp(21);
+  irkelv.setLight(true);
+  EXPECT_STATE_EQ(expectedState, irkelv.getRaw(), KELVINATOR_BITS);
+  irkelv.setRaw(initialState);
+  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), KELVINATOR_BITS);
+}
+
+TEST(TestKelvinatorClass, HumanReadable) {
+  IRKelvinatorAC irkelv(0);
+
+  EXPECT_EQ("Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Turbo: Off, "
+            "Quiet: Off, XFan: Off, IonFilter: Off, Light: Off, "
+            "Swing (Horizontal): Off, Swing (Vertical): Off",
+            irkelv.toString());
+  irkelv.on();
+  irkelv.setMode(KELVINATOR_COOL);
+  irkelv.setTemp(25);
+  irkelv.setFan(KELVINATOR_FAN_MAX);
+  irkelv.setXFan(true);
+  irkelv.setIonFilter(true);
+  irkelv.setLight(true);
+  irkelv.setSwingHorizontal(true);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 25C, Fan: 5 (MAX), Turbo: Off, "
+            "Quiet: Off, XFan: On, IonFilter: On, Light: On, "
+            "Swing (Horizontal): On, Swing (Vertical): Off",
+            irkelv.toString());
+}
 
 TEST(TestKelvinatorClass, MessageConstuction) {
   IRKelvinatorAC irkelv(0);
