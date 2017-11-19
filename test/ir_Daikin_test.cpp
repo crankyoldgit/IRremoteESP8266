@@ -437,8 +437,8 @@ TEST(TestDaikinClass, FanSpeed) {
   irdaikin.setFan(DAIKIN_FAN_AUTO);
   EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_QUITE);
-  EXPECT_EQ(DAIKIN_FAN_QUITE, irdaikin.getFan());
+  irdaikin.setFan(DAIKIN_FAN_QUIET);
+  EXPECT_EQ(DAIKIN_FAN_QUIET, irdaikin.getFan());
 }
 
 TEST(TestDaikinClass, CurrentTime) {
@@ -587,6 +587,85 @@ TEST(TestDaikinClass, SensorSetting) {
 
   irdaikin.setSensor(false);
   ASSERT_FALSE(irdaikin.getSensor());
+}
+
+TEST(TestDaikinClass, RenderTime) {
+  EXPECT_EQ("0:00", IRDaikinESP::renderTime(0));
+  EXPECT_EQ("0:10", IRDaikinESP::renderTime(10));
+  EXPECT_EQ("1:00", IRDaikinESP::renderTime(1 * 60 + 0));
+  EXPECT_EQ("23:59", IRDaikinESP::renderTime(23 * 60 + 59));
+}
+
+TEST(TestDaikinClass, SetAndGetRaw) {
+  IRDaikinESP irdaikin(0);
+  uint8_t initialState[DAIKIN_COMMAND_LENGTH] = {
+    0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
+    0x11, 0xDA, 0x27, 0x00, 0x00, 0x49, 0x1E, 0x00,
+    0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x4F};
+  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+    0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
+    0x11, 0xDA, 0x27, 0x00, 0x00, 0x48, 0x2A, 0x00,
+    0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x02, 0x5A};
+
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+  // toggle the power state.
+  irdaikin.setPower(!irdaikin.getPower());
+  irdaikin.setTemp(21);
+  irdaikin.setMold(true);
+  EXPECT_STATE_EQ(expectedState, irdaikin.getRaw(), DAIKIN_BITS);
+  irdaikin.setRaw(initialState);
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+}
+
+TEST(TestDaikinClass, ChecksumValidation) {
+  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
+      0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE1};
+
+  EXPECT_TRUE(IRDaikinESP::validChecksum(daikin_code));
+  // Change the array so the checksum is invalid.
+  daikin_code[0] ^= 0xFF;
+  EXPECT_FALSE(IRDaikinESP::validChecksum(daikin_code));
+  // Restore the previous change, and change another byte.
+  daikin_code[0] ^= 0xFF;
+  daikin_code[4] ^= 0xFF;
+  EXPECT_FALSE(IRDaikinESP::validChecksum(daikin_code));
+  daikin_code[4] ^= 0xFF;
+  // Change something in the 2nd block.
+  daikin_code[10] ^= 0xFF;
+  EXPECT_FALSE(IRDaikinESP::validChecksum(daikin_code));
+  daikin_code[10] ^= 0xFF;
+  EXPECT_TRUE(IRDaikinESP::validChecksum(daikin_code));
+}
+
+// Test human readable output.
+TEST(TestDaikinClass, HumanReadable) {
+  IRDaikinESP irdaikin(0);
+
+  EXPECT_EQ("Power: On, Mode: 4 (HEAT), Temp: 15C, Fan: 11 (QUIET), "
+            "Powerful: Off, Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, "
+            "Swing (Horizontal): Off, Swing (Vertical): Off, "
+            "Current Time: 0:00, On Time: Off, Off Time: Off",
+            irdaikin.toString());
+  irdaikin.setMode(DAIKIN_AUTO);
+  irdaikin.setTemp(25);
+  irdaikin.setFan(DAIKIN_FAN_AUTO);
+  irdaikin.setQuiet(true);
+  irdaikin.setSensor(true);
+  irdaikin.setEye(true);
+  irdaikin.setMold(true);
+  irdaikin.setSwingVertical(true);
+  irdaikin.setSwingHorizontal(true);
+  irdaikin.setCurrentTime(9 * 60 + 15);
+  irdaikin.enableOnTimer(8 * 60 + 0);
+  irdaikin.enableOffTimer(17 * 60 + 30);
+  irdaikin.off();
+  EXPECT_EQ("Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 10 (AUTO), "
+            "Powerful: Off, Quiet: On, Sensor: On, Eye: On, Mold: On, "
+            "Swing (Horizontal): On, Swing (Vertical): On, "
+            "Current Time: 9:15, On Time: 8:00, Off Time: 17:30",
+            irdaikin.toString());
 }
 
 // Test general message construction after tweaking some settings.

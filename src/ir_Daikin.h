@@ -1,12 +1,16 @@
-/* Copyright 2016 sillyfrog */
+// Copyright 2016 sillyfrog
+// Copyright 2017 sillyfrog, crankyoldgit
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
 
-#include "IRremoteESP8266.h"
-#include "IRsend.h"
 #ifndef UNIT_TEST
 #include <Arduino.h>
+#else
+#include <string>
 #endif
+#include "IRremoteESP8266.h"
+#include "IRrecv.h"
+#include "IRsend.h"
 
 // Option to disable the additional Daikin debug info to conserve memory
 #define DAIKIN_DEBUG false
@@ -82,7 +86,7 @@
 #define DAIKIN_FAN_MIN       (uint8_t) 1U
 #define DAIKIN_FAN_MAX       (uint8_t) 5U
 #define DAIKIN_FAN_AUTO      (uint8_t) 0b1010
-#define DAIKIN_FAN_QUITE     (uint8_t) 0b1011
+#define DAIKIN_FAN_QUIET     (uint8_t) 0b1011
 
 #define DAIKIN_BYTE_POWER             13
 #define DAIKIN_BIT_POWER      0b00000001
@@ -135,8 +139,6 @@ class IRDaikinESP {
   void off();
   void setPower(bool state);
   bool getPower();
-  void setAux(uint8_t aux);
-  uint8_t getAux();
   void setTemp(uint8_t temp);
   uint8_t getTemp();
   void setFan(uint8_t fan);
@@ -171,24 +173,26 @@ class IRDaikinESP {
   uint16_t getCurrentTime();
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
-#ifdef UNIT_TEST
-  uint16_t renderTime(uint16_t timemins);
-#else
-  String renderTime(uint16_t timemins);
-#endif
 #if DAIKIN_DEBUG
-#ifdef ARDUINO
-  String renderTime(uint16_t timemins);
   void printState();
-#endif  // ARDUINO
 #endif  // DAIKIN_DEBUG
   uint32_t getCommand();
   void setCommand(uint32_t value);
+  static bool validChecksum(const uint8_t state[],
+                            const uint16_t length = DAIKIN_COMMAND_LENGTH);
+#ifdef ARDUINO
+  String toString();
+  static String renderTime(uint16_t timemins);
+#else
+  std::string toString();
+  static std::string renderTime(uint16_t timemins);
+#endif
 
  private:
   // # of bytes per command
   uint8_t daikin[DAIKIN_COMMAND_LENGTH];
   void stateReset();
+  static uint8_t calcBlockChecksum(const uint8_t *block, const uint16_t length);
   void checksum();
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);
