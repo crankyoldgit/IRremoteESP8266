@@ -21,23 +21,12 @@ function maxFromList()
   echo $max
 }
 
-function cullListHigh()
+function cullList()
 {
   high_mark=$1
   shift
   for i in $*; do
     if [[ $i -lt $high_mark ]]; then
-      echo $i
-    fi
-  done
-}
-
-function cullListLow()
-{
-  low_mark=$1
-  shift
-  for i in $*; do
-    if [[ $i -ge $low_mark ]]; then
       echo $i
     fi
   done
@@ -49,16 +38,9 @@ function reduceList()
   max=$(maxFromList $*)
   while [[ $max -gt 0 ]]; do
     echo "$max"
-    list=$(cullListHigh $((max - RANGE)) $list)
+    list=$(cullList $((max - RANGE)) $list)
     max=$(maxFromList $list)
   done
-}
-
-function sortReverse()
-{
-  for i in $*; do
-    echo $i
-  done | sort -nr
 }
 
 function listLength()
@@ -103,22 +85,14 @@ function isGap()
 
 function addBit()
 {
-  echo -n $1
-  if [[ $bits -eq 0 ]]; then
-    hex_value=""
-    value=0
+  if [[ ${1} == "reset" ]]; then
+    binary_value=""
+    bits=0
+    return
   fi
+  echo -n "${1}"  # This effectively displays in LSB first order.
   bits=$((bits + 1))
-  if [[ $((bits % 8)) -eq 1 && $bits -gt 1 ]]; then
-    hex_value=$(getValue)
-    value=0
-  fi
-  value=$(((value * 2) + $1))
-}
-
-function getValue()
-{
-  echo "${hex_value}$(printf %02X $value)"
+  binary_value="${binary_value}${1}"  # Storing it in MSB first order.
 }
 
 function isOdd()
@@ -148,6 +122,27 @@ EOF
   exit 1
 }
 
+function binToBase()
+{
+  bc -q << EOF
+obase=${2}
+ibase=2
+${1}
+EOF
+}
+
+function displayBinaryValue()
+{
+  [[ -z ${1} ]] && return  # Nothing to display
+  reversed=$(echo ${1} | rev)  # Convert the binary value to LSB first
+  echo "  Bits: ${bits}"
+  echo "  Hex:  0x$(binToBase ${1} 16) (MSB first)"
+  echo "        0x$(binToBase ${reversed} 16) (LSB first)"
+  echo "  Dec:  $(binToBase ${1} 10) (MSB first)"
+  echo "        $(binToBase ${reversed} 10) (LSB first)"
+  echo "  Bin:  ${1} (MSB first)"
+  echo "        ${reversed} (LSB first)"
+}
 
 # Main program
 
@@ -166,20 +161,28 @@ else
   RANGE=${DEFAULT_RANGE}
 fi
 
+if ! which bc &> /dev/null ; then
+  cat << EOF
+'bc' program not found. Exiting.
+Suggestion: sudo apt-get install bc
+EOF
+  exit 2
+fi
+
 # Parse the input.
 count=1
 while read line; do
   # Quick and Dirty Removal of any array declaration syntax, and any commas.
-  line="$(echo ${line} | sed 's/uint.*{//i' | sed 's/,//g' | sed 's/};.*//g')"
+  line="$(echo ${line} | sed 's/^.*uint.*{//i' | sed 's/,/ /g' | sed 's/};.*//g')"
   for msecs in ${line}; do
     if isDigits "${msecs}"; then
-      orig="$orig $msecs"
+      orig="${orig} ${msecs}"
       if isOdd $count; then
-        marks="$marks $msecs"
+        marks="${marks} ${msecs}"
       else
-        spaces="$spaces $msecs"
+        spaces="${spaces} ${msecs}"
       fi
-      count=$(($count + 1))
+      count=$((count + 1))
     fi
   done
 done
@@ -234,29 +237,27 @@ fi
 
 echo
 echo "Decoding protocol based on analysis so far:"
-echo "[NOTE: Data bits are assumed to be in Most Significant Bit First order.]"
 echo
 last=""
-value=0
-bits=0
+addBit reset
 count=1
 for msecs in $orig; do
   if isHdrMark $msecs && isOdd $count; then
     last="HM"
     if [[ $bits -ne 0 ]]; then
       echo
-      echo "Value = $(getValue) ($bits bits)"
+      displayBinaryValue ${binary_value}
       echo -n $last
     fi
-    bits=0
+    addBit reset
     echo -n "HDR_MARK+"
   elif isHdrSpace $msecs; then
     if [[ $last != "HM" ]]; then
       if [[ $bits -ne 0 ]]; then
         echo
-        echo "Value = $(getValue) ($bits bits)"
+        displayBinaryValue ${binary_value}
       fi
-      bits=0
+      addBit reset
       echo -n "UNEXPECTED->"
     fi
     last="HS"
@@ -284,8 +285,8 @@ for msecs in $orig; do
     fi
     last="GS"
     echo " GAP($msecs)"
-    echo "Value = $(getValue) ($bits bits)"
-    bits=0
+    displayBinaryValue ${binary_value}
+    addBit reset
   else
     echo -n "UNKNOWN($msecs)"
     last="UNK"
@@ -293,4 +294,4 @@ for msecs in $orig; do
   count=$((count + 1))
 done
 echo
-echo "Value = $(getValue) ($bits bits)"
+displayBinaryValue ${binary_value}
