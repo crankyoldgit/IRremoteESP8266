@@ -46,14 +46,17 @@ void loop() {
   daikinir.setFan(1);
   daikinir.setMode(DAIKIN_COOL);
   daikinir.setTemp(25);
-  daikinir.setSwingVertical(0);
-  daikinir.setSwingHorizontal(0);
+  daikinir.setSwingVertical(false);
+  daikinir.setSwingHorizontal(false);
 
   // Set the current time to 1:33PM (13:33)
   // Time works in minutes past midnight
   daikinir.setCurrentTime((13*60) + 33);
   // Turn off about 1 hour later at 2:30PM (15:30)
   daikinir.enableOffTimer((14*60) + 30);
+
+  // Display what we are going to send.
+  Serial.println(daikinir.toString());
 
   // Now send the IR signal.
   daikinir.send();

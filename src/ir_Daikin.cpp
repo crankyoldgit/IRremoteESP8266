@@ -4,13 +4,18 @@ Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
 Copyright 2016 sillyfrog
+Copyright 2017 sillyfrog, crankyoldgit
 */
 
 #include "ir_Daikin.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 #include "IRrecv.h"
+#include "IRsend.h"
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -82,7 +87,9 @@ void IRsend::sendDaikinGapHeader() {
   mark(DAIKIN_HDR_MARK);
   space(DAIKIN_HDR_SPACE);
 }
+#endif  // SEND_DAIKIN
 
+#if (SEND_DAIKIN || DECODE_DAIKIN)
 IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -96,16 +103,41 @@ void IRDaikinESP::send() {
   _irsend.sendDaikin(daikin);
 }
 
-void IRDaikinESP::checksum() {
+// Calculate the checksum for a given data block.
+// Args:
+//   block:  Ptr to the start of the data block.
+//   length: Nr. of bytes to checksum.
+// Returns:
+//   A byte containing the calculated checksum.
+uint8_t IRDaikinESP::calcBlockChecksum(const uint8_t *block,
+                                       const uint16_t length) {
   uint8_t sum = 0;
-  for (uint8_t i = 0; i <= 6; i++)
-    sum += daikin[i];
-  daikin[7] = sum & 0xFF;
+  // Daikin checksum is just the addition of all the data bytes
+  // in the block but capped to 8 bits.
+  for (uint16_t i = 0; i < length; i++, block++)
+    sum += *block;
+  return sum & 0xFFU;
+}
 
-  sum = 0;
-  for (uint8_t i = 8; i <= 25; i++)
-    sum += daikin[i];
-  daikin[26] = sum & 0xFF;
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikinESP::validChecksum(const uint8_t state[],
+                                const uint16_t length) {
+  if (length < 8 || state[7] != calcBlockChecksum(state, 7))  return false;
+  if (length < 10 ||
+      state[length - 1] != calcBlockChecksum(state + 8, length - 9))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikinESP::checksum() {
+  daikin[7] = calcBlockChecksum(daikin, 7);
+  daikin[26] = calcBlockChecksum(daikin + 8, 17);
 }
 
 void IRDaikinESP::stateReset() {
@@ -116,6 +148,7 @@ void IRDaikinESP::stateReset() {
   daikin[1] = 0xDA;
   daikin[2] = 0x27;
   daikin[4] = 0x42;
+  // daikin[7] is a checksum byte, it will be set by checksum().
   daikin[8] = 0x11;
   daikin[9] = 0xDA;
   daikin[10] = 0x27;
@@ -125,7 +158,7 @@ void IRDaikinESP::stateReset() {
   daikin[19] = 0x06;
   daikin[20] = 0x60;
   daikin[23] = 0xC0;
-  daikin[26] = 0xE3;
+  // daikin[26] is a checksum byte, it will be set by checksum().
   checksum();
 }
 
@@ -135,9 +168,8 @@ uint8_t* IRDaikinESP::getRaw() {
 }
 
 void IRDaikinESP::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
+  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
     daikin[i] = new_code[i];
-  }
 }
 
 void IRDaikinESP::on() {
@@ -174,11 +206,11 @@ uint8_t IRDaikinESP::getTemp() {
   return daikin[14] / 2;
 }
 
-// Set the speed of the fan, 1-5 or DAIKIN_FAN_AUTO or DAIKIN_FAN_QUITE
+// Set the speed of the fan, 1-5 or DAIKIN_FAN_AUTO or DAIKIN_FAN_QUIET
 void IRDaikinESP::setFan(uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
-  if (fan == DAIKIN_FAN_QUITE || fan == DAIKIN_FAN_AUTO)
+  if (fan == DAIKIN_FAN_QUIET || fan == DAIKIN_FAN_AUTO)
     fanset = fan;
   else if (fan < DAIKIN_FAN_MIN || fan > DAIKIN_FAN_MAX)
     fanset = DAIKIN_FAN_AUTO;
@@ -190,7 +222,7 @@ void IRDaikinESP::setFan(uint8_t fan) {
 
 uint8_t IRDaikinESP::getFan() {
   uint8_t fan = daikin[16] >> 4;
-  if (fan != DAIKIN_FAN_QUITE && fan != DAIKIN_FAN_AUTO)
+  if (fan != DAIKIN_FAN_QUIET && fan != DAIKIN_FAN_AUTO)
     fan -= 2;
   return fan;
 }
@@ -401,123 +433,141 @@ uint16_t IRDaikinESP::getCurrentTime() {
   return ret;
 }
 
-#ifdef UNIT_TEST
-uint16_t IRDaikinESP::renderTime(uint16_t timemins) {
-  return timemins;
-}
-#else
+#ifdef ARDUINO
 String IRDaikinESP::renderTime(uint16_t timemins) {
+  String ret;
+#else  // ARDUINO
+std::string IRDaikinESP::renderTime(uint16_t timemins) {
+  std::string ret;
+#endif  // ARDUINO
   uint16_t hours, mins;
   hours = timemins / 60;
+  ret = uint64ToString(hours) + ":";
   mins = timemins - (hours * 60);
-  String ret = String(mins);
-  if (ret.length() == 1)
-    ret = "0" + ret;
-  ret = ":" + ret;
-  ret = String(hours) + ret;
+  if (mins < 10)
+    ret += "0";
+  ret += uint64ToString(mins);
   return ret;
 }
-#endif
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRDaikinESP::toString() {
+  String result = "";
+#else  // ARDUINO
+std::string IRDaikinESP::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case DAIKIN_AUTO:
+      result += " (AUTO)";
+      break;
+    case DAIKIN_COOL:
+      result += " (COOL)";
+      break;
+    case DAIKIN_HEAT:
+      result += " (HEAT)";
+      break;
+    case DAIKIN_DRY:
+      result += " (DRY)";
+      break;
+    case DAIKIN_FAN:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case DAIKIN_FAN_AUTO:
+      result += " (AUTO)";
+      break;
+    case DAIKIN_FAN_QUIET:
+      result += " (QUIET)";
+      break;
+    case DAIKIN_FAN_MIN:
+      result += " (MIN)";
+      break;
+    case DAIKIN_FAN_MAX:
+      result += " (MAX)";
+      break;
+  }
+  result += ", Powerful: ";
+  if (getPowerful())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Quiet: ";
+  if (getQuiet())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Sensor: ";
+  if (getSensor())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Eye: ";
+  if (getEye())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mold: ";
+  if (getMold())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Swing (Horizontal): ";
+  if (getSwingHorizontal())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Swing (Vertical): ";
+  if (getSwingVertical())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Current Time: " + renderTime(getCurrentTime());
+  result += ", On Time: ";
+  if (getOnTimerEnabled())
+    result += renderTime(getOnTime());
+  else
+    result += "Off";
+  result += ", Off Time: ";
+  if (getOffTimerEnabled())
+    result += renderTime(getOffTime());
+  else
+    result += "Off";
+
+  return result;
+}
 
 #if DAIKIN_DEBUG
-
-#ifdef UNIT_TEST
+// Print what we have
 void IRDaikinESP::printState() {
-  // Pass for Unit Tests
-}
-#else
-void IRDaikinESP::printState() {
-  // Print what we have
-  Serial.println("Raw Bits:");
+#ifdef ARDUINO
+  String strbits;
+#else  // ARDUINO
+  std::string strbits;
+#endif  // ARDUINO
+  DPRINTLN("Raw Bits:");
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
-    String strbits = String(daikin[i], BIN);
+    strbits = uint64ToString(daikin[i], BIN);
     while (strbits.length() < 8)
-      strbits = String("0") + strbits;
-    Serial.print(strbits);
-    Serial.print(" ");
+      strbits = "0" + strbits;
+    DPRINT(strbits);
+    DPRINT(" ");
   }
-  Serial.println("");
-
-  // Human readable
-  uint8_t var;
-  Serial.print("Power: ");
-  Serial.println(getPower() ? "On" : "Off");
-
-  Serial.print("Temperature: ");
-  Serial.println(getTemp());
-
-  Serial.print("Quiet: ");
-  Serial.println(getQuiet() ? "On" : "Off");
-
-  Serial.print("Sensor: ");
-  Serial.println(getSensor() ? "On" : "Off");
-
-  Serial.print("Powerful: ");
-  Serial.println(getPowerful() ? "On" : "Off");
-
-  Serial.print("Econo: ");
-  Serial.println(getEcono() ? "On" : "Off");
-
-  Serial.print("Eye: ");
-  Serial.println(getEye() ? "On" : "Off");
-
-  Serial.print("Mold: ");
-  Serial.println(getMold() ? "On" : "Off");
-
-  Serial.print("Swing Vertical: ");
-  Serial.println(getSwingVertical() ? "On" : "Off");
-
-  Serial.print("Swing Horizontal: ");
-  Serial.println(getSwingHorizontal() ? "On" : "Off");
-
-  Serial.print("Fan Speed: ");
-  var = getFan();
-  if (var == DAIKIN_FAN_AUTO)
-    Serial.println("Auto");
-  else if (var == DAIKIN_FAN_QUITE)
-    Serial.println("Quite");
-  else
-    Serial.println(var);
-
-  Serial.print("Mode: ");
-  switch (getMode()) {
-    case DAIKIN_COOL:
-        Serial.println("Cool");
-        break;
-    case DAIKIN_HEAT:
-        Serial.println("Heat");
-        break;
-    case DAIKIN_FAN:
-        Serial.println("Fan");
-        break;
-    case DAIKIN_AUTO:
-        Serial.println("Auto");
-        break;
-    case DAIKIN_DRY:
-        Serial.println("Dry");
-        break;
-  }
-
-  var = getOnTimerEnabled();
-  Serial.print("On Timer: ");
-  Serial.println(var ? "Enabled" : "Off");
-  if (var) {
-    Serial.print("On Time: ");
-    Serial.println(renderTime(getOnTime()));
-  }
-
-  var = getOffTimerEnabled();
-  Serial.print("Off Timer: ");
-  Serial.println(var ? "Enabled" : "Off");
-  if (var) {
-    Serial.print("Off Time: ");
-    Serial.println(renderTime(getOffTime()));
-  }
-
-  Serial.print("Current Time: ");
-  Serial.println(renderTime(getCurrentTime()));
+  DPRINTLN("");
+  DPRINTLN(toString());
 }
-#endif  // UNIT_TEST
 #endif  // DAIKIN_DEBUG
 
 /*
@@ -595,7 +645,7 @@ void IRDaikinESP::setCommand(uint32_t value) {
   value >>= 20;
   setCurrentTime(value);
 }
-#endif  // SEND_DAIKIN
+#endif  // (SEND_DAIKIN || DECODE_DAIKIN)
 
 #if DECODE_DAIKIN
 
@@ -661,8 +711,10 @@ bool readbits(decode_results *results, uint16_t *offset,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Working, return command is incomplete as there is too much data,
-//         if DAIKIN_DEBUG enabled, will print all the set options and values.
+// Status: BETA / Should be working.
+//
+// Notes:
+//   If DAIKIN_DEBUG enabled, will print all the set options and values.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -717,7 +769,9 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
     return false;
 
   // Compliance
-  // TODO(crankyoldgit): Add a check to see if the checksums match.
+  if (strict) {
+    if (!IRDaikinESP::validChecksum(daikin_code)) return false;
+  }
 
   // Success
 #if DAIKIN_DEBUG
@@ -725,16 +779,15 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   dako.setRaw(daikin_code);
 #ifdef ARDUINO
   yield();
+#endif  // ARDUINO
   dako.printState();
-#endif
-#endif
+#endif  // DAIKIN_DEBUG
 
   // Copy across the bits to state
   for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
     results->state[i] = daikin_code[i];
   results->bits = DAIKIN_COMMAND_LENGTH * 8;
   results->decode_type = DAIKIN;
-  //  results->command = dako.getCommand(); // include the common options
   return true;
 }
 #endif  // DECODE_DAIKIN
