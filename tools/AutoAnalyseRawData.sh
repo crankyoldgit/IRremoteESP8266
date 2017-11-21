@@ -92,6 +92,7 @@ function addBit()
   fi
   echo -n "${1}"  # This effectively displays in LSB first order.
   bits=$((bits + 1))
+  total_bits=$((total_bits + 1))
   binary_value="${binary_value}${1}"  # Storing it in MSB first order.
 }
 
@@ -145,6 +146,9 @@ function displayBinaryValue()
   echo "        $(binToBase ${reversed} 10) (LSB first)"
   echo "  Bin:  ${1} (MSB first)"
   echo "        ${reversed} (LSB first)"
+  if [[ "${1}" == "${last_binary_value}" ]]; then
+    echo "  Note: Value is the same as the last one. Could be a repeated message."
+  fi
 }
 
 function addCode() {
@@ -153,11 +157,24 @@ function addCode() {
 
 function addDataCode() {
   addCode "    // Data #${data_count}"
-  addCode "    // e.g. data = 0x$(binToBase ${binary_value} 16)"
-  addCode "    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, bits, true);"
+  if [[ "${binary_value}" == "${last_binary_value}" ]]; then
+    addCode "    // CAUTION: data value appears to be a duplicate."
+    addCode "    //          This could be a repeated message."
+  fi
+  addCode "    // e.g. data = 0x$(binToBase ${binary_value} 16), nbits = ${bits}"
+  addCode "$(bitSizeWarning ${bits} '    ')"
+  addCode "    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, nbits, true);"
   addCode "    // Footer #${data_count}"
   addCode "    mark(BIT_MARK);"
   data_count=$((data_count + 1))
+  last_binary_value=$binary_value
+}
+
+function bitSizeWarning() {
+  # $1 is the nr of bits. $2 is what to indent with.
+  if [[ ${1} -gt 64 ]]; then
+    echo "${2}// DANGER: More than 64 bits detected. A uint64_t for data won't work!"
+  fi
 }
 
 # Main program
@@ -171,7 +188,7 @@ while getopts "r:g" opt; do
       if isDigits $OPTARG; then
         RANGE=$OPTARG
       else
-        echo "Error: grouping_range is not a posative integer." >&2
+        echo "Error: grouping_range is not a positive integer." >&2
         usage
       fi
       ;;
@@ -274,15 +291,18 @@ echo
 echo "Decoding protocol based on analysis so far:"
 echo
 last=""
-addBit reset
 count=1
 data_count=1
+last_binary_value=""
+total_bits=0
+addBit reset
+
 addCode "// Function"
-addCode "void IRsend::sendXYZ(const uint64_t data, const uint16_t bits, const uint16_t repeat) {"
+addCode "void IRsend::sendXYZ(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {"
 addCode "  for (uint16_t r = 0; r <= repeat; r++) {"
 
 for msecs in $orig; do
-  if isHdrMark $msecs && isOdd $count; then
+  if isHdrMark $msecs && isOdd $count && ! isBitMark $msecs; then
     last="HM"
     if [[ $bits -ne 0 ]]; then
       echo
@@ -293,7 +313,7 @@ for msecs in $orig; do
     echo -n "HDR_MARK+"
     addCode "    // Header #${data_count}"
     addCode "    mark(HDR_MARK);"
-  elif isHdrSpace $msecs; then
+  elif isHdrSpace $msecs && ! isOneSpace $msecs; then
     if [[ $last != "HM" ]]; then
       if [[ $bits -ne 0 ]]; then
         echo
@@ -327,10 +347,10 @@ for msecs in $orig; do
       echo -n "UNEXPECTED->"
     fi
     last="GS"
-    addDataCode
-    addCode "    space($msecs);"
     echo " GAP($msecs)"
     displayBinaryValue ${binary_value}
+    addDataCode
+    addCode "    space($msecs);"
     addBit reset
   else
     echo -n "UNKNOWN($msecs)"
@@ -345,6 +365,7 @@ displayBinaryValue ${binary_value}
   echo "Generating a VERY rough code outline:"
   echo
   echo "// WARNING: This probably isn't directly usable. It's a guide only."
+  bitSizeWarning ${total_bits}
   addDataCode
   addCode "    delay(100);  // A 100% made up guess of the gap between messages."
   addCode "  }"
