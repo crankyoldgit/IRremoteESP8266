@@ -102,14 +102,17 @@ function isOdd()
 
 function usage()
 {
-  cat << EOF
-Usage: $0 [grouping_range]
+  cat >&2 << EOF
+Usage: $0 [-r grouping_range] [-g]
   Reads an IRremoteESP8266 rawData declaration from STDIN and tries to
   analyse it.
 
   Args:
-    grouping_range: Max number of milli-seconds difference between values
-                    to consider it the same value. (Default: ${DEFAULT_RANGE})
+    -r grouping_range
+        Max number of milli-seconds difference between values
+        to consider it the same value. (Default: ${RANGE})
+    -g
+        Produce a C++ code outline to aid making a IRsend function.
 
   Example input:
     uint16_t rawbuf[37] = {
@@ -144,21 +147,46 @@ function displayBinaryValue()
   echo "        ${reversed} (LSB first)"
 }
 
+function addCode() {
+  CODE=$(echo "${CODE}"; echo "${*}")
+}
+
+function addDataCode() {
+  addCode "    // Data #${data_count}"
+  addCode "    // e.g. data = 0x$(binToBase ${binary_value} 16)"
+  addCode "    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, bits, true);"
+  addCode "    // Footer #${data_count}"
+  addCode "    mark(BIT_MARK);"
+  data_count=$((data_count + 1))
+}
+
 # Main program
 
-DEFAULT_RANGE=200
+RANGE=200
+OUTPUT_CODE=""
 
-# Check the calling arguments.
-if [[ $# -gt 1 ]]; then
+while getopts "r:g" opt; do
+  case $opt in
+    r)
+      if isDigits $OPTARG; then
+        RANGE=$OPTARG
+      else
+        echo "Error: grouping_range is not a posative integer." >&2
+        usage
+      fi
+      ;;
+    g)
+      DISPLAY_CODE="yes"
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [[ $# -ne 0 ]]; then
   usage
-elif [[ $# -eq 1 ]]; then
-  if isDigits $1; then
-    RANGE=$1
-  else
-    usage
-  fi
-else
-  RANGE=${DEFAULT_RANGE}
 fi
 
 if ! which bc &> /dev/null ; then
@@ -204,9 +232,12 @@ if [[ $nr_space_candidates -ge $nr_mark_candidates ]]; then
   # Largest mark is likely the HDR_MARK
   HDR_MARK=$(reduceList $marks | head -1)
   echo HDR_MARK = $HDR_MARK
+  addCode "#define HDR_MARK ${HDR_MARK}U"
   # The mark bit is likely to be the smallest.
   BIT_MARK=$(reduceList $marks | tail -1)
   echo BIT_MARK = $BIT_MARK
+  addCode "#define BIT_MARK ${BIT_MARK}U"
+
 
   left=$nr_space_candidates
   gap_num=0
@@ -218,6 +249,7 @@ if [[ $nr_space_candidates -ge $nr_mark_candidates ]]; then
     GAP_LIST="$GAP_LIST $SPACE_GAP"
     left=$((left - 1))
     echo SPACE_GAP${gap} = $SPACE_GAP
+    addCode "#define SPACE_GAP${gap} ${SPACE_GAP}U"
   done
   # We should have 3 space candidates left.
   # They should be ZERO_SPACE (smallest), ONE_SPACE, & HDR_SPACE (largest)
@@ -225,8 +257,11 @@ if [[ $nr_space_candidates -ge $nr_mark_candidates ]]; then
   ONE_SPACE=$(reduceList $spaces | tail -2 | head -1)
   HDR_SPACE=$(reduceList $spaces | tail -3 | head -1)
   echo HDR_SPACE = $HDR_SPACE
+  addCode "#define HDR_SPACE ${HDR_SPACE}U"
   echo ONE_SPACE = $ONE_SPACE
+  addCode "#define ONE_SPACE ${ONE_SPACE}U"
   echo ZERO_SPACE = $ZERO_SPACE
+  addCode "#define ZERO_SPACE ${ZERO_SPACE}U"
 else
   echo "Sorry, it looks like it is Mark encoded. I can't do that yet. Exiting."
   exit 1
@@ -241,6 +276,11 @@ echo
 last=""
 addBit reset
 count=1
+data_count=1
+addCode "// Function"
+addCode "void IRsend::sendXYZ(const uint64_t data, const uint16_t bits, const uint16_t repeat) {"
+addCode "  for (uint16_t r = 0; r <= repeat; r++) {"
+
 for msecs in $orig; do
   if isHdrMark $msecs && isOdd $count; then
     last="HM"
@@ -251,6 +291,8 @@ for msecs in $orig; do
     fi
     addBit reset
     echo -n "HDR_MARK+"
+    addCode "    // Header #${data_count}"
+    addCode "    mark(HDR_MARK);"
   elif isHdrSpace $msecs; then
     if [[ $last != "HM" ]]; then
       if [[ $bits -ne 0 ]]; then
@@ -262,6 +304,7 @@ for msecs in $orig; do
     fi
     last="HS"
     echo -n "HDR_SPACE+"
+    addCode "    space(HDR_SPACE);"
   elif isBitMark $msecs && isOdd $count; then
     if [[ $last != "HS" && $last != "BS" ]]; then
       echo -n "BIT_MARK(UNEXPECTED)"
@@ -284,6 +327,8 @@ for msecs in $orig; do
       echo -n "UNEXPECTED->"
     fi
     last="GS"
+    addDataCode
+    addCode "    space($msecs);"
     echo " GAP($msecs)"
     displayBinaryValue ${binary_value}
     addBit reset
@@ -295,3 +340,14 @@ for msecs in $orig; do
 done
 echo
 displayBinaryValue ${binary_value}
+  if [[ "$DISPLAY_CODE" == "yes" ]]; then
+  echo
+  echo "Generating a VERY rough code outline:"
+  echo
+  echo "// WARNING: This probably isn't directly usable. It's a guide only."
+  addDataCode
+  addCode "    delay(100);  // A 100% made up guess of the gap between messages."
+  addCode "  }"
+  addCode "}"
+  echo "$CODE"
+fi
