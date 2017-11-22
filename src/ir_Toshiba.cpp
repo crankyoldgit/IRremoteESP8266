@@ -20,8 +20,8 @@
 //
 // Equipment it seems compatible with:
 //  * Toshiba RAS-B13N3KV2 / Akita EVO II
-//  * Toshiba RAS-B13N3KVP-E
-//  * Toshiba WH-TA04NE
+//  * Toshiba RAS-B13N3KVP-E, RAS 18SKP-ES
+//  * Toshiba WH-TA04NE, WC-L03SE
 //  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Constants
