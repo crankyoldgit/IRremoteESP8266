@@ -46,6 +46,7 @@ std::string encoding(decode_results *results) {
     case COOLIX:       return "COOLIX";        break;
     case NIKAI:        return "NIKAI";         break;
     case TOSHIBA_AC:   return "TOSHIBA_AC";    break;
+    case MIDEA:        return "MIDEA";         break;
   }
 }
 

@@ -379,6 +379,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeToshibaAC(results))
     return true;
 #endif
+#if DECODE_MIDEA
+  DPRINTLN("Attempting Midea decode");
+  if (decodeMidea(results))
+    return true;
+#endif
 /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
   // The Sanyo S866500B decoder is very poor quality & depricated.
@@ -601,12 +606,16 @@ bool IRrecv::decodeHash(decode_results *results) {
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
+//   tolerance: Percentage error margin to allow.
 // Returns:
 //  A match_result_t structure containing the success (or not), the data value,
 //  and how many buffer entries were used.
-match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
-                                 uint16_t onemark, uint32_t onespace,
-                                 uint16_t zeromark, uint32_t zerospace) {
+match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
+                                 const uint16_t nbits, const uint16_t onemark,
+                                 const uint32_t onespace,
+                                 const uint16_t zeromark,
+                                 const uint32_t zerospace,
+                                 const uint8_t tolerance) {
   match_result_t result;
   result.success = false;
   result.data = 0;
@@ -614,12 +623,12 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
     for (result.used = 0;
          result.used < nbits * 2;
          result.used += 2, data_ptr++) {
-      if (!matchMark(*data_ptr, onemark))
+      if (!matchMark(*data_ptr, onemark, tolerance))
         return result;  // Fail
       data_ptr++;
-      if (matchSpace(*data_ptr, onespace))
+      if (matchSpace(*data_ptr, onespace, tolerance))
         result.data = (result.data << 1) | 1;
-      else if (matchSpace(*data_ptr, zerospace))
+      else if (matchSpace(*data_ptr, zerospace, tolerance))
         result.data <<= 1;
       else
         return result;  // Fail
@@ -629,14 +638,14 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
     for (result.used = 0;
          result.used < nbits * 2;
          result.used += 2, data_ptr++) {
-      if (matchMark(*data_ptr, onemark))
+      if (matchMark(*data_ptr, onemark, tolerance))
         result.data = (result.data << 1) | 1;
-      else if (matchMark(*data_ptr, zeromark))
+      else if (matchMark(*data_ptr, zeromark, tolerance))
         result.data <<= 1;
       else
         return result;  // Fail
       data_ptr++;
-      if (!matchSpace(*data_ptr, onespace))
+      if (!matchSpace(*data_ptr, onespace, tolerance))
         return result;  // Fail
     }
     result.success = true;
