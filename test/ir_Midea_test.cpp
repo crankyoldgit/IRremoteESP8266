@@ -2,6 +2,7 @@
 
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "ir_Midea.h"
 #include "gtest/gtest.h"
 
 // Tests for sendMidea().
@@ -209,6 +210,242 @@ TEST(TestSendMidea, SendUsualSize) {
   EXPECT_EQ("" , irsend.outputStr());
 }
 
+// Tests for IRMideaAC class.
+
+// Tests for controlling the power state.
+TEST(TestMideaACClass, Power) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1026FFFFFE2);  // Power off.
+
+  midea.on();
+  EXPECT_TRUE(midea.getPower());
+
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+
+  midea.off();
+  EXPECT_FALSE(midea.getPower());
+  EXPECT_EQ(0xA1026FFFFFE2, midea.getRaw());
+
+
+  midea.setPower(true);
+  EXPECT_TRUE(midea.getPower());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+
+  midea.setPower(false);
+  EXPECT_FALSE(midea.getPower());
+  EXPECT_EQ(0xA1026FFFFFE2, midea.getRaw());
+}
+
+// Tests for the various Checksum routines.
+TEST(TestMideaACClass, Checksums) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  // Known good states
+  EXPECT_EQ(0x62, IRMideaAC::calcChecksum(0xA1826FFFFF62));
+  EXPECT_EQ(0x70, IRMideaAC::calcChecksum(0xA18177FFFF70));
+  // Now without the checksum part.
+  EXPECT_EQ(0x62, IRMideaAC::calcChecksum(0xA1826FFFFF00));
+  EXPECT_EQ(0x70, IRMideaAC::calcChecksum(0xA18177FFFF00));
+  // Made up values.
+  EXPECT_EQ(0x00, IRMideaAC::calcChecksum(0x000000000000));
+  EXPECT_EQ(0xDF, IRMideaAC::calcChecksum(0x1234567890AB));
+  EXPECT_EQ(0xA0, IRMideaAC::calcChecksum(0xFFFFFFFFFFFF));
+  // Larger than expected value (full 64bit)
+  EXPECT_EQ(0xDF, IRMideaAC::calcChecksum(0xFF1234567890AB));
+  EXPECT_EQ(0xDF, IRMideaAC::calcChecksum(0x551234567890AB));
+
+  // Validity tests.
+  EXPECT_TRUE(IRMideaAC::validChecksum(0xA1826FFFFF62));
+  EXPECT_TRUE(IRMideaAC::validChecksum(0xA18177FFFF70));
+  EXPECT_FALSE(IRMideaAC::validChecksum(0x1234567890AB));
+
+  // Doing a setRaw() with a bad state should make a valid checksum on getRaw().
+  midea.setRaw(0xA1826FFFFF00);
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+}
+
+TEST(TestMideaACClass, OperatingMode) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1826FFFFF62);  // Auto mode already set.
+  midea.setMode(MIDEA_AC_AUTO);
+  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());  // State shouldn't have changed.
+
+  midea.setMode(MIDEA_AC_COOL);
+  EXPECT_EQ(MIDEA_AC_COOL, midea.getMode());
+  EXPECT_EQ(0xA1806FFFFF61, midea.getRaw());
+
+  midea.setMode(MIDEA_AC_AUTO);
+  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+
+  midea.setMode(MIDEA_AC_HEAT);
+  EXPECT_EQ(MIDEA_AC_HEAT, midea.getMode());
+  EXPECT_EQ(0xA1836FFFFF63, midea.getRaw());
+
+  midea.setMode(MIDEA_AC_DRY);
+  EXPECT_EQ(MIDEA_AC_DRY, midea.getMode());
+  EXPECT_EQ(0xA1816FFFFF60, midea.getRaw());
+
+  midea.setMode(MIDEA_AC_FAN);
+  EXPECT_EQ(MIDEA_AC_FAN, midea.getMode());
+  EXPECT_EQ(0xA1846FFFFF66, midea.getRaw());
+
+  midea.setMode(255);
+  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+}
+
+TEST(TestMideaACClass, FanSpeed) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1826FFFFF62);  // Auto mode already set.
+  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+
+  midea.setFan(MIDEA_AC_FAN_LOW);
+  EXPECT_EQ(MIDEA_AC_FAN_LOW, midea.getFan());
+  EXPECT_EQ(0xA18A6FFFFF6C, midea.getRaw());
+
+  midea.setFan(255);  // Setting an unexpected value defaults to auto.
+  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+
+  midea.setFan(MIDEA_AC_FAN_MED);
+  EXPECT_EQ(MIDEA_AC_FAN_MED, midea.getFan());
+  EXPECT_EQ(0xA1926FFFFF7C, midea.getRaw());
+
+  midea.setFan(MIDEA_AC_FAN_HI);
+  EXPECT_EQ(MIDEA_AC_FAN_HI, midea.getFan());
+  EXPECT_EQ(0xA19A6FFFFF74, midea.getRaw());
+
+  midea.setFan(MIDEA_AC_FAN_AUTO);
+  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+}
+
+TEST(TestMideaACClass, Temperature) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1826FFFFF62);  // 77F / 25C
+  EXPECT_EQ(77, midea.getTemp());  // F
+  EXPECT_EQ(77, midea.getTemp(false));  // F
+  EXPECT_EQ(25, midea.getTemp(true));  // F
+
+  midea.setTemp(0);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  EXPECT_EQ(0xA18260FFFF6C, midea.getRaw());
+
+  midea.setTemp(255);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  EXPECT_EQ(0xA18278FFFF78, midea.getRaw());
+
+  midea.setTemp(0, true);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  EXPECT_EQ(0xA18260FFFF6C, midea.getRaw());
+
+  midea.setTemp(255, true);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  EXPECT_EQ(0xA18278FFFF78, midea.getRaw());
+
+  // fahrenheit min/max etc.
+  midea.setTemp(MIDEA_AC_MIN_TEMP_F);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+
+  midea.setTemp(MIDEA_AC_MAX_TEMP_F);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+
+  midea.setTemp(MIDEA_AC_MIN_TEMP_F - 1);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+
+  midea.setTemp(MIDEA_AC_MAX_TEMP_F + 1);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+
+  // celsius min/max etc.
+  midea.setTemp(MIDEA_AC_MIN_TEMP_C, true);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_C, midea.getTemp(true));
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp(false));
+
+  midea.setTemp(MIDEA_AC_MAX_TEMP_C, true);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_C, midea.getTemp(true));
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp(false));
+
+  midea.setTemp(MIDEA_AC_MIN_TEMP_C - 1, true);
+  EXPECT_EQ(MIDEA_AC_MIN_TEMP_C, midea.getTemp(true));
+
+  midea.setTemp(MIDEA_AC_MAX_TEMP_C + 1, true);
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_C, midea.getTemp(true));
+  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp(false));
+
+  // General changes.
+  midea.setTemp(17, true);  // C
+  EXPECT_EQ(17, midea.getTemp(true));  // C
+  EXPECT_EQ(63, midea.getTemp(false));  // F
+
+  midea.setTemp(21, true);  // C
+  EXPECT_EQ(21, midea.getTemp(true));  // C
+  EXPECT_EQ(70, midea.getTemp(false));  // F
+
+  midea.setTemp(25, true);  // C
+  EXPECT_EQ(25, midea.getTemp(true));  // C
+  EXPECT_EQ(77, midea.getTemp(false));  // F
+
+  midea.setTemp(30, true);  // C
+  EXPECT_EQ(30, midea.getTemp(true));  // C
+  EXPECT_EQ(86, midea.getTemp(false));  // F
+
+  midea.setTemp(80, false);  // F
+  EXPECT_EQ(26, midea.getTemp(true));  // C
+  EXPECT_EQ(80, midea.getTemp(false));  // F
+
+  midea.setTemp(70);  // F
+  EXPECT_EQ(21, midea.getTemp(true));  // C
+  EXPECT_EQ(70, midea.getTemp(false));  // F
+  EXPECT_EQ(70, midea.getTemp());  // F
+}
+
+// Tests for controlling the sleep state.
+TEST(TestMideaACClass, Sleep) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1826FFFFF62);  // Sleep off.
+
+  EXPECT_FALSE(midea.getSleep());
+  midea.setSleep(true);
+  EXPECT_TRUE(midea.getSleep());
+  EXPECT_EQ(0xA1C26FFFFF22, midea.getRaw());
+  midea.setSleep(false);
+  EXPECT_FALSE(midea.getSleep());
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+}
+
+TEST(TestMideaACClass, HumanReadableOutput) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1826FFFFF62);
+  EXPECT_EQ("Power: On, Mode: 2 (AUTO), Temp: 25C/77F, Fan: 0 (AUTO), "
+            "Sleep: Off", midea.toString());
+  midea.off();
+  midea.setTemp(25);
+  midea.setFan(MIDEA_AC_FAN_HI);
+  midea.setMode(MIDEA_AC_DRY);
+  midea.setSleep(true);
+  EXPECT_EQ("Power: Off, Mode: 1 (DRY), Temp: 16C/62F, Fan: 3 (HI), Sleep: On",
+            midea.toString());
+
+  midea.setRaw(0xA19867FFFF7E);
+  EXPECT_EQ("Power: On, Mode: 0 (COOL), Temp: 20C/69F, Fan: 3 (HI), Sleep: Off",
+            midea.toString());
+}
+
 // Tests for decodeMidea().
 
 // Decode normal Midea messages with strict set.
@@ -219,12 +456,12 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
 
   // Normal Midea 48-bit message.
   irsend.reset();
-  irsend.sendMidea(0x1234567890AB);
+  irsend.sendMidea(0x1234567890DF);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x1234567890AB, irsend.capture.value);
+  EXPECT_EQ(0x1234567890DF, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -241,27 +478,27 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  // Normal Midea 24-bit message.
+  // Normal Midea 48-bit message.
   irsend.reset();
-  irsend.sendMidea(0xFFFFFF);
+  irsend.sendMidea(0xFFFFFFFFFFA0);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0xFFFFFF, irsend.capture.value);
+  EXPECT_EQ(0xFFFFFFFFFFA0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  // Normal Midea 48-bit message via just decode().
+  // Real Midea 48-bit message via just decode().
   // i.e. No conficts with other decoders.
   irsend.reset();
-  irsend.sendMidea(0x1234567890AB);
+  irsend.sendMidea(0xA18263FFFF6E);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x1234567890AB, irsend.capture.value);
+  EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -275,25 +512,25 @@ TEST(TestDecodeMidea, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Midea 48-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendMidea(0x123456, MIDEA_BITS, 2);
+  irsend.sendMidea(0xA18263FFFF6E, MIDEA_BITS, 2);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x123456, irsend.capture.value);
+  EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_FALSE(irsend.capture.repeat);
 
   irsend.makeDecodeResult(2 * (2 * MIDEA_BITS + 4));
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x123456, irsend.capture.value);
+  EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 
   irsend.makeDecodeResult(4 * (2 * MIDEA_BITS + 4));
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0x123456, irsend.capture.value);
+  EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 }
 
 // Decode unsupported Midea messages.
@@ -375,30 +612,29 @@ TEST(TestDecodeMidea, DecodeRealExample) {
   IRsendTest irsend(4);
   IRrecv irrecv(4);
   irsend.begin();
-
   irsend.reset();
+
   uint16_t rawData[199] = {
-      4278, 4584, 488, 1668, 436, 588, 514, 1642, 564, 538, 488, 618, 438, 690,
-      360, 662, 410, 1718, 442, 610, 488, 666, 356, 640, 462, 666, 694, 356,
-      466, 616, 460, 1708, 448, 642, 412, 662, 518, 1582, 522, 1666, 440, 1690,
-      490, 1692, 464, 636, 442, 558, 540, 618, 410, 1662, 466, 1746, 462, 1666,
-      490, 1748, 544, 1528, 490, 1666, 562, 1644, 468, 1642, 406, 1744, 486,
-      1710, 448, 1746, 414, 1586, 548, 1708, 464, 1736, 494, 1616, 544, 1586,
-      466, 1742, 416, 1662, 518, 1662, 508, 1644, 692, 1464, 516, 666, 528,
-      472, 492, 584, 462, 5264, 4296, 4566, 466, 614, 468, 1738, 436, 588, 494,
-      1642, 508, 1672, 460, 1694, 490, 1664, 538, 486, 490, 1690, 518, 1690,
-      464, 1662, 490, 1692, 414, 1770, 410, 1662, 518, 590, 512, 1586, 516,
-      1722, 388, 638, 514, 536, 632, 516, 516, 516, 492, 1672, 500, 1694, 464,
-      1666, 518, 534, 468, 636, 380, 712, 478, 528, 598, 534, 466, 638, 458,
-      592, 410, 668, 462, 642, 404, 644, 490, 612, 412, 612, 542, 562, 466, 614,
-      460, 584, 468, 638, 466, 588, 488, 638, 384, 618, 512, 564, 490, 612, 542,
-      1638, 488, 1668, 438, 1740, 492};
-  irsend.makeDecodeResult();
+      4366, 4470, 498, 1658, 522, 554, 498, 1658, 496, 580, 498, 580, 498, 578,
+      498, 580, 498, 1658, 498, 1658, 498, 578, 498, 578, 498, 580, 496, 582,
+      496, 578, 498, 1658, 498, 580, 498, 580, 498, 1656, 498, 1656, 500, 580,
+      498, 578, 502, 576, 500, 1656, 498, 1656, 500, 1654, 500, 1656, 500, 1656,
+      498, 1658, 498, 1656, 500, 1658, 498, 1656, 498, 1656, 500, 1656, 500,
+      1654, 500, 1578, 578, 1658, 498, 1656, 500, 1658, 498, 1656, 498, 1656,
+      500, 578, 498, 1638, 516, 1656, 500, 578, 500, 1656, 500, 1656, 498, 1658,
+      522, 554, 500, 5258, 4366, 4472, 498, 580, 498, 1658, 498, 580, 498, 1656,
+      500, 1600, 556, 1658, 500, 1656, 500, 578, 498, 578, 522, 1634, 498, 1588,
+      568, 1658, 498, 1656, 500, 1654, 498, 580, 498, 1658, 498, 1658, 498, 580,
+      496, 578, 500, 1654, 500, 1636, 518, 1656, 500, 578, 520, 558, 498, 578,
+      498, 580, 498, 576, 500, 578, 498, 580, 498, 578, 498, 578, 498, 580, 498,
+      578, 498, 580, 498, 580, 520, 556, 498, 580, 496, 580, 498, 578, 500, 578,
+      498, 1658, 498, 580, 498, 578, 498, 1656, 500, 578, 498, 580, 498, 580,
+      498, 1656, 522};
   irsend.sendRaw(rawData, 199, 38000);
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
-  EXPECT_EQ(0xA10278FFFFF8, irsend.capture.value);
+  EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 }
