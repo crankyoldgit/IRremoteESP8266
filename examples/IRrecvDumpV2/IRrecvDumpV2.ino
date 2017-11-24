@@ -71,6 +71,7 @@ void encoding(decode_results *results) {
     case DENON:        Serial.print("DENON");         break;
     case COOLIX:       Serial.print("COOLIX");        break;
     case NIKAI:        Serial.print("NIKAI");         break;
+    case MAGIQUEST:    Serial.print("MAGIQUEST");     break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
 }

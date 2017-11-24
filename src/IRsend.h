@@ -184,6 +184,9 @@ class IRsend {
   void sendNikai(uint64_t data, uint16_t nbits = NIKAI_BITS,
                  uint16_t repeat = 0);
 #endif
+#if SEND_MAGIQUEST
+  void sendMagiQuest(uint32_t wand_id, uint16_t magnitude);
+#endif
 
  protected:
 #ifdef UNIT_TEST

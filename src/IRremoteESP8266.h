@@ -135,6 +135,9 @@
 #define DECODE_NIKAI     true
 #define SEND_NIKAI       true
 
+#define DECODE_MAGIQUEST      true
+#define SEND_MAGIQUEST        true
+
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
@@ -173,7 +176,8 @@ enum decode_type_t {
   TROTEC,
   NIKAI,
   RAW,  // Technically not a protocol, but an encoding.
-  GLOBALCACHE  // Technically not a protocol, but an encoding.
+  GLOBALCACHE,  // Technically not a protocol, but an encoding.
+  MAGIQUEST
 };
 
 // Message lengths & required repeat values
@@ -229,6 +233,8 @@ enum decode_type_t {
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
 #define NIKAI_BITS                  24U
+#define MAGIQUEST_BITS              56
+
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1

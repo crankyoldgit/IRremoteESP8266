@@ -82,6 +82,7 @@ class decode_results {
   bool repeat;  // Is the result a repeat code?
   uint32_t address;  // Decoded device address.
   uint32_t command;  // Decoded command.
+  uint16_t magiquestMagnitude; // This is only used for MagiQuest
 };
 
 // main class for receiving IR
@@ -201,6 +202,9 @@ class IRrecv {
 #if DECODE_NIKAI
   bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
                    bool strict = true);
+#endif
+#if DECODE_MAGIQUEST
+  bool decodeMagiQuest(decode_results *results);
 #endif
 };
 
