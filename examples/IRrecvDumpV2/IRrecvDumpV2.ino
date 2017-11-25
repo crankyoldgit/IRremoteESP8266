@@ -16,6 +16,12 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
+#if DECODE_AC
+#include <ir_Daikin.h>
+#include <ir_Kelvinator.h>
+#include <ir_Midea.h>
+#include <ir_Toshiba.h>
+#endif  // DECODE_AC
 
 // An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
 // board).
@@ -33,9 +39,9 @@ uint16_t CAPTURE_BUFFER_SIZE = 1024;
 #define TIMEOUT 50U  // Some A/C units have gaps in their protocols of ~40ms.
                      // e.g. Kelvinator
                      // A value this large may swallow repeats of some protocols
-#else
+#else  // DECODE_AC
 #define TIMEOUT 15U  // Suits most messages, while not swallowing repeats.
-#endif
+#endif  // DECODE_AC
 
 // Use turn on the save buffer feature for more complete capture coverage.
 IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT, true);
@@ -50,42 +56,6 @@ void setup() {
   irrecv.enableIRIn();  // Start the receiver
 }
 
-// Display encoding type
-//
-void encoding(decode_results *results) {
-  switch (results->decode_type) {
-    default:
-    case UNKNOWN:      Serial.print("UNKNOWN");       break;
-    case NEC:          Serial.print("NEC");           break;
-    case NEC_LIKE:     Serial.print("NEC (non-strict)");  break;
-    case SONY:         Serial.print("SONY");          break;
-    case RC5:          Serial.print("RC5");           break;
-    case RC5X:         Serial.print("RC5X");          break;
-    case RC6:          Serial.print("RC6");           break;
-    case RCMM:         Serial.print("RCMM");          break;
-    case DISH:         Serial.print("DISH");          break;
-    case SHARP:        Serial.print("SHARP");         break;
-    case JVC:          Serial.print("JVC");           break;
-    case SANYO:        Serial.print("SANYO");         break;
-    case SANYO_LC7461: Serial.print("SANYO_LC7461");  break;
-    case MITSUBISHI:   Serial.print("MITSUBISHI");    break;
-    case SAMSUNG:      Serial.print("SAMSUNG");       break;
-    case LG:           Serial.print("LG");            break;
-    case WHYNTER:      Serial.print("WHYNTER");       break;
-    case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break;
-    case PANASONIC:    Serial.print("PANASONIC");     break;
-    case DENON:        Serial.print("DENON");         break;
-    case COOLIX:       Serial.print("COOLIX");        break;
-    case NIKAI:        Serial.print("NIKAI");         break;
-    case DAIKIN:       Serial.print("DAIKIN");        break;
-    case KELVINATOR:   Serial.print("KELVINATOR");    break;
-    case TOSHIBA_AC:   Serial.print("TOSHIBA_AC");    break;
-    case MIDEA:        Serial.print("MIDEA");         break;
-    case MAGIQUEST:    Serial.print("MAGIQUEST");     break;
-  }
-  if (results->repeat) Serial.print(" (Repeat)");
-}
-
 // Dump out the decode_results structure.
 //
 void dumpInfo(decode_results *results) {
@@ -96,27 +66,50 @@ void dumpInfo(decode_results *results) {
                   CAPTURE_BUFFER_SIZE);
 
   // Show Encoding standard
-  Serial.print("Encoding  : ");
-  encoding(results);
-  Serial.println("");
+  Serial.println("Encoding  : " +
+                 typeToString(results->decode_type, results->repeat));
 
   // Show Code & length
   Serial.print("Code      : ");
-  switch (results->decode_type) {
+  if (hasACState(results->decode_type)) {
 #if DECODE_AC
-    case DAIKIN:
-    case KELVINATOR:
-    case TOSHIBA_AC:
       for (uint16_t i = 0; results->bits > i * 8; i++)
         Serial.printf("%02X", results->state[i]);
-      break;
-#endif
-    default:
-      serialPrintUint64(results->value, HEX);
+#endif  // DECODE_AC
+  } else {
+    serialPrintUint64(results->value, HEX);
   }
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
+
+#if DECODE_AC
+  // Display the human readable state of an A/C message if we can.
+  IRDaikinESP daikin(0);
+  IRKelvinatorAC kelvinator(0);
+  IRToshibaAC toshiba(0);
+  IRMideaAC midea(0);
+
+  String description = "";
+  switch (results->decode_type) {
+    case DAIKIN:
+      daikin.setRaw(results->state);
+      description = daikin.toString();
+    case KELVINATOR:
+      kelvinator.setRaw(results->state);
+      description = kelvinator.toString();
+    case TOSHIBA_AC:
+      toshiba.setRaw(results->state);
+      description = toshiba.toString();
+    case MIDEA:
+      midea.setRaw(results->value);
+      description = midea.toString();
+  }
+  // If we got a human-readable description of the message, display it.
+  if (description != "")  Serial.println("Human     : " + description);
+#endif  // DECODE_AC
+  Serial.print("Library   : v");
+  Serial.println(_IRREMOTEESP8266_VERSION_);
 }
 
 uint16_t getCookedLength(decode_results *results) {
@@ -179,47 +172,36 @@ void dumpCode(decode_results *results) {
   Serial.print("};");  //
 
   // Comment
-  Serial.print("  // ");
-  encoding(results);
-  Serial.print(" ");
-  serialPrintUint64(results->value, HEX);
-
-  // Newline
-  Serial.println("");
+  Serial.println("  // " + typeToString(results->decode_type, results->repeat) +
+                 " " + uint64ToString(results->value, HEX));
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
-    uint16_t nbytes;
-    switch (results->decode_type) {
+    if (hasACState(results->decode_type)) {
 #if DECODE_AC
-      case KELVINATOR:  // Complex protocols. e.g. Air Conditioners
-      case DAIKIN:
-        nbytes = results->bits / 8;
-        Serial.printf("uint8_t state[%d] = {", nbytes);
-        for (uint16_t i = 0; i < nbytes; i++) {
-          Serial.printf("0x%02X", results->state[i]);
-          if (i < nbytes - 1)
-            Serial.print(", ");
-        }
-        Serial.println("};");
-        break;
+      uint16_t nbytes = results->bits / 8;
+      Serial.printf("uint8_t state[%d] = {", nbytes);
+      for (uint16_t i = 0; i < nbytes; i++) {
+        Serial.printf("0x%02X", results->state[i]);
+        if (i < nbytes - 1)
+          Serial.print(", ");
+      }
+      Serial.println("};");
 #endif  // DECODE_AC
-      default:  // Simple protocols
-        // Some protocols have an address &/or command.
-        // NOTE: It will ignore the atypical case when a message has been
-        // decoded but the address & the command are both 0.
-        if (results->address > 0 || results->command > 0) {
-          Serial.print("uint32_t address = 0x");
-          Serial.print(results->address, HEX);
-          Serial.println(";");
-          Serial.print("uint32_t command = 0x");
-          Serial.print(results->command, HEX);
-          Serial.println(";");
-        }
-        // Most protocols have data
-        Serial.print("uint64_t data = 0x");
-        serialPrintUint64(results->value, HEX);
-        Serial.println(";");
+    } else {
+      // Simple protocols
+      // Some protocols have an address &/or command.
+      // NOTE: It will ignore the atypical case when a message has been
+      // decoded but the address & the command are both 0.
+      if (results->address > 0 || results->command > 0) {
+        Serial.println("uint32_t address = 0x" +
+                       uint64ToString(results->address, HEX) + ";");
+        Serial.println("uint32_t command = 0x" +
+                       uint64ToString(results->command, HEX) + ";");
+      }
+      // Most protocols have data
+      Serial.println("uint64_t data = 0x" +
+                     uint64ToString(results->value, HEX) + ";");
     }
   }
 }
