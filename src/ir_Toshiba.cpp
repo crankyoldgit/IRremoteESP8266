@@ -17,6 +17,12 @@
 //       TTT    OOOO0   SSSSS  HH   HH IIIII BBBBBB  AA   AA
 
 // Toshiba A/C support added by David Conran
+//
+// Equipment it seems compatible with:
+//  * Toshiba RAS-B13N3KV2 / Akita EVO II
+//  * Toshiba RAS-B13N3KVP-E, RAS 18SKP-ES
+//  * Toshiba WH-TA04NE, WC-L03SE
+//  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Constants
 
@@ -39,7 +45,7 @@
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = TOSHIBA_AC_MIN_REPEAT).
 //
-// Status: Beta / Appears to be working.
+// Status: StABLE / Working.
 //
 void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
@@ -70,11 +76,8 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
 // Inspired and derived from the work done at:
 //   https://github.com/r45635/HVAC-IR-Control
 //
-// Warning: Consider this very alpha code. Seems to work, but not validated.
+// Status:  STABLE / Working.
 //
-// Equipment it seems compatible with:
-//  * Toshiba RAS-B13N3KV2 / Akita EVO II
-//  * <Add models (A/C & remotes) you've gotten it working with here>
 // Initialise the object.
 IRToshibaAC::IRToshibaAC(uint16_t pin) : _irsend(pin) {
   stateReset();
@@ -300,7 +303,7 @@ std::string IRToshibaAC::toString() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status:  BETA / Under development.
+// Status:  STABLE / Working.
 //
 // Ref:
 //
