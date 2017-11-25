@@ -3,12 +3,14 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include <string.h>
 #include <string>
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "IRutils.h"
 
-#define MAX_GC_CODE_LENGHT 512
+#define MAX_GC_CODE_LENGTH 10000
 
 void str_to_uint16(char *str, uint16_t *res) {
   char *end;
@@ -18,34 +20,6 @@ void str_to_uint16(char *str, uint16_t *res) {
     end == str || *end != '\0')
     return;
   *res = (uint16_t) val;
-}
-
-std::string encoding(decode_results *results) {
-  switch (results->decode_type) {
-    default:
-    case UNKNOWN:      return "UNKNOWN";       break;
-    case NEC:          return "NEC";           break;
-    case NEC_LIKE:     return "NEC (non-strict)";  break;
-    case SONY:         return "SONY";          break;
-    case RC5:          return "RC5";           break;
-    case RC5X:         return "RC5X";          break;
-    case RC6:          return "RC6";           break;
-    case RCMM:         return "RCMM";          break;
-    case DISH:         return "DISH";          break;
-    case SHARP:        return "SHARP";         break;
-    case JVC:          return "JVC";           break;
-    case SANYO:        return "SANYO";         break;
-    case SANYO_LC7461: return "SANYO_LC7461";  break;
-    case MITSUBISHI:   return "MITSUBISHI";    break;
-    case SAMSUNG:      return "SAMSUNG";       break;
-    case LG:           return "LG";            break;
-    case WHYNTER:      return "WHYNTER";       break;
-    case AIWA_RC_T501: return "AIWA_RC_T501";  break;
-    case PANASONIC:    return "PANASONIC";     break;
-    case DENON:        return "DENON";         break;
-    case COOLIX:       return "COOLIX";        break;
-    case NIKAI:        return "NIKAI";         break;
-  }
 }
 
 void usage_error(char * name) {
@@ -70,13 +44,13 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  uint16_t gc_test[MAX_GC_CODE_LENGHT];
+  uint16_t gc_test[MAX_GC_CODE_LENGTH];
   int index = 0;
   char *pch;
   char *saveptr1;
 
   pch = strtok_r(argv[argv_offset], ",", &saveptr1);
-  while (pch != NULL && index < MAX_GC_CODE_LENGHT) {
+  while (pch != NULL && index < MAX_GC_CODE_LENGTH) {
     str_to_uint16(pch, &gc_test[index]);
     pch = strtok_r(NULL, ",", &saveptr1);
     index++;
@@ -93,11 +67,20 @@ int main(int argc, char * argv[]) {
 
   std::cout << "Code GC length " << index << std::endl
   << "Code type      " << irsend.capture.decode_type
-  << " (" << encoding(&irsend.capture) << ")" << std::endl
-  << "Code bits      " << irsend.capture.bits << std::endl
-  << "Code value     0x" << std::hex << irsend.capture.value << std::endl
-  << "Code address   0x" << std::hex << irsend.capture.address << std::endl
-  << "Code command   0x" << std::hex << irsend.capture.command << std::endl;
+  << " (" << typeToString(irsend.capture.decode_type) << ")" << std::endl
+  << "Code bits      " << irsend.capture.bits << std::endl;
+  if (hasACState(irsend.capture.decode_type)) {
+    std::cout << "State value    0x";
+    for (uint16_t i = 0; i < irsend.capture.bits / 8; i++)
+      printf("%02X", irsend.capture.state[i]);
+    std::cout << std::endl;
+  } else {
+    std::cout << "Code value     0x" <<
+        std::hex << irsend.capture.value << std::endl <<
+        "Code address   0x" << std::hex << irsend.capture.address << std::endl
+        << "Code command   0x" << std::hex << irsend.capture.command <<
+        std::endl;
+  }
 
   if (dumpraw || irsend.capture.decode_type == UNKNOWN)
     irsend.dumpRawResult();

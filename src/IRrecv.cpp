@@ -121,6 +121,9 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
   } else {
     irparams_save = NULL;
   }
+#if DECODE_HASH
+  unknown_threshold = UNKNOWN_THRESHOLD;
+#endif  // DECODE_HASH
 }
 
 // Class destructor
@@ -197,6 +200,13 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
 uint16_t IRrecv::getBufSize() {
   return irparams.bufsize;
 }
+
+#if DECODE_HASH
+// Set the minimum length we will consider for reporting UNKNOWN message types.
+void IRrecv::setUnknownThreshold(uint16_t length) {
+  unknown_threshold = length;
+}
+#endif  // DECODE_HASH
 
 // Decodes the received IR message.
 // If the interrupt state is saved, we will immediately resume waiting
@@ -364,6 +374,26 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeNikai(results))
     return true;
 #endif
+#if DECODE_KELVINATOR
+  DPRINTLN("Attempting Kelvinator decode");
+  if (decodeKelvinator(results))
+    return true;
+#endif
+#if DECODE_DAIKIN
+  DPRINTLN("Attempting Daikin decode");
+  if (decodeDaikin(results))
+    return true;
+#endif
+#if DECODE_TOSHIBA_AC
+  DPRINTLN("Attempting Toshiba AC decode");
+  if (decodeToshibaAC(results))
+    return true;
+#endif
+#if DECODE_MIDEA
+  DPRINTLN("Attempting Midea decode");
+  if (decodeMidea(results))
+    return true;
+#endif
 /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
   // The Sanyo S866500B decoder is very poor quality & depricated.
@@ -380,18 +410,20 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // This needs to be done after all other codes that use strict and some
   // other protocols that are NEC-like as well, as turning off strict may
   // cause this to match other valid protocols.
-  DPRINTLN("Attempting NEC (non-stict) decode");
+  DPRINTLN("Attempting NEC (non-strict) decode");
   if (decodeNEC(results, NEC_BITS, false)) {
     results->decode_type = NEC_LIKE;
     return true;
   }
 #endif
+#if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
   if (decodeHash(results)) {
     return true;
   }
+#endif  // DECODE_HASH
   // Throw away and start over
   if (!resumed)  // Check if we have already resumed.
     resume();
@@ -550,13 +582,14 @@ int16_t IRrecv::compare(uint16_t oldval, uint16_t newval) {
     return 1;
 }
 
+#if DECODE_HASH
 /* Converts the raw code values into a 32-bit hash code.
  * Hopefully this code is unique for each button.
  * This isn't a "real" decoding, just an arbitrary value.
  */
 bool IRrecv::decodeHash(decode_results *results) {
-  // Require at least 6 samples to prevent triggering on noise
-  if (results->rawlen < 6)
+  // Require at least some samples to prevent triggering on noise
+  if (results->rawlen < unknown_threshold)
     return false;
   int32_t hash = FNV_BASIS_32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
@@ -575,6 +608,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   results->decode_type = UNKNOWN;
   return true;
 }
+#endif  // DECODE_HASH
 
 // Match & decode the typical data section of an IR message.
 // The data value constructed as the Most Significant Bit first.
@@ -586,12 +620,16 @@ bool IRrecv::decodeHash(decode_results *results) {
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
+//   tolerance: Percentage error margin to allow.
 // Returns:
 //  A match_result_t structure containing the success (or not), the data value,
 //  and how many buffer entries were used.
-match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
-                                 uint16_t onemark, uint32_t onespace,
-                                 uint16_t zeromark, uint32_t zerospace) {
+match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
+                                 const uint16_t nbits, const uint16_t onemark,
+                                 const uint32_t onespace,
+                                 const uint16_t zeromark,
+                                 const uint32_t zerospace,
+                                 const uint8_t tolerance) {
   match_result_t result;
   result.success = false;
   result.data = 0;
@@ -599,12 +637,12 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
     for (result.used = 0;
          result.used < nbits * 2;
          result.used += 2, data_ptr++) {
-      if (!matchMark(*data_ptr, onemark))
+      if (!matchMark(*data_ptr, onemark, tolerance))
         return result;  // Fail
       data_ptr++;
-      if (matchSpace(*data_ptr, onespace))
+      if (matchSpace(*data_ptr, onespace, tolerance))
         result.data = (result.data << 1) | 1;
-      else if (matchSpace(*data_ptr, zerospace))
+      else if (matchSpace(*data_ptr, zerospace, tolerance))
         result.data <<= 1;
       else
         return result;  // Fail
@@ -614,14 +652,14 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr, uint16_t nbits,
     for (result.used = 0;
          result.used < nbits * 2;
          result.used += 2, data_ptr++) {
-      if (matchMark(*data_ptr, onemark))
+      if (matchMark(*data_ptr, onemark, tolerance))
         result.data = (result.data << 1) | 1;
-      else if (matchMark(*data_ptr, zeromark))
+      else if (matchMark(*data_ptr, zeromark, tolerance))
         result.data <<= 1;
       else
         return result;  // Fail
       data_ptr++;
-      if (!matchSpace(*data_ptr, onespace))
+      if (!matchSpace(*data_ptr, onespace, tolerance))
         return result;  // Fail
     }
     result.success = true;

@@ -1,5 +1,6 @@
 // Copyright 2017 David Conran
 
+#include "IRrecv_test.h"
 #include "IRremoteESP8266.h"
 #include "IRrecv.h"
 #include "IRsend.h"
