@@ -166,7 +166,7 @@ void dumpCode(decode_results *results) {
     for (usecs = results->rawbuf[i] * RAWTICK;
          usecs > UINT16_MAX;
          usecs -= UINT16_MAX)
-      Serial.printf("%d, 0", UINT16_MAX);
+      Serial.printf("%d, 0, ", UINT16_MAX);
     Serial.print(usecs, DEC);
     if (i < results->rawlen - 1)
       Serial.print(", ");  // ',' not needed on last one
