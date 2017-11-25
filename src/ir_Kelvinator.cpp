@@ -16,6 +16,9 @@
 
 #include "ir_Kelvinator.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
@@ -135,7 +138,9 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
     space(KELVINATOR_GAP_SPACE * 2);
   }
 }
+#endif  // SEND_KELVINATOR
 
+#if (SEND_KELVINATOR || DECODE_KELVINATOR)
 IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -168,22 +173,48 @@ uint8_t* IRKelvinatorAC::getRaw() {
   return remote_state;
 }
 
-// Many Bothans died to bring us this information.
-void IRKelvinatorAC::checksum() {
-  // For each command + options block.
-  for (uint8_t offset = 0; offset < KELVINATOR_STATE_LENGTH; offset += 8) {
-    uint8_t sum = KELVINATOR_CHECKSUM_START;
-    // Sum the lower half of the first 4 bytes of this block.
-    for (uint8_t i = 0; i < 4; i++)
-      sum += (remote_state[i + offset] & 0xFU);
+void IRKelvinatorAC::setRaw(uint8_t new_code[]) {
+  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++) {
+    remote_state[i] = new_code[i];
+  }
+}
+
+uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
+                                          const uint16_t length) {
+  uint8_t sum = KELVINATOR_CHECKSUM_START;
+  // Sum the lower half of the first 4 bytes of this block.
+  for (uint8_t i = 0; i < 4 && i < length - 1; i++, block++)
+    sum += (*block & 0x0FU);
     // then sum the upper half of the next 3 bytes.
-    for (uint8_t i = 4; i < 7; i++)
-      sum += (remote_state[i + offset] >> 4);
-    // Trim it down to fit into the 4 bits allowed. i.e. Mod 16.
-    sum &= 0xFU;
-    // Place it into the IR code in the top half of the 8th & 16th byte.
+  for (uint8_t i = 4; i < length - 1; i++, block++)
+    sum += (*block >> 4);
+  // Trim it down to fit into the 4 bits allowed. i.e. Mod 16.
+  return sum & 0x0FU;
+}
+
+// Many Bothans died to bring us this information.
+void IRKelvinatorAC::checksum(const uint16_t length) {
+  // For each command + options block.
+  for (uint16_t offset = 0; offset + 7 < length; offset += 8) {
+    uint8_t sum = calcBlockChecksum(remote_state + offset);
     remote_state[7 + offset] = (sum << 4) | (remote_state[7 + offset] & 0xFU);
   }
+}
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRKelvinatorAC::validChecksum(const uint8_t state[],
+                                   const uint16_t length) {
+  for (uint16_t offset = 0; offset + 7 < length; offset += 8) {
+    // Top 4 bits of the last byte in the block is the block's checksum.
+    if (state[offset + 7] >> 4 != calcBlockChecksum(state + offset))
+      return false;
+  }
+  return true;
 }
 
 void IRKelvinatorAC::on() {
@@ -339,7 +370,88 @@ void IRKelvinatorAC::setTurbo(bool state) {
 bool IRKelvinatorAC::getTurbo() {
   return ((remote_state[2] & KELVINATOR_TURBO) != 0);
 }
-#endif  // SEND_KELVINATOR
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRKelvinatorAC::toString() {
+  String result = "";
+#else
+std::string IRKelvinatorAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case KELVINATOR_AUTO:
+      result += " (AUTO)";
+      break;
+    case KELVINATOR_COOL:
+      result += " (COOL)";
+      break;
+    case KELVINATOR_HEAT:
+      result += " (HEAT)";
+      break;
+    case KELVINATOR_DRY:
+      result += " (DRY)";
+      break;
+    case KELVINATOR_FAN:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case KELVINATOR_FAN_AUTO:
+      result += " (AUTO)";
+      break;
+    case KELVINATOR_FAN_MAX:
+      result += " (MAX)";
+      break;
+  }
+  result += ", Turbo: ";
+  if (getTurbo())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Quiet: ";
+  if (getQuiet())
+    result += "On";
+  else
+    result += "Off";
+  result += ", XFan: ";
+  if (getXFan())
+    result += "On";
+  else
+    result += "Off";
+  result += ", IonFilter: ";
+  if (getIonFilter())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Light: ";
+  if (getLight())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Swing (Horizontal): ";
+  if (getSwingHorizontal())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Swing (Vertical): ";
+  if (getSwingVertical())
+    result += "On";
+  else
+    result += "Off";
+  return result;
+}
+#endif  // (SEND_KELVINATOR || DECODE_KELVINATOR)
 
 #if DECODE_KELVINATOR
 // Decode the supplied Kelvinator message.
@@ -449,7 +561,8 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
   if (strict) {
     // Correct size/length)
     if (state_pos != KELVINATOR_STATE_LENGTH) return false;
-    // TODO(crankyoldgit): Add a checksum test.
+    // Verify the message's checksum is correct.
+    if (!IRKelvinatorAC::validChecksum(results->state)) return false;
   }
 
   // Success
