@@ -52,6 +52,8 @@
 // Disable (set to false) all the protocols you do not need/want!
 // The Air Conditioner protocols are the most expensive memory-wise.
 //
+#define DECODE_HASH          true  // Semi-unique code for unknown messages
+
 #define DECODE_NEC           true
 #define SEND_NEC             true
 

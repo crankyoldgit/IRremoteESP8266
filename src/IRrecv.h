@@ -24,6 +24,7 @@
 #define MARK_EXCESS   50U
 #define RAWBUF       100U  // Default length of raw capture buffer
 #define REPEAT UINT64_MAX
+#define UNKNOWN_THRESHOLD 6U  // Default min size of reported UNKNOWN messages.
 // receiver states
 #define STATE_IDLE     2U
 #define STATE_MARK     3U
@@ -117,18 +118,23 @@ class IRrecv {
   void disableIRIn();
   void resume();
   uint16_t getBufSize();
+#if DECODE_HASH
+  void setUnknownThreshold(uint16_t length);
+#endif
   static bool match(uint32_t measured, uint32_t desired,
              uint8_t tolerance = TOLERANCE);
   static bool matchMark(uint32_t measured, uint32_t desired,
                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   static bool matchSpace(uint32_t measured, uint32_t desired,
                   uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
-
 #ifndef UNIT_TEST
 
  private:
 #endif
   irparams_t *irparams_save;
+#if DECODE_HASH
+  uint16_t unknown_threshold;
+#endif
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
