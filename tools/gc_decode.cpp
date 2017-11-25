@@ -3,12 +3,13 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include <string.h>
 #include <string>
 #include "IRsend.h"
 #include "IRsend_test.h"
 
-#define MAX_GC_CODE_LENGHT 512
+#define MAX_GC_CODE_LENGTH 10000
 
 void str_to_uint16(char *str, uint16_t *res) {
   char *end;
@@ -45,6 +46,8 @@ std::string encoding(decode_results *results) {
     case DENON:        return "DENON";         break;
     case COOLIX:       return "COOLIX";        break;
     case NIKAI:        return "NIKAI";         break;
+    case DAIKIN:       return "DAIKIN";        break;
+    case KELVINATOR:   return "KELVINATOR";    break;
     case TOSHIBA_AC:   return "TOSHIBA_AC";    break;
   }
 }
@@ -71,13 +74,13 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  uint16_t gc_test[MAX_GC_CODE_LENGHT];
+  uint16_t gc_test[MAX_GC_CODE_LENGTH];
   int index = 0;
   char *pch;
   char *saveptr1;
 
   pch = strtok_r(argv[argv_offset], ",", &saveptr1);
-  while (pch != NULL && index < MAX_GC_CODE_LENGHT) {
+  while (pch != NULL && index < MAX_GC_CODE_LENGTH) {
     str_to_uint16(pch, &gc_test[index]);
     pch = strtok_r(NULL, ",", &saveptr1);
     index++;
@@ -95,10 +98,23 @@ int main(int argc, char * argv[]) {
   std::cout << "Code GC length " << index << std::endl
   << "Code type      " << irsend.capture.decode_type
   << " (" << encoding(&irsend.capture) << ")" << std::endl
-  << "Code bits      " << irsend.capture.bits << std::endl
-  << "Code value     0x" << std::hex << irsend.capture.value << std::endl
-  << "Code address   0x" << std::hex << irsend.capture.address << std::endl
-  << "Code command   0x" << std::hex << irsend.capture.command << std::endl;
+  << "Code bits      " << irsend.capture.bits << std::endl;
+  switch (irsend.capture.decode_type) {
+    case DAIKIN:
+    case KELVINATOR:
+    case TOSHIBA_AC:
+      std::cout << "State value    0x";
+      for (uint16_t i = 0; i < irsend.capture.bits / 8; i++)
+        printf("%02X", irsend.capture.state[i]);
+      std::cout << std::endl;
+      break;
+    default:
+      std::cout << "Code value     0x" <<
+          std::hex << irsend.capture.value << std::endl <<
+          "Code address   0x" << std::hex << irsend.capture.address << std::endl
+          << "Code command   0x" << std::hex << irsend.capture.command <<
+          std::endl;
+  }
 
   if (dumpraw || irsend.capture.decode_type == UNKNOWN)
     irsend.dumpRawResult();
