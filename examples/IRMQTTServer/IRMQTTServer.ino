@@ -228,6 +228,7 @@ void handleRoot() {
         "<option value='13'>Dish</option>"
         "<option value='6'>JVC</option>"
         "<option value='10'>LG</option>"
+        "<option value='34'>Midea</option>"
         "<option value='12'>Mitsubishi</option>"
         "<option selected='selected' value='3'>NEC</option>"  // Default
         "<option value='29'>Nikai</option>"
@@ -981,6 +982,11 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
     case GLOBALCACHE:  // 31
       parseStringAndSendGC(code_str);
+      break;
+    case MIDEA:  // 34
+      if (bits == 0)
+        bits = MIDEA_BITS;
+      irsend.sendMidea(code, bits, repeat);
       break;
   }
 

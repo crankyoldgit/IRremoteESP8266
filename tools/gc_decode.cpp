@@ -49,6 +49,7 @@ std::string encoding(decode_results *results) {
     case DAIKIN:       return "DAIKIN";        break;
     case KELVINATOR:   return "KELVINATOR";    break;
     case TOSHIBA_AC:   return "TOSHIBA_AC";    break;
+    case MIDEA:        return "MIDEA";         break;
   }
 }
 

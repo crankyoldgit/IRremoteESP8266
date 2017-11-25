@@ -190,6 +190,10 @@ class IRsend {
                      uint16_t nbytes = TOSHIBA_AC_STATE_LENGTH,
                      uint16_t repeat = TOSHIBA_AC_MIN_REPEAT);
 #endif
+#if SEND_MIDEA
+  void sendMidea(uint64_t data, uint16_t nbits = MIDEA_BITS,
+                 uint16_t repeat = MIDEA_MIN_REPEAT);
+#endif
 
  protected:
 #ifdef UNIT_TEST

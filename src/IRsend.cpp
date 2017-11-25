@@ -322,6 +322,9 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501: sendAiwaRCT501(data, nbits); break;
 #endif
+#if SEND_MIDEA
+    case MIDEA: sendMidea(data, nbits); break;
+#endif
   }
 }
 #endif

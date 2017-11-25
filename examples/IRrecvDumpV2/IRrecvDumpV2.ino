@@ -80,6 +80,7 @@ void encoding(decode_results *results) {
     case DAIKIN:       Serial.print("DAIKIN");        break;
     case KELVINATOR:   Serial.print("KELVINATOR");    break;
     case TOSHIBA_AC:   Serial.print("TOSHIBA_AC");    break;
+    case MIDEA:        Serial.print("MIDEA");         break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
 }

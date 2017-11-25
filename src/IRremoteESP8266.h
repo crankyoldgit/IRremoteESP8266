@@ -141,6 +141,9 @@
 #define DECODE_TOSHIBA_AC    true
 #define SEND_TOSHIBA_AC      true
 
+#define DECODE_MIDEA         true
+#define SEND_MIDEA           true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC)
@@ -188,7 +191,8 @@ enum decode_type_t {
   RAW,  // Technically not a protocol, but an encoding.
   GLOBALCACHE,  // Technically not a protocol, but an encoding.
   TOSHIBA_AC,
-  FUJITSU_AC
+  FUJITSU_AC,
+  MIDEA
 };
 
 // Message lengths & required repeat values
@@ -252,6 +256,8 @@ enum decode_type_t {
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
 #define NIKAI_BITS                  24U
+#define MIDEA_BITS                  48U
+#define MIDEA_MIN_REPEAT             0U
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1
