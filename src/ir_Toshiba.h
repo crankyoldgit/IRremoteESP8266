@@ -11,6 +11,7 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRrecv.h"
 
 //     TTTTTTT  OOOOO   SSSSS  HH   HH IIIII BBBBB     AAA
 //       TTT   OO   OO SS      HH   HH  III  BB   B   AAAAA
@@ -34,7 +35,7 @@
 #if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 class IRToshibaAC {
  public:
-  explicit IRToshibaAC(uint16_t pin);
+  explicit IRToshibaAC(uint16_t pinTx, uint16_t pinRx = NULL);
 
   void stateReset();
   void send();
@@ -51,6 +52,7 @@ class IRToshibaAC {
   uint8_t getMode(bool useRaw = false);
   void setRaw(uint8_t newState[]);
   uint8_t* getRaw();
+  bool decode(decode_results *results);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
 #ifdef ARDUINO
@@ -68,6 +70,7 @@ class IRToshibaAC {
                               const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
   uint8_t mode_state;
   IRsend _irsend;
+  IRrecv _irrecv;
 };
 
 #endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)

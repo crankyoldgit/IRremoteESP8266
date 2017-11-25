@@ -79,7 +79,9 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
 // Status:  STABLE / Working.
 //
 // Initialise the object.
-IRToshibaAC::IRToshibaAC(uint16_t pin) : _irsend(pin) {
+IRToshibaAC::IRToshibaAC(uint16_t pinTx, uint16_t pinRx) : 
+	_irsend(pinTx), 
+	_irrecv(pinRx, 512, TIMEOUT_MS, true) {
   stateReset();
 }
 
@@ -105,6 +107,7 @@ void IRToshibaAC::stateReset() {
 // Configure the pin for output.
 void IRToshibaAC::begin() {
     _irsend.begin();
+	_irrecv.enableIRIn();  // Start the receiver
 }
 
 // Send the current desired state to the IR LED.
@@ -359,4 +362,18 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   // is a union data type.
   return true;
 }
+
+bool IRToshibaAC::decode(decode_results *results) {
+	bool res = _irrecv.decode(results);
+	
+	// Just inspect Toshiba AC packets
+	if (results->decode_type != TOSHIBA_AC)
+		return false;
+	
+	// Copy received bytes to remote_state array
+	setRaw(results->state);
+	
+	return res;
+}
+
 #endif  // DECODE_TOSHIBA_AC
