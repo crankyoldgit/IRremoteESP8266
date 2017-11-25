@@ -50,7 +50,7 @@ gc_decode : $(COMMON_OBJ) gc_decode.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 
-IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h
+IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRutils.cpp
 
 IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h
