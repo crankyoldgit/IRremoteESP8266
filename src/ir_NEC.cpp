@@ -176,7 +176,7 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Footer
   if (!matchMark(results->rawbuf[offset++], NEC_BIT_MARK_TICKS * mark_tick))
       return false;
-  if (offset <= results->rawlen &&
+  if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], NEC_MIN_GAP_TICKS * space_tick))
     return false;
 

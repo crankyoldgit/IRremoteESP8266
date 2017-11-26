@@ -112,6 +112,7 @@ std::string typeToString(const decode_type_t protocol,
     case JVC:           result = "JVC";               break;
     case KELVINATOR:    result = "KELVINATOR";        break;
     case LG:            result = "LG";                break;
+    case MAGIQUEST:     result = "MAGIQUEST";         break;
     case MIDEA:         result = "MIDEA";             break;
     case MITSUBISHI:    result = "MITSUBISHI";        break;
     case MITSUBISHI_AC: result = "MITSUBISHI_AC";     break;
@@ -149,4 +150,158 @@ bool hasACState(const decode_type_t protocol) {
     default:
       return false;
   }
+}
+
+// Return the corrected length of a 'raw' format array structure
+// after over-large values are converted into multiple entries.
+// Args:
+//   results: A ptr to a decode result.
+// Returns:
+//   A uint16_t containing the length.
+uint16_t getCorrectedRawLength(const decode_results *results) {
+  uint16_t extended_length = results->rawlen - 1;
+  for (uint16_t i = 0; i < results->rawlen - 1; i++) {
+    uint32_t usecs = results->rawbuf[i] * RAWTICK;
+    // Add two extra entries for multiple larger than UINT16_MAX it is.
+    extended_length += (usecs / (UINT16_MAX + 1)) * 2;
+  }
+  return extended_length;
+}
+
+// Return a string containing the key values of a decode_results structure
+// in a C/C++ code style format.
+#ifdef ARDUINO
+String resultToSourceCode(const decode_results *results) {
+  String output = "";
+#else
+std::string resultToSourceCode(const decode_results *results) {
+  std::string output = "";
+#endif
+  // Start declaration
+  output += "uint16_t ";  // variable type
+  output += "rawData[";   // array name
+  output += uint64ToString(getCorrectedRawLength(results), 10);
+    // array size
+  output += "] = {";                   // Start declaration
+
+  // Dump data
+  for (uint16_t i = 1; i < results->rawlen; i++) {
+    uint32_t usecs;
+    for (usecs = results->rawbuf[i] * RAWTICK;
+         usecs > UINT16_MAX;
+         usecs -= UINT16_MAX) {
+      output += uint64ToString(UINT16_MAX);
+      if (i % 2)
+        output += ", 0,  ";
+      else
+        output += ",  0, ";
+    }
+    output += uint64ToString(usecs, 10);
+    if (i < results->rawlen - 1)
+      output += ", ";  // ',' not needed on the last one
+    if (i % 2 == 0)  output += " ";  // Extra if it was even.
+  }
+
+  // End declaration
+  output +="};";
+
+  // Comment
+  output += "  // " + typeToString(results->decode_type, results->repeat);
+  // Only display the value if the decode type doesn't have an A/C state.
+  if (!hasACState(results->decode_type))
+    output += " " + uint64ToString(results->value, 16);
+  output += "\n";
+
+  // Now dump "known" codes
+  if (results->decode_type != UNKNOWN) {
+    if (hasACState(results->decode_type)) {
+#if DECODE_AC
+      uint16_t nbytes = results->bits / 8;
+      output += "uint8_t state[" + uint64ToString(nbytes) + "] = {";
+      for (uint16_t i = 0; i < nbytes; i++) {
+        output += "0x";
+        if (results->state[i] < 0x10)  output += "0";
+        output += uint64ToString(results->state[i], 16);
+        if (i < nbytes - 1)
+          output += ", ";
+      }
+      output += "};\n";
+#endif  // DECODE_AC
+    } else {
+      // Simple protocols
+      // Some protocols have an address &/or command.
+      // NOTE: It will ignore the atypical case when a message has been
+      // decoded but the address & the command are both 0.
+      if (results->address > 0 || results->command > 0) {
+        output += "uint32_t address = 0x" +
+                  uint64ToString(results->address, 16) + ";\n";
+        output += "uint32_t command = 0x" +
+                  uint64ToString(results->command, 16) + ";\n";
+      }
+      // Most protocols have data
+      output += "uint64_t data = 0x" + uint64ToString(results->value, 16) +
+                ";\n";
+    }
+  }
+  return output;
+}
+
+// Dump out the decode_results structure.
+//
+#ifdef ARDUINO
+String resultToTimingInfo(const decode_results *results) {
+  String output = "";
+  String value = "";
+#else
+std::string resultToTimingInfo(const decode_results *results) {
+  std::string output = "";
+  std::string value = "";
+#endif
+  output += "Raw Timing[" + uint64ToString(results->rawlen - 1, 10) + "]:\n";
+
+  for (uint16_t i = 1; i < results->rawlen; i++) {
+    if (i % 2 == 0)
+      output += "-";  // even
+    else
+      output += "   +";  // odd
+    value = uint64ToString(results->rawbuf[i] * RAWTICK);
+    // Space pad the value till it is at least 6 chars long.
+    while (value.length() < 6)
+      value = " " + value;
+    output += value;
+    if (i < results->rawlen - 1)
+      output += ", ";  // ',' not needed for last one
+    if (!(i % 8))  output += "\n";  // Newline every 8 entries.
+  }
+  output += "\n";
+  return output;
+}
+
+// Dump out the decode_results structure.
+//
+#ifdef ARDUINO
+String resultToHumanReadableBasic(const decode_results *results) {
+  String output = "";
+#else
+std::string resultToHumanReadableBasic(const decode_results *results) {
+  std::string output = "";
+#endif
+  // Show Encoding standard
+  output += "Encoding  : " +
+            typeToString(results->decode_type, results->repeat) + "\n";
+
+  // Show Code & length
+  output += "Code      : ";
+  if (hasACState(results->decode_type)) {
+#if DECODE_AC
+      for (uint16_t i = 0; results->bits > i * 8; i++) {
+        if (results->state[i] < 0x10)  output += "0";  // Zero pad
+        output += uint64ToString(results->state[i], 16);
+      }
+#endif  // DECODE_AC
+  } else {
+    output += uint64ToString(results->value, 16);
+  }
+  output += " (" + uint64ToString(results->bits) + " bits)\n";
+  return output;
 }

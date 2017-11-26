@@ -47,7 +47,7 @@ class IRsendTest: public IRsend {
   void makeDecodeResult(uint16_t offset = 0) {
     capture.decode_type = UNKNOWN;
     capture.bits = 0;
-    capture.rawlen = last + 1 - offset;
+    capture.rawlen = last + 2 - offset;
     capture.overflow = (last - offset >= (int16_t) RAW_BUF);
     capture.repeat = false;
     capture.address = 0;

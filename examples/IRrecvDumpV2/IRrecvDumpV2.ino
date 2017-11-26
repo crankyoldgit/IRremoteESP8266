@@ -1,13 +1,20 @@
 /*
  * IRremoteESP8266: IRrecvDumpV2 - dump details of IR codes with IRrecv
  * An IR detector/demodulator must be connected to the input RECV_PIN.
+ *
+ * Copyright 2009 Ken Shirriff, http://arcfn.com
+ * Copyright 2017 David Conran
+ *
  * Example circuit diagram:
  *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
+ *
  * Changes:
+ *   Version 0.3 November, 2017
+ *     - Support for A/C decoding for some protcols.
  *   Version 0.2 April, 2017
  *     - Decode from a copy of the data so we can start capturing faster thus
  *       reduce the likelihood of miscaptures.
- * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009, Copyright 2009 Ken Shirriff, http://arcfn.com
+ * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009,
  */
 
 #ifndef UNIT_TEST
@@ -23,187 +30,114 @@
 #include <ir_Toshiba.h>
 #endif  // DECODE_AC
 
-// An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
-// board).
-uint16_t RECV_PIN = 14;
+// ==================== start of TUNEABLE PARAMETERS ====================
+// An IR detector/demodulator is connected to GPIO pin 14
+// e.g. D5 on a NodeMCU board.
+#define RECV_PIN 14
+
+// The Serial connection baud rate.
+// i.e. Status message will be sent to the PC at this baud rate.
+// Try to avoid slow speeds like 9600, as you will miss messages and
+// cause other problems. 115200 (or faster) is recommended.
+// NOTE: Make sure you set your Serial Monitor to the same speed.
+#define BAUD_RATE 115200
+
 // As this program is a special purpose capture/decoder, let us use a larger
 // than normal buffer so we can handle Air Conditioner remote codes.
-uint16_t CAPTURE_BUFFER_SIZE = 1024;
+#define CAPTURE_BUFFER_SIZE 1024
 
-// Nr. of milli-Seconds of no-more-data before we consider a message ended.
+// TIMEOUT is the Nr. of milli-Seconds of no-more-data before we consider a
+// message ended.
+// This parameter is an interesting trade-off. The longer the timeout, the more
+// complex a message it can capture. e.g. Some device protocols will send
+// multiple message packets in quick succession, like Air Conditioner remotes.
+// Air Coniditioner protocols often have a considerable gap (20-40+ms) between
+// packets.
+// The downside of a large timeout value is a lot of less complex protocols
+// send multiple messages when the remote's button is held down. The gap between
+// them is often also around 20+ms. This can result in the raw data be 2-3+
+// times larger than needed as it has captured 2-3+ messages in a single
+// capture. Setting a low timeout value can resolve this.
+// So, choosing the best TIMEOUT value for your use particular case is
+// quite nuanced. Good luck and happy hunting.
 // NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
-// #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
-                        // units, but can accidently swallow repeated messages
-                        // in the rawData[] output.
 #if DECODE_AC
 #define TIMEOUT 50U  // Some A/C units have gaps in their protocols of ~40ms.
                      // e.g. Kelvinator
                      // A value this large may swallow repeats of some protocols
 #else  // DECODE_AC
-#define TIMEOUT 15U  // Suits most messages, while not swallowing repeats.
+#define TIMEOUT 15U  // Suits most messages, while not swallowing many repeats.
 #endif  // DECODE_AC
+// Alternatives:
+// #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
+                        // units, but can accidently swallow repeated messages
+                        // in the rawData[] output.
+// #define TIMEOUT MAX_TIMEOUT_MS  // This will set it to our currently allowed
+                                   // maximum. Values this high are problematic
+                                   // because it is roughly the typical boundary
+                                   // where most messages repeat.
+                                   // e.g. It will stop decoding a message and
+                                   //   start sending it to serial at precisely
+                                   //   the time when the next message is likely
+                                   //   to be transmitted, and may miss it.
+
+// Set the smallest sized "UNKNOWN" message packets we actually care about.
+// This value helps reduce the false-positive detection rate of IR background
+// noise as real messages. The chances of background IR noise getting detected
+// as a message increases with the length of the TIMEOUT value. (See above)
+// The downside of setting this message too large is you can miss some valid
+// short messages for protocols that this library doesn't yet decode.
+//
+// Set higher if you get lots of random short UNKNOWN messages when nothing
+// should be sending a message.
+// Set lower if you are sure your setup is working, but it doesn't see messages
+// from your device. (e.g. Other IR remotes work.)
+// NOTE: Set this value very high to effectively turn off UNKNOWN detection.
+#define MIN_UNKNOWN_SIZE 12
+// ==================== end of TUNEABLE PARAMETERS ====================
+
 
 // Use turn on the save buffer feature for more complete capture coverage.
 IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT, true);
 
 decode_results results;  // Somewhere to store the results
 
-void setup() {
-  // Status message will be sent to the PC at 115200 baud
-  Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
-  delay(500);  // Wait a bit for the serial connection to be establised.
-
-  irrecv.enableIRIn();  // Start the receiver
-}
-
-// Dump out the decode_results structure.
-//
-void dumpInfo(decode_results *results) {
-  if (results->overflow)
-    Serial.printf("WARNING: IR code too big for buffer (>= %d). "
-                  "These results shouldn't be trusted until this is resolved. "
-                  "Edit & increase CAPTURE_BUFFER_SIZE.\n",
-                  CAPTURE_BUFFER_SIZE);
-
-  // Show Encoding standard
-  Serial.println("Encoding  : " +
-                 typeToString(results->decode_type, results->repeat));
-
-  // Show Code & length
-  Serial.print("Code      : ");
-  if (hasACState(results->decode_type)) {
-#if DECODE_AC
-      for (uint16_t i = 0; results->bits > i * 8; i++)
-        Serial.printf("%02X", results->state[i]);
-#endif  // DECODE_AC
-  } else {
-    serialPrintUint64(results->value, HEX);
-  }
-  Serial.print(" (");
-  Serial.print(results->bits, DEC);
-  Serial.println(" bits)");
-
-#if DECODE_AC
-  // Display the human readable state of an A/C message if we can.
-  IRDaikinESP daikin(0);
-  IRKelvinatorAC kelvinator(0);
-  IRToshibaAC toshiba(0);
-  IRMideaAC midea(0);
-
+// Display the human readable state of an A/C message if we can.
+void dumpACInfo(decode_results *results) {
   String description = "";
-  switch (results->decode_type) {
-    case DAIKIN:
-      daikin.setRaw(results->state);
-      description = daikin.toString();
-    case KELVINATOR:
-      kelvinator.setRaw(results->state);
-      description = kelvinator.toString();
-    case TOSHIBA_AC:
-      toshiba.setRaw(results->state);
-      description = toshiba.toString();
-    case MIDEA:
-      midea.setRaw(results->value);
-      description = midea.toString();
+
+  if (results->decode_type == DAIKIN) {
+    IRDaikinESP ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+  if (results->decode_type == KELVINATOR) {
+    IRKelvinatorAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+  if (results->decode_type == TOSHIBA_AC) {
+    IRToshibaAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+  if (results->decode_type == MIDEA) {
+    IRMideaAC ac(0);
+    ac.setRaw(results->value);  // Midea uses value instead of state.
+    description = ac.toString();
   }
   // If we got a human-readable description of the message, display it.
-  if (description != "")  Serial.println("Human     : " + description);
-#endif  // DECODE_AC
-  Serial.print("Library   : v");
-  Serial.println(_IRREMOTEESP8266_VERSION_);
+  if (description != "")  Serial.println("Mesg Desc.: " + description);
 }
 
-uint16_t getCookedLength(decode_results *results) {
-  uint16_t length = results->rawlen - 1;
-  for (uint16_t i = 0; i < results->rawlen - 1; i++) {
-    uint32_t usecs = results->rawbuf[i] * RAWTICK;
-    // Add two extra entries for multiple larger than UINT16_MAX it is.
-    length += (usecs / UINT16_MAX) * 2;
-  }
-  return length;
-}
+// The section of code run only once at start-up.
+void setup() {
+  Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
+  delay(500);  // Wait a bit for the serial connection to be establised.
 
-// Dump out the decode_results structure.
-//
-void dumpRaw(decode_results *results) {
-  // Print Raw data
-  Serial.print("Timing[");
-  Serial.print(results->rawlen - 1, DEC);
-  Serial.println("]: ");
-
-  for (uint16_t i = 1; i < results->rawlen; i++) {
-    if (i % 100 == 0)
-      yield();  // Preemptive yield every 100th entry to feed the WDT.
-    if (i % 2 == 0) {  // even
-      Serial.print("-");
-    } else {  // odd
-      Serial.print("   +");
-    }
-    Serial.printf("%6d", results->rawbuf[i] * RAWTICK);
-    if (i < results->rawlen - 1)
-      Serial.print(", ");  // ',' not needed for last one
-    if (!(i % 8)) Serial.println("");
-  }
-  Serial.println("");  // Newline
-}
-
-// Dump out the decode_results structure.
-//
-void dumpCode(decode_results *results) {
-  // Start declaration
-  Serial.print("uint16_t ");               // variable type
-  Serial.print("rawData[");                // array name
-  Serial.print(getCookedLength(results), DEC);  // array size
-  Serial.print("] = {");                   // Start declaration
-
-  // Dump data
-  for (uint16_t i = 1; i < results->rawlen; i++) {
-    uint32_t usecs;
-    for (usecs = results->rawbuf[i] * RAWTICK;
-         usecs > UINT16_MAX;
-         usecs -= UINT16_MAX)
-      Serial.printf("%d, 0, ", UINT16_MAX);
-    Serial.print(usecs, DEC);
-    if (i < results->rawlen - 1)
-      Serial.print(", ");  // ',' not needed on last one
-    if (i % 2 == 0) Serial.print(" ");  // Extra if it was even.
-  }
-
-  // End declaration
-  Serial.print("};");  //
-
-  // Comment
-  Serial.println("  // " + typeToString(results->decode_type, results->repeat) +
-                 " " + uint64ToString(results->value, HEX));
-
-  // Now dump "known" codes
-  if (results->decode_type != UNKNOWN) {
-    if (hasACState(results->decode_type)) {
-#if DECODE_AC
-      uint16_t nbytes = results->bits / 8;
-      Serial.printf("uint8_t state[%d] = {", nbytes);
-      for (uint16_t i = 0; i < nbytes; i++) {
-        Serial.printf("0x%02X", results->state[i]);
-        if (i < nbytes - 1)
-          Serial.print(", ");
-      }
-      Serial.println("};");
-#endif  // DECODE_AC
-    } else {
-      // Simple protocols
-      // Some protocols have an address &/or command.
-      // NOTE: It will ignore the atypical case when a message has been
-      // decoded but the address & the command are both 0.
-      if (results->address > 0 || results->command > 0) {
-        Serial.println("uint32_t address = 0x" +
-                       uint64ToString(results->address, HEX) + ";");
-        Serial.println("uint32_t command = 0x" +
-                       uint64ToString(results->command, HEX) + ";");
-      }
-      // Most protocols have data
-      Serial.println("uint64_t data = 0x" +
-                     uint64ToString(results->value, HEX) + ";");
-    }
-  }
+  // Ignore messages with less than minimum on or off pulses.
+  irrecv.setUnknownThreshold(MIN_UNKNOWN_SIZE);
+  irrecv.enableIRIn();  // Start the receiver
 }
 
 // The repeating section of the code
@@ -211,9 +145,31 @@ void dumpCode(decode_results *results) {
 void loop() {
   // Check if the IR code has been received.
   if (irrecv.decode(&results)) {
-    dumpInfo(&results);           // Output the results
-    dumpRaw(&results);            // Output the results in RAW format
-    dumpCode(&results);           // Output the results as source code
-    Serial.println("");           // Blank line between entries
+    // Display a crude timestamp.
+    uint32_t now = millis();
+    Serial.printf("Timestamp : %06u.%03u\n", now / 1000, now % 1000);
+    if (results.overflow)
+      Serial.printf("WARNING: IR code is too big for buffer (>= %d). "
+                    "This result shouldn't be trusted until this is resolved. "
+                    "Edit & increase CAPTURE_BUFFER_SIZE.\n",
+                    CAPTURE_BUFFER_SIZE);
+    // Display the basic output of what we found.
+    Serial.print(resultToHumanReadableBasic(&results));
+    dumpACInfo(&results);  // Display any extra A/C info if we have it.
+    yield();  // Feed the WDT as the text output can take a while to print.
+
+    // Display the library version the message was captured with.
+    Serial.print("Library   : v");
+    Serial.println(_IRREMOTEESP8266_VERSION_);
+    Serial.println();
+
+    // Output RAW timing info of the result.
+    Serial.println(resultToTimingInfo(&results));
+    yield();  // Feed the WDT (again)
+
+    // Output the results as source code
+    Serial.println(resultToSourceCode(&results));
+    Serial.println("");  // Blank line between entries
+    yield();  // Feed the WDT (again)
   }
 }

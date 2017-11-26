@@ -137,7 +137,7 @@ TEST(TestDecodeMagiQuest, RealExamples) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t rawData[112] = {
+  uint16_t rawData[111] = {
       262, 842,  298, 858,  238, 866,  240, 890,  238, 866,  240, 862,
       244, 886,  242, 860,  246, 858,  554, 604,  264, 840,  560, 622,
       266, 836,  552, 604,  556, 626,  262, 866,  240, 864,  264, 838,
@@ -147,9 +147,9 @@ TEST(TestDecodeMagiQuest, RealExamples) {
       264, 866,  240, 890,  532, 598,  268, 834,  294, 836,  270, 834,
       262, 866,  272, 858,  238, 866,  534, 622,  268, 836,  270, 860,
       268, 862,  526, 604,  264, 892,  530, 600,  268, 836,  586, 598,
-      270, 834,  556, 0};  // Data from PR #365 captured by coolacid
+      270, 834,  556};  // Data from PR #365 captured by coolacid
 
-  irsend.sendRaw(rawData, 112, 36000);
+  irsend.sendRaw(rawData, 111, 36000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);

@@ -104,10 +104,9 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
   // 00000000 00100000 10001000 00110001 00000010 00000010 10110100
 
   // Decode the (MARK + SPACE) bits
-  while (offset + 1 < results->rawlen) {
+  while (offset + 1 < results->rawlen && bits < nbits - 1) {
     uint16_t mark  = results->rawbuf[offset];
     uint16_t space = results->rawbuf[offset + 1];
-
     if (!matchMark(mark + space, MAGIQUEST_TOTAL_USEC)) {
       DPRINT("Not enough time to be Magiquest - Mark: ");
       DPRINT(mark);
@@ -133,6 +132,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
     if (strict && bits == 8 && data != 0)  return false;
   }
 
+  // Last bit is special as the protocol ends with a SPACE, not a MARK.
   // Grab the last MARK bit, assuming a good SPACE after it
   if (offset < results->rawlen) {
     uint16_t mark  = results->rawbuf[offset];

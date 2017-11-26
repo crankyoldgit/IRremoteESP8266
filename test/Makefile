@@ -108,10 +108,10 @@ gtest_main.a : gtest-all.o gtest_main.o
 IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRutils.cpp
 
-IRutils_test.o : IRutils_test.cpp $(USER_DIR)/IRutils.h $(GTEST_HEADERS)
+IRutils_test.o : IRutils_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c IRutils_test.cpp
 
-IRutils_test : IRutils.o IRutils_test.o gtest_main.a
+IRutils_test : IRutils_test.o ir_NEC.o ir_Nikai.o ir_Toshiba.o $(COMMON_OBJ) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 IRtimer.o : $(USER_DIR)/IRtimer.cpp $(USER_DIR)/IRtimer.h
