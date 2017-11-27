@@ -315,11 +315,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeRCMM(results))
     return true;
 #endif
+#if DECODE_FUJITSU_AC
+  // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
+  // message which looks exactly the same as a Panasonic/Denon message.
+  DPRINTLN("Attempting Fujitsu A/C decode");
+  if (decodeFujitsuAC(results))
+    return true;
+#endif
 #if DECODE_DENON
   // Denon needs to precede Panasonic as it is a special case of Panasonic.
-#ifdef DEBUG
   DPRINTLN("Attempting Denon decode");
-#endif
   if (decodeDenon(results, DENON_48_BITS) ||
       decodeDenon(results, DENON_BITS) ||
       decodeDenon(results, DENON_LEGACY_BITS))

@@ -111,7 +111,7 @@
 #define DECODE_MITSUBISHI_AC false  // Not written.
 #define SEND_MITSUBISHI_AC   true
 
-#define DECODE_FUJITSU_AC    false  // Not written.
+#define DECODE_FUJITSU_AC    true
 #define SEND_FUJITSU_AC      true
 
 #define DECODE_DAIKIN        true
@@ -228,6 +228,8 @@ enum decode_type_t {
 #define FUJITSU_AC_MIN_REPEAT        0U
 #define FUJITSU_AC_STATE_LENGTH     16U
 #define FUJITSU_AC_STATE_LENGTH_SHORT 7U
+#define FUJITSU_AC_BITS             (FUJITSU_AC_STATE_LENGTH * 8)
+#define FUJITSU_AC_MIN_BITS         ((FUJITSU_AC_STATE_LENGTH_SHORT - 1) * 8)
 #define NEC_BITS                    32U
 #define PANASONIC_BITS              48U
 #define PANASONIC_MANUFACTURER   0x4004ULL

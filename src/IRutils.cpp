@@ -305,3 +305,11 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
   output += " (" + uint64ToString(results->bits) + " bits)\n";
   return output;
 }
+
+uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
+  uint8_t checksum = init;
+  uint8_t *ptr;
+  for (ptr = start; ptr - start < length; ptr++)
+    checksum += *ptr;
+  return checksum;
+}
