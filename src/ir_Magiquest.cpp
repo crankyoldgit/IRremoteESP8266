@@ -5,7 +5,7 @@
 #include "IRtimer.h"
 #include "IRutils.h"
 
-#define DEBUG
+// #define DEBUG
 
 #define IS_ZERO(m, s) (((m) * 100 / ((m) + (s))) <= MAGIQUEST_ZERO_RATIO)
 #define IS_ONE(m, s)  (((m) * 100 / ((m) + (s))) >= MAGIQUEST_ONE_RATIO)
@@ -14,6 +14,8 @@
 // https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
 // and
 // https://github.com/mpflaga/Arduino-IRremote
+
+// Source: https://github.com/mpflaga/Arduino-IRremote
 
 #if SEND_MAGIQUEST
 void IRsend::sendMagiQuest(uint32_t wand_id, uint16_t magnitude)
@@ -38,6 +40,8 @@ void IRsend::sendMagiQuest(uint32_t wand_id, uint16_t magnitude)
   }
 }
 #endif
+
+// Source: https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
 
 #if DECODE_MAGIQUEST
 bool  IRrecv::decodeMagiQuest (decode_results *results)
