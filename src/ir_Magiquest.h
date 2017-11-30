@@ -1,3 +1,5 @@
+// Copyright 2017 Jason kendall
+
 #ifndef IR_MAGIQUEST_H_
 #define IR_MAGIQUEST_H_
 

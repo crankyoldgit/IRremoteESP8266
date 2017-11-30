@@ -1,3 +1,5 @@
+// Copyright 2017 Jason kendall
+
 #include "ir_Magiquest.h"
 #include <algorithm>
 #include "IRrecv.h"
