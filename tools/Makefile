@@ -134,3 +134,7 @@ ir_Pronto.o : $(USER_DIR)/ir_Pronto.cpp $(GTEST_HEADERS)
 
 ir_Nikai.o : $(USER_DIR)/ir_Nikai.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Nikai.cpp
+
+ir_Magiquest.o : $(USER_DIR)/ir_Magiquest.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Magiquest.cpp
+	
