@@ -426,6 +426,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
   }
 #endif
+#if DECODE_LASERTAG
+  DPRINTLN("Attempting Lasertag decode");
+  if (decodeLasertag(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
