@@ -17,8 +17,8 @@ union magiquest {
     uint32_t wand_id;
     uint8_t  padding;
     uint8_t  scrap;
-  } cmd ;
-} ;
+  } cmd;
+};
 
 #define MAGIQUEST_BITS               56
 #define MAGIQUEST_TOTAL_USEC       1150
@@ -31,4 +31,5 @@ union magiquest {
 #define MAGIQUEST_MARK_ONE   580
 #define MAGIQUEST_SPACE_ONE  600
 
-#endif // IR_MAGIQUEST_H_
+#endif  // IR_MAGIQUEST_H_
+

@@ -82,7 +82,7 @@ class decode_results {
   bool repeat;  // Is the result a repeat code?
   uint32_t address;  // Decoded device address.
   uint32_t command;  // Decoded command.
-  uint16_t magiquestMagnitude; // This is only used for MagiQuest
+  uint16_t magiquestMagnitude;  // This is only used for MagiQuest
 };
 
 // main class for receiving IR
