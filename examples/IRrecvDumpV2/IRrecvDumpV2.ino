@@ -26,10 +26,16 @@ uint16_t CAPTURE_BUFFER_SIZE = 1024;
 
 // Nr. of milli-Seconds of no-more-data before we consider a message ended.
 // NOTE: Don't exceed MAX_TIMEOUT_MS. Typically 130ms.
-#define TIMEOUT 15U  // Suits most messages, while not swallowing repeats.
 // #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
                         // units, but can accidently swallow repeated messages
                         // in the rawData[] output.
+#if DECODE_AC
+#define TIMEOUT 50U  // Some A/C units have gaps in their protocols of ~40ms.
+                     // e.g. Kelvinator
+                     // A value this large may swallow repeats of some protocols
+#else
+#define TIMEOUT 15U  // Suits most messages, while not swallowing repeats.
+#endif
 
 // Use turn on the save buffer feature for more complete capture coverage.
 IRrecv irrecv(RECV_PIN, CAPTURE_BUFFER_SIZE, TIMEOUT, true);
@@ -71,6 +77,10 @@ void encoding(decode_results *results) {
     case DENON:        Serial.print("DENON");         break;
     case COOLIX:       Serial.print("COOLIX");        break;
     case NIKAI:        Serial.print("NIKAI");         break;
+    case DAIKIN:       Serial.print("DAIKIN");        break;
+    case KELVINATOR:   Serial.print("KELVINATOR");    break;
+    case TOSHIBA_AC:   Serial.print("TOSHIBA_AC");    break;
+    case MIDEA:        Serial.print("MIDEA");         break;
     case MAGIQUEST:    Serial.print("MAGIQUEST");     break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
@@ -92,7 +102,18 @@ void dumpInfo(decode_results *results) {
 
   // Show Code & length
   Serial.print("Code      : ");
-  serialPrintUint64(results->value, 16);
+  switch (results->decode_type) {
+#if DECODE_AC
+    case DAIKIN:
+    case KELVINATOR:
+    case TOSHIBA_AC:
+      for (uint16_t i = 0; results->bits > i * 8; i++)
+        Serial.printf("%02X", results->state[i]);
+      break;
+#endif
+    default:
+      serialPrintUint64(results->value, HEX);
+  }
   Serial.print(" (");
   Serial.print(results->bits, DEC);
   Serial.println(" bits)");
@@ -147,7 +168,7 @@ void dumpCode(decode_results *results) {
     for (usecs = results->rawbuf[i] * RAWTICK;
          usecs > UINT16_MAX;
          usecs -= UINT16_MAX)
-      Serial.printf("%d, 0", UINT16_MAX);
+      Serial.printf("%d, 0, ", UINT16_MAX);
     Serial.print(usecs, DEC);
     if (i < results->rawlen - 1)
       Serial.print(", ");  // ',' not needed on last one
@@ -168,22 +189,38 @@ void dumpCode(decode_results *results) {
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
-    // Some protocols have an address &/or command.
-    // NOTE: It will ignore the atypical case when a message has been decoded
-    // but the address & the command are both 0.
-    if (results->address > 0 || results->command > 0) {
-      Serial.print("uint32_t address = 0x");
-      Serial.print(results->address, HEX);
-      Serial.println(";");
-      Serial.print("uint32_t command = 0x");
-      Serial.print(results->command, HEX);
-      Serial.println(";");
+    uint16_t nbytes;
+    switch (results->decode_type) {
+#if DECODE_AC
+      case KELVINATOR:  // Complex protocols. e.g. Air Conditioners
+      case DAIKIN:
+        nbytes = results->bits / 8;
+        Serial.printf("uint8_t state[%d] = {", nbytes);
+        for (uint16_t i = 0; i < nbytes; i++) {
+          Serial.printf("0x%02X", results->state[i]);
+          if (i < nbytes - 1)
+            Serial.print(", ");
+        }
+        Serial.println("};");
+        break;
+#endif  // DECODE_AC
+      default:  // Simple protocols
+        // Some protocols have an address &/or command.
+        // NOTE: It will ignore the atypical case when a message has been
+        // decoded but the address & the command are both 0.
+        if (results->address > 0 || results->command > 0) {
+          Serial.print("uint32_t address = 0x");
+          Serial.print(results->address, HEX);
+          Serial.println(";");
+          Serial.print("uint32_t command = 0x");
+          Serial.print(results->command, HEX);
+          Serial.println(";");
+        }
+        // Most protocols have data
+        Serial.print("uint64_t data = 0x");
+        serialPrintUint64(results->value, HEX);
+        Serial.println(";");
     }
-
-    // All protocols have data
-    Serial.print("uint64_t data = 0x");
-    serialPrintUint64(results->value, 16);
-    Serial.println(";");
   }
 }
 

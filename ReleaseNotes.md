@@ -1,5 +1,32 @@
 # Release Notes
 
+## _v2.3.0 (TBD)_
+
+**[Bug Fixes]**
+- Panasonic-based protocols had incorrect message gap. (#358)
+- Formatting error for large rawData values in example code. (#355)
+- Off-by-one error in payload_copy malloc. (#337)
+- Off-by-one error in unit test helper routines (#363)
+
+**[Features]**
+- Support sending and receiving Midea A/C codes.
+- Support for receiving Kelvinator A/C codes. (#332)
+- Support more operation features for Daikin A/Cs.
+- Support for decoding Daikin A/Cs.
+- Support sending and receiving Toshiba A/Cs. (#333)
+- Support sending and receiving AR-DB1 Fujitsu A/C codes. (#367)
+- Add new AutoAnalyseRawData.sh & RawToGlobalCache.sh tools (#345) (#343)
+
+**[Misc]**
+- Add checksum verification to Kelvinator A/C decodes. (#348)
+- Changes to the threshold reporting of UNKNOWN messages (#347)
+- Major re-work of Daikin A/C support.
+- Sending for all A/Cs added to MQTT example code.
+- MQTT example code improvements. (#334)
+- IRrecvDumpV2 significant output improvements. (#363)
+- Improved unit test coverage for the library.
+
+
 ## _v2.2.1 (20171025)_
 
 **[Features]**

@@ -31,7 +31,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
         ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
         ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
-				ir_Magiquest_test
+        ir_Toshiba_test ir_Midea_test ir_Magiquest_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -68,9 +68,10 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
 # All the IR protocol object files.
 PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
-            ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o ir_Denon.o ir_Dish.o \
+    ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o ir_Denon.o ir_Dish.o \
 		ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
-		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Magiquest.o
+		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
+		ir_Midea.o ir_Magiquest.o
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
              $(PROTOCOLS) gtest_main.a
@@ -78,7 +79,7 @@ COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
               $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
 # Common test dependencies
-COMMON_TEST_DEPS = $(COMMON_DEPS) IRsend_test.h
+COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h
 
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
@@ -346,6 +347,24 @@ ir_Nikai_test.o : ir_Nikai_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Nikai_test.cpp
 
 ir_Nikai_test : $(COMMON_OBJ) ir_Nikai_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Toshiba.o : $(USER_DIR)/ir_Toshiba.cpp $(USER_DIR)/ir_Toshiba.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Toshiba.cpp
+
+ir_Toshiba_test.o : ir_Toshiba_test.cpp $(USER_DIR)/ir_Toshiba.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Toshiba_test.cpp
+
+ir_Toshiba_test : $(COMMON_OBJ) ir_Toshiba_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Midea.o : $(USER_DIR)/ir_Midea.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Midea.cpp
+
+ir_Midea_test.o : ir_Midea_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Midea_test.cpp
+
+ir_Midea_test : $(COMMON_OBJ) ir_Midea_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Magiquest.o : $(USER_DIR)/ir_Magiquest.cpp $(GTEST_HEADERS)
