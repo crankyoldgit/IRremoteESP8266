@@ -995,7 +995,6 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
         bits = MAGIQUEST_BITS;
       irsend.sendMagiQuest(code, bits, repeat);
       break;
-
   }
 
   // Release the lock.
