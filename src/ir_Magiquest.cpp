@@ -18,33 +18,72 @@
 // Source: https://github.com/mpflaga/Arduino-IRremote
 
 #if SEND_MAGIQUEST
-void IRsend::sendMagiQuest(uint32_t wand_id, uint16_t magnitude) {
-  magiquest data;
-  data.cmd.padding = 0x00;
-  data.cmd.magnitude = magnitude;
-  data.cmd.wand_id = wand_id;
+// Send an MagiQuest formatted message.
+//
+// Args:
+//   data:   The contents of the message you want to send.
+//   nbits:  The bit size of the message being sent.
+//           Typically MAGIQUEST_BITS.
+//   repeat: The number of times you want the message to be repeated.
+//
+// Status: Alpha / Should be working.
+//
+void IRsend::sendMagiQuest(uint64_t data, uint16_t nbits, uint16_t repeat) {
+  enableIROut(36);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // No Headers - Technically it's included in the data. i.e. 8 zeros.
 
-  enableIROut(38);
-  for (uint16_t i = 0; i < 56; i++) {
-    data.llword <<= 1;
-    if (((int8_t) data.byte[6]) < 0) {  // if negative then MSBit is one.
-      mark(MAGIQUEST_MARK_ONE);
-      space(MAGIQUEST_SPACE_ONE);
-    } else {
-      mark(MAGIQUEST_MARK_ZERO);
-      space(MAGIQUEST_SPACE_ZERO);
-    }
+    // Data
+    sendData(MAGIQUEST_MARK_ONE, MAGIQUEST_SPACE_ONE, MAGIQUEST_MARK_ZERO,
+             MAGIQUEST_SPACE_ZERO, data, nbits, true);
+    // Footer
+    space(MAGIQUEST_GAP);
   }
+}
+
+// Encode a MagiQuest wand_id, and a magnitude into a single 64bit value.
+// (Only 48 bits of real data + 8 leading zero bits)
+// This is suitable for calling sendMagiQuest() with.
+// e.g. sendMagiQuest(encodeMagiQuest(wand_id, magnitude));
+uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
+  uint64_t result = 0;
+  result = wand_id;
+  result <<= 16;
+  result |= magnitude;
+  // Shouldn't be needed, but ensure top 8/16 bit are zero.
+  result &= 0xFFFFFFFFFFFFULL;
+  return result;
 }
 #endif
 
 // Source: https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
 
 #if DECODE_MAGIQUEST
-bool  IRrecv::decodeMagiQuest(decode_results *results) {
-  int bits = 0;
+// Decode the supplied MagiQuest message.
+// MagiQuest protocol appears to be a header of 8 'zero' bits, followed
+// by 32 bits of "wand ID" and finally 16 bits of "magnitude".
+// Even though we describe this protocol as 56 bits, it really only has
+// 48 bits of data that matter.
+//
+// In transmission order, 8 zeros + 32 wand_id + 16 magnitude.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion, inc. the 8 bit header.
+//            Typically MAGIQUEST_BITS.
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: Alpha / Should work.
+//
+// Ref:
+//   https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
+bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
+                             bool strict) {
+  uint16_t bits = 0;
   uint64_t data = 0;
-  int offset = 1;  // Skip first SPACE
+  uint16_t offset = OFFSET_START;
 
   if (results->rawlen < (2 * MAGIQUEST_BITS))  {
     DPRINT("Not enough bits to be Magiquest - Rawlen: ");
@@ -53,6 +92,10 @@ bool  IRrecv::decodeMagiQuest(decode_results *results) {
     DPRINTLN((2 * MAGIQUEST_BITS));
     return false;
   }
+
+  // Compliance
+  if (strict && nbits != MAGIQUEST_BITS)  return false;
+
   // Of six wands as datapoints, so far they all start with 8 ZEROs.
   // For example, here is the data from two wands
   // 00000000 00100011 01001100 00100110 00000010 00000010 00010111
@@ -60,8 +103,8 @@ bool  IRrecv::decodeMagiQuest(decode_results *results) {
 
   // Decode the (MARK + SPACE) bits
   while (offset + 1 < results->rawlen) {
-    int mark  = results->rawbuf[offset+0];
-    int space = results->rawbuf[offset+1];
+    uint16_t mark  = results->rawbuf[offset];
+    uint16_t space = results->rawbuf[offset + 1];
 
     if (!matchMark(mark + space, MAGIQUEST_TOTAL_USEC)) {
       DPRINT("Not enough time to be Magiquest - Mark: ");
@@ -81,12 +124,17 @@ bool  IRrecv::decodeMagiQuest(decode_results *results) {
 
     bits++;
     offset += 2;
+
+    // Compliance
+    // The first 8 bits of this protocol are supposed to all be 0.
+    // Exit out early as it is never going to match.
+    if (strict && bits == 8 && data != 0)  return false;
   }
 
   // Grab the last MARK bit, assuming a good SPACE after it
   if (offset < results->rawlen) {
-    int mark  = results->rawbuf[offset+0];
-    int space = (MAGIQUEST_TOTAL_USEC / RAWTICK) - mark;
+    uint16_t mark  = results->rawbuf[offset];
+    uint16_t space = (MAGIQUEST_TOTAL_USEC / RAWTICK) - mark;
 
     if      (IS_ZERO(mark, space))  data = (data << 1) | 0;
     else if (IS_ONE( mark, space))  data = (data << 1) | 1;
@@ -95,13 +143,20 @@ bool  IRrecv::decodeMagiQuest(decode_results *results) {
     bits++;
   }
 
-  if (bits != MAGIQUEST_BITS)  return false;
+  if (bits != nbits)  return false;
 
+  if (strict) {
+    // The top 8 bits of the 56 bits needs to be 0x00 to be valid.
+    // i.e. bits 56 to 49 are all zero.
+    if ((data >> (nbits - 8)) != 0)  return false;
+  }
+
+  // Success
   results->decode_type = MAGIQUEST;
-  results->bits = 32;
-  results->value = data >> 24;
-  results->magiquestMagnitude = data & 0xFFFFFF;
-
+  results->bits = bits;
+  results->value = data;
+  results->address = data >> 16;  // Wand ID
+  results->command = data & 0xFFFF;  // Magnitude
   return true;
 }
 #endif

@@ -227,6 +227,7 @@ void handleRoot() {
         "<option value='13'>Dish</option>"
         "<option value='6'>JVC</option>"
         "<option value='10'>LG</option>"
+        "<option value='32'>MagiQuest</option>"
         "<option value='12'>Mitsubishi</option>"
         "<option selected='selected' value='3'>NEC</option>"  // Default
         "<option value='29'>Nikai</option>"
@@ -261,6 +262,7 @@ void handleRoot() {
         "<option value='32'>32</option>"
         "<option value='36'>36</option>"
         "<option value='48'>48</option>"
+        "<option value='56'>56</option>"
       "</select>"
       " Repeats: <input type='number' name='repeats' min='0' max='99' value='0'"
         "size='2' maxlength='2'>"
@@ -873,6 +875,11 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
     case GLOBALCACHE:  // 31
       parseStringAndSendGC(code_str);
+      break;
+    case MAGIQUEST:  // 32
+      if (bits == 0)
+        bits = MAGIQUEST_BITS;
+      irsend.sendMagiQuest(code, bits, repeat);
       break;
   }
 

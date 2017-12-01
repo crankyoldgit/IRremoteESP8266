@@ -185,7 +185,9 @@ class IRsend {
                  uint16_t repeat = 0);
 #endif
 #if SEND_MAGIQUEST
-  void sendMagiQuest(uint32_t wand_id, uint16_t magnitude);
+  void sendMagiQuest(uint64_t data, uint16_t nbits = MAGIQUEST_BITS,
+                     uint16_t repeat = 0);
+  uint64_t encodeMagiQuest(uint32_t wand_id, uint16_t magnitude);
 #endif
 
  protected:

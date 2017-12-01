@@ -233,7 +233,7 @@ enum decode_type_t {
 #define WHYNTER_BITS                32U
 #define ARGO_COMMAND_LENGTH         12U
 #define NIKAI_BITS                  24U
-#define MAGIQUEST_BITS              56
+#define MAGIQUEST_BITS              56U
 
 
 // Turn on Debugging information by uncommenting the following line.
