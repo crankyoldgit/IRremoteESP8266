@@ -46,6 +46,7 @@ std::string encoding(decode_results *results) {
     case DENON:        return "DENON";         break;
     case COOLIX:       return "COOLIX";        break;
     case NIKAI:        return "NIKAI";         break;
+    case MAGIQUEST:    return "MAGIQUEST";     break;
     case DAIKIN:       return "DAIKIN";        break;
     case KELVINATOR:   return "KELVINATOR";    break;
     case TOSHIBA_AC:   return "TOSHIBA_AC";    break;

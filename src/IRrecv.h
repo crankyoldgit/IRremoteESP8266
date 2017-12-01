@@ -230,6 +230,10 @@ class IRrecv {
   bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
                    bool strict = true);
 #endif
+#if DECODE_MAGIQUEST
+  bool decodeMagiQuest(decode_results *results, uint16_t nbits = MAGIQUEST_BITS,
+                       bool strict = true);
+#endif
 #if DECODE_KELVINATOR
   bool decodeKelvinator(decode_results *results,
                         uint16_t nbits = KELVINATOR_BITS,

@@ -194,6 +194,11 @@ class IRsend {
   void sendMidea(uint64_t data, uint16_t nbits = MIDEA_BITS,
                  uint16_t repeat = MIDEA_MIN_REPEAT);
 #endif
+#if SEND_MAGIQUEST
+  void sendMagiQuest(uint64_t data, uint16_t nbits = MAGIQUEST_BITS,
+                     uint16_t repeat = 0);
+  uint64_t encodeMagiQuest(uint32_t wand_id, uint16_t magnitude);
+#endif
 
  protected:
 #ifdef UNIT_TEST

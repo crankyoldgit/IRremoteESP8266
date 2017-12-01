@@ -81,6 +81,7 @@ void encoding(decode_results *results) {
     case KELVINATOR:   Serial.print("KELVINATOR");    break;
     case TOSHIBA_AC:   Serial.print("TOSHIBA_AC");    break;
     case MIDEA:        Serial.print("MIDEA");         break;
+    case MAGIQUEST:    Serial.print("MAGIQUEST");     break;
   }
   if (results->repeat) Serial.print(" (Repeat)");
 }
