@@ -1,4 +1,6 @@
-// Copyright 2017 Jason kendall
+// Copyright 2013 mpflaga
+// Copyright 2015 kitlaan
+// Copyright 2017 Jason kendall, David Conran
 
 #include "ir_Magiquest.h"
 #include <algorithm>

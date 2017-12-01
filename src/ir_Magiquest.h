@@ -1,4 +1,6 @@
-// Copyright 2017 Jason kendall
+// Copyright 2013 mpflaga
+// Copyright 2015 kitlaan
+// Copyright 2017 Jason kendall, David Conran
 
 #ifndef IR_MAGIQUEST_H_
 #define IR_MAGIQUEST_H_
