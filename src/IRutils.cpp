@@ -144,6 +144,7 @@ std::string typeToString(const decode_type_t protocol,
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
     case DAIKIN:
+    case FUJITSU_AC:
     case KELVINATOR:
     case TOSHIBA_AC:
       return true;
