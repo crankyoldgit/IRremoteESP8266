@@ -377,7 +377,7 @@ ir_Magiquest_test.o : ir_Magiquest_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Magiquest_test.cpp
 
 ir_Magiquest_test : $(COMMON_OBJ) ir_Magiquest_test.o
-$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Lasertag.o : $(USER_DIR)/ir_Lasertag.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lasertag.cpp

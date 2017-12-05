@@ -300,7 +300,7 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://en.wikipedia.org/wiki/Manchester_code
 int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
                            uint16_t *used, uint16_t bitTime,
-                           uint8_t tolerance, int16_t excess) {
+                           uint8_t tolerance, int16_t excess, uint16_t delta) {
   DPRINT("DEBUG: getRClevel: offset = ");
   DPRINTLN(uint64ToString(*offset));
   if (*offset > results->rawlen) {
@@ -311,7 +311,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
   uint16_t val = ((*offset) % 2) ? kMARK : kSPACE;
   // Check to see if we have hit an inter-message gap (> 20ms).
-  if (val == kSPACE && width > 20000) {
+  if (val == kSPACE && width > 20000 - delta) {
     DPRINTLN("DEBUG: getRClevel: SPACE, hit end of mesg gap.");
     return kSPACE;
   }
@@ -322,11 +322,11 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   // Note: We want to match in greedy order as the other way leads to
   //       mismatches due to overlaps induced by the correction and tolerance
   //       values.
-  if (match(width, 3 * bitTime + correction, tolerance)) {
+  if (match(width, 3 * bitTime + correction, tolerance, delta)) {
     avail = 3;
-  } else if (match(width, 2 * bitTime + correction, tolerance)) {
+  } else if (match(width, 2 * bitTime + correction, tolerance, delta)) {
     avail = 2;
-  } else if (match(width, bitTime + correction, tolerance)) {
+  } else if (match(width, bitTime + correction, tolerance, delta)) {
     avail = 1;
   } else {
     DPRINTLN("DEBUG: getRClevel: Unexpected width. Exiting.");

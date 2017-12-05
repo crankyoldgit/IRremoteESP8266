@@ -122,7 +122,7 @@ class IRrecv {
   void setUnknownThreshold(uint16_t length);
 #endif
   static bool match(uint32_t measured, uint32_t desired,
-             uint8_t tolerance = TOLERANCE);
+             uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
   static bool matchMark(uint32_t measured, uint32_t desired,
                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
   static bool matchSpace(uint32_t measured, uint32_t desired,
@@ -138,10 +138,12 @@ class IRrecv {
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
-  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE);
-  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE);
+  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+                           uint16_t delta = 0);
+  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+                           uint16_t delta = 0);
   bool matchAtLeast(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = TOLERANCE);
+                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
@@ -172,7 +174,7 @@ class IRrecv {
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = TOLERANCE,
-                     int16_t excess = MARK_EXCESS);
+                     int16_t excess = MARK_EXCESS, uint16_t delta = 0);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t nbits = RC5X_BITS,

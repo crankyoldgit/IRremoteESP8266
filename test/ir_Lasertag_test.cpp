@@ -208,4 +208,56 @@ TEST(TestDecodeLasertag, RealExamples) {
   EXPECT_EQ(0x0F, irsend.capture.value);
   EXPECT_EQ(0xF, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
+
+  irsend.reset();
+  uint16_t red_unit2_1[23] = {
+      406, 262,  384, 374,  256, 354,  306, 366,  252, 442,  256, 374,
+      358, 336,  278, 438,  246, 340,  380, 292,  304, 688,  746};
+  irsend.sendRaw(red_unit2_1, 23, 36000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
+  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x02, irsend.capture.value);
+  EXPECT_EQ(0x2, irsend.capture.address);  // Unit
+  EXPECT_EQ(0x0, irsend.capture.command);  // Team
+
+  irsend.reset();
+  uint16_t red_unit2_2[23] = {
+      302, 306,  302, 392,  196, 476,  278, 352,  304, 348,  278, 438,
+      226, 382,  328, 366,  252, 458,  196, 392,  302, 688,  644};
+  irsend.sendRaw(red_unit2_2, 23, 36000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
+  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x02, irsend.capture.value);
+  EXPECT_EQ(0x2, irsend.capture.address);  // Unit
+  EXPECT_EQ(0x0, irsend.capture.command);  // Team
+
+  irsend.reset();
+  uint16_t red_unit2_3[23] = {
+      196, 432,  304, 348,  328, 386,  304, 326,  302, 370,  252, 442,
+      272, 356,  278, 374,  276, 438,  274, 352,  302, 668,  622};
+  irsend.sendRaw(red_unit2_3, 23, 36000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
+  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x02, irsend.capture.value);
+  EXPECT_EQ(0x2, irsend.capture.address);  // Unit
+  EXPECT_EQ(0x0, irsend.capture.command);  // Team
+
+  irsend.reset();
+  uint16_t red_unit2_4[23] = {
+      304, 390,  328, 324,  324, 346,  350, 364,  300, 330,  320, 310,
+      324, 388,  242, 366,  354, 318,  354, 340,  244, 726,  670};
+  irsend.sendRaw(red_unit2_4, 23, 36000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
+  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x02, irsend.capture.value);
+  EXPECT_EQ(0x2, irsend.capture.address);  // Unit
+  EXPECT_EQ(0x0, irsend.capture.command);  // Team
 }

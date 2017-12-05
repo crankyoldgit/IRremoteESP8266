@@ -450,11 +450,13 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 // Args:
 //   usecs:  Nr. of uSeconds.
 //   tolerance:  Percent as an integer. e.g. 10 is 10%
+//   delta:  A non-scaling amount to reduce usecs by.
 // Returns:
 //   Nr. of ticks.
-uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
+uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return((uint32_t) std::max((int32_t) (usecs * (1.0 - tolerance / 100.0)), 0));
+  return((uint32_t) std::max(
+      (int32_t) (usecs * (1.0 - tolerance / 100.0) - delta), 0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -462,48 +464,52 @@ uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance) {
 // Args:
 //   usecs:  Nr. of uSeconds.
 //   tolerance:  Percent as an integer. e.g. 10 is 10%
+//   delta:  A non-scaling amount to increase usecs by.
 // Returns:
 //   Nr. of ticks.
-uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance) {
-  return((uint32_t) (usecs * (1.0 + tolerance / 100.0)) + 1);
+uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
+  return((uint32_t) (usecs * (1.0 + tolerance / 100.0)) + 1 + delta);
 }
 
 // Check if we match a pulse(measured) with the desired within
-// +/-tolerance percent.
+// +/-tolerance percent and/or +/- a fixed delta range.
 //
 // Args:
 //   measured:  The recorded period of the signal pulse.
 //   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//   delta:  A non-scaling (+/-) error margin (in useconds).
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured, uint32_t desired,
-                   uint8_t tolerance) {
+                   uint8_t tolerance, uint16_t delta) {
   measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching: ");
-  DPRINT(ticksLow(desired, tolerance));
+  DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(" <= ");
   DPRINT(measured);
   DPRINT(" <= ");
-  DPRINTLN(ticksHigh(desired, tolerance));
-  return (measured >= ticksLow(desired, tolerance) &&
-          measured <= ticksHigh(desired, tolerance));
+  DPRINTLN(ticksHigh(desired, tolerance, delta));
+  return (measured >= ticksLow(desired, tolerance, delta) &&
+          measured <= ticksHigh(desired, tolerance, delta));
 }
 
 
 // Check if we match a pulse(measured) of at least desired within
-// +/-tolerance percent.
+// tolerance percent and/or a fixed delta margin.
 //
 // Args:
 //   measured:  The recorded period of the signal pulse.
 //   desired:  The expected period (in useconds) we are matching against.
 //   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
+//   delta:  A non-scaling amount to reduce usecs by.
+
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
-                          uint8_t tolerance) {
+                          uint8_t tolerance, uint16_t delta) {
   measured *= RAWTICK;  // Convert to uSecs.
   DPRINT("Matching ATLEAST ");
   DPRINT(measured);
@@ -512,17 +518,18 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)), tolerance));
+  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)), tolerance,
+                  delta));
   DPRINT(" [min(");
-  DPRINT(ticksLow(desired, tolerance));
+  DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(", ");
-  DPRINT(ticksLow(MS_TO_USEC(irparams.timeout), tolerance));
+  DPRINT(ticksLow(MS_TO_USEC(irparams.timeout), tolerance, delta));
   DPRINTLN(")]");
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
   return measured >= ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)),
-                              tolerance);
+                              tolerance, delta);
 }
 
 // Check if we match a mark signal(measured) with the desired within

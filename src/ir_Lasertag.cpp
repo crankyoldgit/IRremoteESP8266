@@ -16,8 +16,9 @@
 #define MIN_LASERTAG_SAMPLES       13U
 #define LASERTAG_TICK             333U
 #define LASERTAG_MIN_GAP       100000UL  // Completely made up amount.
-#define LASERTAG_TOLERANCE  TOLERANCE    // Percentage error margin
-#define LASERTAG_EXCESS            20U   // See MARK_EXCESS
+#define LASERTAG_TOLERANCE          0U   // Percentage error margin
+#define LASERTAG_EXCESS             0U   // See MARK_EXCESS
+#define LASERTAG_DELTA            150U   // Use instead of EXCESS and TOLERANCE.
 const int16_t kSPACE = 1;
 const int16_t kMARK = 0;
 
@@ -91,9 +92,11 @@ bool IRrecv::decodeLasertag(decode_results *results, uint16_t nbits,
   // Data
   for (; offset <= results->rawlen; actual_bits++) {
     int16_t levelA = getRClevel(results, &offset, &used, LASERTAG_TICK,
-                                LASERTAG_TOLERANCE, LASERTAG_EXCESS);
+                                LASERTAG_TOLERANCE, LASERTAG_EXCESS,
+                                LASERTAG_DELTA);
     int16_t levelB = getRClevel(results, &offset, &used, LASERTAG_TICK,
-                                LASERTAG_TOLERANCE, LASERTAG_EXCESS);
+                                LASERTAG_TOLERANCE, LASERTAG_EXCESS,
+                                LASERTAG_DELTA);
     if (levelA == kSPACE && levelB == kMARK) {
       data = (data << 1) | 1;  // 1
     } else {
