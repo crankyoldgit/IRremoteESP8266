@@ -101,6 +101,10 @@ TEST(TestSendRaw, GeneralUse) {
   irsend.reset();
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(32, irsend.capture.bits);
+  EXPECT_EQ(0xC3E0E0E8, irsend.capture.value);
   EXPECT_EQ(
       "m8950s4500"
       "m550s1650m600s1650m550s550m600s500m600s550m550s550m600s1650m550s1650"
@@ -108,10 +112,6 @@ TEST(TestSendRaw, GeneralUse) {
       "m550s1650m600s1650m600s1650m550s550m600s500m600s500m600s550m550s550"
       "m600s1650m550s1650m600s1650m600s500m650s1600m600s500m600s550m550s550"
       "m600", irsend.outputStr());
-  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
-  EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(32, irsend.capture.bits);
-  EXPECT_EQ(0xC3E0E0E8, irsend.capture.value);
 }
 
 // Incorrect handling of decodes from Raw. i.e. There is no gap recorded at
