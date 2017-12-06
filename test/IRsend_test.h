@@ -26,7 +26,10 @@ class IRsendTest: public IRsend {
 
   void reset() {
     last = 0;
-    output[last] = 0;
+    for (uint16_t i = 0; i < OUTPUT_BUF; i++)
+      output[i] = 0;
+    for (uint16_t i = 0; i < RAW_BUF; i++)
+        rawbuf[i] = 0;
   }
 
   std::string outputStr() {
