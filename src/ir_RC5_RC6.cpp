@@ -303,7 +303,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
                            uint8_t tolerance, int16_t excess, uint16_t delta) {
   DPRINT("DEBUG: getRClevel: offset = ");
   DPRINTLN(uint64ToString(*offset));
-  if (*offset > results->rawlen) {
+  if (*offset >= results->rawlen) {
     DPRINTLN("DEBUG: getRClevel: SPACE, past end of rawbuf");
     return kSPACE;  // After end of recorded buffer, assume SPACE.
   }
