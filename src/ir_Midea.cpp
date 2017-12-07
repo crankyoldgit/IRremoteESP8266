@@ -27,16 +27,16 @@
 //   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Constants
-#define MIDEA_TICK             100U
-#define MIDEA_BIT_MARK_TICKS     5U
+#define MIDEA_TICK              80U
+#define MIDEA_BIT_MARK_TICKS     7U
 #define MIDEA_BIT_MARK         (MIDEA_BIT_MARK_TICKS * MIDEA_TICK)
-#define MIDEA_ONE_SPACE_TICKS   17U
+#define MIDEA_ONE_SPACE_TICKS   21U
 #define MIDEA_ONE_SPACE        (MIDEA_ONE_SPACE_TICKS * MIDEA_TICK)
-#define MIDEA_ZERO_SPACE_TICKS   5U
+#define MIDEA_ZERO_SPACE_TICKS   7U
 #define MIDEA_ZERO_SPACE       (MIDEA_ZERO_SPACE_TICKS * MIDEA_TICK)
-#define MIDEA_HDR_MARK_TICKS    43U
+#define MIDEA_HDR_MARK_TICKS    56U
 #define MIDEA_HDR_MARK         (MIDEA_HDR_MARK_TICKS * MIDEA_TICK)
-#define MIDEA_HDR_SPACE_TICKS   43U
+#define MIDEA_HDR_SPACE_TICKS   56U
 #define MIDEA_HDR_SPACE        (MIDEA_HDR_SPACE_TICKS * MIDEA_TICK)
 #define MIDEA_MIN_GAP_TICKS    (MIDEA_HDR_MARK_TICKS + MIDEA_ZERO_SPACE_TICKS \
                                 + MIDEA_BIT_MARK_TICKS)
