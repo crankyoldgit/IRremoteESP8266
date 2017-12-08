@@ -33,5 +33,6 @@ std::string resultToHumanReadableBasic(const decode_results *results);
 #endif
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results *results);
+uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init = 0);
 
 #endif  // IRUTILS_H_

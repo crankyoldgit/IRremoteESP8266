@@ -65,6 +65,10 @@
  *                               Pronto (25), 1 repeat, & "0000 006E 0022 0002 ..." (Sherwood Amp Tape Input)
  *   ac_protocol_num,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010F0
  *                           Kelvinator (18) Air Con on, Low Fan, 25 deg etc.
+ *                           NOTE: Ensure you zero-pad to the correct number of
+ *                                 digits for the bit/byte size you want to send
+ *                                 as some A/C units have units have different
+ *                                 sized messages. e.g. Fujitsu A/C units.
  *   In short:
  *     No spaces after/before commas.
  *     Values are comma separated.
@@ -397,12 +401,21 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       stateSize = GREE_STATE_LENGTH;
       break;
     case FUJITSU_AC:
-      // Fujitsu has two distinct & different size states, make a best guess
-      // which one we are being presented with.
-      if (inputLength / 2 <= FUJITSU_AC_STATE_LENGTH_SHORT)
-        stateSize = FUJITSU_AC_STATE_LENGTH_SHORT;
-      else
-        stateSize = FUJITSU_AC_STATE_LENGTH;
+      // Fujitsu has four distinct & different size states, so make a best guess
+      // which one we are being presented with based on the number of
+      // hexidecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize,
+                           (uint16_t) (FUJITSU_AC_STATE_LENGTH_SHORT - 1));
+      // If we think it isn't a "short" message.
+      if (stateSize > FUJITSU_AC_STATE_LENGTH_SHORT)
+        // Then it has to be at least the smaller version of the "normal" size.
+        stateSize = std::max(stateSize,
+                             (uint16_t) (FUJITSU_AC_STATE_LENGTH - 1));
+      // Lastly, it should never exceed the maximum "normal" size.
+      stateSize = std::min(stateSize, (uint16_t) FUJITSU_AC_STATE_LENGTH);
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");

@@ -252,6 +252,11 @@ class IRrecv {
   bool decodeMidea(decode_results *results, uint16_t nbits = MIDEA_BITS,
                    bool strict = true);
 #endif
+#if DECODE_FUJITSU_AC
+  bool decodeFujitsuAC(decode_results *results,
+                       uint16_t nbits = FUJITSU_AC_BITS,
+                       bool strict = false);
+#endif
 };
 
 #endif  // IRRECV_H_
