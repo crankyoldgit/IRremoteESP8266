@@ -13,6 +13,11 @@
 //                          S  H   H  A   A  R  R   P
 //                      SSSS   H   H  A   A  R   R  P
 
+// Equipment it seems compatible with:
+//  * Sharp LC-52D62U
+//  * <Add models (devices & remotes) you've gotten it working with here>
+//
+
 // Constants
 // period time = 1/38000Hz = 26.316 microseconds.
 // Ref:
@@ -165,7 +170,7 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should work okay.
+// Status: STABLE / Working fine.
 //
 // Note:
 //   This procedure returns a value suitable for use in sendSharpRaw().

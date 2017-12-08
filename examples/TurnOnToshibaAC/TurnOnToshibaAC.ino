@@ -1,4 +1,4 @@
-/* Copyright 2017 sillyfrog
+/* Copyright 2017 David Conran
 *
 * An IR LED circuit *MUST* be connected to ESP8266 pin 4 (D2).
 *
@@ -22,44 +22,48 @@
 *   * ESP-01 modules are tricky. We suggest you use a module with more GPIOs
 *     for your first time. e.g. ESP-12 etc.
 */
-
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <ir_Daikin.h>
+#include <ir_Toshiba.h>
 
-IRDaikinESP daikinir(D2);  // An IR LED is controlled by GPIO pin 4 (D2)
+IRToshibaAC toshibair(D2);  // An IR LED is controlled by GPIO pin 4 (D2)
 
-void setup() {
-  daikinir.begin();
-  Serial.begin(115200);
+void printState() {
+  // Display the settings.
+  Serial.println("Toshiba A/C remote is in the following state:");
+  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d\n",
+                toshibair.getPower(), toshibair.getMode(), toshibair.getTemp(),
+                toshibair.getFan());
+  // Display the encoded IR sequence.
+  unsigned char* ir_code = toshibair.getRaw();
+  Serial.print("IR Code: 0x");
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++)
+    Serial.printf("%02X", ir_code[i]);
+  Serial.println();
 }
 
+void setup() {
+  toshibair.begin();
+  Serial.begin(115200);
+  delay(200);
+
+  // Set up what we want to send. See ir_Toshiba.cpp for all the options.
+  Serial.println("Default state of the remote.");
+  printState();
+  Serial.println("Setting desired state for A/C.");
+  toshibair.on();
+  toshibair.setFan(1);
+  toshibair.setMode(TOSHIBA_AC_COOL);
+  toshibair.setTemp(26);
+}
 
 void loop() {
-  Serial.println("Sending...");
-
-  // Set up what we want to send. See ir_Daikin.cpp for all the options.
-  daikinir.on();
-  daikinir.setFan(1);
-  daikinir.setMode(DAIKIN_COOL);
-  daikinir.setTemp(25);
-  daikinir.setSwingVertical(false);
-  daikinir.setSwingHorizontal(false);
-
-  // Set the current time to 1:33PM (13:33)
-  // Time works in minutes past midnight
-  daikinir.setCurrentTime((13*60) + 33);
-  // Turn off about 1 hour later at 2:30PM (15:30)
-  daikinir.enableOffTimer((14*60) + 30);
-
-  // Display what we are going to send.
-  Serial.println(daikinir.toString());
-
   // Now send the IR signal.
-  daikinir.send();
-
-  delay(15000);
+  Serial.println("Sending IR command to A/C ...");
+  toshibair.send();
+  printState();
+  delay(5000);
 }
