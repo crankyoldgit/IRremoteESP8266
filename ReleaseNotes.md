@@ -1,6 +1,6 @@
 # Release Notes
 
-## _v2.3.0 (TBD)_
+## _v2.3.0 (20171208)_
 
 **[Bug Fixes]**
 - Panasonic-based protocols had incorrect message gap. (#358)
