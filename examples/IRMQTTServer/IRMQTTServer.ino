@@ -374,7 +374,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   // Calculate how many hexidecimal characters there are.
   uint16_t inputLength = str.length() - strOffset;
   if (inputLength == 0) {
-    debug("Zero length AirCon code encounterd. Ignored.");
+    debug("Zero length AirCon code encountered. Ignored.");
     return;  // No input. Abort.
   }
 
