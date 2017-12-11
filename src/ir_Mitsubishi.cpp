@@ -67,22 +67,12 @@
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  enableIROut(33);  // Set IR carrier frequency
-  IRtimer usecTimer = IRtimer();
-
-  for (uint16_t i = 0; i <= repeat; i++) {
-    usecTimer.reset();
-    // No header
-
-    // Data
-    sendData(MITSUBISHI_BIT_MARK, MITSUBISHI_ONE_SPACE,
-             MITSUBISHI_BIT_MARK, MITSUBISHI_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(MITSUBISHI_BIT_MARK);
-    space(std::max(MITSUBISHI_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-                   MITSUBISHI_MIN_GAP));
-  }
+  sendGeneric(0, 0,  // No Header
+              MITSUBISHI_BIT_MARK, MITSUBISHI_ONE_SPACE,
+              MITSUBISHI_BIT_MARK, MITSUBISHI_ZERO_SPACE,
+              MITSUBISHI_BIT_MARK, MITSUBISHI_MIN_GAP,
+              MITSUBISHI_MIN_COMMAND_LENGTH,
+              data, nbits, 33, true, repeat, 50);
 }
 #endif
 

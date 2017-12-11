@@ -62,13 +62,14 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
   // We always send the data & footer at least once, hence '<= repeat'.
   for (uint16_t i = 0; i <= repeat; i++) {
-    // Data
-    sendData(JVC_BIT_MARK, JVC_ONE_SPACE, JVC_BIT_MARK, JVC_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(JVC_BIT_MARK);
+    sendGeneric(0, 0,  // No Header
+                JVC_BIT_MARK, JVC_ONE_SPACE,
+                JVC_BIT_MARK, JVC_ZERO_SPACE,
+                JVC_BIT_MARK, JVC_MIN_GAP,
+                data, nbits, 38, true, 0,  // Repeats are handles elsewhere.
+                33);
     // Wait till the end of the repeat time window before we send another code.
-    space(std::max(JVC_MIN_GAP, JVC_RPT_LENGTH - usecs.elapsed()));
+    space(std::max(JVC_RPT_LENGTH - JVC_MIN_GAP - usecs.elapsed(), 0U));
     usecs.reset();
   }
 }

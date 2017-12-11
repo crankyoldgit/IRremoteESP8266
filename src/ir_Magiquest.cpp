@@ -31,16 +31,13 @@
 // Status: Alpha / Should be working.
 //
 void IRsend::sendMagiQuest(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  enableIROut(36);
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // No Headers - Technically it's included in the data. i.e. 8 zeros.
-
-    // Data
-    sendData(MAGIQUEST_MARK_ONE, MAGIQUEST_SPACE_ONE, MAGIQUEST_MARK_ZERO,
-             MAGIQUEST_SPACE_ZERO, data, nbits, true);
-    // Footer
-    space(MAGIQUEST_GAP);
-  }
+  sendGeneric(0, 0,  // No Headers - Technically it's included in the data.
+                     // i.e. 8 zeros.
+              MAGIQUEST_MARK_ONE, MAGIQUEST_SPACE_ONE,
+              MAGIQUEST_MARK_ZERO, MAGIQUEST_SPACE_ZERO,
+              0,  // No footer mark.
+              MAGIQUEST_GAP,
+              data, nbits, 36, true, repeat, 50);
 }
 
 // Encode a MagiQuest wand_id, and a magnitude into a single 64bit value.

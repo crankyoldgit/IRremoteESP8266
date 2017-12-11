@@ -69,11 +69,7 @@ uint8_t calcLGChecksum(uint16_t data) {
 // Notes:
 //   LG has a separate message to indicate a repeat, like NEC does.
 void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // Set IR carrier frequency
-  enableIROut(38);
-
   uint16_t repeatHeaderMark = 0;
-  IRtimer usecTimer = IRtimer();
 
   if (nbits >= LG32_BITS) {
     // LG 32bit protocol is near identical to Samsung except for repeats.
@@ -83,18 +79,18 @@ void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
   } else {
     // LG (28-bit) protocol.
     repeatHeaderMark = LG_HDR_MARK;
-    // Header
-    usecTimer.reset();
-    mark(LG_HDR_MARK);
-    space(LG_HDR_SPACE);
-    // Data
-    sendData(LG_BIT_MARK, LG_ONE_SPACE, LG_BIT_MARK, LG_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(LG_BIT_MARK);
-    space(std::max((uint32_t) (LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed()),
-                   (uint32_t) LG_MIN_GAP));
+    sendGeneric(LG_HDR_MARK, LG_HDR_SPACE,
+                LG_BIT_MARK, LG_ONE_SPACE,
+                LG_BIT_MARK, LG_ZERO_SPACE,
+                LG_BIT_MARK,
+                LG_MIN_GAP, LG_MIN_MESSAGE_LENGTH,
+                data, nbits, 38, true, 0,  // Repeats are handled later.
+                50);
   }
+
+  // Set IR carrier frequency
+  enableIROut(38);
+  IRtimer usecTimer = IRtimer();
 
   // Repeat
   // Protocol has a mandatory repeat-specific code sent after every command.

@@ -58,18 +58,17 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
   for (uint16_t i = 0; i <= repeat; i++) {
     usecTimer.reset();
-    // Header
+    // (Pre-)Header
     mark(WHYNTER_BIT_MARK);
     space(WHYNTER_ZERO_SPACE);
-    mark(WHYNTER_HDR_MARK);
-    space(WHYNTER_HDR_SPACE);
-    // Data
-    sendData(WHYNTER_BIT_MARK, WHYNTER_ONE_SPACE, WHYNTER_BIT_MARK,
-             WHYNTER_ZERO_SPACE, data, nbits, true);
-    // Footer
-    mark(WHYNTER_BIT_MARK);
-    space(std::max(WHYNTER_MIN_COMMAND_LENGTH - usecTimer.elapsed(),
-                   WHYNTER_MIN_GAP));
+    sendGeneric(WHYNTER_HDR_MARK, WHYNTER_HDR_SPACE,
+                WHYNTER_BIT_MARK, WHYNTER_ONE_SPACE,
+                WHYNTER_BIT_MARK, WHYNTER_ZERO_SPACE,
+                WHYNTER_BIT_MARK, WHYNTER_MIN_GAP,
+                data, nbits, 38, true, 0,  // Repeats are already handled.
+                50);
+    space(std::max(WHYNTER_MIN_COMMAND_LENGTH - WHYNTER_MIN_GAP -
+                   usecTimer.elapsed(), 0U));
   }
 }
 #endif
