@@ -41,21 +41,11 @@
 //
 void IRsend::sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
-  // Set IR carrier frequency
-  enableIROut(38);
-  for (uint16_t r = 0; r <= repeat; ++r) {
-    // Header
-    mark(FUJITSU_AC_HDR_MARK);
-    space(FUJITSU_AC_HDR_SPACE);
-    // Data
-    for (uint16_t i = 0; i < nbytes; i++)
-      sendData(FUJITSU_AC_BIT_MARK, FUJITSU_AC_ONE_SPACE,
-               FUJITSU_AC_BIT_MARK, FUJITSU_AC_ZERO_SPACE,
-               data[i], 8, false);
-    // Footer
-    mark(FUJITSU_AC_BIT_MARK);
-    space(FUJITSU_AC_MIN_GAP);
-  }
+  sendGeneric(FUJITSU_AC_HDR_MARK, FUJITSU_AC_HDR_SPACE,
+              FUJITSU_AC_BIT_MARK, FUJITSU_AC_ONE_SPACE,
+              FUJITSU_AC_BIT_MARK, FUJITSU_AC_ZERO_SPACE,
+              FUJITSU_AC_BIT_MARK, FUJITSU_AC_MIN_GAP,
+              data, nbytes, 38, false, repeat, 50);
 }
 #endif  // SEND_FUJITSU_AC
 

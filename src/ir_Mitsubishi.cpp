@@ -160,22 +160,11 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
   if (nbytes < MITSUBISHI_AC_STATE_LENGTH)
     return;  // Not enough bytes to send a proper message.
 
-  // Set IR carrier frequency
-  enableIROut(38);
-  // Mitsubishi AC remote sends the packet twice.
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // Header
-    mark(MITSUBISHI_AC_HDR_MARK);
-    space(MITSUBISHI_AC_HDR_SPACE);
-    // Data
-    for (uint16_t i = 0; i < nbytes; i++)
-      sendData(MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-               MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
-               data[i], 8, false);
-    // Footer
-    mark(MITSUBISHI_AC_RPT_MARK);
-    space(MITSUBISHI_AC_RPT_SPACE);
-  }
+  sendGeneric(MITSUBISHI_AC_HDR_MARK, MITSUBISHI_AC_HDR_SPACE,
+              MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+              MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
+              MITSUBISHI_AC_RPT_MARK, MITSUBISHI_AC_RPT_SPACE,
+              data, nbytes, 38, false, repeat, 50);
 }
 
 // Code to emulate Mitsubishi A/C IR remote control unit.

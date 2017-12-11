@@ -51,23 +51,11 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
   if (nbytes < TOSHIBA_AC_STATE_LENGTH)
     return;  // Not enough bytes to send a proper message.
-
-  // Set IR carrier frequency
-  enableIROut(38);
-  // Repeat the message if requested.
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // Header
-    mark(TOSHIBA_AC_HDR_MARK);
-    space(TOSHIBA_AC_HDR_SPACE);
-    // Data
-    for (uint16_t i = 0; i < nbytes; i++)
-      sendData(TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ONE_SPACE,
-               TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ZERO_SPACE,
-               data[i], 8, true);
-    // Footer
-    mark(TOSHIBA_AC_BIT_MARK);
-    space(TOSHIBA_AC_MIN_GAP);
-  }
+  sendGeneric(TOSHIBA_AC_HDR_MARK, TOSHIBA_AC_HDR_SPACE,
+              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ONE_SPACE,
+              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ZERO_SPACE,
+              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_MIN_GAP,
+              data, nbytes, 38, true, repeat, 50);
 }
 #endif  // SEND_TOSHIBA_AC
 

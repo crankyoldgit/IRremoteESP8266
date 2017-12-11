@@ -356,6 +356,59 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   }
 }
 
+// Generic method for sending simple protocol messages.
+//
+// Args:
+//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
+//                A value of 0 means no header mark.
+//   headerspace: Nr. of usecs for the led to be off after the header mark.
+//                A value of 0 means no header space.
+//   onemark:     Nr. of usecs for the led to be pulsed for a '1' bit.
+//   onespace:    Nr. of usecs for the led to be fully off for a '1' bit.
+//   zeromark:    Nr. of usecs for the led to be pulsed for a '0' bit.
+//   zerospace:   Nr. of usecs for the led to be fully off for a '0' bit.
+//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
+//                A value of 0 means no footer mark.
+//   gap:         Nr. of usecs for the led to be off after the footer mark.
+//                This is effectively the gap between messages.
+//                A value of 0 means no gap space.
+//   dataptr:     Pointer to the data to be transmitted.
+//   nbytes:      Nr. of bytes of data to be sent.
+//   frequency:   The frequency we want to modulate at.
+//                Assumes < 1000 means kHz otherwise it is in Hz.
+//                Most common value is 38000 or 38, for 38kHz.
+//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
+//   repeat:      Nr. of extra times the message will be sent.
+//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+//   dutycycle:   Percentage duty cycle of the LED.
+//                e.g. 25 = 25% = 1/4 on, 3/4 off.
+//                If you are not sure, try 50 percent.
+void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
+                         const uint16_t onemark, const uint32_t onespace,
+                         const uint16_t zeromark, const uint32_t zerospace,
+                         const uint16_t footermark, const uint32_t gap,
+                         const uint8_t *dataptr, const uint16_t nbytes,
+                         const uint16_t frequency, const bool MSBfirst,
+                         const uint16_t repeat, const uint8_t dutycycle) {
+  // Setup
+  enableIROut(frequency, dutycycle);
+  // We always send a message, even for repeat=0, hence '<= repeat'.
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Header
+    if (headermark > 0)  mark(headermark);
+    if (headerspace > 0)  space(headerspace);
+
+    // Data
+    for (uint16_t i = 0; i < nbytes; i++)
+      sendData(onemark, onespace, zeromark, zerospace,
+               *(dataptr + i), 8, MSBfirst);
+
+    // Footer
+    if (footermark > 0)  mark(footermark);
+    space(gap);
+  }
+}
+
 // Send a raw IRremote message.
 //
 // Args:
