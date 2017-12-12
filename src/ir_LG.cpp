@@ -88,20 +88,14 @@ void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
                 50);
   }
 
-  // Set IR carrier frequency
-  enableIROut(38);
-  IRtimer usecTimer = IRtimer();
-
   // Repeat
   // Protocol has a mandatory repeat-specific code sent after every command.
-  for (uint16_t i = 0; i < repeat; i++) {
-    usecTimer.reset();
-    mark(repeatHeaderMark);
-    space(LG_RPT_SPACE);
-    mark(LG_BIT_MARK);
-    space(std::max((uint32_t) LG_MIN_MESSAGE_LENGTH - usecTimer.elapsed(),
-                   (uint32_t) LG_MIN_GAP));
-  }
+  if (repeat)
+    sendGeneric(repeatHeaderMark, LG_RPT_SPACE,
+                0, 0, 0, 0,  // No data is sent.
+                LG_BIT_MARK, LG_MIN_GAP, LG_MIN_MESSAGE_LENGTH,
+                0, 0,  // No data.
+                38, true, repeat - 1, 50);
 }
 
 // Construct a raw 28-bit LG message from the supplied address & command.

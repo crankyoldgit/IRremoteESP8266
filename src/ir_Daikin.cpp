@@ -54,38 +54,34 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
   if (nbytes < DAIKIN_COMMAND_LENGTH)
     return;  // Not enough bytes to send a proper message.
-  // Set IR carrier frequency
-  enableIROut(38);
+
   for (uint16_t r = 0; r <= repeat; r++) {
     // Send the header, 0b00000
-    sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
-             DAIKIN_ZERO_SPACE, 0, 5, false);
-    sendDaikinGapHeader();
+    sendGeneric(0, 0,  // No header for the header
+                DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                (uint64_t) 0b00000, 5, 38, false, 0, 50);
     // Leading header
     // Do this as a constant to save RAM and keep in flash memory
-    sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
-             DAIKIN_ZERO_SPACE, DAIKIN_FIRST_HEADER64, 64, false);
-    sendDaikinGapHeader();
+    sendGeneric(DAIKIN_HDR_MARK, DAIKIN_HDR_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                DAIKIN_FIRST_HEADER64, 64, 38, false, 0, 50);
     // Data #1
-    for (uint16_t i = 0; i < 8 && i < nbytes; i++)
-      sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
-               DAIKIN_ZERO_SPACE, data[i], 8, false);
-    sendDaikinGapHeader();
+    sendGeneric(DAIKIN_HDR_MARK, DAIKIN_HDR_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                data, 8, 38, false, 0, 50);
     // Data #2
-    for (uint16_t i = 8; i < nbytes; i++)
-      sendData(DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE, DAIKIN_BIT_MARK,
-               DAIKIN_ZERO_SPACE, data[i], 8, false);
-    // Footer #2
-    mark(DAIKIN_BIT_MARK);
-    space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
+    sendGeneric(DAIKIN_HDR_MARK, DAIKIN_HDR_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ONE_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE,
+                DAIKIN_BIT_MARK, DAIKIN_ZERO_SPACE + DAIKIN_GAP,
+                data + 8, nbytes - 8, 38, false, 0, 50);
   }
-}
-
-void IRsend::sendDaikinGapHeader() {
-  mark(DAIKIN_BIT_MARK);
-  space(DAIKIN_ZERO_SPACE + DAIKIN_GAP);
-  mark(DAIKIN_HDR_MARK);
-  space(DAIKIN_HDR_SPACE);
 }
 #endif  // SEND_DAIKIN
 

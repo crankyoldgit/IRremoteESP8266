@@ -285,14 +285,14 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
-    if (headermark > 0)  mark(headermark);
-    if (headerspace > 0)  space(headerspace);
+    if (headermark)  mark(headermark);
+    if (headerspace)  space(headerspace);
 
     // Data
     sendData(onemark, onespace, zeromark, zerospace, data, nbits, MSBfirst);
 
     // Footer
-    if (footermark > 0)  mark(footermark);
+    if (footermark)  mark(footermark);
     space(gap);
   }
 }
@@ -344,14 +344,14 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
     usecs.reset();
 
     // Header
-    if (headermark > 0)  mark(headermark);
-    if (headerspace > 0)  space(headerspace);
+    if (headermark)  mark(headermark);
+    if (headerspace)  space(headerspace);
 
     // Data
     sendData(onemark, onespace, zeromark, zerospace, data, nbits, MSBfirst);
 
     // Footer
-    if (footermark > 0)  mark(footermark);
+    if (footermark)  mark(footermark);
     space(std::max(gap, mesgtime - usecs.elapsed()));
   }
 }
@@ -395,8 +395,8 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
-    if (headermark > 0)  mark(headermark);
-    if (headerspace > 0)  space(headerspace);
+    if (headermark)  mark(headermark);
+    if (headerspace)  space(headerspace);
 
     // Data
     for (uint16_t i = 0; i < nbytes; i++)
@@ -404,7 +404,7 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                *(dataptr + i), 8, MSBfirst);
 
     // Footer
-    if (footermark > 0)  mark(footermark);
+    if (footermark)  mark(footermark);
     space(gap);
   }
 }

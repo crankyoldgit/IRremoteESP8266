@@ -64,7 +64,7 @@ void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
               data, nbits, 38, true, 0,  // Repeats are handled later.
               33);
   // Optional command repeat sequence.
-  if (repeat > 0)
+  if (repeat)
     sendGeneric(NEC_HDR_MARK, NEC_RPT_SPACE,
                 0, 0, 0, 0,  // No actual data sent.
                 NEC_BIT_MARK, NEC_MIN_GAP, NEC_MIN_COMMAND_LENGTH,
