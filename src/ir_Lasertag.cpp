@@ -31,7 +31,7 @@ const int16_t kMARK = 0;
 //   nbits:   Bit size of the protocol you want to send.
 //   repeat:  Nr. of extra times the data will be sent.
 //
-// Status: Alpha / Untested.
+// Status: STABLE / Working.
 //
 
 void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
@@ -69,7 +69,7 @@ void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: So Alpha, it hurts.
+// Status: BETA / Appears to be working 90% of the time.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
