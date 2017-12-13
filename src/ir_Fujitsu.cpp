@@ -86,11 +86,13 @@ void IRFujitsuAC::begin() {
   _irsend.begin();
 }
 
+#if SEND_FUJITSU_AC
 // Send the current desired state to the IR LED.
 void IRFujitsuAC::send() {
   getRaw();
   _irsend.sendFujitsuAC(remote_state, getStateLength());
 }
+#endif  // SEND_FUJITSU_AC
 
 void IRFujitsuAC::buildState() {
   remote_state[0] = 0x14;
