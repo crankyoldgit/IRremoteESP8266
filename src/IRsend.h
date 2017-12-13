@@ -199,6 +199,10 @@ class IRsend {
                      uint16_t repeat = 0);
   uint64_t encodeMagiQuest(uint32_t wand_id, uint16_t magnitude);
 #endif
+#if SEND_LASERTAG
+  void sendLasertag(uint64_t data, uint16_t nbits = LASERTAG_BITS,
+                    uint16_t repeat = LASERTAG_MIN_REPEAT);
+#endif
 
  protected:
 #ifdef UNIT_TEST

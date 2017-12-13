@@ -232,6 +232,7 @@ void handleRoot() {
         "<option value='13'>Dish</option>"
         "<option value='6'>JVC</option>"
         "<option value='10'>LG</option>"
+        "<option value='36'>Lasertag</option>"
         "<option value='35'>MagiQuest</option>"
         "<option value='34'>Midea</option>"
         "<option value='12'>Mitsubishi</option>"
@@ -1007,6 +1008,11 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = MAGIQUEST_BITS;
       irsend.sendMagiQuest(code, bits, repeat);
+      break;
+    case LASERTAG:  // 36
+      if (bits == 0)
+        bits = LASERTAG_BITS;
+      irsend.sendLasertag(code, bits, repeat);
       break;
   }
 
