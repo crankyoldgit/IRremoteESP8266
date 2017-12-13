@@ -89,7 +89,9 @@ void sendGCString(String str) {
     count++;
   } while (index != -1);
 
+#if SEND_GLOBALCACHE
   irsend.sendGC(code_array, count);  // All done. Send it.
+#endif  // SEND_GLOBALCACHE
   free(code_array);  // Free up the memory allocated.
 }
 

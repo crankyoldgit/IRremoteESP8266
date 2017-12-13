@@ -453,30 +453,46 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 
   // Make the appropriate call for the protocol type.
   switch (irType) {
+#if SEND_KELVINATOR
     case KELVINATOR:
       irsend.sendKelvinator(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_TOSHIBA_AC
     case TOSHIBA_AC:
       irsend.sendToshibaAC(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_DAIKIN
     case DAIKIN:
       irsend.sendDaikin(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if MITSUBISHI_AC
     case MITSUBISHI_AC:
       irsend.sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_TROTEC
     case TROTEC:
       irsend.sendTrotec(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_ARGO
     case ARGO:
       irsend.sendArgo(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_GREE
     case GREE:
       irsend.sendGree(reinterpret_cast<uint8_t *>(state));
       break;
+#endif
+#if SEND_FUJITSU_AC
     case FUJITSU_AC:
       irsend.sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
+#endif
   }
 }
 
@@ -517,6 +533,7 @@ uint16_t * newCodeArray(const uint16_t size) {
   return result;
 }
 
+#if SEND_GLOBALCACHE
 // Parse a GlobalCache String/code and send it.
 // Args:
 //   str: A GlobalCache formatted String of comma separated numbers.
@@ -556,7 +573,9 @@ void parseStringAndSendGC(const String str) {
   irsend.sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
 }
+#endif  // SEND_GLOBALCACHE
 
+#if SEND_PRONTO
 // Parse a Pronto Hex String/code and send it.
 // Args:
 //   str: A comma-separated String of nr. of repeats, then hexadecimal numbers.
@@ -609,7 +628,9 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
   irsend.sendPronto(code_array, count, repeats);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
 }
+#endif  // SEND_PRONTO
 
+#if SEND_RAW
 // Parse an IRremote Raw Hex String/code and send it.
 // Args:
 //   str: A comma-separated String containing the freq and raw IR data.
@@ -649,6 +670,7 @@ void parseStringAndSendRaw(const String str) {
   irsend.sendRaw(raw_array, count, freq);  // All done. Send it.
   free(raw_array);  // Free up the memory allocated.
 }
+#endif  // SEND_RAW
 
 // Parse the URL args to find the IR code.
 void handleIr() {
@@ -876,80 +898,108 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 
   // send the IR message.
   switch (ir_type) {
+#if SEND_RC5
     case RC5:  // 1
       if (bits == 0)
         bits = RC5_BITS;
       irsend.sendRC5(code, bits, repeat);
       break;
+#endif
+#if SEND_RC6
     case RC6:  // 2
       if (bits == 0)
         bits = RC6_MODE0_BITS;
       irsend.sendRC6(code, bits, repeat);
       break;
+#endif
+#if SEND_NEC
     case NEC:  // 3
       if (bits == 0)
         bits = NEC_BITS;
       irsend.sendNEC(code, bits, repeat);
       break;
+#endif
+#if SEND_SONY
     case SONY:  // 4
       if (bits == 0)
         bits = SONY_12_BITS;
       repeat = std::max(repeat, (uint16_t) SONY_MIN_REPEAT);
       irsend.sendSony(code, bits, repeat);
       break;
+#endif
+#if SEND_PANASONIC
     case PANASONIC:  // 5
       if (bits == 0)
         bits = PANASONIC_BITS;
       irsend.sendPanasonic64(code, bits, repeat);
       break;
+#endif
+#if SEND_JVC
     case JVC:  // 6
       if (bits == 0)
         bits = JVC_BITS;
       irsend.sendJVC(code, bits, repeat);
       break;
+#endif
+#if SEND_SAMSUNG
     case SAMSUNG:  // 7
       if (bits == 0)
         bits = SAMSUNG_BITS;
       irsend.sendSAMSUNG(code, bits, repeat);
       break;
+#endif
+#if SEND_WHYNTER
     case WHYNTER:  // 8
       if (bits == 0)
         bits = WHYNTER_BITS;
       irsend.sendWhynter(code, bits, repeat);
       break;
+#endif
+#if SEND_AIWA_RC_T501
     case AIWA_RC_T501:  // 9
       if (bits == 0)
         bits = AIWA_RC_T501_BITS;
       repeat = std::max(repeat, (uint16_t) AIWA_RC_T501_MIN_REPEAT);
       irsend.sendAiwaRCT501(code, bits, repeat);
       break;
+#endif
+#if SEND_LG
     case LG:  // 10
       if (bits == 0)
         bits = LG_BITS;
       irsend.sendLG(code, bits, repeat);
       break;
+#endif
+#if SEND_MITSUBISHI
     case MITSUBISHI:  // 12
       if (bits == 0)
         bits = MITSUBISHI_BITS;
       repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
       irsend.sendMitsubishi(code, bits, repeat);
       break;
+#endif
+#if SEND_DISH
     case DISH:  // 13
       if (bits == 0)
         bits = DISH_BITS;
       repeat = std::max(repeat, (uint16_t) DISH_MIN_REPEAT);
       irsend.sendDISH(code, bits, repeat);
       break;
+#endif
+#if SEND_SHARP
     case SHARP:  // 14
       if (bits == 0)
         bits = SHARP_BITS;
       irsend.sendSharpRaw(code, bits, repeat);
       break;
+#endif
+#if SEND_COOLIX
     case COOLIX:  // 15
       if (bits == 0)
         bits = COOLIX_BITS;
       irsend.sendCOOLIX(code, bits, repeat);
       break;
+#endif
     case DAIKIN:  // 16
     case KELVINATOR:  // 18
     case MITSUBISHI_AC:  // 20
@@ -960,60 +1010,85 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case FUJITSU_AC:  // 33
       parseStringAndSendAirCon(ir_type, code_str);
       break;
+#if SEND_DENON
     case DENON:  // 17
       if (bits == 0)
         bits = DENON_BITS;
       irsend.sendDenon(code, bits, repeat);
       break;
+#endif
+#if SEND_SHERWOOD
     case SHERWOOD:  // 19
       if (bits == 0)
         bits = SHERWOOD_BITS;
       repeat = std::max(repeat, (uint16_t) SHERWOOD_MIN_REPEAT);
       irsend.sendSherwood(code, bits, repeat);
       break;
+#endif
+#if SEND_RCMM
     case RCMM:  // 21
       if (bits == 0)
         bits == RCMM_BITS;
       irsend.sendRCMM(code, bits, repeat);
       break;
+#endif
+#if SEND_SANYO
     case SANYO_LC7461:  // 22
       if (bits == 0)
         bits = SANYO_LC7461_BITS;
       irsend.sendSanyoLC7461(code, bits, repeat);
       break;
+#endif
+#if SEND_RC5
     case RC5X:  // 23
       if (bits == 0)
         bits = RC5X_BITS;
       irsend.sendRC5(code, bits, repeat);
+      break;
+#endif
+#if SEND_PRONTO
     case PRONTO:  // 25
       parseStringAndSendPronto(code_str, repeat);
       break;
+#endif
+#if SEND_NIKAI
     case NIKAI:  // 29
       if (bits == 0)
         bits = NIKAI_BITS;
       irsend.sendNikai(code, bits, repeat);
       break;
+#endif
+#if SEND_RAW
     case RAW:  // 30
       parseStringAndSendRaw(code_str);
       break;
+#endif
+#if SEND_GLOBALCACHE
     case GLOBALCACHE:  // 31
       parseStringAndSendGC(code_str);
       break;
+#endif
+#if SEND_MIDEA
     case MIDEA:  // 34
       if (bits == 0)
         bits = MIDEA_BITS;
       irsend.sendMidea(code, bits, repeat);
       break;
+#endif
+#if SEND_MAGIQUEST
     case MAGIQUEST:  // 35
       if (bits == 0)
         bits = MAGIQUEST_BITS;
       irsend.sendMagiQuest(code, bits, repeat);
       break;
+#endif
+#if SEND_LASERTAG
     case LASERTAG:  // 36
       if (bits == 0)
         bits = LASERTAG_BITS;
       irsend.sendLasertag(code, bits, repeat);
       break;
+#endif
   }
 
   // Release the lock.

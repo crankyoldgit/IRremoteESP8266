@@ -128,12 +128,13 @@
 #define DAIKIN_FIRST_HEADER64 \
     0b1101011100000000000000001100010100000000001001111101101000010001
 
-#if SEND_DAIKIN
 class IRDaikinESP {
  public:
   explicit IRDaikinESP(uint16_t pin);
 
+#if SEND_DAIKIN
   void send();
+#endif
   void begin();
   void on();
   void off();
@@ -199,6 +200,5 @@ class IRDaikinESP {
   uint8_t getBit(uint8_t byte, uint8_t bitmask);
   IRsend _irsend;
 };
-#endif
 
 #endif  // IR_DAIKIN_H_

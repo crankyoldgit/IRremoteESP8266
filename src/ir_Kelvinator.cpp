@@ -126,7 +126,6 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_KELVINATOR
 
-#if (SEND_KELVINATOR || DECODE_KELVINATOR)
 IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -149,10 +148,12 @@ void IRKelvinatorAC::fixup() {
   checksum();  // Calculate the checksums
 }
 
+#if SEND_KELVINATOR
 void IRKelvinatorAC::send() {
   fixup();   // Ensure correct settings before sending.
   _irsend.sendKelvinator(remote_state);
 }
+#endif  // SEND_KELVINATOR
 
 uint8_t* IRKelvinatorAC::getRaw() {
   fixup();   // Ensure correct settings before sending.
@@ -437,7 +438,6 @@ std::string IRKelvinatorAC::toString() {
     result += "Off";
   return result;
 }
-#endif  // (SEND_KELVINATOR || DECODE_KELVINATOR)
 
 #if DECODE_KELVINATOR
 // Decode the supplied Kelvinator message.

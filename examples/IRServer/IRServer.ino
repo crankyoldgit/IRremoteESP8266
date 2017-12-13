@@ -61,7 +61,9 @@ void handleIr() {
   for (uint8_t i = 0; i < server.args(); i++) {
     if (server.argName(i) == "code") {
       uint32_t code = strtoul(server.arg(i).c_str(), NULL, 10);
+#if SEND_NEC
       irsend.sendNEC(code, 32);
+#endif  // SEND_NEC
     }
   }
   handleRoot();

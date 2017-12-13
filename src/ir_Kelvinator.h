@@ -110,15 +110,15 @@
     b7-4 = checksum of the previous bytes (8-14)
 */
 
-#if SEND_KELVINATOR
-
 // Classes
 class IRKelvinatorAC {
  public:
   explicit IRKelvinatorAC(uint16_t pin);
 
   void stateReset();
+#if SEND_KELVINATOR
   void send();
+#endif  // SEND_KELVINATOR
   void begin();
   void on();
   void off();
@@ -164,6 +164,5 @@ class IRKelvinatorAC {
   void fixup();
   IRsend _irsend;
 };
-#endif  // SEND_KELVINATOR
 
 #endif  // IR_KELVINATOR_H_

@@ -54,6 +54,8 @@
 //
 #define DECODE_HASH          true  // Semi-unique code for unknown messages
 
+#define SEND_RAW             true
+
 #define DECODE_NEC           true
 #define SEND_NEC             true
 

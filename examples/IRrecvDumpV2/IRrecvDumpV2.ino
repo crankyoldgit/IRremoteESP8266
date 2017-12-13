@@ -150,8 +150,10 @@ void setup() {
   Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
   delay(500);  // Wait a bit for the serial connection to be establised.
 
+#if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(MIN_UNKNOWN_SIZE);
+#endif  // DECODE_HASH
   irrecv.enableIRIn();  // Start the receiver
 }
 

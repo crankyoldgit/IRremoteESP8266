@@ -59,7 +59,6 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_TOSHIBA_AC
 
-#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 // Code to emulate Toshiba A/C IR remote control unit.
 // Inspired and derived from the work done at:
 //   https://github.com/r45635/HVAC-IR-Control
@@ -95,11 +94,13 @@ void IRToshibaAC::begin() {
     _irsend.begin();
 }
 
+#if SEND_TOSHIBA_AC
 // Send the current desired state to the IR LED.
 void IRToshibaAC::send() {
   checksum();   // Ensure correct checksum before sending.
   _irsend.sendToshibaAC(remote_state);
 }
+#endif  // SEND_TOSHIBA_AC
 
 // Return a pointer to the internal state date of the remote.
 uint8_t* IRToshibaAC::getRaw() {
@@ -279,7 +280,6 @@ std::string IRToshibaAC::toString() {
   }
   return result;
 }
-#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 
 #if DECODE_TOSHIBA_AC
 // Decode a Toshiba AC IR message if possible.

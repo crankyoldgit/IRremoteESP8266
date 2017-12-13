@@ -35,6 +35,7 @@ void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
               0, 0,  // No Footer.
               data, nbytes, 38, false, repeat, 50);
 }
+#endif  // SEND_ARGO
 
 IRArgoAC::IRArgoAC(uint16_t pin) : _irsend(pin) {
   stateReset();
@@ -44,11 +45,12 @@ void IRArgoAC::begin() {
   _irsend.begin();
 }
 
+#if SEND_ARGO
 void IRArgoAC::send() {
-  // Serial.println("Sending IR code"); // Only for Debug
   checksum();  // Create valid checksum before sending
   _irsend.sendArgo(argo);
 }
+#endif  // SEND_ARGO
 
 void IRArgoAC::checksum() {
   uint8_t sum = 2;  // Corresponds to byte 11 being constant 0b01
@@ -252,4 +254,3 @@ void IRArgoAC::setRoomTemp(uint8_t temp) {
   argo[3] += temp << 5;  // Append to bit 5,6,7
   argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
 }
-#endif  // SEND_ARGO

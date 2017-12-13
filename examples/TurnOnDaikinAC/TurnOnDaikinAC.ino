@@ -59,7 +59,9 @@ void loop() {
   Serial.println(daikinir.toString());
 
   // Now send the IR signal.
+#if SEND_DAIKIN
   daikinir.send();
+#endif  // SEND_DAIKIN
 
   delay(15000);
 }

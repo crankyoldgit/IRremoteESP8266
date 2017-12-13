@@ -397,6 +397,7 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   }
 }
 
+#if SEND_RAW
 // Send a raw IRremote message.
 //
 // Args:
@@ -423,6 +424,7 @@ void IRsend::sendRaw(uint16_t buf[], uint16_t len, uint16_t hz) {
   }
   ledOff();  // We potentially have ended with a mark(), so turn of the LED.
 }
+#endif  // SEND_RAW
 
 #ifndef UNIT_TEST
 void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {

@@ -62,8 +62,10 @@ void setup() {
 
 void loop() {
   // Now send the IR signal.
+#if SEND_TOSHIBA_AC
   Serial.println("Sending IR command to A/C ...");
   toshibair.send();
+#endif  // SEND_TOSHIBA_AC
   printState();
   delay(5000);
 }

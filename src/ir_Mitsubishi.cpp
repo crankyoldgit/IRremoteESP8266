@@ -166,6 +166,7 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
               MITSUBISHI_AC_RPT_MARK, MITSUBISHI_AC_RPT_SPACE,
               data, nbytes, 38, false, repeat, 50);
 }
+#endif  // SEND_MITSUBISHI_AC
 
 // Code to emulate Mitsubishi A/C IR remote control unit.
 // Inspired and derived from the work done at:
@@ -211,11 +212,13 @@ void IRMitsubishiAC::begin() {
     _irsend.begin();
 }
 
+#if SEND_MITSUBISHI_AC
 // Send the current desired state to the IR LED.
 void IRMitsubishiAC::send() {
   checksum();   // Ensure correct checksum before sending.
   _irsend.sendMitsubishiAC(remote_state);
 }
+#endif  // SEND_MITSUBISHI_AC
 
 // Return a pointer to the internal state date of the remote.
 uint8_t* IRMitsubishiAC::getRaw() {
@@ -325,4 +328,3 @@ void IRMitsubishiAC::setVane(uint8_t mode) {
 uint8_t IRMitsubishiAC::getVane() {
   return ((remote_state[9] & 0b00111000) >> 3);
 }
-#endif

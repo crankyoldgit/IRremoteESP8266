@@ -58,6 +58,10 @@ void setup() {
 
 void loop() {
   Serial.println("Toggling power");
+#if SEND_GLOBALCACHE
   irsend.sendGC(Samsung_power_toggle, 71);
+#else  // SEND_GLOBALCACHE
+  Serial.println("Can't send because SEND_GLOBALCACHE has been disabled.");
+#endif  // SEND_GLOBALCACHE
   delay(10000);
 }
