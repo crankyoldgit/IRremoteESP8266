@@ -20,7 +20,7 @@
 // Source: https://github.com/mpflaga/Arduino-IRremote
 
 #if SEND_MAGIQUEST
-// Send an MagiQuest formatted message.
+// Send a MagiQuest formatted message.
 //
 // Args:
 //   data:   The contents of the message you want to send.

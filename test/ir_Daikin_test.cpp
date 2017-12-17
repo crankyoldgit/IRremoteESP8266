@@ -810,7 +810,7 @@ TEST(TestDecodeDaikin, RealExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
-// Test decoding a message we entirely constructed based soley on a given state.
+// Test decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeDaikin, SyntheticExample) {
   IRDaikinESP irdaikin(0);
   IRsendTest irsend(4);

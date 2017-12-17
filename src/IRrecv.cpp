@@ -90,7 +90,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 //            (Default: TIMEOUT_MS)
 //   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
 // Returns:
-//   A IRrecv class object.
+//   An IRrecv class object.
 IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
                bool save_buffer) {
   irparams.recvpin = recvpin;

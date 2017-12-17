@@ -355,7 +355,7 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != MIDEA_BITS)
-      return false;  // Not strictly an MIDEA message.
+      return false;  // Not strictly a MIDEA message.
     min_nr_of_messages = 2;
   }
 
