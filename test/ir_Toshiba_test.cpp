@@ -469,7 +469,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
       "m543s7048", irsend.outputStr());
 }
 
-// Test decoding a message we entirely constructed based solely on a given state.
+// Decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeToshibaAC, SyntheticExample) {
   IRsendTest irsend(4);
   IRrecv irrecv(4);
