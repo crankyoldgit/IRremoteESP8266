@@ -38,36 +38,26 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
   if (nbytes < GREE_STATE_LENGTH)
     return;  // Not enough bytes to send a proper message.
 
-  // Set IR carrier frequency
-  enableIROut(38);
-
   for (uint16_t r = 0; r <= repeat; r++) {
-    // Header #1
-    mark(GREE_HDR_MARK);
-    space(GREE_HDR_SPACE);
+    // Block #1
+    sendGeneric(GREE_HDR_MARK, GREE_HDR_SPACE,
+                GREE_BIT_MARK, GREE_ONE_SPACE,
+                GREE_BIT_MARK, GREE_ZERO_SPACE,
+                0, 0,  // No Footer.
+                data, 4, 38, false, 0, 50);
+    // Footer #1
+    sendGeneric(0, 0,  // No Header
+                GREE_BIT_MARK, GREE_ONE_SPACE,
+                GREE_BIT_MARK, GREE_ZERO_SPACE,
+                GREE_BIT_MARK, GREE_MSG_SPACE,
+                0b010, 3, 38, true, 0, false);
 
-    // Data #1
-    uint16_t i;
-    for (i = 0; i < 4 && i < nbytes; i++)
-      sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
-               data[i], 8, false);
-
-    // Footer #1 (010)
-    sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
-             0b010, 3);
-
-    // Header #2
-    mark(GREE_BIT_MARK);
-    space(GREE_MSG_SPACE);
-
-    // Data #2
-    for (; i < nbytes; i++)
-      sendData(GREE_BIT_MARK, GREE_ONE_SPACE, GREE_BIT_MARK, GREE_ZERO_SPACE,
-               data[i], 8, false);
-
-    // Footer #2
-    mark(GREE_BIT_MARK);
-    space(GREE_MSG_SPACE);
+    // Block #2
+    sendGeneric(0, 0,  // No Header for Block #2
+                GREE_BIT_MARK, GREE_ONE_SPACE,
+                GREE_BIT_MARK, GREE_ZERO_SPACE,
+                GREE_BIT_MARK, GREE_MSG_SPACE,
+                data + 4, nbytes - 4, 38, false, 0, 50);
   }
 }
 

@@ -43,20 +43,11 @@
 //
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/309
 void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
-  enableIROut(38, 33);
-  // We always send a message, even for repeat=0, hence '<= repeat'.
-  for (uint16_t i=0; i <= repeat; i++) {
-    // Header
-    mark(NIKAI_HDR_MARK);
-    space(NIKAI_HDR_SPACE);
-    // Data
-    sendData(NIKAI_BIT_MARK, NIKAI_ONE_SPACE, NIKAI_BIT_MARK,
-             NIKAI_ZERO_SPACE, data, nbits, true);
-    // Footer
-    mark(NIKAI_BIT_MARK);
-    space(NIKAI_MIN_GAP);
-  }
+  sendGeneric(NIKAI_HDR_MARK, NIKAI_HDR_SPACE,
+              NIKAI_BIT_MARK, NIKAI_ONE_SPACE,
+              NIKAI_BIT_MARK, NIKAI_ZERO_SPACE,
+              NIKAI_BIT_MARK, NIKAI_MIN_GAP,
+              data, nbits, 38, true, repeat, 33);
 }
 #endif
 

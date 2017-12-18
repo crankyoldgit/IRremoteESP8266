@@ -53,24 +53,12 @@
 // Note:
 //   This protocol is a modified version of Kaseikyo.
 void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  enableIROut(36700U);  // Set IR carrier frequency of 36.7kHz.
-  IRtimer usecTimer = IRtimer();
-
-  for (uint16_t i = 0; i <= repeat; i++) {
-    usecTimer.reset();
-    // Header
-    mark(PANASONIC_HDR_MARK);
-    space(PANASONIC_HDR_SPACE);
-    // Data
-    sendData(PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
-             PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
-             data, nbits, true);
-    // Footer
-    mark(PANASONIC_BIT_MARK);
-    space(std::max((uint32_t) PANASONIC_MIN_COMMAND_LENGTH -
-                       usecTimer.elapsed(),
-                   PANASONIC_MIN_GAP));
-  }
+  sendGeneric(PANASONIC_HDR_MARK, PANASONIC_HDR_SPACE,
+              PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
+              PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
+              PANASONIC_BIT_MARK,
+              PANASONIC_MIN_GAP, PANASONIC_MIN_COMMAND_LENGTH,
+              data, nbits, 36700U, true, repeat, 50);
 }
 
 // Send a Panasonic formatted message.

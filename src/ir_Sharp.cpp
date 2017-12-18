@@ -61,25 +61,18 @@
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
 void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
-  enableIROut(38, 33);
-
   for (uint16_t i = 0; i <= repeat; i++) {
     // Protocol demands that the data be sent twice; once normally,
     // then with all but the address bits inverted.
     // Note: Previously this used to be performed 3 times (normal, inverted,
     //       normal), however all data points to that being incorrect.
     for (uint8_t n = 0; n < 2; n++) {
-      // No Header
-
-      // Data
-      sendData(SHARP_BIT_MARK, SHARP_ONE_SPACE,
-               SHARP_BIT_MARK, SHARP_ZERO_SPACE,
-               data, nbits, true);
-      // Footer
-      mark(SHARP_BIT_MARK);
-      space(SHARP_GAP);
-
+      sendGeneric(0, 0,  // No Header
+                  SHARP_BIT_MARK, SHARP_ONE_SPACE,
+                  SHARP_BIT_MARK, SHARP_ZERO_SPACE,
+                  SHARP_BIT_MARK, SHARP_GAP,
+                  data, nbits, 38, true, 0,  // Repeats are handled already.
+                  33);
       // Invert the data per protocol. This is always called twice, so it's
       // retured to original upon exiting the inner loop.
       data ^= SHARP_TOGGLE_MASK;

@@ -83,59 +83,45 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
   if (nbytes < KELVINATOR_STATE_LENGTH)
     return;  // Not enough bytes to send a proper message.
 
-  // Set IR carrier frequency
-  enableIROut(38);
-
   for (uint16_t r = 0; r <= repeat; r++) {
-    // Header #1
-    mark(KELVINATOR_HDR_MARK);
-    space(KELVINATOR_HDR_SPACE);
-    // Data (command)
-    // Send the first command data (4 bytes)
-    uint8_t i;
-    for (i = 0; i < 4; i++)
-      sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-               KELVINATOR_ZERO_SPACE, data[i], 8, false);
-    // Send Footer for the command data (3 bits (0b010))
-    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER,
-             KELVINATOR_CMD_FOOTER_BITS, false);
-    // Send an interdata gap.
-    mark(KELVINATOR_BIT_MARK);
-    space(KELVINATOR_GAP_SPACE);
-    // Data (options)
-    // Send the 1st option chunk of data (4 bytes).
-    for (; i < 8; i++)
-      sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-               KELVINATOR_ZERO_SPACE, data[i], 8, false);
-    // Send a double data gap to signify we are starting a new command sequence.
-    mark(KELVINATOR_BIT_MARK);
-    space(KELVINATOR_GAP_SPACE * 2);
-    // Header #2
-    mark(KELVINATOR_HDR_MARK);
-    space(KELVINATOR_HDR_SPACE);
-    // Data (command)
-    // Send the 2nd command data (4 bytes).
-    // Basically an almost identical repeat of the earlier command data.
-    for (; i < 12; i++)
-      sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-               KELVINATOR_ZERO_SPACE, data[i], 8, false);
-    // Send Footer for the command data (3 bits (B010))
-    sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-             KELVINATOR_ZERO_SPACE, KELVINATOR_CMD_FOOTER,
-             KELVINATOR_CMD_FOOTER_BITS, false);
-    // Send an interdata gap.
-    mark(KELVINATOR_BIT_MARK);
-    space(KELVINATOR_GAP_SPACE);
-    // Data (options)
-    // Send the 2nd option chunk of data (4 bytes).
-    // Unlike the commands, definitely not a repeat of the earlier option data.
-    for (; i < KELVINATOR_STATE_LENGTH; i++)
-      sendData(KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE, KELVINATOR_BIT_MARK,
-               KELVINATOR_ZERO_SPACE, data[i], 8, false);
-    // Footer
-    mark(KELVINATOR_BIT_MARK);
-    space(KELVINATOR_GAP_SPACE * 2);
+    // Command Block #1 (4 bytes)
+    sendGeneric(KELVINATOR_HDR_MARK, KELVINATOR_HDR_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                0, 0,  // No Footer yet.
+                data, 4, 38, false, 0, 50);
+    // Send Footer for the command block (3 bits (B010))
+    sendGeneric(0, 0,  // No Header
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_GAP_SPACE,
+                KELVINATOR_CMD_FOOTER, KELVINATOR_CMD_FOOTER_BITS,
+                38, false, 0, 50);
+    // Data Block #1 (4 bytes)
+    sendGeneric(0, 0,  // No header
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_GAP_SPACE * 2,
+                data + 4, 4, 38, false, 0, 50);
+    // Command Block #2 (4 bytes)
+    sendGeneric(KELVINATOR_HDR_MARK, KELVINATOR_HDR_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                0, 0,  // No Footer yet.
+                data + 8, 4, 38, false, 0, 50);
+    // Send Footer for the command block (3 bits (B010))
+    sendGeneric(0, 0,  // No Header
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_GAP_SPACE,
+                KELVINATOR_CMD_FOOTER, KELVINATOR_CMD_FOOTER_BITS,
+                38, false, 0, 50);
+    // Data Block #2 (4 bytes)
+    sendGeneric(0, 0,  // No header
+                KELVINATOR_BIT_MARK, KELVINATOR_ONE_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_ZERO_SPACE,
+                KELVINATOR_BIT_MARK, KELVINATOR_GAP_SPACE * 2,
+                data + 12, 4, 38, false, 0, 50);
   }
 }
 #endif  // SEND_KELVINATOR
