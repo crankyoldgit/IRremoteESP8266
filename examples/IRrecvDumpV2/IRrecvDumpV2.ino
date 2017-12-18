@@ -71,7 +71,7 @@
 #endif  // DECODE_AC
 // Alternatives:
 // #define TIMEOUT 90U  // Suits messages with big gaps like XMP-1 & some aircon
-                        // units, but can accidently swallow repeated messages
+                        // units, but can accidentally swallow repeated messages
                         // in the rawData[] output.
 // #define TIMEOUT MAX_TIMEOUT_MS  // This will set it to our currently allowed
                                    // maximum. Values this high are problematic

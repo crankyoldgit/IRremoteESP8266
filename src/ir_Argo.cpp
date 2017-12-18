@@ -18,7 +18,7 @@ Copyright 2017 Schmolders
 #define ARGO_ZERO_SPACE            900U
 
 #if SEND_ARGO
-// Send a Argo A/C message.
+// Send an Argo A/C message.
 //
 // Args:
 //   data: An array of ARGO_COMMAND_LENGTH bytes containing the IR command.

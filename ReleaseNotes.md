@@ -34,7 +34,7 @@
 - Support for sending and decoding Nikai TV messages. (#311, #313)
 - gc_decode: External utility to decode Global Cache codes. (#308, #312)
 - IRMQTTServer: Example code to send IR messages via HTTP & MQTT. (#316, #323)
-- Improve converting 64bit values to hexidecimal. (#318)
+- Improve converting 64bit values to hexadecimal. (#318)
 
 **[Misc]**
 - IRrecvDump.ino code is now deprecated. Use IRrecvDumpV2.ino instead. (#314)

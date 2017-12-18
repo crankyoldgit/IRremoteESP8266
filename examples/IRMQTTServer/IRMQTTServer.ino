@@ -1,5 +1,5 @@
 /*
- * Send arbitary IR codes via a web server or MQTT.
+ * Send arbitrary IR codes via a web server or MQTT.
  * Copyright David Conran 2016
  * Version 0.3 Oct, 2017
  *
@@ -73,7 +73,7 @@
  *     No spaces after/before commas.
  *     Values are comma separated.
  *     The first value is always in Decimal.
- *     For simple protocols, the next value (hexcode) is always hexidecimal.
+ *     For simple protocols, the next value (hexcode) is always hexadecimal.
  *     The optional bit size is in decimal.
  *
  *   Unix command line usage example:
@@ -129,7 +129,7 @@
 #include <algorithm>
 #include <string>
 
-// Configuration paramters
+// Configuration parameters
 #define IR_LED 4  // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define HTTP_PORT 80  // The port the HTTP server is listening on.
 
@@ -162,9 +162,9 @@ WiFiClient espClient;
 WiFiManager wifiManager;
 
 uint16_t *codeArray;
-uint32_t lastReconnectAttempt = 0;  // MQTT last attemps reconnection number
+uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
-bool ir_lock = false;  // Primative locking for gating the IR LED.
+bool ir_lock = false;  // Primitive locking for gating the IR LED.
 
 #ifdef MQTT_ENABLE
 // MQTT client parameters
@@ -364,7 +364,7 @@ void handleReset() {
 // Parse an Air Conditioner A/C Hex String/code and send it.
 // Args:
 //   irType: Nr. of the protocol we need to send.
-//   str: A hexidecimal string containing the state to be sent.
+//   str: A hexadecimal string containing the state to be sent.
 void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint8_t strOffset = 0;
   uint8_t state[STATE_SIZE_MAX] = {0};  // All array elements are set to 0.
@@ -372,7 +372,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 
   if (str.startsWith("0x") || str.startsWith("0X"))
     strOffset = 2;
-  // Calculate how many hexidecimal characters there are.
+  // Calculate how many hexadecimal characters there are.
   uint16_t inputLength = str.length() - strOffset;
   if (inputLength == 0) {
     debug("Zero length AirCon code encountered. Ignored.");
@@ -404,7 +404,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case FUJITSU_AC:
       // Fujitsu has four distinct & different size states, so make a best guess
       // which one we are being presented with based on the number of
-      // hexidecimal digits provided. i.e. Zero-pad if you need to to get
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
       // the correct length/byte size.
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
@@ -432,7 +432,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 
   // Convert the string into a state array of the correct length.
   for (uint16_t i = 0; i < inputLength; i++) {
-    // Grab the next least sigificant hexidecimal digit from the string.
+    // Grab the next least sigificant hexadecimal digit from the string.
     uint8_t c = tolower(str[inputLength + strOffset - i - 1]);
     if (isxdigit(c)) {
       if (isdigit(c))
@@ -440,7 +440,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       else
         c = c - 'a' + 10;
     } else {
-      debug("Aborting! Non-hexidecimal char found in AirCon state: " + str);
+      debug("Aborting! Non-hexadecimal char found in AirCon state: " + str);
       return;
     }
     if (i % 2 == 1) {  // Odd: Upper half of the byte.
@@ -559,7 +559,7 @@ void parseStringAndSendGC(const String str) {
 
 // Parse a Pronto Hex String/code and send it.
 // Args:
-//   str: A comma-separated String of nr. of repeats, then hexidecimal numbers.
+//   str: A comma-separated String of nr. of repeats, then hexadecimal numbers.
 //        e.g. "R1,0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,
 //              0030,0018,0018,0018,0030,0018,0018,0018,0018,0018,0030,0018,
 //              0018,0018,0030,0018,0030,0018,0030,0018,0018,0018,0018,0018,
@@ -599,7 +599,7 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
   count = 0;
   do {
     index = str.indexOf(',', start_from);
-    // Convert the hexidecimal value string to an unsigned integer.
+    // Convert the hexadecimal value string to an unsigned integer.
     code_array[count] = strtoul(str.substring(start_from, index).c_str(),
                                 NULL, 16);
     start_from = index + 1;
@@ -610,7 +610,7 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
   free(code_array);  // Free up the memory allocated.
 }
 
-// Parse a IRremote Raw Hex String/code and send it.
+// Parse an IRremote Raw Hex String/code and send it.
 // Args:
 //   str: A comma-separated String containing the freq and raw IR data.
 //        e.g. "38000,9000,4500,600,1450,600,900,650,1500,..."
@@ -1064,7 +1064,7 @@ void receivingMQTT(String const topic_name, String const callback_str) {
 
   debug("Receiving data by MQTT topic " + topic_name);
 
-  // Make a copy of the callback string as strtok destorys it.
+  // Make a copy of the callback string as strtok destroys it.
   char* callback_c_str = strdup(callback_str.c_str());
   debug("MQTT Payload (raw): " + callback_str);
 

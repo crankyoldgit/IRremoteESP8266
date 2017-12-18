@@ -113,7 +113,7 @@ Usage: $0 [-r grouping_range] [-g]
         Max number of milli-seconds difference between values
         to consider it the same value. (Default: ${RANGE})
     -g
-        Produce a C++ code outline to aid making a IRsend function.
+        Produce a C++ code outline to aid making an IRsend function.
 
   Example input:
     uint16_t rawbuf[37] = {

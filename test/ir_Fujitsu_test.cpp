@@ -376,7 +376,7 @@ TEST(TestDecodeFujitsuAC, RealShortARDB1OffExample) {
   irsend.begin();
 
   irsend.reset();
-  // "Off" Message recorded from a AR-DB1 remote.
+  // "Off" Message recorded from an AR-DB1 remote.
   uint16_t rawData[99] = {
       3310, 1636,  440, 386,  440, 394,  442, 1210,  442, 390,  414, 1220,
       444, 390,  446, 380,  446, 380,  436, 1216,  438, 1214,  438, 388,
