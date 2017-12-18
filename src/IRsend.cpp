@@ -280,21 +280,9 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                          const uint64_t data, const uint16_t nbits,
                          const uint16_t frequency, const bool MSBfirst,
                          const uint16_t repeat, const uint8_t dutycycle) {
-  // Setup
-  enableIROut(frequency, dutycycle);
-  // We always send a message, even for repeat=0, hence '<= repeat'.
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // Header
-    if (headermark)  mark(headermark);
-    if (headerspace)  space(headerspace);
-
-    // Data
-    sendData(onemark, onespace, zeromark, zerospace, data, nbits, MSBfirst);
-
-    // Footer
-    if (footermark)  mark(footermark);
-    space(gap);
-  }
+  sendGeneric(headermark, headerspace, onemark, onespace, zeromark, zerospace,
+              footermark, gap, 0U, data, nbits, frequency, MSBfirst, repeat,
+              dutycycle);
 }
 
 // Generic method for sending simple protocol messages.
