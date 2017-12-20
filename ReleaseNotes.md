@@ -1,5 +1,21 @@
 # Release Notes
 
+## _v2.3.1 (20171229)_
+
+**[Bug Fixes]**
+- Setting `#define SEND_FUJITSU_AC false` caused a compilation error (#375)
+- Integer underflow caused huge `space()` in `sendGeneric()` (#381)
+
+**[Features]**
+- Support sending & receiving Lasertag codes. (#374)
+- Reduce the library footprint by using a new `sendGeneric()` routine. (#373)
+
+**[Misc]**
+- Lots of grammar & typo fixes. (#378)
+- Update keywords.txt for Arduino IDE users (#371)
+- Update pins in examples so they are compatible with Adafruit boards. (#383)
+
+
 ## _v2.3.0 (20171208)_
 
 **[Bug Fixes]**
