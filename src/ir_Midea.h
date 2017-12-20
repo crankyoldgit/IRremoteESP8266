@@ -44,13 +44,14 @@
 #define MIDEA_AC_MODE_MASK          0x0000FFF8FFFFFFFFULL
 #define MIDEA_AC_CHECKSUM_MASK      0x0000FFFFFFFFFF00ULL
 
-#if (SEND_MIDEA || DECODE_MIDEA)
 class IRMideaAC {
  public:
   explicit IRMideaAC(uint16_t pin);
 
   void stateReset();
+#if SEND_MIDEA
   void send();
+#endif  // SEND_MIDEA
   void begin();
   void on();
   void off();
@@ -82,6 +83,5 @@ class IRMideaAC {
   IRsend _irsend;
 };
 
-#endif  // (SEND_MIDEA || DECODE_MIDEA)
 
 #endif  // IR_MIDEA_H_

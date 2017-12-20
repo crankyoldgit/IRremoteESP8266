@@ -85,7 +85,6 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN
 
-#if (SEND_DAIKIN || DECODE_DAIKIN)
 IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -94,10 +93,12 @@ void IRDaikinESP::begin() {
   _irsend.begin();
 }
 
+#if SEND_DAIKIN
 void IRDaikinESP::send() {
   checksum();
   _irsend.sendDaikin(daikin);
 }
+#endif  // SEND_DAIKIN
 
 // Calculate the checksum for a given data block.
 // Args:
@@ -641,7 +642,6 @@ void IRDaikinESP::setCommand(uint32_t value) {
   value >>= 20;
   setCurrentTime(value);
 }
-#endif  // (SEND_DAIKIN || DECODE_DAIKIN)
 
 #if DECODE_DAIKIN
 

@@ -46,7 +46,11 @@ void loop() {
   trotecir.setTemp(25);
 
   // Now send the IR signal.
+#if SEND_TROTEC
   trotecir.send();
+#else  // SEND_TROTEC
+  Serial.println("Can't send because SEND_TROTEC has been disabled.");
+#endif  // SEND_TROTEC
 
   delay(5000);
 }

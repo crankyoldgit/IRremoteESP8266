@@ -45,8 +45,12 @@ void loop() {
   argoir.setCoolMode(ARGO_COOL_AUTO);
   argoir.setTemp(25);
 
+#if SEND_ARGO
   // Now send the IR signal.
   argoir.send();
+#else  // SEND_ARGO
+  Serial.println("Can't send because SEND_ARGO has been disabled.");
+#endif  // SEND_ARGO
 
   delay(5000);
 }

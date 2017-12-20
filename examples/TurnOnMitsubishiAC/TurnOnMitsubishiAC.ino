@@ -64,8 +64,10 @@ void setup() {
 
 void loop() {
   // Now send the IR signal.
+#if SEND_MITSUBISHI_AC
   Serial.println("Sending IR command to A/C ...");
   mitsubir.send();
+#endif  // SEND_MITSUBISHI_AC
   printState();
   delay(5000);
 }

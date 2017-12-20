@@ -73,8 +73,10 @@ void setup() {
 
 void loop() {
   // Now send the IR signal.
+#if SEND_KELVINATOR
   Serial.println("Sending IR command to A/C ...");
   kelvir.send();
+#endif  // SEND_KELVINATOR
   printState();
   delay(5000);
 }

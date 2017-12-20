@@ -24,7 +24,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
 
-  // Set up what we want to send. See ir_Mitsubishi.cpp for all the options.
+  // Set up what we want to send. See ir_Fujitsu.cpp for all the options.
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
@@ -38,7 +38,11 @@ void setup() {
 void loop() {
   // Now send the IR signal.
   Serial.println("Sending IR command to A/C ...");
+#if SEND_FUJITSU_AC
   fujitsu.send();
+#else  // SEND_FUJITSU_AC
+  Serial.println("Can't send because SEND_FUJITSU_AC has been disabled.");
+#endif  // SEND_FUJITSU_AC
   printState();
   delay(5000);
 }

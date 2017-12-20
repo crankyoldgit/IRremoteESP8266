@@ -50,13 +50,19 @@ void setup() {
 }
 
 void loop() {
+#if SEND_NEC
   Serial.println("NEC");
   irsend.sendNEC(0x00FFE01FUL, 32);
+#endif  // SEND_NEC
   delay(2000);
+#if SEND_SONY
   Serial.println("Sony");
   irsend.sendSony(0xa90, 12, 2);
+#endif  // SEND_SONY
   delay(2000);
+#if SEND_RAW
   Serial.println("a rawData capture from IRrecvDumpV2");
   irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
+#endif  // SEND_RAW
   delay(2000);
 }

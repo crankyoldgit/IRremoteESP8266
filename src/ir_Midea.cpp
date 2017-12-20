@@ -90,7 +90,6 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
 }
 #endif
 
-#if (SEND_MIDEA || DECODE_MIDEA)
 // Code to emulate Midea A/C IR remote control unit.
 // Warning: Consider this very alpha code.
 
@@ -110,11 +109,13 @@ void IRMideaAC::begin() {
     _irsend.begin();
 }
 
+#if SEND_MIDEA
 // Send the current desired state to the IR LED.
 void IRMideaAC::send() {
   checksum();   // Ensure correct checksum before sending.
   _irsend.sendMidea(remote_state);
 }
+#endif  // SEND_MIDEA
 
 // Return a pointer to the internal state date of the remote.
 uint64_t IRMideaAC::getRaw() {
@@ -333,8 +334,6 @@ std::string IRMideaAC::toString() {
   return result;
 }
 
-#endif  // SEND_MIDEA || DECODE_MIDEA
-
 #if DECODE_MIDEA
 // Decode the supplied Midea message.
 //
@@ -425,4 +424,4 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_MIDEA

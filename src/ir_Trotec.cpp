@@ -34,6 +34,7 @@ void IRsend::sendTrotec(unsigned char data[], uint16_t nbytes,
     space(TROTEC_GAP_END);
   }
 }
+#endif  // SEND_TROTEC
 
 IRTrotecESP::IRTrotecESP(uint16_t pin) : _irsend(pin) {
   stateReset();
@@ -43,10 +44,12 @@ void IRTrotecESP::begin() {
   _irsend.begin();
 }
 
+#if SEND_TROTEC
 void IRTrotecESP::send() {
   checksum();
   _irsend.sendTrotec(trotec);
 }
+#endif  // SEND_TROTEC
 
 void IRTrotecESP::checksum() {
   uint8_t sum = 0;
@@ -141,5 +144,3 @@ void IRTrotecESP::setTimer(uint8_t timer) {
 uint8_t IRTrotecESP::getTimer() {
   return trotec[6];
 }
-
-#endif  // SEND_TROTEC

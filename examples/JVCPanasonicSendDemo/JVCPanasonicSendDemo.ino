@@ -46,11 +46,19 @@ void setup() {
 
 void loop() {
   // This should turn your TV on and off
+#if SEND_PANASONIC
   irsend.sendPanasonic(PanasonicAddress, PanasonicPower);
+#else  // SEND_PANASONIC
+  Serial.println("Can't send because SEND_PANASONIC has been disabled.");
+#endif  // SEND_PANASONIC
 
+#if SEND_JVC
   irsend.sendJVC(JVCPower, 16, 0);  // hex value, 16 bits, no repeat
   // see http://www.sbprojects.com/knowledge/ir/jvc.php for information
   delayMicroseconds(50);
   irsend.sendJVC(JVCPower, 16, 1);  // hex value, 16 bits, repeat
   delayMicroseconds(50);
+#else  // SEND_JVC
+  Serial.println("Can't send because SEND_JVC has been disabled.");
+#endif  // SEND_JVC
 }

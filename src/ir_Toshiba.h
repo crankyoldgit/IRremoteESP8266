@@ -31,13 +31,14 @@
 #define TOSHIBA_AC_MIN_TEMP         17U  // 17C
 #define TOSHIBA_AC_MAX_TEMP         30U  // 30C
 
-#if (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 class IRToshibaAC {
  public:
   explicit IRToshibaAC(uint16_t pin);
 
   void stateReset();
+#if SEND_TOSHIBA_AC
   void send();
+#endif  // SEND_TOSHIBA_AC
   void begin();
   void on();
   void off();
@@ -69,7 +70,5 @@ class IRToshibaAC {
   uint8_t mode_state;
   IRsend _irsend;
 };
-
-#endif  // (SEND_TOSHIBA_AC || DECODE_TOSHIBA_AC)
 
 #endif  // IR_TOSHIBA_H_

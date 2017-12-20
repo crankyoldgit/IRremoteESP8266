@@ -96,10 +96,15 @@ void setup() {
 }
 
 void loop() {
+#if SEND_PRONTO
   Serial.println("Sending a Samsung TV 'on' command.");
   irsend.sendPronto(samsungProntoCode, 72);
   delay(2000);
   Serial.println("Sending a Panasonic Plasma TV 'on' command.");
   irsend.sendPronto(panasonicProntoCode, 104);
   delay(2000);
+#else  // SEND_PRONTO
+  Serial.println("Can't send because SEND_PRONTO has been disabled.");
+  delay(10000);
+#endif  // SEND_PRONTO
 }
