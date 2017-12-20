@@ -45,7 +45,6 @@
 #define FUJITSU_AC_SWING_BOTH     0x03U
 
 
-#if SEND_FUJITSU_AC
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,
   ARDB1,
@@ -57,7 +56,9 @@ class IRFujitsuAC {
 
   void setModel(fujitsu_ac_remote_model_t model);
   void stateReset();
+#if SEND_FUJITSU_AC
   void send();
+#endif  // SEND_FUJITSU_AC
   void begin();
   void off();
   void stepHoriz();
@@ -97,6 +98,5 @@ class IRFujitsuAC {
   void buildState();
   void buildFromState(const uint16_t length);
 };
-#endif  // SEND_FUJITSU_AC
 
 #endif  // IR_FUJITSU_H_
