@@ -340,7 +340,12 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
 
     // Footer
     if (footermark)  mark(footermark);
-    space(std::max(gap, mesgtime - usecs.elapsed()));
+    uint32_t elapsed = usecs.elapsed();
+    // Avoid potential unsigned integer underflow. e.g. when mesgtime is 0.
+    if (elapsed >= mesgtime)
+      space(gap);
+    else
+      space(std::max(gap, mesgtime - elapsed));
   }
 }
 
