@@ -1,6 +1,6 @@
 /* Copyright 2016 David Conran
 *
-* An IR LED circuit *MUST* be connected to ESP8266 pin 4 (D2).
+* An IR LED circuit *MUST* be connected to ESP8266 GPIO4.
 *
 * TL;DR: The IR LED needs to be driven by a transistor for a good result.
 *
@@ -29,7 +29,7 @@
 #include <IRsend.h>
 #include <ir_Kelvinator.h>
 
-IRKelvinatorAC kelvir(D2);  // An IR LED is controlled by GPIO pin 4 (D2)
+IRKelvinatorAC kelvir(4);  // An IR LED is controlled by GPIO4, NodeMCU D2
 
 void printState() {
   // Display the settings.
