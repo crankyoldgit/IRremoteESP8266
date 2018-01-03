@@ -33,7 +33,8 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
         ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
         ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
-        ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test
+        ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
+				ir_Carrier_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -73,7 +74,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
     ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o ir_Denon.o ir_Dish.o \
 		ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
 		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
-		ir_Midea.o ir_Magiquest.o ir_Lasertag.o
+		ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
@@ -386,4 +387,13 @@ ir_Lasertag_test.o : ir_Lasertag_test.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_TE
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Lasertag_test.cpp
 
 ir_Lasertag_test : $(COMMON_OBJ) ir_Lasertag_test.o ir_RC5_RC6.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Carrier.o : $(USER_DIR)/ir_Carrier.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Carrier.cpp
+
+ir_Carrier_test.o : ir_Carrier_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Carrier_test.cpp
+
+ir_Carrier_test : $(COMMON_OBJ) ir_Carrier_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

@@ -324,3 +324,22 @@ TEST(TestResultToHumanReadableBasic, ComplexCodes) {
       "Code      : F20D03FC0100000001 (72 bits)\n",
       resultToHumanReadableBasic(&irsend.capture));
 }
+
+TEST(TestInvertBits, Normal) {
+  ASSERT_EQ(0xAAAA5555AAAA5555, invertBits(0x5555AAAA5555AAAA, 64));
+  ASSERT_EQ(0xAAAA5555, invertBits(0x5555AAAA, 32));
+  ASSERT_EQ(0xFFFFFFFFFFFFFFFF, invertBits(0x0, 64));
+  ASSERT_EQ(0x0, invertBits(invertBits(0x0, 64), 64));
+  ASSERT_EQ(0x2, invertBits(0x1, 2));
+}
+
+TEST(TestInvertBits, ZeroBits) {
+  ASSERT_EQ(0xAAAA5555AAAA5555, invertBits(0xAAAA5555AAAA5555, 0));
+  ASSERT_EQ(0x0, invertBits(0x0, 0));
+  ASSERT_EQ(0x1, invertBits(0x1, 0));
+}
+
+TEST(TestInvertBits, MoreThan64Bits) {
+  ASSERT_EQ(0xAAAA5555AAAA5555, invertBits(0x5555AAAA5555AAAA, 70));
+  ASSERT_EQ(0xFFFFFFFFFFFFFFFF, invertBits(0x0, 128));
+}

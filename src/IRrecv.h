@@ -264,6 +264,11 @@ class IRrecv {
   bool decodeLasertag(decode_results *results, uint16_t nbits = LASERTAG_BITS,
                       bool strict = true);
 #endif
+#if DECODE_CARRIER_AC
+  bool decodeCarrierAC(decode_results *results,
+                       uint16_t nbits = CARRIER_AC_BITS,
+                       bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

@@ -33,6 +33,8 @@
  * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
  * Fujitsu A/C code added by jonnygraham
  * Trotec AC code by stufisher
+ * Carrier AC code by crankyoldgit
+ *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -152,6 +154,9 @@
 #define DECODE_LASERTAG      true
 #define SEND_LASERTAG        true
 
+#define DECODE_CARRIER_AC    true
+#define SEND_CARRIER_AC      true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC)
@@ -203,13 +208,16 @@ enum decode_type_t {
   FUJITSU_AC,
   MIDEA,
   MAGIQUEST,
-  LASERTAG
+  LASERTAG,
+  CARRIER_AC
 };
 
 // Message lengths & required repeat values
 #define AIWA_RC_T501_BITS           15U
 #define AIWA_RC_T501_MIN_REPEAT      1U
 #define COOLIX_BITS                 24U
+#define CARRIER_AC_BITS             32U
+#define CARRIER_AC_MIN_REPEAT        0U
 // Daikin has a lot of static stuff that is discarded
 #define DAIKIN_RAW_BITS            583U
 #define DAIKIN_COMMAND_LENGTH       27U
