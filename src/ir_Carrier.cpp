@@ -1,9 +1,7 @@
 // Copyright 2018 David Conran
 
-#include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //             CCCCC    AAA   RRRRRR  RRRRRR  IIIII EEEEEEE RRRRRR
@@ -12,6 +10,10 @@
 //            CC    C AAAAAAA RR  RR  RR  RR   III  EE      RR  RR
 //             CCCCC  AA   AA RR   RR RR   RR IIIII EEEEEEE RR   RR
 
+// Suits Carrier/Surrey HVAC models:
+//   42QG5A55970 (remote)
+//   619EGX0090E0 / 619EGX0120E0 / 619EGX0180E0 / 619EGX0220E0 (indoor units)
+//   53NGK009/012 (inverter)
 
 // Constants
 // Ref:
@@ -31,7 +33,7 @@
 //   nbits:  The bit size of the message being sent. typically CARRIER_AC_BITS.
 //   repeat: The number of times the message is to be repeated.
 //
-// Status: ALPHA / Untested against a real device.
+// Status: BETA / Appears to work on real devices.
 //
 void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++) {
