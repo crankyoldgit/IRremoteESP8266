@@ -102,6 +102,7 @@ std::string typeToString(const decode_type_t protocol,
     case UNUSED:        result = "UNUSED";            break;
     case AIWA_RC_T501:  result = "AIWA_RC_T501";      break;
     case ARGO:          result = "ARGO";              break;
+    case CARRIER_AC:    result = "CARRIER_AC";        break;
     case COOLIX:        result = "COOLIX";            break;
     case DAIKIN:        result = "DAIKIN";            break;
     case DENON:         result = "DENON";             break;
@@ -314,4 +315,14 @@ uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
   for (ptr = start; ptr - start < length; ptr++)
     checksum += *ptr;
   return checksum;
+}
+
+uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
+  // No change if we are asked to invert no bits.
+  if (nbits == 0)  return data;
+  uint64_t result = ~data;
+  // If we are asked to invert all the bits or more than we have, it's simple.
+  if (nbits >= sizeof(data) * 8)  return result;
+  // Mask off any unwanted bits and return the result.
+  return (result & ((1ULL << nbits) - 1));
 }

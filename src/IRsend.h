@@ -225,6 +225,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendLasertag(uint64_t data, uint16_t nbits = LASERTAG_BITS,
                     uint16_t repeat = LASERTAG_MIN_REPEAT);
 #endif
+#if SEND_CARRIER_AC
+  void sendCarrierAC(uint64_t data, uint16_t nbits = CARRIER_AC_BITS,
+                     uint16_t repeat = CARRIER_AC_MIN_REPEAT);
+#endif
 
  protected:
 #ifdef UNIT_TEST

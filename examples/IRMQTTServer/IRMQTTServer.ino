@@ -227,6 +227,7 @@ void handleRoot() {
       "Type: "
       "<select name='type'>"
         "<option value='9'>Aiwa RC T501</option>"
+        "<option value='37'>Carrier AC</option>"
         "<option value='15'>Coolix</option>"
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
@@ -1087,6 +1088,13 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = LASERTAG_BITS;
       irsend.sendLasertag(code, bits, repeat);
+      break;
+#endif
+#if SEND_CARRIER_AC
+    case CARRIER_AC:  // 37
+      if (bits == 0)
+        bits = CARRIER_AC_BITS;
+      irsend.sendCarrierAC(code, bits, repeat);
       break;
 #endif
   }
