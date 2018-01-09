@@ -1,4 +1,5 @@
 // Quick and dirty tool to decode GlobalCache (GC) codes
+// and ProntoHex codes
 // Copyright 2017 Jorge Cisneros
 
 #include <errno.h>
@@ -12,10 +13,10 @@
 
 #define MAX_GC_CODE_LENGTH 10000
 
-void str_to_uint16(char *str, uint16_t *res) {
+void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
   char *end;
   errno = 0;
-  intmax_t val = strtoimax(str, &end, 10);
+  intmax_t val = strtoimax(str, &end, base);
   if (errno == ERANGE || val < 0 || val > UINT16_MAX ||
     end == str || *end != '\0')
     return;
@@ -23,18 +24,25 @@ void str_to_uint16(char *str, uint16_t *res) {
 }
 
 void usage_error(char * name) {
-  std::cerr << "Usage: " << name << " [-raw] <global_code>" << std::endl;
+  std::cerr << "Usage: " << name << " [-raw] <global_code>" << std::endl
+  << "Usage: " << name << " -prontohex [-raw] <prontohex_code>" << std::endl;
 }
 
 int main(int argc, char * argv[]) {
   int argv_offset = 1;
   bool dumpraw = false;
+  bool prontohex = false;
 
   // Check the invocation/calling usage.
-  if (argc < 2 || argc > 3) {
+  if (argc < 2 || argc > 4) {
     usage_error(argv[0]);
     return 1;
   }
+  if (strncmp("-prontohex", argv[argv_offset], 10) == 0) {
+    prontohex = true;
+    argv_offset++;
+  }
+
   if (strncmp("-raw", argv[argv_offset], 4) == 0) {
     dumpraw = true;
     argv_offset++;
@@ -48,11 +56,18 @@ int main(int argc, char * argv[]) {
   int index = 0;
   char *pch;
   char *saveptr1;
+  char *sep = const_cast<char *>(",");
+  int codebase = 10;
 
-  pch = strtok_r(argv[argv_offset], ",", &saveptr1);
+  if (prontohex) {
+      sep = const_cast<char *>(" ");
+      codebase = 16;
+  }
+
+  pch = strtok_r(argv[argv_offset], sep, &saveptr1);
   while (pch != NULL && index < MAX_GC_CODE_LENGTH) {
-    str_to_uint16(pch, &gc_test[index]);
-    pch = strtok_r(NULL, ",", &saveptr1);
+    str_to_uint16(pch, &gc_test[index], codebase);
+    pch = strtok_r(NULL, sep, &saveptr1);
     index++;
   }
 
@@ -61,11 +76,15 @@ int main(int argc, char * argv[]) {
   irsend.begin();
   irsend.reset();
 
-  irsend.sendGC(gc_test, index);
+  if (prontohex) {
+      irsend.sendPronto(gc_test, index);
+  } else {
+      irsend.sendGC(gc_test, index);
+  }
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
 
-  std::cout << "Code GC length " << index << std::endl
+  std::cout << "Code length " << index << std::endl
   << "Code type      " << irsend.capture.decode_type
   << " (" << typeToString(irsend.capture.decode_type) << ")" << std::endl
   << "Code bits      " << irsend.capture.bits << std::endl;
