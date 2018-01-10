@@ -742,7 +742,7 @@ void setup(void) {
 
   lastReconnectAttempt = 0;
   
-  #ifdef MQTT
+  #ifdef MQTT_ENABLE
   if (mdns.begin(MQTTprefix, WiFi.localIP())) {
     debug("MDNS responder started");
   }
