@@ -742,9 +742,11 @@ void setup(void) {
 
   lastReconnectAttempt = 0;
 
+  #ifdef MQTT_ENABLE
   if (mdns.begin(MQTTprefix, WiFi.localIP())) {
     debug("MDNS responder started");
   }
+  #endif
 
   // Setup the root web page.
   server.on("/", handleRoot);
