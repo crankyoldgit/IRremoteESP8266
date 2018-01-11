@@ -1,6 +1,6 @@
 /*
  * Send arbitrary IR codes via a web server or MQTT.
- * Copyright David Conran 2016
+ * Copyright David Conran 2016, 2017, 2018
  * Version 0.3 Oct, 2017
  *
  * NOTE: An IR LED circuit *MUST* be connected to ESP8266 pin 4 (D2). See IR_LED
@@ -132,6 +132,7 @@
 // Configuration parameters
 #define IR_LED 4  // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define HTTP_PORT 80  // The port the HTTP server is listening on.
+#define HOSTNAME "ir_server"  // Name of the device you want in mDNS.
 
 #ifdef MQTT_ENABLE
 // Address of your MQTT server.
@@ -142,7 +143,8 @@ const char* mqtt_user = "";
 const char* mqtt_password = "";
 #define MQTT_RECONNECT_TIME 5000  // Delay(ms) between reconnect tries.
 
-#define MQTTprefix "ir_server"
+#define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
+                             // independent of the hostname.
 #define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
 #define MQTTcommand MQTTprefix "/send"  // Topic we get new commands from.
 #endif  // MQTT_ENABLE
@@ -742,11 +744,9 @@ void setup(void) {
 
   lastReconnectAttempt = 0;
 
-  #ifdef MQTT_ENABLE
-  if (mdns.begin(MQTTprefix, WiFi.localIP())) {
+  if (mdns.begin(HOSTNAME, WiFi.localIP())) {
     debug("MDNS responder started");
   }
-  #endif
 
   // Setup the root web page.
   server.on("/", handleRoot);
