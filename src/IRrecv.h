@@ -22,7 +22,7 @@
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
 #define MARK_EXCESS   50U
-#define RAWBUF       100U  // Default length of raw capture buffer
+#define RAWBUF       150U  // Default length of raw capture buffer
 #define REPEAT UINT64_MAX
 #define UNKNOWN_THRESHOLD 6U  // Default min size of reported UNKNOWN messages.
 // receiver states
