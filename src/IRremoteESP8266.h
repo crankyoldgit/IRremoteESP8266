@@ -127,7 +127,7 @@
 #define DECODE_GLOBALCACHE   false  // Not written.
 #define SEND_GLOBALCACHE     true
 
-#define DECODE_GREE          false  // Not written.
+#define DECODE_GREE          true
 #define SEND_GREE            true
 
 #define DECODE_PRONTO        false  // Not written.
