@@ -40,6 +40,19 @@
 #define GREE_XFAN_MASK                    0b10000000U
 #define GREE_SLEEP_MASK                   0b10000000U
 
+#define GREE_SWING_AUTO_MASK              0b01000000U
+#define GREE_SWING_POS_MASK               0b00001111U
+#define GREE_SWING_LAST_POS               0b00000000U
+#define GREE_SWING_AUTO                   0b00000001U
+#define GREE_SWING_UP                     0b00000010U
+#define GREE_SWING_MIDDLE_UP              0b00000011U
+#define GREE_SWING_MIDDLE                 0b00000100U
+#define GREE_SWING_MIDDLE_DOWN            0b00000101U
+#define GREE_SWING_DOWN                   0b00000110U
+#define GREE_SWING_DOWN_AUTO              0b00000111U
+#define GREE_SWING_MIDDLE_AUTO            0b00001001U
+#define GREE_SWING_UP_AUTO                0b00001011U
+
 // Classes
 class IRGreeAC {
  public:
@@ -68,6 +81,10 @@ class IRGreeAC {
   bool getSleep();
   void setTurbo(const bool state);
   bool getTurbo();
+  void setSwingVertical(const bool automatic, const uint8_t position);
+  bool getSwingVerticalAuto();
+  uint8_t getSwingVerticalPosition();
+
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],

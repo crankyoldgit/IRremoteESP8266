@@ -218,6 +218,8 @@ TEST(TestGreeClass, Temperature) {
   IRGreeAC irgree(0);
   irgree.begin();
 
+  irgree.setMode(GREE_COOL);
+
   irgree.setTemp(0);
   EXPECT_EQ(GREE_MIN_TEMP, irgree.getTemp());
 
@@ -253,8 +255,12 @@ TEST(TestGreeClass, OperatingMode) {
   IRGreeAC irgree(0);
   irgree.begin();
 
-  irgree.setMode(GREE_AUTO);
+  irgree.setTemp(17);
+  irgree.setMode(GREE_AUTO);  // Auto should lock the temp to 25C.
   EXPECT_EQ(GREE_AUTO, irgree.getMode());
+  EXPECT_EQ(25, irgree.getTemp());
+  irgree.setTemp(17);
+  EXPECT_EQ(25, irgree.getTemp());
 
   irgree.setMode(GREE_COOL);
   EXPECT_EQ(GREE_COOL, irgree.getMode());
@@ -262,8 +268,13 @@ TEST(TestGreeClass, OperatingMode) {
   irgree.setMode(GREE_HEAT);
   EXPECT_EQ(GREE_HEAT, irgree.getMode());
 
-  irgree.setMode(GREE_DRY);
+  ASSERT_NE(GREE_FAN_MAX, 1);
+  irgree.setFan(GREE_FAN_MAX);
+  irgree.setMode(GREE_DRY);  // Dry should lock the fan to speed 1.
   EXPECT_EQ(GREE_DRY, irgree.getMode());
+  EXPECT_EQ(1, irgree.getFan());
+  irgree.setFan(GREE_FAN_MAX);
+  EXPECT_EQ(1, irgree.getFan());
 
   irgree.setMode(GREE_FAN);
   EXPECT_EQ(GREE_FAN, irgree.getMode());
@@ -360,6 +371,40 @@ TEST(TestGreeClass, FanSpeed) {
   EXPECT_EQ(3, irgree.getFan());
 }
 
+TEST(TestGreeClass, VerticalSwing) {
+  IRGreeAC irgree(0);
+  irgree.begin();
+  EXPECT_FALSE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_LAST_POS, irgree.getSwingVerticalPosition());
+
+  irgree.setSwingVertical(true, GREE_SWING_AUTO);
+  EXPECT_TRUE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_AUTO, irgree.getSwingVerticalPosition());
+
+  irgree.setSwingVertical(false, GREE_SWING_MIDDLE);
+  EXPECT_FALSE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_MIDDLE, irgree.getSwingVerticalPosition());
+
+  irgree.setSwingVertical(true, GREE_SWING_DOWN_AUTO);
+  EXPECT_TRUE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_DOWN_AUTO, irgree.getSwingVerticalPosition());
+
+  // Out of bounds.
+  irgree.setSwingVertical(false, 255);
+  EXPECT_FALSE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_LAST_POS, irgree.getSwingVerticalPosition());
+  irgree.setSwingVertical(false, GREE_SWING_AUTO);
+  EXPECT_FALSE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_LAST_POS, irgree.getSwingVerticalPosition());
+
+  irgree.setSwingVertical(true, 255);
+  EXPECT_TRUE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_AUTO, irgree.getSwingVerticalPosition());
+  irgree.setSwingVertical(true, GREE_SWING_DOWN);
+  EXPECT_TRUE(irgree.getSwingVerticalAuto());
+  EXPECT_EQ(GREE_SWING_AUTO, irgree.getSwingVerticalPosition());
+}
+
 TEST(TestGreeClass, SetAndGetRaw) {
   IRGreeAC irgree(0);
   uint8_t initialState[GREE_STATE_LENGTH] = {
@@ -371,17 +416,17 @@ TEST(TestGreeClass, SetAndGetRaw) {
 
   // toggle the power state.
   irgree.setPower(!irgree.getPower());
+  irgree.setMode(GREE_COOL);
   irgree.setTemp(21);
   irgree.setFan(2);
-  irgree.setMode(GREE_COOL);
   irgree.setLight(false);
   irgree.setTurbo(true);
   irgree.setSleep(true);
   irgree.setXFan(true);
 
+  EXPECT_EQ(GREE_COOL, irgree.getMode());
   EXPECT_EQ(21, irgree.getTemp());
   EXPECT_EQ(2, irgree.getFan());
-  EXPECT_EQ(GREE_COOL, irgree.getMode());
   EXPECT_FALSE(irgree.getLight());
   EXPECT_TRUE(irgree.getTurbo());
   EXPECT_TRUE(irgree.getSleep());
@@ -396,7 +441,8 @@ TEST(TestGreeClass, HumanReadable) {
   IRGreeAC irgree(0);
 
   EXPECT_EQ("Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), Turbo: Off, "
-            "XFan: Off, Light: On, Sleep: Off",
+            "XFan: Off, Light: On, Sleep: Off, Swing Vertical Mode: Manual, "
+            "Swing Vertical Pos: 0 (Last Pos)",
             irgree.toString());
   irgree.on();
   irgree.setMode(GREE_COOL);
@@ -406,8 +452,10 @@ TEST(TestGreeClass, HumanReadable) {
   irgree.setSleep(true);
   irgree.setLight(false);
   irgree.setTurbo(true);
+  irgree.setSwingVertical(true, GREE_SWING_AUTO);
   EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (MAX), Turbo: On, "
-            "XFan: On, Light: Off, Sleep: On",
+            "XFan: On, Light: Off, Sleep: On, Swing Vertical Mode: Auto, "
+            "Swing Vertical Pos: 1 (Auto)",
             irgree.toString());
 }
 
@@ -463,5 +511,6 @@ TEST(TestDecodeGree, NormalRealExample) {
   EXPECT_STATE_EQ(gree_code, irsend.capture.state, GREE_BITS);
   irgree.setRaw(irsend.capture.state);
   EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1, Turbo: Off, "
-            "XFan: Off, Light: On, Sleep: Off", irgree.toString());
+            "XFan: Off, Light: On, Sleep: Off, Swing Vertical Mode: Manual, "
+            "Swing Vertical Pos: 2", irgree.toString());
 }

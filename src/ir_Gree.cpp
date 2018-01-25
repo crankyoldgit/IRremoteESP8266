@@ -203,6 +203,7 @@ bool IRGreeAC::getPower() {
 void IRGreeAC::setTemp(const uint8_t temp) {
   uint8_t new_temp = std::max((uint8_t) GREE_MIN_TEMP, temp);
   new_temp = std::min((uint8_t) GREE_MAX_TEMP, new_temp);
+  if (getMode() == GREE_AUTO) new_temp = 25;
   remote_state[1] = (remote_state[1] & 0xF0U) | (new_temp - GREE_MIN_TEMP);
 }
 
@@ -215,12 +216,10 @@ uint8_t IRGreeAC::getTemp() {
 void IRGreeAC::setFan(const uint8_t speed) {
   uint8_t fan = std::min((uint8_t) GREE_FAN_MAX, speed);  // Bounds check
 
-  // Only change things if we need to.
-  if (fan != getFan()) {
-    // Set the basic fan values.
-    remote_state[0] &= ~GREE_FAN_MASK;
-    remote_state[0] |= (fan << 4);
-  }
+  if (getMode() == GREE_DRY) fan = 1;  // DRY mode is always locked to fan 1.
+  // Set the basic fan values.
+  remote_state[0] &= ~GREE_FAN_MASK;
+  remote_state[0] |= (fan << 4);
 }
 
 uint8_t IRGreeAC::getFan() {
@@ -229,8 +228,23 @@ uint8_t IRGreeAC::getFan() {
 
 void IRGreeAC::setMode(const uint8_t new_mode) {
   uint8_t mode = new_mode;
-  // If we get an unexpected mode, default to AUTO.
-  if (mode > GREE_HEAT) mode = GREE_AUTO;
+  switch (mode) {
+    case GREE_AUTO:
+      // AUTO is locked to 25C
+      setTemp(25);
+      break;
+    case GREE_DRY:
+      // DRY always sets the fan to 1.
+      setFan(1);
+      break;
+    case GREE_COOL:
+    case GREE_FAN:
+    case GREE_HEAT:
+      break;
+    default:
+      // If we get an unexpected mode, default to AUTO.
+      mode = GREE_AUTO;
+  }
   remote_state[0] &= ~GREE_MODE_MASK;
   remote_state[0] |= mode;
 }
@@ -273,6 +287,44 @@ void IRGreeAC::setTurbo(const bool state) {
 
 bool IRGreeAC::getTurbo() {
   return remote_state[2] & GREE_TURBO_MASK;
+}
+
+void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
+  remote_state[0] &= ~GREE_SWING_AUTO_MASK;
+  remote_state[0] |= (automatic << 6);
+  uint8_t new_position = position;
+  if (!automatic) {
+    switch (position) {
+      case GREE_SWING_UP:
+      case GREE_SWING_MIDDLE_UP:
+      case GREE_SWING_MIDDLE:
+      case GREE_SWING_MIDDLE_DOWN:
+      case GREE_SWING_DOWN:
+        break;
+      default:
+        new_position = GREE_SWING_LAST_POS;
+    }
+  } else {
+    switch (position) {
+      case GREE_SWING_AUTO:
+      case GREE_SWING_DOWN_AUTO:
+      case GREE_SWING_MIDDLE_AUTO:
+      case GREE_SWING_UP_AUTO:
+        break;
+      default:
+        new_position = GREE_SWING_AUTO;
+    }
+  }
+  remote_state[4] &= ~GREE_SWING_POS_MASK;
+  remote_state[4] |= new_position;
+}
+
+bool IRGreeAC::getSwingVerticalAuto() {
+  return remote_state[0] & GREE_SWING_AUTO_MASK;
+}
+
+uint8_t IRGreeAC::getSwingVerticalPosition() {
+  return remote_state[4] & GREE_SWING_POS_MASK;
 }
 
 // Convert the internal state into a human readable string.
@@ -338,6 +390,21 @@ std::string IRGreeAC::toString() {
     result += "On";
   else
     result += "Off";
+  result += ", Swing Vertical Mode: ";
+  if (getSwingVerticalAuto())
+    result += "Auto";
+  else
+    result += "Manual";
+  result += ", Swing Vertical Pos: " +
+      uint64ToString(getSwingVerticalPosition());
+  switch (getSwingVerticalPosition()) {
+    case GREE_SWING_LAST_POS:
+      result += " (Last Pos)";
+      break;
+    case GREE_SWING_AUTO:
+      result += " (Auto)";
+      break;
+  }
   return result;
 }
 
