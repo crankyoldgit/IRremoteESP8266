@@ -17,7 +17,7 @@ TEST(TestSendJVC, SendDataOnly) {
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000", irsend.outputStr());
+      "m525s70875", irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -31,22 +31,22 @@ TEST(TestSendJVC, SendWithRepeats) {
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000"
+      "m525s70875"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000", irsend.outputStr());
+      "m525s70875", irsend.outputStr());
   irsend.sendJVC(0xC2B8, JVC_BITS, 2);  // 2 repeats.
   EXPECT_EQ(
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000"
+      "m525s70875"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000"
+      "m525s70875"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s60000", irsend.outputStr());
+      "m525s70875", irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -59,7 +59,7 @@ TEST(TestSendJVC, SendUsualSize) {
   EXPECT_EQ(
       "m8400s4200"
       "m525s525m525s525m525s525m525s525m525s525m525s525m525s525m525s525"
-      "m525s60000", irsend.outputStr());
+      "m525s70875", irsend.outputStr());
 
   irsend.reset();
   irsend.sendJVC(0x1234567890ABCDEF, 64);
@@ -73,7 +73,7 @@ TEST(TestSendJVC, SendUsualSize) {
       "m525s1725m525s525m525s1725m525s525m525s1725m525s525m525s1725m525s1725"
       "m525s1725m525s1725m525s525m525s525m525s1725m525s1725m525s525m525s1725"
       "m525s1725m525s1725m525s1725m525s525m525s1725m525s1725m525s1725m525s1725"
-      "m525s60000", irsend.outputStr());
+      "m525s70875", irsend.outputStr());
 }
 
 // Tests for encodeJVC().
