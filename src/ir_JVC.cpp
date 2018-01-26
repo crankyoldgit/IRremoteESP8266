@@ -69,7 +69,11 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
                 data, nbits, 38, true, 0,  // Repeats are handles elsewhere.
                 33);
     // Wait till the end of the repeat time window before we send another code.
-    space(std::max(JVC_RPT_LENGTH - JVC_MIN_GAP - usecs.elapsed(), 0U));
+    uint32_t elapsed = usecs.elapsed();
+    // Avoid potential unsigned integer underflow.
+    // e.g. when elapsed > JVC_RPT_LENGTH.
+    if (elapsed < JVC_RPT_LENGTH)
+      space(JVC_RPT_LENGTH - elapsed);
     usecs.reset();
   }
 }

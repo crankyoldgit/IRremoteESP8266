@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //               W   W  H   H  Y   Y N   N TTTTT EEEEE  RRRRR
@@ -54,10 +53,8 @@
 void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set IR carrier frequency
   enableIROut(38);
-  IRtimer usecTimer = IRtimer();
 
   for (uint16_t i = 0; i <= repeat; i++) {
-    usecTimer.reset();
     // (Pre-)Header
     mark(WHYNTER_BIT_MARK);
     space(WHYNTER_ZERO_SPACE);
@@ -65,10 +62,10 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
                 WHYNTER_BIT_MARK, WHYNTER_ONE_SPACE,
                 WHYNTER_BIT_MARK, WHYNTER_ZERO_SPACE,
                 WHYNTER_BIT_MARK, WHYNTER_MIN_GAP,
+                WHYNTER_MIN_COMMAND_LENGTH - (WHYNTER_BIT_MARK +
+                                              WHYNTER_ZERO_SPACE),
                 data, nbits, 38, true, 0,  // Repeats are already handled.
                 50);
-    space(std::max(WHYNTER_MIN_COMMAND_LENGTH - WHYNTER_MIN_GAP -
-                   usecTimer.elapsed(), 0U));
   }
 }
 #endif
