@@ -1,5 +1,18 @@
 # Release Notes
 
+## _v2.3.2 (20180126)_
+
+**[Bug Fixes]**
+- Integer underflow caused device not to respond in `sendJVC()` (#401)
+
+**[Features]**
+- Initial support for sending & receiving Carrier HVAC codes. (#387)
+- Add Pronto HEX code support to _gc_decode_ tool. (#388)
+
+**[Misc]**
+- Make mDNS independent of MQTT in IRMQTTServer example code. (#390 #391)
+
+
 ## _v2.3.1 (20171229)_
 
 **[Bug Fixes]**
