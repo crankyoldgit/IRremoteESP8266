@@ -6,7 +6,6 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 #define IS_ZERO(m, s) (((m) * 100 / ((m) + (s))) <= MAGIQUEST_ZERO_RATIO)

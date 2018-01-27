@@ -3,7 +3,6 @@
 
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //                       DDDD   IIIII   SSSS  H   H
