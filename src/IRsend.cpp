@@ -47,6 +47,7 @@ void IRsend::begin() {
 #ifndef UNIT_TEST
   pinMode(IRpin, OUTPUT);
 #endif
+  ledOff();  // Ensure the LED is in a known safe state when we start.
 }
 
 // Turn off the IR LED.
