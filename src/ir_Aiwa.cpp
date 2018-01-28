@@ -2,7 +2,6 @@
 
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 
 //                         AAA   IIIII  W   W   AAA
 //                        A   A    I    W   W  A   A

@@ -7,7 +7,6 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //                  MM    MM IIIII DDDDD   EEEEEEE   AAA

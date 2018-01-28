@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //               NN   NN IIIII KK  KK   AAA   IIIII

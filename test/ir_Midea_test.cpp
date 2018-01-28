@@ -166,7 +166,7 @@ TEST(TestSendMidea, SendWithRepeats) {
 }
 
 // Test sending an atypical data size.
-TEST(TestSendMidea, SendUsualSize) {
+TEST(TestSendMidea, SendUnusualSize) {
   IRsendTest irsend(4);
   irsend.begin();
 

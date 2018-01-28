@@ -6,7 +6,6 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //                               L       GGGG
@@ -140,8 +139,13 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 // Ref:
 //   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
 bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1 && results->rawlen != 4)
-    return false;  // Can't possibly be a valid LG message.
+  if (nbits >= LG32_BITS) {
+    if (results->rawlen < 2 * nbits + 2 * (HEADER + FOOTER) - 1)
+      return false;  // Can't possibly be a valid LG32 message.
+  } else {
+    if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+      return false;  // Can't possibly be a valid LG message.
+  }
   if (strict && nbits != LG_BITS && nbits != LG32_BITS)
     return false;  // Doesn't comply with expected LG protocol.
 
@@ -185,15 +189,6 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   if (nbits >= LG32_BITS) {
     // If we are expecting the LG 32-bit protocol, there is always
     // a repeat message. So, check for it.
-#ifndef UNIT_TEST
-    if (!matchSpace(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
-#else
-    if (!(matchSpace(results->rawbuf[offset],
-                     LG_MIN_MESSAGE_LENGTH_TICKS * s_tick) ||
-          matchSpace(results->rawbuf[offset], 65500) ||
-          matchSpace(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick)))
-#endif  // UNIT_TEST
-      return false;
     offset++;
     if (!matchMark(results->rawbuf[offset++], LG32_RPT_HDR_MARK_TICKS * m_tick))
       return false;

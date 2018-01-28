@@ -12,6 +12,7 @@ class IRtimer {
   IRtimer();
   void reset();
   uint32_t elapsed();
+  static void add(uint32_t usecs);
 
  private:
   uint32_t start;

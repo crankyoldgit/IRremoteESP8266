@@ -3,7 +3,6 @@
 
 #include "IRrecv.h"
 #include "IRsend.h"
-#include "IRtimer.h"
 #include "IRutils.h"
 
 //             CCCCC   OOOOO   OOOOO  LL      IIIII XX    XX

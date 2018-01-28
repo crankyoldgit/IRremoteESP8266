@@ -10,9 +10,16 @@
 #include <string>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtimer.h"
 
 #define OUTPUT_BUF 10000U
 #define RAW_BUF 10000U
+
+#ifdef UNIT_TEST
+// Used to help simulate elapsed time in unit tests.
+uint32_t _IRtimer_unittest_now = 0;
+#endif  // UNIT_TEST
+
 class IRsendTest: public IRsend {
  public:
   uint32_t output[OUTPUT_BUF];
@@ -87,6 +94,7 @@ class IRsendTest: public IRsend {
 
  protected:
   uint16_t mark(uint16_t usec) {
+    IRtimer::add(usec);
     if (last >= OUTPUT_BUF)
       return 0;
     if (last & 1)  // Is odd? (i.e. last call was a space())
@@ -97,6 +105,7 @@ class IRsendTest: public IRsend {
   }
 
   void space(uint32_t time) {
+    IRtimer::add(time);
     if (last >= OUTPUT_BUF)
       return;
     if (last & 1) {  // Is odd? (i.e. last call was a space())
