@@ -26,6 +26,7 @@
 #if DECODE_AC
 #include <ir_Daikin.h>
 #include <ir_Fujitsu.h>
+#include <ir_Gree.h>
 #include <ir_Kelvinator.h>
 #include <ir_Midea.h>
 #include <ir_Toshiba.h>
@@ -134,6 +135,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_TOSHIBA_AC
+#if DECODE_GREE
+if (results->decode_type == GREE) {
+  IRGreeAC ac(0);
+  ac.setRaw(results->state);
+  description = ac.toString();
+}
+#endif  // DECODE_GREE
 #if DECODE_MIDEA
   if (results->decode_type == MIDEA) {
     IRMideaAC ac(0);

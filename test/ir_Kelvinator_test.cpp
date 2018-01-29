@@ -494,7 +494,6 @@ TEST(TestKelvinatorClass, MessageConstuction) {
       "m680s39950", irsend.outputStr());
 }
 
-#if DECODE_KELVINATOR
 // Decode a synthetic Kelvinator message.
 TEST(TestDecodeKelvinator, NormalSynthetic) {
   IRsendTest irsend(4);
@@ -512,4 +511,3 @@ TEST(TestDecodeKelvinator, NormalSynthetic) {
   ASSERT_EQ(KELVINATOR_BITS, irsend.capture.bits);
   EXPECT_STATE_EQ(kelv_code, irsend.capture.state, KELVINATOR_BITS);
 }
-#endif  // DECODE_KELVINATOR

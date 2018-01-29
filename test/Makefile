@@ -332,7 +332,7 @@ ir_Gree.o : $(USER_DIR)/ir_Gree.cpp $(GTEST_HEADERS)
 ir_Gree_test.o : ir_Gree_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Gree_test.cpp
 
-ir_Gree_test : $(COMMON_OBJ) ir_Gree_test.o
+ir_Gree_test : $(COMMON_OBJ) ir_Gree_test.o ir_Kelvinator.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Pronto.o : $(USER_DIR)/ir_Pronto.cpp $(GTEST_HEADERS)

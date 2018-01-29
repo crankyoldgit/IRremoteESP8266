@@ -269,6 +269,10 @@ class IRrecv {
                        uint16_t nbits = CARRIER_AC_BITS,
                        bool strict = true);
 #endif
+#if DECODE_GREE
+  bool decodeGree(decode_results *results,
+                  uint16_t nbits = GREE_BITS, bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

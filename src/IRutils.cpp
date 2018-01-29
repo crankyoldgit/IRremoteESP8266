@@ -147,6 +147,7 @@ bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
     case DAIKIN:
     case FUJITSU_AC:
+    case GREE:
     case KELVINATOR:
     case TOSHIBA_AC:
       return true;

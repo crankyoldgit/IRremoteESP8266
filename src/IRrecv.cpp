@@ -389,6 +389,8 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
     return true;
 #endif
 #if DECODE_KELVINATOR
+// Kelvinator based-devices use a similar code to Gree ones, to avoid false
+// matches this needs to happen before decodeGree().
   DPRINTLN("Attempting Kelvinator decode");
   if (decodeKelvinator(results))
     return true;
@@ -438,6 +440,13 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_LASERTAG
   DPRINTLN("Attempting Lasertag decode");
   if (decodeLasertag(results))
+    return true;
+#endif
+#if DECODE_GREE
+  // Gree based-devices use a similar code to Kelvinator ones, to avoid false
+  // matches this needs to happen after decodeKelvinator().
+  DPRINTLN("Attempting Gree decode");
+  if (decodeGree(results))
     return true;
 #endif
 #if DECODE_HASH
