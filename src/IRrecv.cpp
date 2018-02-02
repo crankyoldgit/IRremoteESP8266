@@ -671,39 +671,23 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
                                  const uint32_t zerospace,
                                  const uint8_t tolerance) {
   match_result_t result;
-  result.success = false;
+  result.success = false;  // Fail by default.
   result.data = 0;
-  if (onemark == zeromark) {  // Is this space encoded data format?
-    for (result.used = 0;
-         result.used < nbits * 2;
-         result.used += 2, data_ptr++) {
-      if (!matchMark(*data_ptr, onemark, tolerance))
-        return result;  // Fail
-      data_ptr++;
-      if (matchSpace(*data_ptr, onespace, tolerance))
-        result.data = (result.data << 1) | 1;
-      else if (matchSpace(*data_ptr, zerospace, tolerance))
-        result.data <<= 1;
-      else
-        return result;  // Fail
-    }
-    result.success = true;
-  } else if (onespace == zerospace) {  // Is this mark encoded data format?
-    for (result.used = 0;
-         result.used < nbits * 2;
-         result.used += 2, data_ptr++) {
-      if (matchMark(*data_ptr, onemark, tolerance))
-        result.data = (result.data << 1) | 1;
-      else if (matchMark(*data_ptr, zeromark, tolerance))
-        result.data <<= 1;
-      else
-        return result;  // Fail
-      data_ptr++;
-      if (!matchSpace(*data_ptr, onespace, tolerance))
-        return result;  // Fail
-    }
-    result.success = true;
+  for (result.used = 0;
+       result.used < nbits * 2;
+       result.used += 2, data_ptr += 2) {
+    // Is the bit a '1'?
+    if (matchMark(*data_ptr, onemark, tolerance) &&
+        matchSpace(*(data_ptr + 1), onespace, tolerance))
+      result.data = (result.data << 1) | 1;
+    // or is the bit a '0'?
+    else if (matchMark(*data_ptr, zeromark, tolerance) &&
+             matchSpace(*(data_ptr + 1), zerospace, tolerance))
+      result.data <<= 1;
+    else
+      return result;  // It's neither, so fail.
   }
+  result.success = true;
   return result;
 }
 
