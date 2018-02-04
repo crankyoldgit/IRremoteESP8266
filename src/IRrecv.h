@@ -47,16 +47,8 @@
 #define FNV_PRIME_32 16777619UL
 #define FNV_BASIS_32 2166136261UL
 
-#define MAX2(a, b) ((a > b)?(a):(b))
-#define MAX4(a, b, c, d) MAX2(MAX2(a, b), MAX2(c, d))
-#define STATE_SIZE_MAX MAX2(MAX4(ARGO_COMMAND_LENGTH, \
-                                 TROTEC_COMMAND_LENGTH, \
-                                 MITSUBISHI_AC_STATE_LENGTH, \
-                                 KELVINATOR_STATE_LENGTH), \
-                            MAX4(GREE_STATE_LENGTH, \
-                                 DAIKIN_COMMAND_LENGTH, \
-                                 TOSHIBA_AC_STATE_LENGTH, \
-                                 FUJITSU_AC_STATE_LENGTH))
+// Daikin is the current largest state size (by far).
+#define STATE_SIZE_MAX DAIKIN_COMMAND_LENGTH
 
 // Types
 // information for the interrupt handler
@@ -272,6 +264,10 @@ class IRrecv {
 #if DECODE_GREE
   bool decodeGree(decode_results *results,
                   uint16_t nbits = GREE_BITS, bool strict = true);
+#endif
+#if DECODE_HAIER_AC
+  bool decodeHaierAC(decode_results *results,
+                   uint16_t nbits = HAIER_AC_BITS, bool strict = true);
 #endif
 };
 

@@ -325,6 +325,7 @@ void handleRoot() {
         "<option value='16'>Daikin</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
+        "<option value='38'>Haier</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
         "<option value='32'>Toshiba</option>"
@@ -420,6 +421,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
                              (uint16_t) (FUJITSU_AC_STATE_LENGTH - 1));
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, (uint16_t) FUJITSU_AC_STATE_LENGTH);
+      break;
+    case HAIER_AC:
+      stateSize = HAIER_AC_STATE_LENGTH;
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");

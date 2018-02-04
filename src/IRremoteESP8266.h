@@ -157,9 +157,12 @@
 #define DECODE_CARRIER_AC    true
 #define SEND_CARRIER_AC      true
 
+#define DECODE_HAIER_AC      true
+#define SEND_HAIER_AC        true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
-     DECODE_TROTEC)
+     DECODE_TROTEC || DECODE_HAIER_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -209,7 +212,8 @@ enum decode_type_t {
   MIDEA,
   MAGIQUEST,
   LASERTAG,
-  CARRIER_AC
+  CARRIER_AC,
+  HAIER_AC
 };
 
 // Message lengths & required repeat values
@@ -229,6 +233,8 @@ enum decode_type_t {
 #define DISH_MIN_REPEAT              3U
 #define GREE_STATE_LENGTH            8U
 #define GREE_BITS                   (GREE_STATE_LENGTH * 8)
+#define HAIER_AC_STATE_LENGTH        9U
+#define HAIER_AC_BITS               (HAIER_AC_STATE_LENGTH * 8)
 #define JVC_BITS                    16U
 #define KELVINATOR_STATE_LENGTH     16U
 #define KELVINATOR_BITS             (KELVINATOR_STATE_LENGTH * 8)

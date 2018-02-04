@@ -229,6 +229,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendCarrierAC(uint64_t data, uint16_t nbits = CARRIER_AC_BITS,
                      uint16_t repeat = CARRIER_AC_MIN_REPEAT);
 #endif
+#if SEND_HAIER_AC
+  void sendHaierAC(unsigned char data[],
+                   uint16_t nbytes = HAIER_AC_STATE_LENGTH,
+                   uint16_t repeat = 0);
+#endif
 
  protected:
 #ifdef UNIT_TEST
