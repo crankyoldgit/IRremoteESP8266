@@ -156,7 +156,11 @@ if (results->decode_type == GREE) {
 // The section of code run only once at start-up.
 void setup() {
   Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
-  delay(500);  // Wait a bit for the serial connection to be establised.
+  while (!Serial)  // Wait for the serial connection to be establised.
+    delay(50);
+  Serial.println();
+  Serial.print("IRrecvDumpV2 is now running and waiting for IR input on Pin ");
+  Serial.println(RECV_PIN);
 
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
