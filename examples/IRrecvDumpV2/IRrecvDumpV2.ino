@@ -27,6 +27,7 @@
 #include <ir_Daikin.h>
 #include <ir_Fujitsu.h>
 #include <ir_Gree.h>
+#include <ir_Haier.h>
 #include <ir_Kelvinator.h>
 #include <ir_Midea.h>
 #include <ir_Toshiba.h>
@@ -136,11 +137,11 @@ void dumpACInfo(decode_results *results) {
   }
 #endif  // DECODE_TOSHIBA_AC
 #if DECODE_GREE
-if (results->decode_type == GREE) {
-  IRGreeAC ac(0);
-  ac.setRaw(results->state);
-  description = ac.toString();
-}
+  if (results->decode_type == GREE) {
+    IRGreeAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
 #endif  // DECODE_GREE
 #if DECODE_MIDEA
   if (results->decode_type == MIDEA) {
@@ -149,6 +150,13 @@ if (results->decode_type == GREE) {
     description = ac.toString();
   }
 #endif  // DECODE_MIDEA
+#if DECODE_HAIER_AC
+  if (results->decode_type == HAIER_AC) {
+    IRHaierAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_HAIER_AC
   // If we got a human-readable description of the message, display it.
   if (description != "")  Serial.println("Mesg Desc.: " + description);
 }
