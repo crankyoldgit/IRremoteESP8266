@@ -183,7 +183,7 @@ TEST(TestSendFujitsuAC, GenerateMessage) {
   irsend.reset();
   irsend.sendFujitsuAC(fujitsu.getRaw(), FUJITSU_AC_STATE_LENGTH);
   EXPECT_EQ(
-  "m3224s1574m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448"
+  "m3324s1574m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448"
   "s390m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
   "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448"
   "s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390m448s390m448"
@@ -214,7 +214,7 @@ TEST(TestSendFujitsuAC, GenerateShortMessage) {
   irsend.reset();
   irsend.sendFujitsuAC(fujitsu.getRaw(), FUJITSU_AC_STATE_LENGTH_SHORT);
   EXPECT_EQ(
-  "m3224s1574m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448"
+  "m3324s1574m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448"
   "s390m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
   "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
   "m448s390m448s390m448s390m448s1182m448s390m448s390m448s390m448s390m448s390"
@@ -236,7 +236,7 @@ TEST(TestSendFujitsuAC, Issue275) {
   irsend.sendFujitsuAC(fujitsu.getRaw(), FUJITSU_AC_STATE_LENGTH_SHORT);
   EXPECT_EQ(
       // Header
-      "m3224s1574"
+      "m3324s1574"
       //  0       0       1        0       1        0       0       0     (0x28)
       "m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448s390"
       //  1        1        0       0       0       1        1        0   (0xC6)
@@ -479,4 +479,74 @@ TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
   EXPECT_EQ(FUJITSU_AC_STATE_LENGTH - 1, fujitsu.getStateLength());
   EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 19C, Fan: 0 (AUTO), "
             "Swing: Off, Command: N/A", fujitsu.toString());
+}
+
+TEST(TestDecodeFujitsuAC, Issue414) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRFujitsuAC fujitsu = IRFujitsuAC(0);
+
+  // Capture as supplied by arpmota
+  uint16_t rawData[259] = {3352, 1574, 480, 350, 480, 346, 480, 1190, 458, 346,
+      508, 1140, 480, 346, 506, 346, 458, 346, 480, 1168, 480, 1192, 452, 374,
+      458, 346, 480, 346, 508, 1168, 480, 1140, 480, 346, 506, 346, 458, 346,
+      480, 346, 480, 346, 480, 346, 484, 372, 454, 374, 456, 346, 508, 318,
+      480, 374, 458, 374, 480, 318, 480, 1196, 452, 346, 480, 346, 484, 342,
+      484, 346, 480, 374, 458, 346, 506, 318, 508, 1170, 452, 346, 480, 374,
+      458, 346, 506, 318, 480, 1196, 452, 1190, 458, 1162, 480, 1196, 452,
+      1170, 480, 1190, 458, 1164, 480, 1196, 480, 318, 508, 346, 456, 1192,
+      480, 346, 456, 374, 452, 346, 480, 374, 458, 342, 484, 346, 508, 346,
+      456, 342, 512, 1164, 458, 1164, 508, 346, 456, 346, 480, 1190, 456, 342,
+      484, 346, 506, 346, 456, 374, 452, 346, 508, 346, 458, 1164, 508, 346,
+      458, 374, 452, 1168, 480, 374, 480, 318, 480, 374, 456, 346, 508, 318,
+      480, 346, 484, 374, 480, 318, 484, 342, 484, 374, 480, 318, 484, 342,
+      484, 346, 508, 318, 508, 346, 458, 346, 506, 318, 480, 374, 458, 346,
+      506, 318, 480, 346, 484, 374, 480, 318, 482, 372, 456, 346, 508, 318,
+      506, 348, 456, 342, 484, 346, 508, 318, 484, 374, 480, 318, 508, 318,
+      484, 346, 508, 318, 480, 374, 456, 346, 508, 346, 480, 318, 480, 346,
+      484, 374, 480, 320, 484, 1164, 508, 346, 458, 342, 512, 1164, 458, 1190,
+      454, 346, 484, 1164, 508, 346, 458, 1164, 480, 350, 480, 374, 480};
+  uint8_t state[16] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30, 0x81, 0x04, 0x00, 0x00,
+      0x00, 0x00, 0x20, 0x2B};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 259, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, irsend.capture.decode_type);
+  ASSERT_EQ(FUJITSU_AC_BITS, irsend.capture.bits);
+  EXPECT_TRUE(ArraysMatch(state, irsend.capture.state));
+  fujitsu.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ(FUJITSU_AC_STATE_LENGTH, fujitsu.getStateLength());
+  EXPECT_EQ("Power: On, Mode: 4 (HEAT), Temp: 24C, Fan: 0 (AUTO), "
+            "Swing: Off, Command: N/A", fujitsu.toString());
+
+  // Resend it using the state this time.
+  irsend.reset();
+  irsend.sendFujitsuAC(state, 16);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, irsend.capture.decode_type);
+  ASSERT_EQ(FUJITSU_AC_BITS, irsend.capture.bits);
+  EXPECT_TRUE(ArraysMatch(state, irsend.capture.state));
+  EXPECT_EQ(
+      "m3324s1574"
+      "m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448s390"
+      "m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182"
+      "m448s1182m448s390m448s390m448s1182m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s1182m448s390m448s390"
+      "m448s1182m448s390m448s390m448s390m448s390m448s390m448s390m448s1182"
+      "m448s390m448s390m448s1182m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s1182m448s390m448s390"
+      "m448s1182m448s1182m448s390m448s1182m448s390m448s1182m448s390m448s390"
+      "m448s8100", irsend.outputStr());
 }

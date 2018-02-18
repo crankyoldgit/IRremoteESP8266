@@ -17,7 +17,7 @@
 
 // Ref:
 // These values are based on averages of measurements
-#define FUJITSU_AC_HDR_MARK    3224U
+#define FUJITSU_AC_HDR_MARK    3324U
 #define FUJITSU_AC_HDR_SPACE   1574U
 #define FUJITSU_AC_BIT_MARK    448U
 #define FUJITSU_AC_ONE_SPACE   1182U
