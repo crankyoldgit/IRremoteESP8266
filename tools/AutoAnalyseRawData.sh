@@ -174,6 +174,7 @@ function bitSizeWarning() {
   # $1 is the nr of bits. $2 is what to indent with.
   if [[ ${1} -gt 64 ]]; then
     echo "${2}// DANGER: More than 64 bits detected. A uint64_t for data won't work!"
+    echo "${2}// DANGER: Try using alternative AirCon version below!"
   fi
 }
 
@@ -360,7 +361,7 @@ for msecs in $orig; do
 done
 echo
 displayBinaryValue ${binary_value}
-  if [[ "$DISPLAY_CODE" == "yes" ]]; then
+if [[ "$DISPLAY_CODE" == "yes" ]]; then
   echo
   echo "Generating a VERY rough code outline:"
   echo
@@ -370,5 +371,18 @@ displayBinaryValue ${binary_value}
   addCode "    delay(100);  // A 100% made up guess of the gap between messages."
   addCode "  }"
   addCode "}"
+  if [[ ${total_bits} -gt 64 ]]; then
+    addCode "Alternative (aircon code):"
+    addCode "// Alternative Function AirCon mode"
+    addCode "void IRsend::sendXYZ(uint8_t data[], uint16_t nbytes, uint16_t repeat) {"
+    addCode "  // nbytes should typically be $(($total_bits / 8))"
+    addCode "  // data should typically be of a type: uint8_t data[$(($total_bits / 8))] = {};"
+    addCode "  // data[] will is assumed to be in MSB order."
+    addCode "  for (uint16_t r = 0; r <= repeat; r++) {"
+    addCode "    sendGeneric(HDR_MARK, HDR_SPACE, BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, BIT_MARK"
+    addCode "                100, data, nbytes, 38, true, 0, 50);"
+    addCode "}"
+  fi
+
   echo "$CODE"
 fi
