@@ -53,7 +53,9 @@ WiFiServer server(4998);  // Uses port 4998.
 WiFiClient client;
 
 uint16_t *code_array;
-IRsend irsend(4);  // An IR LED is controlled by GPIO pin 4 (D2)
+#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+
+IRsend irsend(IR_LED);  // Set the GPIO to be used to sending the message.
 
 void sendGCString(String str) {
   int16_t index;

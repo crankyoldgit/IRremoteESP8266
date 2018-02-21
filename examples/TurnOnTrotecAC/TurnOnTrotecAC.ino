@@ -1,5 +1,6 @@
 /* Copyright 2017 stufisher
-* An IR LED circuit *MUST* be connected to ESP8266 GPIO4.
+* An IR LED circuit *MUST* be connected to the ESP8266 on a pin
+* as specified by IR_LED below.
 *
 * TL;DR: The IR LED needs to be driven by a transistor for a good result.
 *
@@ -29,7 +30,8 @@
 #include <IRsend.h>
 #include <ir_Trotec.h>
 
-IRTrotecESP trotecir(4);  // An IR LED is controlled by GPIO4, NodeMCU D2
+#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRTrotecESP trotecir(IR_LED);  // Set the GPIO to be used for sending messages.
 
 void setup() {
   trotecir.begin();
