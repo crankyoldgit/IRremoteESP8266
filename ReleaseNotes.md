@@ -1,5 +1,23 @@
 # Release Notes
 
+## _v2.3.3 (20180302)_
+
+**[Bug Fixes]**
+- Ensure the IR LED is off before we start. (#405)
+
+**[Features]**
+- Experimental decode support for Gree HVAC units (#397)
+- Initial support for Haier A/Cs. (#409)
+- Improve timing accuracy of unit tests. (#403)
+- Rework matchData() to handle equal total data bit time protocols. (#408)
+
+**[Misc]**
+- Add startup text to IRrecvDumpV2 and IRrecvDemo (#412)
+- Tweak timings on Fujitsu A/C header (#418)
+- AutoAnalyseRawData.sh: Add some support for handling larger than 64 bit codes. (#419)
+- Use better comments for send GPIO in examples. (#425)
+
+
 ## _v2.3.2 (20180126)_
 
 **[Bug Fixes]**
