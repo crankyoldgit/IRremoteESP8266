@@ -103,7 +103,7 @@ void setup() {
   delay(100);
   Serial.println(" ");
   Serial.println("IR TCP Server");
-
+  WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(900);
     Serial.print(".");
