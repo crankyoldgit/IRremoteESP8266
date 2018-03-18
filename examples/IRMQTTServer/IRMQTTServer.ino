@@ -500,6 +500,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
+#if SEND_HAIER_AC
+    case HAIER_AC:
+      irsend.sendHaierAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
   }
 }
 
