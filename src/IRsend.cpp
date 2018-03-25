@@ -29,9 +29,15 @@
 //               Setting this to something other than the default could
 //               easily destroy your IR LED if you are overdriving it.
 //               Unless you *REALLY* know what you are doing, don't change this.
+// Next two parameters allows to Override modulation frequences for IR output, even if hardware depended "send" method defines frequency
+// -1 - No override 
+// 0 - No modulation (allows to connect output to device's IR input directly - for example, AC receivers)
+//   mark_freq - modilation frequiency override  for "1" (no override by default), 
+//   space_freq - modulation frequency for 0 (no modulation by default)
+
 // Returns:
 //   An IRsend object.
-IRsend::IRsend(uint16_t IRsendPin, bool inverted) : IRpin(IRsendPin),
+IRsend::IRsend(uint16_t IRsendPin, bool inverted, int32_t mark_freq, int32_t space_freq) : IRpin(IRsendPin),
     periodOffset(PERIOD_OFFSET) {
   if (inverted) {
     outputOn = LOW;
@@ -40,6 +46,20 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted) : IRpin(IRsendPin),
     outputOn = HIGH;
     outputOff = LOW;
   }
+markFreq=mark_freq;
+spaceFreq=space_freq;  
+}
+
+// overrideFreqs ----------------------------------------------------------------------
+// Override modulation frequences for IR output, even if hardware depended "send" method defines frequency
+// -1 - No override (default)
+// 0 - No modulation (allows to connect output to device's IR input directly - for example, AC receivers)
+//
+// Args:
+//   mark_freq - modilation frequiency for "1", space_freq - modulation frequency for 0 (no modulation by default)
+void IRsend::overrideFreqs(int32_t mark_freq, int32_t space_freq) {
+markFreq=mark_freq;
+spaceFreq=space_freq;  
 }
 
 // Enable the pin for output.
@@ -84,7 +104,10 @@ uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
 //   Integer timing functions & math mean we can't do fractions of
 //   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
-void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
+void IRsend::enableIROut(uint32_t freq, uint8_t duty, uint32_t space_freq) {
+  if (markFreq!=-1)  freq=markFreq;
+  if (spaceFreq!=-1) space_freq=spaceFreq;
+  
   // Can't have more than 100% duty cycle.
   duty = std::min(duty, (uint8_t) 100);
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
@@ -94,7 +117,28 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   onTimePeriod = (period * duty) / 100;
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
+  
+  period = calcUSecPeriod(space_freq);
+  // Nr. of uSeconds the LED will be on per pulse.
+  spaceOnTimePeriod = (period * duty) / 100;
+  // Nr. of uSeconds the LED will be off per pulse.
+  spaceOffTimePeriod = period - onTimePeriod;
+  
 }
+
+void xDelayMicroseconds (uint32_t time) {  
+  // delayMicroseconds is only accurate to 16383us.
+  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
+  if (time <= 16383) {
+    delayMicroseconds(time);
+  } else {
+    // Invoke a delay(), where possible, to avoid triggering the WDT.
+    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
+    // Delay the remaining sub-millisecond.
+    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
+  }
+}
+
 
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
 //
@@ -112,7 +156,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 //   Hence, for greater compatibility & choice, we don't use that method.
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
-uint16_t IRsend::mark(uint16_t usec) {
+uint16_t IRsend::mark(uint32_t usec) {
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
   // Cache the time taken so far. This saves us calling time, and we can be
@@ -124,7 +168,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     digitalWrite(IRpin, outputOn);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
-    delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
+    xDelayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, outputOff);  // Turn the LED off.
 #endif
     counter++;
@@ -132,13 +176,14 @@ uint16_t IRsend::mark(uint16_t usec) {
       return counter;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
 #ifndef UNIT_TEST
-    delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
+    xDelayMicroseconds(std::min(usec - elapsed - onTimePeriod,
                                (uint32_t) offTimePeriod));
 #endif
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
 }
+
 
 // Turn the pin (LED) off for a given time.
 // Sends an IR space for the specified number of microseconds.
@@ -147,20 +192,33 @@ uint16_t IRsend::mark(uint16_t usec) {
 // Args:
 //   time: Time in microseconds (us).
 void IRsend::space(uint32_t time) {
-  ledOff();
-  if (time == 0) return;
+  IRtimer usecTimer = IRtimer();
+  // Cache the time taken so far. This saves us calling time, and we can be
+  // assured that we can't have odd math problems. i.e. unsigned under/overflow.
+  if (time == 0) {ledOff();return;}
+
+  uint32_t elapsed = usecTimer.elapsed();
+
+  while (elapsed < time) {  // Loop until we've met/exceeded our required time.
+
+
 #ifndef UNIT_TEST
-  // delayMicroseconds is only accurate to 16383us.
-  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-  if (time <= 16383) {
-    delayMicroseconds(time);
-  } else {
-    // Invoke a delay(), where possible, to avoid triggering the WDT.
-    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
-    // Delay the remaining sub-millisecond.
-    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
-  }
+    digitalWrite(IRpin, outputOff);  // Turn the LED off.
+    // Calculate how long we should pulse on for.
+    // e.g. Are we to close to the end of our requested mark time (usec)?
+    xDelayMicroseconds(std::min((uint32_t) spaceOffTimePeriod, time - elapsed));
 #endif
+    if (elapsed + spaceOffTimePeriod >= time)
+      return;  // LED is now off & we've passed our allotted time.
+    // Wait for the lesser of the rest of the duty cycle, or the time remaining.
+#ifndef UNIT_TEST
+    digitalWrite(IRpin, outputOn);  // Turn the LED on.
+    xDelayMicroseconds(std::min(time - elapsed - spaceOnTimePeriod,
+                               (uint32_t) spaceOnTimePeriod));
+    digitalWrite(IRpin, outputOff);
+#endif
+    elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
+  }
 }
 
 // Calculate & set any offsets to account for execution times.
@@ -331,11 +389,10 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
     usecs.reset();
-
     // Header
     if (headermark)  mark(headermark);
     if (headerspace)  space(headerspace);
-
+//Serial.println(headermark);Serial.println(headerspace);
     // Data
     sendData(onemark, onespace, zeromark, zerospace, data, nbits, MSBfirst);
 
