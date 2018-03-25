@@ -28,9 +28,10 @@
 // Classes
 class IRsend {
  public:
-  explicit IRsend(uint16_t IRsendPin, bool inverted = false);
+  explicit IRsend(uint16_t IRsendPin, bool inverted = false, int32_t mark_freq=-1, int32_t space_freq=0);
   void begin();
-  void enableIROut(uint32_t freq, uint8_t duty = DUTY_DEFAULT);
+  void enableIROut(uint32_t mark_freq=0, uint8_t duty = DUTY_DEFAULT, uint32_t space_freq=0);
+  void overrideFreqs(int32_t mark_freq=-1, int32_t space_freq=-1);
   VIRTUAL uint16_t mark(uint16_t usec);
   VIRTUAL void space(uint32_t usec);
   void calibrate(uint16_t hz = 38000U);
@@ -250,6 +251,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
  private:
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
+  uint16_t spaceOnTimePeriod;
+  uint16_t spaceOffTimePeriod; 
+  int32_t  markFreq;
+  int32_t  spaceFreq;
   uint16_t IRpin;
   int8_t periodOffset;
   void ledOff();
