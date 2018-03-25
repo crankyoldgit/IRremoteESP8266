@@ -126,6 +126,20 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty, uint32_t space_freq) {
   
 }
 
+void xDelayMicroseconds (uint32_t time) {  
+  // delayMicroseconds is only accurate to 16383us.
+  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
+  if (time <= 16383) {
+    delayMicroseconds(time);
+  } else {
+    // Invoke a delay(), where possible, to avoid triggering the WDT.
+    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
+    // Delay the remaining sub-millisecond.
+    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
+  }
+}
+
+
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
 //
 // Args:
@@ -142,7 +156,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty, uint32_t space_freq) {
 //   Hence, for greater compatibility & choice, we don't use that method.
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
-uint16_t IRsend::mark(uint16_t usec) {
+uint16_t IRsend::mark(uint32_t usec) {
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
   // Cache the time taken so far. This saves us calling time, and we can be
@@ -154,7 +168,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     digitalWrite(IRpin, outputOn);  // Turn the LED on.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
-    delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
+    xDelayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
     digitalWrite(IRpin, outputOff);  // Turn the LED off.
 #endif
     counter++;
@@ -162,7 +176,7 @@ uint16_t IRsend::mark(uint16_t usec) {
       return counter;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
 #ifndef UNIT_TEST
-    delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
+    xDelayMicroseconds(std::min(usec - elapsed - onTimePeriod,
                                (uint32_t) offTimePeriod));
 #endif
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
@@ -170,20 +184,6 @@ uint16_t IRsend::mark(uint16_t usec) {
   return counter;
 }
 
-
-
-void xDelayMicroseconds (uint32_t time) {  
-  // delayMicroseconds is only accurate to 16383us.
-  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-  if (time <= 16383) {
-    delayMicroseconds(time);
-  } else {
-    // Invoke a delay(), where possible, to avoid triggering the WDT.
-    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
-    // Delay the remaining sub-millisecond.
-    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
-  }
-}
 
 // Turn the pin (LED) off for a given time.
 // Sends an IR space for the specified number of microseconds.
@@ -206,15 +206,16 @@ void IRsend::space(uint32_t time) {
     digitalWrite(IRpin, outputOff);  // Turn the LED off.
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
-    xDelayMicroseconds(std::min((uint32_t) onTimePeriod, time - elapsed));
+    xDelayMicroseconds(std::min((uint32_t) spaceOffTimePeriod, time - elapsed));
 #endif
-    if (elapsed + onTimePeriod >= time)
+    if (elapsed + spaceOffTimePeriod >= time)
       return;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
 #ifndef UNIT_TEST
     digitalWrite(IRpin, outputOn);  // Turn the LED on.
-    xDelayMicroseconds(std::min(time - elapsed - onTimePeriod,
-                               (uint32_t) offTimePeriod));
+    xDelayMicroseconds(std::min(time - elapsed - spaceOnTimePeriod,
+                               (uint32_t) spaceOnTimePeriod));
+    digitalWrite(IRpin, outputOff);
 #endif
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
@@ -388,11 +389,10 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
     usecs.reset();
-
     // Header
     if (headermark)  mark(headermark);
     if (headerspace)  space(headerspace);
-
+//Serial.println(headermark);Serial.println(headerspace);
     // Data
     sendData(onemark, onespace, zeromark, zerospace, data, nbits, MSBfirst);
 

@@ -32,7 +32,7 @@ class IRsend {
   void begin();
   void enableIROut(uint32_t mark_freq=0, uint8_t duty = DUTY_DEFAULT, uint32_t space_freq=0);
   void overrideFreqs(int32_t mark_freq=-1, int32_t space_freq=-1);
-  VIRTUAL uint16_t mark(uint16_t usec);
+  VIRTUAL uint16_t mark(uint32_t usec);
   VIRTUAL void space(uint32_t usec);
   void calibrate(uint16_t hz = 38000U);
   void sendRaw(uint16_t buf[], uint16_t len, uint16_t hz);
@@ -249,10 +249,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   uint8_t outputOff;
 
  private:
-  uint16_t onTimePeriod;
-  uint16_t offTimePeriod;
-  uint16_t spaceOnTimePeriod;
-  uint16_t spaceOffTimePeriod; 
+  uint32_t onTimePeriod;
+  uint32_t offTimePeriod;
+  uint32_t spaceOnTimePeriod;
+  uint32_t spaceOffTimePeriod; 
   int32_t  markFreq;
   int32_t  spaceFreq;
   uint16_t IRpin;
