@@ -37,7 +37,7 @@
 
 // Returns:
 //   An IRsend object.
-IRsend::IRsend(uint16_t IRsendPin, bool inverted int32_t mark_freq, int32_t space_freq) : IRpin(IRsendPin),
+IRsend::IRsend(uint16_t IRsendPin, bool inverted int32_t, mark_freq, int32_t space_freq) : IRpin(IRsendPin),
     periodOffset(PERIOD_OFFSET) {
   if (inverted) {
     outputOn = LOW;
@@ -105,7 +105,7 @@ uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
 //   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
 void IRsend::enableIROut(uint32_t freq, uint8_t duty, uint32_t space_freq) {
-  if (marqFreq!=-1)  freq=marqFreq;
+  if (markFreq!=-1)  freq=marqFreq;
   if (spaceFreq!=-1) space_freq=spaceFreq;
   
   // Can't have more than 100% duty cycle.
