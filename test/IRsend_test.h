@@ -27,7 +27,8 @@ class IRsendTest: public IRsend {
   uint16_t rawbuf[RAW_BUF];
   decode_results capture;
 
-  explicit IRsendTest(uint16_t x, bool i = false) : IRsend(x, i) {
+  explicit IRsendTest(uint16_t x, bool i = false, bool j = true) :
+      IRsend(x, i, j) {
     reset();
   }
 
@@ -115,4 +116,37 @@ class IRsendTest: public IRsend {
     }
   }
 };
+
+#ifdef UNIT_TEST
+class IRsendLowLevelTest: public IRsend {
+ public:
+  std::string low_level_sequence;
+
+  explicit IRsendLowLevelTest(uint16_t x, bool i = false, bool j = true) :
+      IRsend(x, i, j) {
+    reset();
+  }
+
+  void reset() {
+    low_level_sequence = "";
+  }
+
+ protected:
+  void _delayMicroseconds(uint32_t usec) {
+    _IRtimer_unittest_now += usec;
+    std::ostringstream Convert;
+    Convert << usec;
+    low_level_sequence += Convert.str() + "usecs";
+  }
+
+  void ledOff() {
+    low_level_sequence += "[Off]";
+  }
+
+  void ledOn() {
+    low_level_sequence += "[On]";
+  }
+};
+#endif  // UNIT_TEST
+
 #endif  // TEST_IRSEND_TEST_H_

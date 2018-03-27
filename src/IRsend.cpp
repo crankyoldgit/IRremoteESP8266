@@ -29,10 +29,14 @@
 //               Setting this to something other than the default could
 //               easily destroy your IR LED if you are overdriving it.
 //               Unless you *REALLY* know what you are doing, don't change this.
+//   use_modulation: Do we do frequency modulation during transmission?
+//                   i.e. If not, assume a 100% duty cycle. Ignore attempts
+//                        to change the duty cycle etc.
 // Returns:
 //   An IRsend object.
-IRsend::IRsend(uint16_t IRsendPin, bool inverted) : IRpin(IRsendPin),
-    periodOffset(PERIOD_OFFSET) {
+IRsend::IRsend(uint16_t IRsendPin, bool inverted,
+               bool use_modulation) : IRpin(IRsendPin),
+                                      periodOffset(PERIOD_OFFSET) {
   if (inverted) {
     outputOn = LOW;
     outputOff = HIGH;
@@ -40,6 +44,11 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted) : IRpin(IRsendPin),
     outputOn = HIGH;
     outputOff = LOW;
   }
+  modulation = use_modulation;
+  if (modulation)
+    _dutycycle = DUTY_DEFAULT;
+  else
+    _dutycycle = DUTY_MAX;
 }
 
 // Enable the pin for output.
@@ -54,6 +63,13 @@ void IRsend::begin() {
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
   digitalWrite(IRpin, outputOff);
+#endif
+}
+
+// Turn on the IR LED.
+void IRsend::ledOn() {
+#ifndef UNIT_TEST
+  digitalWrite(IRpin, outputOn);
 #endif
 }
 
@@ -79,21 +95,46 @@ uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
 // Args:
 //   freq: The freq we want to modulate at. Assumes < 1000 means kHz else Hz.
 //   duty: Percentage duty cycle of the LED. e.g. 25 = 25% = 1/4 on, 3/4 off.
+//         This is ignored if modulation is disabled at object instantiation.
 //
 // Note:
 //   Integer timing functions & math mean we can't do fractions of
 //   microseconds timing. Thus minor changes to the freq & duty values may have
 //   limited effect. You've been warned.
 void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
-  // Can't have more than 100% duty cycle.
-  duty = std::min(duty, (uint8_t) 100);
+  // Set the duty cycle to use if we want freq. modulation.
+  if (modulation) {
+    _dutycycle = std::min(duty, (uint8_t) DUTY_MAX);
+  } else {
+    _dutycycle = DUTY_MAX;
+  }
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
   uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
-  onTimePeriod = (period * duty) / 100;
+  onTimePeriod = (period * _dutycycle) / DUTY_MAX;
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
+}
+
+// An ESP8266 RTOS watch-dog timer friendly version of delayMicroseconds().
+// Args:
+//   usec: Nr. of uSeconds to delay for.
+void IRsend::_delayMicroseconds(uint32_t usec) {
+  // delayMicroseconds is only accurate to 16383us.
+  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
+  if (usec <= 16383) {
+#ifndef UNIT_TEST
+    delayMicroseconds(usec);
+#endif
+  } else {
+#ifndef UNIT_TEST
+    // Invoke a delay(), where possible, to avoid triggering the WDT.
+    delay(usec / 1000UL);  // Delay for as many whole milliseconds as we can.
+    // Delay the remaining sub-millisecond.
+    delayMicroseconds(static_cast<uint16_t>(usec % 1000UL));
+#endif
+  }
 }
 
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
@@ -113,6 +154,15 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 // Ref:
 //   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
+  // Handle the simple case of no required frequency modulation.
+  if (!modulation || _dutycycle >= 100) {
+    ledOn();
+    _delayMicroseconds(usec);
+    ledOff();
+    return 1;
+  }
+
+  // Not simple, so do it assuming frequency modulation.
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
   // Cache the time taken so far. This saves us calling time, and we can be
@@ -120,21 +170,17 @@ uint16_t IRsend::mark(uint16_t usec) {
   uint32_t elapsed = usecTimer.elapsed();
 
   while (elapsed < usec) {  // Loop until we've met/exceeded our required time.
-#ifndef UNIT_TEST
-    digitalWrite(IRpin, outputOn);  // Turn the LED on.
+    ledOn();
     // Calculate how long we should pulse on for.
     // e.g. Are we to close to the end of our requested mark time (usec)?
-    delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
-    digitalWrite(IRpin, outputOff);  // Turn the LED off.
-#endif
+    _delayMicroseconds(std::min((uint32_t) onTimePeriod, usec - elapsed));
+    ledOff();
     counter++;
     if (elapsed + onTimePeriod >= usec)
       return counter;  // LED is now off & we've passed our allotted time.
     // Wait for the lesser of the rest of the duty cycle, or the time remaining.
-#ifndef UNIT_TEST
-    delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
-                               (uint32_t) offTimePeriod));
-#endif
+    _delayMicroseconds(std::min(usec - elapsed - onTimePeriod,
+                                (uint32_t) offTimePeriod));
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
@@ -149,18 +195,7 @@ uint16_t IRsend::mark(uint16_t usec) {
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
-#ifndef UNIT_TEST
-  // delayMicroseconds is only accurate to 16383us.
-  // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-  if (time <= 16383) {
-    delayMicroseconds(time);
-  } else {
-    // Invoke a delay(), where possible, to avoid triggering the WDT.
-    delay(time / 1000UL);  // Delay for as many whole milliseconds as we can.
-    // Delay the remaining sub-millisecond.
-    delayMicroseconds(static_cast<uint16_t>(time % 1000UL));
-  }
-#endif
+  _delayMicroseconds(time);
 }
 
 // Calculate & set any offsets to account for execution times.
