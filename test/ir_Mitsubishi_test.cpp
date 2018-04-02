@@ -820,7 +820,7 @@ TEST(TestDecodeMitsubishi2, DecodeRealExample) {
       8454, 4170,  560, 514,  528, 516,  526, 520,  524, 490, 556, 1572,
       534, 1534,  560, 1568,  530, 1538,  558, 4166,
       560, 1538,  558, 490,  560, 512,  530, 514,  532, 484,  558, 514,
-      532, 1566,  530, 486, 554};  // UNKNOWN 96A1512F
+      532, 1566,  530, 486,  554};  // UNKNOWN 96A1512F
 
   irsend.sendRaw(rawData, 75, 33);
   irsend.makeDecodeResult();

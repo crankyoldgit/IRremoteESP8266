@@ -39,14 +39,15 @@
 #define MITSUBISHI_MIN_GAP            (MITSUBISHI_MIN_GAP_TICKS * \
                                        MITSUBISHI_TICK)
 
+// Mitsubishi Projector (HC3000)
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/441
 #define MITSUBISHI2_HDR_MARK                8400U
 #define MITSUBISHI2_HDR_SPACE         (MITSUBISHI2_HDR_MARK / 2)
 #define MITSUBISHI2_BIT_MARK                 560U
 #define MITSUBISHI2_ZERO_SPACE               520U
 #define MITSUBISHI2_ONE_SPACE         (MITSUBISHI2_ZERO_SPACE * 3)
 #define MITSUBISHI2_MIN_GAP                28500U
-
-
 
 // Mitsubishi A/C
 // Ref:
@@ -163,16 +164,23 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 // Status: ALPHA / untested.
 //
 // Notes:
-//   This protocol appears to have a manditory repeat.
+//   Based on a Mitsubishi HC3000 projector's remote.
+//   This protocol appears to have a manditory in-protocol repeat.
+//   That is in *addition* to the entire message needing to be sent twice
+//   for the device to accept the command. That is separate from the repeat.
+//   i.e. Allegedly, the real remote requires the "OFF" button pressed twice.
+//        You will need to add a suitable gap yourself.
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/441
 void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t i = 0; i <= repeat; i++) {
+    // First half of the data.
     sendGeneric(MITSUBISHI2_HDR_MARK, MITSUBISHI2_HDR_SPACE,
       MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
       MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
       MITSUBISHI2_BIT_MARK, MITSUBISHI2_HDR_SPACE,
       data >> (nbits / 2), nbits / 2, 33, true, 0, 50);
+    // Second half of the data.
     sendGeneric(0, 0,  // No header for the second data block
       MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
       MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
@@ -192,9 +200,11 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / previously working.
+// Status: BETA / Works with simulated data.
 //
 // Notes:
+//   Hardware supported:
+//     * Mitsubishi HC3000 projector's remote.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/441
