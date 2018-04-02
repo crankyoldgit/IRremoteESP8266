@@ -118,6 +118,7 @@ std::string typeToString(const decode_type_t protocol,
     case MAGIQUEST:     result = "MAGIQUEST";         break;
     case MIDEA:         result = "MIDEA";             break;
     case MITSUBISHI:    result = "MITSUBISHI";        break;
+    case MITSUBISHI2:   result = "MITSUBISHI";        break;
     case MITSUBISHI_AC: result = "MITSUBISHI_AC";     break;
     case NEC:           result = "NEC";               break;
     case NEC_LIKE:      result = "NEC (non-strict)";  break;

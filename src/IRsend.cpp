@@ -477,6 +477,9 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #if SEND_MITSUBISHI
     case MITSUBISHI: sendMitsubishi(data, nbits); break;
 #endif
+#if SEND_MITSUBISHI2
+    case MITSUBISHI2: sendMitsubishi2(data, nbits); break;
+#endif
 #if SEND_SHARP
     case SHARP: sendSharpRaw(data, nbits); break;
 #endif

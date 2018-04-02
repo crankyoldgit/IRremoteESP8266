@@ -157,6 +157,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendMitsubishi(uint64_t data, uint16_t nbits = MITSUBISHI_BITS,
                       uint16_t repeat = MITSUBISHI_MIN_REPEAT);
 #endif
+#if SEND_MITSUBISHI2
+  void sendMitsubishi2(uint64_t data, uint16_t nbits = MITSUBISHI_BITS,
+                       uint16_t repeat = MITSUBISHI_MIN_REPEAT);
+#endif
 #if SEND_MITSUBISHI_AC
   void sendMitsubishiAC(unsigned char data[],
                         uint16_t nbytes = MITSUBISHI_AC_STATE_LENGTH,

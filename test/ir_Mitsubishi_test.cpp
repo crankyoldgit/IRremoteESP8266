@@ -692,3 +692,143 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
       "m450s420m450s420m450s420m450s1300m450s420m450s420m450s1300m450s420"
       "m440s17100", irsend.outputStr());
 }
+
+// Tests for sendMitsubishi2().
+
+// Test sending typical data only.
+TEST(TestSendMitsubishi2, SendDataOnly) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0xF82);
+  EXPECT_EQ(
+      "m8400s4200"
+      "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+      "m560s4200"
+      "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+      "m560s28500"
+      "m8400s4200"
+      "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+      "m560s4200"
+      "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+      "m560s28500", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0x0);
+  EXPECT_EQ(
+      "m8400s4200"
+      "m560s520m560s520m560s520m560s520m560s520m560s520m560s520m560s520"
+      "m560s4200"
+      "m560s520m560s520m560s520m560s520m560s520m560s520m560s520m560s520"
+      "m560s28500"
+      "m8400s4200"
+      "m560s520m560s520m560s520m560s520m560s520m560s520m560s520m560s520"
+      "m560s4200"
+      "m560s520m560s520m560s520m560s520m560s520m560s520m560s520m560s520"
+      "m560s28500", irsend.outputStr());
+}
+
+// Test sending odd repeats.
+TEST(TestSendMitsubishi2, Repeats) {
+  IRsendTest irsend(4);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0xF82, MITSUBISHI_BITS, 0);
+  EXPECT_EQ(
+      "m8400s4200"
+      "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+      "m560s4200"
+      "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+      "m560s28500", irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0xF82, MITSUBISHI_BITS, 2);
+  EXPECT_EQ(
+    "m8400s4200"
+    "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+    "m560s4200"
+    "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+    "m560s28500"
+    "m8400s4200"
+    "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+    "m560s4200"
+    "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+    "m560s28500"
+    "m8400s4200"
+    "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
+    "m560s4200"
+    "m560s1560m560s520m560s520m560s520m560s520m560s520m560s1560m560s520"
+    "m560s28500", irsend.outputStr());
+}
+
+// Tests for decodeMitsubishi2().
+
+// Decode synthetic examples.
+TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Mitsubishi Projector "Power On" (16-bit).
+  irsend.sendMitsubishi2(0xF82);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
+  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(0xF82, irsend.capture.value);
+  EXPECT_EQ(0xF, irsend.capture.address);
+  EXPECT_EQ(0x82, irsend.capture.command);
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0x0);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
+  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x0, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+
+  irsend.reset();
+  irsend.sendMitsubishi2(0x1234);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
+  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x1234, irsend.capture.value);
+  EXPECT_EQ(0x12, irsend.capture.address);
+  EXPECT_EQ(0x34, irsend.capture.command);
+}
+
+// Decode a 'real' example from Issue #441
+TEST(TestDecodeMitsubishi2, DecodeRealExample) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Mitsubishi Projector "Power On" (16-bit).
+  uint16_t rawData[75] = {
+      8402, 4172,  554, 490,  562, 484,  560, 514,  532, 512,  534, 1566,
+      526, 1572,  526, 1542,  560, 1568,  532, 4192,
+      534, 1564,  532, 484,  560, 512,  532, 512,  532, 514,  530, 514,
+      526, 1570,  524, 520,  526, 28506,
+      8454, 4170,  560, 514,  528, 516,  526, 520,  524, 490, 556, 1572,
+      534, 1534,  560, 1568,  530, 1538,  558, 4166,
+      560, 1538,  558, 490,  560, 512,  530, 514,  532, 484,  558, 514,
+      532, 1566,  530, 486, 554};  // UNKNOWN 96A1512F
+
+  irsend.sendRaw(rawData, 75, 33);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
+  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(0xF82, irsend.capture.value);
+  EXPECT_EQ(0xF, irsend.capture.address);
+  EXPECT_EQ(0x82, irsend.capture.command);
+}

@@ -163,6 +163,11 @@ class IRrecv {
                         uint16_t nbits = MITSUBISHI_BITS,
                         bool strict = true);
 #endif
+#if DECODE_MITSUBISHI
+  bool decodeMitsubishi2(decode_results *results,
+                         uint16_t nbits = MITSUBISHI_BITS,
+                         bool strict = true);
+#endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = TOLERANCE,
