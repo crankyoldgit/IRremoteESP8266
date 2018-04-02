@@ -239,6 +239,7 @@ void handleRoot() {
         "<option value='35'>MagiQuest</option>"
         "<option value='34'>Midea</option>"
         "<option value='12'>Mitsubishi</option>"
+        "<option value='39'>Mitsubishi2</option>"
         "<option selected='selected' value='3'>NEC</option>"  // Default
         "<option value='29'>Nikai</option>"
         "<option value='5'>Panasonic</option>"
@@ -1106,6 +1107,14 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = CARRIER_AC_BITS;
       irsend.sendCarrierAC(code, bits, repeat);
+      break;
+#endif
+#if SEND_MITSUBISHI2
+    case MITSUBISHI2:  // 39
+      if (bits == 0)
+        bits = MITSUBISHI_BITS;
+      repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
+      irsend.sendMitsubishi2(code, bits, repeat);
       break;
 #endif
   }
