@@ -163,7 +163,7 @@ class IRrecv {
                         uint16_t nbits = MITSUBISHI_BITS,
                         bool strict = true);
 #endif
-#if DECODE_MITSUBISHI
+#if DECODE_MITSUBISHI2
   bool decodeMitsubishi2(decode_results *results,
                          uint16_t nbits = MITSUBISHI_BITS,
                          bool strict = true);
