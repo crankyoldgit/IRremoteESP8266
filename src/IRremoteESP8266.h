@@ -100,6 +100,9 @@
 #define DECODE_MITSUBISHI    true
 #define SEND_MITSUBISHI      true
 
+#define DECODE_MITSUBISHI2   true
+#define SEND_MITSUBISHI2     true
+
 #define DECODE_DISH          true
 #define SEND_DISH            true
 
@@ -213,7 +216,8 @@ enum decode_type_t {
   MAGIQUEST,
   LASERTAG,
   CARRIER_AC,
-  HAIER_AC
+  HAIER_AC,
+  MITSUBISHI2
 };
 
 // Message lengths & required repeat values

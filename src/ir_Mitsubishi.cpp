@@ -39,6 +39,16 @@
 #define MITSUBISHI_MIN_GAP            (MITSUBISHI_MIN_GAP_TICKS * \
                                        MITSUBISHI_TICK)
 
+// Mitsubishi Projector (HC3000)
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/441
+#define MITSUBISHI2_HDR_MARK                8400U
+#define MITSUBISHI2_HDR_SPACE         (MITSUBISHI2_HDR_MARK / 2)
+#define MITSUBISHI2_BIT_MARK                 560U
+#define MITSUBISHI2_ZERO_SPACE               520U
+#define MITSUBISHI2_ONE_SPACE         (MITSUBISHI2_ZERO_SPACE * 3)
+#define MITSUBISHI2_MIN_GAP                28500U
+
 // Mitsubishi A/C
 // Ref:
 //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L84
@@ -73,7 +83,7 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
               MITSUBISHI_MIN_COMMAND_LENGTH,
               data, nbits, 33, true, repeat, 50);
 }
-#endif
+#endif   // SEND_MITSUBISHI
 
 #if DECODE_MITSUBISHI
 // Decode the supplied Mitsubishi message.
@@ -141,7 +151,122 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_MITSUBISHI
+
+#if SEND_MITSUBISHI2
+// Send a Mitsubishi2 message
+//
+// Args:
+//   data:   Contents of the message to be sent.
+//   nbits:  Nr. of bits of data to be sent. Typically MITSUBISHI_BITS.
+//   repeat: Nr. of additional times the message is to be sent.
+//
+// Status: ALPHA / untested.
+//
+// Notes:
+//   Based on a Mitsubishi HC3000 projector's remote.
+//   This protocol appears to have a manditory in-protocol repeat.
+//   That is in *addition* to the entire message needing to be sent twice
+//   for the device to accept the command. That is separate from the repeat.
+//   i.e. Allegedly, the real remote requires the "OFF" button pressed twice.
+//        You will need to add a suitable gap yourself.
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/441
+void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
+  for (uint16_t i = 0; i <= repeat; i++) {
+    // First half of the data.
+    sendGeneric(MITSUBISHI2_HDR_MARK, MITSUBISHI2_HDR_SPACE,
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_HDR_SPACE,
+      data >> (nbits / 2), nbits / 2, 33, true, 0, 50);
+    // Second half of the data.
+    sendGeneric(0, 0,  // No header for the second data block
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
+      MITSUBISHI2_BIT_MARK, MITSUBISHI2_MIN_GAP,
+      data & ((1 << (nbits / 2)) - 1), nbits / 2, 33, true, 0, 50);
+  }
+}
+#endif  // SEND_MITSUBISHI2
+
+#if DECODE_MITSUBISHI2
+// Decode the supplied Mitsubishi2 message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / Works with simulated data.
+//
+// Notes:
+//   Hardware supported:
+//     * Mitsubishi HC3000 projector's remote.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/441
+bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
+                               bool strict) {
+  if (results->rawlen < 2 * nbits + HEADER + (FOOTER * 2) - 1)
+    return false;  // Shorter than shortest possibly expected.
+  if (strict && nbits != MITSUBISHI_BITS)
+    return false;  // Request is out of spec.
+
+  uint16_t offset = OFFSET_START;
+  uint64_t data = 0;
+  uint16_t actualBits = 0;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], MITSUBISHI2_HDR_MARK))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], MITSUBISHI2_HDR_SPACE))
+    return false;
+  for (uint8_t i = 1; i <= 2; i++) {
+    // Data
+    match_result_t data_result = matchData(&(results->rawbuf[offset]),
+                                           nbits / 2,
+                                           MITSUBISHI2_BIT_MARK,
+                                           MITSUBISHI2_ONE_SPACE,
+                                           MITSUBISHI2_BIT_MARK,
+                                           MITSUBISHI2_ZERO_SPACE);
+    if (data_result.success == false) return false;
+    data <<= nbits / 2;
+    data += data_result.data;
+    offset += data_result.used;
+    actualBits += data_result.used / 2;
+
+    // Footer
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI2_BIT_MARK))
+      return false;
+    if (i % 2) {  // Every odd data block, we expect a HDR space.
+      if (!matchSpace(results->rawbuf[offset++], MITSUBISHI2_HDR_SPACE))
+        return false;
+    } else {  // Every even data block, we expect Min Gap or end of the message.
+      if (offset < results->rawlen &&
+          !matchAtLeast(results->rawbuf[offset++], MITSUBISHI2_MIN_GAP))
+        return false;
+    }
+  }
+
+
+  // Compliance
+  if (actualBits < nbits)
+    return false;
+  if (strict && actualBits != nbits)
+    return false;  // Not as we expected.
+
+  // Success
+  results->decode_type = MITSUBISHI2;
+  results->bits = actualBits;
+  results->value = data;
+  results->address = data >> actualBits / 2;
+  results->command = data & ((1 << (actualBits / 2)) - 1);
+  return true;
+}
+#endif  // DECODE_MITSUBISHI2
 
 #if SEND_MITSUBISHI_AC
 // Send a Mitsubishi A/C message.

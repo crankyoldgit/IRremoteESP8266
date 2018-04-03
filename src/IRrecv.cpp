@@ -309,6 +309,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeMitsubishi(results))
     return true;
 #endif
+#if DECODE_MITSUBISHI2
+  DPRINTLN("Attempting Mitsubishi2 decode");
+  if (decodeMitsubishi2(results))
+    return true;
+#endif
 #if DECODE_RC5
   DPRINTLN("Attempting RC5 decode");
   if (decodeRC5(results))
