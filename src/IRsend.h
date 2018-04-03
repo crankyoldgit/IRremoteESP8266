@@ -24,13 +24,16 @@
 // Value determined in https://github.com/markszabo/IRremoteESP8266/issues/62
 #define PERIOD_OFFSET -3
 #define DUTY_DEFAULT 50
+#define DUTY_MAX 100  // Percentage
 
 // Classes
 class IRsend {
  public:
-  explicit IRsend(uint16_t IRsendPin, bool inverted = false);
+  explicit IRsend(uint16_t IRsendPin, bool inverted = false,
+                  bool use_modulation = true);
   void begin();
   void enableIROut(uint32_t freq, uint8_t duty = DUTY_DEFAULT);
+  VIRTUAL void _delayMicroseconds(uint32_t usec);
   VIRTUAL uint16_t mark(uint16_t usec);
   VIRTUAL void space(uint32_t usec);
   void calibrate(uint16_t hz = 38000U);
@@ -246,13 +249,16 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #endif  // UNIT_TEST
   uint8_t outputOn;
   uint8_t outputOff;
+  VIRTUAL void ledOff();
+  VIRTUAL void ledOn();
 
  private:
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
   uint16_t IRpin;
   int8_t periodOffset;
-  void ledOff();
+  uint8_t _dutycycle;
+  bool modulation;
   uint32_t calcUSecPeriod(uint32_t hz, bool use_offset = true);
 };
 
