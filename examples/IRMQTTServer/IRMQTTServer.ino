@@ -189,11 +189,10 @@ void debug(String str) {
 #endif  // DEBUG
 }
 
-String timeSince(uint32_t start) {
-  String result = "";
-  uint32_t diff = 0;
+String timeSince(uint32_t const start) {
   if (start == 0)
     return "Never";
+  uint32_t diff = 0;
   uint32_t now = millis();
   if (start < now)
     diff = now - start;
@@ -202,20 +201,36 @@ String timeSince(uint32_t start) {
   diff /= 1000;  // Convert to seconds.
   if (diff == 0)  return "Now";
 
+  // Note: millis() can only count up to 45 days, so uint8_t is safe.
   uint8_t days = diff / (60 * 60 * 24);
   uint8_t hours = (diff / (60 * 60)) % 24;
   uint8_t minutes = (diff / 60) % 60;
   uint8_t seconds = diff % 60;
 
+  String result = "";
   if (days)
-    result += String(days) + " day(s)";
+    result += String(days) + " day";
+  if (days > 1)  result += "s";
   if (hours)
-    result += (days ? " " : "") + String(hours) + " hour(s)";
+    result += " " + String(hours) + " hour";
+  if (hours > 1)  result += "s";
   if (minutes)
-    result += (hours ? " " : "") + String(minutes) + " minute(s)";
+    result += " " + String(minutes) + " minute";
+  if (minutes > 1)  result += "s";
   if (seconds)
-    result += (minutes ? " " : "") + String(seconds) + " second(s)";
+    result += " " + String(seconds) + " second";
+  if (seconds > 1)  result += "s";
+  result.trim();
   return result + " ago";
+}
+
+// Quick and dirty check for any unsafe chars in a string
+// that may cause HTML shenanigans. e.g. An XSS.
+bool hasUnsafeHTMLChars(String input) {
+  static char unsafe[] = "';!-\"<>=&{}()";
+  for (uint8_t i = 0; unsafe[i]; i++)
+    if (input.indexOf(unsafe[i]) != -1) return true;
+  return false;
 }
 
 // Root web page with example usage etc.
@@ -232,12 +247,17 @@ void handleRoot() {
     "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
-    "<p>MQTT server: " MQTT_SERVER ":" + String(MQTT_PORT) + " (" +
-    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")<br>"
-    "Client ID: " + mqtt_clientid + "<br>"
+    "<p>Server: " MQTT_SERVER ":" + String(MQTT_PORT) + " <i>(" +
+    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")</i><br>"
+    "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
     "Acknowledgements topic: " MQTTack "<br>"
-    "Last command: " + lastMqttCmd + " (" + timeSince(lastMqttCmdTime) + ")</p>"
+    "Last command seen: " +
+    // lastMqttCmd is unescaped untrusted input.
+    // Avoid any possible HTML/XSS when displaying it.
+    (hasUnsafeHTMLChars(lastMqttCmd) ?
+        "<i>Contains unsafe HTML characters</i>" : lastMqttCmd) +
+    " <i>(" + timeSince(lastMqttCmdTime) + ")</i></p>"
 #endif  // MQTT_ENABLE
     "<br><hr>"
     "<h3>Hardcoded examples</h3>"
