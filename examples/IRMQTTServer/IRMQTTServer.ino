@@ -1081,6 +1081,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case TROTEC:  // 28
     case TOSHIBA_AC:  // 32
     case FUJITSU_AC:  // 33
+    case HAIER_AC:  // 38
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
