@@ -167,14 +167,18 @@ uint16_t *codeArray;
 uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
 bool ir_lock = false;  // Primitive locking for gating the IR LED.
+uint32_t sendReqCounter = 0;
 
 #ifdef MQTT_ENABLE
+String lastMqttCmd = "None";
+uint32_t lastMqttCmdTime = 0;
+
+
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
 PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, callback, espClient);
 // Create a unique MQTT client id.
-const char* mqtt_clientid = String(MQTTprefix +
-                                   String(ESP.getChipId(), HEX)).c_str();
+String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 #endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
@@ -185,6 +189,50 @@ void debug(String str) {
 #endif  // DEBUG
 }
 
+String timeSince(uint32_t const start) {
+  if (start == 0)
+    return "Never";
+  uint32_t diff = 0;
+  uint32_t now = millis();
+  if (start < now)
+    diff = now - start;
+  else
+    diff = UINT32_MAX - start + now;
+  diff /= 1000;  // Convert to seconds.
+  if (diff == 0)  return "Now";
+
+  // Note: millis() can only count up to 45 days, so uint8_t is safe.
+  uint8_t days = diff / (60 * 60 * 24);
+  uint8_t hours = (diff / (60 * 60)) % 24;
+  uint8_t minutes = (diff / 60) % 60;
+  uint8_t seconds = diff % 60;
+
+  String result = "";
+  if (days)
+    result += String(days) + " day";
+  if (days > 1)  result += "s";
+  if (hours)
+    result += " " + String(hours) + " hour";
+  if (hours > 1)  result += "s";
+  if (minutes)
+    result += " " + String(minutes) + " minute";
+  if (minutes > 1)  result += "s";
+  if (seconds)
+    result += " " + String(seconds) + " second";
+  if (seconds > 1)  result += "s";
+  result.trim();
+  return result + " ago";
+}
+
+// Quick and dirty check for any unsafe chars in a string
+// that may cause HTML shenanigans. e.g. An XSS.
+bool hasUnsafeHTMLChars(String input) {
+  static char unsafe[] = "';!-\"<>=&{}()";
+  for (uint8_t i = 0; unsafe[i]; i++)
+    if (input.indexOf(unsafe[i]) != -1) return true;
+  return false;
+}
+
 // Root web page with example usage etc.
 void handleRoot() {
   server.send(200, "text/html",
@@ -192,13 +240,24 @@ void handleRoot() {
     "<body>"
     "<center><h1>ESP8266 IR MQTT Server</h1></center>"
     "<br><hr>"
-    "<h3>Connection details</h3>"
-    "<p>IP address: " + WiFi.localIP().toString() + "</p>"
+    "<h3>Information</h3>"
+    "<p>IP address: " + WiFi.localIP().toString() + "<br>"
+    "Booted: " + timeSince(1) + "<br>" +
+    "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
+    "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
-    "<p>MQTT server: " MQTT_SERVER ":" + String(MQTT_PORT) + " ("+
-    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")<br>"
+    "<h4>MQTT Information</h4>"
+    "<p>Server: " MQTT_SERVER ":" + String(MQTT_PORT) + " <i>(" +
+    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")</i><br>"
+    "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
-    "Acknowledgements topic: " MQTTack "</p>"
+    "Acknowledgements topic: " MQTTack "<br>"
+    "Last command seen: " +
+    // lastMqttCmd is unescaped untrusted input.
+    // Avoid any possible HTML/XSS when displaying it.
+    (hasUnsafeHTMLChars(lastMqttCmd) ?
+        "<i>Contains unsafe HTML characters</i>" : lastMqttCmd) +
+    " <i>(" + timeSince(lastMqttCmdTime) + ")</i></p>"
 #endif  // MQTT_ENABLE
     "<br><hr>"
     "<h3>Hardcoded examples</h3>"
@@ -823,9 +882,10 @@ bool reconnect() {
     debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(MQTT_PORT) +
           "... ");
     if (mqtt_user && mqtt_password)
-      connected = mqtt_client.connect(mqtt_clientid, mqtt_user, mqtt_password);
+      connected = mqtt_client.connect(mqtt_clientid.c_str(), mqtt_user,
+                                      mqtt_password);
     else
-      connected = mqtt_client.connect(mqtt_clientid);
+      connected = mqtt_client.connect(mqtt_clientid.c_str());
     if (connected) {
     // Once connected, publish an announcement...
       mqtt_client.publish(MQTTack, "Connected");
@@ -1021,6 +1081,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case TROTEC:  // 28
     case TOSHIBA_AC:  // 32
     case FUJITSU_AC:  // 33
+    case HAIER_AC:  // 38
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
@@ -1118,7 +1179,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
 #endif
   }
-
+  sendReqCounter++;
   // Release the lock.
   ir_lock = false;
 
@@ -1170,6 +1231,9 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   // Make a copy of the callback string as strtok destroys it.
   char* callback_c_str = strdup(callback_str.c_str());
   debug("MQTT Payload (raw): " + callback_str);
+  // Save the message as the last command seen (global).
+  lastMqttCmd = callback_str;
+  lastMqttCmdTime = millis();
 
   // Get the numeric protocol type.
   int ir_type = strtoul(strtok_r(callback_c_str, ",", &tok_ptr), NULL, 10);
