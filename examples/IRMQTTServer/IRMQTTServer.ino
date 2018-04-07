@@ -485,6 +485,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case HAIER_AC:
       stateSize = HAIER_AC_STATE_LENGTH;
       break;
+    case HITACHI_AC:
+      stateSize = HITACHI_AC_STATE_LENGTH;
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return;
@@ -563,6 +566,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_HAIER_AC
     case HAIER_AC:
       irsend.sendHaierAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_HITACHI_AC
+    case HITACHI_AC:
+      irsend.sendHitachiAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
   }
@@ -1082,6 +1090,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case TOSHIBA_AC:  // 32
     case FUJITSU_AC:  // 33
     case HAIER_AC:  // 38
+    case HITACHI_AC:  // 40
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
