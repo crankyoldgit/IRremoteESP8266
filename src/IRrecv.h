@@ -47,8 +47,8 @@
 #define FNV_PRIME_32 16777619UL
 #define FNV_BASIS_32 2166136261UL
 
-// Daikin is the current largest state size (by far).
-#define STATE_SIZE_MAX DAIKIN_COMMAND_LENGTH
+// Hitachi is the current largest state size.
+#define STATE_SIZE_MAX HITACHI_AC_STATE_LENGTH
 
 // Types
 // information for the interrupt handler
@@ -273,6 +273,10 @@ class IRrecv {
 #if DECODE_HAIER_AC
   bool decodeHaierAC(decode_results *results,
                    uint16_t nbits = HAIER_AC_BITS, bool strict = true);
+#endif
+#if DECODE_HAIER_AC
+  bool decodeHitachiAC(decode_results *results,
+                       uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
 #endif
 };
 

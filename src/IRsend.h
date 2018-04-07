@@ -241,6 +241,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                    uint16_t nbytes = HAIER_AC_STATE_LENGTH,
                    uint16_t repeat = 0);
 #endif
+#if SEND_HITACHI_AC
+  void sendHitachiAC(unsigned char data[],
+                     uint16_t nbytes = HITACHI_AC_STATE_LENGTH,
+                     uint16_t repeat = 0);
+#endif
 
  protected:
 #ifdef UNIT_TEST

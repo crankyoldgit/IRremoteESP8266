@@ -34,7 +34,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_Denon.o ir_Dish.o ir_Panasonic.o ir_Whynter.o ir_Coolix.o \
             ir_Aiwa.o ir_Sherwood.o ir_Kelvinator.o ir_Daikin.o ir_Gree.o \
             ir_Pronto.o ir_GlobalCache.o ir_Nikai.o ir_Toshiba.o ir_Midea.o \
-            ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o
+            ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o ir_Hitachi.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o $(PROTOCOLS)
@@ -154,3 +154,6 @@ ir_Carrier.o : $(USER_DIR)/ir_Carrier.cpp $(GTEST_HEADERS)
 
 ir_Haier.o : $(USER_DIR)/ir_Haier.cpp $(USER_DIR)/ir_Haier.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Haier.cpp
+
+ir_Hitachi.o : $(USER_DIR)/ir_Hitachi.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Hitachi.cpp

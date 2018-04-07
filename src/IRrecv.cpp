@@ -459,6 +459,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeHaierAC(results))
     return true;
 #endif
+#if DECODE_HITACHI_AC
+  DPRINTLN("Attempting Hitachi AC decode");
+  if (decodeHitachiAC(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
