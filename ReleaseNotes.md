@@ -1,5 +1,23 @@
 # Release Notes
 
+## _v2.4.0 (20180407)_
+
+**[Bug Fixes]**
+- Add missing WiFi.begin() call to IRGCTCPServer example. (#433)
+- Add missing sendHaierAC() to IRMQTTServer example. (#434 & #444)
+- Make mqtt clientid unique in IRMQTTServer example. (#444)
+
+**[Features]**
+
+- Initial Mitsubishi projector protocol support. (#442)
+- Experimental support of Hitachi A/C messages. (#445)
+- Improve transmission pulse modulation support.
+  Allow disabling of transmission frequency modulation.(#439)
+
+**[Misc]**
+- IRMQTTServer example improvements. (#444)
+
+
 ## _v2.3.3 (20180302)_
 
 **[Bug Fixes]**
