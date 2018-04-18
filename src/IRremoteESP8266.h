@@ -166,6 +166,9 @@
 #define DECODE_HITACHI_AC    true
 #define SEND_HITACHI_AC      true
 
+#define DECODE_GICABLE       true
+#define SEND_GICABLE         true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC)
@@ -221,7 +224,8 @@ enum decode_type_t {
   CARRIER_AC,
   HAIER_AC,
   MITSUBISHI2,
-  HITACHI_AC
+  HITACHI_AC,
+  GICABLE
 };
 
 // Message lengths & required repeat values
@@ -239,6 +243,8 @@ enum decode_type_t {
 #define DENON_LEGACY_BITS           14U
 #define DISH_BITS                   16U
 #define DISH_MIN_REPEAT              3U
+#define GICABLE_BITS                16U
+#define GICABLE_MIN_REPEAT           1U
 #define GREE_STATE_LENGTH            8U
 #define GREE_BITS                   (GREE_STATE_LENGTH * 8)
 #define HAIER_AC_STATE_LENGTH        9U

@@ -278,6 +278,10 @@ class IRrecv {
   bool decodeHitachiAC(decode_results *results,
                        uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
 #endif
+#if DECODE_GICABLE
+  bool decodeGICable(decode_results *results, uint16_t nbits = GICABLE_BITS,
+                     bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_
