@@ -127,3 +127,26 @@ TEST(TestDecodeGICable, RealExampleDecodeLEFT) {
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 }
+
+TEST(TestDecodeGICable, RealExampleDecodeZEROKey) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Real GICable "Zero Key" message.
+  // Note: Zero key looks similar to a JVC message, hence this test.
+  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/447
+  uint16_t rawData[39] = {
+      9036, 4434, 552, 2178, 552, 2178, 552, 2180, 550, 2178, 552, 2178, 550,
+      2180, 552, 2178, 552, 2178, 550, 2180, 552, 2178, 526, 2204, 552, 2178,
+      552, 2178, 526, 2204, 526, 2204, 526, 2204, 526, 41932, 9036, 2176, 552};
+  irsend.reset();
+  irsend.sendRaw(rawData, 39, 39);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(GICABLE, irsend.capture.decode_type);
+  EXPECT_EQ(GICABLE_BITS, irsend.capture.bits);
+  EXPECT_EQ(0x0, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+}

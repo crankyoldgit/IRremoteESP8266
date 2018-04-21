@@ -358,6 +358,13 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeLG(results, LG32_BITS, true))
     return true;
 #endif
+#if DECODE_GICABLE
+  // Note: Needs to happen before JVC decode, because it looks similar except
+  //       with a required NEC-like repeat code.
+  DPRINTLN("Attempting GICable decode");
+  if (decodeGICable(results))
+    return true;
+#endif
 #if DECODE_JVC
   DPRINTLN("Attempting JVC decode");
   if (decodeJVC(results))
@@ -462,11 +469,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
   if (decodeHitachiAC(results))
-    return true;
-#endif
-#if DECODE_GICABLE
-  DPRINTLN("Attempting GICable decode");
-  if (decodeGICable(results))
     return true;
 #endif
 #if DECODE_HASH
