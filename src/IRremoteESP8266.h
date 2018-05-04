@@ -176,9 +176,9 @@
 
 // Use millisecond 'delay()' calls where we can to avoid tripping the WDT.
 // Note: If you plan to send IR messages in the callbacks of the AsyncWebserver
-//       library, you need to set PREFER_DELAY to false.
+//       library, you need to set ALLOW_DELAY_CALLS to false.
 //       Ref: https://github.com/markszabo/IRremoteESP8266/issues/430
-#define PREFER_DELAY true
+#define ALLOW_DELAY_CALLS true
 
 /*
  * Always add to the end of the list and should never remove entries

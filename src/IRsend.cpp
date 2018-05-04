@@ -117,7 +117,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   offTimePeriod = period - onTimePeriod;
 }
 
-#if PREFER_DELAY
+#if ALLOW_DELAY_CALLS
 // An ESP8266 RTOS watch-dog timer friendly version of delayMicroseconds().
 // Args:
 //   usec: Nr. of uSeconds to delay for.
@@ -137,7 +137,7 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 #endif
   }
 }
-#else  // PREFER_DELAY
+#else  // ALLOW_DELAY_CALLS
 // A version of delayMicroseconds() that handles large values and does NOT use
 // the watch-dog friendly delay() calls where appropriate.
 // Args:
@@ -152,7 +152,7 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
   delayMicroseconds(static_cast<uint16_t>(usec));
 #endif  // UNIT_TEST
 }
-#endif  // PREFER_DELAY
+#endif  // ALLOW_DELAY_CALLS
 
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
 //
