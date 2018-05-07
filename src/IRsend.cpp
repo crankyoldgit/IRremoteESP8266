@@ -117,13 +117,14 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   offTimePeriod = period - onTimePeriod;
 }
 
+#if ALLOW_DELAY_CALLS
 // An ESP8266 RTOS watch-dog timer friendly version of delayMicroseconds().
 // Args:
 //   usec: Nr. of uSeconds to delay for.
 void IRsend::_delayMicroseconds(uint32_t usec) {
-  // delayMicroseconds is only accurate to 16383us.
+  // delayMicroseconds() is only accurate to 16383us.
   // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-  if (usec <= 16383) {
+  if (usec <= MAX_ACCURATE_USEC_DELAY) {
 #ifndef UNIT_TEST
     delayMicroseconds(usec);
 #endif
@@ -136,6 +137,22 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 #endif
   }
 }
+#else  // ALLOW_DELAY_CALLS
+// A version of delayMicroseconds() that handles large values and does NOT use
+// the watch-dog friendly delay() calls where appropriate.
+// Args:
+//   usec: Nr. of uSeconds to delay for.
+//
+// NOTE: Use this only if you know what you are doing as it may cause the WDT
+//       to reset the ESP8266.
+void IRsend::_delayMicroseconds(uint32_t usec) {
+  for (; usec > MAX_ACCURATE_USEC_DELAY; usec -= MAX_ACCURATE_USEC_DELAY)
+#ifndef UNIT_TEST
+    delayMicroseconds(MAX_ACCURATE_USEC_DELAY);
+  delayMicroseconds(static_cast<uint16_t>(usec));
+#endif  // UNIT_TEST
+}
+#endif  // ALLOW_DELAY_CALLS
 
 // Modulate the IR LED for the given period (usec) and at the duty cycle set.
 //

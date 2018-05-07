@@ -174,6 +174,12 @@
 #define DECODE_AC false   // We don't need that infrastructure.
 #endif
 
+// Use millisecond 'delay()' calls where we can to avoid tripping the WDT.
+// Note: If you plan to send IR messages in the callbacks of the AsyncWebserver
+//       library, you need to set ALLOW_DELAY_CALLS to false.
+//       Ref: https://github.com/markszabo/IRremoteESP8266/issues/430
+#define ALLOW_DELAY_CALLS true
+
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage

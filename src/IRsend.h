@@ -25,6 +25,9 @@
 #define PERIOD_OFFSET -3
 #define DUTY_DEFAULT 50
 #define DUTY_MAX 100  // Percentage
+// delayMicroseconds() is only accurate to 16383us.
+// Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
+#define MAX_ACCURATE_USEC_DELAY 16383U
 
 // Classes
 class IRsend {
