@@ -377,7 +377,7 @@ if [[ "$DISPLAY_CODE" == "yes" ]]; then
     addCode "void IRsend::sendXYZ(uint8_t data[], uint16_t nbytes, uint16_t repeat) {"
     addCode "  // nbytes should typically be $(($total_bits / 8))"
     addCode "  // data should typically be of a type: uint8_t data[$(($total_bits / 8))] = {};"
-    addCode "  // data[] will is assumed to be in MSB order."
+    addCode "  // data[] is assumed to be in MSB order."
     addCode "  for (uint16_t r = 0; r <= repeat; r++) {"
     addCode "    sendGeneric(HDR_MARK, HDR_SPACE, BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, BIT_MARK"
     addCode "                100, data, nbytes, 38, true, 0, 50);"
