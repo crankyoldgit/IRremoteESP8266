@@ -8,12 +8,12 @@ import argparse
 import sys
 
 
-class Defs(object):
-  """House the parameters for a message."""
+class RawIRMessage(object):
+  """Basic analyse functions & structure for raw IR messages."""
 
   # pylint: disable=too-many-instance-attributes
 
-  def __init__(self, margin):
+  def __init__(self, margin, timings, output=sys.stdout, verbose=True):
     self.hdr_mark = None
     self.hdr_space = None
     self.bit_mark = None
@@ -23,20 +23,27 @@ class Defs(object):
     self.margin = margin
     self.marks = []
     self.spaces = []
+    self.output = output
+    self.verbose = verbose
+    if len(timings) <= 3:
+      raise ValueError("Too few message timings supplied.")
+    self.timings = timings
+    self._generate_timing_candidates()
+    self._calc_values()
 
-  def process_data(self, data):
-    """Determine the values from the given data."""
+  def _generate_timing_candidates(self):
+    """Determine the likely values from the given data."""
     count = 0
-    for usecs in data:
+    for usecs in self.timings:
       count = count + 1
-      if is_odd(count):
+      if count % 2:
         self.marks.append(usecs)
       else:
         self.spaces.append(usecs)
-    self.marks = self.reduce_list(self.marks)
-    self.spaces = self.reduce_list(self.spaces)
+    self.marks = self._reduce_list(self.marks)
+    self.spaces = self._reduce_list(self.spaces)
 
-  def reduce_list(self, items):
+  def _reduce_list(self, items):
     """Reduce the list of numbers into buckets that are atleast margin apart."""
     result = []
     last = -1
@@ -46,132 +53,183 @@ class Defs(object):
         last = item
     return result
 
+  def _usec_compare(self, seen, expected):
+    """Compare two usec values and see if they match within a
+       subtrative margin."""
+    return seen <= expected and seen > expected - self.margin
 
-def usec_compare(seen, expected, margin):
-  """Compare two usec values and see if they match within a
-     subtrative margin."""
-  return seen <= expected and seen > expected - margin
+  def _usec_compares(self, usecs, expecteds):
+    """Compare a usec value to a list of values and return True
+       if they are within a subtractive margin."""
+    for expected in expecteds:
+      if self._usec_compare(usecs, expected):
+        return True
+    return False
+
+  def display_binary(self, binary_str):
+    """Display common representations of the suppied binary string."""
+    num = int(binary_str, 2)
+    bits = len(binary_str)
+    rev_binary_str = binary_str[::-1]
+    rev_num = int(rev_binary_str, 2)
+    self.output.write("\n  Bits: %d\n"
+                      "  Hex:  %s (MSB first)\n"
+                      "        %s (LSB first)\n"
+                      "  Dec:  %s (MSB first)\n"
+                      "        %s (LSB first)\n"
+                      "  Bin:  0b%s (MSB first)\n"
+                      "        0b%s (LSB first)\n" %
+                      (bits, "0x{0:0{1}X}".format(num, bits / 4),
+                       "0x{0:0{1}X}".format(rev_num, bits / 4), num, rev_num,
+                       binary_str, rev_binary_str))
+
+  def add_data_code(self, bin_str):
+    """Add the common "data" sequence of code to send the bulk of a message."""
+    # pylint: disable=no-self-use
+    code = []
+    code.append("    // Data")
+    code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
+                                                         len(bin_str)))
+    code.append("    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, "
+                "nbits, true);")
+    code.append("    // Footer")
+    code.append("    mark(BIT_MARK);")
+    return code
+
+  def _calc_values(self):
+    """Calculate the values which describe the standard timings
+       for the protocol."""
+    if self.verbose:
+      self.output.write("Potential Mark Candidates:\n"
+                        "%s\n"
+                        "Potential Space Candidates:\n"
+                        "%s\n" % (str(self.marks), str(self.spaces)))
+    # Largest mark is likely the HDR_MARK
+    self.hdr_mark = self.marks[0]
+    # The bit mark is likely to be the smallest mark.
+    self.bit_mark = self.marks[-1]
+
+    if self.is_space_encoded() and len(self.spaces) >= 3:
+      if self.verbose and len(self.marks) > 2:
+        self.output.write("DANGER: Unexpected and unused mark timings!")
+      # We should have 3 space candidates at least.
+      # They should be: zero_space (smallest), one_space, & hdr_space (largest)
+      spaces = list(self.spaces)
+      self.zero_space = spaces.pop()
+      self.one_space = spaces.pop()
+      self.hdr_space = spaces.pop()
+      # Rest are probably message gaps
+      self.gaps = spaces
+
+  def is_space_encoded(self):
+    """Make an educated guess if the message is space encoded."""
+    return len(self.spaces) > len(self.marks)
+
+  def is_hdr_mark(self, usec):
+    """Is usec the header mark?"""
+    return self._usec_compare(usec, self.hdr_mark)
+
+  def is_hdr_space(self, usec):
+    """Is usec the header space?"""
+    return self._usec_compare(usec, self.hdr_space)
+
+  def is_bit_mark(self, usec):
+    """Is usec the bit mark?"""
+    return self._usec_compare(usec, self.bit_mark)
+
+  def is_one_space(self, usec):
+    """Is usec the one space?"""
+    return self._usec_compare(usec, self.one_space)
+
+  def is_zero_space(self, usec):
+    """Is usec the zero_space?"""
+    return self._usec_compare(usec, self.zero_space)
+
+  def is_gap(self, usec):
+    """Is usec the a space gap?"""
+    return self._usec_compares(usec, self.gaps)
 
 
-def usec_compares(usecs, expecteds, margin):
-  """Compare a usec value to a list of values and return True
-     if they are within a subtractive margin."""
-  for expected in expecteds:
-    if usec_compare(usecs, expected, margin):
-      return True
-  return False
-
-
-def add_bit(so_far, bit):
+def add_bit(so_far, bit, output=sys.stdout):
   """Add a bit to the end of the bits collected so far. """
   if bit == "reset":
     return ""
-  sys.stdout.write(str(bit))  # This effectively displays in LSB first order.
+  output.write(str(bit))  # This effectively displays in LSB first order.
   return so_far + str(bit)  # Storing it in MSB first order.
-
-
-def is_odd(num):
-  """Is the num odd? i.e. Not even."""
-  return num % 2
-
-
-def display_bin_value(binary_str, output=sys.stdout):
-  """Display common representations of the suppied binary string."""
-  num = int(binary_str, 2)
-  bits = len(binary_str)
-  rev_binary_str = binary_str[::-1]
-  rev_num = int(rev_binary_str, 2)
-  output.write("\n  Bits: %d\n" % bits)
-  output.write("  Hex:  %s (MSB first)\n" % "0x{0:0{1}X}".format(num, bits / 4))
-  output.write(
-      "        %s (LSB first)\n" % "0x{0:0{1}X}".format(rev_num, bits / 4))
-  output.write("  Dec:  %s (MSB first)\n" % num)
-  output.write("        %s (LSB first)\n" % rev_num)
-  output.write("  Bin:  0b%s (MSB first)\n" % binary_str)
-  output.write("        0b%s (LSB first)\n" % rev_binary_str)
-
-
-def add_data_code(bin_str):
-  """Add the common "data" sequence of code to send the bulk of a message."""
-  code = []
-  code.append("    // Data")
-  code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
-                                                       len(bin_str)))
-  code.append("    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, "
-              "nbits, true);")
-  code.append("    // Footer")
-  code.append("    mark(BIT_MARK);")
-  return code
 
 
 def convert_rawdata(data_str):
   """Parse a C++ rawdata declaration into a list of values."""
   start = data_str.find('{')
   end = data_str.find('}')
+  if end == -1:
+    end = len(data_str)
+  if start > end:
+    raise ValueError("Raw Data not parsible due to parentheses placement.")
   data_str = data_str[start + 1:end]
-  return [int(x.strip()) for x in data_str.split(',')]
+  results = []
+  for timing in [x.strip() for x in data_str.split(',')]:
+    try:
+      results.append(int(timing))
+    except ValueError:
+      raise ValueError(
+          "Raw Data contains a non-numeric value of '%s'." % timing)
+  return results
+
+
+def dump_constants(message, defines, output=sys.stdout):
+  """Dump the key constants and generate the C++ #defines."""
+  output.write("Guessing key value:\n"
+               "HDR_MARK   = %d\n"
+               "HDR_SPACE  = %d\n"
+               "BIT_MARK   = %d\n"
+               "ONE_SPACE  = %d\n"
+               "ZERO_SPACE = %d\n" %
+               (message.hdr_mark, message.hdr_space, message.bit_mark,
+                message.one_space, message.zero_space))
+  defines.append("#define HDR_MARK %dU" % message.hdr_mark)
+  defines.append("#define BIT_MARK %dU" % message.bit_mark)
+  defines.append("#define HDR_SPACE %dU" % message.hdr_space)
+  defines.append("#define ONE_SPACE %dU" % message.one_space)
+  defines.append("#define ZERO_SPACE %dU" % message.zero_space)
+
+  if len(message.gaps) == 1:
+    output.write("SPACE_GAP = %d\n" % message.gaps[0])
+    defines.append("#define SPACE_GAP = %dU" % message.gaps[0])
+  else:
+    count = 0
+    for gap in message.gaps:
+      # We probably (still) have a gap in the protocol.
+      count = count + 1
+      output.write("SPACE_GAP%d = %d\n" % (count, gap))
+      defines.append("#define SPACE_GAP%d = %dU" % (count, gap))
 
 
 def parse_and_report(rawdata_str, margin, gen_code=False, output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
-  code_defs = []
-  code_64bit = []
-  defs = Defs(margin)
+  defines = []
+  function_code = []
 
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
 
-  defs.process_data(rawdata)
-  output.write("Potential Mark Candidates:\n"
-               "%s\n"
-               "Potential Space Candidates:\n"
-               "%s\n" % (str(defs.marks), str(defs.spaces)))
-  output.write("\n\nGuessing encoding type:\n")
-  if len(defs.spaces) > len(defs.marks):
-    output.write("Looks like it uses space encoding. Yay!\n\n"
-                 "Guessing key value:\n")
+  output.write("Found %d timing entries.\n" % len(rawdata))
 
-    # Largest mark is likely the HDR_MARK
-    defs.hdr_mark = defs.marks[0]
-    output.write("HDR_MARK   = %d\n" % defs.hdr_mark)
-    code_defs.append("#define HDR_MARK %dU" % defs.hdr_mark)
-    # The mark bit is likely to be the smallest.
-    defs.bit_mark = defs.marks[-1]
-    output.write("BIT_MARK   = %d\n" % defs.bit_mark)
-    code_defs.append("#define BIT_MARK %dU" % defs.bit_mark)
-
-    gap = 0
-    defs.gaps = []
-    while len(defs.spaces) > 3:
-      # We probably (still) have a gap in the protocol.
-      gap = gap + 1
-      space = defs.spaces.remove()
-      defs.gaps.append(space)
-      output.write("SPACE_GAP%d = %d\n" % (gap, space))
-      code_defs.append("#define SPACE_GAP%d = %dU" % (gap, space))
-
-    # We should have 3 space candidates left.
-    # They should be zero_space (smallest), one_space, & hdr_space (largest)
-    defs.zero_space = defs.spaces.pop()
-    defs.one_space = defs.spaces.pop()
-    defs.hdr_space = defs.spaces.pop()
-    code_defs.append("#define HDR_SPACE %dU" % defs.hdr_space)
-    code_defs.append("#define ONE_SPACE %dU" % defs.one_space)
-    code_defs.append("#define ZERO_SPACE %dU" % defs.zero_space)
-    output.write("HDR_SPACE  = %d\n"
-                 "ONE_SPACE  = %d\n"
-                 "ZERO_SPACE = %d\n" % (defs.hdr_space, defs.one_space,
-                                        defs.zero_space))
+  message = RawIRMessage(margin, rawdata, output)
+  output.write("\nGuessing encoding type:\n")
+  if message.is_space_encoded():
+    output.write("Looks like it uses space encoding. Yay!\n\n")
+    dump_constants(message, defines, output)
   else:
     output.write("Sorry, it looks like it is Mark encoded. "
                  "I can't do that yet. Exiting.\n")
     sys.exit(1)
-  total_bits = decode_data(rawdata, defs, code_defs, code_64bit, output)
+  total_bits = decode_data(message, defines, function_code, output)
   if gen_code:
-    generate_code(code_defs, code_64bit, total_bits, output)
+    generate_irsend_code(defines, function_code, total_bits, output)
 
 
-def decode_data(data, defs, code_defs, code_64bit, output=sys.stdout):
+def decode_data(message, defines, function_code, output=sys.stdout):
   """Decode the data sequence with the given values in mind."""
   # pylint: disable=too-many-branches,too-many-statements
 
@@ -179,12 +237,12 @@ def decode_data(data, defs, code_defs, code_64bit, output=sys.stdout):
   # sequence and break it up and indicate accordingly.
 
   output.write("\nDecoding protocol based on analysis so far:\n\n")
-  last = ""
+  state = ""
   count = 1
   total_bits = ""
   binary_value = add_bit("", "reset")
 
-  code_64bit.extend([
+  function_code.extend([
       "// Function should be safe up to 64 bits.",
       "void IRsend::sendXYZ(const uint64_t data, const uint16_t"
       " nbits, const uint16_t repeat) {",
@@ -192,78 +250,77 @@ def decode_data(data, defs, code_defs, code_64bit, output=sys.stdout):
       "  for (uint16_t r = 0; r <= repeat; r++) {"
   ])
 
-  for usecs in data:
-    if (usec_compare(usecs, defs.hdr_mark, defs.margin) and is_odd(count) and
-        not usec_compare(usecs, defs.bit_mark, defs.margin)):
-      last = "HM"
+  for usec in message.timings:
+    if (message.is_hdr_mark(usec) and count % 2 and
+        not message.is_bit_mark(usec)):
+      state = "HM"
       if binary_value:
-        display_bin_value(binary_value)
+        message.display_binary(binary_value)
         total_bits = total_bits + binary_value
-        output.write(last)
+        output.write(state)
       binary_value = add_bit(binary_value, "reset")
       output.write("HDR_MARK+")
-      code_64bit.extend(["    // Header", "    mark(HDR_MARK);"])
-    elif (usec_compare(usecs, defs.hdr_space, defs.margin) and
-          not usec_compare(usecs, defs.one_space, defs.margin)):
-      if last != "HM":
+      function_code.extend(["    // Header", "    mark(HDR_MARK);"])
+    elif (message.is_hdr_space(usec) and not message.is_one_space(usec)):
+      if state != "HM":
         if binary_value:
-          display_bin_value(binary_value)
+          message.display_binary(binary_value)
           total_bits = total_bits + binary_value
-          code_64bit.extend(add_data_code(binary_value))
+          function_code.extend(message.add_data_code(binary_value))
         binary_value = add_bit(binary_value, "reset")
         output.write("UNEXPECTED->")
-      last = "HS"
+      state = "HS"
       output.write("HDR_SPACE+")
-      code_64bit.append("    space(HDR_SPACE);")
-    elif usec_compare(usecs, defs.bit_mark, defs.margin) and is_odd(count):
-      if last != "HS" and last != "BS":
+      function_code.append("    space(HDR_SPACE);")
+    elif message.is_bit_mark(usec) and count % 2:
+      if state != "HS" and state != "BS":
         output.write("BIT_MARK(UNEXPECTED)")
-      last = "BM"
-    elif usec_compare(usecs, defs.zero_space, defs.margin):
-      if last != "BM":
+      state = "BM"
+    elif message.is_zero_space(usec):
+      if state != "BM":
         output.write("ZERO_SPACE(UNEXPECTED)")
-      last = "BS"
-      binary_value = add_bit(binary_value, 0)
-    elif usec_compare(usecs, defs.one_space, defs.margin):
-      if last != "BM":
+      state = "BS"
+      binary_value = add_bit(binary_value, 0, output)
+    elif message.is_one_space(usec):
+      if state != "BM":
         output.write("ONE_SPACE(UNEXPECTED)")
-      last = "BS"
-      binary_value = add_bit(binary_value, 1)
-    elif usec_compares(usecs, defs.gaps, defs.margin):
-      if last != "BM":
+      state = "BS"
+      binary_value = add_bit(binary_value, 1, output)
+    elif message.is_gap(usec):
+      if state != "BM":
         output.write("UNEXPECTED->")
-      last = "GS"
-      output.write(" GAP(%d)" % usecs)
-      display_bin_value(binary_value)
-      code_64bit.extend(add_data_code(binary_value))
-      code_64bit.append("    space(SPACE_GAP);")
+      state = "GS"
+      output.write(" GAP(%d)" % usec)
+      message.display_binary(binary_value)
+      function_code.extend(message.add_data_code(binary_value))
+      function_code.append("    space(SPACE_GAP);")
       total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
     else:
-      output.write("UNKNOWN(%d)" % usecs)
-      last = "UNK"
+      output.write("UNKNOWN(%d)" % usec)
+      state = "UNK"
     count = count + 1
-  display_bin_value(binary_value)
-  code_64bit.extend(add_data_code(binary_value))
-  code_64bit.extend([
+  message.display_binary(binary_value)
+  function_code.extend(message.add_data_code(binary_value))
+  function_code.extend([
       "    space(100000);  // A 100% made up guess of the gap"
       " between messages.", "  }", "}"
   ])
 
   total_bits = total_bits + binary_value
   output.write("Total Nr. of suspected bits: %d\n" % len(total_bits))
-  code_defs.append("#define XYZ_BITS %dU" % len(total_bits))
+  defines.append("#define XYZ_BITS %dU" % len(total_bits))
   if len(total_bits) > 64:
-    code_defs.append("#define XYZ_STATE_LENGTH %dU" % (len(total_bits) / 8))
+    defines.append("#define XYZ_STATE_LENGTH %dU" % (len(total_bits) / 8))
   return total_bits
 
 
-def generate_code(defs, normal, bits_str, output=sys.stdout):
+def generate_irsend_code(defines, normal, bits_str, output=sys.stdout):
   """Output the estimated C++ code to reproduce the IR message."""
   output.write("\nGenerating a VERY rough code outline:\n\n"
                "// WARNING: This probably isn't directly usable."
                " It's a guide only.\n")
-  for line in defs:
+  for line in defines:
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
@@ -297,49 +354,53 @@ def generate_code(defs, normal, bits_str, output=sys.stdout):
                                      for i in range(0, len(bits_str), 8)))
 
 
-# Main program
+def main():
+  """Parse the commandline arguments and call the method."""
+  arg_parser = argparse.ArgumentParser(
+      description="Read an IRremoteESP8266 rawData declaration and tries to "
+      "analyse it.",
+      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  arg_parser.add_argument(
+      "-g",
+      "--code",
+      action="store_true",
+      default=False,
+      dest="gen_code",
+      help="Generate a C++ code outline to aid making an IRsend function.")
+  arg_group = arg_parser.add_mutually_exclusive_group(required=True)
+  arg_group.add_argument(
+      "rawdata",
+      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
+      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
+      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
+      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
+      nargs="?")
+  arg_group.add_argument(
+      "-f", "--file", help="Read in a rawData line from the file.")
+  arg_parser.add_argument(
+      "-r",
+      "--range",
+      type=int,
+      help="Max number of micro-seconds difference between values to consider"
+      " it the same value.",
+      dest="margin",
+      default=200)
+  arg_group.add_argument(
+      "--stdin",
+      help="Read in a rawData line from STDIN.",
+      action="store_true",
+      default=False)
+  arg_options = arg_parser.parse_args()
 
-ARG_PARSER = argparse.ArgumentParser(
-    description="Read an IRremoteESP8266 rawData declaration and tries to "
-    "analyse it.",
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-ARG_PARSER.add_argument(
-    "-g",
-    "--code",
-    action="store_true",
-    default=False,
-    dest="gen_code",
-    help="Generate a C++ code outline to aid making an IRsend function.")
-ARG_GROUP = ARG_PARSER.add_mutually_exclusive_group(required=True)
-ARG_GROUP.add_argument(
-    "rawdata",
-    help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {7930, "
-    "3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, 520,"
-    " 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494, "
-    "520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
-    nargs="?")
-ARG_GROUP.add_argument(
-    "-f", "--file", help="Read in a rawData line from the file.")
-ARG_PARSER.add_argument(
-    "-r",
-    "--range",
-    type=int,
-    help="Max number of micro-seconds difference between values to consider it "
-    "the same value.",
-    dest="margin",
-    default=200)
-ARG_GROUP.add_argument(
-    "--stdin",
-    help="Read in a rawData line from STDIN.",
-    action="store_true",
-    default=False)
-ARG_OPTIONS = ARG_PARSER.parse_args()
+  if arg_options.stdin:
+    data = sys.stdin.read()
+  elif arg_options.file:
+    with open(arg_options.file) as input_file:
+      data = input_file.read()
+  else:
+    data = arg_options.rawdata
+  parse_and_report(data, arg_options.margin, arg_options.gen_code)
 
-if ARG_OPTIONS.stdin:
-  DATA = sys.stdin.read()
-elif ARG_OPTIONS.file:
-  with open(ARG_OPTIONS.file) as f:
-    DATA = f.read()
-else:
-  DATA = ARG_OPTIONS.rawdata
-parse_and_report(DATA, ARG_OPTIONS.margin, ARG_OPTIONS.gen_code)
+
+if __name__ == '__main__':
+  main()

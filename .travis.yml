@@ -20,6 +20,7 @@ install:
   - arduino --board $BD --save-prefs
   - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
+  - sudo pip install pylint
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
@@ -44,9 +45,11 @@ script:
   # Check for lint issues.
   - shopt -s nullglob
   - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
+  - pylint {src,test,tools}/*.py
   - shopt -u nullglob
   # Build and run the unit tests.
   - (cd test; make run)
+  - (cd tools; make run_tests)
   # Check the version numbers match.
   - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
   - test ${LIB_VERSION} == "$(jq -r .version library.json)"
