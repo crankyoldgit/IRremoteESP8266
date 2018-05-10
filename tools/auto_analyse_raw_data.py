@@ -10,6 +10,7 @@ import sys
 
 class Defs(object):
   """House the parameters for a message."""
+
   # pylint: disable=too-many-instance-attributes
 
   def __init__(self, margin):
@@ -309,6 +310,16 @@ ARG_PARSER.add_argument(
     default=False,
     dest="gen_code",
     help="Generate a C++ code outline to aid making an IRsend function.")
+ARG_GROUP = ARG_PARSER.add_mutually_exclusive_group(required=True)
+ARG_GROUP.add_argument(
+    "rawdata",
+    help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {7930, "
+    "3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, 520,"
+    " 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494, "
+    "520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
+    nargs="?")
+ARG_GROUP.add_argument(
+    "-f", "--file", help="Read in a rawData line from the file.")
 ARG_PARSER.add_argument(
     "-r",
     "--range",
@@ -317,12 +328,18 @@ ARG_PARSER.add_argument(
     "the same value.",
     dest="margin",
     default=200)
-ARG_PARSER.add_argument(
-    "rawdata",
-    help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {7930, "
-    "3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, 520,"
-    " 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494, "
-    "520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'")
+ARG_GROUP.add_argument(
+    "--stdin",
+    help="Read in a rawData line from STDIN.",
+    action="store_true",
+    default=False)
 ARG_OPTIONS = ARG_PARSER.parse_args()
 
-parse_and_report(ARG_OPTIONS.rawdata, ARG_OPTIONS.margin, ARG_OPTIONS.gen_code)
+if ARG_OPTIONS.stdin:
+  DATA = sys.stdin.read()
+elif ARG_OPTIONS.file:
+  with open(ARG_OPTIONS.file) as f:
+    DATA = f.read()
+else:
+  DATA = ARG_OPTIONS.rawdata
+parse_and_report(DATA, ARG_OPTIONS.margin, ARG_OPTIONS.gen_code)
