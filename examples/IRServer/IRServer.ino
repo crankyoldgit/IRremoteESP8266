@@ -102,7 +102,7 @@ void setup(void) {
   Serial.print("Connected to ");
   Serial.println(ssid);
   Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP().toString());
 
   if (mdns.begin("esp8266", WiFi.localIP())) {
     Serial.println("MDNS responder started");
