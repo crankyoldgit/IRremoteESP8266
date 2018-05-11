@@ -804,7 +804,7 @@ void setup_wifi() {
     delay(5000);
   }
 
-  debug("WiFi connected. IP address: " + WiFi.localIP());
+  debug("WiFi connected. IP address: " + WiFi.localIP().toString());
 }
 
 void setup(void) {

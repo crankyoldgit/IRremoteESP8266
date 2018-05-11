@@ -111,7 +111,7 @@ void setup() {
 
   server.begin();
   IPAddress myAddress = WiFi.localIP();
-  Serial.println(myAddress);
+  Serial.println(myAddress.toString());
   irsend.begin();
 }
 
