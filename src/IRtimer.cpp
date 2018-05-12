@@ -38,8 +38,8 @@ uint32_t IRtimer::elapsed() {
 }
 
 // Only used in unit testing.
-void IRtimer::add(uint32_t usecs) {
 #ifdef UNIT_TEST
+void IRtimer::add(uint32_t usecs) {
   _IRtimer_unittest_now += usecs;
-#endif  // UNIT_TEST
 }
+#endif  // UNIT_TEST
