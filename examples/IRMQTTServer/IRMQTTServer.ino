@@ -1111,7 +1111,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_RCMM
     case RCMM:  // 21
       if (bits == 0)
-        bits == RCMM_BITS;
+        bits = RCMM_BITS;
       irsend.sendRCMM(code, bits, repeat);
       break;
 #endif
