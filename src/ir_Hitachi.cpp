@@ -58,6 +58,9 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 #if SEND_HITACHI_AC1
 // Send a Hitachi A/C 13-byte message.
 //
+// For devices:
+//  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
+//
 // Args:
 //   data: An array of bytes containing the IR command.
 //   nbytes: Nr. of bytes of data in the array. (>=HITACHI_AC1_STATE_LENGTH)
@@ -148,6 +151,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
 #if DECODE_HITACHI_AC1
 // Decode the supplied Hitachi A/C 13-byte message.
 //
+// For devices:
+//  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
+//
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   The number of data bits to expect. Typically HITACHI_AC1_BITS.
@@ -156,6 +162,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: ALPHA / Untested.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/453
 bool IRrecv::decodeHitachiAC1(decode_results *results, uint16_t nbits,
                               bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
