@@ -1195,35 +1195,33 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
   // Indicate that we sent the message.
   debug("Sent the IR message.");
   debug("Type: " + String(ir_type));
-  switch (ir_type) {
-    case KELVINATOR:
-    case PRONTO:
-    case RAW:
-    case GLOBALCACHE:
-      debug("Code: ");
-      debug(code_str);
-      debug("Repeats: " + String(repeat));
-      // Confirm what we were asked to send was sent.
+  // For "long" codes we basically repeat what we got.
+  if (hasACState((decode_type_t) ir_type) ||
+      ir_type == PRONTO ||
+      ir_type == RAW ||
+      ir_type == GLOBALCACHE) {
+    debug("Code: ");
+    debug(code_str);
+    debug("Repeats: " + String(repeat));
+    // Confirm what we were asked to send was sent.
 #ifdef MQTT_ENABLE
-      if (ir_type == PRONTO && repeat > 0)
-        mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
-                                      String(repeat) + "," +
-                                      String(code_str)).c_str());
-      else
-        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                      String(code_str)).c_str());
-#endif  // MQTT_ENABLE
-      break;
-    default:
-      debug("Code: 0x" + uint64ToString(code, 16));
-      debug("Bits: " + String(bits));
-      debug("Repeats: " + String(repeat));
-
-#ifdef MQTT_ENABLE
+    if (ir_type == PRONTO && repeat > 0)
+      mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
+                                    String(repeat) + "," +
+                                    String(code_str)).c_str());
+    else
       mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    uint64ToString(code, 16)
-                                    + "," + String(bits) + "," +
-                                    String(repeat)).c_str());
+                                    String(code_str)).c_str());
+#endif  // MQTT_ENABLE
+  } else {  // For "short" codes, we break it down a bit more before we report.
+    debug("Code: 0x" + uint64ToString(code, 16));
+    debug("Bits: " + String(bits));
+    debug("Repeats: " + String(repeat));
+#ifdef MQTT_ENABLE
+    mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                  uint64ToString(code, 16)
+                                  + "," + String(bits) + "," +
+                                  String(repeat)).c_str());
 #endif  // MQTT_ENABLE
   }
 }
