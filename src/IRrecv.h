@@ -274,9 +274,13 @@ class IRrecv {
   bool decodeHaierAC(decode_results *results,
                    uint16_t nbits = HAIER_AC_BITS, bool strict = true);
 #endif
-#if DECODE_HAIER_AC
+#if DECODE_HITACHI_AC
   bool decodeHitachiAC(decode_results *results,
                        uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
+#endif
+#if DECODE_HITACHI_AC1
+  bool decodeHitachiAC1(decode_results *results,
+                        uint16_t nbits = HITACHI_AC1_BITS, bool strict = true);
 #endif
 #if DECODE_GICABLE
   bool decodeGICable(decode_results *results, uint16_t nbits = GICABLE_BITS,

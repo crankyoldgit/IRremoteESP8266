@@ -314,3 +314,70 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   ASSERT_EQ(HITACHI_AC_BITS, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, HITACHI_AC_BITS);
 }
+
+// Tests for sendHitachiAC1().
+
+// Test sending typical data only.
+TEST(TestSendHitachiAC1, SendData) {
+  IRsendTest irsend(0);
+  irsend.begin();
+
+  uint8_t hitachi_code[HITACHI_AC1_STATE_LENGTH] = {
+      0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84, 0x00, 0x00, 0x00, 0x00, 0x30,
+      0xB8};
+  irsend.reset();
+  irsend.sendHitachiAC1(hitachi_code);
+  EXPECT_EQ(
+      "m3400s3400"
+      "m400s1250m400s500m400s1250m400s1250m400s500m400s500m400s1250m400s500"
+      "m400s1250m400s500m400s1250m400s500m400s1250m400s1250m400s1250m400s500"
+      "m400s500m400s1250m400s500m400s500m400s1250m400s1250m400s500m400s1250"
+      "m400s500m400s1250m400s500m400s1250m400s500m400s500m400s500m400s1250"
+      "m400s1250m400s1250m400s1250m400s1250m400s500m400s500m400s500m400s500"
+      "m400s500m400s1250m400s1250m400s500m400s500m400s500m400s500m400s1250"
+      "m400s1250m400s500m400s500m400s500m400s500m400s1250m400s500m400s500"
+      "m400s500m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
+      "m400s500m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
+      "m400s500m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
+      "m400s500m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
+      "m400s500m400s500m400s1250m400s1250m400s500m400s500m400s500m400s500"
+      "m400s1250m400s500m400s1250m400s1250m400s1250m400s500m400s500m400s500"
+      "m400s100000", irsend.outputStr());
+}
+
+// Decode a 'real' HitachiAC1 message.
+TEST(TestDecodeHitachiAC1, NormalRealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  uint8_t hitachi_code[HITACHI_AC1_STATE_LENGTH] = {
+    0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84, 0x00, 0x00, 0x00, 0x00, 0x10,
+    0x98};
+
+  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/453
+  uint16_t rawData[211] = {
+    3400, 3350, 450, 1250, 450, 400, 400, 1300, 400, 1300, 400, 400, 450, 400,
+    400, 1300, 400, 400, 400, 1300, 400, 400, 450, 1250, 400, 450, 400, 1300,
+    400, 1250, 450, 1250, 450, 400, 400, 450, 400, 1250, 450, 400, 400, 400,
+    400, 1300, 400, 1300, 400, 400, 450, 1250, 450, 400, 400, 1300, 400, 400,
+    450, 1250, 400, 400, 450, 400, 400, 400, 450, 1250, 400, 1300, 450, 1250,
+    450, 1250, 400, 1300, 400, 400, 450, 400, 400, 450, 350, 450, 400, 400, 400,
+    1300, 400, 1300, 400, 400, 450, 400, 400, 400, 450, 400, 400, 1300, 400,
+    1250, 450, 400, 400, 400, 450, 400, 400, 400, 450, 1250, 450, 400, 400, 400,
+    450, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400,
+    400, 400, 450, 400, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400, 450,
+    400, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400, 450, 400, 400, 400,
+    400, 400, 450, 400, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400, 400,
+    450, 400, 400, 400, 450, 400, 400, 400, 450, 400, 400, 1300, 400, 400, 450,
+    400, 400, 400, 400, 400, 450, 1250, 450, 400, 400, 400, 450, 1250, 450,
+    1250, 450, 400, 400, 400, 450, 400, 400};  // UNKNOWN 828A89E1
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 211, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC1, irsend.capture.decode_type);
+  ASSERT_EQ(HITACHI_AC1_BITS, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, HITACHI_AC1_BITS);
+}
