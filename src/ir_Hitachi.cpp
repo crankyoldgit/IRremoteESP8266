@@ -83,138 +83,133 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_HITACHI_AC1
 
-#if DECODE_HITACHI_AC
-// Decode the supplied Hitachi A/C message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HITACHI_AC_BITS.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: ALPHA / Untested.
-bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
-                             bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
-    return false;  // Can't possibly be a valid HitachiAC message.
-  if (strict && nbits != HITACHI_AC_BITS)
-    return false;  // Not strictly a HitachiAC message.
-
-  uint16_t offset = OFFSET_START;
-  uint16_t dataBitsSoFar = 0;
-  match_result_t data_result;
-
-  // Header
-  if (!matchMark(results->rawbuf[offset++], HITACHI_AC_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], HITACHI_AC_HDR_SPACE))
-    return false;
-
-  // Data
-  // Keep reading bytes until we either run out of message or state to fill.
-  for (uint16_t i = 0;
-      offset <= results->rawlen - 16 && i < HITACHI_AC_STATE_LENGTH;
-      i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            HITACHI_AC_BIT_MARK,
-                            HITACHI_AC_ONE_SPACE,
-                            HITACHI_AC_BIT_MARK,
-                            HITACHI_AC_ZERO_SPACE);
-    if (data_result.success == false)  break;  // Fail
-    results->state[i] = (uint8_t) data_result.data;
-  }
-
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], HITACHI_AC_BIT_MARK))
-    return false;
-  if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], HITACHI_AC_MIN_GAP))
-    return false;
-
-  // Compliance
-  if (strict) {
-    // Correct size/length)
-    if (dataBitsSoFar / 8 != HITACHI_AC_STATE_LENGTH) return false;
-  }
-
-  // Success
-  results->decode_type = HITACHI_AC;
-  results->bits = dataBitsSoFar;
-  // No need to record the state as we stored it as we decoded it.
-  // As we use result->state, we don't record value, address, or command as it
-  // is a union data type.
-  return true;
-}
-#endif  // DECODE_HITACHI_AC
-
-#if DECODE_HITACHI_AC1
-// Decode the supplied Hitachi A/C 13-byte message.
+#if SEND_HITACHI_AC2
+// Send a Hitachi A/C 53-byte message.
 //
 // For devices:
 //  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
 //
 // Args:
+//   data: An array of bytes containing the IR command.
+//   nbytes: Nr. of bytes of data in the array. (>=HITACHI_AC2_STATE_LENGTH)
+//   repeat: Nr. of times the message is to be repeated. (Default = 0).
+//
+// Status: BETA / Appears to work.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/417
+//   Basically the same as sendHitatchiAC() except different size.
+void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
+                            uint16_t repeat) {
+  if (nbytes < HITACHI_AC2_STATE_LENGTH)
+    return;  // Not enough bytes to send a proper message.
+  sendHitachiAC(data, nbytes, repeat);
+}
+#endif  // SEND_HITACHI_AC2
+
+#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
+// Decode the supplied Hitachi A/C message.
+//
+// Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HITACHI_AC1_BITS.
+//   nbits:   The number of data bits to expect.
+//            Typically HITACHI_AC_BITS, HITACHI_AC1_BITS, HITACHI_AC2_BITS
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: ALPHA / Untested.
 //
+// Supported devices:
+//  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
+//
 // Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/417
 //   https://github.com/markszabo/IRremoteESP8266/issues/453
-bool IRrecv::decodeHitachiAC1(decode_results *results, uint16_t nbits,
-                              bool strict) {
+bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
+                             bool strict) {
+  const uint8_t kTolerance = 30;
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
-    return false;  // Can't possibly be a valid HitachiAC1 message.
-  if (strict && nbits != HITACHI_AC1_BITS)
-    return false;  // Not strictly a HitachiAC1 message.
-
+    return false;  // Can't possibly be a valid HitachiAC message.
+  if (strict) {
+    switch (nbits) {
+      case HITACHI_AC_BITS:
+      case HITACHI_AC1_BITS:
+      case HITACHI_AC2_BITS:
+        break;  // Okay to continue.
+      default:
+        return false;  // Not strictly a Hitachi message.
+    }
+  }
   uint16_t offset = OFFSET_START;
   uint16_t dataBitsSoFar = 0;
   match_result_t data_result;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], HITACHI_AC1_HDR_MARK))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], HITACHI_AC1_HDR_SPACE))
-    return false;
-
+  if (nbits == HITACHI_AC1_BITS) {
+    if (!matchMark(results->rawbuf[offset++], HITACHI_AC1_HDR_MARK, kTolerance))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], HITACHI_AC1_HDR_SPACE,
+                    kTolerance))
+      return false;
+  } else {  // Everything else.
+    if (!matchMark(results->rawbuf[offset++], HITACHI_AC_HDR_MARK, kTolerance))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], HITACHI_AC_HDR_SPACE,
+                    kTolerance))
+      return false;
+  }
   // Data
   // Keep reading bytes until we either run out of message or state to fill.
   for (uint16_t i = 0;
-      offset <= results->rawlen - 16 && i < HITACHI_AC1_STATE_LENGTH;
+      offset <= results->rawlen - 16 && i < nbits / 8;
       i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             HITACHI_AC_BIT_MARK,
                             HITACHI_AC_ONE_SPACE,
                             HITACHI_AC_BIT_MARK,
-                            HITACHI_AC_ZERO_SPACE);
+                            HITACHI_AC_ZERO_SPACE,
+                            kTolerance);
     if (data_result.success == false)  break;  // Fail
     results->state[i] = (uint8_t) data_result.data;
   }
 
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], HITACHI_AC_BIT_MARK))
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], HITACHI_AC_BIT_MARK, kTolerance))
     return false;
   if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], HITACHI_AC_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset], HITACHI_AC_MIN_GAP, kTolerance))
     return false;
 
   // Compliance
   if (strict) {
-    // Correct size/length)
-    if (dataBitsSoFar / 8 != HITACHI_AC1_STATE_LENGTH) return false;
+    // Re-check we got the correct size/length due to the way we read the data.
+    switch (dataBitsSoFar / 8) {
+      case HITACHI_AC_STATE_LENGTH:
+      case HITACHI_AC1_STATE_LENGTH:
+      case HITACHI_AC2_STATE_LENGTH:
+        break;  // Continue
+      default:
+        return false;
+    }
   }
 
   // Success
-  results->decode_type = HITACHI_AC1;
+  switch (dataBitsSoFar) {
+    case HITACHI_AC1_BITS:
+      results->decode_type = HITACHI_AC1;
+      break;
+    case HITACHI_AC2_BITS:
+      results->decode_type = HITACHI_AC2;
+      break;
+    case HITACHI_AC_BITS:
+    default:
+      results->decode_type = HITACHI_AC;
+  }
   results->bits = dataBitsSoFar;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
   return true;
 }
-#endif  // DECODE_HITACHI_AC1
+#endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)

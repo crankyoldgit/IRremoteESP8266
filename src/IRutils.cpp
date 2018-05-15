@@ -156,6 +156,7 @@ bool hasACState(const decode_type_t protocol) {
     case HAIER_AC:
     case HITACHI_AC:
     case HITACHI_AC1:
+    case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
     case TOSHIBA_AC:

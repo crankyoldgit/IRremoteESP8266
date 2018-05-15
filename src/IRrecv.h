@@ -47,8 +47,8 @@
 #define FNV_PRIME_32 16777619UL
 #define FNV_BASIS_32 2166136261UL
 
-// Hitachi is the current largest state size.
-#define STATE_SIZE_MAX HITACHI_AC_STATE_LENGTH
+// Hitachi AC is the current largest state size.
+#define STATE_SIZE_MAX HITACHI_AC2_STATE_LENGTH
 
 // Types
 // information for the interrupt handler
@@ -114,11 +114,13 @@ class IRrecv {
   void setUnknownThreshold(uint16_t length);
 #endif
   static bool match(uint32_t measured, uint32_t desired,
-             uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
+                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
   static bool matchMark(uint32_t measured, uint32_t desired,
-                 uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
+                        uint8_t tolerance = TOLERANCE,
+                        int16_t excess = MARK_EXCESS);
   static bool matchSpace(uint32_t measured, uint32_t desired,
-                  uint8_t tolerance = TOLERANCE, int16_t excess = MARK_EXCESS);
+                         uint8_t tolerance = TOLERANCE,
+                         int16_t excess = MARK_EXCESS);
 #ifndef UNIT_TEST
 
  private:

@@ -254,9 +254,16 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                       uint16_t nbytes = HITACHI_AC1_STATE_LENGTH,
                       uint16_t repeat = 0);
 #endif
+<<<<<<< 9bf1ebe072c312a2e04bc65319c5639fd50a2096
 #if SEND_GICABLE
   void sendGICable(uint64_t data, uint16_t nbits = GICABLE_BITS,
                    uint16_t repeat = GICABLE_MIN_REPEAT);
+=======
+#if SEND_HITACHI_AC2
+  void sendHitachiAC2(unsigned char data[],
+                      uint16_t nbytes = HITACHI_AC2_STATE_LENGTH,
+                      uint16_t repeat = 0);
+>>>>>>> Add basic support for 53 byte Hitachi A/C protocol.
 #endif
 
  protected:
