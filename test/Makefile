@@ -60,6 +60,8 @@ run : all
 	  echo "PASS: \o/ \o/ All unit tests passed. \o/ \o/"; \
 	fi
 
+run_tests : run
+
 install-googletest :
 	git clone https://github.com/google/googletest.git ../lib/googletest
 
