@@ -108,6 +108,7 @@ std::string typeToString(const decode_type_t protocol,
     case DENON:         result = "DENON";             break;
     case DISH:          result = "DISH";              break;
     case FUJITSU_AC:    result = "FUJITSU_AC";        break;
+    case GICABLE:       result = "GICABLE";           break;
     case GLOBALCACHE:   result = "GLOBALCACHE";       break;
     case GREE:          result = "GREE";              break;
     case HAIER_AC:      result = "HAIER_AC";          break;

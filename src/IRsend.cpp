@@ -541,6 +541,9 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #if SEND_MIDEA
     case MIDEA: sendMidea(data, nbits); break;
 #endif
+#if SEND_GICABLE
+    case GICABLE: sendGICable(data, nbits); break;
+#endif
   }
 }
 #endif

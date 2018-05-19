@@ -292,6 +292,7 @@ void handleRoot() {
         "<option value='15'>Coolix</option>"
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
+        "<option value='41'>GICable</option>"
         "<option value='6'>JVC</option>"
         "<option value='10'>LG</option>"
         "<option value='36'>Lasertag</option>"
@@ -1185,6 +1186,14 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
         bits = MITSUBISHI_BITS;
       repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
       irsend.sendMitsubishi2(code, bits, repeat);
+      break;
+#endif
+#if SEND_GICABLE
+    case GICABLE:  // 41
+      if (bits == 0)
+        bits = GICABLE_BITS;
+      repeat = std::max(repeat, (uint16_t) GICABLE_BITS);
+      irsend.sendGICable(code, bits, repeat);
       break;
 #endif
   }
