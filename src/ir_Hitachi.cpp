@@ -31,7 +31,7 @@
 #define HITACHI_AC_ZERO_SPACE          500U
 #define HITACHI_AC_MIN_GAP          100000U  // Completely made up value.
 
-#if SEND_HITACHI_AC
+#if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
 //
 // Args:
@@ -53,7 +53,7 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
               HITACHI_AC_BIT_MARK, HITACHI_AC_MIN_GAP,
               data, nbytes, 38, true, repeat, 50);
 }
-#endif  // SEND_HITACHI_AC
+#endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 
 #if SEND_HITACHI_AC1
 // Send a Hitachi A/C 13-byte message.

@@ -114,6 +114,7 @@ std::string typeToString(const decode_type_t protocol,
     case HAIER_AC:      result = "HAIER_AC";          break;
     case HITACHI_AC:    result = "HITACHI_AC";        break;
     case HITACHI_AC1:   result = "HITACHI_AC1";       break;
+    case HITACHI_AC2:   result = "HITACHI_AC2";       break;
     case JVC:           result = "JVC";               break;
     case KELVINATOR:    result = "KELVINATOR";        break;
     case LG:            result = "LG";                break;

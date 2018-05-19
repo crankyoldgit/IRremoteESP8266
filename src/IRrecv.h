@@ -276,7 +276,7 @@ class IRrecv {
   bool decodeHaierAC(decode_results *results,
                    uint16_t nbits = HAIER_AC_BITS, bool strict = true);
 #endif
-#if DECODE_HITACHI_AC
+#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
   bool decodeHitachiAC(decode_results *results,
                        uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
 #endif
