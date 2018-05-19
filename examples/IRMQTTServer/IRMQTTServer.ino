@@ -1210,7 +1210,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
 #endif
 #if SEND_GICABLE
-    case GICABLE:  // 41
+    case GICABLE:  // 43
       if (bits == 0)
         bits = GICABLE_BITS;
       repeat = std::max(repeat, (uint16_t) GICABLE_BITS);
