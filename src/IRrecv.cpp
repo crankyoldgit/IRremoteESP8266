@@ -466,9 +466,20 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeHaierAC(results))
     return true;
 #endif
+#if DECODE_HITACHI_AC2
+  // HitachiAC2 should be checked before HitachiAC
+  DPRINTLN("Attempting Hitachi AC2 decode");
+  if (decodeHitachiAC(results, HITACHI_AC2_BITS))
+    return true;
+#endif
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results))
+  if (decodeHitachiAC(results, HITACHI_AC_BITS))
+    return true;
+#endif
+#if DECODE_HITACHI_AC1
+  DPRINTLN("Attempting Hitachi AC1 decode");
+  if (decodeHitachiAC(results, HITACHI_AC1_BITS))
     return true;
 #endif
 #if DECODE_HASH

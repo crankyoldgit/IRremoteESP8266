@@ -387,6 +387,9 @@ void handleRoot() {
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
         "<option value='38'>Haier</option>"
+        "<option value='40'>Hitachi (28 bytes)</option>"
+        "<option value='41'>Hitachi1 (13 bytes)</option>"
+        "<option value='42'>Hitachi2 (53 bytes)</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
         "<option value='32'>Toshiba</option>"
@@ -489,6 +492,12 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case HITACHI_AC:
       stateSize = HITACHI_AC_STATE_LENGTH;
       break;
+    case HITACHI_AC1:
+      stateSize = HITACHI_AC1_STATE_LENGTH;
+      break;
+    case HITACHI_AC2:
+      stateSize = HITACHI_AC2_STATE_LENGTH;
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return;
@@ -572,6 +581,16 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_HITACHI_AC
     case HITACHI_AC:
       irsend.sendHitachiAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_HITACHI_AC1
+    case HITACHI_AC1:
+      irsend.sendHitachiAC1(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_HITACHI_AC2
+    case HITACHI_AC2:
+      irsend.sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
   }
@@ -1092,6 +1111,8 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case FUJITSU_AC:  // 33
     case HAIER_AC:  // 38
     case HITACHI_AC:  // 40
+    case HITACHI_AC1:  // 41
+    case HITACHI_AC2:  // 42
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
@@ -1189,7 +1210,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
 #endif
 #if SEND_GICABLE
-    case GICABLE:  // 41
+    case GICABLE:  // 43
       if (bits == 0)
         bits = GICABLE_BITS;
       repeat = std::max(repeat, (uint16_t) GICABLE_BITS);
