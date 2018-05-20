@@ -1,5 +1,20 @@
 # Release Notes
 
+## _v2.4.1 (20180520)_
+
+**[Bug Fixes]**
+- Fix crash in IRMQTTServer when compiled under Arduino IDE. (#455)
+- Default bit length not set for RCMM in IRMQTTServer example. (#456)
+- Bad acknowledgements for some A/C protocols in IRMQTTServer example. (#460)
+
+**[Features]**
+- Allow disabling the use of delay() calls. (#450)
+- Initial support for G.I. Cable protocol. (#458)
+- Support of Hitachi A/C 13 & 53 byte messages. (#461)
+
+**[Misc]**
+- Auto Analyse Raw Data script converted to Python. (#454)
+
 ## _v2.4.0 (20180407)_
 
 **[Bug Fixes]**
