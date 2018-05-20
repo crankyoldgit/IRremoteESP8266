@@ -1,9 +1,8 @@
 /*
  * Send arbitrary IR codes via a web server or MQTT.
  * Copyright David Conran 2016, 2017, 2018
- * Version 0.3 Oct, 2017
  *
- * NOTE: An IR LED circuit *MUST* be connected to ESP8266 pin 4 (D2). See IR_LED
+ * NOTE: An IR LED circuit *MUST* be connected to ESP8266 GPIO4 (D2). See IR_LED
  *
  * WARN: This is very advanced & complicated example code. Not for beginners.
  *       You are strongly suggested to try & look at other example code first.
@@ -130,7 +129,9 @@
 #include <string>
 
 // Configuration parameters
-#define IR_LED 4  // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
+// GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
+#define IR_LED 4
+// define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
 #define HTTP_PORT 80  // The port the HTTP server is listening on.
 #define HOSTNAME "ir_server"  // Name of the device you want in mDNS.
 
@@ -154,7 +155,18 @@ const char* mqtt_password = "";
 #define argData "code"
 #define argBits "bits"
 #define argRepeat "repeats"
-#define DEBUG True
+
+#define _MY_VERSION_ "v0.4"
+
+#if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
+#undef DEBUG
+#define DEBUG true  // Change to 'false' to disable all serial output.
+#else
+#undef DEBUG
+#define DEBUG false
+#endif
+// NOTE: Make sure you set your Serial Monitor to the same speed.
+#define BAUD_RATE 115200  // Serial port Baud rate.
 
 // Globals
 ESP8266WebServer server(HTTP_PORT);
@@ -243,6 +255,7 @@ void handleRoot() {
     "<h3>Information</h3>"
     "<p>IP address: " + WiFi.localIP().toString() + "<br>"
     "Booted: " + timeSince(1) + "<br>" +
+    "Version: " _MY_VERSION_ "<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
@@ -831,7 +844,12 @@ void setup(void) {
   irsend.begin();
 
   #ifdef DEBUG
-  Serial.begin(115200);
+  // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
+  Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
+  while (!Serial)  // Wait for the serial connection to be establised.
+    delay(50);
+  Serial.println();
+  debug("IRMQTTServer " _MY_VERSION_" has booted.");
   #endif  // DEBUG
 
   setup_wifi();
