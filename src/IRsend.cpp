@@ -220,12 +220,15 @@ void IRsend::space(uint32_t time) {
 // Args:
 //   hz: The frequency to calibrate at >= 1000Hz. Default is 38000Hz.
 //
-// Status:  ALPHA / Untested.
+// Returns:
+//   The calculated period offset (in uSeconds) which is now in use. e.g. -5.
+//
+// Status:  Stable / Working.
 //
 // NOTE:
 //   This will generate an 65535us mark() IR LED signal.
 //   This only needs to be called once, if at all.
-void IRsend::calibrate(uint16_t hz) {
+int8_t IRsend::calibrate(uint16_t hz) {
   if (hz < 1000)  // Were we given kHz? Supports the old call usage.
     hz *= 1000;
   periodOffset = 0;  // Turn off any existing offset while we calibrate.
@@ -250,6 +253,7 @@ void IRsend::calibrate(uint16_t hz) {
   double_t actualPeriod = (double_t) timeTaken / (double_t) pulses;
   // Store the difference between the actual time per period vs. calculated.
   periodOffset = (int8_t) ((double_t) calcPeriod - actualPeriod);
+  return periodOffset;
 }
 
 // Generic method for sending data that is common to most protocols.

@@ -156,7 +156,7 @@ const char* mqtt_password = "";
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.4"
+#define _MY_VERSION_ "v0.5"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG
@@ -180,6 +180,7 @@ uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
 bool ir_lock = false;  // Primitive locking for gating the IR LED.
 uint32_t sendReqCounter = 0;
+int8_t offset;  // The calculated period offset for this chip and library.
 
 #ifdef MQTT_ENABLE
 String lastMqttCmd = "None";
@@ -256,7 +257,9 @@ void handleRoot() {
     "<p>IP address: " + WiFi.localIP().toString() + "<br>"
     "Booted: " + timeSince(1) + "<br>" +
     "Version: " _MY_VERSION_ "<br>"
+    "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
+    "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
@@ -842,6 +845,7 @@ void setup_wifi() {
 
 void setup(void) {
   irsend.begin();
+  offset = irsend.calibrate();
 
   #ifdef DEBUG
   // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
