@@ -19,13 +19,6 @@ Before reporting an issue or asking for help, please try to follow our [Troubles
 ## Frequently Asked Questions
 Some common answers to common questions and problems are on our [F.A.Q. wiki page](https://github.com/markszabo/IRremoteESP8266/wiki/Frequently-Asked-Questions).
 
-## Library History
-This library was originally based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
-
-[Mark Szabo](https://github.com/markszabo/IRremoteESP8266) has updated the IRsend class to work on ESP8266 and [Sebastien Warin](https://github.com/sebastienwarin/IRremoteESP8266) the receiving & decoding part (IRrecv class).
-
-As of v2.0, the library was almost entirely re-written with the ESP8266's resources in mind.
-
 ## Installation
 ##### Official releases via the Arduino IDE v1.8+ (Windows & Linux)
 1. Click the _"Sketch"_ -> _"Include Library"_ -> _"Manage Libraries..."_ Menu items.
@@ -51,29 +44,6 @@ git clone https://github.com/markszabo/IRremoteESP8266.git
 cd ~/Arduino/libraries/IRremoteESP8266 && git pull
 ```
 
-## Unit Tests
-_**For Library Developers**_<br>
-The [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing) under the [test/](https://github.com/markszabo/IRremoteESP8266/tree/master/test) directory are for a Unix machine, **not** the micro-controller (ESP8266).
-The tests are for execution under [Travis](https://travis-ci.org/) and on a developer's machine.
-All internal library code _must_ use [c99 exact-width type definitions](https://en.wikipedia.org/wiki/C_data_types#Fixed-width_integer_types).
-e.g. uint16_t etc.
-You _must_ disable any Arduino/ESP8266 specific code _(e.g. `Serial.print()` etc.)_ using something like:
-```
-#ifndef UNIT_TEST
-<Arduino specific code ...>
-#endif
-```
-
-Unit Tests & Test Coverage are not perfect as we can not emulate hardware specific features and differences. e.g. Interrupts, GPIOs, CPU instruction timing etc, etc.
-
-The example code has no unit tests.
-
-To run all the tests yourself, try the following:
-```
-$ cd test
-$ make run
-```
-
 ## Contributing
 If you want to [contribute](.github/CONTRIBUTING.md#how-can-i-contribute) to this project, consider:
 - [Report](.github/CONTRIBUTING.md#reporting-bugs) bugs and errors
@@ -84,3 +54,11 @@ If you want to [contribute](.github/CONTRIBUTING.md#how-can-i-contribute) to thi
 
 ## Contributors
 Available [here](.github/Contributors.md)
+
+## Library History
+This library was originally based on Ken Shirriff's work (https://github.com/shirriff/Arduino-IRremote/)
+
+[Mark Szabo](https://github.com/markszabo/IRremoteESP8266) has updated the IRsend class to work on ESP8266 and [Sebastien Warin](https://github.com/sebastienwarin/IRremoteESP8266) the receiving & decoding part (IRrecv class).
+
+As of v2.0, the library was almost entirely re-written with the ESP8266's resources in mind.
+
