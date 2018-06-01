@@ -56,6 +56,7 @@ cancelTimers	KEYWORD2
 checkheader	KEYWORD2
 checksum	KEYWORD2
 clearBit	KEYWORD2
+compare	KEYWORD2
 copyIrParams	KEYWORD2
 decode	KEYWORD2
 decodeAiwaRCT501	KEYWORD2
@@ -134,12 +135,15 @@ getMode	KEYWORD2
 getMold	KEYWORD2
 getNight	KEYWORD2
 getOffTime	KEYWORD2
+getOffTimer	KEYWORD2
 getOffTimerEnabled	KEYWORD2
 getOnTime	KEYWORD2
+getOnTimer	KEYWORD2
 getOnTimerEnabled	KEYWORD2
 getPower	KEYWORD2
 getPowerful	KEYWORD2
 getQuiet	KEYWORD2
+getRClevel	KEYWORD2
 getRaw	KEYWORD2
 getSensor	KEYWORD2
 getSleep	KEYWORD2

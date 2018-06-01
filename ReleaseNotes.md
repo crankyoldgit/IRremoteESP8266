@@ -1,5 +1,14 @@
 # Release Notes
 
+## _v2.4.2 (20180601)_
+
+**[Bug Fixes]**
+- Timing Fix: Update the period offset compensation.
+
+**[Features]**
+- Improvements for IRMQTTServer example (#466)
+
+
 ## _v2.4.1 (20180520)_
 
 **[Bug Fixes]**

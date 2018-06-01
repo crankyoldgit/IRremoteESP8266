@@ -45,7 +45,7 @@ cat << EndOfTextEndOfTextEndOfText
 
 EndOfTextEndOfTextEndOfText
 
-METHODS=$(egrep "^(uint|void|bool|String|static|match_result_t).*\(" src/*.cpp |
+METHODS=$(egrep "^(u?int|void|bool|String|static|match_result_t).*\(" src/*.cpp|
           cut -d' ' -f2- | sed 's/^.*:://' | cut -d'(' -f1 | sort -u |
           grep -v ICACHE_RAM_ATTR)
 for i in ${METHODS}; do
