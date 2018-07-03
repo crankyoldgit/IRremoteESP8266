@@ -133,7 +133,19 @@
 #define IR_LED 4
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
 #define HTTP_PORT 80  // The port the HTTP server is listening on.
-#define HOSTNAME "ir_server"  // Name of the device you want in mDNS.
+// Name of the device you want in mDNS.
+// NOTE: Changing this will change the MQTT path too unless you override it
+//       via MQTTprefix below.
+#define HOSTNAME "ir_server"
+
+// We obtain our network config via DHCP by default but allow an easy way to
+// use a static IP config.
+#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
+#if USE_STATIC_IP
+const IPAddress kIPAddress = IPAddress(10, 0, 1, 78);
+const IPAddress kGateway = IPAddress(10, 0, 1, 1);
+const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
+#endif  // USE_STATIC_IP
 
 #ifdef MQTT_ENABLE
 // Address of your MQTT server.
@@ -832,6 +844,10 @@ void setup_wifi() {
   // We start by connecting to a WiFi network
 
   wifiManager.setTimeout(300);  // Time out after 5 mins.
+#if USE_STATIC_IP
+  // Use a static IP config rather than the one supplied via DHCP.
+  wifiManager.setSTAStaticIPConfig(kIPAddress, kGateway, kSubnetMask);
+#endif  // USE_STATIC_IP
   if (!wifiManager.autoConnect()) {
     debug("Wifi failed to connect and hit timeout.");
     delay(3000);
