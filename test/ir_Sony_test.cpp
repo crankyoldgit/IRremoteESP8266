@@ -321,3 +321,25 @@ TEST(TestDecodeSony, DecodeGlobalCacheExample) {
   // With strict and correct size.
   ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, SONY_12_BITS, true));
 }
+
+// Encoding & Decode 20 bit Sony messages. Issue #476
+TEST(TestEncodeSony, Issue476) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendSony(0x6AB47, 20);
+  irsend.makeDecodeResult();
+
+  // Without strict.
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SONY, irsend.capture.decode_type);
+  EXPECT_EQ(20, irsend.capture.bits);
+  EXPECT_EQ(0x6AB47, irsend.capture.value);  // 20 bits
+  EXPECT_EQ(0x1A, irsend.capture.address);  // 5 bits
+  EXPECT_EQ(0x7156, irsend.capture.command);  // 15 bits
+  EXPECT_EQ(0x56, 0x7156 & 0x7F);  // command (lower 7 bits)
+  EXPECT_EQ(0xE2, (0x7156 >> 7) & 0xFF);  // extended (top 8 of 15 bits)
+  EXPECT_EQ(0x6AB47, irsend.encodeSony(20, 0x56, 0x1A, 0xE2));
+}
