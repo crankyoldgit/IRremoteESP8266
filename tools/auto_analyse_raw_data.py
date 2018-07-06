@@ -83,7 +83,7 @@ class RawIRMessage(object):
                        "0x{0:0{1}X}".format(rev_num, bits / 4), num, rev_num,
                        binary_str, rev_binary_str))
 
-  def add_data_code(self, bin_str):
+  def add_data_code(self, bin_str, footer=True):
     """Add the common "data" sequence of code to send the bulk of a message."""
     # pylint: disable=no-self-use
     code = []
@@ -92,8 +92,9 @@ class RawIRMessage(object):
                                                          len(bin_str)))
     code.append("    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, "
                 "nbits, true);")
-    code.append("    // Footer")
-    code.append("    mark(BIT_MARK);")
+    if footer:
+      code.append("    // Footer")
+      code.append("    mark(BIT_MARK);")
     return code
 
   def _calc_values(self):
@@ -256,7 +257,7 @@ def decode_data(message, defines, function_code, output=sys.stdout):
       state = "HM"
       if binary_value:
         message.display_binary(binary_value)
-        function_code.extend(message.add_data_code(binary_value))
+        function_code.extend(message.add_data_code(binary_value, False))
         total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
       output.write("HDR_MARK+")
@@ -295,8 +296,7 @@ def decode_data(message, defines, function_code, output=sys.stdout):
         message.display_binary(binary_value)
         function_code.extend(message.add_data_code(binary_value))
       else:
-        function_code.append("    // Gap")
-        function_code.append("    mark(BIT_MARK);")
+        function_code.extend(["    // Gap", "    mark(BIT_MARK);"])
       function_code.append("    space(SPACE_GAP);")
       total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
