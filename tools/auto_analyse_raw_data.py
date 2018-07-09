@@ -83,7 +83,7 @@ class RawIRMessage(object):
                        "0x{0:0{1}X}".format(rev_num, bits / 4), num, rev_num,
                        binary_str, rev_binary_str))
 
-  def add_data_code(self, bin_str):
+  def add_data_code(self, bin_str, footer=True):
     """Add the common "data" sequence of code to send the bulk of a message."""
     # pylint: disable=no-self-use
     code = []
@@ -92,8 +92,9 @@ class RawIRMessage(object):
                                                          len(bin_str)))
     code.append("    sendData(BIT_MARK, ONE_SPACE, BIT_MARK, ZERO_SPACE, data, "
                 "nbits, true);")
-    code.append("    // Footer")
-    code.append("    mark(BIT_MARK);")
+    if footer:
+      code.append("    // Footer")
+      code.append("    mark(BIT_MARK);")
     return code
 
   def _calc_values(self):
@@ -256,12 +257,12 @@ def decode_data(message, defines, function_code, output=sys.stdout):
       state = "HM"
       if binary_value:
         message.display_binary(binary_value)
+        function_code.extend(message.add_data_code(binary_value, False))
         total_bits = total_bits + binary_value
-        output.write(state)
       binary_value = add_bit(binary_value, "reset")
       output.write("HDR_MARK+")
       function_code.extend(["    // Header", "    mark(HDR_MARK);"])
-    elif (message.is_hdr_space(usec) and not message.is_one_space(usec)):
+    elif message.is_hdr_space(usec) and not message.is_one_space(usec):
       if state != "HM":
         if binary_value:
           message.display_binary(binary_value)
@@ -290,9 +291,12 @@ def decode_data(message, defines, function_code, output=sys.stdout):
       if state != "BM":
         output.write("UNEXPECTED->")
       state = "GS"
-      output.write(" GAP(%d)" % usec)
-      message.display_binary(binary_value)
-      function_code.extend(message.add_data_code(binary_value))
+      output.write("GAP(%d)" % usec)
+      if binary_value:
+        message.display_binary(binary_value)
+        function_code.extend(message.add_data_code(binary_value))
+      else:
+        function_code.extend(["    // Gap", "    mark(BIT_MARK);"])
       function_code.append("    space(SPACE_GAP);")
       total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
@@ -300,15 +304,16 @@ def decode_data(message, defines, function_code, output=sys.stdout):
       output.write("UNKNOWN(%d)" % usec)
       state = "UNK"
     count = count + 1
-  message.display_binary(binary_value)
-  function_code.extend(message.add_data_code(binary_value))
+  if binary_value:
+    message.display_binary(binary_value)
+    function_code.extend(message.add_data_code(binary_value))
   function_code.extend([
       "    space(100000);  // A 100% made up guess of the gap"
       " between messages.", "  }", "}"
   ])
 
   total_bits = total_bits + binary_value
-  output.write("Total Nr. of suspected bits: %d\n" % len(total_bits))
+  output.write("\nTotal Nr. of suspected bits: %d\n" % len(total_bits))
   defines.append("#define XYZ_BITS %dU" % len(total_bits))
   if len(total_bits) > 64:
     defines.append("#define XYZ_STATE_LENGTH %dU" % (len(total_bits) / 8))
