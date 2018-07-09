@@ -18,6 +18,8 @@
 
 // Supported devices:
 //   * Haier HSU07-HEA03 Remote control.
+//   * Haier YR-W02 Remote control
+//   * Haier HSU-09HMC203 A/C unit.
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/404
@@ -32,8 +34,8 @@
 #define HAIER_AC_ZERO_SPACE    650U
 #define HAIER_AC_MIN_GAP    150000U  // Completely made up value.
 
-#if SEND_HAIER_AC
-// Send a Haier A/C message.
+#if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
+// Send a Haier A/C message. (HSU07-HEA03 remote)
 //
 // Args:
 //   data: An array of bytes containing the IR command.
@@ -59,8 +61,26 @@ void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
                 50);
   }
 }
-#endif  // SEND_HAIER_AC
+#endif  // (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 
+#if SEND_HAIER_AC_YRW02
+// Send a Haier YR-W02 remote A/C message.
+//
+// Args:
+//   data: An array of bytes containing the IR command.
+//   nbytes: Nr. of bytes of data in the array. (>=HAIER_AC_YRW02_STATE_LENGTH)
+//   repeat: Nr. of times the message is to be repeated. (Default = 0).
+//
+// Status: Alpha / Untested on a real device.
+//
+void IRsend::sendHaierACYRW02(unsigned char data[], uint16_t nbytes,
+                         uint16_t repeat) {
+  if (nbytes >= HAIER_AC_YRW02_STATE_LENGTH)
+    sendHaierAC(data, nbytes, repeat);
+}
+#endif  // SEND_HAIER_AC_YRW02
+
+// Class for emulating a Haier HSU07-HEA03 remote
 IRHaierAC::IRHaierAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -430,9 +450,10 @@ std::string IRHaierAC::toString() {
 
   return result;
 }
+// End of IRHaierAC class.
 
-#if DECODE_HAIER_AC
-// Decode the supplied Haier message.
+#if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
+// Decode the supplied Haier HSU07-HEA03 remote message.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -494,4 +515,33 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
   results->bits = nbits;
   return true;
 }
-#endif  // DECODE_HAIER_AC
+#endif  // (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
+
+#if DECODE_HAIER_AC_YRW02
+// Decode the supplied Haier YR-W02 remote A/C message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically HAIER_AC_YRW02_BITS.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / Appears to be working.
+//
+bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
+                                bool strict) {
+  if (strict) {
+    if (nbits != HAIER_AC_YRW02_BITS)
+      return false;  // Not strictly a HAIER_AC_YRW02 message.
+  }
+
+  // The protocol is almost exactly the same as HAIER_AC
+  if (!decodeHaierAC(results, nbits, false))
+    return false;
+  // Success
+  // It looks correct, but we haven't check the checksum etc.
+  results->decode_type = HAIER_AC_YRW02;
+  return true;
+}
+#endif  // DECODE_HAIER_AC_YRW02

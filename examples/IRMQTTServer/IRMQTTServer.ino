@@ -414,7 +414,8 @@ void handleRoot() {
         "<option value='16'>Daikin</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
-        "<option value='38'>Haier</option>"
+        "<option value='38'>Haier (9 bytes)</option>"
+        "<option value='44'>Haier (14 bytes/YR-W02)</option>"
         "<option value='40'>Hitachi (28 bytes)</option>"
         "<option value='41'>Hitachi1 (13 bytes)</option>"
         "<option value='42'>Hitachi2 (53 bytes)</option>"
@@ -517,6 +518,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case HAIER_AC:
       stateSize = HAIER_AC_STATE_LENGTH;
       break;
+    case HAIER_AC_YRW02:
+      stateSize = HAIER_AC_YRW02_STATE_LENGTH;
+      break;
     case HITACHI_AC:
       stateSize = HITACHI_AC_STATE_LENGTH;
       break;
@@ -604,6 +608,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_HAIER_AC
     case HAIER_AC:
       irsend.sendHaierAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_HAIER_AC_YRW02
+    case HAIER_AC_YRW02:
+      irsend.sendHaierACYRW02(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_HITACHI_AC
@@ -1148,6 +1157,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case TOSHIBA_AC:  // 32
     case FUJITSU_AC:  // 33
     case HAIER_AC:  // 38
+    case HAIER_AC_YRW02:  // 44
     case HITACHI_AC:  // 40
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42

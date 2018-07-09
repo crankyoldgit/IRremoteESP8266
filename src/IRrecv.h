@@ -272,9 +272,14 @@ class IRrecv {
   bool decodeGree(decode_results *results,
                   uint16_t nbits = GREE_BITS, bool strict = true);
 #endif
-#if DECODE_HAIER_AC
+#if (DECODE_HAIER_AC | DECODE_HAIER_AC_YRW02)
   bool decodeHaierAC(decode_results *results,
                    uint16_t nbits = HAIER_AC_BITS, bool strict = true);
+#endif
+#if DECODE_HAIER_AC_YRW02
+  bool decodeHaierACYRW02(decode_results *results,
+                          uint16_t nbits = HAIER_AC_YRW02_BITS,
+                          bool strict = true);
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
   bool decodeHitachiAC(decode_results *results,

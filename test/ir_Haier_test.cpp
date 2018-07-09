@@ -558,3 +558,61 @@ TEST(TestDecodeHaierAC, RealExample3) {
             "Current Time: 00:09, On Timer: Off, Off Timer: Off",
             haier.toString());
 }
+
+// Decode normal "synthetic" messages.
+TEST(TestDecodeHaierAC_YRW02, NormalDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  uint8_t expectedState[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0x12, 0x00, 0x02, 0x40, 0x20, 0x00,
+      0x20, 0x00, 0x00, 0x00, 0x00, 0x05, 0x3F};
+
+  irsend.reset();
+  irsend.sendHaierACYRW02(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HAIER_AC_YRW02, irsend.capture.decode_type);
+  EXPECT_EQ(HAIER_AC_YRW02_BITS, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a "real" example message.
+TEST(TestDecodeHaierAC_YRW02, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // Data from Issue #485 captured by non7top
+  uint16_t rawData[229] = {2998, 3086, 2998, 4460, 568, 1640, 596, 492, 514,
+      1690, 590, 496, 566, 532, 592, 1596, 570, 1618, 518, 584, 590, 538,
+      524, 536, 568, 532, 590, 1596, 516, 612, 568, 538, 522, 1638, 586, 500,
+      512, 614, 568, 538, 520, 538, 586, 538, 566, 540, 520, 538, 586, 538, 522,
+      538, 588, 538, 568, 538, 520, 538, 586, 538, 566, 538, 520, 540, 588,
+      1596, 590, 536, 568, 538, 520, 1592, 640, 538, 520, 540, 588, 538, 568,
+      538, 516, 562, 566, 538, 518, 542, 586, 540, 566, 1596, 590, 538, 566,
+      538, 516, 544, 586, 538, 516, 542, 588, 540, 564, 540, 468, 590, 588,
+      538, 566, 540, 466, 590, 588, 538, 514, 544, 588, 538, 566, 538, 468,
+      1692, 606, 526, 466, 592, 588, 538, 568, 490, 588, 538, 566, 540, 466,
+      592, 588, 538, 566, 538, 466, 592, 588, 538, 568, 492, 586, 540, 566, 540,
+      468, 590, 588, 538, 568, 516, 488, 590, 588, 538, 568, 492, 588, 538, 566,
+      518, 488, 590, 588, 540, 564, 518, 490, 590, 588, 538, 562, 496, 588, 538,
+      566, 518, 488, 590, 588, 538, 562, 522, 488, 588, 590, 538, 560, 498, 588,
+      540, 564, 522, 486, 590, 590, 538, 560, 524, 488, 588, 588, 1598, 514,
+      608, 564, 1600, 548, 536, 586, 538, 568, 1594, 590, 1618, 578, 1606, 606,
+      1582, 590, 1596, 590, 1616, 580};
+  uint8_t expectedState[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0x12, 0x00, 0x02, 0x40, 0x20, 0x00,
+      0x20, 0x00, 0x00, 0x00, 0x00, 0x05, 0x3F};
+
+  irsend.sendRaw(rawData, 229, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HAIER_AC_YRW02, irsend.capture.decode_type);
+  EXPECT_EQ(HAIER_AC_YRW02_BITS, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
