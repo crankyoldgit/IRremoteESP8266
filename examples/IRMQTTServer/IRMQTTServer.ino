@@ -414,7 +414,7 @@ void handleRoot() {
         "<option value='16'>Daikin</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
-        "<option value='38'>Haier</option>"
+        "<option value='38'>Haier (9 bytes)</option>"
         "<option value='44'>Haier (14 bytes/YR-W02)</option>"
         "<option value='40'>Hitachi (28 bytes)</option>"
         "<option value='41'>Hitachi1 (13 bytes)</option>"
