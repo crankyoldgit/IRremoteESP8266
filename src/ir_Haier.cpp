@@ -18,6 +18,8 @@
 
 // Supported devices:
 //   * Haier HSU07-HEA03 Remote control.
+//   * Haier YR-W02 Remote control
+//   * Haier HSU-09HMC203 A/C unit.
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/404
@@ -33,7 +35,7 @@
 #define HAIER_AC_MIN_GAP    150000U  // Completely made up value.
 
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
-// Send a Haier A/C message.
+// Send a Haier A/C message. (HSU07-HEA03 remote)
 //
 // Args:
 //   data: An array of bytes containing the IR command.
@@ -62,7 +64,7 @@ void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
 #endif  // (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 
 #if SEND_HAIER_AC_YRW02
-// Send a Haier YR-W02 A/C message.
+// Send a Haier YR-W02 remote A/C message.
 //
 // Args:
 //   data: An array of bytes containing the IR command.
@@ -78,6 +80,7 @@ void IRsend::sendHaierACYRW02(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_HAIER_AC_YRW02
 
+// Class for emulating a Haier HSU07-HEA03 remote
 IRHaierAC::IRHaierAC(uint16_t pin) : _irsend(pin) {
   stateReset();
 }
@@ -447,9 +450,10 @@ std::string IRHaierAC::toString() {
 
   return result;
 }
+// End of IRHaierAC class.
 
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
-// Decode the supplied Haier message.
+// Decode the supplied Haier HSU07-HEA03 remote message.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -514,7 +518,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 #endif  // (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 
 #if DECODE_HAIER_AC_YRW02
-// Decode the supplied Haier YR-W02 A/C message.
+// Decode the supplied Haier YR-W02 remote A/C message.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
