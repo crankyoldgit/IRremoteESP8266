@@ -157,6 +157,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC_YRW02
+  if (results->decode_type == HAIER_AC_YRW02) {
+    IRHaierACYRW02 ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_HAIER_AC_YRW02
   // If we got a human-readable description of the message, display it.
   if (description != "")  Serial.println("Mesg Desc.: " + description);
 }

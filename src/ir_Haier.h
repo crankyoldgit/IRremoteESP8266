@@ -21,8 +21,12 @@
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/404
 //   https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
+//   https://github.com/markszabo/IRremoteESP8266/issues/485
+//   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants
+
+// Haier HSU07-HEA03 remote
 // Byte 0
 #define HAIER_AC_PREFIX      0b10100101
 
@@ -62,6 +66,63 @@
 #define HAIER_AC_FAN_HIGH       3
 
 #define HAIER_AC_MAX_TIME      (23 * 60 + 59)
+
+// Haier YRW02 remote
+// Byte 0
+#define HAIER_AC_YRW02_PREFIX      0xA6
+
+// Byte 1
+// Bits 0-3
+// 0x0 = 16DegC, ... 0xE = 30DegC
+// Bits 4-7 - Swing
+#define HAIER_AC_YRW02_SWING_OFF          0x0
+#define HAIER_AC_YRW02_SWING_TOP          0x1
+#define HAIER_AC_YRW02_SWING_TOP_COOL     0x2
+#define HAIER_AC_YRW02_SWING_BOTTOM       0x3
+#define HAIER_AC_YRW02_SWING_BOTTOM_HEAT  0xA
+#define HAIER_AC_YRW02_SWING_AUTO         0xC  // Airflow
+
+
+// Byte 3
+// Bit 7 - Health mode
+
+// Byte 4
+#define HAIER_AC_YRW02_POWER    0b01000000
+
+// Byte 5
+#define HAIER_AC_YRW02_FAN_LOW    0x60
+#define HAIER_AC_YRW02_FAN_MED    0x40
+#define HAIER_AC_YRW02_FAN_HIGH   0x20
+#define HAIER_AC_YRW02_FAN_AUTO   0xA0
+
+
+// Byte 6
+#define HAIER_AC_YRW02_TURBO_OFF  0x00
+#define HAIER_AC_YRW02_TURBO_LOW  0x80
+#define HAIER_AC_YRW02_TURBO_HIGH 0x40
+
+// Byte 7
+// Bits 0-3
+#define HAIER_AC_YRW02_AUTO     0x0
+#define HAIER_AC_YRW02_COOL     0x2
+#define HAIER_AC_YRW02_DRY      0x4
+#define HAIER_AC_YRW02_HEAT     0x8
+#define HAIER_AC_YRW02_FAN      0xC
+
+// Byte 8
+#define HAIER_AC_YRW02_SLEEP    0b10000000
+
+// Byte 12
+// Bits 4-7
+#define HAIER_AC_YRW02_BUTTON_TEMP_UP      0x0
+#define HAIER_AC_YRW02_BUTTON_TEMP_DOWN    0x1
+#define HAIER_AC_YRW02_BUTTON_SWING        0x2
+#define HAIER_AC_YRW02_BUTTON_FAN          0x4
+#define HAIER_AC_YRW02_BUTTON_POWER        0x5
+#define HAIER_AC_YRW02_BUTTON_MODE         0x6
+#define HAIER_AC_YRW02_BUTTON_HEALTH       0x7
+#define HAIER_AC_YRW02_BUTTON_TURBO        0x8
+#define HAIER_AC_YRW02_BUTTON_SLEEP        0xB
 
 
 class IRHaierAC {
@@ -120,6 +181,61 @@ class IRHaierAC {
   void checksum();
   static uint16_t getTime(const uint8_t ptr[]);
   static void setTime(uint8_t ptr[], const uint16_t nr_mins);
+  IRsend _irsend;
+};
+
+
+class IRHaierACYRW02 {
+ public:
+  explicit IRHaierACYRW02(uint16_t pin);
+
+#if SEND_HAIER_AC_YRW02
+  void send();
+#endif  // SEND_HAIER_AC_YRW02
+  void begin();
+
+  void setButton(const uint8_t button);
+  uint8_t getButton();
+
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+
+  void setFan(const uint8_t speed);
+  uint8_t getFan();
+
+  uint8_t getMode();
+  void setMode(const uint8_t mode);
+
+  bool getPower();
+  void setPower(const bool state);
+  void on();
+  void off();
+
+  bool getSleep();
+  void setSleep(const bool state);
+  bool getHealth();
+  void setHealth(const bool state);
+
+  uint8_t getTurbo();
+  void setTurbo(const uint8_t speed);
+
+  uint8_t getSwing();
+  void setSwing(const uint8_t state);
+
+  uint8_t* getRaw();
+  void setRaw(uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+      const uint16_t length = HAIER_AC_YRW02_STATE_LENGTH);
+  #ifdef ARDUINO
+    String toString();
+  #else
+    std::string toString();
+  #endif
+
+ private:
+  uint8_t remote_state[HAIER_AC_YRW02_STATE_LENGTH];
+  void stateReset();
+  void checksum();
   IRsend _irsend;
 };
 

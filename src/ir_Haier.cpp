@@ -1,5 +1,7 @@
 // Copyright 2018 crankyoldgit
-// The specifics of reverse engineering the protocol details by kuzin2006
+// The specifics of reverse engineering the protocols details:
+// * HSU07-HEA03 by kuzin2006.
+// * YR-W02/HSU-09HMC203 by non7top.
 
 #include "ir_Haier.h"
 #ifndef UNIT_TEST
@@ -24,6 +26,8 @@
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/404
 //   https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
+//   https://github.com/markszabo/IRremoteESP8266/issues/485
+//   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants
 #define HAIER_AC_HDR          3000U
@@ -197,7 +201,7 @@ uint8_t IRHaierAC::getMode() {
   return (remote_state[7] & 0b11100000) >> 5;
 }
 
-void IRHaierAC::setTemp(const uint8_t celcius ) {
+void IRHaierAC::setTemp(const uint8_t celcius) {
   uint8_t temp = celcius;
   if (temp < HAIER_AC_MIN_TEMP)
     temp = HAIER_AC_MIN_TEMP;
@@ -452,6 +456,349 @@ std::string IRHaierAC::toString() {
 }
 // End of IRHaierAC class.
 
+// Class for emulating a Haier YRW02 remote
+IRHaierACYRW02::IRHaierACYRW02(uint16_t pin) : _irsend(pin) {
+  stateReset();
+}
+
+void IRHaierACYRW02::begin() {
+  _irsend.begin();
+}
+
+#if SEND_HAIER_AC_YRW02
+void IRHaierACYRW02::send() {
+  checksum();
+  _irsend.sendHaierACYRW02(remote_state);
+}
+#endif  // SEND_HAIER_AC_YRW02
+
+void IRHaierACYRW02::checksum() {
+  remote_state[HAIER_AC_YRW02_STATE_LENGTH - 1] = sumBytes(
+      remote_state, HAIER_AC_YRW02_STATE_LENGTH - 1);
+}
+
+bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
+  if (length < 2)  return false;  // 1 byte of data can't have a checksum.
+  return (state[length - 1] == sumBytes(state, length - 1));
+}
+
+void IRHaierACYRW02::stateReset() {
+  for (uint8_t i = 1; i < HAIER_AC_YRW02_STATE_LENGTH; i++)
+    remote_state[i] = 0x0;
+  remote_state[0] = HAIER_AC_YRW02_PREFIX;
+
+  setTemp(HAIER_AC_DEF_TEMP);
+  setHealth(true);
+  setTurbo(HAIER_AC_YRW02_TURBO_OFF);
+  setSleep(false);
+  setFan(HAIER_AC_YRW02_FAN_AUTO);
+  setSwing(HAIER_AC_YRW02_SWING_OFF);
+  setMode(HAIER_AC_YRW02_AUTO);
+  setPower(true);
+}
+
+uint8_t* IRHaierACYRW02::getRaw() {
+  checksum();
+  return remote_state;
+}
+
+void IRHaierACYRW02::setRaw(uint8_t new_code[]) {
+  for (uint8_t i = 0; i < HAIER_AC_YRW02_STATE_LENGTH; i++) {
+    remote_state[i] = new_code[i];
+  }
+}
+
+void IRHaierACYRW02::setButton(uint8_t button) {
+  switch (button) {
+    case HAIER_AC_YRW02_BUTTON_TEMP_UP:
+    case HAIER_AC_YRW02_BUTTON_TEMP_DOWN:
+    case HAIER_AC_YRW02_BUTTON_SWING:
+    case HAIER_AC_YRW02_BUTTON_FAN:
+    case HAIER_AC_YRW02_BUTTON_POWER:
+    case HAIER_AC_YRW02_BUTTON_MODE:
+    case HAIER_AC_YRW02_BUTTON_HEALTH:
+    case HAIER_AC_YRW02_BUTTON_TURBO:
+    case HAIER_AC_YRW02_BUTTON_SLEEP:
+      remote_state[12] &= 0b11110000;
+      remote_state[12] |= (button & 0b00001111);
+  }
+}
+
+uint8_t IRHaierACYRW02::getButton() {
+  return remote_state[12] & (0b00001111);
+}
+
+void IRHaierACYRW02::setMode(uint8_t mode) {
+  uint8_t new_mode = mode;
+  setButton(HAIER_AC_YRW02_BUTTON_MODE);
+  switch (mode) {
+    case HAIER_AC_YRW02_AUTO:
+    case HAIER_AC_YRW02_COOL:
+    case HAIER_AC_YRW02_DRY:
+    case HAIER_AC_YRW02_HEAT:
+    case HAIER_AC_YRW02_FAN:
+      break;
+    default:  // If unexpected, default to auto mode.
+      new_mode = HAIER_AC_YRW02_AUTO;
+  }
+  remote_state[7] &= 0b0001111;
+  remote_state[7] |= (new_mode << 4);
+}
+
+uint8_t IRHaierACYRW02::getMode() {
+  return remote_state[7] >> 4;
+}
+
+void IRHaierACYRW02::setTemp(const uint8_t celcius) {
+  uint8_t temp = celcius;
+  if (temp < HAIER_AC_MIN_TEMP)
+    temp = HAIER_AC_MIN_TEMP;
+  else if (temp > HAIER_AC_MAX_TEMP)
+    temp = HAIER_AC_MAX_TEMP;
+
+  uint8_t old_temp = getTemp();
+  if (old_temp == temp)  return;
+  if (old_temp > temp)
+    setButton(HAIER_AC_YRW02_BUTTON_TEMP_DOWN);
+  else
+    setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+
+  remote_state[1] &= 0b00001111;  // Clear the previous temp.
+  remote_state[1] |= ((temp - HAIER_AC_MIN_TEMP) << 4);
+}
+
+uint8_t IRHaierACYRW02::getTemp() {
+  return ((remote_state[1] & 0b11110000) >> 4) + HAIER_AC_MIN_TEMP;
+}
+
+void IRHaierACYRW02::setHealth(bool state) {
+  setButton(HAIER_AC_YRW02_BUTTON_HEALTH);
+  remote_state[3] &= 0b11111101;
+  remote_state[3] |= (state << 1);
+}
+
+bool IRHaierACYRW02::getHealth(void) {
+  return remote_state[3] & 0b00000010;
+}
+
+bool IRHaierACYRW02::getPower() {
+  return remote_state[4] & HAIER_AC_YRW02_POWER;
+}
+
+void IRHaierACYRW02::setPower(bool state) {
+  setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  if (state)
+    remote_state[4] |= HAIER_AC_YRW02_POWER;
+  else
+    remote_state[4] &= ~HAIER_AC_YRW02_POWER;
+}
+
+void IRHaierACYRW02::on() {
+  setPower(true);
+}
+
+void IRHaierACYRW02::off() {
+  setPower(false);
+}
+
+bool IRHaierACYRW02::getSleep() {
+  return remote_state[8] & HAIER_AC_YRW02_SLEEP;
+}
+
+void IRHaierACYRW02::setSleep(bool state) {
+  setButton(HAIER_AC_YRW02_BUTTON_SLEEP);
+  if (state)
+    remote_state[8] |= HAIER_AC_YRW02_SLEEP;
+  else
+    remote_state[8] &= ~HAIER_AC_YRW02_SLEEP;
+}
+
+uint8_t IRHaierACYRW02::getTurbo() {
+  return remote_state[6];
+}
+
+void IRHaierACYRW02::setTurbo(uint8_t speed) {
+  switch (speed) {
+    case HAIER_AC_YRW02_TURBO_OFF:
+    case HAIER_AC_YRW02_TURBO_LOW:
+    case HAIER_AC_YRW02_TURBO_HIGH:
+      remote_state[6] = speed;
+      setButton(HAIER_AC_YRW02_BUTTON_TURBO);
+  }
+}
+
+uint8_t IRHaierACYRW02::getFan() {
+  return remote_state[5];
+}
+
+void IRHaierACYRW02::setFan(uint8_t speed) {
+  switch (speed) {
+    case HAIER_AC_YRW02_FAN_LOW:
+    case HAIER_AC_YRW02_FAN_MED:
+    case HAIER_AC_YRW02_FAN_HIGH:
+    case HAIER_AC_YRW02_FAN_AUTO:
+      remote_state[5] = speed;
+      setButton(HAIER_AC_YRW02_BUTTON_FAN);
+  }
+}
+
+uint8_t IRHaierACYRW02::getSwing() {
+  return remote_state[1] & 0b00001111;
+}
+
+void IRHaierACYRW02::setSwing(uint8_t state) {
+  uint8_t newstate = state;
+  switch (state) {
+    case HAIER_AC_YRW02_SWING_OFF:
+    case HAIER_AC_YRW02_SWING_AUTO:
+    case HAIER_AC_YRW02_SWING_TOP:
+    case HAIER_AC_YRW02_SWING_TOP_COOL:
+    case HAIER_AC_YRW02_SWING_BOTTOM:
+    case HAIER_AC_YRW02_SWING_BOTTOM_HEAT:
+      setButton(HAIER_AC_YRW02_BUTTON_SWING);
+      break;
+    default:
+      return;  // Unexpected value so don't do anything.
+  }
+
+  // TOP_COOL is only allowed if we are in Cool mode, otherwise TOP.
+  if (state == HAIER_AC_YRW02_SWING_TOP_COOL &&
+      getMode() != HAIER_AC_YRW02_COOL)
+    newstate = HAIER_AC_YRW02_SWING_TOP;
+
+  // BOTTOM_HEAT is only allowed if we are in Heat mode, otherwise BOTTOM.
+  if (state == HAIER_AC_YRW02_SWING_BOTTOM_HEAT &&
+      getMode() != HAIER_AC_YRW02_HEAT)
+    newstate = HAIER_AC_YRW02_SWING_BOTTOM;
+  remote_state[1] &= 0b11110000;
+  remote_state[1] |= newstate;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRHaierACYRW02::toString() {
+  String result = "";
+#else
+std::string IRHaierACYRW02::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  uint8_t cmd = getButton();
+  result += ", Button: " + uint64ToString(cmd) +" (";
+  switch (cmd) {
+    case HAIER_AC_YRW02_BUTTON_POWER:
+      result += "Power";
+      break;
+    case HAIER_AC_YRW02_BUTTON_MODE:
+      result += "Mode";
+      break;
+    case HAIER_AC_YRW02_BUTTON_FAN:
+      result += "Fan";
+      break;
+    case HAIER_AC_YRW02_BUTTON_TEMP_UP:
+      result += "Temp Up";
+      break;
+    case HAIER_AC_YRW02_BUTTON_TEMP_DOWN:
+      result += "Temp Down";
+      break;
+    case HAIER_AC_YRW02_BUTTON_SLEEP:
+      result += "Sleep";
+      break;
+    case HAIER_AC_YRW02_BUTTON_HEALTH:
+      result += "Health";
+      break;
+    case HAIER_AC_YRW02_BUTTON_SWING:
+      result += "Swing";
+      break;
+    case HAIER_AC_YRW02_BUTTON_TURBO:
+      result += "Turbo";
+      break;
+    default:
+      result += "Unknown";
+  }
+  result += ")";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case HAIER_AC_YRW02_AUTO:
+      result += " (AUTO)";
+      break;
+    case HAIER_AC_YRW02_COOL:
+      result += " (COOL)";
+      break;
+    case HAIER_AC_YRW02_HEAT:
+      result += " (HEAT)";
+      break;
+    case HAIER_AC_YRW02_DRY:
+      result += " (DRY)";
+      break;
+    case HAIER_AC_YRW02_FAN:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case HAIER_AC_YRW02_FAN_AUTO:
+      result += " (AUTO)";
+      break;
+    case HAIER_AC_YRW02_FAN_HIGH:
+      result += " (HIGH)";
+      break;
+    case HAIER_AC_YRW02_FAN_LOW:
+      result += " (LOW)";
+      break;
+    case HAIER_AC_YRW02_FAN_MED:
+      result += " (MED)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Swing: " + uint64ToString(getSwing()) + " (";
+  switch (getSwing()) {
+    case HAIER_AC_YRW02_SWING_OFF:
+      result += "Off";
+      break;
+    case HAIER_AC_YRW02_SWING_AUTO:
+      result += "Auto";
+      break;
+    case HAIER_AC_YRW02_SWING_BOTTOM:
+      result += "Bottom";
+      break;
+    case HAIER_AC_YRW02_SWING_BOTTOM_HEAT:
+      result += "Bottom [Heat]";
+      break;
+    case HAIER_AC_YRW02_SWING_TOP:
+      result += "Top";
+      break;
+    case HAIER_AC_YRW02_SWING_TOP_COOL:
+      result += "Top [Cool]";
+      break;
+    default:
+      result += "Unknown";
+  }
+  result += ")";
+  result += ", Sleep: ";
+  if (getSleep())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Health: ";
+  if (getHealth())
+    result += "On";
+  else
+    result += "Off";
+
+  return result;
+}
+// End of IRHaierACYRW02 class.
+
+
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 // Decode the supplied Haier HSU07-HEA03 remote message.
 //
@@ -539,6 +886,14 @@ bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
   // The protocol is almost exactly the same as HAIER_AC
   if (!decodeHaierAC(results, nbits, false))
     return false;
+
+  // Compliance
+  if (strict) {
+    if (results->state[0] != HAIER_AC_YRW02_PREFIX)  return false;
+    if (!IRHaierACYRW02::validChecksum(results->state, nbits / 8))
+      return false;
+  }
+
   // Success
   // It looks correct, but we haven't check the checksum etc.
   results->decode_type = HAIER_AC_YRW02;
