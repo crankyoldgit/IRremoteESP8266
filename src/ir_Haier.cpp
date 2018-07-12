@@ -614,7 +614,7 @@ void IRHaierACYRW02::setSleep(bool state) {
 }
 
 uint8_t IRHaierACYRW02::getTurbo() {
-  return remote_state[6];
+  return remote_state[6] >> 6;
 }
 
 void IRHaierACYRW02::setTurbo(uint8_t speed) {
@@ -622,13 +622,14 @@ void IRHaierACYRW02::setTurbo(uint8_t speed) {
     case HAIER_AC_YRW02_TURBO_OFF:
     case HAIER_AC_YRW02_TURBO_LOW:
     case HAIER_AC_YRW02_TURBO_HIGH:
-      remote_state[6] = speed;
+      remote_state[6] &= 0b00111111;
+      remote_state[6] |= (speed << 6);
       setButton(HAIER_AC_YRW02_BUTTON_TURBO);
   }
 }
 
 uint8_t IRHaierACYRW02::getFan() {
-  return remote_state[5];
+  return remote_state[5] >> 4;
 }
 
 void IRHaierACYRW02::setFan(uint8_t speed) {
@@ -637,7 +638,8 @@ void IRHaierACYRW02::setFan(uint8_t speed) {
     case HAIER_AC_YRW02_FAN_MED:
     case HAIER_AC_YRW02_FAN_HIGH:
     case HAIER_AC_YRW02_FAN_AUTO:
-      remote_state[5] = speed;
+      remote_state[5] &= 0b00001111;
+      remote_state[5] |= (speed << 4);
       setButton(HAIER_AC_YRW02_BUTTON_FAN);
   }
 }
@@ -652,24 +654,25 @@ void IRHaierACYRW02::setSwing(uint8_t state) {
     case HAIER_AC_YRW02_SWING_OFF:
     case HAIER_AC_YRW02_SWING_AUTO:
     case HAIER_AC_YRW02_SWING_TOP:
-    case HAIER_AC_YRW02_SWING_TOP_COOL:
+    case HAIER_AC_YRW02_SWING_MIDDLE:
     case HAIER_AC_YRW02_SWING_BOTTOM:
-    case HAIER_AC_YRW02_SWING_BOTTOM_HEAT:
+    case HAIER_AC_YRW02_SWING_DOWN:
       setButton(HAIER_AC_YRW02_BUTTON_SWING);
       break;
     default:
       return;  // Unexpected value so don't do anything.
   }
 
-  // TOP_COOL is only allowed if we are in Cool mode, otherwise TOP.
-  if (state == HAIER_AC_YRW02_SWING_TOP_COOL &&
-      getMode() != HAIER_AC_YRW02_COOL)
-    newstate = HAIER_AC_YRW02_SWING_TOP;
-
-  // BOTTOM_HEAT is only allowed if we are in Heat mode, otherwise BOTTOM.
-  if (state == HAIER_AC_YRW02_SWING_BOTTOM_HEAT &&
-      getMode() != HAIER_AC_YRW02_HEAT)
+  // Heat mode has no MIDDLE setting, use BOTTOM instead.
+  if (state == HAIER_AC_YRW02_SWING_MIDDLE &&
+      getMode() == HAIER_AC_YRW02_HEAT)
     newstate = HAIER_AC_YRW02_SWING_BOTTOM;
+
+  // BOTTOM is only allowed if we are in Heat mode, otherwise MIDDLE.
+  if (state == HAIER_AC_YRW02_SWING_BOTTOM &&
+      getMode() != HAIER_AC_YRW02_HEAT)
+    newstate = HAIER_AC_YRW02_SWING_MIDDLE;
+
   remote_state[1] &= 0b11110000;
   remote_state[1] |= newstate;
 }
@@ -724,19 +727,19 @@ std::string IRHaierACYRW02::toString() {
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
     case HAIER_AC_YRW02_AUTO:
-      result += " (AUTO)";
+      result += " (Auto)";
       break;
     case HAIER_AC_YRW02_COOL:
-      result += " (COOL)";
+      result += " (Cool)";
       break;
     case HAIER_AC_YRW02_HEAT:
-      result += " (HEAT)";
+      result += " (Heat)";
       break;
     case HAIER_AC_YRW02_DRY:
-      result += " (DRY)";
+      result += " (Dry)";
       break;
     case HAIER_AC_YRW02_FAN:
-      result += " (FAN)";
+      result += " (Fan)";
       break;
     default:
       result += " (UNKNOWN)";
@@ -745,20 +748,35 @@ std::string IRHaierACYRW02::toString() {
   result += ", Fan: " + uint64ToString(getFan());
   switch (getFan()) {
     case HAIER_AC_YRW02_FAN_AUTO:
-      result += " (AUTO)";
+      result += " (Auto)";
       break;
     case HAIER_AC_YRW02_FAN_HIGH:
-      result += " (HIGH)";
+      result += " (High)";
       break;
     case HAIER_AC_YRW02_FAN_LOW:
-      result += " (LOW)";
+      result += " (Low)";
       break;
     case HAIER_AC_YRW02_FAN_MED:
-      result += " (MED)";
+      result += " (Med)";
       break;
     default:
-      result += " (UNKNOWN)";
+      result += " (Unknown)";
   }
+  result += ", Turbo: " + uint64ToString(getTurbo()) + " (";
+  switch (getTurbo()) {
+    case HAIER_AC_YRW02_TURBO_OFF:
+      result += "Off";
+      break;
+    case HAIER_AC_YRW02_TURBO_LOW:
+      result += "Low";
+      break;
+    case HAIER_AC_YRW02_TURBO_HIGH:
+      result += "High";
+      break;
+    default:
+      result += "Unknown";
+  }
+  result += ")";
   result += ", Swing: " + uint64ToString(getSwing()) + " (";
   switch (getSwing()) {
     case HAIER_AC_YRW02_SWING_OFF:
@@ -770,14 +788,14 @@ std::string IRHaierACYRW02::toString() {
     case HAIER_AC_YRW02_SWING_BOTTOM:
       result += "Bottom";
       break;
-    case HAIER_AC_YRW02_SWING_BOTTOM_HEAT:
-      result += "Bottom [Heat]";
+    case HAIER_AC_YRW02_SWING_DOWN:
+      result += "Down";
       break;
     case HAIER_AC_YRW02_SWING_TOP:
       result += "Top";
       break;
-    case HAIER_AC_YRW02_SWING_TOP_COOL:
-      result += "Top [Cool]";
+    case HAIER_AC_YRW02_SWING_MIDDLE:
+      result += "Middle";
       break;
     default:
       result += "Unknown";

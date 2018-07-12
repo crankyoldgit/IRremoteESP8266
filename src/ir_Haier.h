@@ -77,9 +77,9 @@
 // Bits 4-7 - Swing
 #define HAIER_AC_YRW02_SWING_OFF          0x0
 #define HAIER_AC_YRW02_SWING_TOP          0x1
-#define HAIER_AC_YRW02_SWING_TOP_COOL     0x2
-#define HAIER_AC_YRW02_SWING_BOTTOM       0x3
-#define HAIER_AC_YRW02_SWING_BOTTOM_HEAT  0xA
+#define HAIER_AC_YRW02_SWING_MIDDLE       0x2  // Not available in heat mode.
+#define HAIER_AC_YRW02_SWING_BOTTOM       0x3  // Only available in heat mode.
+#define HAIER_AC_YRW02_SWING_DOWN         0xA
 #define HAIER_AC_YRW02_SWING_AUTO         0xC  // Airflow
 
 
@@ -90,16 +90,18 @@
 #define HAIER_AC_YRW02_POWER    0b01000000
 
 // Byte 5
-#define HAIER_AC_YRW02_FAN_LOW    0x60
-#define HAIER_AC_YRW02_FAN_MED    0x40
-#define HAIER_AC_YRW02_FAN_HIGH   0x20
-#define HAIER_AC_YRW02_FAN_AUTO   0xA0
+// Bits 0-3
+#define HAIER_AC_YRW02_FAN_HIGH   0x2
+#define HAIER_AC_YRW02_FAN_MED    0x4
+#define HAIER_AC_YRW02_FAN_LOW    0x6
+#define HAIER_AC_YRW02_FAN_AUTO   0xA
 
 
 // Byte 6
-#define HAIER_AC_YRW02_TURBO_OFF  0x00
-#define HAIER_AC_YRW02_TURBO_LOW  0x80
-#define HAIER_AC_YRW02_TURBO_HIGH 0x40
+// Bits 0-1
+#define HAIER_AC_YRW02_TURBO_OFF  0x0
+#define HAIER_AC_YRW02_TURBO_HIGH 0x1
+#define HAIER_AC_YRW02_TURBO_LOW  0x2
 
 // Byte 7
 // Bits 0-3
