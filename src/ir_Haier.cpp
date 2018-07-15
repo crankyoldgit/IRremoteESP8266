@@ -197,8 +197,8 @@ uint8_t IRHaierAC::getMode() {
   return (remote_state[7] & 0b11100000) >> 5;
 }
 
-void IRHaierAC::setTemp(const uint8_t celcius ) {
-  uint8_t temp = celcius;
+void IRHaierAC::setTemp(const uint8_t celsius) {
+  uint8_t temp = celsius;
   if (temp < HAIER_AC_MIN_TEMP)
     temp = HAIER_AC_MIN_TEMP;
   else if (temp > HAIER_AC_MAX_TEMP)

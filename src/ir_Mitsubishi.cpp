@@ -354,7 +354,7 @@ uint8_t* IRMitsubishiAC::getRaw() {
 void IRMitsubishiAC::checksum() {
   uint8_t sum = 0;
   // Checksum is simple addition of all previous bytes stored
-  // as a 8 bit value.
+  // as an 8 bit value.
   for (uint8_t i = 0; i < 17; i++)
     sum += remote_state[i];
   remote_state[17] = sum & 0xFFU;
