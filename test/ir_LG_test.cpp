@@ -30,12 +30,12 @@ TEST(TestSendLG, SendDataOnly) {
   irsend.reset();
   irsend.sendLG(0x4B4AE51);
   EXPECT_EQ(
-      "m8000s4000"
+      "m8500s4250"
       "m550s550m550s1600m550s550m550s550"
       "m550s1600m550s550m550s1600m550s1600m550s550m550s1600m550s550m550s550"
       "m550s1600m550s550m550s1600m550s550m550s1600m550s1600m550s1600m550s550"
       "m550s550m550s1600m550s550m550s1600m550s550m550s550m550s550m550s1600"
-      "m550s51050", irsend.outputStr());
+      "m550s50300", irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0xB4B4AE51, LG32_BITS);
@@ -57,13 +57,13 @@ TEST(TestSendLG, SendWithRepeats) {
   irsend.reset();
   irsend.sendLG(0x4B4AE51, LG_BITS, 1);
   EXPECT_EQ(
-      "m8000s4000"
+      "m8500s4250"
       "m550s550m550s1600m550s550m550s550"
       "m550s1600m550s550m550s1600m550s1600m550s550m550s1600m550s550m550s550"
       "m550s1600m550s550m550s1600m550s550m550s1600m550s1600m550s1600m550s550"
       "m550s550m550s1600m550s550m550s1600m550s550m550s550m550s550m550s1600"
-      "m550s51050"
-      "m8000s2250m550s97250", irsend.outputStr());
+      "m550s50300"
+      "m8500s2250m550s96750", irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0xB4B4AE51, LG32_BITS, 1);
@@ -86,12 +86,12 @@ TEST(TestSendLG, SendUnusualSize) {
   irsend.reset();
   irsend.sendLG(0x0, 31);
   EXPECT_EQ(
-      "m8000s4000"
+      "m8500s4250"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
-      "m550s61400", irsend.outputStr());
+      "m550s60650", irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0x0, 64);
