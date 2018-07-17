@@ -19,9 +19,9 @@
 
 // Constants
 #define LG_TICK                       50U
-#define LG_HDR_MARK_TICKS            160U
+#define LG_HDR_MARK_TICKS            170U  // 8500
 #define LG_HDR_MARK                  (LG_HDR_MARK_TICKS * LG_TICK)
-#define LG_HDR_SPACE_TICKS            80U
+#define LG_HDR_SPACE_TICKS            85U  // 4250
 #define LG_HDR_SPACE                 (LG_HDR_SPACE_TICKS * LG_TICK)
 #define LG_BIT_MARK_TICKS             11U
 #define LG_BIT_MARK                  (LG_BIT_MARK_TICKS * LG_TICK)
