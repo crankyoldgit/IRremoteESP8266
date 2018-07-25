@@ -414,6 +414,338 @@ TEST(TestHaierACClass, MessageConstuction) {
   EXPECT_TRUE(IRHaierAC::validChecksum(haier.getRaw()));
 }
 
+// Tests for the IRHaierACYRW02 class.
+
+TEST(TestHaierACYRW02Class, Button) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_POWER, haier.getButton());
+  haier.setButton(HAIER_AC_YRW02_BUTTON_MODE);
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_MODE, haier.getButton());
+  haier.setButton(HAIER_AC_YRW02_BUTTON_SLEEP);
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SLEEP, haier.getButton());
+  haier.setButton(HAIER_AC_YRW02_BUTTON_FAN);
+
+
+  // Test unexpected values.
+  haier.setButton(0xFF);
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+  haier.setButton(0x10);
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+}
+
+TEST(TestHaierACYRW02Class, OperatingMode) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  haier.setMode(HAIER_AC_YRW02_AUTO);
+  EXPECT_EQ(HAIER_AC_YRW02_AUTO, haier.getMode());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_MODE, haier.getButton());
+
+  haier.setMode(HAIER_AC_YRW02_COOL);
+  EXPECT_EQ(HAIER_AC_YRW02_COOL, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_HEAT);
+  EXPECT_EQ(HAIER_AC_YRW02_HEAT, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_FAN);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_DRY);
+  EXPECT_EQ(HAIER_AC_YRW02_DRY, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_AUTO - 1);
+  EXPECT_EQ(HAIER_AC_YRW02_AUTO, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_COOL);
+  EXPECT_EQ(HAIER_AC_YRW02_COOL, haier.getMode());
+
+  haier.setMode(HAIER_AC_YRW02_FAN + 1);
+  EXPECT_EQ(HAIER_AC_YRW02_AUTO, haier.getMode());
+
+  haier.setMode(255);
+  EXPECT_EQ(HAIER_AC_YRW02_AUTO, haier.getMode());
+}
+
+TEST(TestHaierACYRW02Class, Temperature) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setTemp(HAIER_AC_MIN_TEMP);
+  EXPECT_EQ(HAIER_AC_MIN_TEMP, haier.getTemp());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  haier.setTemp(HAIER_AC_MIN_TEMP + 1);
+  EXPECT_EQ(HAIER_AC_MIN_TEMP + 1, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+
+  haier.setTemp(HAIER_AC_MAX_TEMP);
+  EXPECT_EQ(HAIER_AC_MAX_TEMP, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+
+  haier.setTemp(HAIER_AC_MIN_TEMP - 1);
+  EXPECT_EQ(HAIER_AC_MIN_TEMP, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_DOWN, haier.getButton());
+
+  haier.setTemp(HAIER_AC_MAX_TEMP + 1);
+  EXPECT_EQ(HAIER_AC_MAX_TEMP, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+
+  haier.setTemp(23);
+  EXPECT_EQ(23, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_DOWN, haier.getButton());
+  haier.setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  haier.setTemp(23);
+  EXPECT_EQ(23, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_POWER, haier.getButton());
+
+  haier.setTemp(0);
+  EXPECT_EQ(HAIER_AC_MIN_TEMP, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_DOWN, haier.getButton());
+
+  haier.setTemp(255);
+  EXPECT_EQ(HAIER_AC_MAX_TEMP, haier.getTemp());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+}
+
+TEST(TestHaierACYRW02Class, HealthMode) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setHealth(true);
+  EXPECT_TRUE(haier.getHealth());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_HEALTH, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+  haier.setHealth(false);
+  EXPECT_FALSE(haier.getHealth());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_HEALTH, haier.getButton());
+
+  haier.setHealth(true);
+  EXPECT_TRUE(haier.getHealth());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_HEALTH, haier.getButton());
+}
+
+TEST(TestHaierACYRW02Class, Power) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setPower(true);
+  EXPECT_TRUE(haier.getPower());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_POWER, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+  haier.setPower(false);
+  EXPECT_FALSE(haier.getPower());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_POWER, haier.getButton());
+
+  haier.setPower(true);
+  EXPECT_TRUE(haier.getPower());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_POWER, haier.getButton());
+
+  haier.off();
+  EXPECT_FALSE(haier.getPower());
+  haier.on();
+  EXPECT_TRUE(haier.getPower());
+}
+
+TEST(TestHaierACYRW02Class, SleepMode) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setSleep(true);
+  EXPECT_TRUE(haier.getSleep());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SLEEP, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+  haier.setSleep(false);
+  EXPECT_FALSE(haier.getSleep());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SLEEP, haier.getButton());
+
+  haier.setSleep(true);
+  EXPECT_TRUE(haier.getSleep());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SLEEP, haier.getButton());
+}
+
+
+TEST(TestHaierACYRW02Class, TurboMode) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setTurbo(HAIER_AC_YRW02_TURBO_OFF);
+  EXPECT_EQ(HAIER_AC_YRW02_TURBO_OFF, haier.getTurbo());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TURBO, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+
+  haier.setTurbo(HAIER_AC_YRW02_TURBO_LOW);
+  EXPECT_EQ(HAIER_AC_YRW02_TURBO_LOW, haier.getTurbo());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TURBO, haier.getButton());
+
+  haier.setTurbo(HAIER_AC_YRW02_TURBO_HIGH);
+  EXPECT_EQ(HAIER_AC_YRW02_TURBO_HIGH, haier.getTurbo());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TURBO, haier.getButton());
+
+  haier.setTurbo(HAIER_AC_YRW02_TURBO_OFF);
+  EXPECT_EQ(HAIER_AC_YRW02_TURBO_OFF, haier.getTurbo());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TURBO, haier.getButton());
+}
+
+TEST(TestHaierACYRW02Class, Fan) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setFan(HAIER_AC_YRW02_FAN_AUTO);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN_AUTO, haier.getFan());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+
+  haier.setFan(HAIER_AC_YRW02_FAN_LOW);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN_LOW, haier.getFan());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+
+  haier.setFan(HAIER_AC_YRW02_FAN_HIGH);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN_HIGH, haier.getFan());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+
+  haier.setFan(HAIER_AC_YRW02_FAN_MED);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN_MED, haier.getFan());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_FAN, haier.getButton());
+
+  // Test unexpected values.
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+  haier.setFan(0x00);
+  EXPECT_EQ(HAIER_AC_YRW02_FAN_MED, haier.getFan());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+}
+
+TEST(TestHaierACYRW02Class, Swing) {
+  IRHaierACYRW02 haier(0);
+  haier.begin();
+
+  haier.setSwing(HAIER_AC_YRW02_SWING_OFF);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_OFF, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SWING, haier.getButton());
+
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+
+  haier.setSwing(HAIER_AC_YRW02_SWING_AUTO);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_AUTO, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SWING, haier.getButton());
+
+  haier.setSwing(HAIER_AC_YRW02_SWING_TOP);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_TOP, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SWING, haier.getButton());
+
+  haier.setSwing(HAIER_AC_YRW02_SWING_DOWN);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_DOWN, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SWING, haier.getButton());
+
+  // Test unexpected values.
+  haier.setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+  haier.setSwing(0xFF);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_DOWN, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_TEMP_UP, haier.getButton());
+
+  // Test the mode-dependant positions.
+  haier.setMode(HAIER_AC_YRW02_AUTO);
+  haier.setSwing(HAIER_AC_YRW02_SWING_MIDDLE);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_MIDDLE, haier.getSwing());
+  EXPECT_EQ(HAIER_AC_YRW02_BUTTON_SWING, haier.getButton());
+  haier.setMode(HAIER_AC_YRW02_HEAT);
+  haier.setSwing(HAIER_AC_YRW02_SWING_MIDDLE);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_BOTTOM, haier.getSwing());
+  haier.setSwing(HAIER_AC_YRW02_SWING_AUTO);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_AUTO, haier.getSwing());
+  haier.setSwing(HAIER_AC_YRW02_SWING_BOTTOM);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_BOTTOM, haier.getSwing());
+  haier.setMode(HAIER_AC_YRW02_COOL);
+  haier.setSwing(HAIER_AC_YRW02_SWING_BOTTOM);
+  EXPECT_EQ(HAIER_AC_YRW02_SWING_MIDDLE, haier.getSwing());
+}
+
+TEST(TestHaierACYRW02Class, MessageConstuction) {
+  IRHaierACYRW02 haier(0);
+
+  EXPECT_EQ("Power: On, Button: 5 (Power), Mode: 0 (Auto), Temp: 25C,"
+            " Fan: 10 (Auto), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+            " Health: On",
+            haier.toString());
+  haier.setMode(HAIER_AC_YRW02_COOL);
+  haier.setTemp(21);
+  haier.setFan(HAIER_AC_YRW02_FAN_HIGH);
+  EXPECT_EQ("Power: On, Button: 4 (Fan), Mode: 2 (Cool), Temp: 21C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+            " Health: On",
+            haier.toString());
+
+  haier.setSwing(HAIER_AC_YRW02_SWING_MIDDLE);
+  haier.setHealth(false);
+  haier.setSleep(true);
+  haier.setTurbo(HAIER_AC_YRW02_TURBO_HIGH);
+  EXPECT_EQ("Power: On, Button: 8 (Turbo), Mode: 2 (Cool), Temp: 21C,"
+            " Fan: 2 (High), Turbo: 1 (High), Swing: 2 (Middle),"
+            " Sleep: On, Health: Off",
+            haier.toString());
+}
+
+// Decode "real" state messages.
+TEST(TestHaierACYRW02Class, RealStates) {
+  uint8_t expectedState1[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0xE1, 0x00, 0x00, 0x40, 0x20, 0x00,
+      0x80, 0x00, 0x00, 0x00, 0x00, 0x07, 0x6E};
+
+  IRHaierACYRW02 haier(0);
+  haier.setRaw(expectedState1);
+  EXPECT_EQ("Power: On, Button: 7 (Health), Mode: 8 (Heat), Temp: 30C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 1 (Top), Sleep: Off,"
+            " Health: Off",
+            haier.toString());
+
+  uint8_t expectedState2[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0xE0, 0x00, 0x00, 0x00, 0x20, 0x00,
+      0x80, 0x00, 0x00, 0x00, 0x00, 0x05, 0x75};
+  haier.setRaw(expectedState2);
+  EXPECT_EQ("Power: Off, Button: 5 (Power), Mode: 8 (Heat), Temp: 30C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+            " Health: Off",
+            haier.toString());
+
+  uint8_t expectedState3[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0x02, 0x00, 0x02, 0x40, 0x20, 0x00,
+      0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x2B};
+  haier.setRaw(expectedState3);
+  EXPECT_EQ("Power: On, Button: 1 (Temp Down), Mode: 2 (Cool), Temp: 16C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
+            " Health: On",
+            haier.toString());
+
+  // cool 25, health, fan auto, swing auto,  sleep on
+  uint8_t expectedState4[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0x9C, 0x00, 0x02, 0x40, 0xA8, 0x00,
+      0x20, 0x80, 0x00, 0x00, 0x00, 0x0B, 0xD7};
+  haier.setRaw(expectedState4);
+  EXPECT_EQ("Power: On, Button: 11 (Sleep), Mode: 2 (Cool), Temp: 25C,"
+            " Fan: 10 (Auto), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
+            " Health: On",
+            haier.toString());
+
+  // cool 25, health, fan 3, swing auto,  sleep on
+  uint8_t expectedState5[HAIER_AC_YRW02_STATE_LENGTH] = {
+      0xA6, 0x9C, 0x00, 0x02, 0x40, 0x27, 0x36,
+      0x20, 0x80, 0x00, 0x00, 0x00, 0x04, 0x85};
+  haier.setRaw(expectedState5);
+  EXPECT_EQ("Power: On, Button: 4 (Fan), Mode: 2 (Cool), Temp: 25C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
+            " Health: On",
+            haier.toString());
+}
+
+
 // Tests for decodeHaierAC().
 
 // Decode normal "synthetic" messages.
@@ -424,6 +756,7 @@ TEST(TestDecodeHaierAC, NormalDecodeWithStrict) {
 
   uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
       0xA5, 0x01, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0xA7};
+
   // With the specific decoder.
   irsend.reset();
   irsend.sendHaierAC(expectedState);
@@ -615,4 +948,11 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
   EXPECT_EQ(HAIER_AC_YRW02_BITS, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRHaierACYRW02 haier(0);
+  haier.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Button: 5 (Power), Mode: 2 (Cool), Temp: 17C,"
+            " Fan: 2 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
+            " Health: On",
+            haier.toString());
 }
