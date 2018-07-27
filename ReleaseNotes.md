@@ -1,5 +1,20 @@
 # Release Notes
 
+## _v2.4.3 (20180727)_
+
+**[Bug Fixes]**
+- Handle Space Gaps better in auto analyse tool. (#482)
+- Correct min repeat for GICABLE in IRMQTTServer. (#494)
+
+**[Features]**
+- Add static IP config option to IRMQTTServer (#480)
+- Full decoding/encoding support for the Haier YRW02 A/C. (#485 #486 #487)
+
+**[Misc]**
+- Update LG (28-bit) HDR mark and space timings. (#492)
+- Spelling and grammar fixes (#491)
+
+
 ## _v2.4.2 (20180601)_
 
 **[Bug Fixes]**

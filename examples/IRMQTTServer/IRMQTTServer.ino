@@ -168,7 +168,7 @@ const char* mqtt_password = "";
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.5"
+#define _MY_VERSION_ "v0.5.1"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG

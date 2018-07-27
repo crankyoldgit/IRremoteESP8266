@@ -9,6 +9,8 @@
  *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
  *
  * Changes:
+ *   Version 0.4 July, 2018
+ *     - Minor improvements and more A/C unit support.
  *   Version 0.3 November, 2017
  *     - Support for A/C decoding for some protcols.
  *   Version 0.2 April, 2017

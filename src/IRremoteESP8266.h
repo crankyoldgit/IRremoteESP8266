@@ -33,7 +33,7 @@
  * (https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/)
  * Fujitsu A/C code added by jonnygraham
  * Trotec AC code by stufisher
- * Carrier AC code by crankyoldgit
+ * Carrier & Haier AC code by crankyoldgit
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
@@ -48,7 +48,7 @@
 #endif
 
 // Library Version
-#define _IRREMOTEESP8266_VERSION_ "2.4.2"
+#define _IRREMOTEESP8266_VERSION_ "2.4.3"
 // Supported IR protocols
 // Each protocol you include costs memory and, during decode, costs time
 // Disable (set to false) all the protocols you do not need/want!
