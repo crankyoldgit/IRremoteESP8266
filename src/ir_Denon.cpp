@@ -104,21 +104,21 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // NOTE: I don't think this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     // Check we have enough data
-    if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+    if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
       return false;
     if (strict && nbits != kDenonLegacyBits)
       return false;
 
     uint64_t data = 0;
-    uint16_t offset = OFFSET_START;
+    uint16_t offset = kStartOffset;
 
     // Header
     if (!matchMark(results->rawbuf[offset], DENON_HDR_MARK)) return false;
     // Calculate how long the common tick time is based on the header mark.
-    uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+    uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
         DENON_HDR_MARK_TICKS;
     if (!matchSpace(results->rawbuf[offset], DENON_HDR_SPACE)) return false;
-    uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+    uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
         DENON_HDR_SPACE_TICKS;
 
     // Data

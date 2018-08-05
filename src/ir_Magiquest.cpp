@@ -81,7 +81,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
                              bool strict) {
   uint16_t bits = 0;
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   if (results->rawlen < (2 * kMagiquestBits))  {
     DPRINT("Not enough bits to be Magiquest - Rawlen: ");
@@ -132,7 +132,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
   // Grab the last MARK bit, assuming a good SPACE after it
   if (offset < results->rawlen) {
     uint16_t mark  = results->rawbuf[offset];
-    uint16_t space = (MAGIQUEST_TOTAL_USEC / RAWTICK) - mark;
+    uint16_t space = (MAGIQUEST_TOTAL_USEC / kRawTick) - mark;
 
     if      (IS_ZERO(mark, space))  data = (data << 1) | 0;
     else if (IS_ONE( mark, space))  data = (data << 1) | 1;

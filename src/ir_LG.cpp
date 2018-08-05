@@ -140,33 +140,33 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 //   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
 bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   if (nbits >= kLG32Bits) {
-    if (results->rawlen < 2 * nbits + 2 * (HEADER + FOOTER) - 1)
+    if (results->rawlen < 2 * nbits + 2 * (kHeader + kFooter) - 1)
       return false;  // Can't possibly be a valid LG32 message.
   } else {
-    if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+    if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
       return false;  // Can't possibly be a valid LG message.
   }
   if (strict && nbits != kLGBits && nbits != kLG32Bits)
     return false;  // Doesn't comply with expected LG protocol.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], LG_HDR_MARK) &&
       !matchMark(results->rawbuf[offset], LG32_HDR_MARK)) return false;
   uint32_t m_tick;
   if (matchMark(results->rawbuf[offset], LG_HDR_MARK))
-    m_tick = results->rawbuf[offset++] * RAWTICK / LG_HDR_MARK_TICKS;
+    m_tick = results->rawbuf[offset++] * kRawTick / LG_HDR_MARK_TICKS;
   else
-    m_tick = results->rawbuf[offset++] * RAWTICK / LG32_HDR_MARK_TICKS;
+    m_tick = results->rawbuf[offset++] * kRawTick / LG32_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE) &&
       !matchSpace(results->rawbuf[offset], LG32_HDR_SPACE)) return false;
   uint32_t s_tick;
   if (matchSpace(results->rawbuf[offset], LG_HDR_SPACE))
-    s_tick = results->rawbuf[offset++] * RAWTICK / LG_HDR_SPACE_TICKS;
+    s_tick = results->rawbuf[offset++] * kRawTick / LG_HDR_SPACE_TICKS;
   else
-    s_tick = results->rawbuf[offset++] * RAWTICK / LG32_HDR_SPACE_TICKS;
+    s_tick = results->rawbuf[offset++] * kRawTick / LG32_HDR_SPACE_TICKS;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

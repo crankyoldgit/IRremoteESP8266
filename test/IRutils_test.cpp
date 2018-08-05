@@ -115,7 +115,7 @@ TEST(TestGetCorrectedRawLength, WithLargeValues) {
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
   irsend.capture.rawbuf[3] = 60000;
-  ASSERT_EQ(2, RAWTICK);  // The following values rely on RAWTICK being 2.
+  ASSERT_EQ(2, kRawTick);  // The following values rely on kRawTick being 2.
   EXPECT_EQ(7 + 2, getCorrectedRawLength(&irsend.capture));
   irsend.capture.rawbuf[4] = UINT16_MAX - 1;
   EXPECT_EQ(7 + 2 * 2, getCorrectedRawLength(&irsend.capture));

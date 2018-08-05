@@ -421,13 +421,13 @@ std::string IRGreeAC::toString() {
 // Status: ALPHA / Untested.
 bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * (nbits + GREE_BLOCK_FOOTER_BITS) +
-                        (HEADER + FOOTER + 1))
+                        (kHeader + kFooter + 1))
     return false;  // Can't possibly be a valid Gree message.
   if (strict && nbits != kGreeBits)
     return false;  // Not strictly a Gree message.
 
   uint32_t data;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // There are two blocks back-to-back in a full Gree IR message
   // sequence.

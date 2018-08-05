@@ -16,8 +16,8 @@
 #define LASERTAG_TICK             333U
 #define LASERTAG_MIN_GAP       100000UL  // Completely made up amount.
 #define LASERTAG_TOLERANCE          0U   // Percentage error margin
-#define LASERTAG_EXCESS             0U   // See MARK_EXCESS
-#define LASERTAG_DELTA            150U   // Use instead of EXCESS and TOLERANCE.
+#define LASERTAG_EXCESS             0U   // See kMarkExcess
+#define LASERTAG_DELTA            150U   // Use instead of EXCESS and kTolerance
 const int16_t kSPACE = 1;
 const int16_t kMARK = 0;
 
@@ -81,7 +81,7 @@ bool IRrecv::decodeLasertag(decode_results *results, uint16_t nbits,
   // Compliance
   if (strict && nbits != kLasertagBits) return false;
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint16_t used = 0;
   uint64_t data = 0;
   uint16_t actual_bits = 0;

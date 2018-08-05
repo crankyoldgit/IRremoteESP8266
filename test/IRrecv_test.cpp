@@ -10,7 +10,7 @@
 // Tests for the IRrecv object.
 TEST(TestIRrecv, DefaultBufferSize) {
   IRrecv irrecv_default(1);
-  EXPECT_EQ(RAWBUF, irrecv_default.getBufSize());
+  EXPECT_EQ(kRawBuf, irrecv_default.getBufSize());
 }
 
 TEST(TestIRrecv, LargeBufferSize) {
@@ -30,7 +30,7 @@ TEST(TestIRrecv, MediumBufferSize) {
 
 TEST(TestIRrecv, IRrecvDestructor) {
   IRrecv *irrecv_ptr = new IRrecv(1);
-  EXPECT_EQ(RAWBUF, irrecv_ptr->getBufSize());
+  EXPECT_EQ(kRawBuf, irrecv_ptr->getBufSize());
 
   delete irrecv_ptr;
   irrecv_ptr = new IRrecv(1, 1234);

@@ -95,7 +95,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
                           bool strict) {
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
-  if (results->rawlen < 2 * 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid COOLIX message.
   if (strict && nbits != kCoolixBits)
     return false;  // Not strictly a COOLIX message.
@@ -104,7 +104,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
 
   uint64_t data = 0;
   uint64_t inverted = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   if (nbits > sizeof(data) * 8)
     return false;  // We can't possibly capture a Coolix packet that big.
@@ -112,10 +112,11 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   // Header
   if (!matchMark(results->rawbuf[offset], COOLIX_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK / COOLIX_HDR_MARK_TICKS;
+  uint32_t m_tick = results->rawbuf[offset++] *
+      kRawTick / COOLIX_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], COOLIX_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       COOLIX_HDR_SPACE_TICKS;
 
   // Data

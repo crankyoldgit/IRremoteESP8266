@@ -840,10 +840,10 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
       return false;  // Not strictly a HAIER_AC message.
   }
 
-  if (results->rawlen < (2 * nbits + HEADER) + FOOTER - 1)
+  if (results->rawlen < (2 * nbits + kHeader) + kFooter - 1)
     return false;  // Can't possibly be a valid HAIER_AC message.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
 
   // Header

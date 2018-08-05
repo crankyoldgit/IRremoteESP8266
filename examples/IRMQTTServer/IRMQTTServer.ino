@@ -425,8 +425,8 @@ void handleRoot() {
         "<option value='28'>Trotec</option>"
       "</select>"
       " State code: 0x"
-      "<input type='text' name='code' size='" + String(STATE_SIZE_MAX * 2) +
-          "' maxlength='" + String(STATE_SIZE_MAX * 2) + "'"
+      "<input type='text' name='code' size='" + String(kStateSizeMax * 2) +
+          "' maxlength='" + String(kStateSizeMax * 2) + "'"
           " value='190B8050000000E0190B8070000010F0'>"
       " <input type='submit' value='Send A/C State'>"
     "</form>"
@@ -464,7 +464,7 @@ void handleReset() {
 //   str: A hexadecimal string containing the state to be sent.
 void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint8_t strOffset = 0;
-  uint8_t state[STATE_SIZE_MAX] = {0};  // All array elements are set to 0.
+  uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
   uint16_t stateSize = 0;
 
   if (str.startsWith("0x") || str.startsWith("0X"))

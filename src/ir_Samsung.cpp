@@ -104,22 +104,22 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid Samsung message.
   if (strict && nbits != kSamsungBits)
     return false;  // We expect Samsung to be 32 bits of message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], SAMSUNG_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
       SAMSUNG_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], SAMSUNG_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       SAMSUNG_HDR_SPACE_TICKS;
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

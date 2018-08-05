@@ -371,13 +371,13 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
 // TODO(anyone):
 //   Serious testing of the RC-5X and strict aspects needs to be done.
 bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < MIN_RC5_SAMPLES + HEADER - 1) return false;
+  if (results->rawlen < MIN_RC5_SAMPLES + kHeader - 1) return false;
 
   // Compliance
   if (strict && nbits != kRC5Bits && nbits != kRC5XBits)
     return false;  // It's neither RC-5 or RC-5X.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint16_t used = 0;
   bool is_rc5x = false;
   uint64_t data = 0;
@@ -452,7 +452,7 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 // TODO(anyone):
 //   Testing of the strict compliance aspects.
 bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < HEADER + 2 + 4)  // Up to the double-wide T bit.
+  if (results->rawlen < kHeader + 2 + 4)  // Up to the double-wide T bit.
     return false;  // Smaller than absolute smallest possible RC6 message.
 
   if (strict) {  // Compliance
@@ -462,7 +462,7 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     // Also due to potential melding with the start bit, we can only count
     // the start bit as 1, instead of a more typical 2 value. The header still
     // remains as normal.
-    if (results->rawlen < nbits + HEADER + 1)
+    if (results->rawlen < nbits + kHeader + 1)
       return false;  // Don't have enough entries/samples to be valid.
     switch (nbits) {
       case kRC6Mode0Bits:
@@ -473,12 +473,12 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     }
   }
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset++] * RAWTICK / RC6_HDR_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset++] * kRawTick / RC6_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE_TICKS * tick))
     return false;
 
