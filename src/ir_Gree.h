@@ -28,20 +28,24 @@
 #define GREE_FAN                                   3U
 #define GREE_HEAT                                  4U
 
+// Byte 0
+#define GREE_MODE_MASK                    0b00000111U
 #define GREE_POWER1_MASK                  0b00001000U
+#define GREE_FAN_MASK                     0b00110000U
+#define GREE_SWING_AUTO_MASK              0b01000000U
+#define GREE_SLEEP_MASK                   0b10000000U
+// Byte 2
+#define GREE_TURBO_MASK                   0b00010000U
+#define GREE_LIGHT_MASK                   0b00100000U
 #define GREE_POWER2_MASK                  0b01000000U
+#define GREE_XFAN_MASK                    0b10000000U
+// Byte 4
+#define GREE_SWING_POS_MASK               0b00001111U
+
 #define GREE_MIN_TEMP                             16U  // Celsius
 #define GREE_MAX_TEMP                             30U  // Celsius
 #define GREE_FAN_MAX                               3U
-#define GREE_FAN_MASK                     0b00110000U
-#define GREE_MODE_MASK                    0b00000111U
-#define GREE_TURBO_MASK                   0b00010000U
-#define GREE_LIGHT_MASK                   0b00100000U
-#define GREE_XFAN_MASK                    0b10000000U
-#define GREE_SLEEP_MASK                   0b10000000U
 
-#define GREE_SWING_AUTO_MASK              0b01000000U
-#define GREE_SWING_POS_MASK               0b00001111U
 #define GREE_SWING_LAST_POS               0b00000000U
 #define GREE_SWING_AUTO                   0b00000001U
 #define GREE_SWING_UP                     0b00000010U
