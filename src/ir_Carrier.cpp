@@ -18,12 +18,12 @@
 // Constants
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/385
-#define CARRIER_AC_HDR_MARK           8532U
-#define CARRIER_AC_HDR_SPACE          4228U
-#define CARRIER_AC_BIT_MARK            628U
-#define CARRIER_AC_ONE_SPACE          1320U
-#define CARRIER_AC_ZERO_SPACE          532U
-#define CARRIER_AC_GAP               20000U
+const uint16_t kCarrierACHdrMark = 8532;
+const uint16_t kCarrierACHdrSpace = 4228;
+const uint16_t kCarrierACBitMark = 628;
+const uint16_t kCarrierACOneSpace = 1320;
+const uint16_t kCarrierACZeroSpace = 532;
+const uint16_t kCarrierACGap = 20000;
 
 #if SEND_CARRIER_AC
 // Send a Carrier HVAC formatted message.
@@ -40,11 +40,11 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
     uint64_t temp_data = data;
     // Carrier sends the data block three times. normal + inverted + normal.
     for (uint16_t i = 0; i < 3; i++) {
-      sendGeneric(CARRIER_AC_HDR_MARK, CARRIER_AC_HDR_SPACE,
-        CARRIER_AC_BIT_MARK, CARRIER_AC_ONE_SPACE,
-        CARRIER_AC_BIT_MARK, CARRIER_AC_ZERO_SPACE,
-        CARRIER_AC_BIT_MARK, CARRIER_AC_GAP,
-        temp_data, nbits, 38, true, 0, 50);
+      sendGeneric(kCarrierACHdrMark, kCarrierACHdrSpace,
+        kCarrierACBitMark, kCarrierACOneSpace,
+        kCarrierACBitMark, kCarrierACZeroSpace,
+        kCarrierACBitMark, kCarrierACGap,
+        temp_data, nbits, 38, true, 0, kDutyDefault);
       temp_data = invertBits(temp_data, nbits);
     }
   }
@@ -79,24 +79,24 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
   for (uint8_t i = 0; i < 3; i++) {
     prev_data = data;
     // Header
-    if (!matchMark(results->rawbuf[offset++], CARRIER_AC_HDR_MARK))
+    if (!matchMark(results->rawbuf[offset++], kCarrierACHdrMark))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], CARRIER_AC_HDR_SPACE))
+    if (!matchSpace(results->rawbuf[offset++], kCarrierACHdrSpace))
       return false;
     // Data
     match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                           CARRIER_AC_BIT_MARK,
-                                           CARRIER_AC_ONE_SPACE,
-                                           CARRIER_AC_BIT_MARK,
-                                           CARRIER_AC_ZERO_SPACE);
+                                           kCarrierACBitMark,
+                                           kCarrierACOneSpace,
+                                           kCarrierACBitMark,
+                                           kCarrierACZeroSpace);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;
     // Footer
-    if (!matchMark(results->rawbuf[offset++], CARRIER_AC_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], kCarrierACBitMark))
       return false;
     if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], CARRIER_AC_GAP))
+      !matchAtLeast(results->rawbuf[offset++], kCarrierACGap))
       return false;
     // Compliance.
     if (strict) {
