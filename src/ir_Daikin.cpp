@@ -43,7 +43,7 @@ Copyright 2017 sillyfrog, crankyoldgit
 // Send a Daikin A/C message.
 //
 // Args:
-//   data: An array of DAIKIN_COMMAND_LENGTH bytes containing the IR command.
+//   data: An array of kDaikinStateLength bytes containing the IR command.
 //
 // Status: STABLE
 //
@@ -52,7 +52,7 @@ Copyright 2017 sillyfrog, crankyoldgit
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
-  if (nbytes < DAIKIN_COMMAND_LENGTH)
+  if (nbytes < kDaikinStateLength)
     return;  // Not enough bytes to send a proper message.
 
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -138,7 +138,7 @@ void IRDaikinESP::checksum() {
 }
 
 void IRDaikinESP::stateReset() {
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < kDaikinStateLength; i++)
     daikin[i] = 0x0;
 
   daikin[0] = 0x11;
@@ -165,7 +165,7 @@ uint8_t* IRDaikinESP::getRaw() {
 }
 
 void IRDaikinESP::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < kDaikinStateLength; i++)
     daikin[i] = new_code[i];
 }
 
@@ -555,7 +555,7 @@ void IRDaikinESP::printState() {
   std::string strbits;
 #endif  // ARDUINO
   DPRINTLN("Raw Bits:");
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++) {
+  for (uint8_t i = 0; i < kDaikinStateLength; i++) {
     strbits = uint64ToString(daikin[i], BIN);
     while (strbits.length() < 8)
       strbits = "0" + strbits;
@@ -702,7 +702,7 @@ bool readbits(decode_results *results, uint16_t *offset,
 // Decode the supplied Daikin A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. (DAIKIN_RAW_BITS)
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikinRawBits)
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -716,16 +716,16 @@ bool readbits(decode_results *results, uint16_t *offset,
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                           bool strict) {
-  if (results->rawlen < DAIKIN_RAW_BITS)
+  if (results->rawlen < kDaikinRawBits)
     return false;
 
   // Compliance
-  if (strict && nbits != DAIKIN_RAW_BITS)
+  if (strict && nbits != kDaikinRawBits)
     return false;
 
   uint16_t offset = OFFSET_START;
-  unsigned char daikin_code[DAIKIN_COMMAND_LENGTH + 2];
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH+2; i++)
+  unsigned char daikin_code[kDaikinStateLength + 2];
+  for (uint8_t i = 0; i < kDaikinStateLength+2; i++)
     daikin_code[i] = 0;
 
   // Header (#1)
@@ -741,7 +741,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   // Ignore everything that has just been captured as it is not needed.
   // Some remotes may not send this portion, my remote did, but it's not
   // required.
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH + 2; i++)
+  for (uint8_t i = 0; i < kDaikinStateLength + 2; i++)
     daikin_code[i] = 0;
 
   // Header (#2)
@@ -754,7 +754,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (!checkheader(results, &offset)) return false;
 
   // Data (#3), read up everything else
-  if (!readbits(results, &offset, daikin_code, DAIKIN_BITS - (8 * 8)))
+  if (!readbits(results, &offset, daikin_code, kDaikinBits - (8 * 8)))
     return false;
 
   // Footer
@@ -780,9 +780,9 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
 #endif  // DAIKIN_DEBUG
 
   // Copy across the bits to state
-  for (uint8_t i = 0; i < DAIKIN_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < kDaikinStateLength; i++)
     results->state[i] = daikin_code[i];
-  results->bits = DAIKIN_COMMAND_LENGTH * 8;
+  results->bits = kDaikinStateLength * 8;
   results->decode_type = DAIKIN;
   return true;
 }

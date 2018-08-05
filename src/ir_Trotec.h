@@ -71,7 +71,7 @@ class IRTrotecESP {
   uint8_t* getRaw();
 
  private:
-  uint8_t trotec[TROTEC_COMMAND_LENGTH];
+  uint8_t trotec[kTrotecStateLength];
   void stateReset();
   void checksum();
   IRsend _irsend;

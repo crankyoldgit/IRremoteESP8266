@@ -36,11 +36,11 @@
 #define NEC_MIN_COMMAND_LENGTH_TICKS 193U
 #define NEC_MIN_COMMAND_LENGTH       (NEC_MIN_COMMAND_LENGTH_TICKS * NEC_TICK)
 #define NEC_MIN_GAP (NEC_MIN_COMMAND_LENGTH - \
-    (NEC_HDR_MARK + NEC_HDR_SPACE + NEC_BITS * (NEC_BIT_MARK + NEC_ONE_SPACE) \
+    (NEC_HDR_MARK + NEC_HDR_SPACE + kNECBits * (NEC_BIT_MARK + NEC_ONE_SPACE) \
      + NEC_BIT_MARK))
 #define NEC_MIN_GAP_TICKS (NEC_MIN_COMMAND_LENGTH_TICKS - \
     (NEC_HDR_MARK_TICKS + NEC_HDR_SPACE_TICKS + \
-     NEC_BITS * (NEC_BIT_MARK_TICKS + NEC_ONE_SPACE_TICKS) + \
+     kNECBits * (NEC_BIT_MARK_TICKS + NEC_ONE_SPACE_TICKS) + \
      NEC_BIT_MARK_TICKS))
 
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
@@ -48,7 +48,7 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically NEC_BITS.
+//   nbits:  The number of bits of the message to be sent. Typically kNECBits.
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: STABLE / Known working.
@@ -103,7 +103,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically NEC_BITS.
+//   nbits:   The number of data bits to expect. Typically kNECBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -124,7 +124,7 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1 &&
       results->rawlen != NEC_RPT_LENGTH)
     return false;  // Can't possibly be a valid NEC message.
-  if (strict && nbits != NEC_BITS)
+  if (strict && nbits != kNECBits)
     return false;  // Not strictly an NEC message.
 
   uint64_t data = 0;

@@ -48,7 +48,7 @@
 #define FNV_BASIS_32 2166136261UL
 
 // Hitachi AC is the current largest state size.
-#define STATE_SIZE_MAX HITACHI_AC2_STATE_LENGTH
+#define STATE_SIZE_MAX kHitachiAC2StateLength
 
 // Types
 // information for the interrupt handler
@@ -144,30 +144,30 @@ class IRrecv {
                            const uint8_t tolerance = TOLERANCE);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
-  bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
+  bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
                  bool strict = true);
 #endif
 #if DECODE_SONY
-  bool decodeSony(decode_results *results, uint16_t nbits = SONY_MIN_BITS,
+  bool decodeSony(decode_results *results, uint16_t nbits = kSonyMinBits,
                   bool strict = false);
 #endif
 #if DECODE_SANYO
   // DISABLED due to poor quality.
   // bool decodeSanyo(decode_results *results,
-  //                  uint16_t nbits = SANYO_SA8650B_BITS,
+  //                  uint16_t nbits = kSanyoSA8650BBits,
   //                  bool strict = false);
   bool decodeSanyoLC7461(decode_results *results,
-                         uint16_t nbits = SANYO_LC7461_BITS,
+                         uint16_t nbits = kSanyoLC7461Bits,
                          bool strict = true);
 #endif
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results,
-                        uint16_t nbits = MITSUBISHI_BITS,
+                        uint16_t nbits = kMitsubishiBits,
                         bool strict = true);
 #endif
 #if DECODE_MITSUBISHI2
   bool decodeMitsubishi2(decode_results *results,
-                         uint16_t nbits = MITSUBISHI_BITS,
+                         uint16_t nbits = kMitsubishiBits,
                          bool strict = true);
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
@@ -176,40 +176,40 @@ class IRrecv {
                      int16_t excess = MARK_EXCESS, uint16_t delta = 0);
 #endif
 #if DECODE_RC5
-  bool decodeRC5(decode_results *results, uint16_t nbits = RC5X_BITS,
+  bool decodeRC5(decode_results *results, uint16_t nbits = kRC5XBits,
                  bool strict = true);
 #endif
 #if DECODE_RC6
-  bool decodeRC6(decode_results *results, uint16_t nbits = RC6_MODE0_BITS,
+  bool decodeRC6(decode_results *results, uint16_t nbits = kRC6Mode0Bits,
                  bool strict = false);
 #endif
 #if DECODE_RCMM
-  bool decodeRCMM(decode_results *results, uint16_t nbits = RCMM_BITS,
+  bool decodeRCMM(decode_results *results, uint16_t nbits = kRCMMBits,
                   bool strict = false);
 #endif
 #if (DECODE_PANASONIC || DECODE_DENON)
-  bool decodePanasonic(decode_results *results, uint16_t nbits = PANASONIC_BITS,
+  bool decodePanasonic(decode_results *results, uint16_t nbits = kPanasonicBits,
                        bool strict = false,
-                       uint32_t manufacturer = PANASONIC_MANUFACTURER);
+                       uint32_t manufacturer = kPanasonicManufacturer);
 #endif
 #if DECODE_LG
-  bool decodeLG(decode_results *results, uint16_t nbits = LG_BITS,
+  bool decodeLG(decode_results *results, uint16_t nbits = kLGBits,
                 bool strict = false);
 #endif
 #if DECODE_JVC
-  bool decodeJVC(decode_results *results, uint16_t nbits = JVC_BITS,
+  bool decodeJVC(decode_results *results, uint16_t nbits = kJVCBits,
                  bool strict = true);
 #endif
 #if DECODE_SAMSUNG
-  bool decodeSAMSUNG(decode_results *results, uint16_t nbits = SAMSUNG_BITS,
+  bool decodeSAMSUNG(decode_results *results, uint16_t nbits = kSamsungBits,
                      bool strict = true);
 #endif
 #if DECODE_WHYNTER
-  bool decodeWhynter(decode_results *results, uint16_t nbits = WHYNTER_BITS,
+  bool decodeWhynter(decode_results *results, uint16_t nbits = kWhynterBits,
                      bool strict = true);
 #endif
 #if DECODE_COOLIX
-  bool decodeCOOLIX(decode_results *results, uint16_t nbits = COOLIX_BITS,
+  bool decodeCOOLIX(decode_results *results, uint16_t nbits = kCoolixBits,
                     bool strict = true);
 #endif
 #if DECODE_DENON
@@ -217,80 +217,80 @@ class IRrecv {
                    bool strict = true);
 #endif
 #if DECODE_DISH
-  bool decodeDISH(decode_results *results, uint16_t nbits = DISH_BITS,
+  bool decodeDISH(decode_results *results, uint16_t nbits = kDishBits,
                   bool strict = true);
 #endif
 #if (DECODE_SHARP || DECODE_DENON)
-  bool decodeSharp(decode_results *results, uint16_t nbits = SHARP_BITS,
+  bool decodeSharp(decode_results *results, uint16_t nbits = kSharpBits,
                    bool strict = true, bool expansion = true);
 #endif
 #if DECODE_AIWA_RC_T501
   bool decodeAiwaRCT501(decode_results *results,
-                        uint16_t nbits = AIWA_RC_T501_BITS, bool strict = true);
+                        uint16_t nbits = kAiwaRcT501Bits, bool strict = true);
 #endif
 #if DECODE_NIKAI
-  bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
+  bool decodeNikai(decode_results *results, uint16_t nbits = kNikaiBits,
                    bool strict = true);
 #endif
 #if DECODE_MAGIQUEST
-  bool decodeMagiQuest(decode_results *results, uint16_t nbits = MAGIQUEST_BITS,
+  bool decodeMagiQuest(decode_results *results, uint16_t nbits = kMagiquestBits,
                        bool strict = true);
 #endif
 #if DECODE_KELVINATOR
   bool decodeKelvinator(decode_results *results,
-                        uint16_t nbits = KELVINATOR_BITS,
+                        uint16_t nbits = kKelvinatorBits,
                         bool strict = true);
 #endif
 #if DECODE_DAIKIN
-  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_RAW_BITS,
+  bool decodeDaikin(decode_results *results, uint16_t nbits = kDaikinRawBits,
                     bool strict = true);
 #endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
-                       uint16_t nbytes = TOSHIBA_AC_BITS,
+                       uint16_t nbytes = kToshibaACBits,
                        bool strict = true);
 #endif
 #if DECODE_MIDEA
-  bool decodeMidea(decode_results *results, uint16_t nbits = MIDEA_BITS,
+  bool decodeMidea(decode_results *results, uint16_t nbits = kMideaBits,
                    bool strict = true);
 #endif
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results,
-                       uint16_t nbits = FUJITSU_AC_BITS,
+                       uint16_t nbits = kFujitsuACBits,
                        bool strict = false);
 #endif
 #if DECODE_LASERTAG
-  bool decodeLasertag(decode_results *results, uint16_t nbits = LASERTAG_BITS,
+  bool decodeLasertag(decode_results *results, uint16_t nbits = kLasertagBits,
                       bool strict = true);
 #endif
 #if DECODE_CARRIER_AC
   bool decodeCarrierAC(decode_results *results,
-                       uint16_t nbits = CARRIER_AC_BITS,
+                       uint16_t nbits = kCarrierACBits,
                        bool strict = true);
 #endif
 #if DECODE_GREE
   bool decodeGree(decode_results *results,
-                  uint16_t nbits = GREE_BITS, bool strict = true);
+                  uint16_t nbits = kGreeBits, bool strict = true);
 #endif
 #if (DECODE_HAIER_AC | DECODE_HAIER_AC_YRW02)
   bool decodeHaierAC(decode_results *results,
-                   uint16_t nbits = HAIER_AC_BITS, bool strict = true);
+                   uint16_t nbits = kHaierACBits, bool strict = true);
 #endif
 #if DECODE_HAIER_AC_YRW02
   bool decodeHaierACYRW02(decode_results *results,
-                          uint16_t nbits = HAIER_AC_YRW02_BITS,
+                          uint16_t nbits = kHaierACYRW02Bits,
                           bool strict = true);
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
   bool decodeHitachiAC(decode_results *results,
-                       uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
+                       uint16_t nbits = kHitachiACBits, bool strict = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results,
-                        uint16_t nbits = HITACHI_AC1_BITS, bool strict = true);
+                        uint16_t nbits = kHitachiAC1Bits, bool strict = true);
 #endif
 #if DECODE_GICABLE
-  bool decodeGICable(decode_results *results, uint16_t nbits = GICABLE_BITS,
+  bool decodeGICable(decode_results *results, uint16_t nbits = kGICableBits,
                      bool strict = true);
 #endif
 };

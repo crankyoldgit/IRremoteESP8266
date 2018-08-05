@@ -18,7 +18,7 @@
 
 void IRsend::sendTrotec(unsigned char data[], uint16_t nbytes,
                         uint16_t repeat) {
-  if (nbytes < TROTEC_COMMAND_LENGTH)
+  if (nbytes < kTrotecStateLength)
     return;
 
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -61,7 +61,7 @@ void IRTrotecESP::checksum() {
 }
 
 void IRTrotecESP::stateReset() {
-  for (uint8_t i = 2; i < TROTEC_COMMAND_LENGTH; i++)
+  for (uint8_t i = 2; i < kTrotecStateLength; i++)
     trotec[i] = 0x0;
 
   trotec[0] = TROTEC_INTRO1;

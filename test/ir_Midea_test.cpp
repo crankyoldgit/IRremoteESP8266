@@ -79,7 +79,7 @@ TEST(TestSendMidea, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendMidea(0x55AA55AA55AA, MIDEA_BITS, 1);  // 1 repeat.
+  irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
@@ -113,7 +113,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s5600", irsend.outputStr());
-  irsend.sendMidea(0x55AA55AA55AA, MIDEA_BITS, 2);  // 2 repeats.
+  irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 2);  // 2 repeats.
   EXPECT_EQ(
     "m4480s4480"
     "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
@@ -458,9 +458,9 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0x1234567890DF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0x1234567890DF, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -470,9 +470,9 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -482,9 +482,9 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0xFFFFFFFFFFA0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFA0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -497,7 +497,7 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -512,24 +512,24 @@ TEST(TestDecodeMidea, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Midea 48-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendMidea(0xA18263FFFF6E, MIDEA_BITS, 2);
+  irsend.sendMidea(0xA18263FFFF6E, kMideaBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  irsend.makeDecodeResult(2 * (2 * MIDEA_BITS + 4));
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  irsend.makeDecodeResult(2 * (2 * kMideaBits + 4));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 
-  irsend.makeDecodeResult(4 * (2 * MIDEA_BITS + 4));
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  irsend.makeDecodeResult(4 * (2 * kMideaBits + 4));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 }
 
@@ -543,7 +543,7 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
   irsend.sendMidea(0x12, 8);  // Illegal value Midea 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, 8, false));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
@@ -554,7 +554,7 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
   irsend.sendMidea(0x12345678, 32);  // Illegal value Midea 32-bit message.
   irsend.makeDecodeResult();
   // Shouldn't pass with strict when we ask for less bits than we got.
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -567,7 +567,7 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
 
   // Decode should fail if asked to decode non-multiples of 8 bits.
   irsend.reset();
-  irsend.sendMidea(0x123456, MIDEA_BITS, 2);
+  irsend.sendMidea(0x123456, kMideaBits, 2);
   irsend.makeDecodeResult();
   ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, 9, false));
 }
@@ -604,7 +604,7 @@ TEST(TestDecodeMidea, FailToDecodeNonMideaExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, MIDEA_BITS, false));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, false));
 }
 
 // Decode against a real capture reported by a user. See issue #354
@@ -635,6 +635,6 @@ TEST(TestDecodeMidea, DecodeRealExample) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
-  EXPECT_EQ(MIDEA_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 }

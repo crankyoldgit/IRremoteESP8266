@@ -110,8 +110,8 @@
 #define DAIKIN_BYTE_ON_TIMER          13
 #define DAIKIN_BIT_ON_TIMER   0b00000010
 
-#define DAIKIN_CURBIT DAIKIN_COMMAND_LENGTH
-#define DAIKIN_CURINDEX (DAIKIN_COMMAND_LENGTH + 1)
+#define DAIKIN_CURBIT kDaikinStateLength
+#define DAIKIN_CURINDEX (kDaikinStateLength + 1)
 #define OFFSET_ERR 65432
 
 #define DAIKIN_TOLERANCE 35
@@ -180,7 +180,7 @@ class IRDaikinESP {
   uint32_t getCommand();
   void setCommand(uint32_t value);
   static bool validChecksum(const uint8_t state[],
-                            const uint16_t length = DAIKIN_COMMAND_LENGTH);
+                            const uint16_t length = kDaikinStateLength);
 #ifdef ARDUINO
   String toString();
   static String renderTime(uint16_t timemins);
@@ -191,7 +191,7 @@ class IRDaikinESP {
 
  private:
   // # of bytes per command
-  uint8_t daikin[DAIKIN_COMMAND_LENGTH];
+  uint8_t daikin[kDaikinStateLength];
   void stateReset();
   static uint8_t calcBlockChecksum(const uint8_t *block, const uint16_t length);
   void checksum();

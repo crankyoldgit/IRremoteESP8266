@@ -131,7 +131,7 @@ TEST(TestSendPronto, NonRepeatingCode) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
-  EXPECT_EQ(SONY_12_BITS, irsend.capture.bits);
+  EXPECT_EQ(kSony12Bits, irsend.capture.bits);
   EXPECT_EQ(0x10, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -156,7 +156,7 @@ TEST(TestSendPronto, NonRepeatingCode) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
-  EXPECT_EQ(SONY_12_BITS, irsend.capture.bits);
+  EXPECT_EQ(kSony12Bits, irsend.capture.bits);
   EXPECT_EQ(0x10, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -197,7 +197,7 @@ TEST(TestSendPronto, RepeatSequenceOnlyForSony) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
-  EXPECT_EQ(SONY_20_BITS, irsend.capture.bits);
+  EXPECT_EQ(kSony20Bits, irsend.capture.bits);
   EXPECT_EQ(0x74B92, irsend.capture.value);
   EXPECT_EQ(0x1A, irsend.capture.address);
   EXPECT_EQ(0x24AE, irsend.capture.command);
@@ -209,11 +209,11 @@ TEST(TestSendPronto, RepeatSequenceOnlyForSony) {
 
   // Send the Pronto code with 2 repeats.
   irsend.reset();
-  irsend.sendPronto(pronto_test, 46, SONY_MIN_REPEAT);
+  irsend.sendPronto(pronto_test, 46, kSonyMinRepeat);
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
-  EXPECT_EQ(SONY_20_BITS, irsend.capture.bits);
+  EXPECT_EQ(kSony20Bits, irsend.capture.bits);
   EXPECT_EQ(0x74B92, irsend.capture.value);
   EXPECT_EQ(0x1A, irsend.capture.address);
   EXPECT_EQ(0x24AE, irsend.capture.command);
@@ -261,7 +261,7 @@ TEST(TestSendPronto, RepeatSequenceOnlyForPanasonic) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x400401007C7D, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x1007C7D, irsend.capture.command);
@@ -303,7 +303,7 @@ TEST(TestSendPronto, NormalPlusRepeatSequence) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x18E710EF, irsend.capture.value);
   EXPECT_EQ(0x18, irsend.capture.address);
   EXPECT_EQ(0x8, irsend.capture.command);
@@ -321,7 +321,7 @@ TEST(TestSendPronto, NormalPlusRepeatSequence) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x18E710EF, irsend.capture.value);
   EXPECT_EQ(0x18, irsend.capture.address);
   EXPECT_EQ(0x8, irsend.capture.command);
@@ -340,7 +340,7 @@ TEST(TestSendPronto, NormalPlusRepeatSequence) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x18E710EF, irsend.capture.value);
   EXPECT_EQ(0x18, irsend.capture.address);
   EXPECT_EQ(0x8, irsend.capture.command);

@@ -37,7 +37,7 @@
 //
 // Args:
 //   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically COOLIX_BITS.
+//   nbits:  Nr. of bits of data to be sent. Typically kCoolixBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // Status: BETA / Probably works.
@@ -85,7 +85,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically COOLIX_BITS.
+//   nbits:   The number of data bits to expect. Typically kCoolixBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -97,7 +97,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   // each byte. Hence twice the number of expected data bits.
   if (results->rawlen < 2 * 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid COOLIX message.
-  if (strict && nbits != COOLIX_BITS)
+  if (strict && nbits != kCoolixBits)
     return false;  // Not strictly a COOLIX message.
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
     return false;

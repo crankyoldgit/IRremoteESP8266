@@ -30,12 +30,12 @@
 // Args:
 //   data: An array of bytes containing the IR command.
 //   nbytes: Nr. of bytes of data in the array. Typically one of:
-//           FUJITSU_AC_STATE_LENGTH
-//           FUJITSU_AC_STATE_LENGTH - 1
-//           FUJITSU_AC_STATE_LENGTH_SHORT
-//           FUJITSU_AC_STATE_LENGTH_SHORT - 1
+//           kFujitsuACStateLength
+//           kFujitsuACStateLength - 1
+//           kFujitsuACStateLengthShort
+//           kFujitsuACStateLengthShort - 1
 //   repeat: Nr. of times the message is to be repeated.
-//          (Default = FUJITSU_AC_MIN_REPEAT).
+//          (Default = kFujitsuACMinRepeat).
 //
 // Status: BETA / Appears to be working.
 //
@@ -62,12 +62,12 @@ void IRFujitsuAC::setModel(fujitsu_ac_remote_model_t model) {
   _model = model;
   switch (model) {
     case ARDB1:
-      _state_length = FUJITSU_AC_STATE_LENGTH - 1;
-      _state_length_short = FUJITSU_AC_STATE_LENGTH_SHORT - 1;
+      _state_length = kFujitsuACStateLength - 1;
+      _state_length_short = kFujitsuACStateLengthShort - 1;
       break;
     default:
-      _state_length = FUJITSU_AC_STATE_LENGTH;
-      _state_length_short = FUJITSU_AC_STATE_LENGTH_SHORT;
+      _state_length = kFujitsuACStateLength;
+      _state_length_short = kFujitsuACStateLengthShort;
   }
 }
 
@@ -158,7 +158,7 @@ void IRFujitsuAC::buildState() {
                                                             - 2];
     // Zero the rest of the state.
     for (uint8_t i = _state_length_short;
-         i < FUJITSU_AC_STATE_LENGTH;
+         i < kFujitsuACStateLength;
          i++)
       remote_state[i] = 0;
   }
@@ -181,8 +181,8 @@ uint8_t* IRFujitsuAC::getRaw() {
 
 void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (length) {
-    case FUJITSU_AC_STATE_LENGTH - 1:
-    case FUJITSU_AC_STATE_LENGTH_SHORT - 1:
+    case kFujitsuACStateLength - 1:
+    case kFujitsuACStateLengthShort - 1:
       setModel(ARDB1);
       break;
     default:
@@ -214,8 +214,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
 }
 
 bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
-  if (length > FUJITSU_AC_STATE_LENGTH)  return false;
-  for (uint16_t i = 0; i < FUJITSU_AC_STATE_LENGTH; i++) {
+  if (length > kFujitsuACStateLength)  return false;
+  for (uint16_t i = 0; i < kFujitsuACStateLength; i++) {
     if (i < length)
       remote_state[i] = newState[i];
     else
@@ -326,15 +326,15 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
   uint8_t sum_complement = 0;
   uint8_t checksum = state[length - 1];
   switch (length) {
-    case FUJITSU_AC_STATE_LENGTH_SHORT:  // ARRAH2E
+    case kFujitsuACStateLengthShort:  // ARRAH2E
       return state[length - 1] == (uint8_t) ~state[length - 2];
-    case FUJITSU_AC_STATE_LENGTH - 1:  // ARDB1
+    case kFujitsuACStateLength - 1:  // ARDB1
       sum = sumBytes(state, length - 1);
       sum_complement = 0x9B;
       break;
-    case FUJITSU_AC_STATE_LENGTH:  // ARRAH2E
-      sum = sumBytes(state + FUJITSU_AC_STATE_LENGTH_SHORT,
-                     length - 1 - FUJITSU_AC_STATE_LENGTH_SHORT);
+    case kFujitsuACStateLength:  // ARRAH2E
+      sum = sumBytes(state + kFujitsuACStateLengthShort,
+                     length - 1 - kFujitsuACStateLengthShort);
       break;
     default:  // Includes ARDB1 short.
       return true;  // Assume the checksum is valid for other lengths.
@@ -430,7 +430,7 @@ std::string IRFujitsuAC::toString() {
 // Places successful decode information in the results pointer.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically FUJITSU_AC_BITS.
+//   nbits:   The number of data bits to expect. Typically kFujitsuACBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -445,17 +445,17 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
   uint16_t dataBitsSoFar = 0;
 
   // Have we got enough data to successfully decode?
-  if (results->rawlen < (2 * FUJITSU_AC_MIN_BITS) + HEADER + FOOTER - 1)
+  if (results->rawlen < (2 * kFujitsuACMinBits) + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid message.
 
 
   // Compliance
   if (strict) {
     switch (nbits) {
-      case FUJITSU_AC_BITS:
-      case FUJITSU_AC_BITS - 8:
-      case FUJITSU_AC_MIN_BITS:
-      case FUJITSU_AC_MIN_BITS + 8:
+      case kFujitsuACBits:
+      case kFujitsuACBits - 8:
+      case kFujitsuACMinBits:
+      case kFujitsuACMinBits + 8:
         break;
       default:
         return false;  // Must be called with the correct nr. of bits.
@@ -470,15 +470,15 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
 
   // Data (Fixed signature)
   match_result_t data_result = matchData(&(results->rawbuf[offset]),
-                                        FUJITSU_AC_MIN_BITS - 8,
+                                        kFujitsuACMinBits - 8,
                                         FUJITSU_AC_BIT_MARK,
                                         FUJITSU_AC_ONE_SPACE,
                                         FUJITSU_AC_BIT_MARK,
                                         FUJITSU_AC_ZERO_SPACE);
   if (data_result.success == false)  return false;  // Fail
-  if (reverseBits(data_result.data, FUJITSU_AC_MIN_BITS - 8) != 0x1010006314)
+  if (reverseBits(data_result.data, kFujitsuACMinBits - 8) != 0x1010006314)
     return false;  // Signature failed.
-  dataBitsSoFar += FUJITSU_AC_MIN_BITS - 8;
+  dataBitsSoFar += kFujitsuACMinBits - 8;
   offset += data_result.used;
   results->state[0] = 0x14;
   results->state[1] = 0x63;
@@ -488,7 +488,7 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
 
   // Keep reading bytes until we either run out of message or state to fill.
   for (uint16_t i = 5;
-      offset <= results->rawlen - 16 && i < FUJITSU_AC_STATE_LENGTH;
+      offset <= results->rawlen - 16 && i < kFujitsuACStateLength;
       i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             FUJITSU_AC_BIT_MARK,
@@ -516,23 +516,23 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
 
   // Compliance
   switch (dataBitsSoFar) {
-    case FUJITSU_AC_MIN_BITS:
+    case kFujitsuACMinBits:
       // Check if this values indicate that this should have been a long state
       // message.
       if (results->state[5] == 0xFC)  return false;
       return true;  // Success
-    case FUJITSU_AC_MIN_BITS + 8:
+    case kFujitsuACMinBits + 8:
       // Check if this values indicate that this should have been a long state
       // message.
       if (results->state[5] == 0xFE)  return false;
       // The last byte needs to be the inverse of the penultimate byte.
       if (results->state[5] != (uint8_t) ~results->state[6])  return false;
       return true;  // Success
-    case FUJITSU_AC_BITS - 8:
+    case kFujitsuACBits - 8:
       // Long messages of this size require this byte be correct.
       if (results->state[5] != 0xFC)  return false;
       break;
-    case FUJITSU_AC_BITS:
+    case kFujitsuACBits:
       // Long messages of this size require this byte be correct.
       if (results->state[5] != 0xFE)  return false;
       break;

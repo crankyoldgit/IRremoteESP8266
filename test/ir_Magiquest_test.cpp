@@ -53,7 +53,7 @@ TEST(TestSendMagiQuest, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendMagiQuest(0x12345678ABCD, MAGIQUEST_BITS, 2);  // two repeats.
+  irsend.sendMagiQuest(0x12345678ABCD, kMagiquestBits, 2);  // two repeats.
   EXPECT_EQ(
       "m280s850m280s850m280s850m280s850m280s850m280s850m280s850m280s850"
       "m280s850m280s850m280s850m580s600m280s850m280s850m580s600m280s850"
@@ -90,9 +90,9 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, MAGIQUEST_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
-  EXPECT_EQ(MAGIQUEST_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -101,9 +101,9 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(irsend.encodeMagiQuest(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, MAGIQUEST_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
-  EXPECT_EQ(MAGIQUEST_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x10001, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x1, irsend.capture.command);
@@ -112,9 +112,9 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(irsend.encodeMagiQuest(0x12345678, 0xABCD));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, MAGIQUEST_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
-  EXPECT_EQ(MAGIQUEST_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678ABCD, irsend.capture.value);
   EXPECT_EQ(0x12345678, irsend.capture.address);
   EXPECT_EQ(0xABCD, irsend.capture.command);
@@ -126,7 +126,7 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
-  EXPECT_EQ(MAGIQUEST_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678ABCD, irsend.capture.value);
 }
 
@@ -153,7 +153,7 @@ TEST(TestDecodeMagiQuest, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
-  EXPECT_EQ(MAGIQUEST_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x560F40020455, irsend.capture.value);
   EXPECT_EQ(0x560F4002, irsend.capture.address);  // Wand ID
   EXPECT_EQ(0x0455, irsend.capture.command);  // Magnitude

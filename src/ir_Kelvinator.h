@@ -148,9 +148,9 @@ class IRKelvinatorAC {
   void setRaw(uint8_t new_code[]);
   static uint8_t calcBlockChecksum(
       const uint8_t *block,
-      const uint16_t length = KELVINATOR_STATE_LENGTH / 2);
+      const uint16_t length = kKelvinatorStateLength / 2);
   static bool validChecksum(const uint8_t state[],
-                            const uint16_t length = KELVINATOR_STATE_LENGTH);
+                            const uint16_t length = kKelvinatorStateLength);
 #ifdef ARDUINO
   String toString();
 #else
@@ -159,8 +159,8 @@ class IRKelvinatorAC {
 
  private:
   // The state of the IR remote in IR code form.
-  uint8_t remote_state[KELVINATOR_STATE_LENGTH];
-  void checksum(const uint16_t length = KELVINATOR_STATE_LENGTH);
+  uint8_t remote_state[kKelvinatorStateLength];
+  void checksum(const uint16_t length = kKelvinatorStateLength);
   void fixup();
   IRsend _irsend;
 };

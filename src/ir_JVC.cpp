@@ -34,7 +34,7 @@
 #define JVC_RPT_LENGTH       (JVC_RPT_LENGTH_TICKS * JVC_TICK)
 #define JVC_MIN_GAP_TICKS    (JVC_RPT_LENGTH_TICKS - \
     (JVC_HDR_MARK_TICKS + JVC_HDR_SPACE_TICKS + \
-     JVC_BITS * (JVC_BIT_MARK_TICKS + JVC_ONE_SPACE_TICKS) + \
+     kJVCBits * (JVC_BIT_MARK_TICKS + JVC_ONE_SPACE_TICKS) + \
      JVC_BIT_MARK_TICKS))
 #define JVC_MIN_GAP          (JVC_MIN_GAP_TICKS * JVC_TICK)
 
@@ -43,7 +43,7 @@
 //
 // Args:
 //   data:   The contents of the command you want to send.
-//   nbits:  The bit size of the command being sent. (JVC_BITS)
+//   nbits:  The bit size of the command being sent. (kJVCBits)
 //   repeat: The number of times you want the command to be repeated.
 //
 // Status: STABLE.
@@ -100,7 +100,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits of data to expect. Typically JVC_BITS.
+//   nbits:   Nr. of bits of data to expect. Typically kJVCBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -112,7 +112,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
 bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
-  if (strict && nbits != JVC_BITS)
+  if (strict && nbits != kJVCBits)
     return false;  // Must be called with the correct nr. of bits.
   if (results->rawlen < 2 * nbits + FOOTER - 1)
     return false;  // Can't possibly be a valid JVC message.

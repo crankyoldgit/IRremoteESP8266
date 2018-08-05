@@ -30,7 +30,7 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically CARRIER_AC_BITS.
+//   nbits:  The bit size of the message being sent. typically kCarrierACBits.
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: BETA / Appears to work on real devices.
@@ -58,7 +58,7 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   Nr. of bits to expect in the data portion.
-//            Typically CARRIER_AC_BITS.
+//            Typically kCarrierACBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -69,7 +69,7 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
                            bool strict) {
   if (results->rawlen < ((2 * nbits + HEADER + FOOTER) * 3) - 1)
     return false;  // Can't possibly be a valid Carrier message.
-  if (strict && nbits != CARRIER_AC_BITS)
+  if (strict && nbits != kCarrierACBits)
     return false;  // We expect Carrier to be 32 bits of message.
 
   uint64_t data = 0;

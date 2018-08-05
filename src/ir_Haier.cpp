@@ -43,14 +43,14 @@
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HAIER_AC_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHaierACStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: Beta / Probably working.
 //
 void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
-  if (nbytes < HAIER_AC_STATE_LENGTH)
+  if (nbytes < kHaierACStateLength)
     return;
 
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -72,14 +72,14 @@ void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HAIER_AC_YRW02_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHaierACYRW02StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: Alpha / Untested on a real device.
 //
 void IRsend::sendHaierACYRW02(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
-  if (nbytes >= HAIER_AC_YRW02_STATE_LENGTH)
+  if (nbytes >= kHaierACYRW02StateLength)
     sendHaierAC(data, nbytes, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
@@ -101,7 +101,7 @@ void IRHaierAC::send() {
 #endif  // SEND_HAIER_AC
 
 void IRHaierAC::checksum() {
-  remote_state[8] = sumBytes(remote_state, HAIER_AC_STATE_LENGTH - 1);
+  remote_state[8] = sumBytes(remote_state, kHaierACStateLength - 1);
 }
 
 bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
@@ -110,7 +110,7 @@ bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
 }
 
 void IRHaierAC::stateReset() {
-  for (uint8_t i = 1; i < HAIER_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 1; i < kHaierACStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = HAIER_AC_PREFIX;
   remote_state[2] = 0b00100000;
@@ -127,7 +127,7 @@ uint8_t* IRHaierAC::getRaw() {
 }
 
 void IRHaierAC::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < HAIER_AC_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kHaierACStateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
@@ -474,8 +474,8 @@ void IRHaierACYRW02::send() {
 #endif  // SEND_HAIER_AC_YRW02
 
 void IRHaierACYRW02::checksum() {
-  remote_state[HAIER_AC_YRW02_STATE_LENGTH - 1] = sumBytes(
-      remote_state, HAIER_AC_YRW02_STATE_LENGTH - 1);
+  remote_state[kHaierACYRW02StateLength - 1] = sumBytes(
+      remote_state, kHaierACYRW02StateLength - 1);
 }
 
 bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
@@ -484,7 +484,7 @@ bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
 }
 
 void IRHaierACYRW02::stateReset() {
-  for (uint8_t i = 1; i < HAIER_AC_YRW02_STATE_LENGTH; i++)
+  for (uint8_t i = 1; i < kHaierACYRW02StateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = HAIER_AC_YRW02_PREFIX;
 
@@ -504,7 +504,7 @@ uint8_t* IRHaierACYRW02::getRaw() {
 }
 
 void IRHaierACYRW02::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < HAIER_AC_YRW02_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kHaierACYRW02StateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
@@ -823,7 +823,7 @@ std::string IRHaierACYRW02::toString() {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HAIER_AC_BITS.
+//   nbits:   The number of data bits to expect. Typically kHaierACBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -836,7 +836,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
     return false;
 
   if (strict) {
-    if (nbits != HAIER_AC_BITS)
+    if (nbits != kHaierACBits)
       return false;  // Not strictly a HAIER_AC message.
   }
 
@@ -888,7 +888,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HAIER_AC_YRW02_BITS.
+//   nbits:   The number of data bits to expect. Typically kHaierACYRW02Bits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -898,7 +898,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
                                 bool strict) {
   if (strict) {
-    if (nbits != HAIER_AC_YRW02_BITS)
+    if (nbits != kHaierACYRW02Bits)
       return false;  // Not strictly a HAIER_AC_YRW02 message.
   }
 

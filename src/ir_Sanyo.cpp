@@ -32,8 +32,8 @@
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 //   http://slydiman.narod.ru/scr/kb/sanyo.htm
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
-#define SANYO_LC7461_ADDRESS_MASK ((1 << SANYO_LC7461_ADDRESS_BITS) - 1)
-#define SANYO_LC7461_COMMAND_MASK ((1 << SANYO_LC7461_COMMAND_BITS) - 1)
+#define SANYO_LC7461_ADDRESS_MASK ((1 << kSanyoLC7461AddressBits) - 1)
+#define SANYO_LC7461_COMMAND_MASK ((1 << kSanyoLC7461CommandBits) - 1)
 #define SANYO_LC7461_HDR_MARK             9000U
 #define SANYO_LC7461_HDR_SPACE            4500U
 #define SANYO_LC7461_BIT_MARK              560U  // 1T
@@ -41,7 +41,7 @@
 #define SANYO_LC7461_ZERO_SPACE            560U  // 1T
 #define SANYO_LC7461_MIN_COMMAND_LENGTH 108000UL
 #define SANYO_LC7461_MIN_GAP SANYO_LC7461_MIN_COMMAND_LENGTH - \
-    (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + SANYO_LC7461_BITS * \
+    (SANYO_LC7461_HDR_MARK + SANYO_LC7461_HDR_SPACE + kSanyoLC7461Bits * \
      (SANYO_LC7461_BIT_MARK + (SANYO_LC7461_ONE_SPACE + \
                                SANYO_LC7461_ZERO_SPACE) / 2) \
      + SANYO_LC7461_BIT_MARK)
@@ -67,12 +67,12 @@ uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint8_t command) {
   uint64_t data = address;
   address ^= SANYO_LC7461_ADDRESS_MASK;  // Invert the 13 LSBs.
   // Append the now inverted address.
-  data = (data << SANYO_LC7461_ADDRESS_BITS) | address;
+  data = (data << kSanyoLC7461AddressBits) | address;
   // Append the command.
-  data = (data << SANYO_LC7461_COMMAND_BITS) | command;
+  data = (data << kSanyoLC7461CommandBits) | command;
   command ^= SANYO_LC7461_COMMAND_MASK;  // Invert the command.
   // Append the now inverted command.
-  data = (data << SANYO_LC7461_COMMAND_BITS) | command;
+  data = (data << kSanyoLC7461CommandBits) | command;
 
   return data;
 }
@@ -127,17 +127,17 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
                                bool strict) {
-  if (strict && nbits != SANYO_LC7461_BITS)
+  if (strict && nbits != kSanyoLC7461Bits)
     return false;  // Not strictly in spec.
   // This protocol is basically a 42-bit variant of the NEC protocol.
   if (!decodeNEC(results, nbits, false))
     return false;  // Didn't match a NEC format (without strict)
 
   // Bits 30 to 42+.
-  uint16_t address = results->value >> (SANYO_LC7461_BITS -
-                                        SANYO_LC7461_ADDRESS_BITS);
+  uint16_t address = results->value >> (kSanyoLC7461Bits -
+                                        kSanyoLC7461AddressBits);
   // Bits 9 to 16.
-  uint8_t command = (results->value >> SANYO_LC7461_COMMAND_BITS) &
+  uint8_t command = (results->value >> kSanyoLC7461CommandBits) &
       SANYO_LC7461_COMMAND_MASK;
   // Compliance
   if (strict) {
@@ -145,7 +145,7 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
       return false;
     // Bits 17 to 29.
     uint16_t inverted_address =
-        (results->value >> (SANYO_LC7461_COMMAND_BITS * 2)) &
+        (results->value >> (kSanyoLC7461CommandBits * 2)) &
         SANYO_LC7461_ADDRESS_MASK;
     // Bits 1-8.
     uint8_t inverted_command = results->value & SANYO_LC7461_COMMAND_MASK;
@@ -184,7 +184,7 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
 bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + HEADER - 1)
     return false;  // Shorter than shortest possible.
-  if (strict && nbits != SANYO_SA8650B_BITS)
+  if (strict && nbits != kSanyoSA8650BBits)
     return false;  // Doesn't match the spec.
 
   uint16_t offset = 0;
@@ -223,7 +223,7 @@ bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
     offset++;
   }
 
-  if (strict && SANYO_SA8650B_BITS > (offset - 1U) / 2U)
+  if (strict && kSanyoSA8650BBits > (offset - 1U) / 2U)
     return false;
 
   // Success

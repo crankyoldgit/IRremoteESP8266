@@ -56,7 +56,7 @@ class IRMitsubishiAC {
   uint8_t* getRaw();
 
  private:
-  uint8_t remote_state[MITSUBISHI_AC_STATE_LENGTH];
+  uint8_t remote_state[kMitsubishiACStateLength];
   void checksum();
   IRsend _irsend;
 };

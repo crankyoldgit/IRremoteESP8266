@@ -24,7 +24,7 @@
 // Args:
 //   data:   The contents of the message you want to send.
 //   nbits:  The bit size of the message being sent.
-//           Typically MAGIQUEST_BITS.
+//           Typically kMagiquestBits.
 //   repeat: The number of times you want the message to be repeated.
 //
 // Status: Alpha / Should be working.
@@ -68,7 +68,7 @@ uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   Nr. of bits to expect in the data portion, inc. the 8 bit header.
-//            Typically MAGIQUEST_BITS.
+//            Typically kMagiquestBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -83,16 +83,16 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
   uint64_t data = 0;
   uint16_t offset = OFFSET_START;
 
-  if (results->rawlen < (2 * MAGIQUEST_BITS))  {
+  if (results->rawlen < (2 * kMagiquestBits))  {
     DPRINT("Not enough bits to be Magiquest - Rawlen: ");
     DPRINT(results->rawlen);
     DPRINT(" Expected: ");
-    DPRINTLN((2 * MAGIQUEST_BITS));
+    DPRINTLN((2 * kMagiquestBits));
     return false;
   }
 
   // Compliance
-  if (strict && nbits != MAGIQUEST_BITS)  return false;
+  if (strict && nbits != kMagiquestBits)  return false;
 
   // Of six wands as datapoints, so far they all start with 8 ZEROs.
   // For example, here is the data from two wands

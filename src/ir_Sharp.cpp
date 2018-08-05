@@ -33,16 +33,16 @@
 #define SHARP_GAP              (SHARP_GAP_TICKS * SHARP_TICK)
 
 // Address(5) + Command(8) + Expansion(1) + Check(1)
-#define SHARP_TOGGLE_MASK  ((1 << (SHARP_BITS - SHARP_ADDRESS_BITS)) - 1)
-#define SHARP_ADDRESS_MASK ((1 << SHARP_ADDRESS_BITS) - 1)
-#define SHARP_COMMAND_MASK ((1 << SHARP_COMMAND_BITS) - 1)
+#define SHARP_TOGGLE_MASK  ((1 << (kSharpBits - kSharpAddressBits)) - 1)
+#define SHARP_ADDRESS_MASK ((1 << kSharpAddressBits) - 1)
+#define SHARP_COMMAND_MASK ((1 << kSharpCommandBits) - 1)
 
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
 //
 // Args:
 //   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically SHARP_BITS.
+//   nbits:  Nr. of bits of data to be sent. Typically kSharpBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // Status: BETA / Previously working fine.
@@ -107,17 +107,17 @@ uint32_t IRsend::encodeSharp(uint16_t address, uint16_t command,
                              uint16_t expansion, uint16_t check,
                              bool MSBfirst) {
   // Mask any unexpected bits.
-  address &= ((1 << SHARP_ADDRESS_BITS) - 1);
-  command &= ((1 << SHARP_COMMAND_BITS) - 1);
+  address &= ((1 << kSharpAddressBits) - 1);
+  command &= ((1 << kSharpCommandBits) - 1);
   expansion &= 1;
   check &= 1;
 
   if (!MSBfirst) {  // Correct bit order if needed.
-    address = reverseBits(address, SHARP_ADDRESS_BITS);
-    command = reverseBits(command, SHARP_COMMAND_BITS);
+    address = reverseBits(address, kSharpAddressBits);
+    command = reverseBits(command, kSharpCommandBits);
   }
   // Concatinate all the bits.
-  return (address << (SHARP_COMMAND_BITS + 2)) | (command << 2) |
+  return (address << (kSharpCommandBits + 2)) | (command << 2) |
          (expansion << 1) | check;
 }
 
@@ -126,7 +126,7 @@ uint32_t IRsend::encodeSharp(uint16_t address, uint16_t command,
 // Args:
 //   address:  Address value to be sent.
 //   command:  Command value to be sent.
-//   nbits:    Nr. of bits of data to be sent. Typically SHARP_BITS.
+//   nbits:    Nr. of bits of data to be sent. Typically kSharpBits.
 //   repeat:   Nr. of additional times the message is to be sent.
 //
 // Status:  DEPRICATED / Previously working fine.
@@ -156,7 +156,7 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
 //
 // Args:
 //   results:   Ptr to the data to decode and where to store the decode result.
-//   nbits:     Nr. of data bits to expect. Typically SHARP_BITS.
+//   nbits:     Nr. of data bits to expect. Typically kSharpBits.
 //   strict:    Flag indicating if we should perform strict matching.
 //   expansion: Should we expect the expansion bit to be set. Default is true.
 // Returns:
@@ -179,7 +179,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
   if (strict) {
-    if (nbits != SHARP_BITS)
+    if (nbits != kSharpBits)
       return false;  // Request is out of spec.
     // DISABLED - See TODO
 #ifdef UNIT_TEST
@@ -269,7 +269,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   // Address & command are actually transmitted in LSB first order.
   results->address = reverseBits(data, nbits) & SHARP_ADDRESS_MASK;
   results->command = reverseBits((data >> 2) & SHARP_COMMAND_MASK,
-                                 SHARP_COMMAND_BITS);
+                                 kSharpCommandBits);
   return true;
 }
 #endif  // (DECODE_SHARP || DECODE_DENON)

@@ -79,7 +79,7 @@ bool IRrecv::decodeLasertag(decode_results *results, uint16_t nbits,
   if (results->rawlen < MIN_LASERTAG_SAMPLES) return false;
 
   // Compliance
-  if (strict && nbits != LASERTAG_BITS) return false;
+  if (strict && nbits != kLasertagBits) return false;
 
   uint16_t offset = OFFSET_START;
   uint16_t used = 0;
@@ -110,7 +110,7 @@ bool IRrecv::decodeLasertag(decode_results *results, uint16_t nbits,
 
   // Compliance
   if (actual_bits < nbits) return false;  // Less data than we expected.
-  if (strict && actual_bits != LASERTAG_BITS) return false;
+  if (strict && actual_bits != kLasertagBits) return false;
 
   // Success
   results->decode_type = LASERTAG;

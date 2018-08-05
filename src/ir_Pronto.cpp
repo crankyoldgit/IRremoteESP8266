@@ -49,14 +49,14 @@
 //           0x0030, 0x0018, 0x0018, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018,
 //           0x0018, 0x03f6};
 //       // Send the Pronto(Sony) code. Repeat twice as Sony's require that.
-//       sendPronto(prontoCode, 46, SONY_MIN_REPEAT);
+//       sendPronto(prontoCode, 46, kSonyMinRepeat);
 //
 // Ref:
 //   http://www.etcwiki.org/wiki/Pronto_Infrared_Format
 //   http://www.remotecentral.com/features/irdisp2.htm
 void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
   // Check we have enough data to work out what to send.
-  if (len < PRONTO_MIN_LENGTH) return;
+  if (len < kProntoMinLength) return;
 
   // We only know how to deal with 'raw' pronto codes types. Reject all others.
   if (data[PRONTO_TYPE_OFFSET] != 0) return;

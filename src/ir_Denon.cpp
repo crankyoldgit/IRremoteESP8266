@@ -55,9 +55,9 @@
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 //   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
 void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits >= PANASONIC_BITS)  // Is this really Panasonic?
+  if (nbits >= kPanasonicBits)  // Is this really Panasonic?
     sendPanasonic64(data, nbits, repeat);
-  else if (nbits == DENON_LEGACY_BITS)
+  else if (nbits == kDenonLegacyBits)
     // Support legacy (broken) calls of sendDenon().
     sendSharpRaw(data & (~0x2000ULL), nbits + 1, repeat);
   else
@@ -84,7 +84,7 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     switch (nbits) {
       case DENON_BITS:
       case DENON_48_BITS:
-      case DENON_LEGACY_BITS:
+      case kDenonLegacyBits:
         break;
       default:
         return false;
@@ -106,7 +106,7 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // Check we have enough data
     if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
       return false;
-    if (strict && nbits != DENON_LEGACY_BITS)
+    if (strict && nbits != kDenonLegacyBits)
       return false;
 
     uint64_t data = 0;

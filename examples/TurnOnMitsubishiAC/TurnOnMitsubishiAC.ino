@@ -43,7 +43,7 @@ void printState() {
   // Display the encoded IR sequence.
   unsigned char* ir_code = mitsubir.getRaw();
   Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kMitsubishiACStateLength; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }

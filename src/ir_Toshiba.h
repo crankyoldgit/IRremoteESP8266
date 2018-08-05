@@ -53,7 +53,7 @@ class IRToshibaAC {
   void setRaw(uint8_t newState[]);
   uint8_t* getRaw();
   static bool validChecksum(const uint8_t state[],
-                            const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+                            const uint16_t length = kToshibaACStateLength);
 #ifdef ARDUINO
   String toString();
 #else
@@ -63,10 +63,10 @@ class IRToshibaAC {
 
  private:
 #endif
-  uint8_t remote_state[TOSHIBA_AC_STATE_LENGTH];
-  void checksum(const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+  uint8_t remote_state[kToshibaACStateLength];
+  void checksum(const uint16_t length = kToshibaACStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
-                              const uint16_t length = TOSHIBA_AC_STATE_LENGTH);
+                              const uint16_t length = kToshibaACStateLength);
   uint8_t mode_state;
   IRsend _irsend;
 };

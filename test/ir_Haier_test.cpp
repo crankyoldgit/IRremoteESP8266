@@ -13,7 +13,7 @@
 TEST(TestSendHaierAC, SendDataOnly) {
   IRsendTest irsend(0);
   irsend.begin();
-  uint8_t haier_zero[HAIER_AC_STATE_LENGTH] = {
+  uint8_t haier_zero[kHaierACStateLength] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
   irsend.reset();
@@ -31,7 +31,7 @@ TEST(TestSendHaierAC, SendDataOnly) {
       "m520s650m520s650m520s650m520s650m520s650m520s650m520s650m520s650"
       "m520s150000", irsend.outputStr());
 
-  uint8_t haier_test[HAIER_AC_STATE_LENGTH] = {
+  uint8_t haier_test[kHaierACStateLength] = {
     0xA5, 0x01, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0xA7};
   irsend.reset();
   irsend.sendHaierAC(haier_test);
@@ -55,10 +55,10 @@ TEST(TestSendHaierAC, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t haier_test[HAIER_AC_STATE_LENGTH] = {
+  uint8_t haier_test[kHaierACStateLength] = {
     0xA5, 0x01, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0xA7};
   irsend.reset();
-  irsend.sendHaierAC(haier_test, HAIER_AC_STATE_LENGTH, 2);  // two repeats.
+  irsend.sendHaierAC(haier_test, kHaierACStateLength, 2);  // two repeats.
   EXPECT_EQ(
       "m3000s3000m3000s4300"
       "m520s1650m520s650m520s1650m520s650m520s650m520s1650m520s650m520s1650"
@@ -394,15 +394,15 @@ TEST(TestHaierACClass, MessageConstuction) {
             "Current Time: 10:15, On Timer: 13:52, Off Timer: 18:45",
             haier.toString());
 
-  uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACStateLength] = {
     0xA5, 0x96, 0xEA, 0xCF, 0x32, 0x2D, 0x0D, 0x74, 0xD4};
-  EXPECT_STATE_EQ(expectedState, haier.getRaw(), HAIER_AC_BITS);
+  EXPECT_STATE_EQ(expectedState, haier.getRaw(), kHaierACBits);
 
   // Check that the checksum is valid.
   EXPECT_TRUE(IRHaierAC::validChecksum(haier.getRaw()));
 
   // Now load up some random data.
-  uint8_t randomState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t randomState[kHaierACStateLength] = {
       0x52, 0x49, 0x50, 0x20, 0x54, 0x61, 0x6C, 0x69, 0x61};
   EXPECT_FALSE(IRHaierAC::validChecksum(randomState));
   haier.setRaw(randomState);
@@ -695,7 +695,7 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
 
 // Decode "real" state messages.
 TEST(TestHaierACYRW02Class, RealStates) {
-  uint8_t expectedState1[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState1[kHaierACYRW02StateLength] = {
       0xA6, 0xE1, 0x00, 0x00, 0x40, 0x20, 0x00,
       0x80, 0x00, 0x00, 0x00, 0x00, 0x07, 0x6E};
 
@@ -706,7 +706,7 @@ TEST(TestHaierACYRW02Class, RealStates) {
             " Health: Off",
             haier.toString());
 
-  uint8_t expectedState2[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState2[kHaierACYRW02StateLength] = {
       0xA6, 0xE0, 0x00, 0x00, 0x00, 0x20, 0x00,
       0x80, 0x00, 0x00, 0x00, 0x00, 0x05, 0x75};
   haier.setRaw(expectedState2);
@@ -715,7 +715,7 @@ TEST(TestHaierACYRW02Class, RealStates) {
             " Health: Off",
             haier.toString());
 
-  uint8_t expectedState3[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState3[kHaierACYRW02StateLength] = {
       0xA6, 0x02, 0x00, 0x02, 0x40, 0x20, 0x00,
       0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x2B};
   haier.setRaw(expectedState3);
@@ -725,7 +725,7 @@ TEST(TestHaierACYRW02Class, RealStates) {
             haier.toString());
 
   // cool 25, health, fan auto, swing auto,  sleep on
-  uint8_t expectedState4[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState4[kHaierACYRW02StateLength] = {
       0xA6, 0x9C, 0x00, 0x02, 0x40, 0xA8, 0x00,
       0x20, 0x80, 0x00, 0x00, 0x00, 0x0B, 0xD7};
   haier.setRaw(expectedState4);
@@ -735,7 +735,7 @@ TEST(TestHaierACYRW02Class, RealStates) {
             haier.toString());
 
   // cool 25, health, fan 3, swing auto,  sleep on
-  uint8_t expectedState5[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState5[kHaierACYRW02StateLength] = {
       0xA6, 0x9C, 0x00, 0x02, 0x40, 0x27, 0x36,
       0x20, 0x80, 0x00, 0x00, 0x00, 0x04, 0x85};
   haier.setRaw(expectedState5);
@@ -754,16 +754,16 @@ TEST(TestDecodeHaierAC, NormalDecodeWithStrict) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACStateLength] = {
       0xA5, 0x01, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0xA7};
 
   // With the specific decoder.
   irsend.reset();
   irsend.sendHaierAC(expectedState);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeHaierAC(&irsend.capture, HAIER_AC_BITS, true));
+  ASSERT_TRUE(irrecv.decodeHaierAC(&irsend.capture, kHaierACBits, true));
   EXPECT_EQ(HAIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
@@ -773,7 +773,7 @@ TEST(TestDecodeHaierAC, NormalDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HAIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
@@ -797,14 +797,14 @@ TEST(TestDecodeHaierAC, RealExample1) {
       714, 550, 582, 552, 582, 578, 568, 552, 712, 552, 582, 550, 582, 550,
       582, 550, 712, 552, 582, 550, 582, 552, 582, 578, 722, 552, 1704, 550,
       582, 550, 1706, 550, 736, 550, 582, 550, 1706, 550, 1704, 552, 1704, 578};
-  uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACStateLength] = {
       0xA5, 0x01, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0xA7};
 
   irsend.sendRaw(rawData, 149, 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(HAIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
@@ -835,14 +835,14 @@ TEST(TestDecodeHaierAC, RealExample2) {
       550, 582, 550, 582, 580, 568, 552, 712, 550, 584, 550, 582, 550, 584, 550,
       712, 550, 582, 550, 582, 550, 582, 578, 722, 550, 582, 552, 580, 552, 582,
       550, 738, 550, 1706, 550, 1704, 552, 582, 550, 582, 578};
-  uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACStateLength] = {
       0xA5, 0x66, 0x20, 0x01, 0x00, 0xC0, 0x20, 0x00, 0x0C};
 
   irsend.sendRaw(rawData, 149, 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(HAIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
@@ -873,14 +873,14 @@ TEST(TestDecodeHaierAC, RealExample3) {
       714, 550, 582, 550, 582, 578, 568, 552, 712, 552, 582, 550, 582, 550, 582,
       550, 712, 550, 584, 550, 582, 552, 582, 578, 722, 552, 1704, 550, 582,
       550, 1706, 550, 1862, 550, 1706, 550, 582, 550, 1704, 552, 582, 578};
-  uint8_t expectedState[HAIER_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACStateLength] = {
       0xA5, 0xEC, 0x20, 0x09, 0x20, 0xC0, 0x20, 0x00, 0xBA};
 
   irsend.sendRaw(rawData, 149, 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(HAIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
@@ -898,7 +898,7 @@ TEST(TestDecodeHaierAC_YRW02, NormalDecode) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t expectedState[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACYRW02StateLength] = {
       0xA6, 0x12, 0x00, 0x02, 0x40, 0x20, 0x00,
       0x20, 0x00, 0x00, 0x00, 0x00, 0x05, 0x3F};
 
@@ -907,7 +907,7 @@ TEST(TestDecodeHaierAC_YRW02, NormalDecode) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HAIER_AC_YRW02, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_YRW02_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACYRW02Bits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
@@ -937,7 +937,7 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
       540, 564, 522, 486, 590, 590, 538, 560, 524, 488, 588, 588, 1598, 514,
       608, 564, 1600, 548, 536, 586, 538, 568, 1594, 590, 1618, 578, 1606, 606,
       1582, 590, 1596, 590, 1616, 580};
-  uint8_t expectedState[HAIER_AC_YRW02_STATE_LENGTH] = {
+  uint8_t expectedState[kHaierACYRW02StateLength] = {
       0xA6, 0x12, 0x00, 0x02, 0x40, 0x20, 0x00,
       0x20, 0x00, 0x00, 0x00, 0x00, 0x05, 0x3F};
 
@@ -945,7 +945,7 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(HAIER_AC_YRW02, irsend.capture.decode_type);
-  EXPECT_EQ(HAIER_AC_YRW02_BITS, irsend.capture.bits);
+  EXPECT_EQ(kHaierACYRW02Bits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 

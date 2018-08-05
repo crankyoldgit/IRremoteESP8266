@@ -69,7 +69,7 @@ TEST(TestSendDish, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendDISH(0x9C00, DISH_BITS, 0);  // 0 repeats.
+  irsend.sendDISH(0x9C00, kDishBits, 0);  // 0 repeats.
   EXPECT_EQ(
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
@@ -77,7 +77,7 @@ TEST(TestSendDish, SendWithRepeats) {
       "m400s6100", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendDISH(0x9C00, DISH_BITS, 1);  // 1 repeat.
+  irsend.sendDISH(0x9C00, kDishBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
@@ -87,7 +87,7 @@ TEST(TestSendDish, SendWithRepeats) {
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
       "m400s6100", irsend.outputStr());
 
-  irsend.sendDISH(0x9C00, DISH_BITS, 2);  // 2 repeats.
+  irsend.sendDISH(0x9C00, kDishBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
@@ -173,9 +173,9 @@ TEST(TestDecodeDish, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendDISH(0x9C00);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, true));
+  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
   EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(DISH_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDishBits, irsend.capture.bits);
   EXPECT_EQ(0x9C00, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -192,7 +192,7 @@ TEST(TestDecodeDish, DecodeWithNonStrictSize) {
   irsend.sendDISH(0x12, 8);  // Illegal size Dish message. (smaller)
   irsend.makeDecodeResult();
 
-  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, true));
+  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -209,7 +209,7 @@ TEST(TestDecodeDish, DecodeWithNonStrictSize) {
   irsend.sendDISH(0x12345678, 32);  // Illegal size Dish message. (larger)
   irsend.makeDecodeResult();
 
-  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, true));
+  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -256,9 +256,9 @@ TEST(TestDecodeDish, DecodeGlobalCacheExample) {
   irsend.sendGC(gc_test_dtv, 27);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, true));
+  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
   EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(DISH_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDishBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -266,7 +266,7 @@ TEST(TestDecodeDish, DecodeGlobalCacheExample) {
 
   ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture));
   EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(DISH_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDishBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -285,9 +285,9 @@ TEST(TestDecodeDish, DecodeGlobalCacheExample) {
   irsend.sendGC(gc_test_hopper, 73);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, true));
+  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
   EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(DISH_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDishBits, irsend.capture.bits);
   EXPECT_EQ(0x9C00, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -295,7 +295,7 @@ TEST(TestDecodeDish, DecodeGlobalCacheExample) {
 
   ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture));
   EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(DISH_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDishBits, irsend.capture.bits);
   EXPECT_EQ(0x9C00, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -317,5 +317,5 @@ TEST(TestDecodeDish, FailToDecodeNonDishExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, DISH_BITS, false));
+  ASSERT_FALSE(irrecv.decodeDISH(&irsend.capture, kDishBits, false));
 }

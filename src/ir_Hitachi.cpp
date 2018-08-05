@@ -36,7 +36,7 @@
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HITACHI_AC_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiACStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: ALPHA / Untested.
@@ -45,7 +45,7 @@
 //   https://github.com/markszabo/IRremoteESP8266/issues/417
 void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
-  if (nbytes < HITACHI_AC_STATE_LENGTH)
+  if (nbytes < kHitachiACStateLength)
     return;  // Not enough bytes to send a proper message.
   sendGeneric(HITACHI_AC_HDR_MARK, HITACHI_AC_HDR_SPACE,
               HITACHI_AC_BIT_MARK, HITACHI_AC_ONE_SPACE,
@@ -63,7 +63,7 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HITACHI_AC1_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAC1StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: BETA / Appears to work.
@@ -73,7 +73,7 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 //   Basically the same as sendHitatchiAC() except different size and header.
 void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
-  if (nbytes < HITACHI_AC1_STATE_LENGTH)
+  if (nbytes < kHitachiAC1StateLength)
     return;  // Not enough bytes to send a proper message.
   sendGeneric(HITACHI_AC1_HDR_MARK, HITACHI_AC1_HDR_SPACE,
               HITACHI_AC_BIT_MARK, HITACHI_AC_ONE_SPACE,
@@ -91,7 +91,7 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HITACHI_AC2_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAC2StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: BETA / Appears to work.
@@ -101,7 +101,7 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 //   Basically the same as sendHitatchiAC() except different size.
 void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
-  if (nbytes < HITACHI_AC2_STATE_LENGTH)
+  if (nbytes < kHitachiAC2StateLength)
     return;  // Not enough bytes to send a proper message.
   sendHitachiAC(data, nbytes, repeat);
 }
@@ -113,7 +113,7 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   The number of data bits to expect.
-//            Typically HITACHI_AC_BITS, HITACHI_AC1_BITS, HITACHI_AC2_BITS
+//            Typically kHitachiACBits, kHitachiAC1Bits, kHitachiAC2Bits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -133,9 +133,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
     return false;  // Can't possibly be a valid HitachiAC message.
   if (strict) {
     switch (nbits) {
-      case HITACHI_AC_BITS:
-      case HITACHI_AC1_BITS:
-      case HITACHI_AC2_BITS:
+      case kHitachiACBits:
+      case kHitachiAC1Bits:
+      case kHitachiAC2Bits:
         break;  // Okay to continue.
       default:
         return false;  // Not strictly a Hitachi message.
@@ -146,7 +146,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
   match_result_t data_result;
 
   // Header
-  if (nbits == HITACHI_AC1_BITS) {
+  if (nbits == kHitachiAC1Bits) {
     if (!matchMark(results->rawbuf[offset++], HITACHI_AC1_HDR_MARK, kTolerance))
       return false;
     if (!matchSpace(results->rawbuf[offset++], HITACHI_AC1_HDR_SPACE,
@@ -185,9 +185,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     switch (dataBitsSoFar / 8) {
-      case HITACHI_AC_STATE_LENGTH:
-      case HITACHI_AC1_STATE_LENGTH:
-      case HITACHI_AC2_STATE_LENGTH:
+      case kHitachiACStateLength:
+      case kHitachiAC1StateLength:
+      case kHitachiAC2StateLength:
         break;  // Continue
       default:
         return false;
@@ -196,13 +196,13 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
 
   // Success
   switch (dataBitsSoFar) {
-    case HITACHI_AC1_BITS:
+    case kHitachiAC1Bits:
       results->decode_type = HITACHI_AC1;
       break;
-    case HITACHI_AC2_BITS:
+    case kHitachiAC2Bits:
       results->decode_type = HITACHI_AC2;
       break;
-    case HITACHI_AC_BITS:
+    case kHitachiACBits:
     default:
       results->decode_type = HITACHI_AC;
   }

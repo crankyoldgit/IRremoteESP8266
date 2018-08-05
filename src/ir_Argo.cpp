@@ -21,13 +21,13 @@ Copyright 2017 Schmolders
 // Send an Argo A/C message.
 //
 // Args:
-//   data: An array of ARGO_COMMAND_LENGTH bytes containing the IR command.
+//   data: An array of kArgoStateLength bytes containing the IR command.
 //
 // Status: ALPHA / Untested.
 
 void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
   // Check if we have enough bytes to send a proper message.
-  if (nbytes < ARGO_COMMAND_LENGTH) return;
+  if (nbytes < kArgoStateLength) return;
   // TODO(kaschmo): validate
   sendGeneric(ARGO_HDR_MARK, ARGO_HDR_SPACE,
               ARGO_BIT_MARK, ARGO_ONE_SPACE,
@@ -70,7 +70,7 @@ void IRArgoAC::checksum() {
 }
 
 void IRArgoAC::stateReset() {
-  for (uint8_t i = 0; i < ARGO_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < kArgoStateLength; i++)
     argo[i] = 0x0;
 
   // Argo Message. Store MSB left.
