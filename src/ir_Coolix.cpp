@@ -17,20 +17,19 @@
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
 // pulse parameters in usec
-#define COOLIX_TICK             560U  // Approximately 21 cycles at 38kHz
-#define COOLIX_BIT_MARK_TICKS     1U
-#define COOLIX_BIT_MARK         (COOLIX_BIT_MARK_TICKS * COOLIX_TICK)
-#define COOLIX_ONE_SPACE_TICKS    3U
-#define COOLIX_ONE_SPACE        (COOLIX_ONE_SPACE_TICKS * COOLIX_TICK)
-#define COOLIX_ZERO_SPACE_TICKS   1U
-#define COOLIX_ZERO_SPACE       (COOLIX_ZERO_SPACE_TICKS * COOLIX_TICK)
-#define COOLIX_HDR_MARK_TICKS     8U
-#define COOLIX_HDR_MARK         (COOLIX_HDR_MARK_TICKS * COOLIX_TICK)
-#define COOLIX_HDR_SPACE_TICKS    8U
-#define COOLIX_HDR_SPACE        (COOLIX_HDR_SPACE_TICKS * COOLIX_TICK)
-#define COOLIX_MIN_GAP_TICKS    (COOLIX_HDR_MARK_TICKS + \
-                                 COOLIX_ZERO_SPACE_TICKS)
-#define COOLIX_MIN_GAP          (COOLIX_MIN_GAP_TICKS * COOLIX_TICK)
+const uint16_t kCoolixTick = 560;  // Approximately 21 cycles at 38kHz
+const uint16_t kCoolixBitMarkTicks = 1;
+const uint16_t kCoolixBitMark = kCoolixBitMarkTicks * kCoolixTick;
+const uint16_t kCoolixOneSpaceTicks = 3;
+const uint16_t kCoolixOneSpace = kCoolixOneSpaceTicks * kCoolixTick;
+const uint16_t kCoolixZeroSpaceTicks = 1;
+const uint16_t kCoolixZeroSpace = kCoolixZeroSpaceTicks * kCoolixTick;
+const uint16_t kCoolixHdrMarkTicks = 8;
+const uint16_t kCoolixHdrMark = kCoolixHdrMarkTicks * kCoolixTick;
+const uint16_t kCoolixHdrSpaceTicks = 8;
+const uint16_t kCoolixHdrSpace = kCoolixHdrSpaceTicks * kCoolixTick;
+const uint16_t kCoolixMinGapTicks = kCoolixHdrMarkTicks + kCoolixZeroSpaceTicks;
+const uint16_t kCoolixMinGap = kCoolixMinGapTicks * kCoolixTick;
 
 #if SEND_COOLIX
 // Send a Coolix message
@@ -54,8 +53,8 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
-    mark(COOLIX_HDR_MARK);
-    space(COOLIX_HDR_SPACE);
+    mark(kCoolixHdrMark);
+    space(kCoolixHdrSpace);
 
     // Data
     //   Break data into byte segments, starting at the Most Significant
@@ -64,18 +63,18 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
       // Grab a bytes worth of data.
       uint8_t segment = (data >> (nbits - i)) & 0xFF;
       // Normal
-      sendData(COOLIX_BIT_MARK, COOLIX_ONE_SPACE,
-               COOLIX_BIT_MARK, COOLIX_ZERO_SPACE,
+      sendData(kCoolixBitMark, kCoolixOneSpace,
+               kCoolixBitMark, kCoolixZeroSpace,
                segment, 8, true);
       // Inverted.
-      sendData(COOLIX_BIT_MARK, COOLIX_ONE_SPACE,
-               COOLIX_BIT_MARK, COOLIX_ZERO_SPACE,
+      sendData(kCoolixBitMark, kCoolixOneSpace,
+               kCoolixBitMark, kCoolixZeroSpace,
                segment ^ 0xFF, 8, true);
     }
 
     // Footer
-    mark(COOLIX_BIT_MARK);
-    space(COOLIX_MIN_GAP);  // Pause before repeating
+    mark(kCoolixBitMark);
+    space(kCoolixMinGap);  // Pause before repeating
   }
 }
 #endif
@@ -110,28 +109,28 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
     return false;  // We can't possibly capture a Coolix packet that big.
 
   // Header
-  if (!matchMark(results->rawbuf[offset], COOLIX_HDR_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset], kCoolixHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
   uint32_t m_tick = results->rawbuf[offset++] *
-      kRawTick / COOLIX_HDR_MARK_TICKS;
-  if (!matchSpace(results->rawbuf[offset], COOLIX_HDR_SPACE)) return false;
+      kRawTick / kCoolixHdrMarkTicks;
+  if (!matchSpace(results->rawbuf[offset], kCoolixHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
   uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      COOLIX_HDR_SPACE_TICKS;
+      kCoolixHdrSpaceTicks;
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
   for (uint16_t i = 0; i < nbits * 2; i++, offset++) {
     bool flip = (i / 8) % 2;
-    if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK_TICKS * m_tick))
+    if (!matchMark(results->rawbuf[offset++], kCoolixBitMarkTicks * m_tick))
       return false;
-    if (matchSpace(results->rawbuf[offset], COOLIX_ONE_SPACE_TICKS * s_tick)) {
+    if (matchSpace(results->rawbuf[offset], kCoolixOneSpaceTicks * s_tick)) {
       if (flip)
         inverted = (inverted << 1) | 1;
       else
         data = (data << 1) | 1;
     } else if (matchSpace(results->rawbuf[offset],
-                          COOLIX_ZERO_SPACE_TICKS * s_tick)) {
+                          kCoolixZeroSpaceTicks * s_tick)) {
       if (flip)
         inverted <<= 1;
       else
@@ -142,10 +141,10 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], COOLIX_BIT_MARK_TICKS * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kCoolixBitMarkTicks * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], COOLIX_MIN_GAP_TICKS * s_tick))
+      !matchAtLeast(results->rawbuf[offset], kCoolixMinGapTicks * s_tick))
     return false;
 
   // Compliance
