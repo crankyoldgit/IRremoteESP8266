@@ -101,7 +101,7 @@ void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php
 bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   if (results->rawlen <= 4)
     return false;  // Not enough entries to ever be RCMM.
@@ -122,10 +122,10 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
   // Header decode
   if (!matchMark(results->rawbuf[offset], RCMM_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK / RCMM_HDR_MARK_TICKS;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / RCMM_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], RCMM_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK / RCMM_HDR_SPACE_TICKS;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick / RCMM_HDR_SPACE_TICKS;
 
   // Data decode
   // RC-MM has two bits of data per mark/space pair.
@@ -138,10 +138,10 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
     // Use non-default tolerance & excess for matching some of the spaces as the
     // defaults are too generous and causes mis-matches in some cases.
     if (match(results->rawbuf[offset], RCMM_BIT_SPACE_0_TICKS * s_tick,
-              TOLERANCE))
+              kTolerance))
       data += 0;
     else if (match(results->rawbuf[offset], RCMM_BIT_SPACE_1_TICKS * s_tick,
-                   TOLERANCE))
+                   kTolerance))
       data += 1;
     else if (match(results->rawbuf[offset], RCMM_BIT_SPACE_2_TICKS * s_tick,
                    RCMM_TOLERANCE))

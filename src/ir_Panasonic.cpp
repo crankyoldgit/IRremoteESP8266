@@ -124,22 +124,22 @@ uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
                              bool strict, uint32_t manufacturer) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Not enough entries to be a Panasonic message.
   if (strict && nbits != kPanasonicBits)
     return false;  // Request is out of spec.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
       PANASONIC_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], PANASONIC_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       PANASONIC_HDR_SPACE_TICKS;
 
   // Data

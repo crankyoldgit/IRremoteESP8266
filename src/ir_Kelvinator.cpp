@@ -453,13 +453,13 @@ std::string IRKelvinatorAC::toString() {
 bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
                               bool strict) {
   if (results->rawlen < 2 * (nbits + KELVINATOR_CMD_FOOTER_BITS) +
-                        (HEADER + FOOTER + 1) * 2 - 1)
+                        (kHeader + kFooter + 1) * 2 - 1)
     return false;  // Can't possibly be a valid Kelvinator message.
   if (strict && nbits != kKelvinatorBits)
     return false;  // Not strictly a Kelvinator message.
 
   uint32_t data;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // There are two messages back-to-back in a full Kelvinator IR message
   // sequence.
@@ -470,12 +470,12 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
     // Header
     if (!matchMark(results->rawbuf[offset], KELVINATOR_HDR_MARK)) return false;
     // Calculate how long the lowest tick time is based on the header mark.
-    uint32_t mark_tick = results->rawbuf[offset++] * RAWTICK /
+    uint32_t mark_tick = results->rawbuf[offset++] * kRawTick /
         KELVINATOR_HDR_MARK_TICKS;
     if (!matchSpace(results->rawbuf[offset], KELVINATOR_HDR_SPACE))
       return false;
     // Calculate how long the common tick time is based on the header space.
-    uint32_t space_tick = results->rawbuf[offset++] * RAWTICK /
+    uint32_t space_tick = results->rawbuf[offset++] * kRawTick /
         KELVINATOR_HDR_SPACE_TICKS;
 
     // Data (Command) (32 bits)

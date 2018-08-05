@@ -104,12 +104,12 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < 2 * nbits + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kFooter - 1)
     return false;  // Shorter than shortest possibly expected.
   if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint64_t data = 0;
 
   // No Header
@@ -117,7 +117,8 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
   if (!matchMark(results->rawbuf[offset], MITSUBISHI_BIT_MARK, 30))
     return false;
   // Calculate how long the common tick time is based on the initial mark.
-  uint32_t tick = results->rawbuf[offset] * RAWTICK / MITSUBISHI_BIT_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset] *
+      kRawTick / MITSUBISHI_BIT_MARK_TICKS;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
@@ -210,12 +211,12 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://github.com/markszabo/IRremoteESP8266/issues/441
 bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
                                bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + (FOOTER * 2) - 1)
+  if (results->rawlen < 2 * nbits + kHeader + (kFooter * 2) - 1)
     return false;  // Shorter than shortest possibly expected.
   if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint64_t data = 0;
   uint16_t actualBits = 0;
 

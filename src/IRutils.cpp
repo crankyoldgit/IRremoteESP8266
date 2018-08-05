@@ -178,7 +178,7 @@ bool hasACState(const decode_type_t protocol) {
 uint16_t getCorrectedRawLength(const decode_results *results) {
   uint16_t extended_length = results->rawlen - 1;
   for (uint16_t i = 0; i < results->rawlen - 1; i++) {
-    uint32_t usecs = results->rawbuf[i] * RAWTICK;
+    uint32_t usecs = results->rawbuf[i] * kRawTick;
     // Add two extra entries for multiple larger than UINT16_MAX it is.
     extended_length += (usecs / (UINT16_MAX + 1)) * 2;
   }
@@ -204,7 +204,7 @@ std::string resultToSourceCode(const decode_results *results) {
   // Dump data
   for (uint16_t i = 1; i < results->rawlen; i++) {
     uint32_t usecs;
-    for (usecs = results->rawbuf[i] * RAWTICK;
+    for (usecs = results->rawbuf[i] * kRawTick;
          usecs > UINT16_MAX;
          usecs -= UINT16_MAX) {
       output += uint64ToString(UINT16_MAX);
@@ -281,7 +281,7 @@ std::string resultToTimingInfo(const decode_results *results) {
       output += "-";  // even
     else
       output += "   +";  // odd
-    value = uint64ToString(results->rawbuf[i] * RAWTICK);
+    value = uint64ToString(results->rawbuf[i] * kRawTick);
     // Space pad the value till it is at least 6 chars long.
     while (value.length() < 6)
       value = " " + value;

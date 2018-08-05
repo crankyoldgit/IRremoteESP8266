@@ -15,40 +15,42 @@
 #include "IRremoteESP8266.h"
 
 // Constants
-#define HEADER         2U  // Usual nr. of header entries.
-#define FOOTER         2U  // Usual nr. of footer (stop bits) entries.
-#define OFFSET_START   1U  // Usual rawbuf entry to start processing from.
+const uint16_t kHeader = 2;  // Usual nr. of header entries.
+const uint16_t kFooter = 2;  // Usual nr. of footer (stop bits) entries.
+const uint16_t kStartOffset = 1;  // Usual rawbuf entry to start from.
 #define MS_TO_USEC(x)  (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
-#define MARK_EXCESS   50U
-#define RAWBUF       100U  // Default length of raw capture buffer
+const uint16_t kMarkExcess = 50;
+const uint16_t kRawBuf = 100;  // Default length of raw capture buffer
 #define REPEAT UINT64_MAX
-#define UNKNOWN_THRESHOLD 6U  // Default min size of reported UNKNOWN messages.
+// Default min size of reported UNKNOWN messages.
+const uint16_t kUnknownThreshold = 6;
+
 // receiver states
-#define STATE_IDLE     2U
-#define STATE_MARK     3U
-#define STATE_SPACE    4U
-#define STATE_STOP     5U
-#define TOLERANCE     25U  // default percent tolerance in measurements
-#define RAWTICK        2U  // Capture tick to uSec factor.
+const uint8_t kIdleState = 2;
+const uint8_t kMarkState = 3;
+const uint8_t kSpaceState = 4;
+const uint8_t kStopState = 5;
+const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
+const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
 // How long (ms) before we give up wait for more data?
 // Don't exceed MAX_TIMEOUT_MS without a good reason.
-// That is the capture buffers maximum value size. (UINT16_MAX / RAWTICK)
+// That is the capture buffers maximum value size. (UINT16_MAX / kRawTick)
 // Typically messages/protocols tend to repeat around the 100ms timeframe,
 // thus we should timeout before that to give us some time to try to decode
 // before we need to start capturing a possible new message.
 // Typically 15ms suits most applications. However, some protocols demand a
 // higher value. e.g. 90ms for XMP-1 and some aircon units.
 #define TIMEOUT_MS    15U  // In MilliSeconds.
-#define MAX_TIMEOUT_MS (RAWTICK * UINT16_MAX / MS_TO_USEC(1))
+#define MAX_TIMEOUT_MS (kRawTick * UINT16_MAX / MS_TO_USEC(1))
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
-#define FNV_PRIME_32 16777619UL
-#define FNV_BASIS_32 2166136261UL
+const uint32_t kFnvPrime32 = 16777619UL;
+const uint32_t kFnvBasis32 = 2166136261UL;
 
 // Hitachi AC is the current largest state size.
-#define STATE_SIZE_MAX kHitachiAC2StateLength
+const uint16_t kStateSizeMax = kHitachiAC2StateLength;
 
 // Types
 // information for the interrupt handler
@@ -88,7 +90,7 @@ class decode_results {
       uint32_t command;  // Decoded command.
     };
 #if DECODE_AC  // Only include state if we must. It's big.
-    uint8_t state[STATE_SIZE_MAX];  // Complex multi-byte A/C result.
+    uint8_t state[kStateSizeMax];  // Complex multi-byte A/C result.
 #endif
   };
   uint16_t bits;  // Number of bits in decoded value
@@ -101,7 +103,7 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
-  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF,
+  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = kRawBuf,
                   uint8_t timeout = TIMEOUT_MS,
                   bool save_buffer = false);  // Constructor
   ~IRrecv();  // Destructor
@@ -114,13 +116,13 @@ class IRrecv {
   void setUnknownThreshold(uint16_t length);
 #endif
   static bool match(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
+                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
   static bool matchMark(uint32_t measured, uint32_t desired,
-                        uint8_t tolerance = TOLERANCE,
-                        int16_t excess = MARK_EXCESS);
+                        uint8_t tolerance = kTolerance,
+                        int16_t excess = kMarkExcess);
   static bool matchSpace(uint32_t measured, uint32_t desired,
-                         uint8_t tolerance = TOLERANCE,
-                         int16_t excess = MARK_EXCESS);
+                         uint8_t tolerance = kTolerance,
+                         int16_t excess = kMarkExcess);
 #ifndef UNIT_TEST
 
  private:
@@ -132,16 +134,16 @@ class IRrecv {
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
-  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = kTolerance,
                            uint16_t delta = 0);
-  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = kTolerance,
                            uint16_t delta = 0);
   bool matchAtLeast(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
+                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
-                           const uint8_t tolerance = TOLERANCE);
+                           const uint8_t tolerance = kTolerance);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
@@ -172,8 +174,8 @@ class IRrecv {
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
-                     uint16_t bitTime, uint8_t tolerance = TOLERANCE,
-                     int16_t excess = MARK_EXCESS, uint16_t delta = 0);
+                     uint16_t bitTime, uint8_t tolerance = kTolerance,
+                     int16_t excess = kMarkExcess, uint16_t delta = 0);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t nbits = kRC5XBits,

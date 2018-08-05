@@ -296,11 +296,11 @@ std::string IRToshibaAC::toString() {
 //
 bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
                              bool strict) {
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint16_t dataBitsSoFar = 0;
 
   // Have we got enough data to successfully decode?
-  if (results->rawlen < kToshibaACBits + HEADER + FOOTER - 1)
+  if (results->rawlen < kToshibaACBits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid message.
 
 

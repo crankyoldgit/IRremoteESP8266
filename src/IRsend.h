@@ -22,12 +22,12 @@
 // Offset (in microseconds) to use in Period time calculations to account for
 // code excution time in producing the software PWM signal.
 // Value was calculated on Wemos D1 mini using v2.4.1 with v2.4.0 ESP core
-#define PERIOD_OFFSET -5
-#define DUTY_DEFAULT 50
-#define DUTY_MAX 100  // Percentage
+const int8_t kPeriodOffset = -5;
+const uint8_t kDutyDefault = 50;  // Percentage
+const uint8_t kDutyMax = 100;  // Percentage
 // delayMicroseconds() is only accurate to 16383us.
 // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-#define MAX_ACCURATE_USEC_DELAY 16383U
+const uint16_t kMaxAccurateUsecDelay = 16383;
 
 // Classes
 class IRsend {
@@ -35,7 +35,7 @@ class IRsend {
   explicit IRsend(uint16_t IRsendPin, bool inverted = false,
                   bool use_modulation = true);
   void begin();
-  void enableIROut(uint32_t freq, uint8_t duty = DUTY_DEFAULT);
+  void enableIROut(uint32_t freq, uint8_t duty = kDutyDefault);
   VIRTUAL void _delayMicroseconds(uint32_t usec);
   VIRTUAL uint16_t mark(uint16_t usec);
   VIRTUAL void space(uint32_t usec);

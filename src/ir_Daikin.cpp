@@ -723,7 +723,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   if (strict && nbits != kDaikinRawBits)
     return false;
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   unsigned char daikin_code[kDaikinStateLength + 2];
   for (uint8_t i = 0; i < kDaikinStateLength+2; i++)
     daikin_code[i] = 0;

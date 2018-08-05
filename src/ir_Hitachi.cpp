@@ -129,7 +129,7 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
                              bool strict) {
   const uint8_t kTolerance = 30;
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid HitachiAC message.
   if (strict) {
     switch (nbits) {
@@ -141,7 +141,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
         return false;  // Not strictly a Hitachi message.
     }
   }
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint16_t dataBitsSoFar = 0;
   match_result_t data_result;
 

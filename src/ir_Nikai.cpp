@@ -64,22 +64,22 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Status: STABLE / Working.
 //
 bool IRrecv::decodeNikai(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid Nikai message.
   if (strict && nbits != kNikaiBits)
     return false;  // We expect Nikai to be a certain sized message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], NIKAI_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
       NIKAI_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], NIKAI_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       NIKAI_HDR_SPACE_TICKS;
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

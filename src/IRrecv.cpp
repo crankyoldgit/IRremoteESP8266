@@ -35,7 +35,7 @@ irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
   if (irparams.rawlen)
-    irparams.rcvstate = STATE_STOP;
+    irparams.rcvstate = kStopState;
   os_intr_unlock();
 }
 
@@ -57,20 +57,20 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 
   if (rawlen >= irparams.bufsize) {
     irparams.overflow = true;
-    irparams.rcvstate = STATE_STOP;
+    irparams.rcvstate = kStopState;
   }
 
-  if (irparams.rcvstate == STATE_STOP)
+  if (irparams.rcvstate == kStopState)
     return;
 
-  if (irparams.rcvstate == STATE_IDLE) {
-    irparams.rcvstate = STATE_MARK;
+  if (irparams.rcvstate == kIdleState) {
+    irparams.rcvstate = kMarkState;
     irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / RAWTICK;
+      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / kRawTick;
     else
-      irparams.rawbuf[rawlen] = (now - start) / RAWTICK;
+      irparams.rawbuf[rawlen] = (now - start) / kRawTick;
   }
   irparams.rawlen++;
 
@@ -85,7 +85,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 // Class constructor
 // Args:
 //   recvpin: GPIO pin the IR receiver module's data pin is connected to.
-//   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
+//   bufsize: Nr. of entries to have in the capture buffer. (Default: kRawBuf)
 //   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
 //            (Default: TIMEOUT_MS)
 //   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
@@ -122,7 +122,7 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
     irparams_save = NULL;
   }
 #if DECODE_HASH
-  unknown_threshold = UNKNOWN_THRESHOLD;
+  unknown_threshold = kUnknownThreshold;
 #endif  // DECODE_HASH
 }
 
@@ -159,7 +159,7 @@ void IRrecv::disableIRIn() {
 }
 
 void IRrecv::resume() {
-  irparams.rcvstate = STATE_IDLE;
+  irparams.rcvstate = kIdleState;
   irparams.rawlen = 0;
   irparams.overflow = false;
 }
@@ -167,7 +167,7 @@ void IRrecv::resume() {
 // Make a copy of the interrupt state & buffer data.
 // Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
 // Only call this when you know the interrupt handlers won't modify anything.
-// i.e. In STATE_STOP.
+// i.e. In kStopState.
 //
 // Args:
 //   src: Pointer to an irparams_t structure to copy from.
@@ -223,7 +223,7 @@ void IRrecv::setUnknownThreshold(uint16_t length) {
 bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
-  if (irparams.rcvstate != STATE_STOP)
+  if (irparams.rcvstate != kStopState)
     return false;
 #endif
 
@@ -540,7 +540,7 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance, uint16_t delta) {
-  measured *= RAWTICK;  // Convert to uSecs.
+  measured *= kRawTick;  // Convert to uSecs.
   DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(" <= ");
@@ -566,7 +566,7 @@ bool IRrecv::match(uint32_t measured, uint32_t desired,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance, uint16_t delta) {
-  measured *= RAWTICK;  // Convert to uSecs.
+  measured *= kRawTick;  // Convert to uSecs.
   DPRINT("Matching ATLEAST ");
   DPRINT(measured);
   DPRINT(" vs ");
@@ -602,7 +602,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
   DPRINT("Matching MARK ");
-  DPRINT(measured * RAWTICK);
+  DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
@@ -625,7 +625,7 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
   DPRINT("Matching SPACE ");
-  DPRINT(measured * RAWTICK);
+  DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
@@ -669,7 +669,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   // Require at least some samples to prevent triggering on noise
   if (results->rawlen < unknown_threshold)
     return false;
-  int32_t hash = FNV_BASIS_32;
+  int32_t hash = kFnvBasis32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
   // however it is left this way for compatibility with previously captured
@@ -677,7 +677,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   for (uint16_t i = 1; i < results->rawlen - 2; i++) {
     int16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
     // Add value into the hash
-    hash = (hash * FNV_PRIME_32) ^ value;
+    hash = (hash * kFnvPrime32) ^ value;
   }
   results->value = hash & 0xFFFFFFFF;
   results->bits = results->rawlen / 2;

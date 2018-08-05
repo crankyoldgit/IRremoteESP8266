@@ -114,11 +114,11 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   if (strict && nbits != kJVCBits)
     return false;  // Must be called with the correct nr. of bits.
-  if (results->rawlen < 2 * nbits + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kFooter - 1)
     return false;  // Can't possibly be a valid JVC message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   bool isRepeat = true;
 
   uint32_t m_tick;
@@ -127,12 +127,12 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   // (Optional as repeat codes don't have the header)
   if (matchMark(results->rawbuf[offset], JVC_HDR_MARK)) {
     isRepeat = false;
-    m_tick = results->rawbuf[offset++] * RAWTICK / JVC_HDR_MARK_TICKS;
+    m_tick = results->rawbuf[offset++] * kRawTick / JVC_HDR_MARK_TICKS;
     if (results->rawlen < 2 * nbits + 4)
       return false;  // Can't possibly be a valid JVC message with a header.
     if (!matchSpace(results->rawbuf[offset], JVC_HDR_SPACE))
       return false;
-    s_tick = results->rawbuf[offset++] * RAWTICK / JVC_HDR_SPACE_TICKS;
+    s_tick = results->rawbuf[offset++] * kRawTick / JVC_HDR_SPACE_TICKS;
   } else {
     // We can't easily auto-calibrate as there is no header, so assume
     // the default tick time.

@@ -228,7 +228,7 @@ TEST(TestDecodeSharp, NormalDecodeWithRepeatAndStrict) {
   EXPECT_EQ(0x07, irsend.capture.address);
   EXPECT_EQ(0x99, irsend.capture.command);
 
-  irsend.makeDecodeResult(2 * (2 * kSharpBits + FOOTER));
+  irsend.makeDecodeResult(2 * (2 * kSharpBits + kFooter));
   ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);

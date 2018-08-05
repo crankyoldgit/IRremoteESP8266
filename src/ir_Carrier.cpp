@@ -67,14 +67,14 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < ((2 * nbits + HEADER + FOOTER) * 3) - 1)
+  if (results->rawlen < ((2 * nbits + kHeader + kFooter) * 3) - 1)
     return false;  // Can't possibly be a valid Carrier message.
   if (strict && nbits != kCarrierACBits)
     return false;  // We expect Carrier to be 32 bits of message.
 
   uint64_t data = 0;
   uint64_t prev_data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   for (uint8_t i = 0; i < 3; i++) {
     prev_data = data;

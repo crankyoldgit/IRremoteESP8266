@@ -121,19 +121,19 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/nec.php
 bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1 &&
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 &&
       results->rawlen != NEC_RPT_LENGTH)
     return false;  // Can't possibly be a valid NEC message.
   if (strict && nbits != kNECBits)
     return false;  // Not strictly an NEC message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], NEC_HDR_MARK)) return false;
   // Calculate how long the lowest tick time is based on the header mark.
-  uint32_t mark_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t mark_tick = results->rawbuf[offset++] * kRawTick /
       NEC_HDR_MARK_TICKS;
   // Check if it is a repeat code.
   if (results->rawlen == NEC_RPT_LENGTH &&
@@ -151,7 +151,7 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Header (cont.)
   if (!matchSpace(results->rawbuf[offset], NEC_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t space_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t space_tick = results->rawbuf[offset++] * kRawTick /
       NEC_HDR_SPACE_TICKS;
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,

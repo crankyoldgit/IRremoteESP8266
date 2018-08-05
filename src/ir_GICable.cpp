@@ -72,13 +72,13 @@ void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Status: Alpha / Not tested against a real device.
 bool IRrecv::decodeGICable(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * (nbits + HEADER + FOOTER) - 1)
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
     return false;  // Can't possibly be a valid GICABLE message.
   if (strict && nbits != kGICableBits)
     return false;  // Not strictly an GICABLE message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset++], GICABLE_HDR_MARK)) return false;

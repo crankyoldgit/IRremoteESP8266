@@ -86,14 +86,14 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
 bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * nbits + 2 * HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + 2 * kHeader + kFooter - 1)
      return false;  // We don't have enough entries to possibly match.
 
   // Compliance
   if (strict && nbits != kWhynterBits)
     return false;  // Incorrect nr. of bits per spec.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
   // Sequence begins with a bit mark and a zero space.
@@ -104,11 +104,11 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   // Main header mark and space
   if (!matchMark(results->rawbuf[offset], WHYNTER_HDR_MARK)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
       WHYNTER_HDR_MARK_TICKS;
   if (!matchSpace(results->rawbuf[offset], WHYNTER_HDR_SPACE)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       WHYNTER_HDR_SPACE_TICKS;
 
   // Data
