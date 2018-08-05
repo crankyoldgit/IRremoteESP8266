@@ -40,7 +40,7 @@
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=GREE_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kGreeStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: ALPHA / Untested.
@@ -48,7 +48,7 @@
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
 void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < GREE_STATE_LENGTH)
+  if (nbytes < kGreeStateLength)
     return;  // Not enough bytes to send a proper message.
 
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -78,7 +78,7 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
 //
 // Args:
 //   data: The raw message to be sent.
-//   nbits: Nr. of bits of data in the message. (Default is GREE_BITS)
+//   nbits: Nr. of bits of data in the message. (Default is kGreeBits)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: ALPHA / Untested.
@@ -86,7 +86,7 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
 void IRsend::sendGree(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits != GREE_BITS)
+  if (nbits != kGreeBits)
     return;  // Wrong nr. of bits to send a proper message.
   // Set IR carrier frequency
   enableIROut(38);
@@ -121,7 +121,7 @@ IRGreeAC::IRGreeAC(uint16_t pin) : _irsend(pin) {
 
 void IRGreeAC::stateReset() {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.
-  for (uint8_t i = 0; i < GREE_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kGreeStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[1] = 0x09;
   remote_state[2] = 0x20;
@@ -151,7 +151,7 @@ uint8_t* IRGreeAC::getRaw() {
 }
 
 void IRGreeAC::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < GREE_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kGreeStateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
@@ -413,7 +413,7 @@ std::string IRGreeAC::toString() {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically GREE_BITS.
+//   nbits:   The number of data bits to expect. Typically kGreeBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -423,7 +423,7 @@ bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * (nbits + GREE_BLOCK_FOOTER_BITS) +
                         (HEADER + FOOTER + 1))
     return false;  // Can't possibly be a valid Gree message.
-  if (strict && nbits != GREE_BITS)
+  if (strict && nbits != kGreeBits)
     return false;  // Not strictly a Gree message.
 
   uint32_t data;
@@ -482,7 +482,7 @@ bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   // Compliance
   if (strict) {
     // Correct size/length)
-    if (state_pos != GREE_STATE_LENGTH) return false;
+    if (state_pos != kGreeStateLength) return false;
     // Verify the message's checksum is correct.
     if (!IRGreeAC::validChecksum(results->state)) return false;
   }

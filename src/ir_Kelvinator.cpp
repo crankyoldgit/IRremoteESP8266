@@ -73,14 +73,14 @@
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=KELVINATOR_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kKelvinatorStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: STABLE / Known working.
 //
 void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
-  if (nbytes < KELVINATOR_STATE_LENGTH)
+  if (nbytes < kKelvinatorStateLength)
     return;  // Not enough bytes to send a proper message.
 
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -131,7 +131,7 @@ IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
 }
 
 void IRKelvinatorAC::stateReset() {
-  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kKelvinatorStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[3] = 0x50;
   remote_state[11] = 0x70;
@@ -161,7 +161,7 @@ uint8_t* IRKelvinatorAC::getRaw() {
 }
 
 void IRKelvinatorAC::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kKelvinatorStateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
@@ -444,7 +444,7 @@ std::string IRKelvinatorAC::toString() {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically KELVINATOR_BITS.
+//   nbits:   The number of data bits to expect. Typically kKelvinatorBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -455,7 +455,7 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
   if (results->rawlen < 2 * (nbits + KELVINATOR_CMD_FOOTER_BITS) +
                         (HEADER + FOOTER + 1) * 2 - 1)
     return false;  // Can't possibly be a valid Kelvinator message.
-  if (strict && nbits != KELVINATOR_BITS)
+  if (strict && nbits != kKelvinatorBits)
     return false;  // Not strictly a Kelvinator message.
 
   uint32_t data;
@@ -546,7 +546,7 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
   // Compliance
   if (strict) {
     // Correct size/length)
-    if (state_pos != KELVINATOR_STATE_LENGTH) return false;
+    if (state_pos != kKelvinatorStateLength) return false;
     // Verify the message's checksum is correct.
     if (!IRKelvinatorAC::validChecksum(results->state)) return false;
   }

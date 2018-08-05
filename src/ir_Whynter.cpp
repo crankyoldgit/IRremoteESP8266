@@ -35,7 +35,7 @@
                                           WHYNTER_TICK)
 #define WHYNTER_MIN_GAP_TICKS            (WHYNTER_MIN_COMMAND_LENGTH_TICKS - \
     (2 * (WHYNTER_BIT_MARK_TICKS + WHYNTER_ZERO_SPACE_TICKS) + \
-     WHYNTER_BITS * (WHYNTER_BIT_MARK_TICKS + WHYNTER_ONE_SPACE_TICKS)))
+     kWhynterBits * (WHYNTER_BIT_MARK_TICKS + WHYNTER_ONE_SPACE_TICKS)))
 #define WHYNTER_MIN_GAP                  (WHYNTER_MIN_GAP_TICKS * WHYNTER_TICK)
 
 #if SEND_WHYNTER
@@ -90,7 +90,7 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
      return false;  // We don't have enough entries to possibly match.
 
   // Compliance
-  if (strict && nbits != WHYNTER_BITS)
+  if (strict && nbits != kWhynterBits)
     return false;  // Incorrect nr. of bits per spec.
 
   uint16_t offset = OFFSET_START;

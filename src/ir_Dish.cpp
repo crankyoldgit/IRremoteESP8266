@@ -73,7 +73,7 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically DISH_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. Typically kDishBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -91,7 +91,7 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Not enough entries to be valid.
-  if (strict && nbits != DISH_BITS)
+  if (strict && nbits != kDishBits)
     return false;  // Not strictly compliant.
 
   uint64_t data = 0;

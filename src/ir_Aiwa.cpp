@@ -26,7 +26,7 @@
 // Args:
 //   data:   The message to be sent.
 //   nbits:  The number of bits of the message to be sent.
-//           Typically AIWA_RC_T501_BITS. Max is 37 = (64 - 27)
+//           Typically kAiwaRcT501Bits. Max is 37 = (64 - 27)
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: BETA / Should work.
@@ -52,7 +52,7 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically AIWA_RC_T501_BITS.
+//   nbits:   The number of data bits to expect. Typically kAiwaRcT501Bits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -71,7 +71,7 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
 bool IRrecv::decodeAiwaRCT501(decode_results *results, uint16_t nbits,
                               bool strict) {
   // Compliance
-  if (strict && nbits != AIWA_RC_T501_BITS)
+  if (strict && nbits != kAiwaRcT501Bits)
     return false;  // Doesn't match our protocol defn.
 
   // Add on the pre & post bits to our requested bit length.

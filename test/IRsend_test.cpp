@@ -101,7 +101,7 @@ TEST(TestSendRaw, GeneralUse) {
   irsend.reset();
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
+  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, kNECBits, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0xC3E0E0E8, irsend.capture.value);
@@ -135,7 +135,7 @@ TEST(TestSendRaw, NoTrailingGap) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
 }
 
 TEST(TestLowLevelSend, MarkFrequencyModulationAt38kHz) {

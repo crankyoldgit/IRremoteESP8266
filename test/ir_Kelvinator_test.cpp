@@ -15,7 +15,7 @@ TEST(TestSendKelvinator, SendDataOnly) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t kelv_code[KELVINATOR_STATE_LENGTH] = {
+  uint8_t kelv_code[kKelvinatorStateLength] = {
       0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
       0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0};
   irsend.reset();
@@ -53,12 +53,12 @@ TEST(TestSendKelvinator, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t kelv_code[KELVINATOR_STATE_LENGTH] = {
+  uint8_t kelv_code[kKelvinatorStateLength] = {
       0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
       0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0};
   irsend.reset();
 
-  irsend.sendKelvinator(kelv_code, KELVINATOR_STATE_LENGTH, 1);
+  irsend.sendKelvinator(kelv_code, kKelvinatorStateLength, 1);
   EXPECT_EQ(
       "m9010s4505"
       "m680s1530m680s510m680s510m680s1530m680s1530m680s510m680s510m680s510"
@@ -374,7 +374,7 @@ TEST(TestKelvinatorClass, FanSpeed) {
 }
 
 TEST(TestKelvinatorClass, Checksums) {
-  uint8_t kelv_code[KELVINATOR_STATE_LENGTH] = {
+  uint8_t kelv_code[kKelvinatorStateLength] = {
       0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
       0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0};
 
@@ -396,21 +396,21 @@ TEST(TestKelvinatorClass, Checksums) {
 
 TEST(TestKelvinatorClass, SetAndGetRaw) {
   IRKelvinatorAC irkelv(0);
-  uint8_t initialState[KELVINATOR_STATE_LENGTH] = {
+  uint8_t initialState[kKelvinatorStateLength] = {
       0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0xA0,
       0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0xA0};
-  uint8_t expectedState[KELVINATOR_STATE_LENGTH] = {
+  uint8_t expectedState[kKelvinatorStateLength] = {
       0x08, 0x05, 0x20, 0x50, 0x00, 0x00, 0x00, 0x70,
       0x08, 0x05, 0x20, 0x70, 0x00, 0x00, 0x00, 0x70};
 
-  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), KELVINATOR_BITS);
+  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), kKelvinatorBits);
   // toggle the power state.
   irkelv.setPower(!irkelv.getPower());
   irkelv.setTemp(21);
   irkelv.setLight(true);
-  EXPECT_STATE_EQ(expectedState, irkelv.getRaw(), KELVINATOR_BITS);
+  EXPECT_STATE_EQ(expectedState, irkelv.getRaw(), kKelvinatorBits);
   irkelv.setRaw(initialState);
-  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), KELVINATOR_BITS);
+  EXPECT_STATE_EQ(initialState, irkelv.getRaw(), kKelvinatorBits);
 }
 
 TEST(TestKelvinatorClass, HumanReadable) {
@@ -500,7 +500,7 @@ TEST(TestDecodeKelvinator, NormalSynthetic) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t kelv_code[KELVINATOR_STATE_LENGTH] = {
+  uint8_t kelv_code[kKelvinatorStateLength] = {
       0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
       0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0};
   irsend.reset();
@@ -508,6 +508,6 @@ TEST(TestDecodeKelvinator, NormalSynthetic) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(KELVINATOR, irsend.capture.decode_type);
-  ASSERT_EQ(KELVINATOR_BITS, irsend.capture.bits);
-  EXPECT_STATE_EQ(kelv_code, irsend.capture.state, KELVINATOR_BITS);
+  ASSERT_EQ(kKelvinatorBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(kelv_code, irsend.capture.state, kKelvinatorBits);
 }

@@ -15,7 +15,7 @@ TEST(TestSendGreeChars, SendData) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t gree_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_code[kGreeStateLength] = {
       0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF};
   irsend.reset();
   irsend.sendGree(gree_code);
@@ -61,11 +61,11 @@ TEST(TestSendGreeChars, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t gree_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_code[kGreeStateLength] = {
       0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF};
   irsend.reset();
 
-  irsend.sendGree(gree_code, GREE_STATE_LENGTH, 1);
+  irsend.sendGree(gree_code, kGreeStateLength, 1);
   EXPECT_EQ(
     "m9000s4000"
     "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
@@ -98,7 +98,7 @@ TEST(TestSendGreeUint64, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendGree(0x1234567890ABCDEF, GREE_BITS, 1);
+  irsend.sendGree(0x1234567890ABCDEF, kGreeBits, 1);
   EXPECT_EQ(
     "m9000s4000"
     "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
@@ -131,16 +131,16 @@ TEST(TestSendGreeChars, SendUnexpectedSizes) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t gree_short_code[GREE_STATE_LENGTH - 1] = {
+  uint8_t gree_short_code[kGreeStateLength - 1] = {
       0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD};
-  uint8_t gree_long_code[GREE_STATE_LENGTH + 1] = {
+  uint8_t gree_long_code[kGreeStateLength + 1] = {
       0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12};
   irsend.reset();
-  irsend.sendGree(gree_short_code, GREE_STATE_LENGTH - 1);
+  irsend.sendGree(gree_short_code, kGreeStateLength - 1);
   ASSERT_EQ("", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendGree(gree_long_code, GREE_STATE_LENGTH + 1);
+  irsend.sendGree(gree_long_code, kGreeStateLength + 1);
   ASSERT_EQ(
     "m9000s4000"
     "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
@@ -162,11 +162,11 @@ TEST(TestSendGreeUint64, SendUnexpectedSizes) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendGree(0x1234567890ABCDEF, GREE_BITS - 1);
+  irsend.sendGree(0x1234567890ABCDEF, kGreeBits - 1);
   ASSERT_EQ("", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendGree(0x1234567890ABCDEF, GREE_BITS + 1);
+  irsend.sendGree(0x1234567890ABCDEF, kGreeBits + 1);
   ASSERT_EQ("", irsend.outputStr());
 }
 
@@ -174,7 +174,7 @@ TEST(TestSendGree, CompareUint64ToCharResults) {
   IRsendTest irsend_chars(4);
   IRsendTest irsend_uint64(0);
 
-  uint8_t gree_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_code[kGreeStateLength] = {
       0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF};
 
   irsend_chars.begin();
@@ -186,7 +186,7 @@ TEST(TestSendGree, CompareUint64ToCharResults) {
   irsend_uint64.sendGree(0x1234567890ABCDEF);
   ASSERT_EQ(irsend_chars.outputStr(), irsend_uint64.outputStr());
 
-  uint8_t gree_zero_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_zero_code[kGreeStateLength] = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   irsend_chars.reset();
   irsend_uint64.reset();
@@ -407,12 +407,12 @@ TEST(TestGreeClass, VerticalSwing) {
 
 TEST(TestGreeClass, SetAndGetRaw) {
   IRGreeAC irgree(0);
-  uint8_t initialState[GREE_STATE_LENGTH] = {
+  uint8_t initialState[kGreeStateLength] = {
       0x00, 0x09, 0x20, 0x50, 0x00, 0x20, 0x00, 0x50};
-  uint8_t expectedState[GREE_STATE_LENGTH] = {
+  uint8_t expectedState[kGreeStateLength] = {
       0xA9, 0x05, 0xD0, 0x50, 0x00, 0x20, 0x00, 0xA0};
 
-  EXPECT_STATE_EQ(initialState, irgree.getRaw(), GREE_BITS);
+  EXPECT_STATE_EQ(initialState, irgree.getRaw(), kGreeBits);
 
   // toggle the power state.
   irgree.setPower(!irgree.getPower());
@@ -432,9 +432,9 @@ TEST(TestGreeClass, SetAndGetRaw) {
   EXPECT_TRUE(irgree.getSleep());
   EXPECT_TRUE(irgree.getXFan());
 
-  EXPECT_STATE_EQ(expectedState, irgree.getRaw(), GREE_BITS);
+  EXPECT_STATE_EQ(expectedState, irgree.getRaw(), kGreeBits);
   irgree.setRaw(initialState);
-  EXPECT_STATE_EQ(initialState, irgree.getRaw(), GREE_BITS);
+  EXPECT_STATE_EQ(initialState, irgree.getRaw(), kGreeBits);
 }
 
 TEST(TestGreeClass, HumanReadable) {
@@ -467,7 +467,7 @@ TEST(TestDecodeGree, NormalSynthetic) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t gree_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_code[kGreeStateLength] = {
       0x00, 0x09, 0x20, 0x50, 0x00, 0x20, 0x00, 0x50};
 
   irsend.reset();
@@ -475,8 +475,8 @@ TEST(TestDecodeGree, NormalSynthetic) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GREE, irsend.capture.decode_type);
-  ASSERT_EQ(GREE_BITS, irsend.capture.bits);
-  EXPECT_STATE_EQ(gree_code, irsend.capture.state, GREE_BITS);
+  ASSERT_EQ(kGreeBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(gree_code, irsend.capture.state, kGreeBits);
 }
 
 // Decode a synthetic Gree message.
@@ -486,7 +486,7 @@ TEST(TestDecodeGree, NormalRealExample) {
   IRGreeAC irgree(4);
   irsend.begin();
 
-  uint8_t gree_code[GREE_STATE_LENGTH] = {
+  uint8_t gree_code[kGreeStateLength] = {
       0x19, 0x0A, 0x60, 0x50, 0x02, 0x23, 0x00, 0xF0};
 
   // Ref: https://github.com/markszabo/IRremoteESP8266/issues/386
@@ -507,8 +507,8 @@ TEST(TestDecodeGree, NormalRealExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GREE, irsend.capture.decode_type);
-  ASSERT_EQ(GREE_BITS, irsend.capture.bits);
-  EXPECT_STATE_EQ(gree_code, irsend.capture.state, GREE_BITS);
+  ASSERT_EQ(kGreeBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(gree_code, irsend.capture.state, kGreeBits);
   irgree.setRaw(irsend.capture.state);
   EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1, Turbo: Off, "
             "XFan: Off, Light: On, Sleep: Off, Swing Vertical Mode: Manual, "

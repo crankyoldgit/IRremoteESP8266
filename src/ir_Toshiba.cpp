@@ -40,15 +40,15 @@
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=TOSHIBA_AC_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kToshibaACStateLength)
 //   repeat: Nr. of times the message is to be repeated.
-//          (Default = TOSHIBA_AC_MIN_REPEAT).
+//          (Default = kToshibaACMinRepeat).
 //
 // Status: StABLE / Working.
 //
 void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
-  if (nbytes < TOSHIBA_AC_STATE_LENGTH)
+  if (nbytes < kToshibaACStateLength)
     return;  // Not enough bytes to send a proper message.
   sendGeneric(TOSHIBA_AC_HDR_MARK, TOSHIBA_AC_HDR_SPACE,
               TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ONE_SPACE,
@@ -75,14 +75,14 @@ void IRToshibaAC::stateReset() {
   // Known good state obtained from:
   //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L103
   // Note: Can't use the following because it requires -std=c++11
-  // uint8_t remote_state[TOSHIBA_AC_STATE_LENGTH] = {
+  // uint8_t remote_state[kToshibaACStateLength] = {
   //    0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00 };
   remote_state[0] = 0xF2;
   remote_state[1] = 0x0D;
   remote_state[2] = 0x03;
   remote_state[3] = 0xFC;
   remote_state[4] = 0x01;
-  for (uint8_t i = 5; i < TOSHIBA_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 5; i < kToshibaACStateLength; i++)
     remote_state[i] = 0;
   mode_state = remote_state[6] & 0b00000011;
   checksum();  // Calculate the checksum
@@ -109,7 +109,7 @@ uint8_t* IRToshibaAC::getRaw() {
 
 // Override the internal state with the new state.
 void IRToshibaAC::setRaw(uint8_t newState[]) {
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kToshibaACStateLength; i++) {
     remote_state[i] = newState[i];
   }
   mode_state = getMode(true);
@@ -285,7 +285,7 @@ std::string IRToshibaAC::toString() {
 // Places successful decode information in the results pointer.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically TOSHIBA_AC_BITS.
+//   nbits:   The number of data bits to expect. Typically kToshibaACBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -300,12 +300,12 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   uint16_t dataBitsSoFar = 0;
 
   // Have we got enough data to successfully decode?
-  if (results->rawlen < TOSHIBA_AC_BITS + HEADER + FOOTER - 1)
+  if (results->rawlen < kToshibaACBits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid message.
 
 
   // Compliance
-  if (strict && nbits != TOSHIBA_AC_BITS)
+  if (strict && nbits != kToshibaACBits)
     return false;  // Must be called with the correct nr. of bytes.
 
   // Header
@@ -315,7 +315,7 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
     return false;
 
   // Data
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kToshibaACStateLength; i++) {
     // Read a byte's worth of data.
     match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
                                            TOSHIBA_AC_BIT_MARK,

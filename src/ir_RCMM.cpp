@@ -90,7 +90,7 @@ void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Places successful decode information in the results pointer.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically RCMM_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. Typically kRCMMBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.

@@ -65,7 +65,7 @@
 //
 // Args:
 //   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically MITSUBISHI_BITS.
+//   nbits:  Nr. of bits of data to be sent. Typically kMitsubishiBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // Status: ALPHA / untested.
@@ -106,7 +106,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
                               bool strict) {
   if (results->rawlen < 2 * nbits + FOOTER - 1)
     return false;  // Shorter than shortest possibly expected.
-  if (strict && nbits != MITSUBISHI_BITS)
+  if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
   uint16_t offset = OFFSET_START;
@@ -158,7 +158,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 //
 // Args:
 //   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically MITSUBISHI_BITS.
+//   nbits:  Nr. of bits of data to be sent. Typically kMitsubishiBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // Status: ALPHA / untested.
@@ -212,7 +212,7 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
                                bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + (FOOTER * 2) - 1)
     return false;  // Shorter than shortest possibly expected.
-  if (strict && nbits != MITSUBISHI_BITS)
+  if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
   uint16_t offset = OFFSET_START;
@@ -273,15 +273,15 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=MITSUBISHI_AC_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kMitsubishiACStateLength)
 //   repeat: Nr. of times the message is to be repeated.
-//          (Default = MITSUBISHI_AC_MIN_REPEAT).
+//          (Default = kMitsubishiACMinRepeat).
 //
 // Status: BETA / Appears to be working.
 //
 void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
-  if (nbytes < MITSUBISHI_AC_STATE_LENGTH)
+  if (nbytes < kMitsubishiACStateLength)
     return;  // Not enough bytes to send a proper message.
 
   sendGeneric(MITSUBISHI_AC_HDR_MARK, MITSUBISHI_AC_HDR_SPACE,
@@ -311,7 +311,7 @@ void IRMitsubishiAC::stateReset() {
   // Known good state obtained from:
   //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
   // Note: Can't use the following because it requires -std=c++11
-  // uint8_t known_good_state[MITSUBISHI_AC_STATE_LENGTH] = {
+  // uint8_t known_good_state[kMitsubishiACStateLength] = {
   //    0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
   //    0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
   remote_state[0] = 0x23;
@@ -325,9 +325,9 @@ void IRMitsubishiAC::stateReset() {
   remote_state[8] = 0x30;
   remote_state[9] = 0x45;
   remote_state[10] = 0x67;
-  for (uint8_t i = 11; i < MITSUBISHI_AC_STATE_LENGTH - 1; i++)
+  for (uint8_t i = 11; i < kMitsubishiACStateLength - 1; i++)
     remote_state[i] = 0;
-  remote_state[MITSUBISHI_AC_STATE_LENGTH - 1] = 0x1F;
+  remote_state[kMitsubishiACStateLength - 1] = 0x1F;
   checksum();  // Calculate the checksum
 }
 

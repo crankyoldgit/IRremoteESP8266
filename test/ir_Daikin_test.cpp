@@ -13,7 +13,7 @@ TEST(TestSendDaikin, SendDataOnly) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3};
@@ -69,13 +69,13 @@ TEST(TestSendDaikin, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3};
   irsend.reset();
 
-  irsend.sendDaikin(daikin_code, DAIKIN_COMMAND_LENGTH, 1);
+  irsend.sendDaikin(daikin_code, kDaikinStateLength, 1);
   EXPECT_EQ(
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
@@ -164,21 +164,21 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t daikin_short_code[DAIKIN_COMMAND_LENGTH - 1] = {
+  uint8_t daikin_short_code[kDaikinStateLength - 1] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00};
 
   irsend.reset();
-  irsend.sendDaikin(daikin_short_code, DAIKIN_COMMAND_LENGTH - 1);
+  irsend.sendDaikin(daikin_short_code, kDaikinStateLength - 1);
   ASSERT_EQ("", irsend.outputStr());
 
-  uint8_t daikin_long_code[DAIKIN_COMMAND_LENGTH + 1] = {
+  uint8_t daikin_long_code[kDaikinStateLength + 1] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3, 0x11};
   irsend.reset();
-  irsend.sendDaikin(daikin_long_code, DAIKIN_COMMAND_LENGTH + 1);
+  irsend.sendDaikin(daikin_long_code, kDaikinStateLength + 1);
   ASSERT_EQ(
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
@@ -598,27 +598,27 @@ TEST(TestDaikinClass, RenderTime) {
 
 TEST(TestDaikinClass, SetAndGetRaw) {
   IRDaikinESP irdaikin(0);
-  uint8_t initialState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t initialState[kDaikinStateLength] = {
     0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
     0x11, 0xDA, 0x27, 0x00, 0x00, 0x49, 0x1E, 0x00,
     0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x4F};
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
     0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
     0x11, 0xDA, 0x27, 0x00, 0x00, 0x48, 0x2A, 0x00,
     0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x02, 0x5A};
 
-  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), kDaikinBits);
   // toggle the power state.
   irdaikin.setPower(!irdaikin.getPower());
   irdaikin.setTemp(21);
   irdaikin.setMold(true);
-  EXPECT_STATE_EQ(expectedState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(expectedState, irdaikin.getRaw(), kDaikinBits);
   irdaikin.setRaw(initialState);
-  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), kDaikinBits);
 }
 
 TEST(TestDaikinClass, ChecksumValidation) {
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE1};
@@ -746,11 +746,11 @@ TEST(TestDecodeDaikin, RealExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
       0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
       0x00, 0x00, 0x32};
-  uint16_t rawData[DAIKIN_RAW_BITS] = {
+  uint16_t rawData[kDaikinRawBits] = {
       416, 446,  416, 446,  416, 446,  418, 446,  416, 446,  416, 25434,
       3436, 1768,  390, 1336,  390, 446,  416, 446,  416, 446,  416, 1336,
       390, 446,  416, 446,  416, 446,  416, 446,  416, 1336,  390, 448,
@@ -802,11 +802,11 @@ TEST(TestDecodeDaikin, RealExample) {
       390, 1336,  390, 446,  416, 446,  416};  // Captured by @sillyfrog
 
   irsend.reset();
-  irsend.sendRaw(rawData, DAIKIN_RAW_BITS, 38000);
+  irsend.sendRaw(rawData, kDaikinRawBits, 38000);
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
-  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  ASSERT_EQ(kDaikinBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
@@ -817,7 +817,7 @@ TEST(TestDecodeDaikin, SyntheticExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
       0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
       0x00, 0x00, 0x32};
@@ -827,6 +827,6 @@ TEST(TestDecodeDaikin, SyntheticExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
-  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  ASSERT_EQ(kDaikinBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

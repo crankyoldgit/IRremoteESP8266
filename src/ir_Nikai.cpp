@@ -35,7 +35,7 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically NIKAI_BITS.
+//   nbits:  The bit size of the message being sent. typically kNikaiBits.
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: STABLE / Working.
@@ -56,7 +56,7 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   Nr. of bits to expect in the data portion.
-//            Typically NIKAI_BITS.
+//            Typically kNikaiBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -66,7 +66,7 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 bool IRrecv::decodeNikai(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid Nikai message.
-  if (strict && nbits != NIKAI_BITS)
+  if (strict && nbits != kNikaiBits)
     return false;  // We expect Nikai to be a certain sized message.
 
   uint64_t data = 0;

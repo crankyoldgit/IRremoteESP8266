@@ -341,7 +341,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Denon decode");
   if (decodeDenon(results, DENON_48_BITS) ||
       decodeDenon(results, DENON_BITS) ||
-      decodeDenon(results, DENON_LEGACY_BITS))
+      decodeDenon(results, kDenonLegacyBits))
     return true;
 #endif
 #if DECODE_PANASONIC
@@ -351,11 +351,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_LG
   DPRINTLN("Attempting LG (28-bit) decode");
-  if (decodeLG(results, LG_BITS, true))
+  if (decodeLG(results, kLGBits, true))
     return true;
   DPRINTLN("Attempting LG (32-bit) decode");
   // LG32 should be tried before Samsung
-  if (decodeLG(results, LG32_BITS, true))
+  if (decodeLG(results, kLG32Bits, true))
     return true;
 #endif
 #if DECODE_GICABLE
@@ -444,7 +444,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // other protocols that are NEC-like as well, as turning off strict may
   // cause this to match other valid protocols.
   DPRINTLN("Attempting NEC (non-strict) decode");
-  if (decodeNEC(results, NEC_BITS, false)) {
+  if (decodeNEC(results, kNECBits, false)) {
     results->decode_type = NEC_LIKE;
     return true;
   }
@@ -474,17 +474,17 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_HITACHI_AC2
   // HitachiAC2 should be checked before HitachiAC
   DPRINTLN("Attempting Hitachi AC2 decode");
-  if (decodeHitachiAC(results, HITACHI_AC2_BITS))
+  if (decodeHitachiAC(results, kHitachiAC2Bits))
     return true;
 #endif
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results, HITACHI_AC_BITS))
+  if (decodeHitachiAC(results, kHitachiACBits))
     return true;
 #endif
 #if DECODE_HITACHI_AC1
   DPRINTLN("Attempting Hitachi AC1 decode");
-  if (decodeHitachiAC(results, HITACHI_AC1_BITS))
+  if (decodeHitachiAC(results, kHitachiAC1Bits))
     return true;
 #endif
 #if DECODE_HASH

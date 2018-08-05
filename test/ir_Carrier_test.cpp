@@ -84,7 +84,7 @@ TEST(TestSendCarrierAC, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendCarrierAC(0x12345678, CARRIER_AC_BITS, 2);  // two repeats.
+  irsend.sendCarrierAC(0x12345678, kCarrierACBits, 2);  // two repeats.
   EXPECT_EQ(
     "m8532s4228"
     "m628s532m628s532m628s532m628s1320m628s532m628s532m628s1320m628s532"
@@ -153,9 +153,9 @@ TEST(TestDecodeCarrierAC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCarrierAC(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, CARRIER_AC_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kCarrierACBits, true));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(CARRIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCarrierACBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -164,9 +164,9 @@ TEST(TestDecodeCarrierAC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCarrierAC(0xB335ABE2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, CARRIER_AC_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kCarrierACBits, true));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(CARRIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCarrierACBits, irsend.capture.bits);
   EXPECT_EQ(0xB335ABE2, irsend.capture.value);
   EXPECT_EQ(0xB335, irsend.capture.address);
   EXPECT_EQ(0xABE2, irsend.capture.command);
@@ -178,7 +178,7 @@ TEST(TestDecodeCarrierAC, NormalDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(CARRIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCarrierACBits, irsend.capture.bits);
   EXPECT_EQ(0xB335ABE2, irsend.capture.value);
 }
 
@@ -211,7 +211,7 @@ TEST(TestDecodeCarrierAC, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
-  EXPECT_EQ(CARRIER_AC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCarrierACBits, irsend.capture.bits);
   EXPECT_EQ(0xB335ABE2, irsend.capture.value);
   EXPECT_EQ(0xB335, irsend.capture.address);
   EXPECT_EQ(0xABE2, irsend.capture.command);

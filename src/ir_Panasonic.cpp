@@ -36,7 +36,7 @@
 #define PANASONIC_END_GAP              5000U  // See issue #245
 #define PANASONIC_MIN_GAP_TICKS (PANASONIC_MIN_COMMAND_LENGTH_TICKS - \
     (PANASONIC_HDR_MARK_TICKS + PANASONIC_HDR_SPACE_TICKS + \
-     PANASONIC_BITS * (PANASONIC_BIT_MARK_TICKS + PANASONIC_ONE_SPACE_TICKS) + \
+     kPanasonicBits * (PANASONIC_BIT_MARK_TICKS + PANASONIC_ONE_SPACE_TICKS) + \
      PANASONIC_BIT_MARK_TICKS))
 #define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_GAP_TICKS * PANASONIC_TICK))
 #if (SEND_PANASONIC || SEND_DENON)
@@ -44,7 +44,7 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. (PANASONIC_BITS).
+//   nbits:  The number of bits of the message to be sent. (kPanasonicBits).
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: BETA / Should be working.
@@ -65,7 +65,7 @@ void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Args:
 //   address: The manufacturer code.
 //   data:    The data portion to be sent.
-//   nbits:   The number of bits of the message to be sent. (PANASONIC_BITS).
+//   nbits:   The number of bits of the message to be sent. (kPanasonicBits).
 //   repeat:  The number of times the command is to be repeated.
 //
 // Status: STABLE.
@@ -126,7 +126,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
                              bool strict, uint32_t manufacturer) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Not enough entries to be a Panasonic message.
-  if (strict && nbits != PANASONIC_BITS)
+  if (strict && nbits != kPanasonicBits)
     return false;  // Request is out of spec.
 
   uint64_t data = 0;

@@ -27,7 +27,7 @@
 #define GICABLE_MIN_COMMAND_LENGTH     99600U
 #define GICABLE_MIN_GAP (GICABLE_MIN_COMMAND_LENGTH - \
     (GICABLE_HDR_MARK + GICABLE_HDR_SPACE + \
-     GICABLE_BITS * (GICABLE_BIT_MARK + GICABLE_ONE_SPACE) + GICABLE_BIT_MARK))
+     kGICableBits * (GICABLE_BIT_MARK + GICABLE_ONE_SPACE) + GICABLE_BIT_MARK))
 
 
 #if SEND_GICABLE
@@ -36,7 +36,7 @@
 // Args:
 //   data:   The message to be sent.
 //   nbits:  The number of bits of the message to be sent.
-//           Typically GICABLE_BITS.
+//           Typically kGICableBits.
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: Alpha / Untested.
@@ -64,7 +64,7 @@ void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically GICABLE_BITS.
+//   nbits:   The number of data bits to expect. Typically kGICableBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -74,7 +74,7 @@ bool IRrecv::decodeGICable(decode_results *results, uint16_t nbits,
                            bool strict) {
   if (results->rawlen < 2 * (nbits + HEADER + FOOTER) - 1)
     return false;  // Can't possibly be a valid GICABLE message.
-  if (strict && nbits != GICABLE_BITS)
+  if (strict && nbits != kGICableBits)
     return false;  // Not strictly an GICABLE message.
 
   uint64_t data = 0;

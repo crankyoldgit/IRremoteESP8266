@@ -42,7 +42,7 @@ void printState() {
   // Display the encoded IR sequence.
   unsigned char* ir_code = toshibair.getRaw();
   Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kToshibaACStateLength; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }

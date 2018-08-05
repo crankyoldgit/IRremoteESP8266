@@ -54,7 +54,7 @@ TEST(TestSendCoolix, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendCOOLIX(0xAA55AA, COOLIX_BITS, 1);  // 1 repeat.
+  irsend.sendCOOLIX(0xAA55AA, kCoolixBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m4480s4480"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -72,7 +72,7 @@ TEST(TestSendCoolix, SendWithRepeats) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s5040", irsend.outputStr());
-  irsend.sendCOOLIX(0xAA55AA, COOLIX_BITS, 2);  // 2 repeats.
+  irsend.sendCOOLIX(0xAA55AA, kCoolixBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m4480s4480"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -153,9 +153,9 @@ TEST(TestDecodeCoolix, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCOOLIX(0x123456);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0x123456, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -165,9 +165,9 @@ TEST(TestDecodeCoolix, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCOOLIX(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -177,9 +177,9 @@ TEST(TestDecodeCoolix, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCOOLIX(0xFFFFFF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFF, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -194,24 +194,24 @@ TEST(TestDecodeCoolix, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Coolix 16-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendCOOLIX(0x123456, COOLIX_BITS, 2);
+  irsend.sendCOOLIX(0x123456, kCoolixBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0x123456, irsend.capture.value);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  irsend.makeDecodeResult(4 * COOLIX_BITS + 4);
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  irsend.makeDecodeResult(4 * kCoolixBits + 4);
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0x123456, irsend.capture.value);
 
-  irsend.makeDecodeResult(2 * (4 * COOLIX_BITS + 4));
-  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  irsend.makeDecodeResult(2 * (4 * kCoolixBits + 4));
+  ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
-  EXPECT_EQ(COOLIX_BITS, irsend.capture.bits);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
   EXPECT_EQ(0x123456, irsend.capture.value);
 }
 
@@ -225,7 +225,7 @@ TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
   irsend.sendCOOLIX(0x12, 8);  // Illegal value Coolix 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeCOOLIX(&irsend.capture, 8, false));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
@@ -236,7 +236,7 @@ TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
   irsend.sendCOOLIX(0x12345678, 32);  // Illegal value Coolix 32-bit message.
   irsend.makeDecodeResult();
   // Shouldn't pass with strict when we ask for less bits than we got.
-  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, true));
+  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -249,7 +249,7 @@ TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
 
   // Decode should fail if asked to decode non-multiples of 8 bits.
   irsend.reset();
-  irsend.sendCOOLIX(0x123456, COOLIX_BITS, 2);
+  irsend.sendCOOLIX(0x123456, kCoolixBits, 2);
   irsend.makeDecodeResult();
   ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, 9, false));
 }
@@ -286,5 +286,5 @@ TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, COOLIX_BITS, false));
+  ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, false));
 }

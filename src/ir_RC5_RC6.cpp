@@ -25,7 +25,7 @@
 #define MIN_RC6_SAMPLES             1U
 #define RC5_T1                    889U
 #define RC5_MIN_COMMAND_LENGTH 113778UL
-#define RC5_MIN_GAP (RC5_MIN_COMMAND_LENGTH - RC5_RAW_BITS * (2 * RC5_T1))
+#define RC5_MIN_GAP (RC5_MIN_COMMAND_LENGTH - kRC5RawBits * (2 * RC5_T1))
 #define RC5_TOGGLE_MASK         0x800U  // (The 12th bit)
 // RC-6
 // Ref:
@@ -74,7 +74,7 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set 36kHz IR carrier frequency & a 1/4 (25%) duty cycle.
   enableIROut(36, 25);
 
-  if (nbits >= RC5X_BITS) {  // Is this a RC-5X message?
+  if (nbits >= kRC5XBits) {  // Is this a RC-5X message?
     // field bit is the inverted MSB of RC-5X data.
     field_bit = ((data >> (nbits - 1)) ^ 1) & 1;
     nbits--;
@@ -131,7 +131,7 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://en.wikipedia.org/wiki/RC-5
 uint16_t IRsend::encodeRC5(uint8_t address, uint8_t command,
                            bool key_released) {
-  return (key_released << (RC5_BITS - 1)) |
+  return (key_released << (kRC5Bits - 1)) |
          ((address & 0x1f) << 6) |
          (command & 0x3F);
 }
@@ -156,7 +156,7 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
   // The 2nd start/field bit (MSB of the return value) is the value of the 7th
   // command bit.
   bool s2 = (command >> 6) & 1;
-  return ((uint16_t) s2 << (RC5X_BITS - 1)) |
+  return ((uint16_t) s2 << (kRC5XBits - 1)) |
       encodeRC5(address, command, key_released);
 }
 
@@ -198,7 +198,7 @@ uint64_t IRsend::toggleRC5(uint64_t data) {
 //   http://www.sbprojects.com/knowledge/ir/rc6.php
 //   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
 uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
-  if (nbits == RC6_36_BITS)
+  if (nbits == kRC6_36Bits)
     return data ^ RC6_36_TOGGLE_MASK;
   return data ^ RC6_TOGGLE_MASK;
 }
@@ -223,9 +223,9 @@ uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
 uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command,
                            uint16_t mode) {
   switch (mode) {
-    case RC6_MODE0_BITS:
+    case kRC6Mode0Bits:
       return ((address & 0xFFF) << 8) | (command & 0xFF);
-    case RC6_36_BITS:
+    case kRC6_36Bits:
       return ((uint64_t) (address & 0xFFFFFFF) << 8) | (command & 0xFF);
     default:
       return 0;
@@ -374,7 +374,7 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < MIN_RC5_SAMPLES + HEADER - 1) return false;
 
   // Compliance
-  if (strict && nbits != RC5_BITS && nbits != RC5X_BITS)
+  if (strict && nbits != kRC5Bits && nbits != kRC5XBits)
     return false;  // It's neither RC-5 or RC-5X.
 
   uint16_t offset = OFFSET_START;
@@ -392,7 +392,7 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
   if (levelA == kSPACE && levelB == kMARK) {  // Matched a 1.
     is_rc5x = false;
   } else if (levelA == kMARK && levelB == kSPACE) {  // Matched a 0.
-    if (nbits <= RC5_BITS) return false;  // Field bit must be '1' for RC5.
+    if (nbits <= kRC5Bits) return false;  // Field bit must be '1' for RC5.
     is_rc5x = true;
     data = 1;
   } else {
@@ -414,8 +414,8 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   // Compliance
   if (actual_bits < nbits) return false;  // Less data than we expected.
-  if (strict && actual_bits != RC5_BITS &&
-                actual_bits != RC5X_BITS) return false;
+  if (strict && actual_bits != kRC5Bits &&
+                actual_bits != kRC5XBits) return false;
 
   // Success
   results->value = data;
@@ -465,8 +465,8 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     if (results->rawlen < nbits + HEADER + 1)
       return false;  // Don't have enough entries/samples to be valid.
     switch (nbits) {
-      case RC6_MODE0_BITS:
-      case RC6_36_BITS:
+      case kRC6Mode0Bits:
+      case kRC6_36Bits:
         break;
       default:
         return false;  // Asking for the wrong number of bits.

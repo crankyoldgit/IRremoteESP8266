@@ -92,7 +92,7 @@ class IRGreeAC {
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],
-                            const uint16_t length = GREE_STATE_LENGTH);
+                            const uint16_t length = kGreeStateLength);
 #ifdef ARDUINO
   String toString();
 #else
@@ -101,8 +101,8 @@ class IRGreeAC {
 
  private:
   // The state of the IR remote in IR code form.
-  uint8_t remote_state[GREE_STATE_LENGTH];
-  void checksum(const uint16_t length = GREE_STATE_LENGTH);
+  uint8_t remote_state[kGreeStateLength];
+  void checksum(const uint16_t length = kGreeStateLength);
   void fixup();
   IRsend _irsend;
 };

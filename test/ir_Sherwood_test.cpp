@@ -65,7 +65,7 @@ TEST(TestSendSherwood, DecodesAsNEC) {
 
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0xC1A28877, irsend.capture.value);
   EXPECT_EQ(0x4583, irsend.capture.address);
   EXPECT_EQ(0x11, irsend.capture.command);

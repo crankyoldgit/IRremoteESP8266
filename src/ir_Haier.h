@@ -168,7 +168,7 @@ class IRHaierAC {
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
-                            const uint16_t length = HAIER_AC_STATE_LENGTH);
+                            const uint16_t length = kHaierACStateLength);
   #ifdef ARDUINO
     String toString();
     static String timeToString(const uint16_t nr_mins);
@@ -178,7 +178,7 @@ class IRHaierAC {
   #endif
 
  private:
-  uint8_t remote_state[HAIER_AC_STATE_LENGTH];
+  uint8_t remote_state[kHaierACStateLength];
   void stateReset();
   void checksum();
   static uint16_t getTime(const uint8_t ptr[]);
@@ -227,7 +227,7 @@ class IRHaierACYRW02 {
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
-      const uint16_t length = HAIER_AC_YRW02_STATE_LENGTH);
+      const uint16_t length = kHaierACYRW02StateLength);
   #ifdef ARDUINO
     String toString();
   #else
@@ -235,7 +235,7 @@ class IRHaierACYRW02 {
   #endif
 
  private:
-  uint8_t remote_state[HAIER_AC_YRW02_STATE_LENGTH];
+  uint8_t remote_state[kHaierACYRW02StateLength];
   void stateReset();
   void checksum();
   IRsend _irsend;

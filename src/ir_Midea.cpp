@@ -47,7 +47,7 @@
 //
 // Args:
 //   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically MIDEA_BITS.
+//   nbits:  Nr. of bits of data to be sent. Typically kMideaBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
 // Status: Alpha / Needs testing against a real device.
@@ -338,7 +338,7 @@ std::string IRMideaAC::toString() {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically MIDEA_BITS.
+//   nbits:   The number of data bits to expect. Typically kMideaBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -352,7 +352,7 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
 
   uint8_t min_nr_of_messages = 1;
   if (strict) {
-    if (nbits != MIDEA_BITS)
+    if (nbits != kMideaBits)
       return false;  // Not strictly a MIDEA message.
     min_nr_of_messages = 2;
   }
@@ -410,7 +410,7 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
     // Protocol requires a second message with all the data bits inverted.
     // We should have checked we got a second message in the previous loop.
     // Just need to check it's value is an inverted copy of the first message.
-    uint64_t mask = (1ULL << MIDEA_BITS) - 1;
+    uint64_t mask = (1ULL << kMideaBits) - 1;
     if ((data & mask) != ((inverted ^ mask) & mask))  return false;
     if (!IRMideaAC::validChecksum(data))  return false;
   }

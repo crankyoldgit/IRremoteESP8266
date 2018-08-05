@@ -13,7 +13,7 @@ TEST(TestSendToshibaAC, SendDataOnly) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t toshiba_code[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t toshiba_code[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
   irsend.reset();
   irsend.sendToshibaAC(toshiba_code);
@@ -48,10 +48,10 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t toshiba_code[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t toshiba_code[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
 
-  irsend.sendToshibaAC(toshiba_code, TOSHIBA_AC_STATE_LENGTH, 0);
+  irsend.sendToshibaAC(toshiba_code, kToshibaACStateLength, 0);
   EXPECT_EQ(
     "m4400s4300"
     "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
@@ -66,7 +66,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
     "m543s7048", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendToshibaAC(toshiba_code, TOSHIBA_AC_STATE_LENGTH, 2);
+  irsend.sendToshibaAC(toshiba_code, kToshibaACStateLength, 2);
   EXPECT_EQ(
     "m4400s4300"
     "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
@@ -113,11 +113,11 @@ TEST(TestSendToshibaAC, SendUnexpectedSizes) {
   uint8_t toshiba_long_code[10] = {0x01, 0x02, 0x03, 0x04, 0x05,
                                    0x06, 0x07, 0x08, 0x09, 0x0A};
   irsend.reset();
-  irsend.sendToshibaAC(toshiba_short_code, TOSHIBA_AC_STATE_LENGTH - 1);
+  irsend.sendToshibaAC(toshiba_short_code, kToshibaACStateLength - 1);
   ASSERT_EQ("", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendToshibaAC(toshiba_long_code, TOSHIBA_AC_STATE_LENGTH + 1);
+  irsend.sendToshibaAC(toshiba_long_code, kToshibaACStateLength + 1);
   ASSERT_EQ(
       "m4400s4300"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s1623"
@@ -267,13 +267,13 @@ TEST(TestToshibaACClass, RawState) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
-  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t initial_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
-  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t modified_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
 
   // Verify the starting state.
-  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), kToshibaACBits);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
   EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
@@ -287,7 +287,7 @@ TEST(TestToshibaACClass, RawState) {
   EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
   EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
   // Retrieve the modified state.
-  EXPECT_STATE_EQ(modified_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+  EXPECT_STATE_EQ(modified_state, toshiba.getRaw(), kToshibaACBits);
 
   // Set it back to the initial state.
   toshiba.setRaw(initial_state);
@@ -296,18 +296,18 @@ TEST(TestToshibaACClass, RawState) {
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
   EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
-  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), TOSHIBA_AC_BITS);
+  EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), kToshibaACBits);
 }
 
 TEST(TestToshibaACClass, Checksums) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
-  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t initial_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
-  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t modified_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
-  uint8_t invalid_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t invalid_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00};
 
   EXPECT_EQ(0x01, toshiba.calcChecksum(initial_state));
@@ -316,7 +316,7 @@ TEST(TestToshibaACClass, Checksums) {
   EXPECT_EQ(0x01, IRToshibaAC::calcChecksum(initial_state));
   // Use different lengths.
   EXPECT_EQ(0x01, IRToshibaAC::calcChecksum(initial_state,
-                                            TOSHIBA_AC_STATE_LENGTH - 1));
+                                            kToshibaACStateLength - 1));
   EXPECT_EQ(0xFF, IRToshibaAC::calcChecksum(initial_state, 3));
   // Minimum length that actually means anything.
   EXPECT_EQ(0xF2, IRToshibaAC::calcChecksum(initial_state, 2));
@@ -338,9 +338,9 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
-  uint8_t initial_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t initial_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
-  uint8_t modified_state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t modified_state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0xC1, 0x00, 0xC0};
 
   toshiba.setRaw(initial_state);
@@ -475,7 +475,7 @@ TEST(TestDecodeToshibaAC, SyntheticExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t expectedState[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t expectedState[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
@@ -483,7 +483,7 @@ TEST(TestDecodeToshibaAC, SyntheticExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
@@ -527,7 +527,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   toshiba.setRaw(irsend.capture.state);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(23, toshiba.getTemp());
@@ -566,7 +566,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   toshiba.setRaw(irsend.capture.state);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(17, toshiba.getTemp());
@@ -605,7 +605,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   toshiba.setRaw(irsend.capture.state);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(24, toshiba.getTemp());
@@ -644,7 +644,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
       irsend.makeDecodeResult();
       EXPECT_TRUE(irrecv.decode(&irsend.capture));
       ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-      ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+      ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
       toshiba.setRaw(irsend.capture.state);
       EXPECT_FALSE(toshiba.getPower());
       EXPECT_EQ(22, toshiba.getTemp());

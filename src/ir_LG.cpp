@@ -60,7 +60,7 @@ uint8_t calcLGChecksum(uint16_t data) {
 // Args:
 //   data:   The contents of the message you want to send.
 //   nbits:  The bit size of the message being sent.
-//           Typically LG_BITS or LG32_BITS.
+//           Typically kLGBits or kLG32Bits.
 //   repeat: The number of times you want the message to be repeated.
 //
 // Status: Beta / Should be working.
@@ -70,7 +70,7 @@ uint8_t calcLGChecksum(uint16_t data) {
 void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
   uint16_t repeatHeaderMark = 0;
 
-  if (nbits >= LG32_BITS) {
+  if (nbits >= kLG32Bits) {
     // LG 32bit protocol is near identical to Samsung except for repeats.
     sendSAMSUNG(data, nbits, 0);  // Send it as a single Samsung message.
     repeatHeaderMark = LG32_RPT_HDR_MARK;
@@ -125,7 +125,7 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   Nr. of bits to expect in the data portion.
-//            Typically LG_BITS or LG32_BITS.
+//            Typically kLGBits or kLG32Bits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -139,14 +139,14 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 // Ref:
 //   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
 bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
-  if (nbits >= LG32_BITS) {
+  if (nbits >= kLG32Bits) {
     if (results->rawlen < 2 * nbits + 2 * (HEADER + FOOTER) - 1)
       return false;  // Can't possibly be a valid LG32 message.
   } else {
     if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
       return false;  // Can't possibly be a valid LG message.
   }
-  if (strict && nbits != LG_BITS && nbits != LG32_BITS)
+  if (strict && nbits != kLGBits && nbits != kLG32Bits)
     return false;  // Doesn't comply with expected LG protocol.
 
   uint64_t data = 0;
@@ -186,7 +186,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
     return false;
 
   // Repeat
-  if (nbits >= LG32_BITS) {
+  if (nbits >= kLG32Bits) {
     // If we are expecting the LG 32-bit protocol, there is always
     // a repeat message. So, check for it.
     offset++;

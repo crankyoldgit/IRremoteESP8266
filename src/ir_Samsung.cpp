@@ -35,7 +35,7 @@
                                     SAMSUNG_TICK)
 #define SAMSUNG_MIN_GAP_TICKS      (SAMSUNG_MIN_MESSAGE_LENGTH_TICKS - \
     (SAMSUNG_HDR_MARK_TICKS + SAMSUNG_HDR_SPACE_TICKS + \
-     SAMSUNG_BITS * (SAMSUNG_BIT_MARK_TICKS + SAMSUNG_ONE_SPACE_TICKS) + \
+     kSamsungBits * (SAMSUNG_BIT_MARK_TICKS + SAMSUNG_ONE_SPACE_TICKS) + \
      SAMSUNG_BIT_MARK_TICKS))
 #define SAMSUNG_MIN_GAP            (SAMSUNG_MIN_GAP_TICKS * SAMSUNG_TICK)
 
@@ -49,7 +49,7 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically SAMSUNG_BITS.
+//   nbits:  The bit size of the message being sent. typically kSamsungBits.
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: BETA / Should be working.
@@ -90,7 +90,7 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically SAMSUNG_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. Typically kSamsungBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -106,7 +106,7 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
                            bool strict) {
   if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
     return false;  // Can't possibly be a valid Samsung message.
-  if (strict && nbits != SAMSUNG_BITS)
+  if (strict && nbits != kSamsungBits)
     return false;  // We expect Samsung to be 32 bits of message.
 
   uint64_t data = 0;

@@ -103,7 +103,7 @@ class IRArgoAC {
 
  private:
   // # of bytes per command
-  uint8_t argo[ARGO_COMMAND_LENGTH];  // Defined in IRremoteESP8266.h
+  uint8_t argo[kArgoStateLength];  // Defined in IRremoteESP8266.h
   void stateReset();
   void checksum();
   IRsend _irsend;  // instance of the IR send class

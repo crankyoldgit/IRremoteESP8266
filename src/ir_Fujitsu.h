@@ -85,7 +85,7 @@ class IRFujitsuAC {
   #endif
 
  private:
-  uint8_t remote_state[FUJITSU_AC_STATE_LENGTH];
+  uint8_t remote_state[kFujitsuACStateLength];
   IRsend _irsend;
   uint8_t _temp;
   uint8_t _fanSpeed;
