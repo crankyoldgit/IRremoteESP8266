@@ -263,7 +263,8 @@ const uint16_t kDaikinRawBits = 583;
 const uint16_t kDaikinStateLength = 27;
 #define DAIKIN_COMMAND_LENGTH       kDaikinStateLength
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
-#define DENON_BITS                  kSharpBits
+const uint16_t kDenonBits = 15;
+#define DENON_BITS                  kDenonBits
 #define DENON_48_BITS               kPanasonicBits
 const uint16_t kDenonLegacyBits = 14;
 #define DENON_LEGACY_BITS           kDenonLegacyBits
