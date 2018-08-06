@@ -18,17 +18,16 @@
 //   https://github.com/markszabo/IRremoteESP8266/issues/447
 
 // Constants
-#define GICABLE_HDR_MARK                9000U
-#define GICABLE_HDR_SPACE               4400U
-#define GICABLE_BIT_MARK                 550U
-#define GICABLE_ONE_SPACE               4400U
-#define GICABLE_ZERO_SPACE              2200U
-#define GICABLE_RPT_SPACE               2200U
-#define GICABLE_MIN_COMMAND_LENGTH     99600U
-#define GICABLE_MIN_GAP (GICABLE_MIN_COMMAND_LENGTH - \
-    (GICABLE_HDR_MARK + GICABLE_HDR_SPACE + \
-     kGICableBits * (GICABLE_BIT_MARK + GICABLE_ONE_SPACE) + GICABLE_BIT_MARK))
-
+const uint16_t kGICableHdrMark = 9000;
+const uint16_t kGICableHdrSpace = 4400;
+const uint16_t kGICableBitMark = 550;
+const uint16_t kGICableOneSpace = 4400;
+const uint16_t kGICableZeroSpace = 2200;
+const uint16_t kGICableRptSpace = 2200;
+const uint32_t kGICableMinCommandLength = 99600;
+const uint32_t kGICableMinGap = kGICableMinCommandLength -
+    (kGICableHdrMark + kGICableHdrSpace +
+     kGICableBits * (kGICableBitMark + kGICableOneSpace) + kGICableBitMark);
 
 #if SEND_GICABLE
 // Send a raw G.I. Cable formatted message.
@@ -43,17 +42,17 @@
 //
 // Ref:
 void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(GICABLE_HDR_MARK, GICABLE_HDR_SPACE,
-              GICABLE_BIT_MARK, GICABLE_ONE_SPACE,
-              GICABLE_BIT_MARK, GICABLE_ZERO_SPACE,
-              GICABLE_BIT_MARK, GICABLE_MIN_GAP, GICABLE_MIN_COMMAND_LENGTH,
+  sendGeneric(kGICableHdrMark, kGICableHdrSpace,
+              kGICableBitMark, kGICableOneSpace,
+              kGICableBitMark, kGICableZeroSpace,
+              kGICableBitMark, kGICableMinGap, kGICableMinCommandLength,
               data, nbits, 39, true, 0,  // Repeats are handled later.
               50);
   // Message repeat sequence.
   if (repeat)
-    sendGeneric(GICABLE_HDR_MARK, GICABLE_RPT_SPACE,
+    sendGeneric(kGICableHdrMark, kGICableRptSpace,
                 0, 0, 0, 0,  // No actual data sent.
-                GICABLE_BIT_MARK, GICABLE_MIN_GAP, GICABLE_MIN_COMMAND_LENGTH,
+                kGICableBitMark, kGICableMinGap, kGICableMinCommandLength,
                 0, 0,  // No data to be sent.
                 39, true, repeat - 1, 50);
 }
@@ -81,31 +80,31 @@ bool IRrecv::decodeGICable(decode_results *results, uint16_t nbits,
   uint16_t offset = kStartOffset;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], GICABLE_HDR_MARK)) return false;
-  if (!matchSpace(results->rawbuf[offset++], GICABLE_HDR_SPACE)) return false;
+  if (!matchMark(results->rawbuf[offset++], kGICableHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kGICableHdrSpace)) return false;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         GICABLE_BIT_MARK,
-                                         GICABLE_ONE_SPACE,
-                                         GICABLE_BIT_MARK,
-                                         GICABLE_ZERO_SPACE);
+                                         kGICableBitMark,
+                                         kGICableOneSpace,
+                                         kGICableBitMark,
+                                         kGICableZeroSpace);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], GICABLE_BIT_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset++], kGICableBitMark)) return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], GICABLE_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset++], kGICableMinGap))
     return false;
 
   // Compliance
   if (strict) {
     // We expect a repeat frame.
-    if (!matchMark(results->rawbuf[offset++], GICABLE_HDR_MARK)) return false;
-    if (!matchSpace(results->rawbuf[offset++], GICABLE_RPT_SPACE)) return false;
-    if (!matchMark(results->rawbuf[offset++], GICABLE_BIT_MARK)) return false;
+    if (!matchMark(results->rawbuf[offset++], kGICableHdrMark)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kGICableRptSpace)) return false;
+    if (!matchMark(results->rawbuf[offset++], kGICableBitMark)) return false;
   }
 
   // Success
