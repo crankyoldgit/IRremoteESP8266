@@ -42,8 +42,8 @@
 #define RC6_36_TOGGLE_MASK     0x8000U  // (The 16th bit)
 
 // Common (getRClevel())
-const int16_t kMARK = 0;
-const int16_t kSPACE = 1;
+const int16_t kMark = 0;
+const int16_t kSpace = 1;
 
 #if SEND_RC5
 // Send a Philips RC-5/RC-5X packet.
@@ -305,17 +305,17 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   DPRINTLN(uint64ToString(*offset));
   if (*offset >= results->rawlen) {
     DPRINTLN("DEBUG: getRClevel: SPACE, past end of rawbuf");
-    return kSPACE;  // After end of recorded buffer, assume SPACE.
+    return kSpace;  // After end of recorded buffer, assume SPACE.
   }
   uint16_t width = results->rawbuf[*offset];
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
-  uint16_t val = ((*offset) % 2) ? kMARK : kSPACE;
+  uint16_t val = ((*offset) % 2) ? kMark : kSpace;
   // Check to see if we have hit an inter-message gap (> 20ms).
-  if (val == kSPACE && width > 20000 - delta) {
+  if (val == kSpace && width > 20000 - delta) {
     DPRINTLN("DEBUG: getRClevel: SPACE, hit end of mesg gap.");
-    return kSPACE;
+    return kSpace;
   }
-  int16_t correction = (val == kMARK) ? excess : -excess;
+  int16_t correction = (val == kMark) ? excess : -excess;
 
   // Calculate the look-ahead for our current position in the buffer.
   uint16_t avail;
@@ -339,7 +339,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
     *used = 0;
     (*offset)++;
   }
-  if (val == kMARK) {
+  if (val == kMark) {
     DPRINTLN("DEBUG: getRClevel: MARK");
   } else {
     DPRINTLN("DEBUG: getRClevel: SPACE");
@@ -384,14 +384,14 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   // Header
   // Get start bit #1.
-  if (getRClevel(results, &offset, &used, RC5_T1) != kMARK) return false;
+  if (getRClevel(results, &offset, &used, RC5_T1) != kMark) return false;
   // Get field/start bit #2 (inverted bit-7 of the command if RC-5X protocol)
   uint16_t actual_bits = 1;
   int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
   int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
-  if (levelA == kSPACE && levelB == kMARK) {  // Matched a 1.
+  if (levelA == kSpace && levelB == kMark) {  // Matched a 1.
     is_rc5x = false;
-  } else if (levelA == kMARK && levelB == kSPACE) {  // Matched a 0.
+  } else if (levelA == kMark && levelB == kSpace) {  // Matched a 0.
     if (nbits <= kRC5Bits) return false;  // Field bit must be '1' for RC5.
     is_rc5x = true;
     data = 1;
@@ -403,9 +403,9 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
   for (; offset < results->rawlen; actual_bits++) {
     int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
     int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
-    if (levelA == kSPACE && levelB == kMARK)
+    if (levelA == kSpace && levelB == kMark)
       data = (data << 1) | 1;  // 1
-    else if (levelA == kMARK && levelB == kSPACE)
+    else if (levelA == kMark && levelB == kSpace)
       data <<= 1;  // 0
     else
       break;
@@ -485,8 +485,8 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t used = 0;
 
   // Get the start bit. e.g. 1.
-  if (getRClevel(results, &offset, &used, tick) != kMARK) return false;
-  if (getRClevel(results, &offset, &used, tick) != kSPACE) return false;
+  if (getRClevel(results, &offset, &used, tick) != kMark) return false;
+  if (getRClevel(results, &offset, &used, tick) != kSpace) return false;
 
   uint16_t actual_bits;
   uint64_t data = 0;
@@ -504,9 +504,9 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     if (actual_bits == 3 &&
         levelB != getRClevel(results, &offset, &used, tick))
       return false;
-    if (levelA == kMARK && levelB == kSPACE)  // reversed compared to RC5
+    if (levelA == kMark && levelB == kSpace)  // reversed compared to RC5
       data = (data << 1) | 1;  // 1
-    else if (levelA == kSPACE && levelB == kMARK)
+    else if (levelA == kSpace && levelB == kMark)
       data <<= 1;  // 0
     else
       break;
