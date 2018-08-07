@@ -22,14 +22,14 @@
 
 // Constants
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/417
-#define HITACHI_AC_HDR_MARK           3300U
-#define HITACHI_AC_HDR_SPACE          1700U
-#define HITACHI_AC1_HDR_MARK          3400U
-#define HITACHI_AC1_HDR_SPACE         3400U
-#define HITACHI_AC_BIT_MARK            400U
-#define HITACHI_AC_ONE_SPACE          1250U
-#define HITACHI_AC_ZERO_SPACE          500U
-#define HITACHI_AC_MIN_GAP          100000U  // Completely made up value.
+const uint16_t kHitachiACHdrMark = 3300;
+const uint16_t kHitachiACHdrSpace = 1700;
+const uint16_t kHitachiAC1HdrMark = 3400;
+const uint16_t kHitachiAC1HdrSpace = 3400;
+const uint16_t kHitachiACBitMark = 400;
+const uint16_t kHitachiACOneSpace = 1250;
+const uint16_t kHitachiACZeroSpace = 500;
+const uint32_t kHitachiACMinGap = 100000;  // Completely made up value.
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
@@ -47,10 +47,10 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
   if (nbytes < kHitachiACStateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(HITACHI_AC_HDR_MARK, HITACHI_AC_HDR_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_ONE_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_ZERO_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_MIN_GAP,
+  sendGeneric(kHitachiACHdrMark, kHitachiACHdrSpace,
+              kHitachiACBitMark, kHitachiACOneSpace,
+              kHitachiACBitMark, kHitachiACZeroSpace,
+              kHitachiACBitMark, kHitachiACMinGap,
               data, nbytes, 38, true, repeat, 50);
 }
 #endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2)
@@ -75,10 +75,10 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
   if (nbytes < kHitachiAC1StateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(HITACHI_AC1_HDR_MARK, HITACHI_AC1_HDR_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_ONE_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_ZERO_SPACE,
-              HITACHI_AC_BIT_MARK, HITACHI_AC_MIN_GAP,
+  sendGeneric(kHitachiAC1HdrMark, kHitachiAC1HdrSpace,
+              kHitachiACBitMark, kHitachiACOneSpace,
+              kHitachiACBitMark, kHitachiACZeroSpace,
+              kHitachiACBitMark, kHitachiACMinGap,
               data, nbytes, 38, true, repeat, 50);
 }
 #endif  // SEND_HITACHI_AC1
@@ -147,15 +147,15 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
 
   // Header
   if (nbits == kHitachiAC1Bits) {
-    if (!matchMark(results->rawbuf[offset++], HITACHI_AC1_HDR_MARK, kTolerance))
+    if (!matchMark(results->rawbuf[offset++], kHitachiAC1HdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], HITACHI_AC1_HDR_SPACE,
+    if (!matchSpace(results->rawbuf[offset++], kHitachiAC1HdrSpace,
                     kTolerance))
       return false;
   } else {  // Everything else.
-    if (!matchMark(results->rawbuf[offset++], HITACHI_AC_HDR_MARK, kTolerance))
+    if (!matchMark(results->rawbuf[offset++], kHitachiACHdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], HITACHI_AC_HDR_SPACE,
+    if (!matchSpace(results->rawbuf[offset++], kHitachiACHdrSpace,
                     kTolerance))
       return false;
   }
@@ -165,20 +165,20 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
       offset <= results->rawlen - 16 && i < nbits / 8;
       i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(&(results->rawbuf[offset]), 8,
-                            HITACHI_AC_BIT_MARK,
-                            HITACHI_AC_ONE_SPACE,
-                            HITACHI_AC_BIT_MARK,
-                            HITACHI_AC_ZERO_SPACE,
+                            kHitachiACBitMark,
+                            kHitachiACOneSpace,
+                            kHitachiACBitMark,
+                            kHitachiACZeroSpace,
                             kTolerance);
     if (data_result.success == false)  break;  // Fail
     results->state[i] = (uint8_t) data_result.data;
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], HITACHI_AC_BIT_MARK, kTolerance))
+  if (!matchMark(results->rawbuf[offset++], kHitachiACBitMark, kTolerance))
     return false;
   if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], HITACHI_AC_MIN_GAP, kTolerance))
+      !matchAtLeast(results->rawbuf[offset], kHitachiACMinGap, kTolerance))
     return false;
 
   // Compliance
