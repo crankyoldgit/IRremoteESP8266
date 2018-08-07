@@ -505,11 +505,12 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       // the correct length/byte size.
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
-      stateSize = std::max(stateSize, kFujitsuACStateLengthShort - 1);
+      stateSize = std::max(stateSize,
+                           (uint16_t) (kFujitsuACStateLengthShort - 1));
       // If we think it isn't a "short" message.
       if (stateSize > kFujitsuACStateLengthShort)
         // Then it has to be at least the smaller version of the "normal" size.
-        stateSize = std::max(stateSize, kFujitsuACStateLength - 1);
+        stateSize = std::max(stateSize, (uint16_t) (kFujitsuACStateLength - 1));
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, kFujitsuACStateLength);
       break;
