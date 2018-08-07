@@ -354,7 +354,7 @@ const uint16_t kSharpBits = kSharpAddressBits + kSharpCommandBits + 2;  // 15
 #define SHARP_BITS                  kSharpBits
 const uint8_t kSherwoodBits = kNECBits;
 #define SHERWOOD_BITS          kSherwoodBits
-const uint8_t kSherwoodMinRepeat = kSingleRepeat;
+const uint16_t kSherwoodMinRepeat = kSingleRepeat;
 const uint16_t kSony12Bits = 12;
 #define SONY_12_BITS                kSony12Bits
 const uint16_t kSony15Bits = 15;
