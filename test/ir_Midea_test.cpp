@@ -272,32 +272,32 @@ TEST(TestMideaACClass, OperatingMode) {
   midea.begin();
 
   midea.setRaw(0xA1826FFFFF62);  // Auto mode already set.
-  midea.setMode(MIDEA_AC_AUTO);
-  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  midea.setMode(kMideaACAuto);
+  EXPECT_EQ(kMideaACAuto, midea.getMode());
   EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());  // State shouldn't have changed.
 
-  midea.setMode(MIDEA_AC_COOL);
-  EXPECT_EQ(MIDEA_AC_COOL, midea.getMode());
+  midea.setMode(kMideaACCool);
+  EXPECT_EQ(kMideaACCool, midea.getMode());
   EXPECT_EQ(0xA1806FFFFF61, midea.getRaw());
 
-  midea.setMode(MIDEA_AC_AUTO);
-  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  midea.setMode(kMideaACAuto);
+  EXPECT_EQ(kMideaACAuto, midea.getMode());
   EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
 
-  midea.setMode(MIDEA_AC_HEAT);
-  EXPECT_EQ(MIDEA_AC_HEAT, midea.getMode());
+  midea.setMode(kMideaACHeat);
+  EXPECT_EQ(kMideaACHeat, midea.getMode());
   EXPECT_EQ(0xA1836FFFFF63, midea.getRaw());
 
-  midea.setMode(MIDEA_AC_DRY);
-  EXPECT_EQ(MIDEA_AC_DRY, midea.getMode());
+  midea.setMode(kMideaACDry);
+  EXPECT_EQ(kMideaACDry, midea.getMode());
   EXPECT_EQ(0xA1816FFFFF60, midea.getRaw());
 
-  midea.setMode(MIDEA_AC_FAN);
-  EXPECT_EQ(MIDEA_AC_FAN, midea.getMode());
+  midea.setMode(kMideaACFan);
+  EXPECT_EQ(kMideaACFan, midea.getMode());
   EXPECT_EQ(0xA1846FFFFF66, midea.getRaw());
 
   midea.setMode(255);
-  EXPECT_EQ(MIDEA_AC_AUTO, midea.getMode());
+  EXPECT_EQ(kMideaACAuto, midea.getMode());
   EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
 }
 
@@ -306,26 +306,26 @@ TEST(TestMideaACClass, FanSpeed) {
   midea.begin();
 
   midea.setRaw(0xA1826FFFFF62);  // Auto mode already set.
-  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+  EXPECT_EQ(kMideaACFanAuto, midea.getFan());
 
-  midea.setFan(MIDEA_AC_FAN_LOW);
-  EXPECT_EQ(MIDEA_AC_FAN_LOW, midea.getFan());
+  midea.setFan(kMideaACFanLow);
+  EXPECT_EQ(kMideaACFanLow, midea.getFan());
   EXPECT_EQ(0xA18A6FFFFF6C, midea.getRaw());
 
   midea.setFan(255);  // Setting an unexpected value defaults to auto.
-  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+  EXPECT_EQ(kMideaACFanAuto, midea.getFan());
   EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
 
-  midea.setFan(MIDEA_AC_FAN_MED);
-  EXPECT_EQ(MIDEA_AC_FAN_MED, midea.getFan());
+  midea.setFan(kMideaACFanMed);
+  EXPECT_EQ(kMideaACFanMed, midea.getFan());
   EXPECT_EQ(0xA1926FFFFF7C, midea.getRaw());
 
-  midea.setFan(MIDEA_AC_FAN_HI);
-  EXPECT_EQ(MIDEA_AC_FAN_HI, midea.getFan());
+  midea.setFan(kMideaACFanHigh);
+  EXPECT_EQ(kMideaACFanHigh, midea.getFan());
   EXPECT_EQ(0xA19A6FFFFF74, midea.getRaw());
 
-  midea.setFan(MIDEA_AC_FAN_AUTO);
-  EXPECT_EQ(MIDEA_AC_FAN_AUTO, midea.getFan());
+  midea.setFan(kMideaACFanAuto);
+  EXPECT_EQ(kMideaACFanAuto, midea.getFan());
   EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
 }
 
@@ -339,49 +339,49 @@ TEST(TestMideaACClass, Temperature) {
   EXPECT_EQ(25, midea.getTemp(true));  // F
 
   midea.setTemp(0);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  EXPECT_EQ(kMideaACMinTempF, midea.getTemp());
   EXPECT_EQ(0xA18260FFFF6C, midea.getRaw());
 
   midea.setTemp(255);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp());
   EXPECT_EQ(0xA18278FFFF78, midea.getRaw());
 
   midea.setTemp(0, true);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  EXPECT_EQ(kMideaACMinTempF, midea.getTemp());
   EXPECT_EQ(0xA18260FFFF6C, midea.getRaw());
 
   midea.setTemp(255, true);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp());
   EXPECT_EQ(0xA18278FFFF78, midea.getRaw());
 
   // fahrenheit min/max etc.
-  midea.setTemp(MIDEA_AC_MIN_TEMP_F);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  midea.setTemp(kMideaACMinTempF);
+  EXPECT_EQ(kMideaACMinTempF, midea.getTemp());
 
-  midea.setTemp(MIDEA_AC_MAX_TEMP_F);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  midea.setTemp(kMideaACMaxTempF);
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp());
 
-  midea.setTemp(MIDEA_AC_MIN_TEMP_F - 1);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp());
+  midea.setTemp(kMideaACMinTempF - 1);
+  EXPECT_EQ(kMideaACMinTempF, midea.getTemp());
 
-  midea.setTemp(MIDEA_AC_MAX_TEMP_F + 1);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp());
+  midea.setTemp(kMideaACMaxTempF + 1);
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp());
 
   // celsius min/max etc.
-  midea.setTemp(MIDEA_AC_MIN_TEMP_C, true);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_C, midea.getTemp(true));
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_F, midea.getTemp(false));
+  midea.setTemp(kMideaACMinTempC, true);
+  EXPECT_EQ(kMideaACMinTempC, midea.getTemp(true));
+  EXPECT_EQ(kMideaACMinTempF, midea.getTemp(false));
 
-  midea.setTemp(MIDEA_AC_MAX_TEMP_C, true);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_C, midea.getTemp(true));
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp(false));
+  midea.setTemp(kMideaACMaxTempC, true);
+  EXPECT_EQ(kMideaACMaxTempC, midea.getTemp(true));
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp(false));
 
-  midea.setTemp(MIDEA_AC_MIN_TEMP_C - 1, true);
-  EXPECT_EQ(MIDEA_AC_MIN_TEMP_C, midea.getTemp(true));
+  midea.setTemp(kMideaACMinTempC - 1, true);
+  EXPECT_EQ(kMideaACMinTempC, midea.getTemp(true));
 
-  midea.setTemp(MIDEA_AC_MAX_TEMP_C + 1, true);
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_C, midea.getTemp(true));
-  EXPECT_EQ(MIDEA_AC_MAX_TEMP_F, midea.getTemp(false));
+  midea.setTemp(kMideaACMaxTempC + 1, true);
+  EXPECT_EQ(kMideaACMaxTempC, midea.getTemp(true));
+  EXPECT_EQ(kMideaACMaxTempF, midea.getTemp(false));
 
   // General changes.
   midea.setTemp(17, true);  // C
@@ -435,8 +435,8 @@ TEST(TestMideaACClass, HumanReadableOutput) {
             "Sleep: Off", midea.toString());
   midea.off();
   midea.setTemp(25);
-  midea.setFan(MIDEA_AC_FAN_HI);
-  midea.setMode(MIDEA_AC_DRY);
+  midea.setFan(kMideaACFanHigh);
+  midea.setMode(kMideaACDry);
   midea.setSleep(true);
   EXPECT_EQ("Power: Off, Mode: 1 (DRY), Temp: 16C/62F, Fan: 3 (HI), Sleep: On",
             midea.toString());
