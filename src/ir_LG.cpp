@@ -18,29 +18,30 @@
 // LG send originally added by https://github.com/chaeplin
 
 // Constants
-#define LG_TICK                       50U
-#define LG_HDR_MARK_TICKS            170U  // 8500
-#define LG_HDR_MARK                  (LG_HDR_MARK_TICKS * LG_TICK)
-#define LG_HDR_SPACE_TICKS            85U  // 4250
-#define LG_HDR_SPACE                 (LG_HDR_SPACE_TICKS * LG_TICK)
-#define LG_BIT_MARK_TICKS             11U
-#define LG_BIT_MARK                  (LG_BIT_MARK_TICKS * LG_TICK)
-#define LG_ONE_SPACE_TICKS            32U
-#define LG_ONE_SPACE                 (LG_ONE_SPACE_TICKS * LG_TICK)
-#define LG_ZERO_SPACE_TICKS           11U
-#define LG_ZERO_SPACE                (LG_ZERO_SPACE_TICKS * LG_TICK)
-#define LG_RPT_SPACE_TICKS            45U
-#define LG_RPT_SPACE                 (LG_RPT_SPACE_TICKS * LG_TICK)
-#define LG_MIN_GAP_TICKS             795U
-#define LG_MIN_GAP                   (LG_MIN_GAP_TICKS * LG_TICK)
-#define LG_MIN_MESSAGE_LENGTH_TICKS 2161U
-#define LG_MIN_MESSAGE_LENGTH        (LG_MIN_MESSAGE_LENGTH_TICKS * LG_TICK)
-#define LG32_HDR_MARK_TICKS           90U
-#define LG32_HDR_MARK                (LG32_HDR_MARK_TICKS * LG_TICK)
-#define LG32_HDR_SPACE_TICKS          89U
-#define LG32_HDR_SPACE               (LG32_HDR_SPACE_TICKS * LG_TICK)
-#define LG32_RPT_HDR_MARK_TICKS      179U
-#define LG32_RPT_HDR_MARK            (LG32_RPT_HDR_MARK_TICKS * LG_TICK)
+const uint16_t kLGTick = 50;
+const uint16_t kLGHdrMarkTicks = 170;
+const uint16_t kLGHdrMark = kLGHdrMarkTicks * kLGTick;  // 8500
+const uint16_t kLGHdrSpaceTicks = 85;
+const uint16_t kLGHdrSpace = kLGHdrSpaceTicks * kLGTick;  // 4250
+const uint16_t kLGBitMarkTicks = 11;
+const uint16_t kLGBitMark = kLGBitMarkTicks * kLGTick;
+const uint16_t kLGOneSpaceTicks = 32;
+const uint16_t kLGOneSpace = kLGOneSpaceTicks * kLGTick;
+const uint16_t kLGZeroSpaceTicks = 11;
+const uint16_t kLGZeroSpace = kLGZeroSpaceTicks * kLGTick;
+const uint16_t kLGRptSpaceTicks = 45;
+const uint16_t kLGRptSpace = kLGRptSpaceTicks * kLGTick;
+const uint16_t kLGMinGapTicks = 795;
+const uint16_t kLGMinGap = kLGMinGapTicks * kLGTick;
+const uint16_t kLGMinMessageLengthTicks = 2161;
+const uint32_t kLGMinMessageLength = kLGMinMessageLengthTicks * kLGTick;
+
+const uint16_t kLG32HdrMarkTicks = 90;
+const uint16_t kLG32HdrMark = kLG32HdrMarkTicks * kLGTick;
+const uint16_t kLG32HdrSpaceTicks = 89;
+const uint16_t kLG32HdrSpace = kLG32HdrSpaceTicks * kLGTick;
+const uint16_t kLG32RptHdrMarkTicks = 179;
+const uint16_t kLG32RptHdrMark = kLG32RptHdrMarkTicks * kLGTick;
 
 #if (SEND_LG || DECODE_LG)
 // Calculate the rolling 4-bit wide checksum over all of the data.
@@ -73,16 +74,16 @@ void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits >= kLG32Bits) {
     // LG 32bit protocol is near identical to Samsung except for repeats.
     sendSAMSUNG(data, nbits, 0);  // Send it as a single Samsung message.
-    repeatHeaderMark = LG32_RPT_HDR_MARK;
+    repeatHeaderMark = kLG32RptHdrMark;
     repeat++;
   } else {
     // LG (28-bit) protocol.
-    repeatHeaderMark = LG_HDR_MARK;
-    sendGeneric(LG_HDR_MARK, LG_HDR_SPACE,
-                LG_BIT_MARK, LG_ONE_SPACE,
-                LG_BIT_MARK, LG_ZERO_SPACE,
-                LG_BIT_MARK,
-                LG_MIN_GAP, LG_MIN_MESSAGE_LENGTH,
+    repeatHeaderMark = kLGHdrMark;
+    sendGeneric(kLGHdrMark, kLGHdrSpace,
+                kLGBitMark, kLGOneSpace,
+                kLGBitMark, kLGZeroSpace,
+                kLGBitMark,
+                kLGMinGap, kLGMinMessageLength,
                 data, nbits, 38, true, 0,  // Repeats are handled later.
                 50);
   }
@@ -90,9 +91,9 @@ void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Repeat
   // Protocol has a mandatory repeat-specific code sent after every command.
   if (repeat)
-    sendGeneric(repeatHeaderMark, LG_RPT_SPACE,
+    sendGeneric(repeatHeaderMark, kLGRptSpace,
                 0, 0, 0, 0,  // No data is sent.
-                LG_BIT_MARK, LG_MIN_GAP, LG_MIN_MESSAGE_LENGTH,
+                kLGBitMark, kLGMinGap, kLGMinMessageLength,
                 0, 0,  // No data.
                 38, true, repeat - 1, 50);
 }
@@ -153,36 +154,36 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = kStartOffset;
 
   // Header
-  if (!matchMark(results->rawbuf[offset], LG_HDR_MARK) &&
-      !matchMark(results->rawbuf[offset], LG32_HDR_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset], kLGHdrMark) &&
+      !matchMark(results->rawbuf[offset], kLG32HdrMark)) return false;
   uint32_t m_tick;
-  if (matchMark(results->rawbuf[offset], LG_HDR_MARK))
-    m_tick = results->rawbuf[offset++] * kRawTick / LG_HDR_MARK_TICKS;
+  if (matchMark(results->rawbuf[offset], kLGHdrMark))
+    m_tick = results->rawbuf[offset++] * kRawTick / kLGHdrMarkTicks;
   else
-    m_tick = results->rawbuf[offset++] * kRawTick / LG32_HDR_MARK_TICKS;
-  if (!matchSpace(results->rawbuf[offset], LG_HDR_SPACE) &&
-      !matchSpace(results->rawbuf[offset], LG32_HDR_SPACE)) return false;
+    m_tick = results->rawbuf[offset++] * kRawTick / kLG32HdrMarkTicks;
+  if (!matchSpace(results->rawbuf[offset], kLGHdrSpace) &&
+      !matchSpace(results->rawbuf[offset], kLG32HdrSpace)) return false;
   uint32_t s_tick;
-  if (matchSpace(results->rawbuf[offset], LG_HDR_SPACE))
-    s_tick = results->rawbuf[offset++] * kRawTick / LG_HDR_SPACE_TICKS;
+  if (matchSpace(results->rawbuf[offset], kLGHdrSpace))
+    s_tick = results->rawbuf[offset++] * kRawTick / kLGHdrSpaceTicks;
   else
-    s_tick = results->rawbuf[offset++] * kRawTick / LG32_HDR_SPACE_TICKS;
+    s_tick = results->rawbuf[offset++] * kRawTick / kLG32HdrSpaceTicks;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         LG_BIT_MARK_TICKS * m_tick,
-                                         LG_ONE_SPACE_TICKS * s_tick,
-                                         LG_BIT_MARK_TICKS * m_tick,
-                                         LG_ZERO_SPACE_TICKS * s_tick);
+                                         kLGBitMarkTicks * m_tick,
+                                         kLGOneSpaceTicks * s_tick,
+                                         kLGBitMarkTicks * m_tick,
+                                         kLGZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK_TICKS * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kLGBitMarkTicks * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
+      !matchAtLeast(results->rawbuf[offset], kLGMinGapTicks * s_tick))
     return false;
 
   // Repeat
@@ -190,14 +191,14 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
     // If we are expecting the LG 32-bit protocol, there is always
     // a repeat message. So, check for it.
     offset++;
-    if (!matchMark(results->rawbuf[offset++], LG32_RPT_HDR_MARK_TICKS * m_tick))
+    if (!matchMark(results->rawbuf[offset++], kLG32RptHdrMarkTicks * m_tick))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], LG_RPT_SPACE_TICKS * s_tick))
+    if (!matchSpace(results->rawbuf[offset++], kLGRptSpaceTicks * s_tick))
       return false;
-    if (!matchMark(results->rawbuf[offset++], LG_BIT_MARK_TICKS * m_tick))
+    if (!matchMark(results->rawbuf[offset++], kLGBitMarkTicks * m_tick))
       return false;
     if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], LG_MIN_GAP_TICKS * s_tick))
+        !matchAtLeast(results->rawbuf[offset], kLGMinGapTicks * s_tick))
       return false;
   }
 
