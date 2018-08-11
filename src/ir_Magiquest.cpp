@@ -8,8 +8,8 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-#define IS_ZERO(m, s) (((m) * 100 / ((m) + (s))) <= MAGIQUEST_ZERO_RATIO)
-#define IS_ONE(m, s)  (((m) * 100 / ((m) + (s))) >= MAGIQUEST_ONE_RATIO)
+#define IS_ZERO(m, s) (((m) * 100 / ((m) + (s))) <= kMagiQuestZeroRatio)
+#define IS_ONE(m, s)  (((m) * 100 / ((m) + (s))) >= kMagiQuestOneRatio)
 
 // Strips taken from:
 // https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
@@ -32,10 +32,10 @@
 void IRsend::sendMagiQuest(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(0, 0,  // No Headers - Technically it's included in the data.
                      // i.e. 8 zeros.
-              MAGIQUEST_MARK_ONE, MAGIQUEST_SPACE_ONE,
-              MAGIQUEST_MARK_ZERO, MAGIQUEST_SPACE_ZERO,
+              kMagiQuestMarkOne, kMagiQuestSpaceOne,
+              kMagiQuestMarkZero, kMagiQuestSpaceZero,
               0,  // No footer mark.
-              MAGIQUEST_GAP,
+              kMagiQuestGap,
               data, nbits, 36, true, repeat, 50);
 }
 
@@ -103,7 +103,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
   while (offset + 1 < results->rawlen && bits < nbits - 1) {
     uint16_t mark  = results->rawbuf[offset];
     uint16_t space = results->rawbuf[offset + 1];
-    if (!matchMark(mark + space, MAGIQUEST_TOTAL_USEC)) {
+    if (!matchMark(mark + space, kMagiQuestTotalUsec)) {
       DPRINT("Not enough time to be Magiquest - Mark: ");
       DPRINT(mark);
       DPRINT(" Space: ");
@@ -111,7 +111,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
       DPRINT(" Total: ");
       DPRINT(mark+space);
       DPRINT("Expected: ");
-      DPRINTLN(MAGIQUEST_TOTAL_USEC);
+      DPRINTLN(kMagiQuestTotalUsec);
       return false;
     }
 
@@ -132,7 +132,7 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
   // Grab the last MARK bit, assuming a good SPACE after it
   if (offset < results->rawlen) {
     uint16_t mark  = results->rawbuf[offset];
-    uint16_t space = (MAGIQUEST_TOTAL_USEC / kRawTick) - mark;
+    uint16_t space = (kMagiQuestTotalUsec / kRawTick) - mark;
 
     if      (IS_ZERO(mark, space))  data = (data << 1) | 0;
     else if (IS_ONE( mark, space))  data = (data << 1) | 1;
