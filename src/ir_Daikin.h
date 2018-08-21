@@ -76,57 +76,62 @@
 */
 
 // Constants
-#define DAIKIN_COOL                0b011
-#define DAIKIN_HEAT                0b100
-#define DAIKIN_FAN                 0b110
-#define DAIKIN_AUTO                0b000
-#define DAIKIN_DRY                 0b010
-#define DAIKIN_MIN_TEMP               10U  // Celsius
-#define DAIKIN_MAX_TEMP               32U  // Celsius
-#define DAIKIN_FAN_MIN       (uint8_t) 1U
-#define DAIKIN_FAN_MAX       (uint8_t) 5U
-#define DAIKIN_FAN_AUTO      (uint8_t) 0b1010
-#define DAIKIN_FAN_QUIET     (uint8_t) 0b1011
-
-#define DAIKIN_BYTE_POWER             13
-#define DAIKIN_BIT_POWER      0b00000001
-
-#define DAIKIN_BYTE_POWERFUL          21
-#define DAIKIN_BIT_POWERFUL   0b00000001
-#define DAIKIN_BYTE_SILENT            21
-#define DAIKIN_BIT_SILENT     0b00100000
-
-#define DAIKIN_BYTE_SENSOR            24
-#define DAIKIN_BIT_SENSOR     0b00000010
-#define DAIKIN_BYTE_ECONO             24
-#define DAIKIN_BIT_ECONO      0b00000100
-#define DAIKIN_BYTE_EYE               24
-#define DAIKIN_BIT_EYE        0b10000000
-#define DAIKIN_BYTE_MOLD              25
-#define DAIKIN_BIT_MOLD       0b00000010
-
-#define DAIKIN_BYTE_OFF_TIMER         13
-#define DAIKIN_BIT_OFF_TIMER  0b00000100
-#define DAIKIN_BYTE_ON_TIMER          13
-#define DAIKIN_BIT_ON_TIMER   0b00000010
-
-#define DAIKIN_CURBIT kDaikinStateLength
-#define DAIKIN_CURINDEX (kDaikinStateLength + 1)
-#define OFFSET_ERR 65432
-
-#define DAIKIN_TOLERANCE 35
-#define DAIKIN_MARK_EXCESS kMarkExcess
-
-#define DAIKIN_HDR_MARK            3650U  // DAIKIN_BIT_MARK * 8
-#define DAIKIN_HDR_SPACE           1623U  // DAIKIN_BIT_MARK * 4
-#define DAIKIN_BIT_MARK             428U
-#define DAIKIN_ZERO_SPACE           428U
-#define DAIKIN_ONE_SPACE           1280U
-#define DAIKIN_GAP                29000U
-
+const uint8_t kDaikinAuto = 0b000;
+const uint8_t kDaikinDry = 0b010;
+const uint8_t kDaikinCool = 0b011;
+const uint8_t kDaikinHeat = 0b100;
+const uint8_t kDaikinFan = 0b110;
+const uint8_t kDaikinMinTemp = 10;  // Celsius
+const uint8_t kDaikinMaxTemp = 32;  // Celsius
+const uint8_t kDaikinFanMin = 1;
+const uint8_t kDaikinFanMax = 5;
+const uint8_t kDaikinFanAuto = 0b1010;
+const uint8_t kDaikinFanQuiet = 0b1011;
+const uint8_t kDaikinBytePower = 13;
+const uint8_t kDaikinBitPower = 0b00000001;
+const uint8_t kDaikinBytePowerful = 21;
+const uint8_t kDaikinBitPowerful = 0b00000001;
+const uint8_t kDaikinByteSilent = 21;
+const uint8_t kDaikinBitSilent = 0b00100000;
+const uint8_t kDaikinByteSensor = 24;
+const uint8_t kDaikinBitSensor = 0b00000010;
+const uint8_t kDaikinByteEcono = 24;
+const uint8_t kDaikinBitEcono = 0b00000100;
+const uint8_t kDaikinByteEye = 24;
+const uint8_t kDaikinBitEye = 0b10000000;
+const uint8_t kDaikinByteMold = 25;
+const uint8_t kDaikinBitMold = 0b00000010;
+const uint8_t kDaikinByteOffTimer = 13;
+const uint8_t kDaikinBitOffTimer = 0b00000100;
+const uint8_t kDaikinByteOnTimer = 13;
+const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint8_t kDaikinCurBit = kDaikinStateLength;
+const uint8_t kDaikinCurIndex = kDaikinStateLength + 1;
+const uint8_t kDaikinTolerance = 35;
+const uint16_t kDaikinMarkExcess = kMarkExcess;
+const uint16_t kDaikinHdrMark = 3650;  // kDaikinBitMark * 8
+const uint16_t kDaikinHdrSpace = 1623;  // kDaikinBitMark * 4
+const uint16_t kDaikinBitMark = 428;
+const uint16_t kDaikinZeroSpace = 428;
+const uint16_t kDaikinOneSpace = 1280;
+const uint16_t kDaikinGap = 29000;
 // Note bits in each octet swapped so can be sent as a single value
-#define DAIKIN_FIRST_HEADER64 \
-    0b1101011100000000000000001100010100000000001001111101101000010001
+const uint64_t kDaikinFirstHeader64 =
+0b1101011100000000000000001100010100000000001001111101101000010001;
+
+// Legacy defines.
+#define DAIKIN_COOL                kDaikinCool
+#define DAIKIN_HEAT                kDaikinHeat
+#define DAIKIN_FAN                 kDaikinFan
+#define DAIKIN_AUTO                kDaikinAuto
+#define DAIKIN_DRY                 kDaikinDry
+#define DAIKIN_MIN_TEMP            kDaikinMinTemp
+#define kDaikinMaxTemp             kDaikinMaxTemp
+#define DAIKIN_FAN_MIN             kDaikinFanMin
+#define DAIKIN_FAN_MAX             kDaikinFanMax
+#define DAIKIN_FAN_AUTO            kDaikinFanAuto
+#define DAIKIN_FAN_QUIET           kDaikinFanQuiet
+
 
 class IRDaikinESP {
  public:
