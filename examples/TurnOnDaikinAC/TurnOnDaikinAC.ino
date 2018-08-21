@@ -46,7 +46,7 @@ void loop() {
   // Set up what we want to send. See ir_Daikin.cpp for all the options.
   daikinir.on();
   daikinir.setFan(1);
-  daikinir.setMode(DAIKIN_COOL);
+  daikinir.setMode(kDaikinCool);
   daikinir.setTemp(25);
   daikinir.setSwingVertical(false);
   daikinir.setSwingHorizontal(false);
