@@ -169,22 +169,22 @@ TEST(TestToshibaACClass, Temperature) {
   toshiba.begin();
 
   toshiba.setTemp(0);
-  EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
+  EXPECT_EQ(kToshibaAcMinTemp, toshiba.getTemp());
 
   toshiba.setTemp(255);
-  EXPECT_EQ(TOSHIBA_AC_MAX_TEMP, toshiba.getTemp());
+  EXPECT_EQ(kToshibaAcMaxTemp, toshiba.getTemp());
 
-  toshiba.setTemp(TOSHIBA_AC_MIN_TEMP);
-  EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
+  toshiba.setTemp(kToshibaAcMinTemp);
+  EXPECT_EQ(kToshibaAcMinTemp, toshiba.getTemp());
 
-  toshiba.setTemp(TOSHIBA_AC_MAX_TEMP);
-  EXPECT_EQ(TOSHIBA_AC_MAX_TEMP, toshiba.getTemp());
+  toshiba.setTemp(kToshibaAcMaxTemp);
+  EXPECT_EQ(kToshibaAcMaxTemp, toshiba.getTemp());
 
-  toshiba.setTemp(TOSHIBA_AC_MIN_TEMP - 1);
-  EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
+  toshiba.setTemp(kToshibaAcMinTemp - 1);
+  EXPECT_EQ(kToshibaAcMinTemp, toshiba.getTemp());
 
-  toshiba.setTemp(TOSHIBA_AC_MAX_TEMP + 1);
-  EXPECT_EQ(TOSHIBA_AC_MAX_TEMP, toshiba.getTemp());
+  toshiba.setTemp(kToshibaAcMaxTemp + 1);
+  EXPECT_EQ(kToshibaAcMaxTemp, toshiba.getTemp());
 
   toshiba.setTemp(17);
   EXPECT_EQ(17, toshiba.getTemp());
@@ -203,49 +203,49 @@ TEST(TestToshibaACClass, OperatingMode) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
-  toshiba.setMode(TOSHIBA_AC_AUTO);
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  toshiba.setMode(kToshibaAcAuto);
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
 
-  toshiba.setMode(TOSHIBA_AC_COOL);
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  toshiba.setMode(kToshibaAcCool);
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
 
-  toshiba.setMode(TOSHIBA_AC_HEAT);
-  EXPECT_EQ(TOSHIBA_AC_HEAT, toshiba.getMode());
+  toshiba.setMode(kToshibaAcHeat);
+  EXPECT_EQ(kToshibaAcHeat, toshiba.getMode());
 
-  toshiba.setMode(TOSHIBA_AC_DRY);
-  EXPECT_EQ(TOSHIBA_AC_DRY, toshiba.getMode());
+  toshiba.setMode(kToshibaAcDry);
+  EXPECT_EQ(kToshibaAcDry, toshiba.getMode());
 
-  toshiba.setMode(TOSHIBA_AC_HEAT + 1);
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  toshiba.setMode(kToshibaAcHeat + 1);
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
 
   toshiba.setMode(255);
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
 
   // Setting the power off changes the underlying mode in the state to heat.
   toshiba.setPower(true);
-  toshiba.setMode(TOSHIBA_AC_COOL);
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode(true));
+  toshiba.setMode(kToshibaAcCool);
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode(true));
   toshiba.setPower(false);
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
-  EXPECT_EQ(TOSHIBA_AC_HEAT, toshiba.getMode(true));
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcHeat, toshiba.getMode(true));
 }
 
 TEST(TestToshibaACClass, FanSpeed) {
   IRToshibaAC toshiba(0);
   toshiba.begin();
 
-  toshiba.setFan(TOSHIBA_AC_FAN_AUTO);
-  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
+  toshiba.setFan(kToshibaAcFanAuto);
+  EXPECT_EQ(kToshibaAcFanAuto, toshiba.getFan());
 
   toshiba.setFan(255);
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcFanMax, toshiba.getFan());
 
-  toshiba.setFan(TOSHIBA_AC_FAN_MAX);
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
+  toshiba.setFan(kToshibaAcFanMax);
+  EXPECT_EQ(kToshibaAcFanMax, toshiba.getFan());
 
-  toshiba.setFan(TOSHIBA_AC_FAN_MAX - 1);
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX - 1, toshiba.getFan());
+  toshiba.setFan(kToshibaAcFanMax - 1);
+  EXPECT_EQ(kToshibaAcFanMax - 1, toshiba.getFan());
 
   toshiba.setFan(1);
   EXPECT_EQ(1, toshiba.getFan());
@@ -259,8 +259,8 @@ TEST(TestToshibaACClass, FanSpeed) {
   toshiba.setFan(4);
   EXPECT_EQ(4, toshiba.getFan());
 
-  toshiba.setFan(TOSHIBA_AC_FAN_MAX + 1);
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
+  toshiba.setFan(kToshibaAcFanMax + 1);
+  EXPECT_EQ(kToshibaAcFanMax, toshiba.getFan());
 }
 
 TEST(TestToshibaACClass, RawState) {
@@ -275,17 +275,17 @@ TEST(TestToshibaACClass, RawState) {
   // Verify the starting state.
   EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), kToshibaACBits);
   EXPECT_TRUE(toshiba.getPower());
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
-  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcFanAuto, toshiba.getFan());
 
   // Change some settings.
-  toshiba.setMode(TOSHIBA_AC_COOL);
-  toshiba.setFan(TOSHIBA_AC_FAN_MAX);
-  toshiba.setTemp(TOSHIBA_AC_MIN_TEMP);
+  toshiba.setMode(kToshibaAcCool);
+  toshiba.setFan(kToshibaAcFanMax);
+  toshiba.setTemp(kToshibaAcMinTemp);
   // Verify those were set.
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_MIN_TEMP, toshiba.getTemp());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcFanMax, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcMinTemp, toshiba.getTemp());
   // Retrieve the modified state.
   EXPECT_STATE_EQ(modified_state, toshiba.getRaw(), kToshibaACBits);
 
@@ -294,8 +294,8 @@ TEST(TestToshibaACClass, RawState) {
 
   // Check the new state was set correctly.
   EXPECT_TRUE(toshiba.getPower());
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
-  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcFanAuto, toshiba.getFan());
   EXPECT_STATE_EQ(initial_state, toshiba.getRaw(), kToshibaACBits);
 }
 
@@ -352,7 +352,7 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
   toshiba.off();
   toshiba.setTemp(25);
   toshiba.setFan(3);
-  toshiba.setMode(TOSHIBA_AC_DRY);
+  toshiba.setMode(kToshibaAcDry);
   EXPECT_EQ("Power: Off, Mode: 2 (DRY), Temp: 25C, Fan: 3",
             toshiba.toString());
 }
@@ -364,13 +364,13 @@ TEST(TestToshibaACClass, MessageConstuction) {
   irsend.begin();
 
   toshiba.setFan(1);
-  toshiba.setMode(TOSHIBA_AC_COOL);
+  toshiba.setMode(kToshibaAcCool);
   toshiba.setTemp(27);
   toshiba.on();
 
   // Check everything for kicks.
   EXPECT_EQ(1, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
   EXPECT_EQ(27, toshiba.getTemp());
   EXPECT_TRUE(toshiba.getPower());
 
@@ -404,7 +404,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
   toshiba.setPower(false);
   // Check everything for kicks.
   EXPECT_EQ(1, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
   EXPECT_EQ(27, toshiba.getTemp());
   EXPECT_FALSE(toshiba.getPower());
 
@@ -438,7 +438,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
   toshiba.on();
 
   EXPECT_EQ(1, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
   EXPECT_EQ(27, toshiba.getTemp());
   EXPECT_TRUE(toshiba.getPower());
 
@@ -531,8 +531,8 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   toshiba.setRaw(irsend.capture.state);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(23, toshiba.getTemp());
-  EXPECT_EQ(TOSHIBA_AC_FAN_AUTO, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_AUTO, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcFanAuto, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcAuto, toshiba.getMode());
 
   uint16_t rawData2[295] = {
       4500, 4236,  636, 1520,  642, 1520,  640, 1520,  664, 1492,  642, 440,
@@ -571,7 +571,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(17, toshiba.getTemp());
   EXPECT_EQ(3, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_COOL, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcCool, toshiba.getMode());
 
   uint16_t rawData3[295] = {
       4474, 4262,  642, 1514,  642, 1520,  642, 1520,  642, 1514,
@@ -609,8 +609,8 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   toshiba.setRaw(irsend.capture.state);
   EXPECT_TRUE(toshiba.getPower());
   EXPECT_EQ(24, toshiba.getTemp());
-  EXPECT_EQ(TOSHIBA_AC_FAN_MAX, toshiba.getFan());
-  EXPECT_EQ(TOSHIBA_AC_HEAT, toshiba.getMode());
+  EXPECT_EQ(kToshibaAcFanMax, toshiba.getFan());
+  EXPECT_EQ(kToshibaAcHeat, toshiba.getMode());
 
   uint16_t rawData4[295] = {
       4474, 4262,  636, 1520,  640, 1520,  640, 1520,  638, 1518,  642, 438,
@@ -654,5 +654,5 @@ TEST(TestDecodeToshibaAC, RealExamples) {
       // sets the mode to heat.
       // The previous state the remote was in was 'AUTO' just prior to
       // sending the power off message.
-      EXPECT_EQ(TOSHIBA_AC_HEAT, toshiba.getMode());
+      EXPECT_EQ(kToshibaAcHeat, toshiba.getMode());
 }
