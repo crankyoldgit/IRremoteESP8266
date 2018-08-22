@@ -28,12 +28,12 @@
 // Toshiba A/C
 // Ref:
 //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
-#define TOSHIBA_AC_HDR_MARK    4400U
-#define TOSHIBA_AC_HDR_SPACE   4300U
-#define TOSHIBA_AC_BIT_MARK     543U
-#define TOSHIBA_AC_ONE_SPACE   1623U
-#define TOSHIBA_AC_ZERO_SPACE   472U
-#define TOSHIBA_AC_MIN_GAP     7048U
+const uint16_t kToshibaAcHdrMark = 4400;
+const uint16_t kToshibaAcHdrSpace = 4300;
+const uint16_t kToshibaAcBitMark = 543;
+const uint16_t kToshibaAcOneSpace = 1623;
+const uint16_t kToshibaAcZeroSpace = 472;
+const uint16_t kToshibaAcMinGap = 7048;
 
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
@@ -50,10 +50,10 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
                               uint16_t repeat) {
   if (nbytes < kToshibaACStateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(TOSHIBA_AC_HDR_MARK, TOSHIBA_AC_HDR_SPACE,
-              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ONE_SPACE,
-              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_ZERO_SPACE,
-              TOSHIBA_AC_BIT_MARK, TOSHIBA_AC_MIN_GAP,
+  sendGeneric(kToshibaAcHdrMark, kToshibaAcHdrSpace,
+              kToshibaAcBitMark, kToshibaAcOneSpace,
+              kToshibaAcBitMark, kToshibaAcZeroSpace,
+              kToshibaAcBitMark, kToshibaAcMinGap,
               data, nbytes, 38, true, repeat, 50);
 }
 #endif  // SEND_TOSHIBA_AC
@@ -154,14 +154,14 @@ void IRToshibaAC::checksum(const uint16_t length) {
 // Set the requested power state of the A/C to off.
 void IRToshibaAC::on() {
   // state = ON;
-  remote_state[6] &= ~TOSHIBA_AC_POWER;
+  remote_state[6] &= ~kToshibaAcPower;
   setMode(mode_state);
 }
 
 // Set the requested power state of the A/C to off.
 void IRToshibaAC::off() {
   // state = OFF;
-  remote_state[6] |= (TOSHIBA_AC_POWER | 0b00000011);
+  remote_state[6] |= (kToshibaAcPower | 0b00000011);
 }
 
 // Set the requested power state of the A/C.
@@ -174,28 +174,28 @@ void IRToshibaAC::setPower(bool state) {
 
 // Return the requested power state of the A/C.
 bool IRToshibaAC::getPower() {
-  return((remote_state[6] & TOSHIBA_AC_POWER) == 0);
+  return((remote_state[6] & kToshibaAcPower) == 0);
 }
 
 // Set the temp. in deg C
 void IRToshibaAC::setTemp(uint8_t temp) {
-  temp = std::max((uint8_t) TOSHIBA_AC_MIN_TEMP, temp);
-  temp = std::min((uint8_t) TOSHIBA_AC_MAX_TEMP, temp);
-  remote_state[5] = (temp - TOSHIBA_AC_MIN_TEMP) << 4;
+  temp = std::max((uint8_t) kToshibaAcMinTemp, temp);
+  temp = std::min((uint8_t) kToshibaAcMaxTemp, temp);
+  remote_state[5] = (temp - kToshibaAcMinTemp) << 4;
 }
 
 // Return the set temp. in deg C
 uint8_t IRToshibaAC::getTemp() {
-  return((remote_state[5] >> 4) + TOSHIBA_AC_MIN_TEMP);
+  return((remote_state[5] >> 4) + kToshibaAcMinTemp);
 }
 
 // Set the speed of the fan, 0-5.
 // 0 is auto, 1-5 is the speed, 5 is Max.
 void IRToshibaAC::setFan(uint8_t fan) {
   // Bounds check
-  if (fan > TOSHIBA_AC_FAN_MAX)
-    fan = TOSHIBA_AC_FAN_MAX;  // Set the fan to maximum if out of range.
-  if (fan > TOSHIBA_AC_FAN_AUTO) fan++;
+  if (fan > kToshibaAcFanMax)
+    fan = kToshibaAcFanMax;  // Set the fan to maximum if out of range.
+  if (fan > kToshibaAcFanAuto) fan++;
   remote_state[6] &= 0b00011111;  // Clear the previous fan state
   remote_state[6] |= (fan << 5);
 }
@@ -203,7 +203,7 @@ void IRToshibaAC::setFan(uint8_t fan) {
 // Return the requested state of the unit's fan.
 uint8_t IRToshibaAC::getFan() {
   uint8_t fan = remote_state[6] >> 5;
-  if (fan == TOSHIBA_AC_FAN_AUTO) return TOSHIBA_AC_FAN_AUTO;
+  if (fan == kToshibaAcFanAuto) return kToshibaAcFanAuto;
   return --fan;
 }
 
@@ -223,11 +223,11 @@ uint8_t IRToshibaAC::getMode(bool useRaw) {
 void IRToshibaAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case TOSHIBA_AC_AUTO: break;
-    case TOSHIBA_AC_COOL: break;
-    case TOSHIBA_AC_DRY: break;
-    case TOSHIBA_AC_HEAT: break;
-    default: mode = TOSHIBA_AC_AUTO;
+    case kToshibaAcAuto: break;
+    case kToshibaAcCool: break;
+    case kToshibaAcDry: break;
+    case kToshibaAcHeat: break;
+    default: mode = kToshibaAcAuto;
   }
   mode_state = mode;
   // Only adjust the remote_state if we have power set to on.
@@ -252,16 +252,16 @@ std::string IRToshibaAC::toString() {
     result += "Off";
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
-    case TOSHIBA_AC_AUTO:
+    case kToshibaAcAuto:
       result += " (AUTO)";
       break;
-    case TOSHIBA_AC_COOL:
+    case kToshibaAcCool:
       result += " (COOL)";
       break;
-    case TOSHIBA_AC_HEAT:
+    case kToshibaAcHeat:
       result += " (HEAT)";
       break;
-    case TOSHIBA_AC_DRY:
+    case kToshibaAcDry:
       result += " (DRY)";
       break;
     default:
@@ -270,10 +270,10 @@ std::string IRToshibaAC::toString() {
   result += ", Temp: " + uint64ToString(getTemp()) + "C";
   result += ", Fan: " + uint64ToString(getFan());
   switch (getFan()) {
-    case TOSHIBA_AC_FAN_AUTO:
+    case kToshibaAcFanAuto:
       result += " (AUTO)";
       break;
-    case TOSHIBA_AC_FAN_MAX:
+    case kToshibaAcFanMax:
       result += " (MAX)";
       break;
   }
@@ -309,19 +309,19 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
     return false;  // Must be called with the correct nr. of bytes.
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_HDR_MARK))
+  if (!matchMark(results->rawbuf[offset++], kToshibaAcHdrMark))
     return false;
-  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_HDR_SPACE))
+  if (!matchSpace(results->rawbuf[offset++], kToshibaAcHdrSpace))
     return false;
 
   // Data
   for (uint8_t i = 0; i < kToshibaACStateLength; i++) {
     // Read a byte's worth of data.
     match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
-                                           TOSHIBA_AC_BIT_MARK,
-                                           TOSHIBA_AC_ONE_SPACE,
-                                           TOSHIBA_AC_BIT_MARK,
-                                           TOSHIBA_AC_ZERO_SPACE);
+                                           kToshibaAcBitMark,
+                                           kToshibaAcOneSpace,
+                                           kToshibaAcBitMark,
+                                           kToshibaAcZeroSpace);
     if (data_result.success == false) return false;  // Fail
     dataBitsSoFar += 8;
     results->state[i] = (uint8_t) data_result.data;
@@ -329,8 +329,8 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], TOSHIBA_AC_BIT_MARK)) return false;
-  if (!matchSpace(results->rawbuf[offset++], TOSHIBA_AC_MIN_GAP)) return false;
+  if (!matchMark(results->rawbuf[offset++], kToshibaAcBitMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kToshibaAcMinGap)) return false;
 
   // Compliance
   if (strict) {
