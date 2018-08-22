@@ -18,31 +18,31 @@
 // FUJITSU A/C support added by Jonny Graham
 
 // Constants
-const uint16_t kFujitsuAcModeAuto = 0x00;
-const uint16_t kFujitsuAcModeCool = 0x01;
-const uint16_t kFujitsuAcModeDry = 0x02;
-const uint16_t kFujitsuAcModeFan = 0x03;
-const uint16_t kFujitsuAcModeHeat = 0x04;
+const uint8_t kFujitsuAcModeAuto = 0x00;
+const uint8_t kFujitsuAcModeCool = 0x01;
+const uint8_t kFujitsuAcModeDry = 0x02;
+const uint8_t kFujitsuAcModeFan = 0x03;
+const uint8_t kFujitsuAcModeHeat = 0x04;
 
-const uint16_t kFujitsuAcCmdStayOn = 0x00;
-const uint16_t kFujitsuAcCmdTurnOn = 0x01;
-const uint16_t kFujitsuAcCmdTurnOff = 0x02;
-const uint16_t kFujitsuAcCmdStepHoriz = 0x79;
-const uint16_t kFujitsuAcCmdStepVert = 0x6C;
+const uint8_t kFujitsuAcCmdStayOn = 0x00;
+const uint8_t kFujitsuAcCmdTurnOn = 0x01;
+const uint8_t kFujitsuAcCmdTurnOff = 0x02;
+const uint8_t kFujitsuAcCmdStepHoriz = 0x79;
+const uint8_t kFujitsuAcCmdStepVert = 0x6C;
 
-const uint16_t kFujitsuAcFanAuto = 0x00;
-const uint16_t kFujitsuAcFanHigh = 0x01;
-const uint16_t kFujitsuAcFanMed = 0x02;
-const uint16_t kFujitsuAcFanLow = 0x03;
-const uint16_t kFujitsuAcFanQuiet = 0x04;
+const uint8_t kFujitsuAcFanAuto = 0x00;
+const uint8_t kFujitsuAcFanHigh = 0x01;
+const uint8_t kFujitsuAcFanMed = 0x02;
+const uint8_t kFujitsuAcFanLow = 0x03;
+const uint8_t kFujitsuAcFanQuiet = 0x04;
 
-const uint16_t kFujitsuAcMinTemp = 16;  // 16C
-const uint16_t kFujitsuAcMaxTemp = 30;  // 30C
+const uint8_t kFujitsuAcMinTemp = 16;  // 16C
+const uint8_t kFujitsuAcMaxTemp = 30;  // 30C
 
-const uint16_t kFujitsuAcSwingOff = 0x00;
-const uint16_t kFujitsuAcSwingVert = 0x01;
-const uint16_t kFujitsuAcSwingHoriz = 0x02;
-const uint16_t kFujitsuAcSwingBoth = 0x03;
+const uint8_t kFujitsuAcSwingOff = 0x00;
+const uint8_t kFujitsuAcSwingVert = 0x01;
+const uint8_t kFujitsuAcSwingHoriz = 0x02;
+const uint8_t kFujitsuAcSwingBoth = 0x03;
 
 // Legacy defines.
 #define FUJITSU_AC_MODE_AUTO      kFujitsuAcModeAuto
