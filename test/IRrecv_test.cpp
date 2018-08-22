@@ -134,7 +134,7 @@ TEST(TestDecode, DecodeJVC) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
 }
 
@@ -148,15 +148,15 @@ TEST(TestDecode, DecodeLG) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
-  EXPECT_EQ(kLGBits, irsend.capture.bits);
+  EXPECT_EQ(kLgBits, irsend.capture.bits);
   EXPECT_EQ(0x4B4AE51, irsend.capture.value);
 
   irsend.reset();
-  irsend.sendLG(0xB4B4AE51, kLG32Bits);
+  irsend.sendLG(0xB4B4AE51, kLg32Bits);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
-  EXPECT_EQ(kLG32Bits, irsend.capture.bits);
+  EXPECT_EQ(kLg32Bits, irsend.capture.bits);
   EXPECT_EQ(0xB4B4AE51, irsend.capture.value);
 }
 

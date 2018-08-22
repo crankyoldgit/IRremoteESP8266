@@ -50,7 +50,7 @@ const uint32_t kFnvPrime32 = 16777619UL;
 const uint32_t kFnvBasis32 = 2166136261UL;
 
 // Hitachi AC is the current largest state size.
-const uint16_t kStateSizeMax = kHitachiAC2StateLength;
+const uint16_t kStateSizeMax = kHitachiAc2StateLength;
 
 // Types
 // information for the interrupt handler
@@ -195,11 +195,11 @@ class IRrecv {
                        uint32_t manufacturer = kPanasonicManufacturer);
 #endif
 #if DECODE_LG
-  bool decodeLG(decode_results *results, uint16_t nbits = kLGBits,
+  bool decodeLG(decode_results *results, uint16_t nbits = kLgBits,
                 bool strict = false);
 #endif
 #if DECODE_JVC
-  bool decodeJVC(decode_results *results, uint16_t nbits = kJVCBits,
+  bool decodeJVC(decode_results *results, uint16_t nbits = kJvcBits,
                  bool strict = true);
 #endif
 #if DECODE_SAMSUNG
@@ -267,7 +267,7 @@ class IRrecv {
 #endif
 #if DECODE_CARRIER_AC
   bool decodeCarrierAC(decode_results *results,
-                       uint16_t nbits = kCarrierACBits,
+                       uint16_t nbits = kCarrierAcBits,
                        bool strict = true);
 #endif
 #if DECODE_GREE
@@ -285,14 +285,14 @@ class IRrecv {
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
   bool decodeHitachiAC(decode_results *results,
-                       uint16_t nbits = kHitachiACBits, bool strict = true);
+                       uint16_t nbits = kHitachiAcBits, bool strict = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results,
-                        uint16_t nbits = kHitachiAC1Bits, bool strict = true);
+                        uint16_t nbits = kHitachiAc1Bits, bool strict = true);
 #endif
 #if DECODE_GICABLE
-  bool decodeGICable(decode_results *results, uint16_t nbits = kGICableBits,
+  bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,
                      bool strict = true);
 #endif
 };

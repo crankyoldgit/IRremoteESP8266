@@ -93,7 +93,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   uint32_t encodeSAMSUNG(uint8_t customer, uint8_t command);
 #endif
 #if SEND_LG
-  void sendLG(uint64_t data, uint16_t nbits = kLGBits,
+  void sendLG(uint64_t data, uint16_t nbits = kLgBits,
               uint16_t repeat = kNoRepeat);
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
@@ -107,7 +107,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                     uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_JVC
-  void sendJVC(uint64_t data, uint16_t nbits = kJVCBits,
+  void sendJVC(uint64_t data, uint16_t nbits = kJvcBits,
                uint16_t repeat = kNoRepeat);
   uint16_t encodeJVC(uint8_t address, uint8_t command);
 #endif
@@ -243,8 +243,8 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                     uint16_t repeat = kLasertagMinRepeat);
 #endif
 #if SEND_CARRIER_AC
-  void sendCarrierAC(uint64_t data, uint16_t nbits = kCarrierACBits,
-                     uint16_t repeat = kCarrierACMinRepeat);
+  void sendCarrierAC(uint64_t data, uint16_t nbits = kCarrierAcBits,
+                     uint16_t repeat = kCarrierAcMinRepeat);
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
   void sendHaierAC(unsigned char data[],
@@ -258,22 +258,22 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #endif
 #if SEND_HITACHI_AC
   void sendHitachiAC(unsigned char data[],
-                     uint16_t nbytes = kHitachiACStateLength,
+                     uint16_t nbytes = kHitachiAcStateLength,
                      uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_HITACHI_AC1
   void sendHitachiAC1(unsigned char data[],
-                      uint16_t nbytes = kHitachiAC1StateLength,
+                      uint16_t nbytes = kHitachiAc1StateLength,
                       uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_HITACHI_AC2
   void sendHitachiAC2(unsigned char data[],
-                      uint16_t nbytes = kHitachiAC2StateLength,
+                      uint16_t nbytes = kHitachiAc2StateLength,
                       uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_GICABLE
-  void sendGICable(uint64_t data, uint16_t nbits = kGICableBits,
-                   uint16_t repeat = kGICableMinRepeat);
+  void sendGICable(uint64_t data, uint16_t nbits = kGicableBits,
+                   uint16_t repeat = kGicableMinRepeat);
 #endif
 
  protected:

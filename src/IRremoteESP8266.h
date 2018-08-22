@@ -255,9 +255,9 @@ const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kCoolixBits = 24;
 #define COOLIX_BITS                 kCoolixBits
-const uint16_t kCarrierACBits = 32;
-#define CARRIER_AC_BITS             kCarrierACBits
-const uint16_t kCarrierACMinRepeat = kNoRepeat;
+const uint16_t kCarrierAcBits = 32;
+#define CARRIER_AC_BITS             kCarrierAcBits
+const uint16_t kCarrierAcMinRepeat = kNoRepeat;
 // Daikin has a lot of static stuff that is discarded
 const uint16_t kDaikinRawBits = 583;
 const uint16_t kDaikinStateLength = 27;
@@ -271,9 +271,9 @@ const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 #define DISH_BITS                   kDishBits
 const uint16_t kDishMinRepeat = 3;
-const uint16_t kGICableBits = 16;
-#define GICABLE_BITS                kGICableBits
-const uint16_t kGICableMinRepeat = kSingleRepeat;
+const uint16_t kGicableBits = 16;
+#define GICABLE_BITS                kGicableBits
+const uint16_t kGicableMinRepeat = kSingleRepeat;
 const uint16_t kGreeStateLength = 8;
 #define GREE_STATE_LENGTH            kGreeStateLength
 const uint16_t kGreeBits = kGreeStateLength * 8;
@@ -283,27 +283,27 @@ const uint16_t kHaierACBits = kHaierACStateLength * 8;
 const uint16_t kHaierACYRW02StateLength = 14;
 #define HAIER_AC_YRW02_STATE_LENGTH kHaierACYRW02StateLength
 const uint16_t kHaierACYRW02Bits = kHaierACYRW02StateLength * 8;
-const uint16_t kHitachiACStateLength = 28;
-#define HITACHI_AC_STATE_LENGTH     kHitachiACStateLength
-const uint16_t kHitachiACBits = kHitachiACStateLength * 8;
-#define HITACHI_AC_BITS             kHitachiACBits
-const uint16_t kHitachiAC1StateLength = 13;
-#define HITACHI_AC1_STATE_LENGTH    kHitachiAC1StateLength
-const uint16_t kHitachiAC1Bits = kHitachiAC1StateLength * 8;
-#define HITACHI_AC1_BITS            kHitachiAC1Bits
-const uint16_t kHitachiAC2StateLength = 53;
-#define HITACHI_AC2_STATE_LENGTH    kHitachiAC2StateLength
-const uint16_t kHitachiAC2Bits = kHitachiAC2StateLength * 8;
-#define HITACHI_AC2_BITS            kHitachiAC2Bits
-const uint16_t kJVCBits = 16;
-#define JVC_BITS                    kJVCBits
+const uint16_t kHitachiAcStateLength = 28;
+#define HITACHI_AC_STATE_LENGTH     kHitachiAcStateLength
+const uint16_t kHitachiAcBits = kHitachiAcStateLength * 8;
+#define HITACHI_AC_BITS             kHitachiAcBits
+const uint16_t kHitachiAc1StateLength = 13;
+#define HITACHI_AC1_STATE_LENGTH    kHitachiAc1StateLength
+const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
+#define HITACHI_AC1_BITS            kHitachiAc1Bits
+const uint16_t kHitachiAc2StateLength = 53;
+#define HITACHI_AC2_STATE_LENGTH    kHitachiAc2StateLength
+const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
+#define HITACHI_AC2_BITS            kHitachiAc2Bits
+const uint16_t kJvcBits = 16;
+#define JVC_BITS                    kJvcBits
 const uint16_t kKelvinatorStateLength = 16;
 #define KELVINATOR_STATE_LENGTH     kKelvinatorStateLength
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;
-const uint16_t kLGBits = 28;
-#define LG_BITS                     kLGBits
-const uint16_t kLG32Bits = 32;
-#define LG32_BITS                   kLG32Bits
+const uint16_t kLgBits = 28;
+#define LG_BITS                     kLgBits
+const uint16_t kLg32Bits = 32;
+#define LG32_BITS                   kLg32Bits
 const uint16_t kMitsubishiBits = 16;
 #define MITSUBISHI_BITS             kMitsubishiBits
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.

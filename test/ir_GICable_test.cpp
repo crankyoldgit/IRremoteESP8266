@@ -38,14 +38,14 @@ TEST(TestSendGICable, SendWithRepeats) {
   IRsendTest irsend(0);
   irsend.begin();
   // Send a command with 0 repeats.
-  irsend.sendGICable(0x8807, kGICableBits, 0);
+  irsend.sendGICable(0x8807, kGicableBits, 0);
   EXPECT_EQ(
       "m9000s4400"
       "m550s4400m550s2200m550s2200m550s2200m550s4400m550s2200m550s2200m550s2200"
       "m550s2200m550s2200m550s2200m550s2200m550s2200m550s4400m550s4400m550s4400"
       "m550s30650", irsend.outputStr());
   // Send a command with 1 repeat.
-  irsend.sendGICable(0x8807, kGICableBits, 1);
+  irsend.sendGICable(0x8807, kGicableBits, 1);
   EXPECT_EQ(
       "m9000s4400"
       "m550s4400m550s2200m550s2200m550s2200m550s4400m550s2200m550s2200m550s2200"
@@ -53,7 +53,7 @@ TEST(TestSendGICable, SendWithRepeats) {
       "m550s30650"
       "m9000s2200m550s87850", irsend.outputStr());
   // Send a command with 3 repeats.
-  irsend.sendGICable(0x8807, kGICableBits, 3);
+  irsend.sendGICable(0x8807, kGicableBits, 3);
   EXPECT_EQ(
       "m9000s4400"
       "m550s4400m550s2200m550s2200m550s2200m550s4400m550s2200m550s2200m550s2200"
@@ -77,7 +77,7 @@ TEST(TestDecodeGICable, SyntheticDecode) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GICABLE, irsend.capture.decode_type);
-  EXPECT_EQ(kGICableBits, irsend.capture.bits);
+  EXPECT_EQ(kGicableBits, irsend.capture.bits);
   EXPECT_EQ(0x8807, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -100,7 +100,7 @@ TEST(TestDecodeGICable, RealExampleDecodeOK) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GICABLE, irsend.capture.decode_type);
-  EXPECT_EQ(kGICableBits, irsend.capture.bits);
+  EXPECT_EQ(kGicableBits, irsend.capture.bits);
   EXPECT_EQ(0x8807, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -122,7 +122,7 @@ TEST(TestDecodeGICable, RealExampleDecodeLEFT) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GICABLE, irsend.capture.decode_type);
-  EXPECT_EQ(kGICableBits, irsend.capture.bits);
+  EXPECT_EQ(kGicableBits, irsend.capture.bits);
   EXPECT_EQ(0x6C0E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -145,7 +145,7 @@ TEST(TestDecodeGICable, RealExampleDecodeZEROKey) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(GICABLE, irsend.capture.decode_type);
-  EXPECT_EQ(kGICableBits, irsend.capture.bits);
+  EXPECT_EQ(kGicableBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);

@@ -26,7 +26,7 @@ TEST(TestSendJVC, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendJVC(0xC2B8, kJVCBits, 1);  // 1 repeat.
+  irsend.sendJVC(0xC2B8, kJvcBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
@@ -35,7 +35,7 @@ TEST(TestSendJVC, SendWithRepeats) {
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
       "m525s34275", irsend.outputStr());
-  irsend.sendJVC(0xC2B8, kJVCBits, 2);  // 2 repeats.
+  irsend.sendJVC(0xC2B8, kJvcBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
@@ -100,9 +100,9 @@ TEST(TestDecodeJVC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendJVC(0xC2B8);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x43, irsend.capture.address);
   EXPECT_EQ(0x1D, irsend.capture.command);
@@ -112,9 +112,9 @@ TEST(TestDecodeJVC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendJVC(irsend.encodeJVC(0x07, 0x99));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xE099, irsend.capture.value);
   EXPECT_EQ(0x07, irsend.capture.address);
   EXPECT_EQ(0x99, irsend.capture.command);
@@ -124,9 +124,9 @@ TEST(TestDecodeJVC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendJVC(irsend.encodeJVC(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0x8080, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x1, irsend.capture.command);
@@ -141,27 +141,27 @@ TEST(TestDecodeJVC, NormalDecodeWithRepeatAndStrict) {
 
   // Normal JVC 16-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendJVC(0xC2B8, kJVCBits, 2);
+  irsend.sendJVC(0xC2B8, kJvcBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x43, irsend.capture.address);
   EXPECT_EQ(0x1D, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  irsend.makeDecodeResult(2 * kJVCBits + 4);
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  irsend.makeDecodeResult(2 * kJvcBits + 4);
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_TRUE(irsend.capture.repeat);
 
-  irsend.makeDecodeResult(2 * kJVCBits + 4 + 2 * kJVCBits + 2);
-  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  irsend.makeDecodeResult(2 * kJvcBits + 4 + 2 * kJvcBits + 2);
+  ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_TRUE(irsend.capture.repeat);
 
@@ -176,7 +176,7 @@ TEST(TestDecodeJVC, NormalDecodeWithRepeatAndStrict) {
 
   ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x43, irsend.capture.address);
   EXPECT_EQ(0x1D, irsend.capture.command);
@@ -193,7 +193,7 @@ TEST(TestDecodeJVC, DecodeWithNonStrictValues) {
   irsend.sendJVC(0x0, 8);  // Illegal value JVC 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture, 8, false));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
@@ -206,7 +206,7 @@ TEST(TestDecodeJVC, DecodeWithNonStrictValues) {
   irsend.sendJVC(0x12345678, 32);  // Illegal value JVC 32-bit message.
   irsend.makeDecodeResult();
   // Should not pass with strict when we ask for less bits than we got.
-  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJVCBits, true));
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJvcBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -225,7 +225,7 @@ TEST(TestDecodeJVC, DecodeWithNonStrictValues) {
   irsend.makeDecodeResult();
 
   // Shouldn't pass if strict off and the wrong expected bits.
-  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJVCBits, false));
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJvcBits, false));
 
   // Re-decode with correct bit size.
   ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, 36, true));
@@ -273,7 +273,7 @@ TEST(TestDecodeJVC, DecodeGlobalCacheExample) {
 
   ASSERT_TRUE(irrecv.decodeJVC(&irsend.capture));
   EXPECT_EQ(JVC, irsend.capture.decode_type);
-  EXPECT_EQ(kJVCBits, irsend.capture.bits);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x43, irsend.capture.address);
   EXPECT_EQ(0x1D, irsend.capture.command);
@@ -295,5 +295,5 @@ TEST(TestDecodeJVC, FailToDecodeNonJVCExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJVCBits, false));
+  ASSERT_FALSE(irrecv.decodeJVC(&irsend.capture, kJvcBits, false));
 }
