@@ -84,8 +84,8 @@ void IRArgoAC::stateReset() {
   this->off();
   this->setTemp(20);
   this->setRoomTemp(25);
-  this->setCoolMode(ARGO_COOL_AUTO);
-  this->setFan(ARGO_FAN_AUTO);
+  this->setCoolMode(kArgoCoolAuto);
+  this->setFan(kArgoFanAuto);
 }
 
 uint8_t* IRArgoAC::getRaw() {
@@ -135,10 +135,10 @@ bool IRArgoAC::getMax() {
 // Set the temp in deg C
 // Sending 0 equals +4
 void IRArgoAC::setTemp(uint8_t temp) {
-  if (temp < ARGO_MIN_TEMP)
-    temp = ARGO_MIN_TEMP;
-  else if (temp > ARGO_MAX_TEMP)
-    temp = ARGO_MAX_TEMP;
+  if (temp < kArgoMinTemp)
+    temp = kArgoMinTemp;
+  else if (temp > kArgoMaxTemp)
+    temp = kArgoMaxTemp;
 
   // Store in attributes
   set_temp = temp;
