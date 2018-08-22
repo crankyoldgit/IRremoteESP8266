@@ -258,7 +258,7 @@ class IRrecv {
 #endif
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results,
-                       uint16_t nbits = kFujitsuACBits,
+                       uint16_t nbits = kFujitsuAcBits,
                        bool strict = false);
 #endif
 #if DECODE_LASERTAG

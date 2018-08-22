@@ -312,16 +312,16 @@ const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiACStateLength = 18;
 #define MITSUBISHI_AC_STATE_LENGTH  kMitsubishiACStateLength
 const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
-const uint16_t kFujitsuACMinRepeat = kNoRepeat;
-#define FUJITSU_AC_MIN_REPEAT        kFujitsuACMinRepeat
-const uint16_t kFujitsuACStateLength = 16;
-#define FUJITSU_AC_STATE_LENGTH     kFujitsuACStateLength
-const uint16_t kFujitsuACStateLengthShort = 7;
-#define FUJITSU_AC_STATE_LENGTH_SHORT kFujitsuACStateLengthShort
-const uint16_t kFujitsuACBits = kFujitsuACStateLength * 8;
-#define FUJITSU_AC_BITS             kFujitsuACBits
-const uint16_t kFujitsuACMinBits = (kFujitsuACStateLengthShort - 1) * 8;
-#define FUJITSU_AC_MIN_BITS         kFujitsuACMinBits
+const uint16_t kFujitsuAcMinRepeat = kNoRepeat;
+#define FUJITSU_AC_MIN_REPEAT        kFujitsuAcMinRepeat
+const uint16_t kFujitsuAcStateLength = 16;
+#define FUJITSU_AC_STATE_LENGTH     kFujitsuAcStateLength
+const uint16_t kFujitsuAcStateLengthShort = 7;
+#define FUJITSU_AC_STATE_LENGTH_SHORT kFujitsuAcStateLengthShort
+const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
+#define FUJITSU_AC_BITS             kFujitsuAcBits
+const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
+#define FUJITSU_AC_MIN_BITS         kFujitsuAcMinBits
 const uint16_t kNECBits = 32;
 #define NEC_BITS                    kNECBits
 const uint16_t kPanasonicBits = 48;
