@@ -181,7 +181,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #if SEND_FUJITSU_AC
   void sendFujitsuAC(unsigned char data[],
                      uint16_t nbytes,
-                     uint16_t repeat = kFujitsuACMinRepeat);
+                     uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
 #if SEND_GLOBALCACHE
   void sendGC(uint16_t buf[], uint16_t len);
