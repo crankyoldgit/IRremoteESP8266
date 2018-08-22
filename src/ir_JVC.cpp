@@ -19,31 +19,31 @@
 // Constants
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-const uint16_t kJVCTick = 75;
-const uint16_t kJVCHdrMarkTicks = 112;
-const uint16_t kJVCHdrMark = kJVCHdrMarkTicks * kJVCTick;
-const uint16_t kJVCHdrSpaceTicks = 56;
-const uint16_t kJVCHdrSpace = kJVCHdrSpaceTicks * kJVCTick;
-const uint16_t kJVCBitMarkTicks = 7;
-const uint16_t kJVCBitMark = kJVCBitMarkTicks * kJVCTick;
-const uint16_t kJVCOneSpaceTicks = 23;
-const uint16_t kJVCOneSpace = kJVCOneSpaceTicks * kJVCTick;
-const uint16_t kJVCZeroSpaceTicks = 7;
-const uint16_t kJVCZeroSpace = kJVCZeroSpaceTicks * kJVCTick;
-const uint16_t kJVCRptLengthTicks = 800;
-const uint16_t kJVCRptLength = kJVCRptLengthTicks * kJVCTick;
-const uint16_t kJVCMinGapTicks = kJVCRptLengthTicks -
-    (kJVCHdrMarkTicks + kJVCHdrSpaceTicks +
-     kJVCBits * (kJVCBitMarkTicks + kJVCOneSpaceTicks) +
-     kJVCBitMarkTicks);
-const uint16_t kJVCMinGap = kJVCMinGapTicks * kJVCTick;
+const uint16_t kJvcTick = 75;
+const uint16_t kJvcHdrMarkTicks = 112;
+const uint16_t kJvcHdrMark = kJvcHdrMarkTicks * kJvcTick;
+const uint16_t kJvcHdrSpaceTicks = 56;
+const uint16_t kJvcHdrSpace = kJvcHdrSpaceTicks * kJvcTick;
+const uint16_t kJvcBitMarkTicks = 7;
+const uint16_t kJvcBitMark = kJvcBitMarkTicks * kJvcTick;
+const uint16_t kJvcOneSpaceTicks = 23;
+const uint16_t kJvcOneSpace = kJvcOneSpaceTicks * kJvcTick;
+const uint16_t kJvcZeroSpaceTicks = 7;
+const uint16_t kJvcZeroSpace = kJvcZeroSpaceTicks * kJvcTick;
+const uint16_t kJvcRptLengthTicks = 800;
+const uint16_t kJvcRptLength = kJvcRptLengthTicks * kJvcTick;
+const uint16_t kJvcMinGapTicks = kJvcRptLengthTicks -
+    (kJvcHdrMarkTicks + kJvcHdrSpaceTicks +
+     kJvcBits * (kJvcBitMarkTicks + kJvcOneSpaceTicks) +
+     kJvcBitMarkTicks);
+const uint16_t kJvcMinGap = kJvcMinGapTicks * kJvcTick;
 
 #if SEND_JVC
 // Send a JVC message.
 //
 // Args:
 //   data:   The contents of the command you want to send.
-//   nbits:  The bit size of the command being sent. (kJVCBits)
+//   nbits:  The bit size of the command being sent. (kJvcBits)
 //   repeat: The number of times you want the command to be repeated.
 //
 // Status: STABLE.
@@ -57,23 +57,23 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   IRtimer usecs = IRtimer();
   // Header
   // Only sent for the first message.
-  mark(kJVCHdrMark);
-  space(kJVCHdrSpace);
+  mark(kJvcHdrMark);
+  space(kJvcHdrSpace);
 
   // We always send the data & footer at least once, hence '<= repeat'.
   for (uint16_t i = 0; i <= repeat; i++) {
     sendGeneric(0, 0,  // No Header
-                kJVCBitMark, kJVCOneSpace,
-                kJVCBitMark, kJVCZeroSpace,
-                kJVCBitMark, kJVCMinGap,
+                kJvcBitMark, kJvcOneSpace,
+                kJvcBitMark, kJvcZeroSpace,
+                kJvcBitMark, kJvcMinGap,
                 data, nbits, 38, true, 0,  // Repeats are handles elsewhere.
                 33);
     // Wait till the end of the repeat time window before we send another code.
     uint32_t elapsed = usecs.elapsed();
     // Avoid potential unsigned integer underflow.
-    // e.g. when elapsed > kJVCRptLength.
-    if (elapsed < kJVCRptLength)
-      space(kJVCRptLength - elapsed);
+    // e.g. when elapsed > kJvcRptLength.
+    if (elapsed < kJvcRptLength)
+      space(kJvcRptLength - elapsed);
     usecs.reset();
   }
 }
@@ -100,7 +100,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits of data to expect. Typically kJVCBits.
+//   nbits:   Nr. of bits of data to expect. Typically kJvcBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -112,7 +112,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
 bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
-  if (strict && nbits != kJVCBits)
+  if (strict && nbits != kJvcBits)
     return false;  // Must be called with the correct nr. of bits.
   if (results->rawlen < 2 * nbits + kFooter - 1)
     return false;  // Can't possibly be a valid JVC message.
@@ -125,36 +125,36 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   uint32_t s_tick;
   // Header
   // (Optional as repeat codes don't have the header)
-  if (matchMark(results->rawbuf[offset], kJVCHdrMark)) {
+  if (matchMark(results->rawbuf[offset], kJvcHdrMark)) {
     isRepeat = false;
-    m_tick = results->rawbuf[offset++] * kRawTick / kJVCHdrMarkTicks;
+    m_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrMarkTicks;
     if (results->rawlen < 2 * nbits + 4)
       return false;  // Can't possibly be a valid JVC message with a header.
-    if (!matchSpace(results->rawbuf[offset], kJVCHdrSpace))
+    if (!matchSpace(results->rawbuf[offset], kJvcHdrSpace))
       return false;
-    s_tick = results->rawbuf[offset++] * kRawTick / kJVCHdrSpaceTicks;
+    s_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrSpaceTicks;
   } else {
     // We can't easily auto-calibrate as there is no header, so assume
     // the default tick time.
-    m_tick = kJVCTick;
-    s_tick = kJVCTick;
+    m_tick = kJvcTick;
+    s_tick = kJvcTick;
   }
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kJVCBitMarkTicks * m_tick,
-                                         kJVCOneSpaceTicks * s_tick,
-                                         kJVCBitMarkTicks * m_tick,
-                                         kJVCZeroSpaceTicks * s_tick);
+                                         kJvcBitMarkTicks * m_tick,
+                                         kJvcOneSpaceTicks * s_tick,
+                                         kJvcBitMarkTicks * m_tick,
+                                         kJvcZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kJVCBitMarkTicks * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kJvcBitMarkTicks * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kJVCMinGapTicks * s_tick))
+      !matchAtLeast(results->rawbuf[offset], kJvcMinGapTicks * s_tick))
     return false;
 
   // Success

@@ -521,13 +521,13 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       stateSize = kHaierACYRW02StateLength;
       break;
     case HITACHI_AC:
-      stateSize = kHitachiACStateLength;
+      stateSize = kHitachiAcStateLength;
       break;
     case HITACHI_AC1:
-      stateSize = kHitachiAC1StateLength;
+      stateSize = kHitachiAc1StateLength;
       break;
     case HITACHI_AC2:
-      stateSize = kHitachiAC2StateLength;
+      stateSize = kHitachiAc2StateLength;
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
@@ -1084,7 +1084,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_JVC
     case JVC:  // 6
       if (bits == 0)
-        bits = kJVCBits;
+        bits = kJvcBits;
       irsend.sendJVC(code, bits, repeat);
       break;
 #endif
@@ -1113,7 +1113,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_LG
     case LG:  // 10
       if (bits == 0)
-        bits = kLGBits;
+        bits = kLgBits;
       irsend.sendLG(code, bits, repeat);
       break;
 #endif
@@ -1244,7 +1244,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_CARRIER_AC
     case CARRIER_AC:  // 37
       if (bits == 0)
-        bits = kCarrierACBits;
+        bits = kCarrierAcBits;
       irsend.sendCarrierAC(code, bits, repeat);
       break;
 #endif
@@ -1259,8 +1259,8 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_GICABLE
     case GICABLE:  // 43
       if (bits == 0)
-        bits = kGICableBits;
-      repeat = std::max(repeat, kGICableMinRepeat);
+        bits = kGicableBits;
+      repeat = std::max(repeat, kGicableMinRepeat);
       irsend.sendGICable(code, bits, repeat);
       break;
 #endif

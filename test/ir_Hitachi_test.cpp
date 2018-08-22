@@ -14,7 +14,7 @@ TEST(TestSendHitachiAC, SendData) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiACStateLength] = {
+  uint8_t hitachi_code[kHitachiAcStateLength] = {
       0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
       0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x80, 0x00, 0x00, 0xAC};
@@ -58,13 +58,13 @@ TEST(TestSendHitachiAC, SendWithRepeats) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiACStateLength] = {
+  uint8_t hitachi_code[kHitachiAcStateLength] = {
       0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
       0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x80, 0x00, 0x00, 0xAC};
   irsend.reset();
 
-  irsend.sendHitachiAC(hitachi_code, kHitachiACStateLength, 1);
+  irsend.sendHitachiAC(hitachi_code, kHitachiAcStateLength, 1);
   EXPECT_EQ(
     "m3300s1700"
     "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
@@ -133,20 +133,20 @@ TEST(TestSendHitachiAC, SendUnexpectedSizes) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t hitachi_short_code[kHitachiACStateLength - 1] = {
+  uint8_t hitachi_short_code[kHitachiAcStateLength - 1] = {
     0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
     0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x80, 0x00, 0x00};
-  uint8_t hitachi_long_code[kHitachiACStateLength + 1] = {
+  uint8_t hitachi_long_code[kHitachiAcStateLength + 1] = {
     0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
     0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x80, 0x00, 0x00, 0xAC, 0xFF};
   irsend.reset();
-  irsend.sendHitachiAC(hitachi_short_code, kHitachiACStateLength - 1);
+  irsend.sendHitachiAC(hitachi_short_code, kHitachiAcStateLength - 1);
   ASSERT_EQ("", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendHitachiAC(hitachi_long_code, kHitachiACStateLength + 1);
+  irsend.sendHitachiAC(hitachi_long_code, kHitachiAcStateLength + 1);
   ASSERT_EQ(
     "m3300s1700"
     "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
@@ -189,7 +189,7 @@ TEST(TestDecodeHitachiAC, NormalSynthetic) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiACStateLength] = {
+  uint8_t hitachi_code[kHitachiAcStateLength] = {
     0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
     0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x80, 0x00, 0x00, 0xAC};
@@ -199,8 +199,8 @@ TEST(TestDecodeHitachiAC, NormalSynthetic) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HITACHI_AC, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiACBits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiACBits);
+  ASSERT_EQ(kHitachiAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
 }
 
 // Decode a 'real' HitachiAC message.
@@ -209,7 +209,7 @@ TEST(TestDecodeHitachiAC, NormalRealExample1) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiACStateLength] = {
+  uint8_t hitachi_code[kHitachiAcStateLength] = {
     0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80, 0x20, 0x04,
     0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x80, 0x00, 0x00, 0xAC};
@@ -255,8 +255,8 @@ TEST(TestDecodeHitachiAC, NormalRealExample1) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeHitachiAC(&irsend.capture));
   EXPECT_EQ(HITACHI_AC, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiACBits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiACBits);
+  ASSERT_EQ(kHitachiAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
 }
 
 // Decode another 'real' HitachiAC message.
@@ -265,7 +265,7 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiACStateLength] = {
+  uint8_t hitachi_code[kHitachiAcStateLength] = {
     0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x10, 0xC0, 0x02,
     0x00, 0xA0, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x80, 0x00, 0x00, 0xD0};
@@ -311,8 +311,8 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HITACHI_AC, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiACBits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiACBits);
+  ASSERT_EQ(kHitachiAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
 }
 
 // Tests for sendHitachiAC1().
@@ -322,7 +322,7 @@ TEST(TestSendHitachiAC1, SendData) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiAC1StateLength] = {
+  uint8_t hitachi_code[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84, 0x00, 0x00, 0x00, 0x00, 0x30,
       0xB8};
   irsend.reset();
@@ -351,7 +351,7 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiAC1StateLength] = {
+  uint8_t hitachi_code[kHitachiAc1StateLength] = {
     0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84, 0x00, 0x00, 0x00, 0x00, 0x10,
     0x98};
 
@@ -378,8 +378,8 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HITACHI_AC1, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiAC1Bits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAC1Bits);
+  ASSERT_EQ(kHitachiAc1Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc1Bits);
 }
 
 
@@ -390,7 +390,7 @@ TEST(TestSendHitachiAC2, SendData) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiAC2StateLength] = {
+  uint8_t hitachi_code[kHitachiAc2StateLength] = {
       0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x49, 0xB6, 0x22,
       0xDD, 0x01, 0xFE, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0xCA, 0x35, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0,
@@ -464,7 +464,7 @@ TEST(TestDecodeHitachiAC2, NormalSyntheticExample) {
   irsend.begin();
 
   // ON - 32c cool (fan auto)
-  uint8_t hitachi_code[kHitachiAC2StateLength] = {
+  uint8_t hitachi_code[kHitachiAc2StateLength] = {
       0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x49, 0xB6, 0x22,
       0xDD, 0x01, 0xFE, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0xCA, 0x35, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0,
@@ -476,8 +476,8 @@ TEST(TestDecodeHitachiAC2, NormalSyntheticExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HITACHI_AC2, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiAC2Bits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAC2Bits);
+  ASSERT_EQ(kHitachiAc2Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc2Bits);
 }
 
 // Decode a 'real' HitachiAC2 message.
@@ -486,7 +486,7 @@ TEST(TestDecodeHitachiAC2, NormalRealExample) {
   IRrecv irrecv(0);
   irsend.begin();
 
-  uint8_t hitachi_code[kHitachiAC2StateLength] = {
+  uint8_t hitachi_code[kHitachiAc2StateLength] = {
       0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x49, 0xB6, 0x22,
       0xDD, 0x01, 0xFE, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0xCA, 0x35, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0,
@@ -572,6 +572,6 @@ TEST(TestDecodeHitachiAC2, NormalRealExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(HITACHI_AC2, irsend.capture.decode_type);
-  ASSERT_EQ(kHitachiAC2Bits, irsend.capture.bits);
-  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAC2Bits);
+  ASSERT_EQ(kHitachiAc2Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc2Bits);
 }

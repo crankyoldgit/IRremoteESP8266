@@ -22,21 +22,21 @@
 
 // Constants
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/417
-const uint16_t kHitachiACHdrMark = 3300;
-const uint16_t kHitachiACHdrSpace = 1700;
-const uint16_t kHitachiAC1HdrMark = 3400;
-const uint16_t kHitachiAC1HdrSpace = 3400;
-const uint16_t kHitachiACBitMark = 400;
-const uint16_t kHitachiACOneSpace = 1250;
-const uint16_t kHitachiACZeroSpace = 500;
-const uint32_t kHitachiACMinGap = 100000;  // Completely made up value.
+const uint16_t kHitachiAcHdrMark = 3300;
+const uint16_t kHitachiAcHdrSpace = 1700;
+const uint16_t kHitachiAc1HdrMark = 3400;
+const uint16_t kHitachiAc1HdrSpace = 3400;
+const uint16_t kHitachiAcBitMark = 400;
+const uint16_t kHitachiAcOneSpace = 1250;
+const uint16_t kHitachiAcZeroSpace = 500;
+const uint32_t kHitachiAcMinGap = 100000;  // Completely made up value.
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kHitachiACStateLength)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAcStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: ALPHA / Untested.
@@ -45,12 +45,12 @@ const uint32_t kHitachiACMinGap = 100000;  // Completely made up value.
 //   https://github.com/markszabo/IRremoteESP8266/issues/417
 void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
-  if (nbytes < kHitachiACStateLength)
+  if (nbytes < kHitachiAcStateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(kHitachiACHdrMark, kHitachiACHdrSpace,
-              kHitachiACBitMark, kHitachiACOneSpace,
-              kHitachiACBitMark, kHitachiACZeroSpace,
-              kHitachiACBitMark, kHitachiACMinGap,
+  sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace,
+              kHitachiAcBitMark, kHitachiAcOneSpace,
+              kHitachiAcBitMark, kHitachiAcZeroSpace,
+              kHitachiAcBitMark, kHitachiAcMinGap,
               data, nbytes, 38, true, repeat, 50);
 }
 #endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2)
@@ -63,7 +63,7 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAC1StateLength)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc1StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: BETA / Appears to work.
@@ -73,12 +73,12 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 //   Basically the same as sendHitatchiAC() except different size and header.
 void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
-  if (nbytes < kHitachiAC1StateLength)
+  if (nbytes < kHitachiAc1StateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(kHitachiAC1HdrMark, kHitachiAC1HdrSpace,
-              kHitachiACBitMark, kHitachiACOneSpace,
-              kHitachiACBitMark, kHitachiACZeroSpace,
-              kHitachiACBitMark, kHitachiACMinGap,
+  sendGeneric(kHitachiAc1HdrMark, kHitachiAc1HdrSpace,
+              kHitachiAcBitMark, kHitachiAcOneSpace,
+              kHitachiAcBitMark, kHitachiAcZeroSpace,
+              kHitachiAcBitMark, kHitachiAcMinGap,
               data, nbytes, 38, true, repeat, 50);
 }
 #endif  // SEND_HITACHI_AC1
@@ -91,7 +91,7 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAC2StateLength)
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc2StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: BETA / Appears to work.
@@ -101,7 +101,7 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 //   Basically the same as sendHitatchiAC() except different size.
 void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
-  if (nbytes < kHitachiAC2StateLength)
+  if (nbytes < kHitachiAc2StateLength)
     return;  // Not enough bytes to send a proper message.
   sendHitachiAC(data, nbytes, repeat);
 }
@@ -113,7 +113,7 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
 //   nbits:   The number of data bits to expect.
-//            Typically kHitachiACBits, kHitachiAC1Bits, kHitachiAC2Bits
+//            Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -133,9 +133,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
     return false;  // Can't possibly be a valid HitachiAC message.
   if (strict) {
     switch (nbits) {
-      case kHitachiACBits:
-      case kHitachiAC1Bits:
-      case kHitachiAC2Bits:
+      case kHitachiAcBits:
+      case kHitachiAc1Bits:
+      case kHitachiAc2Bits:
         break;  // Okay to continue.
       default:
         return false;  // Not strictly a Hitachi message.
@@ -146,16 +146,16 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
   match_result_t data_result;
 
   // Header
-  if (nbits == kHitachiAC1Bits) {
-    if (!matchMark(results->rawbuf[offset++], kHitachiAC1HdrMark, kTolerance))
+  if (nbits == kHitachiAc1Bits) {
+    if (!matchMark(results->rawbuf[offset++], kHitachiAc1HdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], kHitachiAC1HdrSpace,
+    if (!matchSpace(results->rawbuf[offset++], kHitachiAc1HdrSpace,
                     kTolerance))
       return false;
   } else {  // Everything else.
-    if (!matchMark(results->rawbuf[offset++], kHitachiACHdrMark, kTolerance))
+    if (!matchMark(results->rawbuf[offset++], kHitachiAcHdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], kHitachiACHdrSpace,
+    if (!matchSpace(results->rawbuf[offset++], kHitachiAcHdrSpace,
                     kTolerance))
       return false;
   }
@@ -165,29 +165,29 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
       offset <= results->rawlen - 16 && i < nbits / 8;
       i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kHitachiACBitMark,
-                            kHitachiACOneSpace,
-                            kHitachiACBitMark,
-                            kHitachiACZeroSpace,
+                            kHitachiAcBitMark,
+                            kHitachiAcOneSpace,
+                            kHitachiAcBitMark,
+                            kHitachiAcZeroSpace,
                             kTolerance);
     if (data_result.success == false)  break;  // Fail
     results->state[i] = (uint8_t) data_result.data;
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kHitachiACBitMark, kTolerance))
+  if (!matchMark(results->rawbuf[offset++], kHitachiAcBitMark, kTolerance))
     return false;
   if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kHitachiACMinGap, kTolerance))
+      !matchAtLeast(results->rawbuf[offset], kHitachiAcMinGap, kTolerance))
     return false;
 
   // Compliance
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     switch (dataBitsSoFar / 8) {
-      case kHitachiACStateLength:
-      case kHitachiAC1StateLength:
-      case kHitachiAC2StateLength:
+      case kHitachiAcStateLength:
+      case kHitachiAc1StateLength:
+      case kHitachiAc2StateLength:
         break;  // Continue
       default:
         return false;
@@ -196,13 +196,13 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
 
   // Success
   switch (dataBitsSoFar) {
-    case kHitachiAC1Bits:
+    case kHitachiAc1Bits:
       results->decode_type = HITACHI_AC1;
       break;
-    case kHitachiAC2Bits:
+    case kHitachiAc2Bits:
       results->decode_type = HITACHI_AC2;
       break;
-    case kHitachiACBits:
+    case kHitachiAcBits:
     default:
       results->decode_type = HITACHI_AC;
   }

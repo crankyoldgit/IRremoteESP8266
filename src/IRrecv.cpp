@@ -351,11 +351,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_LG
   DPRINTLN("Attempting LG (28-bit) decode");
-  if (decodeLG(results, kLGBits, true))
+  if (decodeLG(results, kLgBits, true))
     return true;
   DPRINTLN("Attempting LG (32-bit) decode");
   // LG32 should be tried before Samsung
-  if (decodeLG(results, kLG32Bits, true))
+  if (decodeLG(results, kLg32Bits, true))
     return true;
 #endif
 #if DECODE_GICABLE
@@ -474,17 +474,17 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_HITACHI_AC2
   // HitachiAC2 should be checked before HitachiAC
   DPRINTLN("Attempting Hitachi AC2 decode");
-  if (decodeHitachiAC(results, kHitachiAC2Bits))
+  if (decodeHitachiAC(results, kHitachiAc2Bits))
     return true;
 #endif
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results, kHitachiACBits))
+  if (decodeHitachiAC(results, kHitachiAcBits))
     return true;
 #endif
 #if DECODE_HITACHI_AC1
   DPRINTLN("Attempting Hitachi AC1 decode");
-  if (decodeHitachiAC(results, kHitachiAC1Bits))
+  if (decodeHitachiAC(results, kHitachiAc1Bits))
     return true;
 #endif
 #if DECODE_HASH
