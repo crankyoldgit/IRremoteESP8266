@@ -521,22 +521,22 @@ TEST(TestMitsubishiACClass, Temperature) {
   mitsub.begin();
 
   mitsub.setTemp(0);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
   mitsub.setTemp(255);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MIN_TEMP);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMinTemp);
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MAX_TEMP);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMaxTemp);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MIN_TEMP - 1);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMinTemp - 1);
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MAX_TEMP + 1);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMaxTemp + 1);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
   mitsub.setTemp(17);
   EXPECT_EQ(17, mitsub.getTemp());
@@ -555,60 +555,60 @@ TEST(TestMitsubishiACClass, OperatingMode) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setMode(MITSUBISHI_AC_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcAuto);
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_COOL);
-  EXPECT_EQ(MITSUBISHI_AC_COOL, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcCool);
+  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_HEAT);
-  EXPECT_EQ(MITSUBISHI_AC_HEAT, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcHeat);
+  EXPECT_EQ(kMitsubishiAcHeat, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_DRY);
-  EXPECT_EQ(MITSUBISHI_AC_DRY, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcDry);
+  EXPECT_EQ(kMitsubishiAcDry, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_AUTO + 1);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcAuto + 1);
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 
   mitsub.setMode(255);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 }
 
 TEST(TestMitsubishiACClass, VaneMode) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAuto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO + 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO + 1, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAuto + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE + 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE - 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE - 1, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove - 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, mitsub.getVane());
 }
 
 TEST(TestMitsubishiACClass, FanSpeed) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_AUTO, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanAuto);
+  EXPECT_EQ(kMitsubishiAcFanAuto, mitsub.getFan());
 
   mitsub.setFan(255);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_MAX);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanMax);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_MAX - 1);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_MAX - 1, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanMax - 1);
+  EXPECT_EQ(kMitsubishiAcFanMax - 1, mitsub.getFan());
 
   mitsub.setFan(1);
   EXPECT_EQ(1, mitsub.getFan());
@@ -622,11 +622,11 @@ TEST(TestMitsubishiACClass, FanSpeed) {
   mitsub.setFan(4);
   EXPECT_EQ(4, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_SILENT);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_SILENT, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanSilent);
+  EXPECT_EQ(kMitsubishiAcFanSilent, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_SILENT + 1);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanSilent + 1);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 }
 
 TEST(TestMitsubishiACClass, MessageConstuction) {
@@ -636,14 +636,14 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   irsend.begin();
 
   mitsub.setFan(1);
-  mitsub.setMode(MITSUBISHI_AC_COOL);
+  mitsub.setMode(kMitsubishiAcCool);
   mitsub.setTemp(27);
   mitsub.setVane(3);
   mitsub.on();
 
   // Check everything for kicks.
   EXPECT_EQ(1, mitsub.getFan());
-  EXPECT_EQ(MITSUBISHI_AC_COOL, mitsub.getMode());
+  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
   EXPECT_EQ(27, mitsub.getTemp());
   EXPECT_EQ(3, mitsub.getVane());
   EXPECT_TRUE(mitsub.getPower());
