@@ -254,6 +254,7 @@ void IRFujitsuAC::setCmd(uint8_t cmd) {
     case FUJITSU_AC_CMD_STEP_HORIZ:
       if (_model != ARDB1)  // AR-DB1 remote doesn't have step horizontal.
         _cmd = cmd;
+      // FALLTHRU
     default:
       _cmd = FUJITSU_AC_CMD_STAY_ON;
       break;
@@ -323,18 +324,18 @@ uint8_t IRFujitsuAC::getSwing() {
 bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
   uint8_t sum = 0;
   uint8_t sum_complement = 0;
-  uint8_t checksum = 0;
+  uint8_t checksum = state[length - 1];
   switch (length) {
     case FUJITSU_AC_STATE_LENGTH_SHORT:  // ARRAH2E
       return state[length - 1] == (uint8_t) ~state[length - 2];
     case FUJITSU_AC_STATE_LENGTH - 1:  // ARDB1
       sum = sumBytes(state, length - 1);
       sum_complement = 0x9B;
-      checksum = state[length - 1];
       break;
     case FUJITSU_AC_STATE_LENGTH:  // ARRAH2E
       sum = sumBytes(state + FUJITSU_AC_STATE_LENGTH_SHORT,
                      length - 1 - FUJITSU_AC_STATE_LENGTH_SHORT);
+      break;
     default:  // Includes ARDB1 short.
       return true;  // Assume the checksum is valid for other lengths.
   }
