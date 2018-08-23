@@ -22,43 +22,42 @@
 // Ref:
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
-#define MITSUBISHI_TICK                       30U
-#define MITSUBISHI_BIT_MARK_TICKS             10U
-#define MITSUBISHI_BIT_MARK           (MITSUBISHI_BIT_MARK_TICKS * \
-                                       MITSUBISHI_TICK)
-#define MITSUBISHI_ONE_SPACE_TICKS            70U
-#define MITSUBISHI_ONE_SPACE          (MITSUBISHI_ONE_SPACE_TICKS * \
-                                       MITSUBISHI_TICK)
-#define MITSUBISHI_ZERO_SPACE_TICKS           30U
-#define MITSUBISHI_ZERO_SPACE         (MITSUBISHI_ZERO_SPACE_TICKS * \
-                                       MITSUBISHI_TICK)
-#define MITSUBISHI_MIN_COMMAND_LENGTH_TICKS 1786U
-#define MITSUBISHI_MIN_COMMAND_LENGTH (MITSUBISHI_MIN_COMMAND_LENGTH_TICKS * \
-                                       MITSUBISHI_TICK)
-#define MITSUBISHI_MIN_GAP_TICKS             936U
-#define MITSUBISHI_MIN_GAP            (MITSUBISHI_MIN_GAP_TICKS * \
-                                       MITSUBISHI_TICK)
+const uint16_t kMitsubishiTick = 30;
+const uint16_t kMitsubishiBitMarkTicks = 10;
+const uint16_t kMitsubishiBitMark = kMitsubishiBitMarkTicks * kMitsubishiTick;
+const uint16_t kMitsubishiOneSpaceTicks = 70;
+const uint16_t kMitsubishiOneSpace = kMitsubishiOneSpaceTicks * kMitsubishiTick;
+const uint16_t kMitsubishiZeroSpaceTicks = 30;
+const uint16_t kMitsubishiZeroSpace =
+    kMitsubishiZeroSpaceTicks * kMitsubishiTick;
+const uint16_t kMitsubishiMinCommandLengthTicks = 1786;
+const uint16_t kMitsubishiMinCommandLength =
+    kMitsubishiMinCommandLengthTicks * kMitsubishiTick;
+const uint16_t kMitsubishiMinGapTicks = 936;
+const uint16_t kMitsubishiMinGap = kMitsubishiMinGapTicks * kMitsubishiTick;
 
 // Mitsubishi Projector (HC3000)
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/441
-#define MITSUBISHI2_HDR_MARK                8400U
-#define MITSUBISHI2_HDR_SPACE         (MITSUBISHI2_HDR_MARK / 2)
-#define MITSUBISHI2_BIT_MARK                 560U
-#define MITSUBISHI2_ZERO_SPACE               520U
-#define MITSUBISHI2_ONE_SPACE         (MITSUBISHI2_ZERO_SPACE * 3)
-#define MITSUBISHI2_MIN_GAP                28500U
+
+const uint16_t kMitsubishi2HdrMark = 8400;
+const uint16_t kMitsubishi2HdrSpace = kMitsubishi2HdrMark / 2;
+const uint16_t kMitsubishi2BitMark = 560;
+const uint16_t kMitsubishi2ZeroSpace = 520;
+const uint16_t kMitsubishi2OneSpace = kMitsubishi2ZeroSpace * 3;
+const uint16_t kMitsubishi2MinGap = 28500;
 
 // Mitsubishi A/C
 // Ref:
 //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L84
-#define MITSUBISHI_AC_HDR_MARK    3400U
-#define MITSUBISHI_AC_HDR_SPACE   1750U
-#define MITSUBISHI_AC_BIT_MARK     450U
-#define MITSUBISHI_AC_ONE_SPACE   1300U
-#define MITSUBISHI_AC_ZERO_SPACE   420U
-#define MITSUBISHI_AC_RPT_MARK     440U
-#define MITSUBISHI_AC_RPT_SPACE  17100UL
+
+const uint16_t kMitsubishiAcHdrMark = 3400;
+const uint16_t kMitsubishiAcHdrSpace = 1750;
+const uint16_t kMitsubishiAcBitMark = 450;
+const uint16_t kMitsubishiAcOneSpace = 1300;
+const uint16_t kMitsubishiAcZeroSpace = 420;
+const uint16_t kMitsubishiAcRptMark = 440;
+const uint16_t kMitsubishiAcRptSpace = 17100;
 
 #if SEND_MITSUBISHI
 // Send a Mitsubishi message
@@ -77,10 +76,10 @@
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(0, 0,  // No Header
-              MITSUBISHI_BIT_MARK, MITSUBISHI_ONE_SPACE,
-              MITSUBISHI_BIT_MARK, MITSUBISHI_ZERO_SPACE,
-              MITSUBISHI_BIT_MARK, MITSUBISHI_MIN_GAP,
-              MITSUBISHI_MIN_COMMAND_LENGTH,
+              kMitsubishiBitMark, kMitsubishiOneSpace,
+              kMitsubishiBitMark, kMitsubishiZeroSpace,
+              kMitsubishiBitMark, kMitsubishiMinGap,
+              kMitsubishiMinCommandLength,
               data, nbits, 33, true, repeat, 50);
 }
 #endif   // SEND_MITSUBISHI
@@ -114,28 +113,28 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 
   // No Header
   // But try to auto-calibrate off the initial mark signal.
-  if (!matchMark(results->rawbuf[offset], MITSUBISHI_BIT_MARK, 30))
+  if (!matchMark(results->rawbuf[offset], kMitsubishiBitMark, 30))
     return false;
   // Calculate how long the common tick time is based on the initial mark.
   uint32_t tick = results->rawbuf[offset] *
-      kRawTick / MITSUBISHI_BIT_MARK_TICKS;
+      kRawTick / kMitsubishiBitMarkTicks;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         MITSUBISHI_BIT_MARK_TICKS * tick,
-                                         MITSUBISHI_ONE_SPACE_TICKS * tick,
-                                         MITSUBISHI_BIT_MARK_TICKS * tick,
-                                         MITSUBISHI_ZERO_SPACE_TICKS * tick);
+                                         kMitsubishiBitMarkTicks * tick,
+                                         kMitsubishiOneSpaceTicks * tick,
+                                         kMitsubishiBitMarkTicks * tick,
+                                         kMitsubishiZeroSpaceTicks * tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
   uint16_t actualBits = data_result.used / 2;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_BIT_MARK_TICKS * tick,
+  if (!matchMark(results->rawbuf[offset++], kMitsubishiBitMarkTicks * tick,
                  30)) return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], MITSUBISHI_MIN_GAP_TICKS * tick))
+      !matchAtLeast(results->rawbuf[offset], kMitsubishiMinGapTicks * tick))
     return false;
 
   // Compliance
@@ -176,16 +175,16 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t i = 0; i <= repeat; i++) {
     // First half of the data.
-    sendGeneric(MITSUBISHI2_HDR_MARK, MITSUBISHI2_HDR_SPACE,
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_HDR_SPACE,
+    sendGeneric(kMitsubishi2HdrMark, kMitsubishi2HdrSpace,
+      kMitsubishi2BitMark, kMitsubishi2OneSpace,
+      kMitsubishi2BitMark, kMitsubishi2ZeroSpace,
+      kMitsubishi2BitMark, kMitsubishi2HdrSpace,
       data >> (nbits / 2), nbits / 2, 33, true, 0, 50);
     // Second half of the data.
     sendGeneric(0, 0,  // No header for the second data block
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ONE_SPACE,
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_ZERO_SPACE,
-      MITSUBISHI2_BIT_MARK, MITSUBISHI2_MIN_GAP,
+      kMitsubishi2BitMark, kMitsubishi2OneSpace,
+      kMitsubishi2BitMark, kMitsubishi2ZeroSpace,
+      kMitsubishi2BitMark, kMitsubishi2MinGap,
       data & ((1 << (nbits / 2)) - 1), nbits / 2, 33, true, 0, 50);
   }
 }
@@ -221,18 +220,18 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
   uint16_t actualBits = 0;
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], MITSUBISHI2_HDR_MARK))
+  if (!matchMark(results->rawbuf[offset++], kMitsubishi2HdrMark))
     return false;
-  if (!matchSpace(results->rawbuf[offset++], MITSUBISHI2_HDR_SPACE))
+  if (!matchSpace(results->rawbuf[offset++], kMitsubishi2HdrSpace))
     return false;
   for (uint8_t i = 1; i <= 2; i++) {
     // Data
     match_result_t data_result = matchData(&(results->rawbuf[offset]),
                                            nbits / 2,
-                                           MITSUBISHI2_BIT_MARK,
-                                           MITSUBISHI2_ONE_SPACE,
-                                           MITSUBISHI2_BIT_MARK,
-                                           MITSUBISHI2_ZERO_SPACE);
+                                           kMitsubishi2BitMark,
+                                           kMitsubishi2OneSpace,
+                                           kMitsubishi2BitMark,
+                                           kMitsubishi2ZeroSpace);
     if (data_result.success == false) return false;
     data <<= nbits / 2;
     data += data_result.data;
@@ -240,14 +239,14 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
     actualBits += data_result.used / 2;
 
     // Footer
-    if (!matchMark(results->rawbuf[offset++], MITSUBISHI2_BIT_MARK))
+    if (!matchMark(results->rawbuf[offset++], kMitsubishi2BitMark))
       return false;
     if (i % 2) {  // Every odd data block, we expect a HDR space.
-      if (!matchSpace(results->rawbuf[offset++], MITSUBISHI2_HDR_SPACE))
+      if (!matchSpace(results->rawbuf[offset++], kMitsubishi2HdrSpace))
         return false;
     } else {  // Every even data block, we expect Min Gap or end of the message.
       if (offset < results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], MITSUBISHI2_MIN_GAP))
+          !matchAtLeast(results->rawbuf[offset++], kMitsubishi2MinGap))
         return false;
     }
   }
@@ -285,10 +284,10 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
   if (nbytes < kMitsubishiACStateLength)
     return;  // Not enough bytes to send a proper message.
 
-  sendGeneric(MITSUBISHI_AC_HDR_MARK, MITSUBISHI_AC_HDR_SPACE,
-              MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-              MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ZERO_SPACE,
-              MITSUBISHI_AC_RPT_MARK, MITSUBISHI_AC_RPT_SPACE,
+  sendGeneric(kMitsubishiAcHdrMark, kMitsubishiAcHdrSpace,
+              kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+              kMitsubishiAcBitMark, kMitsubishiAcZeroSpace,
+              kMitsubishiAcRptMark, kMitsubishiAcRptSpace,
               data, nbytes, 38, false, repeat, 50);
 }
 #endif  // SEND_MITSUBISHI_AC
@@ -364,13 +363,13 @@ void IRMitsubishiAC::checksum() {
 // Set the requested power state of the A/C to off.
 void IRMitsubishiAC::on() {
   // state = ON;
-  remote_state[5] |= MITSUBISHI_AC_POWER;
+  remote_state[5] |= kMitsubishiAcPower;
 }
 
 // Set the requested power state of the A/C to off.
 void IRMitsubishiAC::off() {
   // state = OFF;
-  remote_state[5] &= ~MITSUBISHI_AC_POWER;
+  remote_state[5] &= ~kMitsubishiAcPower;
 }
 
 // Set the requested power state of the A/C.
@@ -383,31 +382,31 @@ void IRMitsubishiAC::setPower(bool state) {
 
 // Return the requested power state of the A/C.
 bool IRMitsubishiAC::getPower() {
-  return((remote_state[5] & MITSUBISHI_AC_POWER) != 0);
+  return((remote_state[5] & kMitsubishiAcPower) != 0);
 }
 
 // Set the temp. in deg C
 void IRMitsubishiAC::setTemp(uint8_t temp) {
-  temp = std::max((uint8_t) MITSUBISHI_AC_MIN_TEMP, temp);
-  temp = std::min((uint8_t) MITSUBISHI_AC_MAX_TEMP, temp);
-  remote_state[7] = temp - MITSUBISHI_AC_MIN_TEMP;
+  temp = std::max((uint8_t) kMitsubishiAcMinTemp, temp);
+  temp = std::min((uint8_t) kMitsubishiAcMaxTemp, temp);
+  remote_state[7] = temp - kMitsubishiAcMinTemp;
 }
 
 // Return the set temp. in deg C
 uint8_t IRMitsubishiAC::getTemp() {
-  return(remote_state[7] + MITSUBISHI_AC_MIN_TEMP);
+  return(remote_state[7] + kMitsubishiAcMinTemp);
 }
 
 // Set the speed of the fan, 0-6.
 // 0 is auto, 1-5 is the speed, 6 is silent.
 void IRMitsubishiAC::setFan(uint8_t fan) {
   // Bounds check
-  if (fan > MITSUBISHI_AC_FAN_SILENT)
-    fan = MITSUBISHI_AC_FAN_MAX;  // Set the fan to maximum if out of range.
-  if (fan == MITSUBISHI_AC_FAN_AUTO) {   // Automatic is a special case.
+  if (fan > kMitsubishiAcFanSilent)
+    fan = kMitsubishiAcFanMax;  // Set the fan to maximum if out of range.
+  if (fan == kMitsubishiAcFanAuto) {   // Automatic is a special case.
     remote_state[9] = 0b10000000 | (remote_state[9] & 0b01111000);
     return;
-  } else if (fan >= MITSUBISHI_AC_FAN_MAX) {
+  } else if (fan >= kMitsubishiAcFanMax) {
     fan--;  // There is no spoon^H^H^Heed 5 (max), pretend it doesn't exist.
   }
   remote_state[9] &= 0b01111000;  // Clear the previous state
@@ -417,8 +416,8 @@ void IRMitsubishiAC::setFan(uint8_t fan) {
 // Return the requested state of the unit's fan.
 uint8_t IRMitsubishiAC::getFan() {
   uint8_t fan = remote_state[9] & 0b111;
-  if (fan == MITSUBISHI_AC_FAN_MAX)
-    return MITSUBISHI_AC_FAN_SILENT;
+  if (fan == kMitsubishiAcFanMax)
+    return kMitsubishiAcFanSilent;
   return fan;
 }
 
@@ -431,11 +430,11 @@ uint8_t IRMitsubishiAC::getMode() {
 void IRMitsubishiAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case MITSUBISHI_AC_AUTO: break;
-    case MITSUBISHI_AC_COOL: break;
-    case MITSUBISHI_AC_DRY: break;
-    case MITSUBISHI_AC_HEAT: break;
-    default: mode = MITSUBISHI_AC_AUTO;
+    case kMitsubishiAcAuto: break;
+    case kMitsubishiAcCool: break;
+    case kMitsubishiAcDry: break;
+    case kMitsubishiAcHeat: break;
+    default: mode = kMitsubishiAcAuto;
   }
   remote_state[6] = mode;
 }
