@@ -23,23 +23,25 @@
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
 #define MIN_RC5_SAMPLES            11U
 #define MIN_RC6_SAMPLES             1U
-#define RC5_T1                    889U
-#define RC5_MIN_COMMAND_LENGTH 113778UL
-#define RC5_MIN_GAP (RC5_MIN_COMMAND_LENGTH - kRC5RawBits * (2 * RC5_T1))
-#define RC5_TOGGLE_MASK         0x800U  // (The 12th bit)
+
+const uint16_t kRc5T1 = 889;
+const uint32_t kRc5MinCommandLength = 113778;
+const uint32_t kRc5MinGap = kRc5MinCommandLength - kRC5RawBits * (2 * kRc5T1);
+const uint16_t kRc5ToggleMask = 0x800;  // The 12th bit.
 // RC-6
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-6
 //   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
-#define RC6_TICK                  444U
-#define RC6_HDR_MARK_TICKS          6U
-#define RC6_HDR_MARK             (RC6_HDR_MARK_TICKS * RC6_TICK)
-#define RC6_HDR_SPACE_TICKS         2U
-#define RC6_HDR_SPACE            (RC6_HDR_SPACE_TICKS * RC6_TICK)
-#define RC6_RPT_LENGTH_TICKS      187U
-#define RC6_RPT_LENGTH           (RC6_RPT_LENGTH_TICKS * RC6_TICK)
-#define RC6_TOGGLE_MASK       0x10000UL  // (The 17th bit)
-#define RC6_36_TOGGLE_MASK     0x8000U  // (The 16th bit)
+
+const uint16_t kRc6Tick = 444;
+const uint16_t kRc6HdrMarkTicks = 6;
+const uint16_t kRc6HdrMark = kRc6HdrMarkTicks * kRc6Tick;
+const uint16_t kRc6HdrSpaceTicks = 2;
+const uint16_t kRc6HdrSpace = kRc6HdrSpaceTicks * kRc6Tick;
+const uint16_t kRc6RptLengthTicks = 187;
+const uint32_t kRc6RptLength = kRc6RptLengthTicks * kRc6Tick;
+const uint32_t kRc6ToggleMask = 0x10000UL;  // The 17th bit.
+const uint16_t kRc6_36ToggleMask = 0x8000;  // The 16th bit.
 
 // Common (getRClevel())
 const int16_t kMark = 0;
@@ -89,28 +91,28 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
     if (skipSpace)
       skipSpace = false;  // First time through, we assume the leading space().
     else
-      space(RC5_T1);
-    mark(RC5_T1);
+      space(kRc5T1);
+    mark(kRc5T1);
     // Field/Second start bit.
     if (field_bit) {  // Send a 1. Normal for RC-5.
-      space(RC5_T1);
-      mark(RC5_T1);
+      space(kRc5T1);
+      mark(kRc5T1);
     } else {  // Send a 0. Special case for RC-5X. Means 7th command bit is 1.
-      mark(RC5_T1);
-      space(RC5_T1);
+      mark(kRc5T1);
+      space(kRc5T1);
     }
 
     // Data
     for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
       if (data & mask) {  // 1
-        space(RC5_T1);  // 1 is space, then mark.
-        mark(RC5_T1);
+        space(kRc5T1);  // 1 is space, then mark.
+        mark(kRc5T1);
       } else {  // 0
-        mark(RC5_T1);  // 0 is mark, then space.
-        space(RC5_T1);
+        mark(kRc5T1);  // 0 is mark, then space.
+        space(kRc5T1);
       }
     // Footer
-    space(std::max(RC5_MIN_GAP, RC5_MIN_COMMAND_LENGTH - usecTimer.elapsed()));
+    space(std::max(kRc5MinGap, kRc5MinCommandLength - usecTimer.elapsed()));
   }
 }
 
@@ -175,7 +177,7 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
 //   https://en.wikipedia.org/wiki/RC-5
 uint64_t IRsend::toggleRC5(uint64_t data) {
-  return data ^ RC5_TOGGLE_MASK;
+  return data ^ kRc5ToggleMask;
 }
 #endif  // SEND_RC5
 
@@ -199,8 +201,8 @@ uint64_t IRsend::toggleRC5(uint64_t data) {
 //   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
 uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
   if (nbits == kRC6_36Bits)
-    return data ^ RC6_36_TOGGLE_MASK;
-  return data ^ RC6_TOGGLE_MASK;
+    return data ^ kRc6_36ToggleMask;
+  return data ^ kRc6ToggleMask;
 }
 
 // Encode a Philips RC-6 data message.
@@ -255,18 +257,18 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(36, 33);
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
-    mark(RC6_HDR_MARK);
-    space(RC6_HDR_SPACE);
+    mark(kRc6HdrMark);
+    space(kRc6HdrSpace);
     // Start bit.
-    mark(RC6_TICK);  // mark, then space == 0x1.
-    space(RC6_TICK);
+    mark(kRc6Tick);  // mark, then space == 0x1.
+    space(kRc6Tick);
     // Data
     uint16_t bitTime;
     for (uint64_t i = 1, mask = 1ULL << (nbits - 1); mask; i++, mask >>= 1) {
       if (i == 4)  // The fourth bit we send is a "double width trailer bit".
-        bitTime = 2 * RC6_TICK;  // double-wide trailer bit
+        bitTime = 2 * kRc6Tick;  // double-wide trailer bit
       else
-        bitTime = RC6_TICK;  // Normal bit
+        bitTime = kRc6Tick;  // Normal bit
       if (data & mask) {  // 1
         mark(bitTime);
         space(bitTime);
@@ -276,7 +278,7 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
       }
     }
     // Footer
-    space(RC6_RPT_LENGTH);
+    space(kRc6RptLength);
   }
 }
 #endif  // SEND_RC6
@@ -384,11 +386,11 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   // Header
   // Get start bit #1.
-  if (getRClevel(results, &offset, &used, RC5_T1) != kMark) return false;
+  if (getRClevel(results, &offset, &used, kRc5T1) != kMark) return false;
   // Get field/start bit #2 (inverted bit-7 of the command if RC-5X protocol)
   uint16_t actual_bits = 1;
-  int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
-  int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
+  int16_t levelA = getRClevel(results, &offset, &used, kRc5T1);
+  int16_t levelB = getRClevel(results, &offset, &used, kRc5T1);
   if (levelA == kSpace && levelB == kMark) {  // Matched a 1.
     is_rc5x = false;
   } else if (levelA == kMark && levelB == kSpace) {  // Matched a 0.
@@ -401,8 +403,8 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   // Data
   for (; offset < results->rawlen; actual_bits++) {
-    int16_t levelA = getRClevel(results, &offset, &used, RC5_T1);
-    int16_t levelB = getRClevel(results, &offset, &used, RC5_T1);
+    int16_t levelA = getRClevel(results, &offset, &used, kRc5T1);
+    int16_t levelB = getRClevel(results, &offset, &used, kRc5T1);
     if (levelA == kSpace && levelB == kMark)
       data = (data << 1) | 1;  // 1
     else if (levelA == kMark && levelB == kSpace)
@@ -476,10 +478,10 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = kStartOffset;
 
   // Header
-  if (!matchMark(results->rawbuf[offset], RC6_HDR_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset], kRc6HdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset++] * kRawTick / RC6_HDR_MARK_TICKS;
-  if (!matchSpace(results->rawbuf[offset++], RC6_HDR_SPACE_TICKS * tick))
+  uint32_t tick = results->rawbuf[offset++] * kRawTick / kRc6HdrMarkTicks;
+  if (!matchSpace(results->rawbuf[offset++], kRc6HdrSpaceTicks * tick))
     return false;
 
   uint16_t used = 0;
