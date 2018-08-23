@@ -180,22 +180,22 @@ TEST(TestKelvinatorClass, Temperature) {
   irkelv.begin();
 
   irkelv.setTemp(0);
-  EXPECT_EQ(KELVINATOR_MIN_TEMP, irkelv.getTemp());
+  EXPECT_EQ(kKelvinatorMinTemp, irkelv.getTemp());
 
   irkelv.setTemp(255);
-  EXPECT_EQ(KELVINATOR_MAX_TEMP, irkelv.getTemp());
+  EXPECT_EQ(kKelvinatorMaxTemp, irkelv.getTemp());
 
-  irkelv.setTemp(KELVINATOR_MIN_TEMP);
-  EXPECT_EQ(KELVINATOR_MIN_TEMP, irkelv.getTemp());
+  irkelv.setTemp(kKelvinatorMinTemp);
+  EXPECT_EQ(kKelvinatorMinTemp, irkelv.getTemp());
 
-  irkelv.setTemp(KELVINATOR_MAX_TEMP);
-  EXPECT_EQ(KELVINATOR_MAX_TEMP, irkelv.getTemp());
+  irkelv.setTemp(kKelvinatorMaxTemp);
+  EXPECT_EQ(kKelvinatorMaxTemp, irkelv.getTemp());
 
-  irkelv.setTemp(KELVINATOR_MIN_TEMP - 1);
-  EXPECT_EQ(KELVINATOR_MIN_TEMP, irkelv.getTemp());
+  irkelv.setTemp(kKelvinatorMinTemp - 1);
+  EXPECT_EQ(kKelvinatorMinTemp, irkelv.getTemp());
 
-  irkelv.setTemp(KELVINATOR_MAX_TEMP + 1);
-  EXPECT_EQ(KELVINATOR_MAX_TEMP, irkelv.getTemp());
+  irkelv.setTemp(kKelvinatorMaxTemp + 1);
+  EXPECT_EQ(kKelvinatorMaxTemp, irkelv.getTemp());
 
   irkelv.setTemp(17);
   EXPECT_EQ(17, irkelv.getTemp());
@@ -215,29 +215,29 @@ TEST(TestKelvinatorClass, OperatingMode) {
   irkelv.begin();
 
   irkelv.setTemp(24);
-  irkelv.setMode(KELVINATOR_AUTO);
-  EXPECT_EQ(KELVINATOR_AUTO, irkelv.getMode());
-  EXPECT_EQ(KELVINATOR_AUTO_TEMP, irkelv.getTemp());
+  irkelv.setMode(kKelvinatorAuto);
+  EXPECT_EQ(kKelvinatorAuto, irkelv.getMode());
+  EXPECT_EQ(kKelvinatorAutoTemp, irkelv.getTemp());
 
-  irkelv.setMode(KELVINATOR_COOL);
-  EXPECT_EQ(KELVINATOR_COOL, irkelv.getMode());
+  irkelv.setMode(kKelvinatorCool);
+  EXPECT_EQ(kKelvinatorCool, irkelv.getMode());
 
-  irkelv.setMode(KELVINATOR_HEAT);
-  EXPECT_EQ(KELVINATOR_HEAT, irkelv.getMode());
+  irkelv.setMode(kKelvinatorHeat);
+  EXPECT_EQ(kKelvinatorHeat, irkelv.getMode());
 
   irkelv.setTemp(24);
-  irkelv.setMode(KELVINATOR_DRY);
-  EXPECT_EQ(KELVINATOR_DRY, irkelv.getMode());
-  EXPECT_EQ(KELVINATOR_AUTO_TEMP, irkelv.getTemp());
+  irkelv.setMode(kKelvinatorDry);
+  EXPECT_EQ(kKelvinatorDry, irkelv.getMode());
+  EXPECT_EQ(kKelvinatorAutoTemp, irkelv.getTemp());
 
-  irkelv.setMode(KELVINATOR_FAN);
-  EXPECT_EQ(KELVINATOR_FAN, irkelv.getMode());
+  irkelv.setMode(kKelvinatorFan);
+  EXPECT_EQ(kKelvinatorFan, irkelv.getMode());
 
-  irkelv.setMode(KELVINATOR_HEAT + 1);
-  EXPECT_EQ(KELVINATOR_AUTO, irkelv.getMode());
+  irkelv.setMode(kKelvinatorHeat + 1);
+  EXPECT_EQ(kKelvinatorAuto, irkelv.getMode());
 
   irkelv.setMode(255);
-  EXPECT_EQ(KELVINATOR_AUTO, irkelv.getMode());
+  EXPECT_EQ(kKelvinatorAuto, irkelv.getMode());
 }
 
 TEST(TestKelvinatorClass, VaneSwing) {
@@ -352,16 +352,16 @@ TEST(TestKelvinatorClass, FanSpeed) {
   EXPECT_EQ(0, irkelv.getFan());
 
   irkelv.setFan(255);
-  EXPECT_EQ(KELVINATOR_FAN_MAX, irkelv.getFan());
+  EXPECT_EQ(kKelvinatorFanMax, irkelv.getFan());
 
-  irkelv.setFan(KELVINATOR_FAN_MAX);
-  EXPECT_EQ(KELVINATOR_FAN_MAX, irkelv.getFan());
+  irkelv.setFan(kKelvinatorFanMax);
+  EXPECT_EQ(kKelvinatorFanMax, irkelv.getFan());
 
-  irkelv.setFan(KELVINATOR_FAN_MAX + 1);
-  EXPECT_EQ(KELVINATOR_FAN_MAX, irkelv.getFan());
+  irkelv.setFan(kKelvinatorFanMax + 1);
+  EXPECT_EQ(kKelvinatorFanMax, irkelv.getFan());
 
-  irkelv.setFan(KELVINATOR_FAN_MAX - 1);
-  EXPECT_EQ(KELVINATOR_FAN_MAX - 1, irkelv.getFan());
+  irkelv.setFan(kKelvinatorFanMax - 1);
+  EXPECT_EQ(kKelvinatorFanMax - 1, irkelv.getFan());
 
   irkelv.setFan(1);
   EXPECT_EQ(1, irkelv.getFan());
@@ -421,9 +421,9 @@ TEST(TestKelvinatorClass, HumanReadable) {
             "Swing (Horizontal): Off, Swing (Vertical): Off",
             irkelv.toString());
   irkelv.on();
-  irkelv.setMode(KELVINATOR_COOL);
+  irkelv.setMode(kKelvinatorCool);
   irkelv.setTemp(25);
-  irkelv.setFan(KELVINATOR_FAN_MAX);
+  irkelv.setFan(kKelvinatorFanMax);
   irkelv.setXFan(true);
   irkelv.setIonFilter(true);
   irkelv.setLight(true);
@@ -441,7 +441,7 @@ TEST(TestKelvinatorClass, MessageConstuction) {
   irsend.begin();
 
   irkelv.setFan(1);
-  irkelv.setMode(KELVINATOR_COOL);
+  irkelv.setMode(kKelvinatorCool);
   irkelv.setTemp(27);
   irkelv.setSwingVertical(false);
   irkelv.setSwingHorizontal(true);
@@ -454,7 +454,7 @@ TEST(TestKelvinatorClass, MessageConstuction) {
 
   // Check everything for kicks.
   EXPECT_EQ(1, irkelv.getFan());
-  EXPECT_EQ(KELVINATOR_COOL, irkelv.getMode());
+  EXPECT_EQ(kKelvinatorCool, irkelv.getMode());
   EXPECT_EQ(27, irkelv.getTemp());
   EXPECT_FALSE(irkelv.getSwingVertical());
   EXPECT_TRUE(irkelv.getSwingHorizontal());
