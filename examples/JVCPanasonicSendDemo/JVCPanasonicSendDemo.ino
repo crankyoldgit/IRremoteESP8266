@@ -55,12 +55,9 @@ void loop() {
 #endif  // SEND_PANASONIC
 
 #if SEND_JVC
-  irsend.sendJVC(kJVCPower, 16, 0);  // hex value, 16 bits, no repeat
-  // see http://www.sbprojects.com/knowledge/ir/jvc.php for information
-  delayMicroseconds(50);
-  irsend.sendJVC(kJVCPower, 16, 1);  // hex value, 16 bits, repeat
-  delayMicroseconds(50);
+  irsend.sendJVC(kJVCPower, 16, 1);  // hex value, 16 bits, single repeat
 #else  // SEND_JVC
   Serial.println("Can't send because SEND_JVC has been disabled.");
 #endif  // SEND_JVC
+  delay(10000);  // Wait 10 seconds before we repeat everything.
 }
