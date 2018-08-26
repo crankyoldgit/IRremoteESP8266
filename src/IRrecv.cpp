@@ -87,7 +87,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 //   recvpin: GPIO pin the IR receiver module's data pin is connected to.
 //   bufsize: Nr. of entries to have in the capture buffer. (Default: kRawBuf)
 //   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
-//            (Default: TIMEOUT_MS)
+//            (Default: kTimeoutMs)
 //   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
 // Returns:
 //   An IRrecv class object.
@@ -97,7 +97,7 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
-  irparams.timeout = std::min(timeout, (uint8_t) MAX_TIMEOUT_MS);
+  irparams.timeout = std::min(timeout, (uint8_t) kMaxTimeoutMs);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
     DPRINTLN("Could not allocate memory for the primary IR buffer.\n"

@@ -2,7 +2,8 @@
 #include <IRsend.h>
 #include <ir_Fujitsu.h>
 
-IRFujitsuAC fujitsu(5);  // IR led controlled by Pin D1.
+const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRFujitsuAC fujitsu(kIrLed);
 
 void printState() {
   // Display the settings.

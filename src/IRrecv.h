@@ -23,7 +23,7 @@ const uint16_t kStartOffset = 1;  // Usual rawbuf entry to start from.
 // when received due to sensor lag.
 const uint16_t kMarkExcess = 50;
 const uint16_t kRawBuf = 100;  // Default length of raw capture buffer
-#define REPEAT UINT64_MAX
+const uint64_t kRepeat = UINT64_MAX;
 // Default min size of reported UNKNOWN messages.
 const uint16_t kUnknownThreshold = 6;
 
@@ -35,15 +35,16 @@ const uint8_t kStopState = 5;
 const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
 const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
 // How long (ms) before we give up wait for more data?
-// Don't exceed MAX_TIMEOUT_MS without a good reason.
+// Don't exceed kMaxTimeoutMs without a good reason.
 // That is the capture buffers maximum value size. (UINT16_MAX / kRawTick)
 // Typically messages/protocols tend to repeat around the 100ms timeframe,
 // thus we should timeout before that to give us some time to try to decode
 // before we need to start capturing a possible new message.
 // Typically 15ms suits most applications. However, some protocols demand a
 // higher value. e.g. 90ms for XMP-1 and some aircon units.
-#define TIMEOUT_MS    15U  // In MilliSeconds.
-#define MAX_TIMEOUT_MS (kRawTick * UINT16_MAX / MS_TO_USEC(1))
+const uint8_t kTimeoutMs = 15;  // In MilliSeconds.
+#define TIMEOUT_MS kTimeoutMs  // For legacy documentation.
+const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
 const uint32_t kFnvPrime32 = 16777619UL;
@@ -104,7 +105,7 @@ class decode_results {
 class IRrecv {
  public:
   explicit IRrecv(uint16_t recvpin, uint16_t bufsize = kRawBuf,
-                  uint8_t timeout = TIMEOUT_MS,
+                  uint8_t timeout = kTimeoutMs,
                   bool save_buffer = false);  // Constructor
   ~IRrecv();  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);

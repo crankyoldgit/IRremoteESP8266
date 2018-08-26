@@ -196,7 +196,7 @@ bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
   //   remove it.
   if (results->rawbuf[offset++] < kSanyoSa8650bDoubleSpaceUsecs) {
     results->bits = 0;
-    results->value = REPEAT;
+    results->value = kRepeat;
     results->decode_type = SANYO;
     results->address = 0;
     results->command = 0;

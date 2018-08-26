@@ -5,7 +5,7 @@
  * Copyright 2009 Ken Shirriff, http://arcfn.com
  *
  * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
- * as specified by IR_LED below.
+ * as specified by kIrLed below.
  *
  * TL;DR: The IR LED needs to be driven by a transistor for a good result.
  *
@@ -34,9 +34,9 @@
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 
-#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 
-IRsend irsend(IR_LED);  // Set the GPIO to be used to sending the message.
+IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
 
 // Example of data captured by IRrecvDumpV2.ino
 uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
