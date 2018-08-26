@@ -13,7 +13,7 @@ TEST(TestSendDaikin, SendDataOnly) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3};
@@ -69,13 +69,13 @@ TEST(TestSendDaikin, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3};
   irsend.reset();
 
-  irsend.sendDaikin(daikin_code, DAIKIN_COMMAND_LENGTH, 1);
+  irsend.sendDaikin(daikin_code, kDaikinStateLength, 1);
   EXPECT_EQ(
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
@@ -164,21 +164,21 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t daikin_short_code[DAIKIN_COMMAND_LENGTH - 1] = {
+  uint8_t daikin_short_code[kDaikinStateLength - 1] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00};
 
   irsend.reset();
-  irsend.sendDaikin(daikin_short_code, DAIKIN_COMMAND_LENGTH - 1);
+  irsend.sendDaikin(daikin_short_code, kDaikinStateLength - 1);
   ASSERT_EQ("", irsend.outputStr());
 
-  uint8_t daikin_long_code[DAIKIN_COMMAND_LENGTH + 1] = {
+  uint8_t daikin_long_code[kDaikinStateLength + 1] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x20,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE3, 0x11};
   irsend.reset();
-  irsend.sendDaikin(daikin_long_code, DAIKIN_COMMAND_LENGTH + 1);
+  irsend.sendDaikin(daikin_long_code, kDaikinStateLength + 1);
   ASSERT_EQ(
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
@@ -247,25 +247,25 @@ TEST(TestDaikinClass, Temperature) {
   irdaikin.begin();
 
   irdaikin.setTemp(0);
-  EXPECT_EQ(DAIKIN_MIN_TEMP, irdaikin.getTemp());
+  EXPECT_EQ(kDaikinMinTemp, irdaikin.getTemp());
 
   irdaikin.setTemp(255);
-  EXPECT_EQ(DAIKIN_MAX_TEMP, irdaikin.getTemp());
+  EXPECT_EQ(kDaikinMaxTemp, irdaikin.getTemp());
 
-  irdaikin.setTemp(DAIKIN_MIN_TEMP);
-  EXPECT_EQ(DAIKIN_MIN_TEMP, irdaikin.getTemp());
+  irdaikin.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, irdaikin.getTemp());
 
-  irdaikin.setTemp(DAIKIN_MAX_TEMP);
-  EXPECT_EQ(DAIKIN_MAX_TEMP, irdaikin.getTemp());
+  irdaikin.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, irdaikin.getTemp());
 
-  irdaikin.setTemp(DAIKIN_MIN_TEMP - 1);
-  EXPECT_EQ(DAIKIN_MIN_TEMP, irdaikin.getTemp());
+  irdaikin.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, irdaikin.getTemp());
 
-  irdaikin.setTemp(DAIKIN_MAX_TEMP + 1);
-  EXPECT_EQ(DAIKIN_MAX_TEMP, irdaikin.getTemp());
+  irdaikin.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, irdaikin.getTemp());
 
-  irdaikin.setTemp(DAIKIN_MIN_TEMP + 1);
-  EXPECT_EQ(DAIKIN_MIN_TEMP + 1, irdaikin.getTemp());
+  irdaikin.setTemp(kDaikinMinTemp + 1);
+  EXPECT_EQ(kDaikinMinTemp + 1, irdaikin.getTemp());
 
   irdaikin.setTemp(21);
   EXPECT_EQ(21, irdaikin.getTemp());
@@ -281,29 +281,29 @@ TEST(TestDaikinClass, OperatingMode) {
   IRDaikinESP irdaikin(0);
   irdaikin.begin();
 
-  irdaikin.setMode(DAIKIN_AUTO);
-  EXPECT_EQ(DAIKIN_AUTO, irdaikin.getMode());
+  irdaikin.setMode(kDaikinAuto);
+  EXPECT_EQ(kDaikinAuto, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_COOL);
-  EXPECT_EQ(DAIKIN_COOL, irdaikin.getMode());
+  irdaikin.setMode(kDaikinCool);
+  EXPECT_EQ(kDaikinCool, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_HEAT);
-  EXPECT_EQ(DAIKIN_HEAT, irdaikin.getMode());
+  irdaikin.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikinHeat, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_DRY);
-  EXPECT_EQ(DAIKIN_DRY, irdaikin.getMode());
+  irdaikin.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_FAN);
-  EXPECT_EQ(DAIKIN_FAN, irdaikin.getMode());
+  irdaikin.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikinFan, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_FAN + 1);
-  EXPECT_EQ(DAIKIN_AUTO, irdaikin.getMode());
+  irdaikin.setMode(kDaikinFan + 1);
+  EXPECT_EQ(kDaikinAuto, irdaikin.getMode());
 
-  irdaikin.setMode(DAIKIN_AUTO + 1);
-  EXPECT_EQ(DAIKIN_AUTO, irdaikin.getMode());
+  irdaikin.setMode(kDaikinAuto + 1);
+  EXPECT_EQ(kDaikinAuto, irdaikin.getMode());
 
   irdaikin.setMode(255);
-  EXPECT_EQ(DAIKIN_AUTO, irdaikin.getMode());
+  EXPECT_EQ(kDaikinAuto, irdaikin.getMode());
 }
 
 TEST(TestDaikinClass, VaneSwing) {
@@ -405,40 +405,40 @@ TEST(TestDaikinClass, FanSpeed) {
 
   // Unexpected value should default to Auto.
   irdaikin.setFan(0);
-  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+  EXPECT_EQ(kDaikinFanAuto, irdaikin.getFan());
 
   // Unexpected value should default to Auto.
   irdaikin.setFan(255);
-  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+  EXPECT_EQ(kDaikinFanAuto, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_MAX);
-  EXPECT_EQ(DAIKIN_FAN_MAX, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMax);
+  EXPECT_EQ(kDaikinFanMax, irdaikin.getFan());
 
   // Beyond Max should default to Auto.
-  irdaikin.setFan(DAIKIN_FAN_MAX + 1);
-  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMax + 1);
+  EXPECT_EQ(kDaikinFanAuto, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_MAX - 1);
-  EXPECT_EQ(DAIKIN_FAN_MAX - 1, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMax - 1);
+  EXPECT_EQ(kDaikinFanMax - 1, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_MIN);
-  EXPECT_EQ(DAIKIN_FAN_MIN, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMin);
+  EXPECT_EQ(kDaikinFanMin, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_MIN + 1);
-  EXPECT_EQ(DAIKIN_FAN_MIN + 1, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMin + 1);
+  EXPECT_EQ(kDaikinFanMin + 1, irdaikin.getFan());
 
   // Beyond Min should default to Auto.
-  irdaikin.setFan(DAIKIN_FAN_MIN - 1);
-  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanMin - 1);
+  EXPECT_EQ(kDaikinFanAuto, irdaikin.getFan());
 
   irdaikin.setFan(3);
   EXPECT_EQ(3, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_AUTO);
-  EXPECT_EQ(DAIKIN_FAN_AUTO, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanAuto);
+  EXPECT_EQ(kDaikinFanAuto, irdaikin.getFan());
 
-  irdaikin.setFan(DAIKIN_FAN_QUIET);
-  EXPECT_EQ(DAIKIN_FAN_QUIET, irdaikin.getFan());
+  irdaikin.setFan(kDaikinFanQuiet);
+  EXPECT_EQ(kDaikinFanQuiet, irdaikin.getFan());
 }
 
 TEST(TestDaikinClass, CurrentTime) {
@@ -598,27 +598,27 @@ TEST(TestDaikinClass, RenderTime) {
 
 TEST(TestDaikinClass, SetAndGetRaw) {
   IRDaikinESP irdaikin(0);
-  uint8_t initialState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t initialState[kDaikinStateLength] = {
     0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
     0x11, 0xDA, 0x27, 0x00, 0x00, 0x49, 0x1E, 0x00,
     0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x4F};
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
     0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
     0x11, 0xDA, 0x27, 0x00, 0x00, 0x48, 0x2A, 0x00,
     0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC0, 0x00, 0x02, 0x5A};
 
-  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), kDaikinBits);
   // toggle the power state.
   irdaikin.setPower(!irdaikin.getPower());
   irdaikin.setTemp(21);
   irdaikin.setMold(true);
-  EXPECT_STATE_EQ(expectedState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(expectedState, irdaikin.getRaw(), kDaikinBits);
   irdaikin.setRaw(initialState);
-  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), DAIKIN_BITS);
+  EXPECT_STATE_EQ(initialState, irdaikin.getRaw(), kDaikinBits);
 }
 
 TEST(TestDaikinClass, ChecksumValidation) {
-  uint8_t daikin_code[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t daikin_code[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x41, 0x1E, 0x00,
       0xB0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0xE1};
@@ -648,9 +648,9 @@ TEST(TestDaikinClass, HumanReadable) {
             "Swing (Horizontal): Off, Swing (Vertical): Off, "
             "Current Time: 0:00, On Time: Off, Off Time: Off",
             irdaikin.toString());
-  irdaikin.setMode(DAIKIN_AUTO);
+  irdaikin.setMode(kDaikinAuto);
   irdaikin.setTemp(25);
-  irdaikin.setFan(DAIKIN_FAN_AUTO);
+  irdaikin.setFan(kDaikinFanAuto);
   irdaikin.setQuiet(true);
   irdaikin.setSensor(true);
   irdaikin.setEye(true);
@@ -675,8 +675,8 @@ TEST(TestDaikinClass, MessageConstuction) {
   irdaikin.begin();
   irsend.begin();
 
-  irdaikin.setFan(DAIKIN_FAN_MIN);
-  irdaikin.setMode(DAIKIN_COOL);
+  irdaikin.setFan(kDaikinFanMin);
+  irdaikin.setMode(kDaikinCool);
   irdaikin.setTemp(27);
   irdaikin.setSwingVertical(false);
   irdaikin.setSwingHorizontal(true);
@@ -684,8 +684,8 @@ TEST(TestDaikinClass, MessageConstuction) {
   irdaikin.setPower(true);
 
   // Check everything for kicks.
-  EXPECT_EQ(DAIKIN_FAN_MIN, irdaikin.getFan());
-  EXPECT_EQ(DAIKIN_COOL, irdaikin.getMode());
+  EXPECT_EQ(kDaikinFanMin, irdaikin.getFan());
+  EXPECT_EQ(kDaikinCool, irdaikin.getMode());
   EXPECT_EQ(27, irdaikin.getTemp());
   EXPECT_FALSE(irdaikin.getSwingVertical());
   EXPECT_TRUE(irdaikin.getSwingHorizontal());
@@ -746,11 +746,11 @@ TEST(TestDecodeDaikin, RealExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
       0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
       0x00, 0x00, 0x32};
-  uint16_t rawData[DAIKIN_RAW_BITS] = {
+  uint16_t rawData[kDaikinRawBits] = {
       416, 446,  416, 446,  416, 446,  418, 446,  416, 446,  416, 25434,
       3436, 1768,  390, 1336,  390, 446,  416, 446,  416, 446,  416, 1336,
       390, 446,  416, 446,  416, 446,  416, 446,  416, 1336,  390, 448,
@@ -802,11 +802,11 @@ TEST(TestDecodeDaikin, RealExample) {
       390, 1336,  390, 446,  416, 446,  416};  // Captured by @sillyfrog
 
   irsend.reset();
-  irsend.sendRaw(rawData, DAIKIN_RAW_BITS, 38000);
+  irsend.sendRaw(rawData, kDaikinRawBits, 38000);
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
-  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  ASSERT_EQ(kDaikinBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
@@ -817,7 +817,7 @@ TEST(TestDecodeDaikin, SyntheticExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-  uint8_t expectedState[DAIKIN_COMMAND_LENGTH] = {
+  uint8_t expectedState[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x42, 0x3A, 0x05, 0x93, 0x11, 0xDA, 0x27, 0x00,
       0x00, 0x3F, 0x3A, 0x00, 0xA0, 0x00, 0x0A, 0x25, 0x17, 0x01, 0x00, 0xC0,
       0x00, 0x00, 0x32};
@@ -827,6 +827,6 @@ TEST(TestDecodeDaikin, SyntheticExample) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(DAIKIN, irsend.capture.decode_type);
-  ASSERT_EQ(DAIKIN_BITS, irsend.capture.bits);
+  ASSERT_EQ(kDaikinBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

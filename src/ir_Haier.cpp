@@ -30,37 +30,36 @@
 //   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants
-#define HAIER_AC_HDR          3000U
-#define HAIER_AC_HDR_GAP      4300U
-
-#define HAIER_AC_BIT_MARK      520U
-#define HAIER_AC_ONE_SPACE    1650U
-#define HAIER_AC_ZERO_SPACE    650U
-#define HAIER_AC_MIN_GAP    150000U  // Completely made up value.
+const uint16_t kHaierAcHdr = 3000;
+const uint16_t kHaierAcHdrGap = 4300;
+const uint16_t kHaierAcBitMark = 520;
+const uint16_t kHaierAcOneSpace = 1650;
+const uint16_t kHaierAcZeroSpace = 650;
+const uint32_t kHaierAcMinGap = 150000;  // Completely made up value.
 
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 // Send a Haier A/C message. (HSU07-HEA03 remote)
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HAIER_AC_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHaierACStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: Beta / Probably working.
 //
 void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
-  if (nbytes < HAIER_AC_STATE_LENGTH)
+  if (nbytes < kHaierACStateLength)
     return;
 
   for (uint16_t r = 0; r <= repeat; r++) {
     enableIROut(38000);
-    mark(HAIER_AC_HDR);
-    space(HAIER_AC_HDR);
-    sendGeneric(HAIER_AC_HDR, HAIER_AC_HDR_GAP,
-                HAIER_AC_BIT_MARK, HAIER_AC_ONE_SPACE,
-                HAIER_AC_BIT_MARK, HAIER_AC_ZERO_SPACE,
-                HAIER_AC_BIT_MARK, HAIER_AC_MIN_GAP,
+    mark(kHaierAcHdr);
+    space(kHaierAcHdr);
+    sendGeneric(kHaierAcHdr, kHaierAcHdrGap,
+                kHaierAcBitMark, kHaierAcOneSpace,
+                kHaierAcBitMark, kHaierAcZeroSpace,
+                kHaierAcBitMark, kHaierAcMinGap,
                 data, nbytes, 38, true, 0,  // Repeats handled elsewhere
                 50);
   }
@@ -72,14 +71,14 @@ void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=HAIER_AC_YRW02_STATE_LENGTH)
+//   nbytes: Nr. of bytes of data in the array. (>=kHaierACYRW02StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: Alpha / Untested on a real device.
 //
 void IRsend::sendHaierACYRW02(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
-  if (nbytes >= HAIER_AC_YRW02_STATE_LENGTH)
+  if (nbytes >= kHaierACYRW02StateLength)
     sendHaierAC(data, nbytes, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
@@ -101,7 +100,7 @@ void IRHaierAC::send() {
 #endif  // SEND_HAIER_AC
 
 void IRHaierAC::checksum() {
-  remote_state[8] = sumBytes(remote_state, HAIER_AC_STATE_LENGTH - 1);
+  remote_state[8] = sumBytes(remote_state, kHaierACStateLength - 1);
 }
 
 bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
@@ -110,15 +109,15 @@ bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
 }
 
 void IRHaierAC::stateReset() {
-  for (uint8_t i = 1; i < HAIER_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 1; i < kHaierACStateLength; i++)
     remote_state[i] = 0x0;
-  remote_state[0] = HAIER_AC_PREFIX;
+  remote_state[0] = kHaierAcPrefix;
   remote_state[2] = 0b00100000;
 
-  setTemp(HAIER_AC_DEF_TEMP);
-  setFan(HAIER_AC_FAN_AUTO);
-  setMode(HAIER_AC_AUTO);
-  setCommand(HAIER_AC_CMD_ON);
+  setTemp(kHaierAcDefTemp);
+  setFan(kHaierAcFanAuto);
+  setMode(kHaierAcAuto);
+  setCommand(kHaierAcCmdOn);
 }
 
 uint8_t* IRHaierAC::getRaw() {
@@ -127,7 +126,7 @@ uint8_t* IRHaierAC::getRaw() {
 }
 
 void IRHaierAC::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < HAIER_AC_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kHaierACStateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
@@ -135,17 +134,17 @@ void IRHaierAC::setRaw(uint8_t new_code[]) {
 void IRHaierAC::setCommand(uint8_t state) {
   remote_state[1] &= 0b11110000;
   switch (state) {
-    case HAIER_AC_CMD_OFF:
-    case HAIER_AC_CMD_ON:
-    case HAIER_AC_CMD_MODE:
-    case HAIER_AC_CMD_FAN:
-    case HAIER_AC_CMD_TEMP_UP:
-    case HAIER_AC_CMD_TEMP_DOWN:
-    case HAIER_AC_CMD_SLEEP:
-    case HAIER_AC_CMD_TIMER_SET:
-    case HAIER_AC_CMD_TIMER_CANCEL:
-    case HAIER_AC_CMD_HEALTH:
-    case HAIER_AC_CMD_SWING:
+    case kHaierAcCmdOff:
+    case kHaierAcCmdOn:
+    case kHaierAcCmdMode:
+    case kHaierAcCmdFan:
+    case kHaierAcCmdTempUp:
+    case kHaierAcCmdTempDown:
+    case kHaierAcCmdSleep:
+    case kHaierAcCmdTimerSet:
+    case kHaierAcCmdTimerCancel:
+    case kHaierAcCmdHealth:
+    case kHaierAcCmdSwing:
       remote_state[1] |= (state & 0b00001111);
   }
 }
@@ -155,22 +154,22 @@ uint8_t IRHaierAC::getCommand() {
 }
 
 void IRHaierAC::setFan(uint8_t speed) {
-  uint8_t new_speed = HAIER_AC_FAN_AUTO;
+  uint8_t new_speed = kHaierAcFanAuto;
   switch (speed) {
-    case HAIER_AC_FAN_LOW:
+    case kHaierAcFanLow:
       new_speed = 3;
       break;
-    case HAIER_AC_FAN_MED:
+    case kHaierAcFanMed:
       new_speed = 1;
       break;
-    case HAIER_AC_FAN_HIGH:
+    case kHaierAcFanHigh:
       new_speed = 2;
       break;
     default:
-      new_speed = HAIER_AC_FAN_AUTO;  // Default to auto for anything else.
+      new_speed = kHaierAcFanAuto;  // Default to auto for anything else.
   }
 
-  if (speed != getFan())  setCommand(HAIER_AC_CMD_FAN);
+  if (speed != getFan())  setCommand(kHaierAcCmdFan);
   remote_state[5] &= 0b11111100;
   remote_state[5] |= new_speed;
 }
@@ -178,21 +177,21 @@ void IRHaierAC::setFan(uint8_t speed) {
 uint8_t IRHaierAC::getFan() {
   switch (remote_state[5] & 0b00000011) {
     case 1:
-      return HAIER_AC_FAN_MED;
+      return kHaierAcFanMed;
     case 2:
-      return HAIER_AC_FAN_HIGH;
+      return kHaierAcFanHigh;
     case 3:
-      return HAIER_AC_FAN_LOW;
+      return kHaierAcFanLow;
     default:
-      return HAIER_AC_FAN_AUTO;
+      return kHaierAcFanAuto;
   }
 }
 
 void IRHaierAC::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
-  setCommand(HAIER_AC_CMD_MODE);
-  if (mode > HAIER_AC_FAN)  // If out of range, default to auto mode.
-    new_mode = HAIER_AC_AUTO;
+  setCommand(kHaierAcCmdMode);
+  if (mode > kHaierAcFan)  // If out of range, default to auto mode.
+    new_mode = kHaierAcAuto;
   remote_state[7] &= 0b00011111;
   remote_state[7] |= (new_mode << 5);
 }
@@ -204,28 +203,28 @@ uint8_t IRHaierAC::getMode() {
 
 void IRHaierAC::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
-  if (temp < HAIER_AC_MIN_TEMP)
-    temp = HAIER_AC_MIN_TEMP;
-  else if (temp > HAIER_AC_MAX_TEMP)
-    temp = HAIER_AC_MAX_TEMP;
+  if (temp < kHaierAcMinTemp)
+    temp = kHaierAcMinTemp;
+  else if (temp > kHaierAcMaxTemp)
+    temp = kHaierAcMaxTemp;
 
   uint8_t old_temp = getTemp();
   if (old_temp == temp)  return;
   if (old_temp > temp)
-    setCommand(HAIER_AC_CMD_TEMP_DOWN);
+    setCommand(kHaierAcCmdTempDown);
   else
-    setCommand(HAIER_AC_CMD_TEMP_UP);
+    setCommand(kHaierAcCmdTempUp);
 
   remote_state[1] &= 0b00001111;  // Clear the previous temp.
-  remote_state[1] |= ((temp - HAIER_AC_MIN_TEMP) << 4);
+  remote_state[1] |= ((temp - kHaierAcMinTemp) << 4);
 }
 
 uint8_t IRHaierAC::getTemp() {
-  return ((remote_state[1] & 0b11110000) >> 4) + HAIER_AC_MIN_TEMP;
+  return ((remote_state[1] & 0b11110000) >> 4) + kHaierAcMinTemp;
 }
 
 void IRHaierAC::setHealth(bool state) {
-  setCommand(HAIER_AC_CMD_HEALTH);
+  setCommand(kHaierAcCmdHealth);
   remote_state[4] &= 0b11011111;
   remote_state[4] |= (state << 5);
 }
@@ -235,7 +234,7 @@ bool IRHaierAC::getHealth(void) {
 }
 
 void IRHaierAC::setSleep(bool state) {
-  setCommand(HAIER_AC_CMD_SLEEP);
+  setCommand(kHaierAcCmdSleep);
   remote_state[7] &= 0b10111111;
   remote_state[7] |= (state << 6);
 }
@@ -268,8 +267,8 @@ uint16_t IRHaierAC::getCurrTime() {
 
 void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   uint16_t mins = nr_mins;
-  if (nr_mins > HAIER_AC_MAX_TIME)
-    mins = HAIER_AC_MAX_TIME;
+  if (nr_mins > kHaierAcMaxTime)
+    mins = kHaierAcMaxTime;
 
     // Hours
   ptr[0] &= 0b11100000;
@@ -280,19 +279,19 @@ void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
 }
 
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
-  setCommand(HAIER_AC_CMD_TIMER_SET);
+  setCommand(kHaierAcCmdTimerSet);
   remote_state[3] |= 0b10000000;
   setTime(remote_state + 6, nr_mins);
 }
 
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
-  setCommand(HAIER_AC_CMD_TIMER_SET);
+  setCommand(kHaierAcCmdTimerSet);
   remote_state[3] |= 0b01000000;
   setTime(remote_state + 4, nr_mins);
 }
 
 void IRHaierAC::cancelTimers() {
-  setCommand(HAIER_AC_CMD_TIMER_CANCEL);
+  setCommand(kHaierAcCmdTimerCancel);
   remote_state[3] &= 0b00111111;
 }
 
@@ -306,12 +305,12 @@ uint8_t IRHaierAC::getSwing() {
 
 void IRHaierAC::setSwing(const uint8_t state) {
   if (state == getSwing())  return;  // Nothing to do.
-  setCommand(HAIER_AC_CMD_SWING);
+  setCommand(kHaierAcCmdSwing);
   switch (state) {
-    case HAIER_AC_SWING_OFF:
-    case HAIER_AC_SWING_UP:
-    case HAIER_AC_SWING_DOWN:
-    case HAIER_AC_SWING_CHG:
+    case kHaierAcSwingOff:
+    case kHaierAcSwingUp:
+    case kHaierAcSwingDown:
+    case kHaierAcSwingChg:
       remote_state[2] &= 0b00111111;
       remote_state[2] |= (state << 6);
       break;
@@ -346,37 +345,37 @@ std::string IRHaierAC::toString() {
   uint8_t cmd = getCommand();
   result += "Command: " + uint64ToString(cmd) +" (";
   switch (cmd) {
-    case HAIER_AC_CMD_OFF:
+    case kHaierAcCmdOff:
       result += "Off";
       break;
-    case HAIER_AC_CMD_ON:
+    case kHaierAcCmdOn:
       result += "On";
       break;
-    case HAIER_AC_CMD_MODE:
+    case kHaierAcCmdMode:
       result += "Mode";
       break;
-    case HAIER_AC_CMD_FAN:
+    case kHaierAcCmdFan:
       result += "Fan";
       break;
-    case HAIER_AC_CMD_TEMP_UP:
+    case kHaierAcCmdTempUp:
       result += "Temp Up";
       break;
-    case HAIER_AC_CMD_TEMP_DOWN:
+    case kHaierAcCmdTempDown:
       result += "Temp Down";
       break;
-    case HAIER_AC_CMD_SLEEP:
+    case kHaierAcCmdSleep:
       result += "Sleep";
       break;
-    case HAIER_AC_CMD_TIMER_SET:
+    case kHaierAcCmdTimerSet:
       result += "Timer Set";
       break;
-    case HAIER_AC_CMD_TIMER_CANCEL:
+    case kHaierAcCmdTimerCancel:
       result += "Timer Cancel";
       break;
-    case HAIER_AC_CMD_HEALTH:
+    case kHaierAcCmdHealth:
       result += "Health";
       break;
-    case HAIER_AC_CMD_SWING:
+    case kHaierAcCmdSwing:
       result += "Swing";
       break;
     default:
@@ -385,19 +384,19 @@ std::string IRHaierAC::toString() {
   result += ")";
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
-    case HAIER_AC_AUTO:
+    case kHaierAcAuto:
       result += " (AUTO)";
       break;
-    case HAIER_AC_COOL:
+    case kHaierAcCool:
       result += " (COOL)";
       break;
-    case HAIER_AC_HEAT:
+    case kHaierAcHeat:
       result += " (HEAT)";
       break;
-    case HAIER_AC_DRY:
+    case kHaierAcDry:
       result += " (DRY)";
       break;
-    case HAIER_AC_FAN:
+    case kHaierAcFan:
       result += " (FAN)";
       break;
     default:
@@ -406,25 +405,25 @@ std::string IRHaierAC::toString() {
   result += ", Temp: " + uint64ToString(getTemp()) + "C";
   result += ", Fan: " + uint64ToString(getFan());
   switch (getFan()) {
-    case HAIER_AC_FAN_AUTO:
+    case kHaierAcFanAuto:
       result += " (AUTO)";
       break;
-    case HAIER_AC_FAN_HIGH:
+    case kHaierAcFanHigh:
       result += " (MAX)";
       break;
   }
   result += ", Swing: " + uint64ToString(getSwing()) + " (";
   switch (getSwing()) {
-    case HAIER_AC_SWING_OFF:
+    case kHaierAcSwingOff:
       result += "Off";
       break;
-    case HAIER_AC_SWING_UP:
+    case kHaierAcSwingUp:
       result += "Up";
       break;
-    case HAIER_AC_SWING_DOWN:
+    case kHaierAcSwingDown:
       result += "Down";
       break;
-    case HAIER_AC_SWING_CHG:
+    case kHaierAcSwingChg:
       result += "Chg";
       break;
     default:
@@ -474,8 +473,8 @@ void IRHaierACYRW02::send() {
 #endif  // SEND_HAIER_AC_YRW02
 
 void IRHaierACYRW02::checksum() {
-  remote_state[HAIER_AC_YRW02_STATE_LENGTH - 1] = sumBytes(
-      remote_state, HAIER_AC_YRW02_STATE_LENGTH - 1);
+  remote_state[kHaierACYRW02StateLength - 1] = sumBytes(
+      remote_state, kHaierACYRW02StateLength - 1);
 }
 
 bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
@@ -484,17 +483,17 @@ bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
 }
 
 void IRHaierACYRW02::stateReset() {
-  for (uint8_t i = 1; i < HAIER_AC_YRW02_STATE_LENGTH; i++)
+  for (uint8_t i = 1; i < kHaierACYRW02StateLength; i++)
     remote_state[i] = 0x0;
-  remote_state[0] = HAIER_AC_YRW02_PREFIX;
+  remote_state[0] = kHaierAcYrw02Prefix;
 
-  setTemp(HAIER_AC_DEF_TEMP);
+  setTemp(kHaierAcDefTemp);
   setHealth(true);
-  setTurbo(HAIER_AC_YRW02_TURBO_OFF);
+  setTurbo(kHaierAcYrw02TurboOff);
   setSleep(false);
-  setFan(HAIER_AC_YRW02_FAN_AUTO);
-  setSwing(HAIER_AC_YRW02_SWING_OFF);
-  setMode(HAIER_AC_YRW02_AUTO);
+  setFan(kHaierAcYrw02FanAuto);
+  setSwing(kHaierAcYrw02SwingOff);
+  setMode(kHaierAcYrw02Auto);
   setPower(true);
 }
 
@@ -504,22 +503,22 @@ uint8_t* IRHaierACYRW02::getRaw() {
 }
 
 void IRHaierACYRW02::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < HAIER_AC_YRW02_STATE_LENGTH; i++) {
+  for (uint8_t i = 0; i < kHaierACYRW02StateLength; i++) {
     remote_state[i] = new_code[i];
   }
 }
 
 void IRHaierACYRW02::setButton(uint8_t button) {
   switch (button) {
-    case HAIER_AC_YRW02_BUTTON_TEMP_UP:
-    case HAIER_AC_YRW02_BUTTON_TEMP_DOWN:
-    case HAIER_AC_YRW02_BUTTON_SWING:
-    case HAIER_AC_YRW02_BUTTON_FAN:
-    case HAIER_AC_YRW02_BUTTON_POWER:
-    case HAIER_AC_YRW02_BUTTON_MODE:
-    case HAIER_AC_YRW02_BUTTON_HEALTH:
-    case HAIER_AC_YRW02_BUTTON_TURBO:
-    case HAIER_AC_YRW02_BUTTON_SLEEP:
+    case kHaierAcYrw02ButtonTempUp:
+    case kHaierAcYrw02ButtonTempDown:
+    case kHaierAcYrw02ButtonSwing:
+    case kHaierAcYrw02ButtonFan:
+    case kHaierAcYrw02ButtonPower:
+    case kHaierAcYrw02ButtonMode:
+    case kHaierAcYrw02ButtonHealth:
+    case kHaierAcYrw02ButtonTurbo:
+    case kHaierAcYrw02ButtonSleep:
       remote_state[12] &= 0b11110000;
       remote_state[12] |= (button & 0b00001111);
   }
@@ -531,16 +530,16 @@ uint8_t IRHaierACYRW02::getButton() {
 
 void IRHaierACYRW02::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
-  setButton(HAIER_AC_YRW02_BUTTON_MODE);
+  setButton(kHaierAcYrw02ButtonMode);
   switch (mode) {
-    case HAIER_AC_YRW02_AUTO:
-    case HAIER_AC_YRW02_COOL:
-    case HAIER_AC_YRW02_DRY:
-    case HAIER_AC_YRW02_HEAT:
-    case HAIER_AC_YRW02_FAN:
+    case kHaierAcYrw02Auto:
+    case kHaierAcYrw02Cool:
+    case kHaierAcYrw02Dry:
+    case kHaierAcYrw02Heat:
+    case kHaierAcYrw02Fan:
       break;
     default:  // If unexpected, default to auto mode.
-      new_mode = HAIER_AC_YRW02_AUTO;
+      new_mode = kHaierAcYrw02Auto;
   }
   remote_state[7] &= 0b0001111;
   remote_state[7] |= (new_mode << 4);
@@ -552,28 +551,28 @@ uint8_t IRHaierACYRW02::getMode() {
 
 void IRHaierACYRW02::setTemp(const uint8_t celcius) {
   uint8_t temp = celcius;
-  if (temp < HAIER_AC_MIN_TEMP)
-    temp = HAIER_AC_MIN_TEMP;
-  else if (temp > HAIER_AC_MAX_TEMP)
-    temp = HAIER_AC_MAX_TEMP;
+  if (temp < kHaierAcMinTemp)
+    temp = kHaierAcMinTemp;
+  else if (temp > kHaierAcMaxTemp)
+    temp = kHaierAcMaxTemp;
 
   uint8_t old_temp = getTemp();
   if (old_temp == temp)  return;
   if (old_temp > temp)
-    setButton(HAIER_AC_YRW02_BUTTON_TEMP_DOWN);
+    setButton(kHaierAcYrw02ButtonTempDown);
   else
-    setButton(HAIER_AC_YRW02_BUTTON_TEMP_UP);
+    setButton(kHaierAcYrw02ButtonTempUp);
 
   remote_state[1] &= 0b00001111;  // Clear the previous temp.
-  remote_state[1] |= ((temp - HAIER_AC_MIN_TEMP) << 4);
+  remote_state[1] |= ((temp - kHaierAcMinTemp) << 4);
 }
 
 uint8_t IRHaierACYRW02::getTemp() {
-  return ((remote_state[1] & 0b11110000) >> 4) + HAIER_AC_MIN_TEMP;
+  return ((remote_state[1] & 0b11110000) >> 4) + kHaierAcMinTemp;
 }
 
 void IRHaierACYRW02::setHealth(bool state) {
-  setButton(HAIER_AC_YRW02_BUTTON_HEALTH);
+  setButton(kHaierAcYrw02ButtonHealth);
   remote_state[3] &= 0b11111101;
   remote_state[3] |= (state << 1);
 }
@@ -583,15 +582,15 @@ bool IRHaierACYRW02::getHealth(void) {
 }
 
 bool IRHaierACYRW02::getPower() {
-  return remote_state[4] & HAIER_AC_YRW02_POWER;
+  return remote_state[4] & kHaierAcYrw02Power;
 }
 
 void IRHaierACYRW02::setPower(bool state) {
-  setButton(HAIER_AC_YRW02_BUTTON_POWER);
+  setButton(kHaierAcYrw02ButtonPower);
   if (state)
-    remote_state[4] |= HAIER_AC_YRW02_POWER;
+    remote_state[4] |= kHaierAcYrw02Power;
   else
-    remote_state[4] &= ~HAIER_AC_YRW02_POWER;
+    remote_state[4] &= ~kHaierAcYrw02Power;
 }
 
 void IRHaierACYRW02::on() {
@@ -603,15 +602,15 @@ void IRHaierACYRW02::off() {
 }
 
 bool IRHaierACYRW02::getSleep() {
-  return remote_state[8] & HAIER_AC_YRW02_SLEEP;
+  return remote_state[8] & kHaierAcYrw02Sleep;
 }
 
 void IRHaierACYRW02::setSleep(bool state) {
-  setButton(HAIER_AC_YRW02_BUTTON_SLEEP);
+  setButton(kHaierAcYrw02ButtonSleep);
   if (state)
-    remote_state[8] |= HAIER_AC_YRW02_SLEEP;
+    remote_state[8] |= kHaierAcYrw02Sleep;
   else
-    remote_state[8] &= ~HAIER_AC_YRW02_SLEEP;
+    remote_state[8] &= ~kHaierAcYrw02Sleep;
 }
 
 uint8_t IRHaierACYRW02::getTurbo() {
@@ -620,12 +619,12 @@ uint8_t IRHaierACYRW02::getTurbo() {
 
 void IRHaierACYRW02::setTurbo(uint8_t speed) {
   switch (speed) {
-    case HAIER_AC_YRW02_TURBO_OFF:
-    case HAIER_AC_YRW02_TURBO_LOW:
-    case HAIER_AC_YRW02_TURBO_HIGH:
+    case kHaierAcYrw02TurboOff:
+    case kHaierAcYrw02TurboLow:
+    case kHaierAcYrw02TurboHigh:
       remote_state[6] &= 0b00111111;
       remote_state[6] |= (speed << 6);
-      setButton(HAIER_AC_YRW02_BUTTON_TURBO);
+      setButton(kHaierAcYrw02ButtonTurbo);
   }
 }
 
@@ -635,13 +634,13 @@ uint8_t IRHaierACYRW02::getFan() {
 
 void IRHaierACYRW02::setFan(uint8_t speed) {
   switch (speed) {
-    case HAIER_AC_YRW02_FAN_LOW:
-    case HAIER_AC_YRW02_FAN_MED:
-    case HAIER_AC_YRW02_FAN_HIGH:
-    case HAIER_AC_YRW02_FAN_AUTO:
+    case kHaierAcYrw02FanLow:
+    case kHaierAcYrw02FanMed:
+    case kHaierAcYrw02FanHigh:
+    case kHaierAcYrw02FanAuto:
       remote_state[5] &= 0b00001111;
       remote_state[5] |= (speed << 4);
-      setButton(HAIER_AC_YRW02_BUTTON_FAN);
+      setButton(kHaierAcYrw02ButtonFan);
   }
 }
 
@@ -652,27 +651,27 @@ uint8_t IRHaierACYRW02::getSwing() {
 void IRHaierACYRW02::setSwing(uint8_t state) {
   uint8_t newstate = state;
   switch (state) {
-    case HAIER_AC_YRW02_SWING_OFF:
-    case HAIER_AC_YRW02_SWING_AUTO:
-    case HAIER_AC_YRW02_SWING_TOP:
-    case HAIER_AC_YRW02_SWING_MIDDLE:
-    case HAIER_AC_YRW02_SWING_BOTTOM:
-    case HAIER_AC_YRW02_SWING_DOWN:
-      setButton(HAIER_AC_YRW02_BUTTON_SWING);
+    case kHaierAcYrw02SwingOff:
+    case kHaierAcYrw02SwingAuto:
+    case kHaierAcYrw02SwingTop:
+    case kHaierAcYrw02SwingMiddle:
+    case kHaierAcYrw02SwingBottom:
+    case kHaierAcYrw02SwingDown:
+      setButton(kHaierAcYrw02ButtonSwing);
       break;
     default:
       return;  // Unexpected value so don't do anything.
   }
 
   // Heat mode has no MIDDLE setting, use BOTTOM instead.
-  if (state == HAIER_AC_YRW02_SWING_MIDDLE &&
-      getMode() == HAIER_AC_YRW02_HEAT)
-    newstate = HAIER_AC_YRW02_SWING_BOTTOM;
+  if (state == kHaierAcYrw02SwingMiddle &&
+      getMode() == kHaierAcYrw02Heat)
+    newstate = kHaierAcYrw02SwingBottom;
 
   // BOTTOM is only allowed if we are in Heat mode, otherwise MIDDLE.
-  if (state == HAIER_AC_YRW02_SWING_BOTTOM &&
-      getMode() != HAIER_AC_YRW02_HEAT)
-    newstate = HAIER_AC_YRW02_SWING_MIDDLE;
+  if (state == kHaierAcYrw02SwingBottom &&
+      getMode() != kHaierAcYrw02Heat)
+    newstate = kHaierAcYrw02SwingMiddle;
 
   remote_state[1] &= 0b11110000;
   remote_state[1] |= newstate;
@@ -694,31 +693,31 @@ std::string IRHaierACYRW02::toString() {
   uint8_t cmd = getButton();
   result += ", Button: " + uint64ToString(cmd) +" (";
   switch (cmd) {
-    case HAIER_AC_YRW02_BUTTON_POWER:
+    case kHaierAcYrw02ButtonPower:
       result += "Power";
       break;
-    case HAIER_AC_YRW02_BUTTON_MODE:
+    case kHaierAcYrw02ButtonMode:
       result += "Mode";
       break;
-    case HAIER_AC_YRW02_BUTTON_FAN:
+    case kHaierAcYrw02ButtonFan:
       result += "Fan";
       break;
-    case HAIER_AC_YRW02_BUTTON_TEMP_UP:
+    case kHaierAcYrw02ButtonTempUp:
       result += "Temp Up";
       break;
-    case HAIER_AC_YRW02_BUTTON_TEMP_DOWN:
+    case kHaierAcYrw02ButtonTempDown:
       result += "Temp Down";
       break;
-    case HAIER_AC_YRW02_BUTTON_SLEEP:
+    case kHaierAcYrw02ButtonSleep:
       result += "Sleep";
       break;
-    case HAIER_AC_YRW02_BUTTON_HEALTH:
+    case kHaierAcYrw02ButtonHealth:
       result += "Health";
       break;
-    case HAIER_AC_YRW02_BUTTON_SWING:
+    case kHaierAcYrw02ButtonSwing:
       result += "Swing";
       break;
-    case HAIER_AC_YRW02_BUTTON_TURBO:
+    case kHaierAcYrw02ButtonTurbo:
       result += "Turbo";
       break;
     default:
@@ -727,19 +726,19 @@ std::string IRHaierACYRW02::toString() {
   result += ")";
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
-    case HAIER_AC_YRW02_AUTO:
+    case kHaierAcYrw02Auto:
       result += " (Auto)";
       break;
-    case HAIER_AC_YRW02_COOL:
+    case kHaierAcYrw02Cool:
       result += " (Cool)";
       break;
-    case HAIER_AC_YRW02_HEAT:
+    case kHaierAcYrw02Heat:
       result += " (Heat)";
       break;
-    case HAIER_AC_YRW02_DRY:
+    case kHaierAcYrw02Dry:
       result += " (Dry)";
       break;
-    case HAIER_AC_YRW02_FAN:
+    case kHaierAcYrw02Fan:
       result += " (Fan)";
       break;
     default:
@@ -748,16 +747,16 @@ std::string IRHaierACYRW02::toString() {
   result += ", Temp: " + uint64ToString(getTemp()) + "C";
   result += ", Fan: " + uint64ToString(getFan());
   switch (getFan()) {
-    case HAIER_AC_YRW02_FAN_AUTO:
+    case kHaierAcYrw02FanAuto:
       result += " (Auto)";
       break;
-    case HAIER_AC_YRW02_FAN_HIGH:
+    case kHaierAcYrw02FanHigh:
       result += " (High)";
       break;
-    case HAIER_AC_YRW02_FAN_LOW:
+    case kHaierAcYrw02FanLow:
       result += " (Low)";
       break;
-    case HAIER_AC_YRW02_FAN_MED:
+    case kHaierAcYrw02FanMed:
       result += " (Med)";
       break;
     default:
@@ -765,13 +764,13 @@ std::string IRHaierACYRW02::toString() {
   }
   result += ", Turbo: " + uint64ToString(getTurbo()) + " (";
   switch (getTurbo()) {
-    case HAIER_AC_YRW02_TURBO_OFF:
+    case kHaierAcYrw02TurboOff:
       result += "Off";
       break;
-    case HAIER_AC_YRW02_TURBO_LOW:
+    case kHaierAcYrw02TurboLow:
       result += "Low";
       break;
-    case HAIER_AC_YRW02_TURBO_HIGH:
+    case kHaierAcYrw02TurboHigh:
       result += "High";
       break;
     default:
@@ -780,22 +779,22 @@ std::string IRHaierACYRW02::toString() {
   result += ")";
   result += ", Swing: " + uint64ToString(getSwing()) + " (";
   switch (getSwing()) {
-    case HAIER_AC_YRW02_SWING_OFF:
+    case kHaierAcYrw02SwingOff:
       result += "Off";
       break;
-    case HAIER_AC_YRW02_SWING_AUTO:
+    case kHaierAcYrw02SwingAuto:
       result += "Auto";
       break;
-    case HAIER_AC_YRW02_SWING_BOTTOM:
+    case kHaierAcYrw02SwingBottom:
       result += "Bottom";
       break;
-    case HAIER_AC_YRW02_SWING_DOWN:
+    case kHaierAcYrw02SwingDown:
       result += "Down";
       break;
-    case HAIER_AC_YRW02_SWING_TOP:
+    case kHaierAcYrw02SwingTop:
       result += "Top";
       break;
-    case HAIER_AC_YRW02_SWING_MIDDLE:
+    case kHaierAcYrw02SwingMiddle:
       result += "Middle";
       break;
     default:
@@ -823,7 +822,7 @@ std::string IRHaierACYRW02::toString() {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HAIER_AC_BITS.
+//   nbits:   The number of data bits to expect. Typically kHaierACBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -836,43 +835,43 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
     return false;
 
   if (strict) {
-    if (nbits != HAIER_AC_BITS)
+    if (nbits != kHaierACBits)
       return false;  // Not strictly a HAIER_AC message.
   }
 
-  if (results->rawlen < (2 * nbits + HEADER) + FOOTER - 1)
+  if (results->rawlen < (2 * nbits + kHeader) + kFooter - 1)
     return false;  // Can't possibly be a valid HAIER_AC message.
 
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], HAIER_AC_HDR)) return false;
-  if (!matchSpace(results->rawbuf[offset++], HAIER_AC_HDR)) return false;
-  if (!matchMark(results->rawbuf[offset++], HAIER_AC_HDR)) return false;
-  if (!matchSpace(results->rawbuf[offset++], HAIER_AC_HDR_GAP)) return false;
+  if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
+  if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kHaierAcHdrGap)) return false;
 
   // Data
   for (uint16_t i = 0; i < nbits / 8; i++) {
     match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
-                                           HAIER_AC_BIT_MARK,
-                                           HAIER_AC_ONE_SPACE,
-                                           HAIER_AC_BIT_MARK,
-                                           HAIER_AC_ZERO_SPACE);
+                                           kHaierAcBitMark,
+                                           kHaierAcOneSpace,
+                                           kHaierAcBitMark,
+                                           kHaierAcZeroSpace);
     if (data_result.success == false) return false;
     offset += data_result.used;
     results->state[i] = (uint8_t) data_result.data;
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], HAIER_AC_BIT_MARK))  return false;
+  if (!matchMark(results->rawbuf[offset++], kHaierAcBitMark))  return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], HAIER_AC_MIN_GAP))
+      !matchAtLeast(results->rawbuf[offset++], kHaierAcMinGap))
     return false;
 
   // Compliance
   if (strict) {
-    if (results->state[0] != HAIER_AC_PREFIX)  return false;
+    if (results->state[0] != kHaierAcPrefix)  return false;
     if (!IRHaierAC::validChecksum(results->state, nbits / 8))  return false;
   }
 
@@ -888,7 +887,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically HAIER_AC_YRW02_BITS.
+//   nbits:   The number of data bits to expect. Typically kHaierACYRW02Bits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -898,7 +897,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
                                 bool strict) {
   if (strict) {
-    if (nbits != HAIER_AC_YRW02_BITS)
+    if (nbits != kHaierACYRW02Bits)
       return false;  // Not strictly a HAIER_AC_YRW02 message.
   }
 
@@ -908,7 +907,7 @@ bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
 
   // Compliance
   if (strict) {
-    if (results->state[0] != HAIER_AC_YRW02_PREFIX)  return false;
+    if (results->state[0] != kHaierAcYrw02Prefix)  return false;
     if (!IRHaierACYRW02::validChecksum(results->state, nbits / 8))
       return false;
   }

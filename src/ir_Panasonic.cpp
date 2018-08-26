@@ -19,32 +19,34 @@
 // Constants
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-#define PANASONIC_TICK                     432U
-#define PANASONIC_HDR_MARK_TICKS             8U
-#define PANASONIC_HDR_MARK         (PANASONIC_HDR_MARK_TICKS * PANASONIC_TICK)
-#define PANASONIC_HDR_SPACE_TICKS            4U
-#define PANASONIC_HDR_SPACE        (PANASONIC_HDR_SPACE_TICKS * PANASONIC_TICK)
-#define PANASONIC_BIT_MARK_TICKS             1U
-#define PANASONIC_BIT_MARK         (PANASONIC_BIT_MARK_TICKS * PANASONIC_TICK)
-#define PANASONIC_ONE_SPACE_TICKS            3U
-#define PANASONIC_ONE_SPACE        (PANASONIC_ONE_SPACE_TICKS * PANASONIC_TICK)
-#define PANASONIC_ZERO_SPACE_TICKS           1U
-#define PANASONIC_ZERO_SPACE       (PANASONIC_ZERO_SPACE_TICKS * PANASONIC_TICK)
-#define PANASONIC_MIN_COMMAND_LENGTH_TICKS 378UL
-#define PANASONIC_MIN_COMMAND_LENGTH (PANASONIC_MIN_COMMAND_LENGTH_TICKS * \
-                                      PANASONIC_TICK)
-#define PANASONIC_END_GAP              5000U  // See issue #245
-#define PANASONIC_MIN_GAP_TICKS (PANASONIC_MIN_COMMAND_LENGTH_TICKS - \
-    (PANASONIC_HDR_MARK_TICKS + PANASONIC_HDR_SPACE_TICKS + \
-     PANASONIC_BITS * (PANASONIC_BIT_MARK_TICKS + PANASONIC_ONE_SPACE_TICKS) + \
-     PANASONIC_BIT_MARK_TICKS))
-#define PANASONIC_MIN_GAP ((uint32_t)(PANASONIC_MIN_GAP_TICKS * PANASONIC_TICK))
+
+const uint16_t kPanasonicTick = 432;
+const uint16_t kPanasonicHdrMarkTicks = 8;
+const uint16_t kPanasonicHdrMark = kPanasonicHdrMarkTicks * kPanasonicTick;
+const uint16_t kPanasonicHdrSpaceTicks = 4;
+const uint16_t kPanasonicHdrSpace = kPanasonicHdrSpaceTicks * kPanasonicTick;
+const uint16_t kPanasonicBitMarkTicks = 1;
+const uint16_t kPanasonicBitMark = kPanasonicBitMarkTicks * kPanasonicTick;
+const uint16_t kPanasonicOneSpaceTicks = 3;
+const uint16_t kPanasonicOneSpace = kPanasonicOneSpaceTicks * kPanasonicTick;
+const uint16_t kPanasonicZeroSpaceTicks = 1;
+const uint16_t kPanasonicZeroSpace = kPanasonicZeroSpaceTicks * kPanasonicTick;
+const uint16_t kPanasonicMinCommandLengthTicks = 378;
+const uint32_t kPanasonicMinCommandLength =
+    kPanasonicMinCommandLengthTicks * kPanasonicTick;
+const uint16_t kPanasonicEndGap = 5000;  // See issue #245
+const uint16_t kPanasonicMinGapTicks = kPanasonicMinCommandLengthTicks -
+    (kPanasonicHdrMarkTicks + kPanasonicHdrSpaceTicks +
+     kPanasonicBits * (kPanasonicBitMarkTicks + kPanasonicOneSpaceTicks) +
+     kPanasonicBitMarkTicks);
+const uint32_t kPanasonicMinGap = kPanasonicMinGapTicks * kPanasonicTick;
+
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. (PANASONIC_BITS).
+//   nbits:  The number of bits of the message to be sent. (kPanasonicBits).
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: BETA / Should be working.
@@ -52,11 +54,11 @@
 // Note:
 //   This protocol is a modified version of Kaseikyo.
 void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(PANASONIC_HDR_MARK, PANASONIC_HDR_SPACE,
-              PANASONIC_BIT_MARK, PANASONIC_ONE_SPACE,
-              PANASONIC_BIT_MARK, PANASONIC_ZERO_SPACE,
-              PANASONIC_BIT_MARK,
-              PANASONIC_MIN_GAP, PANASONIC_MIN_COMMAND_LENGTH,
+  sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
+              kPanasonicBitMark, kPanasonicOneSpace,
+              kPanasonicBitMark, kPanasonicZeroSpace,
+              kPanasonicBitMark,
+              kPanasonicMinGap, kPanasonicMinCommandLength,
               data, nbits, 36700U, true, repeat, 50);
 }
 
@@ -65,7 +67,7 @@ void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Args:
 //   address: The manufacturer code.
 //   data:    The data portion to be sent.
-//   nbits:   The number of bits of the message to be sent. (PANASONIC_BITS).
+//   nbits:   The number of bits of the message to be sent. (kPanasonicBits).
 //   repeat:  The number of times the command is to be repeated.
 //
 // Status: STABLE.
@@ -124,39 +126,39 @@ uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
                              bool strict, uint32_t manufacturer) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Not enough entries to be a Panasonic message.
-  if (strict && nbits != PANASONIC_BITS)
+  if (strict && nbits != kPanasonicBits)
     return false;  // Request is out of spec.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
-  if (!matchMark(results->rawbuf[offset], PANASONIC_HDR_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
-      PANASONIC_HDR_MARK_TICKS;
-  if (!matchSpace(results->rawbuf[offset], PANASONIC_HDR_SPACE)) return false;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
+      kPanasonicHdrMarkTicks;
+  if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
-      PANASONIC_HDR_SPACE_TICKS;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
+      kPanasonicHdrSpaceTicks;
 
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         PANASONIC_BIT_MARK_TICKS * m_tick,
-                                         PANASONIC_ONE_SPACE_TICKS * s_tick,
-                                         PANASONIC_BIT_MARK_TICKS * m_tick,
-                                         PANASONIC_ZERO_SPACE_TICKS * s_tick);
+                                         kPanasonicBitMarkTicks * m_tick,
+                                         kPanasonicOneSpaceTicks * s_tick,
+                                         kPanasonicBitMarkTicks * m_tick,
+                                         kPanasonicZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Footer
-  if (!match(results->rawbuf[offset++], PANASONIC_BIT_MARK_TICKS * m_tick))
+  if (!match(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], PANASONIC_END_GAP))
+      !matchAtLeast(results->rawbuf[offset], kPanasonicEndGap))
     return false;
 
   // Compliance

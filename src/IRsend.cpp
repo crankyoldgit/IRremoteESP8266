@@ -36,7 +36,7 @@
 //   An IRsend object.
 IRsend::IRsend(uint16_t IRsendPin, bool inverted,
                bool use_modulation) : IRpin(IRsendPin),
-                                      periodOffset(PERIOD_OFFSET) {
+                                      periodOffset(kPeriodOffset) {
   if (inverted) {
     outputOn = LOW;
     outputOff = HIGH;
@@ -46,9 +46,9 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted,
   }
   modulation = use_modulation;
   if (modulation)
-    _dutycycle = DUTY_DEFAULT;
+    _dutycycle = kDutyDefault;
   else
-    _dutycycle = DUTY_MAX;
+    _dutycycle = kDutyMax;
 }
 
 // Enable the pin for output.
@@ -104,15 +104,15 @@ uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
 void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   // Set the duty cycle to use if we want freq. modulation.
   if (modulation) {
-    _dutycycle = std::min(duty, (uint8_t) DUTY_MAX);
+    _dutycycle = std::min(duty, kDutyMax);
   } else {
-    _dutycycle = DUTY_MAX;
+    _dutycycle = kDutyMax;
   }
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
   uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
-  onTimePeriod = (period * _dutycycle) / DUTY_MAX;
+  onTimePeriod = (period * _dutycycle) / kDutyMax;
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
 }
@@ -124,7 +124,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 void IRsend::_delayMicroseconds(uint32_t usec) {
   // delayMicroseconds() is only accurate to 16383us.
   // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
-  if (usec <= MAX_ACCURATE_USEC_DELAY) {
+  if (usec <= kMaxAccurateUsecDelay) {
 #ifndef UNIT_TEST
     delayMicroseconds(usec);
 #endif
@@ -146,9 +146,9 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 // NOTE: Use this only if you know what you are doing as it may cause the WDT
 //       to reset the ESP8266.
 void IRsend::_delayMicroseconds(uint32_t usec) {
-  for (; usec > MAX_ACCURATE_USEC_DELAY; usec -= MAX_ACCURATE_USEC_DELAY)
+  for (; usec > kMaxAccurateUsecDelay; usec -= kMaxAccurateUsecDelay)
 #ifndef UNIT_TEST
-    delayMicroseconds(MAX_ACCURATE_USEC_DELAY);
+    delayMicroseconds(kMaxAccurateUsecDelay);
   delayMicroseconds(static_cast<uint16_t>(usec));
 #endif  // UNIT_TEST
 }
