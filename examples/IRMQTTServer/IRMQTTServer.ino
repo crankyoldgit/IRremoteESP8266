@@ -132,7 +132,7 @@
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define IR_LED 4
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
-#define HTTP_PORT 80  // The port the HTTP server is listening on.
+const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
 //       via MQTTprefix below.
@@ -150,11 +150,11 @@ const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
 #ifdef MQTT_ENABLE
 // Address of your MQTT server.
 #define MQTT_SERVER "10.20.0.253"  // <=- CHANGE ME
-#define MQTT_PORT 1883  // Default port used by MQTT servers.
+const uint16_t kMqttPort = 1883;  // Default port used by MQTT servers.
 // Set if your MQTT server requires a Username & Password to connect.
 const char* mqtt_user = "";
 const char* mqtt_password = "";
-#define MQTT_RECONNECT_TIME 5000  // Delay(ms) between reconnect tries.
+const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
                              // independent of the hostname.
@@ -181,7 +181,7 @@ const char* mqtt_password = "";
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
 // Globals
-ESP8266WebServer server(HTTP_PORT);
+ESP8266WebServer server(kHttpPort);
 IRsend irsend = IRsend(IR_LED);
 MDNSResponder mdns;
 WiFiClient espClient;
@@ -201,7 +201,7 @@ uint32_t lastMqttCmdTime = 0;
 
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
-PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, callback, espClient);
+PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 #endif  // MQTT_ENABLE
@@ -275,7 +275,7 @@ void handleRoot() {
     "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
-    "<p>Server: " MQTT_SERVER ":" + String(MQTT_PORT) + " <i>(" +
+    "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
     (mqtt_client.connected() ? "Connected" : "Disconnected") + ")</i><br>"
     "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
@@ -953,7 +953,7 @@ bool reconnect() {
   while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
     // Attempt to connect
-    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(MQTT_PORT) +
+    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(kMqttPort) +
           "... ");
     if (mqtt_user && mqtt_password)
       connected = mqtt_client.connect(mqtt_clientid.c_str(), mqtt_user,
@@ -985,8 +985,8 @@ void loop(void) {
   // MQTT client connection management
   if (!mqtt_client.connected()) {
     uint32_t now = millis();
-    // Reconnect if it's longer than MQTT_RECONNECT_TIME since we last tried.
-    if (now - lastReconnectAttempt > MQTT_RECONNECT_TIME) {
+    // Reconnect if it's longer than kMqttReconnectTime since we last tried.
+    if (now - lastReconnectAttempt > kMqttReconnectTime) {
       lastReconnectAttempt = now;
       debug("client mqtt not connected, trying to connect");
       // Attempt to reconnect

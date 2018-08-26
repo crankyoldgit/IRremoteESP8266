@@ -11,7 +11,7 @@
 #include "IRsend_test.h"
 #include "IRutils.h"
 
-#define MAX_GC_CODE_LENGTH 10000
+const uint16_t kMaxGcCodeLength = 10000;
 
 void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
   char *end;
@@ -52,7 +52,7 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  uint16_t gc_test[MAX_GC_CODE_LENGTH];
+  uint16_t gc_test[kMaxGcCodeLength];
   int index = 0;
   char *pch;
   char *saveptr1;
@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
   }
 
   pch = strtok_r(argv[argv_offset], sep, &saveptr1);
-  while (pch != NULL && index < MAX_GC_CODE_LENGTH) {
+  while (pch != NULL && index < kMaxGcCodeLength) {
     str_to_uint16(pch, &gc_test[index], codebase);
     pch = strtok_r(NULL, sep, &saveptr1);
     index++;

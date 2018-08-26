@@ -250,139 +250,142 @@ enum decode_type_t {
 // Message lengths & required repeat values
 const uint16_t kNoRepeat = 0;
 const uint16_t kSingleRepeat = 1;
+
 const uint16_t kAiwaRcT501Bits = 15;
-#define AIWA_RC_T501_BITS           kAiwaRcT501Bits
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
+const uint16_t kArgoStateLength = 12;
 const uint16_t kCoolixBits = 24;
-#define COOLIX_BITS                 kCoolixBits
 const uint16_t kCarrierAcBits = 32;
-#define CARRIER_AC_BITS             kCarrierAcBits
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
 // Daikin has a lot of static stuff that is discarded
 const uint16_t kDaikinRawBits = 583;
 const uint16_t kDaikinStateLength = 27;
-#define DAIKIN_COMMAND_LENGTH       kDaikinStateLength
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
 const uint16_t kDenonBits = 15;
-#define DENON_BITS                  kDenonBits
-#define DENON_48_BITS               kPanasonicBits
 const uint16_t kDenonLegacyBits = 14;
-#define DENON_LEGACY_BITS           kDenonLegacyBits
 const uint16_t kDishBits = 16;
-#define DISH_BITS                   kDishBits
 const uint16_t kDishMinRepeat = 3;
+const uint16_t kFujitsuAcMinRepeat = kNoRepeat;
+const uint16_t kFujitsuAcStateLength = 16;
+const uint16_t kFujitsuAcStateLengthShort = 7;
+const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
+const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
 const uint16_t kGicableBits = 16;
-#define GICABLE_BITS                kGicableBits
 const uint16_t kGicableMinRepeat = kSingleRepeat;
 const uint16_t kGreeStateLength = 8;
-#define GREE_STATE_LENGTH            kGreeStateLength
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kHaierACStateLength = 9;
-#define HAIER_AC_STATE_LENGTH        kHaierACStateLength
 const uint16_t kHaierACBits = kHaierACStateLength * 8;
 const uint16_t kHaierACYRW02StateLength = 14;
-#define HAIER_AC_YRW02_STATE_LENGTH kHaierACYRW02StateLength
 const uint16_t kHaierACYRW02Bits = kHaierACYRW02StateLength * 8;
 const uint16_t kHitachiAcStateLength = 28;
-#define HITACHI_AC_STATE_LENGTH     kHitachiAcStateLength
 const uint16_t kHitachiAcBits = kHitachiAcStateLength * 8;
-#define HITACHI_AC_BITS             kHitachiAcBits
 const uint16_t kHitachiAc1StateLength = 13;
-#define HITACHI_AC1_STATE_LENGTH    kHitachiAc1StateLength
 const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
-#define HITACHI_AC1_BITS            kHitachiAc1Bits
 const uint16_t kHitachiAc2StateLength = 53;
-#define HITACHI_AC2_STATE_LENGTH    kHitachiAc2StateLength
 const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
-#define HITACHI_AC2_BITS            kHitachiAc2Bits
 const uint16_t kJvcBits = 16;
-#define JVC_BITS                    kJvcBits
 const uint16_t kKelvinatorStateLength = 16;
-#define KELVINATOR_STATE_LENGTH     kKelvinatorStateLength
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;
+const uint16_t kLasertagBits = 13;
+const uint16_t kLasertagMinRepeat = kNoRepeat;
 const uint16_t kLgBits = 28;
-#define LG_BITS                     kLgBits
 const uint16_t kLg32Bits = 32;
-#define LG32_BITS                   kLg32Bits
+const uint16_t kMagiquestBits = 56;
+const uint16_t kMideaBits = 48;
+const uint16_t kMideaMinRepeat = kNoRepeat;
 const uint16_t kMitsubishiBits = 16;
-#define MITSUBISHI_BITS             kMitsubishiBits
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 //               Based on marcosamarinho's code.
 const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiACStateLength = 18;
-#define MITSUBISHI_AC_STATE_LENGTH  kMitsubishiACStateLength
 const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
-const uint16_t kFujitsuAcMinRepeat = kNoRepeat;
-#define FUJITSU_AC_MIN_REPEAT        kFujitsuAcMinRepeat
-const uint16_t kFujitsuAcStateLength = 16;
-#define FUJITSU_AC_STATE_LENGTH     kFujitsuAcStateLength
-const uint16_t kFujitsuAcStateLengthShort = 7;
-#define FUJITSU_AC_STATE_LENGTH_SHORT kFujitsuAcStateLengthShort
-const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
-#define FUJITSU_AC_BITS             kFujitsuAcBits
-const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
-#define FUJITSU_AC_MIN_BITS         kFujitsuAcMinBits
+const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
-#define NEC_BITS                    kNECBits
 const uint16_t kPanasonicBits = 48;
-#define PANASONIC_BITS              kPanasonicBits
 const uint32_t kPanasonicManufacturer = 0x4004;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;
 const uint16_t kRC5Bits = kRC5RawBits - 2;
-#define RC5_BITS      kRC5Bits
 const uint16_t kRC5XBits = kRC5RawBits - 1;
-#define RC5X_BITS     kRC5XBits
 const uint16_t kRC6Mode0Bits = 20;  // Excludes the 'start' bit.
-#define RC6_MODE0_BITS              kRC6Mode0Bits
 const uint16_t kRC6_36Bits = 36;  // Excludes the 'start' bit.
-#define RC6_36_BITS                 kRC6_36Bits
 const uint16_t kRCMMBits = 24;
-#define RCMM_BITS                   kRCMMBits
 const uint16_t kSamsungBits = 32;
-#define SAMSUNG_BITS                kSamsungBits
 const uint16_t kSanyoSA8650BBits = 12;
-#define SANYO_SA8650B_BITS          kSanyoSA8650BBits
 const uint16_t kSanyoLC7461AddressBits = 13;
 const uint16_t kSanyoLC7461CommandBits = 8;
 const uint16_t kSanyoLC7461Bits = (kSanyoLC7461AddressBits +
                                    kSanyoLC7461CommandBits) * 2;
-#define SANYO_LC7461_BITS           kSanyoLC7461Bits
 const uint8_t kSharpAddressBits = 5;
 const uint8_t kSharpCommandBits = 8;
 const uint16_t kSharpBits = kSharpAddressBits + kSharpCommandBits + 2;  // 15
-#define SHARP_BITS                  kSharpBits
 const uint8_t kSherwoodBits = kNECBits;
-#define SHERWOOD_BITS          kSherwoodBits
 const uint16_t kSherwoodMinRepeat = kSingleRepeat;
 const uint16_t kSony12Bits = 12;
-#define SONY_12_BITS                kSony12Bits
 const uint16_t kSony15Bits = 15;
-#define SONY_15_BITS                kSony15Bits
 const uint16_t kSony20Bits = 20;
-#define SONY_20_BITS                kSony20Bits
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
 const uint16_t kToshibaACStateLength = 9;
-#define TOSHIBA_AC_STATE_LENGTH      kToshibaACStateLength
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
 const uint16_t kTrotecStateLength = 9;
-#define TROTEC_COMMAND_LENGTH        kTrotecStateLength
 const uint16_t kWhynterBits = 32;
-#define WHYNTER_BITS                kWhynterBits
-const uint16_t kArgoStateLength = 12;
-#define ARGO_COMMAND_LENGTH         kArgoStateLength
-const uint16_t kNikaiBits = 24;
-#define NIKAI_BITS                  kNikaiBits
-const uint16_t kMagiquestBits = 56;
-#define MAGIQUEST_BITS              kMagiquestBits
-const uint16_t kMideaBits = 48;
-#define MIDEA_BITS                  kMideaBits
-const uint16_t kMideaMinRepeat = kNoRepeat;
-const uint16_t kLasertagBits = 13;
-#define LASERTAG_BITS               kLasertagBits
-const uint16_t kLasertagMinRepeat = kNoRepeat;
+
+// Legacy defines. (Deprecated)
+#define AIWA_RC_T501_BITS             kAiwaRcT501Bits
+#define ARGO_COMMAND_LENGTH           kArgoStateLength
+#define COOLIX_BITS                   kCoolixBits
+#define CARRIER_AC_BITS               kCarrierAcBits
+#define DAIKIN_COMMAND_LENGTH         kDaikinStateLength
+#define DENON_BITS                    kDenonBits
+#define DENON_48_BITS                 kPanasonicBits
+#define DENON_LEGACY_BITS             kDenonLegacyBits
+#define DISH_BITS                     kDishBits
+#define FUJITSU_AC_MIN_REPEAT         kFujitsuAcMinRepeat
+#define FUJITSU_AC_STATE_LENGTH       kFujitsuAcStateLength
+#define FUJITSU_AC_STATE_LENGTH_SHORT kFujitsuAcStateLengthShort
+#define FUJITSU_AC_BITS               kFujitsuAcBits
+#define FUJITSU_AC_MIN_BITS           kFujitsuAcMinBits
+#define GICABLE_BITS                  kGicableBits
+#define GREE_STATE_LENGTH             kGreeStateLength
+#define HAIER_AC_STATE_LENGTH         kHaierACStateLength
+#define HAIER_AC_YRW02_STATE_LENGTH   kHaierACYRW02StateLength
+#define HITACHI_AC_STATE_LENGTH       kHitachiAcStateLength
+#define HITACHI_AC_BITS               kHitachiAcBits
+#define HITACHI_AC1_STATE_LENGTH      kHitachiAc1StateLength
+#define HITACHI_AC1_BITS              kHitachiAc1Bits
+#define HITACHI_AC2_STATE_LENGTH      kHitachiAc2StateLength
+#define HITACHI_AC2_BITS              kHitachiAc2Bits
+#define JVC_BITS                      kJvcBits
+#define KELVINATOR_STATE_LENGTH       kKelvinatorStateLength
+#define LASERTAG_BITS                 kLasertagBits
+#define LG_BITS                       kLgBits
+#define LG32_BITS                     kLg32Bits
+#define MAGIQUEST_BITS                kMagiquestBits
+#define MIDEA_BITS                    kMideaBits
+#define MITSUBISHI_BITS               kMitsubishiBits
+#define MITSUBISHI_AC_STATE_LENGTH    kMitsubishiACStateLength
+#define NEC_BITS                      kNECBits
+#define NIKAI_BITS                    kNikaiBits
+#define PANASONIC_BITS                kPanasonicBits
+#define RC5_BITS                      kRC5Bits
+#define RC5X_BITS                     kRC5XBits
+#define RC6_MODE0_BITS                kRC6Mode0Bits
+#define RC6_36_BITS                   kRC6_36Bits
+#define RCMM_BITS                     kRCMMBits
+#define SANYO_LC7461_BITS             kSanyoLC7461Bits
+#define SAMSUNG_BITS                  kSamsungBits
+#define SANYO_SA8650B_BITS            kSanyoSA8650BBits
+#define SHARP_BITS                    kSharpBits
+#define SHERWOOD_BITS                 kSherwoodBits
+#define SONY_12_BITS                  kSony12Bits
+#define SONY_15_BITS                  kSony15Bits
+#define SONY_20_BITS                  kSony20Bits
+#define TOSHIBA_AC_STATE_LENGTH       kToshibaACStateLength
+#define TROTEC_COMMAND_LENGTH         kTrotecStateLength
+#define WHYNTER_BITS                  kWhynterBits
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1

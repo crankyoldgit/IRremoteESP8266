@@ -139,7 +139,7 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen == kNecRptLength &&
       matchSpace(results->rawbuf[offset], kNecRptSpace) &&
       matchMark(results->rawbuf[offset + 1], kNecBitMarkTicks * mark_tick)) {
-    results->value = REPEAT;
+    results->value = kRepeat;
     results->decode_type = NEC;
     results->bits = 0;
     results->address = 0;
