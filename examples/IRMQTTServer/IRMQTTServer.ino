@@ -168,7 +168,7 @@ const char* mqtt_password = "";
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.5.1"
+#define _MY_VERSION_ "v0.5.2"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG
@@ -1280,7 +1280,6 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       ir_type == GLOBALCACHE) {
     debug("Code: ");
     debug(code_str);
-    debug("Repeats: " + String(repeat));
     // Confirm what we were asked to send was sent.
 #ifdef MQTT_ENABLE
     if (ir_type == PRONTO && repeat > 0)
