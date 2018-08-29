@@ -62,15 +62,15 @@ class TestAutoAnalyseRawData(unittest.TestCase):
     ], ignore)
     analyse.dump_constants(message, defs, output)
     self.assertEqual(defs, [
-        'const uint16_t kHdrMark = 7930;', 'const uint16_t kBitMark = 520;',
-        'const uint16_t kHdrSpace = 3978;', 'const uint16_t kOneSpace = 1508;',
+        'const uint16_t kHdrMark = 7930;', 'const uint16_t kBitMark = 496;',
+        'const uint16_t kHdrSpace = 3965;', 'const uint16_t kOneSpace = 1485;',
         'const uint16_t kZeroSpace = 520;'
     ])
     self.assertEqual(output.getvalue(), 'Guessing key value:\n'
                      'kHdrMark   = 7930\n'
-                     'kHdrSpace  = 3978\n'
-                     'kBitMark   = 520\n'
-                     'kOneSpace  = 1508\n'
+                     'kHdrSpace  = 3965\n'
+                     'kBitMark   = 496\n'
+                     'kOneSpace  = 1485\n'
                      'kZeroSpace = 520\n')
 
   def test_dump_constants_aircon(self):
@@ -93,16 +93,16 @@ class TestAutoAnalyseRawData(unittest.TestCase):
     ], ignore)
     analyse.dump_constants(message, defs, output)
     self.assertEqual(defs, [
-        'const uint16_t kHdrMark = 9008;', 'const uint16_t kBitMark = 676;',
-        'const uint16_t kHdrSpace = 4496;', 'const uint16_t kOneSpace = 1680;',
-        'const uint16_t kZeroSpace = 584;', 'const uint16_t kSpaceGap = 19990;'
+        'const uint16_t kHdrMark = 9008;', 'const uint16_t kBitMark = 650;',
+        'const uint16_t kHdrSpace = 4496;', 'const uint16_t kOneSpace = 1657;',
+        'const uint16_t kZeroSpace = 554;', 'const uint16_t kSpaceGap = 19990;'
     ])
     self.assertEqual(output.getvalue(), 'Guessing key value:\n'
                      'kHdrMark   = 9008\n'
                      'kHdrSpace  = 4496\n'
-                     'kBitMark   = 676\n'
-                     'kOneSpace  = 1680\n'
-                     'kZeroSpace = 584\n'
+                     'kBitMark   = 650\n'
+                     'kOneSpace  = 1657\n'
+                     'kZeroSpace = 554\n'
                      'kSpaceGap = 19990\n')
 
   def test_convert_rawdata(self):
@@ -171,8 +171,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
             648};"""
     analyse.parse_and_report(input_str, 200, False, output)
     self.assertEqual(
-        output.getvalue(),
-        'Found 139 timing entries.\n'
+        output.getvalue(), 'Found 139 timing entries.\n'
         'Potential Mark Candidates:\n'
         '[9008, 676]\n'
         'Potential Space Candidates:\n'
@@ -184,9 +183,9 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         'Guessing key value:\n'
         'kHdrMark   = 9008\n'
         'kHdrSpace  = 4496\n'
-        'kBitMark   = 676\n'
-        'kOneSpace  = 1680\n'
-        'kZeroSpace = 584\n'
+        'kBitMark   = 650\n'
+        'kOneSpace  = 1657\n'
+        'kZeroSpace = 554\n'
         'kSpaceGap = 19990\n'
         '\n'
         'Decoding protocol based on analysis so far:\n'
@@ -219,8 +218,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
             494, 520, 494, 1482, 494};"""
     analyse.parse_and_report(input_str, 200, True, output)
     self.assertEqual(
-        output.getvalue(),
-        'Found 37 timing entries.\n'
+        output.getvalue(), 'Found 37 timing entries.\n'
         'Potential Mark Candidates:\n'
         '[7930, 520]\n'
         'Potential Space Candidates:\n'
@@ -231,9 +229,9 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '\n'
         'Guessing key value:\n'
         'kHdrMark   = 7930\n'
-        'kHdrSpace  = 3978\n'
-        'kBitMark   = 520\n'
-        'kOneSpace  = 1508\n'
+        'kHdrSpace  = 3965\n'
+        'kBitMark   = 496\n'
+        'kOneSpace  = 1485\n'
         'kZeroSpace = 520\n'
         '\n'
         'Decoding protocol based on analysis so far:\n'
@@ -261,9 +259,9 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '\n'
         "// WARNING: This probably isn't directly usable. It's a guide only.\n"
         'const uint16_t kHdrMark = 7930;\n'
-        'const uint16_t kBitMark = 520;\n'
-        'const uint16_t kHdrSpace = 3978;\n'
-        'const uint16_t kOneSpace = 1508;\n'
+        'const uint16_t kBitMark = 496;\n'
+        'const uint16_t kHdrSpace = 3965;\n'
+        'const uint16_t kOneSpace = 1485;\n'
         'const uint16_t kZeroSpace = 520;\n'
         'const uint16_t kXyzBits = 16;\n'
         '// Function should be safe up to 64 bits.\n'
@@ -325,8 +323,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
             864, 2620, 864, 864, 864, 864, 3485, 3512, 864, 13996};"""
     analyse.parse_and_report(input_str, 200, True, output)
     self.assertEqual(
-        output.getvalue(),
-        'Found 272 timing entries.\n'
+        output.getvalue(), 'Found 272 timing entries.\n'
         'Potential Mark Candidates:\n'
         '[3485, 864]\n'
         'Potential Space Candidates:\n'
@@ -464,6 +461,30 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         ' frequency.\n'
         '                true, 0, 50);\n'
         '}\n')
+
+  def test_reduce_list(self):
+    """Tests for the reduce_list method."""
+
+    ignore = StringIO.StringIO()
+    message = analyse.RawIRMessage(200, [
+        7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494,
+        520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494,
+        520, 520, 520, 494, 520, 494, 520, 494, 1482, 494
+    ], ignore)
+    test_space_data = [4496, 1660, 530, 558, 1636, 1660, 556]
+    result_list, result_dict = message.reduce_list(test_space_data)
+    self.assertEqual([4496, 1660, 558], result_list)
+    self.assertEqual({
+        558: [558, 556, 530],
+        1660: [1660, 1660, 1636],
+        4496: [4496]
+    }, result_dict)
+
+  def test_avg_list(self):
+    """Tests for the avg_list method."""
+
+    self.assertEqual(0, analyse.avg_list([]))
+    self.assertEqual(23, analyse.avg_list([10, 20, 40]))
 
 
 if __name__ == '__main__':
