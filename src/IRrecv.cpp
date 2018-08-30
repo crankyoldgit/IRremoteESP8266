@@ -309,6 +309,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeMitsubishi(results))
     return true;
 #endif
+#if DECODE_MITSUBISHI_AC
+  DPRINTLN("Attempting Mitsubishi AC decode");
+  if (decodeMitsubishiAC(results))
+    return true;
+#endif
 #if DECODE_MITSUBISHI2
   DPRINTLN("Attempting Mitsubishi2 decode");
   if (decodeMitsubishi2(results))
@@ -541,12 +546,12 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance, uint16_t delta) {
   measured *= RAWTICK;  // Convert to uSecs.
-  DPRINT("Matching: ");
+/*  DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(" <= ");
   DPRINT(measured);
   DPRINT(" <= ");
-  DPRINTLN(ticksHigh(desired, tolerance, delta));
+  DPRINTLN(ticksHigh(desired, tolerance, delta));*/
   return (measured >= ticksLow(desired, tolerance, delta) &&
           measured <= ticksHigh(desired, tolerance, delta));
 }
@@ -601,13 +606,13 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
-  DPRINT("Matching MARK ");
+/*  DPRINT("Matching MARK ");
   DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired + excess, tolerance);
 }
 
@@ -624,13 +629,13 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
-  DPRINT("Matching SPACE ");
+/*  DPRINT("Matching SPACE ");
   DPRINT(measured * RAWTICK);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired - excess, tolerance);
 }
 

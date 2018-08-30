@@ -31,10 +31,16 @@
 #define MITSUBISHI_AC_MAX_TEMP         31U  // 31C
 #define MITSUBISHI_AC_VANE_AUTO         0U
 #define MITSUBISHI_AC_VANE_AUTO_MOVE    7U
+#define MITSUBISHI_AC_NO_TIMER          0U
+#define MITSUBISHI_AC_START_TIMER       5U
+#define MITSUBISHI_AC_STOP_TIMER    3U
+#define MITSUBISHI_AC_START_STOP_TIMER  7U
 
 class IRMitsubishiAC {
  public:
   explicit IRMitsubishiAC(uint16_t pin);
+
+  static uint8_t calculateChecksum(uint8_t *data);
 
   void stateReset();
 #if SEND_MITSUBISHI_AC
@@ -54,8 +60,27 @@ class IRMitsubishiAC {
   void setVane(uint8_t mode);
   uint8_t getVane();
   uint8_t* getRaw();
+  void setRaw(uint8_t* data);
+  uint8_t getClock();
+  void setClock(uint8_t clock);
+  uint8_t getStartClock();
+  void setStartClock(uint8_t clock);
+  uint8_t getStopClock();
+  void setStopClock(uint8_t clock);
+  uint8_t getTimer();
+  void setTimer(uint8_t timer);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 
  private:
+#ifdef ARDUINO
+  String timeToString(uint64_t time);
+#else
+  std::string timeToString(uint64_t time);
+#endif
   uint8_t remote_state[MITSUBISHI_AC_STATE_LENGTH];
   void checksum();
   IRsend _irsend;

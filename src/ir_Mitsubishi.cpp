@@ -291,6 +291,122 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
               data, nbytes, 38, false, repeat, 50);
 }
 #endif  // SEND_MITSUBISHI_AC
+bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
+                           const uint16_t mark, const uint32_t onespace,
+                           const uint32_t zerospace, bool MSBFirst) {
+  *resultByte = 0;
+  int pos = 0;
+  for (int i = 0; i < 8; i++) {
+    if (!matchMark(*(data_ptr+(i*2)), mark))
+      return false;
+  if (MSBFirst)
+    pos = 7-i;
+  else
+    pos = i;
+  if (matchSpace(*(data_ptr+(i*2)+1), onespace))
+    *resultByte|=1 << pos;
+  else
+    if (!matchSpace(*(data_ptr+(i*2)+1), zerospace))
+      return false;
+  }
+  return true;
+}
+#if DECODE_MITSUBISHI_AC
+// Decode the supplied Mitsubishi message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Under development
+//
+// Ref: https://i2.wp.com/www.analysir.com/blog/wp-content/uploads/2014/12/Mitsubishi_AC_IR_Signal_Fields.jpg?ssl=1
+bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
+                              bool strict) {
+  DPRINT("results->rawlen: ");
+  DPRINTLN(results->rawlen);
+  DPRINT("results->nbits: ");
+  DPRINTLN(nbits);
+  if (results->rawlen < ((MITSUBISHI_AC_STATE_LENGTH * 8 * 2) + 6)) {
+    DPRINTLN("Shorter than shortest possibly expected.");
+    return false;  // Shorter than shortest possibly expected.
+  }
+  if (strict && nbits != MITSUBISHI_AC_BITS) {
+    DPRINTLN("Request is out of spec.");
+    return false;  // Request is out of spec.
+  }
+  uint16_t offset = OFFSET_START;
+  for (int i = 0; i < 18; i++) {
+    results->state[i] = 0;
+  }
+// Header:
+  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)) {
+    DPRINTLN("Header mark does not match.");
+    return false;
+  }
+  if (!matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
+    DPRINTLN("Header space does not match.");
+    return false;
+  }
+// Decode byte-by-byte:
+  for (int i = 0; i < 18; i++) {
+    results->state[i] = 0;
+    if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
+        MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+        MITSUBISHI_AC_ZERO_SPACE)) {
+     return false;
+    }
+    offset+=16;
+    DPRINT(std::hex << (uint16_t)results->state[i]);
+    DPRINT(",");
+  }
+  DPRINTLN("");
+// HEADER validation:
+  if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
+      results->state[2] != 0x26 || results->state[3] != 0x01 ||
+      results->state[4] != 0x00) {
+    DPRINTLN("Header mismatch.");
+    return false;
+  }
+// DATA part:
+
+// FOOTER checksum:
+  if (IRMitsubishiAC::calculateChecksum(results->state) != results->state[17])
+    return false;
+// Check if the repeat is correct:
+  if (strict) {
+  DPRINTLN("Repeat check enabled.");
+// Repeat mark and space:
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_RPT_MARK) ||
+        !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE)) {
+    DPRINTLN("Repear mark error.");
+    return false;
+  }
+// Header mark and space:
+    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK) ||
+        !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
+      DPRINTLN("Repear header mark error.");
+      return false;
+    }
+// Payload:
+    uint8_t data;
+    for (int i = 0; i < 18; i++) {
+      if (!matchByte(&data, &(results->rawbuf[offset]),
+          MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+          MITSUBISHI_AC_ZERO_SPACE) || data != results->state[i]) {
+        DPRINTLN("Repeat payload error.");
+        return false;
+      }
+      offset+=16;
+    }
+  }
+  results->decode_type = MITSUBISHI_AC;
+  return true;
+}
+#endif  // DECODE_MITSUBISHI_AC
 
 // Code to emulate Mitsubishi A/C IR remote control unit.
 // Inspired and derived from the work done at:
@@ -350,14 +466,25 @@ uint8_t* IRMitsubishiAC::getRaw() {
   return remote_state;
 }
 
+void IRMitsubishiAC::setRaw(uint8_t* data) {
+  for (int i = 0; i < 17; i++) {
+    remote_state[i] = data[i];
+  }
+  checksum();
+}
+
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishiAC::checksum() {
+  remote_state[17] = calculateChecksum(remote_state);
+}
+
+uint8_t IRMitsubishiAC::calculateChecksum(uint8_t *data) {
   uint8_t sum = 0;
   // Checksum is simple addition of all previous bytes stored
   // as an 8 bit value.
   for (uint8_t i = 0; i < 17; i++)
-    sum += remote_state[i];
-  remote_state[17] = sum & 0xFFU;
+    sum += data[i];
+  return sum & 0xFFU;
 }
 
 // Set the requested power state of the A/C to off.
@@ -430,11 +557,21 @@ uint8_t IRMitsubishiAC::getMode() {
 void IRMitsubishiAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case MITSUBISHI_AC_AUTO: break;
-    case MITSUBISHI_AC_COOL: break;
-    case MITSUBISHI_AC_DRY: break;
-    case MITSUBISHI_AC_HEAT: break;
-    default: mode = MITSUBISHI_AC_AUTO;
+    case MITSUBISHI_AC_AUTO:
+      remote_state[8] = 0b00110000;
+      break;
+    case MITSUBISHI_AC_COOL:
+      remote_state[8] = 0b00110110;
+      break;
+    case MITSUBISHI_AC_DRY:
+      remote_state[8] = 0b00110010;
+      break;
+    case MITSUBISHI_AC_HEAT:
+      remote_state[8] = 0b00110000;
+      break;
+    default: 
+      mode = MITSUBISHI_AC_AUTO;
+      remote_state[8] = 0b00110000;
   }
   remote_state[6] = mode;
 }
@@ -451,4 +588,146 @@ void IRMitsubishiAC::setVane(uint8_t mode) {
 // Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getVane() {
   return ((remote_state[9] & 0b00111000) >> 3);
+}
+
+// Return the clock setting of the message. 1=1/6 hour. e.g. 4pm = 48
+uint8_t IRMitsubishiAC::getClock() {
+  return remote_state[10];
+}
+
+// Set the current time. 1 = 1/6 hour. e.g. 6am = 36.
+void IRMitsubishiAC::setClock(uint8_t clock) {
+  remote_state[10] =  clock;
+}
+
+// Return the desired start time. 1 = 1/6 hour. e.g. 1am = 6
+uint8_t IRMitsubishiAC::getStartClock() {
+  return remote_state[12];
+}
+
+// Set the desired start tiem of the AC.  1 = 1/6 hour. e.g. 8pm = 120
+void IRMitsubishiAC::setStartClock(uint8_t clock) {
+  remote_state[12] = clock;
+}
+
+// Return the desired stop time of the AC. 1 = 1/6 hour. e.g 10pm = 132
+uint8_t IRMitsubishiAC::getStopClock() {
+  return remote_state[11];
+}
+
+// Set the desired stop time of the AC. 1 = 1/6 hour. e.g 10pm = 132
+void IRMitsubishiAC::setStopClock(uint8_t clock) {
+  remote_state[11] = clock;
+}
+
+// Return the timer setting. Possible values: MITSUBISHI_AC_NO_TIMER,
+//  MITSUBISHI_AC_START_TIMER, MITSUBISHI_AC_STOP_TIMER,
+//  MITSUBISHI_AC_START_STOP_TIMER
+uint8_t IRMitsubishiAC::getTimer() {
+  return remote_state[13] & 0b111;
+}
+
+// Set the timer setting. Possible values: MITSUBISHI_AC_NO_TIMER,
+//  MITSUBISHI_AC_START_TIMER, MITSUBISHI_AC_STOP_TIMER,
+//  MITSUBISHI_AC_START_STOP_TIMER
+void IRMitsubishiAC::setTimer(uint8_t timer) {
+  remote_state[13] = timer & 0b111;
+}
+
+#ifdef ARDUINO
+String IRMitsubishiAC::timeToString(uint64_t time) {
+  String result = "";
+#else
+std::string IRMitsubishiAC::timeToString(uint64_t time) {
+  std::string result = "";
+#endif  // ARDUINO
+  if (time/6 < 10)
+    result += "0";
+  result += uint64ToString(time/6);
+  result += ":";
+  if (time*10%60 < 10)
+    result += "0";
+  result += uint64ToString(time*10%60);
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRMitsubishiAC::toString() {
+  String result = "";
+#else
+std::string IRMitsubishiAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  switch (getMode()) {
+    case MITSUBISHI_AC_AUTO:
+      result += " (AUTO)";
+      break;
+    case MITSUBISHI_AC_COOL:
+      result += " (COOL)";
+      break;
+    case MITSUBISHI_AC_DRY:
+      result += " (DRY)";
+      break;
+    case MITSUBISHI_AC_HEAT:
+      result += " (HEAT)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", FAN: ";
+  switch (getFan()) {
+    case MITSUBISHI_AC_FAN_AUTO:
+      result += "AUTO";
+      break;
+    case MITSUBISHI_AC_FAN_MAX:
+      result += "MAX";
+      break;
+    case MITSUBISHI_AC_FAN_SILENT:
+      result += "SILENT";
+      break;
+    default:
+      result += uint64ToString(getFan());
+  }
+  result += ", VANE: ";
+  switch (getVane()) {
+    case MITSUBISHI_AC_VANE_AUTO:
+      result += "AUTO";
+      break;
+    case MITSUBISHI_AC_VANE_AUTO_MOVE:
+      result += "AUTO MOVE";
+      break;
+    default:
+        result += uint64ToString(getVane());
+  }
+  result += ", Time: ";
+  result += timeToString(getClock());
+  result += ", On timer: ";
+  result += timeToString(getStartClock());
+  result += ", Off timer: ";
+  result += timeToString(getStopClock());
+  result += ", Timer: ";
+  switch (getTimer()) {
+    case MITSUBISHI_AC_NO_TIMER:
+      result += "-";
+      break;
+    case MITSUBISHI_AC_START_TIMER:
+      result += "Start";
+      break;
+    case MITSUBISHI_AC_STOP_TIMER:
+      result += "Stop";
+      break;
+    case MITSUBISHI_AC_START_STOP_TIMER:
+      result += "Start+Stop";
+      break;
+    default:
+      result += "?";
+  }
+  return result;
 }

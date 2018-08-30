@@ -44,6 +44,7 @@
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #ifdef UNIT_TEST
+#define DEBUG
 #include <iostream>
 #endif
 
@@ -115,7 +116,7 @@
 #define DECODE_KELVINATOR      true
 #define SEND_KELVINATOR        true
 
-#define DECODE_MITSUBISHI_AC   false  // Not written.
+#define DECODE_MITSUBISHI_AC   true  // Under construction.
 #define SEND_MITSUBISHI_AC     true
 
 #define DECODE_FUJITSU_AC      true
@@ -285,6 +286,7 @@ enum decode_type_t {
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 #define MITSUBISHI_MIN_REPEAT        1U  // Based on marcosamarinho's code.
 #define MITSUBISHI_AC_STATE_LENGTH  18U
+#define MITSUBISHI_AC_BITS         144U
 #define MITSUBISHI_AC_MIN_REPEAT     1U
 #define FUJITSU_AC_MIN_REPEAT        0U
 #define FUJITSU_AC_STATE_LENGTH     16U
