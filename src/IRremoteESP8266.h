@@ -44,7 +44,6 @@
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #ifdef UNIT_TEST
-#define DEBUG
 #include <iostream>
 #endif
 

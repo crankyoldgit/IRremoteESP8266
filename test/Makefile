@@ -27,9 +27,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = IRutils_test IRsend_test ir_Mitsubishi_test
-
-TESTS_ORI = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
+TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
         ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
         ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
@@ -48,7 +46,6 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TESTS)
 
 clean :
-	rm -f $(TESTS_ORI) gtest.a gtest_main.a *.o
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
 
 # Build and run all the tests.

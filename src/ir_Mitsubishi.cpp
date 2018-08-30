@@ -569,7 +569,7 @@ void IRMitsubishiAC::setMode(uint8_t mode) {
     case MITSUBISHI_AC_HEAT:
       remote_state[8] = 0b00110000;
       break;
-    default: 
+    default:
       mode = MITSUBISHI_AC_AUTO;
       remote_state[8] = 0b00110000;
   }
