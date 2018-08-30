@@ -454,7 +454,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '    sendGeneric(kHdrMark, kHdrSpace,\n'
         '                kBitMark, kOneSpace,\n'
         '                kBitMark, kZeroSpace,\n'
-        '                kBitMark\n'
+        '                kBitMark,\n'
         '                100000, // 100% made-up guess at the message gap.\n'
         '                data, nbytes,\n'
         '                38000, // Complete guess of the modulation'

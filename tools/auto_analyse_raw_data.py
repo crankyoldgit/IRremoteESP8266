@@ -368,7 +368,7 @@ def generate_irsend_code(defines, normal, bits_str, output=sys.stdout):
                  "    sendGeneric(kHdrMark, kHdrSpace,\n"
                  "                kBitMark, kOneSpace,\n"
                  "                kBitMark, kZeroSpace,\n"
-                 "                kBitMark\n"
+                 "                kBitMark,\n"
                  "                100000, // 100%% made-up guess at the"
                  " message gap.\n"
                  "                data, nbytes,\n"
