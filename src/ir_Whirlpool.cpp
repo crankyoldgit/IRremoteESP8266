@@ -104,6 +104,7 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
   uint16_t dataBitsSoFar = 0;
   uint16_t i = 0;
   match_result_t data_result;
+  uint8_t sectionSize[3] = {6, 8, 7};
 
   // Header
   if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcHdrMark))
@@ -111,61 +112,29 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kWhirlpoolAcHdrSpace))
     return false;
 
-  // Data Section #1 (48 bits/6 bytes)
-  // Keep reading bytes until we either run out of section 1 or state to fill.
-  for (; offset <= results->rawlen - 16 && i < 6;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcOneSpace,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcZeroSpace);
-    if (data_result.success == false)  break;  // Fail
-    results->state[i] = (uint8_t) data_result.data;
+  // Data Section
+  // Keep reading bytes until we either run out of section or state to fill.
+  for (uint8_t section = 0, pos = 0; section < 3; section++) {
+    pos += sectionSize[section];
+    for (; offset <= results->rawlen - 16 && i < pos;
+         i++, dataBitsSoFar += 8, offset += data_result.used) {
+      data_result = matchData(&(results->rawbuf[offset]), 8,
+                              kWhirlpoolAcBitMark,
+                              kWhirlpoolAcOneSpace,
+                              kWhirlpoolAcBitMark,
+                              kWhirlpoolAcZeroSpace);
+      if (data_result.success == false)  break;  // Fail
+      results->state[i] = (uint8_t) data_result.data;
+    }
+    // Section Footer
+    if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
+      return false;
+    if (offset <= results->rawlen &&
+        !matchAtLeast(results->rawbuf[offset++], kWhirlpoolAcGap))
+      return false;
   }
-  // Section Footer
-  if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kWhirlpoolAcGap))
-    return false;
-  // Data Section #2 (64 bits/8 bytes)
-  // Keep reading bytes until we either run out of section 2 or state to fill.
-  for (; offset <= results->rawlen - 16 && i < 6 + 8;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcOneSpace,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcZeroSpace);
-    if (data_result.success == false)  break;  // Fail
-    results->state[i] = (uint8_t) data_result.data;
-  }
-  // Section Footer
-  if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kWhirlpoolAcGap))
-    return false;
-  // Data Section #3 (56 bits/7 bytes)
-  // Keep reading bytes until we either run out of section 2 or state to fill.
-  for (; offset <= results->rawlen - 16 && i < kWhirlpoolAcStateLength;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcOneSpace,
-                            kWhirlpoolAcBitMark,
-                            kWhirlpoolAcZeroSpace);
-    if (data_result.success == false)  break;  // Fail
-    results->state[i] = (uint8_t) data_result.data;
-  }
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
-    return false;
-  if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kWhirlpoolAcGap, kTolerance))
-    return false;
 
   // Compliance
-
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     if (dataBitsSoFar != kWhirlpoolAcBits)  return false;
