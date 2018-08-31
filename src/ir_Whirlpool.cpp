@@ -29,6 +29,7 @@ const uint16_t kWhirlpoolAcOneSpace = 1649;
 const uint16_t kWhirlpoolAcZeroSpace = 533;
 const uint16_t kWhirlpoolAcGap = 7920;
 const uint32_t kWhirlpoolAcMinGap = 100000;  // Completely made up value.
+const uint8_t  kWhirlpoolAcSections = 3;
 
 #if SEND_WHIRLPOOL_AC
 // Send a Whirlpool A/C message.
@@ -65,6 +66,7 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
                 data + 6, 8,  // 8 bytes == 64 bits
                 38000,  // Complete guess of the modulation frequency.
                 true, 0, 50);
+    // Section 3
     sendGeneric(0, 0,
                 kWhirlpoolAcBitMark, kWhirlpoolAcOneSpace,
                 kWhirlpoolAcBitMark, kWhirlpoolAcZeroSpace,
@@ -104,7 +106,7 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
   uint16_t dataBitsSoFar = 0;
   uint16_t i = 0;
   match_result_t data_result;
-  uint8_t sectionSize[3] = {6, 8, 7};
+  uint8_t sectionSize[kWhirlpoolAcSections] = {6, 8, 7};
 
   // Header
   if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcHdrMark))
@@ -114,7 +116,9 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
 
   // Data Section
   // Keep reading bytes until we either run out of section or state to fill.
-  for (uint8_t section = 0, pos = 0; section < 3; section++) {
+  for (uint8_t section = 0, pos = 0;
+       section < kWhirlpoolAcSections;
+       section++) {
     pos += sectionSize[section];
     for (; offset <= results->rawlen - 16 && i < pos;
          i++, dataBitsSoFar += 8, offset += data_result.used) {
@@ -129,9 +133,14 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
     // Section Footer
     if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
       return false;
-    if (offset <= results->rawlen &&
+    if (section < kWhirlpoolAcSections - 1) {  // Inter-section gaps.
+      if (!matchSpace(results->rawbuf[offset++], kWhirlpoolAcGap))
+        return false;
+    } else {  // Last section / End of message gap.
+      if (offset <= results->rawlen &&
         !matchAtLeast(results->rawbuf[offset++], kWhirlpoolAcGap))
-      return false;
+        return false;
+    }
   }
 
   // Compliance
