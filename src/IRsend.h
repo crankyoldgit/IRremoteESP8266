@@ -275,6 +275,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendGICable(uint64_t data, uint16_t nbits = kGicableBits,
                    uint16_t repeat = kGicableMinRepeat);
 #endif
+#if SEND_WHIRLPOOL_AC
+  void sendWhirlpoolAC(unsigned char data[],
+                       uint16_t nbytes = kWhirlpoolAcStateLength,
+                       uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST
