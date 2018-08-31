@@ -94,7 +94,7 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
 bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
                              bool strict) {
   if (results->rawlen < 2 * nbits + 4 + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid HitachiAC message.
+    return false;  // Can't possibly be a valid Whirlpool A/C message.
   if (strict) {
     if (nbits != kWhirlpoolAcBits)
       return false;
