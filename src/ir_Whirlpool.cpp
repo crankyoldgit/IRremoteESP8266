@@ -56,7 +56,7 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
                 kWhirlpoolAcGap,
                 data, 6,  // 6 bytes == 48 bits
                 38000,  // Complete guess of the modulation frequency.
-                true, 0, 50);
+                false, 0, 50);
     // Section 2
     sendGeneric(0, 0,
                 kWhirlpoolAcBitMark, kWhirlpoolAcOneSpace,
@@ -65,7 +65,7 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
                 kWhirlpoolAcGap,
                 data + 6, 8,  // 8 bytes == 64 bits
                 38000,  // Complete guess of the modulation frequency.
-                true, 0, 50);
+                false, 0, 50);
     // Section 3
     sendGeneric(0, 0,
                 kWhirlpoolAcBitMark, kWhirlpoolAcOneSpace,
@@ -73,7 +73,7 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
                 kWhirlpoolAcBitMark, kWhirlpoolAcMinGap,
                 data + 14, 7,  // 7 bytes == 56 bits
                 38000,  // Complete guess of the modulation frequency.
-                true, 0, 50);
+                false, 0, 50);
   }
 }
 #endif  // SEND_WHIRLPOOL_AC
@@ -128,7 +128,8 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
                               kWhirlpoolAcBitMark,
                               kWhirlpoolAcZeroSpace);
       if (data_result.success == false)  break;  // Fail
-      results->state[i] = (uint8_t) data_result.data;
+      // Data is in LSB order. We need to reverse it.
+      results->state[i] = (uint8_t) reverseBits(data_result.data & 0xFF, 8);
     }
     // Section Footer
     if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))
