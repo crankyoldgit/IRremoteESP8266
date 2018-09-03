@@ -136,6 +136,7 @@ std::string typeToString(const decode_type_t protocol,
     case RC6:            result = "RC6";               break;
     case RCMM:           result = "RCMM";              break;
     case SAMSUNG:        result = "SAMSUNG";           break;
+    case SAMSUNG_AC:     result = "SAMSUNG_AC";        break;
     case SANYO:          result = "SANYO";             break;
     case SANYO_LC7461:   result = "SANYO_LC7461";      break;
     case SHARP:          result = "SHARP";             break;
@@ -163,6 +164,7 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
+    case SAMSUNG_AC:
     case TOSHIBA_AC:
     case WHIRLPOOL_AC:
       return true;

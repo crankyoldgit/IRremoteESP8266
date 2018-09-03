@@ -92,6 +92,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                    uint16_t repeat = kNoRepeat);
   uint32_t encodeSAMSUNG(uint8_t customer, uint8_t command);
 #endif
+#if SEND_SAMSUNG_AC
+  void sendSamsungAC(unsigned char data[],
+                      uint16_t nbytes = kSamsungAcStateLength,
+                      uint16_t repeat = kNoRepeat);
+#endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
               uint16_t repeat = kNoRepeat);

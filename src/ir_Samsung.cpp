@@ -17,7 +17,6 @@
 // Constants
 // Ref:
 //   http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-
 const uint16_t kSamsungTick = 560;
 const uint16_t kSamsungHdrMarkTicks = 8;
 const uint16_t kSamsungHdrMark = kSamsungHdrMarkTicks * kSamsungTick;
@@ -40,6 +39,15 @@ const uint16_t kSamsungMinGapTicks = kSamsungMinMessageLengthTicks -
      kSamsungBitMarkTicks);
 const uint32_t kSamsungMinGap = kSamsungMinGapTicks * kSamsungTick;
 
+const uint16_t kSamsungAcHdrMark = 690;
+const uint16_t kSamsungAcHdrSpace = 17844;
+const uint8_t  kSamsungAcSections = 2;
+const uint16_t kSamsungAcSectionMark = 3086;
+const uint16_t kSamsungAcSectionSpace = 8864;
+const uint16_t kSamsungAcSectionGap = 2886;
+const uint16_t kSamsungAcBitMark = 586;
+const uint16_t kSamsungAcOneSpace = 1432;
+const uint16_t kSamsungAcZeroSpace = 436;
 
 #if SEND_SAMSUNG
 // Send a Samsung formatted message.
@@ -160,3 +168,126 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
   return true;
 }
 #endif
+
+#if SEND_SAMSUNG_AC
+// Send a Samsung A/C message.
+//
+// Args:
+//   data: An array of bytes containing the IR command.
+//   nbytes: Nr. of bytes of data in the array. (>=kSamsungAcStateLength)
+//   repeat: Nr. of times the message is to be repeated. (Default = 0).
+//
+// Status: ALPHA / Untested.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/505
+void IRsend::sendSamsungAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
+  if (nbytes < kSamsungAcStateLength)
+  return;  // Not enough bytes to send a proper message.
+
+  enableIROut(38);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Header
+    mark(kSamsungAcHdrMark);
+    space(kSamsungAcHdrSpace);
+    // Section 1
+    sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
+                kSamsungAcBitMark, kSamsungAcOneSpace,
+                kSamsungAcBitMark, kSamsungAcZeroSpace,
+                kSamsungAcBitMark, kSamsungAcSectionGap,
+                data, 7,  // 7 bytes == 56 bits
+                38000,
+                true, 0, 50);
+    // Section 2
+    sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
+                kSamsungAcBitMark, kSamsungAcOneSpace,
+                kSamsungAcBitMark, kSamsungAcZeroSpace,
+                kSamsungAcBitMark,
+                100000,  // Complete made up guess at inter-message gap.
+                data + 7, 7,  // 7 bytes == 56 bits
+                38000,
+                true, 0, 50);
+    }
+}
+#endif  // SEND_SAMSUNG_AC
+
+#if DECODE_SAMSUNG_AC
+// Decode the supplied Samsung A/C message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically kSamsungAcBits
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Untested.
+//
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/505
+bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
+                             bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1)
+    return false;  // Can't possibly be a valid Samsung A/C message.
+  if (strict) {
+    if (nbits != kSamsungAcBits)
+      return false;
+  }
+
+  uint16_t offset = kStartOffset;
+  uint16_t dataBitsSoFar = 0;
+  match_result_t data_result;
+
+  // Message Header
+  if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], kSamsungAcHdrSpace))
+    return false;
+  // Section(s)
+  for (uint8_t section = 0, pos = 7, i = 0;
+       section < kSamsungAcSections;
+       section++, pos += 7) {
+    // Section Header
+    if (!matchMark(results->rawbuf[offset++], kSamsungAcSectionMark))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], kSamsungAcSectionSpace))
+      return false;
+    // Section Data
+    // Keep reading bytes until we either run out of section or state to fill.
+    for (; offset <= results->rawlen - 16 && i < pos;
+         i++, dataBitsSoFar += 8, offset += data_result.used) {
+      data_result = matchData(&(results->rawbuf[offset]), 8,
+                              kSamsungAcBitMark,
+                              kSamsungAcOneSpace,
+                              kSamsungAcBitMark,
+                              kSamsungAcZeroSpace);
+      if (data_result.success == false)  break;  // Fail
+      results->state[i] = (uint8_t) data_result.data;
+    }
+    // Section Footer
+    if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark))
+      return false;
+    if (section < kSamsungAcSections - 1) {  // Inter-section gap.
+      if (!matchSpace(results->rawbuf[offset++], kSamsungAcSectionGap))
+        return false;
+    } else {  // Last section / End of message gap.
+      if (offset <= results->rawlen &&
+        !matchAtLeast(results->rawbuf[offset++], kSamsungAcSectionGap))
+        return false;
+    }
+  }
+  // Compliance
+  if (strict) {
+    // Re-check we got the correct size/length due to the way we read the data.
+    if (dataBitsSoFar != kSamsungAcBits)  return false;
+  }
+  // Success
+  results->decode_type = SAMSUNG_AC;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_SAMSUNG_AC

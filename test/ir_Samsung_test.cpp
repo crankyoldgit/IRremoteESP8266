@@ -1,5 +1,7 @@
 // Copyright 2017 David Conran
 
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -273,4 +275,95 @@ TEST(TestDecodeSamsung, FailToDecodeNonSamsungExample) {
 
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
+}
+
+// Tests for sendSamsungAC().
+
+// Test sending typical data only.
+TEST(TestSendSamsungAC, SendDataOnly) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  uint8_t data[kSamsungAcStateLength] = {
+      0x40, 0x49, 0xF0, 0x00, 0x00, 0x00, 0x0F,
+      0x80, 0x40, 0xF5, 0x8E, 0x00, 0xA8, 0x0F};
+  irsend.sendSamsungAC(data);
+  EXPECT_EQ(
+      "m690s17844"
+      "m3086s8864"
+      "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s436m586s1432"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s2886"
+      "m3086s8864"
+      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s1432m586s436m586s1432"
+      "m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s1432m586s436m586s1432m586s436m586s1432m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s100000", irsend.outputStr());
+}
+
+// Tests for decodeSamsungAC().
+
+// Decode normal SamsungAC messages.
+TEST(TestDecodeSamsungAC, SyntheticDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+  irsend.reset();
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x40, 0x49, 0xF0, 0x00, 0x00, 0x00, 0x0F,
+      0x80, 0x40, 0xF5, 0x8E, 0x00, 0xA8, 0x0F};
+  // Synthesised Normal Samsung A/C message.
+  irsend.sendSamsungAC(expectedState);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a real Samsung A/C example from Issue #505
+TEST(TestDecodeSamsungAC, DecodeRealExample) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Samsung A/C example from Issue #505
+  uint16_t rawData[233] = {
+      690, 17844, 3084, 8864, 606, 406, 586, 1410, 580, 436, 570, 424, 570, 426,
+      570, 404, 596, 418, 580, 416, 584, 410, 586, 1402, 588, 408, 586, 410,
+      584, 1380, 610, 408, 586, 408, 586, 1404, 586, 1404, 586, 1408, 594, 1396,
+      596, 1394, 602, 418, 582, 410, 586, 408, 584, 408, 586, 408, 586, 410,
+      586, 408, 586, 410, 586, 408, 586, 408, 586, 408, 586, 408, 586, 410, 584,
+      436, 558, 436, 570, 424, 570, 424, 574, 420, 578, 416, 582, 412, 586, 410,
+      586, 408, 584, 410, 586, 408, 586, 410, 584, 410, 584, 408, 586, 408, 586,
+      410, 586, 408, 586, 412, 584, 436, 556, 1410, 592, 1396, 602, 1390, 608,
+      1384, 608, 2886, 3086, 8858, 610, 1380, 610, 410, 586, 408, 586, 410, 586,
+      408, 586, 410, 586, 408, 586, 436, 558, 436, 554, 1410, 594, 426, 572,
+      422, 578, 418, 582, 412, 586, 410, 584, 410, 586, 1380, 610, 1382, 608,
+      1404, 586, 1404, 586, 408, 586, 1432, 558, 436, 554, 1414, 590, 1398, 602,
+      418, 580, 414, 586, 410, 584, 1382, 606, 1382, 608, 1382, 608, 408, 586,
+      408, 586, 408, 586, 408, 586, 410, 584, 436, 560, 434, 570, 426, 566, 430,
+      568, 1400, 600, 416, 584, 1406, 586, 410, 584, 1384, 606, 410, 586, 410,
+      584, 408, 586, 408, 586, 408, 586, 408, 588, 410, 584, 1408, 590, 1400,
+      592, 1398, 602, 1388, 612};
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x40, 0x49, 0xF0, 0x00, 0x00, 0x00, 0x0F,
+      0x80, 0x40, 0xF5, 0x8E, 0x00, 0xA8, 0x0F};
+
+  irsend.sendRaw(rawData, 233, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
