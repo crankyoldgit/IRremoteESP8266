@@ -2,7 +2,7 @@
 //
 // Code to emulate Whirlpool protocol compatible devices.
 // Should be compatible with:
-// * <Add your device details here>
+// * SPIS409L, SPIS412L, SPIW409L, SPIW412L, SPIW418L
 //
 
 #include <algorithm>
