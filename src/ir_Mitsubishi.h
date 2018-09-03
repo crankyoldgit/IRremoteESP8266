@@ -5,6 +5,11 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 

@@ -176,7 +176,7 @@ class IRrecv {
                         bool MSBFirst = false);
   bool decodeMitsubishiAC(decode_results *results,
                         uint16_t nbits = MITSUBISHI_AC_BITS,
-                        bool strict = true);
+                        bool strict = false);
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,

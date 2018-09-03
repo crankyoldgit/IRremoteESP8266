@@ -31,6 +31,7 @@
 #include <ir_Gree.h>
 #include <ir_Haier.h>
 #include <ir_Kelvinator.h>
+#include <ir_Mitsubishi.h>
 #include <ir_Midea.h>
 #include <ir_Toshiba.h>
 #endif  // DECODE_AC
@@ -131,6 +132,16 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_KELVINATOR
+#if DECODE_MITSUBISHI_AC
+  Serial.println("Trying Mitchu AC:");
+  if (results->decode_type == MITSUBISHI_AC) {
+    IRMitsubishiAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  } else {
+    Serial.println("Not Mitsu AC.");
+  }
+#endif  // DECODE_MITSUBISHI_AC
 #if DECODE_TOSHIBA_AC
   if (results->decode_type == TOSHIBA_AC) {
     IRToshibaAC ac(0);
@@ -205,17 +216,19 @@ void loop() {
     yield();  // Feed the WDT as the text output can take a while to print.
 
     // Display the library version the message was captured with.
-    Serial.print("Library   : v");
-    Serial.println(_IRREMOTEESP8266_VERSION_);
-    Serial.println();
+    if (results.decode_type == UNKNOWN){
+      Serial.print("Library   : v");
+      Serial.println(_IRREMOTEESP8266_VERSION_);
+      Serial.println();
 
-    // Output RAW timing info of the result.
-    Serial.println(resultToTimingInfo(&results));
-    yield();  // Feed the WDT (again)
+      // Output RAW timing info of the result.
+      Serial.println(resultToTimingInfo(&results));
+      yield();  // Feed the WDT (again)
 
-    // Output the results as source code
-    Serial.println(resultToSourceCode(&results));
-    Serial.println("");  // Blank line between entries
-    yield();  // Feed the WDT (again)
+      // Output the results as source code
+      Serial.println(resultToSourceCode(&results));
+      Serial.println("");  // Blank line between entries
+      yield();  // Feed the WDT (again)
+    }
   }
 }

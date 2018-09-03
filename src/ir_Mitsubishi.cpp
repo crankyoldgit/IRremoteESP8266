@@ -3,9 +3,17 @@
 
 #include "ir_Mitsubishi.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
+
+#ifdef ARDUINO
+#define PRINT(x) do { Serial.print(x); } while (0)
+#define PRINTLN(x) do { Serial.println(x); } while (0)
+#endif  // ARDUINO
 
 //    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
 //    M M M    I     T    S      U   U  B   B    I    S      H   H    I
@@ -297,17 +305,29 @@ bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
   *resultByte = 0;
   int pos = 0;
   for (int i = 0; i < 8; i++) {
-    if (!matchMark(*(data_ptr+(i*2)), mark))
+    if (!matchMark(*(data_ptr+(i*2)), mark, 80)){
+      PRINT("Mark match failed at ");
+      PRINT((uint16_t)i);
+      PRINT(" (");
+      PRINT((uint16_t)*(data_ptr+(i*2)));
+      PRINTLN(")");
       return false;
+    }
   if (MSBFirst)
     pos = 7-i;
   else
     pos = i;
-  if (matchSpace(*(data_ptr+(i*2)+1), onespace))
+  if (matchSpace(*(data_ptr+(i*2)+1), onespace, 40))
     *resultByte|=1 << pos;
   else
-    if (!matchSpace(*(data_ptr+(i*2)+1), zerospace))
+    if (!matchSpace(*(data_ptr+(i*2)+1), zerospace, 40)) {
+      PRINT("Space match failed at ");
+      PRINT((uint16_t)i);
+      PRINT(" (");
+      PRINT((uint16_t)*(data_ptr+(i*2)+1));
+      PRINTLN(")");
       return false;
+    }
   }
   return true;
 }
@@ -326,10 +346,6 @@ bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
 // Ref: https://i2.wp.com/www.analysir.com/blog/wp-content/uploads/2014/12/Mitsubishi_AC_IR_Signal_Fields.jpg?ssl=1
 bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
                               bool strict) {
-  DPRINT("results->rawlen: ");
-  DPRINTLN(results->rawlen);
-  DPRINT("results->nbits: ");
-  DPRINTLN(nbits);
   if (results->rawlen < ((MITSUBISHI_AC_STATE_LENGTH * 8 * 2) + 6)) {
     DPRINTLN("Shorter than shortest possibly expected.");
     return false;  // Shorter than shortest possibly expected.
@@ -343,24 +359,29 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     results->state[i] = 0;
   }
 // Header:
-  if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)) {
-    DPRINTLN("Header mark does not match.");
+//  Somtime happens that junk signals arrives before the real message
+  bool headerFound = false;
+  while (!headerFound && offset<10) { 
+    headerFound = matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)
+        && matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE);
+  }
+  if (!headerFound) {
+    PRINTLN("Header mark not found.");
     return false;
   }
-  if (!matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
-    DPRINTLN("Header space does not match.");
-    return false;
-  }
-// Decode byte-by-byte:
+
+ // Decode byte-by-byte:
   for (int i = 0; i < 18; i++) {
     results->state[i] = 0;
     if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
         MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
         MITSUBISHI_AC_ZERO_SPACE)) {
-     return false;
+      PRINT("Byte decode failed at #");
+      PRINTLN((uint16_t)i);
+      return false;
     }
     offset+=16;
-    DPRINT(std::hex << (uint16_t)results->state[i]);
+    DPRINT((uint16_t)results->state[i]);
     DPRINT(",");
   }
   DPRINTLN("");
@@ -368,14 +389,16 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
   if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
       results->state[2] != 0x26 || results->state[3] != 0x01 ||
       results->state[4] != 0x00) {
-    DPRINTLN("Header mismatch.");
+    PRINTLN("Header mismatch.");
     return false;
   }
 // DATA part:
 
 // FOOTER checksum:
-  if (IRMitsubishiAC::calculateChecksum(results->state) != results->state[17])
+  if (IRMitsubishiAC::calculateChecksum(results->state) != results->state[17]) {
+    PRINTLN("Checksum error.");
     return false;
+  }
 // Check if the repeat is correct:
   if (strict) {
   DPRINTLN("Repeat check enabled.");
@@ -727,7 +750,9 @@ std::string IRMitsubishiAC::toString() {
       result += "Start+Stop";
       break;
     default:
-      result += "?";
+      result += "? (";
+      result += getTimer();
+      result += ")\n";
   }
   return result;
 }
