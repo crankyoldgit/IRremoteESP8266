@@ -22,7 +22,9 @@ class RawIRMessage(object):
     self.gaps = []
     self.margin = margin
     self.marks = []
+    self.mark_buckets = {}
     self.spaces = []
+    self.space_buckets = {}
     self.output = output
     self.verbose = verbose
     if len(timings) <= 3:
@@ -40,18 +42,22 @@ class RawIRMessage(object):
         self.marks.append(usecs)
       else:
         self.spaces.append(usecs)
-    self.marks = self._reduce_list(self.marks)
-    self.spaces = self._reduce_list(self.spaces)
+    self.marks, self.mark_buckets = self.reduce_list(self.marks)
+    self.spaces, self.space_buckets = self.reduce_list(self.spaces)
 
-  def _reduce_list(self, items):
+  def reduce_list(self, items):
     """Reduce the list of numbers into buckets that are atleast margin apart."""
     result = []
     last = -1
+    buckets = {}
     for item in sorted(items, reverse=True):
       if last == -1 or item < last - self.margin:
         result.append(item)
         last = item
-    return result
+        buckets[last] = [item]
+      else:
+        buckets[last].append(item)
+    return result, buckets
 
   def _usec_compare(self, seen, expected):
     """Compare two usec values and see if they match within a
@@ -151,6 +157,13 @@ class RawIRMessage(object):
     return self._usec_compares(usec, self.gaps)
 
 
+def avg_list(items):
+  """Return the average of a list of numbers."""
+  if items:
+    return sum(items) / len(items)
+  return 0
+
+
 def add_bit(so_far, bit, output=sys.stdout):
   """Add a bit to the end of the bits collected so far. """
   if bit == "reset":
@@ -180,26 +193,32 @@ def convert_rawdata(data_str):
 
 def dump_constants(message, defines, output=sys.stdout):
   """Dump the key constants and generate the C++ #defines."""
+  hdr_mark = avg_list(message.mark_buckets[message.hdr_mark])
+  bit_mark = avg_list(message.mark_buckets[message.bit_mark])
+  hdr_space = avg_list(message.space_buckets[message.hdr_space])
+  one_space = avg_list(message.space_buckets[message.one_space])
+  zero_space = avg_list(message.space_buckets[message.zero_space])
+
   output.write("Guessing key value:\n"
                "kHdrMark   = %d\n"
                "kHdrSpace  = %d\n"
                "kBitMark   = %d\n"
                "kOneSpace  = %d\n"
-               "kZeroSpace = %d\n" %
-               (message.hdr_mark, message.hdr_space, message.bit_mark,
-                message.one_space, message.zero_space))
-  defines.append("const uint16_t kHdrMark = %d;" % message.hdr_mark)
-  defines.append("const uint16_t kBitMark = %d;" % message.bit_mark)
-  defines.append("const uint16_t kHdrSpace = %d;" % message.hdr_space)
-  defines.append("const uint16_t kOneSpace = %d;" % message.one_space)
-  defines.append("const uint16_t kZeroSpace = %d;" % message.zero_space)
+               "kZeroSpace = %d\n" % (hdr_mark, hdr_space, bit_mark, one_space,
+                                      zero_space))
+  defines.append("const uint16_t kHdrMark = %d;" % hdr_mark)
+  defines.append("const uint16_t kBitMark = %d;" % bit_mark)
+  defines.append("const uint16_t kHdrSpace = %d;" % hdr_space)
+  defines.append("const uint16_t kOneSpace = %d;" % one_space)
+  defines.append("const uint16_t kZeroSpace = %d;" % zero_space)
 
+  avg_gaps = [avg_list(message.space_buckets[x]) for x in message.gaps]
   if len(message.gaps) == 1:
-    output.write("kSpaceGap = %d\n" % message.gaps[0])
-    defines.append("const uint16_t kSpaceGap = %d;" % message.gaps[0])
+    output.write("kSpaceGap = %d\n" % avg_gaps[0])
+    defines.append("const uint16_t kSpaceGap = %d;" % avg_gaps[0])
   else:
     count = 0
-    for gap in message.gaps:
+    for gap in avg_gaps:
       # We probably (still) have a gap in the protocol.
       count = count + 1
       output.write("kSpaceGap%d = %d\n" % (count, gap))
@@ -349,7 +368,7 @@ def generate_irsend_code(defines, normal, bits_str, output=sys.stdout):
                  "    sendGeneric(kHdrMark, kHdrSpace,\n"
                  "                kBitMark, kOneSpace,\n"
                  "                kBitMark, kZeroSpace,\n"
-                 "                kBitMark\n"
+                 "                kBitMark,\n"
                  "                100000, // 100%% made-up guess at the"
                  " message gap.\n"
                  "                data, nbytes,\n"
