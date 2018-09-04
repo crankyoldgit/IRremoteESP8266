@@ -10,11 +10,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-#ifdef ARDUINO
-#define PRINT(x) do { Serial.print(x); } while (0)
-#define PRINTLN(x) do { Serial.println(x); } while (0)
-#endif  // ARDUINO
-
 //    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
 //    M M M    I     T    S      U   U  B   B    I    S      H   H    I
 //    M M M    I     T     SSS   U   U  BBBB     I     SSS   HHHHH    I
@@ -299,34 +294,48 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
               data, nbytes, 38, false, repeat, 50);
 }
 #endif  // SEND_MITSUBISHI_AC
+
+// Decode a byte from the marks and spaces.
+//
+// Args:
+//   resultByte:  the pointer for the result.
+//   data_ptr:    pointer for the input.
+//   mark:        desired length of the mark.
+//   onespace:    desired length of the space for 1.
+//   zerospace:   desired length os the space for 0.
+//   MSBFirst:    most significant bit first? (default false).
+//
+// Status: DEAT / Appears to be working.
+//
 bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
                            const uint16_t mark, const uint32_t onespace,
                            const uint32_t zerospace, bool MSBFirst) {
   *resultByte = 0;
-  int pos = 0;
-  for (int i = 0; i < 8; i++) {
-    if (!matchMark(*(data_ptr+(i*2)), mark, 80)){
-      PRINT("Mark match failed at ");
-      PRINT((uint16_t)i);
-      PRINT(" (");
-      PRINT((uint16_t)*(data_ptr+(i*2)));
-      PRINTLN(")");
+  uint8_t pos = 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    if (!matchMark(*(data_ptr+(i*2)), mark)) {
+      DPRINT("Mark match failed at ");
+      DPRINT((uint16_t)i);
+      DPRINT(" (");
+      DPRINT((uint16_t)*(data_ptr+(i*2)));
+      DPRINTLN(")");
       return false;
     }
-  if (MSBFirst)
-    pos = 7-i;
-  else
-    pos = i;
-  if (matchSpace(*(data_ptr+(i*2)+1), onespace, 40))
-    *resultByte|=1 << pos;
-  else
-    if (!matchSpace(*(data_ptr+(i*2)+1), zerospace, 40)) {
-      PRINT("Space match failed at ");
-      PRINT((uint16_t)i);
-      PRINT(" (");
-      PRINT((uint16_t)*(data_ptr+(i*2)+1));
-      PRINTLN(")");
-      return false;
+    if (MSBFirst)
+      pos = 7-i;
+    else
+      pos = i;
+    if (matchSpace(*(data_ptr+(i*2)+1), onespace)) {
+      *resultByte|=1 << pos;
+    } else {
+      if (!matchSpace(*(data_ptr+(i*2)+1), zerospace)) {
+        DPRINT("Space match failed at ");
+        DPRINT((uint16_t)i);
+        DPRINT(" (");
+        DPRINT((uint16_t)*(data_ptr+(i*2)+1));
+        DPRINTLN(")");
+        return false;
+      }
     }
   }
   return true;
@@ -343,10 +352,10 @@ bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
 //
 // Status: ALPHA / Under development
 //
-// Ref: https://i2.wp.com/www.analysir.com/blog/wp-content/uploads/2014/12/Mitsubishi_AC_IR_Signal_Fields.jpg?ssl=1
+// Ref: https://www.analysir.com/blog/2015/01/06/reverse-engineering-mitsubishi-ac-infrared-protocol/
 bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < ((MITSUBISHI_AC_STATE_LENGTH * 8 * 2) + 6)) {
+  if (results->rawlen < ((MITSUBISHI_AC_STATE_LENGTH * 8 * 2) + 2)) {
     DPRINTLN("Shorter than shortest possibly expected.");
     return false;  // Shorter than shortest possibly expected.
   }
@@ -355,77 +364,99 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     return false;  // Request is out of spec.
   }
   uint16_t offset = OFFSET_START;
-  for (int i = 0; i < 18; i++) {
+  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++) {
     results->state[i] = 0;
   }
+  bool failure = false;
+  uint8_t rep = 0;
+  do {
+    failure = false;
 // Header:
 //  Somtime happens that junk signals arrives before the real message
-  bool headerFound = false;
-  while (!headerFound && offset<10) { 
-    headerFound = matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)
-        && matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE);
-  }
-  if (!headerFound) {
-    PRINTLN("Header mark not found.");
-    return false;
-  }
-
- // Decode byte-by-byte:
-  for (int i = 0; i < 18; i++) {
-    results->state[i] = 0;
-    if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
-        MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-        MITSUBISHI_AC_ZERO_SPACE)) {
-      PRINT("Byte decode failed at #");
-      PRINTLN((uint16_t)i);
-      return false;
+    bool headerFound = false;
+    while (!headerFound && offset <
+        (results->rawlen - (MITSUBISHI_AC_STATE_LENGTH * 8 * 2 + 2))) {
+      headerFound = matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)
+          && matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE);
     }
-    offset+=16;
-    DPRINT((uint16_t)results->state[i]);
-    DPRINT(",");
-  }
-  DPRINTLN("");
+    if (!headerFound) {
+      DPRINTLN("Header mark not found.");
+      failure = true;
+    }
+// Decode byte-by-byte:
+    for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH && !failure; i++) {
+      results->state[i] = 0;
+      if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
+          MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+          MITSUBISHI_AC_ZERO_SPACE)) {
+        DPRINT("Byte decode failed at #");
+        DPRINTLN((uint16_t)i);
+        failure = true;
+      } else {
+        offset+=16;  // 8 marks + 8 spaces
+        DPRINT((uint16_t)results->state[i]);
+        DPRINT(",");
+      }
+      DPRINTLN("");
+    }
 // HEADER validation:
-  if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
-      results->state[2] != 0x26 || results->state[3] != 0x01 ||
-      results->state[4] != 0x00) {
-    PRINTLN("Header mismatch.");
-    return false;
-  }
+    if (failure || results->state[0] != 0x23 || results->state[1] != 0xCB ||
+        results->state[2] != 0x26 || results->state[3] != 0x01 ||
+        results->state[4] != 0x00) {
+      DPRINTLN("Header mismatch.");
+      failure = true;
+    } else {
 // DATA part:
 
 // FOOTER checksum:
-  if (IRMitsubishiAC::calculateChecksum(results->state) != results->state[17]) {
-    PRINTLN("Checksum error.");
-    return false;
-  }
-// Check if the repeat is correct:
-  if (strict) {
-  DPRINTLN("Repeat check enabled.");
-// Repeat mark and space:
-    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_RPT_MARK) ||
-        !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE)) {
-    DPRINTLN("Repear mark error.");
-    return false;
-  }
-// Header mark and space:
-    if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK) ||
-        !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
-      DPRINTLN("Repear header mark error.");
-      return false;
+      if (IRMitsubishiAC::calculateChecksum(results->state) !=
+          results->state[17]) {
+        DPRINTLN("Checksum error.");
+        failure = true;
+      }
     }
-// Payload:
-    uint8_t data;
-    for (int i = 0; i < 18; i++) {
-      if (!matchByte(&data, &(results->rawbuf[offset]),
-          MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-          MITSUBISHI_AC_ZERO_SPACE) || data != results->state[i]) {
-        DPRINTLN("Repeat payload error.");
+    if (rep != MITSUBISHI_AC_MIN_REPEAT && failure) {
+      bool repeatMarkFound = false;
+      while (!repeatMarkFound && offset <
+          (results->rawlen  - (MITSUBISHI_AC_STATE_LENGTH * 8 * 2 + 4))) {
+        repeatMarkFound = matchMark(results->rawbuf[offset++],
+            MITSUBISHI_AC_RPT_MARK) &&
+            matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE);
+      }
+      if (!repeatMarkFound) {
+        DPRINTLN("First attempt failure and repeat mark not found.");
         return false;
       }
-      offset+=16;
     }
-  }
+    rep++;
+// Check if the repeat is correct if we need strict decode:
+    if (strict && !failure) {
+      DPRINTLN("Strict repeat check enabled.");
+// Repeat mark and space:
+      if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_RPT_MARK) ||
+          !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE)) {
+      DPRINTLN("Repeat mark error.");
+      return false;
+    }
+// Header mark and space:
+      if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK) ||
+          !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
+        DPRINTLN("Repeat header error.");
+        return false;
+      }
+// Payload:
+      uint8_t data;
+      for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++) {
+        if (!matchByte(&data, &(results->rawbuf[offset]),
+            MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
+            MITSUBISHI_AC_ZERO_SPACE) || data != results->state[i]) {
+          DPRINTLN("Repeat payload error.");
+          return false;
+        }
+        offset+=16;  // 8 marks + 8 spaces
+      }
+    }  // strict repeat check
+  } while (failure && rep <= MITSUBISHI_AC_MIN_REPEAT);
   results->decode_type = MITSUBISHI_AC;
   return true;
 }
