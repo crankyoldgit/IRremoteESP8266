@@ -197,7 +197,7 @@ void IRsend::sendSamsungAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
                 kSamsungAcBitMark, kSamsungAcSectionGap,
                 data, 7,  // 7 bytes == 56 bits
                 38000,
-                true, 0, 50);
+                false, 0, 50);  // Send in LSBF order
     // Section 2
     sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
                 kSamsungAcBitMark, kSamsungAcOneSpace,
@@ -206,7 +206,7 @@ void IRsend::sendSamsungAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
                 100000,  // Complete made up guess at inter-message gap.
                 data + 7, 7,  // 7 bytes == 56 bits
                 38000,
-                true, 0, 50);
+                false, 0, 50);  // Send in LSBF order
     }
 }
 #endif  // SEND_SAMSUNG_AC
@@ -263,7 +263,8 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
                               kSamsungAcBitMark,
                               kSamsungAcZeroSpace);
       if (data_result.success == false)  break;  // Fail
-      results->state[i] = (uint8_t) data_result.data;
+      // Data is in LSB order. We need to reverse it.
+      results->state[i] = (uint8_t) reverseBits(data_result.data & 0xFF, 8);
     }
     // Section Footer
     if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark))
