@@ -39,7 +39,7 @@ const uint8_t kMitsubishiAcVaneAutoMove = 7;
 const uint8_t kMitsubishiAcNoTimer = 0;
 const uint8_t kMitsubishiAcStartTimer = 5;
 const uint8_t kMitsubishiAcStopTimer = 3;
-const uint8_t kMitsubishiAcStartStopTimer =7;
+const uint8_t kMitsubishiAcStartStopTimer = 7;
 
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
