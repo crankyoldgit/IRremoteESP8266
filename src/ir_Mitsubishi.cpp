@@ -3,9 +3,6 @@
 
 #include "ir_Mitsubishi.h"
 #include <algorithm>
-#ifndef ARDUINO
-#include <string>
-#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
