@@ -178,7 +178,7 @@ class IRrecv {
                         uint16_t mark, uint32_t onespace, uint32_t zerospace,
                         bool MSBFirst = false);
   bool decodeMitsubishiAC(decode_results *results,
-                        uint16_t nbits = MITSUBISHI_AC_BITS,
+                        uint16_t nbits = kMitsubishiACBits,
                         bool strict = false);
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)

@@ -299,6 +299,7 @@ const uint16_t kMitsubishiBits = 16;
 //               Based on marcosamarinho's code.
 const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiACStateLength = 18;
+const uint16_t kMitsubishiACBits = kMitsubishiACStateLength * 8;
 const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
 const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;

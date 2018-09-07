@@ -358,16 +358,16 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
 // Ref: https://www.analysir.com/blog/2015/01/06/reverse-engineering-mitsubishi-ac-infrared-protocol/
 bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < ((MITSUBISHI_AC_STATE_LENGTH * 8 * 2) + 2)) {
+  if (results->rawlen < ((kMitsubishiACBits * 2) + 2)) {
     DPRINTLN("Shorter than shortest possibly expected.");
     return false;  // Shorter than shortest possibly expected.
   }
-  if (strict && nbits != MITSUBISHI_AC_BITS) {
+  if (strict && nbits != kMitsubishiACBits) {
     DPRINTLN("Request is out of spec.");
     return false;  // Request is out of spec.
   }
-  uint16_t offset = OFFSET_START;
-  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++) {
+  uint16_t offset = kStartOffset;
+  for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
     results->state[i] = 0;
   }
   bool failure = false;
@@ -378,20 +378,20 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
 //  Somtime happens that junk signals arrives before the real message
     bool headerFound = false;
     while (!headerFound && offset <
-        (results->rawlen - (MITSUBISHI_AC_STATE_LENGTH * 8 * 2 + 2))) {
-      headerFound = matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK)
-          && matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE);
+        (results->rawlen - (kMitsubishiACBits * 2 + 2))) {
+      headerFound = matchMark(results->rawbuf[offset++], kMitsubishiAcHdrMark)
+          && matchSpace(results->rawbuf[offset++], kMitsubishiAcHdrSpace);
     }
     if (!headerFound) {
       DPRINTLN("Header mark not found.");
       failure = true;
     }
 // Decode byte-by-byte:
-    for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH && !failure; i++) {
+    for (uint8_t i = 0; i < kMitsubishiACStateLength && !failure; i++) {
       results->state[i] = 0;
       if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
-          MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-          MITSUBISHI_AC_ZERO_SPACE)) {
+          kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+          kMitsubishiAcZeroSpace)) {
         DPRINT("Byte decode failed at #");
         DPRINTLN((uint16_t)i);
         failure = true;
@@ -418,13 +418,13 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
         failure = true;
       }
     }
-    if (rep != MITSUBISHI_AC_MIN_REPEAT && failure) {
+    if (rep != kMitsubishiACMinRepeat && failure) {
       bool repeatMarkFound = false;
       while (!repeatMarkFound && offset <
-          (results->rawlen  - (MITSUBISHI_AC_STATE_LENGTH * 8 * 2 + 4))) {
+          (results->rawlen  - (kMitsubishiACStateLength * 8 * 2 + 4))) {
         repeatMarkFound = matchMark(results->rawbuf[offset++],
-            MITSUBISHI_AC_RPT_MARK) &&
-            matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE);
+            kMitsubishiAcRptMark) &&
+            matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace);
       }
       if (!repeatMarkFound) {
         DPRINTLN("First attempt failure and repeat mark not found.");
@@ -436,32 +436,32 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     if (strict && !failure) {
       DPRINTLN("Strict repeat check enabled.");
 // Repeat mark and space:
-      if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_RPT_MARK) ||
-          !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_RPT_SPACE)) {
+      if (!matchMark(results->rawbuf[offset++], kMitsubishiAcRptMark) ||
+          !matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace)) {
       DPRINTLN("Repeat mark error.");
       return false;
     }
 // Header mark and space:
-      if (!matchMark(results->rawbuf[offset++], MITSUBISHI_AC_HDR_MARK) ||
-          !matchSpace(results->rawbuf[offset++], MITSUBISHI_AC_HDR_SPACE)) {
+      if (!matchMark(results->rawbuf[offset++], kMitsubishiAcHdrMark) ||
+          !matchSpace(results->rawbuf[offset++], kMitsubishiAcHdrSpace)) {
         DPRINTLN("Repeat header error.");
         return false;
       }
 // Payload:
       uint8_t data;
-      for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++) {
+      for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
         if (!matchByte(&data, &(results->rawbuf[offset]),
-            MITSUBISHI_AC_BIT_MARK, MITSUBISHI_AC_ONE_SPACE,
-            MITSUBISHI_AC_ZERO_SPACE) || data != results->state[i]) {
+            kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+            kMitsubishiAcZeroSpace) || data != results->state[i]) {
           DPRINTLN("Repeat payload error.");
           return false;
         }
         offset+=16;  // 8 marks + 8 spaces
       }
     }  // strict repeat check
-  } while (failure && rep <= MITSUBISHI_AC_MIN_REPEAT);
+  } while (failure && rep <= kMitsubishiACMinRepeat);
   results->decode_type = MITSUBISHI_AC;
-  results->bits = MITSUBISHI_AC_STATE_LENGTH * 8;
+  results->bits = kMitsubishiACStateLength * 8;
   return true;
 }
 #endif  // DECODE_MITSUBISHI_AC
@@ -525,7 +525,7 @@ uint8_t* IRMitsubishiAC::getRaw() {
 }
 
 void IRMitsubishiAC::setRaw(uint8_t* data) {
-  for (uint8_t i = 0; i < (MITSUBISHI_AC_STATE_LENGTH-1); i++) {
+  for (uint8_t i = 0; i < (kMitsubishiACStateLength-1); i++) {
     remote_state[i] = data[i];
   }
   checksum();
@@ -678,16 +678,16 @@ void IRMitsubishiAC::setStopClock(uint8_t clock) {
   remote_state[11] = clock;
 }
 
-// Return the timer setting. Possible values: MITSUBISHI_AC_NO_TIMER,
-//  MITSUBISHI_AC_START_TIMER, MITSUBISHI_AC_STOP_TIMER,
-//  MITSUBISHI_AC_START_STOP_TIMER
+// Return the timer setting. Possible values: kMitsubishiAcNoTimer,
+//  kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
+//  kMitsubishiAcStartStopTimer
 uint8_t IRMitsubishiAC::getTimer() {
   return remote_state[13] & 0b111;
 }
 
-// Set the timer setting. Possible values: MITSUBISHI_AC_NO_TIMER,
-//  MITSUBISHI_AC_START_TIMER, MITSUBISHI_AC_STOP_TIMER,
-//  MITSUBISHI_AC_START_STOP_TIMER
+// Set the timer setting. Possible values: kMitsubishiAcNoTimer,
+//  kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
+//  kMitsubishiAcStartStopTimer
 void IRMitsubishiAC::setTimer(uint8_t timer) {
   remote_state[13] = timer & 0b111;
 }
@@ -772,16 +772,16 @@ std::string IRMitsubishiAC::toString() {
   result += timeToString(getStopClock());
   result += ", Timer: ";
   switch (getTimer()) {
-    case MITSUBISHI_AC_NO_TIMER:
+    case kMitsubishiAcNoTimer:
       result += "-";
       break;
-    case MITSUBISHI_AC_START_TIMER:
+    case kMitsubishiAcStartTimer:
       result += "Start";
       break;
-    case MITSUBISHI_AC_STOP_TIMER:
+    case kMitsubishiAcStopTimer:
       result += "Stop";
       break;
-    case MITSUBISHI_AC_START_STOP_TIMER:
+    case kMitsubishiAcStartStopTimer:
       result += "Start+Stop";
       break;
     default:
