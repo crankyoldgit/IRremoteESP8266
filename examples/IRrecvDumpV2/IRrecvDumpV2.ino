@@ -133,7 +133,6 @@ void dumpACInfo(decode_results *results) {
   }
 #endif  // DECODE_KELVINATOR
 #if DECODE_MITSUBISHI_AC
-  Serial.println("Trying Mitchu AC:");
   if (results->decode_type == MITSUBISHI_AC) {
     IRMitsubishiAC ac(0);
     ac.setRaw(results->state);

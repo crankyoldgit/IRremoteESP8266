@@ -461,6 +461,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     }  // strict repeat check
   } while (failure && rep <= MITSUBISHI_AC_MIN_REPEAT);
   results->decode_type = MITSUBISHI_AC;
+  results->bits = MITSUBISHI_AC_STATE_LENGTH * 8;
   return true;
 }
 #endif  // DECODE_MITSUBISHI_AC
