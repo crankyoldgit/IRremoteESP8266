@@ -168,7 +168,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.5.2"
+#define _MY_VERSION_ "v0.5.5"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG
@@ -320,10 +320,11 @@ void handleRoot() {
         "<option value='15'>Coolix</option>"
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
-        "<option value='41'>GICable</option>"
+        "<option value='43'>GICable</option>"
         "<option value='6'>JVC</option>"
         "<option value='10'>LG</option>"
         "<option value='36'>Lasertag</option>"
+        "<option value='47'>Lutron</option>"
         "<option value='35'>MagiQuest</option>"
         "<option value='34'>Midea</option>"
         "<option value='12'>Mitsubishi</option>"
@@ -359,6 +360,7 @@ void handleRoot() {
         "<option value='24'>24</option>"
         "<option value='28'>28</option>"
         "<option value='32'>32</option>"
+        "<option value='35'>35</option>"
         "<option value='36'>36</option>"
         "<option value='48'>48</option>"
         "<option value='56'>56</option>"
@@ -1262,6 +1264,13 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
         bits = kGicableBits;
       repeat = std::max(repeat, kGicableMinRepeat);
       irsend.sendGICable(code, bits, repeat);
+      break;
+#endif
+#if SEND_LUTRON
+    case LUTRON:  // 47
+      if (bits == 0)
+        bits = kLutronBits;
+      irsend.sendLutron(code, bits, repeat);
       break;
 #endif
   }

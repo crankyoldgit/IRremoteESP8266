@@ -487,6 +487,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeHitachiAC(results, kHitachiAc1Bits))
     return true;
 #endif
+#if DECODE_LUTRON
+  DPRINTLN("Attempting Lutron decode");
+  if (decodeLutron(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

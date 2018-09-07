@@ -120,6 +120,7 @@ std::string typeToString(const decode_type_t protocol,
     case KELVINATOR:     result = "KELVINATOR";        break;
     case LG:             result = "LG";                break;
     case LASERTAG:       result = "LASERTAG";          break;
+    case LUTRON:         result = "LUTRON";            break;
     case MAGIQUEST:      result = "MAGIQUEST";         break;
     case MIDEA:          result = "MIDEA";             break;
     case MITSUBISHI:     result = "MITSUBISHI";        break;

@@ -296,6 +296,10 @@ class IRrecv {
   bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,
                      bool strict = true);
 #endif
+#if DECODE_LUTRON
+  bool decodeLutron(decode_results *results, uint16_t nbits = kLutronBits,
+                     bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

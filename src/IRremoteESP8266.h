@@ -178,6 +178,9 @@
 #define DECODE_HAIER_AC_YRW02  true
 #define SEND_HAIER_AC_YRW02    true
 
+#define DECODE_LUTRON          true
+#define SEND_LUTRON            true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -244,7 +247,10 @@ enum decode_type_t {
   HITACHI_AC1,
   HITACHI_AC2,
   GICABLE,
-  HAIER_AC_YRW02
+  HAIER_AC_YRW02,
+  WHIRLPOOL_AC,
+  SAMSUNG_AC,
+  LUTRON
 };
 
 // Message lengths & required repeat values
@@ -291,6 +297,7 @@ const uint16_t kLasertagBits = 13;
 const uint16_t kLasertagMinRepeat = kNoRepeat;
 const uint16_t kLgBits = 28;
 const uint16_t kLg32Bits = 32;
+const uint16_t kLutronBits = 35;
 const uint16_t kMagiquestBits = 56;
 const uint16_t kMideaBits = 48;
 const uint16_t kMideaMinRepeat = kNoRepeat;
