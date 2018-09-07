@@ -57,7 +57,7 @@ TEST(TestSendLasertag, SendDataWithRepeat) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendLasertag(0x1, LASERTAG_BITS, 1);  // Red 1, one repeat.
+  irsend.sendLasertag(0x1, kLasertagBits, 1);  // Red 1, one repeat.
   EXPECT_EQ(
       "m333s333m333s333m333s333m333s333m333s333m333s333m333s333m333s333"
       "m333s333m333s333m333s333m333s666m333s100000"
@@ -65,7 +65,7 @@ TEST(TestSendLasertag, SendDataWithRepeat) {
       "m333s333m333s333m333s333m333s666m333s100000", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendLasertag(0x52, LASERTAG_BITS, 2);  // Green 2, two repeats.
+  irsend.sendLasertag(0x52, kLasertagBits, 2);  // Green 2, two repeats.
   EXPECT_EQ(
       "m333s333m333s333m333s333m333s333m333s333m333s666m666s666m666s333"
       "m333s666m666s100333"
@@ -100,7 +100,7 @@ TEST(TestDecodeLasertag, NormalSyntheticDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x01, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit 1
   EXPECT_EQ(0x0, irsend.capture.command);  // Team Red
@@ -111,7 +111,7 @@ TEST(TestDecodeLasertag, NormalSyntheticDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit 2
   EXPECT_EQ(0x0, irsend.capture.command);  // Team Red
@@ -122,7 +122,7 @@ TEST(TestDecodeLasertag, NormalSyntheticDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x06, irsend.capture.value);
   EXPECT_EQ(0x6, irsend.capture.address);  // Unit 6
   EXPECT_EQ(0x0, irsend.capture.command);  // Team Red
@@ -133,7 +133,7 @@ TEST(TestDecodeLasertag, NormalSyntheticDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x51, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit 1
   EXPECT_EQ(0x5, irsend.capture.command);  // Team Green
@@ -144,7 +144,7 @@ TEST(TestDecodeLasertag, NormalSyntheticDecodeWithStrict) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x56, irsend.capture.value);
   EXPECT_EQ(0x6, irsend.capture.address);  // Unit
   EXPECT_EQ(0x5, irsend.capture.command);  // Team
@@ -165,7 +165,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x53, irsend.capture.value);
   EXPECT_EQ(0x3, irsend.capture.address);  // Unit
   EXPECT_EQ(0x5, irsend.capture.command);  // Team
@@ -178,7 +178,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x51, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit
   EXPECT_EQ(0x5, irsend.capture.command);  // Team
@@ -191,7 +191,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x54, irsend.capture.value);
   EXPECT_EQ(0x4, irsend.capture.address);  // Unit
   EXPECT_EQ(0x5, irsend.capture.command);  // Team
@@ -204,7 +204,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x0F, irsend.capture.value);
   EXPECT_EQ(0xF, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -217,7 +217,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -230,7 +230,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -243,7 +243,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -256,7 +256,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -269,7 +269,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x01, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -282,7 +282,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x01, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -295,7 +295,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x01, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -308,7 +308,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -321,7 +321,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team
@@ -334,7 +334,7 @@ TEST(TestDecodeLasertag, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LASERTAG, irsend.capture.decode_type);
-  EXPECT_EQ(LASERTAG_BITS, irsend.capture.bits);
+  EXPECT_EQ(kLasertagBits, irsend.capture.bits);
   EXPECT_EQ(0x02, irsend.capture.value);
   EXPECT_EQ(0x2, irsend.capture.address);  // Unit
   EXPECT_EQ(0x0, irsend.capture.command);  // Team

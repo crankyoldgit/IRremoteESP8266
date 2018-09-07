@@ -132,7 +132,7 @@
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define IR_LED 4
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
-#define HTTP_PORT 80  // The port the HTTP server is listening on.
+const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
 //       via MQTTprefix below.
@@ -150,11 +150,11 @@ const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
 #ifdef MQTT_ENABLE
 // Address of your MQTT server.
 #define MQTT_SERVER "10.20.0.253"  // <=- CHANGE ME
-#define MQTT_PORT 1883  // Default port used by MQTT servers.
+const uint16_t kMqttPort = 1883;  // Default port used by MQTT servers.
 // Set if your MQTT server requires a Username & Password to connect.
 const char* mqtt_user = "";
 const char* mqtt_password = "";
-#define MQTT_RECONNECT_TIME 5000  // Delay(ms) between reconnect tries.
+const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
                              // independent of the hostname.
@@ -181,7 +181,7 @@ const char* mqtt_password = "";
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
 // Globals
-ESP8266WebServer server(HTTP_PORT);
+ESP8266WebServer server(kHttpPort);
 IRsend irsend = IRsend(IR_LED);
 MDNSResponder mdns;
 WiFiClient espClient;
@@ -201,7 +201,7 @@ uint32_t lastMqttCmdTime = 0;
 
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
-PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, callback, espClient);
+PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 #endif  // MQTT_ENABLE
@@ -275,7 +275,7 @@ void handleRoot() {
     "Total send requests: " + String(sendReqCounter) + "</p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
-    "<p>Server: " MQTT_SERVER ":" + String(MQTT_PORT) + " <i>(" +
+    "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
     (mqtt_client.connected() ? "Connected" : "Disconnected") + ")</i><br>"
     "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
@@ -425,8 +425,8 @@ void handleRoot() {
         "<option value='28'>Trotec</option>"
       "</select>"
       " State code: 0x"
-      "<input type='text' name='code' size='" + String(STATE_SIZE_MAX * 2) +
-          "' maxlength='" + String(STATE_SIZE_MAX * 2) + "'"
+      "<input type='text' name='code' size='" + String(kStateSizeMax * 2) +
+          "' maxlength='" + String(kStateSizeMax * 2) + "'"
           " value='190B8050000000E0190B8070000010F0'>"
       " <input type='submit' value='Send A/C State'>"
     "</form>"
@@ -464,7 +464,7 @@ void handleReset() {
 //   str: A hexadecimal string containing the state to be sent.
 void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint8_t strOffset = 0;
-  uint8_t state[STATE_SIZE_MAX] = {0};  // All array elements are set to 0.
+  uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
   uint16_t stateSize = 0;
 
   if (str.startsWith("0x") || str.startsWith("0X"))
@@ -478,25 +478,25 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 
   switch (irType) {  // Get the correct state size for the protocol.
     case KELVINATOR:
-      stateSize = KELVINATOR_STATE_LENGTH;
+      stateSize = kKelvinatorStateLength;
       break;
     case TOSHIBA_AC:
-      stateSize = TOSHIBA_AC_STATE_LENGTH;
+      stateSize = kToshibaACStateLength;
       break;
     case DAIKIN:
-      stateSize = DAIKIN_COMMAND_LENGTH;
+      stateSize = kDaikinStateLength;
       break;
     case MITSUBISHI_AC:
-      stateSize = MITSUBISHI_AC_STATE_LENGTH;
+      stateSize = kMitsubishiACStateLength;
       break;
     case TROTEC:
-      stateSize = TROTEC_COMMAND_LENGTH;
+      stateSize = kTrotecStateLength;
       break;
     case ARGO:
-      stateSize = ARGO_COMMAND_LENGTH;
+      stateSize = kArgoStateLength;
       break;
     case GREE:
-      stateSize = GREE_STATE_LENGTH;
+      stateSize = kGreeStateLength;
       break;
     case FUJITSU_AC:
       // Fujitsu has four distinct & different size states, so make a best guess
@@ -506,29 +506,28 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
       stateSize = std::max(stateSize,
-                           (uint16_t) (FUJITSU_AC_STATE_LENGTH_SHORT - 1));
+                           (uint16_t) (kFujitsuAcStateLengthShort - 1));
       // If we think it isn't a "short" message.
-      if (stateSize > FUJITSU_AC_STATE_LENGTH_SHORT)
+      if (stateSize > kFujitsuAcStateLengthShort)
         // Then it has to be at least the smaller version of the "normal" size.
-        stateSize = std::max(stateSize,
-                             (uint16_t) (FUJITSU_AC_STATE_LENGTH - 1));
+        stateSize = std::max(stateSize, (uint16_t) (kFujitsuAcStateLength - 1));
       // Lastly, it should never exceed the maximum "normal" size.
-      stateSize = std::min(stateSize, (uint16_t) FUJITSU_AC_STATE_LENGTH);
+      stateSize = std::min(stateSize, kFujitsuAcStateLength);
       break;
     case HAIER_AC:
-      stateSize = HAIER_AC_STATE_LENGTH;
+      stateSize = kHaierACStateLength;
       break;
     case HAIER_AC_YRW02:
-      stateSize = HAIER_AC_YRW02_STATE_LENGTH;
+      stateSize = kHaierACYRW02StateLength;
       break;
     case HITACHI_AC:
-      stateSize = HITACHI_AC_STATE_LENGTH;
+      stateSize = kHitachiAcStateLength;
       break;
     case HITACHI_AC1:
-      stateSize = HITACHI_AC1_STATE_LENGTH;
+      stateSize = kHitachiAc1StateLength;
       break;
     case HITACHI_AC2:
-      stateSize = HITACHI_AC2_STATE_LENGTH;
+      stateSize = kHitachiAc2StateLength;
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
@@ -722,7 +721,7 @@ void parseStringAndSendGC(const String str) {
 //              0030,0018,0018,0018,0018,0018,0030,0018,0018,03f6"
 //              or
 //              "0000,0067,0000,0015,0060,0018". i.e. without the Repeat value
-//        Requires at least PRONTO_MIN_LENGTH comma-separated values.
+//        Requires at least kProntoMinLength comma-separated values.
 //        sendPronto() only supports raw pronto code types, thus so does this.
 //   repeats:  Nr. of times the message is to be repeated.
 //             This value is ignored if an embeddd repeat is found in str.
@@ -744,8 +743,8 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
     count--;  // We don't count the repeats value as part of the code array.
   }
 
-  // We need at least PRONTO_MIN_LENGTH values for the code part.
-  if (count < PRONTO_MIN_LENGTH) return;
+  // We need at least kProntoMinLength values for the code part.
+  if (count < kProntoMinLength) return;
 
   // Now we know how many there are, allocate the memory to store them all.
   code_array = newCodeArray(count);
@@ -954,7 +953,7 @@ bool reconnect() {
   while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
     // Attempt to connect
-    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(MQTT_PORT) +
+    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(kMqttPort) +
           "... ");
     if (mqtt_user && mqtt_password)
       connected = mqtt_client.connect(mqtt_clientid.c_str(), mqtt_user,
@@ -986,8 +985,8 @@ void loop(void) {
   // MQTT client connection management
   if (!mqtt_client.connected()) {
     uint32_t now = millis();
-    // Reconnect if it's longer than MQTT_RECONNECT_TIME since we last tried.
-    if (now - lastReconnectAttempt > MQTT_RECONNECT_TIME) {
+    // Reconnect if it's longer than kMqttReconnectTime since we last tried.
+    if (now - lastReconnectAttempt > kMqttReconnectTime) {
       lastReconnectAttempt = now;
       debug("client mqtt not connected, trying to connect");
       // Attempt to reconnect
@@ -1049,102 +1048,102 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_RC5
     case RC5:  // 1
       if (bits == 0)
-        bits = RC5_BITS;
+        bits = kRC5Bits;
       irsend.sendRC5(code, bits, repeat);
       break;
 #endif
 #if SEND_RC6
     case RC6:  // 2
       if (bits == 0)
-        bits = RC6_MODE0_BITS;
+        bits = kRC6Mode0Bits;
       irsend.sendRC6(code, bits, repeat);
       break;
 #endif
 #if SEND_NEC
     case NEC:  // 3
       if (bits == 0)
-        bits = NEC_BITS;
+        bits = kNECBits;
       irsend.sendNEC(code, bits, repeat);
       break;
 #endif
 #if SEND_SONY
     case SONY:  // 4
       if (bits == 0)
-        bits = SONY_12_BITS;
-      repeat = std::max(repeat, (uint16_t) SONY_MIN_REPEAT);
+        bits = kSony12Bits;
+      repeat = std::max(repeat, kSonyMinRepeat);
       irsend.sendSony(code, bits, repeat);
       break;
 #endif
 #if SEND_PANASONIC
     case PANASONIC:  // 5
       if (bits == 0)
-        bits = PANASONIC_BITS;
+        bits = kPanasonicBits;
       irsend.sendPanasonic64(code, bits, repeat);
       break;
 #endif
 #if SEND_JVC
     case JVC:  // 6
       if (bits == 0)
-        bits = JVC_BITS;
+        bits = kJvcBits;
       irsend.sendJVC(code, bits, repeat);
       break;
 #endif
 #if SEND_SAMSUNG
     case SAMSUNG:  // 7
       if (bits == 0)
-        bits = SAMSUNG_BITS;
+        bits = kSamsungBits;
       irsend.sendSAMSUNG(code, bits, repeat);
       break;
 #endif
 #if SEND_WHYNTER
     case WHYNTER:  // 8
       if (bits == 0)
-        bits = WHYNTER_BITS;
+        bits = kWhynterBits;
       irsend.sendWhynter(code, bits, repeat);
       break;
 #endif
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501:  // 9
       if (bits == 0)
-        bits = AIWA_RC_T501_BITS;
-      repeat = std::max(repeat, (uint16_t) AIWA_RC_T501_MIN_REPEAT);
+        bits = kAiwaRcT501Bits;
+      repeat = std::max(repeat, kAiwaRcT501MinRepeats);
       irsend.sendAiwaRCT501(code, bits, repeat);
       break;
 #endif
 #if SEND_LG
     case LG:  // 10
       if (bits == 0)
-        bits = LG_BITS;
+        bits = kLgBits;
       irsend.sendLG(code, bits, repeat);
       break;
 #endif
 #if SEND_MITSUBISHI
     case MITSUBISHI:  // 12
       if (bits == 0)
-        bits = MITSUBISHI_BITS;
-      repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
+        bits = kMitsubishiBits;
+      repeat = std::max(repeat, kMitsubishiMinRepeat);
       irsend.sendMitsubishi(code, bits, repeat);
       break;
 #endif
 #if SEND_DISH
     case DISH:  // 13
       if (bits == 0)
-        bits = DISH_BITS;
-      repeat = std::max(repeat, (uint16_t) DISH_MIN_REPEAT);
+        bits = kDishBits;
+      repeat = std::max(repeat, kDishMinRepeat);
       irsend.sendDISH(code, bits, repeat);
       break;
 #endif
 #if SEND_SHARP
     case SHARP:  // 14
       if (bits == 0)
-        bits = SHARP_BITS;
+        bits = kSharpBits;
       irsend.sendSharpRaw(code, bits, repeat);
       break;
 #endif
 #if SEND_COOLIX
     case COOLIX:  // 15
       if (bits == 0)
-        bits = COOLIX_BITS;
+        bits = kCoolixBits;
       irsend.sendCOOLIX(code, bits, repeat);
       break;
 #endif
@@ -1173,29 +1172,29 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_SHERWOOD
     case SHERWOOD:  // 19
       if (bits == 0)
-        bits = SHERWOOD_BITS;
-      repeat = std::max(repeat, (uint16_t) SHERWOOD_MIN_REPEAT);
+        bits = kSherwoodBits;
+      repeat = std::max(repeat, kSherwoodMinRepeat);
       irsend.sendSherwood(code, bits, repeat);
       break;
 #endif
 #if SEND_RCMM
     case RCMM:  // 21
       if (bits == 0)
-        bits = RCMM_BITS;
+        bits = kRCMMBits;
       irsend.sendRCMM(code, bits, repeat);
       break;
 #endif
 #if SEND_SANYO
     case SANYO_LC7461:  // 22
       if (bits == 0)
-        bits = SANYO_LC7461_BITS;
+        bits = kSanyoLC7461Bits;
       irsend.sendSanyoLC7461(code, bits, repeat);
       break;
 #endif
 #if SEND_RC5
     case RC5X:  // 23
       if (bits == 0)
-        bits = RC5X_BITS;
+        bits = kRC5XBits;
       irsend.sendRC5(code, bits, repeat);
       break;
 #endif
@@ -1207,7 +1206,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_NIKAI
     case NIKAI:  // 29
       if (bits == 0)
-        bits = NIKAI_BITS;
+        bits = kNikaiBits;
       irsend.sendNikai(code, bits, repeat);
       break;
 #endif
@@ -1224,44 +1223,44 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_MIDEA
     case MIDEA:  // 34
       if (bits == 0)
-        bits = MIDEA_BITS;
+        bits = kMideaBits;
       irsend.sendMidea(code, bits, repeat);
       break;
 #endif
 #if SEND_MAGIQUEST
     case MAGIQUEST:  // 35
       if (bits == 0)
-        bits = MAGIQUEST_BITS;
+        bits = kMagiquestBits;
       irsend.sendMagiQuest(code, bits, repeat);
       break;
 #endif
 #if SEND_LASERTAG
     case LASERTAG:  // 36
       if (bits == 0)
-        bits = LASERTAG_BITS;
+        bits = kLasertagBits;
       irsend.sendLasertag(code, bits, repeat);
       break;
 #endif
 #if SEND_CARRIER_AC
     case CARRIER_AC:  // 37
       if (bits == 0)
-        bits = CARRIER_AC_BITS;
+        bits = kCarrierAcBits;
       irsend.sendCarrierAC(code, bits, repeat);
       break;
 #endif
 #if SEND_MITSUBISHI2
     case MITSUBISHI2:  // 39
       if (bits == 0)
-        bits = MITSUBISHI_BITS;
-      repeat = std::max(repeat, (uint16_t) MITSUBISHI_MIN_REPEAT);
+        bits = kMitsubishiBits;
+      repeat = std::max(repeat, kMitsubishiMinRepeat);
       irsend.sendMitsubishi2(code, bits, repeat);
       break;
 #endif
 #if SEND_GICABLE
     case GICABLE:  // 43
       if (bits == 0)
-        bits = GICABLE_BITS;
-      repeat = std::max(repeat, (uint16_t) GICABLE_MIN_REPEAT);
+        bits = kGicableBits;
+      repeat = std::max(repeat, kGicableMinRepeat);
       irsend.sendGICable(code, bits, repeat);
       break;
 #endif

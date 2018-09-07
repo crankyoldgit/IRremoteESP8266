@@ -11,29 +11,29 @@ Copyright 2017 Schmolders
 
 // Constants
 // using SPACE modulation. MARK is always const 400u
-#define ARGO_HDR_MARK             6400U  // Mark
-#define ARGO_HDR_SPACE            3300U  // Space
-#define ARGO_BIT_MARK              400U
-#define ARGO_ONE_SPACE            2200U
-#define ARGO_ZERO_SPACE            900U
+const uint16_t kArgoHdrMark = 6400;
+const uint16_t kArgoHdrSpace = 3300;
+const uint16_t kArgoBitMark = 400;
+const uint16_t kArgoOneSpace = 2200;
+const uint16_t kArgoZeroSpace = 900;
 
 #if SEND_ARGO
 // Send an Argo A/C message.
 //
 // Args:
-//   data: An array of ARGO_COMMAND_LENGTH bytes containing the IR command.
+//   data: An array of kArgoStateLength bytes containing the IR command.
 //
 // Status: ALPHA / Untested.
 
 void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
   // Check if we have enough bytes to send a proper message.
-  if (nbytes < ARGO_COMMAND_LENGTH) return;
+  if (nbytes < kArgoStateLength) return;
   // TODO(kaschmo): validate
-  sendGeneric(ARGO_HDR_MARK, ARGO_HDR_SPACE,
-              ARGO_BIT_MARK, ARGO_ONE_SPACE,
-              ARGO_BIT_MARK, ARGO_ZERO_SPACE,
+  sendGeneric(kArgoHdrMark, kArgoHdrSpace,
+              kArgoBitMark, kArgoOneSpace,
+              kArgoBitMark, kArgoZeroSpace,
               0, 0,  // No Footer.
-              data, nbytes, 38, false, repeat, 50);
+              data, nbytes, 38, false, repeat, kDutyDefault);
 }
 #endif  // SEND_ARGO
 
@@ -70,7 +70,7 @@ void IRArgoAC::checksum() {
 }
 
 void IRArgoAC::stateReset() {
-  for (uint8_t i = 0; i < ARGO_COMMAND_LENGTH; i++)
+  for (uint8_t i = 0; i < kArgoStateLength; i++)
     argo[i] = 0x0;
 
   // Argo Message. Store MSB left.
@@ -84,8 +84,8 @@ void IRArgoAC::stateReset() {
   this->off();
   this->setTemp(20);
   this->setRoomTemp(25);
-  this->setCoolMode(ARGO_COOL_AUTO);
-  this->setFan(ARGO_FAN_AUTO);
+  this->setCoolMode(kArgoCoolAuto);
+  this->setFan(kArgoFanAuto);
 }
 
 uint8_t* IRArgoAC::getRaw() {
@@ -135,10 +135,10 @@ bool IRArgoAC::getMax() {
 // Set the temp in deg C
 // Sending 0 equals +4
 void IRArgoAC::setTemp(uint8_t temp) {
-  if (temp < ARGO_MIN_TEMP)
-    temp = ARGO_MIN_TEMP;
-  else if (temp > ARGO_MAX_TEMP)
-    temp = ARGO_MAX_TEMP;
+  if (temp < kArgoMinTemp)
+    temp = kArgoMinTemp;
+  else if (temp > kArgoMaxTemp)
+    temp = kArgoMaxTemp;
 
   // Store in attributes
   set_temp = temp;

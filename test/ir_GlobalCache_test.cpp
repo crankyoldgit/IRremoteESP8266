@@ -24,7 +24,7 @@ TEST(TestSendGlobalCache, NonRepeatingCode) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x20DF827D, irsend.capture.value);
   EXPECT_EQ(0x4, irsend.capture.address);
   EXPECT_EQ(0x41, irsend.capture.command);
@@ -54,7 +54,7 @@ TEST(TestSendGlobalCache, RepeatCode) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0xC1A28877, irsend.capture.value);
   EXPECT_EQ(0x4583, irsend.capture.address);
   EXPECT_EQ(0x11, irsend.capture.command);

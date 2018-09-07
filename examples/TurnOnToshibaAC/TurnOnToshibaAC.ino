@@ -1,7 +1,7 @@
 /* Copyright 2017 David Conran
 *
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
-* as specified by IR_LED below.
+* as specified by kIrLed below.
 *
 * TL;DR: The IR LED needs to be driven by a transistor for a good result.
 *
@@ -30,8 +30,8 @@
 #include <IRsend.h>
 #include <ir_Toshiba.h>
 
-#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRToshibaAC toshibair(IR_LED);  // Set the GPIO to be used for sending messages.
+const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRToshibaAC toshibair(kIrLed);  // Set the GPIO to be used for sending messages.
 
 void printState() {
   // Display the settings.
@@ -42,7 +42,7 @@ void printState() {
   // Display the encoded IR sequence.
   unsigned char* ir_code = toshibair.getRaw();
   Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kToshibaACStateLength; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }

@@ -17,28 +17,28 @@
 // Constants
 // Ref:
 //   http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-#define SAMSUNG_TICK                     560U
-#define SAMSUNG_HDR_MARK_TICKS             8U
-#define SAMSUNG_HDR_MARK           (SAMSUNG_HDR_MARK_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_HDR_SPACE_TICKS            8U
-#define SAMSUNG_HDR_SPACE          (SAMSUNG_HDR_SPACE_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_BIT_MARK_TICKS             1U
-#define SAMSUNG_BIT_MARK           (SAMSUNG_BIT_MARK_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_ONE_SPACE_TICKS            3U
-#define SAMSUNG_ONE_SPACE          (SAMSUNG_ONE_SPACE_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_ZERO_SPACE_TICKS           1U
-#define SAMSUNG_ZERO_SPACE         (SAMSUNG_ZERO_SPACE_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_RPT_SPACE_TICKS            4U
-#define SAMSUNG_RPT_SPACE          (SAMSUNG_RPT_SPACE_TICKS * SAMSUNG_TICK)
-#define SAMSUNG_MIN_MESSAGE_LENGTH_TICKS 193U
-#define SAMSUNG_MIN_MESSAGE_LENGTH (SAMSUNG_MIN_MESSAGE_LENGTH_TICKS * \
-                                    SAMSUNG_TICK)
-#define SAMSUNG_MIN_GAP_TICKS      (SAMSUNG_MIN_MESSAGE_LENGTH_TICKS - \
-    (SAMSUNG_HDR_MARK_TICKS + SAMSUNG_HDR_SPACE_TICKS + \
-     SAMSUNG_BITS * (SAMSUNG_BIT_MARK_TICKS + SAMSUNG_ONE_SPACE_TICKS) + \
-     SAMSUNG_BIT_MARK_TICKS))
-#define SAMSUNG_MIN_GAP            (SAMSUNG_MIN_GAP_TICKS * SAMSUNG_TICK)
 
+const uint16_t kSamsungTick = 560;
+const uint16_t kSamsungHdrMarkTicks = 8;
+const uint16_t kSamsungHdrMark = kSamsungHdrMarkTicks * kSamsungTick;
+const uint16_t kSamsungHdrSpaceTicks = 8;
+const uint16_t kSamsungHdrSpace = kSamsungHdrSpaceTicks * kSamsungTick;
+const uint16_t kSamsungBitMarkTicks = 1;
+const uint16_t kSamsungBitMark = kSamsungBitMarkTicks * kSamsungTick;
+const uint16_t kSamsungOneSpaceTicks = 3;
+const uint16_t kSamsungOneSpace = kSamsungOneSpaceTicks * kSamsungTick;
+const uint16_t kSamsungZeroSpaceTicks = 1;
+const uint16_t kSamsungZeroSpace = kSamsungZeroSpaceTicks * kSamsungTick;
+const uint16_t kSamsungRptSpaceTicks = 4;
+const uint16_t kSamsungRptSpace = kSamsungRptSpaceTicks * kSamsungTick;
+const uint16_t kSamsungMinMessageLengthTicks = 193;
+const uint32_t kSamsungMinMessageLength =
+    kSamsungMinMessageLengthTicks * kSamsungTick;
+const uint16_t kSamsungMinGapTicks = kSamsungMinMessageLengthTicks -
+    (kSamsungHdrMarkTicks + kSamsungHdrSpaceTicks +
+     kSamsungBits * (kSamsungBitMarkTicks + kSamsungOneSpaceTicks) +
+     kSamsungBitMarkTicks);
+const uint32_t kSamsungMinGap = kSamsungMinGapTicks * kSamsungTick;
 
 
 #if SEND_SAMSUNG
@@ -49,18 +49,18 @@
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically SAMSUNG_BITS.
+//   nbits:  The bit size of the message being sent. typically kSamsungBits.
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: BETA / Should be working.
 //
 // Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 void IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(SAMSUNG_HDR_MARK, SAMSUNG_HDR_SPACE,
-              SAMSUNG_BIT_MARK, SAMSUNG_ONE_SPACE,
-              SAMSUNG_BIT_MARK, SAMSUNG_ZERO_SPACE,
-              SAMSUNG_BIT_MARK,
-              SAMSUNG_MIN_GAP, SAMSUNG_MIN_MESSAGE_LENGTH,
+  sendGeneric(kSamsungHdrMark, kSamsungHdrSpace,
+              kSamsungBitMark, kSamsungOneSpace,
+              kSamsungBitMark, kSamsungZeroSpace,
+              kSamsungBitMark,
+              kSamsungMinGap, kSamsungMinMessageLength,
               data, nbits, 38, true, repeat, 33);
 }
 
@@ -90,7 +90,7 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of bits to expect in the data portion. Typically SAMSUNG_BITS.
+//   nbits:   Nr. of bits to expect in the data portion. Typically kSamsungBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -104,37 +104,37 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
                            bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER + FOOTER - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid Samsung message.
-  if (strict && nbits != SAMSUNG_BITS)
+  if (strict && nbits != kSamsungBits)
     return false;  // We expect Samsung to be 32 bits of message.
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
 
   // Header
-  if (!matchMark(results->rawbuf[offset], SAMSUNG_HDR_MARK)) return false;
+  if (!matchMark(results->rawbuf[offset], kSamsungHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * RAWTICK /
-      SAMSUNG_HDR_MARK_TICKS;
-  if (!matchSpace(results->rawbuf[offset], SAMSUNG_HDR_SPACE)) return false;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
+      kSamsungHdrMarkTicks;
+  if (!matchSpace(results->rawbuf[offset], kSamsungHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * RAWTICK /
-      SAMSUNG_HDR_SPACE_TICKS;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
+      kSamsungHdrSpaceTicks;
   // Data
   match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         SAMSUNG_BIT_MARK_TICKS * m_tick,
-                                         SAMSUNG_ONE_SPACE_TICKS * s_tick,
-                                         SAMSUNG_BIT_MARK_TICKS * m_tick,
-                                         SAMSUNG_ZERO_SPACE_TICKS * s_tick);
+                                         kSamsungBitMarkTicks * m_tick,
+                                         kSamsungOneSpaceTicks * s_tick,
+                                         kSamsungBitMarkTicks * m_tick,
+                                         kSamsungZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
   // Footer
-  if (!matchMark(results->rawbuf[offset++], SAMSUNG_BIT_MARK_TICKS * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kSamsungBitMarkTicks * m_tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], SAMSUNG_MIN_GAP_TICKS * s_tick))
+      !matchAtLeast(results->rawbuf[offset], kSamsungMinGapTicks * s_tick))
     return false;
 
   // Compliance

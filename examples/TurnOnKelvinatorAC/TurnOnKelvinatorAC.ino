@@ -1,7 +1,7 @@
 /* Copyright 2016 David Conran
 *
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
-* as specified by IR_LED below.
+* as specified by kIrLed below.
 *
 * TL;DR: The IR LED needs to be driven by a transistor for a good result.
 *
@@ -30,8 +30,8 @@
 #include <IRsend.h>
 #include <ir_Kelvinator.h>
 
-#define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRKelvinatorAC kelvir(IR_LED);  // Set the GPIO to be used for sending messages.
+const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRKelvinatorAC kelvir(kIrLed);  // Set the GPIO to be used for sending messages.
 
 void printState() {
   // Display the settings.
@@ -47,7 +47,7 @@ void printState() {
   // Display the encoded IR sequence.
   unsigned char* ir_code = kelvir.getRaw();
   Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < kKelvinatorStateLength; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }

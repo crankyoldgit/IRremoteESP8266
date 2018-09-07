@@ -49,14 +49,14 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendMitsubishi(0xE242, MITSUBISHI_BITS, 0);  // 0 repeat.
+  irsend.sendMitsubishi(0xE242, kMitsubishiBits, 0);  // 0 repeat.
   EXPECT_EQ(
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendMitsubishi(0xE242, MITSUBISHI_BITS, 1);  // 1 repeat.
+  irsend.sendMitsubishi(0xE242, kMitsubishiBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
@@ -64,7 +64,7 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080", irsend.outputStr());
-  irsend.sendMitsubishi(0xE242, MITSUBISHI_BITS, 2);  // 2 repeats.
+  irsend.sendMitsubishi(0xE242, kMitsubishiBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
@@ -123,9 +123,9 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMitsubishi(0xC2B8);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -134,9 +134,9 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMitsubishi(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -145,9 +145,9 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMitsubishi(0xFFFF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xFFFF, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -158,14 +158,14 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
   // 12 bits.
   irsend.sendMitsubishi(0xFFF, 12);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 12, true));
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 64, true));
 
   // 32 bits.
   irsend.sendMitsubishi(0xFFF, 32);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 12, true));
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 32, true));
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, 64, true));
@@ -179,11 +179,11 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Mitsubishi 16-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendMitsubishi(0xC2B8, MITSUBISHI_BITS, 2);
+  irsend.sendMitsubishi(0xC2B8, kMitsubishiBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -191,11 +191,11 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Mitsubishi 16-bit message with 0 repeats.
   irsend.reset();
-  irsend.sendMitsubishi(0xC2B8, MITSUBISHI_BITS, 0);
+  irsend.sendMitsubishi(0xC2B8, kMitsubishiBits, 0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xC2B8, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -212,7 +212,7 @@ TEST(TestDecodeMitsubishi, DecodeWithNonStrictValues) {
   irsend.sendMitsubishi(0x0, 8);  // Illegal sized Mitsubishi 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, 8, false));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
@@ -227,7 +227,7 @@ TEST(TestDecodeMitsubishi, DecodeWithNonStrictValues) {
   irsend.sendMitsubishi(0xFEDCBA9876543210, 64);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture, 64, false));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
@@ -255,7 +255,7 @@ TEST(TestDecodeMitsubishi, DecodeGlobalCacheExample) {
 
   ASSERT_TRUE(irrecv.decodeMitsubishi(&irsend.capture));
   EXPECT_EQ(MITSUBISHI, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xE242, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -277,7 +277,7 @@ TEST(TestDecodeMitsubishi, FailToDecodeNonMitsubishiExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, MITSUBISHI_BITS,
+  ASSERT_FALSE(irrecv.decodeMitsubishi(&irsend.capture, kMitsubishiBits,
                                        false));
 }
 
@@ -288,7 +288,7 @@ TEST(TestSendMitsubishiAC, SendDataOnly) {
   IRsendTest irsend(4);
   irsend.begin();
 
-  uint8_t mitsub_code[MITSUBISHI_AC_STATE_LENGTH] = {
+  uint8_t mitsub_code[kMitsubishiACStateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30,
       0x45, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
   irsend.reset();
@@ -342,11 +342,11 @@ TEST(TestSendMitsubishiAC, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  uint8_t mitsub_code[MITSUBISHI_AC_STATE_LENGTH] = {
+  uint8_t mitsub_code[kMitsubishiACStateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30,
       0x45, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
 
-  irsend.sendMitsubishiAC(mitsub_code, MITSUBISHI_AC_STATE_LENGTH, 0);
+  irsend.sendMitsubishiAC(mitsub_code, kMitsubishiACStateLength, 0);
   EXPECT_EQ(
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
@@ -370,7 +370,7 @@ TEST(TestSendMitsubishiAC, SendWithRepeats) {
       "m440s17100", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendMitsubishiAC(mitsub_code, MITSUBISHI_AC_STATE_LENGTH, 2);
+  irsend.sendMitsubishiAC(mitsub_code, kMitsubishiACStateLength, 2);
   EXPECT_EQ(
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
@@ -521,22 +521,22 @@ TEST(TestMitsubishiACClass, Temperature) {
   mitsub.begin();
 
   mitsub.setTemp(0);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
   mitsub.setTemp(255);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MIN_TEMP);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMinTemp);
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MAX_TEMP);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMaxTemp);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MIN_TEMP - 1);
-  EXPECT_EQ(MITSUBISHI_AC_MIN_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMinTemp - 1);
+  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
 
-  mitsub.setTemp(MITSUBISHI_AC_MAX_TEMP + 1);
-  EXPECT_EQ(MITSUBISHI_AC_MAX_TEMP, mitsub.getTemp());
+  mitsub.setTemp(kMitsubishiAcMaxTemp + 1);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
 
   mitsub.setTemp(17);
   EXPECT_EQ(17, mitsub.getTemp());
@@ -555,60 +555,60 @@ TEST(TestMitsubishiACClass, OperatingMode) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setMode(MITSUBISHI_AC_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcAuto);
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_COOL);
-  EXPECT_EQ(MITSUBISHI_AC_COOL, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcCool);
+  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_HEAT);
-  EXPECT_EQ(MITSUBISHI_AC_HEAT, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcHeat);
+  EXPECT_EQ(kMitsubishiAcHeat, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_DRY);
-  EXPECT_EQ(MITSUBISHI_AC_DRY, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcDry);
+  EXPECT_EQ(kMitsubishiAcDry, mitsub.getMode());
 
-  mitsub.setMode(MITSUBISHI_AC_AUTO + 1);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  mitsub.setMode(kMitsubishiAcAuto + 1);
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 
   mitsub.setMode(255);
-  EXPECT_EQ(MITSUBISHI_AC_AUTO, mitsub.getMode());
+  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
 }
 
 TEST(TestMitsubishiACClass, VaneMode) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAuto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO + 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO + 1, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAuto + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE + 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
 
-  mitsub.setVane(MITSUBISHI_AC_VANE_AUTO_MOVE - 1);
-  EXPECT_EQ(MITSUBISHI_AC_VANE_AUTO_MOVE - 1, mitsub.getVane());
+  mitsub.setVane(kMitsubishiAcVaneAutoMove - 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, mitsub.getVane());
 }
 
 TEST(TestMitsubishiACClass, FanSpeed) {
   IRMitsubishiAC mitsub(0);
   mitsub.begin();
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_AUTO);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_AUTO, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanAuto);
+  EXPECT_EQ(kMitsubishiAcFanAuto, mitsub.getFan());
 
   mitsub.setFan(255);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_MAX);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanMax);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_MAX - 1);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_MAX - 1, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanMax - 1);
+  EXPECT_EQ(kMitsubishiAcFanMax - 1, mitsub.getFan());
 
   mitsub.setFan(1);
   EXPECT_EQ(1, mitsub.getFan());
@@ -622,11 +622,11 @@ TEST(TestMitsubishiACClass, FanSpeed) {
   mitsub.setFan(4);
   EXPECT_EQ(4, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_SILENT);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_SILENT, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanSilent);
+  EXPECT_EQ(kMitsubishiAcFanSilent, mitsub.getFan());
 
-  mitsub.setFan(MITSUBISHI_AC_FAN_SILENT + 1);
-  EXPECT_EQ(MITSUBISHI_AC_FAN_REAL_MAX, mitsub.getFan());
+  mitsub.setFan(kMitsubishiAcFanSilent + 1);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
 }
 
 TEST(TestMitsubishiACClass, MessageConstuction) {
@@ -636,14 +636,14 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   irsend.begin();
 
   mitsub.setFan(1);
-  mitsub.setMode(MITSUBISHI_AC_COOL);
+  mitsub.setMode(kMitsubishiAcCool);
   mitsub.setTemp(27);
   mitsub.setVane(3);
   mitsub.on();
 
   // Check everything for kicks.
   EXPECT_EQ(1, mitsub.getFan());
-  EXPECT_EQ(MITSUBISHI_AC_COOL, mitsub.getMode());
+  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
   EXPECT_EQ(27, mitsub.getTemp());
   EXPECT_EQ(3, mitsub.getVane());
   EXPECT_TRUE(mitsub.getPower());
@@ -1007,7 +1007,7 @@ TEST(TestSendMitsubishi2, Repeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendMitsubishi2(0xF82, MITSUBISHI_BITS, 0);
+  irsend.sendMitsubishi2(0xF82, kMitsubishiBits, 0);
   EXPECT_EQ(
       "m8400s4200"
       "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
@@ -1016,7 +1016,7 @@ TEST(TestSendMitsubishi2, Repeats) {
       "m560s28500", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendMitsubishi2(0xF82, MITSUBISHI_BITS, 2);
+  irsend.sendMitsubishi2(0xF82, kMitsubishiBits, 2);
   EXPECT_EQ(
     "m8400s4200"
     "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
@@ -1050,7 +1050,7 @@ TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xF82, irsend.capture.value);
   EXPECT_EQ(0xF, irsend.capture.address);
   EXPECT_EQ(0x82, irsend.capture.command);
@@ -1060,7 +1060,7 @@ TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -1070,7 +1070,7 @@ TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0x1234, irsend.capture.value);
   EXPECT_EQ(0x12, irsend.capture.address);
   EXPECT_EQ(0x34, irsend.capture.command);
@@ -1099,7 +1099,7 @@ TEST(TestDecodeMitsubishi2, DecodeRealExample) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MITSUBISHI2, irsend.capture.decode_type);
-  EXPECT_EQ(MITSUBISHI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kMitsubishiBits, irsend.capture.bits);
   EXPECT_EQ(0xF82, irsend.capture.value);
   EXPECT_EQ(0xF, irsend.capture.address);
   EXPECT_EQ(0x82, irsend.capture.command);

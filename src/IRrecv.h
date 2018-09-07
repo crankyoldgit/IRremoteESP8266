@@ -15,40 +15,43 @@
 #include "IRremoteESP8266.h"
 
 // Constants
-#define HEADER         2U  // Usual nr. of header entries.
-#define FOOTER         2U  // Usual nr. of footer (stop bits) entries.
-#define OFFSET_START   1U  // Usual rawbuf entry to start processing from.
+const uint16_t kHeader = 2;  // Usual nr. of header entries.
+const uint16_t kFooter = 2;  // Usual nr. of footer (stop bits) entries.
+const uint16_t kStartOffset = 1;  // Usual rawbuf entry to start from.
 #define MS_TO_USEC(x)  (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
-#define MARK_EXCESS   50U
-#define RAWBUF       100U  // Default length of raw capture buffer
-#define REPEAT UINT64_MAX
-#define UNKNOWN_THRESHOLD 6U  // Default min size of reported UNKNOWN messages.
+const uint16_t kMarkExcess = 50;
+const uint16_t kRawBuf = 100;  // Default length of raw capture buffer
+const uint64_t kRepeat = UINT64_MAX;
+// Default min size of reported UNKNOWN messages.
+const uint16_t kUnknownThreshold = 6;
+
 // receiver states
-#define STATE_IDLE     2U
-#define STATE_MARK     3U
-#define STATE_SPACE    4U
-#define STATE_STOP     5U
-#define TOLERANCE     25U  // default percent tolerance in measurements
-#define RAWTICK        2U  // Capture tick to uSec factor.
+const uint8_t kIdleState = 2;
+const uint8_t kMarkState = 3;
+const uint8_t kSpaceState = 4;
+const uint8_t kStopState = 5;
+const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
+const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
 // How long (ms) before we give up wait for more data?
-// Don't exceed MAX_TIMEOUT_MS without a good reason.
-// That is the capture buffers maximum value size. (UINT16_MAX / RAWTICK)
+// Don't exceed kMaxTimeoutMs without a good reason.
+// That is the capture buffers maximum value size. (UINT16_MAX / kRawTick)
 // Typically messages/protocols tend to repeat around the 100ms timeframe,
 // thus we should timeout before that to give us some time to try to decode
 // before we need to start capturing a possible new message.
 // Typically 15ms suits most applications. However, some protocols demand a
 // higher value. e.g. 90ms for XMP-1 and some aircon units.
-#define TIMEOUT_MS    15U  // In MilliSeconds.
-#define MAX_TIMEOUT_MS (RAWTICK * UINT16_MAX / MS_TO_USEC(1))
+const uint8_t kTimeoutMs = 15;  // In MilliSeconds.
+#define TIMEOUT_MS kTimeoutMs  // For legacy documentation.
+const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
-#define FNV_PRIME_32 16777619UL
-#define FNV_BASIS_32 2166136261UL
+const uint32_t kFnvPrime32 = 16777619UL;
+const uint32_t kFnvBasis32 = 2166136261UL;
 
 // Hitachi AC is the current largest state size.
-#define STATE_SIZE_MAX HITACHI_AC2_STATE_LENGTH
+const uint16_t kStateSizeMax = kHitachiAc2StateLength;
 
 // Types
 // information for the interrupt handler
@@ -88,7 +91,7 @@ class decode_results {
       uint32_t command;  // Decoded command.
     };
 #if DECODE_AC  // Only include state if we must. It's big.
-    uint8_t state[STATE_SIZE_MAX];  // Complex multi-byte A/C result.
+    uint8_t state[kStateSizeMax];  // Complex multi-byte A/C result.
 #endif
   };
   uint16_t bits;  // Number of bits in decoded value
@@ -101,8 +104,8 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
-  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = RAWBUF,
-                  uint8_t timeout = TIMEOUT_MS,
+  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = kRawBuf,
+                  uint8_t timeout = kTimeoutMs,
                   bool save_buffer = false);  // Constructor
   ~IRrecv();  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
@@ -114,13 +117,13 @@ class IRrecv {
   void setUnknownThreshold(uint16_t length);
 #endif
   static bool match(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
+                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
   static bool matchMark(uint32_t measured, uint32_t desired,
-                        uint8_t tolerance = TOLERANCE,
-                        int16_t excess = MARK_EXCESS);
+                        uint8_t tolerance = kTolerance,
+                        int16_t excess = kMarkExcess);
   static bool matchSpace(uint32_t measured, uint32_t desired,
-                         uint8_t tolerance = TOLERANCE,
-                         int16_t excess = MARK_EXCESS);
+                         uint8_t tolerance = kTolerance,
+                         int16_t excess = kMarkExcess);
 #ifndef UNIT_TEST
 
  private:
@@ -132,42 +135,42 @@ class IRrecv {
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
   int16_t compare(uint16_t oldval, uint16_t newval);
-  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = kTolerance,
                            uint16_t delta = 0);
-  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = TOLERANCE,
+  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = kTolerance,
                            uint16_t delta = 0);
   bool matchAtLeast(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = TOLERANCE, uint16_t delta = 0);
+                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
-                           const uint8_t tolerance = TOLERANCE);
+                           const uint8_t tolerance = kTolerance);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
-  bool decodeNEC(decode_results *results, uint16_t nbits = NEC_BITS,
+  bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
                  bool strict = true);
 #endif
 #if DECODE_SONY
-  bool decodeSony(decode_results *results, uint16_t nbits = SONY_MIN_BITS,
+  bool decodeSony(decode_results *results, uint16_t nbits = kSonyMinBits,
                   bool strict = false);
 #endif
 #if DECODE_SANYO
   // DISABLED due to poor quality.
   // bool decodeSanyo(decode_results *results,
-  //                  uint16_t nbits = SANYO_SA8650B_BITS,
+  //                  uint16_t nbits = kSanyoSA8650BBits,
   //                  bool strict = false);
   bool decodeSanyoLC7461(decode_results *results,
-                         uint16_t nbits = SANYO_LC7461_BITS,
+                         uint16_t nbits = kSanyoLC7461Bits,
                          bool strict = true);
 #endif
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results,
-                        uint16_t nbits = MITSUBISHI_BITS,
+                        uint16_t nbits = kMitsubishiBits,
                         bool strict = true);
 #endif
 #if DECODE_MITSUBISHI2
   bool decodeMitsubishi2(decode_results *results,
-                         uint16_t nbits = MITSUBISHI_BITS,
+                         uint16_t nbits = kMitsubishiBits,
                          bool strict = true);
 #endif
 #if DECODE_MITSUBISHI_AC
@@ -180,44 +183,44 @@ class IRrecv {
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
-                     uint16_t bitTime, uint8_t tolerance = TOLERANCE,
-                     int16_t excess = MARK_EXCESS, uint16_t delta = 0);
+                     uint16_t bitTime, uint8_t tolerance = kTolerance,
+                     int16_t excess = kMarkExcess, uint16_t delta = 0);
 #endif
 #if DECODE_RC5
-  bool decodeRC5(decode_results *results, uint16_t nbits = RC5X_BITS,
+  bool decodeRC5(decode_results *results, uint16_t nbits = kRC5XBits,
                  bool strict = true);
 #endif
 #if DECODE_RC6
-  bool decodeRC6(decode_results *results, uint16_t nbits = RC6_MODE0_BITS,
+  bool decodeRC6(decode_results *results, uint16_t nbits = kRC6Mode0Bits,
                  bool strict = false);
 #endif
 #if DECODE_RCMM
-  bool decodeRCMM(decode_results *results, uint16_t nbits = RCMM_BITS,
+  bool decodeRCMM(decode_results *results, uint16_t nbits = kRCMMBits,
                   bool strict = false);
 #endif
 #if (DECODE_PANASONIC || DECODE_DENON)
-  bool decodePanasonic(decode_results *results, uint16_t nbits = PANASONIC_BITS,
+  bool decodePanasonic(decode_results *results, uint16_t nbits = kPanasonicBits,
                        bool strict = false,
-                       uint32_t manufacturer = PANASONIC_MANUFACTURER);
+                       uint32_t manufacturer = kPanasonicManufacturer);
 #endif
 #if DECODE_LG
-  bool decodeLG(decode_results *results, uint16_t nbits = LG_BITS,
+  bool decodeLG(decode_results *results, uint16_t nbits = kLgBits,
                 bool strict = false);
 #endif
 #if DECODE_JVC
-  bool decodeJVC(decode_results *results, uint16_t nbits = JVC_BITS,
+  bool decodeJVC(decode_results *results, uint16_t nbits = kJvcBits,
                  bool strict = true);
 #endif
 #if DECODE_SAMSUNG
-  bool decodeSAMSUNG(decode_results *results, uint16_t nbits = SAMSUNG_BITS,
+  bool decodeSAMSUNG(decode_results *results, uint16_t nbits = kSamsungBits,
                      bool strict = true);
 #endif
 #if DECODE_WHYNTER
-  bool decodeWhynter(decode_results *results, uint16_t nbits = WHYNTER_BITS,
+  bool decodeWhynter(decode_results *results, uint16_t nbits = kWhynterBits,
                      bool strict = true);
 #endif
 #if DECODE_COOLIX
-  bool decodeCOOLIX(decode_results *results, uint16_t nbits = COOLIX_BITS,
+  bool decodeCOOLIX(decode_results *results, uint16_t nbits = kCoolixBits,
                     bool strict = true);
 #endif
 #if DECODE_DENON
@@ -225,80 +228,80 @@ class IRrecv {
                    bool strict = true);
 #endif
 #if DECODE_DISH
-  bool decodeDISH(decode_results *results, uint16_t nbits = DISH_BITS,
+  bool decodeDISH(decode_results *results, uint16_t nbits = kDishBits,
                   bool strict = true);
 #endif
 #if (DECODE_SHARP || DECODE_DENON)
-  bool decodeSharp(decode_results *results, uint16_t nbits = SHARP_BITS,
+  bool decodeSharp(decode_results *results, uint16_t nbits = kSharpBits,
                    bool strict = true, bool expansion = true);
 #endif
 #if DECODE_AIWA_RC_T501
   bool decodeAiwaRCT501(decode_results *results,
-                        uint16_t nbits = AIWA_RC_T501_BITS, bool strict = true);
+                        uint16_t nbits = kAiwaRcT501Bits, bool strict = true);
 #endif
 #if DECODE_NIKAI
-  bool decodeNikai(decode_results *results, uint16_t nbits = NIKAI_BITS,
+  bool decodeNikai(decode_results *results, uint16_t nbits = kNikaiBits,
                    bool strict = true);
 #endif
 #if DECODE_MAGIQUEST
-  bool decodeMagiQuest(decode_results *results, uint16_t nbits = MAGIQUEST_BITS,
+  bool decodeMagiQuest(decode_results *results, uint16_t nbits = kMagiquestBits,
                        bool strict = true);
 #endif
 #if DECODE_KELVINATOR
   bool decodeKelvinator(decode_results *results,
-                        uint16_t nbits = KELVINATOR_BITS,
+                        uint16_t nbits = kKelvinatorBits,
                         bool strict = true);
 #endif
 #if DECODE_DAIKIN
-  bool decodeDaikin(decode_results *results, uint16_t nbits = DAIKIN_RAW_BITS,
+  bool decodeDaikin(decode_results *results, uint16_t nbits = kDaikinRawBits,
                     bool strict = true);
 #endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
-                       uint16_t nbytes = TOSHIBA_AC_BITS,
+                       uint16_t nbytes = kToshibaACBits,
                        bool strict = true);
 #endif
 #if DECODE_MIDEA
-  bool decodeMidea(decode_results *results, uint16_t nbits = MIDEA_BITS,
+  bool decodeMidea(decode_results *results, uint16_t nbits = kMideaBits,
                    bool strict = true);
 #endif
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results,
-                       uint16_t nbits = FUJITSU_AC_BITS,
+                       uint16_t nbits = kFujitsuAcBits,
                        bool strict = false);
 #endif
 #if DECODE_LASERTAG
-  bool decodeLasertag(decode_results *results, uint16_t nbits = LASERTAG_BITS,
+  bool decodeLasertag(decode_results *results, uint16_t nbits = kLasertagBits,
                       bool strict = true);
 #endif
 #if DECODE_CARRIER_AC
   bool decodeCarrierAC(decode_results *results,
-                       uint16_t nbits = CARRIER_AC_BITS,
+                       uint16_t nbits = kCarrierAcBits,
                        bool strict = true);
 #endif
 #if DECODE_GREE
   bool decodeGree(decode_results *results,
-                  uint16_t nbits = GREE_BITS, bool strict = true);
+                  uint16_t nbits = kGreeBits, bool strict = true);
 #endif
 #if (DECODE_HAIER_AC | DECODE_HAIER_AC_YRW02)
   bool decodeHaierAC(decode_results *results,
-                   uint16_t nbits = HAIER_AC_BITS, bool strict = true);
+                   uint16_t nbits = kHaierACBits, bool strict = true);
 #endif
 #if DECODE_HAIER_AC_YRW02
   bool decodeHaierACYRW02(decode_results *results,
-                          uint16_t nbits = HAIER_AC_YRW02_BITS,
+                          uint16_t nbits = kHaierACYRW02Bits,
                           bool strict = true);
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
   bool decodeHitachiAC(decode_results *results,
-                       uint16_t nbits = HITACHI_AC_BITS, bool strict = true);
+                       uint16_t nbits = kHitachiAcBits, bool strict = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results,
-                        uint16_t nbits = HITACHI_AC1_BITS, bool strict = true);
+                        uint16_t nbits = kHitachiAc1Bits, bool strict = true);
 #endif
 #if DECODE_GICABLE
-  bool decodeGICable(decode_results *results, uint16_t nbits = GICABLE_BITS,
+  bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,
                      bool strict = true);
 #endif
 };
