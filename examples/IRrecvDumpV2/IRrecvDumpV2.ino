@@ -216,19 +216,17 @@ void loop() {
     yield();  // Feed the WDT as the text output can take a while to print.
 
     // Display the library version the message was captured with.
-    if (results.decode_type == UNKNOWN){
-      Serial.print("Library   : v");
-      Serial.println(_IRREMOTEESP8266_VERSION_);
-      Serial.println();
+    Serial.print("Library   : v");
+    Serial.println(_IRREMOTEESP8266_VERSION_);
+    Serial.println();
 
-      // Output RAW timing info of the result.
-      Serial.println(resultToTimingInfo(&results));
-      yield();  // Feed the WDT (again)
+    // Output RAW timing info of the result.
+    Serial.println(resultToTimingInfo(&results));
+    yield();  // Feed the WDT (again)
 
-      // Output the results as source code
-      Serial.println(resultToSourceCode(&results));
-      Serial.println("");  // Blank line between entries
-      yield();  // Feed the WDT (again)
-    }
+    // Output the results as source code
+    Serial.println(resultToSourceCode(&results));
+    Serial.println("");  // Blank line between entries
+    yield();  // Feed the WDT (again)
   }
 }
