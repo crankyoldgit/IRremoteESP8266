@@ -115,7 +115,7 @@
 #define DECODE_KELVINATOR      true
 #define SEND_KELVINATOR        true
 
-#define DECODE_MITSUBISHI_AC   true  // Under construction.
+#define DECODE_MITSUBISHI_AC   true  // Beta.
 #define SEND_MITSUBISHI_AC     true
 
 #define DECODE_FUJITSU_AC      true

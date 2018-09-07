@@ -88,6 +88,54 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 }
 #endif   // SEND_MITSUBISHI
 
+#if DECODE_MITSUBISHI_AC
+// Decode a byte from the marks and spaces.
+//
+// Args:
+//   resultByte:  the pointer for the result.
+//   data_ptr:    pointer for the input.
+//   mark:        desired length of the mark.
+//   onespace:    desired length of the space for 1.
+//   zerospace:   desired length os the space for 0.
+//   MSBFirst:    most significant bit first? (default false).
+//
+// Status: DEAT / Appears to be working.
+//
+bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
+                           const uint16_t mark, const uint32_t onespace,
+                           const uint32_t zerospace, bool MSBFirst) {
+  *resultByte = 0;
+  uint8_t pos = 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    if (!matchMark(*(data_ptr+(i*2)), mark)) {
+      DPRINT("Mark match failed at ");
+      DPRINT((uint16_t)i);
+      DPRINT(" (");
+      DPRINT((uint16_t)*(data_ptr+(i*2)));
+      DPRINTLN(")");
+      return false;
+    }
+    if (MSBFirst)
+      pos = 7-i;
+    else
+      pos = i;
+    if (matchSpace(*(data_ptr+(i*2)+1), onespace)) {
+      *resultByte|=1 << pos;
+    } else {
+      if (!matchSpace(*(data_ptr+(i*2)+1), zerospace)) {
+        DPRINT("Space match failed at ");
+        DPRINT((uint16_t)i);
+        DPRINT(" (");
+        DPRINT((uint16_t)*(data_ptr+(i*2)+1));
+        DPRINTLN(")");
+        return false;
+      }
+    }
+  }
+  return true;
+}
+#endif   // DECODE_MITSUBISHI_AC
+
 #if DECODE_MITSUBISHI
 // Decode the supplied Mitsubishi message.
 //
@@ -295,51 +343,6 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_MITSUBISHI_AC
 
-// Decode a byte from the marks and spaces.
-//
-// Args:
-//   resultByte:  the pointer for the result.
-//   data_ptr:    pointer for the input.
-//   mark:        desired length of the mark.
-//   onespace:    desired length of the space for 1.
-//   zerospace:   desired length os the space for 0.
-//   MSBFirst:    most significant bit first? (default false).
-//
-// Status: DEAT / Appears to be working.
-//
-bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
-                           const uint16_t mark, const uint32_t onespace,
-                           const uint32_t zerospace, bool MSBFirst) {
-  *resultByte = 0;
-  uint8_t pos = 0;
-  for (uint8_t i = 0; i < 8; i++) {
-    if (!matchMark(*(data_ptr+(i*2)), mark)) {
-      DPRINT("Mark match failed at ");
-      DPRINT((uint16_t)i);
-      DPRINT(" (");
-      DPRINT((uint16_t)*(data_ptr+(i*2)));
-      DPRINTLN(")");
-      return false;
-    }
-    if (MSBFirst)
-      pos = 7-i;
-    else
-      pos = i;
-    if (matchSpace(*(data_ptr+(i*2)+1), onespace)) {
-      *resultByte|=1 << pos;
-    } else {
-      if (!matchSpace(*(data_ptr+(i*2)+1), zerospace)) {
-        DPRINT("Space match failed at ");
-        DPRINT((uint16_t)i);
-        DPRINT(" (");
-        DPRINT((uint16_t)*(data_ptr+(i*2)+1));
-        DPRINTLN(")");
-        return false;
-      }
-    }
-  }
-  return true;
-}
 #if DECODE_MITSUBISHI_AC
 // Decode the supplied Mitsubishi message.
 //
@@ -521,7 +524,7 @@ uint8_t* IRMitsubishiAC::getRaw() {
 }
 
 void IRMitsubishiAC::setRaw(uint8_t* data) {
-  for (int i = 0; i < 17; i++) {
+  for (uint8_t i = 0; i < (MITSUBISHI_AC_STATE_LENGTH-1); i++) {
     remote_state[i] = data[i];
   }
   checksum();
