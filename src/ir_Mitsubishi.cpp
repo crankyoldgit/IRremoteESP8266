@@ -87,54 +87,6 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 }
 #endif   // SEND_MITSUBISHI
 
-#if DECODE_MITSUBISHI_AC
-// Decode a byte from the marks and spaces.
-//
-// Args:
-//   resultByte:  the pointer for the result.
-//   data_ptr:    pointer for the input.
-//   mark:        desired length of the mark.
-//   onespace:    desired length of the space for 1.
-//   zerospace:   desired length os the space for 0.
-//   MSBFirst:    most significant bit first? (default false).
-//
-// Status: DEAT / Appears to be working.
-//
-bool IRrecv::matchByte(uint8_t *resultByte, volatile uint16_t *data_ptr,
-                           const uint16_t mark, const uint32_t onespace,
-                           const uint32_t zerospace, bool MSBFirst) {
-  *resultByte = 0;
-  uint8_t pos = 0;
-  for (uint8_t i = 0; i < 8; i++) {
-    if (!matchMark(*(data_ptr+(i*2)), mark)) {
-      DPRINT("Mark match failed at ");
-      DPRINT((uint16_t)i);
-      DPRINT(" (");
-      DPRINT((uint16_t)*(data_ptr+(i*2)));
-      DPRINTLN(")");
-      return false;
-    }
-    if (MSBFirst)
-      pos = 7-i;
-    else
-      pos = i;
-    if (matchSpace(*(data_ptr+(i*2)+1), onespace)) {
-      *resultByte|=1 << pos;
-    } else {
-      if (!matchSpace(*(data_ptr+(i*2)+1), zerospace)) {
-        DPRINT("Space match failed at ");
-        DPRINT((uint16_t)i);
-        DPRINT(" (");
-        DPRINT((uint16_t)*(data_ptr+(i*2)+1));
-        DPRINTLN(")");
-        return false;
-      }
-    }
-  }
-  return true;
-}
-#endif   // DECODE_MITSUBISHI_AC
-
 #if DECODE_MITSUBISHI
 // Decode the supplied Mitsubishi message.
 //
@@ -387,16 +339,20 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
       failure = true;
     }
 // Decode byte-by-byte:
+    match_result_t data_result;
     for (uint8_t i = 0; i < kMitsubishiACStateLength && !failure; i++) {
       results->state[i] = 0;
-      if (!matchByte(&results->state[i], &(results->rawbuf[offset]),
-          kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
-          kMitsubishiAcZeroSpace)) {
+      data_result = matchData(&(results->rawbuf[offset]), 8,
+                              kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+                              kMitsubishiAcBitMark, kMitsubishiAcZeroSpace,
+                              kTolerance, kMarkExcess, false);
+      if (data_result.success == false) {
+        failure = true;
         DPRINT("Byte decode failed at #");
         DPRINTLN((uint16_t)i);
-        failure = true;
       } else {
-        offset+=16;  // 8 marks + 8 spaces
+        results->state[i] = data_result.data;
+        offset += data_result.used;
         DPRINT((uint16_t)results->state[i]);
         DPRINT(",");
       }
@@ -413,7 +369,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
 
 // FOOTER checksum:
       if (IRMitsubishiAC::calculateChecksum(results->state) !=
-          results->state[17]) {
+          results->state[kMitsubishiACStateLength - 1]) {
         DPRINTLN("Checksum error.");
         failure = true;
       }
@@ -421,7 +377,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     if (rep != kMitsubishiACMinRepeat && failure) {
       bool repeatMarkFound = false;
       while (!repeatMarkFound && offset <
-          (results->rawlen  - (kMitsubishiACStateLength * 8 * 2 + 4))) {
+          (results->rawlen  - (kMitsubishiACBits * 2 + 4))) {
         repeatMarkFound = matchMark(results->rawbuf[offset++],
             kMitsubishiAcRptMark) &&
             matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace);
@@ -448,15 +404,17 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
         return false;
       }
 // Payload:
-      uint8_t data;
       for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
-        if (!matchByte(&data, &(results->rawbuf[offset]),
-            kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
-            kMitsubishiAcZeroSpace) || data != results->state[i]) {
+        data_result = matchData(&(results->rawbuf[offset]), 8,
+                                kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+                                kMitsubishiAcBitMark, kMitsubishiAcZeroSpace,
+                                kTolerance, kMarkExcess, false);
+        if (data_result.success == false ||
+            data_result.data != results->state[i]) {
           DPRINTLN("Repeat payload error.");
           return false;
         }
-        offset+=16;  // 8 marks + 8 spaces
+        offset += data_result.used;
       }
     }  // strict repeat check
   } while (failure && rep <= kMitsubishiACMinRepeat);
