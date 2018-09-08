@@ -144,7 +144,9 @@ class IRrecv {
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
-                           const uint8_t tolerance = kTolerance);
+                           const uint8_t tolerance = kTolerance,
+                           const int16_t excess = kMarkExcess,
+                           const bool MSBfirst = true);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
