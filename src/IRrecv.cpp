@@ -730,10 +730,9 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
     if (matchMark(*data_ptr, onemark, tolerance, excess) &&
         matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
       result.data = (result.data << 1) | 1;
-    }  // or is the bit a '0'?
-    else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
-             matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
-      result.data <<= 1;
+    } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
+               matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
+      result.data <<= 1;   // The bit is a '0'.
     } else {
       if (!MSBfirst)
         result.data = reverseBits(result.data, result.used / 2);
