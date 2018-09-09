@@ -493,6 +493,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeHitachiAC(results, kHitachiAc1Bits))
     return true;
 #endif
+#if DECODE_WHIRLPOOL_AC
+  DPRINTLN("Attempting Whirlpool AC decode");
+  if (decodeWhirlpoolAC(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

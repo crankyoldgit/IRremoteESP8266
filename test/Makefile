@@ -34,7 +34,8 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
         ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
         ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
-				ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test
+				ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test \
+				ir_Whirlpool_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -77,7 +78,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 		ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
 		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
 		ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
-		ir_Hitachi.o ir_GICable.o
+		ir_Hitachi.o ir_GICable.o ir_Whirlpool.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
@@ -426,4 +427,13 @@ ir_GICable_test.o : ir_GICable_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_GICable_test.cpp
 
 ir_GICable_test : $(COMMON_OBJ) ir_GICable_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Whirlpool.o : $(USER_DIR)/ir_Whirlpool.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Whirlpool.cpp
+
+ir_Whirlpool_test.o : ir_Whirlpool_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Whirlpool_test.cpp
+
+ir_Whirlpool_test : $(COMMON_OBJ) ir_Whirlpool_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

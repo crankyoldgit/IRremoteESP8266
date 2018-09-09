@@ -303,6 +303,10 @@ class IRrecv {
   bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,
                      bool strict = true);
 #endif
+#if DECODE_WHIRLPOOL_AC
+  bool decodeWhirlpoolAC(decode_results *results,
+                         uint16_t nbits = kWhirlpoolAcBits, bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

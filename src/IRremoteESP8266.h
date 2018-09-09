@@ -178,10 +178,14 @@
 #define DECODE_HAIER_AC_YRW02  true
 #define SEND_HAIER_AC_YRW02    true
 
+#define DECODE_WHIRLPOOL_AC    true
+#define SEND_WHIRLPOOL_AC      true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
-     DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02)
+     DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
+     DECODE_WHIRLPOOL_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -244,7 +248,8 @@ enum decode_type_t {
   HITACHI_AC1,
   HITACHI_AC2,
   GICABLE,
-  HAIER_AC_YRW02
+  HAIER_AC_YRW02,
+  WHIRLPOOL_AC
 };
 
 // Message lengths & required repeat values
@@ -318,10 +323,10 @@ const uint16_t kSanyoLC7461AddressBits = 13;
 const uint16_t kSanyoLC7461CommandBits = 8;
 const uint16_t kSanyoLC7461Bits = (kSanyoLC7461AddressBits +
                                    kSanyoLC7461CommandBits) * 2;
-const uint8_t kSharpAddressBits = 5;
-const uint8_t kSharpCommandBits = 8;
+const uint8_t  kSharpAddressBits = 5;
+const uint8_t  kSharpCommandBits = 8;
 const uint16_t kSharpBits = kSharpAddressBits + kSharpCommandBits + 2;  // 15
-const uint8_t kSherwoodBits = kNECBits;
+const uint8_t  kSherwoodBits = kNECBits;
 const uint16_t kSherwoodMinRepeat = kSingleRepeat;
 const uint16_t kSony12Bits = 12;
 const uint16_t kSony15Bits = 15;
@@ -332,6 +337,8 @@ const uint16_t kToshibaACStateLength = 9;
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
 const uint16_t kTrotecStateLength = 9;
+const uint16_t kWhirlpoolAcStateLength = 21;
+const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhynterBits = 32;
 
 // Legacy defines. (Deprecated)
