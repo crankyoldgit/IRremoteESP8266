@@ -31,6 +31,7 @@
 #include <ir_Gree.h>
 #include <ir_Haier.h>
 #include <ir_Kelvinator.h>
+#include <ir_Mitsubishi.h>
 #include <ir_Midea.h>
 #include <ir_Toshiba.h>
 #endif  // DECODE_AC
@@ -132,6 +133,15 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_KELVINATOR
+#if DECODE_MITSUBISHI_AC
+  if (results->decode_type == MITSUBISHI_AC) {
+    IRMitsubishiAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  } else {
+    Serial.println("Not Mitsu AC.");
+  }
+#endif  // DECODE_MITSUBISHI_AC
 #if DECODE_TOSHIBA_AC
   if (results->decode_type == TOSHIBA_AC) {
     IRToshibaAC ac(0);

@@ -40,3 +40,6 @@ tools/gc_decode
 .piolibdeps
 .clang_complete
 .gcc-flags.json
+
+#Cygwin builds
+*.exe

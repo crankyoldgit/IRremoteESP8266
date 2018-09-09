@@ -14,6 +14,7 @@ extern "C" {
 #endif
 #include <algorithm>
 #include "IRremoteESP8266.h"
+#include "IRutils.h"
 
 #ifdef UNIT_TEST
 #undef ICACHE_RAM_ATTR
@@ -307,6 +308,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_MITSUBISHI
   DPRINTLN("Attempting Mitsubishi decode");
   if (decodeMitsubishi(results))
+    return true;
+#endif
+#if DECODE_MITSUBISHI_AC
+  DPRINTLN("Attempting Mitsubishi AC decode");
+  if (decodeMitsubishiAC(results))
     return true;
 #endif
 #if DECODE_MITSUBISHI2
@@ -689,7 +695,8 @@ bool IRrecv::decodeHash(decode_results *results) {
 #endif  // DECODE_HASH
 
 // Match & decode the typical data section of an IR message.
-// The data value constructed as the Most Significant Bit first.
+// The data value is stored in the least significant bits reguardless of the
+// bit ordering requested.
 //
 // Args:
 //   data_ptr: A pointer to where we are at in the capture buffer.
@@ -698,16 +705,21 @@ bool IRrecv::decodeHash(decode_results *results) {
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow.
+//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
 //  A match_result_t structure containing the success (or not), the data value,
 //  and how many buffer entries were used.
 match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
-                                 const uint16_t nbits, const uint16_t onemark,
+                                 const uint16_t nbits,
+                                 const uint16_t onemark,
                                  const uint32_t onespace,
                                  const uint16_t zeromark,
                                  const uint32_t zerospace,
-                                 const uint8_t tolerance) {
+                                 const uint8_t tolerance,
+                                 const int16_t excess,
+                                 const bool MSBfirst) {
   match_result_t result;
   result.success = false;  // Fail by default.
   result.data = 0;
@@ -715,17 +727,21 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
        result.used < nbits * 2;
        result.used += 2, data_ptr += 2) {
     // Is the bit a '1'?
-    if (matchMark(*data_ptr, onemark, tolerance) &&
-        matchSpace(*(data_ptr + 1), onespace, tolerance))
+    if (matchMark(*data_ptr, onemark, tolerance, excess) &&
+        matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
       result.data = (result.data << 1) | 1;
-    // or is the bit a '0'?
-    else if (matchMark(*data_ptr, zeromark, tolerance) &&
-             matchSpace(*(data_ptr + 1), zerospace, tolerance))
-      result.data <<= 1;
-    else
+    } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
+               matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
+      result.data <<= 1;   // The bit is a '0'.
+    } else {
+      if (!MSBfirst)
+        result.data = reverseBits(result.data, result.used / 2);
       return result;  // It's neither, so fail.
+    }
   }
   result.success = true;
+  if (!MSBfirst)
+    result.data = reverseBits(result.data, nbits);
   return result;
 }
 

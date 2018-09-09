@@ -1,8 +1,12 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017 David Conran
+// Copyright 2017-2018 David Conran
+// Copyright 2018 denxhun
 
 #include "ir_Mitsubishi.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
@@ -292,6 +296,135 @@ void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_MITSUBISHI_AC
 
+#if DECODE_MITSUBISHI_AC
+// Decode the supplied Mitsubishi message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Under development
+//
+// Ref: https://www.analysir.com/blog/2015/01/06/reverse-engineering-mitsubishi-ac-infrared-protocol/
+bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
+                              bool strict) {
+  if (results->rawlen < ((kMitsubishiACBits * 2) + 2)) {
+    DPRINTLN("Shorter than shortest possibly expected.");
+    return false;  // Shorter than shortest possibly expected.
+  }
+  if (strict && nbits != kMitsubishiACBits) {
+    DPRINTLN("Request is out of spec.");
+    return false;  // Request is out of spec.
+  }
+  uint16_t offset = kStartOffset;
+  for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
+    results->state[i] = 0;
+  }
+  bool failure = false;
+  uint8_t rep = 0;
+  do {
+    failure = false;
+// Header:
+//  Somtime happens that junk signals arrives before the real message
+    bool headerFound = false;
+    while (!headerFound && offset <
+        (results->rawlen - (kMitsubishiACBits * 2 + 2))) {
+      headerFound = matchMark(results->rawbuf[offset++], kMitsubishiAcHdrMark)
+          && matchSpace(results->rawbuf[offset++], kMitsubishiAcHdrSpace);
+    }
+    if (!headerFound) {
+      DPRINTLN("Header mark not found.");
+      failure = true;
+    }
+// Decode byte-by-byte:
+    match_result_t data_result;
+    for (uint8_t i = 0; i < kMitsubishiACStateLength && !failure; i++) {
+      results->state[i] = 0;
+      data_result = matchData(&(results->rawbuf[offset]), 8,
+                              kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+                              kMitsubishiAcBitMark, kMitsubishiAcZeroSpace,
+                              kTolerance, kMarkExcess, false);
+      if (data_result.success == false) {
+        failure = true;
+        DPRINT("Byte decode failed at #");
+        DPRINTLN((uint16_t)i);
+      } else {
+        results->state[i] = data_result.data;
+        offset += data_result.used;
+        DPRINT((uint16_t)results->state[i]);
+        DPRINT(",");
+      }
+      DPRINTLN("");
+    }
+// HEADER validation:
+    if (failure || results->state[0] != 0x23 || results->state[1] != 0xCB ||
+        results->state[2] != 0x26 || results->state[3] != 0x01 ||
+        results->state[4] != 0x00) {
+      DPRINTLN("Header mismatch.");
+      failure = true;
+    } else {
+// DATA part:
+
+// FOOTER checksum:
+      if (IRMitsubishiAC::calculateChecksum(results->state) !=
+          results->state[kMitsubishiACStateLength - 1]) {
+        DPRINTLN("Checksum error.");
+        failure = true;
+      }
+    }
+    if (rep != kMitsubishiACMinRepeat && failure) {
+      bool repeatMarkFound = false;
+      while (!repeatMarkFound && offset <
+          (results->rawlen  - (kMitsubishiACBits * 2 + 4))) {
+        repeatMarkFound = matchMark(results->rawbuf[offset++],
+            kMitsubishiAcRptMark) &&
+            matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace);
+      }
+      if (!repeatMarkFound) {
+        DPRINTLN("First attempt failure and repeat mark not found.");
+        return false;
+      }
+    }
+    rep++;
+// Check if the repeat is correct if we need strict decode:
+    if (strict && !failure) {
+      DPRINTLN("Strict repeat check enabled.");
+// Repeat mark and space:
+      if (!matchMark(results->rawbuf[offset++], kMitsubishiAcRptMark) ||
+          !matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace)) {
+      DPRINTLN("Repeat mark error.");
+      return false;
+    }
+// Header mark and space:
+      if (!matchMark(results->rawbuf[offset++], kMitsubishiAcHdrMark) ||
+          !matchSpace(results->rawbuf[offset++], kMitsubishiAcHdrSpace)) {
+        DPRINTLN("Repeat header error.");
+        return false;
+      }
+// Payload:
+      for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
+        data_result = matchData(&(results->rawbuf[offset]), 8,
+                                kMitsubishiAcBitMark, kMitsubishiAcOneSpace,
+                                kMitsubishiAcBitMark, kMitsubishiAcZeroSpace,
+                                kTolerance, kMarkExcess, false);
+        if (data_result.success == false ||
+            data_result.data != results->state[i]) {
+          DPRINTLN("Repeat payload error.");
+          return false;
+        }
+        offset += data_result.used;
+      }
+    }  // strict repeat check
+  } while (failure && rep <= kMitsubishiACMinRepeat);
+  results->decode_type = MITSUBISHI_AC;
+  results->bits = kMitsubishiACStateLength * 8;
+  return true;
+}
+#endif  // DECODE_MITSUBISHI_AC
+
 // Code to emulate Mitsubishi A/C IR remote control unit.
 // Inspired and derived from the work done at:
 //   https://github.com/r45635/HVAC-IR-Control
@@ -350,14 +483,25 @@ uint8_t* IRMitsubishiAC::getRaw() {
   return remote_state;
 }
 
+void IRMitsubishiAC::setRaw(uint8_t* data) {
+  for (uint8_t i = 0; i < (kMitsubishiACStateLength-1); i++) {
+    remote_state[i] = data[i];
+  }
+  checksum();
+}
+
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishiAC::checksum() {
+  remote_state[17] = calculateChecksum(remote_state);
+}
+
+uint8_t IRMitsubishiAC::calculateChecksum(uint8_t *data) {
   uint8_t sum = 0;
   // Checksum is simple addition of all previous bytes stored
   // as an 8 bit value.
   for (uint8_t i = 0; i < 17; i++)
-    sum += remote_state[i];
-  remote_state[17] = sum & 0xFFU;
+    sum += data[i];
+  return sum & 0xFFU;
 }
 
 // Set the requested power state of the A/C to off.
@@ -430,11 +574,21 @@ uint8_t IRMitsubishiAC::getMode() {
 void IRMitsubishiAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case kMitsubishiAcAuto: break;
-    case kMitsubishiAcCool: break;
-    case kMitsubishiAcDry: break;
-    case kMitsubishiAcHeat: break;
-    default: mode = kMitsubishiAcAuto;
+    case kMitsubishiAcAuto:
+      remote_state[8] = 0b00110000;
+      break;
+    case kMitsubishiAcCool:
+      remote_state[8] = 0b00110110;
+      break;
+    case kMitsubishiAcDry:
+      remote_state[8] = 0b00110010;
+      break;
+    case kMitsubishiAcHeat:
+      remote_state[8] = 0b00110000;
+      break;
+    default:
+      mode = kMitsubishiAcAuto;
+      remote_state[8] = 0b00110000;
   }
   remote_state[6] = mode;
 }
@@ -451,4 +605,148 @@ void IRMitsubishiAC::setVane(uint8_t mode) {
 // Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getVane() {
   return ((remote_state[9] & 0b00111000) >> 3);
+}
+
+// Return the clock setting of the message. 1=1/6 hour. e.g. 4pm = 48
+uint8_t IRMitsubishiAC::getClock() {
+  return remote_state[10];
+}
+
+// Set the current time. 1 = 1/6 hour. e.g. 6am = 36.
+void IRMitsubishiAC::setClock(uint8_t clock) {
+  remote_state[10] =  clock;
+}
+
+// Return the desired start time. 1 = 1/6 hour. e.g. 1am = 6
+uint8_t IRMitsubishiAC::getStartClock() {
+  return remote_state[12];
+}
+
+// Set the desired start tiem of the AC.  1 = 1/6 hour. e.g. 8pm = 120
+void IRMitsubishiAC::setStartClock(uint8_t clock) {
+  remote_state[12] = clock;
+}
+
+// Return the desired stop time of the AC. 1 = 1/6 hour. e.g 10pm = 132
+uint8_t IRMitsubishiAC::getStopClock() {
+  return remote_state[11];
+}
+
+// Set the desired stop time of the AC. 1 = 1/6 hour. e.g 10pm = 132
+void IRMitsubishiAC::setStopClock(uint8_t clock) {
+  remote_state[11] = clock;
+}
+
+// Return the timer setting. Possible values: kMitsubishiAcNoTimer,
+//  kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
+//  kMitsubishiAcStartStopTimer
+uint8_t IRMitsubishiAC::getTimer() {
+  return remote_state[13] & 0b111;
+}
+
+// Set the timer setting. Possible values: kMitsubishiAcNoTimer,
+//  kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
+//  kMitsubishiAcStartStopTimer
+void IRMitsubishiAC::setTimer(uint8_t timer) {
+  remote_state[13] = timer & 0b111;
+}
+
+#ifdef ARDUINO
+String IRMitsubishiAC::timeToString(uint64_t time) {
+  String result = "";
+#else
+std::string IRMitsubishiAC::timeToString(uint64_t time) {
+  std::string result = "";
+#endif  // ARDUINO
+  if (time/6 < 10)
+    result += "0";
+  result += uint64ToString(time/6);
+  result += ":";
+  if (time*10%60 < 10)
+    result += "0";
+  result += uint64ToString(time*10%60);
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRMitsubishiAC::toString() {
+  String result = "";
+#else
+std::string IRMitsubishiAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  switch (getMode()) {
+    case MITSUBISHI_AC_AUTO:
+      result += " (AUTO)";
+      break;
+    case MITSUBISHI_AC_COOL:
+      result += " (COOL)";
+      break;
+    case MITSUBISHI_AC_DRY:
+      result += " (DRY)";
+      break;
+    case MITSUBISHI_AC_HEAT:
+      result += " (HEAT)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", FAN: ";
+  switch (getFan()) {
+    case MITSUBISHI_AC_FAN_AUTO:
+      result += "AUTO";
+      break;
+    case MITSUBISHI_AC_FAN_MAX:
+      result += "MAX";
+      break;
+    case MITSUBISHI_AC_FAN_SILENT:
+      result += "SILENT";
+      break;
+    default:
+      result += uint64ToString(getFan());
+  }
+  result += ", VANE: ";
+  switch (getVane()) {
+    case MITSUBISHI_AC_VANE_AUTO:
+      result += "AUTO";
+      break;
+    case MITSUBISHI_AC_VANE_AUTO_MOVE:
+      result += "AUTO MOVE";
+      break;
+    default:
+        result += uint64ToString(getVane());
+  }
+  result += ", Time: ";
+  result += timeToString(getClock());
+  result += ", On timer: ";
+  result += timeToString(getStartClock());
+  result += ", Off timer: ";
+  result += timeToString(getStopClock());
+  result += ", Timer: ";
+  switch (getTimer()) {
+    case kMitsubishiAcNoTimer:
+      result += "-";
+      break;
+    case kMitsubishiAcStartTimer:
+      result += "Start";
+      break;
+    case kMitsubishiAcStopTimer:
+      result += "Stop";
+      break;
+    case kMitsubishiAcStartStopTimer:
+      result += "Start+Stop";
+      break;
+    default:
+      result += "? (";
+      result += getTimer();
+      result += ")\n";
+  }
+  return result;
 }
