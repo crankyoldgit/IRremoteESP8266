@@ -2,6 +2,10 @@
 // Copyright 2017 David Conran
 
 #include "ir_Coolix.h"
+#include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
