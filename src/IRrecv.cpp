@@ -498,6 +498,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeWhirlpoolAC(results))
     return true;
 #endif
+#if DECODE_SAMSUNG_AC
+  DPRINTLN("Attempting Samsung AC decode");
+  if (decodeSamsungAC(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

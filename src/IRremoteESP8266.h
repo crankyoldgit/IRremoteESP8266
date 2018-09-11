@@ -85,6 +85,9 @@
 #define DECODE_SAMSUNG         true
 #define SEND_SAMSUNG           true
 
+#define DECODE_SAMSUNG_AC      true
+#define SEND_SAMSUNG_AC        true
+
 #define DECODE_WHYNTER         true
 #define SEND_WHYNTER           true
 
@@ -185,7 +188,7 @@
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
-     DECODE_WHIRLPOOL_AC)
+     DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -249,7 +252,8 @@ enum decode_type_t {
   HITACHI_AC2,
   GICABLE,
   HAIER_AC_YRW02,
-  WHIRLPOOL_AC
+  WHIRLPOOL_AC,
+  SAMSUNG_AC
 };
 
 // Message lengths & required repeat values
@@ -318,6 +322,8 @@ const uint16_t kRC6Mode0Bits = 20;  // Excludes the 'start' bit.
 const uint16_t kRC6_36Bits = 36;  // Excludes the 'start' bit.
 const uint16_t kRCMMBits = 24;
 const uint16_t kSamsungBits = 32;
+const uint16_t kSamsungAcStateLength = 14;
+const uint16_t kSamsungAcBits = kSamsungAcStateLength * 8;
 const uint16_t kSanyoSA8650BBits = 12;
 const uint16_t kSanyoLC7461AddressBits = 13;
 const uint16_t kSanyoLC7461CommandBits = 8;
