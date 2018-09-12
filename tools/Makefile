@@ -64,7 +64,6 @@ gc_decode.o : gc_decode.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 gc_decode : $(COMMON_OBJ) gc_decode.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-
 IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRutils.cpp
 
@@ -90,7 +89,7 @@ ir_Sherwood.o : $(USER_DIR)/ir_Sherwood.cpp $(COMMON_DEPS)
 ir_Sony.o : $(USER_DIR)/ir_Sony.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sony.cpp
 
-ir_Samsung.o : $(USER_DIR)/ir_Samsung.cpp $(COMMON_DEPS)
+ir_Samsung.o : $(USER_DIR)/ir_Samsung.cpp $(USER_DIR)/ir_Samsung.h $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Samsung.cpp
 
 ir_Kelvinator.o : $(USER_DIR)/ir_Kelvinator.cpp $(USER_DIR)/ir_Kelvinator.h $(COMMON_DEPS)
