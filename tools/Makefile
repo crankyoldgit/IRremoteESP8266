@@ -47,7 +47,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_Aiwa.o ir_Sherwood.o ir_Kelvinator.o ir_Daikin.o ir_Gree.o \
             ir_Pronto.o ir_GlobalCache.o ir_Nikai.o ir_Toshiba.o ir_Midea.o \
             ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o ir_Hitachi.o \
-						ir_GICable.o ir_Whirlpool.o
+						ir_GICable.o ir_Whirlpool.o ir_Lutron.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o $(PROTOCOLS)
@@ -176,3 +176,6 @@ ir_GICable.o : $(USER_DIR)/ir_GICable.cpp $(GTEST_HEADERS)
 
 ir_Whirlpool.o : $(USER_DIR)/ir_Whirlpool.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Whirlpool.cpp
+
+ir_Lutron.o : $(USER_DIR)/ir_Lutron.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lutron.cpp
