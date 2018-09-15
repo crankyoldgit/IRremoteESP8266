@@ -503,7 +503,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeSamsungAC(results))
     return true;
 #endif
-  #if DECODE_LUTRON
+#if DECODE_LUTRON
   DPRINTLN("Attempting Lutron decode");
   if (decodeLutron(results))
     return true;
