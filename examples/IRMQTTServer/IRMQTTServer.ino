@@ -423,8 +423,10 @@ void handleRoot() {
         "<option value='42'>Hitachi2 (53 bytes)</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
+        "<option value='46'>Samsung</option>"
         "<option value='32'>Toshiba</option>"
         "<option value='28'>Trotec</option>"
+        "<option value='45'>Whirlpool</option>"
       "</select>"
       " State code: 0x"
       "<input type='text' name='code' size='" + String(kStateSizeMax * 2) +
@@ -530,6 +532,12 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     case HITACHI_AC2:
       stateSize = kHitachiAc2StateLength;
+      break;
+    case WHIRLPOOL_AC:
+      stateSize = kWhirlpoolAcStateLength;
+      break;
+    case SAMSUNG_AC:
+      stateSize = kSamsungAcStateLength;
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");

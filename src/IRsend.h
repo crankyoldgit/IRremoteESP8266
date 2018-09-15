@@ -92,6 +92,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                    uint16_t repeat = kNoRepeat);
   uint32_t encodeSAMSUNG(uint8_t customer, uint8_t command);
 #endif
+#if SEND_SAMSUNG_AC
+  void sendSamsungAC(unsigned char data[],
+                      uint16_t nbytes = kSamsungAcStateLength,
+                      uint16_t repeat = kNoRepeat);
+#endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
               uint16_t repeat = kNoRepeat);
@@ -274,6 +279,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #if SEND_GICABLE
   void sendGICable(uint64_t data, uint16_t nbits = kGicableBits,
                    uint16_t repeat = kGicableMinRepeat);
+#endif
+#if SEND_WHIRLPOOL_AC
+  void sendWhirlpoolAC(unsigned char data[],
+                       uint16_t nbytes = kWhirlpoolAcStateLength,
+                       uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_LUTRON
   void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,

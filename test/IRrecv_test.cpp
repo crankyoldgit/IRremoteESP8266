@@ -498,15 +498,27 @@ TEST(TestMatchData, MarkEncoded) {
   irsend.reset();
   irsend.sendRaw(mark_encoded_raw, 11, 38000);
   irsend.makeDecodeResult();
+  // MSBF order.
   result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1500, 500, 500, 500);
   ASSERT_TRUE(result.success);
   EXPECT_EQ(0b01011, result.data);
+  EXPECT_EQ(10, result.used);
+  // LSBF order.
+  result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1500, 500, 500, 500,
+                            kTolerance, kMarkExcess, false);
+  ASSERT_TRUE(result.success);
+  EXPECT_EQ(0b11010, result.data);  // Bits reversed of the previous test.
   EXPECT_EQ(10, result.used);
 
   irsend.reset();
   irsend.sendRaw(mark_encoded_raw, 11, 38000);
   irsend.makeDecodeResult();
+  // MSBF order.
   result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1000, 500, 500, 500);
+  ASSERT_FALSE(result.success);
+  // LSBF order.
+  result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1000, 500, 500, 500,
+                            kTolerance, kMarkExcess, false);
   ASSERT_FALSE(result.success);
 }
 
