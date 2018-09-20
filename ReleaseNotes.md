@@ -1,5 +1,26 @@
 # Release Notes
 
+## _v2.5.0 (20180919)_
+
+**[Bug Fixes]**
+- Fix HTML menu error for GICABLE in IRMQTTServer. (#516)
+- Fix Mitsubishi A/C mode setting. (#514)
+- Add missing ',' in auto analyse tool generated code. (#513)
+
+**[Features]**
+- Mitsubishi A/C decode improvements. (#514)
+- Basic support for Whirlpool A/C messages. (#511)
+- Basic support for Samsung A/C messages. (#512)
+- Experimental support for detailed Samsung A/C messages. (#521)
+- Experimental support for detailed Coolix A/C messages. (#518)
+- Experimental support for Lutron protocol. (#516)
+- Calculate and use average values for timings in analysing tool. (#513)
+
+**[Misc]**
+- Style change from using #define's for constants to `const kConstantName`.
+- Improve the JVC example code.
+
+
 ## _v2.4.3 (20180727)_
 
 **[Bug Fixes]**
