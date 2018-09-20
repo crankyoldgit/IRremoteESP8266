@@ -4,6 +4,7 @@
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "ir_Samsung.h"
 #include "gtest/gtest.h"
 
 // Tests for sendSAMSUNG().
@@ -309,6 +310,161 @@ TEST(TestSendSamsungAC, SendDataOnly) {
       "m586s100000", irsend.outputStr());
 }
 
+// Tests for IRSamsungAc class.
+
+TEST(TestIRSamsungAcClass, SetAndGetPower) {
+  IRSamsungAc samsung(0);
+  samsung.on();
+  EXPECT_TRUE(samsung.getPower());
+  samsung.off();
+  EXPECT_FALSE(samsung.getPower());
+  samsung.setPower(true);
+  EXPECT_TRUE(samsung.getPower());
+  samsung.setPower(false);
+  EXPECT_FALSE(samsung.getPower());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetSwing) {
+  IRSamsungAc samsung(0);
+  samsung.setSwing(true);
+  EXPECT_TRUE(samsung.getSwing());
+  samsung.setSwing(false);
+  EXPECT_FALSE(samsung.getSwing());
+  samsung.setSwing(true);
+  EXPECT_TRUE(samsung.getSwing());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetClean) {
+  IRSamsungAc samsung(0);
+  samsung.setClean(true);
+  EXPECT_TRUE(samsung.getClean());
+  samsung.setClean(false);
+  EXPECT_FALSE(samsung.getClean());
+  samsung.setClean(true);
+  EXPECT_TRUE(samsung.getClean());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetBeep) {
+  IRSamsungAc samsung(0);
+  samsung.setBeep(false);
+  EXPECT_FALSE(samsung.getBeep());
+  samsung.setBeep(true);
+  EXPECT_TRUE(samsung.getBeep());
+  samsung.setBeep(false);
+  EXPECT_FALSE(samsung.getBeep());
+  samsung.setBeep(true);
+  EXPECT_TRUE(samsung.getBeep());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetTemp) {
+  IRSamsungAc samsung(0);
+  samsung.setTemp(25);
+  EXPECT_EQ(25, samsung.getTemp());
+  samsung.setTemp(kSamsungAcMinTemp);
+  EXPECT_EQ(kSamsungAcMinTemp, samsung.getTemp());
+  samsung.setTemp(kSamsungAcMinTemp - 1);
+  EXPECT_EQ(kSamsungAcMinTemp, samsung.getTemp());
+  samsung.setTemp(kSamsungAcMaxTemp);
+  EXPECT_EQ(kSamsungAcMaxTemp, samsung.getTemp());
+  samsung.setTemp(kSamsungAcMaxTemp + 1);
+  EXPECT_EQ(kSamsungAcMaxTemp, samsung.getTemp());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetMode) {
+  IRSamsungAc samsung(0);
+  samsung.setMode(kSamsungAcCool);
+  EXPECT_EQ(kSamsungAcCool, samsung.getMode());
+  EXPECT_NE(kSamsungAcFanAuto2, samsung.getFan());
+  samsung.setMode(kSamsungAcHeat);
+  EXPECT_EQ(kSamsungAcHeat, samsung.getMode());
+  EXPECT_NE(kSamsungAcFanAuto2, samsung.getFan());
+  samsung.setMode(kSamsungAcAuto);
+  EXPECT_EQ(kSamsungAcAuto, samsung.getMode());
+  EXPECT_EQ(kSamsungAcFanAuto2, samsung.getFan());
+  samsung.setMode(kSamsungAcDry);
+  EXPECT_EQ(kSamsungAcDry, samsung.getMode());
+  EXPECT_NE(kSamsungAcFanAuto2, samsung.getFan());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetFan) {
+  IRSamsungAc samsung(0);
+  samsung.setMode(kSamsungAcCool);  // Most fan modes avail in this setting.
+  samsung.setFan(kSamsungAcFanAuto);
+  EXPECT_EQ(kSamsungAcFanAuto, samsung.getFan());
+  samsung.setFan(kSamsungAcFanLow);
+  EXPECT_EQ(kSamsungAcFanLow, samsung.getFan());
+  samsung.setFan(kSamsungAcFanAuto2);  // Not available in Cool mode.
+  EXPECT_EQ(kSamsungAcFanLow, samsung.getFan());  // Shouldn't change.
+  samsung.setMode(kSamsungAcAuto);  // Has special fan setting.
+  EXPECT_EQ(kSamsungAcFanAuto2, samsung.getFan());
+  samsung.setFan(kSamsungAcFanLow);  // Shouldn't be available in Auto mode.
+  EXPECT_EQ(kSamsungAcFanAuto2, samsung.getFan());
+  samsung.setMode(kSamsungAcHeat);  // Most fan modes avail in this setting.
+  samsung.setFan(kSamsungAcFanHigh);
+  EXPECT_EQ(kSamsungAcFanHigh, samsung.getFan());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetQuiet) {
+  IRSamsungAc samsung(0);
+  samsung.setQuiet(false);
+  EXPECT_FALSE(samsung.getQuiet());
+  samsung.setFan(kSamsungAcFanHigh);
+  samsung.setQuiet(true);
+  EXPECT_TRUE(samsung.getQuiet());
+  EXPECT_EQ(kSamsungAcFanAuto, samsung.getFan());
+  samsung.setQuiet(false);
+  EXPECT_FALSE(samsung.getQuiet());
+}
+
+TEST(TestIRSamsungAcClass, ChecksumCalculation) {
+  IRSamsungAc samsung(0);
+
+  const uint8_t originalstate[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAF, 0x71, 0x00, 0x15, 0xF0};
+  uint8_t examplestate[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAF, 0x71, 0x00, 0x15, 0xF0};
+
+  EXPECT_TRUE(IRSamsungAc::validChecksum(examplestate));
+  EXPECT_EQ(0, IRSamsungAc::calcChecksum(examplestate));
+
+  examplestate[8] = 0x12;  // Set an incoorect checksum.
+  EXPECT_FALSE(IRSamsungAc::validChecksum(examplestate));
+  EXPECT_EQ(0, IRSamsungAc::calcChecksum(examplestate));
+  samsung.setRaw(examplestate);
+  // Extracting the state from the object should have a correct checksum.
+  EXPECT_TRUE(IRSamsungAc::validChecksum(samsung.getRaw()));
+  EXPECT_STATE_EQ(originalstate, samsung.getRaw(), kSamsungAcBits);
+  examplestate[8] = 0x02;  // Restore old checksum value.
+
+  // Change the state to force a different checksum.
+  examplestate[11] = 0x01;
+  EXPECT_FALSE(IRSamsungAc::validChecksum(examplestate));
+  EXPECT_EQ(0xF, IRSamsungAc::calcChecksum(examplestate));
+}
+
+TEST(TestIRSamsungAcClass, HumanReadable) {
+  IRSamsungAc samsung(0);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: Off, "
+            "Beep: Off, Clean: Off, Quiet: Off",
+            samsung.toString());
+  samsung.setTemp(kSamsungAcMaxTemp);
+  samsung.setMode(kSamsungAcHeat);
+  samsung.off();
+  samsung.setFan(kSamsungAcFanHigh);
+  samsung.setSwing(true);
+  samsung.setBeep(true);
+  samsung.setClean(true);
+  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 5 (HIGH), Swing: On, "
+            "Beep: On, Clean: On, Quiet: Off",
+            samsung.toString());
+  samsung.setQuiet(true);
+  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 0 (AUTO), Swing: On, "
+            "Beep: On, Clean: On, Quiet: On",
+            samsung.toString());
+}
+
 // Tests for decodeSamsungAC().
 
 // Decode normal SamsungAC messages.
@@ -366,4 +522,55 @@ TEST(TestDecodeSamsungAC, DecodeRealExample) {
   ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc samsung(0);
+  samsung.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: Off, "
+            "Beep: Off, Clean: Off, Quiet: Off",
+            samsung.toString());
+}
+
+// Decode a real Samsung A/C example from Issue #505
+TEST(TestDecodeSamsungAC, DecodeRealExample2) {
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
+
+  irsend.reset();
+  // Samsung A/C example from Issue #505
+  uint16_t rawData[233] = {
+     668, 17834, 3092, 8862, 608, 410, 586, 1378, 612, 410, 584, 410, 586, 410,
+     584, 410, 586, 408, 586, 408, 586, 410, 586, 1404, 588, 436, 558, 436, 570,
+     1398, 592, 424, 576, 420, 578, 1388, 608, 1382, 610, 1382, 608, 1380, 610,
+     1384, 606, 408, 586, 408, 588, 408, 588, 408, 586, 436, 558, 436, 570, 424,
+     570, 426, 572, 422, 578, 418, 582, 412, 586, 408, 586, 410, 584, 410, 584,
+     410, 584, 410, 586, 410, 586, 408, 586, 408, 586, 408, 586, 408, 586, 408,
+     586, 438, 558, 436, 568, 426, 570, 424, 574, 422, 576, 418, 582, 414, 584,
+     410, 586, 410, 584, 410, 586, 1380, 610, 1382, 608, 1404, 586, 1404, 602,
+     2872, 3096, 8878, 582, 1432, 570, 426, 568, 426, 574, 420, 578, 416, 582,
+     412, 586, 410, 584, 410, 586, 410, 586, 1382, 608, 410, 586, 410, 586, 408,
+     586, 1404, 586, 1408, 582, 1410, 590, 428, 568, 1400, 598, 1394, 606, 1382,
+     610, 1382, 608, 1378, 612, 1382, 608, 1384, 606, 1404, 586, 408, 586, 414,
+     582, 436, 558, 1410, 590, 1422, 576, 1390, 608, 410, 586, 410, 586, 410,
+     584, 410, 584, 410, 586, 410, 586, 410, 584, 410, 586, 1404, 586, 1404,
+     588, 436, 560, 436, 486, 510, 566, 1400, 598, 420, 576, 418, 582, 414, 586,
+     410, 584, 410, 584, 410, 586, 410, 584, 1382, 608, 1384, 606, 1384, 606,
+     1408, 600};
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xE2, 0xFE, 0x71, 0x80, 0x11, 0xF0};
+
+  irsend.sendRaw(rawData, 233, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc samsung(0);
+  samsung.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 0 (AUTO), Swing: Off, "
+            "Beep: Off, Clean: Off, Quiet: Off",
+            samsung.toString());
 }
