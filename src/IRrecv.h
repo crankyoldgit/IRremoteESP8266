@@ -311,6 +311,10 @@ class IRrecv {
   bool decodeWhirlpoolAC(decode_results *results,
                          uint16_t nbits = kWhirlpoolAcBits, bool strict = true);
 #endif
+#if DECODE_LUTRON
+  bool decodeLutron(decode_results *results, uint16_t nbits = kLutronBits,
+                     bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

@@ -126,10 +126,11 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
                               kWhirlpoolAcBitMark,
                               kWhirlpoolAcOneSpace,
                               kWhirlpoolAcBitMark,
-                              kWhirlpoolAcZeroSpace);
+                              kWhirlpoolAcZeroSpace,
+                              kTolerance, kMarkExcess, false);
       if (data_result.success == false)  break;  // Fail
       // Data is in LSB order. We need to reverse it.
-      results->state[i] = (uint8_t) reverseBits(data_result.data & 0xFF, 8);
+      results->state[i] = (uint8_t) data_result.data;
     }
     // Section Footer
     if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcBitMark))

@@ -439,38 +439,40 @@ bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   if (!matchSpace(results->rawbuf[offset++], kGreeHdrSpace)) return false;
   // Data Block #1 (32 bits)
   data_result = matchData(&(results->rawbuf[offset]), 32, kGreeBitMark,
-                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace);
+                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+                          kTolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Record Data Block #1 in the state.
-  for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
-    results->state[i] = reverseBits(data & 0xFF, 8);
+  for (uint16_t i = 0; i < 4; i++, data >>= 8)
+    results->state[state_pos + i] = data & 0xFF;
   state_pos += 4;
 
   // Block #1 footer (3 bits, B010)
   data_result = matchData(&(results->rawbuf[offset]), kGreeBlockFooterBits,
                           kGreeBitMark, kGreeOneSpace, kGreeBitMark,
-                          kGreeZeroSpace);
+                          kGreeZeroSpace, kTolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   if (data_result.data != kGreeBlockFooter) return false;
   offset += data_result.used;
 
   // Inter-block gap.
   if (!matchMark(results->rawbuf[offset++], kGreeBitMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++],  kGreeMsgSpace)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kGreeMsgSpace)) return false;
 
   // Data Block #2 (32 bits)
   data_result = matchData(&(results->rawbuf[offset]), 32, kGreeBitMark,
-                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace);
+                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+                          kTolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Record Data Block #2 in the state.
-  for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
-    results->state[i] = reverseBits(data & 0xFF, 8);
+  for (uint16_t i = 0; i < 4; i++, data >>= 8)
+    results->state[state_pos + i] = data & 0xFF;
   state_pos += 4;
 
   // Footer.

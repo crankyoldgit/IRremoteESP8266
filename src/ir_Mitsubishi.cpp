@@ -1,6 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017-2018 David Conran
-// Copyright 2018 denxhun
+// Copyright 2018 Denes Varga
 
 #include "ir_Mitsubishi.h"
 #include <algorithm>

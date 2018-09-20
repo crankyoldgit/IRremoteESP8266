@@ -1,7 +1,8 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2018 David Conran
 
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "ir_Coolix.h"
 #include "gtest/gtest.h"
 
 // Tests for sendCOOLIX().
@@ -287,4 +288,144 @@ TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
 
   ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeCOOLIX(&irsend.capture, kCoolixBits, false));
+}
+
+// Tests for the IRCoolixAC class.
+
+TEST(TestCoolixACClass, SetAndGetRaw) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setRaw(kCoolixOff);
+  EXPECT_EQ(kCoolixOff, ircoolix.getRaw());
+  ircoolix.setRaw(kCoolixDefaultState);
+  EXPECT_EQ(kCoolixDefaultState, ircoolix.getRaw());
+}
+
+TEST(TestCoolixACClass, SetAndGetTemp) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setTemp(25);
+  EXPECT_EQ(25, ircoolix.getTemp());
+  ircoolix.setTemp(kCoolixTempMin);
+  EXPECT_EQ(kCoolixTempMin, ircoolix.getTemp());
+  ircoolix.setTemp(kCoolixTempMax);
+  EXPECT_EQ(kCoolixTempMax, ircoolix.getTemp());
+  ircoolix.setTemp(kCoolixTempMin - 1);
+  EXPECT_EQ(kCoolixTempMin, ircoolix.getTemp());
+  ircoolix.setTemp(kCoolixTempMax + 1);
+  EXPECT_EQ(kCoolixTempMax, ircoolix.getTemp());
+}
+
+TEST(TestCoolixACClass, SetAndGetMode) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setMode(kCoolixHeat);
+  EXPECT_EQ(kCoolixHeat, ircoolix.getMode());
+  ircoolix.setMode(kCoolixCool);
+  EXPECT_EQ(kCoolixCool, ircoolix.getMode());
+  ircoolix.setMode(kCoolixDry);
+  EXPECT_EQ(kCoolixDry, ircoolix.getMode());
+  ircoolix.setMode(kCoolixAuto);
+  EXPECT_EQ(kCoolixAuto, ircoolix.getMode());
+  ircoolix.setMode(kCoolixFan);
+  EXPECT_EQ(kCoolixFan, ircoolix.getMode());
+}
+
+TEST(TestCoolixACClass, SetAndGetFan) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setFan(kCoolixFanMax);
+  EXPECT_EQ(kCoolixFanMax, ircoolix.getFan());
+  ircoolix.setFan(kCoolixFanMin);
+  EXPECT_EQ(kCoolixFanMin, ircoolix.getFan());
+  ircoolix.setFan(kCoolixFanZoneFollow);
+  EXPECT_EQ(kCoolixFanZoneFollow, ircoolix.getFan());
+  ircoolix.setFan(kCoolixFanAuto);
+  EXPECT_EQ(kCoolixFanAuto, ircoolix.getFan());
+  ircoolix.setFan(kCoolixFanMax);
+  EXPECT_EQ(kCoolixFanMax, ircoolix.getFan());
+  ASSERT_NE(3, kCoolixFanAuto);
+  // Now try some unexpected value.
+  ircoolix.setFan(3);
+  EXPECT_EQ(kCoolixFanAuto, ircoolix.getFan());
+}
+
+TEST(TestCoolixACClass, SetGetClearSensorTempAndZoneFollow) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setRaw(kCoolixDefaultState);
+  EXPECT_FALSE(ircoolix.getZoneFollow());
+  EXPECT_LT(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+
+  ircoolix.setSensorTemp(25);
+  EXPECT_TRUE(ircoolix.getZoneFollow());
+  EXPECT_EQ(25, ircoolix.getSensorTemp());
+
+  // Lower bounds
+  ircoolix.setSensorTemp(kCoolixSensorTempMin);
+  EXPECT_TRUE(ircoolix.getZoneFollow());
+  EXPECT_EQ(kCoolixSensorTempMin, ircoolix.getSensorTemp());
+  ircoolix.setSensorTemp(kCoolixSensorTempMin - 1);
+  EXPECT_TRUE(ircoolix.getZoneFollow());
+  EXPECT_EQ(kCoolixSensorTempMin, ircoolix.getSensorTemp());
+  // Upper bounds
+  ircoolix.setSensorTemp(kCoolixSensorTempMax);
+  EXPECT_TRUE(ircoolix.getZoneFollow());
+  EXPECT_EQ(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+  ircoolix.setSensorTemp(kCoolixSensorTempMax + 1);
+  EXPECT_TRUE(ircoolix.getZoneFollow());
+  EXPECT_EQ(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+  // Clearing
+  ircoolix.clearSensorTemp();
+  EXPECT_FALSE(ircoolix.getZoneFollow());
+  EXPECT_LT(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+}
+
+TEST(TestCoolixACClass, SpecialModesAndReset) {
+  IRCoolixAC ircoolix(0);
+  ASSERT_NE(kCoolixSwing, ircoolix.getRaw());
+  ircoolix.setSwing();
+  ASSERT_EQ(kCoolixSwing, ircoolix.getRaw());
+  ircoolix.setTurbo();
+  ASSERT_EQ(kCoolixTurbo, ircoolix.getRaw());
+  ircoolix.setSleep();
+  ASSERT_EQ(kCoolixSleep, ircoolix.getRaw());
+  ircoolix.setLed();
+  ASSERT_EQ(kCoolixLed, ircoolix.getRaw());
+  ircoolix.setClean();
+  ASSERT_EQ(kCoolixClean, ircoolix.getRaw());
+  ircoolix.stateReset();
+  ASSERT_NE(kCoolixClean, ircoolix.getRaw());
+}
+
+TEST(TestCoolixACClass, HumanReadable) {
+  IRCoolixAC ircoolix(0);
+
+  // Initial starting point.
+  EXPECT_EQ("Power: On, Fan: 5 (AUTO), Mode: 2 (AUTO), Temp: 25C, "
+            "Zone Follow: Off, Sensor Temp: Ignored",
+            ircoolix.toString());
+
+  ircoolix.setSensorTemp(24);
+  ircoolix.setTemp(22);
+  ircoolix.setMode(kCoolixCool);
+  ircoolix.setFan(kCoolixFanMin);
+  EXPECT_EQ("Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 22C, "
+            "Zone Follow: On, Sensor Temp: 24C",
+            ircoolix.toString());
+  ircoolix.setSwing();
+  EXPECT_EQ("Power: On, Fan: 3 (UNKNOWN), Swing: Toggle", ircoolix.toString());
+  ircoolix.setPower(false);
+  EXPECT_EQ("Power: Off", ircoolix.toString());
+}
+
+TEST(TestCoolixACClass, KnownExamples) {
+  IRCoolixAC ircoolix(0);
+
+  ircoolix.setRaw(0b101100101011111111100100);
+  EXPECT_EQ("Power: On, Fan: 5 (AUTO), Mode: 4 (FAN), Zone Follow: Off, "
+            "Sensor Temp: Ignored", ircoolix.toString());
+  ircoolix.setRaw(0b101100101001111100000000);
+  EXPECT_EQ("Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 17C, "
+            "Zone Follow: Off, Sensor Temp: Ignored", ircoolix.toString());
 }

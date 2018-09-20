@@ -25,7 +25,8 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
-#if DECODE_AC
+// The following are only needed for extended decoding of A/C Messages
+#include <ir_Coolix.h>
 #include <ir_Daikin.h>
 #include <ir_Fujitsu.h>
 #include <ir_Gree.h>
@@ -35,7 +36,6 @@
 #include <ir_Midea.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
-#endif  // DECODE_AC
 
 // ==================== start of TUNEABLE PARAMETERS ====================
 // An IR detector/demodulator is connected to GPIO pin 14
@@ -185,6 +185,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_SAMSUNG_AC
+#if DECODE_COOLIX
+  if (results->decode_type == COOLIX) {
+    IRCoolixAC ac(0);
+    ac.setRaw(results->value);  // Coolix uses value instead of state.
+    description = ac.toString();
+  }
+#endif  // DECODE_COOLIX
   // If we got a human-readable description of the message, display it.
   if (description != "")  Serial.println("Mesg Desc.: " + description);
 }

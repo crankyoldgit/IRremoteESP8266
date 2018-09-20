@@ -285,6 +285,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                        uint16_t nbytes = kWhirlpoolAcStateLength,
                        uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_LUTRON
+  void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,
+                  uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

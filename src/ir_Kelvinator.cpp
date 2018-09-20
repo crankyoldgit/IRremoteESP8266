@@ -486,14 +486,15 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
                             kKelvinatorBitMarkTicks * mark_tick,
                             kKelvinatorOneSpaceTicks * space_tick,
                             kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick);
+                            kKelvinatorZeroSpaceTicks * space_tick,
+                            kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;
 
     // Record command data in the state.
-    for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
-      results->state[i] = reverseBits(data & 0xFF, 8);
+    for (uint16_t i = 0; i < 4; i++, data >>= 8)
+      results->state[state_pos + i] = data & 0xFF;
     state_pos += 4;
 
     // Command data footer (3 bits, B010)
@@ -502,7 +503,8 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
                             kKelvinatorBitMarkTicks * mark_tick,
                             kKelvinatorOneSpaceTicks * space_tick,
                             kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick);
+                            kKelvinatorZeroSpaceTicks * space_tick,
+                            kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     if (data_result.data != kKelvinatorCmdFooter) return false;
     offset += data_result.used;
@@ -520,14 +522,15 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
                             kKelvinatorBitMarkTicks * mark_tick,
                             kKelvinatorOneSpaceTicks * space_tick,
                             kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick);
+                            kKelvinatorZeroSpaceTicks * space_tick,
+                            kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;
 
     // Record option data in the state.
-    for (int i = state_pos + 3; i >= state_pos; i--, data >>= 8)
-      results->state[i] = reverseBits(data & 0xFF, 8);
+    for (uint16_t i = 0; i < 4; i++, data >>= 8)
+      results->state[state_pos + i] = data & 0xFF;
     state_pos += 4;
 
     // Inter-sequence gap. (Double length gap)
