@@ -76,9 +76,9 @@ TEST(TestDecodeRCMM, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRCMM(0xe0a600);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, RCMM_BITS, true));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kRCMMBits, true));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
-  EXPECT_EQ(RCMM_BITS, irsend.capture.bits);
+  EXPECT_EQ(kRCMMBits, irsend.capture.bits);
   EXPECT_EQ(0xe0a600, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -210,7 +210,7 @@ TEST(TestDecodeRCMM, FailToDecodeNonRCMMExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, RCMM_BITS, false));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kRCMMBits, false));
 }
 
 // Issue 281 Debugging

@@ -68,10 +68,10 @@ class IRsendTest: public IRsend {
     for (uint16_t i = 0;
          (i < RAW_BUF - 1) && (offset < OUTPUT_BUF);
          i++, offset++)
-      if (output[offset] / RAWTICK > UINT16_MAX)
+      if (output[offset] / kRawTick > UINT16_MAX)
         rawbuf[i + 1] = UINT16_MAX;
       else
-        rawbuf[i + 1] = output[offset] / RAWTICK;
+        rawbuf[i + 1] = output[offset] / kRawTick;
   }
 
   void dumpRawResult() {
@@ -81,7 +81,7 @@ class IRsendTest: public IRsend {
     for (uint16_t i = 1; i < capture.rawlen; i++) {
       if (i % 8 == 1)
         std::cout << std::endl << "    ";
-      std::cout << (capture.rawbuf[i] * RAWTICK);
+      std::cout << (capture.rawbuf[i] * kRawTick);
       // std::cout << "(" << capture.rawbuf[i] << ")";
       if (i < capture.rawlen - 1)
         std::cout << ", ";

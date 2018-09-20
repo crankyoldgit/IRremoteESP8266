@@ -28,7 +28,7 @@ TEST(TestSendNikai, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendNikai(0xD5F2A, NIKAI_BITS, 1);  // 1 repeat.
+  irsend.sendNikai(0xD5F2A, kNikaiBits, 1);  // 1 repeat.
   EXPECT_EQ("m4000s4000"
             "m500s2000m500s2000m500s2000m500s2000m500s1000m500s1000m500s2000"
             "m500s1000m500s2000m500s1000m500s2000m500s1000m500s1000m500s1000"
@@ -40,7 +40,7 @@ TEST(TestSendNikai, SendWithRepeats) {
             "m500s1000m500s1000m500s2000m500s2000m500s1000m500s2000m500s1000"
             "m500s2000m500s1000m500s2000m500s8500",
             irsend.outputStr());
-  irsend.sendNikai(0xD5F2A, NIKAI_BITS, 2);  // 2 repeat.
+  irsend.sendNikai(0xD5F2A, kNikaiBits, 2);  // 2 repeat.
   EXPECT_EQ("m4000s4000"
             "m500s2000m500s2000m500s2000m500s2000m500s1000m500s1000m500s2000"
             "m500s1000m500s2000m500s1000m500s2000m500s1000m500s1000m500s1000"
@@ -71,17 +71,17 @@ TEST(TestDecodeNikai, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendNikai(0x123456);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, true));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
-  EXPECT_EQ(NIKAI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(0x123456, irsend.capture.value);
 
   irsend.reset();
   irsend.sendNikai(0x101);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, true));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
-  EXPECT_EQ(NIKAI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(0x101, irsend.capture.value);
 }
 
@@ -93,11 +93,11 @@ TEST(TestDecodeNikai, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Nikai 24-bit message.
   irsend.reset();
-  irsend.sendNikai(0xD5F2A, NIKAI_BITS, 2);
+  irsend.sendNikai(0xD5F2A, kNikaiBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, true));
+  ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, true));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
-  EXPECT_EQ(NIKAI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(0xD5F2A, irsend.capture.value);
 }
 
@@ -111,9 +111,9 @@ TEST(TestDecodeNikai, NormalDecodeWithNonStrict) {
   irsend.sendNikai(0x0, 16);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, true));
   // And it should fail when we expect more bits.
-  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, false));
+  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, false));
 
   // Should pass if strict off if we ask for correct nr. of bits sent.
   ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, 16, false));
@@ -136,7 +136,7 @@ TEST(TestDecodeNikai, Decode64BitMessages) {
   // Illegal size Nikai 64-bit message.
   irsend.sendNikai(0xFFFFFFFFFFFFFFFF, 64);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, true));
+  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, true));
   // Should work with a 'normal' match (not strict)
   ASSERT_TRUE(irrecv.decodeNikai(&irsend.capture, 64, false));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
@@ -168,7 +168,7 @@ TEST(TestDecodeNikai, DecodeExamples) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
-  EXPECT_EQ(NIKAI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(0xD5F2A, irsend.capture.value);
 
   // Nikai TV Volume Up from Issue #309
@@ -185,7 +185,7 @@ TEST(TestDecodeNikai, DecodeExamples) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NIKAI, irsend.capture.decode_type);
-  EXPECT_EQ(NIKAI_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(0xD0F2F, irsend.capture.value);
 }
 
@@ -206,5 +206,5 @@ TEST(TestDecodeNikai, FailToDecodeNonNikaiExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, NIKAI_BITS, false));
+  ASSERT_FALSE(irrecv.decodeNikai(&irsend.capture, kNikaiBits, false));
 }

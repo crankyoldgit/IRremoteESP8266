@@ -19,19 +19,19 @@
 // Constants
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
-#define SONY_TICK               200U
-#define SONY_HDR_MARK_TICKS      12U
-#define SONY_HDR_MARK           (SONY_HDR_MARK_TICKS * SONY_TICK)
-#define SONY_SPACE_TICKS          3U
-#define SONY_SPACE              (SONY_SPACE_TICKS * SONY_TICK)
-#define SONY_ONE_MARK_TICKS       6U
-#define SONY_ONE_MARK           (SONY_ONE_MARK_TICKS * SONY_TICK)
-#define SONY_ZERO_MARK_TICKS      3U
-#define SONY_ZERO_MARK          (SONY_ZERO_MARK_TICKS * SONY_TICK)
-#define SONY_RPT_LENGTH_TICKS   225U
-#define SONY_RPT_LENGTH         (SONY_RPT_LENGTH_TICKS * SONY_TICK)
-#define SONY_MIN_GAP_TICKS       50U
-#define SONY_MIN_GAP            (SONY_MIN_GAP_TICKS * SONY_TICK)
+const uint16_t kSonyTick = 200;
+const uint16_t kSonyHdrMarkTicks = 12;
+const uint16_t kSonyHdrMark = kSonyHdrMarkTicks * kSonyTick;
+const uint16_t kSonySpaceTicks = 3;
+const uint16_t kSonySpace = kSonySpaceTicks * kSonyTick;
+const uint16_t kSonyOneMarkTicks = 6;
+const uint16_t kSonyOneMark = kSonyOneMarkTicks * kSonyTick;
+const uint16_t kSonyZeroMarkTicks = 3;
+const uint16_t kSonyZeroMark = kSonyZeroMarkTicks * kSonyTick;
+const uint16_t kSonyRptLengthTicks = 225;
+const uint16_t kSonyRptLength = kSonyRptLengthTicks * kSonyTick;
+const uint16_t kSonyMinGapTicks = 50;
+const uint16_t kSonyMinGap = kSonyMinGapTicks * kSonyTick;
 
 #if SEND_SONY
 // Send a Sony/SIRC(Serial Infra-Red Control) message.
@@ -50,11 +50,11 @@
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
 void IRsend::sendSony(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(SONY_HDR_MARK, SONY_SPACE,
-              SONY_ONE_MARK, SONY_SPACE,
-              SONY_ZERO_MARK, SONY_SPACE,
+  sendGeneric(kSonyHdrMark, kSonySpace,
+              kSonyOneMark, kSonySpace,
+              kSonyZeroMark, kSonySpace,
               0,  // No Footer mark.
-              SONY_MIN_GAP, SONY_RPT_LENGTH,
+              kSonyMinGap, kSonyRptLength,
               data, nbits, 40, true, repeat, 33);
 }
 
@@ -107,7 +107,7 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command,
 // Ref:
 // http://www.sbprojects.com/knowledge/ir/sirc.php
 bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + HEADER - 1)
+  if (results->rawlen < 2 * nbits + kHeader - 1)
     return false;  // Message is smaller than we expected.
 
   // Compliance
@@ -123,31 +123,31 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
   }
 
   uint64_t data = 0;
-  uint16_t offset = OFFSET_START;
+  uint16_t offset = kStartOffset;
   uint16_t actualBits;
   uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
 
   // Header
-  timeSoFar += results->rawbuf[offset] * RAWTICK;
-  if (!matchMark(results->rawbuf[offset], SONY_HDR_MARK))
+  timeSoFar += results->rawbuf[offset] * kRawTick;
+  if (!matchMark(results->rawbuf[offset], kSonyHdrMark))
     return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset++] * RAWTICK / SONY_HDR_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset++] * kRawTick / kSonyHdrMarkTicks;
 
   // Data
   for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
-    // The gap after a Sony packet for a repeat should be SONY_MIN_GAP or
-    //   (SONY_RPT_LENGTH - timeSoFar) according to the spec.
-    if (matchSpace(results->rawbuf[offset], SONY_MIN_GAP_TICKS * tick) ||
-        matchAtLeast(results->rawbuf[offset], SONY_RPT_LENGTH - timeSoFar))
+    // The gap after a Sony packet for a repeat should be kSonyMinGap or
+    //   (kSonyRptLength - timeSoFar) according to the spec.
+    if (matchSpace(results->rawbuf[offset], kSonyMinGapTicks * tick) ||
+        matchAtLeast(results->rawbuf[offset], kSonyRptLength - timeSoFar))
       break;  // Found a repeat space.
-    timeSoFar += results->rawbuf[offset] * RAWTICK;
-    if (!matchSpace(results->rawbuf[offset++], SONY_SPACE_TICKS * tick))
+    timeSoFar += results->rawbuf[offset] * kRawTick;
+    if (!matchSpace(results->rawbuf[offset++], kSonySpaceTicks * tick))
       return false;
-    timeSoFar += results->rawbuf[offset] * RAWTICK;
-    if (matchMark(results->rawbuf[offset], SONY_ONE_MARK_TICKS * tick))
+    timeSoFar += results->rawbuf[offset] * kRawTick;
+    if (matchMark(results->rawbuf[offset], kSonyOneMarkTicks * tick))
       data = (data << 1) | 1;
-    else if (matchMark(results->rawbuf[offset], SONY_ZERO_MARK_TICKS * tick))
+    else if (matchMark(results->rawbuf[offset], kSonyZeroMarkTicks * tick))
       data <<= 1;
     else
       return false;

@@ -120,6 +120,7 @@ std::string typeToString(const decode_type_t protocol,
     case KELVINATOR:     result = "KELVINATOR";        break;
     case LG:             result = "LG";                break;
     case LASERTAG:       result = "LASERTAG";          break;
+    case LUTRON:         result = "LUTRON";            break;
     case MAGIQUEST:      result = "MAGIQUEST";         break;
     case MIDEA:          result = "MIDEA";             break;
     case MITSUBISHI:     result = "MITSUBISHI";        break;
@@ -136,6 +137,7 @@ std::string typeToString(const decode_type_t protocol,
     case RC6:            result = "RC6";               break;
     case RCMM:           result = "RCMM";              break;
     case SAMSUNG:        result = "SAMSUNG";           break;
+    case SAMSUNG_AC:     result = "SAMSUNG_AC";        break;
     case SANYO:          result = "SANYO";             break;
     case SANYO_LC7461:   result = "SANYO_LC7461";      break;
     case SHARP:          result = "SHARP";             break;
@@ -143,6 +145,7 @@ std::string typeToString(const decode_type_t protocol,
     case SONY:           result = "SONY";              break;
     case TOSHIBA_AC:     result = "TOSHIBA_AC";        break;
     case TROTEC:         result = "TROTEC";            break;
+    case WHIRLPOOL_AC:   result = "WHIRLPOOL_AC";      break;
     case WHYNTER:        result = "WHYNTER";           break;
   }
   if (isRepeat) result += " (Repeat)";
@@ -162,7 +165,9 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
+    case SAMSUNG_AC:
     case TOSHIBA_AC:
+    case WHIRLPOOL_AC:
       return true;
     default:
       return false;
@@ -178,7 +183,7 @@ bool hasACState(const decode_type_t protocol) {
 uint16_t getCorrectedRawLength(const decode_results *results) {
   uint16_t extended_length = results->rawlen - 1;
   for (uint16_t i = 0; i < results->rawlen - 1; i++) {
-    uint32_t usecs = results->rawbuf[i] * RAWTICK;
+    uint32_t usecs = results->rawbuf[i] * kRawTick;
     // Add two extra entries for multiple larger than UINT16_MAX it is.
     extended_length += (usecs / (UINT16_MAX + 1)) * 2;
   }
@@ -204,7 +209,7 @@ std::string resultToSourceCode(const decode_results *results) {
   // Dump data
   for (uint16_t i = 1; i < results->rawlen; i++) {
     uint32_t usecs;
-    for (usecs = results->rawbuf[i] * RAWTICK;
+    for (usecs = results->rawbuf[i] * kRawTick;
          usecs > UINT16_MAX;
          usecs -= UINT16_MAX) {
       output += uint64ToString(UINT16_MAX);
@@ -281,7 +286,7 @@ std::string resultToTimingInfo(const decode_results *results) {
       output += "-";  // even
     else
       output += "   +";  // odd
-    value = uint64ToString(results->rawbuf[i] * RAWTICK);
+    value = uint64ToString(results->rawbuf[i] * kRawTick);
     // Space pad the value till it is at least 6 chars long.
     while (value.length() < 6)
       value = " " + value;

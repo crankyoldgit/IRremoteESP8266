@@ -101,7 +101,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithStrict) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x807F40BF, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x2, irsend.capture.command);
@@ -112,7 +112,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithStrict) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0xC1A28877, irsend.capture.value);
   EXPECT_EQ(0x4583, irsend.capture.address);
   EXPECT_EQ(0x11, irsend.capture.command);
@@ -129,7 +129,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithStrict) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x807F40BF, irsend.capture.value);
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x2, irsend.capture.command);
@@ -146,7 +146,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithoutStrict) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
@@ -156,7 +156,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithoutStrict) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
   EXPECT_EQ(0x2C48, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
@@ -236,7 +236,7 @@ TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
   irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
   EXPECT_EQ(0x6DD2, irsend.capture.address);
   EXPECT_EQ(0x2, irsend.capture.command);
@@ -246,7 +246,7 @@ TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 
   // Add a zero length space to the message to test how it handles that as
@@ -255,7 +255,7 @@ TEST(TestDecodeNEC, NoTrailingGap_Issue243) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 }
 
@@ -281,7 +281,7 @@ TEST(TestDecodeNEC, NonStrictNECDecode_Issue264) {
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
   EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture));  // Not strictly NEC
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kNECBits, false));
   EXPECT_EQ(0x77E1A040, irsend.capture.value);
 
   // Do it all again, but with a normal decode.
@@ -290,7 +290,7 @@ TEST(TestDecodeNEC, NonStrictNECDecode_Issue264) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(NEC_LIKE, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x77E1A040, irsend.capture.value);
 }
 
@@ -313,8 +313,8 @@ TEST(TestDecodeNEC, AutoReceiveCalibration) {
 
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, NEC_BITS, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kNECBits, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
-  EXPECT_EQ(NEC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x77E1A040, irsend.capture.value);
 }

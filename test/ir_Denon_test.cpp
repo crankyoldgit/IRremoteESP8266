@@ -179,12 +179,12 @@ TEST(TestDecodeDenon, NormalDecodeWithStrict) {
 
   // Legacy Denon 14-bit message.
   irsend.reset();
-  irsend.sendDenon(0x1278, DENON_LEGACY_BITS);
+  irsend.sendDenon(0x1278, kDenonLegacyBits);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeDenon(&irsend.capture, DENON_LEGACY_BITS, true));
+  ASSERT_TRUE(irrecv.decodeDenon(&irsend.capture, kDenonLegacyBits, true));
   EXPECT_EQ(DENON, irsend.capture.decode_type);
-  EXPECT_EQ(DENON_LEGACY_BITS, irsend.capture.bits);
+  EXPECT_EQ(kDenonLegacyBits, irsend.capture.bits);
   EXPECT_EQ(0x1278, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -266,7 +266,7 @@ TEST(TestDecodeDenon, FailToDecodeNonDenonExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeDenon(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeDenon(&irsend.capture, DENON_LEGACY_BITS, false));
+  ASSERT_FALSE(irrecv.decodeDenon(&irsend.capture, kDenonLegacyBits, false));
   ASSERT_FALSE(irrecv.decodeDenon(&irsend.capture, DENON_BITS, false));
   ASSERT_FALSE(irrecv.decodeDenon(&irsend.capture, DENON_48_BITS, false));
 }

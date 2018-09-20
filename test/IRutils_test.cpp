@@ -115,7 +115,7 @@ TEST(TestGetCorrectedRawLength, WithLargeValues) {
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
   irsend.capture.rawbuf[3] = 60000;
-  ASSERT_EQ(2, RAWTICK);  // The following values rely on RAWTICK being 2.
+  ASSERT_EQ(2, kRawTick);  // The following values rely on kRawTick being 2.
   EXPECT_EQ(7 + 2, getCorrectedRawLength(&irsend.capture));
   irsend.capture.rawbuf[4] = UINT16_MAX - 1;
   EXPECT_EQ(7 + 2 * 2, getCorrectedRawLength(&irsend.capture));
@@ -167,7 +167,7 @@ TEST(TestResultToSourceCode, SimpleProtocols) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(NEC, irsend.capture.decode_type);
-  ASSERT_EQ(NEC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(
       "uint16_t rawData[68] = {8960, 4480,  560, 560,  560, 560,  560, 560,  "
       "560, 560,  560, 1680,  560, 560,  560, 560,  560, 560,  560, 1680,  "
@@ -186,7 +186,7 @@ TEST(TestResultToSourceCode, SimpleProtocols) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(NIKAI, irsend.capture.decode_type);
-  ASSERT_EQ(NIKAI_BITS, irsend.capture.bits);
+  ASSERT_EQ(kNikaiBits, irsend.capture.bits);
   EXPECT_EQ(
       "uint16_t rawData[52] = {4000, 4000,  500, 2000,  500, 2000,  "
       "500, 2000,  500, 2000,  500, 1000,  500, 1000,  500, 2000,  500, 1000,  "
@@ -202,7 +202,7 @@ TEST(TestResultToSourceCode, ComplexProtocols) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint8_t state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
@@ -210,7 +210,7 @@ TEST(TestResultToSourceCode, ComplexProtocols) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_EQ(
       "uint16_t rawData[296] = {4400, 4300,  542, 1622,  542, 1622,  "
       "542, 1622,  542, 1622,  542, 472,  542, 472,  542, 1622,  542, 472,  "
@@ -252,7 +252,7 @@ TEST(TestResultToTimingInfo, General) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(NEC, irsend.capture.decode_type);
-  ASSERT_EQ(NEC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(
       "Raw Timing[68]:\n"
       "   +  8960, -  4480,    +   560, -   560,    +   560, -   560,"
@@ -297,7 +297,7 @@ TEST(TestResultToHumanReadableBasic, SimpleCodes) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(NEC, irsend.capture.decode_type);
-  ASSERT_EQ(NEC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(
       "Encoding  : NEC\n"
       "Code      : 8F704FB (32 bits)\n",
@@ -310,7 +310,7 @@ TEST(TestResultToHumanReadableBasic, ComplexCodes) {
   irsend.begin();
 
 
-  uint8_t state[TOSHIBA_AC_STATE_LENGTH] = {
+  uint8_t state[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
@@ -318,7 +318,7 @@ TEST(TestResultToHumanReadableBasic, ComplexCodes) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
-  ASSERT_EQ(TOSHIBA_AC_BITS, irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_EQ(
       "Encoding  : TOSHIBA_AC\n"
       "Code      : F20D03FC0100000001 (72 bits)\n",

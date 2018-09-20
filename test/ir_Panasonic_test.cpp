@@ -69,7 +69,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendPanasonic64(0x40040190ED7C, PANASONIC_BITS, 0);  // 0 repeats.
+  irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 0);  // 0 repeats.
   EXPECT_EQ(
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
@@ -81,7 +81,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
       "m432s102384", irsend.outputStr());
 
   irsend.reset();
-  irsend.sendPanasonic64(0x40040190ED7C, PANASONIC_BITS, 1);  // 1 repeat.
+  irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 1);  // 1 repeat.
   EXPECT_EQ(
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
@@ -100,7 +100,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
       "m432s432m432s1296m432s1296m432s1296m432s1296m432s1296m432s432m432s432"
       "m432s102384", irsend.outputStr());
 
-  irsend.sendPanasonic64(0x40040190ED7C, PANASONIC_BITS, 2);  // 2 repeats.
+  irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
@@ -183,8 +183,8 @@ TEST(TestSendPanasonic, CompareToSendPanasonic64) {
   panasonic64.sendPanasonic64(0x1234567890AB, 64);
   EXPECT_EQ(panasonic64.outputStr(), panasonic.outputStr());
 
-  panasonic.sendPanasonic(0x1234, 0x567890AB, PANASONIC_BITS, 2);
-  panasonic64.sendPanasonic64(0x1234567890AB, PANASONIC_BITS, 2);
+  panasonic.sendPanasonic(0x1234, 0x567890AB, kPanasonicBits, 2);
+  panasonic64.sendPanasonic64(0x1234567890AB, kPanasonicBits, 2);
   EXPECT_EQ(panasonic64.outputStr(), panasonic.outputStr());
 }
 
@@ -200,9 +200,9 @@ TEST(TestDecodePanasonic, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendPanasonic64(0x40040190ED7C);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x0190ED7C, irsend.capture.command);
@@ -212,9 +212,9 @@ TEST(TestDecodePanasonic, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendPanasonic64(irsend.encodePanasonic(0x4004, 0x12, 0x34, 0x56));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x400412345670, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x12345670, irsend.capture.command);
@@ -224,9 +224,9 @@ TEST(TestDecodePanasonic, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendPanasonic64(irsend.encodePanasonic(0x4004, 0x1, 0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x400401010101, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x1010101, irsend.capture.command);
@@ -241,26 +241,26 @@ TEST(TestDecodePanasonic, NormalDecodeWithRepeatAndStrict) {
 
   // Normal Panasonic 48-bit message with 2 repeats.
   irsend.reset();
-  irsend.sendPanasonic64(0x40040190ED7C, PANASONIC_BITS, 2);
+  irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x190ED7C, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
-  irsend.makeDecodeResult(2 * PANASONIC_BITS + 4);
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  irsend.makeDecodeResult(2 * kPanasonicBits + 4);
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
 
-  irsend.makeDecodeResult(2 * (2 * PANASONIC_BITS + 4));
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  irsend.makeDecodeResult(2 * (2 * kPanasonicBits + 4));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
 }
 
@@ -274,11 +274,11 @@ TEST(TestDecodePanasonic, DecodeWithNonStrictValues) {
   irsend.sendPanasonic64(0x0);  // Illegal value Panasonic 48-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, false));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
@@ -288,11 +288,11 @@ TEST(TestDecodePanasonic, DecodeWithNonStrictValues) {
   irsend.sendPanasonic64(irsend.encodePanasonic(0, 1, 2, 3));
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, false));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x1020300, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x1020300, irsend.capture.command);
@@ -308,7 +308,7 @@ TEST(TestDecodePanasonic, DecodeWithNonStrictSize) {
   irsend.sendPanasonic64(0x12345678, 32);  // Illegal size Panasonic message.
   irsend.makeDecodeResult();
 
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
@@ -326,9 +326,9 @@ TEST(TestDecodePanasonic, DecodeWithNonStrictSize) {
   irsend.sendPanasonic64(irsend.encodePanasonic(0x4004, 1, 2, 3), 56);
   irsend.makeDecodeResult();
 
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   // Shouldn't pass if strict off and wrong bit size.
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, false));
   // Re-decode with correct bit size.
   ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, 56, true));
   ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, 56, false));
@@ -378,9 +378,9 @@ TEST(TestDecodePanasonic, DecodeGlobalCacheExample) {
   irsend.sendGC(gc_test, 103);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x0190ED7C, irsend.capture.command);
@@ -388,7 +388,7 @@ TEST(TestDecodePanasonic, DecodeGlobalCacheExample) {
 
   ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x0190ED7C, irsend.capture.command);
@@ -410,7 +410,7 @@ TEST(TestDecodePanasonic, FailToDecodeNonPanasonicExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, PANASONIC_BITS, false));
+  ASSERT_FALSE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, false));
 }
 
 // Failing to decode Panasonic in Issue #245
@@ -437,7 +437,7 @@ TEST(TestDecodePanasonic, DecodeIssue245) {
 
   ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040100BCBD, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x100BCBD, irsend.capture.command);
@@ -449,7 +449,7 @@ TEST(TestDecodePanasonic, DecodeIssue245) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
-  EXPECT_EQ(PANASONIC_BITS, irsend.capture.bits);
+  EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040100BCBD, irsend.capture.value);
   EXPECT_EQ(0x4004, irsend.capture.address);
   EXPECT_EQ(0x100BCBD, irsend.capture.command);

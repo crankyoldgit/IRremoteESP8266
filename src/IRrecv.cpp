@@ -14,6 +14,7 @@ extern "C" {
 #endif
 #include <algorithm>
 #include "IRremoteESP8266.h"
+#include "IRutils.h"
 
 #ifdef UNIT_TEST
 #undef ICACHE_RAM_ATTR
@@ -35,7 +36,7 @@ irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
   if (irparams.rawlen)
-    irparams.rcvstate = STATE_STOP;
+    irparams.rcvstate = kStopState;
   os_intr_unlock();
 }
 
@@ -57,20 +58,20 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 
   if (rawlen >= irparams.bufsize) {
     irparams.overflow = true;
-    irparams.rcvstate = STATE_STOP;
+    irparams.rcvstate = kStopState;
   }
 
-  if (irparams.rcvstate == STATE_STOP)
+  if (irparams.rcvstate == kStopState)
     return;
 
-  if (irparams.rcvstate == STATE_IDLE) {
-    irparams.rcvstate = STATE_MARK;
+  if (irparams.rcvstate == kIdleState) {
+    irparams.rcvstate = kMarkState;
     irparams.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / RAWTICK;
+      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / kRawTick;
     else
-      irparams.rawbuf[rawlen] = (now - start) / RAWTICK;
+      irparams.rawbuf[rawlen] = (now - start) / kRawTick;
   }
   irparams.rawlen++;
 
@@ -85,9 +86,9 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 // Class constructor
 // Args:
 //   recvpin: GPIO pin the IR receiver module's data pin is connected to.
-//   bufsize: Nr. of entries to have in the capture buffer. (Default: RAWBUF)
+//   bufsize: Nr. of entries to have in the capture buffer. (Default: kRawBuf)
 //   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
-//            (Default: TIMEOUT_MS)
+//            (Default: kTimeoutMs)
 //   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
 // Returns:
 //   An IRrecv class object.
@@ -97,7 +98,7 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
-  irparams.timeout = std::min(timeout, (uint8_t) MAX_TIMEOUT_MS);
+  irparams.timeout = std::min(timeout, (uint8_t) kMaxTimeoutMs);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
     DPRINTLN("Could not allocate memory for the primary IR buffer.\n"
@@ -122,7 +123,7 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
     irparams_save = NULL;
   }
 #if DECODE_HASH
-  unknown_threshold = UNKNOWN_THRESHOLD;
+  unknown_threshold = kUnknownThreshold;
 #endif  // DECODE_HASH
 }
 
@@ -159,7 +160,7 @@ void IRrecv::disableIRIn() {
 }
 
 void IRrecv::resume() {
-  irparams.rcvstate = STATE_IDLE;
+  irparams.rcvstate = kIdleState;
   irparams.rawlen = 0;
   irparams.overflow = false;
 }
@@ -167,7 +168,7 @@ void IRrecv::resume() {
 // Make a copy of the interrupt state & buffer data.
 // Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
 // Only call this when you know the interrupt handlers won't modify anything.
-// i.e. In STATE_STOP.
+// i.e. In kStopState.
 //
 // Args:
 //   src: Pointer to an irparams_t structure to copy from.
@@ -223,7 +224,7 @@ void IRrecv::setUnknownThreshold(uint16_t length) {
 bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
-  if (irparams.rcvstate != STATE_STOP)
+  if (irparams.rcvstate != kStopState)
     return false;
 #endif
 
@@ -309,6 +310,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeMitsubishi(results))
     return true;
 #endif
+#if DECODE_MITSUBISHI_AC
+  DPRINTLN("Attempting Mitsubishi AC decode");
+  if (decodeMitsubishiAC(results))
+    return true;
+#endif
 #if DECODE_MITSUBISHI2
   DPRINTLN("Attempting Mitsubishi2 decode");
   if (decodeMitsubishi2(results))
@@ -341,7 +347,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Denon decode");
   if (decodeDenon(results, DENON_48_BITS) ||
       decodeDenon(results, DENON_BITS) ||
-      decodeDenon(results, DENON_LEGACY_BITS))
+      decodeDenon(results, kDenonLegacyBits))
     return true;
 #endif
 #if DECODE_PANASONIC
@@ -351,11 +357,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_LG
   DPRINTLN("Attempting LG (28-bit) decode");
-  if (decodeLG(results, LG_BITS, true))
+  if (decodeLG(results, kLgBits, true))
     return true;
   DPRINTLN("Attempting LG (32-bit) decode");
   // LG32 should be tried before Samsung
-  if (decodeLG(results, LG32_BITS, true))
+  if (decodeLG(results, kLg32Bits, true))
     return true;
 #endif
 #if DECODE_GICABLE
@@ -444,7 +450,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // other protocols that are NEC-like as well, as turning off strict may
   // cause this to match other valid protocols.
   DPRINTLN("Attempting NEC (non-strict) decode");
-  if (decodeNEC(results, NEC_BITS, false)) {
+  if (decodeNEC(results, kNECBits, false)) {
     results->decode_type = NEC_LIKE;
     return true;
   }
@@ -474,17 +480,32 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #if DECODE_HITACHI_AC2
   // HitachiAC2 should be checked before HitachiAC
   DPRINTLN("Attempting Hitachi AC2 decode");
-  if (decodeHitachiAC(results, HITACHI_AC2_BITS))
+  if (decodeHitachiAC(results, kHitachiAc2Bits))
     return true;
 #endif
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results, HITACHI_AC_BITS))
+  if (decodeHitachiAC(results, kHitachiAcBits))
     return true;
 #endif
 #if DECODE_HITACHI_AC1
   DPRINTLN("Attempting Hitachi AC1 decode");
-  if (decodeHitachiAC(results, HITACHI_AC1_BITS))
+  if (decodeHitachiAC(results, kHitachiAc1Bits))
+    return true;
+#endif
+#if DECODE_WHIRLPOOL_AC
+  DPRINTLN("Attempting Whirlpool AC decode");
+  if (decodeWhirlpoolAC(results))
+    return true;
+#endif
+#if DECODE_SAMSUNG_AC
+  DPRINTLN("Attempting Samsung AC decode");
+  if (decodeSamsungAC(results))
+    return true;
+#endif
+#if DECODE_LUTRON
+  DPRINTLN("Attempting Lutron decode");
+  if (decodeLutron(results))
     return true;
 #endif
 #if DECODE_HASH
@@ -540,7 +561,7 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured, uint32_t desired,
                    uint8_t tolerance, uint16_t delta) {
-  measured *= RAWTICK;  // Convert to uSecs.
+  measured *= kRawTick;  // Convert to uSecs.
   DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(" <= ");
@@ -566,7 +587,7 @@ bool IRrecv::match(uint32_t measured, uint32_t desired,
 //   Boolean: true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance, uint16_t delta) {
-  measured *= RAWTICK;  // Convert to uSecs.
+  measured *= kRawTick;  // Convert to uSecs.
   DPRINT("Matching ATLEAST ");
   DPRINT(measured);
   DPRINT(" vs ");
@@ -602,7 +623,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
                        uint8_t tolerance, int16_t excess) {
   DPRINT("Matching MARK ");
-  DPRINT(measured * RAWTICK);
+  DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
@@ -625,7 +646,7 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
                         uint8_t tolerance, int16_t excess) {
   DPRINT("Matching SPACE ");
-  DPRINT(measured * RAWTICK);
+  DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
@@ -669,7 +690,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   // Require at least some samples to prevent triggering on noise
   if (results->rawlen < unknown_threshold)
     return false;
-  int32_t hash = FNV_BASIS_32;
+  int32_t hash = kFnvBasis32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
   // however it is left this way for compatibility with previously captured
@@ -677,7 +698,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   for (uint16_t i = 1; i < results->rawlen - 2; i++) {
     int16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
     // Add value into the hash
-    hash = (hash * FNV_PRIME_32) ^ value;
+    hash = (hash * kFnvPrime32) ^ value;
   }
   results->value = hash & 0xFFFFFFFF;
   results->bits = results->rawlen / 2;
@@ -689,7 +710,8 @@ bool IRrecv::decodeHash(decode_results *results) {
 #endif  // DECODE_HASH
 
 // Match & decode the typical data section of an IR message.
-// The data value constructed as the Most Significant Bit first.
+// The data value is stored in the least significant bits reguardless of the
+// bit ordering requested.
 //
 // Args:
 //   data_ptr: A pointer to where we are at in the capture buffer.
@@ -698,16 +720,21 @@ bool IRrecv::decodeHash(decode_results *results) {
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow.
+//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
 //  A match_result_t structure containing the success (or not), the data value,
 //  and how many buffer entries were used.
 match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
-                                 const uint16_t nbits, const uint16_t onemark,
+                                 const uint16_t nbits,
+                                 const uint16_t onemark,
                                  const uint32_t onespace,
                                  const uint16_t zeromark,
                                  const uint32_t zerospace,
-                                 const uint8_t tolerance) {
+                                 const uint8_t tolerance,
+                                 const int16_t excess,
+                                 const bool MSBfirst) {
   match_result_t result;
   result.success = false;  // Fail by default.
   result.data = 0;
@@ -715,17 +742,21 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
        result.used < nbits * 2;
        result.used += 2, data_ptr += 2) {
     // Is the bit a '1'?
-    if (matchMark(*data_ptr, onemark, tolerance) &&
-        matchSpace(*(data_ptr + 1), onespace, tolerance))
+    if (matchMark(*data_ptr, onemark, tolerance, excess) &&
+        matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
       result.data = (result.data << 1) | 1;
-    // or is the bit a '0'?
-    else if (matchMark(*data_ptr, zeromark, tolerance) &&
-             matchSpace(*(data_ptr + 1), zerospace, tolerance))
-      result.data <<= 1;
-    else
+    } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
+               matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
+      result.data <<= 1;   // The bit is a '0'.
+    } else {
+      if (!MSBfirst)
+        result.data = reverseBits(result.data, result.used / 2);
       return result;  // It's neither, so fail.
+    }
   }
   result.success = true;
+  if (!MSBfirst)
+    result.data = reverseBits(result.data, nbits);
   return result;
 }
 
