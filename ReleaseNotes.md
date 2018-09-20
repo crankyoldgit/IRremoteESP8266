@@ -6,6 +6,8 @@
 - Fix HTML menu error for GICABLE in IRMQTTServer. (#516)
 - Fix Mitsubishi A/C mode setting. (#514)
 - Add missing ',' in auto analyse tool generated code. (#513)
+- Fix Fujitsu checksum validation. (#501)
+- Remove errant Repeat debug statement in IRMQTTServer. (#507)
 
 **[Features]**
 - Mitsubishi A/C decode improvements. (#514)
