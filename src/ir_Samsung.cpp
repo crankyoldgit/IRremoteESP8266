@@ -186,32 +186,29 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
 void IRsend::sendSamsungAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < kSamsungAcStateLength)
-  return;  // Not enough bytes to send a proper message.
+  if (nbytes < kSamsungAcStateLength && nbytes % kSamsungACSectionLength)
+    return;  // Not an appropriate number of bytes to send a proper message.
 
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
     mark(kSamsungAcHdrMark);
     space(kSamsungAcHdrSpace);
-    // Section 1
-    sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
-                kSamsungAcBitMark, kSamsungAcOneSpace,
-                kSamsungAcBitMark, kSamsungAcZeroSpace,
-                kSamsungAcBitMark, kSamsungAcSectionGap,
-                data, 7,  // 7 bytes == 56 bits
-                38000,
-                false, 0, 50);  // Send in LSBF order
-    // Section 2
-    sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
-                kSamsungAcBitMark, kSamsungAcOneSpace,
-                kSamsungAcBitMark, kSamsungAcZeroSpace,
-                kSamsungAcBitMark,
-                100000,  // Complete made up guess at inter-message gap.
-                data + 7, 7,  // 7 bytes == 56 bits
-                38000,
-                false, 0, 50);  // Send in LSBF order
+    // Send in 7 byte sections.
+    for (uint16_t offset = 0;
+         offset < nbytes;
+         offset += kSamsungACSectionLength) {
+         sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
+           kSamsungAcBitMark, kSamsungAcOneSpace,
+           kSamsungAcBitMark, kSamsungAcZeroSpace,
+           kSamsungAcBitMark, kSamsungAcSectionGap,
+           data + offset, kSamsungACSectionLength,  // 7 bytes == 56 bits
+           38000,
+           false, 0, 50);  // Send in LSBF order
     }
+    // Complete made up guess at inter-message gap.
+    space(100000 - kSamsungAcSectionGap);
+  }
 }
 #endif  // SEND_SAMSUNG_AC
 
@@ -221,7 +218,7 @@ IRSamsungAc::IRSamsungAc(uint16_t pin) : _irsend(pin) {
 }
 
 void IRSamsungAc::stateReset() {
-  for (uint8_t i = 0; i < kSamsungAcStateLength; i++)
+  for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = 0x02;
   remote_state[1] = 0x92;
@@ -243,13 +240,14 @@ uint8_t IRSamsungAc::calcChecksum(
     const uint8_t state[], const uint16_t length) {
   uint8_t sum = 0;
   uint8_t currentbyte;
-
+  // Safety check so we don't go outside the array.
+  if (length <= 5)  return 255;
   // Shamelessly inspired by:
   //   https://github.com/adafruit/Raw-IR-decoder-for-Arduino/pull/3/files
   // Count most of the '1' bits after the checksum location.
-  for (uint8_t i = 9; i < length - 1; i++) {
+  for (uint8_t i = length - 5; i < length - 1; i++) {
     currentbyte = state[i];
-    if (i == 9)  currentbyte = state[9] & 0b11111110;
+    if (i == length - 5)  currentbyte = state[length - 5] & 0b11111110;
     for (; currentbyte; currentbyte >>= 1)
       if (currentbyte & 1)  sum++;
   }
@@ -258,15 +256,15 @@ uint8_t IRSamsungAc::calcChecksum(
 
 bool IRSamsungAc::validChecksum(const uint8_t state[],
                                 const uint16_t length) {
-  if (length < 9)  return true;  // No checksum to compare with. Assume okay.
-  return (state[8] >> 4) == calcChecksum(state, length);
+  if (length <= 5)  return true;  // No checksum to compare with. Assume okay.
+  return (state[length - 6] >> 4) == calcChecksum(state, length);
 }
 
 // Update the checksum for the internal state.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 9)  return;
-  remote_state[8] &= 0x0F;
-  remote_state[8] |= (calcChecksum(remote_state, length) << 4);
+  remote_state[length - 6] &= 0x0F;
+  remote_state[length - 6] |= (calcChecksum(remote_state, length) << 4);
 }
 
 #if SEND_SAMSUNG_AC
@@ -281,9 +279,14 @@ uint8_t* IRSamsungAc::getRaw() {
   return remote_state;
 }
 
-void IRSamsungAc::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kSamsungAcStateLength; i++) {
+void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
+  for (uint8_t i = 0; i < length && i < kSamsungAcExtendedStateLength; i++) {
     remote_state[i] = new_code[i];
+  }
+  // Shrink the extended state into a normal state.
+  if (length > kSamsungAcStateLength) {
+    for (uint8_t i = kSamsungAcStateLength; i < length; i++)
+      remote_state[i - kSamsungACSectionLength] = remote_state[i];
   }
 }
 
@@ -506,8 +509,7 @@ std::string IRSamsungAc::toString() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
-//
+// Status: BETA / Appears to mostly work.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
@@ -515,10 +517,8 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
                              bool strict) {
   if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1)
     return false;  // Can't possibly be a valid Samsung A/C message.
-  if (strict) {
-    if (nbits != kSamsungAcBits)
-      return false;
-  }
+  if (nbits != kSamsungAcBits && nbits != kSamsungAcExtendedBits)
+    return false;
 
   uint16_t offset = kStartOffset;
   uint16_t dataBitsSoFar = 0;
@@ -530,9 +530,10 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kSamsungAcHdrSpace))
     return false;
   // Section(s)
-  for (uint8_t section = 0, pos = 7, i = 0;
-       section < kSamsungAcSections;
-       section++, pos += 7) {
+  for (uint16_t pos = kSamsungACSectionLength, i = 0;
+       pos <= nbits / 8;
+       pos += kSamsungACSectionLength) {
+    uint64_t sectiondata = 0;
     // Section Header
     if (!matchMark(results->rawbuf[offset++], kSamsungAcSectionMark))
       return false;
@@ -554,11 +555,13 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
         return false;  // Fail
       }
       results->state[i] = data_result.data;
+      sectiondata = (sectiondata << 8) + data_result.data;
     }
+    DPRINTLN("DEBUG: sectiondata = 0x" + uint64ToString(sectiondata, 16));
     // Section Footer
     if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark))
       return false;
-    if (section < kSamsungAcSections - 1) {  // Inter-section gap.
+    if (pos < nbits / 8) {  // Inter-section gap.
       if (!matchSpace(results->rawbuf[offset++], kSamsungAcSectionGap))
         return false;
     } else {  // Last section / End of message gap.
@@ -568,15 +571,20 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
     }
   }
   // Compliance
+  // Re-check we got the correct size/length due to the way we read the data.
+  if (dataBitsSoFar != nbits)  return false;
+  // Is the signature correct?
+  DPRINTLN("DEBUG: Checking signature.");
+  if (results->state[0] != 0x02 || results->state[2] != 0x0F)
+    return false;
+  if (results->state[1] != 0x92 && results->state[1] != 0xB2)
+    return false;
   if (strict) {
-    // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kSamsungAcBits)  return false;
-    // Is the model signature correct?
-    if (results->state[0] != 0x02 || results->state[1] != 0x92 ||
-        results->state[2] != 0x0F)
-      return false;
     // Is the checksum valid?
-    if (!IRSamsungAc::validChecksum(results->state))  return false;
+    if (!IRSamsungAc::validChecksum(results->state, nbits / 8)) {
+      DPRINTLN("DEBUG: Checksum failed!");
+      return false;
+    }
   }
   // Success
   results->decode_type = SAMSUNG_AC;
