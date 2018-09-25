@@ -364,15 +364,15 @@ uint8_t IRSamsungAc::getFan() {
 }
 
 bool IRSamsungAc::getSwing() {
-  return (remote_state[8] & kSamsungAcSwingMask) == (kSamsungAcSwingMove << 4);
+  return (remote_state[9] & kSamsungAcSwingMask) == (kSamsungAcSwingMove << 4);
 }
 
 void IRSamsungAc::setSwing(const bool state) {
-  remote_state[8] &= ~kSamsungAcSwingMask;  // Clear the previous swing state.
+  remote_state[9] &= ~kSamsungAcSwingMask;  // Clear the previous swing state.
   if (state)
-    remote_state[8] |= (kSamsungAcSwingMove << 4);
+    remote_state[9] |= (kSamsungAcSwingMove << 4);
   else
-    remote_state[8] |= (kSamsungAcSwingStop << 4);
+    remote_state[9] |= (kSamsungAcSwingStop << 4);
 }
 
 bool IRSamsungAc::getBeep() {

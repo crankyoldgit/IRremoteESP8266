@@ -332,6 +332,20 @@ TEST(TestIRSamsungAcClass, SetAndGetSwing) {
   EXPECT_FALSE(samsung.getSwing());
   samsung.setSwing(true);
   EXPECT_TRUE(samsung.getSwing());
+
+  // Real examples from:
+  // https://github.com/markszabo/IRremoteESP8266/issues/505#issuecomment-424036602
+  // TODO(Hollako): Explain why state[9] lowest bit changes between on and off.
+  const uint8_t expected_off[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xE2, 0xFE, 0x71, 0x80, 0x11, 0xF0};
+  samsung.setRaw(expected_off);
+  EXPECT_FALSE(samsung.getSwing());
+  const uint8_t expected_on[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAF, 0x71, 0x80, 0x11, 0xF0};
+  samsung.setRaw(expected_on);
+  EXPECT_TRUE(samsung.getSwing());
 }
 
 TEST(TestIRSamsungAcClass, SetAndGetClean) {
@@ -446,21 +460,21 @@ TEST(TestIRSamsungAcClass, ChecksumCalculation) {
 
 TEST(TestIRSamsungAcClass, HumanReadable) {
   IRSamsungAc samsung(0);
-  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: Off, "
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: On, "
             "Beep: Off, Clean: Off, Quiet: Off",
             samsung.toString());
   samsung.setTemp(kSamsungAcMaxTemp);
   samsung.setMode(kSamsungAcHeat);
   samsung.off();
   samsung.setFan(kSamsungAcFanHigh);
-  samsung.setSwing(true);
+  samsung.setSwing(false);
   samsung.setBeep(true);
   samsung.setClean(true);
-  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 5 (HIGH), Swing: On, "
+  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 5 (HIGH), Swing: Off, "
             "Beep: On, Clean: On, Quiet: Off",
             samsung.toString());
   samsung.setQuiet(true);
-  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 0 (AUTO), Swing: On, "
+  EXPECT_EQ("Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 0 (AUTO), Swing: Off, "
             "Beep: On, Clean: On, Quiet: On",
             samsung.toString());
 }
@@ -525,7 +539,7 @@ TEST(TestDecodeSamsungAC, DecodeRealExample) {
 
   IRSamsungAc samsung(0);
   samsung.setRaw(irsend.capture.state);
-  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: Off, "
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: On, "
             "Beep: Off, Clean: Off, Quiet: Off",
             samsung.toString());
 }
