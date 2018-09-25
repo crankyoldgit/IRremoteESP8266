@@ -139,8 +139,6 @@ void dumpACInfo(decode_results *results) {
     IRMitsubishiAC ac(0);
     ac.setRaw(results->state);
     description = ac.toString();
-  } else {
-    Serial.println("Not Mitsu AC.");
   }
 #endif  // DECODE_MITSUBISHI_AC
 #if DECODE_TOSHIBA_AC
