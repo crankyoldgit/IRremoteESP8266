@@ -13,7 +13,7 @@
  * - Set the MQTT_SERVER define below to the address of your MQTT server.
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - WiFiManager (https://github.com/tzapu/WiFiManager)
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     #define MQTT_MAX_PACKET_SIZE 512
@@ -467,7 +467,9 @@ void handleReset() {
 // Args:
 //   irType: Nr. of the protocol we need to send.
 //   str: A hexadecimal string containing the state to be sent.
-void parseStringAndSendAirCon(const uint16_t irType, const String str) {
+// Returns:
+//   bool: Successfully sent or not.
+bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint8_t strOffset = 0;
   uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
   uint16_t stateSize = 0;
@@ -478,7 +480,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint16_t inputLength = str.length() - strOffset;
   if (inputLength == 0) {
     debug("Zero length AirCon code encountered. Ignored.");
-    return;  // No input. Abort.
+    return false;  // No input. Abort.
   }
 
   switch (irType) {  // Get the correct state size for the protocol.
@@ -545,11 +547,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
-      return;
+      return false;
   }
   if (inputLength > stateSize * 2) {
     debug("AirCon code to large for the given protocol.");
-    return;
+    return false;
   }
 
   // Ptr to the least significant byte of the resulting state for this protocol.
@@ -566,7 +568,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
         c = c - 'a' + 10;
     } else {
       debug("Aborting! Non-hexadecimal char found in AirCon state: " + str);
-      return;
+      return false;
     }
     if (i % 2 == 1) {  // Odd: Upper half of the byte.
       *statePtr += (c << 4);
@@ -650,8 +652,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #endif
     default:
       debug("Unexpected AirCon type in send request. Not sent.");
-      return;
+      return false;
   }
+  return true;  // We were successful as far as we can tell.
 }
 
 // Count how many values are in the String.
@@ -1065,6 +1068,8 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     delay(20);
   ir_lock = true;
 
+  bool success = true;  // Assume success.
+
   // send the IR message.
   switch (ir_type) {
 #if SEND_RC5
@@ -1182,8 +1187,10 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case HITACHI_AC:  // 40
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42
+    case WHIRLPOOL_AC:  // 45
+    case SAMSUNG_AC:  // 46
     case ELECTRA_AC:  // 48
-      parseStringAndSendAirCon(ir_type, code_str);
+      success = parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
     case DENON:  // 17
@@ -1294,13 +1301,20 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       irsend.sendLutron(code, bits, repeat);
       break;
 #endif
+    default:
+      // If we got here, we didn't know how to send it.
+      success = false;
   }
-  sendReqCounter++;
   // Release the lock.
   ir_lock = false;
 
-  // Indicate that we sent the message.
-  debug("Sent the IR message.");
+  // Indicate that we sent the message or not.
+  if (success) {
+    sendReqCounter++;
+    debug("Sent the IR message:");
+  } else {
+    debug("Failed to send IR Message:");
+  }
   debug("Type: " + String(ir_type));
   // For "long" codes we basically repeat what we got.
   if (hasACState((decode_type_t) ir_type) ||
@@ -1311,23 +1325,26 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     debug(code_str);
     // Confirm what we were asked to send was sent.
 #ifdef MQTT_ENABLE
-    if (ir_type == PRONTO && repeat > 0)
-      mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
-                                    String(repeat) + "," +
-                                    String(code_str)).c_str());
-    else
-      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    String(code_str)).c_str());
+    if (success) {
+      if (ir_type == PRONTO && repeat > 0)
+        mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
+                                      String(repeat) + "," +
+                                      String(code_str)).c_str());
+      else
+        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                      String(code_str)).c_str());
+    }
 #endif  // MQTT_ENABLE
   } else {  // For "short" codes, we break it down a bit more before we report.
     debug("Code: 0x" + uint64ToString(code, 16));
     debug("Bits: " + String(bits));
     debug("Repeats: " + String(repeat));
 #ifdef MQTT_ENABLE
-    mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                  uint64ToString(code, 16)
-                                  + "," + String(bits) + "," +
-                                  String(repeat)).c_str());
+    if (success)
+      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                    uint64ToString(code, 16)
+                                    + "," + String(bits) + "," +
+                                    String(repeat)).c_str());
 #endif  // MQTT_ENABLE
   }
 }
