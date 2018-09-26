@@ -10,7 +10,7 @@
 //          EE      LL      EE      CC    C   TTT   RR  RR  AAAAAAA
 //          EEEEEEE LLLLLLL EEEEEEE  CCCCC    TTT   RR   RR AA   AA
 
-// Elctra A/C added by crankyoldgit
+// Electra A/C added by crankyoldgit
 //
 // Equipment it seems compatible with:
 //  * <Add models (A/C & remotes) you've gotten it working with here>
