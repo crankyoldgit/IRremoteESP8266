@@ -1179,6 +1179,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case HITACHI_AC:  // 40
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42
+    case ELECTRA_AC:  // 48
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
