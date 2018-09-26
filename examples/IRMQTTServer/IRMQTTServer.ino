@@ -197,6 +197,7 @@ bool boot = true;
 bool ir_lock = false;  // Primitive locking for gating the IR LED.
 uint32_t sendReqCounter = 0;
 bool lastSendSucceeded = false;  // Store the success status of the last send.
+uint32_t lastSendTime = 0;
 int8_t offset;  // The calculated period offset for this chip and library.
 
 #ifdef MQTT_ENABLE
@@ -278,7 +279,8 @@ void handleRoot() {
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
-    "Last message: " + String(lastSendSucceeded ? "Sent Ok" : "FAILED") + "</p>"
+    "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
+    " <i>(" + timeSince(lastSendTime) + ")</i></p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
     "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
@@ -1329,6 +1331,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       // If we got here, we didn't know how to send it.
       success = false;
   }
+  lastSendTime = millis();
   // Release the lock.
   ir_lock = false;
 
