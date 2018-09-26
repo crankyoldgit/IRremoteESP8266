@@ -289,6 +289,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,
                   uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_ELECTRA_AC
+  void sendElectraAC(unsigned char data[],
+                     uint16_t nbytes = kElectraAcStateLength,
+                     uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

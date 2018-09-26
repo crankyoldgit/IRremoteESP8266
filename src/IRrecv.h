@@ -315,6 +315,10 @@ class IRrecv {
   bool decodeLutron(decode_results *results, uint16_t nbits = kLutronBits,
                      bool strict = true);
 #endif
+#if DECODE_ELECTRA_AC
+  bool decodeElectraAC(decode_results *results,
+                       uint16_t nbits = kElectraAcBits, bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

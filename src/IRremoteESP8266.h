@@ -187,11 +187,14 @@
 #define DECODE_LUTRON          true
 #define SEND_LUTRON            true
 
+#define DECODE_ELECTRA_AC      true
+#define SEND_ELECTRA_AC        true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
-     DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC)
+     DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -257,7 +260,8 @@ enum decode_type_t {
   HAIER_AC_YRW02,
   WHIRLPOOL_AC,
   SAMSUNG_AC,
-  LUTRON
+  LUTRON,
+  ELECTRA_AC,
 };
 
 // Message lengths & required repeat values
@@ -278,6 +282,8 @@ const uint16_t kDenonBits = 15;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
+const uint16_t kElectraAcStateLength = 13;
+const uint16_t kElectraAcBits = kElectraAcStateLength * 8;
 const uint16_t kFujitsuAcMinRepeat = kNoRepeat;
 const uint16_t kFujitsuAcStateLength = 16;
 const uint16_t kFujitsuAcStateLengthShort = 7;
