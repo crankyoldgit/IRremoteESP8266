@@ -10,7 +10,11 @@
  * # Instructions
  *
  * ## Before First Boot (i.e. Compile time)
- * - Set the MQTT_SERVER define below to the address of your MQTT server.
+ * - Either:
+ *   o Set the MQTT_SERVER define below to the address of your MQTT server.
+ *   or
+ *   o Disable MQTT by commenting out the line "#define MQTT_ENABLE" down below.
+ *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
  *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
