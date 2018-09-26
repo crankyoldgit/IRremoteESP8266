@@ -648,6 +648,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendElectraAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+    default:
+      debug("Unexpected AirCon type in send request. Not sent.");
+      return;
   }
 }
 
