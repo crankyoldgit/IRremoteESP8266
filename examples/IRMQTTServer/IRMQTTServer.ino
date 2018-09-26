@@ -537,7 +537,20 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       stateSize = kWhirlpoolAcStateLength;
       break;
     case SAMSUNG_AC:
-      stateSize = kSamsungAcStateLength;
+      // Samsung has two distinct & different size states, so make a best guess
+      // which one we are being presented with based on the number of
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize, (uint16_t) (kSamsungAcStateLength));
+      // If we think it isn't a "normal" message.
+      if (stateSize > kSamsungAcStateLength)
+        // Then it probably the extended size.
+        stateSize = std::max(stateSize,
+                             (uint16_t) (kSamsungAcExtendedStateLength));
+      // Lastly, it should never exceed the maximum "extended" size.
+      stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
@@ -637,6 +650,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_HITACHI_AC2
     case HITACHI_AC2:
       irsend.sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_SAMSUNG_AC
+    case SAMSUNG_AC:
+      irsend.sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
   }
