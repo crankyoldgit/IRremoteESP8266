@@ -190,11 +190,15 @@
 #define DECODE_ELECTRA_AC      true
 #define SEND_ELECTRA_AC        true
 
+#define DECODE_PANASONIC_AC    true
+#define SEND_PANASONIC_AC      true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
-     DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC)
+     DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
+     DECODE_PANASONIC_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -262,6 +266,7 @@ enum decode_type_t {
   SAMSUNG_AC,
   LUTRON,
   ELECTRA_AC,
+  PANASONIC_AC,
 };
 
 // Message lengths & required repeat values
@@ -325,6 +330,8 @@ const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
 const uint16_t kPanasonicBits = 48;
 const uint32_t kPanasonicManufacturer = 0x4004;
+const uint16_t kPanasonicAcStateLength = 27;
+const uint16_t kPanasonicAcBits = kPanasonicAcStateLength * 8;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;
 const uint16_t kRC5Bits = kRC5RawBits - 2;

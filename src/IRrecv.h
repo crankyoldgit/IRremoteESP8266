@@ -320,6 +320,10 @@ class IRrecv {
   bool decodeElectraAC(decode_results *results,
                        uint16_t nbits = kElectraAcBits, bool strict = true);
 #endif
+#if DECODE_PANASONIC_AC
+  bool decodePanasonicAC(decode_results *results,
+                           uint16_t nbits = kPanasonicAcBits, bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_
