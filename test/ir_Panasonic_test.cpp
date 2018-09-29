@@ -566,11 +566,21 @@ TEST(TestIRPanasonicAcClass, SetAndGetModel) {
   EXPECT_EQ(kPanasonicNke, pana.getModel());
   pana.setModel(kPanasonicJke);
   EXPECT_EQ(kPanasonicJke, pana.getModel());
+
+  // This state tickled a bug in getModel(). Should read as a JKE.
+  uint8_t jkeState[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+      0x02, 0x20, 0xE0, 0x04, 0x00, 0x32, 0x2E, 0x80, 0xA2, 0x00, 0x00,
+      0x06, 0x60, 0x00, 0x00, 0x80, 0x00, 0x06, 0x74};
+  pana.setModel(kPanasonicDke);  // Make sure it isn't some how set to JKE
+  pana.setRaw(jkeState);
+  EXPECT_EQ(kPanasonicJke, pana.getModel());
+  EXPECT_STATE_EQ(jkeState, pana.getRaw(), kPanasonicAcBits);
 }
 
 TEST(TestIRPanasonicAcClass, SetAndGetMode) {
   IRPanasonicAc pana(0);
   pana.setMode(kPanasonicAcCool);
+  pana.setTemp(25);
   EXPECT_EQ(kPanasonicAcCool, pana.getMode());
   pana.setMode(kPanasonicAcHeat);
   EXPECT_EQ(kPanasonicAcHeat, pana.getMode());
@@ -578,6 +588,10 @@ TEST(TestIRPanasonicAcClass, SetAndGetMode) {
   EXPECT_EQ(kPanasonicAcAuto, pana.getMode());
   pana.setMode(kPanasonicAcDry);
   EXPECT_EQ(kPanasonicAcDry, pana.getMode());
+  EXPECT_EQ(25, pana.getTemp());  // Temp should be unchanged.
+  pana.setMode(kPanasonicAcFan);
+  EXPECT_EQ(kPanasonicAcFan, pana.getMode());
+  EXPECT_EQ(27, pana.getTemp());  // Temp should change.
   pana.setMode(kPanasonicAcCool);
   EXPECT_EQ(kPanasonicAcCool, pana.getMode());
 }

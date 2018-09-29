@@ -19,8 +19,15 @@
 // Panasonic protocol originally added by Kristian Lauszus from:
 //   https://github.com/z3t0/Arduino-IRremote
 // (Thanks to zenwheel and other people at the original blog post)
-// Panasonic A/C support heavily influenced by:
+//
+// Panasonic A/C support add by crankyoldgit but heavily influenced by:
 //   https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
+// Panasonic A/C models supported:
+//   A/C Series/models:
+//     JKE, LKE, DKE, & NKE series. (In theory)
+//     CS-YW9MKD (confirmed)
+//   A/C Remotes:
+//     A75C3747 (confirmed)
 
 // Constants
 // Ref:
@@ -203,9 +210,14 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //   nbits:  Nr. of bits of data to be sent. Typically kPanasonicAcBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: Alpha / Needs testing against a real device.
-// Notes:
-//   Supported models: NKE, DKE, JKE, & LKE series.
+// Status: Beta / Needs testing against a real device.
+//:
+// Panasonic A/C models supported:
+//   A/C Series/models:
+//     JKE, LKE, DKE, & NKE series.
+//     CS-YW9MKD
+//   A/C Remotes:
+//     A75C3747
 //
 void IRsend::sendPanasonicAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
   if (nbytes < kPanasonicAcStateLength)  return;
@@ -302,10 +314,10 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
 }
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
-  if ((remote_state[13] & 0x0F) == 0x02)
-    return kPanasonicLke;
   if (remote_state[17] == 0x00 && (remote_state[23] & 0x80))
     return kPanasonicJke;
+  if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
+    return kPanasonicLke;
   if (remote_state[23] == 0x01 && remote_state[25] == 0x06)
     return kPanasonicDke;
   if (remote_state[17] == 0x06)
@@ -350,12 +362,15 @@ uint8_t IRPanasonicAc::getMode() {
 void IRPanasonicAc::setMode(const uint8_t desired) {
   uint8_t mode = kPanasonicAcAuto;  // Default to Auto mode.
   switch (desired) {
+    case kPanasonicAcFan:
+      setTemp(27);  // Allegedly Fan mode has a temperature of 27.
+      // FALLTHRU
     case kPanasonicAcAuto:
     case kPanasonicAcCool:
     case kPanasonicAcHeat:
     case kPanasonicAcDry:
-    case kPanasonicAcFan:
       mode = desired;
+      break;
   }
   remote_state[13] &= 0x0F;  // Clear the previous mode bits.
   remote_state[13] |= mode << 4;
@@ -587,8 +602,14 @@ std::string IRPanasonicAc::toString() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Alpha / Needs testing against a real device.
+// Status: Beta / Appears to work with real device(s).
 //
+// Panasonic A/C models supported:
+//   A/C Series/models:
+//     JKE, LKE, DKE, & NKE series.
+//     CS-YW9MKD
+//   A/C Remotes:
+//     A75C3747 (Confirmed)
 bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
                                bool strict) {
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
