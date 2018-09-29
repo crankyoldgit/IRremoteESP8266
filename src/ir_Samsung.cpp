@@ -226,7 +226,7 @@ void IRSamsungAc::stateReset() {
   remote_state[6] = 0xF0;
   remote_state[7] = 0x01;
   remote_state[8] = 0x02;
-  remote_state[9] = 0xAF;
+  remote_state[9] = 0xAE;
   remote_state[10] = 0x71;
   remote_state[12] = 0x15;
   remote_state[13] = 0xF0;
@@ -358,7 +358,7 @@ void IRSamsungAc::setMode(const uint8_t mode) {
 }
 
 uint8_t IRSamsungAc::getMode() {
-  return ((remote_state[12] & kSamsungAcModeMask) >> 4);
+  return (remote_state[12] & kSamsungAcModeMask) >> 4;
 }
 
 void IRSamsungAc::setFan(const uint8_t speed) {
@@ -384,10 +384,14 @@ uint8_t IRSamsungAc::getFan() {
 }
 
 bool IRSamsungAc::getSwing() {
-  return (remote_state[9] & kSamsungAcSwingMask) == (kSamsungAcSwingMove << 4);
+  // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
+  // e.g. 0xAE or 0XAF for swing move.
+  return ((remote_state[9] & kSamsungAcSwingMask) >> 4) == kSamsungAcSwingMove;
 }
 
 void IRSamsungAc::setSwing(const bool state) {
+  // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
+  // e.g. 0xAE or 0XAF for swing move.
   remote_state[9] &= ~kSamsungAcSwingMask;  // Clear the previous swing state.
   if (state)
     remote_state[9] |= (kSamsungAcSwingMove << 4);

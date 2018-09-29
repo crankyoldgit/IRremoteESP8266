@@ -353,6 +353,22 @@ TEST(TestSendSamsungAC, SendExtendedData) {
 
 // Tests for IRSamsungAc class.
 
+TEST(TestIRSamsungAcClass, SetAndGetRaw) {
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+  IRSamsungAc samsung(0);
+  samsung.setRaw(expectedState);
+  EXPECT_STATE_EQ(expectedState, samsung.getRaw(), kSamsungAcBits);
+  uint8_t extendedState[kSamsungAcExtendedStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+  samsung.setRaw(extendedState, kSamsungAcExtendedStateLength);
+  // We should NOT get the extended state back.
+  EXPECT_STATE_EQ(expectedState, samsung.getRaw(), kSamsungAcBits);
+}
+
 TEST(TestIRSamsungAcClass, SetAndGetPower) {
   IRSamsungAc samsung(0);
   samsung.on();
@@ -520,6 +536,41 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
             samsung.toString());
 }
 
+TEST(TestIRSamsungAcClass, GeneralConstruction) {
+  IRSamsungAc samsung(0);
+
+  uint8_t OnCoolFAutoBOffCOffQOffT20Soff[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+
+  samsung.setPower(true);
+  samsung.setMode(kSamsungAcCool);
+  samsung.setFan(kSamsungAcFanAuto);
+  samsung.setSwing(false);
+  samsung.setBeep(false);
+  samsung.setClean(false);
+  samsung.setQuiet(false);
+  samsung.setTemp(20);
+  EXPECT_STATE_EQ(OnCoolFAutoBOffCOffQOffT20Soff, samsung.getRaw(),
+                  kSamsungAcBits);
+  /* Disabled until we understand why LSB bit of the swing byte changes.
+  // TODO(Hollako): Explain why sometimes the LSB of state[9] is a 1.
+  // e.g. 0xAE or 0XAF for swing move.
+  uint8_t OnHeatFAutoBOffCOffQOffT17Son[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAF, 0x71, 0x10, 0x41, 0xF0};
+  samsung.setPower(true);
+  samsung.setMode(kSamsungAcHeat);
+  samsung.setFan(kSamsungAcFanAuto);
+  samsung.setSwing(true);
+  samsung.setBeep(false);
+  samsung.setClean(false);
+  samsung.setQuiet(false);
+  samsung.setTemp(17);
+  EXPECT_STATE_EQ(OnHeatFAutoBOffCOffQOffT17Son, samsung.getRaw(),
+                  kSamsungAcBits);
+  */
+}
 // Tests for decodeSamsungAC().
 
 // Decode normal SamsungAC messages.
@@ -730,5 +781,87 @@ TEST(TestDecodeSamsungAC, DecodePowerOffSample) {
   IRSamsungAc samsung(0);
   samsung.setRaw(irsend.capture.state, kSamsungAcExtendedStateLength);
   EXPECT_EQ("Power: Off, Mode: 1 (COOL), Temp: 24C, Fan: 0 (AUTO), Swing: Off, "
+            "Beep: Off, Clean: Off, Quiet: Off", samsung.toString());
+}
+
+TEST(TestDecodeSamsungAC, DecodeHeatSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[233] = {650, 16260, 3014, 8934, 534, 486, 508, 1478, 514,
+      484, 510, 486, 508, 512, 484, 510, 562, 432, 572, 422, 540, 454, 514,
+      1452, 534, 486, 510, 484, 510, 1456, 536, 484, 510, 484, 510, 1454, 536,
+      1478, 512, 1476, 514, 1482, 508, 1482, 592, 428, 570, 424, 538, 456, 508,
+      486, 510, 484, 512, 484, 510, 486, 510, 484, 510, 484, 510, 486, 510, 484,
+      510, 484, 510, 484, 510, 484, 510, 484, 510, 486, 508, 510, 484, 510, 568,
+      428, 570, 424, 538, 458, 512, 482, 510, 486, 510, 484, 510, 484, 510, 484,
+      510, 484, 510, 484, 510, 484, 510, 484, 510, 484, 510, 484, 510, 1474,
+      516, 1502, 534, 1432, 594, 1398, 536, 2954, 3018, 8932, 536, 1458, 532,
+      484, 510, 484, 512, 484, 510, 484, 510, 484, 510, 484, 512, 484, 510, 484,
+      510, 1480, 508, 510, 530, 464, 568, 426, 568, 426, 514, 480, 508, 486,
+      508, 1456, 534, 1478, 514, 1452, 538, 1478, 512, 484, 510, 1456, 534, 486,
+      510, 1478, 512, 1480, 570, 450, 570, 424, 540, 454, 512, 1452, 534, 1458,
+      534, 1454, 536, 484, 512, 482, 512, 484, 512, 484, 512, 482, 512, 1474,
+      514, 484, 512, 510, 486, 508, 534, 1430, 594, 426, 512, 482, 512, 482,
+      510, 484, 512, 482, 512, 1452, 538, 482, 512, 482, 512, 482, 510, 484,
+      510, 484, 510, 1478, 512, 1504, 488, 1480, 560, 1454, 514};
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAF, 0x71, 0x10, 0x41, 0xF0};
+
+  irsend.sendRaw(rawData, 233, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc samsung(0);
+  samsung.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 4 (HEAT), Temp: 17C, Fan: 0 (AUTO), Swing: On, "
+            "Beep: Off, Clean: Off, Quiet: Off", samsung.toString());
+}
+
+TEST(TestDecodeSamsungAC, DecodeCoolSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[233] = {690, 17854, 3086, 8862, 610, 410, 584, 1382, 610,
+      410, 586, 408, 586, 408, 586, 408, 588, 410, 584, 436, 558, 436, 570,
+      1396, 598, 422, 576, 418, 580, 1384, 612, 410, 586, 410, 584, 1380, 612,
+      1382, 608, 1384, 606, 1404, 586, 1404, 586, 436, 558, 438, 566, 428, 568,
+      426, 570, 424, 576, 418, 578, 416, 584, 410, 586, 408, 584, 410, 586, 408,
+      586, 408, 586, 410, 586, 408, 586, 408, 588, 408, 586, 408, 588, 408, 586,
+      438, 558, 436, 568, 426, 568, 428, 568, 426, 576, 418, 578, 416, 584, 412,
+      584, 410, 586, 408, 586, 410, 586, 410, 584, 410, 586, 408, 586, 1384,
+      606, 1402, 588, 1410, 580, 1410, 608, 2864, 3108, 8864, 594, 1394, 604,
+      416, 584, 410, 586, 410, 586, 410, 586, 410, 584, 410, 586, 410, 586, 408,
+      586, 1404, 588, 408, 586, 408, 586, 436, 560, 1408, 592, 1400, 596, 1396,
+      600, 416, 584, 1382, 608, 1380, 610, 1404, 586, 1384, 608, 1384, 606,
+      1402, 588, 1408, 582, 1410, 564, 452, 568, 428, 572, 424, 576, 1414, 582,
+      1386, 608, 1382, 608, 410, 584, 410, 584, 410, 586, 408, 586, 408, 586,
+      408, 586, 408, 588, 1408, 582, 436, 540, 1426, 590, 428, 574, 420, 578,
+      418, 580, 1384, 610, 410, 584, 410, 584, 410, 584, 412, 584, 408, 586,
+      410, 586, 408, 586, 1404, 586, 1408, 582, 1410, 562, 1426, 610};
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+
+  irsend.sendRaw(rawData, 233, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc samsung(0);
+  samsung.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 0 (AUTO), Swing: Off, "
             "Beep: Off, Clean: Off, Quiet: Off", samsung.toString());
 }
