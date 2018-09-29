@@ -814,7 +814,7 @@ TEST(TestDecodeSamsungAC, DecodeHeatSample) {
 
   irsend.sendRaw(rawData, 233, 38000);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
@@ -855,7 +855,7 @@ TEST(TestDecodeSamsungAC, DecodeCoolSample) {
 
   irsend.sendRaw(rawData, 233, 38000);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
