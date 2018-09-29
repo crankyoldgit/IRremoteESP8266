@@ -168,7 +168,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.5.5"
+#define _MY_VERSION_ "v0.5.6"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG
@@ -414,6 +414,7 @@ void handleRoot() {
       "<select name='type'>"
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin</option>"
+        "<option value='48'>Electra</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
         "<option value='38'>Haier (9 bytes)</option>"
@@ -489,6 +490,9 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     case DAIKIN:
       stateSize = kDaikinStateLength;
+      break;
+    case ELECTRA_AC:
+      stateSize = kElectraAcStateLength;
       break;
     case MITSUBISHI_AC:
       stateSize = kMitsubishiACStateLength;
@@ -655,6 +659,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
       irsend.sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
+      break;
+#endif
+#if SEND_ELECTRA_AC
+    case ELECTRA_AC:
+      irsend.sendElectraAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
   }
@@ -1189,6 +1198,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42
     case SAMSUNG_AC:  // 46
+    case ELECTRA_AC:  // 48
       parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
