@@ -10,10 +10,14 @@
  * # Instructions
  *
  * ## Before First Boot (i.e. Compile time)
- * - Set the MQTT_SERVER define below to the address of your MQTT server.
+ * - Either:
+ *   o Set the MQTT_SERVER define below to the address of your MQTT server.
+ *   or
+ *   o Disable MQTT by commenting out the line "#define MQTT_ENABLE" down below.
+ *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - WiFiManager (https://github.com/tzapu/WiFiManager)
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     #define MQTT_MAX_PACKET_SIZE 512
@@ -168,7 +172,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define argBits "bits"
 #define argRepeat "repeats"
 
-#define _MY_VERSION_ "v0.5.6"
+#define _MY_VERSION_ "v0.6.0"
 
 #if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
 #undef DEBUG
@@ -192,6 +196,8 @@ uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
 bool ir_lock = false;  // Primitive locking for gating the IR LED.
 uint32_t sendReqCounter = 0;
+bool lastSendSucceeded = false;  // Store the success status of the last send.
+uint32_t lastSendTime = 0;
 int8_t offset;  // The calculated period offset for this chip and library.
 
 #ifdef MQTT_ENABLE
@@ -272,7 +278,9 @@ void handleRoot() {
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
-    "Total send requests: " + String(sendReqCounter) + "</p>"
+    "Total send requests: " + String(sendReqCounter) + "<br>"
+    "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
+    " <i>(" + timeSince(lastSendTime) + ")</i></p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
     "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
@@ -467,7 +475,9 @@ void handleReset() {
 // Args:
 //   irType: Nr. of the protocol we need to send.
 //   str: A hexadecimal string containing the state to be sent.
-void parseStringAndSendAirCon(const uint16_t irType, const String str) {
+// Returns:
+//   bool: Successfully sent or not.
+bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint8_t strOffset = 0;
   uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
   uint16_t stateSize = 0;
@@ -478,7 +488,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
   uint16_t inputLength = str.length() - strOffset;
   if (inputLength == 0) {
     debug("Zero length AirCon code encountered. Ignored.");
-    return;  // No input. Abort.
+    return false;  // No input. Abort.
   }
 
   switch (irType) {  // Get the correct state size for the protocol.
@@ -545,11 +555,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
-      return;
+      return false;
   }
   if (inputLength > stateSize * 2) {
     debug("AirCon code to large for the given protocol.");
-    return;
+    return false;
   }
 
   // Ptr to the least significant byte of the resulting state for this protocol.
@@ -566,7 +576,7 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
         c = c - 'a' + 10;
     } else {
       debug("Aborting! Non-hexadecimal char found in AirCon state: " + str);
-      return;
+      return false;
     }
     if (i % 2 == 1) {  // Odd: Upper half of the byte.
       *statePtr += (c << 4);
@@ -648,7 +658,11 @@ void parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendElectraAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+    default:
+      debug("Unexpected AirCon type in send request. Not sent.");
+      return false;
   }
+  return true;  // We were successful as far as we can tell.
 }
 
 // Count how many values are in the String.
@@ -697,7 +711,9 @@ uint16_t * newCodeArray(const uint16_t size) {
 //              20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,
 //              63,20,63,20,63,20,63,20,1798"
 //        Note: The leading "1:1,1," of normal GC codes should be removed.
-void parseStringAndSendGC(const String str) {
+// Returns:
+//   bool: Successfully sent or not.
+bool parseStringAndSendGC(const String str) {
   uint16_t count;
   uint16_t *code_array;
   String tmp_str;
@@ -727,6 +743,9 @@ void parseStringAndSendGC(const String str) {
 
   irsend.sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
+  if (count > 0)
+    return true;  // We sent something.
+  return false;  // We probably didn't.
 }
 #endif  // SEND_GLOBALCACHE
 
@@ -744,7 +763,9 @@ void parseStringAndSendGC(const String str) {
 //        sendPronto() only supports raw pronto code types, thus so does this.
 //   repeats:  Nr. of times the message is to be repeated.
 //             This value is ignored if an embeddd repeat is found in str.
-void parseStringAndSendPronto(const String str, uint16_t repeats) {
+// Returns:
+//   bool: Successfully sent or not.
+bool parseStringAndSendPronto(const String str, uint16_t repeats) {
   uint16_t count;
   uint16_t *code_array;
   int16_t index = -1;
@@ -763,7 +784,7 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
   }
 
   // We need at least kProntoMinLength values for the code part.
-  if (count < kProntoMinLength) return;
+  if (count < kProntoMinLength) return false;
 
   // Now we know how many there are, allocate the memory to store them all.
   code_array = newCodeArray(count);
@@ -782,6 +803,9 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
 
   irsend.sendPronto(code_array, count, repeats);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
+  if (count > 0)
+    return true;  // We sent something.
+  return false;  // We probably didn't.
 }
 #endif  // SEND_PRONTO
 
@@ -792,7 +816,9 @@ void parseStringAndSendPronto(const String str, uint16_t repeats) {
 //        e.g. "38000,9000,4500,600,1450,600,900,650,1500,..."
 //        Requires at least two comma-separated values.
 //        First value is the transmission frequency in Hz or kHz.
-void parseStringAndSendRaw(const String str) {
+// Returns:
+//   bool: Successfully sent or not.
+bool parseStringAndSendRaw(const String str) {
   uint16_t count;
   uint16_t freq = 38000;  // Default to 38kHz.
   uint16_t *raw_array;
@@ -802,7 +828,7 @@ void parseStringAndSendRaw(const String str) {
 
   // We expect the frequency as the first comma separated value, so we need at
   // least two values. If not, bail out.
-  if (count < 2) return;
+  if (count < 2)  return false;
   count--;  // We don't count the frequency value as part of the raw array.
 
   // Now we know how many there are, allocate the memory to store them all.
@@ -824,6 +850,9 @@ void parseStringAndSendRaw(const String str) {
 
   irsend.sendRaw(raw_array, count, freq);  // All done. Send it.
   free(raw_array);  // Free up the memory allocated.
+  if (count > 0)
+    return true;  // We sent something.
+  return false;  // We probably didn't.
 }
 #endif  // SEND_RAW
 
@@ -848,7 +877,8 @@ void handleIr() {
       repeat = atoi(server.arg(i).c_str());
   }
   debug("New code received via HTTP");
-  sendIRCode(ir_type, data, data_str.c_str(), nbits, repeat);
+  lastSendSucceeded = sendIRCode(ir_type, data, data_str.c_str(), nbits,
+                                 repeat);
   handleRoot();
 }
 
@@ -1055,12 +1085,16 @@ uint64_t getUInt64fromHex(char const *str) {
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
 //   bits:     Nr. of bits in the protocol. 0 means use the protocol's default.
 //   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
-void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
+// Returns:
+//   bool: Successfully sent or not.
+bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
                 uint16_t bits, uint16_t repeat) {
   // Create a pseudo-lock so we don't try to send two codes at the same time.
   while (ir_lock)
     delay(20);
   ir_lock = true;
+
+  bool success = true;  // Assume success.
 
   // send the IR message.
   switch (ir_type) {
@@ -1179,8 +1213,10 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case HITACHI_AC:  // 40
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42
+    case WHIRLPOOL_AC:  // 45
+    case SAMSUNG_AC:  // 46
     case ELECTRA_AC:  // 48
-      parseStringAndSendAirCon(ir_type, code_str);
+      success = parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON
     case DENON:  // 17
@@ -1220,7 +1256,7 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #endif
 #if SEND_PRONTO
     case PRONTO:  // 25
-      parseStringAndSendPronto(code_str, repeat);
+      success = parseStringAndSendPronto(code_str, repeat);
       break;
 #endif
 #if SEND_NIKAI
@@ -1232,12 +1268,12 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #endif
 #if SEND_RAW
     case RAW:  // 30
-      parseStringAndSendRaw(code_str);
+      success = parseStringAndSendRaw(code_str);
       break;
 #endif
 #if SEND_GLOBALCACHE
     case GLOBALCACHE:  // 31
-      parseStringAndSendGC(code_str);
+      success = parseStringAndSendGC(code_str);
       break;
 #endif
 #if SEND_MIDEA
@@ -1291,13 +1327,21 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       irsend.sendLutron(code, bits, repeat);
       break;
 #endif
+    default:
+      // If we got here, we didn't know how to send it.
+      success = false;
   }
-  sendReqCounter++;
+  lastSendTime = millis();
   // Release the lock.
   ir_lock = false;
 
-  // Indicate that we sent the message.
-  debug("Sent the IR message.");
+  // Indicate that we sent the message or not.
+  if (success) {
+    sendReqCounter++;
+    debug("Sent the IR message:");
+  } else {
+    debug("Failed to send IR Message:");
+  }
   debug("Type: " + String(ir_type));
   // For "long" codes we basically repeat what we got.
   if (hasACState((decode_type_t) ir_type) ||
@@ -1308,25 +1352,29 @@ void sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     debug(code_str);
     // Confirm what we were asked to send was sent.
 #ifdef MQTT_ENABLE
-    if (ir_type == PRONTO && repeat > 0)
-      mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
-                                    String(repeat) + "," +
-                                    String(code_str)).c_str());
-    else
-      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    String(code_str)).c_str());
+    if (success) {
+      if (ir_type == PRONTO && repeat > 0)
+        mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
+                                      String(repeat) + "," +
+                                      String(code_str)).c_str());
+      else
+        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                      String(code_str)).c_str());
+    }
 #endif  // MQTT_ENABLE
   } else {  // For "short" codes, we break it down a bit more before we report.
     debug("Code: 0x" + uint64ToString(code, 16));
     debug("Bits: " + String(bits));
     debug("Repeats: " + String(repeat));
 #ifdef MQTT_ENABLE
-    mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                  uint64ToString(code, 16)
-                                  + "," + String(bits) + "," +
-                                  String(repeat)).c_str());
+    if (success)
+      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
+                                    uint64ToString(code, 16)
+                                    + "," + String(bits) + "," +
+                                    String(repeat)).c_str());
 #endif  // MQTT_ENABLE
   }
+  return success;
 }
 
 #ifdef MQTT_ENABLE
@@ -1369,9 +1417,10 @@ void receivingMQTT(String const topic_name, String const callback_str) {
 
 
   // send received MQTT value by IR signal
-  sendIRCode(ir_type, code,
-             callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
-             nbits, repeat);
+  lastSendSucceeded = sendIRCode(
+      ir_type, code,
+      callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
+      nbits, repeat);
 }
 
 // Callback function, when the gateway receive an MQTT value on the topics
