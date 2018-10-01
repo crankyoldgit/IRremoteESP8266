@@ -210,7 +210,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //   nbits:  Nr. of bits of data to be sent. Typically kPanasonicAcBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: Beta / Needs testing against a real device.
+// Status: Beta / Appears to work with real device(s).
 //:
 // Panasonic A/C models supported:
 //   A/C Series/models:
