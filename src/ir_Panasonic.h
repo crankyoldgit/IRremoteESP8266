@@ -37,6 +37,7 @@ const uint8_t kPanasonicAcFanOffset = 3;
 const uint8_t kPanasonicAcPower = 1;  // 0b1
 const uint8_t kPanasonicAcMinTemp = 16;  // Celsius
 const uint8_t kPanasonicAcMaxTemp = 30;  // Celsius
+const uint8_t kPanasonicAcFanModeTemp = 27;  // Celsius
 const uint8_t kPanasonicAcQuiet = 1;  // 0b1
 const uint8_t kPanasonicAcPowerful = 0x20;  // 0b100000
 const uint8_t kPanasonicAcSwingVAuto = 0xF;
@@ -49,6 +50,10 @@ const uint8_t kPanasonicAcSwingHLeft = 0xA;
 const uint8_t kPanasonicAcSwingHRight = 0xB;
 const uint8_t kPanasonicAcSwingHFullRight = 0xC;
 const uint8_t kPanasonicAcChecksumInit = 0xF4;
+const uint8_t kPanasonicAcOnTimer =  0b00000010;
+const uint8_t kPanasonicAcOffTimer = 0b00000100;
+
+
 const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
   0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
   0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
@@ -76,7 +81,7 @@ class IRPanasonicAc {
   void off();
   void setPower(const bool state);
   bool getPower();
-  void setTemp(const uint8_t temp);
+  void setTemp(const uint8_t temp, const bool remember = true);
   uint8_t getTemp();
   void setFan(const uint8_t fan);
   uint8_t getFan();
@@ -110,6 +115,7 @@ class IRPanasonicAc {
 #endif
   uint8_t remote_state[kPanasonicAcStateLength];
   uint8_t _swingh = kPanasonicAcSwingHMiddle;
+  uint8_t _temp = 25;
   void fixChecksum(const uint16_t length = kPanasonicAcStateLength);
   static uint8_t calcChecksum(const uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);

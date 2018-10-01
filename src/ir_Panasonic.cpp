@@ -248,6 +248,8 @@ IRPanasonicAc::IRPanasonicAc(uint16_t pin) : _irsend(pin) {
 void IRPanasonicAc::stateReset() {
   for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)
     remote_state[i] = kPanasonicKnownGoodState[i];
+  _temp = 25;  // An initial saved desired temp. Completely made up.
+  _swingh = kPanasonicAcSwingHMiddle;  // A similar made up value for H Swing.
 }
 
 void IRPanasonicAc::begin() {
@@ -363,13 +365,17 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
   uint8_t mode = kPanasonicAcAuto;  // Default to Auto mode.
   switch (desired) {
     case kPanasonicAcFan:
-      setTemp(27);  // Allegedly Fan mode has a temperature of 27.
-      // FALLTHRU
+      // Allegedly Fan mode has a temperature of 27.
+      setTemp(kPanasonicAcFanModeTemp, false);
+      mode = desired;
+      break;
     case kPanasonicAcAuto:
     case kPanasonicAcCool:
     case kPanasonicAcHeat:
     case kPanasonicAcDry:
       mode = desired;
+      // Set the temp to the saved temp, just incase our previous mode was Fan.
+      setTemp(_temp);
       break;
   }
   remote_state[13] &= 0x0F;  // Clear the previous mode bits.
@@ -380,11 +386,18 @@ uint8_t IRPanasonicAc::getTemp() {
   return remote_state[14] >> 1;
 }
 
-void IRPanasonicAc::setTemp(const uint8_t celsius) {
+// Set the desitred temperature in Celcius.
+// Args:
+//   celsius: The temperature to set the A/C unit to.
+//   remember: A boolean flag for the class to remember the temperature.
+//
+// Automatically safely limits the temp to the operating range supported.
+void IRPanasonicAc::setTemp(const uint8_t celsius, const bool remember) {
   uint8_t temperature;
   temperature = std::max(celsius, kPanasonicAcMinTemp);
   temperature = std::min(temperature, kPanasonicAcMaxTemp);
   remote_state[14] = temperature << 1;
+  if (remember)  _temp = temperature;
 }
 
 uint8_t IRPanasonicAc::getSwingVertical() {

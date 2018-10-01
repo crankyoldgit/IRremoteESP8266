@@ -580,7 +580,7 @@ TEST(TestIRPanasonicAcClass, SetAndGetModel) {
 TEST(TestIRPanasonicAcClass, SetAndGetMode) {
   IRPanasonicAc pana(0);
   pana.setMode(kPanasonicAcCool);
-  pana.setTemp(25);
+  pana.setTemp(21);
   EXPECT_EQ(kPanasonicAcCool, pana.getMode());
   pana.setMode(kPanasonicAcHeat);
   EXPECT_EQ(kPanasonicAcHeat, pana.getMode());
@@ -588,12 +588,14 @@ TEST(TestIRPanasonicAcClass, SetAndGetMode) {
   EXPECT_EQ(kPanasonicAcAuto, pana.getMode());
   pana.setMode(kPanasonicAcDry);
   EXPECT_EQ(kPanasonicAcDry, pana.getMode());
-  EXPECT_EQ(25, pana.getTemp());  // Temp should be unchanged.
+  EXPECT_EQ(21, pana.getTemp());  // Temp should be unchanged.
   pana.setMode(kPanasonicAcFan);
   EXPECT_EQ(kPanasonicAcFan, pana.getMode());
-  EXPECT_EQ(27, pana.getTemp());  // Temp should change.
+  EXPECT_EQ(kPanasonicAcFanModeTemp, pana.getTemp());  // Temp should change.
   pana.setMode(kPanasonicAcCool);
   EXPECT_EQ(kPanasonicAcCool, pana.getMode());
+  // Temp should be unchanged from the last manual change.
+  EXPECT_EQ(21, pana.getTemp());
 }
 
 TEST(TestIRPanasonicAcClass, SetAndGetTemp) {
