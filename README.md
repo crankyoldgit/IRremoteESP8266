@@ -11,7 +11,7 @@ This library enables you to **send _and_ receive** infra-red signals on an [ESP8
 Version 2.5.1 of the library is now [available](https://github.com/markszabo/IRremoteESP8266/releases/latest). You can view the [Release Notes](ReleaseNotes.md) for all the significant changes.
 
 #### Upgrading from pre-v2.0
-Usage of the library slight changed at v2.0. You will need to change your usage to work with v2.0 and beyond. You can read more about the changes required on our [Upgrade to v2.0](https://github.com/markszabo/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
+Usage of the library has been slightly changed in v2.0. You will need to change your usage to work with v2.0 and beyond. You can read more about the changes required on our [Upgrade to v2.0](https://github.com/markszabo/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
 
 #### Upgrading from pre-v2.5
 The library has changed from using constants declared as `#define` to
