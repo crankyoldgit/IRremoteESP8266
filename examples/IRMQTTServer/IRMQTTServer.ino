@@ -507,6 +507,9 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
     case MITSUBISHI_AC:
       stateSize = kMitsubishiACStateLength;
       break;
+    case PANASONIC_AC:
+      stateSize = kPanasonicAcStateLength;
+      break;
     case TROTEC:
       stateSize = kTrotecStateLength;
       break;
@@ -656,6 +659,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
       irsend.sendElectraAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_PANASONIC_AC
+    case PANASONIC_AC:
+      irsend.sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
     default:
@@ -1216,6 +1224,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case WHIRLPOOL_AC:  // 45
     case SAMSUNG_AC:  // 46
     case ELECTRA_AC:  // 48
+    case PANASONIC_AC:  // 49
       success = parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON

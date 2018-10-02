@@ -79,13 +79,30 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
 		ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
 		ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o
-
+# All the IR Protocol header files.
+PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
+		$(USER_DIR)/ir_Gree.h \
+		$(USER_DIR)/ir_Magiquest.h \
+		$(USER_DIR)/ir_Coolix.h \
+		$(USER_DIR)/ir_Haier.h \
+		$(USER_DIR)/ir_Midea.h \
+		$(USER_DIR)/ir_Toshiba.h \
+		$(USER_DIR)/ir_Daikin.h \
+		$(USER_DIR)/ir_Kelvinator.h \
+		$(USER_DIR)/ir_Mitsubishi.h \
+		$(USER_DIR)/ir_Samsung.h \
+		$(USER_DIR)/ir_Trotec.h \
+		$(USER_DIR)/ir_Fujitsu.h \
+		$(USER_DIR)/ir_LG.h \
+		$(USER_DIR)/ir_Panasonic.h
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
              $(PROTOCOLS) gtest_main.a
 # Common dependencies
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
-              $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
+              $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h \
+							$(PROTOCOLS_H)
+
 # Common test dependencies
 COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h
 
