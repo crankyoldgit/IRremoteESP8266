@@ -34,6 +34,7 @@ const uint8_t kSpaceState = 4;
 const uint8_t kStopState = 5;
 const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
 const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
+#define RAWTICK kRawTick  // Deprecated. For legacy user code support only.
 // How long (ms) before we give up wait for more data?
 // Don't exceed kMaxTimeoutMs without a good reason.
 // That is the capture buffers maximum value size. (UINT16_MAX / kRawTick)
@@ -318,6 +319,10 @@ class IRrecv {
 #if DECODE_ELECTRA_AC
   bool decodeElectraAC(decode_results *results,
                        uint16_t nbits = kElectraAcBits, bool strict = true);
+#endif
+#if DECODE_PANASONIC_AC
+  bool decodePanasonicAC(decode_results *results,
+                         uint16_t nbits = kPanasonicAcBits, bool strict = true);
 #endif
 };
 

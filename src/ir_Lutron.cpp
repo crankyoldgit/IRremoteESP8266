@@ -28,7 +28,6 @@ const uint32_t kLutronGap = 150000;  // Completely made up value.
 const uint16_t kLutronDelta = 400;  // +/- 300 usecs.
 
 
-
 #if SEND_LUTRON
 // Send a Lutron formatted message.
 //
@@ -37,7 +36,7 @@ const uint16_t kLutronDelta = 400;  // +/- 300 usecs.
 //   nbits:  The number of bits of the message to be sent. Typically kLutronBits
 //   repeat: The number of times the command is to be repeated.
 //
-// Status: ALPHA / Untested.
+// Status: Stable / Appears to be working for real devices.
 
 // Notes:
 //   Protocol is really 36 bits long, but the first bit is always a 1.

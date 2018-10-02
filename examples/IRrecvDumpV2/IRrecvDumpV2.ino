@@ -34,6 +34,7 @@
 #include <ir_Kelvinator.h>
 #include <ir_Mitsubishi.h>
 #include <ir_Midea.h>
+#include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
 
@@ -190,6 +191,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_COOLIX
+#if DECODE_PANASONIC_AC
+  if (results->decode_type == PANASONIC_AC) {
+    IRPanasonicAc ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_PANASONIC_AC
   // If we got a human-readable description of the message, display it.
   if (description != "")  Serial.println("Mesg Desc.: " + description);
 }

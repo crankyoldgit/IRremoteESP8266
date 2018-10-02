@@ -513,6 +513,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeElectraAC(results))
     return true;
 #endif
+#if DECODE_PANASONIC_AC
+  DPRINTLN("Attempting Panasonic AC decode");
+  if (decodePanasonicAC(results))
+    return true;
+#endif
 #if DECODE_LUTRON
   DPRINTLN("Attempting Lutron decode");
   if (decodeLutron(results))
