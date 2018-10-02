@@ -52,6 +52,9 @@ const uint8_t kSamsungAcCleanMask10 = 0x80;
 const uint8_t kSamsungAcCleanMask11 = 0x02;
 const uint8_t kSamsungAcQuietMask11 = 0x01;
 
+const uint16_t kSamsungACSectionLength = 7;
+const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
+
 
 // Classes
 class IRSamsungAc {
@@ -60,7 +63,8 @@ class IRSamsungAc {
 
   void stateReset();
 #if SEND_SAMSUNG_AC
-  void send();
+  void send(const bool calcchecksum = true);
+  void sendExtended(const bool calcchecksum = true);
 #endif  // SEND_SAMSUNG_AC
   void begin();
   void on();
@@ -82,7 +86,8 @@ class IRSamsungAc {
   void setQuiet(const bool state);
   bool getQuiet();
   uint8_t* getRaw();
-  void setRaw(const uint8_t new_code[]);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kSamsungAcStateLength);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kSamsungAcStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
@@ -95,7 +100,7 @@ class IRSamsungAc {
 
  private:
   // The state of the IR remote in IR code form.
-  uint8_t remote_state[kSamsungAcStateLength];
+  uint8_t remote_state[kSamsungAcExtendedStateLength];
   void checksum(const uint16_t length = kSamsungAcStateLength);
   IRsend _irsend;
 };
