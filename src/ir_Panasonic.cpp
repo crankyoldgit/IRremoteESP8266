@@ -28,6 +28,7 @@
 //     CS-YW9MKD (confirmed)
 //   A/C Remotes:
 //     A75C3747 (confirmed)
+//     A75C3704
 
 // Constants
 // Ref:
@@ -218,6 +219,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //     CS-YW9MKD
 //   A/C Remotes:
 //     A75C3747
+//     A75C3704
 //
 void IRsend::sendPanasonicAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
   if (nbytes < kPanasonicAcStateLength)  return;
@@ -623,6 +625,7 @@ std::string IRPanasonicAc::toString() {
 //     CS-YW9MKD
 //   A/C Remotes:
 //     A75C3747 (Confirmed)
+//     A75C3704
 bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
                                bool strict) {
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
@@ -643,11 +646,15 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
   match_result_t data_result;
 
   // Header
-  if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark)) return false;
+  if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark,
+                 kPanasonicAcTolerance, kPanasonicAcExcess))
+    return false;
   // Calculate how long the common tick time is based on the header mark.
   uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
       kPanasonicHdrMarkTicks;
-  if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace)) return false;
+  if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace,
+                  kPanasonicAcTolerance, kPanasonicAcExcess))
+    return false;
   // Calculate how long the common tick time is based on the header space.
   uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
       kPanasonicHdrSpaceTicks;
@@ -662,7 +669,7 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
                             kPanasonicOneSpaceTicks * s_tick,
                             kPanasonicBitMarkTicks * m_tick,
                             kPanasonicZeroSpaceTicks * s_tick,
-                            kTolerance, 0, false);
+                            kPanasonicAcTolerance, kPanasonicAcExcess, false);
     if (data_result.success == false) {
       DPRINT("DEBUG: offset = ");
       DPRINTLN(offset + data_result.used);
@@ -671,14 +678,18 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
     results->state[i] = data_result.data;
   }
   // Section footer.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick,
+                 kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
-  if (!matchSpace(results->rawbuf[offset++], kPanasonicAcSectionGap))
+  if (!matchSpace(results->rawbuf[offset++], kPanasonicAcSectionGap,
+                  kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
   // Header.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicHdrMarkTicks * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kPanasonicHdrMarkTicks * m_tick,
+                 kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
-  if (!matchSpace(results->rawbuf[offset++], kPanasonicHdrSpaceTicks * s_tick))
+  if (!matchSpace(results->rawbuf[offset++], kPanasonicHdrSpaceTicks * s_tick,
+                  kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
   // Data (Section #2)
   // Keep reading bytes until we either run out of data.
@@ -689,7 +700,7 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
                             kPanasonicOneSpaceTicks * s_tick,
                             kPanasonicBitMarkTicks * m_tick,
                             kPanasonicZeroSpaceTicks * s_tick,
-                            kTolerance, 0, false);
+                            kPanasonicAcTolerance, kPanasonicAcExcess, false);
     if (data_result.success == false) {
       DPRINT("DEBUG: offset = ");
       DPRINTLN(offset + data_result.used);
@@ -698,7 +709,8 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
     results->state[i] = data_result.data;
   }
   // Message Footer.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick,
+                 kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
   if (offset <= results->rawlen &&
       !matchAtLeast(results->rawbuf[offset++], kPanasonicAcMessageGap))
