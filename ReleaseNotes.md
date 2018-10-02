@@ -1,5 +1,24 @@
 # Release Notes
 
+## _v2.5.1 (20181002)_
+
+**[Bug Fixes]**
+- Correct the byte used for Samsung AC Swing. (#529)
+- Fix not sending Samsung A/C messages in IRMQTTServer. (#529)
+
+**[Features]**
+- Experimental support for Electra A/C messages. (#528)
+- Experimental support for Panasonic A/C messages. (#535)
+- Samsung A/C fixes & improvements (#529)
+- IRMQTTServer v0.6.0 (#530)
+
+**[Misc]**
+- Change required WifiManager lib version to v0.14
+- Add alias for RAWTICK to kRawTick. (#535)
+- Update sendLutron() status. (#515)
+- Remove leftover debug message in IRrecvDumpV2 (#526)
+
+
 ## _v2.5.0 (20180919)_
 
 **[Bug Fixes]**
