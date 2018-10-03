@@ -1,8 +1,11 @@
 /*
- * Send arbitrary IR codes via a web server or MQTT.
+ * Send & receive arbitrary IR codes via a web server or MQTT.
  * Copyright David Conran 2016, 2017, 2018
  *
- * NOTE: An IR LED circuit *MUST* be connected to ESP8266 GPIO4 (D2). See IR_LED
+ * NOTE: An IR LED circuit *MUST* be connected to ESP8266 GPIO4 (D2) if
+ *       you want to send IR messages. See IR_LED below.
+ *       A compatible IR RX modules *MUST* be connected to ESP8266 GPIO14 (D5)
+ *       if you want to capture & decode IR nessages. See IR_RX below.
  *
  * WARN: This is very advanced & complicated example code. Not for beginners.
  *       You are strongly suggested to try & look at other example code first.
@@ -94,6 +97,19 @@
  *     # Listen to MQTT acknowledgements.
  *     $ mosquitto_sub -h 10.20.0.253 -t ir_server/sent
  *
+ * Incoming IR messages (from an IR remote control) will be transmitted to
+ * the MQTT topic 'ir_server/received'. The MQTT message will be formatted
+ * similar to what is required to for the 'sent' topic.
+ * e.g. "3,C1A2F00F,32" (Protocol,Value,Bits) for simple codes
+ *   or "18,110B805000000060110B807000001070" (Protocol,Value) for complex codes
+ * Note: If the protocol is listed as -1, then that is an UNKNOWN IR protocol.
+ *       You can't use that to recreate/resend an IR message. It's only for
+ *       matching purposes and shouldn't be trusted.
+ *
+ *   Unix command line usage example:
+ *     # Listen via MQTT for IR messages captured by this server.
+ *     $ mosquitto_sub -h 10.20.0.253 -t ir_server/received
+ *
  * If DEBUG is turned on, there is additional information printed on the Serial
  * Port.
  *
@@ -136,6 +152,10 @@
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define IR_LED 4
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
+//
+// GPIO the IR RX module is connected to/controlled by. GPIO 14 = D5.
+// Comment this out to disable receiving/decoding IR messages entirely.
+#define IR_RX 14
 const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
@@ -164,6 +184,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
                              // independent of the hostname.
 #define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
 #define MQTTcommand MQTTprefix "/send"  // Topic we get new commands from.
+#define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
 #endif  // MQTT_ENABLE
 
 // HTML arguments we will parse for IR code information.
@@ -171,10 +192,23 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define argData "code"
 #define argBits "bits"
 #define argRepeat "repeats"
+// Let's use a larger than normal buffer so we can handle AirCon remote codes.
+const uint16_t kCaptureBufferSize = 1024;
+#if DECODE_AC
+// Some A/C units have gaps in their protocols of ~40ms. e.g. Kelvinator
+// A value this large may swallow repeats of some protocols
+const uint8_t kCaptureTimeout = 50;
+#else  // DECODE_AC
+// Suits most messages, while not swallowing many repeats.
+const uint8_t kCaptureTimeout = 15;
+#endif  // DECODE_AC
+// Ignore unknown messages with <10 pulses
+const uint16_t kMinUnknownSize = 20;
 
-#define _MY_VERSION_ "v0.6.0"
+#define _MY_VERSION_ "v0.7.0"
 
-#if IR_LED != 1  // Disable debug output if the LED is on the TX (D1) pin.
+// Disable debug output if any of the IR pins are on the TX (D1) pin.
+#if (IR_LED != 1 && IR_RX != 1)
 #undef DEBUG
 #define DEBUG true  // Change to 'false' to disable all serial output.
 #else
@@ -187,6 +221,10 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 // Globals
 ESP8266WebServer server(kHttpPort);
 IRsend irsend = IRsend(IR_LED);
+#ifdef IR_RX
+IRrecv irrecv(IR_RX, kCaptureBufferSize, kCaptureTimeout, true);
+decode_results capture;  // Somewhere to store inbound IR messages.
+#endif  // IR_RX
 MDNSResponder mdns;
 WiFiClient espClient;
 WiFiManager wifiManager;
@@ -203,6 +241,11 @@ int8_t offset;  // The calculated period offset for this chip and library.
 #ifdef MQTT_ENABLE
 String lastMqttCmd = "None";
 uint32_t lastMqttCmdTime = 0;
+#ifdef IR_RX
+String lastIrReceived = "None";
+uint32_t lastIrReceivedTime = 0;
+uint32_t irRecvCounter = 0;
+#endif  // IR_RX
 
 
 // MQTT client parameters
@@ -278,9 +321,17 @@ void handleRoot() {
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
+    "IR Send GPIO: " + String(IR_LED) + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
-    " <i>(" + timeSince(lastSendTime) + ")</i></p>"
+    " <i>(" + timeSince(lastSendTime) + ")</i><br>"
+#ifdef IR_RX
+    "IR Recv GPIO: " + String(IR_RX) + "<br>"
+    "Total IR Received: " + String(irRecvCounter) + "<br>"
+    "Last IR Received: " + lastIrReceived +
+    " <i>(" + timeSince(lastIrReceivedTime) + ")</i><br>"
+#endif  // IR_RX
+    "</p>"
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
     "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
@@ -288,7 +339,10 @@ void handleRoot() {
     "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
     "Acknowledgements topic: " MQTTack "<br>"
-    "Last command seen: " +
+#ifdef IR_RX
+    "IR Received topic: " MQTTrecv "<br>"
+#endif  // IR_RX
+    "Last MQTT command seen: " +
     // lastMqttCmd is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
     (hasUnsafeHTMLChars(lastMqttCmd) ?
@@ -945,6 +999,13 @@ void setup_wifi() {
 void setup(void) {
   irsend.begin();
   offset = irsend.calibrate();
+#if IR_RX
+#if DECODE_HASH
+  // Ignore messages with less than minimum on or off pulses.
+  irrecv.setUnknownThreshold(kMinUnknownSize);
+#endif  // DECODE_HASH
+  irrecv.enableIRIn();  // Start the receiver
+#endif  // IR_RX
 
   #ifdef DEBUG
   // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
@@ -1054,7 +1115,7 @@ bool reconnect() {
 #endif  // MQTT_ENABLE
 
 void loop(void) {
-  server.handleClient();
+  server.handleClient();  // Handle any web activity
 
 #ifdef MQTT_ENABLE
   // MQTT client connection management
@@ -1080,6 +1141,20 @@ void loop(void) {
     mqtt_client.loop();
   }
 #endif  // MQTT_ENABLE
+#ifdef IR_RX
+  // Check if an IR code has been received via the IR RX module.
+  if (irrecv.decode(&capture)) {
+    lastIrReceivedTime = millis();
+    lastIrReceived = String(capture.decode_type) + "," +
+        resultToHexidecimal(&capture);
+    // If it isn't an AC code, add the bits.
+    if (!hasACState(capture.decode_type))
+      lastIrReceived += "," + String(capture.bits);
+    mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
+    irRecvCounter++;
+    debug("Incoming IR message sent to MQTT: " + lastIrReceived);
+  }
+#endif  // IR_RX
   delay(100);
 }
 
