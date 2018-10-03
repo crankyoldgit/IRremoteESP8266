@@ -24,6 +24,9 @@
 
 // Constants
 const uint16_t kPanasonicFreq = 36700;
+const uint16_t kPanasonicAcExcess = 0;
+// Much higher than usual. See issue #540.
+const uint16_t kPanasonicAcTolerance = 40;
 
 const uint8_t kPanasonicAcAuto = 0;  // 0b0000
 const uint8_t kPanasonicAcDry = 2;   // 0b0010
