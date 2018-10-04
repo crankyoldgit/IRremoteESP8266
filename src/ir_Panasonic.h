@@ -55,7 +55,8 @@ const uint8_t kPanasonicAcSwingHFullRight = 0xC;
 const uint8_t kPanasonicAcChecksumInit = 0xF4;
 const uint8_t kPanasonicAcOnTimer =  0b00000010;
 const uint8_t kPanasonicAcOffTimer = 0b00000100;
-
+const uint16_t kPanasonicAcTimeMax = 23 * 60 + 59;  // Mins since midnight.
+const uint16_t kPanasonicAcTimeSpecial = 0x600;
 
 const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
   0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
@@ -102,15 +103,28 @@ class IRPanasonicAc {
   bool getPowerful();
   void setModel(const panasonic_ac_remote_model_t model);
   panasonic_ac_remote_model_t getModel();
-  void setSwingV(const uint8_t elevation);
+  void setSwingVertical(const uint8_t elevation);
   uint8_t getSwingVertical();
-  void setSwingH(const uint8_t direction);
+  void setSwingHorizontal(const uint8_t direction);
   uint8_t getSwingHorizontal();
-
+  static uint16_t encodeTime(const uint8_t hours, const uint8_t mins);
+  uint16_t getClock();
+  void setClock(const uint16_t mins_since_midnight);
+  uint16_t getOnTimer();
+  void setOnTimer(const uint16_t mins_since_midnight, const bool enable = true);
+  void cancelOnTimer();
+  bool isOnTimerEnabled();
+  uint16_t getOffTimer();
+  void setOffTimer(const uint16_t mins_since_midnight,
+                   const bool enable = true);
+  void cancelOffTimer();
+  bool isOffTimerEnabled();
 #ifdef ARDUINO
   String toString();
+  static String timeToString(const uint16_t mins_since_midnight);
 #else
   std::string toString();
+  static std::string timeToString(const uint16_t mins_since_midnight);
 #endif
 #ifndef UNIT_TEST
 
