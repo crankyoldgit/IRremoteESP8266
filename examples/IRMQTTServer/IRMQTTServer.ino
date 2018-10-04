@@ -241,6 +241,9 @@ int8_t offset;  // The calculated period offset for this chip and library.
 #ifdef MQTT_ENABLE
 String lastMqttCmd = "None";
 uint32_t lastMqttCmdTime = 0;
+uint32_t lastConnectedTime = 0;
+uint32_t lastDisconnectedTime = 0;
+bool wasConnected = true;
 #ifdef IR_RX
 String lastIrReceived = "None";
 uint32_t lastIrReceivedTime = 0;
@@ -335,7 +338,9 @@ void handleRoot() {
 #ifdef MQTT_ENABLE
     "<h4>MQTT Information</h4>"
     "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
-    (mqtt_client.connected() ? "Connected" : "Disconnected") + ")</i><br>"
+    (mqtt_client.connected() ? "Connected " + timeSince(lastDisconnectedTime)
+                             : "Disconnected " + timeSince(lastConnectedTime)) +
+    ")</i><br>"
     "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
     "Acknowledgements topic: " MQTTack "<br>"
@@ -1118,9 +1123,13 @@ void loop(void) {
   server.handleClient();  // Handle any web activity
 
 #ifdef MQTT_ENABLE
+  uint32_t now = millis();
   // MQTT client connection management
   if (!mqtt_client.connected()) {
-    uint32_t now = millis();
+    if (wasConnected) {
+      lastDisconnectedTime = now;
+      wasConnected = false;
+    }
     // Reconnect if it's longer than kMqttReconnectTime since we last tried.
     if (now - lastReconnectAttempt > kMqttReconnectTime) {
       lastReconnectAttempt = now;
@@ -1128,15 +1137,21 @@ void loop(void) {
       // Attempt to reconnect
       if (reconnect()) {
         lastReconnectAttempt = 0;
+        wasConnected = true;
         if (boot) {
           mqtt_client.publish(MQTTack, "IR Server just booted");
           boot = false;
         } else {
-          mqtt_client.publish(MQTTack, "IR Server just (re)connected to MQTT");
+          String text = "IR Server just (re)connected to MQTT. "
+              "Lost connection about " + timeSince(lastConnectedTime);
+          mqtt_client.publish(MQTTack, text.c_str());
         }
+        lastConnectedTime = now;
+        debug("successful client mqtt connection");
       }
     }
   } else {
+    lastConnectedTime = now;
     // MQTT loop
     mqtt_client.loop();
   }
