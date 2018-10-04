@@ -280,6 +280,13 @@ void IRPanasonicAc::fixChecksum(const uint16_t length) {
   remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
+#if SEND_PANASONIC_AC
+void IRPanasonicAc::send() {
+  fixChecksum();
+  _irsend.sendPanasonicAC(remote_state);
+}
+#endif  // SEND_PANASONIC_AC
+
 void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
   switch (model) {
     case kPanasonicDke:
