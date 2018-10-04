@@ -243,6 +243,7 @@ String lastMqttCmd = "None";
 uint32_t lastMqttCmdTime = 0;
 uint32_t lastConnectedTime = 0;
 uint32_t lastDisconnectedTime = 0;
+uint32_t mqttDisconnectCounter = 0;
 bool wasConnected = true;
 #ifdef IR_RX
 String lastIrReceived = "None";
@@ -341,6 +342,7 @@ void handleRoot() {
     (mqtt_client.connected() ? "Connected " + timeSince(lastDisconnectedTime)
                              : "Disconnected " + timeSince(lastConnectedTime)) +
     ")</i><br>"
+    "Disconnections: " + String(mqttDisconnectCounter - 1) + "<br>"
     "Client id: " + mqtt_clientid + "<br>"
     "Command topic: " MQTTcommand "<br>"
     "Acknowledgements topic: " MQTTack "<br>"
@@ -1129,6 +1131,7 @@ void loop(void) {
     if (wasConnected) {
       lastDisconnectedTime = now;
       wasConnected = false;
+      mqttDisconnectCounter++;
     }
     // Reconnect if it's longer than kMqttReconnectTime since we last tried.
     if (now - lastReconnectAttempt > kMqttReconnectTime) {
