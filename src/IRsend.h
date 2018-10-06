@@ -299,6 +299,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                        uint16_t nbytes = kPanasonicAcStateLength,
                        uint16_t repeat = kNoRepeat);
 #endif
+#if (SEND_PIONEER)
+  void sendPioneer(uint64_t data, uint16_t nbits = kPioneerBits,
+               uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST
