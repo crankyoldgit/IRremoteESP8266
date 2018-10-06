@@ -10,11 +10,11 @@
 #include "IRutils.h"
 #include <Arduino.h>
 
-//                        PPPP  III  OOO  N   N EEEE EEEE RRRR  
-//                        P   P  I  O   O NN  N E    E    R   R 
-//                        PPPP   I  O   O N N N EEE  EEE  RRRR  
-//                        P      I  O   O N  NN E    E    R R   
-//                        P     III  OOO  N   N EEEE EEEE R  RR 
+//                        PPPP  III  OOO  N   N EEEE EEEE RRRR
+//                        P   P  I  O   O NN  N E    E    R   R
+//                        PPPP   I  O   O N N N EEE  EEE  RRRR
+//                        P      I  O   O N  NN E    E    R R
+//                        P     III  OOO  N   N EEEE EEEE R  RR
 
 // NEC originally added from https://github.com/shirriff/Arduino-IRremote/
 
@@ -60,28 +60,27 @@ const uint16_t kNecMinGapTicks = kNecMinCommandLengthTicks -
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
 void IRsend::sendPioneer(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  
   // prepare codes
   uint64_t NECcode1 = data;
   uint64_t NECcode2;
-  NECcode1 >>= 32;	// 1st code
-  NECcode2 = data & 0xffffffffUL; // 2nd code
-  
-  // send 1st NEC code 
+  NECcode1 >>= 32;  // 1st code
+  NECcode2 = data & 0xffffffffUL;  // 2nd code
+
+  // send 1st NEC code
   sendGeneric(kNecHdrMark, kNecHdrSpace,
               kNecBitMark, kNecOneSpace,
               kNecBitMark, kNecZeroSpace,
               kNecBitMark, kNecMinGap, kNecMinCommandLength,
               NECcode1, nbits/2, 38, true, 0,  // Repeats are handled later.
               33);
-  
+
   // send space between the codes
   sendGeneric(kNecBitMark, kPioneerCodeSeparatorTicks,
-              0, 0, 0, 0, //No actual data sent.
+              0, 0, 0, 0,  // No actual data sent.
               0, 0, 0,
               0, 0, 38, true, 0,  // Repeats are handled later.
               33);
-  
+
   // send 2nd NEC code
   sendGeneric(kNecHdrMark, kNecHdrSpace,
               kNecBitMark, kNecOneSpace,
@@ -90,7 +89,7 @@ void IRsend::sendPioneer(uint64_t data, uint16_t nbits, uint16_t repeat) {
               NECcode2, nbits/2, 38, true, 0,  // Repeats are handled later.
               33);
   // Optional command repeat sequence.
-  
+
   if (repeat)
     sendGeneric(kNecHdrMark, kNecRptSpace,
                 0, 0, 0, 0,  // No actual data sent.
