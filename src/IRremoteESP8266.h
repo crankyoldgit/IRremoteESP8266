@@ -193,6 +193,8 @@
 #define DECODE_PANASONIC_AC    true
 #define SEND_PANASONIC_AC      true
 
+#define SEND_PIONEER           true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -267,6 +269,7 @@ enum decode_type_t {
   LUTRON,
   ELECTRA_AC,
   PANASONIC_AC,
+  PIONEER,  // Technically not a protocol, but an encoding.
 };
 
 // Message lengths & required repeat values
@@ -332,6 +335,7 @@ const uint16_t kPanasonicBits = 48;
 const uint32_t kPanasonicManufacturer = 0x4004;
 const uint16_t kPanasonicAcStateLength = 27;
 const uint16_t kPanasonicAcBits = kPanasonicAcStateLength * 8;
+const uint16_t kPioneerBits = 64;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;
 const uint16_t kRC5Bits = kRC5RawBits - 2;
@@ -420,6 +424,7 @@ const uint16_t kWhynterBits = 32;
 #define TOSHIBA_AC_STATE_LENGTH       kToshibaACStateLength
 #define TROTEC_COMMAND_LENGTH         kTrotecStateLength
 #define WHYNTER_BITS                  kWhynterBits
+#define PIONEER_BITS                  kPioneerBits
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1
