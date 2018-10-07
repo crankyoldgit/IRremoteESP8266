@@ -46,7 +46,7 @@ class RawIRMessage(object):
     self.spaces, self.space_buckets = self.reduce_list(self.spaces)
 
   def reduce_list(self, items):
-    """Reduce the list of numbers into buckets that are at least margin apart."""
+    """Reduce a list of numbers into buckets that are at least margin apart."""
     result = []
     last = -1
     buckets = {}
