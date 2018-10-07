@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Attempt an automatic analysis of IRremoteESP8266's Raw data output.
    Makes suggestions on key values and tried to break down the message
-   into likely chuncks."""
+   into likely chunks."""
 #
 # Copyright 2018 David Conran
 import argparse
@@ -46,7 +46,7 @@ class RawIRMessage(object):
     self.spaces, self.space_buckets = self.reduce_list(self.spaces)
 
   def reduce_list(self, items):
-    """Reduce the list of numbers into buckets that are atleast margin apart."""
+    """Reduce the list of numbers into buckets that are at least margin apart."""
     result = []
     last = -1
     buckets = {}
@@ -61,7 +61,7 @@ class RawIRMessage(object):
 
   def _usec_compare(self, seen, expected):
     """Compare two usec values and see if they match within a
-       subtrative margin."""
+       subtractive margin."""
     return seen <= expected and seen > expected - self.margin
 
   def _usec_compares(self, usecs, expecteds):
@@ -165,7 +165,7 @@ def avg_list(items):
 
 
 def add_bit(so_far, bit, output=sys.stdout):
-  """Add a bit to the end of the bits collected so far. """
+  """Add a bit to the end of the bits collected so far."""
   if bit == "reset":
     return ""
   output.write(str(bit))  # This effectively displays in LSB first order.
