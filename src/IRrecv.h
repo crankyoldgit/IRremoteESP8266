@@ -91,7 +91,7 @@ class decode_results {
       uint32_t address;  // Decoded device address.
       uint32_t command;  // Decoded command.
     };
-#if DECODE_AC  // Only include state if we must. It's big.
+#if DECODE_AC || DECODE_MWM // Only include state if we must. It's big.
     uint8_t state[kStateSizeMax];  // Complex multi-byte A/C result.
 #endif
   };
@@ -184,7 +184,8 @@ class IRrecv {
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = kTolerance,
-                     int16_t excess = kMarkExcess, uint16_t delta = 0);
+                     int16_t excess = kMarkExcess, uint16_t delta = 0,
+                     uint8_t maxwidth = 3);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t nbits = kRC5XBits,
@@ -323,6 +324,10 @@ class IRrecv {
 #if DECODE_PANASONIC_AC
   bool decodePanasonicAC(decode_results *results,
                          uint16_t nbits = kPanasonicAcBits, bool strict = true);
+#endif
+#if DECODE_MWM
+  bool decodeMWM(decode_results *results, uint16_t nbits = 24,
+                      bool strict = true);
 #endif
 };
 

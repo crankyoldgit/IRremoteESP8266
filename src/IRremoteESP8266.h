@@ -193,6 +193,9 @@
 #define DECODE_PANASONIC_AC    true
 #define SEND_PANASONIC_AC      true
 
+#define DECODE_MWM             true
+#define SEND_MWM               true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -269,6 +272,7 @@ enum decode_type_t {
   PANASONIC_AC,
   PIONEER,
   LG2,
+  MWM,
 };
 
 // Message lengths & required repeat values
