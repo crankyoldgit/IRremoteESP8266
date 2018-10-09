@@ -93,7 +93,6 @@ class IRsendTest: public IRsend {
     space(usecs);
   }
 
- protected:
   uint16_t mark(uint16_t usec) {
     IRtimer::add(usec);
     if (last >= OUTPUT_BUF)
