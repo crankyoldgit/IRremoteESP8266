@@ -51,8 +51,16 @@ const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 const uint32_t kFnvPrime32 = 16777619UL;
 const uint32_t kFnvBasis32 = 2166136261UL;
 
+#if DECODE_AC
 // Hitachi AC is the current largest state size.
 const uint16_t kStateSizeMax = kHitachiAc2StateLength;
+#elif DECODE_MWM
+// MWM requires a slightly less large buffer
+const uint16_t kStateSizeMax = kMWMSizeMax;
+#else
+// Just define something
+const uint16_t kStateSizeMax = 0;
+#endif
 
 // Types
 // information for the interrupt handler
@@ -91,9 +99,7 @@ class decode_results {
       uint32_t address;  // Decoded device address.
       uint32_t command;  // Decoded command.
     };
-#if DECODE_AC || DECODE_MWM // Only include state if we must. It's big.
-    uint8_t state[kStateSizeMax];  // Complex multi-byte A/C result.
-#endif
+    uint8_t state[kStateSizeMax];  // Multi-byte results.
   };
   uint16_t bits;  // Number of bits in decoded value
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks

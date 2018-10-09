@@ -44,7 +44,7 @@ TEST(TestSendMWM, SendDataOnly) {
       "m417s834m417s417m417s834m417s417"
       "m2502s417m834s417"
       "m417s834m2502s417"
-      "m834s417m2085s20834"
+      "m834s417m2085s30834"
       "", irsend.outputStr());
 
   irsend.reset();

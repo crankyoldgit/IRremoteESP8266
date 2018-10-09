@@ -15,12 +15,12 @@
 // Constants
 const uint16_t kMWMMinSamples = 6; // Msgs are >=3 bytes, bytes have >=2 samples
 const uint16_t kMWMTick = 417;
-const uint32_t kMWMMinGap = 20000;  // Completely made up amount.
+const uint32_t kMWMMinGap = 30000;  // Typical observed delay b/w commands
 const uint8_t  kMWMTolerance = 0;  // Percentage error margin.
 const uint16_t kMWMExcess = 0;  // See kMarkExcess.
 const uint16_t kMWMDelta = 150;  // Use instead of Excess and Tolerance.
 const uint8_t  kMWMMaxWidth = 9; // Maximum number of successive bits at a
-                                 // single level
+                                 // single level - worst case
 const int16_t  kSpace = 1;
 const int16_t  kMark = 0;
 
