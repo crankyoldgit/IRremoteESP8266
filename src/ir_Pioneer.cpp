@@ -16,11 +16,9 @@
 //                        P      I  O   O N  NN E    E    R R
 //                        P     III  OOO  N   N EEEE EEEE R  RR
 
-// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
-
 // Constants
 // Ref:
-//  http://www.sbprojects.com/knowledge/ir/nec.php
+//  http://adrian-kingston.com/IRFormatPioneer.htm
 
 const uint16_t kNecTick = 560;
 const uint16_t kNecHdrMarkTicks = 16;
@@ -47,31 +45,31 @@ const uint16_t kNecMinGapTicks = kNecMinCommandLengthTicks -
      kNECBits * (kNecBitMarkTicks + kNecOneSpaceTicks) +
      kNecBitMarkTicks);
 
-#if (SEND_PIONEER)
-// Send a raw NEC(Renesas) formatted message.
+#if SEND_PIONEER
+// Send a raw Pioneer formatted message.
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically kNECBits.
+//   nbits:  The number of bits of the message to be sent. Typically kPioneerBits.
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: STABLE / Known working.
 //
 // Ref:
-//  http://www.sbprojects.com/knowledge/ir/nec.php
+//  http://adrian-kingston.com/IRFormatPioneer.htm
 void IRsend::sendPioneer(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // prepare codes
-  uint64_t NECcode1 = data;
-  uint64_t NECcode2;
-  NECcode1 >>= 32;  // 1st code
-  NECcode2 = data & 0xffffffffUL;  // 2nd code
+  uint64_t PioneerCode1 = data;
+  uint64_t PioneerCode2;
+  PioneerCode1 >>= nbits/2;  // 1st code
+  PioneerCode2 = data & 0xffffffffUL;  // 2nd code
 
-  // send 1st NEC code
+  // send 1st part of the code
   sendGeneric(kNecHdrMark, kNecHdrSpace,
               kNecBitMark, kNecOneSpace,
               kNecBitMark, kNecZeroSpace,
               kNecBitMark, kNecMinGap, kNecMinCommandLength,
-              NECcode1, nbits/2, 38, true, 0,  // Repeats are handled later.
+              PioneerCode1, nbits/2, 38, true, 0,  // Repeats are handled later.
               33);
 
   // send space between the codes
@@ -81,21 +79,7 @@ void IRsend::sendPioneer(uint64_t data, uint16_t nbits, uint16_t repeat) {
               0, 0, 38, true, 0,  // Repeats are handled later.
               33);
 
-  // send 2nd NEC code
-  sendGeneric(kNecHdrMark, kNecHdrSpace,
-              kNecBitMark, kNecOneSpace,
-              kNecBitMark, kNecZeroSpace,
-              kNecBitMark, kNecMinGap, kNecMinCommandLength,
-              NECcode2, nbits/2, 38, true, 0,  // Repeats are handled later.
-              33);
-  // Optional command repeat sequence.
-
-  if (repeat)
-    sendGeneric(kNecHdrMark, kNecRptSpace,
-                0, 0, 0, 0,  // No actual data sent.
-                kNecBitMark, kNecMinGap, kNecMinCommandLength,
-                0, 0,  // No data to be sent.
-                38, true, repeat - 1,  // We've already sent a one message.
-                33);
+  // send 2nd part of the code
+  sendNEC(uint64_t PioneerCode2, uint16_t nbits/2, uint16_t repeat)
 }
 #endif
