@@ -80,6 +80,6 @@ void IRsend::sendPioneer(uint64_t data, uint16_t nbits, uint16_t repeat) {
               33);
 
   // send 2nd part of the code
-  sendNEC(uint64_t PioneerCode2, uint16_t nbits/2, uint16_t repeat)
+  sendNEC(PioneerCode2, nbits/2, repeat);
 }
 #endif
