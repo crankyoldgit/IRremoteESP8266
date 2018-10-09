@@ -66,15 +66,24 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
     // Note: Previously this used to be performed 3 times (normal, inverted,
     //       normal), however all data points to that being incorrect.
     for (uint8_t n = 0; n < 2; n++) {
+#if SEND_DENON
+	    // comment out #define	SEND_SHARP in IRremoteESP8266.h file!!
+      // Invert the data per protocol. This is always called twice, so it's
+      // retured to original upon exiting the inner loop.
+      data ^= SHARP_TOGGLE_MASK;		
+#endif
       sendGeneric(0, 0,  // No Header
                   SHARP_BIT_MARK, SHARP_ONE_SPACE,
                   SHARP_BIT_MARK, SHARP_ZERO_SPACE,
                   SHARP_BIT_MARK, SHARP_GAP,
                   data, nbits, 38, true, 0,  // Repeats are handled already.
                   33);
+#if SEND_SHARP
+	    //	comment out #define	SEND_DENON in IRremoteESP8266.h file!!
       // Invert the data per protocol. This is always called twice, so it's
       // retured to original upon exiting the inner loop.
       data ^= SHARP_TOGGLE_MASK;
+#endif
     }
   }
 }
