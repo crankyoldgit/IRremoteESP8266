@@ -50,7 +50,8 @@ const uint16_t kNecMinGapTicks = kNecMinCommandLengthTicks -
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically kPioneerBits.
+//   nbits:  The number of bits of the message to be sent.
+//           Typically kPioneerBits.
 //   repeat: The number of times the command is to be repeated.
 //
 // Status: STABLE / Known working.
