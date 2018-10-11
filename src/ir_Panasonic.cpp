@@ -298,6 +298,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     case kPanasonicJke:
     case kPanasonicLke:
     case kPanasonicNke:
+    case kPanasonicCkp:
       break;
     default:  // Only proceed if we know what to do.
       return;
@@ -305,6 +306,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
   // clear & set the various bits and bytes.
   remote_state[13] &= 0xF0;
   remote_state[17] = 0x00;
+  remote_state[21] &= 0b11101111;
   remote_state[23] = 0x81;
   remote_state[25] = 0x00;
 
@@ -324,14 +326,20 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
       break;
     case kPanasonicJke:
       break;
+    case kPanasonicCkp:
+      remote_state[21] |= 0x10;
     default:
       break;
   }
 }
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
-  if (remote_state[17] == 0x00 && (remote_state[23] & 0x80))
-    return kPanasonicJke;
+  if (remote_state[17] == 0x00) {
+    if (remote_state[23] & 0x80)
+      return kPanasonicJke;
+    if (remote_state[21] & 0x10)
+      return kPanasonicCkp;
+  }
   if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
     return kPanasonicLke;
   if (remote_state[23] == 0x01)
@@ -470,28 +478,46 @@ uint8_t IRPanasonicAc::getFan() {
 }
 
 bool IRPanasonicAc::getQuiet() {
-  return remote_state[21] & kPanasonicAcQuiet;
+  if (getModel() == kPanasonicCkp)
+    return remote_state[21] & kPanasonicAcQuietCkp;
+  else
+    return remote_state[21] & kPanasonicAcQuiet;
 }
 
 void IRPanasonicAc::setQuiet(const bool state) {
+  uint8_t quiet;
+  if (getModel() == kPanasonicCkp)
+    quiet = kPanasonicAcQuietCkp;
+  else
+    quiet = kPanasonicAcQuiet;
+
   if (state) {
     setPowerful(false);  // Powerful is mutually exclusive.
-    remote_state[21] |= kPanasonicAcQuiet;
+    remote_state[21] |= quiet;
   } else {
-    remote_state[21] &= ~kPanasonicAcQuiet;
+    remote_state[21] &= ~quiet;
   }
 }
 
 bool IRPanasonicAc::getPowerful() {
-  return remote_state[21] & kPanasonicAcPowerful;
+  if (getModel() == kPanasonicCkp)
+    return remote_state[21] & kPanasonicAcPowerfulCkp;
+  else
+    return remote_state[21] & kPanasonicAcPowerful;
 }
 
 void IRPanasonicAc::setPowerful(const bool state) {
+  uint8_t powerful;
+  if (getModel() == kPanasonicCkp)
+    powerful = kPanasonicAcPowerfulCkp;
+  else
+    powerful = kPanasonicAcPowerful;
+
   if (state) {
     setQuiet(false);  // Quiet is mutually exclusive.
-    remote_state[21] |= kPanasonicAcPowerful;
+    remote_state[21] |= powerful;
   } else {
-    remote_state[21] &= ~kPanasonicAcPowerful;
+    remote_state[21] &= ~powerful;
   }
 }
 
@@ -615,6 +641,9 @@ std::string IRPanasonicAc::toString() {
     case kPanasonicLke:
       result += " (LKE)";
       break;
+    case kPanasonicCkp:
+      result += " (CKP)";
+      break;
     default:
       result += " (UNKNOWN)";
   }
@@ -678,31 +707,35 @@ std::string IRPanasonicAc::toString() {
       result += " (UNKNOWN)";
       break;
   }
-  if (getModel() != kPanasonicJke) {  // JKE has no Horizontal Swing
-    result += ", Swing (Horizontal): " + uint64ToString(getSwingHorizontal());
-    switch (getSwingHorizontal()) {
-      case kPanasonicAcSwingHAuto:
-        result += " (AUTO)";
-        break;
-      case kPanasonicAcSwingHFullLeft:
-        result += " (Full Left)";
-        break;
-      case kPanasonicAcSwingHLeft:
-        result += " (Left)";
-        break;
-      case kPanasonicAcSwingHMiddle:
-        result += " (Middle)";
-        break;
-      case kPanasonicAcSwingHFullRight:
-        result += " (Full Right)";
-        break;
-      case kPanasonicAcSwingHRight:
-        result += " (Right)";
-        break;
-      default:
-        result += " (UNKNOWN)";
-        break;
-    }
+  switch (getModel()) {
+    case kPanasonicJke:
+    case kPanasonicCkp:
+      break;  // No Horizontal Swing support.
+    default:
+      result += ", Swing (Horizontal): " + uint64ToString(getSwingHorizontal());
+      switch (getSwingHorizontal()) {
+        case kPanasonicAcSwingHAuto:
+          result += " (AUTO)";
+          break;
+        case kPanasonicAcSwingHFullLeft:
+          result += " (Full Left)";
+          break;
+        case kPanasonicAcSwingHLeft:
+          result += " (Left)";
+          break;
+        case kPanasonicAcSwingHMiddle:
+          result += " (Middle)";
+          break;
+        case kPanasonicAcSwingHFullRight:
+          result += " (Full Right)";
+          break;
+        case kPanasonicAcSwingHRight:
+          result += " (Right)";
+          break;
+        default:
+          result += " (UNKNOWN)";
+          break;
+      }
   }
   result += ", Quiet: ";
   if (getQuiet())
