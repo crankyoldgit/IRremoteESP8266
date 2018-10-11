@@ -201,6 +201,7 @@ printState	KEYWORD2
 readbits	KEYWORD2
 renderTime	KEYWORD2
 reset	KEYWORD2
+resultToHexidecimal	KEYWORD2
 resultToHumanReadableBasic	KEYWORD2
 resultToSourceCode	KEYWORD2
 resultToTimingInfo	KEYWORD2
