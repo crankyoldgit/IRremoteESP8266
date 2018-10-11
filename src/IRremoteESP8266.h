@@ -267,6 +267,8 @@ enum decode_type_t {
   LUTRON,
   ELECTRA_AC,
   PANASONIC_AC,
+  PIONEER,
+  LG2,
 };
 
 // Message lengths & required repeat values

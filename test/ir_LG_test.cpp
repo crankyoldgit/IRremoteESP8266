@@ -356,3 +356,59 @@ TEST(TestDecodeLG, FailToDecodeNonLGExample) {
   ASSERT_FALSE(irrecv.decodeLG(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeLG(&irsend.capture, kLgBits, false));
 }
+
+// Tests for sendLG2().
+
+// Test sending typical data only.
+TEST(TestSendLG2, SendDataOnly) {
+  IRsendTest irsend(0);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendLG2(0x880094D);
+  EXPECT_EQ(
+      "m3200s9850"
+      "m550s1600m550s550m550s550m550s550m550s1600m550s550m550s550m550s550"
+      "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
+      "m550s1600m550s550m550s550m550s1600m550s550m550s1600m550s550m550s550"
+      "m550s1600m550s1600m550s550m550s1600"
+      "m550s55250", irsend.outputStr());
+}
+
+TEST(TestDecodeLG2, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendLG2(0x880094D);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture));
+  ASSERT_EQ(LG2, irsend.capture.decode_type);
+  EXPECT_EQ(kLgBits, irsend.capture.bits);
+  EXPECT_EQ(0x880094D, irsend.capture.value);
+}
+
+
+// Verify decoding of LG variant 2 messages.
+TEST(TestDecodeLG2, RealLG2Example) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // From issue #548
+  uint16_t rawData[59] = {3154, 9834, 520, 1634, 424, 606, 424, 568, 462, 570,
+      462, 1564, 508, 568, 458, 544, 500, 546, 508, 530, 508, 532, 506, 566,
+      464, 568, 460, 578, 464, 568, 464, 532, 506, 552, 474, 1592, 506, 568,
+      460, 570, 462, 1564, 506, 606, 424, 1640, 424, 616, 422, 570, 462, 1616,
+      460, 1584, 500, 544, 506, 1598, 490};  // UNKNOWN F6D13AE8
+  irsend.sendRaw(rawData, 59, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture));
+  ASSERT_EQ(LG2, irsend.capture.decode_type);
+  EXPECT_EQ(kLgBits, irsend.capture.bits);
+  EXPECT_EQ(0x880094D, irsend.capture.value);
+}
