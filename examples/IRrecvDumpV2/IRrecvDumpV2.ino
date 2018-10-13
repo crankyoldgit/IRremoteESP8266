@@ -192,7 +192,8 @@ void dumpACInfo(decode_results *results) {
   }
 #endif  // DECODE_COOLIX
 #if DECODE_PANASONIC_AC
-  if (results->decode_type == PANASONIC_AC) {
+  if (results->decode_type == PANASONIC_AC &&
+      results->bits > kPanasonicAcShortBits) {
     IRPanasonicAc ac(0);
     ac.setRaw(results->state);
     description = ac.toString();
