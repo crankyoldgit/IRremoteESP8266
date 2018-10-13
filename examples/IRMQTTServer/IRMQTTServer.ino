@@ -340,6 +340,7 @@ void handleRoot() {
         "<option selected='selected' value='3'>NEC</option>"  // Default
         "<option value='29'>Nikai</option>"
         "<option value='5'>Panasonic</option>"
+        "<option value='50'>Pioneer</option>"
         "<option value='1'>RC-5</option>"
         "<option value='23'>RC-5X</option>"
         "<option value='2'>RC-6</option>"
@@ -1352,6 +1353,13 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kLutronBits;
       irsend.sendLutron(code, bits, repeat);
+      break;
+#endif
+#if SEND_PIONEER
+    case PIONEER:  // 50
+      if (bits == 0)
+        bits = kPioneerBits;
+      irsend.sendPioneer(code, bits, repeat);
       break;
 #endif
     default:

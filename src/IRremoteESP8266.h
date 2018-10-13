@@ -193,6 +193,7 @@
 #define DECODE_PANASONIC_AC    true
 #define SEND_PANASONIC_AC      true
 
+#define DECODE_PIONEER         true
 #define SEND_PIONEER           true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
@@ -269,7 +270,7 @@ enum decode_type_t {
   LUTRON,
   ELECTRA_AC,
   PANASONIC_AC,
-  PIONEER,  // Technically not a protocol, but an encoding.
+  PIONEER,
 };
 
 // Message lengths & required repeat values
@@ -424,7 +425,6 @@ const uint16_t kWhynterBits = 32;
 #define TOSHIBA_AC_STATE_LENGTH       kToshibaACStateLength
 #define TROTEC_COMMAND_LENGTH         kTrotecStateLength
 #define WHYNTER_BITS                  kWhynterBits
-#define PIONEER_BITS                  kPioneerBits
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1

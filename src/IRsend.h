@@ -300,8 +300,9 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                        uint16_t repeat = kNoRepeat);
 #endif
 #if (SEND_PIONEER)
-  void sendPioneer(uint64_t data, uint16_t nbits = kPioneerBits,
-               uint16_t repeat = kNoRepeat);
+  void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,
+                   const uint16_t repeat = kNoRepeat);
+  uint64_t encodePioneer(uint32_t address, uint32_t command);
 #endif
 
  protected:
