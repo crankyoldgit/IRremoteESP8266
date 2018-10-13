@@ -51,12 +51,12 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
   sendNEC(data & ((1UL << (nbits / 2)) - 1), nbits / 2, repeat);
 }
 
-// Calculate the raw Pioneer data based on address and command.
+// Calculate the raw Pioneer data code based on address and command.
 // Args:
 //   address: A 32-bit address value.
 //   command: A 32-bit command value.
 // Returns:
-//   A raw 64-bit Pioneer message.
+//   A raw 64-bit Pioneer message code.
 //
 // Status: BETA / Expected to work.
 //
