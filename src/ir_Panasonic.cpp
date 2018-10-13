@@ -27,13 +27,13 @@
 //   Code by crankyoldgit
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, & NKE series. (In theory)
+//     JKE, LKE, DKE, CKP, & NKE series. (In theory)
 //     CS-YW9MKD (confirmed)
-//     CS-ME14CKPG
+//     CS-ME14CKPG / CS-ME12CKPG / CS-ME10CKPG
 //   A/C Remotes:
 //     A75C3747 (confirmed)
 //     A75C3704
-//     A75C2311
+//     A75C2311 (CKP)
 
 // Constants
 // Ref:
