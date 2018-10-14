@@ -16,11 +16,8 @@
 //                        P      I  O   O N  NN E    E    R R
 //                        P     III  OOO  N   N EEEE EEEE R  RR
 
-// Constants
 // Ref:
 //  http://adrian-kingston.com/IRFormatPioneer.htm
-const uint16_t kPioneerSectionGap = 989;
-
 
 #if SEND_PIONEER
 // Send a raw Pioneer formatted message.
@@ -42,26 +39,30 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
 
   // send 1st part of the code
   sendNEC(data >> (nbits / 2), nbits / 2, 0);
-
-  // send space between the codes
-  sendGeneric(kNecBitMark, kPioneerSectionGap,
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 38, true, 0, 33);  // No data sent.
-
   // send 2nd part of the code
   sendNEC(data & ((1UL << (nbits / 2)) - 1), nbits / 2, repeat);
 }
 
-// Calculate the raw Pioneer data code based on address and command.
+// Calculate the raw Pioneer data code based on two NEC sub-codes
 // Args:
-//   address: A 32-bit address value.
-//   command: A 32-bit command value.
+//   address A 16-bit "published" NEC value.
+//   command: A 16-bit "published" NEC value.
 // Returns:
 //   A raw 64-bit Pioneer message code.
 //
 // Status: BETA / Expected to work.
 //
-uint64_t IRsend::encodePioneer(const uint32_t address, const uint32_t command) {
-  return (((uint64_t) address) << 32) | command;
+// Note:
+//   Address & Command can be take from a decode result OR from the spreadsheets
+//   located at:
+//     https://www.pioneerelectronics.com/PUSA/Support/Home-Entertainment-Custom-Install/IR+Codes/A+V+Receivers
+//   where the first part is considered the address,
+//   and the second the command.
+//   e.g.
+//   "A556+AF20" is an Address of 0xA556 & a Command of 0xAF20.
+uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
+  return (((uint64_t) encodeNEC(address >> 8, address & 0xFF)) << 32) |
+         encodeNEC(command >> 8, command & 0xFF);
 }
 #endif  // SEND_PIONEER
 
@@ -75,11 +76,11 @@ uint64_t IRsend::encodePioneer(const uint32_t address, const uint32_t command) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working. (Self decodes)
+// Status: BETA / Should be working. (Self decodes & real examples)
 //
 bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
                            const bool strict) {
-  if (results->rawlen < 2 * nbits + 3 * (kHeader + kFooter) - 1)
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
     return false;  // Can't possibly be a valid Pioneer message.
   if (strict && nbits != kPioneerBits)
     return false;  // Not strictly an Pioneer message.
@@ -106,8 +107,26 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
                                            kNecBitMarkTicks * mark_tick,
                                            kNecZeroSpaceTicks * space_tick);
     if (data_result.success == false) return false;
+    uint8_t command = data_result.data >> 8;
+    uint8_t command_inverted = data_result.data;
+    uint8_t address = data_result.data >> 24;
+    uint8_t address_inverted = data_result.data >> 16;
+    // Compliance
+    if (strict) {
+      if (command != (command_inverted ^ 0xFF))
+        return false;  // Command integrity failed.
+      if (address != (address_inverted ^ 0xFF))
+        return false;  // Address integrity failed.
+    }
     data = (data << (nbits / 2)) + data_result.data;
     offset += data_result.used;
+    // NEC-like commands and addresses are technically in LSB first order so the
+    // final versions have to be reversed.
+    uint16_t code = reverseBits((command << 8) + address, 16);
+    if (section)
+      results->command = code;
+    else
+      results->address = code;
 
     // Footer
     if (!matchMark(results->rawbuf[offset++], kNecBitMarkTicks * mark_tick))
@@ -115,21 +134,12 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
     if (offset < results->rawlen &&
         !matchAtLeast(results->rawbuf[offset++], kNecMinGapTicks * space_tick))
       return false;
-    // Inter-section marker.
-    if (section == 0) {
-      if (!matchMark(results->rawbuf[offset++], kNecBitMarkTicks * mark_tick))
-          return false;
-      if (!matchSpace(results->rawbuf[offset++], kPioneerSectionGap))
-          return false;
-    }
   }
 
   // Success
   results->bits = nbits;
   results->value = data;
   results->decode_type = PIONEER;
-  results->command = data & ((1UL << (nbits / 2)) - 1);
-  results->address = data >> (nbits / 2);
   return true;
 }
 #endif  // DECODE_PIONEER
