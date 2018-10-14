@@ -580,7 +580,7 @@ TEST(TestIRPanasonicAcClass, SetAndGetModel) {
   uint8_t ckpState[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
       0x02, 0x20, 0xE0, 0x04, 0x00, 0x67, 0x2E, 0x80, 0xAF, 0x00, 0xC0,
       0x6B, 0x98, 0x10, 0x00, 0x81, 0x64, 0x05, 0x87};
-  pana.setModel(kPanasonicDke);  // Make sure it isn't some how set to JKE
+  pana.setModel(kPanasonicDke);  // Make sure it isn't some how set to CKP
   pana.setRaw(ckpState);
   EXPECT_EQ(kPanasonicCkp, pana.getModel());
   EXPECT_STATE_EQ(ckpState, pana.getRaw(), kPanasonicAcBits);
