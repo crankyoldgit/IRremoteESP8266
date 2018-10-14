@@ -360,14 +360,17 @@ void IRPanasonicAc::setRaw(const uint8_t state[]) {
   }
 }
 
-void IRPanasonicAc::on() {
-  remote_state[13] |= kPanasonicAcPower;
-}
-
-void IRPanasonicAc::off() {
-  remote_state[13] &= ~kPanasonicAcPower;
-}
-
+// Control the power state of the A/C unit.
+//
+// For CKP models, the remote has no memory of the power state the A/C unit
+// should be in. For those models setting this on/true will toggle the power
+// state of the Panasonic A/C unit with the next meessage.
+// e.g. If the A/C unit is already on, setPower(true) will turn it off.
+//      If the A/C unit is already off, setPower(true) will turn it on.
+//      setPower(false) will leave the A/C power state as it was.
+//
+// For all other models, setPower(true) should set the internal state to
+// turn it on, and setPower(false) should turn it off.
 void IRPanasonicAc::setPower(const bool state) {
   if (state)
     on();
@@ -375,8 +378,19 @@ void IRPanasonicAc::setPower(const bool state) {
     off();
 }
 
+// Return the A/C power state of the remote.
+// Except for CKP models, where it returns if the power state will be toggled
+// on the A/C unit when the next message is sent.
 bool IRPanasonicAc::getPower() {
   return (remote_state[13] & kPanasonicAcPower) == kPanasonicAcPower;
+}
+
+void IRPanasonicAc::on() {
+  remote_state[13] |= kPanasonicAcPower;
+}
+
+void IRPanasonicAc::off() {
+  remote_state[13] &= ~kPanasonicAcPower;
 }
 
 uint8_t IRPanasonicAc::getMode() {
