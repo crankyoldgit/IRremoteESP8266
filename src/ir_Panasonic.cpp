@@ -328,6 +328,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
       break;
     case kPanasonicCkp:
       remote_state[21] |= 0x10;
+      remote_state[23] = 0x01;
     default:
       break;
   }
@@ -335,10 +336,10 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
   if (remote_state[17] == 0x00) {
+    if ((remote_state[21] & 0x10) && (remote_state[23] & 0x01))
+      return kPanasonicCkp;
     if (remote_state[23] & 0x80)
       return kPanasonicJke;
-    if (remote_state[21] & 0x10)
-      return kPanasonicCkp;
   }
   if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
     return kPanasonicLke;
