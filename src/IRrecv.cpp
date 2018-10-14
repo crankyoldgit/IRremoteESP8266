@@ -517,6 +517,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Panasonic AC decode");
   if (decodePanasonicAC(results))
     return true;
+  DPRINTLN("Attempting Panasonic AC short decode");
+  if (decodePanasonicAC(results, kPanasonicAcShortBits))
+    return true;
 #endif
 #if DECODE_LUTRON
   DPRINTLN("Attempting Lutron decode");

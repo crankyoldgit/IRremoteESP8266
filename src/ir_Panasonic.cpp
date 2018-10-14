@@ -227,7 +227,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //     A75C3704
 //
 void IRsend::sendPanasonicAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < kPanasonicAcStateLength)  return;
+  if (nbytes < kPanasonicAcSection1Length)  return;
   for (uint16_t r = 0; r <= repeat; r++) {
     // First section. (8 bytes)
     sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
@@ -754,7 +754,7 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
 
   uint8_t min_nr_of_messages = 1;
   if (strict) {
-    if (nbits != kPanasonicAcBits)
+    if (nbits != kPanasonicAcBits && nbits != kPanasonicAcShortBits)
       return false;  // Not strictly a PANASONIC_AC message.
   }
 

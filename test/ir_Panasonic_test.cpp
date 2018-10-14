@@ -984,3 +984,63 @@ TEST(TestIRPanasonicAcClass, TimersAndClock) {
   pana.setClock(kPanasonicAcTimeSpecial);
   EXPECT_EQ(0, pana.getClock());
 }
+
+// Decode a real short Panasonic AC message
+TEST(TestDecodePanasonicAC, RealExampleOfShortMessage) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Data from Issue #544 (Odour Wash)
+  uint16_t rawData[263] = {3496, 1734, 506, 366, 448, 1294, 504, 368, 498, 374,
+      452, 418, 448, 424, 444, 428, 450, 422, 446, 426, 450, 420, 448, 424,
+      452, 418, 448, 422, 444, 1300, 498, 374, 504, 368, 448, 424, 452, 418,
+      448, 424, 444, 428, 450, 422, 446, 1296, 500, 1242, 502, 1242, 504, 368,
+      498, 374, 452, 1292, 504, 366, 450, 422, 444, 426, 450, 420, 446, 424,
+      452, 418, 448, 424, 444, 428, 450, 422, 444, 426, 450, 420, 446, 424,
+      452, 418, 448, 422, 444, 428, 450, 422, 446, 426, 452, 420, 446, 426,
+      452, 418, 448, 424, 442, 428, 448, 422, 444, 426, 450, 420, 446, 426,
+      452, 418, 448, 424, 444, 428, 450, 422, 444, 1298, 500, 1244, 500, 372,
+      444, 428, 450, 422, 446, 426, 452, 418, 448, 10020, 3500, 1732, 498, 372,
+      452, 1290, 506, 366, 450, 422, 446, 426, 452, 420, 448, 424, 452, 418,
+      448, 422, 444, 426, 450, 420, 446, 426, 452, 420, 446, 1296, 500, 370,
+      444, 428, 450, 422, 446, 426, 452, 420, 446, 424, 442, 428, 448, 1294,
+      502, 1240, 504, 1238, 506, 366, 448, 422, 444, 1298, 498, 374, 452, 418,
+      448, 424, 444, 428, 450, 422, 446, 426, 450, 420, 446, 424, 452, 418,
+      448, 422, 444, 428, 450, 420, 446, 1298, 498, 1244, 500, 1242, 502, 368,
+      446, 1298, 500, 1244, 500, 372, 444, 428, 450, 1292, 504, 368, 446, 1296,
+      502, 370, 444, 426, 452, 1290, 504, 1238, 506, 366, 450, 422, 446, 1298,
+      498, 1246, 500, 372, 444, 428, 450, 1294, 452, 420, 446, 1296, 448, 422,
+      444};  // UNKNOWN 1FB51F79
+
+  uint8_t expectedState[kPanasonicAcStateShortLength] = {
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+       0x02, 0x20, 0xE0, 0x04, 0x80, 0x9B, 0x32, 0x53};
+
+  irsend.sendRaw(rawData, 263, kPanasonicFreq);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(PANASONIC_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAcShortBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// Create and decode a short Panasonic AC message
+TEST(TestDecodePanasonicAC, SyntheticShortMessage) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  uint8_t odourWash[kPanasonicAcStateShortLength] = {
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+       0x02, 0x20, 0xE0, 0x04, 0x80, 0x9B, 0x32, 0x53};
+
+  irsend.sendPanasonicAC(odourWash, kPanasonicAcStateShortLength);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(PANASONIC_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAcShortBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(odourWash, irsend.capture.state, irsend.capture.bits);
+}

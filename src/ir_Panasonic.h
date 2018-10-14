@@ -131,8 +131,8 @@ class IRPanasonicAc {
  private:
 #endif
   uint8_t remote_state[kPanasonicAcStateLength];
-  uint8_t _swingh = kPanasonicAcSwingHMiddle;
-  uint8_t _temp = 25;
+  uint8_t _swingh;
+  uint8_t _temp;
   void fixChecksum(const uint16_t length = kPanasonicAcStateLength);
   static uint8_t calcChecksum(const uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);
