@@ -391,8 +391,9 @@ void handleRoot() {
         "<option value='13'>Dish</option>"
         "<option value='43'>GICable</option>"
         "<option value='6'>JVC</option>"
-        "<option value='10'>LG</option>"
         "<option value='36'>Lasertag</option>"
+        "<option value='10'>LG</option>"
+        "<option value='51'>LG2</option>"
         "<option value='47'>Lutron</option>"
         "<option value='35'>MagiQuest</option>"
         "<option value='34'>Midea</option>"
@@ -1445,6 +1446,13 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kLutronBits;
       irsend.sendLutron(code, bits, repeat);
+      break;
+#endif
+#if SEND_LG
+    case LG2:  // 51
+      if (bits == 0)
+        bits = kLgBits;
+      irsend.sendLG2(code, bits, repeat);
       break;
 #endif
     default:
