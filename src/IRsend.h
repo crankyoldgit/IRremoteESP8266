@@ -100,6 +100,8 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
               uint16_t repeat = kNoRepeat);
+  void sendLG2(uint64_t data, uint16_t nbits = kLgBits,
+               uint16_t repeat = kNoRepeat);
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
 #if (SEND_SHARP || SEND_DENON)

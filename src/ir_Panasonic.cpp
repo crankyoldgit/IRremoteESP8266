@@ -22,13 +22,18 @@
 //
 // Panasonic A/C support add by crankyoldgit but heavily influenced by:
 //   https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
+// Panasonic A/C Clock & Timer support:
+//   Reverse Engineering by MikkelTb
+//   Code by crankyoldgit
 // Panasonic A/C models supported:
 //   A/C Series/models:
 //     JKE, LKE, DKE, & NKE series. (In theory)
 //     CS-YW9MKD (confirmed)
+//     CS-ME14CKPG
 //   A/C Remotes:
 //     A75C3747 (confirmed)
 //     A75C3704
+//     A75C2311
 
 // Constants
 // Ref:
@@ -222,7 +227,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //     A75C3704
 //
 void IRsend::sendPanasonicAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < kPanasonicAcStateLength)  return;
+  if (nbytes < kPanasonicAcSection1Length)  return;
   for (uint16_t r = 0; r <= repeat; r++) {
     // First section. (8 bytes)
     sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
@@ -311,8 +316,8 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     case kPanasonicDke:
       remote_state[23] = 0x01;
       remote_state[25] = 0x06;
-      // Has to be done last as setSwingH has model check built-in
-      setSwingH(_swingh);
+      // Has to be done last as setSwingHorizontal has model check built-in
+      setSwingHorizontal(_swingh);
       break;
     case kPanasonicNke:
       remote_state[17] = 0x06;
@@ -329,7 +334,7 @@ panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
     return kPanasonicJke;
   if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
     return kPanasonicLke;
-  if (remote_state[23] == 0x01 && remote_state[25] == 0x06)
+  if (remote_state[23] == 0x01)
     return kPanasonicDke;
   if (remote_state[17] == 0x06)
     return kPanasonicNke;
@@ -413,7 +418,7 @@ uint8_t IRPanasonicAc::getSwingVertical() {
   return remote_state[16] & 0x0F;
 }
 
-void IRPanasonicAc::setSwingV(const uint8_t desired_elevation) {
+void IRPanasonicAc::setSwingVertical(const uint8_t desired_elevation) {
   uint8_t elevation = desired_elevation;
   if (elevation != kPanasonicAcSwingVAuto) {
     elevation = std::max(elevation, kPanasonicAcSwingVUp);
@@ -427,7 +432,7 @@ uint8_t IRPanasonicAc::getSwingHorizontal() {
   return remote_state[17];
 }
 
-void IRPanasonicAc::setSwingH(const uint8_t desired_direction) {
+void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   switch (desired_direction) {
     case kPanasonicAcSwingHAuto:
     case kPanasonicAcSwingHMiddle:
@@ -488,6 +493,104 @@ void IRPanasonicAc::setPowerful(const bool state) {
   } else {
     remote_state[21] &= ~kPanasonicAcPowerful;
   }
+}
+
+uint16_t IRPanasonicAc::encodeTime(const uint8_t hours, const uint8_t mins) {
+  return std::min(hours, (uint8_t) 23) * 60 + std::min(mins, (uint8_t) 59);
+}
+
+uint16_t IRPanasonicAc::getClock() {
+  uint16_t result = ((remote_state[25] & 0b00000111) << 8) + remote_state[24];
+  if (result == kPanasonicAcTimeSpecial) return 0;
+  return result;
+}
+
+void IRPanasonicAc::setClock(const uint16_t mins_since_midnight) {
+  uint16_t corrected = std::min(mins_since_midnight, kPanasonicAcTimeMax);
+  if (mins_since_midnight == kPanasonicAcTimeSpecial)
+    corrected = kPanasonicAcTimeSpecial;
+  remote_state[24] = corrected & 0xFF;
+  remote_state[25] &= 0b11111000;
+  remote_state[25] |= (corrected >> 8);
+}
+
+uint16_t IRPanasonicAc::getOnTimer() {
+  uint16_t result = ((remote_state[19] & 0b00000111) << 8) + remote_state[18];
+  if (result == kPanasonicAcTimeSpecial)  return 0;
+  return result;
+}
+
+void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
+                               const bool enable) {
+  // Ensure it's on a 10 minute boundary and no overflow.
+  uint16_t corrected = std::min(mins_since_midnight, kPanasonicAcTimeMax);
+  corrected -= corrected % 10;
+  if (mins_since_midnight == kPanasonicAcTimeSpecial)
+    corrected = kPanasonicAcTimeSpecial;
+
+  if (enable)
+    remote_state[13] |= kPanasonicAcOnTimer;  // Set the Ontimer flag.
+  else
+    remote_state[13] &= ~kPanasonicAcOnTimer;  // Clear the Ontimer flag.
+  // Store the time.
+  remote_state[18] = corrected & 0xFF;
+  remote_state[19] &= 0b11111000;
+  remote_state[19] |= (corrected >> 8);
+}
+
+void IRPanasonicAc::cancelOnTimer() {
+  setOnTimer(0, false);
+}
+
+bool IRPanasonicAc::isOnTimerEnabled() {
+  return remote_state[13] & kPanasonicAcOnTimer;
+}
+
+uint16_t IRPanasonicAc::getOffTimer() {
+  uint16_t result = ((remote_state[20] & 0b01111111) << 4) +
+      (remote_state[19] >> 4);
+  if (result == kPanasonicAcTimeSpecial)  return 0;
+  return result;
+}
+
+void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
+                               const bool enable) {
+  // Ensure its on a 10 minute boundary and no overflow.
+  uint16_t corrected = std::min(mins_since_midnight, kPanasonicAcTimeMax);
+  corrected -= corrected % 10;
+  if (mins_since_midnight == kPanasonicAcTimeSpecial)
+    corrected = kPanasonicAcTimeSpecial;
+
+  if (enable)
+    remote_state[13] |= kPanasonicAcOffTimer;  // Set the OffTimer flag.
+  else
+    remote_state[13] &= ~kPanasonicAcOffTimer;  // Clear the OffTimer flag.
+  // Store the time.
+  remote_state[19] &= 0b00001111;
+  remote_state[19] |= (corrected & 0b00001111) << 4;
+  remote_state[20] &= 0b10000000;
+  remote_state[20] |= corrected >> 4;
+}
+
+void IRPanasonicAc::cancelOffTimer() {
+  setOffTimer(0, false);
+}
+
+bool IRPanasonicAc::isOffTimerEnabled() {
+  return remote_state[13] & kPanasonicAcOffTimer;
+}
+
+#ifdef ARDUINO
+String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
+  String result = "";
+#else
+std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
+  std::string result = "";
+#endif  // ARDUINO
+result += uint64ToString(mins_since_midnight / 60) + ":";
+uint8_t mins = mins_since_midnight % 60;
+if (mins < 10)  result += "0";  // Zero pad the minutes.
+return result + uint64ToString(mins);
 }
 
 // Convert the internal state into a human readable string.
@@ -611,6 +714,17 @@ std::string IRPanasonicAc::toString() {
     result += "On";
   else
     result += "Off";
+  result += ", Clock: " + timeToString(getClock());
+  result += ", On Timer: ";
+  if (isOnTimerEnabled())
+    result += timeToString(getOnTimer());
+  else
+    result += "Off";
+  result += ", Off Timer: ";
+  if (isOffTimerEnabled())
+    result += timeToString(getOffTimer());
+  else
+    result += "Off";
   return result;
 }
 
@@ -640,7 +754,7 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
 
   uint8_t min_nr_of_messages = 1;
   if (strict) {
-    if (nbits != kPanasonicAcBits)
+    if (nbits != kPanasonicAcBits && nbits != kPanasonicAcShortBits)
       return false;  // Not strictly a PANASONIC_AC message.
   }
 

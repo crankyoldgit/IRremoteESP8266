@@ -271,6 +271,7 @@ enum decode_type_t {
   ELECTRA_AC,
   PANASONIC_AC,
   PIONEER,
+  LG2,
 };
 
 // Message lengths & required repeat values
@@ -335,7 +336,9 @@ const uint16_t kNECBits = 32;
 const uint16_t kPanasonicBits = 48;
 const uint32_t kPanasonicManufacturer = 0x4004;
 const uint16_t kPanasonicAcStateLength = 27;
+const uint16_t kPanasonicAcStateShortLength = 16;
 const uint16_t kPanasonicAcBits = kPanasonicAcStateLength * 8;
+const uint16_t kPanasonicAcShortBits = kPanasonicAcStateShortLength * 8;
 const uint16_t kPioneerBits = 64;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;

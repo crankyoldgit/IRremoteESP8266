@@ -515,6 +515,9 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #if SEND_LG
     case LG: sendLG(data, nbits); break;
 #endif
+#if SEND_LG
+    case LG2: sendLG2(data, nbits); break;
+#endif
 #if SEND_WHYNTER
     case WHYNTER: sendWhynter(data, nbits); break;
 #endif

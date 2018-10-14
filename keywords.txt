@@ -57,6 +57,8 @@ calcLGChecksum	KEYWORD2
 calcUSecPeriod	KEYWORD2
 calculateChecksum	KEYWORD2
 calibrate	KEYWORD2
+cancelOffTimer	KEYWORD2
+cancelOnTimer	KEYWORD2
 cancelTimers	KEYWORD2
 checkheader	KEYWORD2
 checksum	KEYWORD2
@@ -125,6 +127,7 @@ encodeSAMSUNG	KEYWORD2
 encodeSanyoLC7461	KEYWORD2
 encodeSharp	KEYWORD2
 encodeSony	KEYWORD2
+encodeTime	KEYWORD2
 fixChecksum	KEYWORD2
 fixup	KEYWORD2
 getBeep	KEYWORD2
@@ -187,6 +190,8 @@ getZoneFollow	KEYWORD2
 getiFeel	KEYWORD2
 hasACState	KEYWORD2
 invertBits	KEYWORD2
+isOffTimerEnabled	KEYWORD2
+isOnTimerEnabled	KEYWORD2
 ledOff	KEYWORD2
 ledOn	KEYWORD2
 mark	KEYWORD2
@@ -201,6 +206,7 @@ printState	KEYWORD2
 readbits	KEYWORD2
 renderTime	KEYWORD2
 reset	KEYWORD2
+resultToHexidecimal	KEYWORD2
 resultToHumanReadableBasic	KEYWORD2
 resultToSourceCode	KEYWORD2
 resultToTimingInfo	KEYWORD2
@@ -299,9 +305,7 @@ setSpeed	KEYWORD2
 setStartClock	KEYWORD2
 setStopClock	KEYWORD2
 setSwing	KEYWORD2
-setSwingH	KEYWORD2
 setSwingHorizontal	KEYWORD2
-setSwingV	KEYWORD2
 setSwingVertical	KEYWORD2
 setTemp	KEYWORD2
 setTempRaw	KEYWORD2
@@ -1324,6 +1328,7 @@ kPanasonicAcBits	LITERAL1
 kPanasonicAcChecksumInit	LITERAL1
 kPanasonicAcCool	LITERAL1
 kPanasonicAcDry	LITERAL1
+kPanasonicAcExcess	LITERAL1
 kPanasonicAcFan	LITERAL1
 kPanasonicAcFanAuto	LITERAL1
 kPanasonicAcFanMax	LITERAL1
@@ -1351,6 +1356,9 @@ kPanasonicAcSwingHRight	LITERAL1
 kPanasonicAcSwingVAuto	LITERAL1
 kPanasonicAcSwingVDown	LITERAL1
 kPanasonicAcSwingVUp	LITERAL1
+kPanasonicAcTimeMax	LITERAL1
+kPanasonicAcTimeSpecial	LITERAL1
+kPanasonicAcTolerance	LITERAL1
 kPanasonicBitMark	LITERAL1
 kPanasonicBitMarkTicks	LITERAL1
 kPanasonicBits	LITERAL1

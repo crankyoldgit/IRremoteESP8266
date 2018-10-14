@@ -120,6 +120,7 @@ std::string typeToString(const decode_type_t protocol,
     case JVC:            result = "JVC";               break;
     case KELVINATOR:     result = "KELVINATOR";        break;
     case LG:             result = "LG";                break;
+    case LG2:            result = "LG2";               break;
     case LASERTAG:       result = "LASERTAG";          break;
     case LUTRON:         result = "LUTRON";            break;
     case MAGIQUEST:      result = "MAGIQUEST";         break;
@@ -304,6 +305,28 @@ std::string resultToTimingInfo(const decode_results *results) {
   return output;
 }
 
+// Convert the decode_results structure's value/state to simple hexadecimal.
+//
+#ifdef ARDUINO
+String resultToHexidecimal(const decode_results *result) {
+  String output = "";
+#else
+std::string resultToHexidecimal(const decode_results *result) {
+  std::string output = "";
+#endif
+  if (hasACState(result->decode_type)) {
+  #if DECODE_AC
+      for (uint16_t i = 0; result->bits > i * 8; i++) {
+        if (result->state[i] < 0x10)  output += "0";  // Zero pad
+        output += uint64ToString(result->state[i], 16);
+      }
+  #endif  // DECODE_AC
+  } else {
+    output += uint64ToString(result->value, 16);
+  }
+  return output;
+}
+
 // Dump out the decode_results structure.
 //
 #ifdef ARDUINO
@@ -319,16 +342,7 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
 
   // Show Code & length
   output += "Code      : ";
-  if (hasACState(results->decode_type)) {
-#if DECODE_AC
-      for (uint16_t i = 0; results->bits > i * 8; i++) {
-        if (results->state[i] < 0x10)  output += "0";  // Zero pad
-        output += uint64ToString(results->state[i], 16);
-      }
-#endif  // DECODE_AC
-  } else {
-    output += uint64ToString(results->value, 16);
-  }
+  output += resultToHexidecimal(results);
   output += " (" + uint64ToString(results->bits) + " bits)\n";
   return output;
 }
