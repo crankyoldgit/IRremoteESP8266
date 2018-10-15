@@ -571,10 +571,19 @@ TEST(TestIRPanasonicAcClass, SetAndGetModel) {
   uint8_t jkeState[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
       0x02, 0x20, 0xE0, 0x04, 0x00, 0x32, 0x2E, 0x80, 0xA2, 0x00, 0x00,
       0x06, 0x60, 0x00, 0x00, 0x80, 0x00, 0x06, 0x74};
-  pana.setModel(kPanasonicDke);  // Make sure it isn't some how set to JKE
+  pana.setModel(kPanasonicDke);  // Make sure it isn't somehow set to JKE
   pana.setRaw(jkeState);
   EXPECT_EQ(kPanasonicJke, pana.getModel());
   EXPECT_STATE_EQ(jkeState, pana.getRaw(), kPanasonicAcBits);
+
+  // This state tickled a bug in getModel(). Should read as CKP.
+  uint8_t ckpState[27] = {0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+      0x02, 0x20, 0xE0, 0x04, 0x00, 0x67, 0x2E, 0x80, 0xAF, 0x00, 0xC0,
+      0x6B, 0x98, 0x10, 0x00, 0x81, 0x64, 0x05, 0x87};
+  pana.setModel(kPanasonicDke);  // Make sure it isn't somehow set to CKP
+  pana.setRaw(ckpState);
+  EXPECT_EQ(kPanasonicCkp, pana.getModel());
+  EXPECT_STATE_EQ(ckpState, pana.getRaw(), kPanasonicAcBits);
 }
 
 TEST(TestIRPanasonicAcClass, SetAndGetMode) {
@@ -1043,4 +1052,49 @@ TEST(TestDecodePanasonicAC, SyntheticShortMessage) {
   ASSERT_EQ(PANASONIC_AC, irsend.capture.decode_type);
   EXPECT_EQ(kPanasonicAcShortBits, irsend.capture.bits);
   EXPECT_STATE_EQ(odourWash, irsend.capture.state, irsend.capture.bits);
+}
+//
+// Test for CKP model / see issue #544
+TEST(TestDecodePanasonicAC, CkpModelSpecifics) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Data from Issue #544
+  uint8_t ckpPowerfulOn[kPanasonicAcStateLength] = {
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x4E, 0x2E, 0x80, 0xAF, 0x00,
+       0x00, 0x0E, 0xE0, 0x11, 0x00, 0x01, 0x00, 0x06, 0xB7};
+  uint8_t ckpQuietOn[kPanasonicAcStateLength] = {
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
+       0x02, 0x20, 0xE0, 0x04, 0x00, 0x4E, 0x2E, 0x80, 0xAF, 0x00,
+       0x00, 0x0E, 0xE0, 0x30, 0x00, 0x01, 0x00, 0x06, 0xD6};
+
+  irsend.sendPanasonicAC(ckpPowerfulOn);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(PANASONIC_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(ckpPowerfulOn, irsend.capture.state, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  IRPanasonicAc pana(0);
+  pana.setRaw(irsend.capture.state);
+  EXPECT_EQ("Model: 5 (CKP), Power: Off, Mode: 4 (HEAT), Temp: 23C, "
+            "Fan: 7 (AUTO), Swing (Vertical): 15 (AUTO), Quiet: Off, "
+            "Powerful: On, Clock: 0:00, On Timer: 0:00, Off Timer: 0:00",
+            pana.toString());
+
+  pana.setQuiet(true);
+  EXPECT_FALSE(pana.getPowerful());
+  EXPECT_TRUE(pana.getQuiet());
+  EXPECT_EQ(kPanasonicCkp, pana.getModel());
+  EXPECT_STATE_EQ(ckpQuietOn, pana.getRaw(), kPanasonicAcBits);
+
+  pana.setPowerful(true);
+  EXPECT_TRUE(pana.getPowerful());
+  EXPECT_FALSE(pana.getQuiet());
+  EXPECT_EQ(kPanasonicCkp, pana.getModel());
+  EXPECT_STATE_EQ(ckpPowerfulOn, pana.getRaw(), kPanasonicAcBits);
 }
