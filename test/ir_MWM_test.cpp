@@ -149,6 +149,85 @@ TEST(TestDecodeMWM, RealExamples) {
     EXPECT_EQ(short_expected[i], irsend.capture.state[i]) <<
       "values differ at index " << i;
   }
+
+  irsend.reset();
+  uint16_t long_code[] = {
+    427,
+    427,
+    854,
+    854,
+    854,
+    793,
+    915,
+    793,
+    854,
+    366,
+    915,
+    366,
+    854,
+    854,
+    854,
+    793,
+    488,
+    366,
+    915,
+    1220,
+    427,
+    793,
+    488,
+    366,
+    488,
+    366,
+    1281,
+    427,
+    427,
+    1220,
+    915,
+    366,
+    1708,
+    366,
+    488,
+    366,
+    854,
+    854,
+    2136,
+    366,
+    2563,
+    366,
+    854,
+    427,
+    2136,
+    366,
+    488,
+    1220,
+    854,
+    427,
+    854,
+    793,
+    915,
+    366,
+    2136,
+    2075,
+    427,
+    793,
+    488,
+    366,
+    1708,
+    30517
+  };
+  unsigned char long_expected[] = {
+    0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42, 0x06, 0x20, 0xD0, 0x32, 0xF0, 0x0B
+  };
+  irsend.sendRaw(long_code, sizeof(long_code)/sizeof(long_code[0]), 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MWM, irsend.capture.decode_type);
+  EXPECT_EQ(8*sizeof(long_expected)/sizeof(long_expected[0]), irsend.capture.bits);
+  for (int i = 0; i < irsend.capture.bits/8; i++) {
+    EXPECT_EQ(long_expected[i], irsend.capture.state[i]) <<
+      "values differ at index " << i;
+  }
+
 }
 
 // vim: et:ts=2:sw=2
