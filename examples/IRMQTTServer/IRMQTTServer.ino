@@ -731,6 +731,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_WHIRLPOOL_AC
+    case WHIRLPOOL_AC:
+      irsend.sendWhirlpoolAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
       irsend.sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
