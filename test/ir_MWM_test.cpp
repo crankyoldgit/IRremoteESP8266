@@ -89,17 +89,66 @@ TEST(TestDecodeMWM, RealExamples) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t green3[21] = {
-      360, 364, 272, 360, 420, 248, 360, 360, 332, 308, 388, 612, 692, 696,
-      636, 360, 332, 700, 300, 308, 416};
-  irsend.sendRaw(green3, 21, 36000);
+  uint16_t short_code[] = {
+    915,
+    793,
+    488,
+    366,
+    915,
+    793,
+    427,
+    366,
+    915,
+    793,
+    1281,
+    427,
+    2136,
+    366,
+    1281,
+    366,
+    915,
+    793,
+    427,
+    854,
+    854,
+    366,
+    1281,
+    854,
+    1708,
+    366,
+    488,
+    793,
+    854,
+    427,
+    427,
+    427,
+    427,
+    366,
+    854,
+    427,
+    2563,
+    366,
+    488,
+    793,
+    2563,
+    366,
+    488,
+    2075,
+    427,
+    34057
+  };
+  unsigned char short_expected[] = {
+    0x96, 0x19, 0x10, 0x36, 0x0C, 0x53, 0x02, 0x03, 0xDF
+  };
+  irsend.sendRaw(short_code, sizeof(short_code)/sizeof(short_code[0]), 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MWM, irsend.capture.decode_type);
-  EXPECT_EQ(kLasertagBits, irsend.capture.bits); // Number of bits
-  EXPECT_EQ(0x53, irsend.capture.value);
-  EXPECT_EQ(0x3, irsend.capture.address);  // Unit
-  EXPECT_EQ(0x5, irsend.capture.command);  // Team
+  EXPECT_EQ(8*sizeof(short_expected)/sizeof(short_expected[0]), irsend.capture.bits);
+  for (int i = 0; i < irsend.capture.bits/8; i++) {
+    EXPECT_EQ(short_expected[i], irsend.capture.state[i]) <<
+      "values differ at index " << i;
+  }
 }
 
 // vim: et:ts=2:sw=2
