@@ -106,7 +106,7 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
 
   // Data
   uint8_t bits_per_frame = 10;
-  for (; offset < results->rawlen; frame_bits++) {
+  for (; offset < results->rawlen && results->bits < 8*kStateSizeMax; frame_bits++) {
     DPRINT("DEBUG: decodeMWM: offset = ");
     DPRINTLN(uint64ToString(offset));
     int16_t level = getRClevel(results, &offset, &used, kMWMTick,
