@@ -1,5 +1,5 @@
-// Copyright 2017 David Conran
 // Copyright 2018 Brett T. Warden
+// derived from ir_Lasertag.cpp, Copyright 2017 David Conran
 
 #include <algorithm>
 #include "IRrecv.h"
