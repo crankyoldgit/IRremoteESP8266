@@ -5,12 +5,11 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
-//   LL        AAA    SSSSS  EEEEEEE RRRRRR  TTTTTTT   AAA     GGGG
-//   LL       AAAAA  SS      EE      RR   RR   TTT    AAAAA   GG  GG
-//   LL      AA   AA  SSSSS  EEEEE   RRRRRR    TTT   AA   AA GG
-//   LL      AAAAAAA      SS EE      RR  RR    TTT   AAAAAAA GG   GG
-//   LLLLLLL AA   AA  SSSSS  EEEEEEE RR   RR   TTT   AA   AA  GGGGGG
-
+//   MM   MM WW   WW MM   MM
+//   MMM MMM WW   WW MMM MMM
+//   MM M MM WW W WW MM M MM
+//   MM   MM WWW WWW MM   MM
+//   MM   MM WW   WW MM   MM
 
 // Tests for sendMWM().
 
@@ -21,7 +20,7 @@ TEST(TestSendMWM, SendDataOnly) {
 
   irsend.reset();
   unsigned char test1[] = {
-	  0x96, 0x19, 0x10, 0x24, 0x0A, 0x6B, 0x20, 0x03, 0x82
+    0x96, 0x19, 0x10, 0x24, 0x0A, 0x6B, 0x20, 0x03, 0x82
   };
   /*
   ++--+-++--
@@ -49,17 +48,35 @@ TEST(TestSendMWM, SendDataOnly) {
 
   irsend.reset();
   unsigned char test2[] = {
-	  0x96, 0x19, 0x0B, 0x36, 0x06, 0xD4, 0x30, 0x01, 0x7F
+    0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42, 0x06, 0x20, 0xD0, 0x32, 0xF0, 0x0B
+      // +-++--++--
+      // ++--++-++-
+      // ++--++--+-
+      // ++---+--+-
+      // +-+++-+---
+      // ++-++++-+-
+      // ++--+++++-
+      // ++++++-++-
+      // +++++-+---
+      // ++-++--++-
+      // +++++-----
+      // +--+-++++-
   };
   irsend.sendMWM(test2, sizeof(test2), 0);
-  EXPECT_EQ("FOO", irsend.outputStr());
-
-  irsend.reset();
-  unsigned char test3[] = {
-	  0x90, 0x24, 0x58, 0x03, 0x48, 0x0D, 0xD0, 0x3E, 0x32, 0x66, 0x6E, 0xBE
-  };
-  irsend.sendMWM(test3, sizeof(test3), 0);
-  EXPECT_EQ("FOO", irsend.outputStr());
+  EXPECT_EQ(
+      "m417s417m834s834m834s834"
+      "m834s834m834s417m834s417"
+      "m834s834m834s834m417s417"
+      "m834s1251m417s834m417s417"
+      "m417s417m1251s417m417s1251"
+      "m834s417m1668s417m417s417"
+      "m834s834m2085s417"
+      "m2502s417m834s417"
+      "m2085s417m417s1251"
+      "m834s417m834s834m834s417"
+      "m2085s2085"
+      "m417s834m417s417m1668s30417"
+      "", irsend.outputStr());
 
 }
 
@@ -84,3 +101,5 @@ TEST(TestDecodeMWM, RealExamples) {
   EXPECT_EQ(0x3, irsend.capture.address);  // Unit
   EXPECT_EQ(0x5, irsend.capture.command);  // Team
 }
+
+// vim: et:ts=2:sw=2
