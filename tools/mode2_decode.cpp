@@ -1,13 +1,28 @@
-// Quick and dirty tool to decode GlobalCache (GC) codes
-// and ProntoHex codes
-// Copyright 2017 Jorge Cisneros
+// Quick and dirty tool to decode mode2 data from LIRC
+// Copyright 2018 Brett T. Warden
+// based on c2_decode.cpp, Copyright 2017 Jorge Cisneros
+
+// Usage example:
+// mode2 -H udp -d 5000 | ./mode2_decode
+
+/* Sample input (alternating space and pulse durations in microseconds):
+space 500000
+pulse 915
+space 793
+pulse 488
+space 366
+pulse 915
+space 793
+pulse 427
+space 500000
+*/
 
 #include <errno.h>
 #include <inttypes.h>
-#include <iostream>
-#include <sstream>
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include "IRsend.h"
 #include "IRsend_test.h"
@@ -64,8 +79,7 @@ int main(int argc, char * argv[]) {
     }
     if (pulse.compare(type) == 0) {
       irsend.mark(duration);
-    }
-    else if (space.compare(type) == 0) {
+    } else if (space.compare(type) == 0) {
       irsend.space(duration);
     }
     index++;
@@ -78,7 +92,8 @@ int main(int argc, char * argv[]) {
 
         std::cout << "Code length " << index << std::endl
           << "Code type      " << irsend.capture.decode_type
-          << " (" << typeToString(irsend.capture.decode_type) << ")" << std::endl
+          << " (" << typeToString(irsend.capture.decode_type) << ")"
+	  << std::endl
           << "Code bits      " << irsend.capture.bits << std::endl;
         if (hasACState(irsend.capture.decode_type)) {
           std::cout << "State value    0x";
@@ -88,7 +103,8 @@ int main(int argc, char * argv[]) {
         } else {
           std::cout << "Code value     0x" <<
             std::hex << irsend.capture.value << std::endl <<
-            "Code address   0x" << std::hex << irsend.capture.address << std::endl
+            "Code address   0x" << std::hex << irsend.capture.address
+	    << std::endl
             << "Code command   0x" << std::hex << irsend.capture.command <<
             std::endl;
         }

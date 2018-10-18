@@ -1,6 +1,8 @@
 // Copyright 2017 David Conran
 // Copyright 2018 Brett T. Warden
 
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -77,7 +79,6 @@ TEST(TestSendMWM, SendDataOnly) {
       "m2085s2085"
       "m417s834m417s417m1668s30417"
       "", irsend.outputStr());
-
 }
 
 // Tests for decodeMWM().
@@ -144,11 +145,9 @@ TEST(TestDecodeMWM, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MWM, irsend.capture.decode_type);
-  EXPECT_EQ(8*sizeof(short_expected)/sizeof(short_expected[0]), irsend.capture.bits);
-  for (int i = 0; i < irsend.capture.bits/8; i++) {
-    EXPECT_EQ(short_expected[i], irsend.capture.state[i]) <<
-      "values differ at index " << i;
-  }
+  EXPECT_EQ(8 * sizeof(short_expected) / sizeof(short_expected[0]),
+      irsend.capture.bits);
+  EXPECT_STATE_EQ(short_expected, irsend.capture.state, irsend.capture.bits);
 
   irsend.reset();
   uint16_t long_code[] = {
@@ -222,12 +221,9 @@ TEST(TestDecodeMWM, RealExamples) {
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MWM, irsend.capture.decode_type);
-  EXPECT_EQ(8*sizeof(long_expected)/sizeof(long_expected[0]), irsend.capture.bits);
-  for (int i = 0; i < irsend.capture.bits/8; i++) {
-    EXPECT_EQ(long_expected[i], irsend.capture.state[i]) <<
-      "values differ at index " << i;
-  }
-
+  EXPECT_EQ(8 * sizeof(long_expected) / sizeof(long_expected[0]),
+      irsend.capture.bits);
+  EXPECT_STATE_EQ(long_expected, irsend.capture.state, irsend.capture.bits);
 }
 
 // vim: et:ts=2:sw=2

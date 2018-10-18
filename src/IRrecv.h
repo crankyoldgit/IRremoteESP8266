@@ -187,7 +187,7 @@ class IRrecv {
                         uint16_t nbits = kMitsubishiACBits,
                         bool strict = false);
 #endif
-#if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
+#if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = kTolerance,
                      int16_t excess = kMarkExcess, uint16_t delta = 0,

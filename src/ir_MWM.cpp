@@ -13,14 +13,15 @@
 //   MM   MM WW   WW MM   MM
 
 // Constants
-const uint16_t kMWMMinSamples = 6; // Msgs are >=3 bytes, bytes have >=2 samples
+const uint16_t kMWMMinSamples = 6;  // Msgs are >=3 bytes, bytes have >=2
+                                    //samples
 const uint16_t kMWMTick = 417;
 const uint32_t kMWMMinGap = 30000;  // Typical observed delay b/w commands
-const uint8_t  kMWMTolerance = 0;  // Percentage error margin.
-const uint16_t kMWMExcess = 0;  // See kMarkExcess.
-const uint16_t kMWMDelta = 150;  // Use instead of Excess and Tolerance.
-const uint8_t  kMWMMaxWidth = 9; // Maximum number of successive bits at a
-                                 // single level - worst case
+const uint8_t  kMWMTolerance = 0;   // Percentage error margin.
+const uint16_t kMWMExcess = 0;      // See kMarkExcess.
+const uint16_t kMWMDelta = 150;     // Use instead of Excess and Tolerance.
+const uint8_t  kMWMMaxWidth = 9;    // Maximum number of successive bits at a
+                                    // single level - worst case
 const int16_t  kSpace = 1;
 const int16_t  kMark = 0;
 
@@ -106,7 +107,8 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
 
   // Data
   uint8_t bits_per_frame = 10;
-  for (; offset < results->rawlen && results->bits < 8*kStateSizeMax; frame_bits++) {
+  for (; offset < results->rawlen && results->bits < 8*kStateSizeMax;
+       frame_bits++) {
     DPRINT("DEBUG: decodeMWM: offset = ");
     DPRINTLN(uint64ToString(offset));
     int16_t level = getRClevel(results, &offset, &used, kMWMTick,
@@ -129,13 +131,12 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
         if (level != kSpace) {
           DPRINTLN("DEBUG: decodeMWM: framing error - invalid stop bit");
           return false;
-        }
-        else {
+        } else {
           DPRINT("DEBUG: decodeMWM: data_bits = ");
           DPRINTLN(data_bits);
           DPRINT("DEBUG: decodeMWM: Finished byte: ");
           DPRINTLN(data);
-          results->state[data_bits/8-1] = data & 0xFF;
+          results->state[data_bits / 8 - 1] = data & 0xFF;
           results->bits = data_bits;
           data = 0;
         }
@@ -149,7 +150,7 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
         data >>= 1;
         data_bits++;
         break;
-    };
+    }
   }
 
 done:
@@ -183,7 +184,7 @@ done:
         }
       }
       break;
-  };
+  }
   if (data_bits < (payload_length + 3) * 8) {
     DPRINT("DEBUG: decodeMWM: too few bytes; expected ");
     DPRINTLN((payload_length + 3));
