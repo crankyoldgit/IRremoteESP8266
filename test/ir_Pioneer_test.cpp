@@ -109,3 +109,39 @@ TEST(TestDecodePioneer, RealExampleLongDecodeSourceButton) {
   EXPECT_EQ(0xA6A0, irsend.capture.address);
   EXPECT_EQ(0xAFA3, irsend.capture.command);
 }
+
+// Synthetic Pioneer message.
+// For: https://github.com/markszabo/IRremoteESP8266/pull/547#issuecomment-430800734
+TEST(TestDecodePioneer, SyntheticPioneerMessage) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendPioneer(0x659A857AF50A3DC2, 64, 0);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(PIONEER, irsend.capture.decode_type);
+  EXPECT_EQ(kPioneerBits, irsend.capture.bits);
+  EXPECT_EQ(0x659A857AF50A3DC2, irsend.capture.value);
+  EXPECT_EQ(0xA6A1, irsend.capture.address);
+  EXPECT_EQ(0xAFBC, irsend.capture.command);
+
+  irsend.reset();
+  irsend.sendPioneer(0x659A857AF50A3DC2, 64, 0);
+  EXPECT_EQ(
+      "m8960s4480"
+      "m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s40320"
+      "m8960s4480"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s560m560s1680"
+      "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s1680m560s560"
+      "m560s40320", irsend.outputStr());
+
+  irsend.reset();
+}
