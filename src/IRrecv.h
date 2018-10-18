@@ -54,9 +54,6 @@ const uint32_t kFnvBasis32 = 2166136261UL;
 #if DECODE_AC
 // Hitachi AC is the current largest state size.
 const uint16_t kStateSizeMax = kHitachiAc2StateLength;
-#elif DECODE_MWM
-// MWM requires a slightly less large buffer
-const uint16_t kStateSizeMax = kMWMSizeMax;
 #else
 // Just define something
 const uint16_t kStateSizeMax = 0;

@@ -201,7 +201,7 @@
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
-     DECODE_PANASONIC_AC)
+     DECODE_PANASONIC_AC || DECODE_MWM)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -332,7 +332,6 @@ const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiACStateLength = 18;
 const uint16_t kMitsubishiACBits = kMitsubishiACStateLength * 8;
 const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
-const uint16_t kMWMSizeMax = 18;  // 4-bit size field + 3 bytes
 const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
 const uint16_t kPanasonicBits = 48;
