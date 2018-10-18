@@ -6,15 +6,15 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//   MM   MM WW   WW MM   MM
-//   MMM MMM WW   WW MMM MMM
-//   MM M MM WW W WW MM M MM
-//   MM   MM WWW WWW MM   MM
-//   MM   MM WW   WW MM   MM
+//                      MM   MM WW   WW MM   MM
+//                      MMM MMM WW   WW MMM MMM
+//                      MM M MM WW W WW MM M MM
+//                      MM   MM WWW WWW MM   MM
+//                      MM   MM WW   WW MM   MM
 
 // Constants
 const uint16_t kMWMMinSamples = 6;  // Msgs are >=3 bytes, bytes have >=2
-                                    //samples
+                                    // samples
 const uint16_t kMWMTick = 417;
 const uint32_t kMWMMinGap = 30000;  // Typical observed delay b/w commands
 const uint8_t  kMWMTolerance = 0;   // Percentage error margin.

@@ -170,11 +170,11 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
+    case MWM:
     case PANASONIC_AC:
     case SAMSUNG_AC:
     case TOSHIBA_AC:
     case WHIRLPOOL_AC:
-    case MWM:
       return true;
     default:
       return false;

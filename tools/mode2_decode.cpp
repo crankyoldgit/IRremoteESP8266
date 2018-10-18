@@ -93,7 +93,7 @@ int main(int argc, char * argv[]) {
         std::cout << "Code length " << index << std::endl
           << "Code type      " << irsend.capture.decode_type
           << " (" << typeToString(irsend.capture.decode_type) << ")"
-	  << std::endl
+          << std::endl
           << "Code bits      " << irsend.capture.bits << std::endl;
         if (hasACState(irsend.capture.decode_type)) {
           std::cout << "State value    0x";
@@ -104,7 +104,7 @@ int main(int argc, char * argv[]) {
           std::cout << "Code value     0x" <<
             std::hex << irsend.capture.value << std::endl <<
             "Code address   0x" << std::hex << irsend.capture.address
-	    << std::endl
+            << std::endl
             << "Code command   0x" << std::hex << irsend.capture.command <<
             std::endl;
         }
