@@ -40,7 +40,7 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
   // send 1st part of the code
   sendNEC(data >> (nbits / 2), nbits / 2, 0);
   // send 2nd part of the code
-  sendNEC(data & ((1UL << (nbits / 2)) - 1), nbits / 2, repeat);
+  sendNEC(data & (((uint64_t) 1 << (nbits / 2)) - 1), nbits / 2, repeat);
 }
 
 // Calculate the raw Pioneer data code based on two NEC sub-codes

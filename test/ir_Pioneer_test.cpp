@@ -142,6 +142,4 @@ TEST(TestDecodePioneer, SyntheticPioneerMessage) {
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s560m560s1680"
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s1680m560s560"
       "m560s40320", irsend.outputStr());
-
-  irsend.reset();
 }
