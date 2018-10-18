@@ -35,7 +35,7 @@ const int16_t  kMark = 0;
 //   nbits:   Bit size of the protocol you want to send.
 //   repeat:  Nr. of extra times the data will be sent.
 //
-// Status: Unimplemented.
+// Status: Implemented.
 //
 void IRsend::sendMWM(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
   if (nbytes < 3)
@@ -82,11 +82,8 @@ void IRsend::sendMWM(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Unknown.
+// Status: Implemented.
 //
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
 bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
     bool strict) {
   DPRINTLN("DEBUG: decodeMWM");
