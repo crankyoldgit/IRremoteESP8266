@@ -535,6 +535,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   if (decodeLutron(results))
     return true;
 #endif
+#if DECODE_MWM
+  DPRINTLN("Attempting MWM decode");
+  if (decodeMWM(results))
+    return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

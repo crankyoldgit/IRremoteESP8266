@@ -495,6 +495,7 @@ void handleRoot() {
         "<option value='42'>Hitachi2 (53 bytes)</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
+        "<option value='52'>MWM</option>"
         "<option value='46'>Samsung</option>"
         "<option value='32'>Toshiba</option>"
         "<option value='28'>Trotec</option>"
@@ -632,6 +633,17 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       // Lastly, it should never exceed the maximum "extended" size.
       stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;
+    case MWM:
+      // MWM has variable size states, so make a best guess
+      // which one we are being presented with based on the number of
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize, (uint16_t) 3);
+      // Cap the maximum size.
+      stateSize = std::min(stateSize, kStateSizeMax);
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return false;
@@ -732,6 +744,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_WHIRLPOOL_AC
+    case WHIRLPOOL_AC:
+      irsend.sendWhirlpoolAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
       irsend.sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
@@ -745,6 +762,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_PANASONIC_AC
     case PANASONIC_AC:
       irsend.sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_MWM_
+    case MWM:
+      irsend.sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
     default:
@@ -1338,6 +1360,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case SAMSUNG_AC:  // 46
     case ELECTRA_AC:  // 48
     case PANASONIC_AC:  // 49
+    case MWM:  // 52
       success = parseStringAndSendAirCon(ir_type, code_str);
       break;
 #if SEND_DENON

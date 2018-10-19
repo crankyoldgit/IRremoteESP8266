@@ -193,6 +193,9 @@
 #define DECODE_PANASONIC_AC    true
 #define SEND_PANASONIC_AC      true
 
+#define DECODE_MWM             true
+#define SEND_MWM               true
+
 #define DECODE_PIONEER         true
 #define SEND_PIONEER           true
 
@@ -201,7 +204,7 @@
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
-     DECODE_PANASONIC_AC)
+     DECODE_PANASONIC_AC || DECODE_MWM)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -272,6 +275,7 @@ enum decode_type_t {
   PANASONIC_AC,
   PIONEER,
   LG2,
+  MWM,
 };
 
 // Message lengths & required repeat values

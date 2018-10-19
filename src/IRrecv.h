@@ -51,8 +51,13 @@ const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 const uint32_t kFnvPrime32 = 16777619UL;
 const uint32_t kFnvBasis32 = 2166136261UL;
 
+#if DECODE_AC
 // Hitachi AC is the current largest state size.
 const uint16_t kStateSizeMax = kHitachiAc2StateLength;
+#else
+// Just define something
+const uint16_t kStateSizeMax = 0;
+#endif
 
 // Types
 // information for the interrupt handler
@@ -91,9 +96,7 @@ class decode_results {
       uint32_t address;  // Decoded device address.
       uint32_t command;  // Decoded command.
     };
-#if DECODE_AC  // Only include state if we must. It's big.
-    uint8_t state[kStateSizeMax];  // Complex multi-byte A/C result.
-#endif
+    uint8_t state[kStateSizeMax];  // Multi-byte results.
   };
   uint16_t bits;  // Number of bits in decoded value
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks
@@ -181,10 +184,11 @@ class IRrecv {
                         uint16_t nbits = kMitsubishiACBits,
                         bool strict = false);
 #endif
-#if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG)
+#if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = kTolerance,
-                     int16_t excess = kMarkExcess, uint16_t delta = 0);
+                     int16_t excess = kMarkExcess, uint16_t delta = 0,
+                     uint8_t maxwidth = 3);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t nbits = kRC5XBits,
@@ -328,6 +332,10 @@ class IRrecv {
   bool decodePioneer(decode_results *results,
                      const uint16_t nbits = kPioneerBits,
                      const bool strict = true);
+#endif
+#if DECODE_MWM
+  bool decodeMWM(decode_results *results, uint16_t nbits = 24,
+                      bool strict = true);
 #endif
 };
 

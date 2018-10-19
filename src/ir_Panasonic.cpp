@@ -27,13 +27,13 @@
 //   Code by crankyoldgit
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, & NKE series. (In theory)
+//     JKE, LKE, DKE, CKP, & NKE series. (In theory)
 //     CS-YW9MKD (confirmed)
-//     CS-ME14CKPG
+//     CS-ME14CKPG / CS-ME12CKPG / CS-ME10CKPG
 //   A/C Remotes:
 //     A75C3747 (confirmed)
 //     A75C3704
-//     A75C2311
+//     A75C2311 (CKP)
 
 // Constants
 // Ref:
@@ -298,6 +298,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     case kPanasonicJke:
     case kPanasonicLke:
     case kPanasonicNke:
+    case kPanasonicCkp:
       break;
     default:  // Only proceed if we know what to do.
       return;
@@ -305,6 +306,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
   // clear & set the various bits and bytes.
   remote_state[13] &= 0xF0;
   remote_state[17] = 0x00;
+  remote_state[21] &= 0b11101111;
   remote_state[23] = 0x81;
   remote_state[25] = 0x00;
 
@@ -324,14 +326,21 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
       break;
     case kPanasonicJke:
       break;
+    case kPanasonicCkp:
+      remote_state[21] |= 0x10;
+      remote_state[23] = 0x01;
     default:
       break;
   }
 }
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
-  if (remote_state[17] == 0x00 && (remote_state[23] & 0x80))
-    return kPanasonicJke;
+  if (remote_state[17] == 0x00) {
+    if ((remote_state[21] & 0x10) && (remote_state[23] & 0x01))
+      return kPanasonicCkp;
+    if (remote_state[23] & 0x80)
+      return kPanasonicJke;
+  }
   if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
     return kPanasonicLke;
   if (remote_state[23] == 0x01)
@@ -352,14 +361,17 @@ void IRPanasonicAc::setRaw(const uint8_t state[]) {
   }
 }
 
-void IRPanasonicAc::on() {
-  remote_state[13] |= kPanasonicAcPower;
-}
-
-void IRPanasonicAc::off() {
-  remote_state[13] &= ~kPanasonicAcPower;
-}
-
+// Control the power state of the A/C unit.
+//
+// For CKP models, the remote has no memory of the power state the A/C unit
+// should be in. For those models setting this on/true will toggle the power
+// state of the Panasonic A/C unit with the next meessage.
+// e.g. If the A/C unit is already on, setPower(true) will turn it off.
+//      If the A/C unit is already off, setPower(true) will turn it on.
+//      setPower(false) will leave the A/C power state as it was.
+//
+// For all other models, setPower(true) should set the internal state to
+// turn it on, and setPower(false) should turn it off.
 void IRPanasonicAc::setPower(const bool state) {
   if (state)
     on();
@@ -367,8 +379,19 @@ void IRPanasonicAc::setPower(const bool state) {
     off();
 }
 
+// Return the A/C power state of the remote.
+// Except for CKP models, where it returns if the power state will be toggled
+// on the A/C unit when the next message is sent.
 bool IRPanasonicAc::getPower() {
   return (remote_state[13] & kPanasonicAcPower) == kPanasonicAcPower;
+}
+
+void IRPanasonicAc::on() {
+  remote_state[13] |= kPanasonicAcPower;
+}
+
+void IRPanasonicAc::off() {
+  remote_state[13] &= ~kPanasonicAcPower;
 }
 
 uint8_t IRPanasonicAc::getMode() {
@@ -470,28 +493,46 @@ uint8_t IRPanasonicAc::getFan() {
 }
 
 bool IRPanasonicAc::getQuiet() {
-  return remote_state[21] & kPanasonicAcQuiet;
+  if (getModel() == kPanasonicCkp)
+    return remote_state[21] & kPanasonicAcQuietCkp;
+  else
+    return remote_state[21] & kPanasonicAcQuiet;
 }
 
 void IRPanasonicAc::setQuiet(const bool state) {
+  uint8_t quiet;
+  if (getModel() == kPanasonicCkp)
+    quiet = kPanasonicAcQuietCkp;
+  else
+    quiet = kPanasonicAcQuiet;
+
   if (state) {
     setPowerful(false);  // Powerful is mutually exclusive.
-    remote_state[21] |= kPanasonicAcQuiet;
+    remote_state[21] |= quiet;
   } else {
-    remote_state[21] &= ~kPanasonicAcQuiet;
+    remote_state[21] &= ~quiet;
   }
 }
 
 bool IRPanasonicAc::getPowerful() {
-  return remote_state[21] & kPanasonicAcPowerful;
+  if (getModel() == kPanasonicCkp)
+    return remote_state[21] & kPanasonicAcPowerfulCkp;
+  else
+    return remote_state[21] & kPanasonicAcPowerful;
 }
 
 void IRPanasonicAc::setPowerful(const bool state) {
+  uint8_t powerful;
+  if (getModel() == kPanasonicCkp)
+    powerful = kPanasonicAcPowerfulCkp;
+  else
+    powerful = kPanasonicAcPowerful;
+
   if (state) {
     setQuiet(false);  // Quiet is mutually exclusive.
-    remote_state[21] |= kPanasonicAcPowerful;
+    remote_state[21] |= powerful;
   } else {
-    remote_state[21] &= ~kPanasonicAcPowerful;
+    remote_state[21] &= ~powerful;
   }
 }
 
@@ -615,6 +656,9 @@ std::string IRPanasonicAc::toString() {
     case kPanasonicLke:
       result += " (LKE)";
       break;
+    case kPanasonicCkp:
+      result += " (CKP)";
+      break;
     default:
       result += " (UNKNOWN)";
   }
@@ -678,31 +722,35 @@ std::string IRPanasonicAc::toString() {
       result += " (UNKNOWN)";
       break;
   }
-  if (getModel() != kPanasonicJke) {  // JKE has no Horizontal Swing
-    result += ", Swing (Horizontal): " + uint64ToString(getSwingHorizontal());
-    switch (getSwingHorizontal()) {
-      case kPanasonicAcSwingHAuto:
-        result += " (AUTO)";
-        break;
-      case kPanasonicAcSwingHFullLeft:
-        result += " (Full Left)";
-        break;
-      case kPanasonicAcSwingHLeft:
-        result += " (Left)";
-        break;
-      case kPanasonicAcSwingHMiddle:
-        result += " (Middle)";
-        break;
-      case kPanasonicAcSwingHFullRight:
-        result += " (Full Right)";
-        break;
-      case kPanasonicAcSwingHRight:
-        result += " (Right)";
-        break;
-      default:
-        result += " (UNKNOWN)";
-        break;
-    }
+  switch (getModel()) {
+    case kPanasonicJke:
+    case kPanasonicCkp:
+      break;  // No Horizontal Swing support.
+    default:
+      result += ", Swing (Horizontal): " + uint64ToString(getSwingHorizontal());
+      switch (getSwingHorizontal()) {
+        case kPanasonicAcSwingHAuto:
+          result += " (AUTO)";
+          break;
+        case kPanasonicAcSwingHFullLeft:
+          result += " (Full Left)";
+          break;
+        case kPanasonicAcSwingHLeft:
+          result += " (Left)";
+          break;
+        case kPanasonicAcSwingHMiddle:
+          result += " (Middle)";
+          break;
+        case kPanasonicAcSwingHFullRight:
+          result += " (Full Right)";
+          break;
+        case kPanasonicAcSwingHRight:
+          result += " (Right)";
+          break;
+        default:
+          result += " (UNKNOWN)";
+          break;
+      }
   }
   result += ", Quiet: ";
   if (getQuiet())
