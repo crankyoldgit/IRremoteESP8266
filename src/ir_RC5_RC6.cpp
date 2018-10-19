@@ -21,13 +21,13 @@
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-5
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
-#define MIN_RC5_SAMPLES            11U
-#define MIN_RC6_SAMPLES             1U
 
 const uint16_t kRc5T1 = 889;
 const uint32_t kRc5MinCommandLength = 113778;
 const uint32_t kRc5MinGap = kRc5MinCommandLength - kRC5RawBits * (2 * kRc5T1);
 const uint16_t kRc5ToggleMask = 0x800;  // The 12th bit.
+const uint16_t kRc5SamplesMin = 11;
+
 // RC-6
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-6
@@ -378,7 +378,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
 // TODO(anyone):
 //   Serious testing of the RC-5X and strict aspects needs to be done.
 bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < MIN_RC5_SAMPLES + kHeader - 1) return false;
+  if (results->rawlen < kRc5SamplesMin + kHeader - 1) return false;
 
   // Compliance
   if (strict && nbits != kRC5Bits && nbits != kRC5XBits)
