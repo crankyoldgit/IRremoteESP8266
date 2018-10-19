@@ -22,20 +22,21 @@
 // Ref:
 //   GlobalCache's IR Control Tower data.
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
-#define SHARP_TICK               26U
-#define SHARP_BIT_MARK_TICKS     10U
-#define SHARP_BIT_MARK         (SHARP_BIT_MARK_TICKS * SHARP_TICK)
-#define SHARP_ONE_SPACE_TICKS    70U
-#define SHARP_ONE_SPACE        (SHARP_ONE_SPACE_TICKS * SHARP_TICK)
-#define SHARP_ZERO_SPACE_TICKS   30U
-#define SHARP_ZERO_SPACE       (SHARP_ZERO_SPACE_TICKS * SHARP_TICK)
-#define SHARP_GAP_TICKS        1677U
-#define SHARP_GAP              (SHARP_GAP_TICKS * SHARP_TICK)
-
+const uint16_t kSharpTick = 26;
+const uint16_t kSharpBitMarkTicks = 10;
+const uint16_t kSharpBitMark = kSharpBitMarkTicks * kSharpTick;
+const uint16_t kSharpOneSpaceTicks = 70;
+const uint16_t kSharpOneSpace = kSharpOneSpaceTicks * kSharpTick;
+const uint16_t kSharpZeroSpaceTicks = 30;
+const uint16_t kSharpZeroSpace = kSharpZeroSpaceTicks * kSharpTick;
+const uint16_t kSharpGapTicks = 1677;
+const uint16_t kSharpGap = kSharpGapTicks * kSharpTick;
 // Address(5) + Command(8) + Expansion(1) + Check(1)
-#define SHARP_TOGGLE_MASK  ((1 << (kSharpBits - kSharpAddressBits)) - 1)
-#define SHARP_ADDRESS_MASK ((1 << kSharpAddressBits) - 1)
-#define SHARP_COMMAND_MASK ((1 << kSharpCommandBits) - 1)
+const uint64_t kSharpToggleMask = ((uint64_t) 1 << (kSharpBits -
+                                                    kSharpAddressBits)) - 1;
+const uint64_t kSharpAddressMask = ((uint64_t) 1 << kSharpAddressBits) - 1;
+const uint64_t kSharpCommandMask = ((uint64_t) 1 << kSharpCommandBits) - 1;
+
 
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
@@ -67,14 +68,14 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
     //       normal), however all data points to that being incorrect.
     for (uint8_t n = 0; n < 2; n++) {
       sendGeneric(0, 0,  // No Header
-                  SHARP_BIT_MARK, SHARP_ONE_SPACE,
-                  SHARP_BIT_MARK, SHARP_ZERO_SPACE,
-                  SHARP_BIT_MARK, SHARP_GAP,
+                  kSharpBitMark, kSharpOneSpace,
+                  kSharpBitMark, kSharpZeroSpace,
+                  kSharpBitMark, kSharpGap,
                   data, nbits, 38, true, 0,  // Repeats are handled already.
                   33);
       // Invert the data per protocol. This is always called twice, so it's
       // retured to original upon exiting the inner loop.
-      data ^= SHARP_TOGGLE_MASK;
+      data ^= kSharpToggleMask;
     }
   }
 }
@@ -195,27 +196,27 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
 
   // No header
   // But try to auto-calibrate off the initial mark signal.
-  if (!matchMark(results->rawbuf[offset], SHARP_BIT_MARK, 35)) return false;
+  if (!matchMark(results->rawbuf[offset], kSharpBitMark, 35)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset] * kRawTick / SHARP_BIT_MARK_TICKS;
+  uint32_t tick = results->rawbuf[offset] * kRawTick / kSharpBitMarkTicks;
   // Data
   for (uint16_t i = 0; i < nbits; i++, offset++) {
-    // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
-    if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick, 35))
+    // Use a higher tolerance value for kSharpBitMark as it is quite small.
+    if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
       return false;
-    if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE_TICKS * tick))
+    if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
       data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], SHARP_ZERO_SPACE_TICKS * tick))
+    else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
       data <<= 1;  // 0
     else
       return false;
   }
 
   // Footer
-  if (!match(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick))
+  if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], SHARP_GAP_TICKS * tick))
+      !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
     return false;
 
   // Compliance
@@ -231,33 +232,33 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     // Grab the second copy of the data (i.e. inverted)
     // Header
     // i.e. The inter-data/command repeat gap.
-    if (!matchSpace(results->rawbuf[offset++], SHARP_GAP_TICKS * tick))
+    if (!matchSpace(results->rawbuf[offset++], kSharpGapTicks * tick))
       return false;
 
     // Data
     uint64_t second_data = 0;
     for (uint16_t i = 0; i < nbits; i++, offset++) {
-      // Use a higher tolerance value for SHARP_BIT_MARK as it is quite small.
-      if (!matchMark(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick,
+      // Use a higher tolerance value for kSharpBitMark as it is quite small.
+      if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick,
                      35))
         return false;
-      if (matchSpace(results->rawbuf[offset], SHARP_ONE_SPACE_TICKS * tick))
+      if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
         second_data = (second_data << 1) | 1;  // 1
       else if (matchSpace(results->rawbuf[offset],
-                          SHARP_ZERO_SPACE_TICKS * tick))
+                          kSharpZeroSpaceTicks * tick))
         second_data <<= 1;  // 0
       else
         return false;
     }
     // Footer
-    if (!match(results->rawbuf[offset++], SHARP_BIT_MARK_TICKS * tick))
+    if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
       return false;
     if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], SHARP_GAP_TICKS * tick))
+        !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
       return false;
 
     // Check that second_data has been inverted correctly.
-    if (data != (second_data ^ SHARP_TOGGLE_MASK))
+    if (data != (second_data ^ kSharpToggleMask))
       return false;
 #endif  // UNIT_TEST
   }
@@ -267,8 +268,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   results->bits = nbits;
   results->value = data;
   // Address & command are actually transmitted in LSB first order.
-  results->address = reverseBits(data, nbits) & SHARP_ADDRESS_MASK;
-  results->command = reverseBits((data >> 2) & SHARP_COMMAND_MASK,
+  results->address = reverseBits(data, nbits) & kSharpAddressMask;
+  results->command = reverseBits((data >> 2) & kSharpCommandMask,
                                  kSharpCommandBits);
   return true;
 }
