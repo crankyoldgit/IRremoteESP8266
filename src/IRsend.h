@@ -301,6 +301,10 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                        uint16_t nbytes = kPanasonicAcStateLength,
                        uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_MWM
+  void sendMWM(unsigned char data[], uint16_t nbytes,
+                    uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

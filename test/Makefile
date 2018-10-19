@@ -35,7 +35,8 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
         ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
 				ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test \
-				ir_Whirlpool_test ir_Lutron_test ir_Electra_test
+				ir_Whirlpool_test ir_Lutron_test ir_Electra_test \
+				ir_MWM_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -64,7 +65,7 @@ run : all
 run_tests : run
 
 install-googletest :
-	git clone https://github.com/google/googletest.git ../lib/googletest
+	git clone -b v1.8.x https://github.com/google/googletest.git ../lib/googletest
 
 # Builds gtest.a and gtest_main.a.
 
@@ -78,7 +79,8 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 		ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
 		ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
 		ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
-		ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o
+		ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
+		ir_MWM.o
 # All the IR Protocol header files.
 PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_Gree.h \
@@ -472,3 +474,14 @@ ir_Electra_test.o : ir_Electra_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 
 ir_Electra_test : $(COMMON_OBJ) ir_Electra_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_MWM.o : $(USER_DIR)/ir_MWM.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_MWM.cpp
+
+ir_MWM_test.o : ir_MWM_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_MWM_test.cpp
+
+ir_MWM_test : $(COMMON_OBJ) ir_MWM_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+

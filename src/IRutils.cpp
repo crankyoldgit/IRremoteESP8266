@@ -128,6 +128,7 @@ std::string typeToString(const decode_type_t protocol,
     case MITSUBISHI:     result = "MITSUBISHI";        break;
     case MITSUBISHI2:    result = "MITSUBISHI2";       break;
     case MITSUBISHI_AC:  result = "MITSUBISHI_AC";     break;
+    case MWM:            result = "MWM";               break;
     case NEC:            result = "NEC";               break;
     case NEC_LIKE:       result = "NEC (non-strict)";  break;
     case NIKAI:          result = "NIKAI";             break;
@@ -169,6 +170,7 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
+    case MWM:
     case PANASONIC_AC:
     case SAMSUNG_AC:
     case TOSHIBA_AC:

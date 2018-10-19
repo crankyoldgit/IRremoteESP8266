@@ -295,6 +295,8 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   offset:  Ptr to the currect offset to the rawbuf.
 //   used:    Ptr to the current used counter.
 //   bitTime: Time interval of single bit in microseconds.
+//   maxwidth: Maximum number of successive levels to find in a single level
+//             (default 3)
 // Returns:
 //   int: MARK, SPACE, or -1 for error (The measured time interval is not a
 //                                      multiple of t1.)
@@ -302,9 +304,12 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://en.wikipedia.org/wiki/Manchester_code
 int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
                            uint16_t *used, uint16_t bitTime,
-                           uint8_t tolerance, int16_t excess, uint16_t delta) {
+                           uint8_t tolerance, int16_t excess, uint16_t delta,
+                           uint8_t maxwidth) {
   DPRINT("DEBUG: getRClevel: offset = ");
   DPRINTLN(uint64ToString(*offset));
+  DPRINT("DEBUG: getRClevel: rawlen = ");
+  DPRINTLN(uint64ToString(results->rawlen));
   if (*offset >= results->rawlen) {
     DPRINTLN("DEBUG: getRClevel: SPACE, past end of rawbuf");
     return kSpace;  // After end of recorded buffer, assume SPACE.
@@ -313,7 +318,8 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
   uint16_t val = ((*offset) % 2) ? kMark : kSpace;
   // Check to see if we have hit an inter-message gap (> 20ms).
-  if (val == kSpace && width > 20000 - delta) {
+  if (val == kSpace && (width > 20000 - delta ||
+        width > maxwidth * bitTime + delta)) {
     DPRINTLN("DEBUG: getRClevel: SPACE, hit end of mesg gap.");
     return kSpace;
   }
@@ -324,13 +330,12 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   // Note: We want to match in greedy order as the other way leads to
   //       mismatches due to overlaps induced by the correction and tolerance
   //       values.
-  if (match(width, 3 * bitTime + correction, tolerance, delta)) {
-    avail = 3;
-  } else if (match(width, 2 * bitTime + correction, tolerance, delta)) {
-    avail = 2;
-  } else if (match(width, bitTime + correction, tolerance, delta)) {
-    avail = 1;
-  } else {
+  for (avail = maxwidth; avail > 0; avail--) {
+    if (match(width, avail * bitTime + correction, tolerance, delta)) {
+      break;
+    }
+  }
+  if (!avail) {
     DPRINTLN("DEBUG: getRClevel: Unexpected width. Exiting.");
     return -1;  // The width is not what we expected.
   }
