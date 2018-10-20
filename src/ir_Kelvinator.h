@@ -30,26 +30,25 @@ const uint8_t kKelvinatorHeat = 4;
 const uint8_t kKelvinatorBasicFanMax = 3;
 const uint8_t kKelvinatorFanAuto = 0;
 const uint8_t kKelvinatorFanMax = 5;
-const uint8_t kKelvinatorMinTemp = 16;  // 16C
-const uint8_t kKelvinatorMaxTemp = 30;  // 30C
+const uint8_t kKelvinatorMinTemp = 16;   // 16C
+const uint8_t kKelvinatorMaxTemp = 30;   // 30C
 const uint8_t kKelvinatorAutoTemp = 25;  // 25C
 
 // Legacy defines (Deprecated)
-#define KELVINATOR_MIN_TEMP      kKelvinatorMinTemp
-#define KELVINATOR_MAX_TEMP      kKelvinatorMaxTemp
-#define KELVINATOR_HEAT          kKelvinatorHeat
-#define KELVINATOR_FAN_MAX       kKelvinatorFanMax
-#define KELVINATOR_FAN_AUTO      kKelvinatorFanAuto
-#define KELVINATOR_FAN           kKelvinatorFan
-#define KELVINATOR_DRY           kKelvinatorDry
-#define KELVINATOR_COOL          kKelvinatorCool
+#define KELVINATOR_MIN_TEMP kKelvinatorMinTemp
+#define KELVINATOR_MAX_TEMP kKelvinatorMaxTemp
+#define KELVINATOR_HEAT kKelvinatorHeat
+#define KELVINATOR_FAN_MAX kKelvinatorFanMax
+#define KELVINATOR_FAN_AUTO kKelvinatorFanAuto
+#define KELVINATOR_FAN kKelvinatorFan
+#define KELVINATOR_DRY kKelvinatorDry
+#define KELVINATOR_COOL kKelvinatorCool
 #define KELVINATOR_BASIC_FAN_MAX kKelvinatorBasicFanMax
-#define KELVINATOR_AUTO_TEMP     kKelvinatorAutoTemp
-#define KELVINATOR_AUTO          kKelvinatorAuto
-
+#define KELVINATOR_AUTO_TEMP kKelvinatorAutoTemp
+#define KELVINATOR_AUTO kKelvinatorAuto
 
 /*
-	Kelvinator AC map
+        Kelvinator AC map
 
   (header mark and space)
   byte 0 = Basic Modes
@@ -161,8 +160,7 @@ class IRKelvinatorAC {
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static uint8_t calcBlockChecksum(
-      const uint8_t *block,
-      const uint16_t length = kKelvinatorStateLength / 2);
+      const uint8_t* block, const uint16_t length = kKelvinatorStateLength / 2);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kKelvinatorStateLength);
 #ifdef ARDUINO

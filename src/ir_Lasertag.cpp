@@ -15,8 +15,8 @@
 const uint16_t kLasertagMinSamples = 13;
 const uint16_t kLasertagTick = 333;
 const uint32_t kLasertagMinGap = 100000;  // Completely made up amount.
-const uint8_t kLasertagTolerance = 0;  // Percentage error margin.
-const uint16_t kLasertagExcess = 0;  // See kMarkExcess.
+const uint8_t kLasertagTolerance = 0;     // Percentage error margin.
+const uint16_t kLasertagExcess = 0;       // See kMarkExcess.
 const uint16_t kLasertagDelta = 150;  // Use instead of Excess and Tolerance.
 const int16_t kSpace = 1;
 const int16_t kMark = 0;
@@ -33,8 +33,7 @@ const int16_t kMark = 0;
 // Status: STABLE / Working.
 //
 void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits > sizeof(data) * 8)
-    return;  // We can't send something that big.
+  if (nbits > sizeof(data) * 8) return;  // We can't send something that big.
 
   // Set 36kHz IR carrier frequency & a 1/4 (25%) duty cycle.
   // NOTE: duty cycle is not confirmed. Just guessing based on RC5/6 protocols.
@@ -43,10 +42,10 @@ void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t i = 0; i <= repeat; i++) {
     // Data
     for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
-      if (data & mask) {  // 1
+      if (data & mask) {       // 1
         space(kLasertagTick);  // 1 is space, then mark.
         mark(kLasertagTick);
-      } else {  // 0
+      } else {                // 0
         mark(kLasertagTick);  // 0 is mark, then space.
         space(kLasertagTick);
       }
@@ -89,19 +88,19 @@ bool IRrecv::decodeLasertag(decode_results *results, uint16_t nbits,
 
   // Data
   for (; offset <= results->rawlen; actual_bits++) {
-    int16_t levelA = getRClevel(results, &offset, &used, kLasertagTick,
-                                kLasertagTolerance, kLasertagExcess,
-                                kLasertagDelta);
-    int16_t levelB = getRClevel(results, &offset, &used, kLasertagTick,
-                                kLasertagTolerance, kLasertagExcess,
-                                kLasertagDelta);
+    int16_t levelA =
+        getRClevel(results, &offset, &used, kLasertagTick, kLasertagTolerance,
+                   kLasertagExcess, kLasertagDelta);
+    int16_t levelB =
+        getRClevel(results, &offset, &used, kLasertagTick, kLasertagTolerance,
+                   kLasertagExcess, kLasertagDelta);
     if (levelA == kSpace && levelB == kMark) {
       data = (data << 1) | 1;  // 1
     } else {
       if (levelA == kMark && levelB == kSpace) {
         data <<= 1;  // 0
       } else {
-      break;
+        break;
       }
     }
   }

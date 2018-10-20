@@ -10,10 +10,9 @@
 #else
 #include <string>
 #endif
-#include "IRremoteESP8266.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
-
 
 // FUJITSU A/C support added by Jonny Graham
 
@@ -45,27 +44,27 @@ const uint8_t kFujitsuAcSwingHoriz = 0x02;
 const uint8_t kFujitsuAcSwingBoth = 0x03;
 
 // Legacy defines.
-#define FUJITSU_AC_MODE_AUTO      kFujitsuAcModeAuto
-#define FUJITSU_AC_MODE_COOL      kFujitsuAcModeCool
-#define FUJITSU_AC_MODE_DRY       kFujitsuAcModeDry
-#define FUJITSU_AC_MODE_FAN       kFujitsuAcModeFan
-#define FUJITSU_AC_MODE_HEAT      kFujitsuAcModeHeat
-#define FUJITSU_AC_CMD_STAY_ON    kFujitsuAcCmdStayOn
-#define FUJITSU_AC_CMD_TURN_ON    kFujitsuAcCmdTurnOn
-#define FUJITSU_AC_CMD_TURN_OFF   kFujitsuAcCmdTurnOff
+#define FUJITSU_AC_MODE_AUTO kFujitsuAcModeAuto
+#define FUJITSU_AC_MODE_COOL kFujitsuAcModeCool
+#define FUJITSU_AC_MODE_DRY kFujitsuAcModeDry
+#define FUJITSU_AC_MODE_FAN kFujitsuAcModeFan
+#define FUJITSU_AC_MODE_HEAT kFujitsuAcModeHeat
+#define FUJITSU_AC_CMD_STAY_ON kFujitsuAcCmdStayOn
+#define FUJITSU_AC_CMD_TURN_ON kFujitsuAcCmdTurnOn
+#define FUJITSU_AC_CMD_TURN_OFF kFujitsuAcCmdTurnOff
 #define FUJITSU_AC_CMD_STEP_HORIZ kFujitsuAcCmdStepHoriz
-#define FUJITSU_AC_CMD_STEP_VERT  kFujitsuAcCmdStepVert
-#define FUJITSU_AC_FAN_AUTO       kFujitsuAcFanAuto
-#define FUJITSU_AC_FAN_HIGH       kFujitsuAcFanHigh
-#define FUJITSU_AC_FAN_MED        kFujitsuAcFanMed
-#define FUJITSU_AC_FAN_LOW        kFujitsuAcFanLow
-#define FUJITSU_AC_FAN_QUIET      kFujitsuAcFanQuiet
-#define FUJITSU_AC_MIN_TEMP       kFujitsuAcMinTemp
-#define FUJITSU_AC_MAX_TEMP       kFujitsuAcMaxTemp
-#define FUJITSU_AC_SWING_OFF      kFujitsuAcSwingOff
-#define FUJITSU_AC_SWING_VERT     kFujitsuAcSwingVert
-#define FUJITSU_AC_SWING_HORIZ    kFujitsuAcSwingHoriz
-#define FUJITSU_AC_SWING_BOTH     kFujitsuAcSwingBoth
+#define FUJITSU_AC_CMD_STEP_VERT kFujitsuAcCmdStepVert
+#define FUJITSU_AC_FAN_AUTO kFujitsuAcFanAuto
+#define FUJITSU_AC_FAN_HIGH kFujitsuAcFanHigh
+#define FUJITSU_AC_FAN_MED kFujitsuAcFanMed
+#define FUJITSU_AC_FAN_LOW kFujitsuAcFanLow
+#define FUJITSU_AC_FAN_QUIET kFujitsuAcFanQuiet
+#define FUJITSU_AC_MIN_TEMP kFujitsuAcMinTemp
+#define FUJITSU_AC_MAX_TEMP kFujitsuAcMaxTemp
+#define FUJITSU_AC_SWING_OFF kFujitsuAcSwingOff
+#define FUJITSU_AC_SWING_VERT kFujitsuAcSwingVert
+#define FUJITSU_AC_SWING_HORIZ kFujitsuAcSwingHoriz
+#define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,
@@ -98,13 +97,13 @@ class IRFujitsuAC {
   uint8_t* getRaw();
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength();
-  static bool validChecksum(uint8_t *state, uint16_t length);
+  static bool validChecksum(uint8_t* state, uint16_t length);
   bool getPower();
-  #ifdef ARDUINO
-    String toString();
-  #else
-    std::string toString();
-  #endif
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 
  private:
   uint8_t remote_state[kFujitsuAcStateLength];

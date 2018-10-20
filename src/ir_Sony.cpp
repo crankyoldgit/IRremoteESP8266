@@ -50,12 +50,10 @@ const uint16_t kSonyMinGap = kSonyMinGapTicks * kSonyTick;
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/sirc.php
 void IRsend::sendSony(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(kSonyHdrMark, kSonySpace,
-              kSonyOneMark, kSonySpace,
-              kSonyZeroMark, kSonySpace,
+  sendGeneric(kSonyHdrMark, kSonySpace, kSonyOneMark, kSonySpace, kSonyZeroMark,
+              kSonySpace,
               0,  // No Footer mark.
-              kSonyMinGap, kSonyRptLength,
-              data, nbits, 40, true, repeat, 33);
+              kSonyMinGap, kSonyRptLength, data, nbits, 40, true, repeat, 33);
 }
 
 // Convert Sony/SIRC command, address, & extended bits into sendSony format.
@@ -68,8 +66,8 @@ void IRsend::sendSony(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   A sendSony compatible data message.
 //
 // Status: BETA / Should be working.
-uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command,
-                            uint16_t address, uint16_t extended) {
+uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
+                            uint16_t extended) {
   uint32_t result = 0;
   switch (nbits) {
     case 12:  // 5 address bits.
@@ -129,8 +127,7 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
 
   // Header
   timeSoFar += results->rawbuf[offset] * kRawTick;
-  if (!matchMark(results->rawbuf[offset], kSonyHdrMark))
-    return false;
+  if (!matchMark(results->rawbuf[offset], kSonyHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
   uint32_t tick = results->rawbuf[offset++] * kRawTick / kSonyHdrMarkTicks;
 
@@ -166,14 +163,14 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
   data = reverseBits(data, actualBits);
   // Decode the address & command from raw decode value.
   switch (actualBits) {
-    case 12:  // 7 command bits, 5 address bits.
-    case 15:  // 7 command bits, 8 address bits.
+    case 12:                           // 7 command bits, 5 address bits.
+    case 15:                           // 7 command bits, 8 address bits.
       results->command = data & 0x7F;  // Bits 0-6
-      results->address = data >> 7;  // Bits 7-14
+      results->address = data >> 7;    // Bits 7-14
       break;
     case 20:  // 7 command bits, 5 address bits, 8 extended (command) bits.
       results->command = (data & 0x7F) + ((data >> 12) << 7);  // Bits 0-6,12-19
-      results->address = (data >> 7) & 0x1F;  // Bits 7-11
+      results->address = (data >> 7) & 0x1F;                   // Bits 7-11
       break;
     default:  // Shouldn't happen, but just in case.
       results->address = 0;

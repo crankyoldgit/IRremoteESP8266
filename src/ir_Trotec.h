@@ -41,17 +41,17 @@ const uint8_t kTrotecMinTimer = 0;
 const uint8_t kTrotecMaxTimer = 23;
 
 // Legacy defines. (Deperecated)
-#define TROTEC_AUTO          kTrotecAuto
-#define TROTEC_COOL          kTrotecCool
-#define TROTEC_DRY           kTrotecDry
-#define TROTEC_FAN           kTrotecFan
-#define TROTEC_FAN_LOW       kTrotecFanLow
-#define TROTEC_FAN_MED       kTrotecFanMed
-#define TROTEC_FAN_HIGH      kTrotecFanHigh
-#define TROTEC_MIN_TEMP      kTrotecMinTemp
-#define TROTEC_MAX_TEMP      kTrotecMaxTemp
-#define TROTEC_MIN_TIMER     kTrotecMinTimer
-#define TROTEC_MAX_TIMER     kTrotecMaxTimer
+#define TROTEC_AUTO kTrotecAuto
+#define TROTEC_COOL kTrotecCool
+#define TROTEC_DRY kTrotecDry
+#define TROTEC_FAN kTrotecFan
+#define TROTEC_FAN_LOW kTrotecFanLow
+#define TROTEC_FAN_MED kTrotecFanMed
+#define TROTEC_FAN_HIGH kTrotecFanHigh
+#define TROTEC_MIN_TEMP kTrotecMinTemp
+#define TROTEC_MAX_TEMP kTrotecMaxTemp
+#define TROTEC_MIN_TIMER kTrotecMinTimer
+#define TROTEC_MAX_TIMER kTrotecMaxTimer
 
 class IRTrotecESP {
  public:

@@ -54,7 +54,8 @@ const uint16_t kPanasonicMinCommandLengthTicks = 378;
 const uint32_t kPanasonicMinCommandLength =
     kPanasonicMinCommandLengthTicks * kPanasonicTick;
 const uint16_t kPanasonicEndGap = 5000;  // See issue #245
-const uint16_t kPanasonicMinGapTicks = kPanasonicMinCommandLengthTicks -
+const uint16_t kPanasonicMinGapTicks =
+    kPanasonicMinCommandLengthTicks -
     (kPanasonicHdrMarkTicks + kPanasonicHdrSpaceTicks +
      kPanasonicBits * (kPanasonicBitMarkTicks + kPanasonicOneSpaceTicks) +
      kPanasonicBitMarkTicks);
@@ -63,7 +64,6 @@ const uint32_t kPanasonicMinGap = kPanasonicMinGapTicks * kPanasonicTick;
 const uint16_t kPanasonicAcSectionGap = 10000;
 const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = 100000;  // A complete guess.
-
 
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
@@ -78,11 +78,9 @@ const uint32_t kPanasonicAcMessageGap = 100000;  // A complete guess.
 // Note:
 //   This protocol is a modified version of Kaseikyo.
 void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
-              kPanasonicBitMark, kPanasonicOneSpace,
-              kPanasonicBitMark, kPanasonicZeroSpace,
-              kPanasonicBitMark,
-              kPanasonicMinGap, kPanasonicMinCommandLength,
+  sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace, kPanasonicBitMark,
+              kPanasonicOneSpace, kPanasonicBitMark, kPanasonicZeroSpace,
+              kPanasonicBitMark, kPanasonicMinGap, kPanasonicMinCommandLength,
               data, nbits, kPanasonicFreq, true, repeat, 50);
 }
 
@@ -100,7 +98,7 @@ void IRsend::sendPanasonic64(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   This protocol is a modified version of Kaseikyo.
 void IRsend::sendPanasonic(uint16_t address, uint32_t data, uint16_t nbits,
                            uint16_t repeat) {
-  sendPanasonic64(((uint64_t) address << 32) | (uint64_t) data, nbits, repeat);
+  sendPanasonic64(((uint64_t)address << 32) | (uint64_t)data, nbits, repeat);
 }
 
 // Calculate the raw Panasonic data based on device, subdevice, & function.
@@ -119,16 +117,11 @@ void IRsend::sendPanasonic(uint16_t address, uint32_t data, uint16_t nbits,
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
-uint64_t IRsend::encodePanasonic(uint16_t manufacturer,
-                                 uint8_t device,
-                                 uint8_t subdevice,
-                                 uint8_t function) {
+uint64_t IRsend::encodePanasonic(uint16_t manufacturer, uint8_t device,
+                                 uint8_t subdevice, uint8_t function) {
   uint8_t checksum = device ^ subdevice ^ function;
-  return (((uint64_t) manufacturer << 32) |
-          ((uint64_t) device << 24) |
-          ((uint64_t) subdevice << 16) |
-          ((uint64_t) function << 8) |
-          checksum);
+  return (((uint64_t)manufacturer << 32) | ((uint64_t)device << 24) |
+          ((uint64_t)subdevice << 16) | ((uint64_t)function << 8) | checksum);
 }
 #endif  // (SEND_PANASONIC || SEND_DENON)
 
@@ -161,19 +154,18 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
   // Header
   if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-      kPanasonicHdrMarkTicks;
+  uint32_t m_tick =
+      results->rawbuf[offset++] * kRawTick / kPanasonicHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kPanasonicHdrSpaceTicks;
+  uint32_t s_tick =
+      results->rawbuf[offset++] * kRawTick / kPanasonicHdrSpaceTicks;
 
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kPanasonicBitMarkTicks * m_tick,
-                                         kPanasonicOneSpaceTicks * s_tick,
-                                         kPanasonicBitMarkTicks * m_tick,
-                                         kPanasonicZeroSpaceTicks * s_tick);
+  match_result_t data_result = matchData(
+      &(results->rawbuf[offset]), nbits, kPanasonicBitMarkTicks * m_tick,
+      kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
+      kPanasonicZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
@@ -194,8 +186,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
     // Verify the checksum.
     uint8_t checksumOrig = data & 0xFF;
     uint8_t checksumCalc = ((data >> 24) ^ (data >> 16) ^ (data >> 8)) & 0xFF;
-    if (checksumOrig != checksumCalc)
-      return false;
+    if (checksumOrig != checksumCalc) return false;
   }
 
   // Success
@@ -227,30 +218,25 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //     A75C3704
 //
 void IRsend::sendPanasonicAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < kPanasonicAcSection1Length)  return;
+  if (nbytes < kPanasonicAcSection1Length) return;
   for (uint16_t r = 0; r <= repeat; r++) {
     // First section. (8 bytes)
-    sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
-                kPanasonicBitMark, kPanasonicOneSpace,
-                kPanasonicBitMark, kPanasonicZeroSpace,
-                kPanasonicBitMark, kPanasonicAcSectionGap,
-                data, kPanasonicAcSection1Length,
-                kPanasonicFreq, false, 0, 50);
+    sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace, kPanasonicBitMark,
+                kPanasonicOneSpace, kPanasonicBitMark, kPanasonicZeroSpace,
+                kPanasonicBitMark, kPanasonicAcSectionGap, data,
+                kPanasonicAcSection1Length, kPanasonicFreq, false, 0, 50);
     // First section. (The rest of the data bytes)
-    sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace,
-                kPanasonicBitMark, kPanasonicOneSpace,
-                kPanasonicBitMark, kPanasonicZeroSpace,
+    sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace, kPanasonicBitMark,
+                kPanasonicOneSpace, kPanasonicBitMark, kPanasonicZeroSpace,
                 kPanasonicBitMark, kPanasonicAcMessageGap,
                 data + kPanasonicAcSection1Length,
-                nbytes - kPanasonicAcSection1Length,
-                kPanasonicFreq, false, 0, 50);
+                nbytes - kPanasonicAcSection1Length, kPanasonicFreq, false, 0,
+                50);
   }
 }
 #endif  // SEND_PANASONIC_AC
 
-IRPanasonicAc::IRPanasonicAc(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRPanasonicAc::IRPanasonicAc(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRPanasonicAc::stateReset() {
   for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)
@@ -259,9 +245,7 @@ void IRPanasonicAc::stateReset() {
   _swingh = kPanasonicAcSwingHMiddle;  // A similar made up value for H Swing.
 }
 
-void IRPanasonicAc::begin() {
-  _irsend.begin();
-}
+void IRPanasonicAc::begin() { _irsend.begin(); }
 
 // Verify the checksum is valid for a given state.
 // Args:
@@ -269,15 +253,13 @@ void IRPanasonicAc::begin() {
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRPanasonicAc::validChecksum(uint8_t state[],
-                                  const uint16_t length) {
-  if (length < 2)  return false;  // 1 byte of data can't have a checksum.
-  return (state[length - 1] == sumBytes(state, length - 1,
-                                        kPanasonicAcChecksumInit));
+bool IRPanasonicAc::validChecksum(uint8_t state[], const uint16_t length) {
+  if (length < 2) return false;  // 1 byte of data can't have a checksum.
+  return (state[length - 1] ==
+          sumBytes(state, length - 1, kPanasonicAcChecksumInit));
 }
 
-uint8_t IRPanasonicAc::calcChecksum(uint8_t state[],
-                                    const uint16_t length) {
+uint8_t IRPanasonicAc::calcChecksum(uint8_t state[], const uint16_t length) {
   return sumBytes(state, length - 1, kPanasonicAcChecksumInit);
 }
 
@@ -338,19 +320,16 @@ panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
   if (remote_state[17] == 0x00) {
     if ((remote_state[21] & 0x10) && (remote_state[23] & 0x01))
       return kPanasonicCkp;
-    if (remote_state[23] & 0x80)
-      return kPanasonicJke;
+    if (remote_state[23] & 0x80) return kPanasonicJke;
   }
   if (remote_state[17] == 0x06 && (remote_state[13] & 0x0F) == 0x02)
     return kPanasonicLke;
-  if (remote_state[23] == 0x01)
-    return kPanasonicDke;
-  if (remote_state[17] == 0x06)
-    return kPanasonicNke;
+  if (remote_state[23] == 0x01) return kPanasonicDke;
+  if (remote_state[17] == 0x06) return kPanasonicNke;
   return kPanasonicUnknown;
 }
 
-uint8_t* IRPanasonicAc::getRaw() {
+uint8_t *IRPanasonicAc::getRaw() {
   fixChecksum();
   return remote_state;
 }
@@ -386,17 +365,11 @@ bool IRPanasonicAc::getPower() {
   return (remote_state[13] & kPanasonicAcPower) == kPanasonicAcPower;
 }
 
-void IRPanasonicAc::on() {
-  remote_state[13] |= kPanasonicAcPower;
-}
+void IRPanasonicAc::on() { remote_state[13] |= kPanasonicAcPower; }
 
-void IRPanasonicAc::off() {
-  remote_state[13] &= ~kPanasonicAcPower;
-}
+void IRPanasonicAc::off() { remote_state[13] &= ~kPanasonicAcPower; }
 
-uint8_t IRPanasonicAc::getMode() {
-  return remote_state[13] >> 4;
-}
+uint8_t IRPanasonicAc::getMode() { return remote_state[13] >> 4; }
 
 void IRPanasonicAc::setMode(const uint8_t desired) {
   uint8_t mode = kPanasonicAcAuto;  // Default to Auto mode.
@@ -419,9 +392,7 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
   remote_state[13] |= mode << 4;
 }
 
-uint8_t IRPanasonicAc::getTemp() {
-  return remote_state[14] >> 1;
-}
+uint8_t IRPanasonicAc::getTemp() { return remote_state[14] >> 1; }
 
 // Set the desitred temperature in Celcius.
 // Args:
@@ -434,12 +405,10 @@ void IRPanasonicAc::setTemp(const uint8_t celsius, const bool remember) {
   temperature = std::max(celsius, kPanasonicAcMinTemp);
   temperature = std::min(temperature, kPanasonicAcMaxTemp);
   remote_state[14] = temperature << 1;
-  if (remember)  _temp = temperature;
+  if (remember) _temp = temperature;
 }
 
-uint8_t IRPanasonicAc::getSwingVertical() {
-  return remote_state[16] & 0x0F;
-}
+uint8_t IRPanasonicAc::getSwingVertical() { return remote_state[16] & 0x0F; }
 
 void IRPanasonicAc::setSwingVertical(const uint8_t desired_elevation) {
   uint8_t elevation = desired_elevation;
@@ -451,9 +420,7 @@ void IRPanasonicAc::setSwingVertical(const uint8_t desired_elevation) {
   remote_state[16] |= elevation;
 }
 
-uint8_t IRPanasonicAc::getSwingHorizontal() {
-  return remote_state[17];
-}
+uint8_t IRPanasonicAc::getSwingHorizontal() { return remote_state[17]; }
 
 void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   switch (desired_direction) {
@@ -484,8 +451,8 @@ void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
 
 void IRPanasonicAc::setFan(const uint8_t speed) {
   if (speed <= kPanasonicAcFanMax || speed == kPanasonicAcFanAuto)
-    remote_state[16] = (remote_state[16] & 0x0F) |
-                       ((speed + kPanasonicAcFanOffset) << 4);
+    remote_state[16] =
+        (remote_state[16] & 0x0F) | ((speed + kPanasonicAcFanOffset) << 4);
 }
 
 uint8_t IRPanasonicAc::getFan() {
@@ -537,7 +504,7 @@ void IRPanasonicAc::setPowerful(const bool state) {
 }
 
 uint16_t IRPanasonicAc::encodeTime(const uint8_t hours, const uint8_t mins) {
-  return std::min(hours, (uint8_t) 23) * 60 + std::min(mins, (uint8_t) 59);
+  return std::min(hours, (uint8_t)23) * 60 + std::min(mins, (uint8_t)59);
 }
 
 uint16_t IRPanasonicAc::getClock() {
@@ -557,7 +524,7 @@ void IRPanasonicAc::setClock(const uint16_t mins_since_midnight) {
 
 uint16_t IRPanasonicAc::getOnTimer() {
   uint16_t result = ((remote_state[19] & 0b00000111) << 8) + remote_state[18];
-  if (result == kPanasonicAcTimeSpecial)  return 0;
+  if (result == kPanasonicAcTimeSpecial) return 0;
   return result;
 }
 
@@ -579,23 +546,21 @@ void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
   remote_state[19] |= (corrected >> 8);
 }
 
-void IRPanasonicAc::cancelOnTimer() {
-  setOnTimer(0, false);
-}
+void IRPanasonicAc::cancelOnTimer() { setOnTimer(0, false); }
 
 bool IRPanasonicAc::isOnTimerEnabled() {
   return remote_state[13] & kPanasonicAcOnTimer;
 }
 
 uint16_t IRPanasonicAc::getOffTimer() {
-  uint16_t result = ((remote_state[20] & 0b01111111) << 4) +
-      (remote_state[19] >> 4);
-  if (result == kPanasonicAcTimeSpecial)  return 0;
+  uint16_t result =
+      ((remote_state[20] & 0b01111111) << 4) + (remote_state[19] >> 4);
+  if (result == kPanasonicAcTimeSpecial) return 0;
   return result;
 }
 
 void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
-                               const bool enable) {
+                                const bool enable) {
   // Ensure its on a 10 minute boundary and no overflow.
   uint16_t corrected = std::min(mins_since_midnight, kPanasonicAcTimeMax);
   corrected -= corrected % 10;
@@ -613,9 +578,7 @@ void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
   remote_state[20] |= corrected >> 4;
 }
 
-void IRPanasonicAc::cancelOffTimer() {
-  setOffTimer(0, false);
-}
+void IRPanasonicAc::cancelOffTimer() { setOffTimer(0, false); }
 
 bool IRPanasonicAc::isOffTimerEnabled() {
   return remote_state[13] & kPanasonicAcOffTimer;
@@ -628,10 +591,10 @@ String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
 std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
   std::string result = "";
 #endif  // ARDUINO
-result += uint64ToString(mins_since_midnight / 60) + ":";
-uint8_t mins = mins_since_midnight % 60;
-if (mins < 10)  result += "0";  // Zero pad the minutes.
-return result + uint64ToString(mins);
+  result += uint64ToString(mins_since_midnight / 60) + ":";
+  uint8_t mins = mins_since_midnight % 60;
+  if (mins < 10) result += "0";  // Zero pad the minutes.
+  return result + uint64ToString(mins);
 }
 
 // Convert the internal state into a human readable string.
@@ -806,8 +769,8 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
       return false;  // Not strictly a PANASONIC_AC message.
   }
 
-  if (results->rawlen < min_nr_of_messages * (2 * nbits +
-                                              kHeader + kFooter) - 1)
+  if (results->rawlen <
+      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1)
     return false;  // Can't possibly be a valid PANASONIC_AC message.
 
   uint16_t dataBitsSoFar = 0;
@@ -819,26 +782,25 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
                  kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-      kPanasonicHdrMarkTicks;
+  uint32_t m_tick =
+      results->rawbuf[offset++] * kRawTick / kPanasonicHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace,
                   kPanasonicAcTolerance, kPanasonicAcExcess))
     return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kPanasonicHdrSpaceTicks;
+  uint32_t s_tick =
+      results->rawbuf[offset++] * kRawTick / kPanasonicHdrSpaceTicks;
 
   uint16_t i = 0;
   // Data (Section #1)
   // Keep reading bytes until we either run out of section or state to fill.
   for (; offset <= results->rawlen - 16 && i < kPanasonicAcSection1Length;
        i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kPanasonicBitMarkTicks * m_tick,
-                            kPanasonicOneSpaceTicks * s_tick,
-                            kPanasonicBitMarkTicks * m_tick,
-                            kPanasonicZeroSpaceTicks * s_tick,
-                            kPanasonicAcTolerance, kPanasonicAcExcess, false);
+    data_result = matchData(
+        &(results->rawbuf[offset]), 8, kPanasonicBitMarkTicks * m_tick,
+        kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
+        kPanasonicZeroSpaceTicks * s_tick, kPanasonicAcTolerance,
+        kPanasonicAcExcess, false);
     if (data_result.success == false) {
       DPRINT("DEBUG: offset = ");
       DPRINTLN(offset + data_result.used);
@@ -864,12 +826,11 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
   // Keep reading bytes until we either run out of data.
   for (; offset <= results->rawlen - 16 && i < nbits / 8;
        i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kPanasonicBitMarkTicks * m_tick,
-                            kPanasonicOneSpaceTicks * s_tick,
-                            kPanasonicBitMarkTicks * m_tick,
-                            kPanasonicZeroSpaceTicks * s_tick,
-                            kPanasonicAcTolerance, kPanasonicAcExcess, false);
+    data_result = matchData(
+        &(results->rawbuf[offset]), 8, kPanasonicBitMarkTicks * m_tick,
+        kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
+        kPanasonicZeroSpaceTicks * s_tick, kPanasonicAcTolerance,
+        kPanasonicAcExcess, false);
     if (data_result.success == false) {
       DPRINT("DEBUG: offset = ");
       DPRINTLN(offset + data_result.used);
@@ -889,8 +850,9 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t nbits,
   if (strict) {
     // Check the signatures of the section blocks. They start with 0x02& 0x20.
     if (results->state[0] != 0x02 || results->state[1] != 0x20 ||
-        results->state[8] != 0x02 || results->state[9] != 0x20)  return false;
-    if (!IRPanasonicAc::validChecksum(results->state, nbits / 8))  return false;
+        results->state[8] != 0x02 || results->state[9] != 0x20)
+      return false;
+    if (!IRPanasonicAc::validChecksum(results->state, nbits / 8)) return false;
   }
 
   // Success

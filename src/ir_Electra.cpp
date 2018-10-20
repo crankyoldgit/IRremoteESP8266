@@ -38,11 +38,9 @@ const uint32_t kElectraAcMessageGap = 100000;  // Completely made-up guess.
 //
 void IRsend::sendElectraAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++)
-    sendGeneric(kElectraAcHdrMark, kElectraAcHdrSpace,
-                kElectraAcBitMark, kElectraAcOneSpace,
-                kElectraAcBitMark, kElectraAcZeroSpace,
-                kElectraAcBitMark, kElectraAcMessageGap,
-                data, nbytes,
+    sendGeneric(kElectraAcHdrMark, kElectraAcHdrSpace, kElectraAcBitMark,
+                kElectraAcOneSpace, kElectraAcBitMark, kElectraAcZeroSpace,
+                kElectraAcBitMark, kElectraAcMessageGap, data, nbytes,
                 38000,  // Complete guess of the modulation frequency.
                 true, 0, 50);
 }
@@ -78,10 +76,8 @@ bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
   uint16_t offset = kStartOffset;
 
   // Message Header
-  if (!matchMark(results->rawbuf[offset++], kElectraAcHdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kElectraAcHdrSpace))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], kElectraAcHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kElectraAcHdrSpace)) return false;
 
   // Data Section
   match_result_t data_result;
@@ -89,25 +85,21 @@ bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
   // Keep reading bytes until we either run out of section or state to fill.
   for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
        i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kElectraAcBitMark,
-                            kElectraAcOneSpace,
-                            kElectraAcBitMark,
-                            kElectraAcZeroSpace,
-                            kTolerance, 0, true);
-    if (data_result.success == false)  return false;  // Fail
+    data_result = matchData(&(results->rawbuf[offset]), 8, kElectraAcBitMark,
+                            kElectraAcOneSpace, kElectraAcBitMark,
+                            kElectraAcZeroSpace, kTolerance, 0, true);
+    if (data_result.success == false) return false;  // Fail
     results->state[i] = data_result.data;
   }
 
   // Message Footer
-  if (!matchMark(results->rawbuf[offset++], kElectraAcBitMark))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], kElectraAcBitMark)) return false;
   if (offset <= results->rawlen &&
       !matchAtLeast(results->rawbuf[offset++], kElectraAcMessageGap))
     return false;
 
   // Compliance
-  if (strict && dataBitsSoFar != nbits)  return false;
+  if (strict && dataBitsSoFar != nbits) return false;
 
   // Success
   results->decode_type = ELECTRA_AC;

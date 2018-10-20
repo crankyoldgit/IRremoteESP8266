@@ -37,12 +37,12 @@ const uint8_t kPanasonicAcFanMin = 0;
 const uint8_t kPanasonicAcFanMax = 4;
 const uint8_t kPanasonicAcFanAuto = 7;
 const uint8_t kPanasonicAcFanOffset = 3;
-const uint8_t kPanasonicAcPower = 1;  // 0b1
-const uint8_t kPanasonicAcMinTemp = 16;  // Celsius
-const uint8_t kPanasonicAcMaxTemp = 30;  // Celsius
+const uint8_t kPanasonicAcPower = 1;         // 0b1
+const uint8_t kPanasonicAcMinTemp = 16;      // Celsius
+const uint8_t kPanasonicAcMaxTemp = 30;      // Celsius
 const uint8_t kPanasonicAcFanModeTemp = 27;  // Celsius
-const uint8_t kPanasonicAcQuiet = 1;  // 0b1
-const uint8_t kPanasonicAcPowerful = 0x20;  // 0b100000
+const uint8_t kPanasonicAcQuiet = 1;         // 0b1
+const uint8_t kPanasonicAcPowerful = 0x20;   // 0b100000
 // CKP models have Powerful and Quiet bits swapped.
 const uint8_t kPanasonicAcQuietCkp = 0x20;  // 0b100000
 const uint8_t kPanasonicAcPowerfulCkp = 1;  // 0b1
@@ -56,15 +56,15 @@ const uint8_t kPanasonicAcSwingHLeft = 0xA;
 const uint8_t kPanasonicAcSwingHRight = 0xB;
 const uint8_t kPanasonicAcSwingHFullRight = 0xC;
 const uint8_t kPanasonicAcChecksumInit = 0xF4;
-const uint8_t kPanasonicAcOnTimer =  0b00000010;
+const uint8_t kPanasonicAcOnTimer = 0b00000010;
 const uint8_t kPanasonicAcOffTimer = 0b00000100;
 const uint16_t kPanasonicAcTimeMax = 23 * 60 + 59;  // Mins since midnight.
 const uint16_t kPanasonicAcTimeSpecial = 0x600;
 
 const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
-  0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06,
-  0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
-  0x00, 0x0E, 0xE0, 0x00, 0x00, 0x81, 0x00, 0x00, 0x00};
+    0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,
+    0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
+    0x00, 0x0E, 0xE0, 0x00, 0x00, 0x81, 0x00, 0x00, 0x00};
 
 enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
@@ -74,7 +74,6 @@ enum panasonic_ac_remote_model_t {
   kPanasonicJke = 4,
   kPanasonicCkp = 5,
 };
-
 
 class IRPanasonicAc {
  public:
@@ -96,11 +95,11 @@ class IRPanasonicAc {
   void setMode(const uint8_t mode);
   uint8_t getMode();
   void setRaw(const uint8_t state[]);
-  uint8_t* getRaw();
+  uint8_t *getRaw();
   static bool validChecksum(uint8_t *state,
                             const uint16_t length = kPanasonicAcStateLength);
   static uint8_t calcChecksum(uint8_t *state,
-                               const uint16_t length = kPanasonicAcStateLength);
+                              const uint16_t length = kPanasonicAcStateLength);
   void setQuiet(const bool state);
   bool getQuiet();
   void setPowerful(const bool state);

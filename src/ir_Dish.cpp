@@ -61,10 +61,9 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
   space(kDishHdrSpace);
 
   sendGeneric(0, 0,  // No headers from here on in.
-              kDishBitMark, kDishOneSpace,
-              kDishBitMark, kDishZeroSpace,
-              kDishBitMark, kDishRptSpace,
-              data, nbits, 57600, true, repeat, 50);
+              kDishBitMark, kDishOneSpace, kDishBitMark, kDishZeroSpace,
+              kDishBitMark, kDishRptSpace, data, nbits, 57600, true, repeat,
+              50);
 }
 #endif
 
@@ -91,8 +90,7 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Not enough entries to be valid.
-  if (strict && nbits != kDishBits)
-    return false;  // Not strictly compliant.
+  if (strict && nbits != kDishBits) return false;  // Not strictly compliant.
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
@@ -106,11 +104,10 @@ bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
   uint32_t s_tick = results->rawbuf[offset++] * kRawTick / kDishHdrSpaceTicks;
 
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kDishBitMarkTicks * m_tick,
-                                         kDishOneSpaceTicks * s_tick,
-                                         kDishBitMarkTicks * m_tick,
-                                         kDishZeroSpaceTicks * s_tick);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, kDishBitMarkTicks * m_tick,
+                kDishOneSpaceTicks * s_tick, kDishBitMarkTicks * m_tick,
+                kDishZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;

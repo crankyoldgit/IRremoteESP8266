@@ -30,28 +30,28 @@
 
 // Constants
 // Modes
-const uint8_t  kCoolixCool = 0b00;
-const uint8_t  kCoolixDry = 0b01;
-const uint8_t  kCoolixAuto = 0b10;
-const uint8_t  kCoolixHeat = 0b11;
-const uint8_t  kCoolixFan = 4;  // Synthetic.
-const uint32_t kCoolixModeMask =       0b000000000000000000001100;  // 0xC
+const uint8_t kCoolixCool = 0b00;
+const uint8_t kCoolixDry = 0b01;
+const uint8_t kCoolixAuto = 0b10;
+const uint8_t kCoolixHeat = 0b11;
+const uint8_t kCoolixFan = 4;                                 // Synthetic.
+const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
 const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000;  // 0x80000
 // Fan Control
-const uint8_t  kCoolixFanMin = 0b100;
-const uint8_t  kCoolixFanMed = 0b010;
-const uint8_t  kCoolixFanMax = 0b001;
-const uint8_t  kCoolixFanAuto = 0b101;
-const uint8_t  kCoolixFanZoneFollow = 0b110;
-const uint8_t  kCoolixFanFixed = 0b111;
-const uint32_t kCoolixFanMask =        0b000000001110000000000000;  // 0x00E000
+const uint8_t kCoolixFanMin = 0b100;
+const uint8_t kCoolixFanMed = 0b010;
+const uint8_t kCoolixFanMax = 0b001;
+const uint8_t kCoolixFanAuto = 0b101;
+const uint8_t kCoolixFanZoneFollow = 0b110;
+const uint8_t kCoolixFanFixed = 0b111;
+const uint32_t kCoolixFanMask = 0b000000001110000000000000;  // 0x00E000
 // Temperature
-const uint8_t  kCoolixTempMin = 17;  // Celsius
-const uint8_t  kCoolixTempMax = 30;  // Celsius
-const uint8_t  kCoolixTempRange = kCoolixTempMax - kCoolixTempMin + 1;
-const uint8_t  kCoolixFanTempCode = 0b1110;  // Part of Fan Mode.
+const uint8_t kCoolixTempMin = 17;  // Celsius
+const uint8_t kCoolixTempMax = 30;  // Celsius
+const uint8_t kCoolixTempRange = kCoolixTempMax - kCoolixTempMin + 1;
+const uint8_t kCoolixFanTempCode = 0b1110;  // Part of Fan Mode.
 const uint32_t kCoolixTempMask = 0b11110000;
-const uint8_t  kCoolixTempMap[kCoolixTempRange] = {
+const uint8_t kCoolixTempMap[kCoolixTempRange] = {
     0b0000,  // 17C
     0b0001,  // 18c
     0b0011,  // 19C
@@ -67,22 +67,21 @@ const uint8_t  kCoolixTempMap[kCoolixTempRange] = {
     0b1010,  // 29C
     0b1011   // 30C
 };
-const uint8_t  kCoolixSensorTempMin = 16;  // Celsius
-const uint8_t  kCoolixSensorTempMax = 30;  // Celsius
-const uint8_t  kCoolixSensorTempIgnoreCode = 0b1111;
+const uint8_t kCoolixSensorTempMin = 16;  // Celsius
+const uint8_t kCoolixSensorTempMax = 30;  // Celsius
+const uint8_t kCoolixSensorTempIgnoreCode = 0b1111;
 const uint32_t kCoolixSensorTempMask = 0b000000000000111100000000;  // 0xF00
 // Fixed states/messages.
-const uint8_t  kCoolixPrefix = 0b1011;  // 0xB
-const uint8_t  kCoolixUnknown = 0xFF;
-const uint32_t kCoolixOff =      0b101100100111101111100000;  // 0xB27BE0
-const uint32_t kCoolixSwing =    0b101100100110101111100000;  // 0xB26BE0
-const uint32_t kCoolixSleep =    0b101100101110000000000011;  // 0xB2E003
-const uint32_t kCoolixTurbo =    0b101101011111010110100010;  // 0xB5F5A2
-const uint32_t kCoolixLed =      0b101101011111010110100101;  // 0xB5F5A5
-const uint32_t kCoolixClean =    0b101101011111010110101010;  // 0xB5F5AA
+const uint8_t kCoolixPrefix = 0b1011;  // 0xB
+const uint8_t kCoolixUnknown = 0xFF;
+const uint32_t kCoolixOff = 0b101100100111101111100000;    // 0xB27BE0
+const uint32_t kCoolixSwing = 0b101100100110101111100000;  // 0xB26BE0
+const uint32_t kCoolixSleep = 0b101100101110000000000011;  // 0xB2E003
+const uint32_t kCoolixTurbo = 0b101101011111010110100010;  // 0xB5F5A2
+const uint32_t kCoolixLed = 0b101101011111010110100101;    // 0xB5F5A5
+const uint32_t kCoolixClean = 0b101101011111010110101010;  // 0xB5F5AA
 // On, 25C, Mode: Auto, Fan: Auto, Zone Follow: Off, Sensor Temp: Ignore.
-const uint32_t kCoolixDefaultState =  0b101100101011111111001000;  // 0xB2BFC8
-
+const uint32_t kCoolixDefaultState = 0b101100101011111111001000;  // 0xB2BFC8
 
 // Classes
 class IRCoolixAC {

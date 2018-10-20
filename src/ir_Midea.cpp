@@ -37,8 +37,8 @@ const uint16_t kMideaHdrMarkTicks = 56;
 const uint16_t kMideaHdrMark = kMideaHdrMarkTicks * kMideaTick;
 const uint16_t kMideaHdrSpaceTicks = 56;
 const uint16_t kMideaHdrSpace = kMideaHdrSpaceTicks * kMideaTick;
-const uint16_t kMideaMinGapTicks = kMideaHdrMarkTicks + kMideaZeroSpaceTicks +
-                                   kMideaBitMarkTicks;
+const uint16_t kMideaMinGapTicks =
+    kMideaHdrMarkTicks + kMideaZeroSpaceTicks + kMideaBitMarkTicks;
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
 
@@ -53,8 +53,7 @@ const uint8_t kMideaTolerance = 30;  // Percent
 // Status: Alpha / Needs testing against a real device.
 //
 void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits % 8 != 0)
-    return;  // nbits is required to be a multiple of 8.
+  if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
   // Set IR carrier frequency
   enableIROut(38);
@@ -72,8 +71,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
       for (uint16_t i = 8; i <= nbits; i += 8) {
         // Grab a bytes worth of data.
         uint8_t segment = (data >> (nbits - i)) & 0xFF;
-        sendData(kMideaBitMark, kMideaOneSpace,
-                 kMideaBitMark, kMideaZeroSpace,
+        sendData(kMideaBitMark, kMideaOneSpace, kMideaBitMark, kMideaZeroSpace,
                  segment, 8, true);
       }
       // Footer
@@ -93,9 +91,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Warning: Consider this very alpha code.
 
 // Initialise the object.
-IRMideaAC::IRMideaAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRMideaAC::IRMideaAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRMideaAC::stateReset() {
@@ -104,14 +100,12 @@ void IRMideaAC::stateReset() {
 }
 
 // Configure the pin for output.
-void IRMideaAC::begin() {
-    _irsend.begin();
-}
+void IRMideaAC::begin() { _irsend.begin(); }
 
 #if SEND_MIDEA
 // Send the current desired state to the IR LED.
 void IRMideaAC::send() {
-  checksum();   // Ensure correct checksum before sending.
+  checksum();  // Ensure correct checksum before sending.
   _irsend.sendMidea(remote_state);
 }
 #endif  // SEND_MIDEA
@@ -128,14 +122,10 @@ void IRMideaAC::setRaw(uint64_t newState) {
 }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::on() {
-  remote_state |= kMideaACPower;
-}
+void IRMideaAC::on() { remote_state |= kMideaACPower; }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::off() {
-  remote_state &= (kMideaACStateMask ^ kMideaACPower);
-}
+void IRMideaAC::off() { remote_state &= (kMideaACStateMask ^ kMideaACPower); }
 
 // Set the requested power state of the A/C.
 void IRMideaAC::setPower(const bool state) {
@@ -146,9 +136,7 @@ void IRMideaAC::setPower(const bool state) {
 }
 
 // Return the requested power state of the A/C.
-bool IRMideaAC::getPower() {
-  return (remote_state & kMideaACPower);
-}
+bool IRMideaAC::getPower() { return (remote_state & kMideaACPower); }
 
 // Set the temperature.
 // Args:
@@ -159,13 +147,13 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
   if (useCelsius) {
     new_temp = std::max(kMideaACMinTempC, new_temp);
     new_temp = std::min(kMideaACMaxTempC, new_temp);
-    new_temp = (uint8_t) ((new_temp * 1.8) + 32.5);  // 0.5 so we rounding.
+    new_temp = (uint8_t)((new_temp * 1.8) + 32.5);  // 0.5 so we rounding.
   }
   new_temp = std::max(kMideaACMinTempF, new_temp);
   new_temp = std::min(kMideaACMaxTempF, new_temp);
   new_temp -= kMideaACMinTempF;
   remote_state &= kMideaACTempMask;
-  remote_state |= ((uint64_t) new_temp << 24);
+  remote_state |= ((uint64_t)new_temp << 24);
 }
 
 // Return the set temp.
@@ -176,7 +164,7 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
 uint8_t IRMideaAC::getTemp(const bool useCelsius) {
   uint8_t temp = ((remote_state >> 24) & 0x1F) + kMideaACMinTempF;
   if (useCelsius) {
-    temp = (uint8_t) ((temp - 32) / 1.8);
+    temp = (uint8_t)((temp - 32) / 1.8);
   }
   return temp;
 }
@@ -199,16 +187,12 @@ void IRMideaAC::setFan(const uint8_t fan) {
 }
 
 // Return the requested state of the unit's fan.
-uint8_t IRMideaAC::getFan() {
-  return (remote_state >> 35) & 0b111;
-}
+uint8_t IRMideaAC::getFan() { return (remote_state >> 35) & 0b111; }
 
 // Get the requested climate operation mode of the a/c unit.
 // Returns:
 //   A uint8_t containing the A/C mode.
-uint8_t IRMideaAC::getMode() {
-  return ((remote_state >> 32) & 0b111);
-}
+uint8_t IRMideaAC::getMode() { return ((remote_state >> 32) & 0b111); }
 
 // Set the requested climate operation mode of the a/c unit.
 void IRMideaAC::setMode(const uint8_t mode) {
@@ -238,9 +222,7 @@ void IRMideaAC::setSleep(const bool state) {
 }
 
 // Return the Sleep state of the A/C.
-bool IRMideaAC::getSleep() {
-  return (remote_state & kMideaACSleep);
-}
+bool IRMideaAC::getSleep() { return (remote_state & kMideaACSleep); }
 
 // Calculate the checksum for a given array.
 // Args:
@@ -309,7 +291,7 @@ std::string IRMideaAC::toString() {
       result += " (UNKNOWN)";
   }
   result += ", Temp: " + uint64ToString(getTemp(true)) + "C/" +
-      uint64ToString(getTemp(false)) + "F";
+            uint64ToString(getTemp(false)) + "F";
   result += ", Fan: " + uint64ToString(getFan());
   switch (getFan()) {
     case kMideaACFanAuto:
@@ -345,22 +327,20 @@ std::string IRMideaAC::toString() {
 //
 // Status: Alpha / Needs testing against a real device.
 //
-bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
-                         bool strict) {
+bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
     return false;
 
   uint8_t min_nr_of_messages = 1;
   if (strict) {
-    if (nbits != kMideaBits)
-      return false;  // Not strictly a MIDEA message.
+    if (nbits != kMideaBits) return false;  // Not strictly a MIDEA message.
     min_nr_of_messages = 2;
   }
 
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
-  if (results->rawlen < min_nr_of_messages * (2 * nbits +
-                                              kHeader + kFooter) - 1)
+  if (results->rawlen <
+      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1)
     return false;  // Can't possibly be a valid MIDEA message.
 
   uint64_t data = 0;
@@ -374,20 +354,17 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
     // Header
     if (!matchMark(results->rawbuf[offset], kMideaHdrMark)) return false;
     // Calculate how long the common tick time is based on the header mark.
-    uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-        kMideaHdrMarkTicks;
+    uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kMideaHdrMarkTicks;
     if (!matchSpace(results->rawbuf[offset], kMideaHdrSpace)) return false;
     // Calculate how long the common tick time is based on the header space.
-    uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-        kMideaHdrSpaceTicks;
+    uint32_t s_tick =
+        results->rawbuf[offset++] * kRawTick / kMideaHdrSpaceTicks;
 
     // Data (Normal)
-    match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                           kMideaBitMarkTicks * m_tick,
-                                           kMideaOneSpaceTicks * s_tick,
-                                           kMideaBitMarkTicks * m_tick,
-                                           kMideaZeroSpaceTicks * s_tick,
-                                           kMideaTolerance);
+    match_result_t data_result = matchData(
+        &(results->rawbuf[offset]), nbits, kMideaBitMarkTicks * m_tick,
+        kMideaOneSpaceTicks * s_tick, kMideaBitMarkTicks * m_tick,
+        kMideaZeroSpaceTicks * s_tick, kMideaTolerance);
     if (data_result.success == false) return false;
     offset += data_result.used;
     if (i % 2 == 0)
@@ -405,15 +382,14 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits,
       return false;
   }
 
-
   // Compliance
   if (strict) {
     // Protocol requires a second message with all the data bits inverted.
     // We should have checked we got a second message in the previous loop.
     // Just need to check it's value is an inverted copy of the first message.
     uint64_t mask = (1ULL << kMideaBits) - 1;
-    if ((data & mask) != ((inverted ^ mask) & mask))  return false;
-    if (!IRMideaAC::validChecksum(data))  return false;
+    if ((data & mask) != ((inverted ^ mask) & mask)) return false;
+    if (!IRMideaAC::validChecksum(data)) return false;
   }
 
   // Success

@@ -17,13 +17,13 @@ const uint16_t kMWMMinSamples = 6;  // Msgs are >=3 bytes, bytes have >=2
                                     // samples
 const uint16_t kMWMTick = 417;
 const uint32_t kMWMMinGap = 30000;  // Typical observed delay b/w commands
-const uint8_t  kMWMTolerance = 0;   // Percentage error margin.
+const uint8_t kMWMTolerance = 0;    // Percentage error margin.
 const uint16_t kMWMExcess = 0;      // See kMarkExcess.
 const uint16_t kMWMDelta = 150;     // Use instead of Excess and Tolerance.
-const uint8_t  kMWMMaxWidth = 9;    // Maximum number of successive bits at a
+const uint8_t kMWMMaxWidth = 9;     // Maximum number of successive bits at a
                                     // single level - worst case
-const int16_t  kSpace = 1;
-const int16_t  kMark = 0;
+const int16_t kSpace = 1;
+const int16_t kMark = 0;
 
 #if SEND_MWM
 // Send a MWM packet.
@@ -38,8 +38,7 @@ const int16_t  kMark = 0;
 // Status: Implemented.
 //
 void IRsend::sendMWM(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
-  if (nbytes < 3)
-    return;  // Shortest possible message is 3 bytes
+  if (nbytes < 3) return;  // Shortest possible message is 3 bytes
 
   // Set 38kHz IR carrier frequency & a 1/4 (25%) duty cycle.
   // NOTE: duty cycle is not confirmed. Just guessing based on RC5/6 protocols.
@@ -84,8 +83,7 @@ void IRsend::sendMWM(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
 //
 // Status: Implemented.
 //
-bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
-    bool strict) {
+bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits, bool strict) {
   DPRINTLN("DEBUG: decodeMWM");
 
   // Compliance
@@ -104,13 +102,12 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits,
 
   // Data
   uint8_t bits_per_frame = 10;
-  for (; offset < results->rawlen && results->bits < 8*kStateSizeMax;
+  for (; offset < results->rawlen && results->bits < 8 * kStateSizeMax;
        frame_bits++) {
     DPRINT("DEBUG: decodeMWM: offset = ");
     DPRINTLN(uint64ToString(offset));
-    int16_t level = getRClevel(results, &offset, &used, kMWMTick,
-        kMWMTolerance, kMWMExcess,
-        kMWMDelta, kMWMMaxWidth);
+    int16_t level = getRClevel(results, &offset, &used, kMWMTick, kMWMTolerance,
+                               kMWMExcess, kMWMDelta, kMWMMaxWidth);
     if (level < 0) {
       DPRINTLN("DEBUG: decodeMWM: getRClevel returned error");
       break;

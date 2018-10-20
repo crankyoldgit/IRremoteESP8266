@@ -12,10 +12,10 @@ Copyright 2017 sillyfrog, crankyoldgit
 #ifndef ARDUINO
 #include <string>
 #endif
-#include "IRremoteESP8266.h"
-#include "IRutils.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRutils.h"
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
@@ -58,40 +58,32 @@ void IRsend::sendDaikin(unsigned char data[], uint16_t nbytes,
   for (uint16_t r = 0; r <= repeat; r++) {
     // Send the header, 0b00000
     sendGeneric(0, 0,  // No header for the header
-                kDaikinBitMark, kDaikinOneSpace,
-                kDaikinBitMark, kDaikinZeroSpace,
-                kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                (uint64_t) 0b00000, 5, 38, false, 0, 50);
+                kDaikinBitMark, kDaikinOneSpace, kDaikinBitMark,
+                kDaikinZeroSpace, kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
+                (uint64_t)0b00000, 5, 38, false, 0, 50);
     // Leading header
     // Do this as a constant to save RAM and keep in flash memory
-    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace,
-                kDaikinBitMark, kDaikinOneSpace,
-                kDaikinBitMark, kDaikinZeroSpace,
+    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace, kDaikinBitMark,
+                kDaikinOneSpace, kDaikinBitMark, kDaikinZeroSpace,
                 kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
                 kDaikinFirstHeader64, 64, 38, false, 0, 50);
     // Data #1
-    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace,
-                kDaikinBitMark, kDaikinOneSpace,
-                kDaikinBitMark, kDaikinZeroSpace,
-                kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                data, 8, 38, false, 0, 50);
+    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace, kDaikinBitMark,
+                kDaikinOneSpace, kDaikinBitMark, kDaikinZeroSpace,
+                kDaikinBitMark, kDaikinZeroSpace + kDaikinGap, data, 8, 38,
+                false, 0, 50);
     // Data #2
-    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace,
-                kDaikinBitMark, kDaikinOneSpace,
-                kDaikinBitMark, kDaikinZeroSpace,
-                kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                data + 8, nbytes - 8, 38, false, 0, 50);
+    sendGeneric(kDaikinHdrMark, kDaikinHdrSpace, kDaikinBitMark,
+                kDaikinOneSpace, kDaikinBitMark, kDaikinZeroSpace,
+                kDaikinBitMark, kDaikinZeroSpace + kDaikinGap, data + 8,
+                nbytes - 8, 38, false, 0, 50);
   }
 }
 #endif  // SEND_DAIKIN
 
-IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRDaikinESP::begin() {
-  _irsend.begin();
-}
+void IRDaikinESP::begin() { _irsend.begin(); }
 
 #if SEND_DAIKIN
 void IRDaikinESP::send() {
@@ -111,8 +103,7 @@ uint8_t IRDaikinESP::calcBlockChecksum(const uint8_t *block,
   uint8_t sum = 0;
   // Daikin checksum is just the addition of all the data bytes
   // in the block but capped to 8 bits.
-  for (uint16_t i = 0; i < length; i++, block++)
-    sum += *block;
+  for (uint16_t i = 0; i < length; i++, block++) sum += *block;
   return sum & 0xFFU;
 }
 
@@ -122,9 +113,8 @@ uint8_t IRDaikinESP::calcBlockChecksum(const uint8_t *block,
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRDaikinESP::validChecksum(const uint8_t state[],
-                                const uint16_t length) {
-  if (length < 8 || state[7] != calcBlockChecksum(state, 7))  return false;
+bool IRDaikinESP::validChecksum(const uint8_t state[], const uint16_t length) {
+  if (length < 8 || state[7] != calcBlockChecksum(state, 7)) return false;
   if (length < 10 ||
       state[length - 1] != calcBlockChecksum(state + 8, length - 9))
     return false;
@@ -138,8 +128,7 @@ void IRDaikinESP::checksum() {
 }
 
 void IRDaikinESP::stateReset() {
-  for (uint8_t i = 0; i < kDaikinStateLength; i++)
-    daikin[i] = 0x0;
+  for (uint8_t i = 0; i < kDaikinStateLength; i++) daikin[i] = 0x0;
 
   daikin[0] = 0x11;
   daikin[1] = 0xDA;
@@ -159,14 +148,13 @@ void IRDaikinESP::stateReset() {
   checksum();
 }
 
-uint8_t* IRDaikinESP::getRaw() {
-  checksum();   // Ensure correct settings before sending.
+uint8_t *IRDaikinESP::getRaw() {
+  checksum();  // Ensure correct settings before sending.
   return daikin;
 }
 
 void IRDaikinESP::setRaw(uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikinStateLength; i++)
-    daikin[i] = new_code[i];
+  for (uint8_t i = 0; i < kDaikinStateLength; i++) daikin[i] = new_code[i];
 }
 
 void IRDaikinESP::on() {
@@ -199,9 +187,7 @@ void IRDaikinESP::setTemp(uint8_t temp) {
   daikin[14] = temp * 2;
 }
 
-uint8_t IRDaikinESP::getTemp() {
-  return daikin[14] / 2;
-}
+uint8_t IRDaikinESP::getTemp() { return daikin[14] / 2; }
 
 // Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikinESP::setFan(uint8_t fan) {
@@ -219,8 +205,7 @@ void IRDaikinESP::setFan(uint8_t fan) {
 
 uint8_t IRDaikinESP::getFan() {
   uint8_t fan = daikin[16] >> 4;
-  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto)
-    fan -= 2;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
   return fan;
 }
 
@@ -257,9 +242,7 @@ void IRDaikinESP::setSwingVertical(bool state) {
     daikin[16] &= 0xF0;
 }
 
-bool IRDaikinESP::getSwingVertical() {
-  return daikin[16] & 0x01;
-}
+bool IRDaikinESP::getSwingVertical() { return daikin[16] & 0x01; }
 
 void IRDaikinESP::setSwingHorizontal(bool state) {
   if (state)
@@ -268,9 +251,7 @@ void IRDaikinESP::setSwingHorizontal(bool state) {
     daikin[17] &= 0xF0;
 }
 
-bool IRDaikinESP::getSwingHorizontal() {
-  return daikin[17] & 0x01;
-}
+bool IRDaikinESP::getSwingHorizontal() { return daikin[17] & 0x01; }
 
 void IRDaikinESP::setQuiet(bool state) {
   if (state) {
@@ -364,10 +345,10 @@ uint8_t IRDaikinESP::getBit(uint8_t byte, uint8_t bitmask) {
 // starttime: Number of minutes after midnight, in 10 minutes increments
 void IRDaikinESP::enableOnTimer(uint16_t starttime) {
   setBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
-  daikin[18] = (uint8_t) (starttime & 0x00FF);
+  daikin[18] = (uint8_t)(starttime & 0x00FF);
   // only keep 4 bits
   daikin[19] &= 0xF0;
-  daikin[19] |= (uint8_t) ((starttime >> 8) & 0x0F);
+  daikin[19] |= (uint8_t)((starttime >> 8) & 0x0F);
 }
 
 void IRDaikinESP::disableOnTimer() {
@@ -392,7 +373,7 @@ void IRDaikinESP::enableOffTimer(uint16_t endtime) {
   setBit(kDaikinByteOffTimer, kDaikinBitOffTimer);
   daikin[20] = (uint8_t)((endtime >> 4) & 0xFF);
   daikin[19] &= 0x0F;
-  daikin[19] |= (uint8_t) ((endtime & 0x000F) << 4);
+  daikin[19] |= (uint8_t)((endtime & 0x000F) << 4);
 }
 
 void IRDaikinESP::disableOffTimer() {
@@ -416,10 +397,10 @@ bool IRDaikinESP::getOffTimerEnabled() {
 
 void IRDaikinESP::setCurrentTime(uint16_t numMins) {
   if (numMins > 24 * 60) numMins = 0;  // If > 23:59, set to 00:00
-  daikin[5] = (uint8_t) (numMins & 0x00FF);
+  daikin[5] = (uint8_t)(numMins & 0x00FF);
   // only keep 4 bits
   daikin[6] &= 0xF0;
-  daikin[6] |= (uint8_t) ((numMins >> 8) & 0x0F);
+  daikin[6] |= (uint8_t)((numMins >> 8) & 0x0F);
 }
 
 uint16_t IRDaikinESP::getCurrentTime() {
@@ -433,7 +414,7 @@ uint16_t IRDaikinESP::getCurrentTime() {
 #ifdef ARDUINO
 String IRDaikinESP::renderTime(uint16_t timemins) {
   String ret;
-#else  // ARDUINO
+#else   // ARDUINO
 std::string IRDaikinESP::renderTime(uint16_t timemins) {
   std::string ret;
 #endif  // ARDUINO
@@ -441,8 +422,7 @@ std::string IRDaikinESP::renderTime(uint16_t timemins) {
   hours = timemins / 60;
   ret = uint64ToString(hours) + ":";
   mins = timemins - (hours * 60);
-  if (mins < 10)
-    ret += "0";
+  if (mins < 10) ret += "0";
   ret += uint64ToString(mins);
   return ret;
 }
@@ -451,7 +431,7 @@ std::string IRDaikinESP::renderTime(uint16_t timemins) {
 #ifdef ARDUINO
 String IRDaikinESP::toString() {
   String result = "";
-#else  // ARDUINO
+#else   // ARDUINO
 std::string IRDaikinESP::toString() {
   std::string result = "";
 #endif  // ARDUINO
@@ -551,14 +531,13 @@ std::string IRDaikinESP::toString() {
 void IRDaikinESP::printState() {
 #ifdef ARDUINO
   String strbits;
-#else  // ARDUINO
+#else   // ARDUINO
   std::string strbits;
 #endif  // ARDUINO
   DPRINTLN("Raw Bits:");
   for (uint8_t i = 0; i < kDaikinStateLength; i++) {
     strbits = uint64ToString(daikin[i], BIN);
-    while (strbits.length() < 8)
-      strbits = "0" + strbits;
+    while (strbits.length() < 8) strbits = "0" + strbits;
     DPRINT(strbits);
     DPRINT(" ");
   }
@@ -584,8 +563,7 @@ void IRDaikinESP::printState() {
 uint32_t IRDaikinESP::getCommand() {
   uint32_t ret = 0;
   uint32_t tmp = 0;
-  if (getPower())
-    ret |= 0b00000000000000000000000000000001;
+  if (getPower()) ret |= 0b00000000000000000000000000000001;
   tmp = getMode();
   tmp = tmp << 1;
   ret |= tmp;
@@ -598,24 +576,18 @@ uint32_t IRDaikinESP::getCommand() {
   tmp <<= 8;
   ret |= tmp;
 
-  if (getEcono())
-    ret |= 0b00000000000000001000000000000000;
-  if (getPowerful())
-    ret |= 0b00000000000000010000000000000000;
-  if (getQuiet())
-    ret |= 0b00000000000000100000000000000000;
-  if (getSensor())
-    ret |= 0b00000000000001000000000000000000;
-  if (getSwingVertical())
-    ret |= 0b00000000000010000000000000000000;
+  if (getEcono()) ret |= 0b00000000000000001000000000000000;
+  if (getPowerful()) ret |= 0b00000000000000010000000000000000;
+  if (getQuiet()) ret |= 0b00000000000000100000000000000000;
+  if (getSensor()) ret |= 0b00000000000001000000000000000000;
+  if (getSwingVertical()) ret |= 0b00000000000010000000000000000000;
   ret |= (getCurrentTime() << 20);
   return ret;
 }
 
 void IRDaikinESP::setCommand(uint32_t value) {
   uint32_t tmp = 0;
-  if (value & 0b00000000000000000000000000000001)
-    setPower(true);
+  if (value & 0b00000000000000000000000000000001) setPower(true);
   tmp = value & 0b00000000000000000000000000001110;
   tmp >>= 1;
   setMode(tmp);
@@ -628,16 +600,11 @@ void IRDaikinESP::setCommand(uint32_t value) {
   tmp >>= 8;
   setTemp(tmp);
 
-  if (value & 0b00000000000000001000000000000000)
-    setEcono(true);
-  if (value & 0b00000000000000010000000000000000)
-    setPowerful(true);
-  if (value & 0b00000000000000100000000000000000)
-    setQuiet(true);
-  if (value & 0b00000000000001000000000000000000)
-    setSensor(true);
-  if (value & 0b00000000000010000000000000000000)
-    setSwingVertical(true);
+  if (value & 0b00000000000000001000000000000000) setEcono(true);
+  if (value & 0b00000000000000010000000000000000) setPowerful(true);
+  if (value & 0b00000000000000100000000000000000) setQuiet(true);
+  if (value & 0b00000000000001000000000000000000) setSensor(true);
+  if (value & 0b00000000000010000000000000000000) setSwingVertical(true);
 
   value >>= 20;
   setCurrentTime(value);
@@ -662,13 +629,13 @@ void addbit(bool val, unsigned char data[]) {
   data[kDaikinCurIndex] = curindex;
 }
 
-bool checkheader(decode_results *results, uint16_t* offset) {
+bool checkheader(decode_results *results, uint16_t *offset) {
   if (!IRrecv::matchMark(results->rawbuf[(*offset)++], kDaikinBitMark,
                          kDaikinTolerance, kDaikinMarkExcess))
     return false;
   if (!IRrecv::matchSpace(results->rawbuf[(*offset)++],
-                          kDaikinZeroSpace + kDaikinGap,
-                          kDaikinTolerance, kDaikinMarkExcess))
+                          kDaikinZeroSpace + kDaikinGap, kDaikinTolerance,
+                          kDaikinMarkExcess))
     return false;
   if (!IRrecv::matchMark(results->rawbuf[(*offset)++], kDaikinHdrMark,
                          kDaikinTolerance, kDaikinMarkExcess))
@@ -685,13 +652,13 @@ bool readbits(decode_results *results, uint16_t *offset,
   for (uint16_t i = 0; i < countbits && *offset < results->rawlen - 1;
        i++, (*offset)++) {
     if (!IRrecv::matchMark(results->rawbuf[(*offset)++], kDaikinBitMark,
-              kDaikinTolerance, kDaikinMarkExcess))
+                           kDaikinTolerance, kDaikinMarkExcess))
       return false;
     if (IRrecv::matchSpace(results->rawbuf[*offset], kDaikinOneSpace,
-              kDaikinTolerance, kDaikinMarkExcess))
+                           kDaikinTolerance, kDaikinMarkExcess))
       addbit(1, daikin_code);
     else if (IRrecv::matchSpace(results->rawbuf[*offset], kDaikinZeroSpace,
-              kDaikinTolerance, kDaikinMarkExcess))
+                                kDaikinTolerance, kDaikinMarkExcess))
       addbit(0, daikin_code);
     else
       return false;
@@ -716,22 +683,18 @@ bool readbits(decode_results *results, uint16_t *offset,
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
                           bool strict) {
-  if (results->rawlen < kDaikinRawBits)
-    return false;
+  if (results->rawlen < kDaikinRawBits) return false;
 
   // Compliance
-  if (strict && nbits != kDaikinRawBits)
-    return false;
+  if (strict && nbits != kDaikinRawBits) return false;
 
   uint16_t offset = kStartOffset;
   unsigned char daikin_code[kDaikinStateLength + 2];
-  for (uint8_t i = 0; i < kDaikinStateLength+2; i++)
-    daikin_code[i] = 0;
+  for (uint8_t i = 0; i < kDaikinStateLength + 2; i++) daikin_code[i] = 0;
 
   // Header (#1)
   for (uint8_t i = 0; i < 10; i++) {
-    if (!matchMark(results->rawbuf[offset++], kDaikinBitMark))
-      return false;
+    if (!matchMark(results->rawbuf[offset++], kDaikinBitMark)) return false;
   }
   if (!checkheader(results, &offset)) return false;
 
@@ -741,8 +704,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   // Ignore everything that has just been captured as it is not needed.
   // Some remotes may not send this portion, my remote did, but it's not
   // required.
-  for (uint8_t i = 0; i < kDaikinStateLength + 2; i++)
-    daikin_code[i] = 0;
+  for (uint8_t i = 0; i < kDaikinStateLength + 2; i++) daikin_code[i] = 0;
 
   // Header (#2)
   if (!checkheader(results, &offset)) return false;
@@ -758,10 +720,9 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
     return false;
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kDaikinBitMark))
-    return false;
-  if (offset < results->rawlen && !matchAtLeast(results->rawbuf[offset],
-                                                 kDaikinGap))
+  if (!matchMark(results->rawbuf[offset++], kDaikinBitMark)) return false;
+  if (offset < results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], kDaikinGap))
     return false;
 
   // Compliance

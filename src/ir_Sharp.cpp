@@ -32,11 +32,10 @@ const uint16_t kSharpZeroSpace = kSharpZeroSpaceTicks * kSharpTick;
 const uint16_t kSharpGapTicks = 1677;
 const uint16_t kSharpGap = kSharpGapTicks * kSharpTick;
 // Address(5) + Command(8) + Expansion(1) + Check(1)
-const uint64_t kSharpToggleMask = ((uint64_t) 1 << (kSharpBits -
-                                                    kSharpAddressBits)) - 1;
-const uint64_t kSharpAddressMask = ((uint64_t) 1 << kSharpAddressBits) - 1;
-const uint64_t kSharpCommandMask = ((uint64_t) 1 << kSharpCommandBits) - 1;
-
+const uint64_t kSharpToggleMask =
+    ((uint64_t)1 << (kSharpBits - kSharpAddressBits)) - 1;
+const uint64_t kSharpAddressMask = ((uint64_t)1 << kSharpAddressBits) - 1;
+const uint64_t kSharpCommandMask = ((uint64_t)1 << kSharpCommandBits) - 1;
 
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
@@ -68,10 +67,9 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
     //       normal), however all data points to that being incorrect.
     for (uint8_t n = 0; n < 2; n++) {
       sendGeneric(0, 0,  // No Header
-                  kSharpBitMark, kSharpOneSpace,
-                  kSharpBitMark, kSharpZeroSpace,
-                  kSharpBitMark, kSharpGap,
-                  data, nbits, 38, true, 0,  // Repeats are handled already.
+                  kSharpBitMark, kSharpOneSpace, kSharpBitMark, kSharpZeroSpace,
+                  kSharpBitMark, kSharpGap, data, nbits, 38, true,
+                  0,  // Repeats are handled already.
                   33);
       // Invert the data per protocol. This is always called twice, so it's
       // retured to original upon exiting the inner loop.
@@ -180,14 +178,12 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
   if (strict) {
-    if (nbits != kSharpBits)
-      return false;  // Request is out of spec.
+    if (nbits != kSharpBits) return false;  // Request is out of spec.
     // DISABLED - See TODO
 #ifdef UNIT_TEST
     // An in spec message has the data sent normally, then inverted. So we
     // expect twice as many entries than to just get the results.
-    if (results->rawlen < 2 * (2 * nbits + kFooter))
-      return false;
+    if (results->rawlen < 2 * (2 * nbits + kFooter)) return false;
 #endif
   }
 
@@ -222,12 +218,10 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   // Compliance
   if (strict) {
     // Check the state of the expansion bit is what we expect.
-    if ((data & 0b10) >> 1 != expansion)
-      return false;
+    if ((data & 0b10) >> 1 != expansion) return false;
     // The check bit should be cleared in a normal message.
-    if (data & 0b1)
-      return false;
-    // DISABLED - See TODO
+    if (data & 0b1) return false;
+      // DISABLED - See TODO
 #ifdef UNIT_TEST
     // Grab the second copy of the data (i.e. inverted)
     // Header
@@ -239,13 +233,11 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
     uint64_t second_data = 0;
     for (uint16_t i = 0; i < nbits; i++, offset++) {
       // Use a higher tolerance value for kSharpBitMark as it is quite small.
-      if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick,
-                     35))
+      if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
         return false;
       if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
         second_data = (second_data << 1) | 1;  // 1
-      else if (matchSpace(results->rawbuf[offset],
-                          kSharpZeroSpaceTicks * tick))
+      else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
         second_data <<= 1;  // 0
       else
         return false;
@@ -258,8 +250,7 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
       return false;
 
     // Check that second_data has been inverted correctly.
-    if (data != (second_data ^ kSharpToggleMask))
-      return false;
+    if (data != (second_data ^ kSharpToggleMask)) return false;
 #endif  // UNIT_TEST
   }
 
@@ -269,8 +260,8 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   results->value = data;
   // Address & command are actually transmitted in LSB first order.
   results->address = reverseBits(data, nbits) & kSharpAddressMask;
-  results->command = reverseBits((data >> 2) & kSharpCommandMask,
-                                 kSharpCommandBits);
+  results->command =
+      reverseBits((data >> 2) & kSharpCommandMask, kSharpCommandBits);
   return true;
 }
 #endif  // (DECODE_SHARP || DECODE_DENON)

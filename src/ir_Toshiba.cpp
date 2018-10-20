@@ -47,14 +47,13 @@ const uint16_t kToshibaAcMinGap = 7048;
 // Status: StABLE / Working.
 //
 void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
-                              uint16_t repeat) {
+                           uint16_t repeat) {
   if (nbytes < kToshibaACStateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(kToshibaAcHdrMark, kToshibaAcHdrSpace,
-              kToshibaAcBitMark, kToshibaAcOneSpace,
-              kToshibaAcBitMark, kToshibaAcZeroSpace,
-              kToshibaAcBitMark, kToshibaAcMinGap,
-              data, nbytes, 38, true, repeat, 50);
+  sendGeneric(kToshibaAcHdrMark, kToshibaAcHdrSpace, kToshibaAcBitMark,
+              kToshibaAcOneSpace, kToshibaAcBitMark, kToshibaAcZeroSpace,
+              kToshibaAcBitMark, kToshibaAcMinGap, data, nbytes, 38, true,
+              repeat, 50);
 }
 #endif  // SEND_TOSHIBA_AC
 
@@ -65,9 +64,7 @@ void IRsend::sendToshibaAC(unsigned char data[], uint16_t nbytes,
 // Status:  STABLE / Working.
 //
 // Initialise the object.
-IRToshibaAC::IRToshibaAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRToshibaAC::IRToshibaAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRToshibaAC::stateReset() {
@@ -82,21 +79,18 @@ void IRToshibaAC::stateReset() {
   remote_state[2] = 0x03;
   remote_state[3] = 0xFC;
   remote_state[4] = 0x01;
-  for (uint8_t i = 5; i < kToshibaACStateLength; i++)
-    remote_state[i] = 0;
+  for (uint8_t i = 5; i < kToshibaACStateLength; i++) remote_state[i] = 0;
   mode_state = remote_state[6] & 0b00000011;
   checksum();  // Calculate the checksum
 }
 
 // Configure the pin for output.
-void IRToshibaAC::begin() {
-    _irsend.begin();
-}
+void IRToshibaAC::begin() { _irsend.begin(); }
 
 #if SEND_TOSHIBA_AC
 // Send the current desired state to the IR LED.
 void IRToshibaAC::send() {
-  checksum();   // Ensure correct checksum before sending.
+  checksum();  // Ensure correct checksum before sending.
   _irsend.sendToshibaAC(remote_state);
 }
 #endif  // SEND_TOSHIBA_AC
@@ -127,8 +121,7 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
   // Only calculate it for valid lengths.
   if (length > 1) {
     // Checksum is simple XOR of all bytes except the last one.
-    for (uint8_t i = 0; i < length - 1; i++)
-      checksum ^= state[i];
+    for (uint8_t i = 0; i < length - 1; i++) checksum ^= state[i];
   }
   return checksum;
 }
@@ -139,16 +132,14 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRToshibaAC::validChecksum(const uint8_t state[],
-                                const uint16_t length) {
+bool IRToshibaAC::validChecksum(const uint8_t state[], const uint16_t length) {
   return (length > 1 && state[length - 1] == calcChecksum(state, length));
 }
 
 // Calculate & set the checksum for the current internal state of the remote.
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
-  if (length > 1)
-    remote_state[length - 1] = calcChecksum(remote_state, length);
+  if (length > 1) remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 // Set the requested power state of the A/C to off.
@@ -174,19 +165,19 @@ void IRToshibaAC::setPower(bool state) {
 
 // Return the requested power state of the A/C.
 bool IRToshibaAC::getPower() {
-  return((remote_state[6] & kToshibaAcPower) == 0);
+  return ((remote_state[6] & kToshibaAcPower) == 0);
 }
 
 // Set the temp. in deg C
 void IRToshibaAC::setTemp(uint8_t temp) {
-  temp = std::max((uint8_t) kToshibaAcMinTemp, temp);
-  temp = std::min((uint8_t) kToshibaAcMaxTemp, temp);
+  temp = std::max((uint8_t)kToshibaAcMinTemp, temp);
+  temp = std::min((uint8_t)kToshibaAcMaxTemp, temp);
   remote_state[5] = (temp - kToshibaAcMinTemp) << 4;
 }
 
 // Return the set temp. in deg C
 uint8_t IRToshibaAC::getTemp() {
-  return((remote_state[5] >> 4) + kToshibaAcMinTemp);
+  return ((remote_state[5] >> 4) + kToshibaAcMinTemp);
 }
 
 // Set the speed of the fan, 0-5.
@@ -223,11 +214,16 @@ uint8_t IRToshibaAC::getMode(bool useRaw) {
 void IRToshibaAC::setMode(uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case kToshibaAcAuto: break;
-    case kToshibaAcCool: break;
-    case kToshibaAcDry: break;
-    case kToshibaAcHeat: break;
-    default: mode = kToshibaAcAuto;
+    case kToshibaAcAuto:
+      break;
+    case kToshibaAcCool:
+      break;
+    case kToshibaAcDry:
+      break;
+    case kToshibaAcHeat:
+      break;
+    default:
+      mode = kToshibaAcAuto;
   }
   mode_state = mode;
   // Only adjust the remote_state if we have power set to on.
@@ -294,7 +290,7 @@ std::string IRToshibaAC::toString() {
 //
 // Ref:
 //
-bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
+bool IRrecv::decodeToshibaAC(decode_results* results, uint16_t nbits,
                              bool strict) {
   uint16_t offset = kStartOffset;
   uint16_t dataBitsSoFar = 0;
@@ -303,28 +299,23 @@ bool IRrecv::decodeToshibaAC(decode_results *results, uint16_t nbits,
   if (results->rawlen < kToshibaACBits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid message.
 
-
   // Compliance
   if (strict && nbits != kToshibaACBits)
     return false;  // Must be called with the correct nr. of bytes.
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], kToshibaAcHdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kToshibaAcHdrSpace))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], kToshibaAcHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kToshibaAcHdrSpace)) return false;
 
   // Data
   for (uint8_t i = 0; i < kToshibaACStateLength; i++) {
     // Read a byte's worth of data.
-    match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
-                                           kToshibaAcBitMark,
-                                           kToshibaAcOneSpace,
-                                           kToshibaAcBitMark,
-                                           kToshibaAcZeroSpace);
+    match_result_t data_result =
+        matchData(&(results->rawbuf[offset]), 8, kToshibaAcBitMark,
+                  kToshibaAcOneSpace, kToshibaAcBitMark, kToshibaAcZeroSpace);
     if (data_result.success == false) return false;  // Fail
     dataBitsSoFar += 8;
-    results->state[i] = (uint8_t) data_result.data;
+    results->state[i] = (uint8_t)data_result.data;
     offset += data_result.used;
   }
 

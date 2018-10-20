@@ -37,9 +37,8 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Appears to be an extended NEC1 protocol. i.e. 42 bits instead of 32 bits.
   // So use sendNEC instead, however the twist is it has a fixed 26 bit
   // prefix, and a fixed postfix bit.
-  uint64_t new_data = (
-      (kAiwaRcT501PreData << (nbits + kAiwaRcT501PostBits)) |
-      (data << kAiwaRcT501PostBits) | kAiwaRcT501PostData);
+  uint64_t new_data = ((kAiwaRcT501PreData << (nbits + kAiwaRcT501PostBits)) |
+                       (data << kAiwaRcT501PostBits) | kAiwaRcT501PostData);
   nbits += kAiwaRcT501PreBits + kAiwaRcT501PostBits;
   if (nbits > sizeof(new_data) * 8)
     return;  // We are overflowing. Abort, and don't send.
@@ -103,8 +102,7 @@ bool IRrecv::decodeAiwaRCT501(decode_results *results, uint16_t nbits,
     return false;
 
   // Compliance
-  if (strict && results->bits != expected_nbits)
-    return false;
+  if (strict && results->bits != expected_nbits) return false;
 
   // Success
   results->decode_type = AIWA_RC_T501;

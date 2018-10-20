@@ -32,10 +32,10 @@ const uint16_t kJvcZeroSpaceTicks = 7;
 const uint16_t kJvcZeroSpace = kJvcZeroSpaceTicks * kJvcTick;
 const uint16_t kJvcRptLengthTicks = 800;
 const uint16_t kJvcRptLength = kJvcRptLengthTicks * kJvcTick;
-const uint16_t kJvcMinGapTicks = kJvcRptLengthTicks -
+const uint16_t kJvcMinGapTicks =
+    kJvcRptLengthTicks -
     (kJvcHdrMarkTicks + kJvcHdrSpaceTicks +
-     kJvcBits * (kJvcBitMarkTicks + kJvcOneSpaceTicks) +
-     kJvcBitMarkTicks);
+     kJvcBits * (kJvcBitMarkTicks + kJvcOneSpaceTicks) + kJvcBitMarkTicks);
 const uint16_t kJvcMinGap = kJvcMinGapTicks * kJvcTick;
 
 #if SEND_JVC
@@ -63,17 +63,15 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // We always send the data & footer at least once, hence '<= repeat'.
   for (uint16_t i = 0; i <= repeat; i++) {
     sendGeneric(0, 0,  // No Header
-                kJvcBitMark, kJvcOneSpace,
-                kJvcBitMark, kJvcZeroSpace,
-                kJvcBitMark, kJvcMinGap,
-                data, nbits, 38, true, 0,  // Repeats are handles elsewhere.
+                kJvcBitMark, kJvcOneSpace, kJvcBitMark, kJvcZeroSpace,
+                kJvcBitMark, kJvcMinGap, data, nbits, 38, true,
+                0,  // Repeats are handles elsewhere.
                 33);
     // Wait till the end of the repeat time window before we send another code.
     uint32_t elapsed = usecs.elapsed();
     // Avoid potential unsigned integer underflow.
     // e.g. when elapsed > kJvcRptLength.
-    if (elapsed < kJvcRptLength)
-      space(kJvcRptLength - elapsed);
+    if (elapsed < kJvcRptLength) space(kJvcRptLength - elapsed);
     usecs.reset();
   }
 }
@@ -111,7 +109,7 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 //   JVC repeat codes don't have a header.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
+bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits, bool strict) {
   if (strict && nbits != kJvcBits)
     return false;  // Must be called with the correct nr. of bits.
   if (results->rawlen < 2 * nbits + kFooter - 1)
@@ -130,8 +128,7 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
     m_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrMarkTicks;
     if (results->rawlen < 2 * nbits + 4)
       return false;  // Can't possibly be a valid JVC message with a header.
-    if (!matchSpace(results->rawbuf[offset], kJvcHdrSpace))
-      return false;
+    if (!matchSpace(results->rawbuf[offset], kJvcHdrSpace)) return false;
     s_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrSpaceTicks;
   } else {
     // We can't easily auto-calibrate as there is no header, so assume
@@ -141,11 +138,10 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   }
 
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kJvcBitMarkTicks * m_tick,
-                                         kJvcOneSpaceTicks * s_tick,
-                                         kJvcBitMarkTicks * m_tick,
-                                         kJvcZeroSpaceTicks * s_tick);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, kJvcBitMarkTicks * m_tick,
+                kJvcOneSpaceTicks * s_tick, kJvcBitMarkTicks * m_tick,
+                kJvcZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
@@ -162,7 +158,7 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits,  bool strict) {
   results->bits = nbits;
   results->value = data;
   // command & address are transmitted LSB first, so we need to reverse them.
-  results->address = reverseBits(data >> 8, 8);  // The first 8 bits sent.
+  results->address = reverseBits(data >> 8, 8);    // The first 8 bits sent.
   results->command = reverseBits(data & 0xFF, 8);  // The last 8 bits sent.
   results->repeat = isRepeat;
   return true;

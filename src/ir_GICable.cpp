@@ -25,7 +25,8 @@ const uint16_t kGicableOneSpace = 4400;
 const uint16_t kGicableZeroSpace = 2200;
 const uint16_t kGicableRptSpace = 2200;
 const uint32_t kGicableMinCommandLength = 99600;
-const uint32_t kGicableMinGap = kGicableMinCommandLength -
+const uint32_t kGicableMinGap =
+    kGicableMinCommandLength -
     (kGicableHdrMark + kGicableHdrSpace +
      kGicableBits * (kGicableBitMark + kGicableOneSpace) + kGicableBitMark);
 
@@ -42,18 +43,17 @@ const uint32_t kGicableMinGap = kGicableMinCommandLength -
 //
 // Ref:
 void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(kGicableHdrMark, kGicableHdrSpace,
-              kGicableBitMark, kGicableOneSpace,
-              kGicableBitMark, kGicableZeroSpace,
-              kGicableBitMark, kGicableMinGap, kGicableMinCommandLength,
-              data, nbits, 39, true, 0,  // Repeats are handled later.
+  sendGeneric(kGicableHdrMark, kGicableHdrSpace, kGicableBitMark,
+              kGicableOneSpace, kGicableBitMark, kGicableZeroSpace,
+              kGicableBitMark, kGicableMinGap, kGicableMinCommandLength, data,
+              nbits, 39, true, 0,  // Repeats are handled later.
               50);
   // Message repeat sequence.
   if (repeat)
-    sendGeneric(kGicableHdrMark, kGicableRptSpace,
-                0, 0, 0, 0,  // No actual data sent.
-                kGicableBitMark, kGicableMinGap, kGicableMinCommandLength,
-                0, 0,  // No data to be sent.
+    sendGeneric(kGicableHdrMark, kGicableRptSpace, 0, 0, 0,
+                0,  // No actual data sent.
+                kGicableBitMark, kGicableMinGap, kGicableMinCommandLength, 0,
+                0,  // No data to be sent.
                 39, true, repeat - 1, 50);
 }
 #endif  // SEND_GICABLE
@@ -84,11 +84,9 @@ bool IRrecv::decodeGICable(decode_results *results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kGicableHdrSpace)) return false;
 
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kGicableBitMark,
-                                         kGicableOneSpace,
-                                         kGicableBitMark,
-                                         kGicableZeroSpace);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, kGicableBitMark,
+                kGicableOneSpace, kGicableBitMark, kGicableZeroSpace);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;

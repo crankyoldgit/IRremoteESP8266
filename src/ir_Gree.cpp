@@ -12,8 +12,8 @@
 #ifndef ARDUINO
 #include <string>
 #endif
-#include "IRremoteESP8266.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRutils.h"
 #include "ir_Kelvinator.h"
@@ -53,24 +53,19 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
 
   for (uint16_t r = 0; r <= repeat; r++) {
     // Block #1
-    sendGeneric(kGreeHdrMark, kGreeHdrSpace,
-                kGreeBitMark, kGreeOneSpace,
-                kGreeBitMark, kGreeZeroSpace,
-                0, 0,  // No Footer.
+    sendGeneric(kGreeHdrMark, kGreeHdrSpace, kGreeBitMark, kGreeOneSpace,
+                kGreeBitMark, kGreeZeroSpace, 0, 0,  // No Footer.
                 data, 4, 38, false, 0, 50);
     // Footer #1
     sendGeneric(0, 0,  // No Header
-                kGreeBitMark, kGreeOneSpace,
-                kGreeBitMark, kGreeZeroSpace,
-                kGreeBitMark, kGreeMsgSpace,
-                0b010, 3, 38, true, 0, false);
+                kGreeBitMark, kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+                kGreeBitMark, kGreeMsgSpace, 0b010, 3, 38, true, 0, false);
 
     // Block #2
     sendGeneric(0, 0,  // No Header for Block #2
-                kGreeBitMark, kGreeOneSpace,
-                kGreeBitMark, kGreeZeroSpace,
-                kGreeBitMark, kGreeMsgSpace,
-                data + 4, nbytes - 4, 38, false, 0, 50);
+                kGreeBitMark, kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+                kGreeBitMark, kGreeMsgSpace, data + 4, nbytes - 4, 38, false, 0,
+                50);
   }
 }
 
@@ -115,14 +110,11 @@ void IRsend::sendGree(uint64_t data, uint16_t nbits, uint16_t repeat) {
 }
 #endif  // SEND_GREE
 
-IRGreeAC::IRGreeAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRGreeAC::IRGreeAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRGreeAC::stateReset() {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.
-  for (uint8_t i = 0; i < kGreeStateLength; i++)
-    remote_state[i] = 0x0;
+  for (uint8_t i = 0; i < kGreeStateLength; i++) remote_state[i] = 0x0;
   remote_state[1] = 0x09;
   remote_state[2] = 0x20;
   remote_state[3] = 0x50;
@@ -134,19 +126,17 @@ void IRGreeAC::fixup() {
   checksum();  // Calculate the checksums
 }
 
-void IRGreeAC::begin() {
-  _irsend.begin();
-}
+void IRGreeAC::begin() { _irsend.begin(); }
 
 #if SEND_GREE
 void IRGreeAC::send() {
-  fixup();   // Ensure correct settings before sending.
+  fixup();  // Ensure correct settings before sending.
   _irsend.sendGree(remote_state);
 }
 #endif  // SEND_GREE
 
 uint8_t* IRGreeAC::getRaw() {
-  fixup();   // Ensure correct settings before sending.
+  fixup();  // Ensure correct settings before sending.
   return remote_state;
 }
 
@@ -170,8 +160,8 @@ void IRGreeAC::checksum(const uint16_t length) {
 //   A boolean.
 bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
   // Top 4 bits of the last byte in the state is the state's checksum.
-  if (state[length - 1] >> 4 == IRKelvinatorAC::calcBlockChecksum(state,
-                                                                  length))
+  if (state[length - 1] >> 4 ==
+      IRKelvinatorAC::calcBlockChecksum(state, length))
     return true;
   else
     return false;
@@ -201,8 +191,8 @@ bool IRGreeAC::getPower() {
 
 // Set the temp. in deg C
 void IRGreeAC::setTemp(const uint8_t temp) {
-  uint8_t new_temp = std::max((uint8_t) kGreeMinTemp, temp);
-  new_temp = std::min((uint8_t) kGreeMaxTemp, new_temp);
+  uint8_t new_temp = std::max((uint8_t)kGreeMinTemp, temp);
+  new_temp = std::min((uint8_t)kGreeMaxTemp, new_temp);
   if (getMode() == kGreeAuto) new_temp = 25;
   remote_state[1] = (remote_state[1] & 0xF0U) | (new_temp - kGreeMinTemp);
 }
@@ -214,7 +204,7 @@ uint8_t IRGreeAC::getTemp() {
 
 // Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
 void IRGreeAC::setFan(const uint8_t speed) {
-  uint8_t fan = std::min((uint8_t) kGreeFanMax, speed);  // Bounds check
+  uint8_t fan = std::min((uint8_t)kGreeFanMax, speed);  // Bounds check
 
   if (getMode() == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
   // Set the basic fan values.
@@ -222,9 +212,7 @@ void IRGreeAC::setFan(const uint8_t speed) {
   remote_state[0] |= (fan << 4);
 }
 
-uint8_t IRGreeAC::getFan() {
-  return ((remote_state[0] & kGreeFanMask) >> 4);
-}
+uint8_t IRGreeAC::getFan() { return ((remote_state[0] & kGreeFanMask) >> 4); }
 
 void IRGreeAC::setMode(const uint8_t new_mode) {
   uint8_t mode = new_mode;
@@ -249,45 +237,35 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
   remote_state[0] |= mode;
 }
 
-uint8_t IRGreeAC::getMode() {
-  return (remote_state[0] & kGreeModeMask);
-}
+uint8_t IRGreeAC::getMode() { return (remote_state[0] & kGreeModeMask); }
 
 void IRGreeAC::setLight(const bool state) {
   remote_state[2] &= ~kGreeLightMask;
   remote_state[2] |= (state << 5);
 }
 
-bool IRGreeAC::getLight() {
-  return remote_state[2] & kGreeLightMask;
-}
+bool IRGreeAC::getLight() { return remote_state[2] & kGreeLightMask; }
 
 void IRGreeAC::setXFan(const bool state) {
   remote_state[2] &= ~kGreeXfanMask;
   remote_state[2] |= (state << 7);
 }
 
-bool IRGreeAC::getXFan() {
-  return remote_state[2] & kGreeXfanMask;
-}
+bool IRGreeAC::getXFan() { return remote_state[2] & kGreeXfanMask; }
 
 void IRGreeAC::setSleep(const bool state) {
   remote_state[0] &= ~kGreeSleepMask;
   remote_state[0] |= (state << 7);
 }
 
-bool IRGreeAC::getSleep() {
-  return remote_state[0] & kGreeSleepMask;
-}
+bool IRGreeAC::getSleep() { return remote_state[0] & kGreeSleepMask; }
 
 void IRGreeAC::setTurbo(const bool state) {
   remote_state[2] &= ~kGreeTurboMask;
   remote_state[2] |= (state << 4);
 }
 
-bool IRGreeAC::getTurbo() {
-  return remote_state[2] & kGreeTurboMask;
-}
+bool IRGreeAC::getTurbo() { return remote_state[2] & kGreeTurboMask; }
 
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
   remote_state[0] &= ~kGreeSwingAutoMask;
@@ -395,8 +373,8 @@ std::string IRGreeAC::toString() {
     result += "Auto";
   else
     result += "Manual";
-  result += ", Swing Vertical Pos: " +
-      uint64ToString(getSwingVerticalPosition());
+  result +=
+      ", Swing Vertical Pos: " + uint64ToString(getSwingVerticalPosition());
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
       result += " (Last Pos)";
@@ -419,9 +397,9 @@ std::string IRGreeAC::toString() {
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: ALPHA / Untested.
-bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * (nbits + kGreeBlockFooterBits) +
-                        (kHeader + kFooter + 1))
+bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
+  if (results->rawlen <
+      2 * (nbits + kGreeBlockFooterBits) + (kHeader + kFooter + 1))
     return false;  // Can't possibly be a valid Gree message.
   if (strict && nbits != kGreeBits)
     return false;  // Not strictly a Gree message.
@@ -438,9 +416,9 @@ bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   if (!matchMark(results->rawbuf[offset++], kGreeHdrMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kGreeHdrSpace)) return false;
   // Data Block #1 (32 bits)
-  data_result = matchData(&(results->rawbuf[offset]), 32, kGreeBitMark,
-                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
-                          kTolerance, kMarkExcess, false);
+  data_result =
+      matchData(&(results->rawbuf[offset]), 32, kGreeBitMark, kGreeOneSpace,
+                kGreeBitMark, kGreeZeroSpace, kTolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
@@ -463,9 +441,9 @@ bool IRrecv::decodeGree(decode_results *results, uint16_t nbits, bool strict) {
   if (!matchSpace(results->rawbuf[offset++], kGreeMsgSpace)) return false;
 
   // Data Block #2 (32 bits)
-  data_result = matchData(&(results->rawbuf[offset]), 32, kGreeBitMark,
-                          kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
-                          kTolerance, kMarkExcess, false);
+  data_result =
+      matchData(&(results->rawbuf[offset]), 32, kGreeBitMark, kGreeOneSpace,
+                kGreeBitMark, kGreeZeroSpace, kTolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
