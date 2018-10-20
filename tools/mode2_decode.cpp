@@ -34,17 +34,17 @@ void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
   char *end;
   errno = 0;
   intmax_t val = strtoimax(str, &end, base);
-  if (errno == ERANGE || val < 0 || val > UINT16_MAX ||
-    end == str || *end != '\0')
+  if (errno == ERANGE || val < 0 || val > UINT16_MAX || end == str ||
+      *end != '\0')
     return;
-  *res = (uint16_t) val;
+  *res = (uint16_t)val;
 }
 
-void usage_error(char * name) {
+void usage_error(char *name) {
   std::cerr << "Usage: " << name << " [-raw]" << std::endl;
 }
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
   bool dumpraw = false;
 
   // Check the invocation/calling usage.
@@ -91,22 +91,22 @@ int main(int argc, char * argv[]) {
         irrecv.decode(&irsend.capture);
 
         std::cout << "Code length " << index << std::endl
-          << "Code type      " << irsend.capture.decode_type
-          << " (" << typeToString(irsend.capture.decode_type) << ")"
-          << std::endl
-          << "Code bits      " << irsend.capture.bits << std::endl;
+                  << "Code type      " << irsend.capture.decode_type << " ("
+                  << typeToString(irsend.capture.decode_type) << ")"
+                  << std::endl
+                  << "Code bits      " << irsend.capture.bits << std::endl;
         if (hasACState(irsend.capture.decode_type)) {
           std::cout << "State value    0x";
           for (uint16_t i = 0; i < irsend.capture.bits / 8; i++)
             printf("%02X", irsend.capture.state[i]);
           std::cout << std::endl;
         } else {
-          std::cout << "Code value     0x" <<
-            std::hex << irsend.capture.value << std::endl <<
-            "Code address   0x" << std::hex << irsend.capture.address
-            << std::endl
-            << "Code command   0x" << std::hex << irsend.capture.command <<
-            std::endl;
+          std::cout << "Code value     0x" << std::hex << irsend.capture.value
+                    << std::endl
+                    << "Code address   0x" << std::hex << irsend.capture.address
+                    << std::endl
+                    << "Code command   0x" << std::hex << irsend.capture.command
+                    << std::endl;
         }
 
         if (dumpraw || irsend.capture.decode_type == UNKNOWN)
