@@ -1,5 +1,27 @@
 # Release Notes
 
+## _v2.5.2 (20181021)_
+
+**[Bug Fixes]**
+- Add missing send() method to IRPanasonicAC class. (#545)
+- Add missing sendWhirlpoolAC() to IRMQTTServer.ino (#558)
+
+**[Features]**
+- Add IR receiving support to IRMQTTServer. (#543)
+- Pioneer support (#547)
+- Add support for a second LG protocol variant. (#552)
+- Support for short Panasonic A/C messages. (#553)
+- Add support for Panasonic CKP series A/Cs. (#554)
+- Experimental timer/clock support for Panasonic A/Cs. (#546)
+- Add Made With Magic (MWM) support (#557)
+
+**[Misc]**
+- Grammar and typo fixes (#541, #549)
+- Increase Panasonic A/C message tolerances. (#542)
+- Added command mode2_decode in tools/ (#557)
+- General code style cleanup (#560)
+
+
 ## _v2.5.1 (20181002)_
 
 **[Bug Fixes]**
