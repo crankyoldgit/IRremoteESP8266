@@ -1,8 +1,8 @@
 // Copyright 2017-2018 David Conran
 
+#include "ir_Coolix.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_Coolix.h"
 #include "gtest/gtest.h"
 
 // Tests for sendCOOLIX().
@@ -22,7 +22,8 @@ TEST(TestSendCoolix, SendDataOnly) {
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendCOOLIX(0xAA55AA);
@@ -34,7 +35,8 @@ TEST(TestSendCoolix, SendDataOnly) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendCOOLIX(0xFFFFFF);
@@ -46,7 +48,8 @@ TEST(TestSendCoolix, SendDataOnly) {
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -72,7 +75,8 @@ TEST(TestSendCoolix, SendWithRepeats) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
   irsend.sendCOOLIX(0xAA55AA, kCoolixBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m4480s4480"
@@ -98,7 +102,8 @@ TEST(TestSendCoolix, SendWithRepeats) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -112,7 +117,8 @@ TEST(TestSendCoolix, SendUnusualSize) {
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendCOOLIX(0x1234567890ABCDEF, 64);
@@ -134,12 +140,13 @@ TEST(TestSendCoolix, SendUnusualSize) {
       "m560s560m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
       "m560s1680m560s1680m560s1680m560s560m560s1680m560s1680m560s1680m560s1680"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s560m560s560"
-      "m560s5040", irsend.outputStr());
+      "m560s5040",
+      irsend.outputStr());
 
   // Bit sizes must be a multiple of 8.
   irsend.reset();
   irsend.sendCOOLIX(0x0, 17);
-  EXPECT_EQ("" , irsend.outputStr());
+  EXPECT_EQ("", irsend.outputStr());
 }
 
 // Tests for decodeCOOLIX().
@@ -280,9 +287,10 @@ TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
@@ -402,17 +410,19 @@ TEST(TestCoolixACClass, HumanReadable) {
   IRCoolixAC ircoolix(0);
 
   // Initial starting point.
-  EXPECT_EQ("Power: On, Fan: 5 (AUTO), Mode: 2 (AUTO), Temp: 25C, "
-            "Zone Follow: Off, Sensor Temp: Ignored",
-            ircoolix.toString());
+  EXPECT_EQ(
+      "Power: On, Fan: 5 (AUTO), Mode: 2 (AUTO), Temp: 25C, "
+      "Zone Follow: Off, Sensor Temp: Ignored",
+      ircoolix.toString());
 
   ircoolix.setSensorTemp(24);
   ircoolix.setTemp(22);
   ircoolix.setMode(kCoolixCool);
   ircoolix.setFan(kCoolixFanMin);
-  EXPECT_EQ("Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 22C, "
-            "Zone Follow: On, Sensor Temp: 24C",
-            ircoolix.toString());
+  EXPECT_EQ(
+      "Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 22C, "
+      "Zone Follow: On, Sensor Temp: 24C",
+      ircoolix.toString());
   ircoolix.setSwing();
   EXPECT_EQ("Power: On, Fan: 3 (UNKNOWN), Swing: Toggle", ircoolix.toString());
   ircoolix.setPower(false);
@@ -423,9 +433,13 @@ TEST(TestCoolixACClass, KnownExamples) {
   IRCoolixAC ircoolix(0);
 
   ircoolix.setRaw(0b101100101011111111100100);
-  EXPECT_EQ("Power: On, Fan: 5 (AUTO), Mode: 4 (FAN), Zone Follow: Off, "
-            "Sensor Temp: Ignored", ircoolix.toString());
+  EXPECT_EQ(
+      "Power: On, Fan: 5 (AUTO), Mode: 4 (FAN), Zone Follow: Off, "
+      "Sensor Temp: Ignored",
+      ircoolix.toString());
   ircoolix.setRaw(0b101100101001111100000000);
-  EXPECT_EQ("Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 17C, "
-            "Zone Follow: Off, Sensor Temp: Ignored", ircoolix.toString());
+  EXPECT_EQ(
+      "Power: On, Fan: 4 (MIN), Mode: 0 (COOL), Temp: 17C, "
+      "Zone Follow: Off, Sensor Temp: Ignored",
+      ircoolix.toString());
 }

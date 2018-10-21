@@ -88,61 +88,50 @@ void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
 
   for (uint16_t r = 0; r <= repeat; r++) {
     // Command Block #1 (4 bytes)
-    sendGeneric(kKelvinatorHdrMark, kKelvinatorHdrSpace,
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
+    sendGeneric(kKelvinatorHdrMark, kKelvinatorHdrSpace, kKelvinatorBitMark,
+                kKelvinatorOneSpace, kKelvinatorBitMark, kKelvinatorZeroSpace,
                 0, 0,  // No Footer yet.
                 data, 4, 38, false, 0, 50);
     // Send Footer for the command block (3 bits (b010))
     sendGeneric(0, 0,  // No Header
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
-                kKelvinatorBitMark, kKelvinatorGapSpace,
-                kKelvinatorCmdFooter, kKelvinatorCmdFooterBits,
-                38, false, 0, 50);
+                kKelvinatorBitMark, kKelvinatorOneSpace, kKelvinatorBitMark,
+                kKelvinatorZeroSpace, kKelvinatorBitMark, kKelvinatorGapSpace,
+                kKelvinatorCmdFooter, kKelvinatorCmdFooterBits, 38, false, 0,
+                50);
     // Data Block #1 (4 bytes)
     sendGeneric(0, 0,  // No header
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
-                kKelvinatorBitMark, kKelvinatorGapSpace * 2,
-                data + 4, 4, 38, false, 0, 50);
+                kKelvinatorBitMark, kKelvinatorOneSpace, kKelvinatorBitMark,
+                kKelvinatorZeroSpace, kKelvinatorBitMark,
+                kKelvinatorGapSpace * 2, data + 4, 4, 38, false, 0, 50);
     // Command Block #2 (4 bytes)
-    sendGeneric(kKelvinatorHdrMark, kKelvinatorHdrSpace,
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
+    sendGeneric(kKelvinatorHdrMark, kKelvinatorHdrSpace, kKelvinatorBitMark,
+                kKelvinatorOneSpace, kKelvinatorBitMark, kKelvinatorZeroSpace,
                 0, 0,  // No Footer yet.
                 data + 8, 4, 38, false, 0, 50);
     // Send Footer for the command block (3 bits (B010))
     sendGeneric(0, 0,  // No Header
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
-                kKelvinatorBitMark, kKelvinatorGapSpace,
-                kKelvinatorCmdFooter, kKelvinatorCmdFooterBits,
-                38, false, 0, 50);
+                kKelvinatorBitMark, kKelvinatorOneSpace, kKelvinatorBitMark,
+                kKelvinatorZeroSpace, kKelvinatorBitMark, kKelvinatorGapSpace,
+                kKelvinatorCmdFooter, kKelvinatorCmdFooterBits, 38, false, 0,
+                50);
     // Data Block #2 (4 bytes)
     sendGeneric(0, 0,  // No header
-                kKelvinatorBitMark, kKelvinatorOneSpace,
-                kKelvinatorBitMark, kKelvinatorZeroSpace,
-                kKelvinatorBitMark, kKelvinatorGapSpace * 2,
-                data + 12, 4, 38, false, 0, 50);
+                kKelvinatorBitMark, kKelvinatorOneSpace, kKelvinatorBitMark,
+                kKelvinatorZeroSpace, kKelvinatorBitMark,
+                kKelvinatorGapSpace * 2, data + 12, 4, 38, false, 0, 50);
   }
 }
 #endif  // SEND_KELVINATOR
 
-IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRKelvinatorAC::stateReset() {
-  for (uint8_t i = 0; i < kKelvinatorStateLength; i++)
-    remote_state[i] = 0x0;
+  for (uint8_t i = 0; i < kKelvinatorStateLength; i++) remote_state[i] = 0x0;
   remote_state[3] = 0x50;
   remote_state[11] = 0x70;
 }
 
-void IRKelvinatorAC::begin() {
-  _irsend.begin();
-}
+void IRKelvinatorAC::begin() { _irsend.begin(); }
 
 void IRKelvinatorAC::fixup() {
   // X-Fan mode is only valid in COOL or DRY modes.
@@ -153,13 +142,13 @@ void IRKelvinatorAC::fixup() {
 
 #if SEND_KELVINATOR
 void IRKelvinatorAC::send() {
-  fixup();   // Ensure correct settings before sending.
+  fixup();  // Ensure correct settings before sending.
   _irsend.sendKelvinator(remote_state);
 }
 #endif  // SEND_KELVINATOR
 
-uint8_t* IRKelvinatorAC::getRaw() {
-  fixup();   // Ensure correct settings before sending.
+uint8_t *IRKelvinatorAC::getRaw() {
+  fixup();  // Ensure correct settings before sending.
   return remote_state;
 }
 
@@ -175,9 +164,8 @@ uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
   // Sum the lower half of the first 4 bytes of this block.
   for (uint8_t i = 0; i < 4 && i < length - 1; i++, block++)
     sum += (*block & 0x0FU);
-    // then sum the upper half of the next 3 bytes.
-  for (uint8_t i = 4; i < length - 1; i++, block++)
-    sum += (*block >> 4);
+  // then sum the upper half of the next 3 bytes.
+  for (uint8_t i = 4; i < length - 1; i++, block++) sum += (*block >> 4);
   // Trim it down to fit into the 4 bits allowed. i.e. Mod 16.
   return sum & 0x0FU;
 }
@@ -250,11 +238,11 @@ void IRKelvinatorAC::setFan(uint8_t fan) {
     // Set the basic fan values.
     uint8_t fan_basic = std::min(kKelvinatorBasicFanMax, fan);
     remote_state[0] = (remote_state[0] & kKelvinatorBasicFanMask) |
-        (fan_basic << kKelvinatorFanOffset);
+                      (fan_basic << kKelvinatorFanOffset);
     remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
     // Set the advanced(?) fan value.
-    remote_state[14] = (remote_state[14] & kKelvinatorFanMask) |
-        (fan << kKelvinatorFanOffset);
+    remote_state[14] =
+        (remote_state[14] & kKelvinatorFanMask) | (fan << kKelvinatorFanOffset);
     setTurbo(false);  // Turbo mode is turned off if we change the fan settings.
   }
 }
@@ -284,8 +272,7 @@ void IRKelvinatorAC::setSwingVertical(bool state) {
     remote_state[4] |= kKelvinatorVentSwingV;
   } else {
     remote_state[4] &= ~kKelvinatorVentSwingV;
-    if (!getSwingHorizontal())
-      remote_state[0] &= ~kKelvinatorVentSwing;
+    if (!getSwingHorizontal()) remote_state[0] &= ~kKelvinatorVentSwing;
   }
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
@@ -300,8 +287,7 @@ void IRKelvinatorAC::setSwingHorizontal(bool state) {
     remote_state[4] |= kKelvinatorVentSwingH;
   } else {
     remote_state[4] &= ~kKelvinatorVentSwingH;
-    if (!getSwingVertical())
-      remote_state[0] &= ~kKelvinatorVentSwing;
+    if (!getSwingVertical()) remote_state[0] &= ~kKelvinatorVentSwing;
   }
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
@@ -455,8 +441,8 @@ std::string IRKelvinatorAC::toString() {
 // Status: ALPHA / Untested.
 bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < 2 * (nbits + kKelvinatorCmdFooterBits) +
-                        (kHeader + kFooter + 1) * 2 - 1)
+  if (results->rawlen <
+      2 * (nbits + kKelvinatorCmdFooterBits) + (kHeader + kFooter + 1) * 2 - 1)
     return false;  // Can't possibly be a valid Kelvinator message.
   if (strict && nbits != kKelvinatorBits)
     return false;  // Not strictly a Kelvinator message.
@@ -473,21 +459,19 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
     // Header
     if (!matchMark(results->rawbuf[offset], kKelvinatorHdrMark)) return false;
     // Calculate how long the lowest tick time is based on the header mark.
-    uint32_t mark_tick = results->rawbuf[offset++] * kRawTick /
-        kKelvinatorHdrMarkTicks;
-    if (!matchSpace(results->rawbuf[offset], kKelvinatorHdrSpace))
-      return false;
+    uint32_t mark_tick =
+        results->rawbuf[offset++] * kRawTick / kKelvinatorHdrMarkTicks;
+    if (!matchSpace(results->rawbuf[offset], kKelvinatorHdrSpace)) return false;
     // Calculate how long the common tick time is based on the header space.
-    uint32_t space_tick = results->rawbuf[offset++] * kRawTick /
-        kKelvinatorHdrSpaceTicks;
+    uint32_t space_tick =
+        results->rawbuf[offset++] * kRawTick / kKelvinatorHdrSpaceTicks;
 
     // Data (Command) (32 bits)
-    data_result = matchData(&(results->rawbuf[offset]), 32,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorOneSpaceTicks * space_tick,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick,
-                            kTolerance, kMarkExcess, false);
+    data_result = matchData(
+        &(results->rawbuf[offset]), 32, kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorOneSpaceTicks * space_tick,
+        kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorZeroSpaceTicks * space_tick, kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;
@@ -498,13 +482,12 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
     state_pos += 4;
 
     // Command data footer (3 bits, B010)
-    data_result = matchData(&(results->rawbuf[offset]),
-                            kKelvinatorCmdFooterBits,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorOneSpaceTicks * space_tick,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick,
-                            kTolerance, kMarkExcess, false);
+    data_result = matchData(
+        &(results->rawbuf[offset]), kKelvinatorCmdFooterBits,
+        kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorOneSpaceTicks * space_tick,
+        kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorZeroSpaceTicks * space_tick, kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     if (data_result.data != kKelvinatorCmdFooter) return false;
     offset += data_result.used;
@@ -518,12 +501,11 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
       return false;
 
     // Data (Options) (32 bits)
-    data_result = matchData(&(results->rawbuf[offset]), 32,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorOneSpaceTicks * space_tick,
-                            kKelvinatorBitMarkTicks * mark_tick,
-                            kKelvinatorZeroSpaceTicks * space_tick,
-                            kTolerance, kMarkExcess, false);
+    data_result = matchData(
+        &(results->rawbuf[offset]), 32, kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorOneSpaceTicks * space_tick,
+        kKelvinatorBitMarkTicks * mark_tick,
+        kKelvinatorZeroSpaceTicks * space_tick, kTolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;

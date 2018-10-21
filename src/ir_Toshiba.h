@@ -32,15 +32,15 @@ const uint8_t kToshibaAcMinTemp = 17;  // 17C
 const uint8_t kToshibaAcMaxTemp = 30;  // 30C
 
 // Legacy defines. (Deperecated)
-#define TOSHIBA_AC_AUTO              kToshibaAcAuto
-#define TOSHIBA_AC_COOL              kToshibaAcCool
-#define TOSHIBA_AC_DRY               kToshibaAcDry
-#define TOSHIBA_AC_HEAT              kToshibaAcHeat
-#define TOSHIBA_AC_POWER             kToshibaAcPower
-#define TOSHIBA_AC_FAN_AUTO          kToshibaAcFanAuto
-#define TOSHIBA_AC_FAN_MAX           kToshibaAcFanMax
-#define TOSHIBA_AC_MIN_TEMP          kToshibaAcMinTemp
-#define TOSHIBA_AC_MAX_TEMP          kToshibaAcMaxTemp
+#define TOSHIBA_AC_AUTO kToshibaAcAuto
+#define TOSHIBA_AC_COOL kToshibaAcCool
+#define TOSHIBA_AC_DRY kToshibaAcDry
+#define TOSHIBA_AC_HEAT kToshibaAcHeat
+#define TOSHIBA_AC_POWER kToshibaAcPower
+#define TOSHIBA_AC_FAN_AUTO kToshibaAcFanAuto
+#define TOSHIBA_AC_FAN_MAX kToshibaAcFanMax
+#define TOSHIBA_AC_MIN_TEMP kToshibaAcMinTemp
+#define TOSHIBA_AC_MAX_TEMP kToshibaAcMaxTemp
 
 class IRToshibaAC {
  public:

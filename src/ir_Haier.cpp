@@ -49,18 +49,16 @@ const uint32_t kHaierAcMinGap = 150000;  // Completely made up value.
 //
 void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
-  if (nbytes < kHaierACStateLength)
-    return;
+  if (nbytes < kHaierACStateLength) return;
 
   for (uint16_t r = 0; r <= repeat; r++) {
     enableIROut(38000);
     mark(kHaierAcHdr);
     space(kHaierAcHdr);
-    sendGeneric(kHaierAcHdr, kHaierAcHdrGap,
-                kHaierAcBitMark, kHaierAcOneSpace,
-                kHaierAcBitMark, kHaierAcZeroSpace,
-                kHaierAcBitMark, kHaierAcMinGap,
-                data, nbytes, 38, true, 0,  // Repeats handled elsewhere
+    sendGeneric(kHaierAcHdr, kHaierAcHdrGap, kHaierAcBitMark, kHaierAcOneSpace,
+                kHaierAcBitMark, kHaierAcZeroSpace, kHaierAcBitMark,
+                kHaierAcMinGap, data, nbytes, 38, true,
+                0,  // Repeats handled elsewhere
                 50);
   }
 }
@@ -77,20 +75,15 @@ void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
 // Status: Alpha / Untested on a real device.
 //
 void IRsend::sendHaierACYRW02(unsigned char data[], uint16_t nbytes,
-                         uint16_t repeat) {
-  if (nbytes >= kHaierACYRW02StateLength)
-    sendHaierAC(data, nbytes, repeat);
+                              uint16_t repeat) {
+  if (nbytes >= kHaierACYRW02StateLength) sendHaierAC(data, nbytes, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
 
 // Class for emulating a Haier HSU07-HEA03 remote
-IRHaierAC::IRHaierAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRHaierAC::IRHaierAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRHaierAC::begin() {
-  _irsend.begin();
-}
+void IRHaierAC::begin() { _irsend.begin(); }
 
 #if SEND_HAIER_AC
 void IRHaierAC::send() {
@@ -104,13 +97,12 @@ void IRHaierAC::checksum() {
 }
 
 bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
-  if (length < 2)  return false;  // 1 byte of data can't have a checksum.
+  if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] == sumBytes(state, length - 1));
 }
 
 void IRHaierAC::stateReset() {
-  for (uint8_t i = 1; i < kHaierACStateLength; i++)
-    remote_state[i] = 0x0;
+  for (uint8_t i = 1; i < kHaierACStateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = kHaierAcPrefix;
   remote_state[2] = 0b00100000;
 
@@ -149,9 +141,7 @@ void IRHaierAC::setCommand(uint8_t state) {
   }
 }
 
-uint8_t IRHaierAC::getCommand() {
-  return remote_state[1] & (0b00001111);
-}
+uint8_t IRHaierAC::getCommand() { return remote_state[1] & (0b00001111); }
 
 void IRHaierAC::setFan(uint8_t speed) {
   uint8_t new_speed = kHaierAcFanAuto;
@@ -169,7 +159,7 @@ void IRHaierAC::setFan(uint8_t speed) {
       new_speed = kHaierAcFanAuto;  // Default to auto for anything else.
   }
 
-  if (speed != getFan())  setCommand(kHaierAcCmdFan);
+  if (speed != getFan()) setCommand(kHaierAcCmdFan);
   remote_state[5] &= 0b11111100;
   remote_state[5] |= new_speed;
 }
@@ -196,10 +186,7 @@ void IRHaierAC::setMode(uint8_t mode) {
   remote_state[7] |= (new_mode << 5);
 }
 
-uint8_t IRHaierAC::getMode() {
-  return (remote_state[7] & 0b11100000) >> 5;
-}
-
+uint8_t IRHaierAC::getMode() { return (remote_state[7] & 0b11100000) >> 5; }
 
 void IRHaierAC::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
@@ -209,7 +196,7 @@ void IRHaierAC::setTemp(const uint8_t celsius) {
     temp = kHaierAcMaxTemp;
 
   uint8_t old_temp = getTemp();
-  if (old_temp == temp)  return;
+  if (old_temp == temp) return;
   if (old_temp > temp)
     setCommand(kHaierAcCmdTempDown);
   else
@@ -229,9 +216,7 @@ void IRHaierAC::setHealth(bool state) {
   remote_state[4] |= (state << 5);
 }
 
-bool IRHaierAC::getHealth(void) {
-  return remote_state[4] & (1 << 5);
-}
+bool IRHaierAC::getHealth(void) { return remote_state[4] & (1 << 5); }
 
 void IRHaierAC::setSleep(bool state) {
   setCommand(kHaierAcCmdSleep);
@@ -239,9 +224,7 @@ void IRHaierAC::setSleep(bool state) {
   remote_state[7] |= (state << 6);
 }
 
-bool IRHaierAC::getSleep(void) {
-  return remote_state[7] & 0b01000000;
-}
+bool IRHaierAC::getSleep(void) { return remote_state[7] & 0b01000000; }
 
 uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
   return (ptr[0] & 0b00011111) * 60 + (ptr[1] & 0b00111111);
@@ -261,16 +244,13 @@ int16_t IRHaierAC::getOffTimer() {
     return -1;
 }
 
-uint16_t IRHaierAC::getCurrTime() {
-  return getTime(remote_state + 2);
-}
+uint16_t IRHaierAC::getCurrTime() { return getTime(remote_state + 2); }
 
 void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   uint16_t mins = nr_mins;
-  if (nr_mins > kHaierAcMaxTime)
-    mins = kHaierAcMaxTime;
+  if (nr_mins > kHaierAcMaxTime) mins = kHaierAcMaxTime;
 
-    // Hours
+  // Hours
   ptr[0] &= 0b11100000;
   ptr[0] |= (mins / 60);
   // Minutes
@@ -299,12 +279,10 @@ void IRHaierAC::setCurrTime(const uint16_t nr_mins) {
   setTime(remote_state + 2, nr_mins);
 }
 
-uint8_t IRHaierAC::getSwing() {
-  return (remote_state[2] & 0b11000000) >> 6;
-}
+uint8_t IRHaierAC::getSwing() { return (remote_state[2] & 0b11000000) >> 6; }
 
 void IRHaierAC::setSwing(const uint8_t state) {
-  if (state == getSwing())  return;  // Nothing to do.
+  if (state == getSwing()) return;  // Nothing to do.
   setCommand(kHaierAcCmdSwing);
   switch (state) {
     case kHaierAcSwingOff:
@@ -326,10 +304,10 @@ std::string IRHaierAC::timeToString(const uint16_t nr_mins) {
   std::string result = "";
 #endif  // ARDUINO
 
-  if (nr_mins / 24 < 10)  result += "0";  // Zero pad.
+  if (nr_mins / 24 < 10) result += "0";  // Zero pad.
   result += uint64ToString(nr_mins / 60);
   result += ":";
-  if (nr_mins % 60 < 10)  result += "0";  // Zero pad.
+  if (nr_mins % 60 < 10) result += "0";  // Zero pad.
   result += uint64ToString(nr_mins % 60);
   return result;
 }
@@ -343,7 +321,7 @@ std::string IRHaierAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
   uint8_t cmd = getCommand();
-  result += "Command: " + uint64ToString(cmd) +" (";
+  result += "Command: " + uint64ToString(cmd) + " (";
   switch (cmd) {
     case kHaierAcCmdOff:
       result += "Off";
@@ -457,13 +435,9 @@ std::string IRHaierAC::toString() {
 // End of IRHaierAC class.
 
 // Class for emulating a Haier YRW02 remote
-IRHaierACYRW02::IRHaierACYRW02(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRHaierACYRW02::IRHaierACYRW02(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRHaierACYRW02::begin() {
-  _irsend.begin();
-}
+void IRHaierACYRW02::begin() { _irsend.begin(); }
 
 #if SEND_HAIER_AC_YRW02
 void IRHaierACYRW02::send() {
@@ -473,18 +447,17 @@ void IRHaierACYRW02::send() {
 #endif  // SEND_HAIER_AC_YRW02
 
 void IRHaierACYRW02::checksum() {
-  remote_state[kHaierACYRW02StateLength - 1] = sumBytes(
-      remote_state, kHaierACYRW02StateLength - 1);
+  remote_state[kHaierACYRW02StateLength - 1] =
+      sumBytes(remote_state, kHaierACYRW02StateLength - 1);
 }
 
 bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
-  if (length < 2)  return false;  // 1 byte of data can't have a checksum.
+  if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] == sumBytes(state, length - 1));
 }
 
 void IRHaierACYRW02::stateReset() {
-  for (uint8_t i = 1; i < kHaierACYRW02StateLength; i++)
-    remote_state[i] = 0x0;
+  for (uint8_t i = 1; i < kHaierACYRW02StateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = kHaierAcYrw02Prefix;
 
   setTemp(kHaierAcDefTemp);
@@ -524,9 +497,7 @@ void IRHaierACYRW02::setButton(uint8_t button) {
   }
 }
 
-uint8_t IRHaierACYRW02::getButton() {
-  return remote_state[12] & (0b00001111);
-}
+uint8_t IRHaierACYRW02::getButton() { return remote_state[12] & (0b00001111); }
 
 void IRHaierACYRW02::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
@@ -545,9 +516,7 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
   remote_state[7] |= (new_mode << 4);
 }
 
-uint8_t IRHaierACYRW02::getMode() {
-  return remote_state[7] >> 4;
-}
+uint8_t IRHaierACYRW02::getMode() { return remote_state[7] >> 4; }
 
 void IRHaierACYRW02::setTemp(const uint8_t celcius) {
   uint8_t temp = celcius;
@@ -557,7 +526,7 @@ void IRHaierACYRW02::setTemp(const uint8_t celcius) {
     temp = kHaierAcMaxTemp;
 
   uint8_t old_temp = getTemp();
-  if (old_temp == temp)  return;
+  if (old_temp == temp) return;
   if (old_temp > temp)
     setButton(kHaierAcYrw02ButtonTempDown);
   else
@@ -577,13 +546,9 @@ void IRHaierACYRW02::setHealth(bool state) {
   remote_state[3] |= (state << 1);
 }
 
-bool IRHaierACYRW02::getHealth(void) {
-  return remote_state[3] & 0b00000010;
-}
+bool IRHaierACYRW02::getHealth(void) { return remote_state[3] & 0b00000010; }
 
-bool IRHaierACYRW02::getPower() {
-  return remote_state[4] & kHaierAcYrw02Power;
-}
+bool IRHaierACYRW02::getPower() { return remote_state[4] & kHaierAcYrw02Power; }
 
 void IRHaierACYRW02::setPower(bool state) {
   setButton(kHaierAcYrw02ButtonPower);
@@ -593,17 +558,11 @@ void IRHaierACYRW02::setPower(bool state) {
     remote_state[4] &= ~kHaierAcYrw02Power;
 }
 
-void IRHaierACYRW02::on() {
-  setPower(true);
-}
+void IRHaierACYRW02::on() { setPower(true); }
 
-void IRHaierACYRW02::off() {
-  setPower(false);
-}
+void IRHaierACYRW02::off() { setPower(false); }
 
-bool IRHaierACYRW02::getSleep() {
-  return remote_state[8] & kHaierAcYrw02Sleep;
-}
+bool IRHaierACYRW02::getSleep() { return remote_state[8] & kHaierAcYrw02Sleep; }
 
 void IRHaierACYRW02::setSleep(bool state) {
   setButton(kHaierAcYrw02ButtonSleep);
@@ -613,9 +572,7 @@ void IRHaierACYRW02::setSleep(bool state) {
     remote_state[8] &= ~kHaierAcYrw02Sleep;
 }
 
-uint8_t IRHaierACYRW02::getTurbo() {
-  return remote_state[6] >> 6;
-}
+uint8_t IRHaierACYRW02::getTurbo() { return remote_state[6] >> 6; }
 
 void IRHaierACYRW02::setTurbo(uint8_t speed) {
   switch (speed) {
@@ -628,9 +585,7 @@ void IRHaierACYRW02::setTurbo(uint8_t speed) {
   }
 }
 
-uint8_t IRHaierACYRW02::getFan() {
-  return remote_state[5] >> 4;
-}
+uint8_t IRHaierACYRW02::getFan() { return remote_state[5] >> 4; }
 
 void IRHaierACYRW02::setFan(uint8_t speed) {
   switch (speed) {
@@ -644,9 +599,7 @@ void IRHaierACYRW02::setFan(uint8_t speed) {
   }
 }
 
-uint8_t IRHaierACYRW02::getSwing() {
-  return remote_state[1] & 0b00001111;
-}
+uint8_t IRHaierACYRW02::getSwing() { return remote_state[1] & 0b00001111; }
 
 void IRHaierACYRW02::setSwing(uint8_t state) {
   uint8_t newstate = state;
@@ -664,13 +617,11 @@ void IRHaierACYRW02::setSwing(uint8_t state) {
   }
 
   // Heat mode has no MIDDLE setting, use BOTTOM instead.
-  if (state == kHaierAcYrw02SwingMiddle &&
-      getMode() == kHaierAcYrw02Heat)
+  if (state == kHaierAcYrw02SwingMiddle && getMode() == kHaierAcYrw02Heat)
     newstate = kHaierAcYrw02SwingBottom;
 
   // BOTTOM is only allowed if we are in Heat mode, otherwise MIDDLE.
-  if (state == kHaierAcYrw02SwingBottom &&
-      getMode() != kHaierAcYrw02Heat)
+  if (state == kHaierAcYrw02SwingBottom && getMode() != kHaierAcYrw02Heat)
     newstate = kHaierAcYrw02SwingMiddle;
 
   remote_state[1] &= 0b11110000;
@@ -691,7 +642,7 @@ std::string IRHaierACYRW02::toString() {
   else
     result += "Off";
   uint8_t cmd = getButton();
-  result += ", Button: " + uint64ToString(cmd) +" (";
+  result += ", Button: " + uint64ToString(cmd) + " (";
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
       result += "Power";
@@ -816,7 +767,6 @@ std::string IRHaierACYRW02::toString() {
 }
 // End of IRHaierACYRW02 class.
 
-
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 // Decode the supplied Haier HSU07-HEA03 remote message.
 //
@@ -829,7 +779,7 @@ std::string IRHaierACYRW02::toString() {
 //
 // Status: BETA / Appears to be working.
 //
-bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
+bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
                            bool strict) {
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
     return false;
@@ -844,7 +794,6 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 
   uint16_t offset = kStartOffset;
 
-
   // Header
   if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
   if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
@@ -853,26 +802,24 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 
   // Data
   for (uint16_t i = 0; i < nbits / 8; i++) {
-    match_result_t data_result = matchData(&(results->rawbuf[offset]), 8,
-                                           kHaierAcBitMark,
-                                           kHaierAcOneSpace,
-                                           kHaierAcBitMark,
-                                           kHaierAcZeroSpace);
+    match_result_t data_result =
+        matchData(&(results->rawbuf[offset]), 8, kHaierAcBitMark,
+                  kHaierAcOneSpace, kHaierAcBitMark, kHaierAcZeroSpace);
     if (data_result.success == false) return false;
     offset += data_result.used;
-    results->state[i] = (uint8_t) data_result.data;
+    results->state[i] = (uint8_t)data_result.data;
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kHaierAcBitMark))  return false;
+  if (!matchMark(results->rawbuf[offset++], kHaierAcBitMark)) return false;
   if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset++], kHaierAcMinGap))
     return false;
 
   // Compliance
   if (strict) {
-    if (results->state[0] != kHaierAcPrefix)  return false;
-    if (!IRHaierAC::validChecksum(results->state, nbits / 8))  return false;
+    if (results->state[0] != kHaierAcPrefix) return false;
+    if (!IRHaierAC::validChecksum(results->state, nbits / 8)) return false;
   }
 
   // Success
@@ -894,7 +841,7 @@ bool IRrecv::decodeHaierAC(decode_results *results, uint16_t nbits,
 //
 // Status: BETA / Appears to be working.
 //
-bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
+bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t nbits,
                                 bool strict) {
   if (strict) {
     if (nbits != kHaierACYRW02Bits)
@@ -902,14 +849,12 @@ bool IRrecv::decodeHaierACYRW02(decode_results *results, uint16_t nbits,
   }
 
   // The protocol is almost exactly the same as HAIER_AC
-  if (!decodeHaierAC(results, nbits, false))
-    return false;
+  if (!decodeHaierAC(results, nbits, false)) return false;
 
   // Compliance
   if (strict) {
-    if (results->state[0] != kHaierAcYrw02Prefix)  return false;
-    if (!IRHaierACYRW02::validChecksum(results->state, nbits / 8))
-      return false;
+    if (results->state[0] != kHaierAcYrw02Prefix) return false;
+    if (!IRHaierACYRW02::validChecksum(results->state, nbits / 8)) return false;
   }
 
   // Success

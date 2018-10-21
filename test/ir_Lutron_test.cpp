@@ -11,20 +11,20 @@ TEST(TestSendLutron, SendDataOnly) {
   IRsendTest irsend(0);
   irsend.begin();
   irsend.sendLutron(0);
-  EXPECT_EQ(
-      "m2288s230080", irsend.outputStr());
+  EXPECT_EQ("m2288s230080", irsend.outputStr());
   irsend.sendLutron(0xAAAAAAAAA);  // Longest possible sequence. (I think)
   EXPECT_EQ(
       "m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288"
       "m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288m2288s2288"
-      "m2288s2288m2288s2288m2288s2288m2288s152288", irsend.outputStr());
+      "m2288s2288m2288s2288m2288s2288m2288s152288",
+      irsend.outputStr());
   irsend.sendLutron(0x7FFFFFFFF);
-  EXPECT_EQ(
-      "m82368s150000", irsend.outputStr());
+  EXPECT_EQ("m82368s150000", irsend.outputStr());
   irsend.sendLutron(0x7F88BD120);
   EXPECT_EQ(
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
-      "s161440", irsend.outputStr());
+      "s161440",
+      irsend.outputStr());
 }
 
 // Test sending with repeats.
@@ -35,14 +35,16 @@ TEST(TestSendLutron, SendWithRepeats) {
   irsend.sendLutron(0x7F88BD120, kLutronBits, 0);
   EXPECT_EQ(
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
-      "s161440", irsend.outputStr());
+      "s161440",
+      irsend.outputStr());
   // Send a command with 1 repeat.
   irsend.sendLutron(0x7F88BD120, kLutronBits, 1);
   EXPECT_EQ(
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
       "s161440"
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
-      "s161440", irsend.outputStr());
+      "s161440",
+      irsend.outputStr());
   // Send a command with 3 repeats.
   irsend.sendLutron(0x7F88BD120, kLutronBits, 3);
   EXPECT_EQ(
@@ -53,7 +55,8 @@ TEST(TestSendLutron, SendWithRepeats) {
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
       "s161440"
       "m20592s6864m2288s6864m2288s2288m9152s2288m2288s6864m2288s4576m2288"
-      "s161440", irsend.outputStr());
+      "s161440",
+      irsend.outputStr());
 }
 
 // Tests for decodeLutron().
@@ -105,7 +108,6 @@ TEST(TestDecodeLutron, SyntheticDecode) {
   EXPECT_EQ(0x0, irsend.capture.command);
 }
 
-
 // Decode a documented example
 TEST(TestDecodeLutron, DocumentedExampleFullOff) {
   IRsendTest irsend(0);
@@ -114,9 +116,8 @@ TEST(TestDecodeLutron, DocumentedExampleFullOff) {
 
   // Full Off code.
   // Ref: https://github.com/markszabo/IRremoteESP8266/issues/515
-  uint16_t rawData[14] = {
-      20518, 6839, 2280, 6839, 2280, 2280, 9119, 2280, 2280, 6839, 2280, 4560,
-      2280, 11399};
+  uint16_t rawData[14] = {20518, 6839, 2280, 6839, 2280, 2280, 9119,
+                          2280,  2280, 6839, 2280, 4560, 2280, 11399};
   irsend.reset();
   irsend.sendRaw(rawData, 14, 40);
   irsend.makeDecodeResult();
@@ -127,9 +128,9 @@ TEST(TestDecodeLutron, DocumentedExampleFullOff) {
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 
-  uint16_t pronto[18] = {
-      0x0000, 0x0069, 0x0007, 0x0000, 0x032a, 0x010e, 0x005a, 0x010e, 0x005a,
-      0x005a, 0x0168, 0x005a, 0x005a, 0x010e, 0x005a, 0x00b4, 0x005a, 0x01c2};
+  uint16_t pronto[18] = {0x0000, 0x0069, 0x0007, 0x0000, 0x032a, 0x010e,
+                         0x005a, 0x010e, 0x005a, 0x005a, 0x0168, 0x005a,
+                         0x005a, 0x010e, 0x005a, 0x00b4, 0x005a, 0x01c2};
   irsend.reset();
   irsend.sendPronto(pronto, 18);
   irsend.makeDecodeResult();

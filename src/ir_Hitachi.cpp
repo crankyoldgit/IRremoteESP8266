@@ -9,8 +9,8 @@
 #ifndef ARDUINO
 #include <string>
 #endif
-#include "IRremoteESP8266.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRutils.h"
 
@@ -47,11 +47,10 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
   if (nbytes < kHitachiAcStateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace,
-              kHitachiAcBitMark, kHitachiAcOneSpace,
-              kHitachiAcBitMark, kHitachiAcZeroSpace,
-              kHitachiAcBitMark, kHitachiAcMinGap,
-              data, nbytes, 38, true, repeat, 50);
+  sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace, kHitachiAcBitMark,
+              kHitachiAcOneSpace, kHitachiAcBitMark, kHitachiAcZeroSpace,
+              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, true,
+              repeat, 50);
 }
 #endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 
@@ -75,11 +74,10 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
                             uint16_t repeat) {
   if (nbytes < kHitachiAc1StateLength)
     return;  // Not enough bytes to send a proper message.
-  sendGeneric(kHitachiAc1HdrMark, kHitachiAc1HdrSpace,
-              kHitachiAcBitMark, kHitachiAcOneSpace,
-              kHitachiAcBitMark, kHitachiAcZeroSpace,
-              kHitachiAcBitMark, kHitachiAcMinGap,
-              data, nbytes, 38, true, repeat, 50);
+  sendGeneric(kHitachiAc1HdrMark, kHitachiAc1HdrSpace, kHitachiAcBitMark,
+              kHitachiAcOneSpace, kHitachiAcBitMark, kHitachiAcZeroSpace,
+              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, true,
+              repeat, 50);
 }
 #endif  // SEND_HITACHI_AC1
 
@@ -149,29 +147,23 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
   if (nbits == kHitachiAc1Bits) {
     if (!matchMark(results->rawbuf[offset++], kHitachiAc1HdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], kHitachiAc1HdrSpace,
-                    kTolerance))
+    if (!matchSpace(results->rawbuf[offset++], kHitachiAc1HdrSpace, kTolerance))
       return false;
   } else {  // Everything else.
     if (!matchMark(results->rawbuf[offset++], kHitachiAcHdrMark, kTolerance))
       return false;
-    if (!matchSpace(results->rawbuf[offset++], kHitachiAcHdrSpace,
-                    kTolerance))
+    if (!matchSpace(results->rawbuf[offset++], kHitachiAcHdrSpace, kTolerance))
       return false;
   }
   // Data
   // Keep reading bytes until we either run out of message or state to fill.
-  for (uint16_t i = 0;
-      offset <= results->rawlen - 16 && i < nbits / 8;
-      i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kHitachiAcBitMark,
-                            kHitachiAcOneSpace,
-                            kHitachiAcBitMark,
-                            kHitachiAcZeroSpace,
-                            kTolerance);
-    if (data_result.success == false)  break;  // Fail
-    results->state[i] = (uint8_t) data_result.data;
+  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
+       i++, dataBitsSoFar += 8, offset += data_result.used) {
+    data_result = matchData(&(results->rawbuf[offset]), 8, kHitachiAcBitMark,
+                            kHitachiAcOneSpace, kHitachiAcBitMark,
+                            kHitachiAcZeroSpace, kTolerance);
+    if (data_result.success == false) break;  // Fail
+    results->state[i] = (uint8_t)data_result.data;
   }
 
   // Footer

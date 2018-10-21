@@ -46,7 +46,6 @@ const uint8_t kHaierAcCmdTimerCancel = 0b00001010;
 const uint8_t kHaierAcCmdHealth = 0b00001100;
 const uint8_t kHaierAcCmdSwing = 0b00001101;
 
-
 // Byte 2
 const uint8_t kHaierAcSwingOff = 0b00000000;
 const uint8_t kHaierAcSwingUp = 0b00000001;
@@ -68,33 +67,33 @@ const uint8_t kHaierAcFanHigh = 3;
 const uint16_t kHaierAcMaxTime = (23 * 60) + 59;
 
 // Legacy Haier AC defines.
-#define HAIER_AC_MIN_TEMP      kHaierAcMinTemp
-#define HAIER_AC_DEF_TEMP      kHaierAcDefTemp
-#define HAIER_AC_MAX_TEMP      kHaierAcMaxTemp
-#define HAIER_AC_CMD_OFF          kHaierAcCmdOff
-#define HAIER_AC_CMD_ON           kHaierAcCmdOn
-#define HAIER_AC_CMD_MODE         kHaierAcCmdMode
-#define HAIER_AC_CMD_FAN          kHaierAcCmdFan
-#define HAIER_AC_CMD_TEMP_UP      kHaierAcCmdTempUp
-#define HAIER_AC_CMD_TEMP_DOWN    kHaierAcCmdTempDown
-#define HAIER_AC_CMD_SLEEP        kHaierAcCmdSleep
-#define HAIER_AC_CMD_TIMER_SET    kHaierAcCmdTimerSet
+#define HAIER_AC_MIN_TEMP kHaierAcMinTemp
+#define HAIER_AC_DEF_TEMP kHaierAcDefTemp
+#define HAIER_AC_MAX_TEMP kHaierAcMaxTemp
+#define HAIER_AC_CMD_OFF kHaierAcCmdOff
+#define HAIER_AC_CMD_ON kHaierAcCmdOn
+#define HAIER_AC_CMD_MODE kHaierAcCmdMode
+#define HAIER_AC_CMD_FAN kHaierAcCmdFan
+#define HAIER_AC_CMD_TEMP_UP kHaierAcCmdTempUp
+#define HAIER_AC_CMD_TEMP_DOWN kHaierAcCmdTempDown
+#define HAIER_AC_CMD_SLEEP kHaierAcCmdSleep
+#define HAIER_AC_CMD_TIMER_SET kHaierAcCmdTimerSet
 #define HAIER_AC_CMD_TIMER_CANCEL kHaierAcCmdTimerCancel
-#define HAIER_AC_CMD_HEALTH       kHaierAcCmdHealth
-#define HAIER_AC_CMD_SWING        kHaierAcCmdSwing
-#define HAIER_AC_SWING_OFF        kHaierAcSwingOff
-#define HAIER_AC_SWING_UP         kHaierAcSwingUp
-#define HAIER_AC_SWING_DOWN       kHaierAcSwingDown
-#define HAIER_AC_SWING_CHG        kHaierAcSwingChg
-#define HAIER_AC_AUTO           kHaierAcAuto
-#define HAIER_AC_COOL           kHaierAcCool
-#define HAIER_AC_DRY            kHaierAcDry
-#define HAIER_AC_HEAT           kHaierAcHeat
-#define HAIER_AC_FAN            kHaierAcFan
-#define HAIER_AC_FAN_AUTO       kHaierAcFanAuto
-#define HAIER_AC_FAN_LOW        kHaierAcFanLow
-#define HAIER_AC_FAN_MED        kHaierAcFanMed
-#define HAIER_AC_FAN_HIGH       kHaierAcFanHigh
+#define HAIER_AC_CMD_HEALTH kHaierAcCmdHealth
+#define HAIER_AC_CMD_SWING kHaierAcCmdSwing
+#define HAIER_AC_SWING_OFF kHaierAcSwingOff
+#define HAIER_AC_SWING_UP kHaierAcSwingUp
+#define HAIER_AC_SWING_DOWN kHaierAcSwingDown
+#define HAIER_AC_SWING_CHG kHaierAcSwingChg
+#define HAIER_AC_AUTO kHaierAcAuto
+#define HAIER_AC_COOL kHaierAcCool
+#define HAIER_AC_DRY kHaierAcDry
+#define HAIER_AC_HEAT kHaierAcHeat
+#define HAIER_AC_FAN kHaierAcFan
+#define HAIER_AC_FAN_AUTO kHaierAcFanAuto
+#define HAIER_AC_FAN_LOW kHaierAcFanLow
+#define HAIER_AC_FAN_MED kHaierAcFanMed
+#define HAIER_AC_FAN_HIGH kHaierAcFanHigh
 
 // Haier YRW02 remote
 // Byte 0
@@ -111,7 +110,6 @@ const uint8_t kHaierAcYrw02SwingBottom = 0x3;  // Only available in heat mode.
 const uint8_t kHaierAcYrw02SwingDown = 0xA;
 const uint8_t kHaierAcYrw02SwingAuto = 0xC;  // Airflow
 
-
 // Byte 3
 // Bit 7 - Health mode
 
@@ -124,7 +122,6 @@ const uint8_t kHaierAcYrw02FanHigh = 0x2;
 const uint8_t kHaierAcYrw02FanMed = 0x4;
 const uint8_t kHaierAcYrw02FanLow = 0x6;
 const uint8_t kHaierAcYrw02FanAuto = 0xA;
-
 
 // Byte 6
 // Bits 0-1
@@ -156,33 +153,33 @@ const uint8_t kHaierAcYrw02ButtonTurbo = 0x8;
 const uint8_t kHaierAcYrw02ButtonSleep = 0xB;
 
 // Legacy Haier YRW02 remote defines.
-#define HAIER_AC_YRW02_SWING_OFF           kHaierAcYrw02SwingOff
-#define HAIER_AC_YRW02_SWING_TOP           kHaierAcYrw02SwingTop
-#define HAIER_AC_YRW02_SWING_MIDDLE        kHaierAcYrw02SwingMiddle
-#define HAIER_AC_YRW02_SWING_BOTTOM        kHaierAcYrw02SwingBottom
-#define HAIER_AC_YRW02_SWING_DOWN          kHaierAcYrw02SwingDown
-#define HAIER_AC_YRW02_SWING_AUTO          kHaierAcYrw02SwingAuto
-#define HAIER_AC_YRW02_FAN_HIGH            kHaierAcYrw02FanHigh
-#define HAIER_AC_YRW02_FAN_MED             kHaierAcYrw02FanMed
-#define HAIER_AC_YRW02_FAN_LOW             kHaierAcYrw02FanLow
-#define HAIER_AC_YRW02_FAN_AUTO            kHaierAcYrw02FanAuto
-#define HAIER_AC_YRW02_TURBO_OFF           kHaierAcYrw02TurboOff
-#define HAIER_AC_YRW02_TURBO_HIGH          kHaierAcYrw02TurboHigh
-#define HAIER_AC_YRW02_TURBO_LOW           kHaierAcYrw02TurboLow
-#define HAIER_AC_YRW02_AUTO                kHaierAcYrw02Auto
-#define HAIER_AC_YRW02_COOL                kHaierAcYrw02Cool
-#define HAIER_AC_YRW02_DRY                 kHaierAcYrw02Dry
-#define HAIER_AC_YRW02_HEAT                kHaierAcYrw02Heat
-#define HAIER_AC_YRW02_FAN                 kHaierAcYrw02Fan
-#define HAIER_AC_YRW02_BUTTON_TEMP_UP      kHaierAcYrw02ButtonTempUp
-#define HAIER_AC_YRW02_BUTTON_TEMP_DOWN    kHaierAcYrw02ButtonTempDown
-#define HAIER_AC_YRW02_BUTTON_SWING        kHaierAcYrw02ButtonSwing
-#define HAIER_AC_YRW02_BUTTON_FAN          kHaierAcYrw02ButtonFan
-#define HAIER_AC_YRW02_BUTTON_POWER        kHaierAcYrw02ButtonPower
-#define HAIER_AC_YRW02_BUTTON_MODE         kHaierAcYrw02ButtonMode
-#define HAIER_AC_YRW02_BUTTON_HEALTH       kHaierAcYrw02ButtonHealth
-#define HAIER_AC_YRW02_BUTTON_TURBO        kHaierAcYrw02ButtonTurbo
-#define HAIER_AC_YRW02_BUTTON_SLEEP        kHaierAcYrw02ButtonSleep
+#define HAIER_AC_YRW02_SWING_OFF kHaierAcYrw02SwingOff
+#define HAIER_AC_YRW02_SWING_TOP kHaierAcYrw02SwingTop
+#define HAIER_AC_YRW02_SWING_MIDDLE kHaierAcYrw02SwingMiddle
+#define HAIER_AC_YRW02_SWING_BOTTOM kHaierAcYrw02SwingBottom
+#define HAIER_AC_YRW02_SWING_DOWN kHaierAcYrw02SwingDown
+#define HAIER_AC_YRW02_SWING_AUTO kHaierAcYrw02SwingAuto
+#define HAIER_AC_YRW02_FAN_HIGH kHaierAcYrw02FanHigh
+#define HAIER_AC_YRW02_FAN_MED kHaierAcYrw02FanMed
+#define HAIER_AC_YRW02_FAN_LOW kHaierAcYrw02FanLow
+#define HAIER_AC_YRW02_FAN_AUTO kHaierAcYrw02FanAuto
+#define HAIER_AC_YRW02_TURBO_OFF kHaierAcYrw02TurboOff
+#define HAIER_AC_YRW02_TURBO_HIGH kHaierAcYrw02TurboHigh
+#define HAIER_AC_YRW02_TURBO_LOW kHaierAcYrw02TurboLow
+#define HAIER_AC_YRW02_AUTO kHaierAcYrw02Auto
+#define HAIER_AC_YRW02_COOL kHaierAcYrw02Cool
+#define HAIER_AC_YRW02_DRY kHaierAcYrw02Dry
+#define HAIER_AC_YRW02_HEAT kHaierAcYrw02Heat
+#define HAIER_AC_YRW02_FAN kHaierAcYrw02Fan
+#define HAIER_AC_YRW02_BUTTON_TEMP_UP kHaierAcYrw02ButtonTempUp
+#define HAIER_AC_YRW02_BUTTON_TEMP_DOWN kHaierAcYrw02ButtonTempDown
+#define HAIER_AC_YRW02_BUTTON_SWING kHaierAcYrw02ButtonSwing
+#define HAIER_AC_YRW02_BUTTON_FAN kHaierAcYrw02ButtonFan
+#define HAIER_AC_YRW02_BUTTON_POWER kHaierAcYrw02ButtonPower
+#define HAIER_AC_YRW02_BUTTON_MODE kHaierAcYrw02ButtonMode
+#define HAIER_AC_YRW02_BUTTON_HEALTH kHaierAcYrw02ButtonHealth
+#define HAIER_AC_YRW02_BUTTON_TURBO kHaierAcYrw02ButtonTurbo
+#define HAIER_AC_YRW02_BUTTON_SLEEP kHaierAcYrw02ButtonSleep
 
 class IRHaierAC {
  public:
@@ -226,13 +223,13 @@ class IRHaierAC {
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kHaierACStateLength);
-  #ifdef ARDUINO
-    String toString();
-    static String timeToString(const uint16_t nr_mins);
-  #else
-    std::string toString();
-    static std::string timeToString(const uint16_t nr_mins);
-  #endif
+#ifdef ARDUINO
+  String toString();
+  static String timeToString(const uint16_t nr_mins);
+#else
+  std::string toString();
+  static std::string timeToString(const uint16_t nr_mins);
+#endif
 
  private:
   uint8_t remote_state[kHaierACStateLength];
@@ -242,7 +239,6 @@ class IRHaierAC {
   static void setTime(uint8_t ptr[], const uint16_t nr_mins);
   IRsend _irsend;
 };
-
 
 class IRHaierACYRW02 {
  public:
@@ -284,12 +280,12 @@ class IRHaierACYRW02 {
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
-      const uint16_t length = kHaierACYRW02StateLength);
-  #ifdef ARDUINO
-    String toString();
-  #else
-    std::string toString();
-  #endif
+                            const uint16_t length = kHaierACYRW02StateLength);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 
  private:
   uint8_t remote_state[kHaierACYRW02StateLength];

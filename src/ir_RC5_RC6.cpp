@@ -21,13 +21,13 @@
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-5
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
-#define MIN_RC5_SAMPLES            11U
-#define MIN_RC6_SAMPLES             1U
 
 const uint16_t kRc5T1 = 889;
 const uint32_t kRc5MinCommandLength = 113778;
 const uint32_t kRc5MinGap = kRc5MinCommandLength - kRC5RawBits * (2 * kRc5T1);
 const uint16_t kRc5ToggleMask = 0x800;  // The 12th bit.
+const uint16_t kRc5SamplesMin = 11;
+
 // RC-6
 // Ref:
 //   https://en.wikipedia.org/wiki/RC-6
@@ -69,8 +69,7 @@ const int16_t kSpace = 1;
 // TODO(anyone):
 //   Testing of the RC-5X components.
 void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits > sizeof(data) * 8)
-    return;  // We can't send something that big.
+  if (nbits > sizeof(data) * 8) return;  // We can't send something that big.
   bool skipSpace = true;
   bool field_bit = true;
   // Set 36kHz IR carrier frequency & a 1/4 (25%) duty cycle.
@@ -105,9 +104,9 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
     // Data
     for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
       if (data & mask) {  // 1
-        space(kRc5T1);  // 1 is space, then mark.
+        space(kRc5T1);    // 1 is space, then mark.
         mark(kRc5T1);
-      } else {  // 0
+      } else {         // 0
         mark(kRc5T1);  // 0 is mark, then space.
         space(kRc5T1);
       }
@@ -133,8 +132,7 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://en.wikipedia.org/wiki/RC-5
 uint16_t IRsend::encodeRC5(uint8_t address, uint8_t command,
                            bool key_released) {
-  return (key_released << (kRC5Bits - 1)) |
-         ((address & 0x1f) << 6) |
+  return (key_released << (kRC5Bits - 1)) | ((address & 0x1f) << 6) |
          (command & 0x3F);
 }
 
@@ -158,8 +156,8 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
   // The 2nd start/field bit (MSB of the return value) is the value of the 7th
   // command bit.
   bool s2 = (command >> 6) & 1;
-  return ((uint16_t) s2 << (kRC5XBits - 1)) |
-      encodeRC5(address, command, key_released);
+  return ((uint16_t)s2 << (kRC5XBits - 1)) |
+         encodeRC5(address, command, key_released);
 }
 
 // Flip the toggle bit of a Philips RC-5/RC-5X data message.
@@ -176,9 +174,7 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rc5.php
 //   https://en.wikipedia.org/wiki/RC-5
-uint64_t IRsend::toggleRC5(uint64_t data) {
-  return data ^ kRc5ToggleMask;
-}
+uint64_t IRsend::toggleRC5(uint64_t data) { return data ^ kRc5ToggleMask; }
 #endif  // SEND_RC5
 
 #if SEND_RC6
@@ -200,8 +196,7 @@ uint64_t IRsend::toggleRC5(uint64_t data) {
 //   http://www.sbprojects.com/knowledge/ir/rc6.php
 //   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
 uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
-  if (nbits == kRC6_36Bits)
-    return data ^ kRc6_36ToggleMask;
+  if (nbits == kRC6_36Bits) return data ^ kRc6_36ToggleMask;
   return data ^ kRc6ToggleMask;
 }
 
@@ -222,13 +217,12 @@ uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
 //   http://www.sbprojects.com/knowledge/ir/rc6.php
 //   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
 //   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
-uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command,
-                           uint16_t mode) {
+uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command, uint16_t mode) {
   switch (mode) {
     case kRC6Mode0Bits:
       return ((address & 0xFFF) << 8) | (command & 0xFF);
     case kRC6_36Bits:
-      return ((uint64_t) (address & 0xFFFFFFF) << 8) | (command & 0xFF);
+      return ((uint64_t)(address & 0xFFFFFFF) << 8) | (command & 0xFF);
     default:
       return 0;
   }
@@ -251,8 +245,7 @@ uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command,
 //   https://en.wikipedia.org/wiki/Manchester_code
 void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Check we can send the number of bits requested.
-  if (nbits > sizeof(data) * 8)
-    return;
+  if (nbits > sizeof(data) * 8) return;
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(36, 33);
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -269,7 +262,7 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
         bitTime = 2 * kRc6Tick;  // double-wide trailer bit
       else
         bitTime = kRc6Tick;  // Normal bit
-      if (data & mask) {  // 1
+      if (data & mask) {     // 1
         mark(bitTime);
         space(bitTime);
       } else {  // 0
@@ -302,10 +295,9 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //                                      multiple of t1.)
 // Ref:
 //   https://en.wikipedia.org/wiki/Manchester_code
-int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
-                           uint16_t *used, uint16_t bitTime,
-                           uint8_t tolerance, int16_t excess, uint16_t delta,
-                           uint8_t maxwidth) {
+int16_t IRrecv::getRClevel(decode_results *results, uint16_t *offset,
+                           uint16_t *used, uint16_t bitTime, uint8_t tolerance,
+                           int16_t excess, uint16_t delta, uint8_t maxwidth) {
   DPRINT("DEBUG: getRClevel: offset = ");
   DPRINTLN(uint64ToString(*offset));
   DPRINT("DEBUG: getRClevel: rawlen = ");
@@ -318,8 +310,8 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
   //  If the value of offset is odd, it's a MARK. Even, it's a SPACE.
   uint16_t val = ((*offset) % 2) ? kMark : kSpace;
   // Check to see if we have hit an inter-message gap (> 20ms).
-  if (val == kSpace && (width > 20000 - delta ||
-        width > maxwidth * bitTime + delta)) {
+  if (val == kSpace &&
+      (width > 20000 - delta || width > maxwidth * bitTime + delta)) {
     DPRINTLN("DEBUG: getRClevel: SPACE, hit end of mesg gap.");
     return kSpace;
   }
@@ -340,7 +332,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
     return -1;  // The width is not what we expected.
   }
 
-  (*used)++;  // Count another one of the avail slots as used.
+  (*used)++;             // Count another one of the avail slots as used.
   if (*used >= avail) {  // Are we out of look-ahead/avail slots?
     // Yes, so reset the used counter, and move the offset ahead.
     *used = 0;
@@ -378,7 +370,7 @@ int16_t IRrecv::getRClevel(decode_results *results,  uint16_t *offset,
 // TODO(anyone):
 //   Serious testing of the RC-5X and strict aspects needs to be done.
 bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < MIN_RC5_SAMPLES + kHeader - 1) return false;
+  if (results->rawlen < kRc5SamplesMin + kHeader - 1) return false;
 
   // Compliance
   if (strict && nbits != kRC5Bits && nbits != kRC5XBits)
@@ -421,8 +413,8 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 
   // Compliance
   if (actual_bits < nbits) return false;  // Less data than we expected.
-  if (strict && actual_bits != kRC5Bits &&
-                actual_bits != kRC5XBits) return false;
+  if (strict && actual_bits != kRC5Bits && actual_bits != kRC5XBits)
+    return false;
 
   // Success
   results->value = data;
@@ -431,7 +423,7 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
   results->repeat = false;
   if (is_rc5x) {
     results->decode_type = RC5X;
-    results->command |= ((uint32_t) is_rc5x) << 6;
+    results->command |= ((uint32_t)is_rc5x) << 6;
   } else {
     results->decode_type = RC5;
     actual_bits--;  // RC5 doesn't count the field bit as data.
@@ -503,16 +495,14 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     int16_t levelA, levelB;  // Next two levels
     levelA = getRClevel(results, &offset, &used, tick);
     // T bit is double wide; make sure second half matches
-    if (actual_bits == 3 &&
-        levelA != getRClevel(results, &offset, &used, tick))
+    if (actual_bits == 3 && levelA != getRClevel(results, &offset, &used, tick))
       return false;
     levelB = getRClevel(results, &offset, &used, tick);
     // T bit is double wide; make sure second half matches
-    if (actual_bits == 3 &&
-        levelB != getRClevel(results, &offset, &used, tick))
+    if (actual_bits == 3 && levelB != getRClevel(results, &offset, &used, tick))
       return false;
     if (levelA == kMark && levelB == kSpace)  // reversed compared to RC5
-      data = (data << 1) | 1;  // 1
+      data = (data << 1) | 1;                 // 1
     else if (levelA == kSpace && levelB == kMark)
       data <<= 1;  // 0
     else

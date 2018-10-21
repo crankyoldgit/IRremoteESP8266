@@ -69,10 +69,18 @@ void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
       mark(kRcmmBitMark);
       // Grab the next Most Significant Bits to send.
       switch ((data & mask) >> (i - 2)) {
-        case 0b00: space(kRcmmBitSpace0); break;
-        case 0b01: space(kRcmmBitSpace1); break;
-        case 0b10: space(kRcmmBitSpace2); break;
-        case 0b11: space(kRcmmBitSpace3); break;
+        case 0b00:
+          space(kRcmmBitSpace0);
+          break;
+        case 0b01:
+          space(kRcmmBitSpace1);
+          break;
+        case 0b10:
+          space(kRcmmBitSpace2);
+          break;
+        case 0b11:
+          space(kRcmmBitSpace3);
+          break;
       }
       mask >>= 2;
     }
@@ -107,15 +115,14 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
     return false;  // Not enough entries to ever be RCMM.
 
   // Calc the maximum size in bits, the message can be, or that we can accept.
-  int16_t maxBitSize = std::min((uint16_t) results->rawlen - 5,
-                                (uint16_t) sizeof(data) * 8);
+  int16_t maxBitSize =
+      std::min((uint16_t)results->rawlen - 5, (uint16_t)sizeof(data) * 8);
   // Compliance
   if (strict) {
     // Technically the spec says bit sizes should be 12 xor 24. however
     // 32 bits has been seen from a device. We are going to assume
     // 12 <= bits <= 32 is the 'required' bit length for the spec.
-    if (maxBitSize < 12 || maxBitSize > 32)
-      return false;
+    if (maxBitSize < 12 || maxBitSize > 32) return false;
     if (maxBitSize < nbits)
       return false;  // Short cut, we can never reach the expected nr. of bits.
   }
@@ -160,8 +167,7 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
     return false;
 
   // Compliance
-  if (strict && actualBits != nbits)
-    return false;
+  if (strict && actualBits != nbits) return false;
 
   // Success
   results->value = data;

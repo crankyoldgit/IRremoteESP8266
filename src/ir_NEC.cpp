@@ -31,18 +31,15 @@
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
 void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(kNecHdrMark, kNecHdrSpace,
-              kNecBitMark, kNecOneSpace,
-              kNecBitMark, kNecZeroSpace,
-              kNecBitMark, kNecMinGap, kNecMinCommandLength,
+  sendGeneric(kNecHdrMark, kNecHdrSpace, kNecBitMark, kNecOneSpace, kNecBitMark,
+              kNecZeroSpace, kNecBitMark, kNecMinGap, kNecMinCommandLength,
               data, nbits, 38, true, 0,  // Repeats are handled later.
               33);
   // Optional command repeat sequence.
   if (repeat)
-    sendGeneric(kNecHdrMark, kNecRptSpace,
-                0, 0, 0, 0,  // No actual data sent.
-                kNecBitMark, kNecMinGap, kNecMinCommandLength,
-                0, 0,  // No data to be sent.
+    sendGeneric(kNecHdrMark, kNecRptSpace, 0, 0, 0, 0,  // No actual data sent.
+                kNecBitMark, kNecMinGap, kNecMinCommandLength, 0,
+                0,                     // No data to be sent.
                 38, true, repeat - 1,  // We've already sent a one message.
                 33);
 }
@@ -62,8 +59,8 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
   command &= 0xFF;  // We only want the least significant byte of command.
   // sendNEC() sends MSB first, but protocol says this is LSB first.
   command = reverseBits(command, 8);
-  command = (command <<  8) + (command ^ 0xFF);  // Calculate the new command.
-  if (address > 0xFF) {  // Is it Extended NEC?
+  command = (command << 8) + (command ^ 0xFF);  // Calculate the new command.
+  if (address > 0xFF) {                         // Is it Extended NEC?
     address = reverseBits(address, 16);
     return ((address << 16) + command);  // Extended.
   } else {
@@ -108,8 +105,7 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Header
   if (!matchMark(results->rawbuf[offset], kNecHdrMark)) return false;
   // Calculate how long the lowest tick time is based on the header mark.
-  uint32_t mark_tick = results->rawbuf[offset++] * kRawTick /
-      kNecHdrMarkTicks;
+  uint32_t mark_tick = results->rawbuf[offset++] * kRawTick / kNecHdrMarkTicks;
   // Check if it is a repeat code.
   if (results->rawlen == kNecRptLength &&
       matchSpace(results->rawbuf[offset], kNecRptSpace) &&
@@ -126,32 +122,30 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
   // Header (cont.)
   if (!matchSpace(results->rawbuf[offset], kNecHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t space_tick = results->rawbuf[offset++] * kRawTick /
-      kNecHdrSpaceTicks;
+  uint32_t space_tick =
+      results->rawbuf[offset++] * kRawTick / kNecHdrSpaceTicks;
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kNecBitMarkTicks * mark_tick,
-                                         kNecOneSpaceTicks * space_tick,
-                                         kNecBitMarkTicks * mark_tick,
-                                         kNecZeroSpaceTicks * space_tick);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, kNecBitMarkTicks * mark_tick,
+                kNecOneSpaceTicks * space_tick, kNecBitMarkTicks * mark_tick,
+                kNecZeroSpaceTicks * space_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
 
   // Footer
   if (!matchMark(results->rawbuf[offset++], kNecBitMarkTicks * mark_tick))
-      return false;
+    return false;
   if (offset < results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], kNecMinGapTicks * space_tick))
     return false;
 
   // Compliance
   // Calculate command and optionally enforce integrity checking.
-  uint8_t command = (data & 0xFF00) >>  8;
+  uint8_t command = (data & 0xFF00) >> 8;
   // Command is sent twice, once as plain and then inverted.
   if ((command ^ 0xFF) != (data & 0xFF)) {
-    if (strict)
-      return false;  // Command integrity failed.
+    if (strict) return false;  // Command integrity failed.
     command = 0;  // The command value isn't valid, so default to zero.
   }
 

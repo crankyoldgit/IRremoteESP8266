@@ -8,8 +8,8 @@
 #else
 #include <string>
 #endif
-#include "IRremoteESP8266.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
 
 // Option to disable the additional Daikin debug info to conserve memory
@@ -22,57 +22,57 @@
 //                DDDDDD  AA   AA IIIII KK  KK IIIII NN   NN
 
 /*
-	Daikin AC map
-	byte 5=Current time, mins past midnight, low bits
-	byte 6
+        Daikin AC map
+        byte 5=Current time, mins past midnight, low bits
+        byte 6
         b0-b3=Current time, mins past midnight, high bits
-	byte 7= checksum of the first part (and last byte before a 29ms pause)
-	byte 13=mode
-		b7 = 0
-		b6+b5+b4 = Mode
-			Modes: b6+b5+b4
-			011 = Cool
-			100 = Heat (temp 23)
-			110 = FAN (temp not shown, but 25)
-			000 = Fully Automatic (temp 25)
-			010 = DRY (temp 0xc0 = 96 degrees c)
-		b3 = 1
-		b2 = OFF timer set
-		b1 = ON timer set
-		b0 = Air Conditioner ON
-	byte 14=temp*2   (Temp should be between 10 - 32)
-	byte 16=Fan
-		FAN control
-		b7+b6+b5+b4 = Fan speed
-			Fan: b7+b6+b5+b4
-			0×3 = 1 bar
-			0×4 = 2 bar
-			0×5 = 3 bar
-			0×6 = 4 bar
-			0×7 = 5 bar
-			0xa = Auto
-			0xb = Quite
-		b3+b2+b1+b0 = Swing control up/down
-			Swing control up/down:
-			0000 = Swing up/down off
-			1111 = Swing up/down on
-	byte 17
-			Swing control left/right:
-			0000 = Swing left/right off
-			1111 = Swing left/right on
-	byte 18=On timer mins past midnight, low bits
-	byte 19
+        byte 7= checksum of the first part (and last byte before a 29ms pause)
+        byte 13=mode
+                b7 = 0
+                b6+b5+b4 = Mode
+                        Modes: b6+b5+b4
+                        011 = Cool
+                        100 = Heat (temp 23)
+                        110 = FAN (temp not shown, but 25)
+                        000 = Fully Automatic (temp 25)
+                        010 = DRY (temp 0xc0 = 96 degrees c)
+                b3 = 1
+                b2 = OFF timer set
+                b1 = ON timer set
+                b0 = Air Conditioner ON
+        byte 14=temp*2   (Temp should be between 10 - 32)
+        byte 16=Fan
+                FAN control
+                b7+b6+b5+b4 = Fan speed
+                        Fan: b7+b6+b5+b4
+                        0×3 = 1 bar
+                        0×4 = 2 bar
+                        0×5 = 3 bar
+                        0×6 = 4 bar
+                        0×7 = 5 bar
+                        0xa = Auto
+                        0xb = Quite
+                b3+b2+b1+b0 = Swing control up/down
+                        Swing control up/down:
+                        0000 = Swing up/down off
+                        1111 = Swing up/down on
+        byte 17
+                        Swing control left/right:
+                        0000 = Swing left/right off
+                        1111 = Swing left/right on
+        byte 18=On timer mins past midnight, low bits
+        byte 19
         b0-b3=On timer mins past midnight, high bits
         b4-b7=Off timer mins past midnight, low bits
-	byte 20=Off timer mins past midnight, high bits
-	byte 21=Aux  -> Powerful (bit 1), Silent (bit 5)
-	byte 24=Aux2
+        byte 20=Off timer mins past midnight, high bits
+        byte 21=Aux  -> Powerful (bit 1), Silent (bit 5)
+        byte 24=Aux2
         b1: Sensor
         b2: Econo mode
         b7: Intelligent eye on
-	byte 25=Aux3
+        byte 25=Aux3
         b1: Mold Proof
-	byte 26= checksum of the second part
+        byte 26= checksum of the second part
 */
 
 // Constants
@@ -109,7 +109,7 @@ const uint8_t kDaikinCurBit = kDaikinStateLength;
 const uint8_t kDaikinCurIndex = kDaikinStateLength + 1;
 const uint8_t kDaikinTolerance = 35;
 const uint16_t kDaikinMarkExcess = kMarkExcess;
-const uint16_t kDaikinHdrMark = 3650;  // kDaikinBitMark * 8
+const uint16_t kDaikinHdrMark = 3650;   // kDaikinBitMark * 8
 const uint16_t kDaikinHdrSpace = 1623;  // kDaikinBitMark * 4
 const uint16_t kDaikinBitMark = 428;
 const uint16_t kDaikinZeroSpace = 428;
@@ -117,21 +117,20 @@ const uint16_t kDaikinOneSpace = 1280;
 const uint16_t kDaikinGap = 29000;
 // Note bits in each octet swapped so can be sent as a single value
 const uint64_t kDaikinFirstHeader64 =
-0b1101011100000000000000001100010100000000001001111101101000010001;
+    0b1101011100000000000000001100010100000000001001111101101000010001;
 
 // Legacy defines.
-#define DAIKIN_COOL                kDaikinCool
-#define DAIKIN_HEAT                kDaikinHeat
-#define DAIKIN_FAN                 kDaikinFan
-#define DAIKIN_AUTO                kDaikinAuto
-#define DAIKIN_DRY                 kDaikinDry
-#define DAIKIN_MIN_TEMP            kDaikinMinTemp
-#define kDaikinMaxTemp             kDaikinMaxTemp
-#define DAIKIN_FAN_MIN             kDaikinFanMin
-#define DAIKIN_FAN_MAX             kDaikinFanMax
-#define DAIKIN_FAN_AUTO            kDaikinFanAuto
-#define DAIKIN_FAN_QUIET           kDaikinFanQuiet
-
+#define DAIKIN_COOL kDaikinCool
+#define DAIKIN_HEAT kDaikinHeat
+#define DAIKIN_FAN kDaikinFan
+#define DAIKIN_AUTO kDaikinAuto
+#define DAIKIN_DRY kDaikinDry
+#define DAIKIN_MIN_TEMP kDaikinMinTemp
+#define DAIKIN_MAX_TEMP kDaikinMaxTemp
+#define DAIKIN_FAN_MIN kDaikinFanMin
+#define DAIKIN_FAN_MAX kDaikinFanMax
+#define DAIKIN_FAN_AUTO kDaikinFanAuto
+#define DAIKIN_FAN_QUIET kDaikinFanQuiet
 
 class IRDaikinESP {
  public:
@@ -198,7 +197,7 @@ class IRDaikinESP {
   // # of bytes per command
   uint8_t daikin[kDaikinStateLength];
   void stateReset();
-  static uint8_t calcBlockChecksum(const uint8_t *block, const uint16_t length);
+  static uint8_t calcBlockChecksum(const uint8_t* block, const uint16_t length);
   void checksum();
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);

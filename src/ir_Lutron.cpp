@@ -25,8 +25,7 @@
 //  https://github.com/markszabo/IRremoteESP8266/issues/515
 const uint16_t kLutronTick = 2288;
 const uint32_t kLutronGap = 150000;  // Completely made up value.
-const uint16_t kLutronDelta = 400;  // +/- 300 usecs.
-
+const uint16_t kLutronDelta = 400;   // +/- 300 usecs.
 
 #if SEND_LUTRON
 // Send a Lutron formatted message.
@@ -49,12 +48,12 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++) {
     mark(kLutronTick);  // 1st bit is always '1'.
     // Send the supplied data in MSB First order.
-    for (uint64_t mask = 1ULL << (nbits - 1);  mask;  mask >>= 1)
+    for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
       if (data & mask)
         mark(kLutronTick);  // Send a 1
       else
         space(kLutronTick);  // Send a 0
-    space(kLutronGap);  // Inter-message gap.
+    space(kLutronGap);       // Inter-message gap.
   }
 }
 #endif  // SEND_LUTRON
@@ -86,10 +85,9 @@ bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
   uint64_t data = 0;
   int16_t bitsSoFar = -1;
 
-  if (nbits > sizeof(data) * 8)  return false;  // To large to store the data.
+  if (nbits > sizeof(data) * 8) return false;  // To large to store the data.
   for (uint16_t offset = kStartOffset;
-       bitsSoFar < nbits && offset < results->rawlen;
-       offset++) {
+       bitsSoFar < nbits && offset < results->rawlen; offset++) {
     uint16_t entry = results->rawbuf[offset];
     // It has to be large enough to qualify as a bit.
     if (!matchAtLeast(entry, kLutronTick, 0, kLutronDelta)) {
@@ -101,18 +99,18 @@ bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
       bitsSoFar++;
       DPRINT("Bit: ");
       DPRINT(bitsSoFar);
-      if (offset % 2) {  // Is Odd?
+      if (offset % 2) {          // Is Odd?
         data = (data << 1) + 1;  // Append a '1'.
         DPRINTLN(" is a 1.");
-      } else {  // Is it Even?
+      } else {       // Is it Even?
         data <<= 1;  // Append a '0'.
         DPRINTLN(" is a 0.");
         if (bitsSoFar == nbits && matchAtLeast(entry, kLutronGap))
           break;  // We've likely reached the end of a message.
       }
       // Remove a bit length from the current entry.
-      entry = std::max(entry, (uint16_t) (kLutronTick / kRawTick)) -
-          kLutronTick / kRawTick;
+      entry = std::max(entry, (uint16_t)(kLutronTick / kRawTick)) -
+              kLutronTick / kRawTick;
     }
     if (offset % 2 && !match(entry, kLutronDelta, 0, kLutronDelta)) {
       DPRINT("offset = ");
@@ -124,7 +122,7 @@ bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
       DPRINTLN("Odd Entry has too much left over. Aborting.");
       return false;  // Too much left over to be a good value. Reject it.
     }
-    if (offset % 2 == 0 && offset <= results->rawlen -1 &&
+    if (offset % 2 == 0 && offset <= results->rawlen - 1 &&
         !matchAtLeast(entry, kLutronDelta, 0, kLutronDelta)) {
       DPRINT("offset = ");
       DPRINTLN(offset);
@@ -144,7 +142,7 @@ bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
   }
   // If we got less bits than we were expecting, we need to pad with zeros
   // until we get the correct number of bits.
-  if (bitsSoFar < nbits)  data <<= (nbits - bitsSoFar);
+  if (bitsSoFar < nbits) data <<= (nbits - bitsSoFar);
 
   // Success
   DPRINTLN("Lutron Success!");

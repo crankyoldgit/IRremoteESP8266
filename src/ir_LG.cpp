@@ -62,8 +62,9 @@ const uint16_t kLg2BitMark = kLg2BitMarkTicks * kLgTick;  // 500
 //  Returns:
 //    A 4-bit checksum.
 uint8_t calcLGChecksum(uint16_t data) {
-  return(((data >> 12) + ((data >> 8) & 0xF) + ((data >> 4) & 0xF) +
-         (data & 0xF)) & 0xF);
+  return (((data >> 12) + ((data >> 8) & 0xF) + ((data >> 4) & 0xF) +
+           (data & 0xF)) &
+          0xF);
 }
 #endif
 
@@ -93,22 +94,17 @@ void IRsend::sendLG(uint64_t data, uint16_t nbits, uint16_t repeat) {
   } else {
     // LG (28-bit) protocol.
     repeatHeaderMark = kLgHdrMark;
-    sendGeneric(kLgHdrMark, kLgHdrSpace,
-                kLgBitMark, kLgOneSpace,
-                kLgBitMark, kLgZeroSpace,
-                kLgBitMark,
-                kLgMinGap, kLgMinMessageLength,
-                data, nbits, 38, true, 0,  // Repeats are handled later.
+    sendGeneric(kLgHdrMark, kLgHdrSpace, kLgBitMark, kLgOneSpace, kLgBitMark,
+                kLgZeroSpace, kLgBitMark, kLgMinGap, kLgMinMessageLength, data,
+                nbits, 38, true, 0,  // Repeats are handled later.
                 50);
   }
 
   // Repeat
   // Protocol has a mandatory repeat-specific code sent after every command.
   if (repeat)
-    sendGeneric(repeatHeaderMark, kLgRptSpace,
-                0, 0, 0, 0,  // No data is sent.
-                kLgBitMark, kLgMinGap, kLgMinMessageLength,
-                0, 0,  // No data.
+    sendGeneric(repeatHeaderMark, kLgRptSpace, 0, 0, 0, 0,  // No data is sent.
+                kLgBitMark, kLgMinGap, kLgMinMessageLength, 0, 0,  // No data.
                 38, true, repeat - 1, 50);
 }
 
@@ -134,22 +130,17 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
 
   // LGv2 (28-bit) protocol.
-  sendGeneric(kLg2HdrMark, kLg2HdrSpace,
-              kLgBitMark, kLgOneSpace,
-              kLgBitMark, kLgZeroSpace,
-              kLgBitMark,
-              kLgMinGap, kLgMinMessageLength,
-              data, nbits, 38, true, 0,  // Repeats are handled later.
+  sendGeneric(kLg2HdrMark, kLg2HdrSpace, kLgBitMark, kLgOneSpace, kLgBitMark,
+              kLgZeroSpace, kLgBitMark, kLgMinGap, kLgMinMessageLength, data,
+              nbits, 38, true, 0,  // Repeats are handled later.
               50);
 
   // TODO(crackn): Verify the details of what repeat messages look like.
   // Repeat
   // Protocol has a mandatory repeat-specific code sent after every command.
   if (repeat)
-    sendGeneric(kLg2HdrMark, kLgRptSpace,
-                0, 0, 0, 0,  // No data is sent.
-                kLgBitMark, kLgMinGap, kLgMinMessageLength,
-                0, 0,  // No data.
+    sendGeneric(kLg2HdrMark, kLgRptSpace, 0, 0, 0, 0,  // No data is sent.
+                kLgBitMark, kLgMinGap, kLgMinMessageLength, 0, 0,  // No data.
                 38, true, repeat - 1, 50);
 }
 
@@ -248,12 +239,10 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   }
 
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         bitmarkticks * m_tick,
-                                         kLgOneSpaceTicks * s_tick,
-                                         bitmarkticks * m_tick,
-                                         kLgZeroSpaceTicks * s_tick,
-                                         kTolerance, 0);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, bitmarkticks * m_tick,
+                kLgOneSpaceTicks * s_tick, bitmarkticks * m_tick,
+                kLgZeroSpaceTicks * s_tick, kTolerance, 0);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;

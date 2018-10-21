@@ -43,21 +43,20 @@ void IRsend::sendGC(uint16_t buf[], uint16_t len) {
   uint16_t hz = buf[kGlobalCacheFreqIndex];  // GC frequency is in Hz.
   enableIROut(hz);
   uint32_t periodic_time = calcUSecPeriod(hz, false);
-  uint8_t emits = std::min(buf[kGlobalCacheRptIndex],
-                           (uint16_t) kGlobalCacheMaxRepeat);
+  uint8_t emits =
+      std::min(buf[kGlobalCacheRptIndex], (uint16_t)kGlobalCacheMaxRepeat);
   // Repeat
   for (uint8_t repeat = 0; repeat < emits; repeat++) {
     // First time through, start at the beginning (kGlobalCacheStartIndex),
     // otherwise for repeats, we start a specified offset from that.
     uint16_t offset = kGlobalCacheStartIndex;
-    if (repeat)
-      offset += buf[kGlobalCacheRptStartIndex] - 1;
+    if (repeat) offset += buf[kGlobalCacheRptStartIndex] - 1;
     // Data
     for (; offset < len; offset++) {
       // Convert periodic units to microseconds.
       // Minimum is kGlobalCacheMinUsec for actual GC units.
-      uint32_t microseconds = std::max(buf[offset] * periodic_time,
-                                       kGlobalCacheMinUsec);
+      uint32_t microseconds =
+          std::max(buf[offset] * periodic_time, kGlobalCacheMinUsec);
       // These codes start at an odd index (not even as with sendRaw).
       if (offset & 1)  // Odd bit.
         mark(microseconds);

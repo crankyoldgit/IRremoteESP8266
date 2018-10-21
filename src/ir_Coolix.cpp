@@ -55,8 +55,7 @@ const uint16_t kCoolixMinGap = kCoolixMinGapTicks * kCoolixTick;
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp
 // TODO(anyone): Verify repeat functionality against a real unit.
 void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  if (nbits % 8 != 0)
-    return;  // nbits is required to be a multiple of 8.
+  if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
   // Set IR carrier frequency
   enableIROut(38);
@@ -73,13 +72,11 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
       // Grab a bytes worth of data.
       uint8_t segment = (data >> (nbits - i)) & 0xFF;
       // Normal
-      sendData(kCoolixBitMark, kCoolixOneSpace,
-               kCoolixBitMark, kCoolixZeroSpace,
-               segment, 8, true);
+      sendData(kCoolixBitMark, kCoolixOneSpace, kCoolixBitMark,
+               kCoolixZeroSpace, segment, 8, true);
       // Inverted.
-      sendData(kCoolixBitMark, kCoolixOneSpace,
-               kCoolixBitMark, kCoolixZeroSpace,
-               segment ^ 0xFF, 8, true);
+      sendData(kCoolixBitMark, kCoolixOneSpace, kCoolixBitMark,
+               kCoolixZeroSpace, segment ^ 0xFF, 8, true);
     }
 
     // Footer
@@ -89,37 +86,24 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 }
 #endif
 
-
 // IRCoolixAC class
 // Supports:
 //   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/484
-IRCoolixAC::IRCoolixAC(uint16_t pin) : _irsend(pin) {
-  stateReset();
-}
+IRCoolixAC::IRCoolixAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRCoolixAC::stateReset() {
-  remote_state = kCoolixDefaultState;
-}
+void IRCoolixAC::stateReset() { remote_state = kCoolixDefaultState; }
 
-void IRCoolixAC::begin() {
-  _irsend.begin();
-}
+void IRCoolixAC::begin() { _irsend.begin(); }
 
 #if SEND_COOLIX
-void IRCoolixAC::send() {
-  _irsend.sendCOOLIX(remote_state);
-}
+void IRCoolixAC::send() { _irsend.sendCOOLIX(remote_state); }
 #endif  // SEND_COOLIX
 
-uint32_t IRCoolixAC::getRaw() {
-  return remote_state;
-}
+uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
-void IRCoolixAC::setRaw(const uint32_t new_code) {
-  remote_state = new_code;
-}
+void IRCoolixAC::setRaw(const uint32_t new_code) { remote_state = new_code; }
 
 void IRCoolixAC::setTempRaw(const uint8_t code) {
   remote_state &= ~kCoolixTempMask;  // Clear the old temp.
@@ -141,8 +125,7 @@ uint8_t IRCoolixAC::getTemp() {
   uint8_t code = getTempRaw();
   uint8_t i;
   for (i = 0; i < kCoolixTempRange; i++)
-    if (kCoolixTempMap[i] == code)
-      return kCoolixTempMin + i;
+    if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
   return kCoolixUnknown;  // Not a temp we expected.
 }
 
@@ -169,52 +152,38 @@ bool IRCoolixAC::getPower() {
 }
 
 void IRCoolixAC::setPower(const bool power) {
-  if (!power)  remote_state = kCoolixOff;
+  if (!power) remote_state = kCoolixOff;
   // There really is no distinct "on" setting, so do nothing.
 }
 
-bool IRCoolixAC::getSwing() {
-  return remote_state == kCoolixSwing;
-}
+bool IRCoolixAC::getSwing() { return remote_state == kCoolixSwing; }
 
 void IRCoolixAC::setSwing() {
   // Assumes that repeated sending "swing" toggles the action on the device.
   remote_state = kCoolixSwing;
 }
 
-bool IRCoolixAC::getSleep() {
-  return remote_state == kCoolixSleep;
-}
+bool IRCoolixAC::getSleep() { return remote_state == kCoolixSleep; }
 
-void IRCoolixAC::setSleep() {
-  remote_state = kCoolixSleep;
-}
+void IRCoolixAC::setSleep() { remote_state = kCoolixSleep; }
 
-bool IRCoolixAC::getTurbo() {
-  return remote_state == kCoolixTurbo;
-}
+bool IRCoolixAC::getTurbo() { return remote_state == kCoolixTurbo; }
 
 void IRCoolixAC::setTurbo() {
   // Assumes that repeated sending "turbo" toggles the action on the device.
   remote_state = kCoolixTurbo;
 }
 
-bool IRCoolixAC::getLed() {
-  return remote_state == kCoolixLed;
-}
+bool IRCoolixAC::getLed() { return remote_state == kCoolixLed; }
 
 void IRCoolixAC::setLed() {
   // Assumes that repeated sending "Led" toggles the action on the device.
   remote_state = kCoolixLed;
 }
 
-bool IRCoolixAC::getClean() {
-  return remote_state == kCoolixClean;
-}
+bool IRCoolixAC::getClean() { return remote_state == kCoolixClean; }
 
-void IRCoolixAC::setClean() {
-  remote_state = kCoolixClean;
-}
+void IRCoolixAC::setClean() { remote_state = kCoolixClean; }
 
 bool IRCoolixAC::getZoneFollow() {
   return remote_state & kCoolixZoneFollowMask;
@@ -237,8 +206,7 @@ void IRCoolixAC::clearSensorTemp() {
 void IRCoolixAC::setMode(const uint8_t mode) {
   uint32_t actualmode = mode;
   // Fan mode is a special case of Dry.
-  if (mode == kCoolixFan)
-    actualmode = kCoolixDry;
+  if (mode == kCoolixFan) actualmode = kCoolixDry;
   switch (actualmode) {
     case kCoolixCool:
     case kCoolixAuto:
@@ -248,21 +216,17 @@ void IRCoolixAC::setMode(const uint8_t mode) {
       // Force the temp into a known-good state.
       setTemp(getTemp());
   }
-  if (mode == kCoolixFan)
-    setTempRaw(kCoolixFanTempCode);
+  if (mode == kCoolixFan) setTempRaw(kCoolixFanTempCode);
 }
 
 uint8_t IRCoolixAC::getMode() {
   uint8_t mode = (remote_state & kCoolixModeMask) >> 2;
   if (mode == kCoolixDry)
-    if (getTempRaw() == kCoolixFanTempCode)
-      return kCoolixFan;
+    if (getTempRaw() == kCoolixFanTempCode) return kCoolixFan;
   return mode;
 }
 
-uint8_t IRCoolixAC::getFan() {
-  return (remote_state & kCoolixFanMask) >> 13;
-}
+uint8_t IRCoolixAC::getFan() { return (remote_state & kCoolixFanMask) >> 13; }
 
 void IRCoolixAC::setFan(const uint8_t speed) {
   uint8_t newspeed = speed;
@@ -375,7 +339,6 @@ std::string IRCoolixAC::toString() {
   return result;
 }
 
-
 #if DECODE_COOLIX
 // Decode the supplied Coolix message.
 //
@@ -394,7 +357,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   if (results->rawlen < 2 * 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid COOLIX message.
   if (strict && nbits != kCoolixBits)
-    return false;  // Not strictly a COOLIX message.
+    return false;      // Not strictly a COOLIX message.
   if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
     return false;
 
@@ -408,12 +371,10 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   // Header
   if (!matchMark(results->rawbuf[offset], kCoolixHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] *
-      kRawTick / kCoolixHdrMarkTicks;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kCoolixHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kCoolixHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kCoolixHdrSpaceTicks;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick / kCoolixHdrSpaceTicks;
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
@@ -448,8 +409,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
   uint64_t orig = data;  // Save a copy of the data.
   if (strict) {
     for (uint16_t i = 0; i < nbits; i += 8, data >>= 8, inverted >>= 8)
-      if ((data & 0xFF) != ((inverted & 0xFF) ^ 0xFF))
-        return false;
+      if ((data & 0xFF) != ((inverted & 0xFF) ^ 0xFF)) return false;
   }
 
   // Success

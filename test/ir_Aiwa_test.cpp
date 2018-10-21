@@ -21,7 +21,8 @@ TEST(TestSendAiwa, SendDataOnly) {
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s23520"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
 }
 
 // Test sending oversized data.
@@ -48,7 +49,8 @@ TEST(TestSendAiwa, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s1680m560s1680m560s23520", irsend.outputStr());
+      "m560s1680m560s1680m560s23520",
+      irsend.outputStr());
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F, kAiwaRcT501Bits, 1);  // 1 repeat.
   EXPECT_EQ(
@@ -59,7 +61,8 @@ TEST(TestSendAiwa, SendWithRepeats) {
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s23520"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F, kAiwaRcT501Bits, 2);  // 2 repeats.
   EXPECT_EQ(
@@ -71,7 +74,8 @@ TEST(TestSendAiwa, SendWithRepeats) {
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s23520"
       "m8960s2240m560s96320"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -88,7 +92,8 @@ TEST(TestSendAiwa, SendUnusualSize) {
       "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s560m560s560m560s560m560s1680m560s560m560s560"
       "m560s1680m560s560m560s1680m560s36960"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendAiwaRCT501(0x1234567890, 37);
@@ -103,7 +108,8 @@ TEST(TestSendAiwa, SendUnusualSize) {
       "m560s1680m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s1680"
       "m560s560m560s560m560s1680m560s560m560s560m560s560m560s560m560s1680"
       "m560s22400"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
 }
 
 // Tests for decodeAiwaRCT501().
@@ -118,8 +124,7 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7F, irsend.capture.value);
@@ -131,8 +136,7 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -144,8 +148,7 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7FFF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7FFF, irsend.capture.value);
@@ -164,8 +167,7 @@ TEST(TestDecodeAiwa, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F, kAiwaRcT501Bits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7F, irsend.capture.value);
@@ -185,8 +187,7 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1D8113F00FF, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // MUST pass with strict on.
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   ASSERT_EQ(0x7F, irsend.capture.value);
 
   irsend.reset();
@@ -195,11 +196,10 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1234567890A, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   // Should fail if strict off too.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      false));
+  ASSERT_FALSE(
+      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
 
   irsend.reset();
   // Use sendNEC(data, 42) to make/send an illegal value Aiwa message.
@@ -207,11 +207,10 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1D8113F00FE, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   // Should fail if strict off too.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      false));
+  ASSERT_FALSE(
+      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
 
   irsend.reset();
   // Use sendNEC(data, 42) to make/send an illegal value Aiwa message.
@@ -219,11 +218,10 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x0D8113F00FF, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   // Should fail if strict off too.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      false));
+  ASSERT_FALSE(
+      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
 }
 
 // Decode unsupported Aiwa messages.
@@ -236,8 +234,7 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictSizes) {
   irsend.sendAiwaRCT501(0x0, 8);  // Illegal size Aiwa 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   // Should pass if strict off.
   ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, 8, false));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
@@ -248,8 +245,7 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictSizes) {
   irsend.sendAiwaRCT501(0x12345678, 32);  // Illegal size Aiwa 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                      true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
   // Should fail with strict when we ask for the wrong bit size.
   ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, 32, true));
 
@@ -295,14 +291,13 @@ TEST(TestDecodeAiwa, DecodeGlobalCacheExample) {
 
   irsend.reset();
   // Aiwa Power Toggle from Global Cache.
-  uint16_t gc_test[95] = {38000, 1, 89, 342, 171, 21, 21, 21, 64, 21, 64,
-                          21, 64, 21, 21, 21, 64, 21, 64, 21, 21, 21, 21,
-                          21, 21, 21, 21, 21, 21, 21, 21, 21, 64, 21, 21,
-                          21, 21, 21, 21, 21, 64, 21, 21, 21, 21, 21, 64,
-                          21, 64, 21, 64, 21, 64, 21, 64, 21, 64, 21, 21,
-                          21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
-                          21, 21, 21, 64, 21, 64, 21, 64, 21, 64, 21, 64,
-                          21, 64, 21, 64, 21, 64, 21, 875, 342, 171, 21, 3565};
+  uint16_t gc_test[95] = {
+      38000, 1,  89, 342, 171, 21, 21, 21, 64, 21, 64,  21,  64,  21, 21,  21,
+      64,    21, 64, 21,  21,  21, 21, 21, 21, 21, 21,  21,  21,  21, 21,  21,
+      64,    21, 21, 21,  21,  21, 21, 21, 64, 21, 21,  21,  21,  21, 64,  21,
+      64,    21, 64, 21,  64,  21, 64, 21, 64, 21, 21,  21,  21,  21, 21,  21,
+      21,    21, 21, 21,  21,  21, 21, 21, 21, 21, 64,  21,  64,  21, 64,  21,
+      64,    21, 64, 21,  64,  21, 64, 21, 64, 21, 875, 342, 171, 21, 3565};
   irsend.sendGC(gc_test, 95);
   irsend.makeDecodeResult();
 
@@ -326,13 +321,14 @@ TEST(TestDecodeAiwa, FailToDecodeNonAiwaExample) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits,
-                                       false));
+  ASSERT_FALSE(
+      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
 }

@@ -7,7 +7,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-
 // Fujitsu A/C support added by Jonny Graham & David Conran
 
 // Equipment it seems compatible with:
@@ -41,11 +40,10 @@ const uint16_t kFujitsuAcMinGap = 8100;
 //
 void IRsend::sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
-  sendGeneric(kFujitsuAcHdrMark, kFujitsuAcHdrSpace,
-              kFujitsuAcBitMark, kFujitsuAcOneSpace,
-              kFujitsuAcBitMark, kFujitsuAcZeroSpace,
-              kFujitsuAcBitMark, kFujitsuAcMinGap,
-              data, nbytes, 38, false, repeat, 50);
+  sendGeneric(kFujitsuAcHdrMark, kFujitsuAcHdrSpace, kFujitsuAcBitMark,
+              kFujitsuAcOneSpace, kFujitsuAcBitMark, kFujitsuAcZeroSpace,
+              kFujitsuAcBitMark, kFujitsuAcMinGap, data, nbytes, 38, false,
+              repeat, 50);
 }
 #endif  // SEND_FUJITSU_AC
 
@@ -82,9 +80,7 @@ void IRFujitsuAC::stateReset() {
 }
 
 // Configure the pin for output.
-void IRFujitsuAC::begin() {
-  _irsend.begin();
-}
+void IRFujitsuAC::begin() { _irsend.begin(); }
 
 #if SEND_FUJITSU_AC
 // Send the current desired state to the IR LED.
@@ -154,12 +150,10 @@ void IRFujitsuAC::buildState() {
   } else {  // short codes
     if (_model == ARRAH2E)
       // The last byte is the inverse of penultimate byte
-      remote_state[_state_length_short - 1] = ~remote_state[_state_length_short
-                                                            - 2];
+      remote_state[_state_length_short - 1] =
+          ~remote_state[_state_length_short - 2];
     // Zero the rest of the state.
-    for (uint8_t i = _state_length_short;
-         i < kFujitsuAcStateLength;
-         i++)
+    for (uint8_t i = _state_length_short; i < kFujitsuAcStateLength; i++)
       remote_state[i] = 0;
   }
 }
@@ -214,7 +208,7 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
 }
 
 bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
-  if (length > kFujitsuAcStateLength)  return false;
+  if (length > kFujitsuAcStateLength) return false;
   for (uint16_t i = 0; i < kFujitsuAcStateLength; i++) {
     if (i < length)
       remote_state[i] = newState[i];
@@ -226,21 +220,18 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
 }
 
 // Set the requested power state of the A/C to off.
-void IRFujitsuAC::off() {
-  _cmd = kFujitsuAcCmdTurnOff;
-}
+void IRFujitsuAC::off() { _cmd = kFujitsuAcCmdTurnOff; }
 
 void IRFujitsuAC::stepHoriz() {
   switch (_model) {
-    case ARDB1:  break;  // This remote doesn't have a horizontal option.
+    case ARDB1:
+      break;  // This remote doesn't have a horizontal option.
     default:
       _cmd = kFujitsuAcCmdStepHoriz;
   }
 }
 
-void IRFujitsuAC::stepVert() {
-  _cmd = kFujitsuAcCmdStepVert;
-}
+void IRFujitsuAC::stepVert() { _cmd = kFujitsuAcCmdStepVert; }
 
 // Set the requested command of the A/C.
 void IRFujitsuAC::setCmd(uint8_t cmd) {
@@ -261,24 +252,18 @@ void IRFujitsuAC::setCmd(uint8_t cmd) {
   }
 }
 
-uint8_t IRFujitsuAC::getCmd() {
-  return _cmd;
-}
+uint8_t IRFujitsuAC::getCmd() { return _cmd; }
 
-bool IRFujitsuAC::getPower() {
-  return _cmd != kFujitsuAcCmdTurnOff;
-}
+bool IRFujitsuAC::getPower() { return _cmd != kFujitsuAcCmdTurnOff; }
 
 // Set the temp. in deg C
 void IRFujitsuAC::setTemp(uint8_t temp) {
-  temp = std::max((uint8_t) kFujitsuAcMinTemp, temp);
-  temp = std::min((uint8_t) kFujitsuAcMaxTemp, temp);
+  temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
+  temp = std::min((uint8_t)kFujitsuAcMaxTemp, temp);
   _temp = temp;
 }
 
-uint8_t IRFujitsuAC::getTemp() {
-  return _temp;
-}
+uint8_t IRFujitsuAC::getTemp() { return _temp; }
 
 // Set the speed of the fan
 void IRFujitsuAC::setFanSpeed(uint8_t fanSpeed) {
@@ -286,9 +271,7 @@ void IRFujitsuAC::setFanSpeed(uint8_t fanSpeed) {
     fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
   _fanSpeed = fanSpeed;
 }
-uint8_t IRFujitsuAC::getFanSpeed() {
-  return _fanSpeed;
-}
+uint8_t IRFujitsuAC::getFanSpeed() { return _fanSpeed; }
 
 // Set the requested climate operation mode of the a/c unit.
 void IRFujitsuAC::setMode(uint8_t mode) {
@@ -297,29 +280,23 @@ void IRFujitsuAC::setMode(uint8_t mode) {
   _mode = mode;
 }
 
-uint8_t IRFujitsuAC::getMode() {
-  return _mode;
-}
+uint8_t IRFujitsuAC::getMode() { return _mode; }
 // Set the requested swing operation mode of the a/c unit.
 void IRFujitsuAC::setSwing(uint8_t swingMode) {
   switch (_model) {
     case ARDB1:
       // Set the mode to max if out of range
-      if (swingMode > kFujitsuAcSwingVert)
-        swingMode = kFujitsuAcSwingVert;
+      if (swingMode > kFujitsuAcSwingVert) swingMode = kFujitsuAcSwingVert;
       break;
     case ARRAH2E:
     default:
       // Set the mode to max if out of range
-      if (swingMode > kFujitsuAcSwingBoth)
-        swingMode = kFujitsuAcSwingBoth;
+      if (swingMode > kFujitsuAcSwingBoth) swingMode = kFujitsuAcSwingBoth;
   }
   _swingMode = swingMode;
 }
 
-uint8_t IRFujitsuAC::getSwing() {
-  return _swingMode;
-}
+uint8_t IRFujitsuAC::getSwing() { return _swingMode; }
 
 bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
   uint8_t sum = 0;
@@ -327,7 +304,7 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
   uint8_t checksum = state[length - 1];
   switch (length) {
     case kFujitsuAcStateLengthShort:  // ARRAH2E
-      return state[length - 1] == (uint8_t) ~state[length - 2];
+      return state[length - 1] == (uint8_t)~state[length - 2];
     case kFujitsuAcStateLength - 1:  // ARDB1
       sum = sumBytes(state, length - 1);
       sum_complement = 0x9B;
@@ -336,10 +313,10 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
       sum = sumBytes(state + kFujitsuAcStateLengthShort,
                      length - 1 - kFujitsuAcStateLengthShort);
       break;
-    default:  // Includes ARDB1 short.
+    default:        // Includes ARDB1 short.
       return true;  // Assume the checksum is valid for other lengths.
   }
-  return checksum == (uint8_t) (sum_complement - sum);  // Does it match?
+  return checksum == (uint8_t)(sum_complement - sum);  // Does it match?
 }
 
 // Convert the internal state into a human readable string.
@@ -420,7 +397,7 @@ std::string IRFujitsuAC::toString() {
       result += "Step vane vertically";
       break;
     default:
-    result += "N/A";
+      result += "N/A";
   }
   return result;
 }
@@ -439,7 +416,7 @@ std::string IRFujitsuAC::toString() {
 //
 // Ref:
 //
-bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
+bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t nbits,
                              bool strict) {
   uint16_t offset = kStartOffset;
   uint16_t dataBitsSoFar = 0;
@@ -447,7 +424,6 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
   // Have we got enough data to successfully decode?
   if (results->rawlen < (2 * kFujitsuAcMinBits) + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid message.
-
 
   // Compliance
   if (strict) {
@@ -463,21 +439,16 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
   }
 
   // Header
-  if (!matchMark(results->rawbuf[offset++], kFujitsuAcHdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kFujitsuAcHdrSpace))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], kFujitsuAcHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kFujitsuAcHdrSpace)) return false;
 
   // Data (Fixed signature)
-  match_result_t data_result = matchData(&(results->rawbuf[offset]),
-                                        kFujitsuAcMinBits - 8,
-                                        kFujitsuAcBitMark,
-                                        kFujitsuAcOneSpace,
-                                        kFujitsuAcBitMark,
-                                        kFujitsuAcZeroSpace,
-                                        kTolerance, kMarkExcess, false);
-  if (data_result.success == false)  return false;  // Fail
-  if (data_result.data != 0x1010006314)  return false;  // Signature failed.
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), kFujitsuAcMinBits - 8,
+                kFujitsuAcBitMark, kFujitsuAcOneSpace, kFujitsuAcBitMark,
+                kFujitsuAcZeroSpace, kTolerance, kMarkExcess, false);
+  if (data_result.success == false) return false;      // Fail
+  if (data_result.data != 0x1010006314) return false;  // Signature failed.
   dataBitsSoFar += kFujitsuAcMinBits - 8;
   offset += data_result.used;
   results->state[0] = 0x14;
@@ -488,28 +459,27 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
 
   // Keep reading bytes until we either run out of message or state to fill.
   for (uint16_t i = 5;
-      offset <= results->rawlen - 16 && i < kFujitsuAcStateLength;
-      i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kFujitsuAcBitMark,
-                            kFujitsuAcOneSpace,
-                            kFujitsuAcBitMark,
-                            kFujitsuAcZeroSpace,
-                            kTolerance, kMarkExcess, false);
-    if (data_result.success == false)  break;  // Fail
+       offset <= results->rawlen - 16 && i < kFujitsuAcStateLength;
+       i++, dataBitsSoFar += 8, offset += data_result.used) {
+    data_result = matchData(
+        &(results->rawbuf[offset]), 8, kFujitsuAcBitMark, kFujitsuAcOneSpace,
+        kFujitsuAcBitMark, kFujitsuAcZeroSpace, kTolerance, kMarkExcess, false);
+    if (data_result.success == false) break;  // Fail
     results->state[i] = data_result.data;
   }
 
   // Footer
   if (offset > results->rawlen ||
-      !matchMark(results->rawbuf[offset++], kFujitsuAcBitMark)) return false;
+      !matchMark(results->rawbuf[offset++], kFujitsuAcBitMark))
+    return false;
   // The space is optional if we are out of capture.
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kFujitsuAcMinGap)) return false;
+      !matchAtLeast(results->rawbuf[offset], kFujitsuAcMinGap))
+    return false;
 
   // Compliance
   if (strict) {
-    if (dataBitsSoFar != nbits)  return false;
+    if (dataBitsSoFar != nbits) return false;
   }
 
   results->decode_type = FUJITSU_AC;
@@ -520,22 +490,22 @@ bool IRrecv::decodeFujitsuAC(decode_results *results, uint16_t nbits,
     case kFujitsuAcMinBits:
       // Check if this values indicate that this should have been a long state
       // message.
-      if (results->state[5] == 0xFC)  return false;
+      if (results->state[5] == 0xFC) return false;
       return true;  // Success
     case kFujitsuAcMinBits + 8:
       // Check if this values indicate that this should have been a long state
       // message.
-      if (results->state[5] == 0xFE)  return false;
+      if (results->state[5] == 0xFE) return false;
       // The last byte needs to be the inverse of the penultimate byte.
-      if (results->state[5] != (uint8_t) ~results->state[6])  return false;
+      if (results->state[5] != (uint8_t)~results->state[6]) return false;
       return true;  // Success
     case kFujitsuAcBits - 8:
       // Long messages of this size require this byte be correct.
-      if (results->state[5] != 0xFC)  return false;
+      if (results->state[5] != 0xFC) return false;
       break;
     case kFujitsuAcBits:
       // Long messages of this size require this byte be correct.
-      if (results->state[5] != 0xFE)  return false;
+      if (results->state[5] != 0xFE) return false;
       break;
     default:
       return false;  // Unexpected size.

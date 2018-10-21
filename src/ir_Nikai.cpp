@@ -41,11 +41,9 @@ const uint16_t kNikaiMinGap = kNikaiMinGapTicks * kNikaiTick;
 //
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/309
 void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  sendGeneric(kNikaiHdrMark, kNikaiHdrSpace,
-              kNikaiBitMark, kNikaiOneSpace,
-              kNikaiBitMark, kNikaiZeroSpace,
-              kNikaiBitMark, kNikaiMinGap,
-              data, nbits, 38, true, repeat, 33);
+  sendGeneric(kNikaiHdrMark, kNikaiHdrSpace, kNikaiBitMark, kNikaiOneSpace,
+              kNikaiBitMark, kNikaiZeroSpace, kNikaiBitMark, kNikaiMinGap, data,
+              nbits, 38, true, repeat, 33);
 }
 #endif
 
@@ -74,18 +72,15 @@ bool IRrecv::decodeNikai(decode_results *results, uint16_t nbits, bool strict) {
   // Header
   if (!matchMark(results->rawbuf[offset], kNikaiHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-      kNikaiHdrMarkTicks;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kNikaiHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kNikaiHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kNikaiHdrSpaceTicks;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick / kNikaiHdrSpaceTicks;
   // Data
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kNikaiBitMarkTicks * m_tick,
-                                         kNikaiOneSpaceTicks * s_tick,
-                                         kNikaiBitMarkTicks * m_tick,
-                                         kNikaiZeroSpaceTicks * s_tick);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits, kNikaiBitMarkTicks * m_tick,
+                kNikaiOneSpaceTicks * s_tick, kNikaiBitMarkTicks * m_tick,
+                kNikaiZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;

@@ -22,8 +22,7 @@
 // Note:
 //   Sherwood remote codes appear to be NEC codes with a manditory repeat code.
 //   i.e. repeat should be >= kSherwoodMinRepeat (1).
-void IRsend::sendSherwood(uint64_t data, uint16_t nbits,
-                                            uint16_t repeat) {
-  sendNEC(data, nbits, std::max((uint16_t) kSherwoodMinRepeat, repeat));
+void IRsend::sendSherwood(uint64_t data, uint16_t nbits, uint16_t repeat) {
+  sendNEC(data, nbits, std::max((uint16_t)kSherwoodMinRepeat, repeat));
 }
 #endif

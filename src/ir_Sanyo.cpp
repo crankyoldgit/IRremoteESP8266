@@ -38,15 +38,17 @@ const uint16_t kSanyoLc7461AddressMask = (1 << kSanyoLC7461AddressBits) - 1;
 const uint16_t kSanyoLc7461CommandMask = (1 << kSanyoLC7461CommandBits) - 1;
 const uint16_t kSanyoLc7461HdrMark = 9000;
 const uint16_t kSanyoLc7461HdrSpace = 4500;
-const uint16_t kSanyoLc7461BitMark = 560;  // 1T
+const uint16_t kSanyoLc7461BitMark = 560;    // 1T
 const uint16_t kSanyoLc7461OneSpace = 1690;  // 3T
 const uint16_t kSanyoLc7461ZeroSpace = 560;  // 1T
 const uint32_t kSanyoLc7461MinCommandLength = 108000;
 
-const uint16_t kSanyoLc7461MinGap = kSanyoLc7461MinCommandLength -
-    (kSanyoLc7461HdrMark + kSanyoLc7461HdrSpace + kSanyoLC7461Bits *
-     (kSanyoLc7461BitMark + (kSanyoLc7461OneSpace + kSanyoLc7461ZeroSpace) / 2)
-     + kSanyoLc7461BitMark);
+const uint16_t kSanyoLc7461MinGap =
+    kSanyoLc7461MinCommandLength -
+    (kSanyoLc7461HdrMark + kSanyoLc7461HdrSpace +
+     kSanyoLC7461Bits * (kSanyoLc7461BitMark +
+                         (kSanyoLc7461OneSpace + kSanyoLc7461ZeroSpace) / 2) +
+     kSanyoLc7461BitMark);
 
 #if SEND_SANYO
 // Construct a Sanyo LC7461 message.
@@ -136,15 +138,14 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
     return false;  // Didn't match a NEC format (without strict)
 
   // Bits 30 to 42+.
-  uint16_t address = results->value >> (kSanyoLC7461Bits -
-                                        kSanyoLC7461AddressBits);
+  uint16_t address =
+      results->value >> (kSanyoLC7461Bits - kSanyoLC7461AddressBits);
   // Bits 9 to 16.
-  uint8_t command = (results->value >> kSanyoLC7461CommandBits) &
-      kSanyoLc7461CommandMask;
+  uint8_t command =
+      (results->value >> kSanyoLC7461CommandBits) & kSanyoLc7461CommandMask;
   // Compliance
   if (strict) {
-    if (results->bits != nbits)
-      return false;
+    if (results->bits != nbits) return false;
     // Bits 17 to 29.
     uint16_t inverted_address =
         (results->value >> (kSanyoLC7461CommandBits * 2)) &

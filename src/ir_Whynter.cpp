@@ -29,9 +29,10 @@ const uint16_t kWhynterOneSpace = kWhynterOneSpaceTicks * kWhynterTick;
 const uint16_t kWhynterZeroSpaceTicks = 15;
 const uint16_t kWhynterZeroSpace = kWhynterZeroSpaceTicks * kWhynterTick;
 const uint16_t kWhynterMinCommandLengthTicks = 2160;  // Totally made up value.
-const uint32_t kWhynterMinCommandLength = kWhynterMinCommandLengthTicks *
-    kWhynterTick;
-const uint16_t kWhynterMinGapTicks = kWhynterMinCommandLengthTicks -
+const uint32_t kWhynterMinCommandLength =
+    kWhynterMinCommandLengthTicks * kWhynterTick;
+const uint16_t kWhynterMinGapTicks =
+    kWhynterMinCommandLengthTicks -
     (2 * (kWhynterBitMarkTicks + kWhynterZeroSpaceTicks) +
      kWhynterBits * (kWhynterBitMarkTicks + kWhynterOneSpaceTicks));
 const uint16_t kWhynterMinGap = kWhynterMinGapTicks * kWhynterTick;
@@ -56,14 +57,12 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
     // (Pre-)Header
     mark(kWhynterBitMark);
     space(kWhynterZeroSpace);
-    sendGeneric(kWhynterHdrMark, kWhynterHdrSpace,
-                kWhynterBitMark, kWhynterOneSpace,
-                kWhynterBitMark, kWhynterZeroSpace,
-                kWhynterBitMark, kWhynterMinGap,
-                kWhynterMinCommandLength - (kWhynterBitMark +
-                                            kWhynterZeroSpace),
-                data, nbits, 38, true, 0,  // Repeats are already handled.
-                50);
+    sendGeneric(
+        kWhynterHdrMark, kWhynterHdrSpace, kWhynterBitMark, kWhynterOneSpace,
+        kWhynterBitMark, kWhynterZeroSpace, kWhynterBitMark, kWhynterMinGap,
+        kWhynterMinCommandLength - (kWhynterBitMark + kWhynterZeroSpace), data,
+        nbits, 38, true, 0,  // Repeats are already handled.
+        50);
   }
 }
 #endif
@@ -105,16 +104,15 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kWhynterHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kWhynterHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kWhynterHdrSpaceTicks;
+  uint32_t s_tick =
+      results->rawbuf[offset++] * kRawTick / kWhynterHdrSpaceTicks;
 
   // Data
   uint64_t data = 0;
-  match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                         kWhynterBitMarkTicks * m_tick,
-                                         kWhynterOneSpaceTicks * s_tick,
-                                         kWhynterBitMarkTicks * m_tick,
-                                         kWhynterZeroSpaceTicks * s_tick);
+  match_result_t data_result =
+      matchData(&(results->rawbuf[offset]), nbits,
+                kWhynterBitMarkTicks * m_tick, kWhynterOneSpaceTicks * s_tick,
+                kWhynterBitMarkTicks * m_tick, kWhynterZeroSpaceTicks * s_tick);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;
@@ -122,8 +120,8 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
   // Footer
   if (!matchMark(results->rawbuf[offset++], kWhynterBitMarkTicks * m_tick))
     return false;
-  if (offset < results->rawlen && !matchAtLeast(results->rawbuf[offset],
-                                                kWhynterMinGapTicks * s_tick))
+  if (offset < results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], kWhynterMinGapTicks * s_tick))
     return false;
 
   // Success

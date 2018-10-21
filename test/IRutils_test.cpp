@@ -41,14 +41,14 @@ TEST(ReverseBitsTest, LessBitsReversedThanInputHasSet) {
 // Tests for uint64ToString()
 
 TEST(TestUint64ToString, TrivialCases) {
-  EXPECT_EQ("0", uint64ToString(0));  // Default base (10)
-  EXPECT_EQ("0", uint64ToString(0, 2));  // Base-2
-  EXPECT_EQ("0", uint64ToString(0, 8));  // Base-8
+  EXPECT_EQ("0", uint64ToString(0));      // Default base (10)
+  EXPECT_EQ("0", uint64ToString(0, 2));   // Base-2
+  EXPECT_EQ("0", uint64ToString(0, 8));   // Base-8
   EXPECT_EQ("0", uint64ToString(0, 10));  // Base-10
   EXPECT_EQ("0", uint64ToString(0, 16));  // Base-16
 
-  EXPECT_EQ("1", uint64ToString(1, 2));  // Base-2
-  EXPECT_EQ("2", uint64ToString(2, 8));  // Base-8
+  EXPECT_EQ("1", uint64ToString(1, 2));   // Base-2
+  EXPECT_EQ("2", uint64ToString(2, 8));   // Base-8
   EXPECT_EQ("3", uint64ToString(3, 10));  // Base-10
   EXPECT_EQ("4", uint64ToString(4, 16));  // Base-16
 }
@@ -65,17 +65,17 @@ TEST(TestUint64ToString, NormalUse) {
 TEST(TestUint64ToString, Max64Bit) {
   EXPECT_EQ("18446744073709551615", uint64ToString(UINT64_MAX));  // Default
   EXPECT_EQ("1111111111111111111111111111111111111111111111111111111111111111",
-            uint64ToString(UINT64_MAX, 2));  // Base-2
+            uint64ToString(UINT64_MAX, 2));                            // Base-2
   EXPECT_EQ("1777777777777777777777", uint64ToString(UINT64_MAX, 8));  // Base-8
   EXPECT_EQ("18446744073709551615", uint64ToString(UINT64_MAX, 10));  // Base-10
-  EXPECT_EQ("FFFFFFFFFFFFFFFF", uint64ToString(UINT64_MAX, 16));  // Base-16
+  EXPECT_EQ("FFFFFFFFFFFFFFFF", uint64ToString(UINT64_MAX, 16));      // Base-16
 }
 
 TEST(TestUint64ToString, Max32Bit) {
-  EXPECT_EQ("4294967295", uint64ToString(UINT32_MAX));  // Default
+  EXPECT_EQ("4294967295", uint64ToString(UINT32_MAX));      // Default
   EXPECT_EQ("37777777777", uint64ToString(UINT32_MAX, 8));  // Base-8
   EXPECT_EQ("4294967295", uint64ToString(UINT32_MAX, 10));  // Base-10
-  EXPECT_EQ("FFFFFFFF", uint64ToString(UINT32_MAX, 16));  // Base-16
+  EXPECT_EQ("FFFFFFFF", uint64ToString(UINT32_MAX, 16));    // Base-16
 }
 
 TEST(TestUint64ToString, InterestingCases) {
@@ -89,8 +89,8 @@ TEST(TestUint64ToString, SillyBases) {
   EXPECT_EQ("12345", uint64ToString(12345, 0));  // Super silly, makes no sense.
   EXPECT_EQ("12345", uint64ToString(12345, 1));  // We don't do unary.
   EXPECT_EQ("12345", uint64ToString(12345, 100));  // We can't print base-100.
-  EXPECT_EQ("12345", uint64ToString(12345, 37));  // Base-37 is one to far.
-  EXPECT_EQ("9IX", uint64ToString(12345, 36));  // But we *can* do base-36.
+  EXPECT_EQ("12345", uint64ToString(12345, 37));   // Base-37 is one to far.
+  EXPECT_EQ("9IX", uint64ToString(12345, 36));     // But we *can* do base-36.
 }
 
 TEST(TestGetCorrectedRawLength, NoLargeValues) {
@@ -132,18 +132,22 @@ TEST(TestResultToSourceCode, SimpleTests) {
   irsend.sendRaw(test_data, 7, 38000);
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
-  EXPECT_EQ("uint16_t rawData[7] = {10, 20,  30, 40,  50, 60,  70};"
-            "  // UNKNOWN A5E5F35D\n", resultToSourceCode(&irsend.capture));
+  EXPECT_EQ(
+      "uint16_t rawData[7] = {10, 20,  30, 40,  50, 60,  70};"
+      "  // UNKNOWN A5E5F35D\n",
+      resultToSourceCode(&irsend.capture));
 
   // Stick in some large values.
   irsend.capture.rawbuf[3] = 60000;
-  EXPECT_EQ("uint16_t rawData[9] = {10, 20,  65535, 0,  54465, 40,"
-            "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
-            resultToSourceCode(&irsend.capture));
+  EXPECT_EQ(
+      "uint16_t rawData[9] = {10, 20,  65535, 0,  54465, 40,"
+      "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
+      resultToSourceCode(&irsend.capture));
   irsend.capture.rawbuf[5] = UINT16_MAX;
-  EXPECT_EQ("uint16_t rawData[11] = {10, 20,  65535, 0,  54465, 40,"
-            "  65535, 0,  65535, 60,  70};  // UNKNOWN A5E5F35D\n",
-            resultToSourceCode(&irsend.capture));
+  EXPECT_EQ(
+      "uint16_t rawData[11] = {10, 20,  65535, 0,  54465, 40,"
+      "  65535, 0,  65535, 60,  70};  // UNKNOWN A5E5F35D\n",
+      resultToSourceCode(&irsend.capture));
 
   // Reset and put the large value in a space location.
   irsend.reset();
@@ -151,9 +155,10 @@ TEST(TestResultToSourceCode, SimpleTests) {
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
   irsend.capture.rawbuf[4] = UINT16_MAX - 1;
-  EXPECT_EQ("uint16_t rawData[9] = {10, 20,  30, 65535,  0, 65533,"
-            "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
-            resultToSourceCode(&irsend.capture));
+  EXPECT_EQ(
+      "uint16_t rawData[9] = {10, 20,  30, 65535,  0, 65533,"
+      "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
+      resultToSourceCode(&irsend.capture));
 }
 
 TEST(TestResultToSourceCode, SimpleProtocols) {
@@ -178,7 +183,8 @@ TEST(TestResultToSourceCode, SimpleProtocols) {
       "};  // NEC 8F704FB\n"
       "uint32_t address = 0x10;\n"
       "uint32_t command = 0x20;\n"
-      "uint64_t data = 0x8F704FB;\n", resultToSourceCode(&irsend.capture));
+      "uint64_t data = 0x8F704FB;\n",
+      resultToSourceCode(&irsend.capture));
 
   // Generate a code which DOESN'T have address & command values.
   irsend.reset();
@@ -194,7 +200,8 @@ TEST(TestResultToSourceCode, SimpleProtocols) {
       "500, 1000,  500, 1000,  500, 2000,  500, 2000,  500, 1000,  500, 2000,  "
       "500, 1000,  500, 1000,  500, 1000,  500, 1000,  500, 8500 };"
       "  // NIKAI D0F2F\n"
-      "uint64_t data = 0xD0F2F;\n", resultToSourceCode(&irsend.capture));
+      "uint64_t data = 0xD0F2F;\n",
+      resultToSourceCode(&irsend.capture));
 }
 
 TEST(TestResultToSourceCode, ComplexProtocols) {
@@ -202,8 +209,8 @@ TEST(TestResultToSourceCode, ComplexProtocols) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint8_t state[kToshibaACStateLength] = {
-      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
+  uint8_t state[kToshibaACStateLength] = {0xF2, 0x0D, 0x03, 0xFC, 0x01,
+                                          0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
   irsend.sendToshibaAC(state);
@@ -239,7 +246,8 @@ TEST(TestResultToSourceCode, ComplexProtocols) {
       "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 1622,  "
       "542, 7048 };  // TOSHIBA_AC\n"
       "uint8_t state[9] = {0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, "
-      "0x01};\n", resultToSourceCode(&irsend.capture));
+      "0x01};\n",
+      resultToSourceCode(&irsend.capture));
 }
 
 TEST(TestResultToTimingInfo, General) {
@@ -309,9 +317,8 @@ TEST(TestResultToHumanReadableBasic, ComplexCodes) {
   IRrecv irrecv(1);
   irsend.begin();
 
-
-  uint8_t state[kToshibaACStateLength] = {
-      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x01};
+  uint8_t state[kToshibaACStateLength] = {0xF2, 0x0D, 0x03, 0xFC, 0x01,
+                                          0x00, 0x00, 0x00, 0x01};
 
   irsend.reset();
   irsend.sendToshibaAC(state);

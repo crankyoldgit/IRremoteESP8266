@@ -19,7 +19,8 @@ TEST(TestSendWhynter, SendDataOnly) {
       "m750s750m750s750m750s750m750s750m750s750m750s750m750s750m750s750"
       "m750s750m750s750m750s750m750s750m750s750m750s750m750s750m750s750"
       "m750s750m750s750m750s750m750s750m750s750m750s750m750s750m750s750"
-      "m750s52050", irsend.outputStr());
+      "m750s52050",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendWhynter(0xFFFFFFFF);
@@ -29,7 +30,8 @@ TEST(TestSendWhynter, SendDataOnly) {
       "m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150"
       "m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150"
       "m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150m750s2150"
-      "m750s12200", irsend.outputStr());
+      "m750s12200",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendWhynter(0x87654321);
@@ -39,7 +41,8 @@ TEST(TestSendWhynter, SendDataOnly) {
       "m750s750m750s2150m750s2150m750s750m750s750m750s2150m750s750m750s2150"
       "m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150m750s2150"
       "m750s750m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150"
-      "m750s33850", irsend.outputStr());
+      "m750s33850",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -55,7 +58,8 @@ TEST(TestSendWhynter, SendWithRepeats) {
       "m750s750m750s2150m750s2150m750s750m750s750m750s2150m750s750m750s2150"
       "m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150m750s2150"
       "m750s750m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150"
-      "m750s33850", irsend.outputStr());
+      "m750s33850",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendWhynter(0x87654321, kWhynterBits, 1);  // 1 repeat.
@@ -71,7 +75,8 @@ TEST(TestSendWhynter, SendWithRepeats) {
       "m750s750m750s2150m750s2150m750s750m750s750m750s2150m750s750m750s2150"
       "m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150m750s2150"
       "m750s750m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150"
-      "m750s33850", irsend.outputStr());
+      "m750s33850",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendWhynter(0x87654321, kWhynterBits, 2);  // 2 repeats.
@@ -93,7 +98,8 @@ TEST(TestSendWhynter, SendWithRepeats) {
       "m750s750m750s2150m750s2150m750s750m750s750m750s2150m750s750m750s2150"
       "m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150m750s2150"
       "m750s750m750s750m750s2150m750s750m750s750m750s750m750s750m750s2150"
-      "m750s33850", irsend.outputStr());
+      "m750s33850",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -106,7 +112,8 @@ TEST(TestSendWhynter, SendUnusualSize) {
   EXPECT_EQ(
       "m750s750m2850s2850"
       "m750s750m750s750m750s750m750s750m750s750m750s750m750s750m750s750"
-      "m750s88050", irsend.outputStr());
+      "m750s88050",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendWhynter(0x1234567890ABCDEF, 64);
@@ -120,7 +127,8 @@ TEST(TestSendWhynter, SendUnusualSize) {
       "m750s2150m750s750m750s2150m750s750m750s2150m750s750m750s2150m750s2150"
       "m750s2150m750s2150m750s750m750s750m750s2150m750s2150m750s750m750s2150"
       "m750s2150m750s2150m750s2150m750s750m750s2150m750s2150m750s2150m750s2150"
-      "m750s12200", irsend.outputStr());
+      "m750s12200",
+      irsend.outputStr());
 }
 
 // Tests for decodeWhynter().
@@ -238,9 +246,10 @@ TEST(TestDecodeWhynter, FailToDecodeNonWhynterExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 

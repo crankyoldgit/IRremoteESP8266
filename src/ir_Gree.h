@@ -58,24 +58,24 @@ const uint8_t kGreeSwingMiddleAuto = 0b00001001;
 const uint8_t kGreeSwingUpAuto = 0b00001011;
 
 // Legacy defines.
-#define GREE_AUTO              kGreeAuto
-#define GREE_COOL              kGreeCool
-#define GREE_DRY               kGreeDry
-#define GREE_FAN               kGreeFan
-#define GREE_HEAT              kGreeHeat
-#define GREE_MIN_TEMP          kGreeMinTemp
-#define GREE_MAX_TEMP          kGreeMaxTemp
-#define GREE_FAN_MAX           kGreeFanMax
-#define GREE_SWING_LAST_POS    kGreeSwingLastPos
-#define GREE_SWING_AUTO        kGreeSwingAuto
-#define GREE_SWING_UP          kGreeSwingUp
-#define GREE_SWING_MIDDLE_UP   kGreeSwingMiddleUp
-#define GREE_SWING_MIDDLE      kGreeSwingMiddle
+#define GREE_AUTO kGreeAuto
+#define GREE_COOL kGreeCool
+#define GREE_DRY kGreeDry
+#define GREE_FAN kGreeFan
+#define GREE_HEAT kGreeHeat
+#define GREE_MIN_TEMP kGreeMinTemp
+#define GREE_MAX_TEMP kGreeMaxTemp
+#define GREE_FAN_MAX kGreeFanMax
+#define GREE_SWING_LAST_POS kGreeSwingLastPos
+#define GREE_SWING_AUTO kGreeSwingAuto
+#define GREE_SWING_UP kGreeSwingUp
+#define GREE_SWING_MIDDLE_UP kGreeSwingMiddleUp
+#define GREE_SWING_MIDDLE kGreeSwingMiddle
 #define GREE_SWING_MIDDLE_DOWN kGreeSwingMiddleDown
-#define GREE_SWING_DOWN        kGreeSwingDown
-#define GREE_SWING_DOWN_AUTO   kGreeSwingDownAuto
+#define GREE_SWING_DOWN kGreeSwingDown
+#define GREE_SWING_DOWN_AUTO kGreeSwingDownAuto
 #define GREE_SWING_MIDDLE_AUTO kGreeSwingMiddleAuto
-#define GREE_SWING_UP_AUTO     kGreeSwingUpAuto
+#define GREE_SWING_UP_AUTO kGreeSwingUpAuto
 
 // Classes
 class IRGreeAC {

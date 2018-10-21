@@ -30,7 +30,8 @@ const uint16_t kDenonOneSpace = kDenonOneSpaceTicks * kDenonTick;
 const uint16_t kDenonZeroSpaceTicks = 3;
 const uint16_t kDenonZeroSpace = kDenonZeroSpaceTicks * kDenonTick;
 const uint16_t kDenonMinCommandLengthTicks = 510;
-const uint16_t kDenonMinGapTicks = kDenonMinCommandLengthTicks -
+const uint16_t kDenonMinGapTicks =
+    kDenonMinCommandLengthTicks -
     (kDenonHdrMarkTicks + kDenonHdrSpaceTicks +
      kDenonBits * (kDenonBitMarkTicks + kDenonOneSpaceTicks) +
      kDenonBitMarkTicks);
@@ -103,10 +104,8 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // NOTE: I don't think this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     // Check we have enough data
-    if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-      return false;
-    if (strict && nbits != kDenonLegacyBits)
-      return false;
+    if (results->rawlen < 2 * nbits + kHeader + kFooter - 1) return false;
+    if (strict && nbits != kDenonLegacyBits) return false;
 
     uint64_t data = 0;
     uint16_t offset = kStartOffset;
@@ -114,18 +113,16 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
     // Header
     if (!matchMark(results->rawbuf[offset], kDenonHdrMark)) return false;
     // Calculate how long the common tick time is based on the header mark.
-    uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-        kDenonHdrMarkTicks;
+    uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kDenonHdrMarkTicks;
     if (!matchSpace(results->rawbuf[offset], kDenonHdrSpace)) return false;
-    uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-        kDenonHdrSpaceTicks;
+    uint32_t s_tick =
+        results->rawbuf[offset++] * kRawTick / kDenonHdrSpaceTicks;
 
     // Data
-    match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                           kDenonBitMarkTicks * m_tick,
-                                           kDenonOneSpaceTicks * s_tick,
-                                           kDenonBitMarkTicks * m_tick,
-                                           kDenonZeroSpaceTicks * s_tick);
+    match_result_t data_result =
+        matchData(&(results->rawbuf[offset]), nbits,
+                  kDenonBitMarkTicks * m_tick, kDenonOneSpaceTicks * s_tick,
+                  kDenonBitMarkTicks * m_tick, kDenonZeroSpaceTicks * s_tick);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;

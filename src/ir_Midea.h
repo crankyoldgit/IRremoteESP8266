@@ -23,14 +23,14 @@
 //   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Constants
-const uint8_t kMideaACCool = 0;  // 0b000
-const uint8_t kMideaACDry = 1;  // 0b001
-const uint8_t kMideaACAuto = 2;  // 0b010
-const uint8_t kMideaACHeat = 3;  // 0b011
-const uint8_t kMideaACFan = 4;  // 0b100
+const uint8_t kMideaACCool = 0;     // 0b000
+const uint8_t kMideaACDry = 1;      // 0b001
+const uint8_t kMideaACAuto = 2;     // 0b010
+const uint8_t kMideaACHeat = 3;     // 0b011
+const uint8_t kMideaACFan = 4;      // 0b100
 const uint8_t kMideaACFanAuto = 0;  // 0b000
-const uint8_t kMideaACFanLow = 1;  // 0b001
-const uint8_t kMideaACFanMed = 2;  // 0b010
+const uint8_t kMideaACFanLow = 1;   // 0b001
+const uint8_t kMideaACFanMed = 2;   // 0b010
 const uint8_t kMideaACFanHigh = 3;  // 0b011
 const uint64_t kMideaACPower = 1ULL << 39;
 const uint64_t kMideaACSleep = 1ULL << 38;
@@ -45,21 +45,21 @@ const uint64_t kMideaACModeMask = 0x0000FFF8FFFFFFFF;
 const uint64_t kMideaACChecksumMask = 0x0000FFFFFFFFFF00;
 
 // Legacy defines. (Deprecated)
-#define MIDEA_AC_COOL              kMideaACCool
-#define MIDEA_AC_DRY               kMideaACDry
-#define MIDEA_AC_AUTO              kMideaACAuto
-#define MIDEA_AC_HEAT              kMideaACHeat
-#define MIDEA_AC_FAN               kMideaACFan
-#define MIDEA_AC_FAN_AUTO          kMideaACFanAuto
-#define MIDEA_AC_FAN_LOW           kMideaACFanLow
-#define MIDEA_AC_FAN_MED           kMideaACFanMed
-#define MIDEA_AC_FAN_HI            kMideaACFanHigh
-#define MIDEA_AC_POWER             kMideaACPower
-#define MIDEA_AC_SLEEP             kMideaACSleep
-#define MIDEA_AC_MIN_TEMP_F        kMideaACMinTempF
-#define MIDEA_AC_MAX_TEMP_F        kMideaACMaxTempF
-#define MIDEA_AC_MIN_TEMP_C        kMideaACMinTempC
-#define MIDEA_AC_MAX_TEMP_C        kMideaACMaxTempC
+#define MIDEA_AC_COOL kMideaACCool
+#define MIDEA_AC_DRY kMideaACDry
+#define MIDEA_AC_AUTO kMideaACAuto
+#define MIDEA_AC_HEAT kMideaACHeat
+#define MIDEA_AC_FAN kMideaACFan
+#define MIDEA_AC_FAN_AUTO kMideaACFanAuto
+#define MIDEA_AC_FAN_LOW kMideaACFanLow
+#define MIDEA_AC_FAN_MED kMideaACFanMed
+#define MIDEA_AC_FAN_HI kMideaACFanHigh
+#define MIDEA_AC_POWER kMideaACPower
+#define MIDEA_AC_SLEEP kMideaACSleep
+#define MIDEA_AC_MIN_TEMP_F kMideaACMinTempF
+#define MIDEA_AC_MAX_TEMP_F kMideaACMaxTempF
+#define MIDEA_AC_MIN_TEMP_C kMideaACMinTempC
+#define MIDEA_AC_MAX_TEMP_C kMideaACMaxTempC
 
 class IRMideaAC {
  public:
@@ -99,6 +99,5 @@ class IRMideaAC {
   static uint8_t calcChecksum(const uint64_t state);
   IRsend _irsend;
 };
-
 
 #endif  // IR_MIDEA_H_

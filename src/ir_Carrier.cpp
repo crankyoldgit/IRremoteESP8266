@@ -40,11 +40,10 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
     uint64_t temp_data = data;
     // Carrier sends the data block three times. normal + inverted + normal.
     for (uint16_t i = 0; i < 3; i++) {
-      sendGeneric(kCarrierAcHdrMark, kCarrierAcHdrSpace,
-        kCarrierAcBitMark, kCarrierAcOneSpace,
-        kCarrierAcBitMark, kCarrierAcZeroSpace,
-        kCarrierAcBitMark, kCarrierAcGap,
-        temp_data, nbits, 38, true, 0, kDutyDefault);
+      sendGeneric(kCarrierAcHdrMark, kCarrierAcHdrSpace, kCarrierAcBitMark,
+                  kCarrierAcOneSpace, kCarrierAcBitMark, kCarrierAcZeroSpace,
+                  kCarrierAcBitMark, kCarrierAcGap, temp_data, nbits, 38, true,
+                  0, kDutyDefault);
       temp_data = invertBits(temp_data, nbits);
     }
   }
@@ -66,7 +65,7 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Status: ALPHA / Untested.
 //
 bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
-                           bool strict) {
+                             bool strict) {
   if (results->rawlen < ((2 * nbits + kHeader + kFooter) * 3) - 1)
     return false;  // Can't possibly be a valid Carrier message.
   if (strict && nbits != kCarrierAcBits)
@@ -79,29 +78,25 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
   for (uint8_t i = 0; i < 3; i++) {
     prev_data = data;
     // Header
-    if (!matchMark(results->rawbuf[offset++], kCarrierAcHdrMark))
-      return false;
+    if (!matchMark(results->rawbuf[offset++], kCarrierAcHdrMark)) return false;
     if (!matchSpace(results->rawbuf[offset++], kCarrierAcHdrSpace))
       return false;
     // Data
-    match_result_t data_result = matchData(&(results->rawbuf[offset]), nbits,
-                                           kCarrierAcBitMark,
-                                           kCarrierAcOneSpace,
-                                           kCarrierAcBitMark,
-                                           kCarrierAcZeroSpace);
+    match_result_t data_result =
+        matchData(&(results->rawbuf[offset]), nbits, kCarrierAcBitMark,
+                  kCarrierAcOneSpace, kCarrierAcBitMark, kCarrierAcZeroSpace);
     if (data_result.success == false) return false;
     data = data_result.data;
     offset += data_result.used;
     // Footer
-    if (!matchMark(results->rawbuf[offset++], kCarrierAcBitMark))
-      return false;
+    if (!matchMark(results->rawbuf[offset++], kCarrierAcBitMark)) return false;
     if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], kCarrierAcGap))
+        !matchAtLeast(results->rawbuf[offset++], kCarrierAcGap))
       return false;
     // Compliance.
     if (strict) {
       // Check if the data is an inverted copy of the previous data.
-      if (i > 0 && prev_data != invertBits(data, nbits))  return false;
+      if (i > 0 && prev_data != invertBits(data, nbits)) return false;
     }
   }
 

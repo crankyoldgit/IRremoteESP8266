@@ -26,7 +26,8 @@ TEST(TestSendDish, SendDataOnly) {
       "m400s6100"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendDISH(0x9C00);  // Power on.
@@ -43,7 +44,8 @@ TEST(TestSendDish, SendDataOnly) {
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendDISH(0xFFFF);
@@ -60,7 +62,8 @@ TEST(TestSendDish, SendDataOnly) {
       "m400s6100"
       "m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700"
       "m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700m400s1700"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -74,7 +77,8 @@ TEST(TestSendDish, SendWithRepeats) {
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendDISH(0x9C00, kDishBits, 1);  // 1 repeat.
@@ -85,7 +89,8 @@ TEST(TestSendDish, SendWithRepeats) {
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 
   irsend.sendDISH(0x9C00, kDishBits, 2);  // 2 repeats.
   EXPECT_EQ(
@@ -98,7 +103,8 @@ TEST(TestSendDish, SendWithRepeats) {
       "m400s6100"
       "m400s1700m400s2800m400s2800m400s1700m400s1700m400s1700m400s2800m400s2800"
       "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -109,15 +115,16 @@ TEST(TestSendDish, SendUnusualSize) {
   irsend.reset();
   irsend.sendDISH(0x0, 8);
   EXPECT_EQ(
-    "m400s6100"
-    "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-    "m400s6100"
-    "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-    "m400s6100"
-    "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-    "m400s6100"
-    "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
-    "m400s6100", irsend.outputStr());
+      "m400s6100"
+      "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
+      "m400s6100"
+      "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
+      "m400s6100"
+      "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
+      "m400s6100"
+      "m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800m400s2800"
+      "m400s6100",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendDISH(0x1234567890ABCDEF, 64);
@@ -158,7 +165,8 @@ TEST(TestSendDish, SendUnusualSize) {
       "m400s1700m400s2800m400s1700m400s2800m400s1700m400s2800m400s1700m400s1700"
       "m400s1700m400s1700m400s2800m400s2800m400s1700m400s1700m400s2800m400s1700"
       "m400s1700m400s1700m400s1700m400s2800m400s1700m400s1700m400s1700m400s1700"
-      "m400s6100", irsend.outputStr());
+      "m400s6100",
+      irsend.outputStr());
 }
 
 // Tests for decodeDISH().
@@ -247,40 +255,38 @@ TEST(TestDecodeDish, DecodeGlobalCacheExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-/*
-  irsend.reset();
-  // Dish DTV Pal code from Global Cache.
-  uint16_t gc_test_dtv[27] = {58000, 1, 3, 22, 538, 22, 252, 22, 156, 22, 156,
-                              22, 156, 22, 156, 22, 252, 22, 252, 22, 252, 22,
-                              252, 22, 252, 22, 538};
-  irsend.sendGC(gc_test_dtv, 27);
-  irsend.makeDecodeResult();
+  /*
+    irsend.reset();
+    // Dish DTV Pal code from Global Cache.
+    uint16_t gc_test_dtv[27] = {58000, 1, 3, 22, 538, 22, 252, 22, 156, 22, 156,
+                                22, 156, 22, 156, 22, 252, 22, 252, 22, 252, 22,
+                                252, 22, 252, 22, 538};
+    irsend.sendGC(gc_test_dtv, 27);
+    irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
-  EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(kDishBits, irsend.capture.bits);
-  EXPECT_EQ(0x0, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
-  EXPECT_FALSE(irsend.capture.repeat);
+    ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture, kDishBits, true));
+    EXPECT_EQ(DISH, irsend.capture.decode_type);
+    EXPECT_EQ(kDishBits, irsend.capture.bits);
+    EXPECT_EQ(0x0, irsend.capture.value);
+    EXPECT_EQ(0x0, irsend.capture.address);
+    EXPECT_EQ(0x0, irsend.capture.command);
+    EXPECT_FALSE(irsend.capture.repeat);
 
-  ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture));
-  EXPECT_EQ(DISH, irsend.capture.decode_type);
-  EXPECT_EQ(kDishBits, irsend.capture.bits);
-  EXPECT_EQ(0x0, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
-  EXPECT_FALSE(irsend.capture.repeat);
-*/
+    ASSERT_TRUE(irrecv.decodeDISH(&irsend.capture));
+    EXPECT_EQ(DISH, irsend.capture.decode_type);
+    EXPECT_EQ(kDishBits, irsend.capture.bits);
+    EXPECT_EQ(0x0, irsend.capture.value);
+    EXPECT_EQ(0x0, irsend.capture.address);
+    EXPECT_EQ(0x0, irsend.capture.command);
+    EXPECT_FALSE(irsend.capture.repeat);
+  */
   // Dish Hopper 3 code from Global Cache.
-  uint16_t gc_test_hopper[73] = {58000, 1, 37, 23, 351, 23, 94, 23, 164,
-                                 23, 164, 23, 94, 23, 94, 23, 94, 23, 164,
-                                 23, 164, 23, 164, 23, 164, 23, 164, 23, 164,
-                                 23, 164, 23, 164, 23, 164, 23, 164, 23, 351,
-                                 23, 94, 23, 164, 23, 164, 23, 94, 23, 94,
-                                 23, 94, 23, 164, 23, 164, 23, 164, 23, 164,
-                                 23, 164, 23, 164, 23, 164, 23, 164, 23, 164,
-                                 23, 164, 23, 351};
+  uint16_t gc_test_hopper[73] = {
+      58000, 1,  37,  23, 351, 23, 94,  23, 164, 23, 164, 23, 94,  23, 94,  23,
+      94,    23, 164, 23, 164, 23, 164, 23, 164, 23, 164, 23, 164, 23, 164, 23,
+      164,   23, 164, 23, 164, 23, 351, 23, 94,  23, 164, 23, 164, 23, 94,  23,
+      94,    23, 94,  23, 164, 23, 164, 23, 164, 23, 164, 23, 164, 23, 164, 23,
+      164,   23, 164, 23, 164, 23, 164, 23, 351};
   irsend.reset();
   irsend.sendGC(gc_test_hopper, 73);
   irsend.makeDecodeResult();
@@ -310,9 +316,10 @@ TEST(TestDecodeDish, FailToDecodeNonDishExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 

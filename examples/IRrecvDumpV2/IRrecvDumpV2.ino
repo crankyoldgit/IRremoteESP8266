@@ -22,8 +22,8 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
-#include <IRremoteESP8266.h>
 #include <IRrecv.h>
+#include <IRremoteESP8266.h>
 #include <IRutils.h>
 // The following are only needed for extended decoding of A/C Messages
 #include <ir_Coolix.h>
@@ -32,8 +32,8 @@
 #include <ir_Gree.h>
 #include <ir_Haier.h>
 #include <ir_Kelvinator.h>
-#include <ir_Mitsubishi.h>
 #include <ir_Midea.h>
+#include <ir_Mitsubishi.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
@@ -73,7 +73,7 @@ const uint16_t kCaptureBufferSize = 1024;
 // Some A/C units have gaps in their protocols of ~40ms. e.g. Kelvinator
 // A value this large may swallow repeats of some protocols
 const uint8_t kTimeout = 50;
-#else  // DECODE_AC
+#else   // DECODE_AC
 // Suits most messages, while not swallowing many repeats.
 const uint8_t kTimeout = 15;
 #endif  // DECODE_AC
@@ -104,7 +104,6 @@ const uint8_t kTimeout = 15;
 // NOTE: Set this value very high to effectively turn off UNKNOWN detection.
 const uint16_t kMinUnknownSize = 12;
 // ==================== end of TUNEABLE PARAMETERS ====================
-
 
 // Use turn on the save buffer feature for more complete capture coverage.
 IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
@@ -200,7 +199,7 @@ void dumpACInfo(decode_results *results) {
   }
 #endif  // DECODE_PANASONIC_AC
   // If we got a human-readable description of the message, display it.
-  if (description != "")  Serial.println("Mesg Desc.: " + description);
+  if (description != "") Serial.println("Mesg Desc.: " + description);
 }
 
 // The section of code run only once at start-up.
@@ -215,7 +214,7 @@ void setup() {
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
-#endif  // DECODE_HASH
+#endif                  // DECODE_HASH
   irrecv.enableIRIn();  // Start the receiver
 }
 
@@ -228,10 +227,11 @@ void loop() {
     uint32_t now = millis();
     Serial.printf("Timestamp : %06u.%03u\n", now / 1000, now % 1000);
     if (results.overflow)
-      Serial.printf("WARNING: IR code is too big for buffer (>= %d). "
-                    "This result shouldn't be trusted until this is resolved. "
-                    "Edit & increase kCaptureBufferSize.\n",
-                    kCaptureBufferSize);
+      Serial.printf(
+          "WARNING: IR code is too big for buffer (>= %d). "
+          "This result shouldn't be trusted until this is resolved. "
+          "Edit & increase kCaptureBufferSize.\n",
+          kCaptureBufferSize);
     // Display the basic output of what we found.
     Serial.print(resultToHumanReadableBasic(&results));
     dumpACInfo(&results);  // Display any extra A/C info if we have it.
@@ -249,6 +249,6 @@ void loop() {
     // Output the results as source code
     Serial.println(resultToSourceCode(&results));
     Serial.println("");  // Blank line between entries
-    yield();  // Feed the WDT (again)
+    yield();             // Feed the WDT (again)
   }
 }
