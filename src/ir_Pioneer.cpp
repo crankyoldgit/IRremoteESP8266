@@ -35,12 +35,12 @@
 void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
   // If nbits is to big, or is odd, abort.
-  if (nbits > sizeof(data) * 8 || nbits % 2 == 1)  return;
+  if (nbits > sizeof(data) * 8 || nbits % 2 == 1) return;
 
   // send 1st part of the code
   sendNEC(data >> (nbits / 2), nbits / 2, 0);
   // send 2nd part of the code
-  sendNEC(data & (((uint64_t) 1 << (nbits / 2)) - 1), nbits / 2, repeat);
+  sendNEC(data & (((uint64_t)1 << (nbits / 2)) - 1), nbits / 2, repeat);
 }
 
 // Calculate the raw Pioneer data code based on two NEC sub-codes
@@ -61,7 +61,7 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
 //   e.g.
 //   "A556+AF20" is an Address of 0xA556 & a Command of 0xAF20.
 uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
-  return (((uint64_t) encodeNEC(address >> 8, address & 0xFF)) << 32) |
+  return (((uint64_t)encodeNEC(address >> 8, address & 0xFF)) << 32) |
          encodeNEC(command >> 8, command & 0xFF);
 }
 #endif  // SEND_PIONEER
@@ -92,20 +92,18 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
     // Header
     if (!matchMark(results->rawbuf[offset], kNecHdrMark)) return false;
     // Calculate how long the lowest tick time is based on the header mark.
-    uint32_t mark_tick = results->rawbuf[offset++] * kRawTick /
-        kNecHdrMarkTicks;
+    uint32_t mark_tick =
+        results->rawbuf[offset++] * kRawTick / kNecHdrMarkTicks;
     if (!matchSpace(results->rawbuf[offset], kNecHdrSpace)) return false;
     // Calculate how long the common tick time is based on the header space.
-    uint32_t space_tick = results->rawbuf[offset++] * kRawTick /
-        kNecHdrSpaceTicks;
+    uint32_t space_tick =
+        results->rawbuf[offset++] * kRawTick / kNecHdrSpaceTicks;
     //
     // Data
-    match_result_t data_result = matchData(&(results->rawbuf[offset]),
-                                           nbits / 2,
-                                           kNecBitMarkTicks * mark_tick,
-                                           kNecOneSpaceTicks * space_tick,
-                                           kNecBitMarkTicks * mark_tick,
-                                           kNecZeroSpaceTicks * space_tick);
+    match_result_t data_result = matchData(
+        &(results->rawbuf[offset]), nbits / 2, kNecBitMarkTicks * mark_tick,
+        kNecOneSpaceTicks * space_tick, kNecBitMarkTicks * mark_tick,
+        kNecZeroSpaceTicks * space_tick);
     if (data_result.success == false) return false;
     uint8_t command = data_result.data >> 8;
     uint8_t command_inverted = data_result.data;
@@ -130,7 +128,7 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
 
     // Footer
     if (!matchMark(results->rawbuf[offset++], kNecBitMarkTicks * mark_tick))
-        return false;
+      return false;
     if (offset < results->rawlen &&
         !matchAtLeast(results->rawbuf[offset++], kNecMinGapTicks * space_tick))
       return false;

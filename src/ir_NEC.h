@@ -34,12 +34,13 @@ const uint16_t kNecRptSpace = kNecRptSpaceTicks * kNecTick;
 const uint16_t kNecRptLength = 4;
 const uint16_t kNecMinCommandLengthTicks = 193;
 const uint32_t kNecMinCommandLength = kNecMinCommandLengthTicks * kNecTick;
-const uint32_t kNecMinGap = kNecMinCommandLength -
+const uint32_t kNecMinGap =
+    kNecMinCommandLength -
     (kNecHdrMark + kNecHdrSpace + kNECBits * (kNecBitMark + kNecOneSpace) +
      kNecBitMark);
-const uint16_t kNecMinGapTicks = kNecMinCommandLengthTicks -
+const uint16_t kNecMinGapTicks =
+    kNecMinCommandLengthTicks -
     (kNecHdrMarkTicks + kNecHdrSpaceTicks +
-     kNECBits * (kNecBitMarkTicks + kNecOneSpaceTicks) +
-     kNecBitMarkTicks);
+     kNECBits * (kNecBitMarkTicks + kNecOneSpaceTicks) + kNecBitMarkTicks);
 
 #endif  // IR_NEC_H_

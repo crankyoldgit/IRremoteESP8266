@@ -24,7 +24,7 @@
 // Value was calculated on Wemos D1 mini using v2.4.1 with v2.4.0 ESP core
 const int8_t kPeriodOffset = -5;
 const uint8_t kDutyDefault = 50;  // Percentage
-const uint8_t kDutyMax = 100;  // Percentage
+const uint8_t kDutyMax = 100;     // Percentage
 // delayMicroseconds() is only accurate to 16383us.
 // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
 const uint16_t kMaxAccurateUsecDelay = 16383;
@@ -55,10 +55,10 @@ class IRsend {
                    const uint16_t onemark, const uint32_t onespace,
                    const uint16_t zeromark, const uint32_t zerospace,
                    const uint16_t footermark, const uint32_t gap,
-                   const uint32_t mesgtime,
-                   const uint64_t data, const uint16_t nbits,
-                   const uint16_t frequency, const bool MSBfirst,
-                   const uint16_t repeat, const uint8_t dutycycle);
+                   const uint32_t mesgtime, const uint64_t data,
+                   const uint16_t nbits, const uint16_t frequency,
+                   const bool MSBfirst, const uint16_t repeat,
+                   const uint8_t dutycycle);
   void sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                    const uint16_t onemark, const uint32_t onespace,
                    const uint16_t zeromark, const uint32_t zerospace,
@@ -66,7 +66,7 @@ class IRsend {
                    const uint8_t *dataptr, const uint16_t nbytes,
                    const uint16_t frequency, const bool MSBfirst,
                    const uint16_t repeat, const uint8_t dutycycle);
-void send(uint16_t type, uint64_t data, uint16_t nbits);
+  void send(uint16_t type, uint64_t data, uint16_t nbits);
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
   void sendNEC(uint64_t data, uint16_t nbits = kNECBits,
                uint16_t repeat = kNoRepeat);
@@ -94,8 +94,8 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #endif
 #if SEND_SAMSUNG_AC
   void sendSamsungAC(unsigned char data[],
-                      uint16_t nbytes = kSamsungAcStateLength,
-                      uint16_t repeat = kNoRepeat);
+                     uint16_t nbytes = kSamsungAcStateLength,
+                     uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
@@ -186,8 +186,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                         uint16_t repeat = kMitsubishiACMinRepeat);
 #endif
 #if SEND_FUJITSU_AC
-  void sendFujitsuAC(unsigned char data[],
-                     uint16_t nbytes,
+  void sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                      uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
 #if SEND_GLOBALCACHE
@@ -199,8 +198,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                       uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_DAIKIN
-  void sendDaikin(unsigned char data[],
-                  uint16_t nbytes = kDaikinStateLength,
+  void sendDaikin(unsigned char data[], uint16_t nbytes = kDaikinStateLength,
                   uint16_t repeat = kNoRepeat);
   void sendDaikinGapHeader();
 #endif
@@ -218,13 +216,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_ARGO
-  void sendArgo(unsigned char data[],
-                uint16_t nbytes = kArgoStateLength,
+  void sendArgo(unsigned char data[], uint16_t nbytes = kArgoStateLength,
                 uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_TROTEC
-  void sendTrotec(unsigned char data[],
-                  uint16_t nbytes = kTrotecStateLength,
+  void sendTrotec(unsigned char data[], uint16_t nbytes = kTrotecStateLength,
                   uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_NIKAI
@@ -254,8 +250,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                      uint16_t repeat = kCarrierAcMinRepeat);
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
-  void sendHaierAC(unsigned char data[],
-                   uint16_t nbytes = kHaierACStateLength,
+  void sendHaierAC(unsigned char data[], uint16_t nbytes = kHaierACStateLength,
                    uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_HAIER_AC_YRW02
@@ -308,7 +303,7 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
 #endif
 #if SEND_MWM
   void sendMWM(unsigned char data[], uint16_t nbytes,
-                    uint16_t repeat = kNoRepeat);
+               uint16_t repeat = kNoRepeat);
 #endif
 
  protected:

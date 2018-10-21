@@ -7,8 +7,8 @@
 #include <stddef.h>
 #ifndef UNIT_TEST
 extern "C" {
-  #include <gpio.h>
-  #include <user_interface.h>
+#include <gpio.h>
+#include <user_interface.h>
 }
 #include <Arduino.h>
 #endif
@@ -35,8 +35,7 @@ irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 #ifndef UNIT_TEST
 static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
-  if (irparams.rawlen)
-    irparams.rcvstate = kStopState;
+  if (irparams.rawlen) irparams.rcvstate = kStopState;
   os_intr_unlock();
 }
 
@@ -61,8 +60,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
     irparams.rcvstate = kStopState;
   }
 
-  if (irparams.rcvstate == kStopState)
-    return;
+  if (irparams.rcvstate == kStopState) return;
 
   if (irparams.rcvstate == kIdleState) {
     irparams.rcvstate = kMarkState;
@@ -76,7 +74,7 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   irparams.rawlen++;
 
   start = now;
-  #define ONCE 0
+#define ONCE 0
   os_timer_arm(&timer, irparams.timeout, ONCE);
 }
 #endif  // UNIT_TEST
@@ -98,11 +96,12 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
-  irparams.timeout = std::min(timeout, (uint8_t) kMaxTimeoutMs);
+  irparams.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
-    DPRINTLN("Could not allocate memory for the primary IR buffer.\n"
-             "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
+    DPRINTLN(
+        "Could not allocate memory for the primary IR buffer.\n"
+        "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
 #ifndef UNIT_TEST
     ESP.restart();  // Mem alloc failure. Reboot.
 #endif
@@ -113,8 +112,9 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
     irparams_save->rawbuf = new uint16_t[bufsize];
     // Check we allocated the memory successfully.
     if (irparams_save->rawbuf == NULL) {
-      DPRINTLN("Could not allocate memory for the second IR buffer.\n"
-               "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
+      DPRINTLN(
+          "Could not allocate memory for the second IR buffer.\n"
+          "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
 #ifndef UNIT_TEST
       ESP.restart();  // Mem alloc failure. Reboot.
 #endif
@@ -129,9 +129,9 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
 
 // Class destructor
 IRrecv::~IRrecv(void) {
-  delete [] irparams.rawbuf;
+  delete[] irparams.rawbuf;
   if (irparams_save != NULL) {
-    delete [] irparams_save->rawbuf;
+    delete[] irparams_save->rawbuf;
     delete irparams_save;
   }
 }
@@ -175,8 +175,8 @@ void IRrecv::resume() {
 //   dst: Pointer to an irparams_t structure to copy to.
 void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
   // Typecast src and dst addresses to (char *)
-  char *csrc = (char *) src;  // NOLINT(readability/casting)
-  char *cdst = (char *) dst;  // NOLINT(readability/casting)
+  char *csrc = (char *)src;  // NOLINT(readability/casting)
+  char *cdst = (char *)dst;  // NOLINT(readability/casting)
 
   // Save the pointer to the destination's rawbuf so we don't lose it as
   // the for-loop/copy after this will overwrite it with src's rawbuf pointer.
@@ -185,22 +185,18 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
   dst_rawbuf_ptr = dst->rawbuf;
 
   // Copy contents of src[] to dst[]
-  for (uint16_t i = 0; i < sizeof(irparams_t); i++)
-    cdst[i] = csrc[i];
+  for (uint16_t i = 0; i < sizeof(irparams_t); i++) cdst[i] = csrc[i];
 
   // Restore the buffer pointer
   dst->rawbuf = dst_rawbuf_ptr;
 
   // Copy the rawbuf
-  for (uint16_t i = 0; i < dst->bufsize; i++)
-    dst->rawbuf[i] = src->rawbuf[i];
+  for (uint16_t i = 0; i < dst->bufsize; i++) dst->rawbuf[i] = src->rawbuf[i];
 }
 
 // Obtain the maximum number of entries possible in the capture buffer.
 // i.e. It's size.
-uint16_t IRrecv::getBufSize() {
-  return irparams.bufsize;
-}
+uint16_t IRrecv::getBufSize() { return irparams.bufsize; }
 
 #if DECODE_HASH
 // Set the minimum length we will consider for reporting UNKNOWN message types.
@@ -224,8 +220,7 @@ void IRrecv::setUnknownThreshold(uint16_t length) {
 bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
-  if (irparams.rcvstate != kStopState)
-    return false;
+  if (irparams.rcvstate != kStopState) return false;
 #endif
 
   // Clear the entry we are currently pointing to when we got the timeout.
@@ -241,8 +236,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   bool resumed = false;  // Flag indicating if we have resumed.
 
   // If we were requested to use a save buffer previously, do so.
-  if (save == NULL)
-    save = irparams_save;
+  if (save == NULL) save = irparams_save;
 
   if (save == NULL) {
     // We haven't been asked to copy it so use the existing memory.
@@ -274,8 +268,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
   // because the protocols are similar. This protocol is more specific than
   // those ones, so should got before them.
-  if (decodeAiwaRCT501(results))
-    return true;
+  if (decodeAiwaRCT501(results)) return true;
 #endif
 #if DECODE_SANYO
   DPRINTLN("Attempting Sanyo LC7461 decode");
@@ -283,8 +276,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // similar in timings & structure, but the Sanyo one is much longer than the
   // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
   // reduce false detection as a NEC packet.
-  if (decodeSanyoLC7461(results))
-    return true;
+  if (decodeSanyoLC7461(results)) return true;
 #endif
 #if DECODE_CARRIER_AC
   DPRINTLN("Attempting Carrier AC decode");
@@ -292,8 +284,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // similar in timings & structure, but the Carrier one is much longer than the
   // NEC protocol (3x32 bits vs 1x32 bits) so this one should be tried first to
   // try to reduce false detection as a NEC packet.
-  if (decodeCarrierAC(results))
-    return true;
+  if (decodeCarrierAC(results)) return true;
 #endif
 #if DECODE_PIONEER
   DPRINTLN("Attempting Pioneer decode");
@@ -301,146 +292,119 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   // similar in timings & structure, but the Pioneer one is much longer than the
   // NEC protocol (2x32 bits vs 1x32 bits) so this one should be tried first to
   // try to reduce false detection as a NEC packet.
-  if (decodePioneer(results))
-    return true;
+  if (decodePioneer(results)) return true;
 #endif
 #if DECODE_NEC
   DPRINTLN("Attempting NEC decode");
-  if (decodeNEC(results))
-    return true;
+  if (decodeNEC(results)) return true;
 #endif
 #if DECODE_SONY
   DPRINTLN("Attempting Sony decode");
-  if (decodeSony(results))
-    return true;
+  if (decodeSony(results)) return true;
 #endif
 #if DECODE_MITSUBISHI
   DPRINTLN("Attempting Mitsubishi decode");
-  if (decodeMitsubishi(results))
-    return true;
+  if (decodeMitsubishi(results)) return true;
 #endif
 #if DECODE_MITSUBISHI_AC
   DPRINTLN("Attempting Mitsubishi AC decode");
-  if (decodeMitsubishiAC(results))
-    return true;
+  if (decodeMitsubishiAC(results)) return true;
 #endif
 #if DECODE_MITSUBISHI2
   DPRINTLN("Attempting Mitsubishi2 decode");
-  if (decodeMitsubishi2(results))
-    return true;
+  if (decodeMitsubishi2(results)) return true;
 #endif
 #if DECODE_RC5
   DPRINTLN("Attempting RC5 decode");
-  if (decodeRC5(results))
-    return true;
+  if (decodeRC5(results)) return true;
 #endif
 #if DECODE_RC6
   DPRINTLN("Attempting RC6 decode");
-  if (decodeRC6(results))
-    return true;
+  if (decodeRC6(results)) return true;
 #endif
 #if DECODE_RCMM
   DPRINTLN("Attempting RC-MM decode");
-  if (decodeRCMM(results))
-    return true;
+  if (decodeRCMM(results)) return true;
 #endif
 #if DECODE_FUJITSU_AC
   // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
   // message which looks exactly the same as a Panasonic/Denon message.
   DPRINTLN("Attempting Fujitsu A/C decode");
-  if (decodeFujitsuAC(results))
-    return true;
+  if (decodeFujitsuAC(results)) return true;
 #endif
 #if DECODE_DENON
   // Denon needs to precede Panasonic as it is a special case of Panasonic.
   DPRINTLN("Attempting Denon decode");
-  if (decodeDenon(results, DENON_48_BITS) ||
-      decodeDenon(results, DENON_BITS) ||
+  if (decodeDenon(results, DENON_48_BITS) || decodeDenon(results, DENON_BITS) ||
       decodeDenon(results, kDenonLegacyBits))
     return true;
 #endif
 #if DECODE_PANASONIC
   DPRINTLN("Attempting Panasonic decode");
-  if (decodePanasonic(results))
-    return true;
+  if (decodePanasonic(results)) return true;
 #endif
 #if DECODE_LG
   DPRINTLN("Attempting LG (28-bit) decode");
-  if (decodeLG(results, kLgBits, true))
-    return true;
+  if (decodeLG(results, kLgBits, true)) return true;
   DPRINTLN("Attempting LG (32-bit) decode");
   // LG32 should be tried before Samsung
-  if (decodeLG(results, kLg32Bits, true))
-    return true;
+  if (decodeLG(results, kLg32Bits, true)) return true;
 #endif
 #if DECODE_GICABLE
   // Note: Needs to happen before JVC decode, because it looks similar except
   //       with a required NEC-like repeat code.
   DPRINTLN("Attempting GICable decode");
-  if (decodeGICable(results))
-    return true;
+  if (decodeGICable(results)) return true;
 #endif
 #if DECODE_JVC
   DPRINTLN("Attempting JVC decode");
-  if (decodeJVC(results))
-    return true;
+  if (decodeJVC(results)) return true;
 #endif
 #if DECODE_SAMSUNG
   DPRINTLN("Attempting SAMSUNG decode");
-  if (decodeSAMSUNG(results))
-    return true;
+  if (decodeSAMSUNG(results)) return true;
 #endif
 #if DECODE_WHYNTER
   DPRINTLN("Attempting Whynter decode");
-  if (decodeWhynter(results))
-    return true;
+  if (decodeWhynter(results)) return true;
 #endif
 #if DECODE_DISH
   DPRINTLN("Attempting DISH decode");
-  if (decodeDISH(results))
-    return true;
+  if (decodeDISH(results)) return true;
 #endif
 #if DECODE_SHARP
   DPRINTLN("Attempting Sharp decode");
-  if (decodeSharp(results))
-    return true;
+  if (decodeSharp(results)) return true;
 #endif
 #if DECODE_COOLIX
   DPRINTLN("Attempting Coolix decode");
-  if (decodeCOOLIX(results))
-    return true;
+  if (decodeCOOLIX(results)) return true;
 #endif
 #if DECODE_NIKAI
   DPRINTLN("Attempting Nikai decode");
-  if (decodeNikai(results))
-    return true;
+  if (decodeNikai(results)) return true;
 #endif
 #if DECODE_KELVINATOR
-// Kelvinator based-devices use a similar code to Gree ones, to avoid false
-// matches this needs to happen before decodeGree().
+  // Kelvinator based-devices use a similar code to Gree ones, to avoid false
+  // matches this needs to happen before decodeGree().
   DPRINTLN("Attempting Kelvinator decode");
-  if (decodeKelvinator(results))
-    return true;
+  if (decodeKelvinator(results)) return true;
 #endif
 #if DECODE_DAIKIN
   DPRINTLN("Attempting Daikin decode");
-  if (decodeDaikin(results))
-    return true;
+  if (decodeDaikin(results)) return true;
 #endif
 #if DECODE_TOSHIBA_AC
   DPRINTLN("Attempting Toshiba AC decode");
-  if (decodeToshibaAC(results))
-    return true;
+  if (decodeToshibaAC(results)) return true;
 #endif
 #if DECODE_MIDEA
   DPRINTLN("Attempting Midea decode");
-  if (decodeMidea(results))
-    return true;
+  if (decodeMidea(results)) return true;
 #endif
 #if DECODE_MAGIQUEST
   DPRINTLN("Attempting Magiquest decode");
-  if (decodeMagiQuest(results))
-    return true;
+  if (decodeMagiQuest(results)) return true;
 #endif
 /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
@@ -466,79 +430,64 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_LASERTAG
   DPRINTLN("Attempting Lasertag decode");
-  if (decodeLasertag(results))
-    return true;
+  if (decodeLasertag(results)) return true;
 #endif
 #if DECODE_GREE
   // Gree based-devices use a similar code to Kelvinator ones, to avoid false
   // matches this needs to happen after decodeKelvinator().
   DPRINTLN("Attempting Gree decode");
-  if (decodeGree(results))
-    return true;
+  if (decodeGree(results)) return true;
 #endif
 #if DECODE_HAIER_AC
   DPRINTLN("Attempting Haier AC decode");
-  if (decodeHaierAC(results))
-    return true;
+  if (decodeHaierAC(results)) return true;
 #endif
 #if DECODE_HAIER_AC_YRW02
   DPRINTLN("Attempting Haier AC YR-W02 decode");
-  if (decodeHaierACYRW02(results))
-    return true;
+  if (decodeHaierACYRW02(results)) return true;
 #endif
 #if DECODE_HITACHI_AC2
   // HitachiAC2 should be checked before HitachiAC
   DPRINTLN("Attempting Hitachi AC2 decode");
-  if (decodeHitachiAC(results, kHitachiAc2Bits))
-    return true;
+  if (decodeHitachiAC(results, kHitachiAc2Bits)) return true;
 #endif
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results, kHitachiAcBits))
-    return true;
+  if (decodeHitachiAC(results, kHitachiAcBits)) return true;
 #endif
 #if DECODE_HITACHI_AC1
   DPRINTLN("Attempting Hitachi AC1 decode");
-  if (decodeHitachiAC(results, kHitachiAc1Bits))
-    return true;
+  if (decodeHitachiAC(results, kHitachiAc1Bits)) return true;
 #endif
 #if DECODE_WHIRLPOOL_AC
   DPRINTLN("Attempting Whirlpool AC decode");
-  if (decodeWhirlpoolAC(results))
-    return true;
+  if (decodeWhirlpoolAC(results)) return true;
 #endif
 #if DECODE_SAMSUNG_AC
   DPRINTLN("Attempting Samsung AC (extended) decode");
   // Check the extended size first, as it should fail fast due to longer length.
-  if (decodeSamsungAC(results, kSamsungAcExtendedBits, false))
-    return true;
+  if (decodeSamsungAC(results, kSamsungAcExtendedBits, false)) return true;
   // Now check for the more common length.
   DPRINTLN("Attempting Samsung AC decode");
-  if (decodeSamsungAC(results, kSamsungAcBits))
-    return true;
+  if (decodeSamsungAC(results, kSamsungAcBits)) return true;
 #endif
 #if DECODE_ELECTRA_AC
   DPRINTLN("Attempting Electra AC decode");
-  if (decodeElectraAC(results))
-    return true;
+  if (decodeElectraAC(results)) return true;
 #endif
 #if DECODE_PANASONIC_AC
   DPRINTLN("Attempting Panasonic AC decode");
-  if (decodePanasonicAC(results))
-    return true;
+  if (decodePanasonicAC(results)) return true;
   DPRINTLN("Attempting Panasonic AC short decode");
-  if (decodePanasonicAC(results, kPanasonicAcShortBits))
-    return true;
+  if (decodePanasonicAC(results, kPanasonicAcShortBits)) return true;
 #endif
 #if DECODE_LUTRON
   DPRINTLN("Attempting Lutron decode");
-  if (decodeLutron(results))
-    return true;
+  if (decodeLutron(results)) return true;
 #endif
 #if DECODE_MWM
   DPRINTLN("Attempting MWM decode");
-  if (decodeMWM(results))
-    return true;
+  if (decodeMWM(results)) return true;
 #endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
@@ -564,8 +513,8 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 //   Nr. of ticks.
 uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return((uint32_t) std::max(
-      (int32_t) (usecs * (1.0 - tolerance / 100.0) - delta), 0));
+  return ((uint32_t)std::max(
+      (int32_t)(usecs * (1.0 - tolerance / 100.0) - delta), 0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -577,7 +526,7 @@ uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 // Returns:
 //   Nr. of ticks.
 uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
-  return((uint32_t) (usecs * (1.0 + tolerance / 100.0)) + 1 + delta);
+  return ((uint32_t)(usecs * (1.0 + tolerance / 100.0)) + 1 + delta);
 }
 
 // Check if we match a pulse(measured) with the desired within
@@ -591,8 +540,8 @@ uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::match(uint32_t measured, uint32_t desired,
-                   uint8_t tolerance, uint16_t delta) {
+bool IRrecv::match(uint32_t measured, uint32_t desired, uint8_t tolerance,
+                   uint16_t delta) {
   measured *= kRawTick;  // Convert to uSecs.
   DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance, delta));
@@ -603,7 +552,6 @@ bool IRrecv::match(uint32_t measured, uint32_t desired,
   return (measured >= ticksLow(desired, tolerance, delta) &&
           measured <= ticksHigh(desired, tolerance, delta));
 }
-
 
 // Check if we match a pulse(measured) of at least desired within
 // tolerance percent and/or a fixed delta margin.
@@ -652,8 +600,8 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
-                       uint8_t tolerance, int16_t excess) {
+bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
+                       int16_t excess) {
   DPRINT("Matching MARK ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
@@ -675,8 +623,8 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired,
 //
 // Returns:
 //   Boolean: true if it matches, false if it doesn't.
-bool IRrecv::matchSpace(uint32_t measured, uint32_t desired,
-                        uint8_t tolerance, int16_t excess) {
+bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
+                        int16_t excess) {
   DPRINT("Matching SPACE ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
@@ -720,8 +668,7 @@ int16_t IRrecv::compare(uint16_t oldval, uint16_t newval) {
  */
 bool IRrecv::decodeHash(decode_results *results) {
   // Require at least some samples to prevent triggering on noise
-  if (results->rawlen < unknown_threshold)
-    return false;
+  if (results->rawlen < unknown_threshold) return false;
   int32_t hash = kFnvBasis32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
@@ -758,20 +705,14 @@ bool IRrecv::decodeHash(decode_results *results) {
 // Returns:
 //  A match_result_t structure containing the success (or not), the data value,
 //  and how many buffer entries were used.
-match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
-                                 const uint16_t nbits,
-                                 const uint16_t onemark,
-                                 const uint32_t onespace,
-                                 const uint16_t zeromark,
-                                 const uint32_t zerospace,
-                                 const uint8_t tolerance,
-                                 const int16_t excess,
-                                 const bool MSBfirst) {
+match_result_t IRrecv::matchData(
+    volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
+    const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace,
+    const uint8_t tolerance, const int16_t excess, const bool MSBfirst) {
   match_result_t result;
   result.success = false;  // Fail by default.
   result.data = 0;
-  for (result.used = 0;
-       result.used < nbits * 2;
+  for (result.used = 0; result.used < nbits * 2;
        result.used += 2, data_ptr += 2) {
     // Is the bit a '1'?
     if (matchMark(*data_ptr, onemark, tolerance, excess) &&
@@ -779,16 +720,14 @@ match_result_t IRrecv::matchData(volatile uint16_t *data_ptr,
       result.data = (result.data << 1) | 1;
     } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
                matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
-      result.data <<= 1;   // The bit is a '0'.
+      result.data <<= 1;  // The bit is a '0'.
     } else {
-      if (!MSBfirst)
-        result.data = reverseBits(result.data, result.used / 2);
+      if (!MSBfirst) result.data = reverseBits(result.data, result.used / 2);
       return result;  // It's neither, so fail.
     }
   }
   result.success = true;
-  if (!MSBfirst)
-    result.data = reverseBits(result.data, nbits);
+  if (!MSBfirst) result.data = reverseBits(result.data, nbits);
   return result;
 }
 

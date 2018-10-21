@@ -15,10 +15,10 @@
 #include "IRremoteESP8266.h"
 
 // Constants
-const uint16_t kHeader = 2;  // Usual nr. of header entries.
-const uint16_t kFooter = 2;  // Usual nr. of footer (stop bits) entries.
-const uint16_t kStartOffset = 1;  // Usual rawbuf entry to start from.
-#define MS_TO_USEC(x)  (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
+const uint16_t kHeader = 2;        // Usual nr. of header entries.
+const uint16_t kFooter = 2;        // Usual nr. of footer (stop bits) entries.
+const uint16_t kStartOffset = 1;   // Usual rawbuf entry to start from.
+#define MS_TO_USEC(x) (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
 const uint16_t kMarkExcess = 50;
@@ -33,7 +33,7 @@ const uint8_t kMarkState = 3;
 const uint8_t kSpaceState = 4;
 const uint8_t kStopState = 5;
 const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
-const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
+const uint16_t kRawTick = 2;    // Capture tick to uSec factor.
 #define RAWTICK kRawTick  // Deprecated. For legacy user code support only.
 // How long (ms) before we give up wait for more data?
 // Don't exceed kMaxTimeoutMs without a good reason.
@@ -44,7 +44,7 @@ const uint16_t kRawTick = 2;  // Capture tick to uSec factor.
 // Typically 15ms suits most applications. However, some protocols demand a
 // higher value. e.g. 90ms for XMP-1 and some aircon units.
 const uint8_t kTimeoutMs = 15;  // In MilliSeconds.
-#define TIMEOUT_MS kTimeoutMs  // For legacy documentation.
+#define TIMEOUT_MS kTimeoutMs   // For legacy documentation.
 const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 
 // Use FNV hash algorithm: http://isthe.com/chongo/tech/comp/fnv/#FNV-param
@@ -62,21 +62,21 @@ const uint16_t kStateSizeMax = 0;
 // Types
 // information for the interrupt handler
 typedef struct {
-  uint8_t recvpin;              // pin for IR data from detector
-  uint8_t rcvstate;             // state machine
-  uint16_t timer;               // state timer, counts 50uS ticks.
-  uint16_t bufsize;             // max. nr. of entries in the capture buffer.
-  uint16_t *rawbuf;             // raw data
+  uint8_t recvpin;   // pin for IR data from detector
+  uint8_t rcvstate;  // state machine
+  uint16_t timer;    // state timer, counts 50uS ticks.
+  uint16_t bufsize;  // max. nr. of entries in the capture buffer.
+  uint16_t *rawbuf;  // raw data
   // uint16_t is used for rawlen as it saves 3 bytes of iram in the interrupt
   // handler. Don't ask why, I don't know. It just does.
-  uint16_t rawlen;              // counter of entries in rawbuf.
-  uint8_t overflow;             // Buffer overflow indicator.
-  uint8_t timeout;              // Nr. of milliSeconds before we give up.
+  uint16_t rawlen;   // counter of entries in rawbuf.
+  uint8_t overflow;  // Buffer overflow indicator.
+  uint8_t timeout;   // Nr. of milliSeconds before we give up.
 } irparams_t;
 
 // results from a data match
 typedef struct {
-  bool success;  // Was the match successful?
+  bool success;   // Was the match successful?
   uint64_t data;  // The data found.
   uint16_t used;  // How many buffer positions were used.
 } match_result_t;
@@ -92,15 +92,15 @@ class decode_results {
   // structure to save us a handful of valuable bytes of memory.
   union {
     struct {
-      uint64_t value;  // Decoded value
+      uint64_t value;    // Decoded value
       uint32_t address;  // Decoded device address.
       uint32_t command;  // Decoded command.
     };
     uint8_t state[kStateSizeMax];  // Multi-byte results.
   };
-  uint16_t bits;  // Number of bits in decoded value
+  uint16_t bits;              // Number of bits in decoded value
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks
-  uint16_t rawlen;  // Number of records in rawbuf.
+  uint16_t rawlen;            // Number of records in rawbuf.
   bool overflow;
   bool repeat;  // Is the result a repeat code?
 };
@@ -111,7 +111,7 @@ class IRrecv {
   explicit IRrecv(uint16_t recvpin, uint16_t bufsize = kRawBuf,
                   uint8_t timeout = kTimeoutMs,
                   bool save_buffer = false);  // Constructor
-  ~IRrecv();  // Destructor
+  ~IRrecv();                                  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn();
   void disableIRIn();
@@ -142,7 +142,7 @@ class IRrecv {
   static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = kTolerance,
                            uint16_t delta = 0);
   static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = kTolerance,
-                           uint16_t delta = 0);
+                            uint16_t delta = 0);
   bool matchAtLeast(uint32_t measured, uint32_t desired,
                     uint8_t tolerance = kTolerance, uint16_t delta = 0);
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
@@ -166,23 +166,20 @@ class IRrecv {
   //                  uint16_t nbits = kSanyoSA8650BBits,
   //                  bool strict = false);
   bool decodeSanyoLC7461(decode_results *results,
-                         uint16_t nbits = kSanyoLC7461Bits,
-                         bool strict = true);
+                         uint16_t nbits = kSanyoLC7461Bits, bool strict = true);
 #endif
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results,
-                        uint16_t nbits = kMitsubishiBits,
-                        bool strict = true);
+                        uint16_t nbits = kMitsubishiBits, bool strict = true);
 #endif
 #if DECODE_MITSUBISHI2
   bool decodeMitsubishi2(decode_results *results,
-                         uint16_t nbits = kMitsubishiBits,
-                         bool strict = true);
+                         uint16_t nbits = kMitsubishiBits, bool strict = true);
 #endif
 #if DECODE_MITSUBISHI_AC
   bool decodeMitsubishiAC(decode_results *results,
-                        uint16_t nbits = kMitsubishiACBits,
-                        bool strict = false);
+                          uint16_t nbits = kMitsubishiACBits,
+                          bool strict = false);
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
@@ -257,8 +254,7 @@ class IRrecv {
 #endif
 #if DECODE_KELVINATOR
   bool decodeKelvinator(decode_results *results,
-                        uint16_t nbits = kKelvinatorBits,
-                        bool strict = true);
+                        uint16_t nbits = kKelvinatorBits, bool strict = true);
 #endif
 #if DECODE_DAIKIN
   bool decodeDaikin(decode_results *results, uint16_t nbits = kDaikinRawBits,
@@ -266,16 +262,14 @@ class IRrecv {
 #endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
-                       uint16_t nbytes = kToshibaACBits,
-                       bool strict = true);
+                       uint16_t nbytes = kToshibaACBits, bool strict = true);
 #endif
 #if DECODE_MIDEA
   bool decodeMidea(decode_results *results, uint16_t nbits = kMideaBits,
                    bool strict = true);
 #endif
 #if DECODE_FUJITSU_AC
-  bool decodeFujitsuAC(decode_results *results,
-                       uint16_t nbits = kFujitsuAcBits,
+  bool decodeFujitsuAC(decode_results *results, uint16_t nbits = kFujitsuAcBits,
                        bool strict = false);
 #endif
 #if DECODE_LASERTAG
@@ -283,17 +277,16 @@ class IRrecv {
                       bool strict = true);
 #endif
 #if DECODE_CARRIER_AC
-  bool decodeCarrierAC(decode_results *results,
-                       uint16_t nbits = kCarrierAcBits,
+  bool decodeCarrierAC(decode_results *results, uint16_t nbits = kCarrierAcBits,
                        bool strict = true);
 #endif
 #if DECODE_GREE
-  bool decodeGree(decode_results *results,
-                  uint16_t nbits = kGreeBits, bool strict = true);
+  bool decodeGree(decode_results *results, uint16_t nbits = kGreeBits,
+                  bool strict = true);
 #endif
 #if (DECODE_HAIER_AC | DECODE_HAIER_AC_YRW02)
-  bool decodeHaierAC(decode_results *results,
-                   uint16_t nbits = kHaierACBits, bool strict = true);
+  bool decodeHaierAC(decode_results *results, uint16_t nbits = kHaierACBits,
+                     bool strict = true);
 #endif
 #if DECODE_HAIER_AC_YRW02
   bool decodeHaierACYRW02(decode_results *results,
@@ -301,8 +294,8 @@ class IRrecv {
                           bool strict = true);
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
-  bool decodeHitachiAC(decode_results *results,
-                       uint16_t nbits = kHitachiAcBits, bool strict = true);
+  bool decodeHitachiAC(decode_results *results, uint16_t nbits = kHitachiAcBits,
+                       bool strict = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results,
@@ -318,11 +311,11 @@ class IRrecv {
 #endif
 #if DECODE_LUTRON
   bool decodeLutron(decode_results *results, uint16_t nbits = kLutronBits,
-                     bool strict = true);
+                    bool strict = true);
 #endif
 #if DECODE_ELECTRA_AC
-  bool decodeElectraAC(decode_results *results,
-                       uint16_t nbits = kElectraAcBits, bool strict = true);
+  bool decodeElectraAC(decode_results *results, uint16_t nbits = kElectraAcBits,
+                       bool strict = true);
 #endif
 #if DECODE_PANASONIC_AC
   bool decodePanasonicAC(decode_results *results,
@@ -335,7 +328,7 @@ class IRrecv {
 #endif
 #if DECODE_MWM
   bool decodeMWM(decode_results *results, uint16_t nbits = 24,
-                      bool strict = true);
+                 bool strict = true);
 #endif
 };
 
