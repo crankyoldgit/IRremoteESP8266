@@ -134,6 +134,7 @@ std::string typeToString(const decode_type_t protocol,
     case NIKAI:          result = "NIKAI";             break;
     case PANASONIC:      result = "PANASONIC";         break;
     case PANASONIC_AC:   result = "PANASONIC_AC";      break;
+    case PIONEER:        result = "PIONEER";           break;
     case PRONTO:         result = "PRONTO";            break;
     case RAW:            result = "RAW";               break;
     case RC5:            result = "RC5";               break;

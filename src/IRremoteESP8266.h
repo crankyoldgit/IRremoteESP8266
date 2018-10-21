@@ -196,6 +196,9 @@
 #define DECODE_MWM             true
 #define SEND_MWM               true
 
+#define DECODE_PIONEER         true
+#define SEND_PIONEER           true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -340,6 +343,7 @@ const uint16_t kPanasonicAcStateLength = 27;
 const uint16_t kPanasonicAcStateShortLength = 16;
 const uint16_t kPanasonicAcBits = kPanasonicAcStateLength * 8;
 const uint16_t kPanasonicAcShortBits = kPanasonicAcStateShortLength * 8;
+const uint16_t kPioneerBits = 64;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;
 const uint16_t kRC5Bits = kRC5RawBits - 2;

@@ -328,6 +328,11 @@ class IRrecv {
   bool decodePanasonicAC(decode_results *results,
                          uint16_t nbits = kPanasonicAcBits, bool strict = true);
 #endif
+#if DECODE_PIONEER
+  bool decodePioneer(decode_results *results,
+                     const uint16_t nbits = kPioneerBits,
+                     const bool strict = true);
+#endif
 #if DECODE_MWM
   bool decodeMWM(decode_results *results, uint16_t nbits = 24,
                       bool strict = true);

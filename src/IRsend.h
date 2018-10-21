@@ -301,6 +301,11 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                        uint16_t nbytes = kPanasonicAcStateLength,
                        uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_PIONEER
+  void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,
+                   const uint16_t repeat = kNoRepeat);
+  uint64_t encodePioneer(uint16_t address, uint16_t command);
+#endif
 #if SEND_MWM
   void sendMWM(unsigned char data[], uint16_t nbytes,
                     uint16_t repeat = kNoRepeat);

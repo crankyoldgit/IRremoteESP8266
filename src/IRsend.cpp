@@ -551,6 +551,9 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
 #if SEND_GICABLE
     case GICABLE: sendGICable(data, nbits); break;
 #endif
+#if SEND_PIONEER
+    case PIONEER: sendPioneer(data, nbits); break;
+#endif
   }
 }
 #endif
