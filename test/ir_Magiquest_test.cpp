@@ -1,9 +1,9 @@
 // Copyright 2017 David Conran
 
+#include "ir_Magiquest.h"
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_Magiquest.h"
 #include "gtest/gtest.h"
 
 // Tests for encodeMagiQuest()
@@ -137,17 +137,18 @@ TEST(TestDecodeMagiQuest, RealExamples) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t rawData[111] = {
-      262, 842,  298, 858,  238, 866,  240, 890,  238, 866,  240, 862,
-      244, 886,  242, 860,  246, 858,  554, 604,  264, 840,  560, 622,
-      266, 836,  552, 604,  556, 626,  262, 866,  240, 864,  264, 838,
-      268, 862,  244, 886,  536, 620,  530, 628,  554, 628,  532, 624,
-      244, 858,  552, 604,  264, 840,  268, 862,  266, 838,  268, 888,
-      240, 864,  242, 860,  268, 862,  244, 860,  236, 868,  272, 832,
-      264, 866,  240, 890,  532, 598,  268, 834,  294, 836,  270, 834,
-      262, 866,  272, 858,  238, 866,  534, 622,  268, 836,  270, 860,
-      268, 862,  526, 604,  264, 892,  530, 600,  268, 836,  586, 598,
-      270, 834,  556};  // Data from PR #365 captured by coolacid
+  uint16_t rawData[111] = {262, 842, 298, 858, 238, 866, 240, 890, 238, 866,
+                           240, 862, 244, 886, 242, 860, 246, 858, 554, 604,
+                           264, 840, 560, 622, 266, 836, 552, 604, 556, 626,
+                           262, 866, 240, 864, 264, 838, 268, 862, 244, 886,
+                           536, 620, 530, 628, 554, 628, 532, 624, 244, 858,
+                           552, 604, 264, 840, 268, 862, 266, 838, 268, 888,
+                           240, 864, 242, 860, 268, 862, 244, 860, 236, 868,
+                           272, 832, 264, 866, 240, 890, 532, 598, 268, 834,
+                           294, 836, 270, 834, 262, 866, 272, 858, 238, 866,
+                           534, 622, 268, 836, 270, 860, 268, 862, 526, 604,
+                           264, 892, 530, 600, 268, 836, 586, 598, 270, 834,
+                           556};  // Data from PR #365 captured by coolacid
 
   irsend.sendRaw(rawData, 111, 36000);
   irsend.makeDecodeResult();
@@ -156,6 +157,6 @@ TEST(TestDecodeMagiQuest, RealExamples) {
   EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x560F40020455, irsend.capture.value);
   EXPECT_EQ(0x560F4002, irsend.capture.address);  // Wand ID
-  EXPECT_EQ(0x0455, irsend.capture.command);  // Magnitude
+  EXPECT_EQ(0x0455, irsend.capture.command);      // Magnitude
   EXPECT_FALSE(irsend.capture.repeat);
 }

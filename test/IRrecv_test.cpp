@@ -1,8 +1,8 @@
 // Copyright 2017 David Conran
 
 #include "IRrecv_test.h"
-#include "IRremoteESP8266.h"
 #include "IRrecv.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -241,7 +241,6 @@ TEST(TestDecode, DecodeSony) {
   EXPECT_EQ(kSony15Bits, irsend.capture.bits);
   EXPECT_EQ(0x5480, irsend.capture.value);
 
-
   // Synthesised Normal Sony 12-bit message.
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony12Bits, 21, 1), kSony12Bits);
@@ -454,14 +453,8 @@ TEST(TestMatchData, SpaceEncoded) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t space_encoded_raw[11] = {
-    500, 500,
-    500, 1500,
-    499, 499,
-    501, 1501,
-    499, 1490,
-    500
-  };
+  uint16_t space_encoded_raw[11] = {500, 500,  500, 1500, 499, 499,
+                                    501, 1501, 499, 1490, 500};
   match_result_t result;
 
   irsend.reset();
@@ -485,14 +478,8 @@ TEST(TestMatchData, MarkEncoded) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t mark_encoded_raw[11] = {
-    500, 500,
-    1500, 500,
-    499, 499,
-    1501, 501,
-    1499, 490,
-    500
-  };
+  uint16_t mark_encoded_raw[11] = {500,  500, 1500, 500, 499, 499,
+                                   1501, 501, 1499, 490, 500};
   match_result_t result;
 
   irsend.reset();
@@ -528,14 +515,8 @@ TEST(TestMatchData, EqualTotalBitTimeEncoded) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t equal_encoded_raw[11] = {
-    500, 1500,
-    1500, 500,
-    499, 1499,
-    1501, 501,
-    1499, 490,
-    500
-  };
+  uint16_t equal_encoded_raw[11] = {500,  1500, 1500, 500, 499, 1499,
+                                    1501, 501,  1499, 490, 500};
   match_result_t result;
 
   irsend.reset();
@@ -559,21 +540,15 @@ TEST(TestMatchData, ArbitraryEncoded) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t arbitrary_encoded_raw[11] = {
-    500, 1500,
-    3000, 1000,
-    499, 1499,
-    3001, 1001,
-    2999, 990,
-    500
-  };
+  uint16_t arbitrary_encoded_raw[11] = {500,  1500, 3000, 1000, 499, 1499,
+                                        3001, 1001, 2999, 990,  500};
   match_result_t result;
 
   irsend.reset();
   irsend.sendRaw(arbitrary_encoded_raw, 11, 38000);
   irsend.makeDecodeResult();
-  result = irrecv.matchData(irsend.capture.rawbuf + 1, 5,
-                            3000, 1000, 500, 1500);
+  result =
+      irrecv.matchData(irsend.capture.rawbuf + 1, 5, 3000, 1000, 500, 1500);
   ASSERT_TRUE(result.success);
   EXPECT_EQ(0b01011, result.data);
   EXPECT_EQ(10, result.used);

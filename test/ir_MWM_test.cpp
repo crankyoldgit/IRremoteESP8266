@@ -21,9 +21,8 @@ TEST(TestSendMWM, SendDataOnly) {
   irsend.begin();
 
   irsend.reset();
-  unsigned char test1[] = {
-    0x96, 0x19, 0x10, 0x24, 0x0A, 0x6B, 0x20, 0x03, 0x82
-  };
+  unsigned char test1[] = {0x96, 0x19, 0x10, 0x24, 0x0A,
+                           0x6B, 0x20, 0x03, 0x82};
   /*
   ++--+-++--
   +-++--+++-
@@ -45,12 +44,12 @@ TEST(TestSendMWM, SendDataOnly) {
       "m417s834m417s417m417s834m417s417"
       "m2502s417m834s417"
       "m417s834m2502s417"
-      "m834s417m2085s30834"
-      "", irsend.outputStr());
+      "m834s417m2085s30834", irsend.outputStr());
 
   irsend.reset();
   unsigned char test2[] = {
-    0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42, 0x06, 0x20, 0xD0, 0x32, 0xF0, 0x0B
+      0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42, 0x06,
+      0x20, 0xD0, 0x32, 0xF0, 0x0B
       // +-++--++--
       // ++--++-++-
       // ++--++--+-
@@ -77,8 +76,7 @@ TEST(TestSendMWM, SendDataOnly) {
       "m2085s417m417s1251"
       "m834s417m834s834m834s417"
       "m2085s2085"
-      "m417s834m417s417m1668s30417"
-      "", irsend.outputStr());
+      "m417s834m417s417m1668s30417", irsend.outputStr());
 }
 
 // Tests for decodeMWM().
@@ -91,138 +89,35 @@ TEST(TestDecodeMWM, RealExamples) {
 
   irsend.reset();
   uint16_t short_code[] = {
-    915,
-    793,
-    488,
-    366,
-    915,
-    793,
-    427,
-    366,
-    915,
-    793,
-    1281,
-    427,
-    2136,
-    366,
-    1281,
-    366,
-    915,
-    793,
-    427,
-    854,
-    854,
-    366,
-    1281,
-    854,
-    1708,
-    366,
-    488,
-    793,
-    854,
-    427,
-    427,
-    427,
-    427,
-    366,
-    854,
-    427,
-    2563,
-    366,
-    488,
-    793,
-    2563,
-    366,
-    488,
-    2075,
-    427,
-    34057
-  };
-  unsigned char short_expected[] = {
-    0x96, 0x19, 0x10, 0x36, 0x0C, 0x53, 0x02, 0x03, 0xDF
-  };
-  irsend.sendRaw(short_code, sizeof(short_code)/sizeof(short_code[0]), 38000);
+      915,  793, 488,  366, 915,  793, 427, 366,  915, 793,  1281, 427,
+      2136, 366, 1281, 366, 915,  793, 427, 854,  854, 366,  1281, 854,
+      1708, 366, 488,  793, 854,  427, 427, 427,  427, 366,  854,  427,
+      2563, 366, 488,  793, 2563, 366, 488, 2075, 427, 34057};
+  unsigned char short_expected[] = {0x96, 0x19, 0x10, 0x36, 0x0C,
+                                    0x53, 0x02, 0x03, 0xDF};
+  irsend.sendRaw(short_code, sizeof(short_code) / sizeof(short_code[0]), 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MWM, irsend.capture.decode_type);
   EXPECT_EQ(8 * sizeof(short_expected) / sizeof(short_expected[0]),
-      irsend.capture.bits);
+            irsend.capture.bits);
   EXPECT_STATE_EQ(short_expected, irsend.capture.state, irsend.capture.bits);
 
   irsend.reset();
   uint16_t long_code[] = {
-    427,
-    427,
-    854,
-    854,
-    854,
-    793,
-    915,
-    793,
-    854,
-    366,
-    915,
-    366,
-    854,
-    854,
-    854,
-    793,
-    488,
-    366,
-    915,
-    1220,
-    427,
-    793,
-    488,
-    366,
-    488,
-    366,
-    1281,
-    427,
-    427,
-    1220,
-    915,
-    366,
-    1708,
-    366,
-    488,
-    366,
-    854,
-    854,
-    2136,
-    366,
-    2563,
-    366,
-    854,
-    427,
-    2136,
-    366,
-    488,
-    1220,
-    854,
-    427,
-    854,
-    793,
-    915,
-    366,
-    2136,
-    2075,
-    427,
-    793,
-    488,
-    366,
-    1708,
-    30517
-  };
-  unsigned char long_expected[] = {
-    0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42, 0x06, 0x20, 0xD0, 0x32, 0xF0, 0x0B
-  };
-  irsend.sendRaw(long_code, sizeof(long_code)/sizeof(long_code[0]), 38000);
+      427,  427,  854,  854,  854, 793,  915,  793, 854,  366,  915, 366, 854,
+      854,  854,  793,  488,  366, 915,  1220, 427, 793,  488,  366, 488, 366,
+      1281, 427,  427,  1220, 915, 366,  1708, 366, 488,  366,  854, 854, 2136,
+      366,  2563, 366,  854,  427, 2136, 366,  488, 1220, 854,  427, 854, 793,
+      915,  366,  2136, 2075, 427, 793,  488,  366, 1708, 30517};
+  unsigned char long_expected[] = {0x99, 0x26, 0x66, 0x6E, 0xD1, 0x42,
+                                   0x06, 0x20, 0xD0, 0x32, 0xF0, 0x0B};
+  irsend.sendRaw(long_code, sizeof(long_code) / sizeof(long_code[0]), 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(MWM, irsend.capture.decode_type);
   EXPECT_EQ(8 * sizeof(long_expected) / sizeof(long_expected[0]),
-      irsend.capture.bits);
+            irsend.capture.bits);
   EXPECT_STATE_EQ(long_expected, irsend.capture.state, irsend.capture.bits);
 }
 

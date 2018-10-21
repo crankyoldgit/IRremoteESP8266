@@ -17,7 +17,8 @@ TEST(TestSendJVC, SendDataOnly) {
       "m8400s4200"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s21675", irsend.outputStr());
+      "m525s21675",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -34,7 +35,8 @@ TEST(TestSendJVC, SendWithRepeats) {
       "m525s21675"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s34275", irsend.outputStr());
+      "m525s34275",
+      irsend.outputStr());
   irsend.sendJVC(0xC2B8, kJvcBits, 2);  // 2 repeats.
   EXPECT_EQ(
       "m8400s4200"
@@ -46,7 +48,8 @@ TEST(TestSendJVC, SendWithRepeats) {
       "m525s34275"
       "m525s1725m525s1725m525s525m525s525m525s525m525s525m525s1725m525s525"
       "m525s1725m525s525m525s1725m525s1725m525s1725m525s525m525s525m525s525"
-      "m525s34275", irsend.outputStr());
+      "m525s34275",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -59,7 +62,8 @@ TEST(TestSendJVC, SendUnusualSize) {
   EXPECT_EQ(
       "m8400s4200"
       "m525s525m525s525m525s525m525s525m525s525m525s525m525s525m525s525"
-      "m525s38475", irsend.outputStr());
+      "m525s38475",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendJVC(0x1234567890ABCDEF, 64);
@@ -73,7 +77,8 @@ TEST(TestSendJVC, SendUnusualSize) {
       "m525s1725m525s525m525s1725m525s525m525s1725m525s525m525s1725m525s1725"
       "m525s1725m525s1725m525s525m525s525m525s1725m525s1725m525s525m525s1725"
       "m525s1725m525s1725m525s1725m525s525m525s1725m525s1725m525s1725m525s1725"
-      "m525s10875", irsend.outputStr());
+      "m525s10875",
+      irsend.outputStr());
 }
 
 // Tests for encodeJVC().
@@ -167,9 +172,9 @@ TEST(TestDecodeJVC, NormalDecodeWithRepeatAndStrict) {
 
   // Simulate 'just' a JVC repeat command.
   // JVC VCR Power On from Global Cache, but modified to be a repeat message.
-  uint16_t gc_test[37] = {38000, 1, 1, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 20, 20, 61, 20, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[37] = {38000, 1,  1,  20, 61, 20, 61, 20, 20, 20, 20, 20, 20,
+                          20,    20, 20, 61, 20, 20, 20, 61, 20, 20, 20, 61, 20,
+                          61,    20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
   irsend.reset();
   irsend.sendGC(gc_test, 37);
   irsend.makeDecodeResult();
@@ -264,10 +269,11 @@ TEST(TestDecodeJVC, DecodeGlobalCacheExample) {
 
   irsend.reset();
   // JVC VCR Power On from Global Cache.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 20, 20, 61, 20, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
-    // 38000,1,37,320,161,21,59,21,59,21,19,21,19,21,19,21,19,21,59,21,19,21,59,21,59,21,19,21,59,21,19,21,19,21,19,21,19,21,838,21,59,21,59,21,19,21,19,21,19,21,19,21,59,21,19,21,59,21,19,21,59,21,59,21,59,21,19,21,19,21,19,21,850};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61, 20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 20, 20, 61, 20,
+                          20,    20, 61, 20,  20,  20, 61, 20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20, 20, 884};
+  // 38000,1,37,320,161,21,59,21,59,21,19,21,19,21,19,21,19,21,59,21,19,21,59,21,59,21,19,21,59,21,19,21,19,21,19,21,19,21,838,21,59,21,59,21,19,21,19,21,19,21,19,21,59,21,19,21,59,21,19,21,59,21,59,21,59,21,19,21,19,21,19,21,850};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
@@ -288,9 +294,10 @@ TEST(TestDecodeJVC, FailToDecodeNonJVCExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 

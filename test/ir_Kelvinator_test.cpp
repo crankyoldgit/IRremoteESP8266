@@ -1,11 +1,11 @@
 // Copyright 2017 David Conran
 
-#include "IRremoteESP8266.h"
+#include "ir_Kelvinator.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
+#include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_Kelvinator.h"
 #include "gtest/gtest.h"
 
 // Tests for sendKelvinator().
@@ -44,7 +44,8 @@ TEST(TestSendKelvinator, SendDataOnly) {
       "m680s510m680s510m680s510m680s510m680s510m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s1530m680s1530m680s1530"
-      "m680s39950", irsend.outputStr());
+      "m680s39950",
+      irsend.outputStr());
 }
 
 // Test sending with repeats.
@@ -107,7 +108,8 @@ TEST(TestSendKelvinator, SendWithRepeats) {
       "m680s510m680s510m680s510m680s510m680s510m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s1530m680s1530m680s1530"
-      "m680s39950", irsend.outputStr());
+      "m680s39950",
+      irsend.outputStr());
 }
 
 // Test sending atypical sizes.
@@ -117,9 +119,9 @@ TEST(TestSendKelvinator, SendUnexpectedSizes) {
 
   uint8_t kelv_short_code[15] = {0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
                                  0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10};
-  uint8_t kelv_long_code[17] = {0x19, 0x0B, 0x80, 0x50, 0x00, 0x00, 0x00, 0xE0,
-                                0x19, 0x0B, 0x80, 0x70, 0x00, 0x00, 0x10, 0xf0,
-                                0x00};
+  uint8_t kelv_long_code[17] = {0x19, 0x0B, 0x80, 0x50, 0x00, 0x00,
+                                0x00, 0xE0, 0x19, 0x0B, 0x80, 0x70,
+                                0x00, 0x00, 0x10, 0xf0, 0x00};
   irsend.reset();
   irsend.sendKelvinator(kelv_short_code, 15);
   ASSERT_EQ("", irsend.outputStr());
@@ -152,9 +154,9 @@ TEST(TestSendKelvinator, SendUnexpectedSizes) {
       "m680s510m680s510m680s510m680s510m680s510m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s1530m680s1530m680s1530"
-      "m680s39950", irsend.outputStr());
+      "m680s39950",
+      irsend.outputStr());
 }
-
 
 // Tests for IRKelvinatorAC class.
 
@@ -416,10 +418,11 @@ TEST(TestKelvinatorClass, SetAndGetRaw) {
 TEST(TestKelvinatorClass, HumanReadable) {
   IRKelvinatorAC irkelv(0);
 
-  EXPECT_EQ("Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Turbo: Off, "
-            "Quiet: Off, XFan: Off, IonFilter: Off, Light: Off, "
-            "Swing (Horizontal): Off, Swing (Vertical): Off",
-            irkelv.toString());
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Turbo: Off, "
+      "Quiet: Off, XFan: Off, IonFilter: Off, Light: Off, "
+      "Swing (Horizontal): Off, Swing (Vertical): Off",
+      irkelv.toString());
   irkelv.on();
   irkelv.setMode(kKelvinatorCool);
   irkelv.setTemp(25);
@@ -428,10 +431,11 @@ TEST(TestKelvinatorClass, HumanReadable) {
   irkelv.setIonFilter(true);
   irkelv.setLight(true);
   irkelv.setSwingHorizontal(true);
-  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 25C, Fan: 5 (MAX), Turbo: Off, "
-            "Quiet: Off, XFan: On, IonFilter: On, Light: On, "
-            "Swing (Horizontal): On, Swing (Vertical): Off",
-            irkelv.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 25C, Fan: 5 (MAX), Turbo: Off, "
+      "Quiet: Off, XFan: On, IonFilter: On, Light: On, "
+      "Swing (Horizontal): On, Swing (Vertical): Off",
+      irkelv.toString());
 }
 
 TEST(TestKelvinatorClass, MessageConstuction) {
@@ -491,7 +495,8 @@ TEST(TestKelvinatorClass, MessageConstuction) {
       "m680s510m680s510m680s510m680s510m680s510m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s510m680s510m680s510"
       "m680s510m680s510m680s510m680s510m680s1530m680s1530m680s1530m680s1530"
-      "m680s39950", irsend.outputStr());
+      "m680s39950",
+      irsend.outputStr());
 }
 
 // Decode a synthetic Kelvinator message.

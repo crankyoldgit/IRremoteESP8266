@@ -4,7 +4,6 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
-
 // Tests for encodeSanyoLC7461().
 
 TEST(TestEncodeSanyoLC7461, NormalEncoding) {
@@ -34,7 +33,8 @@ TEST(TestEncodeSanyoLC7461, SendDataOnly) {
       "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s1680m560s1680m560s23520", irsend.outputStr());
+      "m560s1680m560s1680m560s23520",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -52,7 +52,8 @@ TEST(TestEncodeSanyoLC7461, SendWithRepeats) {
       "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s23520"
-      "m8960s2240m560s96320", irsend.outputStr());
+      "m8960s2240m560s96320",
+      irsend.outputStr());
 }
 
 // Tests for decodeSanyoLC7461().
@@ -67,8 +68,8 @@ TEST(TestDecodeSanyoLC7461, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSanyoLC7461(0x1D8113F00FF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                       true));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
@@ -80,8 +81,8 @@ TEST(TestDecodeSanyoLC7461, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSanyoLC7461(irsend.encodeSanyoLC7461(0x1234, 0x56));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-              true));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x2468DCB56A9, irsend.capture.value);
@@ -93,8 +94,8 @@ TEST(TestDecodeSanyoLC7461, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSanyoLC7461(irsend.encodeSanyoLC7461(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                       true));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x3FFE01FE, irsend.capture.value);
@@ -113,8 +114,8 @@ TEST(TestDecodeSanyoLC7461, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendSanyoLC7461(0x3FFE01FE, kSanyoLC7461Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                       true));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x3FFE01FE, irsend.capture.value);
@@ -133,11 +134,11 @@ TEST(TestDecodeSanyoLC7461, DecodeWithNonStrictValues) {
   irsend.sendSanyoLC7461(0x0);  // Illegal value Sanyo LC7461 message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                        true));
+  ASSERT_FALSE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                       false));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, false));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -148,20 +149,18 @@ TEST(TestDecodeSanyoLC7461, DecodeWithNonStrictValues) {
   // Illegal value Sanyo LC7461 42-bit message.
   irsend.sendSanyoLC7461(0x1234567890A);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                        true));
+  ASSERT_FALSE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
 
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, 32,
-                                        true));
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, 64,
-                                        true));
+  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, 64, true));
   // And should fail for a bad value.
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                        true));
+  ASSERT_FALSE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-                                       false));
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, false));
   EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
   EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
   EXPECT_EQ(0x1234567890A, irsend.capture.value);
@@ -193,33 +192,33 @@ TEST(TestDecodeSanyoLC7461, Decode64BitMessages) {
 
 // Decode a 'real' example via GlobalCache
 TEST(TestDecodeSanyoLC7461, DecodeGlobalCacheExample) {
-IRsendTest irsend(4);
-IRrecv irrecv(4);
-irsend.begin();
+  IRsendTest irsend(4);
+  IRrecv irrecv(4);
+  irsend.begin();
 
-irsend.reset();
-uint16_t gc_test[95] = {38000, 1, 89, 342, 171, 21, 21, 21, 64, 21, 64,
-                        21, 64, 21, 21, 21, 64, 21, 64, 21, 21, 21, 21,
-                        21, 21, 21, 21, 21, 21, 21, 21, 21, 64, 21, 21,
-                        21, 21, 21, 21, 21, 64, 21, 21, 21, 21, 21, 64,
-                        21, 64, 21, 64, 21, 64, 21, 64, 21, 64, 21, 21,
-                        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
-                        21, 21, 21, 64, 21, 64, 21, 64, 21, 64, 21, 64,
-                        21, 64, 21, 64, 21, 64, 21, 875, 342, 171, 21, 3565};
-irsend.sendGC(gc_test, 95);
-irsend.makeDecodeResult();
+  irsend.reset();
+  uint16_t gc_test[95] = {
+      38000, 1,  89, 342, 171, 21, 21, 21, 64, 21, 64,  21,  64,  21, 21,  21,
+      64,    21, 64, 21,  21,  21, 21, 21, 21, 21, 21,  21,  21,  21, 21,  21,
+      64,    21, 21, 21,  21,  21, 21, 21, 64, 21, 21,  21,  21,  21, 64,  21,
+      64,    21, 64, 21,  64,  21, 64, 21, 64, 21, 21,  21,  21,  21, 21,  21,
+      21,    21, 21, 21,  21,  21, 21, 21, 21, 21, 64,  21,  64,  21, 64,  21,
+      64,    21, 64, 21,  64,  21, 64, 21, 64, 21, 875, 342, 171, 21, 3565};
+  irsend.sendGC(gc_test, 95);
+  irsend.makeDecodeResult();
 
-ASSERT_TRUE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
-EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
-EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
-EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
-EXPECT_EQ(0xEC0, irsend.capture.address);
-EXPECT_EQ(0x0, irsend.capture.command);
-EXPECT_FALSE(irsend.capture.repeat);
+  ASSERT_TRUE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, true));
+  EXPECT_EQ(SANYO_LC7461, irsend.capture.decode_type);
+  EXPECT_EQ(kSanyoLC7461Bits, irsend.capture.bits);
+  EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
+  EXPECT_EQ(0xEC0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
 
-// Confirm what the 42-bit NEC decode is.
-ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, 42, false));
-EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
+  // Confirm what the 42-bit NEC decode is.
+  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, 42, false));
+  EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
 }
 
 // Fail to decode a non-Sanyo LC7461 example via GlobalCache
@@ -230,13 +229,14 @@ TEST(TestDecodeSanyoLC7461, FailToDecodeNonSanyoLC7461Example) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits,
-               false));
+  ASSERT_FALSE(
+      irrecv.decodeSanyoLC7461(&irsend.capture, kSanyoLC7461Bits, false));
 }

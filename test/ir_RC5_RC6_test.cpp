@@ -87,13 +87,15 @@ TEST(TestSendRC5, SendDataOnly) {
   irsend.sendRC5(0x1AAA, kRC5Bits);
   EXPECT_EQ(
       "m889s889m889s889m1778s1778m1778s1778m1778s1778"
-      "m1778s1778m1778s1778m1778s90664", irsend.outputStr());
+      "m1778s1778m1778s1778m1778s90664",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x175, kRC5Bits);
   EXPECT_EQ(
       "m889s889m1778s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s89775", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s89775",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x3FFF, kRC5Bits);
@@ -113,13 +115,15 @@ TEST(TestSendRC5, SendDataOnly) {
   irsend.sendRC5(0x1AAA, kRC5XBits);
   EXPECT_EQ(
       "m1778s1778m1778s1778m1778s1778m1778"
-      "s1778m1778s1778m1778s1778m1778s90664", irsend.outputStr());
+      "s1778m1778s1778m1778s1778m1778s90664",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x175, kRC5XBits);
   EXPECT_EQ(
       "m889s889m1778s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s89775", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s89775",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x3FFF, kRC5XBits);
@@ -140,7 +144,8 @@ TEST(TestSendRC5, SendWithRepeats) {
       "m889s889m1778s889m889s889m889s1778m1778s1778"
       "m889s889m889s889m1778s1778m1778s1778m889s90664"
       "m889s889m1778s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s88886", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s88886",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x175, kRC5Bits, 2);
@@ -150,7 +155,8 @@ TEST(TestSendRC5, SendWithRepeats) {
       "m889s889m1778s889m889s889m889s1778m1778s1778"
       "m889s889m889s889m1778s1778m1778s1778m889s89775"
       "m889s889m1778s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s88886", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s88886",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x175, kRC5XBits, 1);
@@ -158,7 +164,8 @@ TEST(TestSendRC5, SendWithRepeats) {
       "m889s889m1778s889m889s889m889s1778m1778s1778"
       "m889s889m889s889m1778s1778m1778s1778m889s90664"
       "m889s889m1778s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s88886", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s88886",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC5(0x1175, kRC5XBits, 2);
@@ -168,7 +175,8 @@ TEST(TestSendRC5, SendWithRepeats) {
       "m1778s889m889s889m889s889m889s1778m1778s1778"
       "m889s889m889s889m1778s1778m1778s1778m889s89775"
       "m1778s889m889s889m889s889m889s1778m1778s1778"
-      "m889s889m889s889m1778s1778m1778s1778m889s88886", irsend.outputStr());
+      "m889s889m889s889m1778s1778m1778s1778m889s88886",
+      irsend.outputStr());
 }
 // Tests for decodeRC5().
 
@@ -364,9 +372,10 @@ TEST(TestDecodeRC5, FailToDecodeNonRC5Example) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
@@ -421,8 +430,8 @@ TEST(TestToggleRC6, 36BitUse) {
 
   EXPECT_EQ(0x8000, irsend.toggleRC6(0x0, kRC6_36Bits));
   EXPECT_EQ(0x0, irsend.toggleRC6(0x8000, kRC6_36Bits));
-  EXPECT_EQ(0x0, irsend.toggleRC6(irsend.toggleRC6(0x0, kRC6_36Bits),
-                                  kRC6_36Bits));
+  EXPECT_EQ(0x0,
+            irsend.toggleRC6(irsend.toggleRC6(0x0, kRC6_36Bits), kRC6_36Bits));
 }
 
 // Tests for sendRC6().
@@ -439,7 +448,8 @@ TEST(TestSendRC6, SendMode0DataOnly) {
       "m444s888m444s444m444s444m444s888m888s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444s444m444"
-      "s83028", irsend.outputStr());
+      "s83028",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x1FFFF);
@@ -448,7 +458,8 @@ TEST(TestSendRC6, SendMode0DataOnly) {
       "m444s888m444s444m444s444m1332s888m444s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444"
-      "s83472", irsend.outputStr());
+      "s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x15555);
@@ -456,7 +467,8 @@ TEST(TestSendRC6, SendMode0DataOnly) {
       "m2664s888"
       "m444s888m444s444m444s444m1332s1332m888s888m888s888"
       "m888s888m888s888m888s888m888s888m888s888m888"
-      "s83472", irsend.outputStr());
+      "s83472",
+      irsend.outputStr());
 }
 
 // Test sending typical RC-6 36-bit data only.
@@ -474,7 +486,8 @@ TEST(TestSendRC6, Send36BitDataOnly) {
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
-      "s83028", irsend.outputStr());
+      "s83028",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0xFFFFFFFFF, kRC6_36Bits);
@@ -486,7 +499,8 @@ TEST(TestSendRC6, Send36BitDataOnly) {
       "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444"
       "m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
-      "s83472", irsend.outputStr());
+      "s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0xAAAAAAAAAA, kRC6_36Bits);
@@ -506,7 +520,8 @@ TEST(TestSendRC6, Send36BitDataOnly) {
       "s888m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m888s444m444s444m444s444m444s888m888s444m444"
       "s444m444s888m888s888m444s444m444s444m444s444m444s444m444s444m888"
-      "s444m444s888m444s444m444s83028", irsend.outputStr());
+      "s444m444s888m444s444m444s83028",
+      irsend.outputStr());
   irsend.reset();
   irsend.sendRC6(irsend.toggleRC6(0xC800F740C, kRC6_36Bits),
                  kRC6_36Bits);  // Xbox 360 OnOff code (toggled)
@@ -517,7 +532,8 @@ TEST(TestSendRC6, Send36BitDataOnly) {
       "s888m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m888s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s888m888s888m444s444m444s444m444s444m444s444m444"
-      "s444m888s444m444s888m444s444m444s83028", irsend.outputStr());
+      "s444m888s444m444s888m444s444m444s83028",
+      irsend.outputStr());
 }
 
 // Test sending RC-6 Mode 0 with different repeats.
@@ -532,7 +548,8 @@ TEST(TestSendRC6, SendMode0WithRepeats) {
       "m444s888m444s444m444s444m444"
       "s888m888"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x175, kRC6Mode0Bits, 1);
@@ -546,7 +563,8 @@ TEST(TestSendRC6, SendMode0WithRepeats) {
       "m444s888m444s444m444s444m444"
       "s888m888"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x175, kRC6Mode0Bits, 2);
@@ -565,7 +583,8 @@ TEST(TestSendRC6, SendMode0WithRepeats) {
       "m444s888m444s444m444s444m444"
       "s888m888"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 }
 
 // Test sending RC-6 36-bit with different repeats.
@@ -582,7 +601,8 @@ TEST(TestSendRC6, Send36BitWithRepeats) {
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x175, kRC6_36Bits, 1);
@@ -600,7 +620,8 @@ TEST(TestSendRC6, Send36BitWithRepeats) {
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendRC6(0x175, kRC6_36Bits, 2);
@@ -625,7 +646,8 @@ TEST(TestSendRC6, Send36BitWithRepeats) {
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m444s444m444"
       "s444m444s444m444s444m444s444m444s444m444s444m444s444m888s888m888"
-      "s444m444s444m444s888m888s888m888s83472", irsend.outputStr());
+      "s444m444s444m444s888m888s888m888s83472",
+      irsend.outputStr());
 }
 
 // Tests for decodeRC6().
@@ -825,11 +847,11 @@ TEST(TestDecodeRC6, Decode36BitGlobalCacheExample) {
 
   irsend.reset();
   // Xbox-360 Power On from Global Cache.
-  uint16_t gc_test[65] = {36000, 1, 1, 96, 32, 16, 16, 16, 16, 16, 32, 16, 32,
-                          48, 32, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-                          16, 16, 16, 16, 16, 16, 16, 16, 16, 32, 16, 16, 16,
-                          16, 16, 16, 32, 32, 16, 16, 16, 16, 32, 32, 32, 16,
-                          16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 16, 2476};
+  uint16_t gc_test[65] = {
+      36000, 1,  1,  96, 32, 16, 16, 16, 16, 16, 32, 16, 32, 48,  32, 16, 16,
+      16,    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,  16, 16, 16,
+      16,    32, 16, 16, 16, 16, 16, 16, 32, 32, 16, 16, 16, 16,  32, 32, 32,
+      16,    16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 16, 2476};
   irsend.sendGC(gc_test, 65);
   irsend.makeDecodeResult();
 
@@ -849,9 +871,10 @@ TEST(TestDecodeRC5, FailToDecodeNonRC6Example) {
   irsend.begin();
 
   irsend.reset();
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 

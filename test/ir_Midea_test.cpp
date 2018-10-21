@@ -1,8 +1,8 @@
 // Copyright 2017 David Conran
 
+#include "ir_Midea.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_Midea.h"
 #include "gtest/gtest.h"
 
 // Tests for sendMidea().
@@ -30,7 +30,8 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendMidea(0x55AA55AA55AA);
@@ -50,7 +51,8 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendMidea(0xFFFFFFFFFFFF);
@@ -70,7 +72,8 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -112,57 +115,59 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
   irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 2);  // 2 repeats.
   EXPECT_EQ(
-    "m4480s4480"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s5600"
-    "m4480s4480"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s5600"
-    "m4480s4480"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s5600"
-    "m4480s4480"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s5600"
-    "m4480s4480"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s5600"
-    "m4480s4480"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
-    "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-    "m560s5600", irsend.outputStr());
+      "m4480s4480"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s5600"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s5600"
+      "m4480s4480"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s5600"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s5600"
+      "m4480s4480"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s5600"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s5600",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -178,7 +183,8 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s5600"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendMidea(0x1234567890ABCDEF, 64);
@@ -202,12 +208,13 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s560m560s560"
-      "m560s5600", irsend.outputStr());
+      "m560s5600",
+      irsend.outputStr());
 
   // Bit sizes must be a multiple of 8.
   irsend.reset();
   irsend.sendMidea(0x0, 17);
-  EXPECT_EQ("" , irsend.outputStr());
+  EXPECT_EQ("", irsend.outputStr());
 }
 
 // Tests for IRMideaAC class.
@@ -227,7 +234,6 @@ TEST(TestMideaACClass, Power) {
   midea.off();
   EXPECT_FALSE(midea.getPower());
   EXPECT_EQ(0xA1026FFFFFE2, midea.getRaw());
-
 
   midea.setPower(true);
   EXPECT_TRUE(midea.getPower());
@@ -333,10 +339,10 @@ TEST(TestMideaACClass, Temperature) {
   IRMideaAC midea(0);
   midea.begin();
 
-  midea.setRaw(0xA1826FFFFF62);  // 77F / 25C
-  EXPECT_EQ(77, midea.getTemp());  // F
+  midea.setRaw(0xA1826FFFFF62);         // 77F / 25C
+  EXPECT_EQ(77, midea.getTemp());       // F
   EXPECT_EQ(77, midea.getTemp(false));  // F
-  EXPECT_EQ(25, midea.getTemp(true));  // F
+  EXPECT_EQ(25, midea.getTemp(true));   // F
 
   midea.setTemp(0);
   EXPECT_EQ(kMideaACMinTempF, midea.getTemp());
@@ -384,30 +390,30 @@ TEST(TestMideaACClass, Temperature) {
   EXPECT_EQ(kMideaACMaxTempF, midea.getTemp(false));
 
   // General changes.
-  midea.setTemp(17, true);  // C
-  EXPECT_EQ(17, midea.getTemp(true));  // C
+  midea.setTemp(17, true);              // C
+  EXPECT_EQ(17, midea.getTemp(true));   // C
   EXPECT_EQ(63, midea.getTemp(false));  // F
 
-  midea.setTemp(21, true);  // C
-  EXPECT_EQ(21, midea.getTemp(true));  // C
+  midea.setTemp(21, true);              // C
+  EXPECT_EQ(21, midea.getTemp(true));   // C
   EXPECT_EQ(70, midea.getTemp(false));  // F
 
-  midea.setTemp(25, true);  // C
-  EXPECT_EQ(25, midea.getTemp(true));  // C
+  midea.setTemp(25, true);              // C
+  EXPECT_EQ(25, midea.getTemp(true));   // C
   EXPECT_EQ(77, midea.getTemp(false));  // F
 
-  midea.setTemp(30, true);  // C
-  EXPECT_EQ(30, midea.getTemp(true));  // C
+  midea.setTemp(30, true);              // C
+  EXPECT_EQ(30, midea.getTemp(true));   // C
   EXPECT_EQ(86, midea.getTemp(false));  // F
 
-  midea.setTemp(80, false);  // F
-  EXPECT_EQ(26, midea.getTemp(true));  // C
+  midea.setTemp(80, false);             // F
+  EXPECT_EQ(26, midea.getTemp(true));   // C
   EXPECT_EQ(80, midea.getTemp(false));  // F
 
-  midea.setTemp(70);  // F
-  EXPECT_EQ(21, midea.getTemp(true));  // C
+  midea.setTemp(70);                    // F
+  EXPECT_EQ(21, midea.getTemp(true));   // C
   EXPECT_EQ(70, midea.getTemp(false));  // F
-  EXPECT_EQ(70, midea.getTemp());  // F
+  EXPECT_EQ(70, midea.getTemp());       // F
 }
 
 // Tests for controlling the sleep state.
@@ -431,8 +437,10 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   midea.begin();
 
   midea.setRaw(0xA1826FFFFF62);
-  EXPECT_EQ("Power: On, Mode: 2 (AUTO), Temp: 25C/77F, Fan: 0 (AUTO), "
-            "Sleep: Off", midea.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (AUTO), Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Sleep: Off",
+      midea.toString());
   midea.off();
   midea.setTemp(25);
   midea.setFan(kMideaACFanHigh);
@@ -597,9 +605,10 @@ TEST(TestDecodeMidea, FailToDecodeNonMideaExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
@@ -615,21 +624,23 @@ TEST(TestDecodeMidea, DecodeRealExample) {
   irsend.reset();
 
   uint16_t rawData[199] = {
-      4366, 4470, 498, 1658, 522, 554, 498, 1658, 496, 580, 498, 580, 498, 578,
-      498, 580, 498, 1658, 498, 1658, 498, 578, 498, 578, 498, 580, 496, 582,
-      496, 578, 498, 1658, 498, 580, 498, 580, 498, 1656, 498, 1656, 500, 580,
-      498, 578, 502, 576, 500, 1656, 498, 1656, 500, 1654, 500, 1656, 500, 1656,
-      498, 1658, 498, 1656, 500, 1658, 498, 1656, 498, 1656, 500, 1656, 500,
-      1654, 500, 1578, 578, 1658, 498, 1656, 500, 1658, 498, 1656, 498, 1656,
-      500, 578, 498, 1638, 516, 1656, 500, 578, 500, 1656, 500, 1656, 498, 1658,
-      522, 554, 500, 5258, 4366, 4472, 498, 580, 498, 1658, 498, 580, 498, 1656,
-      500, 1600, 556, 1658, 500, 1656, 500, 578, 498, 578, 522, 1634, 498, 1588,
-      568, 1658, 498, 1656, 500, 1654, 498, 580, 498, 1658, 498, 1658, 498, 580,
-      496, 578, 500, 1654, 500, 1636, 518, 1656, 500, 578, 520, 558, 498, 578,
-      498, 580, 498, 576, 500, 578, 498, 580, 498, 578, 498, 578, 498, 580, 498,
-      578, 498, 580, 498, 580, 520, 556, 498, 580, 496, 580, 498, 578, 500, 578,
-      498, 1658, 498, 580, 498, 578, 498, 1656, 500, 578, 498, 580, 498, 580,
-      498, 1656, 522};
+      4366, 4470, 498, 1658, 522,  554,  498, 1658, 496, 580,  498, 580,
+      498,  578,  498, 580,  498,  1658, 498, 1658, 498, 578,  498, 578,
+      498,  580,  496, 582,  496,  578,  498, 1658, 498, 580,  498, 580,
+      498,  1656, 498, 1656, 500,  580,  498, 578,  502, 576,  500, 1656,
+      498,  1656, 500, 1654, 500,  1656, 500, 1656, 498, 1658, 498, 1656,
+      500,  1658, 498, 1656, 498,  1656, 500, 1656, 500, 1654, 500, 1578,
+      578,  1658, 498, 1656, 500,  1658, 498, 1656, 498, 1656, 500, 578,
+      498,  1638, 516, 1656, 500,  578,  500, 1656, 500, 1656, 498, 1658,
+      522,  554,  500, 5258, 4366, 4472, 498, 580,  498, 1658, 498, 580,
+      498,  1656, 500, 1600, 556,  1658, 500, 1656, 500, 578,  498, 578,
+      522,  1634, 498, 1588, 568,  1658, 498, 1656, 500, 1654, 498, 580,
+      498,  1658, 498, 1658, 498,  580,  496, 578,  500, 1654, 500, 1636,
+      518,  1656, 500, 578,  520,  558,  498, 578,  498, 580,  498, 576,
+      500,  578,  498, 580,  498,  578,  498, 578,  498, 580,  498, 578,
+      498,  580,  498, 580,  520,  556,  498, 580,  496, 580,  498, 578,
+      500,  578,  498, 1658, 498,  580,  498, 578,  498, 1656, 500, 578,
+      498,  580,  498, 580,  498,  1656, 522};
   irsend.sendRaw(rawData, 199, 38000);
   irsend.makeDecodeResult();
 

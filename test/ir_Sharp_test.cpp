@@ -37,7 +37,6 @@ TEST(TestEncodeSharp, AdvancedEncoding) {
   EXPECT_EQ(0x454A, irsend.encodeSharp(0x11, 0x52, 1, 0, true));
 }
 
-
 // Tests for sendSharp().
 
 // Test sending typical data only.
@@ -53,7 +52,8 @@ TEST(TestSendSharp, SendDataOnly) {
       "m260s43602"
       "m260s1820m260s780m260s780m260s780m260s1820m260s1820m260s780m260s1820"
       "m260s780m260s1820m260s1820m260s780m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -75,7 +75,8 @@ TEST(TestSendSharp, SendWithRepeats) {
       "m260s43602"
       "m260s1820m260s780m260s780m260s780m260s1820m260s1820m260s780m260s1820"
       "m260s780m260s1820m260s1820m260s780m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -89,7 +90,8 @@ TEST(TestSendSharp, SendUnusualSize) {
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendSharp(0x0, 0x0, 16);
@@ -99,7 +101,8 @@ TEST(TestSendSharp, SendUnusualSize) {
       "m260s43602"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s1820"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Tests for sendSharpRaw().
@@ -117,7 +120,8 @@ TEST(TestSendSharpRaw, SendDataOnly) {
       "m260s43602"
       "m260s1820m260s780m260s780m260s780m260s1820m260s1820m260s780m260s1820"
       "m260s780m260s1820m260s1820m260s780m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -139,7 +143,8 @@ TEST(TestSendSharpRaw, SendWithRepeats) {
       "m260s43602"
       "m260s1820m260s780m260s780m260s780m260s1820m260s1820m260s780m260s1820"
       "m260s780m260s1820m260s1820m260s780m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -153,7 +158,8 @@ TEST(TestSendSharpRaw, SendUnusualSize) {
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendSharpRaw(0x2, 16);
@@ -163,7 +169,8 @@ TEST(TestSendSharpRaw, SendUnusualSize) {
       "m260s43602"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s1820"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
-      "m260s43602", irsend.outputStr());
+      "m260s43602",
+      irsend.outputStr());
 }
 
 // Tests for decodeSharp().
@@ -298,15 +305,11 @@ TEST(TestDecodeSharp, DecodeGlobalCacheExample) {
 
   irsend.reset();
   // Sharp Power On from Global Cache.
-  uint16_t gc_test[67] = {38000, 1, 1,
-                          10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 30,
-                          10, 70, 10, 30, 10, 70, 10, 30, 10, 30, 10, 70,
-                          10, 30, 10, 70, 10, 30,
-                          10, 1657,
-                          10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 70,
-                          10, 30, 10, 70, 10, 30, 10, 70, 10, 70, 10, 30,
-                          10, 70, 10, 30, 10, 70,
-                          10, 1657};
+  uint16_t gc_test[67] = {
+      38000, 1,  1,  10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 30, 10,  70,
+      10,    30, 10, 70, 10, 30, 10, 30, 10, 70, 10, 30, 10, 70, 10, 30,  10,
+      1657,  10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 70, 10, 30, 10,  70,
+      10,    30, 10, 70, 10, 70, 10, 30, 10, 70, 10, 30, 10, 70, 10, 1657};
   irsend.sendGC(gc_test, 67);
   irsend.makeDecodeResult();
 
@@ -327,15 +330,11 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[67] = {38000, 1, 1,
-                          10, 70, 30, 30, 10, 30, 10, 30, 10, 70, 10, 30,
-                          10, 70, 10, 30, 10, 70, 10, 30, 10, 30, 10, 70,
-                          10, 30, 10, 70, 10, 30,
-                          10, 1657,
-                          10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 70,
-                          10, 30, 10, 60, 10, 30, 10, 70, 10, 70, 10, 30,
-                          10, 10, 70, 30, 10, 70,
-                          10, 1657};
+  uint16_t gc_test[67] = {
+      38000, 1,  1,  10, 70, 30, 30, 10, 30, 10, 30, 10, 70, 10, 30, 10,  70,
+      10,    30, 10, 70, 10, 30, 10, 30, 10, 70, 10, 30, 10, 70, 10, 30,  10,
+      1657,  10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 70, 10, 30, 10,  60,
+      10,    30, 10, 70, 10, 70, 10, 30, 10, 10, 70, 30, 10, 70, 10, 1657};
   irsend.sendGC(gc_test, 67);
   irsend.makeDecodeResult();
 
@@ -343,11 +342,9 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, false));
 
   // Test only half of a good message, as it is sent (sort of) twice.
-  uint16_t gc_half[35] = {38000, 1, 1,
-                          10, 70, 10, 30, 10, 30, 10, 30, 10, 70, 10, 30,
-                          10, 70, 10, 30, 10, 70, 10, 30, 10, 30, 10, 70,
-                          10, 30, 10, 70, 10, 30,
-                          10, 1657};
+  uint16_t gc_half[35] = {38000, 1,  1,  10, 70, 10, 30, 10, 30, 10, 30,  10,
+                          70,    10, 30, 10, 70, 10, 30, 10, 70, 10, 30,  10,
+                          30,    10, 70, 10, 30, 10, 70, 10, 30, 10, 1657};
 
   irsend.sendGC(gc_half, 35);
   irsend.makeDecodeResult();

@@ -1,8 +1,8 @@
 // Copyright 2017 David Conran
 
+#include "ir_LG.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_LG.h"
 #include "gtest/gtest.h"
 
 // Tests for calcLGChecksum()
@@ -35,7 +35,8 @@ TEST(TestSendLG, SendDataOnly) {
       "m550s1600m550s550m550s1600m550s1600m550s550m550s1600m550s550m550s550"
       "m550s1600m550s550m550s1600m550s550m550s1600m550s1600m550s1600m550s550"
       "m550s550m550s1600m550s550m550s1600m550s550m550s550m550s550m550s1600"
-      "m550s50300", irsend.outputStr());
+      "m550s50300",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0xB4B4AE51, kLg32Bits);
@@ -46,7 +47,8 @@ TEST(TestSendLG, SendDataOnly) {
       "m560s1680m560s560m560s1680m560s560m560s1680m560s1680m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s560m560s560m560s1680"
       "m560s44800"
-      "m8950s2250m550s96300", irsend.outputStr());
+      "m8950s2250m550s96300",
+      irsend.outputStr());
 }
 
 // Test sending with different repeats.
@@ -63,7 +65,8 @@ TEST(TestSendLG, SendWithRepeats) {
       "m550s1600m550s550m550s1600m550s550m550s1600m550s1600m550s1600m550s550"
       "m550s550m550s1600m550s550m550s1600m550s550m550s550m550s550m550s1600"
       "m550s50300"
-      "m8500s2250m550s96750", irsend.outputStr());
+      "m8500s2250m550s96750",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0xB4B4AE51, kLg32Bits, 1);
@@ -75,7 +78,8 @@ TEST(TestSendLG, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s560m560s560m560s1680"
       "m560s44800"
       "m8950s2250m550s96300"
-      "m8950s2250m550s96300", irsend.outputStr());
+      "m8950s2250m550s96300",
+      irsend.outputStr());
 }
 
 // Test sending an atypical data size.
@@ -91,7 +95,8 @@ TEST(TestSendLG, SendUnusualSize) {
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
-      "m550s60650", irsend.outputStr());
+      "m550s60650",
+      irsend.outputStr());
 
   irsend.reset();
   irsend.sendLG(0x0, 64);
@@ -106,7 +111,8 @@ TEST(TestSendLG, SendUnusualSize) {
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s26880"
-      "m8950s2250m550s96300", irsend.outputStr());
+      "m8950s2250m550s96300",
+      irsend.outputStr());
 }
 
 // Tests for encodeLG().
@@ -317,16 +323,15 @@ TEST(TestDecodeLG, DecodeGlobalCacheExample) {
   IRrecv irrecv(4);
   irsend.begin();
 
-// TODO(anyone): Find a Global Cache example of the LG 28-bit message.
+  // TODO(anyone): Find a Global Cache example of the LG 28-bit message.
   irsend.reset();
   // LG (32-bit) code from Global Cache.
-  uint16_t gc_test[75] = {38000, 1, 69, 341, 170, 21, 64, 21, 21, 21, 64,
-                          21, 64, 21, 21, 21, 64, 21, 21, 21, 21, 21, 64,
-                          21, 21, 21, 64, 21, 64, 21, 21, 21, 64, 21, 21,
-                          21, 21, 21, 64, 21, 21, 21, 64, 21, 21, 21, 64,
-                          21, 64, 21, 64, 21, 21, 21, 21, 21, 64, 21, 21,
-                          21, 64, 21, 21, 21, 21, 21, 21, 21, 64, 21, 1517,
-                          341, 85, 21, 3655};
+  uint16_t gc_test[75] = {
+      38000, 1,  69, 341, 170, 21, 64, 21, 21, 21, 64,   21,  64, 21, 21,
+      21,    64, 21, 21,  21,  21, 21, 64, 21, 21, 21,   64,  21, 64, 21,
+      21,    21, 64, 21,  21,  21, 21, 21, 64, 21, 21,   21,  64, 21, 21,
+      21,    64, 21, 64,  21,  64, 21, 21, 21, 21, 21,   64,  21, 21, 21,
+      64,    21, 21, 21,  21,  21, 21, 21, 64, 21, 1517, 341, 85, 21, 3655};
   irsend.sendGC(gc_test, 75);
   irsend.makeDecodeResult();
 
@@ -347,9 +352,10 @@ TEST(TestDecodeLG, FailToDecodeNonLGExample) {
 
   irsend.reset();
   // Modified a few entries to unexpected values, based on previous test case.
-  uint16_t gc_test[39] = {38000, 1, 1, 322, 162, 20, 61, 20, 61, 20, 20, 20, 20,
-                          20, 20, 20, 127, 20, 61, 9, 20, 20, 61, 20, 20, 20,
-                          61, 20, 61, 20, 61, 20, 20, 20, 20, 20, 20, 20, 884};
+  uint16_t gc_test[39] = {38000, 1,  1,  322, 162, 20, 61,  20, 61, 20,
+                          20,    20, 20, 20,  20,  20, 127, 20, 61, 9,
+                          20,    20, 61, 20,  20,  20, 61,  20, 61, 20,
+                          61,    20, 20, 20,  20,  20, 20,  20, 884};
   irsend.sendGC(gc_test, 39);
   irsend.makeDecodeResult();
 
@@ -372,7 +378,8 @@ TEST(TestSendLG2, SendDataOnly) {
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s1600m550s550m550s550m550s1600m550s550m550s1600m550s550m550s550"
       "m550s1600m550s1600m550s550m550s1600"
-      "m550s55250", irsend.outputStr());
+      "m550s55250",
+      irsend.outputStr());
 }
 
 TEST(TestDecodeLG2, SyntheticExample) {
@@ -390,7 +397,6 @@ TEST(TestDecodeLG2, SyntheticExample) {
   EXPECT_EQ(0x880094D, irsend.capture.value);
 }
 
-
 // Verify decoding of LG variant 2 messages.
 TEST(TestDecodeLG2, RealLG2Example) {
   IRsendTest irsend(0);
@@ -399,11 +405,13 @@ TEST(TestDecodeLG2, RealLG2Example) {
 
   irsend.reset();
   // From issue #548
-  uint16_t rawData[59] = {3154, 9834, 520, 1634, 424, 606, 424, 568, 462, 570,
-      462, 1564, 508, 568, 458, 544, 500, 546, 508, 530, 508, 532, 506, 566,
-      464, 568, 460, 578, 464, 568, 464, 532, 506, 552, 474, 1592, 506, 568,
-      460, 570, 462, 1564, 506, 606, 424, 1640, 424, 616, 422, 570, 462, 1616,
-      460, 1584, 500, 544, 506, 1598, 490};  // UNKNOWN F6D13AE8
+  uint16_t rawData[59] = {
+      3154, 9834, 520, 1634, 424, 606,  424, 568, 462, 570,  462, 1564,
+      508,  568,  458, 544,  500, 546,  508, 530, 508, 532,  506, 566,
+      464,  568,  460, 578,  464, 568,  464, 532, 506, 552,  474, 1592,
+      506,  568,  460, 570,  462, 1564, 506, 606, 424, 1640, 424, 616,
+      422,  570,  462, 1616, 460, 1584, 500, 544, 506, 1598, 490};  // UNKNOWN
+                                                                    // F6D13AE8
   irsend.sendRaw(rawData, 59, 38000);
   irsend.makeDecodeResult();
 
