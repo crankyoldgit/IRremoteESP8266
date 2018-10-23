@@ -375,6 +375,7 @@ def generate_irsend_code(defines, normal, bits_str, output=sys.stdout):
                  "                38000, // Complete guess of the modulation"
                  " frequency.\n"
                  "                true, 0, 50);\n"
+                 "  }\n"
                  "}\n" % ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
                                      for i in range(0, len(bits_str), 8)))
 

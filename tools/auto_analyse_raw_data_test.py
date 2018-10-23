@@ -460,6 +460,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '                38000, // Complete guess of the modulation'
         ' frequency.\n'
         '                true, 0, 50);\n'
+        '  }\n'
         '}\n')
 
   def test_reduce_list(self):
