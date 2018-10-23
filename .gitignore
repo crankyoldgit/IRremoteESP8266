@@ -35,6 +35,7 @@ test/*_test
 tools/*.o
 tools/*.a
 tools/gc_decode
+tools/mode2_decode
 
 .pioenvs
 .piolibdeps
