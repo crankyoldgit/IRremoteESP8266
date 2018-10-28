@@ -107,7 +107,8 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 #endif  // SEND_HITACHI_AC2
 
 // Class for handling the remote control oh a Hitachi 28 byte A/C message.
-// Inspired by: https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
+// Inspired by:
+// https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
 
 IRHitachiAc::IRHitachiAc(uint16_t pin) : _irsend(pin) { stateReset(); }
 
@@ -122,8 +123,7 @@ void IRHitachiAc::stateReset() {
   remote_state[7] = 0x88;
   remote_state[8] = 0x48;
   remote_state[9] = 0x10;
-  for (uint8_t i = 10; i < kHitachiAcStateLength; i++)
-    remote_state[i] = 0x00;
+  for (uint8_t i = 10; i < kHitachiAcStateLength; i++) remote_state[i] = 0x00;
   remote_state[14] = 0x60;
   remote_state[15] = 0x60;
   remote_state[24] = 0x80;
@@ -165,9 +165,7 @@ void IRHitachiAc::send() {
 }
 #endif  // SEND_HITACHI_AC
 
-bool IRHitachiAc::getPower() {
-  return (remote_state[17] & 0x01);
-}
+bool IRHitachiAc::getPower() { return (remote_state[17] & 0x01); }
 
 void IRHitachiAc::setPower(const bool on) {
   if (on)
@@ -180,9 +178,7 @@ void IRHitachiAc::on() { setPower(true); }
 
 void IRHitachiAc::off() { setPower(false); }
 
-uint8_t IRHitachiAc::getMode() {
-  return reverseBits(remote_state[10], 8);
-}
+uint8_t IRHitachiAc::getMode() { return reverseBits(remote_state[10], 8); }
 
 void IRHitachiAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
@@ -208,9 +204,7 @@ void IRHitachiAc::setMode(const uint8_t mode) {
   if (mode != kHitachiAcFan) setTemp(_previoustemp);
 }
 
-uint8_t IRHitachiAc::getTemp() {
-  return reverseBits(remote_state[11], 8) >> 1;
-}
+uint8_t IRHitachiAc::getTemp() { return reverseBits(remote_state[11], 8) >> 1; }
 
 void IRHitachiAc::setTemp(const uint8_t celsius) {
   uint8_t temp;
@@ -230,9 +224,7 @@ void IRHitachiAc::setTemp(const uint8_t celsius) {
     remote_state[9] = 0x10;
 }
 
-uint8_t IRHitachiAc::getFan() {
-  return reverseBits(remote_state[13], 8);
-}
+uint8_t IRHitachiAc::getFan() { return reverseBits(remote_state[13], 8); }
 
 void IRHitachiAc::setFan(const uint8_t speed) {
   uint8_t newspeed = std::max(speed, kHitachiAcFanAuto);
@@ -270,7 +262,7 @@ std::string IRHitachiAc::toString() {
   if (getPower())
     result += "On";
   else
-  result += "Off";
+    result += "Off";
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
     case kHitachiAcAuto:
@@ -308,15 +300,15 @@ std::string IRHitachiAc::toString() {
       break;
   }
   result += ", Swing (Vertical): ";
-    if (getSwingVertical())
-      result += "On";
-    else
-      result += "Off";
+  if (getSwingVertical())
+    result += "On";
+  else
+    result += "Off";
   result += ", Swing (Horizontal): ";
-    if (getSwingHorizontal())
-      result += "On";
-    else
-      result += "Off";
+  if (getSwingHorizontal())
+    result += "On";
+  else
+    result += "Off";
   return result;
 }
 

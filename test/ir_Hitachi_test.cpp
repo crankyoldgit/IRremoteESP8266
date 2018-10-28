@@ -340,8 +340,10 @@ TEST(TestDecodeHitachiAC, NormalRealExample1) {
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
-  EXPECT_EQ("Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 1 (AUTO), "
-            "Swing (Vertical): Off, Swing (Horizontal): Off", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 1 (AUTO), "
+      "Swing (Vertical): Off, Swing (Horizontal): Off",
+      ac.toString());
 }
 
 // Decode another 'real' HitachiAC message.
@@ -406,8 +408,10 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
-  EXPECT_EQ("Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (HIGH), "
-            "Swing (Vertical): Off, Swing (Horizontal): Off", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (HIGH), "
+      "Swing (Vertical): Off, Swing (Horizontal): Off",
+      ac.toString());
 }
 
 // Tests for sendHitachiAC1().
