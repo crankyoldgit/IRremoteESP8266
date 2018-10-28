@@ -135,7 +135,7 @@ void IRHitachiAc::begin() { _irsend.begin(); }
 uint8_t IRHitachiAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
   int8_t sum = 62;
-  for (uint16_t i = 0; i < length; i++) sum -= reverseBits(state[i], 8);
+  for (uint16_t i = 0; i < length - 1; i++) sum -= reverseBits(state[i], 8);
   return reverseBits((uint8_t)sum, 8);
 }
 
@@ -145,7 +145,7 @@ void IRHitachiAc::checksum(const uint16_t length) {
 
 bool IRHitachiAc::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < 2) return true;  // Assume true for lengths that are too short.
-  return (state[length - 1] == calcChecksum(state, length - 1));
+  return (state[length - 1] == calcChecksum(state, length));
 }
 
 uint8_t *IRHitachiAc::getRaw() {
@@ -183,25 +183,21 @@ uint8_t IRHitachiAc::getMode() { return reverseBits(remote_state[10], 8); }
 void IRHitachiAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
   switch (mode) {
-    case kHitachiAcDry:
-      // Dry mode can only have a speed of 2 to 3.
-      setFan(std::min((uint8_t)3, std::max(kHitachiAcFanLow, getFan())));
-      break;
     case kHitachiAcFan:
       // Fan mode sets a special temp.
       setTemp(64);
-      // Fan mode doesn't have a fan auto speed.
-      if (getFan() == kHitachiAcFanAuto) setFan(kHitachiAcFanLow + 1);
       break;
     case kHitachiAcAuto:
     case kHitachiAcHeat:
     case kHitachiAcCool:
+    case kHitachiAcDry:
       break;
     default:
       newmode = kHitachiAcAuto;
   }
   remote_state[10] = reverseBits(newmode, 8);
   if (mode != kHitachiAcFan) setTemp(_previoustemp);
+  setFan(getFan());  // Reset the fan speed after the mode change.
 }
 
 uint8_t IRHitachiAc::getTemp() { return reverseBits(remote_state[11], 8) >> 1; }
@@ -227,8 +223,19 @@ void IRHitachiAc::setTemp(const uint8_t celsius) {
 uint8_t IRHitachiAc::getFan() { return reverseBits(remote_state[13], 8); }
 
 void IRHitachiAc::setFan(const uint8_t speed) {
-  uint8_t newspeed = std::max(speed, kHitachiAcFanAuto);
-  newspeed = std::min(speed, kHitachiAcFanHigh);
+  uint8_t fanmin = kHitachiAcFanAuto;
+  uint8_t fanmax = kHitachiAcFanHigh;
+  switch (getMode()) {
+    case kHitachiAcDry:  // Only 2 x low speeds in Dry mode.
+      fanmin = kHitachiAcFanLow;
+      fanmax = kHitachiAcFanLow + 1;
+      break;
+    case kHitachiAcFan:
+      fanmin = kHitachiAcFanLow;  // No Auto in Fan mode.
+      break;
+  }
+  uint8_t newspeed = std::max(speed, fanmin);
+  newspeed = std::min(newspeed, fanmax);
   remote_state[13] = reverseBits(newspeed, 8);
 }
 

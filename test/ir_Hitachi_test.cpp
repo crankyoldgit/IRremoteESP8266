@@ -256,6 +256,90 @@ TEST(TestIRHitachiAcClass, SetAndGetMode) {
   EXPECT_NE(kHitachiAcFanAuto, ac.getFan());
 }
 
+TEST(TestIRHitachiAcClass, SetAndGetFan) {
+  IRHitachiAc ac(0);
+  ac.setMode(kHitachiAcCool);  // All fan options are available in this mode.
+  ac.setFan(kHitachiAcFanAuto);
+  EXPECT_EQ(kHitachiAcFanAuto, ac.getFan());
+  ac.setFan(kHitachiAcFanLow);
+  EXPECT_EQ(kHitachiAcFanLow, ac.getFan());
+  ac.setFan(kHitachiAcFanHigh);
+  EXPECT_EQ(kHitachiAcFanHigh, ac.getFan());
+  ac.setFan(kHitachiAcFanHigh + 1);
+  EXPECT_EQ(kHitachiAcFanHigh, ac.getFan());
+  ac.setFan(0);
+  EXPECT_EQ(kHitachiAcFanAuto, ac.getFan());
+
+  ac.setMode(kHitachiAcFan);  // No auto-fan in Fan mode.
+  EXPECT_EQ(kHitachiAcFanLow, ac.getFan());
+  ac.setFan(kHitachiAcFanAuto);
+  EXPECT_EQ(kHitachiAcFanLow, ac.getFan());
+  ac.setFan(kHitachiAcFanHigh);
+  EXPECT_EQ(kHitachiAcFanHigh, ac.getFan());
+
+  // Only Low and one higher fan settin in Dry mode.
+  ac.setMode(kHitachiAcDry);
+  EXPECT_EQ(kHitachiAcFanLow + 1, ac.getFan());
+  ac.setFan(kHitachiAcFanHigh);
+  EXPECT_EQ(kHitachiAcFanLow + 1, ac.getFan());
+  ac.setFan(kHitachiAcFanLow);
+  EXPECT_EQ(kHitachiAcFanLow, ac.getFan());
+  ac.setFan(kHitachiAcFanAuto);
+  EXPECT_EQ(kHitachiAcFanLow, ac.getFan());
+}
+
+TEST(TestIRHitachiAcClass, HumanReadable) {
+  IRHitachiAc ac(0);
+
+  ac.setMode(kHitachiAcHeat);
+  ac.setTemp(kHitachiAcMaxTemp);
+  ac.on();
+  ac.setFan(kHitachiAcFanHigh);
+  ac.setSwingVertical(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (HIGH), "
+      "Swing (Vertical): On, Swing (Horizontal): Off",
+      ac.toString());
+  ac.setMode(kHitachiAcCool);
+  ac.setTemp(kHitachiAcMinTemp);
+  ac.setFan(kHitachiAcFanLow);
+  ac.setSwingVertical(false);
+  ac.setSwingHorizontal(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 2 (LOW), "
+      "Swing (Vertical): Off, Swing (Horizontal): On",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAcClass, ChecksumCalculation) {
+  IRHitachiAc ac(0);
+
+  const uint8_t originalstate[kHitachiAcStateLength] = {
+      0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80,
+      0x20, 0x04, 0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0xAC};
+  uint8_t examplestate[kHitachiAcStateLength] = {
+      0x80, 0x08, 0x0C, 0x02, 0xFD, 0x80, 0x7F, 0x88, 0x48, 0x80,
+      0x20, 0x04, 0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0xAC};
+
+  EXPECT_TRUE(IRHitachiAc::validChecksum(examplestate));
+  EXPECT_EQ(0xAC, IRHitachiAc::calcChecksum(examplestate));
+
+  examplestate[kHitachiAcStateLength - 1] =
+      0x12;  // Make the existing checksum invalid
+  EXPECT_FALSE(IRHitachiAc::validChecksum(examplestate));
+  EXPECT_EQ(0xAC, IRHitachiAc::calcChecksum(examplestate));
+  ac.setRaw(examplestate);
+  // Extracting the state from the object should have a correct checksum.
+  EXPECT_TRUE(IRHitachiAc::validChecksum(ac.getRaw()));
+  EXPECT_STATE_EQ(originalstate, ac.getRaw(), kHitachiAcBits);
+
+  examplestate[8] = 0x12;  // Force a different checksum calc.
+  EXPECT_FALSE(IRHitachiAc::validChecksum(examplestate));
+  EXPECT_EQ(0xFF, IRHitachiAc::calcChecksum(examplestate));
+}
+
 // Tests for decodeHitachiAC().
 
 // Decode a synthetic HitachiAC message.
