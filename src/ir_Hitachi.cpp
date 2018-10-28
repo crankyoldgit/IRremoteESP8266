@@ -5,6 +5,7 @@
 // * Hitachi RAS-35THA6 remote
 //
 
+#include "ir_Hitachi.h"
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -105,6 +106,220 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_HITACHI_AC2
 
+// Class for handling the remote control oh a Hitachi 28 byte A/C message.
+// Inspired by: https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
+
+IRHitachiAc::IRHitachiAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRHitachiAc::stateReset() {
+  remote_state[0] = 0x80;
+  remote_state[1] = 0x08;
+  remote_state[2] = 0x0C;
+  remote_state[3] = 0x02;
+  remote_state[4] = 0xFD;
+  remote_state[5] = 0x80;
+  remote_state[6] = 0x7F;
+  remote_state[7] = 0x88;
+  remote_state[8] = 0x48;
+  remote_state[9] = 0x10;
+  for (uint8_t i = 10; i < kHitachiAcStateLength; i++)
+    remote_state[i] = 0x00;
+  remote_state[14] = 0x60;
+  remote_state[15] = 0x60;
+  remote_state[24] = 0x80;
+  setTemp(23);
+}
+
+void IRHitachiAc::begin() { _irsend.begin(); }
+
+uint8_t IRHitachiAc::calcChecksum(const uint8_t state[],
+                                  const uint16_t length) {
+  int8_t sum = 62;
+  for (uint16_t i = 0; i < length; i++) sum -= reverseBits(state[i], 8);
+  return reverseBits((uint8_t)sum, 8);
+}
+
+void IRHitachiAc::checksum(const uint16_t length) {
+  remote_state[length - 1] = calcChecksum(remote_state, length);
+}
+
+bool IRHitachiAc::validChecksum(const uint8_t state[], const uint16_t length) {
+  if (length < 2) return true;  // Assume true for lengths that are too short.
+  return (state[length - 1] == calcChecksum(state, length - 1));
+}
+
+uint8_t *IRHitachiAc::getRaw() {
+  checksum();
+  return remote_state;
+}
+
+void IRHitachiAc::setRaw(const uint8_t new_code[], const uint16_t length) {
+  for (uint8_t i = 0; i < length && i < kHitachiAcStateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+#if SEND_HITACHI_AC
+void IRHitachiAc::send() {
+  checksum();
+  _irsend.sendHitachiAC(remote_state);
+}
+#endif  // SEND_HITACHI_AC
+
+bool IRHitachiAc::getPower() {
+  return (remote_state[17] & 0x01);
+}
+
+void IRHitachiAc::setPower(const bool on) {
+  if (on)
+    remote_state[17] |= 0x01;
+  else
+    remote_state[17] &= 0xFE;
+}
+
+void IRHitachiAc::on() { setPower(true); }
+
+void IRHitachiAc::off() { setPower(false); }
+
+uint8_t IRHitachiAc::getMode() {
+  return reverseBits(remote_state[10], 8);
+}
+
+void IRHitachiAc::setMode(const uint8_t mode) {
+  uint8_t newmode = mode;
+  switch (mode) {
+    case kHitachiAcDry:
+      // Dry mode can only have a speed of 2 to 3.
+      setFan(std::min((uint8_t)3, std::max(kHitachiAcFanLow, getFan())));
+      break;
+    case kHitachiAcFan:
+      // Fan mode sets a special temp.
+      setTemp(64);
+      // Fan mode doesn't have a fan auto speed.
+      if (getFan() == kHitachiAcFanAuto) setFan(kHitachiAcFanLow + 1);
+      break;
+    case kHitachiAcAuto:
+    case kHitachiAcHeat:
+    case kHitachiAcCool:
+      break;
+    default:
+      newmode = kHitachiAcAuto;
+  }
+  remote_state[10] = reverseBits(newmode, 8);
+  if (mode != kHitachiAcFan) setTemp(_previoustemp);
+}
+
+uint8_t IRHitachiAc::getTemp() {
+  return reverseBits(remote_state[11], 8) >> 1;
+}
+
+void IRHitachiAc::setTemp(const uint8_t celsius) {
+  uint8_t temp;
+  if (celsius != 64) _previoustemp = celsius;
+  switch (celsius) {
+    case 64:
+      temp = celsius;
+      break;
+    default:
+      temp = std::min(celsius, kHitachiAcMaxTemp);
+      temp = std::max(temp, kHitachiAcMinTemp);
+  }
+  remote_state[11] = reverseBits(temp << 1, 8);
+  if (temp == kHitachiAcMinTemp)
+    remote_state[9] = 0x90;
+  else
+    remote_state[9] = 0x10;
+}
+
+uint8_t IRHitachiAc::getFan() {
+  return reverseBits(remote_state[13], 8);
+}
+
+void IRHitachiAc::setFan(const uint8_t speed) {
+  uint8_t newspeed = std::max(speed, kHitachiAcFanAuto);
+  newspeed = std::min(speed, kHitachiAcFanHigh);
+  remote_state[13] = reverseBits(newspeed, 8);
+}
+
+bool IRHitachiAc::getSwingVertical() { return remote_state[14] & 0x80; }
+
+void IRHitachiAc::setSwingVertical(const bool on) {
+  if (on)
+    remote_state[14] |= 0x80;
+  else
+    remote_state[14] &= 0x7F;
+}
+
+bool IRHitachiAc::getSwingHorizontal() { return remote_state[15] & 0x80; }
+
+void IRHitachiAc::setSwingHorizontal(const bool on) {
+  if (on)
+    remote_state[15] |= 0x80;
+  else
+    remote_state[15] &= 0x7F;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRHitachiAc::toString() {
+  String result = "";
+#else
+std::string IRHitachiAc::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+  result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case kHitachiAcAuto:
+      result += " (AUTO)";
+      break;
+    case kHitachiAcCool:
+      result += " (COOL)";
+      break;
+    case kHitachiAcHeat:
+      result += " (HEAT)";
+      break;
+    case kHitachiAcDry:
+      result += " (DRY)";
+      break;
+    case kHitachiAcFan:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case kHitachiAcFanAuto:
+      result += " (AUTO)";
+      break;
+    case kHitachiAcFanLow:
+      result += " (LOW)";
+      break;
+    case kHitachiAcFanHigh:
+      result += " (HIGH)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+      break;
+  }
+  result += ", Swing (Vertical): ";
+    if (getSwingVertical())
+      result += "On";
+    else
+      result += "Off";
+  result += ", Swing (Horizontal): ";
+    if (getSwingHorizontal())
+      result += "On";
+    else
+      result += "Off";
+  return result;
+}
+
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
 // Decode the supplied Hitachi A/C message.
 //
@@ -184,6 +399,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
       default:
         return false;
     }
+    if (dataBitsSoFar / 8 == kHitachiAcStateLength &&
+        !IRHitachiAc::validChecksum(results->state, kHitachiAcStateLength))
+      return false;
   }
 
   // Success

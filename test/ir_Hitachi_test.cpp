@@ -1,5 +1,6 @@
 // Copyright 2018 David Conran
 
+#include "ir_Hitachi.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRremoteESP8266.h"
@@ -184,6 +185,77 @@ TEST(TestSendHitachiAC, SendUnexpectedSizes) {
       irsend.outputStr());
 }
 
+// Tests for IRHitachiAc class.
+TEST(TestIRHitachiAcClass, SetAndGetPower) {
+  IRHitachiAc ac(0);
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRHitachiAcClass, SetAndGetSwing) {
+  IRHitachiAc ac(0);
+  ac.setSwingVertical(true);
+  ac.setSwingHorizontal(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  ac.setSwingHorizontal(false);
+  EXPECT_TRUE(ac.getSwingVertical());
+  EXPECT_FALSE(ac.getSwingHorizontal());
+  ac.setSwingHorizontal(true);
+  EXPECT_TRUE(ac.getSwingHorizontal());
+}
+
+TEST(TestIRHitachiAcClass, SetAndGetTemp) {
+  IRHitachiAc ac(0);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp - 1);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp + 1);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+  ac.setTemp(64);
+  EXPECT_EQ(64, ac.getTemp());
+}
+
+TEST(TestIRHitachiAcClass, SetAndGetMode) {
+  IRHitachiAc ac(0);
+  ac.setMode(kHitachiAcCool);
+  ac.setFan(kHitachiAcFanAuto);
+  EXPECT_EQ(kHitachiAcCool, ac.getMode());
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAcFanAuto, ac.getFan());
+  ac.setMode(kHitachiAcFan);
+  EXPECT_EQ(kHitachiAcFan, ac.getMode());
+  EXPECT_EQ(64, ac.getTemp());
+  EXPECT_NE(kHitachiAcFanAuto, ac.getFan());
+  ac.setMode(kHitachiAcHeat);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAcHeat, ac.getMode());
+  ac.setMode(kHitachiAcAuto);
+  ac.setFan(kHitachiAcFanAuto);
+  EXPECT_EQ(kHitachiAcAuto, ac.getMode());
+  ac.setMode(kHitachiAcDry);
+  EXPECT_EQ(kHitachiAcDry, ac.getMode());
+  EXPECT_NE(kHitachiAcFanAuto, ac.getFan());
+}
+
 // Tests for decodeHitachiAC().
 
 // Decode a synthetic HitachiAC message.
@@ -266,6 +338,10 @@ TEST(TestDecodeHitachiAC, NormalRealExample1) {
   EXPECT_EQ(HITACHI_AC, irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
+  IRHitachiAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 1 (AUTO), "
+            "Swing (Vertical): Off, Swing (Horizontal): Off", ac.toString());
 }
 
 // Decode another 'real' HitachiAC message.
@@ -328,6 +404,10 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   EXPECT_EQ(HITACHI_AC, irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAcBits);
+  IRHitachiAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (HIGH), "
+            "Swing (Vertical): Off, Swing (Horizontal): Off", ac.toString());
 }
 
 // Tests for sendHitachiAC1().
