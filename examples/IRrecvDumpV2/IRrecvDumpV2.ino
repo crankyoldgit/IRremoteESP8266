@@ -31,6 +31,7 @@
 #include <ir_Fujitsu.h>
 #include <ir_Gree.h>
 #include <ir_Haier.h>
+#include <ir_Hitachi.h>
 #include <ir_Kelvinator.h>
 #include <ir_Midea.h>
 #include <ir_Mitsubishi.h>
