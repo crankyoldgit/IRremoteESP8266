@@ -31,6 +31,7 @@
 #include <ir_Fujitsu.h>
 #include <ir_Gree.h>
 #include <ir_Haier.h>
+#include <ir_Hitachi.h>
 #include <ir_Kelvinator.h>
 #include <ir_Midea.h>
 #include <ir_Mitsubishi.h>
@@ -198,6 +199,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_HITACHI_AC
+  if (results->decode_type == HITACHI_AC) {
+    IRHitachiAc ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_HITACHI_AC
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }
