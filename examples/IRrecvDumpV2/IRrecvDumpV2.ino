@@ -38,6 +38,8 @@
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
+#include <ir_Whirlpool.h>
+
 
 // ==================== start of TUNEABLE PARAMETERS ====================
 // An IR detector/demodulator is connected to GPIO pin 14
@@ -206,6 +208,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_HITACHI_AC
+#if DECODE_WHIRLPOOL_AC
+  if (results->decode_type == WHIRLPOOL_AC) {
+    IRWhirlpoolAc ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_WHIRLPOOL_AC
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }

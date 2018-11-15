@@ -4,6 +4,7 @@
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "ir_Whirlpool.h"
 #include "gtest/gtest.h"
 
 // Tests for sendWhirlpoolAC().
@@ -64,6 +65,11 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRWhirlpoolAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH)",
+      ac.toString());
 }
 
 // Decode a recorded example
@@ -115,4 +121,9 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRWhirlpoolAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH)",
+      ac.toString());
 }

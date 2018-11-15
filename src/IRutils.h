@@ -36,6 +36,7 @@ std::string resultToHexidecimal(const decode_results *result);
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results *results);
 uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init = 0);
+uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init = 0);
 uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 
 #endif  // IRUTILS_H_

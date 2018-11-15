@@ -459,6 +459,13 @@ uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
   return checksum;
 }
 
+uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
+  uint8_t checksum = init;
+  uint8_t *ptr;
+  for (ptr = start; ptr - start < length; ptr++) checksum ^= *ptr;
+  return checksum;
+}
+
 uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
   // No change if we are asked to invert no bits.
   if (nbits == 0) return data;

@@ -5,6 +5,7 @@
 // * SPIS409L, SPIS412L, SPIW409L, SPIW412L, SPIW418L
 //
 
+#include "ir_Whirlpool.h"
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -71,6 +72,157 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
+IRWhirlpoolAc::IRWhirlpoolAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRWhirlpoolAc::stateReset() {
+  for (uint8_t i = 2; i < kWhirlpoolAcStateLength; i++) remote_state[i] = 0x0;
+  remote_state[0] = 0x83;
+  remote_state[1] = 0x06;
+}
+
+void IRWhirlpoolAc::begin() { _irsend.begin(); }
+
+bool IRWhirlpoolAc::validChecksum(uint8_t state[], const uint16_t length) {
+  if (length > kWhirlpoolAcChecksumByte1 &&
+      state[kWhirlpoolAcChecksumByte1] !=
+          xorBytes(state + 2, kWhirlpoolAcChecksumByte1 - 1 - 2)) {
+    DPRINTLN("DEBUG: First Whirlpool AC checksum failed.");
+    return false;
+  }
+  if (length > kWhirlpoolAcChecksumByte2 &&
+      state[kWhirlpoolAcChecksumByte2] !=
+          xorBytes(state + kWhirlpoolAcChecksumByte1 + 1,
+                   kWhirlpoolAcChecksumByte2 - kWhirlpoolAcChecksumByte1 - 1)) {
+    DPRINTLN("DEBUG: Second Whirlpool AC checksum failed.");
+    return false;
+  }
+  // State is too short to have a checksum or everything checked out.
+  return true;
+}
+
+// Update the checksum for the internal state.
+void IRWhirlpoolAc::checksum(uint16_t length) {
+  if (length >= kWhirlpoolAcChecksumByte1)
+    remote_state[kWhirlpoolAcChecksumByte1] =
+        xorBytes(remote_state + 2, kWhirlpoolAcChecksumByte1 - 1 - 2);
+  if (length >= kWhirlpoolAcChecksumByte2)
+    remote_state[kWhirlpoolAcChecksumByte2] =
+        xorBytes(remote_state + kWhirlpoolAcChecksumByte1 + 1,
+                 kWhirlpoolAcChecksumByte2 - kWhirlpoolAcChecksumByte1 - 1);
+}
+
+#if SEND_WHIRLPOOL_AC
+void IRWhirlpoolAc::send(const bool calcchecksum) {
+  if (calcchecksum) checksum();
+  _irsend.sendWhirlpoolAC(remote_state);
+}
+#endif  // SEND_WHIRLPOOL_AC
+
+uint8_t *IRWhirlpoolAc::getRaw(const bool calcchecksum) {
+  if (calcchecksum) checksum();
+  return remote_state;
+}
+
+void IRWhirlpoolAc::setRaw(const uint8_t new_code[], const uint16_t length) {
+  for (uint8_t i = 0; i < length && i < kWhirlpoolAcStateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+// Set the temp. in deg C
+void IRWhirlpoolAc::setTemp(const uint8_t temp) {
+  uint8_t newtemp = std::max(kWhirlpoolAcMinTemp, temp);
+  newtemp = std::min(kWhirlpoolAcMaxTemp, newtemp);
+  remote_state[3] = (remote_state[3] & 0b00001111) |
+                     ((newtemp - kWhirlpoolAcMinTemp) << 4);
+}
+
+// Return the set temp. in deg C
+uint8_t IRWhirlpoolAc::getTemp() {
+  return ((remote_state[3] & kWhirlpoolAcTempMask) >> 4) + kWhirlpoolAcMinTemp;
+}
+
+void IRWhirlpoolAc::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kWhirlpoolAcHeat:
+    case kWhirlpoolAcAuto:
+    case kWhirlpoolAcCool:
+    case kWhirlpoolAcDry:
+    case kWhirlpoolAcFan:
+      remote_state[3] &= kWhirlpoolAcModeMask;
+      remote_state[3] |= mode;
+      break;
+  }
+}
+
+uint8_t IRWhirlpoolAc::getMode() {
+  return remote_state[3] & ~kWhirlpoolAcModeMask;
+}
+
+void IRWhirlpoolAc::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kWhirlpoolAcFanAuto:
+    case kWhirlpoolAcFanLow:
+    case kWhirlpoolAcFanMedium:
+    case kWhirlpoolAcFanHigh:
+      remote_state[2] = (remote_state[2] & kWhirlpoolAcFanMask) | (speed << 4);
+      break;
+  }
+}
+
+uint8_t IRWhirlpoolAc::getFan() {
+  return (remote_state[2] & ~kWhirlpoolAcFanMask) >> 4;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRWhirlpoolAc::toString() {
+  String result = "";
+#else
+std::string IRWhirlpoolAc::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case kWhirlpoolAcHeat:
+      result += " (HEAT)";
+      break;
+    case kWhirlpoolAcAuto:
+      result += " (AUTO)";
+      break;
+    case kWhirlpoolAcCool:
+      result += " (COOL)";
+      break;
+    case kWhirlpoolAcDry:
+      result += " (DRY)";
+      break;
+    case kWhirlpoolAcFan:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case kWhirlpoolAcFanAuto:
+      result += " (AUTO)";
+      break;
+    case kWhirlpoolAcFanHigh:
+      result += " (HIGH)";
+      break;
+    case kWhirlpoolAcFanMedium:
+      result += " (MEDIUM)";
+      break;
+    case kWhirlpoolAcFanLow:
+      result += " (LOW)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+      break;
+  }
+  return result;
+}
+
 #if DECODE_WHIRLPOOL_AC
 // Decode the supplied Whirlpool A/C message.
 //
@@ -136,6 +288,8 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t nbits,
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     if (dataBitsSoFar != kWhirlpoolAcBits) return false;
+    if (!IRWhirlpoolAc::validChecksum(results->state, dataBitsSoFar / 8))
+      return false;
   }
 
   // Success
