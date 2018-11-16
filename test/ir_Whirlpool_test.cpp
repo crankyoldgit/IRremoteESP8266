@@ -68,7 +68,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH)",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off",
       ac.toString());
 }
 
@@ -124,6 +124,68 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH)",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off",
       ac.toString());
+}
+
+// Tests for IRWhirlpoolAc class.
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetRaw) {
+  uint8_t expectedState[kWhirlpoolAcStateLength] = {
+      0x83, 0x06, 0x10, 0x71, 0x00, 0x00, 0x91, 0x1F, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0xEF, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02};
+  IRWhirlpoolAc ac(0);
+  ac.setRaw(expectedState);
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
+  IRWhirlpoolAc ac(0);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMinTemp);
+  EXPECT_EQ(kWhirlpoolAcMinTemp, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMinTemp - 1);
+  EXPECT_EQ(kWhirlpoolAcMinTemp, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMaxTemp);
+  EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMaxTemp + 1);
+  EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
+}
+
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
+  IRWhirlpoolAc ac(0);
+  ac.setMode(kWhirlpoolAcCool);
+  EXPECT_EQ(kWhirlpoolAcCool, ac.getMode());
+  ac.setMode(kWhirlpoolAcHeat);
+  EXPECT_EQ(kWhirlpoolAcHeat, ac.getMode());
+  ac.setMode(kWhirlpoolAcAuto);
+  EXPECT_EQ(kWhirlpoolAcAuto, ac.getMode());
+  ac.setMode(kWhirlpoolAcDry);
+  EXPECT_EQ(kWhirlpoolAcDry, ac.getMode());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
+  IRWhirlpoolAc ac(0);
+  ac.setFan(kWhirlpoolAcFanAuto);
+  EXPECT_EQ(kWhirlpoolAcFanAuto, ac.getFan());
+  ac.setFan(kWhirlpoolAcFanLow);
+  EXPECT_EQ(kWhirlpoolAcFanLow, ac.getFan());
+  ac.setFan(kWhirlpoolAcFanMedium);
+  EXPECT_EQ(kWhirlpoolAcFanMedium, ac.getFan());
+  ac.setFan(kWhirlpoolAcFanHigh);
+  EXPECT_EQ(kWhirlpoolAcFanHigh, ac.getFan());
+  ac.setFan(kWhirlpoolAcFanAuto);
+  EXPECT_EQ(kWhirlpoolAcFanAuto, ac.getFan());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
+  IRWhirlpoolAc ac(0);
+  ac.setSwing(true);
+  EXPECT_TRUE(ac.getSwing());
+  ac.setSwing(false);
+  EXPECT_FALSE(ac.getSwing());
+  ac.setSwing(true);
+  EXPECT_TRUE(ac.getSwing());
 }

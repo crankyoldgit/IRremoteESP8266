@@ -63,6 +63,8 @@ class IRWhirlpoolAc {
   uint8_t getFan();
   void setMode(const uint8_t mode);
   uint8_t getMode();
+  void setSwing(const bool on);
+  bool getSwing();
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);

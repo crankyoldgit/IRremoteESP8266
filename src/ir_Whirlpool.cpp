@@ -173,6 +173,20 @@ uint8_t IRWhirlpoolAc::getFan() {
   return (remote_state[2] & ~kWhirlpoolAcFanMask) >> 4;
 }
 
+void IRWhirlpoolAc::setSwing(const bool on) {
+  if (on) {
+    remote_state[2] |= 0b00000001;
+    remote_state[11] |= 0b00000010;
+  } else {
+    remote_state[2] &= 0b11111110;
+    remote_state[11] &= 0b11111101;
+  }
+}
+
+bool IRWhirlpoolAc::getSwing() {
+  return (remote_state[2] & 0b00000001) && (remote_state[11] & 0b00000010);
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRWhirlpoolAc::toString() {
@@ -220,6 +234,11 @@ std::string IRWhirlpoolAc::toString() {
       result += " (UNKNOWN)";
       break;
   }
+  result += ", Swing: ";
+  if (getSwing())
+    result += "On";
+  else
+    result += "Off";
   return result;
 }
 
