@@ -68,7 +68,8 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On, "
+      "Time: 17:31",
       ac.toString());
 }
 
@@ -124,7 +125,8 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On, "
+      "Time: 17:31",
       ac.toString());
 }
 
@@ -198,4 +200,29 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetLight) {
   EXPECT_FALSE(ac.getLight());
   ac.setLight(true);
   EXPECT_TRUE(ac.getLight());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
+  IRWhirlpoolAc ac(0);
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getClock()));
+  ac.setClock(1);
+  EXPECT_EQ(1, ac.getClock());
+  EXPECT_EQ("00:01", ac.timeToString(ac.getClock()));
+  ac.setClock(12 * 60 + 34);
+  EXPECT_EQ(12 * 60 + 34, ac.getClock());
+  EXPECT_EQ("12:34", ac.timeToString(ac.getClock()));
+  ac.setClock(7 * 60 + 5);
+  EXPECT_EQ(7 * 60 + 5, ac.getClock());
+  EXPECT_EQ("07:05", ac.timeToString(ac.getClock()));
+  ac.setClock(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
+  EXPECT_EQ("23:59", ac.timeToString(ac.getClock()));
+  ac.setClock(24 * 60 + 0);
+  EXPECT_EQ(0, ac.getClock());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getClock()));
+  ac.setClock(25 * 60 + 23);
+  EXPECT_EQ(1 * 60 + 23, ac.getClock());
+  EXPECT_EQ("01:23", ac.timeToString(ac.getClock()));
 }

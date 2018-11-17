@@ -43,6 +43,7 @@ const uint8_t kWhirlpoolAcMaxTemp = 32;   // 32C
 const uint8_t kWhirlpoolAcAutoTemp = 25;  // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
 const uint8_t kWhirlpoolAcLightMask = 0b00000100;
+const uint8_t kWhirlpoolAcClockHourMask = 0b00011111;
 
 
 // Classes
@@ -69,6 +70,8 @@ class IRWhirlpoolAc {
   bool getSwing();
   void setLight(const bool on);
   bool getLight();
+  uint16_t getClock();
+  void setClock(uint16_t minspastmidnight);
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);
@@ -80,11 +83,18 @@ class IRWhirlpoolAc {
   std::string toString();
 #endif
 
+#ifndef UNIT_TEST
  private:
+#endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kWhirlpoolAcStateLength];
   void checksum(const uint16_t length = kWhirlpoolAcStateLength);
   IRsend _irsend;
+#ifdef ARDUINO
+  String timeToString(uint16_t minspastmidnight);
+#else
+  std::string timeToString(uint16_t minspastmidnight);
+#endif
 };
 
 #endif  // IR_WHIRLPOOL_H_

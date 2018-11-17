@@ -198,6 +198,33 @@ bool IRWhirlpoolAc::getLight() {
   return !(remote_state[6] & kWhirlpoolAcLightMask);
 }
 
+void IRWhirlpoolAc::setClock(const uint16_t minspastmidnight) {
+  remote_state[6] &= ~kWhirlpoolAcClockHourMask;
+  remote_state[6] |= (minspastmidnight / 60) % 24;  // Hours
+  remote_state[7] = minspastmidnight % 60;  // Minutes
+}
+
+uint16_t IRWhirlpoolAc::getClock() {
+  return (remote_state[6] & kWhirlpoolAcClockHourMask) * 60 + remote_state[7];
+}
+
+#ifdef ARDUINO
+String IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
+  String result = "";
+#else
+std::string IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
+  std::string result = "";
+#endif  // ARDUINO
+  uint8_t hours = minspastmidnight / 60;
+  if (hours < 10) result += "0";
+  result += uint64ToString(hours);
+  result += ":";
+  uint8_t mins = minspastmidnight % 60;
+  if (mins < 10) result += "0";
+  result += uint64ToString(mins);
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRWhirlpoolAc::toString() {
@@ -255,6 +282,8 @@ std::string IRWhirlpoolAc::toString() {
     result += "On";
   else
     result += "Off";
+  result += ", Time: ";
+  result += timeToString(getClock());
   return result;
 }
 
