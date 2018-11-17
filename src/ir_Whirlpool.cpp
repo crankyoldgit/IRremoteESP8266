@@ -187,6 +187,17 @@ bool IRWhirlpoolAc::getSwing() {
   return (remote_state[2] & 0b00000001) && (remote_state[11] & 0b00000010);
 }
 
+void IRWhirlpoolAc::setLight(const bool on) {
+  if (on)
+    remote_state[6] &= ~kWhirlpoolAcLightMask;
+  else
+    remote_state[6] |= kWhirlpoolAcLightMask;
+}
+
+bool IRWhirlpoolAc::getLight() {
+  return !(remote_state[6] & kWhirlpoolAcLightMask);
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRWhirlpoolAc::toString() {
@@ -236,6 +247,11 @@ std::string IRWhirlpoolAc::toString() {
   }
   result += ", Swing: ";
   if (getSwing())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Light: ";
+  if (getLight())
     result += "On";
   else
     result += "Off";

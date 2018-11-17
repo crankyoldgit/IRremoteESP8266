@@ -68,7 +68,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On",
       ac.toString());
 }
 
@@ -124,7 +124,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off",
+      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On",
       ac.toString());
 }
 
@@ -188,4 +188,14 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
   EXPECT_FALSE(ac.getSwing());
   ac.setSwing(true);
   EXPECT_TRUE(ac.getSwing());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetLight) {
+  IRWhirlpoolAc ac(0);
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
 }

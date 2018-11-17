@@ -42,6 +42,8 @@ const uint8_t kWhirlpoolAcMinTemp = 18;   // 18C
 const uint8_t kWhirlpoolAcMaxTemp = 32;   // 32C
 const uint8_t kWhirlpoolAcAutoTemp = 25;  // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
+const uint8_t kWhirlpoolAcLightMask = 0b00000100;
+
 
 // Classes
 class IRWhirlpoolAc {
@@ -65,6 +67,8 @@ class IRWhirlpoolAc {
   uint8_t getMode();
   void setSwing(const bool on);
   bool getSwing();
+  void setLight(const bool on);
+  bool getLight();
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);
