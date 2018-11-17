@@ -100,6 +100,7 @@ class IRWhirlpoolAc {
 #endif
 
 #ifndef UNIT_TEST
+
  private:
 #endif
   // The state of the IR remote in IR code form.
