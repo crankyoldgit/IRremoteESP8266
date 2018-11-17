@@ -32,10 +32,10 @@
 #include <ir_Daikin.h>
 
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRDaikinESP daikinir(kIrLed);  // Set the GPIO to be used to sending the message
+IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
 
 void setup() {
-  daikinir.begin();
+  ac.begin();
   Serial.begin(115200);
 }
 
@@ -44,25 +44,25 @@ void loop() {
   Serial.println("Sending...");
 
   // Set up what we want to send. See ir_Daikin.cpp for all the options.
-  daikinir.on();
-  daikinir.setFan(1);
-  daikinir.setMode(kDaikinCool);
-  daikinir.setTemp(25);
-  daikinir.setSwingVertical(false);
-  daikinir.setSwingHorizontal(false);
+  ac.on();
+  ac.setFan(1);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(25);
+  ac.setSwingVertical(false);
+  ac.setSwingHorizontal(false);
 
   // Set the current time to 1:33PM (13:33)
   // Time works in minutes past midnight
-  daikinir.setCurrentTime((13*60) + 33);
-  // Turn off about 1 hour later at 2:30PM (15:30)
-  daikinir.enableOffTimer((14*60) + 30);
+  ac.setCurrentTime(13 * 60 + 33);
+  // Turn off about 1 hour later at 2:30PM (14:30)
+  ac.enableOffTimer(14 * 60 + 30);
 
   // Display what we are going to send.
-  Serial.println(daikinir.toString());
+  Serial.println(ac.toString());
 
   // Now send the IR signal.
 #if SEND_DAIKIN
-  daikinir.send();
+  ac.send();
 #endif  // SEND_DAIKIN
 
   delay(15000);

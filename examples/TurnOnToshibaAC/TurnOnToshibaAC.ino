@@ -1,4 +1,4 @@
-/* Copyright 2017 David Conran
+/* Copyright 2017, 2018 David Conran
 *
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
 * as specified by kIrLed below.
@@ -31,16 +31,14 @@
 #include <ir_Toshiba.h>
 
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRToshibaAC toshibair(kIrLed);  // Set the GPIO to be used for sending messages.
+IRToshibaAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
 
 void printState() {
   // Display the settings.
   Serial.println("Toshiba A/C remote is in the following state:");
-  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d\n",
-                toshibair.getPower(), toshibair.getMode(), toshibair.getTemp(),
-                toshibair.getFan());
+  Serial.printf("  %s\n", ac.toString().c_str());
   // Display the encoded IR sequence.
-  unsigned char* ir_code = toshibair.getRaw();
+  unsigned char* ir_code = ac.getRaw();
   Serial.print("IR Code: 0x");
   for (uint8_t i = 0; i < kToshibaACStateLength; i++)
     Serial.printf("%02X", ir_code[i]);
@@ -48,7 +46,7 @@ void printState() {
 }
 
 void setup() {
-  toshibair.begin();
+  ac.begin();
   Serial.begin(115200);
   delay(200);
 
@@ -56,17 +54,17 @@ void setup() {
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
-  toshibair.on();
-  toshibair.setFan(1);
-  toshibair.setMode(TOSHIBA_AC_COOL);
-  toshibair.setTemp(26);
+  ac.on();
+  ac.setFan(1);
+  ac.setMode(kToshibaAcCool);
+  ac.setTemp(26);
 }
 
 void loop() {
   // Now send the IR signal.
 #if SEND_TOSHIBA_AC
   Serial.println("Sending IR command to A/C ...");
-  toshibair.send();
+  ac.send();
 #endif  // SEND_TOSHIBA_AC
   printState();
   delay(5000);
