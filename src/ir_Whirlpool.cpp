@@ -175,16 +175,17 @@ uint8_t IRWhirlpoolAc::getFan() {
 
 void IRWhirlpoolAc::setSwing(const bool on) {
   if (on) {
-    remote_state[2] |= 0b00000001;
-    remote_state[11] |= 0b00000010;
+    remote_state[2] |= kWhirlpoolAcSwing1Mask;
+    remote_state[8] |= kWhirlpoolAcSwing2Mask;
   } else {
-    remote_state[2] &= 0b11111110;
-    remote_state[11] &= 0b11111101;
+    remote_state[2] &= ~kWhirlpoolAcSwing1Mask;
+    remote_state[8] &= ~kWhirlpoolAcSwing2Mask;
   }
 }
 
 bool IRWhirlpoolAc::getSwing() {
-  return (remote_state[2] & 0b00000001) && (remote_state[11] & 0b00000010);
+  return (remote_state[2] & kWhirlpoolAcSwing1Mask) &&
+         (remote_state[8] & kWhirlpoolAcSwing2Mask);
 }
 
 void IRWhirlpoolAc::setLight(const bool on) {
@@ -198,14 +199,81 @@ bool IRWhirlpoolAc::getLight() {
   return !(remote_state[6] & kWhirlpoolAcLightMask);
 }
 
+void IRWhirlpoolAc::setTime(const uint16_t pos,
+                             const uint16_t minspastmidnight) {
+  // Hours
+  remote_state[pos] &= ~kWhirlpoolAcHourMask;
+  remote_state[pos] |= (minspastmidnight / 60) % 24;
+  // Minutes
+  remote_state[pos + 1] &= ~kWhirlpoolAcMinuteMask;
+  remote_state[pos + 1] |= minspastmidnight % 60;
+}
+
+uint16_t IRWhirlpoolAc::getTime(const uint16_t pos) {
+  return (remote_state[pos] & kWhirlpoolAcHourMask) * 60 +
+         (remote_state[pos + 1] & kWhirlpoolAcMinuteMask);
+}
+
+bool IRWhirlpoolAc::isTimerEnabled(const uint16_t pos) {
+  return remote_state[pos - 1] & kWhirlpoolAcTimerEnableMask;
+}
+
+void IRWhirlpoolAc::enableTimer(const uint16_t pos, const bool state) {
+  if (state)
+    remote_state[pos - 1] |= kWhirlpoolAcTimerEnableMask;
+  else
+    remote_state[pos - 1] &= ~kWhirlpoolAcTimerEnableMask;
+}
+
 void IRWhirlpoolAc::setClock(const uint16_t minspastmidnight) {
-  remote_state[6] &= ~kWhirlpoolAcClockHourMask;
-  remote_state[6] |= (minspastmidnight / 60) % 24;  // Hours
-  remote_state[7] = minspastmidnight % 60;  // Minutes
+  setTime(kWhirlpoolAcClockPos, minspastmidnight);
 }
 
 uint16_t IRWhirlpoolAc::getClock() {
-  return (remote_state[6] & kWhirlpoolAcClockHourMask) * 60 + remote_state[7];
+  return getTime(kWhirlpoolAcClockPos);
+}
+
+void IRWhirlpoolAc::setOffTimer(const uint16_t minspastmidnight) {
+  setTime(kWhirlpoolAcOffTimerPos, minspastmidnight);
+}
+
+uint16_t IRWhirlpoolAc::getOffTimer() {
+  return getTime(kWhirlpoolAcOffTimerPos);
+}
+
+bool IRWhirlpoolAc::isOffTimerEnabled() {
+  return isTimerEnabled(kWhirlpoolAcOffTimerPos);
+}
+
+void IRWhirlpoolAc::enableOffTimer(const bool state) {
+  enableTimer(kWhirlpoolAcOffTimerPos, state);
+}
+
+void IRWhirlpoolAc::setOnTimer(const uint16_t minspastmidnight) {
+  setTime(kWhirlpoolAcOnTimerPos, minspastmidnight);
+}
+
+uint16_t IRWhirlpoolAc::getOnTimer() {
+  return getTime(kWhirlpoolAcOnTimerPos);
+}
+
+bool IRWhirlpoolAc::isOnTimerEnabled() {
+  return isTimerEnabled(kWhirlpoolAcOnTimerPos);
+}
+
+void IRWhirlpoolAc::enableOnTimer(const bool state) {
+  enableTimer(kWhirlpoolAcOnTimerPos, state);
+}
+
+void IRWhirlpoolAc::setPowerToggle(const bool on) {
+  if (on)
+    remote_state[2] |= kWhirlpoolAcPowerToggleMask;
+  else
+    remote_state[2] &= ~kWhirlpoolAcPowerToggleMask;
+}
+
+bool IRWhirlpoolAc::getPowerToggle() {
+  return remote_state[2] & kWhirlpoolAcPowerToggleMask;
 }
 
 #ifdef ARDUINO
@@ -233,7 +301,12 @@ String IRWhirlpoolAc::toString() {
 std::string IRWhirlpoolAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Mode: " + uint64ToString(getMode());
+  result += "Power toggle: ";
+  if (getPowerToggle())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
     case kWhirlpoolAcHeat:
       result += " (HEAT)";
@@ -282,8 +355,18 @@ std::string IRWhirlpoolAc::toString() {
     result += "On";
   else
     result += "Off";
-  result += ", Time: ";
+  result += ", Clock: ";
   result += timeToString(getClock());
+  result += ", On Timer: ";
+  if (isOnTimerEnabled())
+    result += timeToString(getOnTimer());
+  else
+    result += "Off";
+  result += ", Off Timer: ";
+  if (isOffTimerEnabled())
+    result += timeToString(getOffTimer());
+  else
+    result += "Off";
   return result;
 }
 

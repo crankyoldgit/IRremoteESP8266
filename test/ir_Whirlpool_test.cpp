@@ -1,10 +1,10 @@
 // Copyright 2018 David Conran
 
+#include "ir_Whirlpool.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "ir_Whirlpool.h"
 #include "gtest/gtest.h"
 
 // Tests for sendWhirlpoolAC().
@@ -68,8 +68,85 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On, "
-      "Time: 17:31",
+      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
+      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off",
+      ac.toString());
+}
+
+TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint8_t expectedState[kWhirlpoolAcStateLength] = {
+      0x83, 0x06, 0x80, 0x82, 0x00, 0x00, 0x93, 0x12, 0x40, 0x00, 0x00,
+      0x00, 0x00, 0xC3, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x07};
+  irsend.sendWhirlpoolAC(expectedState);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRWhirlpoolAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power toggle: Off, Mode: 2 (COOL), Temp: 26C, Fan: 0 (AUTO), Swing: On, "
+      "Light: On, Clock: 19:18, On Timer: Off, Off Timer: Off",
+      ac.toString());
+}
+
+TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // Dehumidify timer on 7:40 off 8:05
+  uint16_t rawData[343] = {
+      9092, 4556, 604, 1664, 604, 1674, 630, 514,  630, 518,  628, 522,
+      604,  550,  628, 530,  602, 1680, 630, 508,  630, 1644, 604, 1674,
+      604,  544,  604, 548,  630, 524,  604, 554,  620, 530,  630, 506,
+      602,  538,  602, 542,  604, 542,  604, 546,  630, 524,  602, 556,
+      628,  518,  604, 1666, 632, 1644, 604, 540,  602, 546,  604, 1680,
+      604,  1684, 604, 1686, 630, 520,  602, 534,  606, 538,  602, 540,
+      604,  544,  604, 548,  602, 552,  630, 528,  602, 546,  602, 536,
+      628,  510,  606, 540,  604, 544,  630, 522,  604, 554,  600, 554,
+      602,  528,  602, 8032, 604, 1666, 604, 1668, 602, 1676, 630, 518,
+      630,  520,  602, 550,  604, 554,  604, 1678, 630, 1640, 602, 1672,
+      602,  542,  602, 544,  628, 522,  630, 1658, 604, 554,  628, 1652,
+      630,  508,  602, 538,  630, 514,  630, 1652, 602, 546,  604, 550,
+      602,  554,  602, 546,  630, 1638, 604, 536,  630, 1646, 602, 544,
+      628,  522,  632, 524,  628, 528,  602, 1686, 594, 1666, 604, 1670,
+      602,  1674, 632, 516,  604, 546,  638, 518,  622, 534,  628, 518,
+      604,  532,  604, 536,  600, 550,  622, 1652, 630, 520,  602, 1684,
+      602,  554,  602, 544,  630, 506,  628, 512,  602, 540,  628, 518,
+      602,  550,  602, 552,  604, 554,  602, 544,  628, 1642, 602, 536,
+      632,  1646, 630, 516,  602, 1680, 630, 1656, 604, 1688, 602, 1660,
+      602,  8030, 604, 532,  604, 536,  604, 540,  602, 544,  628, 522,
+      602,  552,  602, 556,  602, 544,  602, 1666, 630, 510,  602, 1674,
+      604,  544,  628, 522,  602, 552,  630, 526,  628, 520,  602, 534,
+      630,  510,  604, 540,  602, 544,  606, 544,  604, 550,  604, 554,
+      602,  544,  604, 534,  602, 538,  602, 542,  604, 542,  604, 546,
+      604,  550,  632, 526,  604, 544,  630, 506,  604, 536,  604, 540,
+      628,  518,  602, 548,  604, 550,  604, 552,  630, 516,  602, 534,
+      604,  536,  630, 512,  604, 544,  602, 548,  630, 524,  602, 554,
+      602,  542,  604, 1666, 606, 532,  630, 1644, 602, 544,  630, 520,
+      604,  550,  604, 554,  602, 526,  598};
+  uint8_t expectedState[kWhirlpoolAcStateLength] = {
+      0x83, 0x06, 0x00, 0x73, 0x00, 0x00, 0x87, 0xA3, 0x08, 0x85, 0x07,
+      0x28, 0x00, 0xF5, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x05};
+  irsend.sendRaw(rawData, 343, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRWhirlpoolAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power toggle: Off, Mode: 3 (DRY), Temp: 25C, Fan: 0 (AUTO), Swing: Off, "
+      "Light: On, Clock: 07:35, On Timer: 07:40, Off Timer: 08:05",
       ac.toString());
 }
 
@@ -125,8 +202,8 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), Swing: Off, Light: On, "
-      "Time: 17:31",
+      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
+      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off",
       ac.toString());
 }
 
@@ -154,7 +231,6 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
   ac.setTemp(kWhirlpoolAcMaxTemp + 1);
   EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
 }
-
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
   IRWhirlpoolAc ac(0);
@@ -225,4 +301,60 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
   ac.setClock(25 * 60 + 23);
   EXPECT_EQ(1 * 60 + 23, ac.getClock());
   EXPECT_EQ("01:23", ac.timeToString(ac.getClock()));
+}
+
+TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
+  IRWhirlpoolAc ac(0);
+  // On Timer
+  ac.enableOnTimer(false);
+  ac.setOnTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  ac.setOnTimer(1);
+  EXPECT_EQ(1, ac.getOnTimer());
+  EXPECT_EQ("00:01", ac.timeToString(ac.getOnTimer()));
+  ac.enableOnTimer(true);
+  ac.setOnTimer(12 * 60 + 34);
+  EXPECT_EQ(12 * 60 + 34, ac.getOnTimer());
+  EXPECT_EQ("12:34", ac.timeToString(ac.getOnTimer()));
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  ac.setOnTimer(7 * 60 + 5);
+  EXPECT_EQ(7 * 60 + 5, ac.getOnTimer());
+  EXPECT_EQ("07:05", ac.timeToString(ac.getOnTimer()));
+  ac.setOnTimer(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
+  EXPECT_EQ("23:59", ac.timeToString(ac.getOnTimer()));
+  ac.setOnTimer(24 * 60 + 0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
+  ac.setOnTimer(25 * 60 + 23);
+  EXPECT_EQ(1 * 60 + 23, ac.getOnTimer());
+  EXPECT_EQ("01:23", ac.timeToString(ac.getOnTimer()));
+  // Off Timer
+  ac.enableOffTimer(false);
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getOffTimer()));
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  ac.setOffTimer(1);
+  EXPECT_EQ(1, ac.getOffTimer());
+  EXPECT_EQ("00:01", ac.timeToString(ac.getOffTimer()));
+  ac.enableOffTimer(true);
+  ac.setOffTimer(12 * 60 + 34);
+  EXPECT_EQ(12 * 60 + 34, ac.getOffTimer());
+  EXPECT_EQ("12:34", ac.timeToString(ac.getOffTimer()));
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  ac.setOffTimer(7 * 60 + 5);
+  EXPECT_EQ(7 * 60 + 5, ac.getOffTimer());
+  EXPECT_EQ("07:05", ac.timeToString(ac.getOffTimer()));
+  ac.setOffTimer(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
+  EXPECT_EQ("23:59", ac.timeToString(ac.getOffTimer()));
+  ac.setOffTimer(24 * 60 + 0);
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_EQ("00:00", ac.timeToString(ac.getOffTimer()));
+  ac.setOffTimer(25 * 60 + 23);
+  EXPECT_EQ(1 * 60 + 23, ac.getOffTimer());
+  EXPECT_EQ("01:23", ac.timeToString(ac.getOffTimer()));
 }

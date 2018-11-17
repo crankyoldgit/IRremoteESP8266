@@ -42,8 +42,16 @@ const uint8_t kWhirlpoolAcMinTemp = 18;   // 18C
 const uint8_t kWhirlpoolAcMaxTemp = 32;   // 32C
 const uint8_t kWhirlpoolAcAutoTemp = 25;  // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
-const uint8_t kWhirlpoolAcLightMask = 0b00000100;
-const uint8_t kWhirlpoolAcClockHourMask = 0b00011111;
+const uint8_t kWhirlpoolAcSwing1Mask = 0b10000000;
+const uint8_t kWhirlpoolAcSwing2Mask = 0b01000000;
+const uint8_t kWhirlpoolAcLightMask = 0b00100000;
+const uint8_t kWhirlpoolAcPowerToggleMask = 0b00100000;
+const uint8_t kWhirlpoolAcHourMask = 0b00011111;
+const uint8_t kWhirlpoolAcMinuteMask = 0b00111111;
+const uint8_t kWhirlpoolAcTimerEnableMask = 0b10000000;
+const uint8_t kWhirlpoolAcClockPos = 6;
+const uint8_t kWhirlpoolAcOffTimerPos = 8;
+const uint8_t kWhirlpoolAcOnTimerPos = 10;
 
 
 // Classes
@@ -58,8 +66,8 @@ class IRWhirlpoolAc {
   void begin();
   void on();
   void off();
-  void setPower(const bool state);
-  bool getPower();
+  void setPowerToggle(const bool on);
+  bool getPowerToggle();
   void setTemp(const uint8_t temp);
   uint8_t getTemp();
   void setFan(const uint8_t speed);
@@ -71,7 +79,15 @@ class IRWhirlpoolAc {
   void setLight(const bool on);
   bool getLight();
   uint16_t getClock();
-  void setClock(uint16_t minspastmidnight);
+  void setClock(const uint16_t minspastmidnight);
+  uint16_t getOnTimer();
+  void setOnTimer(const uint16_t minspastmidnight);
+  void enableOnTimer(const bool state);
+  bool isOnTimerEnabled();
+  uint16_t getOffTimer();
+  void setOffTimer(const uint16_t minspastmidnight);
+  void enableOffTimer(const bool state);
+  bool isOffTimerEnabled();
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);
@@ -88,8 +104,12 @@ class IRWhirlpoolAc {
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kWhirlpoolAcStateLength];
-  void checksum(const uint16_t length = kWhirlpoolAcStateLength);
   IRsend _irsend;
+  void checksum(const uint16_t length = kWhirlpoolAcStateLength);
+  uint16_t getTime(const uint16_t pos);
+  void setTime(const uint16_t pos, const uint16_t minspastmidnight);
+  bool isTimerEnabled(const uint16_t pos);
+  void enableTimer(const uint16_t pos, const bool state);
 #ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);
 #else
