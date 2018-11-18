@@ -32,16 +32,19 @@ const uint8_t kWhirlpoolAcAuto = 1;
 const uint8_t kWhirlpoolAcCool = 2;
 const uint8_t kWhirlpoolAcDry = 3;
 const uint8_t kWhirlpoolAcFan = 4;
-const uint8_t kWhirlpoolAcModeMask = 0b11111000;
+const uint8_t kWhirlpoolAcModeMask = 0b00000111;
+const uint8_t kWhirlpoolAcModePos = 3;
 const uint8_t kWhirlpoolAcFanAuto = 0;
 const uint8_t kWhirlpoolAcFanHigh = 1;
 const uint8_t kWhirlpoolAcFanMedium = 2;
 const uint8_t kWhirlpoolAcFanLow = 3;
-const uint8_t kWhirlpoolAcFanMask = 0b11001111;
+const uint8_t kWhirlpoolAcFanMask = 0b00110000;
+const uint8_t kWhirlpoolAcFanPos = 2;
 const uint8_t kWhirlpoolAcMinTemp = 18;   // 18C
 const uint8_t kWhirlpoolAcMaxTemp = 32;   // 32C
 const uint8_t kWhirlpoolAcAutoTemp = 25;  // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
+const uint8_t kWhirlpoolAcTempPos = 3;
 const uint8_t kWhirlpoolAcSwing1Mask = 0b10000000;
 const uint8_t kWhirlpoolAcSwing2Mask = 0b01000000;
 const uint8_t kWhirlpoolAcLightMask = 0b00100000;
@@ -53,6 +56,14 @@ const uint8_t kWhirlpoolAcClockPos = 6;
 const uint8_t kWhirlpoolAcOffTimerPos = 8;
 const uint8_t kWhirlpoolAcOnTimerPos = 10;
 
+const uint8_t kWhirlpoolAcCommandPos = 15;
+const uint8_t kWhirlpoolAcCommandPower = 0x01;
+const uint8_t kWhirlpoolAcCommandTemp = 0x02;
+const uint8_t kWhirlpoolAcCommandTimer = 0x05;  // A guess.
+const uint8_t kWhirlpoolAcCommandMode = 0x06;
+const uint8_t kWhirlpoolAcCommandSwing = 0x07;
+const uint8_t kWhirlpoolAcCommandFanSpeed = 0x11;
+const uint8_t kWhirlpoolAcCommand6thSense = 0x17;
 
 // Classes
 class IRWhirlpoolAc {
@@ -88,6 +99,8 @@ class IRWhirlpoolAc {
   void setOffTimer(const uint16_t minspastmidnight);
   void enableOffTimer(const bool state);
   bool isOffTimerEnabled();
+  void setCommand(const uint8_t code);
+  uint8_t getCommand();
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);

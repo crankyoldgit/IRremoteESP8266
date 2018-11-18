@@ -69,7 +69,8 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
-      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off",
+      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
+      "Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -92,7 +93,8 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power toggle: Off, Mode: 2 (COOL), Temp: 26C, Fan: 0 (AUTO), Swing: On, "
-      "Light: On, Clock: 19:18, On Timer: Off, Off Timer: Off",
+      "Light: On, Clock: 19:18, On Timer: Off, Off Timer: Off, "
+      "Command: 7 (SWING)",
       ac.toString());
 }
 
@@ -146,7 +148,8 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power toggle: Off, Mode: 3 (DRY), Temp: 25C, Fan: 0 (AUTO), Swing: Off, "
-      "Light: On, Clock: 07:35, On Timer: 07:40, Off Timer: 08:05",
+      "Light: On, Clock: 07:35, On Timer: 07:40, Off Timer: 08:05, "
+      "Command: 5 (TIMER)",
       ac.toString());
 }
 
@@ -203,7 +206,8 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
-      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off",
+      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
+      "Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -220,8 +224,11 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetRaw) {
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kWhirlpoolAcCommandTemp, ac.getCommand());
   ac.setTemp(kWhirlpoolAcMinTemp);
   EXPECT_EQ(kWhirlpoolAcMinTemp, ac.getTemp());
   ac.setTemp(kWhirlpoolAcMinTemp - 1);
@@ -234,20 +241,28 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   ac.setMode(kWhirlpoolAcCool);
   EXPECT_EQ(kWhirlpoolAcCool, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcCommandMode, ac.getCommand());
   ac.setMode(kWhirlpoolAcHeat);
   EXPECT_EQ(kWhirlpoolAcHeat, ac.getMode());
   ac.setMode(kWhirlpoolAcAuto);
   EXPECT_EQ(kWhirlpoolAcAuto, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcCommand6thSense, ac.getCommand());
   ac.setMode(kWhirlpoolAcDry);
   EXPECT_EQ(kWhirlpoolAcDry, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcCommandMode, ac.getCommand());
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   ac.setFan(kWhirlpoolAcFanAuto);
   EXPECT_EQ(kWhirlpoolAcFanAuto, ac.getFan());
+  EXPECT_EQ(kWhirlpoolAcCommandFanSpeed, ac.getCommand());
   ac.setFan(kWhirlpoolAcFanLow);
   EXPECT_EQ(kWhirlpoolAcFanLow, ac.getFan());
   ac.setFan(kWhirlpoolAcFanMedium);
@@ -260,8 +275,11 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   ac.setSwing(true);
   EXPECT_TRUE(ac.getSwing());
+  EXPECT_EQ(kWhirlpoolAcCommandSwing, ac.getCommand());
   ac.setSwing(false);
   EXPECT_FALSE(ac.getSwing());
   ac.setSwing(true);
@@ -270,6 +288,8 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetLight) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   ac.setLight(true);
   EXPECT_TRUE(ac.getLight());
   ac.setLight(false);
@@ -305,12 +325,15 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
 
 TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
   IRWhirlpoolAc ac(0);
+  ac.setCommand(0);  // Clear the previous command.
+
   // On Timer
   ac.enableOnTimer(false);
   ac.setOnTimer(0);
   EXPECT_EQ(0, ac.getOnTimer());
   EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
   EXPECT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kWhirlpoolAcCommandTimer, ac.getCommand());
   ac.setOnTimer(1);
   EXPECT_EQ(1, ac.getOnTimer());
   EXPECT_EQ("00:01", ac.timeToString(ac.getOnTimer()));
@@ -357,4 +380,14 @@ TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
   ac.setOffTimer(25 * 60 + 23);
   EXPECT_EQ(1 * 60 + 23, ac.getOffTimer());
   EXPECT_EQ("01:23", ac.timeToString(ac.getOffTimer()));
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetCommand) {
+  IRWhirlpoolAc ac(0);
+  ac.setCommand(0);
+  EXPECT_EQ(0, ac.getCommand());
+  ac.setCommand(kWhirlpoolAcCommandFanSpeed);
+  EXPECT_EQ(kWhirlpoolAcCommandFanSpeed, ac.getCommand());
+  ac.setCommand(255);
+  EXPECT_EQ(255, ac.getCommand());
 }
