@@ -57,13 +57,18 @@ const uint8_t kWhirlpoolAcOffTimerPos = 8;
 const uint8_t kWhirlpoolAcOnTimerPos = 10;
 
 const uint8_t kWhirlpoolAcCommandPos = 15;
+const uint8_t kWhirlpoolAcCommandLight = 0x00;
 const uint8_t kWhirlpoolAcCommandPower = 0x01;
 const uint8_t kWhirlpoolAcCommandTemp = 0x02;
-const uint8_t kWhirlpoolAcCommandTimer = 0x05;  // A guess.
+const uint8_t kWhirlpoolAcCommandSleep = 0x03;
+const uint8_t kWhirlpoolAcCommandSuper = 0x04;
+const uint8_t kWhirlpoolAcCommandOnTimer = 0x05;
 const uint8_t kWhirlpoolAcCommandMode = 0x06;
 const uint8_t kWhirlpoolAcCommandSwing = 0x07;
+const uint8_t kWhirlpoolAcCommandIFeel = 0x0D;
 const uint8_t kWhirlpoolAcCommandFanSpeed = 0x11;
 const uint8_t kWhirlpoolAcCommand6thSense = 0x17;
+const uint8_t kWhirlpoolAcCommandOffTimer = 0x1D;
 
 // Classes
 class IRWhirlpoolAc {

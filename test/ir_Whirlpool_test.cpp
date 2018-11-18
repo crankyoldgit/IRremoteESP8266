@@ -149,7 +149,7 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   EXPECT_EQ(
       "Power toggle: Off, Mode: 3 (DRY), Temp: 25C, Fan: 0 (AUTO), Swing: Off, "
       "Light: On, Clock: 07:35, On Timer: 07:40, Off Timer: 08:05, "
-      "Command: 5 (TIMER)",
+      "Command: 5 (ONTIMER)",
       ac.toString());
 }
 
@@ -333,7 +333,7 @@ TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
   EXPECT_EQ(0, ac.getOnTimer());
   EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
   EXPECT_FALSE(ac.isOnTimerEnabled());
-  EXPECT_EQ(kWhirlpoolAcCommandTimer, ac.getCommand());
+  EXPECT_EQ(kWhirlpoolAcCommandOnTimer, ac.getCommand());
   ac.setOnTimer(1);
   EXPECT_EQ(1, ac.getOnTimer());
   EXPECT_EQ("00:01", ac.timeToString(ac.getOnTimer()));
@@ -360,6 +360,7 @@ TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
   EXPECT_EQ(0, ac.getOffTimer());
   EXPECT_EQ("00:00", ac.timeToString(ac.getOffTimer()));
   EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kWhirlpoolAcCommandOffTimer, ac.getCommand());
   ac.setOffTimer(1);
   EXPECT_EQ(1, ac.getOffTimer());
   EXPECT_EQ("00:01", ac.timeToString(ac.getOffTimer()));

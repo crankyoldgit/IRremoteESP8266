@@ -233,7 +233,6 @@ void IRWhirlpoolAc::enableTimer(const uint16_t pos, const bool state) {
     remote_state[pos - 1] |= kWhirlpoolAcTimerEnableMask;
   else
     remote_state[pos - 1] &= ~kWhirlpoolAcTimerEnableMask;
-  setCommand(kWhirlpoolAcCommandTimer);
 }
 
 void IRWhirlpoolAc::setClock(const uint16_t minspastmidnight) {
@@ -256,6 +255,7 @@ bool IRWhirlpoolAc::isOffTimerEnabled() {
 
 void IRWhirlpoolAc::enableOffTimer(const bool state) {
   enableTimer(kWhirlpoolAcOffTimerPos, state);
+  setCommand(kWhirlpoolAcCommandOffTimer);
 }
 
 void IRWhirlpoolAc::setOnTimer(const uint16_t minspastmidnight) {
@@ -270,6 +270,7 @@ bool IRWhirlpoolAc::isOnTimerEnabled() {
 
 void IRWhirlpoolAc::enableOnTimer(const bool state) {
   enableTimer(kWhirlpoolAcOnTimerPos, state);
+  setCommand(kWhirlpoolAcCommandOnTimer);
 }
 
 void IRWhirlpoolAc::setPowerToggle(const bool on) {
@@ -385,14 +386,23 @@ std::string IRWhirlpoolAc::toString() {
     result += "Off";
   result += ", Command: " + uint64ToString(getCommand());
   switch (getCommand()) {
+    case kWhirlpoolAcCommandLight:
+      result += " (LIGHT)";
+      break;
     case kWhirlpoolAcCommandPower:
       result += " (POWER)";
       break;
     case kWhirlpoolAcCommandTemp:
       result += " (TEMP)";
       break;
-    case kWhirlpoolAcCommandTimer:
-      result += " (TIMER)";
+    case kWhirlpoolAcCommandSleep:
+      result += " (SLEEP)";
+      break;
+    case kWhirlpoolAcCommandSuper:
+      result += " (SUPER)";
+      break;
+    case kWhirlpoolAcCommandOnTimer:
+      result += " (ONTIMER)";
       break;
     case kWhirlpoolAcCommandMode:
       result += " (MODE)";
@@ -400,11 +410,17 @@ std::string IRWhirlpoolAc::toString() {
     case kWhirlpoolAcCommandSwing:
       result += " (SWING)";
       break;
+    case kWhirlpoolAcCommandIFeel:
+      result += " (IFEEL)";
+      break;
     case kWhirlpoolAcCommandFanSpeed:
       result += " (FANSPEED)";
       break;
     case kWhirlpoolAcCommand6thSense:
       result += " (6THSENSE)";
+      break;
+    case kWhirlpoolAcCommandOffTimer:
+      result += " (OFFTIMER)";
       break;
     default:
       result += " (UNKNOWN)";
