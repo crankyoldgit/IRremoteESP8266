@@ -4,7 +4,8 @@
 // Should be compatible with:
 // * SPIS409L, SPIS412L, SPIW409L, SPIW412L, SPIW418L
 // Remotes:
-// * DG11J1-3A
+// * DG11J1-3A / DG11J1-04
+// * DG11J1-91
 //
 
 #include "ir_Whirlpool.h"
@@ -137,14 +138,14 @@ void IRWhirlpoolAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 
 whirlpool_ac_remote_model_t IRWhirlpoolAc::getModel() {
   if (remote_state[kWhirlpoolAcAltTempPos] & kWhirlpoolAcAltTempMask)
-    return WHIRLPOOL_MODEL_1;
+    return DG11J191;
   else
     return DG11J13A;
 }
 
 void IRWhirlpoolAc::setModel(const whirlpool_ac_remote_model_t model) {
   switch (model) {
-    case WHIRLPOOL_MODEL_1:
+    case DG11J191:
       remote_state[kWhirlpoolAcAltTempPos] |= kWhirlpoolAcAltTempMask;
       break;
     case DG11J13A:
@@ -155,26 +156,26 @@ void IRWhirlpoolAc::setModel(const whirlpool_ac_remote_model_t model) {
   _setTemp(_desiredtemp);  // Different models have different temp values.
 }
 
-// Return the min temp. in deg C for the current model.
-uint8_t IRWhirlpoolAc::getMinTemp() {
+// Return the temp. offset in deg C for the current model.
+int8_t IRWhirlpoolAc::getTempOffset() {
   switch (getModel()) {
-    case WHIRLPOOL_MODEL_1:
-      return kWhirlpoolAcMinTempAlt;
+    case DG11J191:
+      return -2;
       break;
     default:
-      return kWhirlpoolAcMinTemp;
+      return 0;
   }
 }
 
 // Set the temp. in deg C
 void IRWhirlpoolAc::_setTemp(const uint8_t temp) {
   _desiredtemp = temp;
-  uint8_t mintemp = getMinTemp();  // Cache the min temp for the model.
-  uint8_t newtemp = std::max(mintemp, temp);
-  newtemp = std::min(kWhirlpoolAcMaxTemp, newtemp);
+  int8_t offset = getTempOffset();  // Cache the min temp for the model.
+  uint8_t newtemp = std::max((uint8_t)(kWhirlpoolAcMinTemp + offset), temp);
+  newtemp = std::min((uint8_t)(kWhirlpoolAcMaxTemp + offset), newtemp);
   remote_state[kWhirlpoolAcTempPos] =
       (remote_state[kWhirlpoolAcTempPos] & ~kWhirlpoolAcTempMask) |
-      ((newtemp - mintemp) << 4);
+      ((newtemp - (kWhirlpoolAcMinTemp + offset)) << 4);
 }
 
 // Set the temp. in deg C
@@ -186,7 +187,7 @@ void IRWhirlpoolAc::setTemp(const uint8_t temp) {
 // Return the set temp. in deg C
 uint8_t IRWhirlpoolAc::getTemp() {
   return ((remote_state[kWhirlpoolAcTempPos] & kWhirlpoolAcTempMask) >> 4) +
-         getMinTemp();
+         + kWhirlpoolAcMinTemp + getTempOffset();
 }
 
 void IRWhirlpoolAc::setMode(const uint8_t mode) {
@@ -364,8 +365,8 @@ std::string IRWhirlpoolAc::toString() {
 #endif  // ARDUINO
   result += "Model: " + uint64ToString(getModel());
   switch (getModel()) {
-    case WHIRLPOOL_MODEL_1:
-      result += " (MODEL_1)";
+    case DG11J191:
+      result += " (DG11J191)";
       break;
     case DG11J13A:
       result += " (DG11J13A)";

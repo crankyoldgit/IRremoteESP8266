@@ -68,7 +68,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
       "Off Timer: Off, Command: 2 (TEMP)",
       ac.toString());
@@ -92,7 +92,7 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
       "Fan: 0 (AUTO), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
       "Off Timer: Off, Command: 7 (SWING)",
       ac.toString());
@@ -147,7 +147,7 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
       "Off Timer: 08:05, Command: 5 (ONTIMER)",
       ac.toString());
@@ -205,7 +205,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
       "Off Timer: Off, Command: 2 (TEMP)",
       ac.toString());
@@ -226,6 +226,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
   IRWhirlpoolAc ac(0);
   ac.setCommand(0);  // Clear the previous command.
 
+  ac.setModel(DG11J13A);
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
   EXPECT_EQ(kWhirlpoolAcCommandTemp, ac.getCommand());
@@ -237,6 +238,19 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
   EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
   ac.setTemp(kWhirlpoolAcMaxTemp + 1);
   EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
+
+  ac.setModel(DG11J191);  // Has a -2 offset on min/max temps.
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kWhirlpoolAcCommandTemp, ac.getCommand());
+  ac.setTemp(kWhirlpoolAcMinTemp - 2);
+  EXPECT_EQ(kWhirlpoolAcMinTemp - 2, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMinTemp - 2 - 1);
+  EXPECT_EQ(kWhirlpoolAcMinTemp - 2 , ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMaxTemp - 2);
+  EXPECT_EQ(kWhirlpoolAcMaxTemp - 2, ac.getTemp());
+  ac.setTemp(kWhirlpoolAcMaxTemp - 2 + 1);
+  EXPECT_EQ(kWhirlpoolAcMaxTemp - 2, ac.getTemp());
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
@@ -424,15 +438,15 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
   ac.setTemp(19);
   ac.setCommand(0);  // Set model shouldn't change the command setting.
 
-  ac.setModel(WHIRLPOOL_MODEL_1);
-  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  ac.setModel(DG11J191);
+  EXPECT_EQ(DG11J191, ac.getModel());
   EXPECT_EQ(19, ac.getTemp());
   EXPECT_EQ(0, ac.getCommand());
   ac.setModel(DG11J13A);
   EXPECT_EQ(DG11J13A, ac.getModel());
   EXPECT_EQ(19, ac.getTemp());
-  ac.setModel(WHIRLPOOL_MODEL_1);
-  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  ac.setModel(DG11J191);
+  EXPECT_EQ(DG11J191, ac.getModel());
   EXPECT_EQ(19, ac.getTemp());
   EXPECT_EQ(0, ac.getCommand());
 
@@ -444,8 +458,8 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
   ac.setModel(DG11J13A);
   EXPECT_EQ(DG11J13A, ac.getModel());
   EXPECT_EQ(18, ac.getTemp());
-  ac.setModel(WHIRLPOOL_MODEL_1);
-  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  ac.setModel(DG11J191);
+  EXPECT_EQ(DG11J191, ac.getModel());
   EXPECT_EQ(16, ac.getTemp());
   EXPECT_EQ(0, ac.getCommand());
 
@@ -458,7 +472,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
                          0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02};
 
   ac.setRaw(state_1);
-  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  EXPECT_EQ(DG11J191, ac.getModel());
   ac.setRaw(state_2);
   EXPECT_EQ(DG11J13A, ac.getModel());
 }

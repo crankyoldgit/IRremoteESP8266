@@ -40,9 +40,8 @@ const uint8_t kWhirlpoolAcFanMedium = 2;
 const uint8_t kWhirlpoolAcFanLow = 3;
 const uint8_t kWhirlpoolAcFanMask = 0b00000011;
 const uint8_t kWhirlpoolAcFanPos = 2;
-const uint8_t kWhirlpoolAcMinTemp = 18;     // 18C (DG11J1-3A)
-const uint8_t kWhirlpoolAcMinTempAlt = 16;  // 16C
-const uint8_t kWhirlpoolAcMaxTemp = 32;     // 32C
+const uint8_t kWhirlpoolAcMinTemp = 18;     // 18C (DG11J1-3A), 16C (DG11J1-91)
+const uint8_t kWhirlpoolAcMaxTemp = 32;     // 32C (DG11J1-3A), 30C (DG11J1-91)
 const uint8_t kWhirlpoolAcAutoTemp = 25;    // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
 const uint8_t kWhirlpoolAcTempPos = 3;
@@ -76,8 +75,8 @@ const uint8_t kWhirlpoolAcAltTempPos = 18;
 
 enum whirlpool_ac_remote_model_t {
   // TODO(crankyoldgit): Replace with correct model numbers when we have them.
-  WHIRLPOOL_MODEL_1 = 1,
-  DG11J13A,
+  DG11J13A = 1,  // DG11J1-04 too
+  DG11J191,
 };
 
 // Classes
@@ -143,7 +142,7 @@ class IRWhirlpoolAc {
   bool isTimerEnabled(const uint16_t pos);
   void enableTimer(const uint16_t pos, const bool state);
   void _setTemp(const uint8_t temp);
-  uint8_t getMinTemp();
+  int8_t getTempOffset();
 #ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);
 #else
