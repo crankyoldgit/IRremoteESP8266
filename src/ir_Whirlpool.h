@@ -40,9 +40,10 @@ const uint8_t kWhirlpoolAcFanMedium = 2;
 const uint8_t kWhirlpoolAcFanLow = 3;
 const uint8_t kWhirlpoolAcFanMask = 0b00000011;
 const uint8_t kWhirlpoolAcFanPos = 2;
-const uint8_t kWhirlpoolAcMinTemp = 18;   // 18C
-const uint8_t kWhirlpoolAcMaxTemp = 32;   // 32C
-const uint8_t kWhirlpoolAcAutoTemp = 25;  // 25C
+const uint8_t kWhirlpoolAcMinTemp = 18;     // 18C (DG11J1-3A)
+const uint8_t kWhirlpoolAcMinTempAlt = 16;  // 16C
+const uint8_t kWhirlpoolAcMaxTemp = 32;     // 32C
+const uint8_t kWhirlpoolAcAutoTemp = 25;    // 25C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
 const uint8_t kWhirlpoolAcTempPos = 3;
 const uint8_t kWhirlpoolAcSwing1Mask = 0b10000000;
@@ -69,6 +70,15 @@ const uint8_t kWhirlpoolAcCommandIFeel = 0x0D;
 const uint8_t kWhirlpoolAcCommandFanSpeed = 0x11;
 const uint8_t kWhirlpoolAcCommand6thSense = 0x17;
 const uint8_t kWhirlpoolAcCommandOffTimer = 0x1D;
+
+const uint8_t kWhirlpoolAcAltTempMask = 0b00001000;
+const uint8_t kWhirlpoolAcAltTempPos = 18;
+
+enum whirlpool_ac_remote_model_t {
+  // TODO(crankyoldgit): Replace with correct model numbers when we have them.
+  WHIRLPOOL_MODEL_1 = 1,
+  DG11J13A,
+};
 
 // Classes
 class IRWhirlpoolAc {
@@ -106,6 +116,8 @@ class IRWhirlpoolAc {
   bool isOffTimerEnabled();
   void setCommand(const uint8_t code);
   uint8_t getCommand();
+  whirlpool_ac_remote_model_t getModel();
+  void setModel(const whirlpool_ac_remote_model_t model);
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);
@@ -124,11 +136,14 @@ class IRWhirlpoolAc {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kWhirlpoolAcStateLength];
   IRsend _irsend;
+  uint8_t _desiredtemp;
   void checksum(const uint16_t length = kWhirlpoolAcStateLength);
   uint16_t getTime(const uint16_t pos);
   void setTime(const uint16_t pos, const uint16_t minspastmidnight);
   bool isTimerEnabled(const uint16_t pos);
   void enableTimer(const uint16_t pos, const bool state);
+  void _setTemp(const uint8_t temp);
+  uint8_t getMinTemp();
 #ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);
 #else

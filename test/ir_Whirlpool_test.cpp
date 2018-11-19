@@ -68,9 +68,9 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
-      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
-      "Command: 2 (TEMP)",
+      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
+      "Off Timer: Off, Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -92,9 +92,9 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 2 (COOL), Temp: 26C, Fan: 0 (AUTO), Swing: On, "
-      "Light: On, Clock: 19:18, On Timer: Off, Off Timer: Off, "
-      "Command: 7 (SWING)",
+      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
+      "Fan: 0 (AUTO), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
+      "Off Timer: Off, Command: 7 (SWING)",
       ac.toString());
 }
 
@@ -147,9 +147,9 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 3 (DRY), Temp: 25C, Fan: 0 (AUTO), Swing: Off, "
-      "Light: On, Clock: 07:35, On Timer: 07:40, Off Timer: 08:05, "
-      "Command: 5 (ONTIMER)",
+      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
+      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
+      "Off Timer: 08:05, Command: 5 (ONTIMER)",
       ac.toString());
 }
 
@@ -205,9 +205,9 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
-      "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
-      "Command: 2 (TEMP)",
+      "Model: 2 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
+      "Off Timer: Off, Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -417,4 +417,48 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetPowerToggle) {
                        0x00, 0x01, 0x00, 0x00, 0x08, 0x00, 0x09};
   ac.setRaw(state);
   EXPECT_TRUE(ac.getPowerToggle());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
+  IRWhirlpoolAc ac(0);
+  ac.setTemp(19);
+  ac.setCommand(0);  // Set model shouldn't change the command setting.
+
+  ac.setModel(WHIRLPOOL_MODEL_1);
+  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  EXPECT_EQ(19, ac.getTemp());
+  EXPECT_EQ(0, ac.getCommand());
+  ac.setModel(DG11J13A);
+  EXPECT_EQ(DG11J13A, ac.getModel());
+  EXPECT_EQ(19, ac.getTemp());
+  ac.setModel(WHIRLPOOL_MODEL_1);
+  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  EXPECT_EQ(19, ac.getTemp());
+  EXPECT_EQ(0, ac.getCommand());
+
+  // One of the models has a lower min temp. Check that desired temp is kept.
+  ac.setTemp(16);
+  ac.setCommand(0);  // Set model shouldn't change the command setting.
+  EXPECT_EQ(16, ac.getTemp());
+  EXPECT_EQ(0, ac.getCommand());
+  ac.setModel(DG11J13A);
+  EXPECT_EQ(DG11J13A, ac.getModel());
+  EXPECT_EQ(18, ac.getTemp());
+  ac.setModel(WHIRLPOOL_MODEL_1);
+  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  EXPECT_EQ(16, ac.getTemp());
+  EXPECT_EQ(0, ac.getCommand());
+
+  // Known states with different models.
+  uint8_t state_1[21] = {0x83, 0x06, 0x01, 0x30, 0x00, 0x00, 0x92,
+                         0x36, 0x00, 0x00, 0x00, 0x00, 0x00, 0x95,
+                         0x00, 0x02, 0x00, 0x00, 0x08, 0x00, 0x0A};
+  uint8_t state_2[21] = {0x83, 0x06, 0x00, 0x30, 0x00, 0x00, 0x8B,
+                         0x35, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8E,
+                         0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02};
+
+  ac.setRaw(state_1);
+  EXPECT_EQ(WHIRLPOOL_MODEL_1, ac.getModel());
+  ac.setRaw(state_2);
+  EXPECT_EQ(DG11J13A, ac.getModel());
 }

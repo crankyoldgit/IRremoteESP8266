@@ -3,6 +3,8 @@
 // Code to emulate Whirlpool protocol compatible devices.
 // Should be compatible with:
 // * SPIS409L, SPIS412L, SPIW409L, SPIW412L, SPIW418L
+// Remotes:
+// * DG11J1-3A
 //
 
 #include "ir_Whirlpool.h"
@@ -72,12 +74,17 @@ void IRsend::sendWhirlpoolAC(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
+// Class for emulating a Whirlpool A/C remote.
+// Decoding help from:
+//   @redmusicxd, @josh929800, @raducostea
+
 IRWhirlpoolAc::IRWhirlpoolAc(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRWhirlpoolAc::stateReset() {
   for (uint8_t i = 2; i < kWhirlpoolAcStateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = 0x83;
   remote_state[1] = 0x06;
+  _setTemp(kWhirlpoolAcAutoTemp);  // Default to a sane value.
 }
 
 void IRWhirlpoolAc::begin() { _irsend.begin(); }
@@ -128,20 +135,58 @@ void IRWhirlpoolAc::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote_state[i] = new_code[i];
 }
 
+whirlpool_ac_remote_model_t IRWhirlpoolAc::getModel() {
+  if (remote_state[kWhirlpoolAcAltTempPos] & kWhirlpoolAcAltTempMask)
+    return WHIRLPOOL_MODEL_1;
+  else
+    return DG11J13A;
+}
+
+void IRWhirlpoolAc::setModel(const whirlpool_ac_remote_model_t model) {
+  switch (model) {
+    case WHIRLPOOL_MODEL_1:
+      remote_state[kWhirlpoolAcAltTempPos] |= kWhirlpoolAcAltTempMask;
+      break;
+    case DG11J13A:
+      // FALL THRU
+    default:
+      remote_state[kWhirlpoolAcAltTempPos] &= ~kWhirlpoolAcAltTempMask;
+  }
+  _setTemp(_desiredtemp);  // Different models have different temp values.
+}
+
+// Return the min temp. in deg C for the current model.
+uint8_t IRWhirlpoolAc::getMinTemp() {
+  switch (getModel()) {
+    case WHIRLPOOL_MODEL_1:
+      return kWhirlpoolAcMinTempAlt;
+      break;
+    default:
+      return kWhirlpoolAcMinTemp;
+  }
+}
+
 // Set the temp. in deg C
-void IRWhirlpoolAc::setTemp(const uint8_t temp) {
-  uint8_t newtemp = std::max(kWhirlpoolAcMinTemp, temp);
+void IRWhirlpoolAc::_setTemp(const uint8_t temp) {
+  _desiredtemp = temp;
+  uint8_t mintemp = getMinTemp();  // Cache the min temp for the model.
+  uint8_t newtemp = std::max(mintemp, temp);
   newtemp = std::min(kWhirlpoolAcMaxTemp, newtemp);
   remote_state[kWhirlpoolAcTempPos] =
       (remote_state[kWhirlpoolAcTempPos] & ~kWhirlpoolAcTempMask) |
-      ((newtemp - kWhirlpoolAcMinTemp) << 4);
+      ((newtemp - mintemp) << 4);
+}
+
+// Set the temp. in deg C
+void IRWhirlpoolAc::setTemp(const uint8_t temp) {
+  _setTemp(temp);
   setCommand(kWhirlpoolAcCommandTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRWhirlpoolAc::getTemp() {
   return ((remote_state[kWhirlpoolAcTempPos] & kWhirlpoolAcTempMask) >> 4) +
-         kWhirlpoolAcMinTemp;
+         getMinTemp();
 }
 
 void IRWhirlpoolAc::setMode(const uint8_t mode) {
@@ -317,7 +362,18 @@ String IRWhirlpoolAc::toString() {
 std::string IRWhirlpoolAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power toggle: ";
+  result += "Model: " + uint64ToString(getModel());
+  switch (getModel()) {
+    case WHIRLPOOL_MODEL_1:
+      result += " (MODEL_1)";
+      break;
+    case DG11J13A:
+      result += " (DG11J13A)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Power toggle: ";
   if (getPowerToggle())
     result += "On";
   else
