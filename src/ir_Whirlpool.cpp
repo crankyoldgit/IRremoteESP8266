@@ -171,15 +171,14 @@ void IRWhirlpoolAc::setFan(const uint8_t speed) {
     case kWhirlpoolAcFanMedium:
     case kWhirlpoolAcFanHigh:
       remote_state[kWhirlpoolAcFanPos] =
-          (remote_state[kWhirlpoolAcFanPos] & ~kWhirlpoolAcFanMask) |
-          (speed << 4);
+          (remote_state[kWhirlpoolAcFanPos] & ~kWhirlpoolAcFanMask) | speed;
       setCommand(kWhirlpoolAcCommandFanSpeed);
       break;
   }
 }
 
 uint8_t IRWhirlpoolAc::getFan() {
-  return (remote_state[kWhirlpoolAcFanPos] & kWhirlpoolAcFanMask) >> 4;
+  return remote_state[kWhirlpoolAcFanPos] & kWhirlpoolAcFanMask;
 }
 
 void IRWhirlpoolAc::setSwing(const bool on) {

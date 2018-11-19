@@ -68,7 +68,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
+      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
       "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
       "Command: 2 (TEMP)",
       ac.toString());
@@ -205,7 +205,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 1 (HIGH), "
+      "Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
       "Swing: Off, Light: On, Clock: 17:31, On Timer: Off, Off Timer: Off, "
       "Command: 2 (TEMP)",
       ac.toString());
