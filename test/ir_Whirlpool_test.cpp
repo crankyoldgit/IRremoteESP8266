@@ -271,6 +271,13 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
   EXPECT_EQ(kWhirlpoolAcFanHigh, ac.getFan());
   ac.setFan(kWhirlpoolAcFanAuto);
   EXPECT_EQ(kWhirlpoolAcFanAuto, ac.getFan());
+
+  // Known state with a non-auto fan mode.
+  const uint8_t state[21] = {0x83, 0x06, 0x0B, 0x82, 0x00, 0x00, 0x93,
+                             0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1E,
+                             0x00, 0x03, 0x00, 0x00, 0x08, 0x00, 0x0B};
+  ac.setRaw(state);
+  EXPECT_EQ(kWhirlpoolAcFanLow, ac.getFan());
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
@@ -391,4 +398,23 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetCommand) {
   EXPECT_EQ(kWhirlpoolAcCommandFanSpeed, ac.getCommand());
   ac.setCommand(255);
   EXPECT_EQ(255, ac.getCommand());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetPowerToggle) {
+  IRWhirlpoolAc ac(0);
+  ac.setCommand(0);
+
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+
+  // Known state with a power toggle in it.
+  uint8_t state[21] = {0x83, 0x06, 0x07, 0x82, 0x00, 0x00, 0x93,
+                       0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12,
+                       0x00, 0x01, 0x00, 0x00, 0x08, 0x00, 0x09};
+  ac.setRaw(state);
+  EXPECT_TRUE(ac.getPowerToggle());
 }
