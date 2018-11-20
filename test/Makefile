@@ -98,7 +98,8 @@ PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_Trotec.h \
 		$(USER_DIR)/ir_Fujitsu.h \
 		$(USER_DIR)/ir_LG.h \
-		$(USER_DIR)/ir_Panasonic.h
+		$(USER_DIR)/ir_Panasonic.h \
+		$(USER_DIR)/ir_Whirlpool.h
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
              $(PROTOCOLS) gtest_main.a
