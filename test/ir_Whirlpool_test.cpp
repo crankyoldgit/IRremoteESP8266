@@ -552,3 +552,33 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetSuper) {
   ac.setRaw(state);
   EXPECT_TRUE(ac.getSuper());
 }
+
+// Build a known good message from scratch.
+TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
+  // Real example captured from a remote. (ref: RealTimerExample)
+  uint8_t expectedState[kWhirlpoolAcStateLength] = {
+      0x83, 0x06, 0x00, 0x73, 0x00, 0x00, 0x87, 0xA3, 0x08, 0x85, 0x07,
+      0x28, 0x00, 0xF5, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x05};
+  IRWhirlpoolAc ac(0);
+  ac.setModel(DG11J13A);
+  ac.setTemp(25);
+  ac.setPowerToggle(false);
+  ac.setMode(kWhirlpoolAcDry);
+  ac.setFan(kWhirlpoolAcFanAuto);
+  ac.setSwing(false);
+  ac.setLight(true);
+  ac.setClock(7 * 60 + 35);
+  ac.setOnTimer(7 * 60 + 40);
+  ac.setOffTimer(8 * 60 + 5);
+  ac.enableOffTimer(true);
+  ac.setSleep(false);
+  ac.setSuper(false);
+  ac.enableOnTimer(true);
+
+  EXPECT_EQ(
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
+      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
+      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
+      ac.toString());
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);
+}

@@ -60,7 +60,6 @@ const uint8_t kWhirlpoolAcTimerEnableMask = 0b10000000;
 const uint8_t kWhirlpoolAcClockPos = 6;
 const uint8_t kWhirlpoolAcOffTimerPos = 8;
 const uint8_t kWhirlpoolAcOnTimerPos = 10;
-
 const uint8_t kWhirlpoolAcCommandPos = 15;
 const uint8_t kWhirlpoolAcCommandLight = 0x00;
 const uint8_t kWhirlpoolAcCommandPower = 0x01;
@@ -74,7 +73,6 @@ const uint8_t kWhirlpoolAcCommandIFeel = 0x0D;
 const uint8_t kWhirlpoolAcCommandFanSpeed = 0x11;
 const uint8_t kWhirlpoolAcCommand6thSense = 0x17;
 const uint8_t kWhirlpoolAcCommandOffTimer = 0x1D;
-
 const uint8_t kWhirlpoolAcAltTempMask = 0b00001000;
 const uint8_t kWhirlpoolAcAltTempPos = 18;
 

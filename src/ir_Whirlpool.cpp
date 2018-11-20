@@ -91,6 +91,7 @@ void IRWhirlpoolAc::stateReset() {
   for (uint8_t i = 2; i < kWhirlpoolAcStateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = 0x83;
   remote_state[1] = 0x06;
+  remote_state[6] = 0x80;
   _setTemp(kWhirlpoolAcAutoTemp);  // Default to a sane value.
 }
 
