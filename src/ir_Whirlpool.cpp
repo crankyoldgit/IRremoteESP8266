@@ -168,8 +168,8 @@ int8_t IRWhirlpoolAc::getTempOffset() {
 }
 
 // Set the temp. in deg C
-void IRWhirlpoolAc::_setTemp(const uint8_t temp) {
-  _desiredtemp = temp;
+void IRWhirlpoolAc::_setTemp(const uint8_t temp, const bool remember) {
+  if (remember) _desiredtemp = temp;
   int8_t offset = getTempOffset();  // Cache the min temp for the model.
   uint8_t newtemp = std::max((uint8_t)(kWhirlpoolAcMinTemp + offset), temp);
   newtemp = std::min((uint8_t)(kWhirlpoolAcMaxTemp + offset), newtemp);
@@ -191,10 +191,10 @@ uint8_t IRWhirlpoolAc::getTemp() {
 }
 
 void IRWhirlpoolAc::setMode(const uint8_t mode) {
-  setCommand(kWhirlpoolAcCommandMode);
   switch (mode) {
     case kWhirlpoolAcAuto:
-      setCommand(kWhirlpoolAcCommand6thSense);
+      setFan(kWhirlpoolAcFanAuto);
+      _setTemp(kWhirlpoolAcAutoTemp, false);
       // FALL THRU
     case kWhirlpoolAcHeat:
     case kWhirlpoolAcCool:
@@ -202,8 +202,12 @@ void IRWhirlpoolAc::setMode(const uint8_t mode) {
     case kWhirlpoolAcFan:
       remote_state[kWhirlpoolAcModePos] &= ~kWhirlpoolAcModeMask;
       remote_state[kWhirlpoolAcModePos] |= mode;
+      setCommand(kWhirlpoolAcCommandMode);
       break;
+    default:
+      return;
   }
+  if (mode == kWhirlpoolAcAuto) setCommand(kWhirlpoolAcCommand6thSense);
 }
 
 uint8_t IRWhirlpoolAc::getMode() {

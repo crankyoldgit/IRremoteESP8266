@@ -42,7 +42,7 @@ const uint8_t kWhirlpoolAcFanMask = 0b00000011;
 const uint8_t kWhirlpoolAcFanPos = 2;
 const uint8_t kWhirlpoolAcMinTemp = 18;     // 18C (DG11J1-3A), 16C (DG11J1-91)
 const uint8_t kWhirlpoolAcMaxTemp = 32;     // 32C (DG11J1-3A), 30C (DG11J1-91)
-const uint8_t kWhirlpoolAcAutoTemp = 25;    // 25C
+const uint8_t kWhirlpoolAcAutoTemp = 23;    // 23C
 const uint8_t kWhirlpoolAcTempMask = 0b11110000;
 const uint8_t kWhirlpoolAcTempPos = 3;
 const uint8_t kWhirlpoolAcSwing1Mask = 0b10000000;
@@ -141,7 +141,7 @@ class IRWhirlpoolAc {
   void setTime(const uint16_t pos, const uint16_t minspastmidnight);
   bool isTimerEnabled(const uint16_t pos);
   void enableTimer(const uint16_t pos, const bool state);
-  void _setTemp(const uint8_t temp);
+  void _setTemp(const uint8_t temp, const bool remember = true);
   int8_t getTempOffset();
 #ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);
