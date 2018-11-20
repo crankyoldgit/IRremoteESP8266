@@ -70,7 +70,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
-      "Off Timer: Off, Command: 2 (TEMP)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -94,7 +94,7 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
       "Fan: 0 (AUTO), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
-      "Off Timer: Off, Command: 7 (SWING)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 7 (SWING)",
       ac.toString());
 }
 
@@ -149,7 +149,7 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
-      "Off Timer: 08:05, Command: 5 (ONTIMER)",
+      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
       ac.toString());
 }
 
@@ -207,7 +207,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
       "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
-      "Off Timer: Off, Command: 2 (TEMP)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
       ac.toString());
 }
 
@@ -475,4 +475,80 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
   EXPECT_EQ(DG11J191, ac.getModel());
   ac.setRaw(state_2);
   EXPECT_EQ(DG11J13A, ac.getModel());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetSleep) {
+  IRWhirlpoolAc ac(0);
+  ac.setFan(kWhirlpoolAcFanAuto);
+  ac.setCommand(0);
+
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  EXPECT_EQ(kWhirlpoolAcCommandSleep, ac.getCommand());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_EQ(kWhirlpoolAcCommandSleep, ac.getCommand());
+  EXPECT_EQ(kWhirlpoolAcFanLow, ac.getFan());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+
+  // Known state with sleep mode in it.
+  uint8_t state[21] = {0x83, 0x06, 0x0B, 0x73, 0x00, 0x00, 0x90,
+                       0x9E, 0x00, 0xA0, 0x17, 0x3A, 0x00, 0xFB,
+                       0x00, 0x03, 0x00, 0x00, 0x08, 0x00, 0x0B};
+  ac.setRaw(state);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestIRWhirlpoolAcClass, SetAndGetSuper) {
+  IRWhirlpoolAc ac(0);
+  ac.setFan(kWhirlpoolAcFanAuto);
+  ac.setMode(kWhirlpoolAcDry);
+  ac.setCommand(0);
+
+  ac.setSuper(false);
+  EXPECT_FALSE(ac.getSuper());
+  EXPECT_EQ(kWhirlpoolAcCommandSuper, ac.getCommand());
+  ac.setSuper(true);
+  EXPECT_TRUE(ac.getSuper());
+  EXPECT_EQ(kWhirlpoolAcCommandSuper, ac.getCommand());
+  EXPECT_EQ(kWhirlpoolAcFanHigh, ac.getFan());
+  EXPECT_EQ(kWhirlpoolAcCool, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcMinTemp, ac.getTemp());
+
+  ac.setSuper(false);
+  EXPECT_FALSE(ac.getSuper());
+  EXPECT_EQ(kWhirlpoolAcFanHigh, ac.getFan());
+  EXPECT_EQ(kWhirlpoolAcCool, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcMinTemp, ac.getTemp());
+
+  // When in heat mode, it should stay in heat mode.
+  ac.setFan(kWhirlpoolAcFanAuto);
+  ac.setMode(kWhirlpoolAcHeat);
+  ac.setSuper(true);
+  EXPECT_TRUE(ac.getSuper());
+  EXPECT_EQ(kWhirlpoolAcCommandSuper, ac.getCommand());
+  EXPECT_EQ(kWhirlpoolAcFanHigh, ac.getFan());
+  EXPECT_EQ(kWhirlpoolAcHeat, ac.getMode());
+  EXPECT_EQ(kWhirlpoolAcMaxTemp, ac.getTemp());
+
+  // Changing mode/temp/fan/power should cancel super,
+  ac.setMode(kWhirlpoolAcCool);
+  EXPECT_FALSE(ac.getSuper());
+  ac.setSuper(true);
+  ac.setTemp(25);
+  EXPECT_FALSE(ac.getSuper());
+  ac.setSuper(true);
+  ac.setFan(kWhirlpoolAcFanMedium);
+  EXPECT_FALSE(ac.getSuper());
+  ac.setSuper(true);
+  ac.setPowerToggle(true);
+  EXPECT_FALSE(ac.getSuper());
+
+  // Known state with Super mode in it.
+  uint8_t state[21] = {0x83, 0x06, 0x01, 0x02, 0x00, 0x90, 0x90,
+                       0x9F, 0x00, 0xA0, 0x17, 0x3A, 0x00, 0x11,
+                       0x00, 0x04, 0x00, 0x00, 0x08, 0x00, 0x0C};
+  ac.setRaw(state);
+  EXPECT_TRUE(ac.getSuper());
 }

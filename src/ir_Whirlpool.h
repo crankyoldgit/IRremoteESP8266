@@ -49,6 +49,11 @@ const uint8_t kWhirlpoolAcSwing1Mask = 0b10000000;
 const uint8_t kWhirlpoolAcSwing2Mask = 0b01000000;
 const uint8_t kWhirlpoolAcLightMask = 0b00100000;
 const uint8_t kWhirlpoolAcPowerToggleMask = 0b00000100;
+const uint8_t kWhirlpoolAcPowerTogglePos = 2;
+const uint8_t kWhirlpoolAcSleepMask = 0b00001000;
+const uint8_t kWhirlpoolAcSleepPos = 2;
+const uint8_t kWhirlpoolAcSuperMask = 0b10010000;
+const uint8_t kWhirlpoolAcSuperPos = 5;
 const uint8_t kWhirlpoolAcHourMask = 0b00011111;
 const uint8_t kWhirlpoolAcMinuteMask = 0b00111111;
 const uint8_t kWhirlpoolAcTimerEnableMask = 0b10000000;
@@ -93,6 +98,10 @@ class IRWhirlpoolAc {
   void off();
   void setPowerToggle(const bool on);
   bool getPowerToggle();
+  void setSleep(const bool on);
+  bool getSleep();
+  void setSuper(const bool on);
+  bool getSuper();
   void setTemp(const uint8_t temp);
   uint8_t getTemp();
   void setFan(const uint8_t speed);
@@ -142,6 +151,7 @@ class IRWhirlpoolAc {
   bool isTimerEnabled(const uint16_t pos);
   void enableTimer(const uint16_t pos, const bool state);
   void _setTemp(const uint8_t temp, const bool remember = true);
+  void _setMode(const uint8_t mode);
   int8_t getTempOffset();
 #ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);

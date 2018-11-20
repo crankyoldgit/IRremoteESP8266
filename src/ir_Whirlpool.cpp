@@ -7,6 +7,12 @@
 // * DG11J1-3A / DG11J1-04
 // * DG11J1-91
 //
+// Note: Smart, iFeel, AroundU, PowerSave, & Silent modes are unsupported.
+//       Advanced 6thSense, Dehumidify, & Sleep modes are not supported.
+//       FYI:
+//         Dim == !Light
+//         Jet == Super == Turbo
+//
 
 #include "ir_Whirlpool.h"
 #include <algorithm>
@@ -181,6 +187,7 @@ void IRWhirlpoolAc::_setTemp(const uint8_t temp, const bool remember) {
 // Set the temp. in deg C
 void IRWhirlpoolAc::setTemp(const uint8_t temp) {
   _setTemp(temp);
+  setSuper(false);  // Changing temp cancels Super/Jet mode.
   setCommand(kWhirlpoolAcCommandTemp);
 }
 
@@ -190,11 +197,12 @@ uint8_t IRWhirlpoolAc::getTemp() {
          + kWhirlpoolAcMinTemp + getTempOffset();
 }
 
-void IRWhirlpoolAc::setMode(const uint8_t mode) {
+void IRWhirlpoolAc::_setMode(const uint8_t mode) {
   switch (mode) {
     case kWhirlpoolAcAuto:
       setFan(kWhirlpoolAcFanAuto);
       _setTemp(kWhirlpoolAcAutoTemp, false);
+      setSleep(false);  // Cancel sleep mode when in auto/6thsense mode.
       // FALL THRU
     case kWhirlpoolAcHeat:
     case kWhirlpoolAcCool:
@@ -210,6 +218,11 @@ void IRWhirlpoolAc::setMode(const uint8_t mode) {
   if (mode == kWhirlpoolAcAuto) setCommand(kWhirlpoolAcCommand6thSense);
 }
 
+void IRWhirlpoolAc::setMode(const uint8_t mode) {
+    setSuper(false);  // Changing mode cancels Super/Jet mode.
+    _setMode(mode);
+}
+
 uint8_t IRWhirlpoolAc::getMode() {
   return remote_state[kWhirlpoolAcModePos] & kWhirlpoolAcModeMask;
 }
@@ -222,6 +235,7 @@ void IRWhirlpoolAc::setFan(const uint8_t speed) {
     case kWhirlpoolAcFanHigh:
       remote_state[kWhirlpoolAcFanPos] =
           (remote_state[kWhirlpoolAcFanPos] & ~kWhirlpoolAcFanMask) | speed;
+      setSuper(false);  // Changing fan speed cancels Super/Jet mode.
       setCommand(kWhirlpoolAcCommandFanSpeed);
       break;
   }
@@ -324,18 +338,58 @@ void IRWhirlpoolAc::enableOnTimer(const bool state) {
 
 void IRWhirlpoolAc::setPowerToggle(const bool on) {
   if (on)
-    remote_state[2] |= kWhirlpoolAcPowerToggleMask;
+    remote_state[kWhirlpoolAcPowerTogglePos] |= kWhirlpoolAcPowerToggleMask;
   else
-    remote_state[2] &= ~kWhirlpoolAcPowerToggleMask;
+    remote_state[kWhirlpoolAcPowerTogglePos] &= ~kWhirlpoolAcPowerToggleMask;
+  setSuper(false);  // Changing power cancels Super/Jet mode.
   setCommand(kWhirlpoolAcCommandPower);
 }
 
 bool IRWhirlpoolAc::getPowerToggle() {
-  return remote_state[2] & kWhirlpoolAcPowerToggleMask;
+  return remote_state[kWhirlpoolAcPowerTogglePos] & kWhirlpoolAcPowerToggleMask;
 }
 
 uint8_t IRWhirlpoolAc::getCommand() {
   return remote_state[kWhirlpoolAcCommandPos];
+}
+
+void IRWhirlpoolAc::setSleep(const bool on) {
+  if (on) {
+    remote_state[kWhirlpoolAcSleepPos] |= kWhirlpoolAcSleepMask;
+    setFan(kWhirlpoolAcFanLow);
+  } else {
+    remote_state[kWhirlpoolAcSleepPos] &= ~kWhirlpoolAcSleepMask;
+  }
+  setCommand(kWhirlpoolAcCommandSleep);
+}
+
+bool IRWhirlpoolAc::getSleep() {
+  return remote_state[kWhirlpoolAcSleepPos] & kWhirlpoolAcSleepMask;
+}
+
+// AKA Jet/Turbo mode.
+void IRWhirlpoolAc::setSuper(const bool on) {
+  if (on) {
+    setFan(kWhirlpoolAcFanHigh);
+    switch (getMode()) {
+      case kWhirlpoolAcHeat:
+        setTemp(kWhirlpoolAcMaxTemp + getTempOffset());
+        break;
+      case kWhirlpoolAcCool:
+      default:
+        setTemp(kWhirlpoolAcMinTemp + getTempOffset());
+        setMode(kWhirlpoolAcCool);
+        break;
+    }
+    remote_state[kWhirlpoolAcSuperPos] |= kWhirlpoolAcSuperMask;
+  } else {
+    remote_state[kWhirlpoolAcSuperPos] &= ~kWhirlpoolAcSuperMask;
+  }
+  setCommand(kWhirlpoolAcCommandSuper);
+}
+
+bool IRWhirlpoolAc::getSuper() {
+  return remote_state[kWhirlpoolAcSuperPos] & kWhirlpoolAcSuperMask;
 }
 
 void IRWhirlpoolAc::setCommand(const uint8_t code) {
@@ -444,6 +498,16 @@ std::string IRWhirlpoolAc::toString() {
     result += timeToString(getOffTimer());
   else
     result += "Off";
+  result += ", Sleep: ";
+  if (getSleep())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Super: ";
+  if (getSuper())
+    result += "On";
+  else
+    result += "Off";
   result += ", Command: " + uint64ToString(getCommand());
   switch (getCommand()) {
     case kWhirlpoolAcCommandLight:
@@ -499,7 +563,7 @@ std::string IRWhirlpoolAc::toString() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: STABLE / Working as intended.
 //
 //
 // Ref:
