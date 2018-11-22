@@ -216,10 +216,10 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
 #endif  // MQTT_ENABLE
 
-#if (FIRMWARE_OTA_ENABLE || HTML_PASSWORD_ENABLE)
+#if (FIRMWARE_OTA_PASSWORD_ENABLE || HTML_PASSWORD_ENABLE)
 const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
 const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME
-#endif  // (FIRMWARE_OTA_ENABLE || HTML_PASSWORD_ENABLE)
+#endif  // (FIRMWARE_OTA_PASSWORD_ENABLE || HTML_PASSWORD_ENABLE)
 
 // HTML arguments we will parse for IR code information.
 #define argType "type"
@@ -1159,7 +1159,6 @@ void setup(void) {
       yield();
     });
 #endif  // FIRMWARE_OTA_ENABLE
-
 
   // Set up an error page.
   server.onNotFound(handleNotFound);
