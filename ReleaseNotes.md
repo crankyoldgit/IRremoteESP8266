@@ -1,5 +1,18 @@
 # Release Notes
 
+## _v2.5.3 (20181123)_
+
+**[Features]**
+- Add deep support for the Hitachi 28-Byte A/C Protocol (#563)
+- Deep decoding for Whirlpool A/C (#572)
+- Improve security options for IRMQTTServer example. (#575)
+- Require a changed firmware password before upload. (#576)
+
+**[Misc]**
+- Add missing '}' in output of Auto analyse. (#562)
+- Make A/C example code a bit more simple. (#571)
+
+
 ## _v2.5.2 (20181021)_
 
 **[Bug Fixes]**
