@@ -133,8 +133,9 @@
  * You should NOT have or use this code or device exposed on an untrusted and/or
  * unprotected network.
  * If you allow access to OTA firmware updates, then a 'Bad Guy<tm>' could
- * potentally compromise your network. If you are sufficiently paranoid, you
- * SHOULD disable uploading firmware via OTA. (see 'FIRMWARE_OTA_ENABLE')
+ * potentially compromise your network. OTA updates are password protected by
+ * default. If you are sufficiently paranoid, you SHOULD disable uploading
+ * firmware via OTA. (see 'FIRMWARE_OTA')
  * You SHOULD also (re)set/change all usernames & passwords. (See `CHANGE_ME`s)
  * For extra bonus points: Use a separate untrusted SSID/vlan/network/ segment
  * for your IoT stuff, including this device.
@@ -146,13 +147,18 @@
  *   resources. I'm *NOT* claiming complete Copyright ownership of all the code.
  *   Likewise, feel free to borrow from this as much as you want.
  */
-
-// Change to 'false' if you don't want these features/functions.
+// ---------------- Start of User Configuration Section ------------------------
+// Change to 'true'/'false' if you do/don't want these features or functions.
+#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
+#define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
-#define FIRMWARE_OTA_ENABLE true  // Less secure if enabled.
 // 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
-#define FIRMWARE_OTA_PASSWORD_ENABLE true  // Protect OTA firmware updates.
+#define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
+                           // Less secure if enabled.
+                           // Note: Firmware OTA is also disabled until
+                           //       'kHtmlPassword' is changed from the default.
 #define HTML_PASSWORD_ENABLE false  // Protect access to the HTML interface.
+                                    // Note: OTA update is always passworded.
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -178,12 +184,12 @@
 
 // Configuration parameters
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
-#define IR_LED 4
+#define IR_LED 4  // <=- CHANGE_ME (optional)
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
 //
 // GPIO the IR RX module is connected to/controlled by. GPIO 14 = D5.
 // Comment this out to disable receiving/decoding IR messages entirely.
-#define IR_RX 14
+#define IR_RX 14  // <=- CHANGE_ME (optional)
 const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
@@ -192,7 +198,6 @@ const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 
 // We obtain our network config via DHCP by default but allow an easy way to
 // use a static IP config.
-#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
 #if USE_STATIC_IP
 const IPAddress kIPAddress = IPAddress(10, 0, 1, 78);
 const IPAddress kGateway = IPAddress(10, 0, 1, 1);
@@ -216,30 +221,27 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
 #endif  // MQTT_ENABLE
 
-#if (FIRMWARE_OTA_PASSWORD_ENABLE || HTML_PASSWORD_ENABLE)
 const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
-const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME
-#endif  // (FIRMWARE_OTA_PASSWORD_ENABLE || HTML_PASSWORD_ENABLE)
+const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME (required)
+// If you do not change 'kHtmlPassword', Firmware OTA updates will be blocked.
 
-// HTML arguments we will parse for IR code information.
-#define argType "type"
-#define argData "code"
-#define argBits "bits"
-#define argRepeat "repeats"
+// This is what the default password is. People should NEVER use this password.
+// Firmware uploads are blocked until the user changes kHtmlPassword to a
+// different value than this.
+const char* kDefaultPassword = "esp8266";  // Do NOT change this.
+
 // Let's use a larger than normal buffer so we can handle AirCon remote codes.
 const uint16_t kCaptureBufferSize = 1024;
 #if DECODE_AC
 // Some A/C units have gaps in their protocols of ~40ms. e.g. Kelvinator
 // A value this large may swallow repeats of some protocols
-const uint8_t kCaptureTimeout = 50;
+const uint8_t kCaptureTimeout = 50;  // Milliseconds
 #else  // DECODE_AC
 // Suits most messages, while not swallowing many repeats.
-const uint8_t kCaptureTimeout = 15;
+const uint8_t kCaptureTimeout = 15;  // Milliseconds
 #endif  // DECODE_AC
-// Ignore unknown messages with <10 pulses
-const uint16_t kMinUnknownSize = 20;
-
-#define _MY_VERSION_ "v0.8.0"
+// Ignore unknown messages with <10 pulses (see also REPORT_UNKNOWNS)
+const uint16_t kMinUnknownSize = 2 * 10;
 
 // Disable debug output if any of the IR pins are on the TX (D1) pin.
 #if (IR_LED != 1 && IR_RX != 1)
@@ -252,7 +254,16 @@ const uint16_t kMinUnknownSize = 20;
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
+// ----------------- End of User Configuration Section -------------------------
+
 // Globals
+#define _MY_VERSION_ "v0.8.1"
+// HTML arguments we will parse for IR code information.
+#define argType "type"
+#define argData "code"
+#define argBits "bits"
+#define argRepeat "repeats"
+
 ESP8266WebServer server(kHttpPort);
 IRsend irsend = IRsend(IR_LED);
 #ifdef IR_RX
@@ -295,7 +306,7 @@ String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 
 // Debug messages get sent to the serial port.
 void debug(String str) {
-#ifdef DEBUG
+#if DEBUG
   uint32_t now = millis();
   Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
 #endif  // DEBUG
@@ -353,7 +364,7 @@ void handleRoot() {
     return server.requestAuthentication();
   }
 #endif
-  server.send(200, "text/html",
+  String html =
     "<html><head><title>IR MQTT server</title></head>"
     "<body>"
     "<center><h1>ESP8266 IR MQTT Server</h1></center>"
@@ -547,19 +558,26 @@ void handleRoot() {
           " value='190B8050000000E0190B8070000010F0'>"
       " <input type='submit' value='Send A/C State'>"
     "</form>"
-    "<br><hr>"
-#if FIRMWARE_OTA_ENABLE
-    "<h3>Update IR Server firmware</h3><p>"
-    "<b><mark>Warning:</mark></b><br> "
-    "<i>Updating your firmware may screw up your access to the device. "
-    "If you are going to use this, know what you are doing first "
-    "(and you probably do).</i><br>"
-    "<form method='POST' action='/update' enctype='multipart/form-data'>"
-      "Firmware to upload: <input type='file' name='update'>"
-      "<input type='submit' value='Update'>"
-    "</form>"
-#endif  // FIRMWARE_OTA_ENABLE
-    "</body></html>");
+    "<br>";
+#if FIRMWARE_OTA
+  html += "<hr><h3>Update IR Server firmware</h3><p>"
+          "<b><mark>Warning:</mark></b><br> ";
+  if (!strcmp(kHtmlPassword, kDefaultPassword))  // Deny if password unchanged
+    html += "<i>OTA firmware is disabled until you change the password. "
+            "(See 'kHtmlPassword' in the source code.)</i><br>";
+  else  // default password has been changed, so allow it.
+    html +=
+        "<i>Updating your firmware may screw up your access to the device. "
+        "If you are going to use this, know what you are doing first "
+        "(and you probably do).</i><br>"
+        "<form method='POST' action='/update' enctype='multipart/form-data'>"
+          "Firmware to upload: <input type='file' name='update'>"
+          "<input type='submit' value='Update'>"
+        "</form>";
+
+#endif  // FIRMWARE_OTA
+  html += "</body></html>";
+  server.send(200, "text/html", html);
 }
 
 // Reset web page
@@ -1092,14 +1110,14 @@ void setup(void) {
   irrecv.enableIRIn();  // Start the receiver
 #endif  // IR_RX
 
-  #ifdef DEBUG
+#if DEBUG
   // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
   Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
   while (!Serial)  // Wait for the serial connection to be establised.
     delay(50);
   Serial.println();
   debug("IRMQTTServer " _MY_VERSION_" has booted.");
-  #endif  // DEBUG
+#endif  // DEBUG
 
   setup_wifi();
 
@@ -1119,46 +1137,47 @@ void setup(void) {
   // Setup a reset page to cause WiFiManager information to be reset.
   server.on("/reset", handleReset);
 
-#if FIRMWARE_OTA_ENABLE
+#if FIRMWARE_OTA
   // Setup the URL to allow Over-The-Air (OTA) firmware updates.
-  server.on("/update", HTTP_POST, [](){
-      server.sendHeader("Connection", "close");
-      server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
-      ESP.restart();
-    }, [](){
-#if (HTML_PASSWORD_ENABLE || FIRMWARE_OTA_PASSWORD_ENABLE)
-      if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
-        debug("Basic HTTP authentication failure for /update.");
-        return server.requestAuthentication();
-      }
-#endif  // (HTML_PASSWORD_ENABLE || FIRMWARE_OTA_PASSWORD_ENABLE)
-      HTTPUpload& upload = server.upload();
-      if (upload.status == UPLOAD_FILE_START) {
-        WiFiUDP::stopAll();
-        debug("Update: " + upload.filename);
-        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
-            0xFFFFF000;
-        if (!Update.begin(maxSketchSpace)) {  // start with max available size
-#ifdef DEBUG
-          Update.printError(Serial);
+  if (strcmp(kHtmlPassword, kDefaultPassword)) {  // Allow if password changed.
+    server.on("/update", HTTP_POST, [](){
+        server.sendHeader("Connection", "close");
+        server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+        ESP.restart();
+      }, [](){
+        if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+          debug("Basic HTTP authentication failure for /update.");
+          return server.requestAuthentication();
+        }
+        HTTPUpload& upload = server.upload();
+        if (upload.status == UPLOAD_FILE_START) {
+          WiFiUDP::stopAll();
+          debug("Update: " + upload.filename);
+          uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
+              0xFFFFF000;
+          if (!Update.begin(maxSketchSpace)) {  // start with max available size
+#if DEBUG
+            Update.printError(Serial);
 #endif  // DEBUG
-        }
-      } else if (upload.status == UPLOAD_FILE_WRITE) {
-        if (Update.write(upload.buf, upload.currentSize) !=
-            upload.currentSize) {
-#ifdef DEBUG
-          Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_WRITE) {
+          if (Update.write(upload.buf, upload.currentSize) !=
+              upload.currentSize) {
+#if DEBUG
+            Update.printError(Serial);
 #endif  // DEBUG
+          }
+        } else if (upload.status == UPLOAD_FILE_END) {
+          // true to set the size to the current progress
+          if (Update.end(true)) {
+            debug("Update Success: " + (String) upload.totalSize +
+                  "\nRebooting...");
+          }
         }
-      } else if (upload.status == UPLOAD_FILE_END) {
-        if (Update.end(true)) {  // true to set the size to the current progress
-          debug("Update Success: " + (String) upload.totalSize +
-                "\nRebooting...");
-        }
-      }
-      yield();
-    });
-#endif  // FIRMWARE_OTA_ENABLE
+        yield();
+      });
+    }
+#endif  // FIRMWARE_OTA
 
   // Set up an error page.
   server.onNotFound(handleNotFound);
@@ -1247,7 +1266,11 @@ void loop(void) {
 #endif  // MQTT_ENABLE
 #ifdef IR_RX
   // Check if an IR code has been received via the IR RX module.
+#if REPORT_UNKNOWNS
   if (irrecv.decode(&capture)) {
+#else
+  if (irrecv.decode(&capture) && capture.decode_type != -1) {
+#endif  // REPORT_UNKNOWNS
     lastIrReceivedTime = millis();
     lastIrReceived = String(capture.decode_type) + "," +
         resultToHexidecimal(&capture);
