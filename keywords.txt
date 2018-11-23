@@ -27,6 +27,7 @@ IRFujitsuAC	KEYWORD1
 IRGreeAC	KEYWORD1
 IRHaierAC	KEYWORD1
 IRHaierACYRW02	KEYWORD1
+IRHitachiAc	KEYWORD1
 IRKelvinatorAC	KEYWORD1
 IRMideaAC	KEYWORD1
 IRMitsubishiAC	KEYWORD1
@@ -34,6 +35,7 @@ IRPanasonicAc	KEYWORD1
 IRSamsungAc	KEYWORD1
 IRToshibaAC	KEYWORD1
 IRTrotecESP	KEYWORD1
+IRWhirlpoolAc	KEYWORD1
 IRrecv	KEYWORD1
 IRsend	KEYWORD1
 IRtimer	KEYWORD1
@@ -46,6 +48,8 @@ match_result_t	KEYWORD1
 #######################################
 
 _delayMicroseconds	KEYWORD2
+_setMode	KEYWORD2
+_setTemp	KEYWORD2
 add	KEYWORD2
 addbit	KEYWORD2
 begin	KEYWORD2
@@ -117,6 +121,7 @@ enableIRIn	KEYWORD2
 enableIROut	KEYWORD2
 enableOffTimer	KEYWORD2
 enableOnTimer	KEYWORD2
+enableTimer	KEYWORD2
 encodeJVC	KEYWORD2
 encodeLG	KEYWORD2
 encodeMagiQuest	KEYWORD2
@@ -166,6 +171,7 @@ getOnTime	KEYWORD2
 getOnTimer	KEYWORD2
 getOnTimerEnabled	KEYWORD2
 getPower	KEYWORD2
+getPowerToggle	KEYWORD2
 getPowerful	KEYWORD2
 getQuiet	KEYWORD2
 getRClevel	KEYWORD2
@@ -177,12 +183,14 @@ getSpeed	KEYWORD2
 getStartClock	KEYWORD2
 getStateLength	KEYWORD2
 getStopClock	KEYWORD2
+getSuper	KEYWORD2
 getSwing	KEYWORD2
 getSwingHorizontal	KEYWORD2
 getSwingVertical	KEYWORD2
 getSwingVerticalAuto	KEYWORD2
 getSwingVerticalPosition	KEYWORD2
 getTemp	KEYWORD2
+getTempOffset	KEYWORD2
 getTempRaw	KEYWORD2
 getTime	KEYWORD2
 getTimer	KEYWORD2
@@ -195,6 +203,7 @@ hasACState	KEYWORD2
 invertBits	KEYWORD2
 isOffTimerEnabled	KEYWORD2
 isOnTimerEnabled	KEYWORD2
+isTimerEnabled	KEYWORD2
 ledOff	KEYWORD2
 ledOn	KEYWORD2
 mark	KEYWORD2
@@ -299,6 +308,7 @@ setNight	KEYWORD2
 setOffTimer	KEYWORD2
 setOnTimer	KEYWORD2
 setPower	KEYWORD2
+setPowerToggle	KEYWORD2
 setPowerful	KEYWORD2
 setQuiet	KEYWORD2
 setRaw	KEYWORD2
@@ -310,6 +320,7 @@ setSleep	KEYWORD2
 setSpeed	KEYWORD2
 setStartClock	KEYWORD2
 setStopClock	KEYWORD2
+setSuper	KEYWORD2
 setSwing	KEYWORD2
 setSwingHorizontal	KEYWORD2
 setSwingVertical	KEYWORD2
@@ -337,6 +348,7 @@ toggleRC6	KEYWORD2
 typeToString	KEYWORD2
 uint64ToString	KEYWORD2
 validChecksum	KEYWORD2
+xorBytes	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
@@ -441,6 +453,8 @@ DENON	LITERAL1
 DENON_48_BITS	LITERAL1
 DENON_BITS	LITERAL1
 DENON_LEGACY_BITS	LITERAL1
+DG11J13A	LITERAL1
+DG11J191	LITERAL1
 DISH	LITERAL1
 DISH_BITS	LITERAL1
 ELECTRA_AC	LITERAL1
@@ -1077,11 +1091,22 @@ kHitachiAc1HdrSpace	LITERAL1
 kHitachiAc1StateLength	LITERAL1
 kHitachiAc2Bits	LITERAL1
 kHitachiAc2StateLength	LITERAL1
+kHitachiAcAuto	LITERAL1
+kHitachiAcAutoTemp	LITERAL1
 kHitachiAcBitMark	LITERAL1
 kHitachiAcBits	LITERAL1
+kHitachiAcCool	LITERAL1
+kHitachiAcDry	LITERAL1
+kHitachiAcFan	LITERAL1
+kHitachiAcFanAuto	LITERAL1
+kHitachiAcFanHigh	LITERAL1
+kHitachiAcFanLow	LITERAL1
 kHitachiAcHdrMark	LITERAL1
 kHitachiAcHdrSpace	LITERAL1
+kHitachiAcHeat	LITERAL1
+kHitachiAcMaxTemp	LITERAL1
 kHitachiAcMinGap	LITERAL1
+kHitachiAcMinTemp	LITERAL1
 kHitachiAcOneSpace	LITERAL1
 kHitachiAcStateLength	LITERAL1
 kHitachiAcZeroSpace	LITERAL1
@@ -1617,15 +1642,65 @@ kTrotecTimerOn	LITERAL1
 kTrotecZeroMark	LITERAL1
 kTrotecZeroSpace	LITERAL1
 kUnknownThreshold	LITERAL1
+kWhirlpoolAcAltTempMask	LITERAL1
+kWhirlpoolAcAltTempPos	LITERAL1
+kWhirlpoolAcAuto	LITERAL1
+kWhirlpoolAcAutoTemp	LITERAL1
 kWhirlpoolAcBitMark	LITERAL1
 kWhirlpoolAcBits	LITERAL1
+kWhirlpoolAcChecksumByte1	LITERAL1
+kWhirlpoolAcChecksumByte2	LITERAL1
+kWhirlpoolAcClockPos	LITERAL1
+kWhirlpoolAcCommand6thSense	LITERAL1
+kWhirlpoolAcCommandFanSpeed	LITERAL1
+kWhirlpoolAcCommandIFeel	LITERAL1
+kWhirlpoolAcCommandLight	LITERAL1
+kWhirlpoolAcCommandMode	LITERAL1
+kWhirlpoolAcCommandOffTimer	LITERAL1
+kWhirlpoolAcCommandOnTimer	LITERAL1
+kWhirlpoolAcCommandPos	LITERAL1
+kWhirlpoolAcCommandPower	LITERAL1
+kWhirlpoolAcCommandSleep	LITERAL1
+kWhirlpoolAcCommandSuper	LITERAL1
+kWhirlpoolAcCommandSwing	LITERAL1
+kWhirlpoolAcCommandTemp	LITERAL1
+kWhirlpoolAcCool	LITERAL1
+kWhirlpoolAcDry	LITERAL1
+kWhirlpoolAcFan	LITERAL1
+kWhirlpoolAcFanAuto	LITERAL1
+kWhirlpoolAcFanHigh	LITERAL1
+kWhirlpoolAcFanLow	LITERAL1
+kWhirlpoolAcFanMask	LITERAL1
+kWhirlpoolAcFanMedium	LITERAL1
+kWhirlpoolAcFanPos	LITERAL1
 kWhirlpoolAcGap	LITERAL1
 kWhirlpoolAcHdrMark	LITERAL1
 kWhirlpoolAcHdrSpace	LITERAL1
+kWhirlpoolAcHeat	LITERAL1
+kWhirlpoolAcHourMask	LITERAL1
+kWhirlpoolAcLightMask	LITERAL1
+kWhirlpoolAcMaxTemp	LITERAL1
 kWhirlpoolAcMinGap	LITERAL1
+kWhirlpoolAcMinTemp	LITERAL1
+kWhirlpoolAcMinuteMask	LITERAL1
+kWhirlpoolAcModeMask	LITERAL1
+kWhirlpoolAcModePos	LITERAL1
+kWhirlpoolAcOffTimerPos	LITERAL1
+kWhirlpoolAcOnTimerPos	LITERAL1
 kWhirlpoolAcOneSpace	LITERAL1
+kWhirlpoolAcPowerToggleMask	LITERAL1
+kWhirlpoolAcPowerTogglePos	LITERAL1
 kWhirlpoolAcSections	LITERAL1
+kWhirlpoolAcSleepMask	LITERAL1
+kWhirlpoolAcSleepPos	LITERAL1
 kWhirlpoolAcStateLength	LITERAL1
+kWhirlpoolAcSuperMask	LITERAL1
+kWhirlpoolAcSuperPos	LITERAL1
+kWhirlpoolAcSwing1Mask	LITERAL1
+kWhirlpoolAcSwing2Mask	LITERAL1
+kWhirlpoolAcTempMask	LITERAL1
+kWhirlpoolAcTempPos	LITERAL1
+kWhirlpoolAcTimerEnableMask	LITERAL1
 kWhirlpoolAcZeroSpace	LITERAL1
 kWhynterBitMark	LITERAL1
 kWhynterBitMarkTicks	LITERAL1
