@@ -42,6 +42,7 @@ const uint8_t kCoolixFanMin = 0b100;
 const uint8_t kCoolixFanMed = 0b010;
 const uint8_t kCoolixFanMax = 0b001;
 const uint8_t kCoolixFanAuto = 0b101;
+const uint8_t kCoolixFanAuto0 = 0b000;
 const uint8_t kCoolixFanZoneFollow = 0b110;
 const uint8_t kCoolixFanFixed = 0b111;
 const uint32_t kCoolixFanMask = 0b000000001110000000000000;  // 0x00E000

@@ -235,6 +235,7 @@ void IRCoolixAC::setFan(const uint8_t speed) {
     case kCoolixFanMed:
     case kCoolixFanMax:
     case kCoolixFanAuto:
+    case kCoolixFanAuto0:
     case kCoolixFanZoneFollow:
     case kCoolixFanFixed:
       break;
@@ -264,6 +265,9 @@ std::string IRCoolixAC::toString() {
   switch (getFan()) {
     case kCoolixFanAuto:
       result += " (AUTO)";
+      break;
+    case kCoolixFanAuto0:
+      result += " (AUTO0)";
       break;
     case kCoolixFanMax:
       result += " (MAX)";
