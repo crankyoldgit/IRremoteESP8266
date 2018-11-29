@@ -268,9 +268,9 @@ void IRPanasonicAc::fixChecksum(const uint16_t length) {
 }
 
 #if SEND_PANASONIC_AC
-void IRPanasonicAc::send() {
+void IRPanasonicAc::send(const uint16_t repeat) {
   fixChecksum();
-  _irsend.sendPanasonicAC(remote_state);
+  _irsend.sendPanasonicAC(remote_state, kPanasonicAcStateLength, repeat);
 }
 #endif  // SEND_PANASONIC_AC
 

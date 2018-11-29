@@ -67,7 +67,7 @@ class IRMideaAC {
 
   void stateReset();
 #if SEND_MIDEA
-  void send();
+  void send(const uint16_t repeat = kMideaMinRepeat);
 #endif  // SEND_MIDEA
   void begin();
   void on();

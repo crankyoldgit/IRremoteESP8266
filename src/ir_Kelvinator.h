@@ -130,7 +130,7 @@ class IRKelvinatorAC {
 
   void stateReset();
 #if SEND_KELVINATOR
-  void send();
+  void send(const uint16_t repeat = kKelvinatorDefaultRepeat);
 #endif  // SEND_KELVINATOR
   void begin();
   void on();

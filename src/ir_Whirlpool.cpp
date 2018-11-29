@@ -127,9 +127,9 @@ void IRWhirlpoolAc::checksum(uint16_t length) {
 }
 
 #if SEND_WHIRLPOOL_AC
-void IRWhirlpoolAc::send(const bool calcchecksum) {
+void IRWhirlpoolAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
-  _irsend.sendWhirlpoolAC(remote_state);
+  _irsend.sendWhirlpoolAC(remote_state, kWhirlpoolAcStateLength, repeat);
 }
 #endif  // SEND_WHIRLPOOL_AC
 

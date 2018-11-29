@@ -81,7 +81,7 @@ class IRPanasonicAc {
 
   void stateReset();
 #if SEND_PANASONIC
-  void send();
+  void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif  // SEND_PANASONIC
   void begin();
   void on();

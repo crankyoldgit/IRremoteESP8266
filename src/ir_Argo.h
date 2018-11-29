@@ -80,7 +80,7 @@ class IRArgoAC {
   explicit IRArgoAC(uint16_t pin);
 
 #if SEND_ARGO
-  void send();
+  void send(const uint16_t repeat = kArgoDefaultRepeat);
 #endif  // SEND_ARGO
   void begin();
   void on();

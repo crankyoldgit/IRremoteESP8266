@@ -453,9 +453,9 @@ void IRMitsubishiAC::begin() { _irsend.begin(); }
 
 #if SEND_MITSUBISHI_AC
 // Send the current desired state to the IR LED.
-void IRMitsubishiAC::send() {
+void IRMitsubishiAC::send(const uint16_t repeat) {
   checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMitsubishiAC(remote_state);
+  _irsend.sendMitsubishiAC(remote_state, kMitsubishiACStateLength, repeat);
 }
 #endif  // SEND_MITSUBISHI_AC
 

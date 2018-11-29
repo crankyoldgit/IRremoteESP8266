@@ -254,14 +254,14 @@ void IRSamsungAc::checksum(uint16_t length) {
 }
 
 #if SEND_SAMSUNG_AC
-void IRSamsungAc::send(const bool calcchecksum) {
+void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
-  _irsend.sendSamsungAC(remote_state);
+  _irsend.sendSamsungAC(remote_state, kSamsungAcStateLength, repeat);
 }
 #endif  // SEND_SAMSUNG_AC
 
 #if SEND_SAMSUNG_AC
-void IRSamsungAc::sendExtended(const bool calcchecksum) {
+void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
   uint8_t extended_state[kSamsungAcExtendedStateLength] = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xD2, 0x0F, 0x00,
@@ -272,7 +272,7 @@ void IRSamsungAc::sendExtended(const bool calcchecksum) {
   for (uint16_t i = kSamsungACSectionLength; i < kSamsungAcStateLength; i++)
     extended_state[i + kSamsungACSectionLength] = remote_state[i];
   // Send it.
-  _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength);
+  _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
 }
 #endif  // SEND_SAMSUNG_AC
 

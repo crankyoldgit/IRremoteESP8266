@@ -86,9 +86,9 @@ IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) { stateReset(); }
 void IRDaikinESP::begin() { _irsend.begin(); }
 
 #if SEND_DAIKIN
-void IRDaikinESP::send() {
+void IRDaikinESP::send(const uint16_t repeat) {
   checksum();
-  _irsend.sendDaikin(daikin);
+  _irsend.sendDaikin(daikin, kDaikinStateLength, repeat);
 }
 #endif  // SEND_DAIKIN
 

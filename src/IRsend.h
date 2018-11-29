@@ -95,7 +95,7 @@ class IRsend {
 #if SEND_SAMSUNG_AC
   void sendSamsungAC(unsigned char data[],
                      uint16_t nbytes = kSamsungAcStateLength,
-                     uint16_t repeat = kNoRepeat);
+                     uint16_t repeat = kSamsungAcDefaultRepeat);
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
@@ -166,7 +166,7 @@ class IRsend {
 #endif
 #if SEND_COOLIX
   void sendCOOLIX(uint64_t data, uint16_t nbits = kCoolixBits,
-                  uint16_t repeat = kNoRepeat);
+                  uint16_t repeat = kCoolixDefaultRepeat);
 #endif
 #if SEND_WHYNTER
   void sendWhynter(uint64_t data, uint16_t nbits = kWhynterBits,
@@ -195,11 +195,11 @@ class IRsend {
 #if SEND_KELVINATOR
   void sendKelvinator(unsigned char data[],
                       uint16_t nbytes = kKelvinatorStateLength,
-                      uint16_t repeat = kNoRepeat);
+                      uint16_t repeat = kKelvinatorDefaultRepeat);
 #endif
 #if SEND_DAIKIN
   void sendDaikin(unsigned char data[], uint16_t nbytes = kDaikinStateLength,
-                  uint16_t repeat = kNoRepeat);
+                  uint16_t repeat = kDaikinDefaultRepeat);
   void sendDaikinGapHeader();
 #endif
 #if SEND_AIWA_RC_T501
@@ -208,20 +208,20 @@ class IRsend {
 #endif
 #if SEND_GREE
   void sendGree(uint64_t data, uint16_t nbits = kGreeBits,
-                uint16_t repeat = kNoRepeat);
+                uint16_t repeat = kGreeDefaultRepeat);
   void sendGree(uint8_t data[], uint16_t nbytes = kGreeStateLength,
-                uint16_t repeat = kNoRepeat);
+                uint16_t repeat = kGreeDefaultRepeat);
 #endif
 #if SEND_PRONTO
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_ARGO
   void sendArgo(unsigned char data[], uint16_t nbytes = kArgoStateLength,
-                uint16_t repeat = kNoRepeat);
+                uint16_t repeat = kArgoDefaultRepeat);
 #endif
 #if SEND_TROTEC
   void sendTrotec(unsigned char data[], uint16_t nbytes = kTrotecStateLength,
-                  uint16_t repeat = kNoRepeat);
+                  uint16_t repeat = kTrotecDefaultRepeat);
 #endif
 #if SEND_NIKAI
   void sendNikai(uint64_t data, uint16_t nbits = kNikaiBits,
@@ -251,17 +251,17 @@ class IRsend {
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
   void sendHaierAC(unsigned char data[], uint16_t nbytes = kHaierACStateLength,
-                   uint16_t repeat = kNoRepeat);
+                   uint16_t repeat = kHaierAcDefaultRepeat);
 #endif
 #if SEND_HAIER_AC_YRW02
   void sendHaierACYRW02(unsigned char data[],
                         uint16_t nbytes = kHaierACYRW02StateLength,
-                        uint16_t repeat = kNoRepeat);
+                        uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif
 #if SEND_HITACHI_AC
   void sendHitachiAC(unsigned char data[],
                      uint16_t nbytes = kHitachiAcStateLength,
-                     uint16_t repeat = kNoRepeat);
+                     uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif
 #if SEND_HITACHI_AC1
   void sendHitachiAC1(unsigned char data[],
@@ -280,7 +280,7 @@ class IRsend {
 #if SEND_WHIRLPOOL_AC
   void sendWhirlpoolAC(unsigned char data[],
                        uint16_t nbytes = kWhirlpoolAcStateLength,
-                       uint16_t repeat = kNoRepeat);
+                       uint16_t repeat = kWhirlpoolAcDefaultRepeat);
 #endif
 #if SEND_LUTRON
   void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,
@@ -294,7 +294,7 @@ class IRsend {
 #if SEND_PANASONIC_AC
   void sendPanasonicAC(unsigned char data[],
                        uint16_t nbytes = kPanasonicAcStateLength,
-                       uint16_t repeat = kNoRepeat);
+                       uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif
 #if SEND_PIONEER
   void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,

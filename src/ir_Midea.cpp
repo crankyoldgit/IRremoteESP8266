@@ -104,9 +104,9 @@ void IRMideaAC::begin() { _irsend.begin(); }
 
 #if SEND_MIDEA
 // Send the current desired state to the IR LED.
-void IRMideaAC::send() {
+void IRMideaAC::send(const uint16_t repeat) {
   checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMidea(remote_state);
+  _irsend.sendMidea(remote_state, kMideaBits, repeat);
 }
 #endif  // SEND_MIDEA
 

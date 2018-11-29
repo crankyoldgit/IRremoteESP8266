@@ -91,7 +91,7 @@ class IRCoolixAC {
 
   void stateReset();
 #if SEND_COOLIX
-  void send();
+  void send(const uint16_t repeat = kCoolixDefaultRepeat);
 #endif  // SEND_COOLIX
   void begin();
   void on();

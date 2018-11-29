@@ -186,7 +186,7 @@ class IRHaierAC {
   explicit IRHaierAC(uint16_t pin);
 
 #if SEND_HAIER_AC
-  void send();
+  void send(const uint16_t repeat = kHaierAcDefaultRepeat);
 #endif  // SEND_HAIER_AC
   void begin();
 
@@ -245,7 +245,7 @@ class IRHaierACYRW02 {
   explicit IRHaierACYRW02(uint16_t pin);
 
 #if SEND_HAIER_AC_YRW02
-  void send();
+  void send(const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif  // SEND_HAIER_AC_YRW02
   void begin();
 

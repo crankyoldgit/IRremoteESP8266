@@ -98,7 +98,9 @@ void IRCoolixAC::stateReset() { remote_state = kCoolixDefaultState; }
 void IRCoolixAC::begin() { _irsend.begin(); }
 
 #if SEND_COOLIX
-void IRCoolixAC::send() { _irsend.sendCOOLIX(remote_state); }
+void IRCoolixAC::send(const uint16_t repeat) {
+  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat);
+}
 #endif  // SEND_COOLIX
 
 uint32_t IRCoolixAC::getRaw() { return remote_state; }

@@ -84,7 +84,7 @@ class IRGreeAC {
 
   void stateReset();
 #if SEND_GREE
-  void send();
+  void send(const uint16_t repeat = kGreeDefaultRepeat);
 #endif  // SEND_GREE
   void begin();
   void on();

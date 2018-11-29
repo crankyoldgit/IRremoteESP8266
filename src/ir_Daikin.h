@@ -137,7 +137,7 @@ class IRDaikinESP {
   explicit IRDaikinESP(uint16_t pin);
 
 #if SEND_DAIKIN
-  void send();
+  void send(const uint16_t repeat = kDaikinDefaultRepeat);
 #endif
   void begin();
   void on();

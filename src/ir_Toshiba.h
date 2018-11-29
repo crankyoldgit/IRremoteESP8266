@@ -48,7 +48,7 @@ class IRToshibaAC {
 
   void stateReset();
 #if SEND_TOSHIBA_AC
-  void send();
+  void send(const uint16_t repeat = kToshibaACMinRepeat);
 #endif  // SEND_TOSHIBA_AC
   void begin();
   void on();

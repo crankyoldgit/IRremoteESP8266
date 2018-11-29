@@ -129,9 +129,9 @@ void IRGreeAC::fixup() {
 void IRGreeAC::begin() { _irsend.begin(); }
 
 #if SEND_GREE
-void IRGreeAC::send() {
+void IRGreeAC::send(const uint16_t repeat) {
   fixup();  // Ensure correct settings before sending.
-  _irsend.sendGree(remote_state);
+  _irsend.sendGree(remote_state, kGreeStateLength, repeat);
 }
 #endif  // SEND_GREE
 
