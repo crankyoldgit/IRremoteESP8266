@@ -35,7 +35,7 @@ class IRHitachiAc {
 
   void stateReset();
 #if SEND_HITACHI_AC
-  void send();
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif  // SEND_HITACHI_AC
   void begin();
   void on();

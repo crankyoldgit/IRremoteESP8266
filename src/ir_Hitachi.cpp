@@ -159,9 +159,9 @@ void IRHitachiAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 #if SEND_HITACHI_AC
-void IRHitachiAc::send() {
+void IRHitachiAc::send(const uint16_t repeat) {
   checksum();
-  _irsend.sendHitachiAC(remote_state);
+  _irsend.sendHitachiAC(remote_state, kHitachiAcStateLength, repeat);
 }
 #endif  // SEND_HITACHI_AC
 

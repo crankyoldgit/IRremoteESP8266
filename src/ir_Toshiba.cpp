@@ -89,9 +89,9 @@ void IRToshibaAC::begin() { _irsend.begin(); }
 
 #if SEND_TOSHIBA_AC
 // Send the current desired state to the IR LED.
-void IRToshibaAC::send() {
+void IRToshibaAC::send(const uint16_t repeat) {
   checksum();  // Ensure correct checksum before sending.
-  _irsend.sendToshibaAC(remote_state);
+  _irsend.sendToshibaAC(remote_state, kToshibaACStateLength, repeat);
 }
 #endif  // SEND_TOSHIBA_AC
 

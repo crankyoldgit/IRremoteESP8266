@@ -64,7 +64,7 @@ class IRMitsubishiAC {
 
   void stateReset();
 #if SEND_MITSUBISHI_AC
-  void send();
+  void send(const uint16_t repeat = kMitsubishiACMinRepeat);
 #endif  // SEND_MITSUBISHI_AC
   void begin();
   void on();

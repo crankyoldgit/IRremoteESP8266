@@ -78,7 +78,7 @@ class IRFujitsuAC {
   void setModel(fujitsu_ac_remote_model_t model);
   void stateReset();
 #if SEND_FUJITSU_AC
-  void send();
+  void send(const uint16_t repeat = kFujitsuAcMinRepeat);
 #endif  // SEND_FUJITSU_AC
   void begin();
   void off();

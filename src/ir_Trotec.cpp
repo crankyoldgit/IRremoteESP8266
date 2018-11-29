@@ -39,9 +39,9 @@ IRTrotecESP::IRTrotecESP(uint16_t pin) : _irsend(pin) { stateReset(); }
 void IRTrotecESP::begin() { _irsend.begin(); }
 
 #if SEND_TROTEC
-void IRTrotecESP::send() {
+void IRTrotecESP::send(const uint16_t repeat) {
   checksum();
-  _irsend.sendTrotec(trotec);
+  _irsend.sendTrotec(trotec, kTrotecStateLength, repeat);
 }
 #endif  // SEND_TROTEC
 

@@ -58,7 +58,7 @@ class IRTrotecESP {
   explicit IRTrotecESP(uint16_t pin);
 
 #if SEND_TROTEC
-  void send();
+  void send(const uint16_t repeat = kTrotecDefaultRepeat);
 #endif  // SEND_TROTEC
   void begin();
 

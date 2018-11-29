@@ -98,7 +98,9 @@ void IRCoolixAC::stateReset() { remote_state = kCoolixDefaultState; }
 void IRCoolixAC::begin() { _irsend.begin(); }
 
 #if SEND_COOLIX
-void IRCoolixAC::send() { _irsend.sendCOOLIX(remote_state); }
+void IRCoolixAC::send(const uint16_t repeat) {
+  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat);
+}
 #endif  // SEND_COOLIX
 
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
@@ -235,6 +237,7 @@ void IRCoolixAC::setFan(const uint8_t speed) {
     case kCoolixFanMed:
     case kCoolixFanMax:
     case kCoolixFanAuto:
+    case kCoolixFanAuto0:
     case kCoolixFanZoneFollow:
     case kCoolixFanFixed:
       break;
@@ -264,6 +267,9 @@ std::string IRCoolixAC::toString() {
   switch (getFan()) {
     case kCoolixFanAuto:
       result += " (AUTO)";
+      break;
+    case kCoolixFanAuto0:
+      result += " (AUTO0)";
       break;
     case kCoolixFanMax:
       result += " (MAX)";

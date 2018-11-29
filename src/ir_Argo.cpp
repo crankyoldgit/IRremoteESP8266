@@ -40,9 +40,9 @@ IRArgoAC::IRArgoAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 void IRArgoAC::begin() { _irsend.begin(); }
 
 #if SEND_ARGO
-void IRArgoAC::send() {
+void IRArgoAC::send(const uint16_t repeat) {
   checksum();  // Create valid checksum before sending
-  _irsend.sendArgo(argo);
+  _irsend.sendArgo(argo, kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
 

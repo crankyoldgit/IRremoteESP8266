@@ -88,7 +88,8 @@ class IRWhirlpoolAc {
 
   void stateReset();
 #if SEND_WHIRLPOOL_AC
-  void send(const bool calcchecksum = true);
+  void send(const uint16_t repeat = kWhirlpoolAcDefaultRepeat,
+            const bool calcchecksum = true);
 #endif  // SEND_WHIRLPOOL_AC
   void begin();
   void on();

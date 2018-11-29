@@ -141,9 +141,9 @@ void IRKelvinatorAC::fixup() {
 }
 
 #if SEND_KELVINATOR
-void IRKelvinatorAC::send() {
+void IRKelvinatorAC::send(const uint16_t repeat) {
   fixup();  // Ensure correct settings before sending.
-  _irsend.sendKelvinator(remote_state);
+  _irsend.sendKelvinator(remote_state, kKelvinatorStateLength, repeat);
 }
 #endif  // SEND_KELVINATOR
 
