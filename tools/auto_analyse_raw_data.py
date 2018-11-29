@@ -85,9 +85,9 @@ class RawIRMessage(object):
                       "        %s (LSB first)\n"
                       "  Bin:  0b%s (MSB first)\n"
                       "        0b%s (LSB first)\n" %
-                      (bits, "0x{0:0{1}X}".format(num, bits / 4),
-                       "0x{0:0{1}X}".format(rev_num, bits / 4), num, rev_num,
-                       binary_str, rev_binary_str))
+                      (bits, ("0x{0:0%dX}" % (bits / 4)).format(num),
+                       ("0x{0:0%dX}" % (bits / 4)).format(rev_num), num,
+                       rev_num, binary_str, rev_binary_str))
 
   def add_data_code(self, bin_str, footer=True):
     """Add the common "data" sequence of code to send the bulk of a message."""
