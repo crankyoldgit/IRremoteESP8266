@@ -117,6 +117,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case DAIKIN:
       result = "DAIKIN";
       break;
+    case DAIKIN2:
+      result = "DAIKIN2";
+      break;
     case DENON:
       result = "DENON";
       break;
@@ -267,6 +270,7 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
     case DAIKIN:
+    case DAIKIN2:
     case ELECTRA_AC:
     case FUJITSU_AC:
     case GREE:
