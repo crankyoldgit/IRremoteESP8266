@@ -5,6 +5,7 @@ http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
 Copyright 2016 sillyfrog
 Copyright 2017 sillyfrog, crankyoldgit
+Copyright 2018 crankyoldgit
 */
 
 #include "ir_Daikin.h"
@@ -27,6 +28,7 @@ Copyright 2017 sillyfrog, crankyoldgit
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 //   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
+//   https://github.com/markszabo/IRremoteESP8266/issues/582
 
 #if SEND_DAIKIN
 // Original header
@@ -748,3 +750,119 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN
+
+#if SEND_DAIKIN2
+// Send a Daikin2 A/C message.
+//
+// Args:
+//   data: An array of kDaikin2StateLength bytes containing the IR command.
+//
+// Status: Alpha/Untested.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/582
+void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
+                        uint16_t repeat) {
+  if (nbytes < kDaikin2Section1Length)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Leader
+    sendGeneric(kDaikin2LeaderMark, kDaikin2LeaderSpace,
+                0, 0, 0, 0, 0, 0, (uint64_t) 0,  // No data payload.
+                0, 38000, false, 0, 50);
+    // Section #1
+    sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
+                kDaikin2OneSpace, kDaikin2BitMark, kDaikin2ZeroSpace,
+                kDaikin2BitMark, kDaikin2Gap, data, kDaikin2Section1Length,
+                38000, false, 0, 50);
+    // Section #2
+    sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
+                kDaikin2OneSpace, kDaikin2BitMark, kDaikin2ZeroSpace,
+                kDaikin2BitMark, kDaikin2Gap, data + kDaikin2Section1Length,
+                nbytes - kDaikin2Section1Length,
+                38000, false, 0, 50);
+  }
+}
+#endif  // SEND_DAIKIN2
+
+#if DECODE_DAIKIN2
+// Decode the supplied Daikin2 A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin2Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: Alpha / Untested.
+//
+// Ref:
+//   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
+                           bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) + kHeader - 1)
+    return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin2Bits) return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t dataBitsSoFar = 0;
+  uint16_t i = 0;
+  match_result_t data_result;
+  uint8_t sectionSize[kDaikin2Sections] = {kDaikin2Section1Length,
+                                           kDaikin2Section2Length};
+
+  // Leader
+  if (!matchMark(results->rawbuf[offset++], kDaikin2LeaderMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kDaikin2LeaderSpace))
+    return false;
+
+  // Sections
+  // Keep reading bytes until we either run out of section or state to fill.
+  for (uint8_t section = 0, pos = 0; section < kDaikin2Sections;
+       section++) {
+    pos += sectionSize[section];
+
+    // Section Header
+    if (!matchMark(results->rawbuf[offset++], kDaikin2HdrMark)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin2HdrSpace)) return false;
+
+    // Section Data
+    for (; offset <= results->rawlen - 16 && i < pos;
+         i++, dataBitsSoFar += 8, offset += data_result.used) {
+      // Read in a byte at a time.
+      data_result =
+          matchData(&(results->rawbuf[offset]), 8, kDaikin2BitMark,
+                    kDaikin2OneSpace, kDaikin2BitMark,
+                    kDaikin2ZeroSpace, kTolerance, kMarkExcess, false);
+      if (data_result.success == false) break;  // Fail
+      results->state[i] = (uint8_t)data_result.data;
+    }
+
+    // Section Footer
+    if (!matchMark(results->rawbuf[offset++], kDaikin2BitMark)) return false;
+    if (section < kDaikin2Sections - 1) {  // Inter-section gaps.
+      if (!matchSpace(results->rawbuf[offset++], kDaikin2Gap)) return false;
+    } else {  // Last section / End of message gap.
+      if (offset <= results->rawlen &&
+          !matchAtLeast(results->rawbuf[offset++], kDaikin2Gap)) return false;
+    }
+  }
+
+  // Compliance
+  if (strict) {
+    // Re-check we got the correct size/length due to the way we read the data.
+    if (dataBitsSoFar != kDaikin2Bits) return false;
+  }
+
+  // Success
+  results->decode_type = DAIKIN2;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN2

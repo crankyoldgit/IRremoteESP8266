@@ -199,12 +199,15 @@
 #define DECODE_PIONEER         true
 #define SEND_PIONEER           true
 
+#define DECODE_DAIKIN2         true
+#define SEND_DAIKIN2           true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
-     DECODE_PANASONIC_AC || DECODE_MWM)
+     DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -228,54 +231,55 @@ enum decode_type_t {
   RC6,
   NEC,
   SONY,
-  PANASONIC,
+  PANASONIC,  // (5)
   JVC,
   SAMSUNG,
   WHYNTER,
   AIWA_RC_T501,
-  LG,
+  LG,  // (10)
   SANYO,
   MITSUBISHI,
   DISH,
   SHARP,
-  COOLIX,
+  COOLIX,  // (15)
   DAIKIN,
   DENON,
   KELVINATOR,
   SHERWOOD,
-  MITSUBISHI_AC,
+  MITSUBISHI_AC,  // (20)
   RCMM,
   SANYO_LC7461,
   RC5X,
   GREE,
-  PRONTO,  // Technically not a protocol, but an encoding.
+  PRONTO,  // Technically not a protocol, but an encoding. (25)
   NEC_LIKE,
   ARGO,
   TROTEC,
   NIKAI,
-  RAW,  // Technically not a protocol, but an encoding.
+  RAW,  // Technically not a protocol, but an encoding. (30)
   GLOBALCACHE,  // Technically not a protocol, but an encoding.
   TOSHIBA_AC,
   FUJITSU_AC,
   MIDEA,
-  MAGIQUEST,
+  MAGIQUEST,  // (35)
   LASERTAG,
   CARRIER_AC,
   HAIER_AC,
   MITSUBISHI2,
-  HITACHI_AC,
+  HITACHI_AC,  // (40)
   HITACHI_AC1,
   HITACHI_AC2,
   GICABLE,
   HAIER_AC_YRW02,
-  WHIRLPOOL_AC,
+  WHIRLPOOL_AC,  // (45)
   SAMSUNG_AC,
   LUTRON,
   ELECTRA_AC,
   PANASONIC_AC,
-  PIONEER,
+  PIONEER,  // 50
   LG2,
   MWM,
+  DAIKIN2,
 };
 
 // Message lengths & required repeat values
@@ -295,6 +299,9 @@ const uint16_t kDaikinRawBits = 583;
 const uint16_t kDaikinStateLength = 27;
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
 const uint16_t kDaikinDefaultRepeat = kNoRepeat;
+const uint16_t kDaikin2StateLength = 39;
+const uint16_t kDaikin2Bits = kDaikin2StateLength * 8;
+const uint16_t kDaikin2DefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;

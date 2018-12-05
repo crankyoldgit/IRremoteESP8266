@@ -257,7 +257,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.8.1"
+#define _MY_VERSION_ "v0.8.2"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -536,6 +536,7 @@ void handleRoot() {
       "<select name='type'>"
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin</option>"
+        "<option value='53'>Daikin2</option>"
         "<option value='48'>Electra</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
@@ -630,6 +631,9 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       break;
     case DAIKIN:
       stateSize = kDaikinStateLength;
+      break;
+    case DAIKIN2:
+      stateSize = kDaikin2StateLength;
       break;
     case ELECTRA_AC:
       stateSize = kElectraAcStateLength;
@@ -758,6 +762,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_DAIKIN
     case DAIKIN:
       irsend.sendDaikin(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif
+#if SEND_DAIKIN2
+    case DAIKIN2:
+      irsend.sendDaikin2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if MITSUBISHI_AC
@@ -1429,6 +1438,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       break;
 #endif
     case DAIKIN:  // 16
+    case DAIKIN2:  // 53
     case KELVINATOR:  // 18
     case MITSUBISHI_AC:  // 20
     case GREE:  // 24

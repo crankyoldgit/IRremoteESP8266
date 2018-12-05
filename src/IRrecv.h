@@ -260,6 +260,10 @@ class IRrecv {
   bool decodeDaikin(decode_results *results, uint16_t nbits = kDaikinRawBits,
                     bool strict = true);
 #endif
+#if DECODE_DAIKIN2
+  bool decodeDaikin2(decode_results *results, uint16_t nbits = kDaikin2Bits,
+                     bool strict = true);
+#endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
                        uint16_t nbytes = kToshibaACBits, bool strict = true);

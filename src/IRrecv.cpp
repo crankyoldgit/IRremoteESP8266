@@ -394,6 +394,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Daikin decode");
   if (decodeDaikin(results)) return true;
 #endif
+#if DECODE_DAIKIN2
+  DPRINTLN("Attempting Daikin2 decode");
+  if (decodeDaikin2(results)) return true;
+#endif
 #if DECODE_TOSHIBA_AC
   DPRINTLN("Attempting Toshiba AC decode");
   if (decodeToshibaAC(results)) return true;

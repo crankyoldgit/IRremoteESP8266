@@ -119,6 +119,19 @@ const uint16_t kDaikinGap = 29000;
 const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
+// Another variant of the protocol.
+const uint16_t kDaikin2LeaderMark = 10024;
+const uint16_t kDaikin2LeaderSpace = 25180;
+const uint16_t kDaikin2Gap = kDaikin2LeaderMark + kDaikin2LeaderSpace;
+const uint16_t kDaikin2HdrMark = 3500;
+const uint16_t kDaikin2HdrSpace = 1728;
+const uint16_t kDaikin2BitMark = 418;
+const uint16_t kDaikin2OneSpace = 1315;
+const uint16_t kDaikin2ZeroSpace = 451;
+const uint16_t kDaikin2Sections = 2;
+const uint16_t kDaikin2Section1Length = 20;
+const uint16_t kDaikin2Section2Length = 19;
+
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
