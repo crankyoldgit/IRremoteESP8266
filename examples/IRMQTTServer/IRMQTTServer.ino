@@ -190,6 +190,7 @@
 // GPIO the IR RX module is connected to/controlled by. GPIO 14 = D5.
 // Comment this out to disable receiving/decoding IR messages entirely.
 #define IR_RX 14  // <=- CHANGE_ME (optional)
+#define IR_RX_PULLUP false
 const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
@@ -381,7 +382,11 @@ void handleRoot() {
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
 #ifdef IR_RX
-    "IR Recv GPIO: " + String(IR_RX) + "<br>"
+    "IR Recv GPIO: " + String(IR_RX) +
+#if IR_RX_PULLUP
+    " (pullup)"
+#endif  // IR_RX_PULLUP
+    "<br>"
     "Total IR Received: " + String(irRecvCounter) + "<br>"
     "Last IR Received: " + lastIrReceived +
     " <i>(" + timeSince(lastIrReceivedTime) + ")</i><br>"
@@ -1112,6 +1117,9 @@ void setup(void) {
   irsend.begin();
   offset = irsend.calibrate();
 #if IR_RX
+#if IR_RX_PULLUP
+  pinMode(IR_RX, INPUT_PULLUP);
+#endif  // IR_RX_PULLUP
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
