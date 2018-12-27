@@ -1291,6 +1291,20 @@ void loop(void) {
     lastIrReceivedTime = millis();
     lastIrReceived = String(capture.decode_type) + "," +
         resultToHexidecimal(&capture);
+    if (capture.decode_type == -1) {
+      lastIrReceived += ";";
+      for (uint16_t i = 1; i < capture.rawlen; i++) {
+        uint32_t usecs;
+        for (usecs = capture.rawbuf[i] * kRawTick; usecs > UINT16_MAX;
+             usecs -= UINT16_MAX) {
+          lastIrReceived += uint64ToString(UINT16_MAX);
+          lastIrReceived += ",0,";
+        }
+        lastIrReceived += uint64ToString(usecs, 10);
+        if (i < capture.rawlen - 1)
+          lastIrReceived += ",";
+      }
+    }
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
