@@ -1278,7 +1278,7 @@ void loop(void) {
 #if REPORT_UNKNOWNS
   if (irrecv.decode(&capture)) {
 #else
-  if (irrecv.decode(&capture) && capture.decode_type != -1) {
+  if (irrecv.decode(&capture) && capture.decode_type != UNKNOWN) {
 #endif  // REPORT_UNKNOWNS
     lastIrReceivedTime = millis();
     lastIrReceived = String(capture.decode_type) + "," +
