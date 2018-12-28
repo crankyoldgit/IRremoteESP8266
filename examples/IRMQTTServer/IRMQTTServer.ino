@@ -26,7 +26,7 @@
  *   o Install the following libraries via Library Manager
  *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
- *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
+ *   o You MUST change <PubSubClient.h> to have the following (or larger, particularly for REPORT_RAW_UNKNOWNS) value:
  *     #define MQTT_MAX_PACKET_SIZE 512
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
@@ -151,6 +151,7 @@
 // Change to 'true'/'false' if you do/don't want these features or functions.
 #define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
 #define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
+#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer. MQTT_MAX_PACKET_SIZE of 1024 or more recommended.
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
 // 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
 #define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
@@ -1291,7 +1292,8 @@ void loop(void) {
     lastIrReceivedTime = millis();
     lastIrReceived = String(capture.decode_type) + "," +
         resultToHexidecimal(&capture);
-    if (capture.decode_type == -1) {
+#if REPORT_RAW_UNKNOWNS
+    if (capture.decode_type == UNKNOWN) {
       lastIrReceived += ";";
       for (uint16_t i = 1; i < capture.rawlen; i++) {
         uint32_t usecs;
@@ -1305,6 +1307,7 @@ void loop(void) {
           lastIrReceived += ",";
       }
     }
+#endif  // REPORT_RAW_UNKNOWNS
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
