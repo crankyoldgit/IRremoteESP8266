@@ -26,7 +26,8 @@
  *   o Install the following libraries via Library Manager
  *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
- *   o You MUST change <PubSubClient.h> to have the following (or larger, particularly for REPORT_RAW_UNKNOWNS) value:
+ *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
+ *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 512
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
@@ -151,7 +152,8 @@
 // Change to 'true'/'false' if you do/don't want these features or functions.
 #define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
 #define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
-#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer. MQTT_MAX_PACKET_SIZE of 1024 or more recommended.
+#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
+                                   // MQTT_MAX_PACKET_SIZE of 1024 or more
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
 // 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
 #define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
