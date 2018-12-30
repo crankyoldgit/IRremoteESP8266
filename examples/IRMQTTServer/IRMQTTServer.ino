@@ -27,6 +27,7 @@
  *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
+ *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 512
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
@@ -151,6 +152,8 @@
 // Change to 'true'/'false' if you do/don't want these features or functions.
 #define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
 #define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
+#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
+                                   // MQTT_MAX_PACKET_SIZE of 1024 or more
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
 // 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
 #define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
@@ -190,6 +193,7 @@
 // GPIO the IR RX module is connected to/controlled by. GPIO 14 = D5.
 // Comment this out to disable receiving/decoding IR messages entirely.
 #define IR_RX 14  // <=- CHANGE_ME (optional)
+#define IR_RX_PULLUP false
 const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
@@ -381,7 +385,11 @@ void handleRoot() {
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
 #ifdef IR_RX
-    "IR Recv GPIO: " + String(IR_RX) + "<br>"
+    "IR Recv GPIO: " + String(IR_RX) +
+#if IR_RX_PULLUP
+    " (pullup)"
+#endif  // IR_RX_PULLUP
+    "<br>"
     "Total IR Received: " + String(irRecvCounter) + "<br>"
     "Last IR Received: " + lastIrReceived +
     " <i>(" + timeSince(lastIrReceivedTime) + ")</i><br>"
@@ -1112,6 +1120,9 @@ void setup(void) {
   irsend.begin();
   offset = irsend.calibrate();
 #if IR_RX
+#if IR_RX_PULLUP
+  pinMode(IR_RX, INPUT_PULLUP);
+#endif  // IR_RX_PULLUP
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
@@ -1283,6 +1294,22 @@ void loop(void) {
     lastIrReceivedTime = millis();
     lastIrReceived = String(capture.decode_type) + "," +
         resultToHexidecimal(&capture);
+#if REPORT_RAW_UNKNOWNS
+    if (capture.decode_type == UNKNOWN) {
+      lastIrReceived += ";";
+      for (uint16_t i = 1; i < capture.rawlen; i++) {
+        uint32_t usecs;
+        for (usecs = capture.rawbuf[i] * kRawTick; usecs > UINT16_MAX;
+             usecs -= UINT16_MAX) {
+          lastIrReceived += uint64ToString(UINT16_MAX);
+          lastIrReceived += ",0,";
+        }
+        lastIrReceived += uint64ToString(usecs, 10);
+        if (i < capture.rawlen - 1)
+          lastIrReceived += ",";
+      }
+    }
+#endif  // REPORT_RAW_UNKNOWNS
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
