@@ -76,6 +76,7 @@ decodeCOOLIX	KEYWORD2
 decodeCarrierAC	KEYWORD2
 decodeDISH	KEYWORD2
 decodeDaikin	KEYWORD2
+decodeDaikin2	KEYWORD2
 decodeDenon	KEYWORD2
 decodeElectraAC	KEYWORD2
 decodeFujitsuAC	KEYWORD2
@@ -231,6 +232,7 @@ sendCOOLIX	KEYWORD2
 sendCarrierAC	KEYWORD2
 sendDISH	KEYWORD2
 sendDaikin	KEYWORD2
+sendDaikin2	KEYWORD2
 sendData	KEYWORD2
 sendDenon	KEYWORD2
 sendElectraAC	KEYWORD2
@@ -387,6 +389,7 @@ CARRIER_AC_BITS	LITERAL1
 COOLIX	LITERAL1
 COOLIX_BITS	LITERAL1
 DAIKIN	LITERAL1
+DAIKIN2	LITERAL1
 DAIKIN_AUTO	LITERAL1
 DAIKIN_COMMAND_LENGTH	LITERAL1
 DAIKIN_COOL	LITERAL1
@@ -406,6 +409,7 @@ DECODE_ARGO	LITERAL1
 DECODE_CARRIER_AC	LITERAL1
 DECODE_COOLIX	LITERAL1
 DECODE_DAIKIN	LITERAL1
+DECODE_DAIKIN2	LITERAL1
 DECODE_DENON	LITERAL1
 DECODE_DISH	LITERAL1
 DECODE_ELECTRA_AC	LITERAL1
@@ -672,6 +676,7 @@ SEND_ARGO	LITERAL1
 SEND_CARRIER_AC	LITERAL1
 SEND_COOLIX	LITERAL1
 SEND_DAIKIN	LITERAL1
+SEND_DAIKIN2	LITERAL1
 SEND_DENON	LITERAL1
 SEND_DISH	LITERAL1
 SEND_ELECTRA_AC	LITERAL1
@@ -764,6 +769,7 @@ kArgoCoolAuto	LITERAL1
 kArgoCoolHum	LITERAL1
 kArgoCoolOff	LITERAL1
 kArgoCoolOn	LITERAL1
+kArgoDefaultRepeat	LITERAL1
 kArgoFan1	LITERAL1
 kArgoFan2	LITERAL1
 kArgoFan3	LITERAL1
@@ -800,10 +806,12 @@ kCoolixBitMarkTicks	LITERAL1
 kCoolixBits	LITERAL1
 kCoolixClean	LITERAL1
 kCoolixCool	LITERAL1
+kCoolixDefaultRepeat	LITERAL1
 kCoolixDefaultState	LITERAL1
 kCoolixDry	LITERAL1
 kCoolixFan	LITERAL1
 kCoolixFanAuto	LITERAL1
+kCoolixFanAuto0	LITERAL1
 kCoolixFanFixed	LITERAL1
 kCoolixFanMask	LITERAL1
 kCoolixFanMax	LITERAL1
@@ -841,6 +849,20 @@ kCoolixUnknown	LITERAL1
 kCoolixZeroSpace	LITERAL1
 kCoolixZeroSpaceTicks	LITERAL1
 kCoolixZoneFollowMask	LITERAL1
+kDaikin2BitMark	LITERAL1
+kDaikin2Bits	LITERAL1
+kDaikin2DefaultRepeat	LITERAL1
+kDaikin2Gap	LITERAL1
+kDaikin2HdrMark	LITERAL1
+kDaikin2HdrSpace	LITERAL1
+kDaikin2LeaderMark	LITERAL1
+kDaikin2LeaderSpace	LITERAL1
+kDaikin2OneSpace	LITERAL1
+kDaikin2Section1Length	LITERAL1
+kDaikin2Section2Length	LITERAL1
+kDaikin2Sections	LITERAL1
+kDaikin2StateLength	LITERAL1
+kDaikin2ZeroSpace	LITERAL1
 kDaikinAuto	LITERAL1
 kDaikinBitEcono	LITERAL1
 kDaikinBitEye	LITERAL1
@@ -865,6 +887,7 @@ kDaikinByteSilent	LITERAL1
 kDaikinCool	LITERAL1
 kDaikinCurBit	LITERAL1
 kDaikinCurIndex	LITERAL1
+kDaikinDefaultRepeat	LITERAL1
 kDaikinDry	LITERAL1
 kDaikinFan	LITERAL1
 kDaikinFanAuto	LITERAL1
@@ -983,6 +1006,7 @@ kGreeBits	LITERAL1
 kGreeBlockFooter	LITERAL1
 kGreeBlockFooterBits	LITERAL1
 kGreeCool	LITERAL1
+kGreeDefaultRepeat	LITERAL1
 kGreeDry	LITERAL1
 kGreeFan	LITERAL1
 kGreeFanMask	LITERAL1
@@ -1034,6 +1058,7 @@ kHaierAcCmdTimerCancel	LITERAL1
 kHaierAcCmdTimerSet	LITERAL1
 kHaierAcCool	LITERAL1
 kHaierAcDefTemp	LITERAL1
+kHaierAcDefaultRepeat	LITERAL1
 kHaierAcDry	LITERAL1
 kHaierAcFan	LITERAL1
 kHaierAcFanAuto	LITERAL1
@@ -1064,6 +1089,7 @@ kHaierAcYrw02ButtonTempDown	LITERAL1
 kHaierAcYrw02ButtonTempUp	LITERAL1
 kHaierAcYrw02ButtonTurbo	LITERAL1
 kHaierAcYrw02Cool	LITERAL1
+kHaierAcYrw02DefaultRepeat	LITERAL1
 kHaierAcYrw02Dry	LITERAL1
 kHaierAcYrw02Fan	LITERAL1
 kHaierAcYrw02FanAuto	LITERAL1
@@ -1096,6 +1122,7 @@ kHitachiAcAutoTemp	LITERAL1
 kHitachiAcBitMark	LITERAL1
 kHitachiAcBits	LITERAL1
 kHitachiAcCool	LITERAL1
+kHitachiAcDefaultRepeat	LITERAL1
 kHitachiAcDry	LITERAL1
 kHitachiAcFan	LITERAL1
 kHitachiAcFanAuto	LITERAL1
@@ -1138,6 +1165,7 @@ kKelvinatorChecksumStart	LITERAL1
 kKelvinatorCmdFooter	LITERAL1
 kKelvinatorCmdFooterBits	LITERAL1
 kKelvinatorCool	LITERAL1
+kKelvinatorDefaultRepeat	LITERAL1
 kKelvinatorDry	LITERAL1
 kKelvinatorFan	LITERAL1
 kKelvinatorFanAuto	LITERAL1
@@ -1360,6 +1388,7 @@ kPanasonicAcAuto	LITERAL1
 kPanasonicAcBits	LITERAL1
 kPanasonicAcChecksumInit	LITERAL1
 kPanasonicAcCool	LITERAL1
+kPanasonicAcDefaultRepeat	LITERAL1
 kPanasonicAcDry	LITERAL1
 kPanasonicAcExcess	LITERAL1
 kPanasonicAcFan	LITERAL1
@@ -1484,6 +1513,7 @@ kSamsungAcBits	LITERAL1
 kSamsungAcCleanMask10	LITERAL1
 kSamsungAcCleanMask11	LITERAL1
 kSamsungAcCool	LITERAL1
+kSamsungAcDefaultRepeat	LITERAL1
 kSamsungAcDry	LITERAL1
 kSamsungAcExtendedBits	LITERAL1
 kSamsungAcExtendedStateLength	LITERAL1
@@ -1617,6 +1647,7 @@ kToshibaAcZeroSpace	LITERAL1
 kTrotecAuto	LITERAL1
 kTrotecCool	LITERAL1
 kTrotecDefTemp	LITERAL1
+kTrotecDefaultRepeat	LITERAL1
 kTrotecDry	LITERAL1
 kTrotecFan	LITERAL1
 kTrotecFanHigh	LITERAL1
@@ -1665,6 +1696,7 @@ kWhirlpoolAcCommandSuper	LITERAL1
 kWhirlpoolAcCommandSwing	LITERAL1
 kWhirlpoolAcCommandTemp	LITERAL1
 kWhirlpoolAcCool	LITERAL1
+kWhirlpoolAcDefaultRepeat	LITERAL1
 kWhirlpoolAcDry	LITERAL1
 kWhirlpoolAcFan	LITERAL1
 kWhirlpoolAcFanAuto	LITERAL1
