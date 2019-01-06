@@ -196,7 +196,7 @@ class IRDaikinESP {
 #endif  // DAIKIN_DEBUG
   uint32_t getCommand();
   void setCommand(uint32_t value);
-  static bool validChecksum(const uint8_t state[],
+  static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
 #ifdef ARDUINO
   String toString();
@@ -210,11 +210,76 @@ class IRDaikinESP {
   // # of bytes per command
   uint8_t daikin[kDaikinStateLength];
   void stateReset();
-  static uint8_t calcBlockChecksum(const uint8_t* block, const uint16_t length);
   void checksum();
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);
   uint8_t getBit(uint8_t byte, uint8_t bitmask);
+  IRsend _irsend;
+};
+
+class IRDaikin2 {
+ public:
+  explicit IRDaikin2(uint16_t pin);
+
+#if SEND_DAIKIN2
+  void send(const uint16_t repeat = kDaikin2DefaultRepeat);
+#endif
+  void begin();
+  void on();
+  void off();
+  void setPower(bool state);
+  bool getPower();
+  void setTemp(uint8_t temp);
+  uint8_t getTemp();
+  void setFan(uint8_t fan);
+  uint8_t getFan();
+  uint8_t getMode();
+  void setMode(uint8_t mode);
+  void setSwingVertical(bool state);
+  bool getSwingVertical();
+  void setSwingHorizontal(bool state);
+  bool getSwingHorizontal();
+  bool getQuiet();
+  void setQuiet(bool state);
+  bool getPowerful();
+  void setPowerful(bool state);
+  void setSensor(bool state);
+  bool getSensor();
+  void setEcono(bool state);
+  bool getEcono();
+  void setEye(bool state);
+  bool getEye();
+  void setMold(bool state);
+  bool getMold();
+  void enableOnTimer(uint16_t starttime);
+  void disableOnTimer();
+  uint16_t getOnTime();
+  bool getOnTimerEnabled();
+  void enableOffTimer(uint16_t endtime);
+  void disableOffTimer();
+  uint16_t getOffTime();
+  bool getOffTimerEnabled();
+  void setCurrentTime(uint16_t time);
+  uint16_t getCurrentTime();
+  uint8_t* getRaw();
+  void setRaw(uint8_t new_code[]);
+  uint32_t getCommand();
+  void setCommand(uint32_t value);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin2StateLength);
+#ifdef ARDUINO
+  String toString();
+  static String renderTime(uint16_t timemins);
+#else
+  std::string toString();
+  static std::string renderTime(uint16_t timemins);
+#endif
+
+ private:
+  // # of bytes per command
+  uint8_t remote_state[kDaikin2StateLength];
+  void stateReset();
+  void checksum();
   IRsend _irsend;
 };
 

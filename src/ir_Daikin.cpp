@@ -94,39 +94,24 @@ void IRDaikinESP::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN
 
-// Calculate the checksum for a given data block.
-// Args:
-//   block:  Ptr to the start of the data block.
-//   length: Nr. of bytes to checksum.
-// Returns:
-//   A byte containing the calculated checksum.
-uint8_t IRDaikinESP::calcBlockChecksum(const uint8_t *block,
-                                       const uint16_t length) {
-  uint8_t sum = 0;
-  // Daikin checksum is just the addition of all the data bytes
-  // in the block but capped to 8 bits.
-  for (uint16_t i = 0; i < length; i++, block++) sum += *block;
-  return sum & 0xFFU;
-}
-
 // Verify the checksum is valid for a given state.
 // Args:
 //   state:  The array to verify the checksum of.
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRDaikinESP::validChecksum(const uint8_t state[], const uint16_t length) {
-  if (length < 8 || state[7] != calcBlockChecksum(state, 7)) return false;
+bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
+  if (length < 8 || state[7] != sumBytes(state, 7)) return false;
   if (length < 10 ||
-      state[length - 1] != calcBlockChecksum(state + 8, length - 9))
+      state[length - 1] != sumBytes(state + 8, length - 9))
     return false;
   return true;
 }
 
 // Calculate and set the checksum values for the internal state.
 void IRDaikinESP::checksum() {
-  daikin[7] = calcBlockChecksum(daikin, 7);
-  daikin[26] = calcBlockChecksum(daikin + 8, 17);
+  daikin[7] = sumBytes(daikin, 7);
+  daikin[26] = sumBytes(daikin + 8, 17);
 }
 
 void IRDaikinESP::stateReset() {
@@ -786,6 +771,59 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN2
 
+// Class for handling Daikin2 A/C messages.
+
+IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRDaikin2::begin() { _irsend.begin(); }
+
+#if SEND_DAIKIN2
+void IRDaikin2::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin2(remote_state, kDaikin2StateLength, repeat);
+}
+#endif  // SEND_DAIKIN
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin2::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin2Section1Length - 1 ||
+      state[kDaikin2Section1Length - 1] != sumBytes(state,
+                                                    kDaikin2Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2 (a.k.a. the rest)
+  if (length <= kDaikin2Section1Length + 1 ||
+      state[length - 1] != sumBytes(state + kDaikin2Section1Length,
+                                    length - kDaikin2Section1Length - 1))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin2::checksum() {
+  remote_state[kDaikin2Section1Length - 1] = sumBytes(
+      remote_state, kDaikin2Section1Length - 1);
+  remote_state[kDaikin2StateLength -1 ] = sumBytes(
+      remote_state + kDaikin2Section1Length, kDaikin2Section2Length - 1);
+}
+
+void IRDaikin2::stateReset() {
+  for (uint8_t i = 0; i < kDaikin2StateLength; i++) remote_state[i] = 0x0;
+
+  remote_state[0] = 0x11;
+  remote_state[1] = 0xDA;
+  remote_state[2] = 0x27;
+  remote_state[4] = 0x01;
+  // remote_state[19] is a checksum byte, it will be set by checksum().
+  // remote_state[38] is a checksum byte, it will be set by checksum().
+  checksum();
+}
+
 #if DECODE_DAIKIN2
 // Decode the supplied Daikin2 A/C message.
 // Args:
@@ -855,6 +893,8 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     if (dataBitsSoFar != kDaikin2Bits) return false;
+    // Validate the checksum.
+    if (!IRDaikin2::validChecksum(results->state)) return false;
   }
 
   // Success
