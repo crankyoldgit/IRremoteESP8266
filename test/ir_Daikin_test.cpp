@@ -914,7 +914,7 @@ TEST(TestDecodeDaikin2, RealExample) {
 
 // Decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeDaikin2, SyntheticExample) {
-  IRDaikinESP irdaikin(0);
+  IRDaikin2 ac(0);
   IRsendTest irsend(0);
   IRrecv irrecv(0);
   irsend.begin();
@@ -932,6 +932,10 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ASSERT_EQ(DAIKIN2, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin2Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C",
+      ac.toString());
 }
 
 TEST(TestUtils, Misc) {

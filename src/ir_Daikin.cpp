@@ -772,6 +772,9 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 #endif  // SEND_DAIKIN2
 
 // Class for handling Daikin2 A/C messages.
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/582
+//   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
 
 IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
 
@@ -782,7 +785,7 @@ void IRDaikin2::send(const uint16_t repeat) {
   checksum();
   _irsend.sendDaikin2(remote_state, kDaikin2StateLength, repeat);
 }
-#endif  // SEND_DAIKIN
+#endif  // SEND_DAIKIN2
 
 // Verify the checksum is valid for a given state.
 // Args:
@@ -820,8 +823,103 @@ void IRDaikin2::stateReset() {
   remote_state[2] = 0x27;
   remote_state[4] = 0x01;
   // remote_state[19] is a checksum byte, it will be set by checksum().
+  remote_state[20] = 0x11;
+  remote_state[21] = 0xDA;
+  remote_state[22] = 0x27;
   // remote_state[38] is a checksum byte, it will be set by checksum().
   checksum();
+}
+
+uint8_t *IRDaikin2::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin2::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin2StateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+void IRDaikin2::on() {
+  remote_state[25] |= 0b00000001;
+}
+
+void IRDaikin2::off() {
+  remote_state[25] &= 0b11111110;
+}
+
+void IRDaikin2::setPower(const bool state) {
+  if (state)
+    on();
+  else
+    off();
+}
+
+bool IRDaikin2::getPower() {
+  return (remote_state[25] & 0b00000001);
+}
+
+uint8_t IRDaikin2::getMode() { return remote_state[25] >> 4; }
+
+void IRDaikin2::setMode(const uint8_t desired_mode) {
+  uint8_t mode = desired_mode;
+  switch (mode) {
+    case kDaikinCool:
+    case kDaikinHeat:
+    case kDaikinFan:
+    case kDaikinDry:
+      break;
+    default:
+      mode = kDaikinAuto;
+  }
+  remote_state[25] &= 0b10001111;
+  remote_state[25] |= (mode << 4);
+}
+
+// Set the temp in deg C
+void IRDaikin2::setTemp(const uint8_t desired) {
+  uint8_t temp = std::max(kDaikinMinTemp, desired);
+  temp = std::min(kDaikinMaxTemp, temp);
+  remote_state[26] = temp * 2;
+}
+
+uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRDaikin2::toString() {
+  String result = "";
+#else   // ARDUINO
+std::string IRDaikin2::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case kDaikinAuto:
+      result += " (AUTO)";
+      break;
+    case kDaikinCool:
+      result += " (COOL)";
+      break;
+    case kDaikinHeat:
+      result += " (HEAT)";
+      break;
+    case kDaikinDry:
+      result += " (DRY)";
+      break;
+    case kDaikinFan:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  return result;
 }
 
 #if DECODE_DAIKIN2
@@ -833,7 +931,7 @@ void IRDaikin2::stateReset() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Alpha / Untested.
+// Status: BETA / Work as expected.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote

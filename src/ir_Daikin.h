@@ -262,7 +262,7 @@ class IRDaikin2 {
   void setCurrentTime(uint16_t time);
   uint16_t getCurrentTime();
   uint8_t* getRaw();
-  void setRaw(uint8_t new_code[]);
+  void setRaw(const uint8_t new_code[]);
   uint32_t getCommand();
   void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
