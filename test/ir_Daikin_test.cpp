@@ -935,7 +935,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Clock: 14:50, "
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), Clock: 14:50, "
       "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off)",
       ac.toString());
 }
@@ -1009,6 +1009,48 @@ TEST(TestDaikin2Class, LightAndBeep) {
   ac.setBeep(kDaikinBeepLoud);
   EXPECT_EQ(kDaikinBeepLoud, ac.getBeep());
   EXPECT_EQ(kDaikinLightBright, ac.getLight());
+}
+
+TEST(TestDaikin2Class, FanSpeed) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax);
+  EXPECT_EQ(kDaikinFanMax, ac.getFan());
+
+  // Beyond Max should default to Auto.
+  ac.setFan(kDaikinFanMax + 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax - 1);
+  EXPECT_EQ(kDaikinFanMax - 1, ac.getFan());
+
+  ac.setFan(kDaikinFanMin);
+  EXPECT_EQ(kDaikinFanMin, ac.getFan());
+
+  ac.setFan(kDaikinFanMin + 1);
+  EXPECT_EQ(kDaikinFanMin + 1, ac.getFan());
+
+  // Beyond Min should default to Auto.
+  ac.setFan(kDaikinFanMin - 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
+
+  ac.setFan(kDaikinFanAuto);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanQuiet);
+  EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
 }
 
 TEST(TestUtils, Misc) {

@@ -822,10 +822,12 @@ void IRDaikin2::stateReset() {
   remote_state[1] = 0xDA;
   remote_state[2] = 0x27;
   remote_state[4] = 0x01;
+  remote_state[7] = 0x70;
   // remote_state[19] is a checksum byte, it will be set by checksum().
   remote_state[20] = 0x11;
   remote_state[21] = 0xDA;
   remote_state[22] = 0x27;
+  remote_state[28] = 0xA0;
   // remote_state[38] is a checksum byte, it will be set by checksum().
   checksum();
 }
@@ -881,6 +883,26 @@ void IRDaikin2::setTemp(const uint8_t desired) {
   uint8_t temp = std::max(kDaikinMinTemp, desired);
   temp = std::min(kDaikinMaxTemp, temp);
   remote_state[26] = temp * 2;
+}
+
+// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+void IRDaikin2::setFan(const uint8_t fan) {
+  // Set the fan speed bits, leave low 4 bits alone
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  remote_state[28] &= 0x0F;
+  remote_state[28] |= (fanset << 4);
+}
+
+uint8_t IRDaikin2::getFan() {
+  uint8_t fan = remote_state[28] >> 4;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  return fan;
 }
 
 uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
@@ -992,6 +1014,21 @@ std::string IRDaikin2::toString() {
       result += " (UNKNOWN)";
   }
   result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case kDaikinFanAuto:
+      result += " (Auto)";
+      break;
+    case kDaikinFanQuiet:
+      result += " (Quiet)";
+      break;
+    case kDaikinFanMin:
+      result += " (Min)";
+      break;
+    case kDaikinFanMax:
+      result += " (Max)";
+      break;
+  }
   result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
   result += ", On Time: ";
   if (getOnTimerEnabled())
