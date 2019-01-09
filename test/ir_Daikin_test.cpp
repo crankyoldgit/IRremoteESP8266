@@ -936,7 +936,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Clock: 14:50, "
-      "On Time: Off, Off Time: Off",
+      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off)",
       ac.toString());
 }
 
@@ -993,6 +993,22 @@ TEST(TestDaikin2Class, OnOffTimers) {
   EXPECT_EQ(kDaikinUnusedTime, ac.getOffTime());
   EXPECT_FALSE(ac.getOnTimerEnabled());
   EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+}
+
+TEST(TestDaikin2Class, LightAndBeep) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setLight(kDaikinLightOff);
+  EXPECT_EQ(kDaikinLightOff, ac.getLight());
+  ac.setBeep(kDaikinBeepOff);
+  EXPECT_EQ(kDaikinBeepOff, ac.getBeep());
+  ac.setLight(kDaikinLightBright);
+  EXPECT_EQ(kDaikinLightBright, ac.getLight());
+  EXPECT_EQ(kDaikinBeepOff, ac.getBeep());
+  ac.setBeep(kDaikinBeepLoud);
+  EXPECT_EQ(kDaikinBeepLoud, ac.getBeep());
+  EXPECT_EQ(kDaikinLightBright, ac.getLight());
 }
 
 TEST(TestUtils, Misc) {

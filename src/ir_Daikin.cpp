@@ -940,6 +940,24 @@ bool IRDaikin2::getOffTimerEnabled() {
   return remote_state[25] & kDaikinBitOffTimer;
 }
 
+uint8_t IRDaikin2::getBeep() {
+  return remote_state[7] >> 6;
+}
+
+void IRDaikin2::setBeep(const uint8_t beep) {
+  remote_state[7] &= 0b00111111;
+  remote_state[7] |= ((beep << 6) & 0b11000000);
+}
+
+uint8_t IRDaikin2::getLight() {
+  return (remote_state[7] & 0b00110000) >> 4;
+}
+
+void IRDaikin2::setLight(const uint8_t light) {
+  remote_state[7] &= 0b11001111;
+  remote_state[7] |= ((light << 4) & 0b00110000);
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRDaikin2::toString() {
@@ -985,6 +1003,34 @@ std::string IRDaikin2::toString() {
     result += IRDaikinESP::renderTime(getOffTime());
   else
     result += "Off";
+  result += ", Beep: " + uint64ToString(getBeep());
+  switch (getBeep()) {
+    case kDaikinBeepLoud:
+      result += " (Loud)";
+      break;
+    case kDaikinBeepQuiet:
+      result += " (Quiet)";
+      break;
+    case kDaikinBeepOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Light: " + uint64ToString(getLight());
+  switch (getLight()) {
+    case kDaikinLightBright:
+      result += " (Bright)";
+      break;
+    case kDaikinLightDim:
+      result += " (Dim)";
+      break;
+    case kDaikinLightOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
   return result;
 }
 
