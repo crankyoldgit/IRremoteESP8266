@@ -329,7 +329,7 @@ uint8_t IRDaikinESP::getBit(uint8_t byte, uint8_t bitmask) {
   return daikin[byte] & bitmask;
 }
 
-// starttime: Number of minutes after midnight, in 10 minutes increments
+// starttime: Number of minutes after midnight.
 void IRDaikinESP::enableOnTimer(uint16_t starttime) {
   setBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
   daikin[18] = (uint8_t)(starttime & 0x00FF);
@@ -339,7 +339,7 @@ void IRDaikinESP::enableOnTimer(uint16_t starttime) {
 }
 
 void IRDaikinESP::disableOnTimer() {
-  enableOnTimer(0x600);
+  enableOnTimer(kDaikinUnusedTime);
   clearBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
 }
 
@@ -355,7 +355,7 @@ bool IRDaikinESP::getOnTimerEnabled() {
   return getBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
 }
 
-// endtime: Number of minutes after midnight, in 10 minutes increments
+// endtime: Number of minutes after midnight.
 void IRDaikinESP::enableOffTimer(uint16_t endtime) {
   setBit(kDaikinByteOffTimer, kDaikinBitOffTimer);
   daikin[20] = (uint8_t)((endtime >> 4) & 0xFF);
@@ -364,7 +364,7 @@ void IRDaikinESP::enableOffTimer(uint16_t endtime) {
 }
 
 void IRDaikinESP::disableOffTimer() {
-  enableOffTimer(0x600);
+  enableOffTimer(kDaikinUnusedTime);
   clearBit(kDaikinByteOffTimer, kDaikinBitOffTimer);
 }
 
@@ -885,6 +885,61 @@ void IRDaikin2::setTemp(const uint8_t desired) {
 
 uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
 
+void IRDaikin2::setCurrentTime(uint16_t numMins) {
+  if (numMins > 24 * 60) numMins = 0;  // If > 23:59, set to 00:00
+  remote_state[5] = (uint8_t)(numMins & 0xFF);
+  // only keep 4 bits
+  remote_state[6] &= 0xF0;
+  remote_state[6] |= (uint8_t)((numMins >> 8) & 0x0F);
+}
+
+uint16_t IRDaikin2::getCurrentTime() {
+  return ((remote_state[6] & 0x0F) << 8) + remote_state[5];
+}
+
+// starttime: Number of minutes after midnight.
+void IRDaikin2::enableOnTimer(uint16_t starttime) {
+  remote_state[25] |= kDaikinBitOnTimer;  // Set the On Timer flag.
+  remote_state[30] = (uint8_t)(starttime & 0xFF);
+  // only keep 4 bits
+  remote_state[31] &= 0xF0;
+  remote_state[31] |= (uint8_t)((starttime >> 8) & 0x0F);
+}
+
+void IRDaikin2::disableOnTimer() {
+  enableOnTimer(kDaikinUnusedTime);
+  remote_state[25] &= ~kDaikinBitOnTimer;  // Clear the On Timer flag.
+}
+
+uint16_t IRDaikin2::getOnTime() {
+  return ((remote_state[31] & 0x0F) << 8) + remote_state[30];
+}
+
+bool IRDaikin2::getOnTimerEnabled() {
+  return remote_state[25] & kDaikinBitOnTimer;
+}
+
+// endtime: Number of minutes after midnight.
+void IRDaikin2::enableOffTimer(uint16_t endtime) {
+  remote_state[25] |= kDaikinBitOffTimer;  // Set the Off Timer flag.
+  remote_state[32] = (uint8_t)((endtime >> 4) & 0xFF);
+  remote_state[31] &= 0x0F;
+  remote_state[31] |= (uint8_t)((endtime & 0xF) << 4);
+}
+
+void IRDaikin2::disableOffTimer() {
+  enableOffTimer(kDaikinUnusedTime);
+  remote_state[25] &= ~kDaikinBitOffTimer;  // Clear the Off Timer flag.
+}
+
+uint16_t IRDaikin2::getOffTime() {
+  return (remote_state[32] << 4) + (remote_state[31] >> 4);
+}
+
+bool IRDaikin2::getOffTimerEnabled() {
+  return remote_state[25] & kDaikinBitOffTimer;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRDaikin2::toString() {
@@ -919,6 +974,17 @@ std::string IRDaikin2::toString() {
       result += " (UNKNOWN)";
   }
   result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
+  result += ", On Time: ";
+  if (getOnTimerEnabled())
+    result += IRDaikinESP::renderTime(getOnTime());
+  else
+    result += "Off";
+  result += ", Off Time: ";
+  if (getOffTimerEnabled())
+    result += IRDaikinESP::renderTime(getOffTime());
+  else
+    result += "Off";
   return result;
 }
 

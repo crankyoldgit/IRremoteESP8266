@@ -105,6 +105,7 @@ const uint8_t kDaikinByteOffTimer = 13;
 const uint8_t kDaikinBitOffTimer = 0b00000100;
 const uint8_t kDaikinByteOnTimer = 13;
 const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint16_t kDaikinUnusedTime = 0x600;
 const uint8_t kDaikinCurBit = kDaikinStateLength;
 const uint8_t kDaikinCurIndex = kDaikinStateLength + 1;
 const uint8_t kDaikinTolerance = 35;

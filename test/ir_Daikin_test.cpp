@@ -466,16 +466,16 @@ TEST(TestDaikinClass, OnOffTimers) {
   irdaikin.disableOnTimer();
   irdaikin.disableOffTimer();
   EXPECT_FALSE(irdaikin.getOnTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOnTime());
   EXPECT_FALSE(irdaikin.getOffTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOffTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOffTime());
 
   // Turn on just the On Timer.
   irdaikin.enableOnTimer(123);
   EXPECT_TRUE(irdaikin.getOnTimerEnabled());
   EXPECT_EQ(123, irdaikin.getOnTime());
   EXPECT_FALSE(irdaikin.getOffTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOffTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOffTime());
 
   // Now turn on the Off Timer.
   irdaikin.enableOffTimer(754);
@@ -487,16 +487,16 @@ TEST(TestDaikinClass, OnOffTimers) {
   // Turn off the just the On Timer.
   irdaikin.disableOnTimer();
   EXPECT_FALSE(irdaikin.getOnTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOnTime());
   EXPECT_TRUE(irdaikin.getOffTimerEnabled());
   EXPECT_EQ(754, irdaikin.getOffTime());
 
   // Now turn off the Off Timer.
   irdaikin.disableOffTimer();
   EXPECT_FALSE(irdaikin.getOffTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOffTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOffTime());
   EXPECT_FALSE(irdaikin.getOnTimerEnabled());
-  EXPECT_EQ(0x600, irdaikin.getOnTime());
+  EXPECT_EQ(kDaikinUnusedTime, irdaikin.getOnTime());
 
   // Use some canary values around the timers to ensure no accidental
   // bit flips happen. i.e. Neighbouring bytes in the state.
@@ -924,6 +924,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
       0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xD5, 0xF5,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x08, 0x26, 0x00, 0xA0, 0x00,
       0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x80, 0x60, 0xE7};
+  //  30    31    32    33    34    35    36    37    38
 
   irsend.reset();
   irsend.sendDaikin2(expectedState);
@@ -934,8 +935,64 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 19C",
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Clock: 14:50, "
+      "On Time: Off, Off Time: Off",
       ac.toString());
+}
+
+TEST(TestDaikin2Class, CurrentTime) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setCurrentTime(0);  // 00:00
+  EXPECT_EQ(0, ac.getCurrentTime());
+
+  ac.setCurrentTime(754);  // 12:34
+  EXPECT_EQ(754, ac.getCurrentTime());
+
+  ac.setCurrentTime(1439);  // 23:59
+  EXPECT_EQ(1439, ac.getCurrentTime());
+}
+
+TEST(TestDaikin2Class, OnOffTimers) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  // Both timers turned off.
+  ac.disableOnTimer();
+  ac.disableOffTimer();
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOffTime());
+
+  // Turn on just the On Timer.
+  ac.enableOnTimer(123);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(123, ac.getOnTime());
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOffTime());
+
+  // Now turn on the Off Timer.
+  ac.enableOffTimer(754);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(754, ac.getOffTime());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(123, ac.getOnTime());
+
+  // Turn off the just the On Timer.
+  ac.disableOnTimer();
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(754, ac.getOffTime());
+
+  // Now turn off the Off Timer.
+  ac.disableOffTimer();
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOffTime());
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
 }
 
 TEST(TestUtils, Misc) {
