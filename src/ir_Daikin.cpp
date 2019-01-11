@@ -907,12 +907,13 @@ uint8_t IRDaikin2::getFan() {
 
 uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
 
-void IRDaikin2::setCurrentTime(uint16_t numMins) {
-  if (numMins > 24 * 60) numMins = 0;  // If > 23:59, set to 00:00
-  remote_state[5] = (uint8_t)(numMins & 0xFF);
+void IRDaikin2::setCurrentTime(const uint16_t numMins) {
+  uint16_t mins = numMins;
+  if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  remote_state[5] = (uint8_t)(mins & 0xFF);
   // only keep 4 bits
   remote_state[6] &= 0xF0;
-  remote_state[6] |= (uint8_t)((numMins >> 8) & 0x0F);
+  remote_state[6] |= (uint8_t)((mins >> 8) & 0x0F);
 }
 
 uint16_t IRDaikin2::getCurrentTime() {
@@ -920,7 +921,7 @@ uint16_t IRDaikin2::getCurrentTime() {
 }
 
 // starttime: Number of minutes after midnight.
-void IRDaikin2::enableOnTimer(uint16_t starttime) {
+void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   remote_state[25] |= kDaikinBitOnTimer;  // Set the On Timer flag.
   remote_state[30] = (uint8_t)(starttime & 0xFF);
   // only keep 4 bits
@@ -942,7 +943,7 @@ bool IRDaikin2::getOnTimerEnabled() {
 }
 
 // endtime: Number of minutes after midnight.
-void IRDaikin2::enableOffTimer(uint16_t endtime) {
+void IRDaikin2::enableOffTimer(const uint16_t endtime) {
   remote_state[25] |= kDaikinBitOffTimer;  // Set the Off Timer flag.
   remote_state[32] = (uint8_t)((endtime >> 4) & 0xFF);
   remote_state[31] &= 0x0F;
@@ -979,6 +980,18 @@ void IRDaikin2::setLight(const uint8_t light) {
   remote_state[7] &= 0b11001111;
   remote_state[7] |= ((light << 4) & 0b00110000);
 }
+
+void IRDaikin2::setMold(const bool state) {
+  if (state)
+    remote_state[8] |= 0b00010000;
+  else
+    remote_state[8] &= 0b11101111;
+}
+
+bool IRDaikin2::getMold() {
+  return remote_state[8] & 0b00010000;
+}
+
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
@@ -1068,6 +1081,8 @@ std::string IRDaikin2::toString() {
     default:
       result += " (UNKNOWN)";
   }
+  result += ", Mold: ";
+  result += (getMold() ? "On" : "Off");
   return result;
 }
 

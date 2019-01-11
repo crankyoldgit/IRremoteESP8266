@@ -936,7 +936,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), Clock: 14:50, "
-      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off)",
+      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off), Mold: Off",
       ac.toString());
 }
 
@@ -1051,6 +1051,21 @@ TEST(TestDaikin2Class, FanSpeed) {
 
   ac.setFan(kDaikinFanQuiet);
   EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
+}
+
+// Test Mold mode.
+TEST(TestDaikin2Class, MoldSetting) {
+  IRDaikinESP ac(0);
+  ac.begin();
+
+  ac.setMold(false);
+  ASSERT_FALSE(ac.getMold());
+
+  ac.setMold(true);
+  ASSERT_TRUE(ac.getMold());
+
+  ac.setMold(false);
+  ASSERT_FALSE(ac.getMold());
 }
 
 TEST(TestUtils, Misc) {
