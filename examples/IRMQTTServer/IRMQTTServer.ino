@@ -777,7 +777,7 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendDaikin2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
-#if MITSUBISHI_AC
+#if SEND_MITSUBISHI_AC
     case MITSUBISHI_AC:
       irsend.sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
       break;
@@ -847,7 +847,7 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       irsend.sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
-#if SEND_MWM_
+#if SEND_MWM
     case MWM:
       irsend.sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
