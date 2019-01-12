@@ -927,6 +927,12 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
 
 uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] >> 4; }
 
+void IRDaikin2::setSwingHorizontal(const uint8_t position) {
+  remote_state[17] = position;
+}
+
+uint8_t IRDaikin2::getSwingHorizontal() { return remote_state[17]; }
+
 void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
   if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
@@ -1173,6 +1179,15 @@ std::string IRDaikin2::toString() {
       break;
     default:
       result += " (Unknown)";
+  }
+  result += ", Swing (H): " + uint64ToString(getSwingHorizontal());
+  switch (getSwingHorizontal()) {
+    case kDaikin2SwingHAuto:
+      result += " (Auto)";
+      break;
+    case kDaikin2SwingHSwing:
+      result += " (Swing)";
+      break;
   }
   result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
   result += ", On Time: ";

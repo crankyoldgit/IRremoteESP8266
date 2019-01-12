@@ -145,6 +145,9 @@ const uint8_t kDaikin2SwingVLow = 0x6;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
 const uint8_t kDaikin2SwingVCirculate = 0xD;
 const uint8_t kDaikin2SwingVAuto = 0xE;
+const uint8_t kDaikin2SwingHAuto = 0xBE;
+const uint8_t kDaikin2SwingHSwing = 0xBF;
+
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -249,10 +252,10 @@ class IRDaikin2 {
   uint8_t getFan();
   uint8_t getMode();
   void setMode(const uint8_t mode);
-  void setSwingVertical(const uint8_t setting);
+  void setSwingVertical(const uint8_t position);
   uint8_t getSwingVertical();
-  void setSwingHorizontal(const bool state);
-  bool getSwingHorizontal();
+  void setSwingHorizontal(const uint8_t position);
+  uint8_t getSwingHorizontal();
   bool getQuiet();
   void setQuiet(const bool state);
   bool getPowerful();
