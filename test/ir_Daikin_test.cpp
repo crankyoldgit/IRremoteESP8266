@@ -935,9 +935,11 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), Clock: 14:50, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 1 (Quiet), "
-      "Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, Eye: Off",
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), "
+      "Swing (V): 13 (Circulate), "
+      "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
+      "Beep: 1 (Quiet), Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, "
+      "Eye: Off",
       ac.toString());
 }
 
@@ -1179,6 +1181,31 @@ TEST(TestDaikin2Class, SleepTimer) {
   EXPECT_EQ(kDaikinUnusedTime, ac.getSleepTime());
   EXPECT_FALSE(ac.getOnTimerEnabled());
   EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+}
+
+// Test Vertical Swing.
+TEST(TestDaikin2Class, VerticalSwing) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setSwingVertical(1);
+  ASSERT_EQ(1, ac.getSwingVertical());
+  ac.setSwingVertical(3);
+  ASSERT_EQ(3, ac.getSwingVertical());
+  ac.setSwingVertical(6);
+  ASSERT_EQ(6, ac.getSwingVertical());
+  ac.setSwingVertical(kDaikin2SwingVBreeze);
+  ASSERT_EQ(kDaikin2SwingVBreeze, ac.getSwingVertical());
+  ac.setSwingVertical(kDaikin2SwingVCirculate);
+  ASSERT_EQ(kDaikin2SwingVCirculate, ac.getSwingVertical());
+  ac.setSwingVertical(kDaikin2SwingVAuto);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
+  ac.setSwingVertical(0);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
+  ac.setSwingVertical(7);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
+  ac.setSwingVertical(255);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
 }
 
 TEST(TestUtils, Misc) {

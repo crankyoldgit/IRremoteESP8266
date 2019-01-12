@@ -823,6 +823,8 @@ void IRDaikin2::stateReset() {
   remote_state[2] = 0x27;
   remote_state[4] = 0x01;
   remote_state[7] = 0x70;
+  remote_state[17] = 0xBE;
+  remote_state[18] = 0xE0;
   // remote_state[19] is a checksum byte, it will be set by checksum().
   remote_state[20] = 0x11;
   remote_state[21] = 0xDA;
@@ -906,6 +908,24 @@ uint8_t IRDaikin2::getFan() {
 }
 
 uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
+
+void IRDaikin2::setSwingVertical(const uint8_t position) {
+  switch (position) {
+    case kDaikin2SwingVHigh:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case kDaikin2SwingVLow:
+    case kDaikin2SwingVBreeze:
+    case kDaikin2SwingVCirculate:
+    case kDaikin2SwingVAuto:
+      remote_state[18] &= 0x0F;
+      remote_state[18] |= (position << 4);
+  }
+}
+
+uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] >> 4; }
 
 void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
@@ -1128,6 +1148,31 @@ std::string IRDaikin2::toString() {
     case kDaikinFanMax:
       result += " (Max)";
       break;
+  }
+  result += ", Swing (V): " + uint64ToString(getSwingVertical());
+  switch (getSwingVertical()) {
+    case kDaikin2SwingVHigh:
+      result += " (Highest)";
+      break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      break;
+    case kDaikin2SwingVLow:
+      result += " (Lowest)";
+      break;
+    case kDaikin2SwingVBreeze:
+      result += " (Breeze)";
+      break;
+    case kDaikin2SwingVCirculate:
+      result += " (Circulate)";
+      break;
+    case kDaikin2SwingVAuto:
+      result += " (Auto)";
+      break;
+    default:
+      result += " (Unknown)";
   }
   result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
   result += ", On Time: ";

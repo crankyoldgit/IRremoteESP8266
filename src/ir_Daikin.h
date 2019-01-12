@@ -105,7 +105,6 @@ const uint8_t kDaikinByteOffTimer = 13;
 const uint8_t kDaikinBitOffTimer = 0b00000100;
 const uint8_t kDaikinByteOnTimer = 13;
 const uint8_t kDaikinBitOnTimer = 0b00000010;
-const uint8_t kDaikin2BitSleepTimer = 0b00100000;
 const uint16_t kDaikinUnusedTime = 0x600;
 const uint8_t kDaikinBeepQuiet = 1;
 const uint8_t kDaikinBeepLoud = 2;
@@ -139,6 +138,13 @@ const uint16_t kDaikin2ZeroSpace = 451;
 const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
+
+const uint8_t kDaikin2BitSleepTimer = 0b00100000;
+const uint8_t kDaikin2SwingVHigh = 0x1;
+const uint8_t kDaikin2SwingVLow = 0x6;
+const uint8_t kDaikin2SwingVBreeze = 0xC;
+const uint8_t kDaikin2SwingVCirculate = 0xD;
+const uint8_t kDaikin2SwingVAuto = 0xE;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -243,8 +249,8 @@ class IRDaikin2 {
   uint8_t getFan();
   uint8_t getMode();
   void setMode(const uint8_t mode);
-  void setSwingVertical(const bool state);
-  bool getSwingVertical();
+  void setSwingVertical(const uint8_t setting);
+  uint8_t getSwingVertical();
   void setSwingHorizontal(const bool state);
   bool getSwingHorizontal();
   bool getQuiet();
