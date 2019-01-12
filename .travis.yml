@@ -40,6 +40,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnArgoAC/TurnOnArgoAC.ino
   - arduino --verify --board $BD $PWD/examples/IRMQTTServer/IRMQTTServer.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnToshibaAC/TurnOnToshibaAC.ino
+  - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino
   # Also check the tools programs compile.
   - (cd tools; make all)
   # Check for lint issues.
