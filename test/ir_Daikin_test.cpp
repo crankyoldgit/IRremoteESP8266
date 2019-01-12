@@ -924,7 +924,6 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
       0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xD5, 0xF5,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x08, 0x26, 0x00, 0xA0, 0x00,
       0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x80, 0x60, 0xE7};
-  //  30    31    32    33    34    35    36    37    38
 
   irsend.reset();
   irsend.sendDaikin2(expectedState);
@@ -936,10 +935,11 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), "
-      "Swing (V): 13 (Circulate), Swing (H): 190 (Auto), "
+      "Swing (V): 5, Swing (H): 190 (Auto), "
       "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
       "Beep: 1 (Quiet), Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, "
-      "Eye: Off, Quiet: Off, Powerful: Off",
+      "Eye: Off, Quiet: Off, Powerful: Off, Sensor: Off, Purify: Off, "
+      "Econo: Off",
       ac.toString());
 }
 
@@ -1253,6 +1253,123 @@ TEST(TestDaikin2Class, PowerfulMode) {
 
   ac.setQuiet(true);
   EXPECT_FALSE(ac.getPowerful());
+}
+
+// Test Sensor mode.
+TEST(TestDaikin2Class, SensorSetting) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setSensor(false);
+  ASSERT_FALSE(ac.getSensor());
+  ac.setSensor(true);
+  ASSERT_TRUE(ac.getSensor());
+  ac.setSensor(false);
+  ASSERT_FALSE(ac.getSensor());
+}
+
+// Test Purify mode.
+TEST(TestDaikin2Class, PurifySetting) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setPurify(false);
+  ASSERT_FALSE(ac.getPurify());
+  ac.setPurify(true);
+  ASSERT_TRUE(ac.getPurify());
+  ac.setPurify(false);
+  ASSERT_FALSE(ac.getPurify());
+}
+
+TEST(TestDaikin2Class, HumanReadable) {
+  IRDaikin2 ac(0);
+  ac.begin();
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(21);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(kDaikin2SwingVAuto);
+  ac.setSwingHorizontal(kDaikin2SwingHSwing);
+  ac.setCurrentTime(12 * 60 + 34);  // 12:34
+  ac.disableOnTimer();
+  ac.enableOffTimer(20 * 60);  // 20:00
+  ac.enableSleepTimer(4 * 60);  // 4:00
+  ac.setBeep(kDaikinBeepLoud);
+  ac.setLight(kDaikinLightDim);
+  ac.setMold(true);
+  ac.setClean(false);
+  ac.setFreshAir(true);
+  ac.setEye(true);
+  ac.setQuiet(false);
+  ac.setPowerful(true);
+  ac.setSensor(true);
+  ac.setPurify(true);
+  ac.setEcono(false);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 21C, Fan: 5 (Max), "
+      "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 12:34, "
+      "On Time: Off, Off Time: 20:00, Sleep Time: 4:00, Beep: 2 (Loud), "
+      "Light: 2 (Dim), Mold: On, Clean: Off, Fresh Air: Low, Eye: On, "
+      "Quiet: Off, Powerful: On, Sensor: On, Purify: On, Econo: Off",
+      ac.toString());
+  ac.setQuiet(true);
+  ac.setMode(kDaikinHeat);
+  ac.setBeep(kDaikinBeepQuiet);
+  ac.setLight(kDaikinLightBright);
+  ac.setTemp(32);
+  ac.setFan(kDaikinFanMin);
+  ac.setCurrentTime(23 * 60 + 45);  // 23:45
+  ac.enableOnTimer(9 * 60 + 11);  // 9:11
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (HEAT), Temp: 32C, Fan: 1 (Min), "
+      "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 23:45, "
+      "On Time: 9:11, Off Time: 20:00, Sleep Time: Off, Beep: 1 (Quiet), "
+      "Light: 1 (Bright), Mold: On, Clean: Off, Fresh Air: Low, Eye: On, "
+      "Quiet: On, Powerful: Off, Sensor: On, Purify: On, Econo: Off",
+      ac.toString());
+}
+
+// See if we can construct a known state.
+TEST(TestDaikin2Class, KnownConstruction) {
+  IRDaikin2 ac(0);
+
+  uint8_t expectedState[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x7A, 0xC3, 0x70, 0x28, 0x0C,
+      0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xD5, 0xF5,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x08, 0x26, 0x00, 0xA0, 0x00,
+      0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x80, 0x60, 0xE7};
+
+  ac.begin();
+  ac.setPower(false);
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(19);
+  ac.setFan(kDaikinFanAuto);
+  ac.setSwingVertical(5);
+  ac.setSwingHorizontal(kDaikin2SwingHAuto);
+  ac.setCurrentTime(14 * 60 + 50);  // 14:50
+  ac.disableOnTimer();
+  ac.disableOffTimer();
+  ac.disableSleepTimer();
+  ac.setBeep(kDaikinBeepQuiet);
+  ac.setLight(kDaikinLightOff);
+  ac.setMold(false);
+  ac.setClean(true);
+  ac.setFreshAir(false);
+  ac.setEye(false);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  ac.setSensor(false);
+  ac.setPurify(false);
+  ac.setEcono(false);
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), "
+      "Swing (V): 5, Swing (H): 190 (Auto), "
+      "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
+      "Beep: 1 (Quiet), Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, "
+      "Eye: Off, Quiet: Off, Powerful: Off, Sensor: Off, Purify: Off, "
+      "Econo: Off",
+      ac.toString());
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin2Bits);
 }
 
 TEST(TestUtils, Misc) {

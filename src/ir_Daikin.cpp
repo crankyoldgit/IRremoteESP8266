@@ -822,15 +822,30 @@ void IRDaikin2::stateReset() {
   remote_state[1] = 0xDA;
   remote_state[2] = 0x27;
   remote_state[4] = 0x01;
+  remote_state[6] = 0xC0;
   remote_state[7] = 0x70;
+  remote_state[8] = 0x08;
+  remote_state[9] = 0x0C;
+  remote_state[10] = 0x80;
+  remote_state[11] = 0x04;
+  remote_state[12] = 0xB0;
+  remote_state[13] = 0x16;
+  remote_state[14] = 0x24;
   remote_state[17] = 0xBE;
-  remote_state[18] = 0xE0;
+  remote_state[18] = 0xD0;
   // remote_state[19] is a checksum byte, it will be set by checksum().
   remote_state[20] = 0x11;
   remote_state[21] = 0xDA;
   remote_state[22] = 0x27;
+  remote_state[25] = 0x08;
   remote_state[28] = 0xA0;
+  remote_state[35] = 0xC1;
+  remote_state[36] = 0x80;
+  remote_state[37] = 0x60;
   // remote_state[38] is a checksum byte, it will be set by checksum().
+  disableOnTimer();
+  disableOffTimer();
+  disableSleepTimer();
   checksum();
 }
 
@@ -920,12 +935,12 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
     case kDaikin2SwingVBreeze:
     case kDaikin2SwingVCirculate:
     case kDaikin2SwingVAuto:
-      remote_state[18] &= 0x0F;
-      remote_state[18] |= (position << 4);
+      remote_state[18] &= 0xF0;
+      remote_state[18] |= (position & 0x0F);
   }
 }
 
-uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] >> 4; }
+uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] & 0x0F; }
 
 void IRDaikin2::setSwingHorizontal(const uint8_t position) {
   remote_state[17] = position;
@@ -1014,8 +1029,8 @@ void IRDaikin2::setLight(const uint8_t light) {
   remote_state[7] |= ((light << 4) & 0b00110000);
 }
 
-void IRDaikin2::setMold(const bool state) {
-  if (state)
+void IRDaikin2::setMold(const bool on) {
+  if (on)
     remote_state[8] |= 0b00010000;
   else
     remote_state[8] &= 0b11101111;
@@ -1026,8 +1041,8 @@ bool IRDaikin2::getMold() {
 }
 
 // Auto clean setting.
-void IRDaikin2::setClean(const bool state) {
-  if (state)
+void IRDaikin2::setClean(const bool on) {
+  if (on)
     remote_state[8] |= 0b00100000;
   else
     remote_state[8] &= 0b11011111;
@@ -1106,8 +1121,8 @@ bool IRDaikin2::getSleepTimerEnabled() {
   return remote_state[36] & kDaikin2BitSleepTimer;
 }
 
-void IRDaikin2::setQuiet(bool state) {
-  if (state) {
+void IRDaikin2::setQuiet(const bool on) {
+  if (on) {
     remote_state[33] |= kDaikinBitSilent;
     // Powerful & Quiet mode being on are mutually exclusive.
     setPowerful(false);
@@ -1118,8 +1133,8 @@ void IRDaikin2::setQuiet(bool state) {
 
 bool IRDaikin2::getQuiet() { return remote_state[33] & kDaikinBitSilent; }
 
-void IRDaikin2::setPowerful(bool state) {
-  if (state) {
+void IRDaikin2::setPowerful(const bool on) {
+  if (on) {
     remote_state[33] |= kDaikinBitPowerful;
     // Powerful & Quiet mode being on are mutually exclusive.
     setQuiet(false);
@@ -1129,6 +1144,24 @@ void IRDaikin2::setPowerful(bool state) {
 }
 
 bool IRDaikin2::getPowerful() { return remote_state[33] & kDaikinBitPowerful; }
+
+void IRDaikin2::setSensor(const bool on) {
+  if (on)
+    remote_state[34] |= kDaikinBitSensor;
+  else
+    remote_state[34] &= ~kDaikinBitSensor;
+}
+
+bool IRDaikin2::getSensor() { return remote_state[34] & kDaikinBitSensor; }
+
+void IRDaikin2::setPurify(const bool on) {
+  if (on)
+    remote_state[34] |= kDaikin2BitPurify;
+  else
+    remote_state[34] &= ~kDaikin2BitPurify;
+}
+
+bool IRDaikin2::getPurify() { return remote_state[34] & kDaikin2BitPurify; }
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
@@ -1272,6 +1305,12 @@ std::string IRDaikin2::toString() {
   result += (getQuiet() ? "On" : "Off");
   result += ", Powerful: ";
   result += (getPowerful() ? "On" : "Off");
+  result += ", Sensor: ";
+  result += (getSensor() ? "On" : "Off");
+  result += ", Purify: ";
+  result += (getPurify() ? "On" : "Off");
+  result += ", Econo: ";
+  result += (getEcono() ? "On" : "Off");
   return result;
 }
 
