@@ -1106,6 +1106,30 @@ bool IRDaikin2::getSleepTimerEnabled() {
   return remote_state[36] & kDaikin2BitSleepTimer;
 }
 
+void IRDaikin2::setQuiet(bool state) {
+  if (state) {
+    remote_state[33] |= kDaikinBitSilent;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    setPowerful(false);
+  } else {
+    remote_state[33] &= ~kDaikinBitSilent;
+  }
+}
+
+bool IRDaikin2::getQuiet() { return remote_state[33] & kDaikinBitSilent; }
+
+void IRDaikin2::setPowerful(bool state) {
+  if (state) {
+    remote_state[33] |= kDaikinBitPowerful;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    setQuiet(false);
+  } else {
+    remote_state[33] &= ~kDaikinBitPowerful;
+  }
+}
+
+bool IRDaikin2::getPowerful() { return remote_state[33] & kDaikinBitPowerful; }
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRDaikin2::toString() {
@@ -1244,6 +1268,10 @@ std::string IRDaikin2::toString() {
     result += "Off";
   result += ", Eye: ";
   result += (getEye() ? "On" : "Off");
+  result += ", Quiet: ";
+  result += (getQuiet() ? "On" : "Off");
+  result += ", Powerful: ";
+  result += (getPowerful() ? "On" : "Off");
   return result;
 }
 

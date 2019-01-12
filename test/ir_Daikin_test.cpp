@@ -939,7 +939,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
       "Swing (V): 13 (Circulate), Swing (H): 190 (Auto), "
       "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
       "Beep: 1 (Quiet), Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, "
-      "Eye: Off",
+      "Eye: Off, Quiet: Off, Powerful: Off",
       ac.toString());
 }
 
@@ -1218,6 +1218,41 @@ TEST(TestDaikin2Class, Swing) {
   ASSERT_EQ(0, ac.getSwingHorizontal());
   ac.setSwingHorizontal(255);
   ASSERT_EQ(255, ac.getSwingHorizontal());
+}
+
+TEST(TestDaikin2Class, QuietMode) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+
+  // But setting Powerful mode should exit out of quiet mode.
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getQuiet());
+}
+
+TEST(TestDaikin2Class, PowerfulMode) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getPowerful());
+
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getPowerful());
 }
 
 TEST(TestUtils, Misc) {
