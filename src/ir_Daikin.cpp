@@ -921,7 +921,9 @@ uint16_t IRDaikin2::getCurrentTime() {
 }
 
 // starttime: Number of minutes after midnight.
+// Note: Timer location is shared with sleep timer.
 void IRDaikin2::enableOnTimer(const uint16_t starttime) {
+  clearSleepTimerFlag();
   remote_state[25] |= kDaikinBitOnTimer;  // Set the On Timer flag.
   remote_state[30] = (uint8_t)(starttime & 0xFF);
   // only keep 4 bits
@@ -929,9 +931,14 @@ void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   remote_state[31] |= (uint8_t)((starttime >> 8) & 0x0F);
 }
 
+void IRDaikin2::clearOnTimerFlag() {
+  remote_state[25] &= ~kDaikinBitOnTimer;
+}
+
 void IRDaikin2::disableOnTimer() {
   enableOnTimer(kDaikinUnusedTime);
-  remote_state[25] &= ~kDaikinBitOnTimer;  // Clear the On Timer flag.
+  clearOnTimerFlag();
+  clearSleepTimerFlag();
 }
 
 uint16_t IRDaikin2::getOnTime() {
@@ -1027,6 +1034,52 @@ bool IRDaikin2::getFreshAirHigh() {
   return remote_state[8] & 0b10000000;
 }
 
+void IRDaikin2::setEye(bool on) {
+  if (on)
+    remote_state[13] |= 0b10000000;
+  else
+    remote_state[13] &= 0b01111111;
+}
+
+bool IRDaikin2::getEye() {
+  return remote_state[13] & 0b10000000;
+}
+
+void IRDaikin2::setEcono(bool on) {
+  if (on)
+    remote_state[36] |= 0b00001000;
+  else
+    remote_state[36] &= 0b11110111;
+}
+
+bool IRDaikin2::getEcono() {
+  return remote_state[36] & 0b00001000;
+}
+
+// sleeptime: Number of minutes.
+// Note: Timer location is shared with On Timer.
+void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
+  enableOnTimer(sleeptime);
+  clearOnTimerFlag();
+  remote_state[36] |= kDaikin2BitSleepTimer;  // Set the Sleep Timer flag.
+}
+
+void IRDaikin2::clearSleepTimerFlag() {
+  remote_state[36] &= ~kDaikin2BitSleepTimer;
+}
+
+void IRDaikin2::disableSleepTimer() {
+  disableOnTimer();
+}
+
+uint16_t IRDaikin2::getSleepTime() {
+  return getOnTime();
+}
+
+bool IRDaikin2::getSleepTimerEnabled() {
+  return remote_state[36] & kDaikin2BitSleepTimer;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRDaikin2::toString() {
@@ -1087,6 +1140,11 @@ std::string IRDaikin2::toString() {
     result += IRDaikinESP::renderTime(getOffTime());
   else
     result += "Off";
+  result += ", Sleep Time: ";
+  if (getSleepTimerEnabled())
+    result += IRDaikinESP::renderTime(getSleepTime());
+  else
+    result += "Off";
   result += ", Beep: " + uint64ToString(getBeep());
   switch (getBeep()) {
     case kDaikinBeepLoud:
@@ -1124,6 +1182,8 @@ std::string IRDaikin2::toString() {
     result += (getFreshAirHigh() ? "High" : "Low");
   else
     result += "Off";
+  result += ", Eye: ";
+  result += (getEye() ? "On" : "Off");
   return result;
 }
 

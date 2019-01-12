@@ -105,6 +105,7 @@ const uint8_t kDaikinByteOffTimer = 13;
 const uint8_t kDaikinBitOffTimer = 0b00000100;
 const uint8_t kDaikinByteOnTimer = 13;
 const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint8_t kDaikin2BitSleepTimer = 0b00100000;
 const uint16_t kDaikinUnusedTime = 0x600;
 const uint8_t kDaikinBeepQuiet = 1;
 const uint8_t kDaikinBeepLoud = 2;
@@ -262,6 +263,10 @@ class IRDaikin2 {
   void disableOnTimer();
   uint16_t getOnTime();
   bool getOnTimerEnabled();
+  void enableSleepTimer(const uint16_t sleeptime);
+  void disableSleepTimer();
+  uint16_t getSleepTime();
+  bool getSleepTimerEnabled();
   void enableOffTimer(const uint16_t endtime);
   void disableOffTimer();
   uint16_t getOffTime();
@@ -297,6 +302,8 @@ class IRDaikin2 {
   uint8_t remote_state[kDaikin2StateLength];
   void stateReset();
   void checksum();
+  void clearOnTimerFlag();
+  void clearSleepTimerFlag();
   IRsend _irsend;
 };
 

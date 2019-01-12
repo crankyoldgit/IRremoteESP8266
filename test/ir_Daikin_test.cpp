@@ -936,8 +936,8 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), Clock: 14:50, "
-      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off), "
-      "Mold: Off, Clean: On, Fresh Air: Off",
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 1 (Quiet), "
+      "Light: 3 (Off), Mold: Off, Clean: On, Fresh Air: Off, Eye: Off",
       ac.toString());
 }
 
@@ -1108,6 +1108,77 @@ TEST(TestDaikin2Class, FreshAirSettings) {
   ac.setFreshAirHigh(false);
   ASSERT_FALSE(ac.getFreshAir());
   ASSERT_FALSE(ac.getFreshAirHigh());
+}
+
+// Test Eye mode.
+TEST(TestDaikin2Class, EyeSetting) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setEye(false);
+  ASSERT_FALSE(ac.getEye());
+  ac.setEye(true);
+  ASSERT_TRUE(ac.getEye());
+  ac.setEye(false);
+  ASSERT_FALSE(ac.getEye());
+}
+
+// Test Econo setting.
+TEST(TestDaikin2Class, EconoSetting) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setEcono(false);
+  ASSERT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  ASSERT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  ASSERT_FALSE(ac.getEcono());
+}
+
+TEST(TestDaikin2Class, SleepTimer) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  // NOTE: On & Sleep timer share the same time location.
+
+  // Both timers turned off.
+  ac.disableOnTimer();
+  ac.disableSleepTimer();
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+  EXPECT_FALSE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getSleepTime());
+
+  // Turn on just the On Timer.
+  ac.enableOnTimer(123);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(123, ac.getOnTime());
+  EXPECT_FALSE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(123, ac.getSleepTime());
+
+  // Now turn on the Sleep Timer. This shoud disable the On Timer.
+  ac.enableSleepTimer(754);
+  EXPECT_TRUE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(754, ac.getSleepTime());
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(754, ac.getOnTime());
+
+  // Turn off the just the On Timer.
+  ac.disableOnTimer();
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
+  EXPECT_FALSE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getSleepTime());
+
+  // Now turn on the On Timer and turn off the Sleep Timer.
+  // Both should be off afterwards.
+  ac.enableOnTimer(123);
+  ac.disableSleepTimer();
+  EXPECT_FALSE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getSleepTime());
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(kDaikinUnusedTime, ac.getOnTime());
 }
 
 TEST(TestUtils, Misc) {
