@@ -936,7 +936,8 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), Clock: 14:50, "
-      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off), Mold: Off",
+      "On Time: Off, Off Time: Off, Beep: 1 (Quiet), Light: 3 (Off), "
+      "Mold: Off, Clean: On, Fresh Air: Off",
       ac.toString());
 }
 
@@ -1055,7 +1056,7 @@ TEST(TestDaikin2Class, FanSpeed) {
 
 // Test Mold mode.
 TEST(TestDaikin2Class, MoldSetting) {
-  IRDaikinESP ac(0);
+  IRDaikin2 ac(0);
   ac.begin();
 
   ac.setMold(false);
@@ -1066,6 +1067,47 @@ TEST(TestDaikin2Class, MoldSetting) {
 
   ac.setMold(false);
   ASSERT_FALSE(ac.getMold());
+}
+
+// Test Auto Clean setting.
+TEST(TestDaikin2Class, CleanSetting) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setClean(false);
+  ASSERT_FALSE(ac.getClean());
+
+  ac.setClean(true);
+  ASSERT_TRUE(ac.getClean());
+
+  ac.setClean(false);
+  ASSERT_FALSE(ac.getClean());
+}
+// Test Fresh Air settings.
+TEST(TestDaikin2Class, FreshAirSettings) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setFreshAir(false);
+  ac.setFreshAirHigh(false);
+  ASSERT_FALSE(ac.getFreshAir());
+  ASSERT_FALSE(ac.getFreshAirHigh());
+
+  ac.setFreshAir(true);
+  ASSERT_TRUE(ac.getFreshAir());
+  ASSERT_FALSE(ac.getFreshAirHigh());
+
+  ac.setFreshAirHigh(true);
+  ASSERT_TRUE(ac.getFreshAir());
+  ASSERT_TRUE(ac.getFreshAirHigh());
+
+  ac.setFreshAir(false);
+  ASSERT_FALSE(ac.getFreshAir());
+  ASSERT_TRUE(ac.getFreshAirHigh());
+
+  ac.setFreshAirHigh(false);
+  ASSERT_FALSE(ac.getFreshAir());
+  ASSERT_FALSE(ac.getFreshAirHigh());
 }
 
 TEST(TestUtils, Misc) {

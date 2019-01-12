@@ -992,6 +992,40 @@ bool IRDaikin2::getMold() {
   return remote_state[8] & 0b00010000;
 }
 
+// Auto clean setting.
+void IRDaikin2::setClean(const bool state) {
+  if (state)
+    remote_state[8] |= 0b00100000;
+  else
+    remote_state[8] &= 0b11011111;
+}
+
+bool IRDaikin2::getClean() {
+  return remote_state[8] & 0b00100000;
+}
+
+// Fresh Air settings.
+void IRDaikin2::setFreshAir(const bool on) {
+  if (on)
+    remote_state[8] |= 0b00000001;
+  else
+    remote_state[8] &= 0b11111110;
+}
+
+bool IRDaikin2::getFreshAir() {
+  return remote_state[8] & 0b00000001;
+}
+
+void IRDaikin2::setFreshAirHigh(const bool on) {
+  if (on)
+    remote_state[8] |= 0b10000000;
+  else
+    remote_state[8] &= 0b01111111;
+}
+
+bool IRDaikin2::getFreshAirHigh() {
+  return remote_state[8] & 0b10000000;
+}
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
@@ -1083,6 +1117,13 @@ std::string IRDaikin2::toString() {
   }
   result += ", Mold: ";
   result += (getMold() ? "On" : "Off");
+  result += ", Clean: ";
+  result += (getClean() ? "On" : "Off");
+  result += ", Fresh Air: ";
+  if (getFreshAir())
+    result += (getFreshAirHigh() ? "High" : "Low");
+  else
+    result += "Off";
   return result;
 }
 

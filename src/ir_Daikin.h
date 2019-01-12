@@ -272,6 +272,12 @@ class IRDaikin2 {
   uint8_t getBeep();
   void setLight(const uint8_t light);
   uint8_t getLight();
+  void setClean(const bool state);
+  bool getClean();
+  void setFreshAir(const bool on);
+  bool getFreshAir();
+  void setFreshAirHigh(const bool on);
+  bool getFreshAirHigh();
   uint8_t* getRaw();
   void setRaw(const uint8_t new_code[]);
   uint32_t getCommand();
