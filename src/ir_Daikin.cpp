@@ -780,7 +780,7 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/582
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
-
+//   https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
 IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRDaikin2::begin() { _irsend.begin(); }
