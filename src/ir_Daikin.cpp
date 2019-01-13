@@ -1,11 +1,11 @@
 /*
-An Arduino sketch to emulate IR Daikin ARC433** remote control unit
+An Arduino sketch to emulate IR Daikin ARC433** & ARC477A1 remote control unit
 Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
 Copyright 2016 sillyfrog
 Copyright 2017 sillyfrog, crankyoldgit
-Copyright 2018 crankyoldgit
+Copyright 2018-2019 crankyoldgit
 */
 
 #include "ir_Daikin.h"
@@ -772,6 +772,11 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 #endif  // SEND_DAIKIN2
 
 // Class for handling Daikin2 A/C messages.
+//
+// Code by crankyoldgit, Reverse engineering analysis by sheppy99
+//
+// Supported Remotes: Daikin ARC477A1 remote
+//
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/582
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
@@ -1322,6 +1327,10 @@ std::string IRDaikin2::toString() {
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin FTXZ25NV1B, FTXZ35NV1B, FTXZ50NV1B Aircon
+// - Daikin ARC477A1 remote
 //
 // Status: BETA / Work as expected.
 //

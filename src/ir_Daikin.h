@@ -1,5 +1,6 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
+// Copyright 2018-2019 crankyoldgit
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
 
@@ -126,7 +127,7 @@ const uint16_t kDaikinGap = 29000;
 const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
-// Another variant of the protocol.
+// Another variant of the protocol for the Daikin ARC477A1 remote.
 const uint16_t kDaikin2LeaderMark = 10024;
 const uint16_t kDaikin2LeaderSpace = 25180;
 const uint16_t kDaikin2Gap = kDaikin2LeaderMark + kDaikin2LeaderSpace;
@@ -235,6 +236,7 @@ class IRDaikinESP {
   IRsend _irsend;
 };
 
+// Class to emulate a Daikin ARC477A1 remote.
 class IRDaikin2 {
  public:
   explicit IRDaikin2(uint16_t pin);
