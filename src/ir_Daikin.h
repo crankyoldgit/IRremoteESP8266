@@ -142,6 +142,15 @@ const uint16_t kDaikin2Section2Length = 19;
 
 const uint8_t kDaikin2BitSleepTimer = 0b00100000;
 const uint8_t kDaikin2BitPurify = 0b00010000;
+const uint8_t kDaikin2BitEcono = 0b00001000;
+const uint8_t kDaikin2BitEye = 0b00000010;
+const uint8_t kDaikin2BitEyeAuto = 0b10000000;
+const uint8_t kDaikin2BitMold = 0b00001000;
+const uint8_t kDaikin2BitClean = 0b00100000;
+const uint8_t kDaikin2BitFreshAir = 0b00000001;
+const uint8_t kDaikin2BitFreshAirHigh = 0b10000000;
+const uint8_t kDaikin2LightMask = 0b00110000;
+const uint8_t kDaikin2BeepMask = 0b11000000;
 const uint8_t kDaikin2SwingVHigh = 0x1;
 const uint8_t kDaikin2SwingVLow = 0x6;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
@@ -269,6 +278,8 @@ class IRDaikin2 {
   bool getEcono();
   void setEye(const bool on);
   bool getEye();
+  void setEyeAuto(const bool on);
+  bool getEyeAuto();
   void setPurify(const bool on);
   bool getPurify();
   void setMold(const bool on);

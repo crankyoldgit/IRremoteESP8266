@@ -865,11 +865,11 @@ void IRDaikin2::setRaw(const uint8_t new_code[]) {
 }
 
 void IRDaikin2::on() {
-  remote_state[25] |= 0b00000001;
+  remote_state[25] |= kDaikinBitPower;
 }
 
 void IRDaikin2::off() {
-  remote_state[25] &= 0b11111110;
+  remote_state[25] &= ~kDaikinBitPower;
 }
 
 void IRDaikin2::setPower(const bool state) {
@@ -880,7 +880,7 @@ void IRDaikin2::setPower(const bool state) {
 }
 
 bool IRDaikin2::getPower() {
-  return (remote_state[25] & 0b00000001);
+  return (remote_state[25] & kDaikinBitPower);
 }
 
 uint8_t IRDaikin2::getMode() { return remote_state[25] >> 4; }
@@ -1021,85 +1021,96 @@ uint8_t IRDaikin2::getBeep() {
 }
 
 void IRDaikin2::setBeep(const uint8_t beep) {
-  remote_state[7] &= 0b00111111;
-  remote_state[7] |= ((beep << 6) & 0b11000000);
+  remote_state[7] &= ~kDaikin2BeepMask;
+  remote_state[7] |= ((beep << 6) & kDaikin2BeepMask);
 }
 
 uint8_t IRDaikin2::getLight() {
-  return (remote_state[7] & 0b00110000) >> 4;
+  return (remote_state[7] & kDaikin2LightMask) >> 4;
 }
 
 void IRDaikin2::setLight(const uint8_t light) {
-  remote_state[7] &= 0b11001111;
-  remote_state[7] |= ((light << 4) & 0b00110000);
+  remote_state[7] &= ~kDaikin2LightMask;
+  remote_state[7] |= ((light << 4) & kDaikin2LightMask);
 }
 
 void IRDaikin2::setMold(const bool on) {
   if (on)
-    remote_state[8] |= 0b00010000;
+    remote_state[8] |= kDaikin2BitMold;
   else
-    remote_state[8] &= 0b11101111;
+    remote_state[8] &= ~kDaikin2BitMold;
 }
 
 bool IRDaikin2::getMold() {
-  return remote_state[8] & 0b00010000;
+  return remote_state[8] & kDaikin2BitMold;
 }
 
 // Auto clean setting.
 void IRDaikin2::setClean(const bool on) {
   if (on)
-    remote_state[8] |= 0b00100000;
+    remote_state[8] |= kDaikin2BitClean;
   else
-    remote_state[8] &= 0b11011111;
+    remote_state[8] &= ~kDaikin2BitClean;
 }
 
 bool IRDaikin2::getClean() {
-  return remote_state[8] & 0b00100000;
+  return remote_state[8] & kDaikin2BitClean;
 }
 
 // Fresh Air settings.
 void IRDaikin2::setFreshAir(const bool on) {
   if (on)
-    remote_state[8] |= 0b00000001;
+    remote_state[8] |= kDaikin2BitFreshAir;
   else
-    remote_state[8] &= 0b11111110;
+    remote_state[8] &= ~kDaikin2BitFreshAir;
 }
 
 bool IRDaikin2::getFreshAir() {
-  return remote_state[8] & 0b00000001;
+  return remote_state[8] & kDaikin2BitFreshAir;
 }
 
 void IRDaikin2::setFreshAirHigh(const bool on) {
   if (on)
-    remote_state[8] |= 0b10000000;
+    remote_state[8] |= kDaikin2BitFreshAirHigh;
   else
-    remote_state[8] &= 0b01111111;
+    remote_state[8] &= ~kDaikin2BitFreshAirHigh;
 }
 
 bool IRDaikin2::getFreshAirHigh() {
-  return remote_state[8] & 0b10000000;
+  return remote_state[8] & kDaikin2BitFreshAirHigh;
+}
+
+void IRDaikin2::setEyeAuto(bool on) {
+  if (on)
+    remote_state[13] |= kDaikin2BitEyeAuto;
+  else
+    remote_state[13] &= ~kDaikin2BitEyeAuto;
+}
+
+bool IRDaikin2::getEyeAuto() {
+  return remote_state[13] & kDaikin2BitEyeAuto;
 }
 
 void IRDaikin2::setEye(bool on) {
   if (on)
-    remote_state[13] |= 0b10000000;
+    remote_state[36] |= kDaikin2BitEye;
   else
-    remote_state[13] &= 0b01111111;
+    remote_state[36] &= ~kDaikin2BitEye;
 }
 
 bool IRDaikin2::getEye() {
-  return remote_state[13] & 0b10000000;
+  return remote_state[36] & kDaikin2BitEye;
 }
 
 void IRDaikin2::setEcono(bool on) {
   if (on)
-    remote_state[36] |= 0b00001000;
+    remote_state[36] |= kDaikin2BitEcono;
   else
-    remote_state[36] &= 0b11110111;
+    remote_state[36] &= ~kDaikin2BitEcono;
 }
 
 bool IRDaikin2::getEcono() {
-  return remote_state[36] & 0b00001000;
+  return remote_state[36] & kDaikin2BitEcono;
 }
 
 // sleeptime: Number of minutes.
@@ -1150,23 +1161,14 @@ void IRDaikin2::setPowerful(const bool on) {
 
 bool IRDaikin2::getPowerful() { return remote_state[33] & kDaikinBitPowerful; }
 
-void IRDaikin2::setSensor(const bool on) {
-  if (on)
-    remote_state[34] |= kDaikinBitSensor;
-  else
-    remote_state[34] &= ~kDaikinBitSensor;
-}
-
-bool IRDaikin2::getSensor() { return remote_state[34] & kDaikinBitSensor; }
-
 void IRDaikin2::setPurify(const bool on) {
   if (on)
-    remote_state[34] |= kDaikin2BitPurify;
+    remote_state[36] |= kDaikin2BitPurify;
   else
-    remote_state[34] &= ~kDaikin2BitPurify;
+    remote_state[36] &= ~kDaikin2BitPurify;
 }
 
-bool IRDaikin2::getPurify() { return remote_state[34] & kDaikin2BitPurify; }
+bool IRDaikin2::getPurify() { return remote_state[36] & kDaikin2BitPurify; }
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
@@ -1306,12 +1308,12 @@ std::string IRDaikin2::toString() {
     result += "Off";
   result += ", Eye: ";
   result += (getEye() ? "On" : "Off");
+  result += ", Eye Auto: ";
+  result += (getEyeAuto() ? "On" : "Off");
   result += ", Quiet: ";
   result += (getQuiet() ? "On" : "Off");
   result += ", Powerful: ";
   result += (getPowerful() ? "On" : "Off");
-  result += ", Sensor: ";
-  result += (getSensor() ? "On" : "Off");
   result += ", Purify: ";
   result += (getPurify() ? "On" : "Off");
   result += ", Econo: ";
