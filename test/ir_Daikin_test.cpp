@@ -1296,7 +1296,7 @@ TEST(TestDaikin2Class, HumanReadable) {
       "Power: On, Mode: 3 (COOL), Temp: 21C, Fan: 5 (Max), "
       "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 12:34, "
       "On Time: Off, Off Time: 20:00, Sleep Time: 4:00, Beep: 2 (Loud), "
-      "Light: 2 (Dim), Mold: On, Clean: Off, Fresh Air: Low, Eye: On, "
+      "Light: 2 (Dim), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
       "Eye Auto: On, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
       ac.toString());
   ac.setQuiet(true);
@@ -1311,7 +1311,7 @@ TEST(TestDaikin2Class, HumanReadable) {
       "Power: On, Mode: 4 (HEAT), Temp: 32C, Fan: 1 (Min), "
       "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 23:45, "
       "On Time: 9:11, Off Time: 20:00, Sleep Time: Off, Beep: 1 (Quiet), "
-      "Light: 1 (Bright), Mold: On, Clean: Off, Fresh Air: Low, Eye: On, "
+      "Light: 1 (Bright), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
       "Eye Auto: On, Quiet: On, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }
@@ -1386,5 +1386,68 @@ TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
       "Off Time: Off, Sleep Time: Off, Beep: 3 (Off), Light: 3 (Off), "
       "Mold: On, Clean: On, Fresh Air: Off, Eye: On, Eye Auto: Off, "
       "Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+}
+
+// https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?ts=5c317775#gid=1023395743
+TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
+  IRDaikin2 ac(0);
+
+  const uint8_t PowerfulOn[39] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x3A, 0x43, 0xF0, 0x28, 0x0C,
+      0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xCE, 0xAE,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x39, 0x28, 0x00, 0xA0, 0x00,
+      0x00, 0x06, 0x60, 0x01, 0x00, 0xC1, 0x90, 0x60, 0x2B};
+  const uint8_t PowerfulOff[39] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x3A, 0x43, 0xF0, 0x28, 0x0C,
+      0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xCE, 0xAE,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x39, 0x28, 0x00, 0xA0, 0x00,
+      0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x90, 0x60, 0x2A};
+  ac.setRaw(PowerfulOn);
+  ASSERT_TRUE(ac.getPowerful());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 20C, Fan: 10 (Auto), "
+      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 13:46, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
+      ac.toString());
+  ac.setRaw(PowerfulOff);
+  ASSERT_FALSE(ac.getPowerful());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 20C, Fan: 10 (Auto), "
+      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 13:46, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+
+  const uint8_t EconoOn[39] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x3B, 0x43, 0xF0, 0x28, 0x0C,
+      0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xCE, 0xAF,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x39, 0x28, 0x00, 0xA0, 0x00,
+      0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x94, 0x60, 0x2E};
+  const uint8_t EconoOff[39] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x3B, 0x43, 0xF0, 0x28, 0x0C,
+      0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xCE, 0xAF,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x39, 0x28, 0x00, 0xA0, 0x00,
+      0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x90, 0x60, 0x2A};
+  ac.setRaw(EconoOn);
+  ASSERT_TRUE(ac.getEcono());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 20C, Fan: 10 (Auto), "
+      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 13:47, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: On",
+      ac.toString());
+  ac.setRaw(EconoOff);
+  ASSERT_FALSE(ac.getEcono());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 20C, Fan: 10 (Auto), "
+      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 13:47, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }

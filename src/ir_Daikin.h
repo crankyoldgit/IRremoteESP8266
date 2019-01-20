@@ -142,7 +142,6 @@ const uint16_t kDaikin2Section2Length = 19;
 
 const uint8_t kDaikin2BitSleepTimer = 0b00100000;
 const uint8_t kDaikin2BitPurify = 0b00010000;
-const uint8_t kDaikin2BitEcono = 0b00001000;
 const uint8_t kDaikin2BitEye = 0b00000010;
 const uint8_t kDaikin2BitEyeAuto = 0b10000000;
 const uint8_t kDaikin2BitMold = 0b00001000;

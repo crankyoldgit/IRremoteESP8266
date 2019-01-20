@@ -1104,13 +1104,13 @@ bool IRDaikin2::getEye() {
 
 void IRDaikin2::setEcono(bool on) {
   if (on)
-    remote_state[36] |= kDaikin2BitEcono;
+    remote_state[36] |= kDaikinBitEcono;
   else
-    remote_state[36] &= ~kDaikin2BitEcono;
+    remote_state[36] &= ~kDaikinBitEcono;
 }
 
 bool IRDaikin2::getEcono() {
-  return remote_state[36] & kDaikin2BitEcono;
+  return remote_state[36] & kDaikinBitEcono;
 }
 
 // sleeptime: Number of minutes.
@@ -1303,7 +1303,7 @@ std::string IRDaikin2::toString() {
   result += (getClean() ? "On" : "Off");
   result += ", Fresh Air: ";
   if (getFreshAir())
-    result += (getFreshAirHigh() ? "High" : "Low");
+    result += (getFreshAirHigh() ? "High" : "On");
   else
     result += "Off";
   result += ", Eye: ";
