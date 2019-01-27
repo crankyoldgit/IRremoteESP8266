@@ -182,7 +182,7 @@ void dumpACInfo(decode_results *results) {
 #if DECODE_SAMSUNG_AC
   if (results->decode_type == SAMSUNG_AC) {
     IRSamsungAc ac(0);
-    ac.setRaw(results->state);
+    ac.setRaw(results->state, results->bits / 8);
     description = ac.toString();
   }
 #endif  // DECODE_SAMSUNG_AC

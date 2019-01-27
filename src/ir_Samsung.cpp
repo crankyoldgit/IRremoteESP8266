@@ -269,13 +269,16 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
   uint8_t extended_state[kSamsungAcExtendedStateLength] = {
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xD2, 0x0F, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   // Copy/convert the internal state to an extended state.
   for (uint16_t i = 0; i < kSamsungACSectionLength; i++)
     extended_state[i] = remote_state[i];
   for (uint16_t i = kSamsungACSectionLength; i < kSamsungAcStateLength; i++)
     extended_state[i + kSamsungACSectionLength] = remote_state[i];
+  // extended_state[8] seems special. This is a guess on how to calculate it.
+  extended_state[8] = (extended_state[1] & 0x9F) | 0x40;
   // Send it.
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
 }
@@ -576,7 +579,6 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
   // Is the signature correct?
   DPRINTLN("DEBUG: Checking signature.");
   if (results->state[0] != 0x02 || results->state[2] != 0x0F) return false;
-  if (results->state[1] != 0x92 && results->state[1] != 0xB2) return false;
   if (strict) {
     // Is the checksum valid?
     if (!IRSamsungAc::validChecksum(results->state, nbits / 8)) {
