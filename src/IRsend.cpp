@@ -596,6 +596,11 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
       sendPioneer(data, nbits);
       break;
 #endif
+#if SEND_VESTEL_AC
+    case VESTEL_AC:
+      sendVestelAC(data, nbits);
+      break;
+#endif
   }
 }
 #endif

@@ -34,6 +34,7 @@
  * Fujitsu A/C code added by jonnygraham
  * Trotec AC code by stufisher
  * Carrier & Haier AC code by crankyoldgit
+ * Vestel AC code by Erdem U. Altınyurt
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
@@ -202,12 +203,15 @@
 #define DECODE_DAIKIN2         true
 #define SEND_DAIKIN2           true
 
+#define DECODE_VESTEL_AC       true
+#define SEND_VESTEL_AC         true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
-     DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2)
+     DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || DECODE_VESTEL_AC )
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -280,6 +284,7 @@ enum decode_type_t {
   LG2,
   MWM,
   DAIKIN2,
+  VESTEL_AC,
 };
 
 // Message lengths & required repeat values
@@ -397,6 +402,8 @@ const uint16_t kWhirlpoolAcStateLength = 21;
 const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhirlpoolAcDefaultRepeat = kNoRepeat;
 const uint16_t kWhynterBits = 32;
+const uint8_t kVestelACBits = 56;
+
 
 // Legacy defines. (Deprecated)
 #define AIWA_RC_T501_BITS             kAiwaRcT501Bits

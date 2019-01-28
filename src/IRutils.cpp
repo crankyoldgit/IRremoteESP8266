@@ -261,6 +261,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case WHYNTER:
       result = "WHYNTER";
       break;
+    case VESTEL_AC:
+      result = "VESTEL_AC";
+      break;
   }
   if (isRepeat) result += " (Repeat)";
   return result;
@@ -286,6 +289,7 @@ bool hasACState(const decode_type_t protocol) {
     case SAMSUNG_AC:
     case TOSHIBA_AC:
     case WHIRLPOOL_AC:
+    case VESTEL_AC:
       return true;
     default:
       return false;

@@ -308,6 +308,9 @@ class IRsend {
   void sendMWM(unsigned char data[], uint16_t nbytes,
                uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_VESTEL_AC
+  void sendVestelAC(uint64_t data, uint16_t nbits = kMideaBits);
+#endif
 
  protected:
 #ifdef UNIT_TEST
