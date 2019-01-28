@@ -129,9 +129,9 @@ class IRVestelAC {
   void setIon(const bool state);
   bool getIon(void);
 #ifdef ARDUINO
-String timeToString(const uint16_t minspastmidnight);
+  String timeToString(const uint16_t minspastmidnight);
 #else
-std::string timeToString(const uint16_t minspastmidnight);
+  std::string timeToString(const uint16_t minspastmidnight);
 #endif  // ARDUINO
 
 #ifdef ARDUINO
