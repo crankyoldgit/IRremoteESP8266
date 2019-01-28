@@ -45,6 +45,8 @@ const uint8_t kVestelACFanAuto = 1;
 const uint8_t kVestelACFanLow = 5;
 const uint8_t kVestelACFanMed = 9;
 const uint8_t kVestelACFanHigh = 0xB;
+const uint8_t kVestelACFanAutoCool = 0xC;
+const uint8_t kVestelACFanAutoHot = 0xD;
 
 const uint8_t kVestelACNormal = 1;
 const uint8_t kVestelACSleep = 3;
