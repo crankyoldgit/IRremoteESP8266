@@ -73,6 +73,7 @@ void IRVestelAC::send() {
 
 // Return the internal state date of the remote.
 uint64_t IRVestelAC::getRaw() {
+  checksum();
   return remote_state.rawCode;
 }
 
