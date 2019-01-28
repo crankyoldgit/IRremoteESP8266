@@ -208,6 +208,23 @@ void IRVestelAC::checksum() {
   remote_state.CRC = calcChecksum(remote_state.rawCode);
   }
 
+#ifdef ARDUINO
+String IRVestelAC::timeToString(const uint16_t minspastmidnight) {
+  String result = "";
+#else
+std::string IRVestelAC::timeToString(const uint16_t minspastmidnight) {
+  std::string result = "";
+#endif  // ARDUINO
+  uint8_t hours = minspastmidnight / 60;
+  if (hours < 10) result += "0";
+  result += uint64ToString(hours);
+  result += ":";
+  uint8_t mins = minspastmidnight % 60;
+  if (mins < 10) result += "0";
+  result += uint64ToString(mins);
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRVestelAC::toString() {
@@ -217,28 +234,21 @@ std::string IRVestelAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
   if( remote_state.power == 0x00 ) {
-    char bufx[35];
-    std::sprintf(bufx, "Timer Command - Time : %02d:%02d",remote_state.t_hour,remote_state.t_minute);
-    result += bufx;
+    result += "Time Command - Time : " + timeToString(remote_state.t_hour * 60 + remote_state.t_minute);
     if( remote_state.t_timer_mode ) {
-      std::sprintf(bufx, ", Timer Mode Off After  %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
-      result += bufx;
+      result += ", Timer Mode Off After " + timeToString(remote_state.t_turnOffHour*60+remote_state.t_turnOffMinute*10 );
       }
     else {
-      if( remote_state.t_on_active ) {
-        std::sprintf(bufx, ", Turn On:   %02d:%2d0",remote_state.t_turnOnHour,remote_state.t_turnOnMinute ),
-        result += bufx;
-        }
-      if( remote_state.t_off_active ) {
-        std::sprintf(bufx, ", Turn Off:   %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
-        result += bufx;
-        }
+      if( remote_state.t_on_active ) 
+        result += ", Turn On: " + timeToString(remote_state.t_turnOnHour*60+remote_state.t_turnOnMinute*10 );
+      if( remote_state.t_off_active ) 
+        result +=  ", Turn Off: "+ timeToString(remote_state.t_turnOffHour*60+remote_state.t_turnOffMinute*10 );
       }
     if( (remote_state.t_timer_mode || remote_state.t_on_active || remote_state.t_off_active) == 0 )
       result += ", Timer Mode Off";
     return result;
     }
-  result += "Power: "; result += (getPower()?"On":"Off");
+  result += "Power: ";  result += (getPower() ? "On" : "Off");
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
     case kVestelACAuto: result += " (AUTO)";  break;
