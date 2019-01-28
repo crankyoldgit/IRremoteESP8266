@@ -309,7 +309,8 @@ class IRsend {
                uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_VESTEL_AC
-  void sendVestelAC(uint64_t data, uint16_t nbits = kMideaBits);
+  void sendVestelAC(const uint64_t data, const uint16_t nbits = kVestelACBits,
+                    const uint16_t repeat = kNoRepeat);
 #endif
 
  protected:

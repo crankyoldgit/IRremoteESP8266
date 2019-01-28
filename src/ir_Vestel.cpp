@@ -36,22 +36,16 @@
 //
 // Status: STABLE / Working.
 //
-void IRsend::sendVestelAC(uint64_t data, uint16_t nbits) {
+void IRsend::sendVestelAC(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
-  // Set IR carrier frequency
-  enableIROut(38);
+  sendGeneric(
+    kVestelACHdrMark, kVestelACHdrSpace,  // Header
+    kVestelACBitMark, kVestelACOneSpace,  // Data
+    kVestelACBitMark,  kVestelACZeroSpace,
+    kVestelACBitMark, 100000,  // Footer + repeat gap
+    data, nbits, 38, false, repeat, 50);
 
-  // Header
-  mark(kVestelACHdrMark);
-  space(kVestelACHdrSpace);
-  // Data
-  //   Break data into byte segments, starting at the Least Significant
-  //   Byte. Each byte then being sent normal, then followed inverted.
-  sendData(kVestelACBitMark, kVestelACOneSpace, kVestelACBitMark, kVestelACZeroSpace, data, 56, false);
-
-  // Footer
-  mark(kVestelACBitMark);
 }
 #endif
 
@@ -177,11 +171,11 @@ void IRVestelAC::setIon(const bool state) { remote_state.ion = state ? kVestelAC
 // Return the Ion state of the A/C.
 bool IRVestelAC::getIon() { return remote_state.ion == kVestelACIon; }
 
-// Set the Wing Roaming state of the A/C.
-void IRVestelAC::setWing(const bool state) { remote_state.wing = state ? kVestelACWing : 0xF; }
+// Set the Swing Roaming state of the A/C.
+void IRVestelAC::setSwing(const bool state) { remote_state.swing = state ? kVestelACSwing : 0xF; }
 
-// Return the Wing Roaming state of the A/C.
-bool IRVestelAC::getWing() { return remote_state.wing == kVestelACWing; }
+// Return the Swing Roaming state of the A/C.
+bool IRVestelAC::getSwing() { return remote_state.swing == kVestelACSwing; }
 
 // Calculate the checksum for a given array.
 // Args:
@@ -192,10 +186,8 @@ uint8_t IRVestelAC::calcChecksum(const uint64_t state) {
   // Just counts the set bits +1 on stream and take inverse after mask
   uint8_t sum = 0;
   uint64_t temp_state = state & kVestelACCRCMask;
-  for (uint8_t i = 0/*+(8+8+4)*/; i < 64; i++) {
-    sum += temp_state & 0x1;
-    temp_state >>= 1;
-  }
+  for (; temp_state; temp_state >>= 1)
+    if (temp_state & 1) sum++;
   sum+=2;
   sum = 0xff - sum;
   return sum;
@@ -264,10 +256,10 @@ std::string IRVestelAC::toString() {
     case kVestelACFanMed:   result += " (MED)";   break;
     case kVestelACFanHigh:  result += " (HI)";    break;
   }
-  result += ", Sleep: "; result +=(getSleep()?"On":"Off");
-  result += ", Turbo: "; result +=(getTurbo()?"On":"Off");
-  result += ", Ion: ";   result +=(getIon()?"On":"Off");
-  result += ", Wing: ";  result +=(getWing()?"On":"Off");
+  result += ", Sleep: "; result +=(getSleep() ? "On" : "Off");
+  result += ", Turbo: "; result +=(getTurbo() ? "On" : "Off");
+  result += ", Ion: "  ; result +=(getIon()   ? "On" : "Off");
+  result += ", Swing: "; result +=(getSwing() ? "On" : "Off");
   return result;
 }
 
@@ -315,7 +307,7 @@ bool IRrecv::decodeVestelAC(decode_results *results, uint16_t nbits, bool strict
 
   // Compliance
   if (strict)
-    if( IRVestelAC::validChecksum(data_result.data) == false ) return false;
+    if(!IRVestelAC::validChecksum(data_result.data)) return false;
 
   // Success
   results->decode_type = VESTEL_AC;

@@ -215,6 +215,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_VESTEL_AC
+  if (results->decode_type == VESTEL_AC) {
+    IRVestelAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_VESTEL_AC
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }
