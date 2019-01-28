@@ -38,6 +38,7 @@
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
+#include <ir_Vestel.h>
 #include <ir_Whirlpool.h>
 
 
@@ -218,7 +219,7 @@ void dumpACInfo(decode_results *results) {
 #if DECODE_VESTEL_AC
   if (results->decode_type == VESTEL_AC) {
     IRVestelAC ac(0);
-    ac.setRaw(results->state);
+    ac.setRaw(results->value);  // Like Coolix, use value instead of state.
     description = ac.toString();
   }
 #endif  // DECODE_VESTEL_AC

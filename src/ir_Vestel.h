@@ -52,9 +52,9 @@ const uint8_t kVestelACTurbo = 7;
 const uint8_t kVestelACIon = 4;
 const uint8_t kVestelACSwing = 0xA;
 
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpacked-bitfield-compat"
-
 union VestelACState {
   // Remotes Command Stack
   struct {
@@ -118,6 +118,7 @@ class IRVestelAC {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setRaw(uint8_t* newState);
+  void setRaw(const uint64_t newState);
   uint64_t getRaw(void);
   static bool validChecksum(const uint64_t state);
   void setSwing(const bool state);

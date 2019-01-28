@@ -87,6 +87,10 @@ void IRVestelAC::setRaw(uint8_t* newState) {
   remote_state.rawCode = upState;
 }
 
+void IRVestelAC::setRaw(const uint64_t newState) {
+  remote_state.rawCode = newState;
+}
+
 // Set the requested power state of the A/C to on.
 void IRVestelAC::on() { remote_state.power = 0xF; }
 

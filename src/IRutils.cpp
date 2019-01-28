@@ -255,14 +255,14 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case TROTEC:
       result = "TROTEC";
       break;
+    case VESTEL_AC:
+      result = "VESTEL_AC";
+      break;
     case WHIRLPOOL_AC:
       result = "WHIRLPOOL_AC";
       break;
     case WHYNTER:
       result = "WHYNTER";
-      break;
-    case VESTEL_AC:
-      result = "VESTEL_AC";
       break;
   }
   if (isRepeat) result += " (Repeat)";

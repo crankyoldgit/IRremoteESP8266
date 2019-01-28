@@ -472,6 +472,7 @@ void handleRoot() {
         "<option value='14'>Sharp</option>"
         "<option value='19'>Sherwood</option>"
         "<option value='4'>Sony</option>"
+        "<option value='54'>Vestel AC</option>"
         "<option value='8'>Whynter</option>"
       "</select>"
       " Code: 0x<input type='text' name='code' min='0' value='0' size='16'"
@@ -1601,12 +1602,18 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       irsend.sendPioneer(code, bits, repeat);
       break;
 #endif
-
 #if SEND_LG
     case LG2:  // 51
       if (bits == 0)
         bits = kLgBits;
       irsend.sendLG2(code, bits, repeat);
+      break;
+#endif
+#if SEND_VESTEL_AC
+    case VESTEL_AC:  // 54
+      if (bits == 0)
+        bits = kVestelACBits;
+      irsend.sendVestelAC(code, bits, repeat);
       break;
 #endif
     default:
