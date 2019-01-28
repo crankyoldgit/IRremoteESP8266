@@ -226,19 +226,19 @@ std::string IRVestelAC::toString() {
 #endif  // ARDUINO
   if( remote_state.power == 0x00 ) {
     char bufx[35];
-    snprintf(bufx, "Timer Command - Time : %02d:%02d",remote_state.t_hour,remote_state.t_minute);
+    sprintf(bufx, "Timer Command - Time : %02d:%02d",remote_state.t_hour,remote_state.t_minute);
     result += bufx;
     if( remote_state.t_timer_mode ) {
-      snprintf(bufx, ", Timer Mode Off After  %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
+      sprintf(bufx, ", Timer Mode Off After  %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
       result += bufx;
       }
     else {
       if( remote_state.t_on_active ) {
-        snprintf(bufx, ", Turn On:   %02d:%2d0",remote_state.t_turnOnHour,remote_state.t_turnOnMinute ),
+        sprintf(bufx, ", Turn On:   %02d:%2d0",remote_state.t_turnOnHour,remote_state.t_turnOnMinute ),
         result += bufx;
         }
       if( remote_state.t_off_active ) {
-        snprintf(bufx, ", Turn Off:   %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
+        sprintf(bufx, ", Turn Off:   %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
         result += bufx;
         }
       }
