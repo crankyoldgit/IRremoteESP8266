@@ -2,7 +2,9 @@
 
 #include "ir_Vestel.h"
 #include <algorithm>
-#ifndef ARDUINO
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#else
 #include <string>
 #endif
 #include "IRremoteESP8266.h"
@@ -82,8 +84,8 @@ uint64_t IRVestelAC::getRaw() {
 
 // Override the internal state with the new state.
 void IRVestelAC::setRaw(uint8_t* newState) {
-  uint64_t upState=0;
-  for(int i=0 ; i < 7 ; i++)
+  uint64_t upState = 0;
+  for(int i = 0 ; i < 7 ; i++)
     upState |= static_cast<uint64_t>(newState[i]) << (i*8);
   remote_state.rawCode = upState;
 }
@@ -109,36 +111,30 @@ bool IRVestelAC::getPower() { return (remote_state.power == 0xF); }
 void IRVestelAC::setTemp(const uint8_t temp) {
   uint8_t new_temp = temp;
   new_temp = std::max(kVestelACMinTempC, new_temp);
-  //new_temp = std::max(kVestelACMinTempH, new_temp); Check MODE
-  new_temp = std::min(kVestelACMaxTemp, new_temp); 
+  // new_temp = std::max(kVestelACMinTempH, new_temp); Check MODE
+  new_temp = std::min(kVestelACMaxTemp, new_temp);
   remote_state.temp = new_temp-16;
 }
 
 // Return the set temperature.
-uint8_t IRVestelAC::getTemp( void ) {
+uint8_t IRVestelAC::getTemp(void) {
   return remote_state.temp + 16;
 }
 
 // Set the speed of the fan,
 // 1-3 set the fan speed, 0 or anything else set it to auto.
 void IRVestelAC::setFan(const uint8_t fan) {
-  switch( fan ){
-    case kVestelACFanLow:   
-    case kVestelACFanMed:   
-    case kVestelACFanHigh:   
-       remote_state.fan = fan; break;
+  switch ( fan ) {
+    case kVestelACFanLow:
+    case kVestelACFanMed:
+    case kVestelACFanHigh:
+      remote_state.fan = fan; break;
     default : remote_state.fan = kVestelACFanAuto;
     }
 }
 
 // Return the requested state of the unit's fan.
 uint8_t IRVestelAC::getFan() {
-   /*switch( remote_state.fan ){
-    case kVestelACFanLow: return 1;
-    case kVestelACFanMed: return 2;
-    case kVestelACFanHigh: return 3;
-    default : return 0;
-    }*/
    return remote_state.fan;
  }
 
@@ -193,7 +189,7 @@ bool IRVestelAC::getWing() { return remote_state.wing == kVestelACWing; }
 // Returns:
 //   The 8 bit checksum value.
 uint8_t IRVestelAC::calcChecksum(const uint64_t state) {
-  //Just counts the set bits +1 on stream and take inverse after mask
+  // Just counts the set bits +1 on stream and take inverse after mask
   uint8_t sum = 0;
   uint64_t temp_state = state & kVestelACCRCMask;
   for (uint8_t i = 0/*+(8+8+4)*/; i < 64; i++) {
@@ -214,14 +210,6 @@ bool IRVestelAC::validChecksum(const uint64_t state) {
   return (( (state >> 12) & 0xFF ) == calcChecksum(state));
 }
 
-String zero_pad_str(uint8_t a){
-  if (a > 99) return "-1";
-  String ret;
-  char buffx[5];
-  sprintf( buffx, "%02d", a);
-  return buffx;
-  }
-
 // Calculate & set the checksum for the current internal state of the remote.
 void IRVestelAC::checksum() {
   // Stored the checksum value in the last byte.
@@ -236,22 +224,29 @@ String IRVestelAC::toString() {
 std::string IRVestelAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  if( remote_state.power == 0x00 ){
-        result += "Timer Command";
-        result += " - Time : " + zero_pad_str(remote_state.t_hour) + ":" + zero_pad_str(remote_state.t_minute);
-	if( remote_state.t_timer_mode )
-		result += ", Timer Mode Off After " + zero_pad_str( remote_state.t_turnOffHour ) + ":" + zero_pad_str( remote_state.t_turnOffMinute*10 );
-	else{
-		if( remote_state.t_on_active )
-		        result += ", Turn On: "  + zero_pad_str( remote_state.t_turnOnHour )  + ":" + zero_pad_str( remote_state.t_turnOnMinute*10 );
-		if( remote_state.t_off_active )
-			result += ", Turn Off: " + zero_pad_str( remote_state.t_turnOffHour ) + ":" + zero_pad_str( remote_state.t_turnOffMinute*10 );
-		}
-	if( (remote_state.t_timer_mode || remote_state.t_on_active || remote_state.t_off_active) == 0 )
-		result += ", Timer Mode Off";
-        return result;
-	}
-  result += "Power: " + String(getPower()?"On":"Off");
+  if( remote_state.power == 0x00 ) {
+    char bufx[35];
+    snprintf(bufx, "Timer Command - Time : %02d:%02d",remote_state.t_hour,remote_state.t_minute);
+    result += bufx;
+    if( remote_state.t_timer_mode ) {
+      snprintf(bufx, ", Timer Mode Off After  %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
+      result += bufx;
+      }
+    else {
+      if( remote_state.t_on_active ) {
+        snprintf(bufx, ", Turn On:   %02d:%2d0",remote_state.t_turnOnHour,remote_state.t_turnOnMinute ),
+        result += bufx;
+        }
+      if( remote_state.t_off_active ) {
+        snprintf(bufx, ", Turn Off:   %02d:%2d0",remote_state.t_turnOffHour,remote_state.t_turnOffMinute ),
+        result += bufx;
+        }
+      }
+    if( (remote_state.t_timer_mode || remote_state.t_on_active || remote_state.t_off_active) == 0 )
+      result += ", Timer Mode Off";
+    return result;
+    }
+  result += "Power: "; result += (getPower()?"On":"Off");
   result += ", Mode: " + uint64ToString(getMode());
   switch (getMode()) {
     case kVestelACAuto: result += " (AUTO)";  break;
@@ -269,10 +264,10 @@ std::string IRVestelAC::toString() {
     case kVestelACFanMed:   result += " (MED)";   break;
     case kVestelACFanHigh:  result += " (HI)";    break;
   }
-  result += ", Sleep: "+String(getSleep()?"On":"Off");
-  result += ", Turbo: "+String(getTurbo()?"On":"Off");
-  result += ", Ion: "+String(getIon()?"On":"Off");
-  result += ", Wing: "+String(getWing()?"On":"Off");
+  result += ", Sleep: "; result +=(getSleep()?"On":"Off");
+  result += ", Turbo: "; result +=(getTurbo()?"On":"Off");
+  result += ", Ion: ";   result +=(getIon()?"On":"Off");
+  result += ", Wing: ";  result +=(getWing()?"On":"Off");
   return result;
 }
 
@@ -296,7 +291,6 @@ bool IRrecv::decodeVestelAC(decode_results *results, uint16_t nbits, bool strict
     if (nbits != kVestelACBits) return false;  // Not strictly a Vestel AC message.
 
   uint64_t data = 0;
-  uint64_t inverted = 0;
   uint16_t offset = kStartOffset;
 
   if (nbits > sizeof(data) * 8)
