@@ -52,7 +52,6 @@ const uint8_t kVestelACTurbo = 7;
 const uint8_t kVestelACIon = 4;
 const uint8_t kVestelACSwing = 0xA;
 
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpacked-bitfield-compat"
 union VestelACState {
@@ -129,12 +128,6 @@ class IRVestelAC {
   bool getTurbo(void);
   void setIon(const bool state);
   bool getIon(void);
-#ifdef ARDUINO
-  String timeToString(const uint16_t minspastmidnight);
-#else
-  std::string timeToString(const uint16_t minspastmidnight);
-#endif  // ARDUINO
-
 #ifdef ARDUINO
   String toString();
 #else

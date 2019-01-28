@@ -11,6 +11,7 @@
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRutils.h"
+#include "ir_Haier.h"
 
 //                 VV     VV  EEEEEEE   SSSSS  TTTTTTTT  EEEEEEE  LL
 //                 VV     VV  EE       S          TT     EE       LL
@@ -40,10 +41,10 @@ void IRsend::sendVestelAC(const uint64_t data, const uint16_t nbits,
                           const uint16_t repeat) {
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
-  sendGeneric(kVestelACHdrMark, kVestelACHdrSpace,  // Header
-              kVestelACBitMark, kVestelACOneSpace,  // Data
-              kVestelACBitMark, kVestelACZeroSpace,
-              kVestelACBitMark, 100000,  // Footer + repeat gap
+  sendGeneric(kVestelACHdrMark, kVestelACHdrSpace,   // Header
+              kVestelACBitMark, kVestelACOneSpace,   // Data
+              kVestelACBitMark, kVestelACZeroSpace,  // Data
+              kVestelACBitMark, 100000,              // Footer + repeat gap
               data, nbits, 38, false, repeat, 50);
 }
 #endif
@@ -225,23 +226,6 @@ void IRVestelAC::checksum() {
   remote_state.CRC = calcChecksum(remote_state.rawCode);
 }
 
-#ifdef ARDUINO
-String IRVestelAC::timeToString(const uint16_t minspastmidnight) {
-  String result = "";
-#else
-std::string IRVestelAC::timeToString(const uint16_t minspastmidnight) {
-  std::string result = "";
-#endif  // ARDUINO
-  uint8_t hours = minspastmidnight / 60;
-  if (hours < 10) result += "0";
-  result += uint64ToString(hours);
-  result += ":";
-  uint8_t mins = minspastmidnight % 60;
-  if (mins < 10) result += "0";
-  result += uint64ToString(mins);
-  return result;
-}
-
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRVestelAC::toString() {
@@ -252,19 +236,20 @@ std::string IRVestelAC::toString() {
 #endif  // ARDUINO
   if (remote_state.power == 0x00) {
     result += "Time Command - Time : " +
-              timeToString(remote_state.t_hour * 60 + remote_state.t_minute);
+              IRHaierAC::timeToString(remote_state.t_hour * 60 +
+                                      remote_state.t_minute);
     if (remote_state.t_timer_mode) {
       result += ", Timer Mode Off After " +
-                timeToString(remote_state.t_turnOffHour * 60 +
-                             remote_state.t_turnOffMinute * 10);
+                IRHaierAC::timeToString(remote_state.t_turnOffHour * 60 +
+                                        remote_state.t_turnOffMinute * 10);
     } else {
       if (remote_state.t_on_active)
-        result +=
-            ", Turn On: " + timeToString(remote_state.t_turnOnHour * 60 +
-                                         remote_state.t_turnOnMinute * 10);
+        result += ", Turn On: " +
+                  IRHaierAC::timeToString(remote_state.t_turnOnHour * 60 +
+                                          remote_state.t_turnOnMinute * 10);
       if (remote_state.t_off_active)
-        result +=
-            ", Turn Off: " + timeToString(remote_state.t_turnOffHour * 60 +
+        result += ", Turn Off: " +
+                  IRHaierAC::timeToString(remote_state.t_turnOffHour * 60 +
                                           remote_state.t_turnOffMinute * 10);
     }
     if ((remote_state.t_timer_mode || remote_state.t_on_active ||
