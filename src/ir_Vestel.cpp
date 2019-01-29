@@ -130,6 +130,8 @@ void IRVestelAC::setFan(const uint8_t fan) {
     case kVestelACFanLow:
     case kVestelACFanMed:
     case kVestelACFanHigh:
+    case kVestelACFanAutoCool:
+    case kVestelACFanAutoHot:
       remote_state.fan = fan;
       break;
     default:
@@ -159,6 +161,18 @@ void IRVestelAC::setMode(const uint8_t mode) {
     default:
       remote_state.mode = kVestelACAuto;
   }
+}
+
+void IRVestelAC::setAuto(const int8_t autoLevel) {
+  if(autoLevel <-2 || autoLevel>2)
+    return;
+  setMode(kVestelACAuto);
+  setFan( (autoLevel < 0 ? kVestelACFanAutoCool : kVestelACFanAutoHot) );
+  if      ( autoLevel == 2 )  setTemp(30);
+  else if ( autoLevel == 1 )  setTemp(31);
+  else if ( autoLevel == 0 )  setTemp(25);
+  else if ( autoLevel == -1 ) setTemp(16);
+  else if ( autoLevel == -2 ) setTemp(17);
 }
 
 // Set the Sleep state of the A/C.
@@ -295,6 +309,12 @@ std::string IRVestelAC::toString() {
       break;
     case kVestelACFanHigh:
       result += " (HIGH)";
+      break;
+    case kVestelACFanAutoCool:
+      result += " (AUTO COOL)";
+      break;
+    case kVestelACFanAutoHot:
+      result += " (AUTO HOT)";
       break;
     default:
       result += " (UNKNOWN)";
