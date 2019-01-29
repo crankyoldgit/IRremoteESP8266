@@ -265,3 +265,9 @@ TEST(TestDecodeVestelAC, NormalDecodeWithStrict) {
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
 }
+
+// General housekeeping
+TEST(TestDecodeVestelAC, Housekeeping) {
+  ASSERT_EQ("VESTEL_AC", typeToString(VESTEL_AC));
+  ASSERT_FALSE(hasACState(VESTEL_AC));  // Uses uint64_t, not uint8_t*.
+}

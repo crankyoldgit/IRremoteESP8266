@@ -119,9 +119,7 @@ void IRVestelAC::setTemp(const uint8_t temp) {
 }
 
 // Return the set temperature.
-uint8_t IRVestelAC::getTemp(void) {
-  return remote_state.temp + 16;
-}
+uint8_t IRVestelAC::getTemp(void) { return remote_state.temp + 16; }
 
 // Set the speed of the fan,
 // 1-3 set the fan speed, 0 or anything else set it to auto.
@@ -162,59 +160,67 @@ void IRVestelAC::setMode(const uint8_t mode) {
       remote_state.mode = kVestelACAuto;
   }
 }
-// Set Auto mode of AC. 
+// Set Auto mode of AC.
 void IRVestelAC::setAuto(const int8_t autoLevel) {
-  if(autoLevel <-2 || autoLevel>2)
-    return;
+  if (autoLevel < -2 || autoLevel > 2) return;
   setMode(kVestelACAuto);
-  setFan( (autoLevel < 0 ? kVestelACFanAutoCool : kVestelACFanAutoHot) );
-  if      ( autoLevel == 2 )  setTemp(30);
-  else if ( autoLevel == 1 )  setTemp(31);
-  else if ( autoLevel == 0 )  setTemp(25);
-  else if ( autoLevel == -1 ) setTemp(16);
-  else if ( autoLevel == -2 ) setTemp(17);
+  setFan((autoLevel < 0 ? kVestelACFanAutoCool : kVestelACFanAutoHot));
+  if (autoLevel == 2)
+    setTemp(30);
+  else if (autoLevel == 1)
+    setTemp(31);
+  else if (autoLevel == 0)
+    setTemp(25);
+  else if (autoLevel == -1)
+    setTemp(16);
+  else if (autoLevel == -2)
+    setTemp(17);
 }
 
 // Set Timer option of AC.
-// Valid time arguments are 0, 0.5, 1, 2, 3 and 5 hours (in min). 0 disables the timer.
-void IRVestelAC::setTimer(const uint16_t minutes){
-  if( minutes==0 ){
-    remote_state.t_turnOnMinute=0;
-    remote_state.t_turnOffMinute=0;
-    remote_state.t_turnOnHour=0;
-    remote_state.t_turnOffHour=0;
-    remote_state.t_timer_mode=0;
-    remote_state.t_on_active=0;
-    remote_state.t_off_active=0;
-    }
-  else{
-    remote_state.t_turnOffHour=minutes/60;
-    remote_state.t_turnOffMinute=minutes/10;
-    remote_state.t_turnOnMinute=0;
-    remote_state.t_turnOnHour=0;
-    remote_state.t_timer_mode=1;
-    remote_state.t_on_active=1; //Yes. t_on_active instead of t_off_active.
-    }
+// Valid time arguments are 0, 0.5, 1, 2, 3 and 5 hours (in min). 0 disables the
+// timer.
+void IRVestelAC::setTimer(const uint16_t minutes) {
+  if (minutes == 0) {
+    remote_state.t_turnOnMinute = 0;
+    remote_state.t_turnOffMinute = 0;
+    remote_state.t_turnOnHour = 0;
+    remote_state.t_turnOffHour = 0;
+    remote_state.t_timer_mode = 0;
+    remote_state.t_on_active = 0;
+    remote_state.t_off_active = 0;
+  } else {
+    remote_state.t_turnOffHour = minutes / 60;
+    remote_state.t_turnOffMinute = minutes / 10;
+    remote_state.t_turnOnMinute = 0;
+    remote_state.t_turnOnHour = 0;
+    remote_state.t_timer_mode = 1;
+    remote_state.t_on_active = 1;  // Yes. t_on_active instead of t_off_active.
+  }
 }
 
 // Set the AC's internal clock
-void IRVestelAC::setTime(const uint16_t minutes){
-  remote_state.t_hour=minutes/60;
-  remote_state.t_minute=minutes-(minutes/60)*minutes;
+void IRVestelAC::setTime(const uint16_t minutes) {
+  remote_state.t_hour = minutes / 60;
+  remote_state.t_minute = minutes - (minutes / 60) * minutes;
 }
 
 // Set AC's wake up time. Takes time in minute.
-void IRVestelAC::setWakeupTime(const uint16_t minutes){
-  remote_state.t_turnOnHour=minutes/60;
-  remote_state.t_turnOnMinute=((minutes/60)*minutes-minutes)/10; // Register is 3 bit and can only hold minute/10
-  remote_state.t_on_active=1;  // Automatic activation
+void IRVestelAC::setWakeupTime(const uint16_t minutes) {
+  remote_state.t_turnOnHour = minutes / 60;
+  remote_state.t_turnOnMinute =
+      ((minutes / 60) * minutes - minutes) /
+      10;  // Register is 3 bit and can only hold minute/10
+  remote_state.t_on_active = 1;  // Automatic activation
 }
 
 // Set AC's turn off time. Takes time in minute.
-void IRVestelAC::setTurnOffTime(const uint16_t minutes){
-  remote_state.t_turnOffHour=minutes/60;
-  remote_state.t_turnOffMinute=((minutes/60)*minutes-minutes)/10; // Register is 3 bit and can only hold minute/10
-  remote_state.t_off_active=1; // Automatic activation
+void IRVestelAC::setTurnOffTime(const uint16_t minutes) {
+  remote_state.t_turnOffHour = minutes / 60;
+  remote_state.t_turnOffMinute =
+      ((minutes / 60) * minutes - minutes) /
+      10;  // Register is 3 bit and can only hold minute/10
+  remote_state.t_off_active = 1;  // Automatic activation
 }
 
 // Set the Sleep state of the A/C.

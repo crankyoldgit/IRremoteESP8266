@@ -289,7 +289,6 @@ bool hasACState(const decode_type_t protocol) {
     case SAMSUNG_AC:
     case TOSHIBA_AC:
     case WHIRLPOOL_AC:
-    case VESTEL_AC:
       return true;
     default:
       return false;
