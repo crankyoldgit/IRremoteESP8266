@@ -115,12 +115,12 @@ void IRVestelAC::setTemp(const uint8_t temp) {
   new_temp = std::max(kVestelACMinTempC, new_temp);
   // new_temp = std::max(kVestelACMinTempH, new_temp); Check MODE
   new_temp = std::min(kVestelACMaxTemp, new_temp);
-  remote_state.temp = new_temp - kVestelACMinTempH;
+  remote_state.temp = new_temp - 16;
 }
 
 // Return the set temperature.
 uint8_t IRVestelAC::getTemp(void) {
-  return remote_state.temp + kVestelACMinTempH;
+  return remote_state.temp + 16;
 }
 
 // Set the speed of the fan,
@@ -130,8 +130,6 @@ void IRVestelAC::setFan(const uint8_t fan) {
     case kVestelACFanLow:
     case kVestelACFanMed:
     case kVestelACFanHigh:
-    case kVestelACFanAutoCool:
-    case kVestelACFanAutoHot:
       remote_state.fan = fan;
       break;
     default:
@@ -293,16 +291,10 @@ std::string IRVestelAC::toString() {
       result += " (LOW)";
       break;
     case kVestelACFanMed:
-      result += " (MED)";
+      result += " (MEDIUM)";
       break;
     case kVestelACFanHigh:
       result += " (HIGH)";
-      break;
-    case kVestelACFanAutoCool:
-      result += " (AUTO COOL)";
-      break;
-    case kVestelACFanAutoHot:
-      result += " (AUTO HOT)";
       break;
     default:
       result += " (UNKNOWN)";
