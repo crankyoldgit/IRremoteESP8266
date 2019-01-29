@@ -189,6 +189,7 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_state.t_timer_mode = 0;
     remote_state.t_on_active = 0;
     remote_state.t_off_active = 0;
+    remote_state.t_not_used = 0; // Changes remote_state to time mode
   } else {
     remote_state.t_turnOffHour = minutes / 60;
     remote_state.t_turnOffMinute = (minutes%60) / 10;
@@ -196,6 +197,7 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_state.t_turnOnHour = 0;
     remote_state.t_timer_mode = 1;
     remote_state.t_on_active = 1;  // Yes. t_on_active instead of t_off_active.
+    remote_state.t_not_used = 0; // Changes remote_state to time mode
   }
 }
 
