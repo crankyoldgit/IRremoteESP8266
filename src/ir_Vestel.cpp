@@ -191,7 +191,7 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_state.t_off_active = 0;
   } else {
     remote_state.t_turnOffHour = minutes / 60;
-    remote_state.t_turnOffMinute = minutes%60) / 10;
+    remote_state.t_turnOffMinute = (minutes%60) / 10;
     remote_state.t_turnOnMinute = 0;
     remote_state.t_turnOnHour = 0;
     remote_state.t_timer_mode = 1;
