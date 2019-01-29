@@ -113,6 +113,10 @@ class IRVestelAC {
   void setPower(const bool state);
   bool getPower();
   void setAuto(const int8_t autoLevel);
+  void setTimer(const uint16_t minutes);
+  void setTime(const uint16_t minutes);
+  void setWakeupTime(const uint16_t minutes);
+  void setTurnOffTime(const uint16_t minutes);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t fan);
