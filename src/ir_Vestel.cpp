@@ -176,17 +176,22 @@ void IRVestelAC::setAuto(const int8_t autoLevel) {
 }
 
 // Set Timer option of AC.
-// Valid time arguments are 0.5, 1, 2, 3 and 5 hours (in min).
+// Valid time arguments are 0, 0.5, 1, 2, 3 and 5 hours (in min). 0 disables the timer.
 void IRVestelAC::setTimer(const uint16_t minutes){
   if( minutes==0 ){
+    remote_state.t_turnOnMinute=0;
     remote_state.t_turnOffMinute=0;
-    remote_state.t_timer_mode=1;
-    remote_state.t_on_active=1;
-    remote_state.t_off_active=1;
+    remote_state.t_turnOnHour=0;
+    remote_state.t_turnOffHour=0;
+    remote_state.t_timer_mode=0;
+    remote_state.t_on_active=0;
+    remote_state.t_off_active=0;
     }
   else{
     remote_state.t_turnOffHour=minutes/60;
     remote_state.t_turnOffMinute=minutes/10;
+    remote_state.t_turnOnMinute=0;
+    remote_state.t_turnOnHour=0;
     remote_state.t_timer_mode=1;
     remote_state.t_on_active=1; //Yes. t_on_active instead of t_off_active.
     }
