@@ -58,7 +58,7 @@ IRVestelAC::IRVestelAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 void IRVestelAC::stateReset() {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state.rawCode = 0x0F00D9001FEF201LL;
-  setTimer(0);
+  remote_time_state.rawCode = 0x00;
 }
 
 // Configure the pin for output.
@@ -190,7 +190,6 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_time_state.t_timer_mode = 0;
     remote_time_state.t_on_active = 0;
     remote_time_state.t_off_active = 0;
-    //remote_time_state.power = 0;      // Changes remote_state to time mode
   } else {
     remote_time_state.t_turnOffHour = minutes / 60;
     remote_time_state.t_turnOffMinute = (minutes%60) / 10;
@@ -198,7 +197,6 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_time_state.t_turnOnHour = 0;
     remote_time_state.t_timer_mode = 1;
     remote_time_state.t_on_active = 1;  // Yes. t_on_active instead of t_off_active.
-    //remote_state.power = 0;           // Changes remote_state to time mode
   }
 }
 
