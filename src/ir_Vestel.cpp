@@ -192,25 +192,26 @@ void IRVestelAC::setTimer(const uint16_t minutes) {
     remote_time_state.t_off_active = 0;
   } else {
     remote_time_state.t_turnOffHour = minutes / 60;
-    remote_time_state.t_turnOffMinute = (minutes%60) / 10;
+    remote_time_state.t_turnOffMinute = (minutes % 60) / 10;
     remote_time_state.t_turnOnMinute = 0;
     remote_time_state.t_turnOnHour = 0;
     remote_time_state.t_timer_mode = 1;
-    remote_time_state.t_on_active = 1;  // Yes. t_on_active instead of t_off_active.
+    remote_time_state.t_on_active =
+        1;  // Yes. t_on_active instead of t_off_active.
   }
 }
 
 // Set the AC's internal clock
 void IRVestelAC::setTime(const uint16_t minutes) {
   remote_time_state.t_hour = minutes / 60;
-  remote_time_state.t_minute = (minutes%60);
+  remote_time_state.t_minute = (minutes % 60);
 }
 
 // Set AC's wake up time. Takes time in minute.
 void IRVestelAC::setWakeupTime(const uint16_t minutes) {
   remote_time_state.t_turnOnHour = minutes / 60;
   // Register is 3 bit and can only hold minute/10
-  remote_time_state.t_turnOnMinute =(minutes%60) / 10;
+  remote_time_state.t_turnOnMinute = (minutes % 60) / 10;
   remote_time_state.t_on_active = 1;  // Automatic activation
 }
 
@@ -218,7 +219,7 @@ void IRVestelAC::setWakeupTime(const uint16_t minutes) {
 void IRVestelAC::setTurnOffTime(const uint16_t minutes) {
   remote_time_state.t_turnOffHour = minutes / 60;
   // Register is 3 bit and can only hold minute/10
-  remote_time_state.t_turnOffMinute = (minutes%60) / 10;
+  remote_time_state.t_turnOffMinute = (minutes % 60) / 10;
   remote_time_state.t_off_active = 1;  // Automatic activation
 }
 
