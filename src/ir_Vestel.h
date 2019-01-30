@@ -145,6 +145,7 @@ class IRVestelAC {
 // private:
 #endif
   VestelACState remote_state;
+  VestelACState remote_time_state;
   void checksum();
   static uint8_t calcChecksum(const uint64_t state);
   IRsend _irsend;
