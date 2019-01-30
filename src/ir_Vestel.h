@@ -114,9 +114,13 @@ class IRVestelAC {
   bool getPower();
   void setAuto(const int8_t autoLevel);
   void setTimer(const uint16_t minutes);
+  uint16_t getTimer(void);
   void setTime(const uint16_t minutes);
-  void setWakeupTime(const uint16_t minutes);
-  void setTurnOffTime(const uint16_t minutes);
+  uint16_t getTime(void);
+  void setOnTimer(const uint16_t minutes);
+  uint16_t getOnTimer(void);
+  void setOffTimer(const uint16_t minutes);
+  uint16_t getOffTimer(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t fan);
@@ -135,6 +139,7 @@ class IRVestelAC {
   bool getTurbo(void);
   void setIon(const bool state);
   bool getIon(void);
+  bool isTimeCommand(void);
 #ifdef ARDUINO
   String toString();
 #else
@@ -146,6 +151,7 @@ class IRVestelAC {
 #endif
   VestelACState remote_state;
   VestelACState remote_time_state;
+  bool use_time_state = false;
   void checksum();
   static uint8_t calcChecksum(const uint64_t state);
   IRsend _irsend;

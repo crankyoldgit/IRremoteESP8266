@@ -59,6 +59,7 @@ void IRVestelAC::stateReset() {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state.rawCode = 0x0F00D9001FEF201LL;
   remote_time_state.rawCode = 0x00;
+  use_time_state = false;
 }
 
 // Configure the pin for output.
@@ -71,13 +72,19 @@ void IRVestelAC::begin() {
 // Send the current desired state to the IR LED.
 void IRVestelAC::send() {
   checksum();  // Ensure correct checksum before sending.
-  _irsend.sendVestelAC(remote_state.rawCode);
+  uint64_t code_to_send;
+  if (use_time_state)
+    code_to_send = remote_time_state.rawCode;
+  else
+    code_to_send = remote_state.rawCode;
+  _irsend.sendVestelAC(code_to_send);
 }
 #endif  // SEND_VESTEL_AC
 
 // Return the internal state date of the remote.
 uint64_t IRVestelAC::getRaw() {
   checksum();
+  if (use_time_state) return remote_time_state.rawCode;
   return remote_state.rawCode;
 }
 
@@ -87,24 +94,27 @@ void IRVestelAC::setRaw(uint8_t* newState) {
   for (int i = 0; i < 7; i++)
     upState |= static_cast<uint64_t>(newState[i]) << (i * 8);
   remote_state.rawCode = upState;
+  remote_time_state.rawCode = upState;
 }
 
 void IRVestelAC::setRaw(const uint64_t newState) {
   remote_state.rawCode = newState;
+  remote_time_state.rawCode = newState;
 }
 
 // Set the requested power state of the A/C to on.
-void IRVestelAC::on() { remote_state.power = 0xF; }
+void IRVestelAC::on() { setPower(true); }
 
 // Set the requested power state of the A/C to off.
-void IRVestelAC::off() { remote_state.power = 0xC; }
+void IRVestelAC::off() { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRVestelAC::setPower(const bool state) {
   if (state)
-    on();
+    remote_state.power = 0xF;
   else
-    off();
+    remote_state.power = 0xC;
+  use_time_state = false;
 }
 
 // Return the requested power state of the A/C.
@@ -117,6 +127,7 @@ void IRVestelAC::setTemp(const uint8_t temp) {
   // new_temp = std::max(kVestelACMinTempH, new_temp); Check MODE
   new_temp = std::min(kVestelACMaxTemp, new_temp);
   remote_state.temp = new_temp - 16;
+  use_time_state = false;
 }
 
 // Return the set temperature.
@@ -136,6 +147,7 @@ void IRVestelAC::setFan(const uint8_t fan) {
     default:
       remote_state.fan = kVestelACFanAuto;
   }
+  use_time_state = false;
 }
 
 // Return the requested state of the unit's fan.
@@ -160,6 +172,7 @@ void IRVestelAC::setMode(const uint8_t mode) {
     default:
       remote_state.mode = kVestelACAuto;
   }
+  use_time_state = false;
 }
 // Set Auto mode of AC.
 void IRVestelAC::setAuto(const int8_t autoLevel) {
@@ -182,50 +195,75 @@ void IRVestelAC::setAuto(const int8_t autoLevel) {
 // Valid time arguments are 0, 0.5, 1, 2, 3 and 5 hours (in min). 0 disables the
 // timer.
 void IRVestelAC::setTimer(const uint16_t minutes) {
-  if (minutes == 0) {
-    remote_time_state.t_turnOnMinute = 0;
-    remote_time_state.t_turnOffMinute = 0;
-    remote_time_state.t_turnOnHour = 0;
-    remote_time_state.t_turnOffHour = 0;
+  remote_time_state.t_turnOnMinute = 0;
+  remote_time_state.t_turnOnHour = 0;
+  remote_time_state.t_turnOffHour = minutes / 60;
+  remote_time_state.t_turnOffMinute = (minutes % 60) / 10;
+  remote_time_state.t_off_active = 0;
+  if (minutes) {
+    remote_time_state.t_timer_mode = 1;
+    // Yes. t_on_active instead of t_off_active.
+    remote_time_state.t_on_active = 1;
+  } else {  // Turn off the timer.
     remote_time_state.t_timer_mode = 0;
     remote_time_state.t_on_active = 0;
-    remote_time_state.t_off_active = 0;
-  } else {
-    remote_time_state.t_turnOffHour = minutes / 60;
-    remote_time_state.t_turnOffMinute = (minutes % 60) / 10;
-    remote_time_state.t_turnOnMinute = 0;
-    remote_time_state.t_turnOnHour = 0;
-    remote_time_state.t_timer_mode = 1;
-    remote_time_state.t_on_active =
-        1;  // Yes. t_on_active instead of t_off_active.
   }
+  use_time_state = true;
 }
+
+uint16_t IRVestelAC::getTimer(void) { return getOffTimer(); }
 
 // Set the AC's internal clock
 void IRVestelAC::setTime(const uint16_t minutes) {
   remote_time_state.t_hour = minutes / 60;
-  remote_time_state.t_minute = (minutes % 60);
+  remote_time_state.t_minute = minutes % 60;
+  use_time_state = true;
+}
+
+uint16_t IRVestelAC::getTime(void) {
+  return remote_time_state.t_hour * 60 + remote_time_state.t_minute;
 }
 
 // Set AC's wake up time. Takes time in minute.
-void IRVestelAC::setWakeupTime(const uint16_t minutes) {
+void IRVestelAC::setOnTimer(const uint16_t minutes) {
   remote_time_state.t_turnOnHour = minutes / 60;
   // Register is 3 bit and can only hold minute/10
   remote_time_state.t_turnOnMinute = (minutes % 60) / 10;
-  remote_time_state.t_on_active = 1;  // Automatic activation
+  if (minutes)
+    remote_time_state.t_on_active = 1;  // activation
+  else
+    remote_time_state.t_on_active = 0;  // deactivate
+  remote_time_state.t_timer_mode = 0;
+  use_time_state = true;
+}
+
+uint16_t IRVestelAC::getOnTimer(void) {
+  return remote_time_state.t_turnOnHour * 60 +
+         remote_time_state.t_turnOnMinute * 10;
 }
 
 // Set AC's turn off time. Takes time in minute.
-void IRVestelAC::setTurnOffTime(const uint16_t minutes) {
+void IRVestelAC::setOffTimer(const uint16_t minutes) {
   remote_time_state.t_turnOffHour = minutes / 60;
   // Register is 3 bit and can only hold minute/10
   remote_time_state.t_turnOffMinute = (minutes % 60) / 10;
-  remote_time_state.t_off_active = 1;  // Automatic activation
+  if (minutes)
+    remote_time_state.t_off_active = 1;  // activation
+  else
+    remote_time_state.t_off_active = 0;  // deactivate
+  remote_time_state.t_timer_mode = 0;
+  use_time_state = true;
+}
+
+uint16_t IRVestelAC::getOffTimer(void) {
+  return remote_time_state.t_turnOffHour * 60 +
+         remote_time_state.t_turnOffMinute * 10;
 }
 
 // Set the Sleep state of the A/C.
 void IRVestelAC::setSleep(const bool state) {
   remote_state.turbo_sleep_normal = state ? kVestelACSleep : kVestelACNormal;
+  use_time_state = false;
 }
 
 // Return the Sleep state of the A/C.
@@ -236,6 +274,7 @@ bool IRVestelAC::getSleep() {
 // Set the Turbo state of the A/C.
 void IRVestelAC::setTurbo(const bool state) {
   remote_state.turbo_sleep_normal = state ? kVestelACTurbo : kVestelACNormal;
+  use_time_state = false;
 }
 
 // Return the Turbo state of the A/C.
@@ -246,6 +285,7 @@ bool IRVestelAC::getTurbo() {
 // Set the Ion state of the A/C.
 void IRVestelAC::setIon(const bool state) {
   remote_state.ion = state ? kVestelACIon : 0;
+  use_time_state = false;
 }
 
 // Return the Ion state of the A/C.
@@ -254,6 +294,7 @@ bool IRVestelAC::getIon() { return remote_state.ion == kVestelACIon; }
 // Set the Swing Roaming state of the A/C.
 void IRVestelAC::setSwing(const bool state) {
   remote_state.swing = state ? kVestelACSwing : 0xF;
+  use_time_state = false;
 }
 
 // Return the Swing Roaming state of the A/C.
@@ -288,6 +329,11 @@ bool IRVestelAC::validChecksum(const uint64_t state) {
 void IRVestelAC::checksum() {
   // Stored the checksum value in the last byte.
   remote_state.CRC = calcChecksum(remote_state.rawCode);
+  remote_time_state.CRC = calcChecksum(remote_time_state.rawCode);
+}
+
+bool IRVestelAC::isTimeCommand() {
+  return (remote_state.power == 0x00 || use_time_state);
 }
 
 // Convert the internal state into a human readable string.
@@ -298,29 +344,26 @@ String IRVestelAC::toString() {
 std::string IRVestelAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  if (remote_state.power == 0x00) {
-    result += "Time Command - Time : " +
-              IRHaierAC::timeToString(remote_state.t_hour * 60 +
-                                      remote_state.t_minute);
-    if (remote_state.t_timer_mode) {
-      result += ", Timer Mode Off After " +
-                IRHaierAC::timeToString(remote_state.t_turnOffHour * 60 +
-                                        remote_state.t_turnOffMinute * 10);
-    } else {
-      if (remote_state.t_on_active)
-        result += ", Turn On: " +
-                  IRHaierAC::timeToString(remote_state.t_turnOnHour * 60 +
-                                          remote_state.t_turnOnMinute * 10);
-      if (remote_state.t_off_active)
-        result += ", Turn Off: " +
-                  IRHaierAC::timeToString(remote_state.t_turnOffHour * 60 +
-                                          remote_state.t_turnOffMinute * 10);
-    }
-    if ((remote_state.t_timer_mode || remote_state.t_on_active ||
-         remote_state.t_off_active) == 0)
-      result += ", Timer Mode Off";
+  if (isTimeCommand()) {
+    result += "Time: " + IRHaierAC::timeToString(getTime());
+
+    result += ", Timer: ";
+    result += remote_time_state.t_timer_mode
+                  ? IRHaierAC::timeToString(getTimer())
+                  : "Off";
+
+    result += ", On Timer: ";
+    result += (remote_time_state.t_on_active && !remote_time_state.t_timer_mode)
+                  ? IRHaierAC::timeToString(getOnTimer())
+                  : "Off";
+
+    result += ", Off Timer: ";
+    result += remote_time_state.t_off_active
+                  ? IRHaierAC::timeToString(getOffTimer())
+                  : "Off";
     return result;
   }
+  // Not a time command, it's a normal command.
   result += "Power: ";
   result += (getPower() ? "On" : "Off");
   result += ", Mode: " + uint64ToString(getMode());

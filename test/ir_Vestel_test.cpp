@@ -87,6 +87,7 @@ TEST(TestVestelACClass, Power) {
 
   ac.on();
   EXPECT_TRUE(ac.getPower());
+  EXPECT_FALSE(ac.isTimeCommand());
 }
 
 TEST(TestVestelACClass, OperatingMode) {
@@ -119,6 +120,7 @@ TEST(TestVestelACClass, OperatingMode) {
 
   ac.setMode(255);
   EXPECT_EQ(kVestelACAuto, ac.getMode());
+  EXPECT_FALSE(ac.isTimeCommand());
 }
 
 TEST(TestVestelACClass, Temperature) {
@@ -148,6 +150,7 @@ TEST(TestVestelACClass, Temperature) {
 
   ac.setTemp(255);
   EXPECT_EQ(kVestelACMaxTemp, ac.getTemp());
+  EXPECT_FALSE(ac.isTimeCommand());
 }
 
 TEST(TestVestelACClass, FanSpeed) {
@@ -167,6 +170,7 @@ TEST(TestVestelACClass, FanSpeed) {
 
   ac.setFan(kVestelACFanHigh);
   EXPECT_EQ(kVestelACFanHigh, ac.getFan());
+  EXPECT_FALSE(ac.isTimeCommand());
 }
 
 TEST(TestVestelACClass, Swing) {
@@ -181,6 +185,134 @@ TEST(TestVestelACClass, Swing) {
 
   ac.setSwing(true);
   EXPECT_TRUE(ac.getSwing());
+  EXPECT_FALSE(ac.isTimeCommand());
+}
+
+TEST(TestVestelACClass, Ion) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+
+  ac.setIon(false);
+  EXPECT_EQ(false, ac.getIon());
+
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+  EXPECT_FALSE(ac.isTimeCommand());
+}
+
+TEST(TestVestelACClass, Turbo) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+
+  ac.setTurbo(false);
+  EXPECT_EQ(false, ac.getTurbo());
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_FALSE(ac.isTimeCommand());
+}
+
+TEST(TestVestelACClass, Sleep) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+
+  ac.setSleep(false);
+  EXPECT_EQ(false, ac.getSleep());
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_FALSE(ac.isTimeCommand());
+}
+
+TEST(TestVestelACClass, Time) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setTime(0);
+  EXPECT_EQ(0, ac.getTime());
+  EXPECT_TRUE(ac.isTimeCommand());
+
+  ac.setTime(1);
+  EXPECT_EQ(1, ac.getTime());
+
+  ac.setTime(1234);
+  EXPECT_EQ(1234, ac.getTime());
+
+  ac.setTime(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getTime());
+}
+
+TEST(TestVestelACClass, OnTimer) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setOnTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.isTimeCommand());
+
+  ac.setOnTimer(1);
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOnTimer(10);
+  EXPECT_EQ(10, ac.getOnTimer());
+
+  ac.setOnTimer(12 * 60 + 15);  // we will round down to 10 min increments.
+  EXPECT_EQ(12 * 60 + 10, ac.getOnTimer());
+
+  ac.setOnTimer(23 * 60 + 50);
+  EXPECT_EQ(23 * 60 + 50, ac.getOnTimer());
+}
+
+TEST(TestVestelACClass, OffTimer) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_TRUE(ac.isTimeCommand());
+
+  ac.setOffTimer(1);
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(10);
+  EXPECT_EQ(10, ac.getOffTimer());
+
+  ac.setOffTimer(12 * 60 + 15);  // we will round down to 10 min increments.
+  EXPECT_EQ(12 * 60 + 10, ac.getOffTimer());
+
+  ac.setOffTimer(23 * 60 + 50);
+  EXPECT_EQ(23 * 60 + 50, ac.getOffTimer());
+}
+
+TEST(TestVestelACClass, Timer) {
+  IRVestelAC ac(0);
+  ac.begin();
+
+  ac.setTimer(0);
+  EXPECT_EQ(0, ac.getTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.isTimeCommand());
+
+  ac.setTimer(10);
+  EXPECT_EQ(10, ac.getTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setTimer(12 * 60 + 15);  // we will round down to 10 min increments.
+  EXPECT_EQ(12 * 60 + 10, ac.getTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setTimer(23 * 60 + 50);
+  EXPECT_EQ(23 * 60 + 50, ac.getTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
 }
 
 TEST(TestVestelACClass, MessageConstuction) {
@@ -193,6 +325,7 @@ TEST(TestVestelACClass, MessageConstuction) {
   ac.setMode(kVestelACCool);
   ac.setTemp(21);
   ac.setFan(kVestelACFanHigh);
+  EXPECT_FALSE(ac.isTimeCommand());
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 11 (HIGH), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
@@ -200,6 +333,7 @@ TEST(TestVestelACClass, MessageConstuction) {
   ac.setSwing(true);
   ac.setIon(true);
   ac.setTurbo(true);
+  EXPECT_FALSE(ac.isTimeCommand());
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 11 (HIGH), Sleep: Off, "
       "Turbo: On, Ion: On, Swing: On",
@@ -212,6 +346,7 @@ TEST(TestVestelACClass, MessageConstuction) {
       "Power: On, Mode: 4 (HEAT), Temp: 21C, Fan: 11 (HIGH), Sleep: On, "
       "Turbo: Off, Ion: On, Swing: On",
       ac.toString());
+  EXPECT_FALSE(ac.isTimeCommand());
 
   ac.setTemp(25);
   ac.setPower(false);
@@ -219,9 +354,42 @@ TEST(TestVestelACClass, MessageConstuction) {
       "Power: Off, Mode: 4 (HEAT), Temp: 25C, Fan: 11 (HIGH), Sleep: On, "
       "Turbo: Off, Ion: On, Swing: On",
       ac.toString());
+  EXPECT_FALSE(ac.isTimeCommand());
 
   // Check that the checksum is valid.
   EXPECT_TRUE(IRVestelAC::validChecksum(ac.getRaw()));
+  ac.setTime(23 * 60 + 59);
+  EXPECT_TRUE(ac.isTimeCommand());
+  EXPECT_EQ(
+      "Time: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setTimer(8 * 60 + 0);
+  EXPECT_TRUE(ac.isTimeCommand());
+  EXPECT_EQ(
+      "Time: 23:59, Timer: 8:00, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setOnTimer(7 * 60 + 40);
+  EXPECT_EQ(
+      "Time: 23:59, Timer: Off, On Timer: 7:40, Off Timer: Off",
+      ac.toString());
+  ac.setOffTimer(17 * 60 + 10);
+  EXPECT_EQ(
+      "Time: 23:59, Timer: Off, On Timer: 7:40, Off Timer: 17:10",
+      ac.toString());
+  ac.setTimer(8 * 60 + 0);
+  EXPECT_EQ(
+      "Time: 23:59, Timer: 8:00, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setTimer(0);
+  EXPECT_EQ(
+      "Time: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.on();
+  EXPECT_FALSE(ac.isTimeCommand());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (HEAT), Temp: 25C, Fan: 11 (HIGH), Sleep: On, "
+      "Turbo: Off, Ion: On, Swing: On",
+      ac.toString());
 }
 
 // Tests for decodeVestelAC().
@@ -263,6 +431,76 @@ TEST(TestDecodeVestelAC, NormalDecodeWithStrict) {
   EXPECT_EQ(
       "Power: On, Mode: 0 (AUTO), Temp: 25C, Fan: 13 (AUTO HOT), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
+      ac.toString());
+}
+
+// Decode a real message from Raw Data.
+TEST(TestDecodeVestelAC, RealNormalExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRVestelAC ac(0);
+  irsend.begin();
+
+  uint16_t rawData[115] = {
+      3098, 9080, 548, 1538, 526, 492,  526, 468,  524, 468,  526, 468,
+      550,  466,  526, 466,  526, 504,  540, 466,  526, 1538, 526, 466,
+      526,  466,  552, 1540, 522, 466,  526, 492,  526, 544,  526, 1536,
+      526,  1536, 552, 1536, 526, 1536, 552, 1536, 552, 1536, 526, 1536,
+      526,  1574, 542, 1536, 526, 492,  526, 466,  526, 494,  524, 468,
+      524,  468,  526, 492,  526, 502,  540, 468,  524, 494,  524, 468,
+      526,  468,  524, 468,  526, 492,  526, 468,  524, 520,  524, 1538,
+      524,  468,  524, 468,  524, 468,  524, 468,  524, 468,  524, 1538,
+      524,  506,  538, 468,  524, 468,  524, 1538, 524, 468,  550, 1538,
+      550,  1538, 524, 1538, 534, 1528, 544};  // VESTEL_AC
+  irsend.reset();
+  irsend.sendRaw(rawData, 115, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(VESTEL_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kVestelACBits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(0xF4410001FF1201ULL, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  ac.begin();
+  ac.setRaw(irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (HEAT), Temp: 16C, Fan: 1 (AUTO), Sleep: Off, "
+      "Turbo: Off, Ion: On, Swing: Off",
+      ac.toString());
+}
+
+TEST(TestDecodeVestelAC, RealTimerExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRVestelAC ac(0);
+  irsend.begin();
+
+  uint16_t rawData[115] = {
+      3022, 9080, 546, 1536, 526, 466,  526, 492,  526, 468,  526, 492,
+      524,  468,  524, 494,  524, 504,  540, 492,  524, 1538, 526, 468,
+      524,  492,  526, 466,  552, 1536, 526, 1536, 526, 1570, 542, 492,
+      524,  1538, 550, 1538, 524, 1536, 526, 494,  524, 466,  526, 468,
+      524,  1574, 540, 1536, 550, 1536, 526, 468,  550, 1536, 526, 492,
+      526,  468,  524, 492,  526, 518,  526, 1536, 552, 1536, 550, 1536,
+      526,  494,  550, 1538, 526, 492,  524, 1538, 526, 504,  540, 466,
+      526,  1536, 526, 1536, 526, 468,  550, 1538, 524, 468,  524, 1538,
+      550,  1574, 540, 468,  550, 1538, 526, 492,  524, 468,  526, 466,
+      526,  468,  524, 494,  524, 468,  546};  // VESTEL_AC 2D6570B8EE201
+  irsend.reset();
+  irsend.sendRaw(rawData, 115, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(VESTEL_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kVestelACBits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(0x2D6570B8EE201ULL, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  ac.begin();
+  ac.setRaw(irsend.capture.value);
+  EXPECT_EQ(
+      "Time: 5:45, Timer: Off, On Timer: 14:00, Off Timer: 23:00",
       ac.toString());
 }
 
