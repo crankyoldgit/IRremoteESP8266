@@ -1119,7 +1119,7 @@ void setup_wifi() {
 void setup(void) {
   irsend.begin();
   offset = irsend.calibrate();
-#if IR_RX
+#ifdef IR_RX
 #if IR_RX_PULLUP
   pinMode(IR_RX, INPUT_PULLUP);
 #endif  // IR_RX_PULLUP
