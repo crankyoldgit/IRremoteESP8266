@@ -1,5 +1,6 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
+// Copyright 2018-2019 crankyoldgit
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
 
@@ -105,6 +106,13 @@ const uint8_t kDaikinByteOffTimer = 13;
 const uint8_t kDaikinBitOffTimer = 0b00000100;
 const uint8_t kDaikinByteOnTimer = 13;
 const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint16_t kDaikinUnusedTime = 0x600;
+const uint8_t kDaikinBeepQuiet = 1;
+const uint8_t kDaikinBeepLoud = 2;
+const uint8_t kDaikinBeepOff = 3;
+const uint8_t kDaikinLightBright = 1;
+const uint8_t kDaikinLightDim = 2;
+const uint8_t kDaikinLightOff = 3;
 const uint8_t kDaikinCurBit = kDaikinStateLength;
 const uint8_t kDaikinCurIndex = kDaikinStateLength + 1;
 const uint8_t kDaikinTolerance = 35;
@@ -119,7 +127,7 @@ const uint16_t kDaikinGap = 29000;
 const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
-// Another variant of the protocol.
+// Another variant of the protocol for the Daikin ARC477A1 remote.
 const uint16_t kDaikin2LeaderMark = 10024;
 const uint16_t kDaikin2LeaderSpace = 25180;
 const uint16_t kDaikin2Gap = kDaikin2LeaderMark + kDaikin2LeaderSpace;
@@ -131,6 +139,25 @@ const uint16_t kDaikin2ZeroSpace = 451;
 const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
+
+const uint8_t kDaikin2BitSleepTimer = 0b00100000;
+const uint8_t kDaikin2BitPurify = 0b00010000;
+const uint8_t kDaikin2BitEye = 0b00000010;
+const uint8_t kDaikin2BitEyeAuto = 0b10000000;
+const uint8_t kDaikin2BitMold = 0b00001000;
+const uint8_t kDaikin2BitClean = 0b00100000;
+const uint8_t kDaikin2BitFreshAir = 0b00000001;
+const uint8_t kDaikin2BitFreshAirHigh = 0b10000000;
+const uint8_t kDaikin2LightMask = 0b00110000;
+const uint8_t kDaikin2BeepMask = 0b11000000;
+const uint8_t kDaikin2SwingVHigh = 0x1;
+const uint8_t kDaikin2SwingVLow = 0x6;
+const uint8_t kDaikin2SwingVBreeze = 0xC;
+const uint8_t kDaikin2SwingVCirculate = 0xD;
+const uint8_t kDaikin2SwingVAuto = 0xE;
+const uint8_t kDaikin2SwingHAuto = 0xBE;
+const uint8_t kDaikin2SwingHSwing = 0xBF;
+
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -196,7 +223,7 @@ class IRDaikinESP {
 #endif  // DAIKIN_DEBUG
   uint32_t getCommand();
   void setCommand(uint32_t value);
-  static bool validChecksum(const uint8_t state[],
+  static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
 #ifdef ARDUINO
   String toString();
@@ -210,11 +237,97 @@ class IRDaikinESP {
   // # of bytes per command
   uint8_t daikin[kDaikinStateLength];
   void stateReset();
-  static uint8_t calcBlockChecksum(const uint8_t* block, const uint16_t length);
   void checksum();
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);
   uint8_t getBit(uint8_t byte, uint8_t bitmask);
+  IRsend _irsend;
+};
+
+// Class to emulate a Daikin ARC477A1 remote.
+class IRDaikin2 {
+ public:
+  explicit IRDaikin2(uint16_t pin);
+
+#if SEND_DAIKIN2
+  void send(const uint16_t repeat = kDaikin2DefaultRepeat);
+#endif
+  void begin();
+  void on();
+  void off();
+  void setPower(const bool state);
+  bool getPower();
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan();
+  uint8_t getMode();
+  void setMode(const uint8_t mode);
+  void setSwingVertical(const uint8_t position);
+  uint8_t getSwingVertical();
+  void setSwingHorizontal(const uint8_t position);
+  uint8_t getSwingHorizontal();
+  bool getQuiet();
+  void setQuiet(const bool on);
+  bool getPowerful();
+  void setPowerful(const bool on);
+  void setSensor(const bool on);
+  bool getSensor();
+  void setEcono(const bool on);
+  bool getEcono();
+  void setEye(const bool on);
+  bool getEye();
+  void setEyeAuto(const bool on);
+  bool getEyeAuto();
+  void setPurify(const bool on);
+  bool getPurify();
+  void setMold(const bool on);
+  bool getMold();
+  void enableOnTimer(const uint16_t starttime);
+  void disableOnTimer();
+  uint16_t getOnTime();
+  bool getOnTimerEnabled();
+  void enableSleepTimer(const uint16_t sleeptime);
+  void disableSleepTimer();
+  uint16_t getSleepTime();
+  bool getSleepTimerEnabled();
+  void enableOffTimer(const uint16_t endtime);
+  void disableOffTimer();
+  uint16_t getOffTime();
+  bool getOffTimerEnabled();
+  void setCurrentTime(const uint16_t time);
+  uint16_t getCurrentTime();
+  void setBeep(const uint8_t beep);
+  uint8_t getBeep();
+  void setLight(const uint8_t light);
+  uint8_t getLight();
+  void setClean(const bool on);
+  bool getClean();
+  void setFreshAir(const bool on);
+  bool getFreshAir();
+  void setFreshAirHigh(const bool on);
+  bool getFreshAirHigh();
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+  uint32_t getCommand();
+  void setCommand(uint32_t value);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin2StateLength);
+#ifdef ARDUINO
+  String toString();
+  static String renderTime(uint16_t timemins);
+#else
+  std::string toString();
+  static std::string renderTime(uint16_t timemins);
+#endif
+
+ private:
+  // # of bytes per command
+  uint8_t remote_state[kDaikin2StateLength];
+  void stateReset();
+  void checksum();
+  void clearOnTimerFlag();
+  void clearSleepTimerFlag();
   IRsend _irsend;
 };
 

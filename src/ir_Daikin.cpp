@@ -1,11 +1,11 @@
 /*
-An Arduino sketch to emulate IR Daikin ARC433** remote control unit
+An Arduino sketch to emulate IR Daikin ARC433** & ARC477A1 remote control unit
 Read more at:
 http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 
 Copyright 2016 sillyfrog
 Copyright 2017 sillyfrog, crankyoldgit
-Copyright 2018 crankyoldgit
+Copyright 2018-2019 crankyoldgit
 */
 
 #include "ir_Daikin.h"
@@ -94,39 +94,24 @@ void IRDaikinESP::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN
 
-// Calculate the checksum for a given data block.
-// Args:
-//   block:  Ptr to the start of the data block.
-//   length: Nr. of bytes to checksum.
-// Returns:
-//   A byte containing the calculated checksum.
-uint8_t IRDaikinESP::calcBlockChecksum(const uint8_t *block,
-                                       const uint16_t length) {
-  uint8_t sum = 0;
-  // Daikin checksum is just the addition of all the data bytes
-  // in the block but capped to 8 bits.
-  for (uint16_t i = 0; i < length; i++, block++) sum += *block;
-  return sum & 0xFFU;
-}
-
 // Verify the checksum is valid for a given state.
 // Args:
 //   state:  The array to verify the checksum of.
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRDaikinESP::validChecksum(const uint8_t state[], const uint16_t length) {
-  if (length < 8 || state[7] != calcBlockChecksum(state, 7)) return false;
+bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
+  if (length < 8 || state[7] != sumBytes(state, 7)) return false;
   if (length < 10 ||
-      state[length - 1] != calcBlockChecksum(state + 8, length - 9))
+      state[length - 1] != sumBytes(state + 8, length - 9))
     return false;
   return true;
 }
 
 // Calculate and set the checksum values for the internal state.
 void IRDaikinESP::checksum() {
-  daikin[7] = calcBlockChecksum(daikin, 7);
-  daikin[26] = calcBlockChecksum(daikin + 8, 17);
+  daikin[7] = sumBytes(daikin, 7);
+  daikin[26] = sumBytes(daikin + 8, 17);
 }
 
 void IRDaikinESP::stateReset() {
@@ -344,7 +329,7 @@ uint8_t IRDaikinESP::getBit(uint8_t byte, uint8_t bitmask) {
   return daikin[byte] & bitmask;
 }
 
-// starttime: Number of minutes after midnight, in 10 minutes increments
+// starttime: Number of minutes after midnight.
 void IRDaikinESP::enableOnTimer(uint16_t starttime) {
   setBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
   daikin[18] = (uint8_t)(starttime & 0x00FF);
@@ -354,7 +339,7 @@ void IRDaikinESP::enableOnTimer(uint16_t starttime) {
 }
 
 void IRDaikinESP::disableOnTimer() {
-  enableOnTimer(0x600);
+  enableOnTimer(kDaikinUnusedTime);
   clearBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
 }
 
@@ -370,7 +355,7 @@ bool IRDaikinESP::getOnTimerEnabled() {
   return getBit(kDaikinByteOnTimer, kDaikinBitOnTimer);
 }
 
-// endtime: Number of minutes after midnight, in 10 minutes increments
+// endtime: Number of minutes after midnight.
 void IRDaikinESP::enableOffTimer(uint16_t endtime) {
   setBit(kDaikinByteOffTimer, kDaikinBitOffTimer);
   daikin[20] = (uint8_t)((endtime >> 4) & 0xFF);
@@ -379,7 +364,7 @@ void IRDaikinESP::enableOffTimer(uint16_t endtime) {
 }
 
 void IRDaikinESP::disableOffTimer() {
-  enableOffTimer(0x600);
+  enableOffTimer(kDaikinUnusedTime);
   clearBit(kDaikinByteOffTimer, kDaikinBitOffTimer);
 }
 
@@ -786,6 +771,556 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN2
 
+// Class for handling Daikin2 A/C messages.
+//
+// Code by crankyoldgit, Reverse engineering analysis by sheppy99
+//
+// Supported Remotes: Daikin ARC477A1 remote
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/582
+//   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
+//   https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
+IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRDaikin2::begin() { _irsend.begin(); }
+
+#if SEND_DAIKIN2
+void IRDaikin2::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin2(remote_state, kDaikin2StateLength, repeat);
+}
+#endif  // SEND_DAIKIN2
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin2::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin2Section1Length - 1 ||
+      state[kDaikin2Section1Length - 1] != sumBytes(state,
+                                                    kDaikin2Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2 (a.k.a. the rest)
+  if (length <= kDaikin2Section1Length + 1 ||
+      state[length - 1] != sumBytes(state + kDaikin2Section1Length,
+                                    length - kDaikin2Section1Length - 1))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin2::checksum() {
+  remote_state[kDaikin2Section1Length - 1] = sumBytes(
+      remote_state, kDaikin2Section1Length - 1);
+  remote_state[kDaikin2StateLength -1 ] = sumBytes(
+      remote_state + kDaikin2Section1Length, kDaikin2Section2Length - 1);
+}
+
+void IRDaikin2::stateReset() {
+  for (uint8_t i = 0; i < kDaikin2StateLength; i++) remote_state[i] = 0x0;
+
+  remote_state[0] = 0x11;
+  remote_state[1] = 0xDA;
+  remote_state[2] = 0x27;
+  remote_state[4] = 0x01;
+  remote_state[6] = 0xC0;
+  remote_state[7] = 0x70;
+  remote_state[8] = 0x08;
+  remote_state[9] = 0x0C;
+  remote_state[10] = 0x80;
+  remote_state[11] = 0x04;
+  remote_state[12] = 0xB0;
+  remote_state[13] = 0x16;
+  remote_state[14] = 0x24;
+  remote_state[17] = 0xBE;
+  remote_state[18] = 0xD0;
+  // remote_state[19] is a checksum byte, it will be set by checksum().
+  remote_state[20] = 0x11;
+  remote_state[21] = 0xDA;
+  remote_state[22] = 0x27;
+  remote_state[25] = 0x08;
+  remote_state[28] = 0xA0;
+  remote_state[35] = 0xC1;
+  remote_state[36] = 0x80;
+  remote_state[37] = 0x60;
+  // remote_state[38] is a checksum byte, it will be set by checksum().
+  disableOnTimer();
+  disableOffTimer();
+  disableSleepTimer();
+  checksum();
+}
+
+uint8_t *IRDaikin2::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin2::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin2StateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+void IRDaikin2::on() {
+  remote_state[25] |= kDaikinBitPower;
+}
+
+void IRDaikin2::off() {
+  remote_state[25] &= ~kDaikinBitPower;
+}
+
+void IRDaikin2::setPower(const bool state) {
+  if (state)
+    on();
+  else
+    off();
+}
+
+bool IRDaikin2::getPower() {
+  return (remote_state[25] & kDaikinBitPower);
+}
+
+uint8_t IRDaikin2::getMode() { return remote_state[25] >> 4; }
+
+void IRDaikin2::setMode(const uint8_t desired_mode) {
+  uint8_t mode = desired_mode;
+  switch (mode) {
+    case kDaikinCool:
+    case kDaikinHeat:
+    case kDaikinFan:
+    case kDaikinDry:
+      break;
+    default:
+      mode = kDaikinAuto;
+  }
+  remote_state[25] &= 0b10001111;
+  remote_state[25] |= (mode << 4);
+}
+
+// Set the temp in deg C
+void IRDaikin2::setTemp(const uint8_t desired) {
+  uint8_t temp = std::max(kDaikinMinTemp, desired);
+  temp = std::min(kDaikinMaxTemp, temp);
+  remote_state[26] = temp * 2;
+}
+
+// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+void IRDaikin2::setFan(const uint8_t fan) {
+  // Set the fan speed bits, leave low 4 bits alone
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  remote_state[28] &= 0x0F;
+  remote_state[28] |= (fanset << 4);
+}
+
+uint8_t IRDaikin2::getFan() {
+  uint8_t fan = remote_state[28] >> 4;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  return fan;
+}
+
+uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
+
+void IRDaikin2::setSwingVertical(const uint8_t position) {
+  switch (position) {
+    case kDaikin2SwingVHigh:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case kDaikin2SwingVLow:
+    case kDaikin2SwingVBreeze:
+    case kDaikin2SwingVCirculate:
+    case kDaikin2SwingVAuto:
+      remote_state[18] &= 0xF0;
+      remote_state[18] |= (position & 0x0F);
+  }
+}
+
+uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] & 0x0F; }
+
+void IRDaikin2::setSwingHorizontal(const uint8_t position) {
+  remote_state[17] = position;
+}
+
+uint8_t IRDaikin2::getSwingHorizontal() { return remote_state[17]; }
+
+void IRDaikin2::setCurrentTime(const uint16_t numMins) {
+  uint16_t mins = numMins;
+  if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  remote_state[5] = (uint8_t)(mins & 0xFF);
+  // only keep 4 bits
+  remote_state[6] &= 0xF0;
+  remote_state[6] |= (uint8_t)((mins >> 8) & 0x0F);
+}
+
+uint16_t IRDaikin2::getCurrentTime() {
+  return ((remote_state[6] & 0x0F) << 8) + remote_state[5];
+}
+
+// starttime: Number of minutes after midnight.
+// Note: Timer location is shared with sleep timer.
+void IRDaikin2::enableOnTimer(const uint16_t starttime) {
+  clearSleepTimerFlag();
+  remote_state[25] |= kDaikinBitOnTimer;  // Set the On Timer flag.
+  remote_state[30] = (uint8_t)(starttime & 0xFF);
+  // only keep 4 bits
+  remote_state[31] &= 0xF0;
+  remote_state[31] |= (uint8_t)((starttime >> 8) & 0x0F);
+}
+
+void IRDaikin2::clearOnTimerFlag() {
+  remote_state[25] &= ~kDaikinBitOnTimer;
+}
+
+void IRDaikin2::disableOnTimer() {
+  enableOnTimer(kDaikinUnusedTime);
+  clearOnTimerFlag();
+  clearSleepTimerFlag();
+}
+
+uint16_t IRDaikin2::getOnTime() {
+  return ((remote_state[31] & 0x0F) << 8) + remote_state[30];
+}
+
+bool IRDaikin2::getOnTimerEnabled() {
+  return remote_state[25] & kDaikinBitOnTimer;
+}
+
+// endtime: Number of minutes after midnight.
+void IRDaikin2::enableOffTimer(const uint16_t endtime) {
+  remote_state[25] |= kDaikinBitOffTimer;  // Set the Off Timer flag.
+  remote_state[32] = (uint8_t)((endtime >> 4) & 0xFF);
+  remote_state[31] &= 0x0F;
+  remote_state[31] |= (uint8_t)((endtime & 0xF) << 4);
+}
+
+void IRDaikin2::disableOffTimer() {
+  enableOffTimer(kDaikinUnusedTime);
+  remote_state[25] &= ~kDaikinBitOffTimer;  // Clear the Off Timer flag.
+}
+
+uint16_t IRDaikin2::getOffTime() {
+  return (remote_state[32] << 4) + (remote_state[31] >> 4);
+}
+
+bool IRDaikin2::getOffTimerEnabled() {
+  return remote_state[25] & kDaikinBitOffTimer;
+}
+
+uint8_t IRDaikin2::getBeep() {
+  return remote_state[7] >> 6;
+}
+
+void IRDaikin2::setBeep(const uint8_t beep) {
+  remote_state[7] &= ~kDaikin2BeepMask;
+  remote_state[7] |= ((beep << 6) & kDaikin2BeepMask);
+}
+
+uint8_t IRDaikin2::getLight() {
+  return (remote_state[7] & kDaikin2LightMask) >> 4;
+}
+
+void IRDaikin2::setLight(const uint8_t light) {
+  remote_state[7] &= ~kDaikin2LightMask;
+  remote_state[7] |= ((light << 4) & kDaikin2LightMask);
+}
+
+void IRDaikin2::setMold(const bool on) {
+  if (on)
+    remote_state[8] |= kDaikin2BitMold;
+  else
+    remote_state[8] &= ~kDaikin2BitMold;
+}
+
+bool IRDaikin2::getMold() {
+  return remote_state[8] & kDaikin2BitMold;
+}
+
+// Auto clean setting.
+void IRDaikin2::setClean(const bool on) {
+  if (on)
+    remote_state[8] |= kDaikin2BitClean;
+  else
+    remote_state[8] &= ~kDaikin2BitClean;
+}
+
+bool IRDaikin2::getClean() {
+  return remote_state[8] & kDaikin2BitClean;
+}
+
+// Fresh Air settings.
+void IRDaikin2::setFreshAir(const bool on) {
+  if (on)
+    remote_state[8] |= kDaikin2BitFreshAir;
+  else
+    remote_state[8] &= ~kDaikin2BitFreshAir;
+}
+
+bool IRDaikin2::getFreshAir() {
+  return remote_state[8] & kDaikin2BitFreshAir;
+}
+
+void IRDaikin2::setFreshAirHigh(const bool on) {
+  if (on)
+    remote_state[8] |= kDaikin2BitFreshAirHigh;
+  else
+    remote_state[8] &= ~kDaikin2BitFreshAirHigh;
+}
+
+bool IRDaikin2::getFreshAirHigh() {
+  return remote_state[8] & kDaikin2BitFreshAirHigh;
+}
+
+void IRDaikin2::setEyeAuto(bool on) {
+  if (on)
+    remote_state[13] |= kDaikin2BitEyeAuto;
+  else
+    remote_state[13] &= ~kDaikin2BitEyeAuto;
+}
+
+bool IRDaikin2::getEyeAuto() {
+  return remote_state[13] & kDaikin2BitEyeAuto;
+}
+
+void IRDaikin2::setEye(bool on) {
+  if (on)
+    remote_state[36] |= kDaikin2BitEye;
+  else
+    remote_state[36] &= ~kDaikin2BitEye;
+}
+
+bool IRDaikin2::getEye() {
+  return remote_state[36] & kDaikin2BitEye;
+}
+
+void IRDaikin2::setEcono(bool on) {
+  if (on)
+    remote_state[36] |= kDaikinBitEcono;
+  else
+    remote_state[36] &= ~kDaikinBitEcono;
+}
+
+bool IRDaikin2::getEcono() {
+  return remote_state[36] & kDaikinBitEcono;
+}
+
+// sleeptime: Number of minutes.
+// Note: Timer location is shared with On Timer.
+void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
+  enableOnTimer(sleeptime);
+  clearOnTimerFlag();
+  remote_state[36] |= kDaikin2BitSleepTimer;  // Set the Sleep Timer flag.
+}
+
+void IRDaikin2::clearSleepTimerFlag() {
+  remote_state[36] &= ~kDaikin2BitSleepTimer;
+}
+
+void IRDaikin2::disableSleepTimer() {
+  disableOnTimer();
+}
+
+uint16_t IRDaikin2::getSleepTime() {
+  return getOnTime();
+}
+
+bool IRDaikin2::getSleepTimerEnabled() {
+  return remote_state[36] & kDaikin2BitSleepTimer;
+}
+
+void IRDaikin2::setQuiet(const bool on) {
+  if (on) {
+    remote_state[33] |= kDaikinBitSilent;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    setPowerful(false);
+  } else {
+    remote_state[33] &= ~kDaikinBitSilent;
+  }
+}
+
+bool IRDaikin2::getQuiet() { return remote_state[33] & kDaikinBitSilent; }
+
+void IRDaikin2::setPowerful(const bool on) {
+  if (on) {
+    remote_state[33] |= kDaikinBitPowerful;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    setQuiet(false);
+  } else {
+    remote_state[33] &= ~kDaikinBitPowerful;
+  }
+}
+
+bool IRDaikin2::getPowerful() { return remote_state[33] & kDaikinBitPowerful; }
+
+void IRDaikin2::setPurify(const bool on) {
+  if (on)
+    remote_state[36] |= kDaikin2BitPurify;
+  else
+    remote_state[36] &= ~kDaikin2BitPurify;
+}
+
+bool IRDaikin2::getPurify() { return remote_state[36] & kDaikin2BitPurify; }
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRDaikin2::toString() {
+  String result = "";
+#else   // ARDUINO
+std::string IRDaikin2::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  if (getPower())
+    result += "On";
+  else
+    result += "Off";
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (getMode()) {
+    case kDaikinAuto:
+      result += " (AUTO)";
+      break;
+    case kDaikinCool:
+      result += " (COOL)";
+      break;
+    case kDaikinHeat:
+      result += " (HEAT)";
+      break;
+    case kDaikinDry:
+      result += " (DRY)";
+      break;
+    case kDaikinFan:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case kDaikinFanAuto:
+      result += " (Auto)";
+      break;
+    case kDaikinFanQuiet:
+      result += " (Quiet)";
+      break;
+    case kDaikinFanMin:
+      result += " (Min)";
+      break;
+    case kDaikinFanMax:
+      result += " (Max)";
+      break;
+  }
+  result += ", Swing (V): " + uint64ToString(getSwingVertical());
+  switch (getSwingVertical()) {
+    case kDaikin2SwingVHigh:
+      result += " (Highest)";
+      break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      break;
+    case kDaikin2SwingVLow:
+      result += " (Lowest)";
+      break;
+    case kDaikin2SwingVBreeze:
+      result += " (Breeze)";
+      break;
+    case kDaikin2SwingVCirculate:
+      result += " (Circulate)";
+      break;
+    case kDaikin2SwingVAuto:
+      result += " (Auto)";
+      break;
+    default:
+      result += " (Unknown)";
+  }
+  result += ", Swing (H): " + uint64ToString(getSwingHorizontal());
+  switch (getSwingHorizontal()) {
+    case kDaikin2SwingHAuto:
+      result += " (Auto)";
+      break;
+    case kDaikin2SwingHSwing:
+      result += " (Swing)";
+      break;
+  }
+  result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
+  result += ", On Time: ";
+  if (getOnTimerEnabled())
+    result += IRDaikinESP::renderTime(getOnTime());
+  else
+    result += "Off";
+  result += ", Off Time: ";
+  if (getOffTimerEnabled())
+    result += IRDaikinESP::renderTime(getOffTime());
+  else
+    result += "Off";
+  result += ", Sleep Time: ";
+  if (getSleepTimerEnabled())
+    result += IRDaikinESP::renderTime(getSleepTime());
+  else
+    result += "Off";
+  result += ", Beep: " + uint64ToString(getBeep());
+  switch (getBeep()) {
+    case kDaikinBeepLoud:
+      result += " (Loud)";
+      break;
+    case kDaikinBeepQuiet:
+      result += " (Quiet)";
+      break;
+    case kDaikinBeepOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Light: " + uint64ToString(getLight());
+  switch (getLight()) {
+    case kDaikinLightBright:
+      result += " (Bright)";
+      break;
+    case kDaikinLightDim:
+      result += " (Dim)";
+      break;
+    case kDaikinLightOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Mold: ";
+  result += (getMold() ? "On" : "Off");
+  result += ", Clean: ";
+  result += (getClean() ? "On" : "Off");
+  result += ", Fresh Air: ";
+  if (getFreshAir())
+    result += (getFreshAirHigh() ? "High" : "On");
+  else
+    result += "Off";
+  result += ", Eye: ";
+  result += (getEye() ? "On" : "Off");
+  result += ", Eye Auto: ";
+  result += (getEyeAuto() ? "On" : "Off");
+  result += ", Quiet: ";
+  result += (getQuiet() ? "On" : "Off");
+  result += ", Powerful: ";
+  result += (getPowerful() ? "On" : "Off");
+  result += ", Purify: ";
+  result += (getPurify() ? "On" : "Off");
+  result += ", Econo: ";
+  result += (getEcono() ? "On" : "Off");
+  return result;
+}
+
 #if DECODE_DAIKIN2
 // Decode the supplied Daikin2 A/C message.
 // Args:
@@ -795,7 +1330,11 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Alpha / Untested.
+// Supported devices:
+// - Daikin FTXZ25NV1B, FTXZ35NV1B, FTXZ50NV1B Aircon
+// - Daikin ARC477A1 remote
+//
+// Status: BETA / Work as expected.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -855,6 +1394,8 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
     if (dataBitsSoFar != kDaikin2Bits) return false;
+    // Validate the checksum.
+    if (!IRDaikin2::validChecksum(results->state)) return false;
   }
 
   // Success
