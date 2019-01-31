@@ -38,6 +38,7 @@
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Toshiba.h>
+#include <ir_Vestel.h>
 #include <ir_Whirlpool.h>
 
 
@@ -215,6 +216,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_VESTEL_AC
+  if (results->decode_type == VESTEL_AC) {
+    IRVestelAC ac(0);
+    ac.setRaw(results->value);  // Like Coolix, use value instead of state.
+    description = ac.toString();
+  }
+#endif  // DECODE_VESTEL_AC
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }

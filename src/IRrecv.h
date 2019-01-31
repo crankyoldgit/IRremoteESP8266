@@ -334,6 +334,10 @@ class IRrecv {
   bool decodeMWM(decode_results *results, uint16_t nbits = 24,
                  bool strict = true);
 #endif
+#if DECODE_VESTEL_AC
+  bool decodeVestelAC(decode_results *results, uint16_t nbits = kVestelACBits,
+                   bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

@@ -48,7 +48,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_Pronto.o ir_GlobalCache.o ir_Nikai.o ir_Toshiba.o ir_Midea.o \
             ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o ir_Hitachi.o \
             ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o ir_Pioneer.o \
-            ir_MWM.o
+            ir_MWM.o ir_Vestel.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o $(PROTOCOLS)
@@ -194,3 +194,6 @@ ir_Pioneer.o : $(USER_DIR)/ir_Pioneer.cpp $(GTEST_HEADERS)
 
 ir_MWM.o : $(USER_DIR)/ir_MWM.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_MWM.cpp
+
+ir_Vestel.o : $(USER_DIR)/ir_Vestel.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Vestel.cpp
