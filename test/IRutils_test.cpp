@@ -350,3 +350,48 @@ TEST(TestInvertBits, MoreThan64Bits) {
   ASSERT_EQ(0xAAAA5555AAAA5555, invertBits(0x5555AAAA5555AAAA, 70));
   ASSERT_EQ(0xFFFFFFFFFFFFFFFF, invertBits(0x0, 128));
 }
+
+TEST(TestCountBits, Pointer) {
+  uint8_t data[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+  ASSERT_EQ(0, countBits(data, 0));
+  ASSERT_EQ(0, countBits(data, 1));
+  ASSERT_EQ(0, countBits(data, 1, true));
+  ASSERT_EQ(8, countBits(data, 1, false));
+  ASSERT_EQ(1, countBits(data, 2));
+  ASSERT_EQ(15, countBits(data, 2, false));
+  ASSERT_EQ(1, countBits(data + 1, 1));
+  ASSERT_EQ(2, countBits(data, 3));
+  ASSERT_EQ(4, countBits(data, 4));
+  ASSERT_EQ(25, countBits(data, 14));
+  ASSERT_EQ(25, countBits(data, 14));
+  ASSERT_EQ(14 * 8, countBits(data, 14, true) + countBits(data, 14, false));
+  ASSERT_EQ(125, countBits(data, 14, true, 100));
+}
+
+TEST(TestCountBits, Integer) {
+  uint64_t data = 0xAAAAAAAAAAAAAAAA;
+
+  ASSERT_EQ(0, countBits(data, 0));
+  ASSERT_EQ(0, countBits(data, 1));
+  ASSERT_EQ(0, countBits(data, 1, true));
+  ASSERT_EQ(1, countBits(data, 1, false));
+  ASSERT_EQ(1, countBits(data, 3));
+  ASSERT_EQ(2, countBits(data, 3, false));
+  ASSERT_EQ(4, countBits(data, 8));
+  ASSERT_EQ(4, countBits(data, 8, false));
+  ASSERT_EQ(32, countBits(data, 64));
+  ASSERT_EQ(32, countBits(data, 64, false));
+
+  data = 0;
+  ASSERT_EQ(0, countBits(data, 1, true));
+  ASSERT_EQ(1, countBits(data, 1, false));
+  ASSERT_EQ(0, countBits(data, 64));
+  ASSERT_EQ(64, countBits(data, 64, false));
+
+  data = 0xFFFFFFFFFFFFFFFF;
+  ASSERT_EQ(1, countBits(data, 1, true));
+  ASSERT_EQ(0, countBits(data, 1, false));
+  ASSERT_EQ(64, countBits(data, 64));
+  ASSERT_EQ(0, countBits(data, 64, false));
+}

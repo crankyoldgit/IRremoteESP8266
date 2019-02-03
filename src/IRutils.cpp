@@ -470,6 +470,49 @@ uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
   return checksum;
 }
 
+// Count the number of bits of a certain type.
+// Args:
+//   start: Ptr to the start of data to count bits in.
+//   length: How many bytes to count.
+//   ones: Count the binary 1 bits. False for counting the 0 bits.
+//   init: Start the counting from this value.
+// Returns:
+//   Nr. of bits found.
+uint16_t countBits(uint8_t *start, const uint16_t length, const bool ones,
+                   const uint16_t init) {
+  uint16_t count = init;
+  uint8_t *ptr = start;
+  uint8_t *end = start + length - 1;
+  for (ptr = start; ptr <= end; ptr++)
+    for (uint8_t currentbyte = *ptr; currentbyte; currentbyte >>= 1)
+      if (currentbyte & 1) count++;
+  if (ones || length == 0)
+    return count;
+  else
+    return (length * 8) - count;
+}
+
+// Count the number of bits of a certain type.
+// Args:
+//   data: The value you want bits counted for, starting from the LSB.
+//   length: How many bits to count.
+//   ones: Count the binary 1 bits. False for counting the 0 bits.
+//   init: Start the counting from this value.
+// Returns:
+//   Nr. of bits found.
+uint16_t countBits(const uint64_t data, const uint8_t length, const bool ones,
+                   const uint16_t init) {
+  uint16_t count = init;
+  uint8_t bitsSoFar = length;
+  for (uint64_t remainder = data; remainder && bitsSoFar;
+       remainder >>= 1, bitsSoFar--)
+      if (remainder & 1) count++;
+  if (ones || length == 0)
+    return count;
+  else
+    return length - count;
+}
+
 uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
   // No change if we are asked to invert no bits.
   if (nbits == 0) return data;
