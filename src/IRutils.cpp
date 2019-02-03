@@ -478,13 +478,13 @@ uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
 //   init: Start the counting from this value.
 // Returns:
 //   Nr. of bits found.
-uint16_t countBits(uint8_t *start, const uint16_t length, const bool ones,
+uint16_t countBits(const uint8_t *start, const uint16_t length, const bool ones,
                    const uint16_t init) {
   uint16_t count = init;
-  uint8_t *ptr = start;
-  uint8_t *end = start + length - 1;
-  for (ptr = start; ptr <= end; ptr++)
-    for (uint8_t currentbyte = *ptr; currentbyte; currentbyte >>= 1)
+  for (uint16_t offset = 0; offset < length; offset++)
+    for (uint8_t currentbyte = *(start + offset);
+         currentbyte;
+         currentbyte >>= 1)
       if (currentbyte & 1) count++;
   if (ones || length == 0)
     return count;

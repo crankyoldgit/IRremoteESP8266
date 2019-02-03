@@ -226,31 +226,35 @@ void IRSamsungAc::begin() { _irsend.begin(); }
 uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
   uint8_t sum = 0;
-  uint8_t currentbyte;
   // Safety check so we don't go outside the array.
-  if (length <= 5) return 255;
+  if (length < 7) return 255;
   // Shamelessly inspired by:
   //   https://github.com/adafruit/Raw-IR-decoder-for-Arduino/pull/3/files
   // Count most of the '1' bits after the checksum location.
-  for (uint8_t i = length - 5; i < length - 1; i++) {
-    currentbyte = state[i];
-    if (i == length - 5) currentbyte = state[length - 5] & 0b11111110;
-    for (; currentbyte; currentbyte >>= 1)
-      if (currentbyte & 1) sum++;
-  }
+  sum += countBits(state[length - 7], 8);
+  sum -= countBits(state[length - 6] & 0xF, 8);
+  sum += countBits(state[length - 5] & 0b11111110, 8);
+  sum += countBits(state + length - 4, 3);
   return (28 - sum) & 0xF;
 }
 
 bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
-  if (length <= 5) return true;  // No checksum to compare with. Assume okay.
-  return (state[length - 6] >> 4) == calcChecksum(state, length);
+  if (length < kSamsungAcStateLength)
+    return true;  // No checksum to compare with. Assume okay.
+  uint8_t offset = 0;
+  if (length >= kSamsungAcExtendedStateLength) offset = 7;
+  return ((state[length - 6] >> 4) == calcChecksum(state, length) &&
+          (state[length - (13 + offset)] >> 4) == calcChecksum(state, length -
+                                                               (7 + offset)));
 }
 
 // Update the checksum for the internal state.
 void IRSamsungAc::checksum(uint16_t length) {
-  if (length < 9) return;
+  if (length < 13) return;
   remote_state[length - 6] &= 0x0F;
   remote_state[length - 6] |= (calcChecksum(remote_state, length) << 4);
+  remote_state[length - 13] &= 0x0F;
+  remote_state[length - 13] |= (calcChecksum(remote_state, length - 7) << 4);
 }
 
 #if SEND_SAMSUNG_AC
