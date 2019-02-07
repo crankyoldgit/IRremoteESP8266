@@ -261,7 +261,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.8.2"
+#define _MY_VERSION_ "v0.8.3"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
