@@ -1,5 +1,21 @@
 # Release Notes
 
+## _v2.5.5 (20190207)_
+
+**[Bug Fixes]**
+- Fix decoding of Samsung A/C Extended messages. (#610)
+- Fix IRMQTTServer example to work with GPIO0 as IR_RX (#608)
+- Fix incorrect #define usage. (#597, #596)
+
+**[Features]**
+- Add deep decoding/construction of Daikin2 messages (#600)
+- Added Old Vestel A/C support (56 Bits) with full functions. (#607)
+
+**[Misc]**
+- Add ControlSamsungAC example code. (#599)
+- Add how to send a state/air-con to IRsendDemo.ino (#594)
+
+
 ## _v2.5.4 (20190102)_
 
 **[Features]**
