@@ -226,31 +226,35 @@ void IRSamsungAc::begin() { _irsend.begin(); }
 uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
   uint8_t sum = 0;
-  uint8_t currentbyte;
   // Safety check so we don't go outside the array.
-  if (length <= 5) return 255;
+  if (length < 7) return 255;
   // Shamelessly inspired by:
   //   https://github.com/adafruit/Raw-IR-decoder-for-Arduino/pull/3/files
   // Count most of the '1' bits after the checksum location.
-  for (uint8_t i = length - 5; i < length - 1; i++) {
-    currentbyte = state[i];
-    if (i == length - 5) currentbyte = state[length - 5] & 0b11111110;
-    for (; currentbyte; currentbyte >>= 1)
-      if (currentbyte & 1) sum++;
-  }
+  sum += countBits(state[length - 7], 8);
+  sum -= countBits(state[length - 6] & 0xF, 8);
+  sum += countBits(state[length - 5] & 0b11111110, 8);
+  sum += countBits(state + length - 4, 3);
   return (28 - sum) & 0xF;
 }
 
 bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
-  if (length <= 5) return true;  // No checksum to compare with. Assume okay.
-  return (state[length - 6] >> 4) == calcChecksum(state, length);
+  if (length < kSamsungAcStateLength)
+    return true;  // No checksum to compare with. Assume okay.
+  uint8_t offset = 0;
+  if (length >= kSamsungAcExtendedStateLength) offset = 7;
+  return ((state[length - 6] >> 4) == calcChecksum(state, length) &&
+          (state[length - (13 + offset)] >> 4) == calcChecksum(state, length -
+                                                               (7 + offset)));
 }
 
 // Update the checksum for the internal state.
 void IRSamsungAc::checksum(uint16_t length) {
-  if (length < 9) return;
+  if (length < 13) return;
   remote_state[length - 6] &= 0x0F;
   remote_state[length - 6] |= (calcChecksum(remote_state, length) << 4);
+  remote_state[length - 13] &= 0x0F;
+  remote_state[length - 13] |= (calcChecksum(remote_state, length - 7) << 4);
 }
 
 #if SEND_SAMSUNG_AC
@@ -269,13 +273,16 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
   uint8_t extended_state[kSamsungAcExtendedStateLength] = {
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xD2, 0x0F, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   // Copy/convert the internal state to an extended state.
   for (uint16_t i = 0; i < kSamsungACSectionLength; i++)
     extended_state[i] = remote_state[i];
   for (uint16_t i = kSamsungACSectionLength; i < kSamsungAcStateLength; i++)
     extended_state[i + kSamsungACSectionLength] = remote_state[i];
+  // extended_state[8] seems special. This is a guess on how to calculate it.
+  extended_state[8] = (extended_state[1] & 0x9F) | 0x40;
   // Send it.
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
 }
@@ -576,7 +583,6 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
   // Is the signature correct?
   DPRINTLN("DEBUG: Checking signature.");
   if (results->state[0] != 0x02 || results->state[2] != 0x0F) return false;
-  if (results->state[1] != 0x92 && results->state[1] != 0xB2) return false;
   if (strict) {
     // Is the checksum valid?
     if (!IRSamsungAc::validChecksum(results->state, nbits / 8)) {
