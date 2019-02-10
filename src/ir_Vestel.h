@@ -54,8 +54,23 @@ const uint8_t kVestelACTurbo = 7;
 const uint8_t kVestelACIon = 4;
 const uint8_t kVestelACSwing = 0xA;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpacked-bitfield-compat"
+const uint8_t kVestelACChecksumOffset = 12;
+const uint8_t kVestelACSwingOffset = 20;
+const uint8_t kVestelACTurboSleepOffset = 24;
+const uint8_t kVestelACTempOffset = 36;
+const uint8_t kVestelACFanOffset = 40;
+const uint8_t kVestelACModeOffset = 44;
+const uint8_t kVestelACIonOffset = 50;
+const uint8_t kVestelACPowerOffset = 52;
+const uint8_t kVestelACOffTimeOffset = 20;
+const uint8_t kVestelACOnTimeOffset = 28;
+const uint8_t kVestelACHourOffset = 36;  // 5 bits
+const uint8_t kVestelACOnTimerFlagOffset = kVestelACHourOffset + 5;
+const uint8_t kVestelACOffTimerFlagOffset = kVestelACHourOffset + 6;
+const uint8_t kVestelACTimerFlagOffset = kVestelACHourOffset + 7;
+const uint8_t kVestelACMinuteOffset = 44;
+
+/*
 union VestelACState {
   // Remotes Command Stack
   struct {
@@ -97,7 +112,7 @@ union VestelACState {
     uint16_t t_not_used : 16;  // 00
   } __attribute__((packed));   // avoids padding.
 };
-#pragma GCC diagnostic pop
+*/
 
 class IRVestelAC {
  public:
@@ -140,20 +155,24 @@ class IRVestelAC {
   void setIon(const bool state);
   bool getIon(void);
   bool isTimeCommand(void);
+  bool isOnTimerActive(void);
+  void setOnTimerActive(const bool on);
+  bool isOffTimerActive(void);
+  void setOffTimerActive(const bool on);
+  bool isTimerActive(void);
+  void setTimerActive(const bool on);
+  static uint8_t calcChecksum(const uint64_t state);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
 
-#ifndef UNIT_TEST
-// private:
-#endif
-  VestelACState remote_state;
-  VestelACState remote_time_state;
+ private:
+  uint64_t remote_state;
+  uint64_t remote_time_state;
   bool use_time_state = false;
   void checksum();
-  static uint8_t calcChecksum(const uint64_t state);
   IRsend _irsend;
 };
 
