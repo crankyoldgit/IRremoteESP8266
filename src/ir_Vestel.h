@@ -1,5 +1,6 @@
 // Copyright 2018 Erdem U. Altinyurt
-// (Used Midea.h as template)
+// Copyright 2019 David Conran
+
 #ifndef IR_VESTEL_H_
 #define IR_VESTEL_H_
 
@@ -20,6 +21,35 @@
 //                    VVV     EEEEEEE  SSSSS      TT     EEEEEEE  LLLLLLL
 
 // Vestel added by Erdem U. Altinyurt
+
+// Structure of a Command message (56 bits)
+//   Signature: 12 bits. e.g. 0x201
+//   Checksum: 8 bits
+//   Swing: 4 bits. (auto 0xA, stop 0xF)
+//   turbo_sleep_normal: 4bits. (normal 0x1, sleep 0x3, turbo 0x7)
+//   Unused: 8 bits. (0x00)
+//   Temperature: 4 bits. (Celcius, but offset by -16 degrees. e.g. 0x0 = 16C)
+//   Fan Speed: 4 bits (auto 0x1, low 0x5, mid 0x9, high 0xB, 0xD auto hot,
+//                    0xC auto cool)
+//   Mode: 3 bits. (auto 0x0, cold 0x1, dry 0x2, fan 0x3, hot 0x4)
+//   unknown/unused: 6 bits.
+//   Ion flag: 1 bit.
+//   unknown/unused: 1 bit.
+//   Power/message type: 4 bits. (on 0xF, off 0xC, 0x0 == Timer mesage)
+//
+// Structure of a Time(r) message (56 bits)
+//   Signature: 12 bits. e.g. 0x201
+//   Checksum: 8 bits
+//   Off Minutes: 3 bits. (Stored in 10 min increments. eg. xx:20 is 0x2)
+//   Off Hours: 5 bits. (0x17 == 11PM / 23:00)
+//   On Minutes: 3 bits. (Stored in 10 min increments. eg. xx:20 is 0x2)
+//   On Hours: 5 bits. (0x9 == 9AM / 09:00)
+//   Clock Hours: 5 bits.
+//   On Timer flag: 1 bit.
+//   Off Timer flag: 1 bit.
+//   Timer mode flag: 1 bit. (Off after X many hours/mins, not at clock time.)
+//   Clock Minutes: 8 bits. (0-59)
+//   Power/message type: 4 bits. (0x0 == Timer mesage, else see Comman message)
 
 // Constants
 const uint16_t kVestelACHdrMark = 3110;
@@ -54,50 +84,22 @@ const uint8_t kVestelACTurbo = 7;
 const uint8_t kVestelACIon = 4;
 const uint8_t kVestelACSwing = 0xA;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpacked-bitfield-compat"
-union VestelACState {
-  // Remotes Command Stack
-  struct {
-    uint16_t footer : 12;  // 0x201 footer
-    uint8_t CRC : 8;
-    uint8_t swing : 4;               // auto 0xA, stop 0xF
-    uint8_t turbo_sleep_normal : 4;  //  normal 0x1, sleep 0x3, turbo 0x7
-    uint8_t zero : 8;                // 0x00
-    uint8_t temp : 4;                // temp-16 degree Celcius
-    uint8_t fan : 4;  // auto 0x1, low 0x5, mid 0x9, high 0xB, 0xD auto hot, 0xC
-                      // auto cool
-    uint8_t mode : 4;   // auto 0x0, cold 0x1, dry 0x2, fan 0x3, hot 0x4
-    uint8_t ion : 4;    // on 0x4, off 0x0
-    uint8_t power : 4;  // on 0xF, off 0xC
-    uint8_t not_used : 8;
-  } __attribute__((packed));  // avoids padding.
+const uint8_t kVestelACChecksumOffset = 12;
+const uint8_t kVestelACSwingOffset = 20;
+const uint8_t kVestelACTurboSleepOffset = 24;
+const uint8_t kVestelACTempOffset = 36;
+const uint8_t kVestelACFanOffset = 40;
+const uint8_t kVestelACModeOffset = 44;
+const uint8_t kVestelACIonOffset = 50;
+const uint8_t kVestelACPowerOffset = 52;
+const uint8_t kVestelACOffTimeOffset = 20;
+const uint8_t kVestelACOnTimeOffset = 28;
+const uint8_t kVestelACHourOffset = 36;  // 5 bits
+const uint8_t kVestelACOnTimerFlagOffset = kVestelACHourOffset + 5;
+const uint8_t kVestelACOffTimerFlagOffset = kVestelACHourOffset + 6;
+const uint8_t kVestelACTimerFlagOffset = kVestelACHourOffset + 7;
+const uint8_t kVestelACMinuteOffset = 44;
 
-  uint64_t rawCode;
-
-  // Remotes Timer Stack for programming AC unit for turn of after some time or
-  // self wakeup - turn off at defined time. There are no timer functions
-  // implemented.
-  // Here is the stack only for decoding and reverse enginering purposes.
-  struct {
-    uint16_t t_footer : 12;  // 0x201 footer
-    uint8_t t_CRC : 8;
-    // timer regs has 0x18 hour mask & 0x3=Minute mask minutes are divided to 10
-    // format. Need to multiply with 10 Examples: 0x01= xx:10 and 0x08 = 01:00,
-    // 0x03= 00:30 0x08=01:00 0x10=02:00 0x44=08:40
-    uint8_t t_turnOffMinute : 3;  // off minute/10
-    uint8_t t_turnOffHour : 5;
-    uint8_t t_turnOnMinute : 3;  // on minute/10
-    uint8_t t_turnOnHour : 5;
-    uint8_t t_hour : 5;  // actual time hour
-    uint8_t t_on_active : 1;
-    uint8_t t_off_active : 1;
-    uint8_t t_timer_mode : 1;  // For timer operation, also need t_on_active bit
-    uint8_t t_minute : 8;      // actual time minute
-    uint16_t t_not_used : 16;  // 00
-  } __attribute__((packed));   // avoids padding.
-};
-#pragma GCC diagnostic pop
 
 class IRVestelAC {
  public:
@@ -140,20 +142,24 @@ class IRVestelAC {
   void setIon(const bool state);
   bool getIon(void);
   bool isTimeCommand(void);
+  bool isOnTimerActive(void);
+  void setOnTimerActive(const bool on);
+  bool isOffTimerActive(void);
+  void setOffTimerActive(const bool on);
+  bool isTimerActive(void);
+  void setTimerActive(const bool on);
+  static uint8_t calcChecksum(const uint64_t state);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
 
-#ifndef UNIT_TEST
-// private:
-#endif
-  VestelACState remote_state;
-  VestelACState remote_time_state;
+ private:
+  uint64_t remote_state;
+  uint64_t remote_time_state;
   bool use_time_state = false;
   void checksum();
-  static uint8_t calcChecksum(const uint64_t state);
   IRsend _irsend;
 };
 
