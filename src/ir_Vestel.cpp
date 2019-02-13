@@ -1,4 +1,5 @@
 // Copyright 2018 Erdem U. Altinyurt
+// Copyright 2019 David Conran
 
 #include "ir_Vestel.h"
 #include <algorithm>
@@ -65,7 +66,6 @@ void IRVestelAC::stateReset() {
 // Configure the pin for output.
 void IRVestelAC::begin() {
   _irsend.begin();
-  stateReset();
 }
 
 #if SEND_VESTEL_AC
