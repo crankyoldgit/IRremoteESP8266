@@ -323,10 +323,13 @@ class IRsend {
                     const uint16_t nbytes = kTcl112AcStateLength,
                     const uint16_t repeat = kTcl112AcDefaultRepeat);
 #endif
+<<<<<<< HEAD
 #if SEND_TECO
   void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
                   uint16_t repeat = kNoRepeat);
 #endif
+=======
+>>>>>>> Fix linter issue IRsend.h
 
  protected:
 #ifdef UNIT_TEST
