@@ -1,6 +1,10 @@
 // Copyright 2019 David Conran
 
 #include "ir_Tcl.h"
+#include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
@@ -30,6 +34,8 @@ void IRTcl112Ac::send(const uint16_t repeat) {
 #endif  // SEND_TCL112AC
 
 void IRTcl112Ac::checksum() {
+  // Last byte of the state is the checksum.
+  // TODO(anyone): Workout how to calculate it.
 }
 
 void IRTcl112Ac::stateReset() {
@@ -44,6 +50,28 @@ void IRTcl112Ac::setRaw(const uint8_t new_code[], const uint16_t length) {
   for (uint8_t i = 0; i < length && i < kTcl112AcStateLength; i++) {
     remote_state[i] = new_code[i];
   }
+}
+
+float IRTcl112Ac::getTemp() {
+  float result = 31.0 - (remote_state[7] & 0xF);
+  if (remote_state[12] & 0b00100000) result += 0.5;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRTcl112Ac::toString() {
+  String result = "";
+#else
+std::string IRTcl112Ac::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  uint16_t temp = getTemp() * 2;
+
+  result += "Temp: " + uint64ToString(temp / 2);
+  if (temp & 1) result += ".5";
+  result += "C";
+  return result;
 }
 
 #if DECODE_TCL112AC

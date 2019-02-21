@@ -61,6 +61,10 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
   ASSERT_EQ(TCL112AC, irsend.capture.decode_type);
   EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRTcl112Ac ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Temp: 24C", ac.toString());
 }
 
 // Decode a synthetic Tcl112Ac A/C example from Issue #619
@@ -82,4 +86,28 @@ TEST(TestDecodeTcl112Ac, DecodeSyntheticExample) {
   ASSERT_EQ(TCL112AC, irsend.capture.decode_type);
   EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestTcl112AcClass, TemperatureExamples) {
+  const uint8_t temp16C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
+  const uint8_t temp16point5C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x00, 0x00, 0x00, 0x00, 0xA0, 0xEB};
+  const uint8_t temp19point5C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0C, 0x00, 0x00, 0x00, 0x00, 0xA0, 0xE8};
+  const uint8_t temp31C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xBC};
+  IRTcl112Ac ac(0);
+  ac.setRaw(temp16C);
+  EXPECT_EQ("Temp: 16C", ac.toString());
+  ac.setRaw(temp16point5C);
+  EXPECT_EQ("Temp: 16.5C", ac.toString());
+  ac.setRaw(temp19point5C);
+  EXPECT_EQ("Temp: 19.5C", ac.toString());
+  ac.setRaw(temp31C);
+  EXPECT_EQ("Temp: 31C", ac.toString());
 }

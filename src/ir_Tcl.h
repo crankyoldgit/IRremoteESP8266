@@ -25,6 +25,13 @@ class IRTcl112Ac {
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kTcl112AcStateLength);
+  void setTemp(const float temp);  // Celsius in 0.5 increments
+  float getTemp(void);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 
  private:
   uint8_t remote_state[kTcl112AcStateLength];
