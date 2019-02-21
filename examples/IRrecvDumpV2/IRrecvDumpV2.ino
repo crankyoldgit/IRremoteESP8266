@@ -37,6 +37,7 @@
 #include <ir_Mitsubishi.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
+#include <ir_Tcl.h>
 #include <ir_Teco.h>
 #include <ir_Toshiba.h>
 #include <ir_Vestel.h>
