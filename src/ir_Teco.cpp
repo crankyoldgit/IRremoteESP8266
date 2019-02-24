@@ -45,7 +45,7 @@ void IRTecoAC::send(const uint16_t repeat) {
 #endif  // SEND_TECO
 
 void IRTecoAC::stateReset(void) {
-  // automatically sets: Mode:auto, Power:Off, fan:auto, temp:16, swing:off, sleep:off
+  // Mode:auto, Power:Off, fan:auto, temp:16, swing:off, sleep:off
   remote_state = kTecoReset;
 }
 

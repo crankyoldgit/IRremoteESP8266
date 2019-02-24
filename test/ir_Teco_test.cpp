@@ -278,3 +278,36 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
       "Swing: Off",
       ac.toString());
 }
+
+// Decode a real message from Raw Data.
+TEST(TestDecodeTeco, RealNormalExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRTecoAC ac(0);
+  irsend.begin();
+
+  uint16_t rawData[73] = {
+      9076, 4442,  670, 1620,  670, 516,  670, 516,  666, 1626,  670, 516,
+      664, 520,  666, 1626,  666, 1626,  664, 1626,  666, 1626,  666, 520,
+      666, 1626,  666, 520,  666, 1626,  666, 520,  666, 516,  670, 514,
+      670, 516,  666, 520,  670, 516,  666, 520,  666, 516,  672, 514,  670,
+      516,  666, 520,  666, 516,  672, 514,  670, 516,  666, 1624,  666, 520,
+      666, 1626,  666, 520,  666, 516,  672, 1620,  670, 516,  670};
+  uint64_t expectedState = 0b01001010000000000000010101111001001;
+  irsend.reset();
+  irsend.sendRaw(rawData, 73, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(TECO, irsend.capture.decode_type);
+  EXPECT_EQ(kTecoBits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(expectedState, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  ac.begin();
+  ac.setRaw(irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
+      "Swing: On",
+      ac.toString());
+}
