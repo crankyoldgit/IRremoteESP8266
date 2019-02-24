@@ -80,7 +80,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 	ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
 	ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
 	ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
-	ir_Pioneer.o ir_MWM.o ir_Vestel.o
+	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o
 
 # All the IR Protocol header files.
 PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
@@ -100,7 +100,8 @@ PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_LG.h \
 		$(USER_DIR)/ir_Panasonic.h \
 		$(USER_DIR)/ir_Whirlpool.h \
-		$(USER_DIR)/ir_Vestel.h
+		$(USER_DIR)/ir_Vestel.h \
+		$(USER_DIR)/ir_Teco.h
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o ir_GlobalCache.o \
              $(PROTOCOLS) gtest_main.a
@@ -505,3 +506,6 @@ ir_Vestel_test.o : ir_Vestel_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 
 ir_Vestel_test : $(COMMON_OBJ) ir_Vestel_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Teco.o : $(USER_DIR)/ir_Teco.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Teco.cpp
