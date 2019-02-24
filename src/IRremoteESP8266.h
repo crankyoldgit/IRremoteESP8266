@@ -288,7 +288,7 @@ enum decode_type_t {
   MWM,
   DAIKIN2,
   VESTEL_AC,
-  TECO,
+  TECO,  // (55)
 };
 
 // Message lengths & required repeat values

@@ -8,10 +8,8 @@
 #else
 #include <string>
 #endif
-
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
-
 
 // Constants. Using LSB to be able to send only 35bits.
 const uint8_t kTecoAuto = 0;  // 0b000
@@ -20,9 +18,9 @@ const uint8_t kTecoDry = 2;  // 0b010
 const uint8_t kTecoFan = 3;  // 0b110
 const uint8_t kTecoHeat = 4;  // 0b001
 const uint8_t kTecoFanAuto = 0;  // 0b00
-const uint8_t kTecoFan3 = 3;  // 0b11
-const uint8_t kTecoFan2 = 2;  // 0b10
-const uint8_t kTecoFan1 = 1;  // 0b01
+const uint8_t kTecoFanHigh = 3;  // 0b11
+const uint8_t kTecoFanMed = 2;  // 0b10
+const uint8_t kTecoFanLow = 1;  // 0b01
 const uint8_t kTecoMinTemp = 16;   // 16C
 const uint8_t kTecoMaxTemp = 30;   // 30C
 
@@ -40,7 +38,7 @@ const uint64_t kTecoReset =      0b01001010000000000000000000000000000;
 /*
   (header mark and space)
         Teco AC map read and to be sent in LSB with number of bits
-  
+
   byte 0 = Cst 0x02
   byte 1 = Cst 0x50
   byte 2:
@@ -88,44 +86,44 @@ const uint64_t kTecoReset =      0b01001010000000000000000000000000000;
 // Classes
 class IRTecoAC {
  public:
-  explicit IRTecoAC(uint16_t pin);
+  explicit IRTecoAC(const uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_TECO
   void send(const uint16_t repeat = kTecoDefaultRepeat);
 #endif  // SEND_TECO
-  void begin();
-  void on();
-  void off();
+  void begin(void);
+  void on(void);
+  void off(void);
 
-  void setPower(bool state);
-  bool getPower();
+  void setPower(const bool on);
+  bool getPower(void);
 
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void);
 
-  void setFan(uint8_t fan);
-  uint8_t getFan();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
 
-  void setMode(uint8_t mode);
-  uint8_t getMode();
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
 
-  void setSwing(bool state);
-  bool getSwing();
+  void setSwing(const bool state);
+  bool getSwing(void);
 
-  void setSleep(bool state);
-  bool getSleep();
+  void setSleep(const bool state);
+  bool getSleep(void);
 
   // void setTimer(uint8_t time);  // To check unit
   // uint8_t getTimer(uint8_t);
 
-  uint64_t getRaw();
+  uint64_t getRaw(void);
   void setRaw(const uint64_t new_code);
 
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 
  private:

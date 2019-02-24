@@ -36,7 +36,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
 	ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test \
 	ir_Whirlpool_test ir_Lutron_test ir_Electra_test ir_Pioneer_test \
-  ir_MWM_test ir_Vestel_test
+  ir_MWM_test ir_Vestel_test ir_Teco_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -509,3 +509,9 @@ ir_Vestel_test : $(COMMON_OBJ) ir_Vestel_test.o
 
 ir_Teco.o : $(USER_DIR)/ir_Teco.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Teco.cpp
+
+ir_Teco_test.o : ir_Teco_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_Teco_test.cpp
+
+ir_Teco_test : $(COMMON_OBJ) ir_Teco_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
