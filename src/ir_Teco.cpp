@@ -78,16 +78,14 @@ void IRTecoAC::setTemp(uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kTecoMaxTemp);
   newtemp = std::max(newtemp, kTecoMinTemp);
-  newtemp -= 16;  // 16=0b000
+  newtemp -= kTecoMinTemp;  // 16=0b000
 
   remote_state &= ~kTecoTempMask;  // reinit temp
   remote_state |= (newtemp << 8);
 }
 
 uint8_t IRTecoAC::getTemp() {
-  uint32_t temp;
-  temp = (remote_state & kTecoTempMask) >> 8;
-  return temp+16;
+  return ((remote_state & kTecoTempMask) >> 8) + kTecoMinTemp;
 }
 
 // Set the speed of the fan
