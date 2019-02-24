@@ -45,9 +45,8 @@ void IRTecoAC::send(const uint16_t repeat) {
 #endif  // SEND_TECO
 
 void IRTecoAC::stateReset(void) {
-  // automatically sets: Mode:auto, Off, fan:auto, temp:16
+  // automatically sets: Mode:auto, Power:Off, fan:auto, temp:16, swing:off, sleep:off
   remote_state = kTecoReset;
-  this->setSwing(true);
 }
 
 uint64_t IRTecoAC::getRaw(void) { return remote_state; }
@@ -145,38 +144,7 @@ std::string IRTecoAC::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result += "Power: ";
-  if (this->getPower()) {
-    result += "On";
-  } else {
-    result += "Off";
-    return result;  // If it's off, there is no other info.
-  }
-  result += ", Fan: " + uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kTecoFanAuto:
-      result += " (Auto)";
-      break;
-    case kTecoFanHigh:
-      result += " (High)";
-      break;
-    case kTecoFanLow:
-      result += " (Low)";
-      break;
-    case kTecoFanMed:
-      result += " (Med)";
-      break;
-    default:
-      result += " (UNKNOWN)";
-  }
-  // Special modes.
-  if (this->getSwing()) {
-    result += ", Swing: Toggle";
-    return result;
-  }
-  if (this->getSleep()) {
-    result += ", Sleep: Toggle";
-    return result;
-  }
+  result += (this->getPower() ? "On" : "Off");
   result += ", Mode: " + uint64ToString(this->getMode());
   switch (this->getMode()) {
     case kTecoAuto:
@@ -197,8 +165,28 @@ std::string IRTecoAC::toString(void) {
     default:
       result += " (UNKNOWN)";
   }
-  if (this->getMode() != kTecoFan)  // Fan mode doesn't have a temperature.
-    result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
+  result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kTecoFanAuto:
+      result += " (Auto)";
+      break;
+    case kTecoFanHigh:
+      result += " (High)";
+      break;
+    case kTecoFanLow:
+      result += " (Low)";
+      break;
+    case kTecoFanMed:
+      result += " (Med)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Sleep: ";
+  result += (this->getSleep() ? "On" : "Off");
+  result += ", Swing: ";
+  result += (this->getSwing() ? "On" : "Off");
   return result;
 }
 
