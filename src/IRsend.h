@@ -312,6 +312,10 @@ class IRsend {
   void sendVestelAC(const uint64_t data, const uint16_t nbits = kVestelACBits,
                     const uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_TECO
+  void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
+                  uint16_t repeat = kNoRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

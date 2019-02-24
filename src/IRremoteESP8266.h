@@ -206,6 +206,9 @@
 #define DECODE_VESTEL_AC       true
 #define SEND_VESTEL_AC         true
 
+#define DECODE_TECO            true
+#define SEND_TECO              true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -285,6 +288,7 @@ enum decode_type_t {
   MWM,
   DAIKIN2,
   VESTEL_AC,
+  TECO,
 };
 
 // Message lengths & required repeat values
@@ -393,6 +397,8 @@ const uint16_t kSony15Bits = 15;
 const uint16_t kSony20Bits = 20;
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
+const uint16_t kTecoBits = 35;
+const uint16_t kTecoDefaultRepeat = kNoRepeat;
 const uint16_t kToshibaACStateLength = 9;
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
