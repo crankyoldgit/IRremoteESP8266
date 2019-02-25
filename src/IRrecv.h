@@ -216,6 +216,11 @@ class IRrecv {
   bool decodeSAMSUNG(decode_results *results, uint16_t nbits = kSamsungBits,
                      bool strict = true);
 #endif
+#if DECODE_SAMSUNG
+  bool decodeSamsung36(decode_results *results,
+                       const uint16_t nbits = kSamsung36Bits,
+                       const bool strict = true);
+#endif
 #if DECODE_SAMSUNG_AC
   bool decodeSamsungAC(decode_results *results, uint16_t nbits = kSamsungAcBits,
                        bool strict = true);
