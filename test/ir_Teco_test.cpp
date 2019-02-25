@@ -21,11 +21,11 @@ TEST(TestSendTeco, SendDataOnly) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendTeco(kTecoReset);
+  irsend.sendTeco(0x250002BC9);
   EXPECT_EQ(
       "m9000s4440"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
+      "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
+      "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s1650m620s580m620s1650m620s580"
       "m620s580m620s1650m620s580"
@@ -39,25 +39,25 @@ TEST(TestSendTeco, SendWithRepeats) {
   irsend.begin();
 
   irsend.reset();
-  irsend.sendTeco(kTecoReset, kTecoBits, 2);  // two repeats.
+  irsend.sendTeco(0x250002BC9, kTecoBits, 2);  // two repeats.
   EXPECT_EQ(
       "m9000s4440"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s1650m620s580m620s1650m620s580"
-      "m620s580m620s1650m620s580"
-      "m620s1000000"
-      "m9000s4440"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
+      "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
+      "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s1650m620s580m620s1650m620s580"
       "m620s580m620s1650m620s580"
       "m620s1000000"
       "m9000s4440"
+      "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
+      "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
-      "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
+      "m620s580m620s580m620s580m620s580m620s1650m620s580m620s1650m620s580"
+      "m620s580m620s1650m620s580"
+      "m620s1000000"
+      "m9000s4440"
+      "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
+      "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s580m620s580m620s580m620s580"
       "m620s580m620s580m620s580m620s580m620s1650m620s580m620s1650m620s580"
       "m620s580m620s1650m620s580"
@@ -68,7 +68,7 @@ TEST(TestSendTeco, SendWithRepeats) {
 
 // Tests for IRTeco class.
 
-TEST(TestTecoClass, Power) {
+TEST(TestTecoACClass, Power) {
   IRTecoAC ac(0);
   ac.begin();
 
@@ -88,7 +88,7 @@ TEST(TestTecoClass, Power) {
   EXPECT_TRUE(ac.getPower());
 }
 
-TEST(TestTecoClass, OperatingMode) {
+TEST(TestTecoACClass, OperatingMode) {
   IRTecoAC ac(0);
   ac.begin();
 
@@ -120,7 +120,7 @@ TEST(TestTecoClass, OperatingMode) {
   EXPECT_EQ(kTecoAuto, ac.getMode());
 }
 
-TEST(TestTecoClass, Temperature) {
+TEST(TestTecoACClass, Temperature) {
   IRTecoAC ac(0);
   ac.begin();
 
@@ -149,7 +149,7 @@ TEST(TestTecoClass, Temperature) {
   EXPECT_EQ(kTecoMaxTemp, ac.getTemp());
 }
 
-TEST(TestTecoClass, FanSpeed) {
+TEST(TestTecoACClass, FanSpeed) {
   IRTecoAC ac(0);
   ac.begin();
   ac.setFan(kTecoFanLow);
@@ -168,7 +168,7 @@ TEST(TestTecoClass, FanSpeed) {
   EXPECT_EQ(kTecoFanHigh, ac.getFan());
 }
 
-TEST(TestTecoClass, Swing) {
+TEST(TestTecoACClass, Swing) {
   IRTecoAC ac(0);
   ac.begin();
 
@@ -182,7 +182,7 @@ TEST(TestTecoClass, Swing) {
   EXPECT_TRUE(ac.getSwing());
 }
 
-TEST(TestTecoClass, Sleep) {
+TEST(TestTecoACClass, Sleep) {
   IRTecoAC ac(0);
   ac.begin();
 
@@ -196,7 +196,7 @@ TEST(TestTecoClass, Sleep) {
   EXPECT_TRUE(ac.getSleep());
 }
 
-TEST(TestTecoClass, MessageConstuction) {
+TEST(TestTecoACClass, MessageConstuction) {
   IRTecoAC ac(0);
 
   EXPECT_EQ(
@@ -234,6 +234,24 @@ TEST(TestTecoClass, MessageConstuction) {
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 25C, Fan: 1 (Low), Sleep: Off, "
       "Swing: Off",
+      ac.toString());
+}
+
+TEST(TestTecoACClass, ReconstructKnownMessage) {
+  IRTecoAC ac(0);
+
+  const uint64_t expected = 0x250002BC9;
+  ASSERT_FALSE(ac.getRaw() == expected);
+  ac.setPower(true);
+  ac.setMode(kTecoCool);
+  ac.setTemp(27);
+  ac.setFan(kTecoFanAuto);
+  ac.setSleep(true);
+  ac.setSwing(true);
+  EXPECT_EQ(expected, ac.getRaw());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
+      "Swing: On",
       ac.toString());
 }
 
@@ -293,7 +311,7 @@ TEST(TestDecodeTeco, RealNormalExample) {
       670, 516,  666, 520,  670, 516,  666, 520,  666, 516,  672, 514,  670,
       516,  666, 520,  666, 516,  672, 514,  670, 516,  666, 1624,  666, 520,
       666, 1626,  666, 520,  666, 516,  672, 1620,  670, 516,  670};
-  uint64_t expectedState = 0b01001010000000000000010101111001001;
+  uint64_t expected = 0b01001010000000000000010101111001001;  // 0x250002BC9
   irsend.reset();
   irsend.sendRaw(rawData, 73, 38);
   irsend.makeDecodeResult();
@@ -301,7 +319,7 @@ TEST(TestDecodeTeco, RealNormalExample) {
   EXPECT_EQ(TECO, irsend.capture.decode_type);
   EXPECT_EQ(kTecoBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
-  EXPECT_EQ(expectedState, irsend.capture.value);
+  EXPECT_EQ(expected, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
   ac.begin();

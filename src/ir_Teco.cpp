@@ -18,6 +18,7 @@ const uint16_t kTecoHdrSpace = 4440;
 const uint16_t kTecoBitMark = 620;
 const uint16_t kTecoOneSpace = 1650;
 const uint16_t kTecoZeroSpace = 580;
+const uint32_t kTecoGap = kDefaultMessageGap;  // Made-up value. Just a guess.
 
 #if SEND_TECO
 // Send a Teco A/C message.
@@ -28,7 +29,7 @@ const uint16_t kTecoZeroSpace = 580;
 //   repeat: Nr. of additional times the message is to be sent.
 void IRsend::sendTeco(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kTecoHdrMark, kTecoHdrSpace, kTecoBitMark, kTecoOneSpace,
-              kTecoBitMark, kTecoZeroSpace, kTecoBitMark, 1000000,
+              kTecoBitMark, kTecoZeroSpace, kTecoBitMark, kTecoGap,
               data, nbits, 38000, false, repeat, kDutyDefault);
 }
 #endif  // SEND_TECO
@@ -117,8 +118,8 @@ void IRTecoAC::setMode(const uint8_t mode) {
 
 uint8_t IRTecoAC::getMode(void) { return remote_state & kTecoModeMask; }
 
-void IRTecoAC::setSwing(const bool state) {
-  if (state)
+void IRTecoAC::setSwing(const bool on) {
+  if (on)
     remote_state |= kTecoSwing;
   else
     remote_state &= ~kTecoSwing;
@@ -126,8 +127,8 @@ void IRTecoAC::setSwing(const bool state) {
 
 bool IRTecoAC::getSwing(void) { return remote_state & kTecoSwing; }
 
-void IRTecoAC::setSleep(const bool state) {
-  if (state)
+void IRTecoAC::setSleep(const bool on) {
+  if (on)
     remote_state |= kTecoSleep;
   else
     remote_state &= ~kTecoSleep;
@@ -224,6 +225,8 @@ bool IRrecv::decodeTeco(decode_results* results, uint16_t nbits, bool strict) {
 
   // Footer.
   if (!matchMark(results->rawbuf[offset++], kTecoBitMark)) return false;
+  if (offset < results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], kTecoGap)) return false;
 
   // Compliance
   if (actualBits < nbits) return false;

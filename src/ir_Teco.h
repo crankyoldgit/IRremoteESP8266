@@ -34,7 +34,7 @@ const uint64_t kTecoTimerHalfH = 0b00000000000000000000001000000000000;
 const uint64_t kTecoTimerTenHr = 0b00000000000000000000110000000000000;
 const uint64_t kTecoTimerOn =    0b00000000000000000001000000000000000;
 const uint64_t kTecoTimerUniHr = 0b00000000000000011110000000000000000;
-const uint64_t kTecoReset =      0b01001010000000000000000000000000000;
+const uint64_t kTecoReset =      0b01001010000000000000010000000000000;
 /*
   (header mark and space)
         Teco AC map read and to be sent in LSB with number of bits
