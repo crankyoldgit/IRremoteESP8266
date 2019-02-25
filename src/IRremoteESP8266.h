@@ -35,6 +35,7 @@
  * Trotec AC code by stufisher
  * Carrier & Haier AC code by crankyoldgit
  * Vestel AC code by Erdem U. Altınyurt
+ * Teco AC code by Fabien Valthier (hcoohb)
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
