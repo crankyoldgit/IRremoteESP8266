@@ -304,28 +304,53 @@ TEST(TestDecodeTeco, RealNormalExample) {
   IRTecoAC ac(0);
   irsend.begin();
 
-  uint16_t rawData[73] = {
+  uint16_t rawData1[73] = {
       9076, 4442,  670, 1620,  670, 516,  670, 516,  666, 1626,  670, 516,
       664, 520,  666, 1626,  666, 1626,  664, 1626,  666, 1626,  666, 520,
       666, 1626,  666, 520,  666, 1626,  666, 520,  666, 516,  670, 514,
       670, 516,  666, 520,  670, 516,  666, 520,  666, 516,  672, 514,  670,
       516,  666, 520,  666, 516,  672, 514,  670, 516,  666, 1624,  666, 520,
       666, 1626,  666, 520,  666, 516,  672, 1620,  670, 516,  670};
-  uint64_t expected = 0b01001010000000000000010101111001001;  // 0x250002BC9
+  uint64_t expected1 = 0b01001010000000000000010101111001001;  // 0x250002BC9
   irsend.reset();
-  irsend.sendRaw(rawData, 73, 38);
+  irsend.sendRaw(rawData1, 73, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(TECO, irsend.capture.decode_type);
   EXPECT_EQ(kTecoBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
-  EXPECT_EQ(expected, irsend.capture.value);
+  EXPECT_EQ(expected1, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
+      "Swing: On",
+      ac.toString());
+
+  uint16_t rawData2[73] = {
+    9048, 4472, 636, 548, 636, 1654, 638, 546, 642, 1650, 642, 546, 638,
+    1654, 638, 1654, 638, 546, 638, 1654, 636, 546, 642, 1650, 640, 548,
+    636, 548, 638, 546, 636, 546, 642, 542, 642, 546, 638, 546, 638, 546,
+    636, 548, 642, 542, 642, 546, 636, 548, 636, 546, 642, 542, 642, 546,
+    638, 546, 638, 546, 636, 1654, 642, 542, 642, 1650, 642, 546, 638, 546,
+    638, 1654, 638, 546, 642};  // TECO 25000056A
+  uint64_t expected2 = 0b01001010000000000000000010101101010;  // 0x25000056A
+  irsend.reset();
+  irsend.sendRaw(rawData2, 73, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(TECO, irsend.capture.decode_type);
+  EXPECT_EQ(kTecoBits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(expected2, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  ac.begin();
+  ac.setRaw(irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (DRY), Temp: 21C, Fan: 2 (Med), Sleep: Off, "
       "Swing: On",
       ac.toString());
 }
