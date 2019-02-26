@@ -86,6 +86,9 @@
 #define DECODE_SAMSUNG         true
 #define SEND_SAMSUNG           true
 
+#define DECODE_SAMSUNG36       true
+#define SEND_SAMSUNG36         true
+
 #define DECODE_SAMSUNG_AC      true
 #define SEND_SAMSUNG_AC        true
 
@@ -285,6 +288,8 @@ enum decode_type_t {
   MWM,
   DAIKIN2,
   VESTEL_AC,
+  TECO,  // (55)
+  SAMSUNG36,
 };
 
 // Message lengths & required repeat values
@@ -373,6 +378,7 @@ const uint16_t kRC6Mode0Bits = 20;  // Excludes the 'start' bit.
 const uint16_t kRC6_36Bits = 36;  // Excludes the 'start' bit.
 const uint16_t kRCMMBits = 24;
 const uint16_t kSamsungBits = 32;
+const uint16_t kSamsung36Bits = 36;
 const uint16_t kSamsungAcStateLength = 14;
 const uint16_t kSamsungAcBits = kSamsungAcStateLength * 8;
 const uint16_t kSamsungAcExtendedStateLength = 21;

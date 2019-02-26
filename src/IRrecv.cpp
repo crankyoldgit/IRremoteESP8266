@@ -364,6 +364,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting SAMSUNG decode");
   if (decodeSAMSUNG(results)) return true;
 #endif
+#if DECODE_SAMSUNG36
+  DPRINTLN("Attempting Samsung36 decode");
+  if (decodeSamsung36(results)) return true;
+#endif
 #if DECODE_WHYNTER
   DPRINTLN("Attempting Whynter decode");
   if (decodeWhynter(results)) return true;

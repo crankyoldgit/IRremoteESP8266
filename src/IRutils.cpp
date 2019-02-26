@@ -231,6 +231,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case SAMSUNG:
       result = "SAMSUNG";
       break;
+    case SAMSUNG36:
+      result = "SAMSUNG36";
+      break;
     case SAMSUNG_AC:
       result = "SAMSUNG_AC";
       break;

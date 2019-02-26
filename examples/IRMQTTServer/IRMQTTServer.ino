@@ -261,7 +261,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.8.3"
+#define _MY_VERSION_ "v0.8.4"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -467,6 +467,7 @@ void handleRoot() {
         "<option value='2'>RC-6</option>"
         "<option value='21'>RC-MM</option>"
         "<option value='7'>Samsung</option>"
+        "<option value='56'>Samsung36</option>"
         "<option value='11'>Sanyo</option>"
         "<option value='22'>Sanyo LC7461</option>"
         "<option value='14'>Sharp</option>"
@@ -1411,6 +1412,13 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kSamsungBits;
       irsend.sendSAMSUNG(code, bits, repeat);
+      break;
+#endif
+#if SEND_SAMSUNG36
+    case SAMSUNG36:  // 56
+      if (bits == 0)
+        bits = kSamsung36Bits;
+      irsend.sendSamsung36(code, bits, repeat);
       break;
 #endif
 #if SEND_WHYNTER
