@@ -64,7 +64,7 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
 
   IRTcl112Ac ac(0);
   ac.setRaw(irsend.capture.state);
-  EXPECT_EQ("Temp: 24C", ac.toString());
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 24C", ac.toString());
 }
 
 // Decode a synthetic Tcl112Ac A/C example from Issue #619
@@ -88,7 +88,7 @@ TEST(TestDecodeTcl112Ac, DecodeSyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
-TEST(TestTcl112AcClass, TemperatureExamples) {
+TEST(TestTcl112AcClass, Temperature) {
   const uint8_t temp16C[kTcl112AcStateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
       0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
@@ -103,11 +103,145 @@ TEST(TestTcl112AcClass, TemperatureExamples) {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xBC};
   IRTcl112Ac ac(0);
   ac.setRaw(temp16C);
-  EXPECT_EQ("Temp: 16C", ac.toString());
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
   ac.setRaw(temp16point5C);
-  EXPECT_EQ("Temp: 16.5C", ac.toString());
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16.5C", ac.toString());
   ac.setRaw(temp19point5C);
-  EXPECT_EQ("Temp: 19.5C", ac.toString());
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 19.5C", ac.toString());
   ac.setRaw(temp31C);
-  EXPECT_EQ("Temp: 31C", ac.toString());
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 31C", ac.toString());
+
+  ac.setTemp(kTcl112AcTempMin);
+  EXPECT_EQ(kTcl112AcTempMin, ac.getTemp());
+
+  ac.setTemp(kTcl112AcTempMin + 1);
+  EXPECT_EQ(kTcl112AcTempMin + 1, ac.getTemp());
+
+  ac.setTemp(kTcl112AcTempMax);
+  EXPECT_EQ(kTcl112AcTempMax, ac.getTemp());
+
+  ac.setTemp(kTcl112AcTempMin - 1);
+  EXPECT_EQ(kTcl112AcTempMin, ac.getTemp());
+
+  ac.setTemp(kTcl112AcTempMax + 0.5);
+  EXPECT_EQ(kTcl112AcTempMax, ac.getTemp());
+
+  ac.setTemp(23);
+  EXPECT_EQ(23, ac.getTemp());
+
+  ac.setTemp(27.4);
+  EXPECT_EQ(27, ac.getTemp());
+
+  ac.setTemp(22.5);
+  EXPECT_EQ(22.5, ac.getTemp());
+
+  ac.setTemp(25.6);
+  EXPECT_EQ(25.5, ac.getTemp());
+
+  ac.setTemp(0);
+  EXPECT_EQ(kTcl112AcTempMin, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kTcl112AcTempMax, ac.getTemp());
+}
+
+TEST(TestTcl112AcClass, OperatingMode) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setMode(kTcl112AcAuto);
+  EXPECT_EQ(kTcl112AcAuto, ac.getMode());
+
+  ac.setMode(kTcl112AcCool);
+  EXPECT_EQ(kTcl112AcCool, ac.getMode());
+
+  ac.setMode(kTcl112AcHeat);
+  EXPECT_EQ(kTcl112AcHeat, ac.getMode());
+
+  ac.setMode(kTcl112AcFan);
+  EXPECT_EQ(kTcl112AcFan, ac.getMode());
+
+  ac.setMode(kTcl112AcDry);
+  EXPECT_EQ(kTcl112AcDry, ac.getMode());
+
+  ac.setMode(kTcl112AcHeat - 1);
+  EXPECT_EQ(kTcl112AcAuto, ac.getMode());
+
+  ac.setMode(kTcl112AcCool);
+  EXPECT_EQ(kTcl112AcCool, ac.getMode());
+
+  ac.setMode(kTcl112AcAuto + 1);
+  EXPECT_EQ(kTcl112AcAuto, ac.getMode());
+
+  ac.setMode(kTcl112AcCool);
+  ac.setMode(255);
+  EXPECT_EQ(kTcl112AcAuto, ac.getMode());
+
+  ac.setMode(kTcl112AcCool);
+  ac.setMode(0);
+  EXPECT_EQ(kTcl112AcAuto, ac.getMode());
+
+  const uint8_t automode[] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x08,
+      0x07, 0x00, 0x00, 0x00, 0x00, 0x80, 0x48};
+  ac.setRaw(automode);
+  EXPECT_EQ("Power: On, Mode: 8 (AUTO), Temp: 24C", ac.toString());
+}
+
+TEST(TestTcl112AcClass, Power) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_EQ(false, ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_EQ(false, ac.getPower());
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  const uint8_t on[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
+  ac.setRaw(on);
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
+
+  const uint8_t off[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x03,
+      0x07, 0x40, 0x00, 0x00, 0x00, 0x80, 0xCB};
+  ac.setRaw(off);
+  EXPECT_EQ("Power: Off, Mode: 3 (COOL), Temp: 24C", ac.toString());
+}
+
+
+TEST(TestTcl112AcClass, Checksum) {
+  uint8_t temp16C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
+  uint8_t temp31C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xBC};
+  IRTcl112Ac ac(0);
+  EXPECT_EQ(0xCB, ac.calcChecksum(temp16C));
+  ac.setRaw(temp16C);
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
+  ac.setRaw(temp31C);
+  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 31C", ac.toString());
+  EXPECT_EQ(0xBC, ac.calcChecksum(temp31C));
+
+  EXPECT_TRUE(IRTcl112Ac::validChecksum(temp16C));
+  EXPECT_TRUE(IRTcl112Ac::validChecksum(temp31C));
+  EXPECT_TRUE(ac.validChecksum(temp31C));
+  ac.setRaw(temp16C);
+  EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
+  ac.setTemp(31);
+  EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
+  EXPECT_EQ(0xBC, ac.calcChecksum(ac.getRaw()));
 }

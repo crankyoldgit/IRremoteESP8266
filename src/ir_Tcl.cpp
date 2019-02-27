@@ -24,25 +24,63 @@ void IRsend::sendTcl112Ac(const unsigned char data[], const uint16_t nbytes,
 
 IRTcl112Ac::IRTcl112Ac(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRTcl112Ac::begin() { _irsend.begin(); }
+void IRTcl112Ac::begin() { this->_irsend.begin(); }
 
 #if SEND_TCL112AC
 void IRTcl112Ac::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendTcl112Ac(remote_state, kTcl112AcStateLength, repeat);
+  this->checksum();
+  this->_irsend.sendTcl112Ac(remote_state, kTcl112AcStateLength, repeat);
 }
 #endif  // SEND_TCL112AC
 
-void IRTcl112Ac::checksum() {
-  // Last byte of the state is the checksum.
-  // TODO(anyone): Workout how to calculate it.
+// Calculate the checksum for a given array.
+// Args:
+//   state:  The array to calculate the checksum over.
+//   length: The size of the array.
+// Returns:
+//   The 8 bit checksum value.
+uint8_t IRTcl112Ac::calcChecksum(uint8_t state[],
+                                 const uint16_t length) {
+  if (length)
+    return sumBytes(state, length - 1);
+  else
+    return 0;
+}
+
+// Calculate & set the checksum for the current internal state of the remote.
+void IRTcl112Ac::checksum(const uint16_t length) {
+  // Stored the checksum value in the last byte.
+  if (length > 1)
+    remote_state[length - 1] = calcChecksum(remote_state, length);
+}
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRTcl112Ac::validChecksum(uint8_t state[], const uint16_t length) {
+  return (length > 1 && state[length - 1] == calcChecksum(state, length));
 }
 
 void IRTcl112Ac::stateReset() {
+  for (uint8_t i = 0; i < kTcl112AcStateLength; i++)
+    remote_state[i] = 0x0;
+  // A known good state. (On, Cool, 24C)
+  remote_state[0] =  0x23;
+  remote_state[1] =  0xCB;
+  remote_state[2] =  0x26;
+  remote_state[3] =  0x01;
+  remote_state[5] =  0x24;
+  remote_state[6] =  0x03;
+  remote_state[7] =  0x07;
+  remote_state[8] =  0x40;
+  remote_state[13] = 0x03;
 }
 
 uint8_t* IRTcl112Ac::getRaw() {
-  checksum();
+  this->checksum();
   return remote_state;
 }
 
@@ -52,9 +90,66 @@ void IRTcl112Ac::setRaw(const uint8_t new_code[], const uint16_t length) {
   }
 }
 
+// Set the requested power state of the A/C to on.
+void IRTcl112Ac::on(void) { this->setPower(true); }
+
+// Set the requested power state of the A/C to off.
+void IRTcl112Ac::off(void) { this->setPower(false); }
+
+// Set the requested power state of the A/C.
+void IRTcl112Ac::setPower(const bool on) {
+  if (on)
+    remote_state[5] |= kTcl112AcPowerMask;
+  else
+    remote_state[5] &= ~kTcl112AcPowerMask;
+}
+
+// Return the requested power state of the A/C.
+bool IRTcl112Ac::getPower(void) {
+  return remote_state[5] & kTcl112AcPowerMask;
+}
+
+// Get the requested climate operation mode of the a/c unit.
+// Returns:
+//   A uint8_t containing the A/C mode.
+uint8_t IRTcl112Ac::getMode() {
+  return remote_state[6] & 0xF;
+}
+
+// Set the requested climate operation mode of the a/c unit.
+void IRTcl112Ac::setMode(const uint8_t mode) {
+  // If we get an unexpected mode, default to AUTO.
+  switch (mode) {
+    case kTcl112AcAuto:
+    case kTcl112AcCool:
+    case kTcl112AcHeat:
+    case kTcl112AcDry:
+    case kTcl112AcFan:
+      remote_state[6] &= 0xF0;
+      remote_state[6] |= mode;
+      break;
+    default:
+      setMode(kTcl112AcAuto);
+  }
+}
+
+void IRTcl112Ac::setTemp(const float celsius) {
+  // Make sure we have desired temp in the correct range.
+  float safecelsius = std::max(celsius, kTcl112AcTempMin);
+  safecelsius = std::min(safecelsius, kTcl112AcTempMax);
+  // Convert to integer nr. of half degrees.
+  uint8_t nrHalfDegrees = safecelsius * 2;
+  if (nrHalfDegrees & 1)  // Do we have a half degree celsius?
+    remote_state[12] |= kTcl112AcHalfDegree;  // Add 0.5 degrees
+  else
+    remote_state[12] &= ~kTcl112AcHalfDegree;  // Clear the half degree.
+  remote_state[7] &= 0xF0;  // Clear temp bits.
+  remote_state[7] |= ((uint8_t)kTcl112AcTempMax - nrHalfDegrees / 2);
+}
+
 float IRTcl112Ac::getTemp() {
-  float result = 31.0 - (remote_state[7] & 0xF);
-  if (remote_state[12] & 0b00100000) result += 0.5;
+  float result = kTcl112AcTempMax - (remote_state[7] & 0xF);
+  if (remote_state[12] & kTcl112AcHalfDegree) result += 0.5;
   return result;
 }
 
@@ -66,10 +161,31 @@ String IRTcl112Ac::toString() {
 std::string IRTcl112Ac::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  uint16_t temp = getTemp() * 2;
-
-  result += "Temp: " + uint64ToString(temp / 2);
-  if (temp & 1) result += ".5";
+  result += "Power: ";
+  result += (this->getPower() ? "On" : "Off");
+  result += ", Mode: " + uint64ToString(getMode());
+  switch (this->getMode()) {
+    case kTcl112AcAuto:
+      result += " (AUTO)";
+      break;
+    case kTcl112AcCool:
+      result += " (COOL)";
+      break;
+    case kTcl112AcHeat:
+      result += " (HEAT)";
+      break;
+    case kTcl112AcDry:
+      result += " (DRY)";
+      break;
+    case kTcl112AcFan:
+      result += " (FAN)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  uint16_t nrHalfDegrees = this->getTemp() * 2;
+  result += ", Temp: " + uint64ToString(nrHalfDegrees / 2);
+  if (nrHalfDegrees & 1) result += ".5";
   result += "C";
   return result;
 }
@@ -124,6 +240,8 @@ bool IRrecv::decodeTcl112Ac(decode_results *results, uint16_t nbits,
   // Compliance
   // Re-check we got the correct size/length due to the way we read the data.
   if (dataBitsSoFar != nbits) return false;
+  // Verify we got a valid checksum.
+  if (strict && !IRTcl112Ac::validChecksum(results->state)) return false;
   // Success
   results->decode_type = TCL112AC;
   results->bits = dataBitsSoFar;
