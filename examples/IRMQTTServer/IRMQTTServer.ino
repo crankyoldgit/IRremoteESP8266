@@ -560,7 +560,7 @@ void handleRoot() {
         "<option value='20'>Mitsubishi</option>"
         "<option value='52'>MWM</option>"
         "<option value='46'>Samsung</option>"
-        "<option value='55'>TCL112</option>"
+        "<option value='57'>TCL112</option>"
         "<option value='32'>Toshiba</option>"
         "<option value='28'>Trotec</option>"
         "<option value='45'>Whirlpool</option>"
