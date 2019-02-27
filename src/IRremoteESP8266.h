@@ -290,6 +290,7 @@ enum decode_type_t {
   DAIKIN2,
   VESTEL_AC,
   TECO,  // (55)
+  SAMSUNG36,
 };
 
 // Message lengths & required repeat values
