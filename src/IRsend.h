@@ -28,6 +28,8 @@ const uint8_t kDutyMax = 100;     // Percentage
 // delayMicroseconds() is only accurate to 16383us.
 // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
 const uint16_t kMaxAccurateUsecDelay = 16383;
+//  Usecs to wait between messages we don't know the proper gap time.
+const uint32_t kDefaultMessageGap = 1000000;
 
 // Classes
 class IRsend {
@@ -315,6 +317,10 @@ class IRsend {
 #if SEND_VESTEL_AC
   void sendVestelAC(const uint64_t data, const uint16_t nbits = kVestelACBits,
                     const uint16_t repeat = kNoRepeat);
+#endif
+#if SEND_TECO
+  void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
+                  uint16_t repeat = kNoRepeat);
 #endif
 
  protected:

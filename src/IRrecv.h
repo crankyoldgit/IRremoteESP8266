@@ -343,6 +343,10 @@ class IRrecv {
   bool decodeVestelAC(decode_results *results, uint16_t nbits = kVestelACBits,
                    bool strict = true);
 #endif
+#if DECODE_TECO
+  bool decodeTeco(decode_results *results, uint16_t nbits = kTecoBits,
+                  bool strict = false);
+#endif
 };
 
 #endif  // IRRECV_H_

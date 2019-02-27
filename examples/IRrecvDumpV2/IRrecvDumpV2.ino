@@ -37,6 +37,7 @@
 #include <ir_Mitsubishi.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
+#include <ir_Teco.h>
 #include <ir_Toshiba.h>
 #include <ir_Vestel.h>
 #include <ir_Whirlpool.h>
@@ -230,6 +231,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_VESTEL_AC
+#if DECODE_TECO
+  if (results->decode_type == TECO) {
+    IRTecoAC ac(0);
+    ac.setRaw(results->value);  // Like Coolix, use value instead of state.
+    description = ac.toString();
+  }
+#endif  // DECODE_TECO
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }

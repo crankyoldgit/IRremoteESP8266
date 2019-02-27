@@ -252,6 +252,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case SONY:
       result = "SONY";
       break;
+    case TECO:
+      result = "TECO";
+      break;
     case TOSHIBA_AC:
       result = "TOSHIBA_AC";
       break;

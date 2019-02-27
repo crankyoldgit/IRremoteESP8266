@@ -35,6 +35,7 @@
  * Trotec AC code by stufisher
  * Carrier & Haier AC code by crankyoldgit
  * Vestel AC code by Erdem U. Altınyurt
+ * Teco AC code by Fabien Valthier (hcoohb)
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
@@ -208,6 +209,9 @@
 
 #define DECODE_VESTEL_AC       true
 #define SEND_VESTEL_AC         true
+
+#define DECODE_TECO            true
+#define SEND_TECO              true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -399,6 +403,8 @@ const uint16_t kSony15Bits = 15;
 const uint16_t kSony20Bits = 20;
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
+const uint16_t kTecoBits = 35;
+const uint16_t kTecoDefaultRepeat = kNoRepeat;
 const uint16_t kToshibaACStateLength = 9;
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
