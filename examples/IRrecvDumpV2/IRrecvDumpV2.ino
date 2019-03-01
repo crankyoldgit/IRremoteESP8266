@@ -37,6 +37,7 @@
 #include <ir_Mitsubishi.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
+#include <ir_Tcl.h>
 #include <ir_Teco.h>
 #include <ir_Toshiba.h>
 #include <ir_Vestel.h>
@@ -238,6 +239,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_TECO
+#if DECODE_TCL112AC
+  if (results->decode_type == TCL112AC) {
+    IRTcl112Ac ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_TCL112AC
   // If we got a human-readable description of the message, display it.
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }

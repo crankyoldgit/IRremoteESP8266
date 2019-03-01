@@ -560,6 +560,7 @@ void handleRoot() {
         "<option value='20'>Mitsubishi</option>"
         "<option value='52'>MWM</option>"
         "<option value='46'>Samsung</option>"
+        "<option value='57'>TCL112</option>"
         "<option value='32'>Toshiba</option>"
         "<option value='28'>Trotec</option>"
         "<option value='45'>Whirlpool</option>"
@@ -725,6 +726,9 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
       // Cap the maximum size.
       stateSize = std::min(stateSize, kStateSizeMax);
       break;
+    case TCL112AC:
+      stateSize = kTcl112AcStateLength;
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return false;
@@ -853,6 +857,11 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
 #if SEND_MWM
     case MWM:
       irsend.sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
+      break;
+#endif
+#if SEND_TCL112AC
+    case TCL112AC:
+      irsend.sendTcl112Ac(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
     default:

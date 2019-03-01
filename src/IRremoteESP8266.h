@@ -213,12 +213,16 @@
 #define DECODE_TECO            true
 #define SEND_TECO              true
 
+#define DECODE_TCL112AC       true
+#define SEND_TCL112AC         true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
-     DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || DECODE_VESTEL_AC )
+     DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
+     DECODE_VESTEL_AC || DECODE_TCL112AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -287,13 +291,14 @@ enum decode_type_t {
   LUTRON,
   ELECTRA_AC,
   PANASONIC_AC,
-  PIONEER,  // 50
+  PIONEER,  // (50)
   LG2,
   MWM,
   DAIKIN2,
   VESTEL_AC,
   TECO,  // (55)
   SAMSUNG36,
+  TCL112AC,
 };
 
 // Message lengths & required repeat values
@@ -403,6 +408,9 @@ const uint16_t kSony15Bits = 15;
 const uint16_t kSony20Bits = 20;
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
+const uint16_t kTcl112AcStateLength = 14;
+const uint16_t kTcl112AcBits = kTcl112AcStateLength * 8;
+const uint16_t kTcl112AcDefaultRepeat = kNoRepeat;
 const uint16_t kTecoBits = 35;
 const uint16_t kTecoDefaultRepeat = kNoRepeat;
 const uint16_t kToshibaACStateLength = 9;
