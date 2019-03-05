@@ -1,6 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2015 Mark Szabo
-// Copyright 2017 David Conran
+// Copyright 2017,2019 David Conran
 
 #include "IRsend.h"
 #ifndef UNIT_TEST
@@ -488,14 +488,15 @@ void IRsend::sendRaw(uint16_t buf[], uint16_t len, uint16_t hz) {
 }
 #endif  // SEND_RAW
 
-#ifndef UNIT_TEST
 // Send a simple (up to 64 bits) IR message of a given type.
 // An unknown/unsupported type will do nothing.
 // Args:
 //   type:  Protocol number/type of the message you want to send.
 //   data:  The data you want to send (up to 64 bits).
 //   nbits: How many bits long the message is to be.
-void IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
+// Returns:
+//   bool: True if it is a type we can attemp to send, false if not.
+bool IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
   switch (type) {
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501:
@@ -582,12 +583,33 @@ void IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
 #endif
 #if SEND_NEC
     case NEC:
+    case NEC_LIKE:
       sendNEC(data, nbits);
+      break;
+#endif
+#if SEND_PANASONIC
+    case PANASONIC:
+      sendPanasonic64(data, nbits);
       break;
 #endif
 #if SEND_PIONEER
     case PIONEER:
       sendPioneer(data, nbits);
+      break;
+#endif
+#if SEND_RC5
+    case RC5:
+      sendRC5(data, nbits);
+      break;
+#endif
+#if SEND_RC6
+    case RC6:
+      sendRC6(data, nbits);
+      break;
+#endif
+#if SEND_RCMM
+    case RCMM:
+      sendRCMM(data, nbits);
       break;
 #endif
 #if SEND_SAMSUNG
@@ -620,26 +642,6 @@ void IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
       sendSony(data, nbits);
       break;
 #endif
-#if SEND_PANASONIC
-    case PANASONIC:
-      sendPanasonic64(data, nbits);
-      break;
-#endif
-#if SEND_RC5
-    case RC5:
-      sendRC5(data, nbits);
-      break;
-#endif
-#if SEND_RC6
-    case RC6:
-      sendRC6(data, nbits);
-      break;
-#endif
-#if SEND_RCMM
-    case RCMM:
-      sendRCMM(data, nbits);
-      break;
-#endif
 #if SEND_TECO
     case TECO:
       sendTeco(data, nbits);
@@ -655,6 +657,8 @@ void IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
       sendWhynter(data, nbits);
       break;
 #endif
+    default:
+      return false;
   }
+  return true;
 }
-#endif  // UNIT_TEST
