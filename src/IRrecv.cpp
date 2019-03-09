@@ -499,7 +499,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 #endif
 #if DECODE_VESTEL_AC
   DPRINTLN("Attempting Vestel AC decode");
-  if (decodeVestelAC(results)) return true;
+  if (decodeVestelAc(results)) return true;
 #endif
 #if DECODE_TCL112AC
   DPRINTLN("Attempting TCL112AC decode");

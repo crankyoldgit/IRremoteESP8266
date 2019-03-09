@@ -227,14 +227,14 @@ void dumpACInfo(decode_results *results) {
 #endif  // DECODE_WHIRLPOOL_AC
 #if DECODE_VESTEL_AC
   if (results->decode_type == VESTEL_AC) {
-    IRVestelAC ac(0);
+    IRVestelAc ac(0);
     ac.setRaw(results->value);  // Like Coolix, use value instead of state.
     description = ac.toString();
   }
 #endif  // DECODE_VESTEL_AC
 #if DECODE_TECO
   if (results->decode_type == TECO) {
-    IRTecoAC ac(0);
+    IRTecoAc ac(0);
     ac.setRaw(results->value);  // Like Coolix, use value instead of state.
     description = ac.toString();
   }

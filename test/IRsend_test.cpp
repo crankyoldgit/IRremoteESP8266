@@ -553,11 +553,11 @@ TEST(TestSend, GenericSimpleSendMethod) {
   EXPECT_EQ(0x1234, irsend.capture.value);
 
   irsend.reset();
-  ASSERT_TRUE(irsend.send(VESTEL_AC, 0xF4410001FF1201, kVestelACBits));
+  ASSERT_TRUE(irsend.send(VESTEL_AC, 0xF4410001FF1201, kVestelAcBits));
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(VESTEL_AC, irsend.capture.decode_type);
-  EXPECT_EQ(kVestelACBits, irsend.capture.bits);
+  EXPECT_EQ(kVestelAcBits, irsend.capture.bits);
   EXPECT_EQ(0xF4410001FF1201, irsend.capture.value);
 
   irsend.reset();

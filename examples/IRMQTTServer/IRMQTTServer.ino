@@ -1630,8 +1630,8 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
 #if SEND_VESTEL_AC
     case VESTEL_AC:  // 54
       if (bits == 0)
-        bits = kVestelACBits;
-      irsend.sendVestelAC(code, bits, repeat);
+        bits = kVestelAcBits;
+      irsend.sendVestelAc(code, bits, repeat);
       break;
 #endif
 #if SEND_TECO
