@@ -158,7 +158,7 @@ class IRVestelAc {
  private:
   uint64_t remote_state;
   uint64_t remote_time_state;
-  bool use_time_state = false;
+  bool use_time_state;
   void checksum();
   IRsend _irsend;
 };
