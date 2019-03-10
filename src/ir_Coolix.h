@@ -128,8 +128,8 @@ class IRCoolixAC {
 #endif
 
  private:
-  uint32_t remote_state; // The state of the IR remote in IR code form.
-  uint32_t saved_state;  // Copy of the state if we required a special mode.
+  uint32_t remote_state;  // The state of the IR remote in IR code form.
+  uint32_t saved_state;   // Copy of the state if we required a special mode.
   IRsend _irsend;
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
