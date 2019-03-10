@@ -530,4 +530,17 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
       "Sensor Temp: Ignored",
       ac.toString());
   EXPECT_EQ(0xB2BF40, ac.getRaw());
+
+  // Now test if we setRaw() a special state first.
+  ac.setRaw(kCoolixSwing);
+  // Repeat change of settings.
+  ac.setPower(true);
+  ac.setTemp(24);
+  ac.setMode(kCoolixCool);
+  ac.setFan(kCoolixFanAuto);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (COOL), Fan: 5 (AUTO), Temp: 24C, Zone Follow: Off, "
+      "Sensor Temp: Ignored",
+      ac.toString());
+  EXPECT_EQ(0xB2BF40, ac.getRaw());
 }

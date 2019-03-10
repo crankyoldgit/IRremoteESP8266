@@ -130,7 +130,11 @@ void IRCoolixAC::updateSavedState(void) {
 }
 
 void IRCoolixAC::recoverSavedState(void) {
+  // If the current state is a special one, last known normal one.
   if (isSpecialState()) remote_state = saved_state;
+  // If the saved_state was also a special state, reset as we expect a normal
+  // state out of all this.
+  if (isSpecialState()) stateReset();
 }
 
 uint32_t IRCoolixAC::getNormalState(void) {
