@@ -35,40 +35,40 @@ void IRsend::sendTeco(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_TECO
 
 // Class for decoding and constructing Teco AC messages.
-IRTecoAC::IRTecoAC(const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRTecoAc::IRTecoAc(const uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRTecoAC::begin() { _irsend.begin(); }
+void IRTecoAc::begin() { _irsend.begin(); }
 
 #if SEND_TECO
-void IRTecoAC::send(const uint16_t repeat) {
+void IRTecoAc::send(const uint16_t repeat) {
   _irsend.sendTeco(remote_state, kTecoBits, repeat);
 }
 #endif  // SEND_TECO
 
-void IRTecoAC::stateReset(void) {
+void IRTecoAc::stateReset(void) {
   // Mode:auto, Power:Off, fan:auto, temp:16, swing:off, sleep:off
   remote_state = kTecoReset;
 }
 
-uint64_t IRTecoAC::getRaw(void) { return remote_state; }
+uint64_t IRTecoAc::getRaw(void) { return remote_state; }
 
-void IRTecoAC::setRaw(const uint64_t new_code) { remote_state = new_code; }
+void IRTecoAc::setRaw(const uint64_t new_code) { remote_state = new_code; }
 
-void IRTecoAC::on(void) { remote_state |= kTecoPower; }
+void IRTecoAc::on(void) { remote_state |= kTecoPower; }
 
-void IRTecoAC::off(void) { remote_state &= ~kTecoPower; }
+void IRTecoAc::off(void) { remote_state &= ~kTecoPower; }
 
-void IRTecoAC::setPower(const bool on) {
+void IRTecoAc::setPower(const bool on) {
   if (on)
     this->on();
   else
     this->off();
 }
 
-bool IRTecoAC::getPower(void) {
+bool IRTecoAc::getPower(void) {
   return (remote_state & kTecoPower) == kTecoPower; }
 
-void IRTecoAC::setTemp(const uint8_t temp) {
+void IRTecoAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kTecoMaxTemp);
   newtemp = std::max(newtemp, kTecoMinTemp);
@@ -78,12 +78,12 @@ void IRTecoAC::setTemp(const uint8_t temp) {
   remote_state |= (newtemp << 8);
 }
 
-uint8_t IRTecoAC::getTemp(void) {
+uint8_t IRTecoAc::getTemp(void) {
   return ((remote_state & kTecoTempMask) >> 8) + kTecoMinTemp;
 }
 
 // Set the speed of the fan
-void IRTecoAC::setFan(const uint8_t speed) {
+void IRTecoAc::setFan(const uint8_t speed) {
   uint8_t newspeed = speed;
   switch (speed) {
     case kTecoFanAuto:
@@ -98,9 +98,9 @@ void IRTecoAC::setFan(const uint8_t speed) {
   remote_state |= (newspeed << 4);
 }
 
-uint8_t IRTecoAC::getFan(void) { return (remote_state & kTecoFanMask) >> 4; }
+uint8_t IRTecoAc::getFan(void) { return (remote_state & kTecoFanMask) >> 4; }
 
-void IRTecoAC::setMode(const uint8_t mode) {
+void IRTecoAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
   switch (mode) {
     case kTecoAuto:
@@ -116,32 +116,32 @@ void IRTecoAC::setMode(const uint8_t mode) {
   remote_state |= newmode;
 }
 
-uint8_t IRTecoAC::getMode(void) { return remote_state & kTecoModeMask; }
+uint8_t IRTecoAc::getMode(void) { return remote_state & kTecoModeMask; }
 
-void IRTecoAC::setSwing(const bool on) {
+void IRTecoAc::setSwing(const bool on) {
   if (on)
     remote_state |= kTecoSwing;
   else
     remote_state &= ~kTecoSwing;
 }
 
-bool IRTecoAC::getSwing(void) { return remote_state & kTecoSwing; }
+bool IRTecoAc::getSwing(void) { return remote_state & kTecoSwing; }
 
-void IRTecoAC::setSleep(const bool on) {
+void IRTecoAc::setSleep(const bool on) {
   if (on)
     remote_state |= kTecoSleep;
   else
     remote_state &= ~kTecoSleep;
 }
 
-bool IRTecoAC::getSleep(void) { return remote_state & kTecoSleep; }
+bool IRTecoAc::getSleep(void) { return remote_state & kTecoSleep; }
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRTecoAC::toString(void) {
+String IRTecoAc::toString(void) {
   String result = "";
 #else
-std::string IRTecoAC::toString(void) {
+std::string IRTecoAc::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result += "Power: ";

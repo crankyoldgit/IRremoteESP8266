@@ -69,7 +69,7 @@ TEST(TestSendTeco, SendWithRepeats) {
 // Tests for IRTeco class.
 
 TEST(TestTecoACClass, Power) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
 
   ac.setPower(true);
@@ -89,7 +89,7 @@ TEST(TestTecoACClass, Power) {
 }
 
 TEST(TestTecoACClass, OperatingMode) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
 
   ac.setMode(kTecoAuto);
@@ -121,7 +121,7 @@ TEST(TestTecoACClass, OperatingMode) {
 }
 
 TEST(TestTecoACClass, Temperature) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
 
   ac.setTemp(kTecoMinTemp);
@@ -150,7 +150,7 @@ TEST(TestTecoACClass, Temperature) {
 }
 
 TEST(TestTecoACClass, FanSpeed) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
   ac.setFan(kTecoFanLow);
 
@@ -169,7 +169,7 @@ TEST(TestTecoACClass, FanSpeed) {
 }
 
 TEST(TestTecoACClass, Swing) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
 
   ac.setSwing(true);
@@ -183,7 +183,7 @@ TEST(TestTecoACClass, Swing) {
 }
 
 TEST(TestTecoACClass, Sleep) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
 
   ac.setSleep(true);
@@ -197,7 +197,7 @@ TEST(TestTecoACClass, Sleep) {
 }
 
 TEST(TestTecoACClass, MessageConstuction) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
 
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (Auto), Sleep: Off, "
@@ -238,7 +238,7 @@ TEST(TestTecoACClass, MessageConstuction) {
 }
 
 TEST(TestTecoACClass, ReconstructKnownMessage) {
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
 
   const uint64_t expected = 0x250002BC9;
   ASSERT_FALSE(ac.getRaw() == expected);
@@ -288,7 +288,7 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
@@ -301,7 +301,7 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
 TEST(TestDecodeTeco, RealNormalExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
-  IRTecoAC ac(0);
+  IRTecoAc ac(0);
   irsend.begin();
 
   uint16_t rawData1[73] = {

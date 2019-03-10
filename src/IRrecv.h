@@ -340,7 +340,7 @@ class IRrecv {
                  bool strict = true);
 #endif
 #if DECODE_VESTEL_AC
-  bool decodeVestelAC(decode_results *results, uint16_t nbits = kVestelACBits,
+  bool decodeVestelAc(decode_results *results, uint16_t nbits = kVestelAcBits,
                       bool strict = true);
 #endif
 #if DECODE_TCL112AC

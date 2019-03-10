@@ -649,7 +649,7 @@ bool IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
 #endif
 #if SEND_VESTEL_AC
     case VESTEL_AC:
-      sendVestelAC(data, nbits);
+      sendVestelAc(data, nbits);
       break;
 #endif
 #if SEND_WHYNTER

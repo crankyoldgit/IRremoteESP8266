@@ -422,7 +422,7 @@ const uint16_t kWhirlpoolAcStateLength = 21;
 const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhirlpoolAcDefaultRepeat = kNoRepeat;
 const uint16_t kWhynterBits = 32;
-const uint8_t kVestelACBits = 56;
+const uint8_t kVestelAcBits = 56;
 
 
 // Legacy defines. (Deprecated)
