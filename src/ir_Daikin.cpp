@@ -755,18 +755,18 @@ void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
     // Leader
     sendGeneric(kDaikin2LeaderMark, kDaikin2LeaderSpace,
                 0, 0, 0, 0, 0, 0, (uint64_t) 0,  // No data payload.
-                0, 38000, false, 0, 50);
+                0, kDaikin2Freq, false, 0, 50);
     // Section #1
     sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
                 kDaikin2OneSpace, kDaikin2BitMark, kDaikin2ZeroSpace,
                 kDaikin2BitMark, kDaikin2Gap, data, kDaikin2Section1Length,
-                38000, false, 0, 50);
+                kDaikin2Freq, false, 0, 50);
     // Section #2
     sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
                 kDaikin2OneSpace, kDaikin2BitMark, kDaikin2ZeroSpace,
                 kDaikin2BitMark, kDaikin2Gap, data + kDaikin2Section1Length,
                 nbytes - kDaikin2Section1Length,
-                38000, false, 0, 50);
+                kDaikin2Freq, false, 0, 50);
   }
 }
 #endif  // SEND_DAIKIN2
