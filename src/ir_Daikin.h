@@ -128,6 +128,7 @@ const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
 // Another variant of the protocol for the Daikin ARC477A1 remote.
+const uint16_t kDaikin2Freq = 36700;  // Modulation Frequency in Hz.
 const uint16_t kDaikin2LeaderMark = 10024;
 const uint16_t kDaikin2LeaderSpace = 25180;
 const uint16_t kDaikin2Gap = kDaikin2LeaderMark + kDaikin2LeaderSpace;
