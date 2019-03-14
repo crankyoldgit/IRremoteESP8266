@@ -310,7 +310,7 @@ const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kCoolixBits = 24;
-const uint16_t kCoolixDefaultRepeat = kNoRepeat;
+const uint16_t kCoolixDefaultRepeat = 1;
 const uint16_t kCarrierAcBits = 32;
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
 // Daikin has a lot of static stuff that is discarded
