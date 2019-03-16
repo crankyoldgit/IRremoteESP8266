@@ -495,7 +495,7 @@ void IRsend::sendRaw(uint16_t buf[], uint16_t len, uint16_t hz) {
 //   data:  The data you want to send (up to 64 bits).
 //   nbits: How many bits long the message is to be.
 // Returns:
-//   bool: True if it is a type we can attemp to send, false if not.
+//   bool: True if it is a type we can attempt to send, false if not.
 bool IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
   switch (type) {
 #if SEND_AIWA_RC_T501
