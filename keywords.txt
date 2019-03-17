@@ -1527,6 +1527,7 @@ kPanasonicMinGapTicks	LITERAL1
 kPanasonicNke	LITERAL1
 kPanasonicOneSpace	LITERAL1
 kPanasonicOneSpaceTicks	LITERAL1
+kPanasonicRkr	LITERAL1
 kPanasonicTick	LITERAL1
 kPanasonicUnknown	LITERAL1
 kPanasonicZeroSpace	LITERAL1
