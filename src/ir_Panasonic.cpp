@@ -467,18 +467,25 @@ uint8_t IRPanasonicAc::getFan() {
 }
 
 bool IRPanasonicAc::getQuiet() {
-  if (getModel() == kPanasonicCkp)
-    return remote_state[21] & kPanasonicAcQuietCkp;
-  else
-    return remote_state[21] & kPanasonicAcQuiet;
+  switch(getModel()) {
+    case kPanasonicRkr:
+    case kPanasonicCkp:
+      return remote_state[21] & kPanasonicAcQuietCkp;
+    default:
+      return remote_state[21] & kPanasonicAcQuiet;
+  }
 }
 
 void IRPanasonicAc::setQuiet(const bool state) {
   uint8_t quiet;
-  if (getModel() == kPanasonicCkp)
-    quiet = kPanasonicAcQuietCkp;
-  else
-    quiet = kPanasonicAcQuiet;
+  switch(getModel()) {
+    case kPanasonicRkr:
+    case kPanasonicCkp:
+      quiet = kPanasonicAcQuietCkp;
+      break;
+    default:
+      quiet = kPanasonicAcQuiet;
+  }
 
   if (state) {
     setPowerful(false);  // Powerful is mutually exclusive.
@@ -489,18 +496,25 @@ void IRPanasonicAc::setQuiet(const bool state) {
 }
 
 bool IRPanasonicAc::getPowerful() {
-  if (getModel() == kPanasonicCkp)
-    return remote_state[21] & kPanasonicAcPowerfulCkp;
-  else
-    return remote_state[21] & kPanasonicAcPowerful;
+  switch(getModel()) {
+    case kPanasonicRkr:
+    case kPanasonicCkp:
+      return remote_state[21] & kPanasonicAcPowerfulCkp;
+    default:
+      return remote_state[21] & kPanasonicAcPowerful;
+  }
 }
 
 void IRPanasonicAc::setPowerful(const bool state) {
   uint8_t powerful;
-  if (getModel() == kPanasonicCkp)
-    powerful = kPanasonicAcPowerfulCkp;
-  else
-    powerful = kPanasonicAcPowerful;
+  switch(getModel()) {
+    case kPanasonicRkr:
+    case kPanasonicCkp:
+      powerful = kPanasonicAcPowerfulCkp;
+      break;
+    default:
+      powerful = kPanasonicAcPowerful;
+  }
 
   if (state) {
     setQuiet(false);  // Quiet is mutually exclusive.

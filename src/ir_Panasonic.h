@@ -43,7 +43,7 @@ const uint8_t kPanasonicAcMaxTemp = 30;      // Celsius
 const uint8_t kPanasonicAcFanModeTemp = 27;  // Celsius
 const uint8_t kPanasonicAcQuiet = 1;         // 0b1
 const uint8_t kPanasonicAcPowerful = 0x20;   // 0b100000
-// CKP models have Powerful and Quiet bits swapped.
+// CKP & RKR models have Powerful and Quiet bits swapped.
 const uint8_t kPanasonicAcQuietCkp = 0x20;  // 0b100000
 const uint8_t kPanasonicAcPowerfulCkp = 1;  // 0b1
 const uint8_t kPanasonicAcSwingVAuto = 0xF;
