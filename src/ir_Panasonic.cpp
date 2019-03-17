@@ -467,7 +467,7 @@ uint8_t IRPanasonicAc::getFan() {
 }
 
 bool IRPanasonicAc::getQuiet() {
-  switch(getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       return remote_state[21] & kPanasonicAcQuietCkp;
@@ -478,7 +478,7 @@ bool IRPanasonicAc::getQuiet() {
 
 void IRPanasonicAc::setQuiet(const bool state) {
   uint8_t quiet;
-  switch(getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       quiet = kPanasonicAcQuietCkp;
@@ -496,7 +496,7 @@ void IRPanasonicAc::setQuiet(const bool state) {
 }
 
 bool IRPanasonicAc::getPowerful() {
-  switch(getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       return remote_state[21] & kPanasonicAcPowerfulCkp;
@@ -507,7 +507,7 @@ bool IRPanasonicAc::getPowerful() {
 
 void IRPanasonicAc::setPowerful(const bool state) {
   uint8_t powerful;
-  switch(getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       powerful = kPanasonicAcPowerfulCkp;
