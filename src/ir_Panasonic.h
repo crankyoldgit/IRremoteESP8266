@@ -73,6 +73,7 @@ enum panasonic_ac_remote_model_t {
   kPanasonicDke = 3,
   kPanasonicJke = 4,
   kPanasonicCkp = 5,
+  kPanasonicRkr = 6,
 };
 
 class IRPanasonicAc {

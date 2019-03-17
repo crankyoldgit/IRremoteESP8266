@@ -27,8 +27,8 @@
 //   Code by crankyoldgit
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, CKP, & NKE series. (In theory)
-//     CS-YW9MKD (confirmed)
+//     JKE, LKE, DKE, CKP, RKR, & NKE series. (In theory)
+//     CS-YW9MKD, CS-Z9RKR (confirmed)
 //     CS-ME14CKPG / CS-ME12CKPG / CS-ME10CKPG
 //   A/C Remotes:
 //     A75C3747 (confirmed)
@@ -211,7 +211,7 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t nbits,
 //:
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, & NKE series.
+//     JKE, LKE, DKE, CKP, RKR, & NKE series.
 //     CS-YW9MKD
 //   A/C Remotes:
 //     A75C3747
@@ -281,6 +281,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     case kPanasonicLke:
     case kPanasonicNke:
     case kPanasonicCkp:
+    case kPanasonicRkr:
       break;
     default:  // Only proceed if we know what to do.
       return;
@@ -311,12 +312,17 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     case kPanasonicCkp:
       remote_state[21] |= 0x10;
       remote_state[23] = 0x01;
+      break;
+    case kPanasonicRkr:
+      remote_state[13] |= 0x08;
+      remote_state[23] = 0x89;
     default:
       break;
   }
 }
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel() {
+  if (remote_state[23] == 0x89) return kPanasonicRkr;
   if (remote_state[17] == 0x00) {
     if ((remote_state[21] & 0x10) && (remote_state[23] & 0x01))
       return kPanasonicCkp;
@@ -438,6 +444,7 @@ void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   uint8_t direction = desired_direction;
   switch (getModel()) {
     case kPanasonicDke:
+    case kPanasonicRkr:
       break;
     case kPanasonicNke:
     case kPanasonicLke:
@@ -621,6 +628,9 @@ std::string IRPanasonicAc::toString() {
       break;
     case kPanasonicCkp:
       result += " (CKP)";
+      break;
+    case kPanasonicRkr:
+      result += " (RKR)";
       break;
     default:
       result += " (UNKNOWN)";
