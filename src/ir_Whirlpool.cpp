@@ -38,7 +38,7 @@ const uint16_t kWhirlpoolAcBitMark = 597;
 const uint16_t kWhirlpoolAcOneSpace = 1649;
 const uint16_t kWhirlpoolAcZeroSpace = 533;
 const uint16_t kWhirlpoolAcGap = 7920;
-const uint32_t kWhirlpoolAcMinGap = 100000;  // Completely made up value.
+const uint32_t kWhirlpoolAcMinGap = kDefaultMessageGap;  // Just a guess.
 const uint8_t kWhirlpoolAcSections = 3;
 
 #if SEND_WHIRLPOOL_AC
