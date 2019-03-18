@@ -63,7 +63,7 @@ const uint32_t kPanasonicMinGap = kPanasonicMinGapTicks * kPanasonicTick;
 
 const uint16_t kPanasonicAcSectionGap = 10000;
 const uint16_t kPanasonicAcSection1Length = 8;
-const uint32_t kPanasonicAcMessageGap = 100000;  // A complete guess.
+const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.

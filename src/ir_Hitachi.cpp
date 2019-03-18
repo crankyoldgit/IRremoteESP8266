@@ -30,7 +30,7 @@ const uint16_t kHitachiAc1HdrSpace = 3400;
 const uint16_t kHitachiAcBitMark = 400;
 const uint16_t kHitachiAcOneSpace = 1250;
 const uint16_t kHitachiAcZeroSpace = 500;
-const uint32_t kHitachiAcMinGap = 100000;  // Completely made up value.
+const uint32_t kHitachiAcMinGap = kDefaultMessageGap;  // Just a guess.
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.

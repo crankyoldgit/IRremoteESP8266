@@ -25,7 +25,7 @@ const uint16_t kElectraAcBitMark = 646;
 const uint16_t kElectraAcHdrSpace = 4470;
 const uint16_t kElectraAcOneSpace = 1647;
 const uint16_t kElectraAcZeroSpace = 547;
-const uint32_t kElectraAcMessageGap = 100000;  // Completely made-up guess.
+const uint32_t kElectraAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
 #if SEND_ELECTRA_AC
 // Send a Electra message
