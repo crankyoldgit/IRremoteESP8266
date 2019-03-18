@@ -1325,9 +1325,9 @@ void loop(void) {
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
-   #if MQTT_ENABLE
+#if MQTT_ENABLE
     mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
-   #endif
+#endif
     irRecvCounter++;
     debug("Incoming IR message sent to MQTT: " + lastIrReceived);
   }
