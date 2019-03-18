@@ -150,6 +150,7 @@ const uint8_t kDaikin2BitMold = 0b00001000;
 const uint8_t kDaikin2BitClean = 0b00100000;
 const uint8_t kDaikin2BitFreshAir = 0b00000001;
 const uint8_t kDaikin2BitFreshAirHigh = 0b10000000;
+const uint8_t kDaikin2BitPower = 0b10000000;
 const uint8_t kDaikin2LightMask = 0b00110000;
 const uint8_t kDaikin2BeepMask = 0b11000000;
 const uint8_t kDaikin2SwingVHigh = 0x1;

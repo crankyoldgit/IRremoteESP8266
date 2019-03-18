@@ -866,10 +866,12 @@ void IRDaikin2::setRaw(const uint8_t new_code[]) {
 
 void IRDaikin2::on() {
   remote_state[25] |= kDaikinBitPower;
+  remote_state[6] &= ~kDaikin2BitPower;
 }
 
 void IRDaikin2::off() {
   remote_state[25] &= ~kDaikinBitPower;
+  remote_state[6] |= kDaikin2BitPower;
 }
 
 void IRDaikin2::setPower(const bool state) {
@@ -880,7 +882,8 @@ void IRDaikin2::setPower(const bool state) {
 }
 
 bool IRDaikin2::getPower() {
-  return (remote_state[25] & kDaikinBitPower);
+  return (remote_state[25] & kDaikinBitPower) &&
+         !(remote_state[6] & kDaikin2BitPower);
 }
 
 uint8_t IRDaikin2::getMode() { return remote_state[25] >> 4; }
