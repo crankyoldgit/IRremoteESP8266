@@ -287,6 +287,12 @@ bool lastSendSucceeded = false;  // Store the success status of the last send.
 uint32_t lastSendTime = 0;
 int8_t offset;  // The calculated period offset for this chip and library.
 
+#ifdef IR_RX
+String lastIrReceived = "None";
+uint32_t lastIrReceivedTime = 0;
+uint32_t irRecvCounter = 0;
+#endif  // IR_RX
+
 #if MQTT_ENABLE
 String lastMqttCmd = "None";
 uint32_t lastMqttCmdTime = 0;
@@ -294,12 +300,6 @@ uint32_t lastConnectedTime = 0;
 uint32_t lastDisconnectedTime = 0;
 uint32_t mqttDisconnectCounter = 0;
 bool wasConnected = true;
-#ifdef IR_RX
-String lastIrReceived = "None";
-uint32_t lastIrReceivedTime = 0;
-uint32_t irRecvCounter = 0;
-#endif  // IR_RX
-
 
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
@@ -1325,7 +1325,9 @@ void loop(void) {
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
+   #if MQTT_ENABLE
     mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
+   #endif
     irRecvCounter++;
     debug("Incoming IR message sent to MQTT: " + lastIrReceived);
   }
