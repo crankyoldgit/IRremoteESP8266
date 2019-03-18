@@ -41,6 +41,8 @@ script:
   - arduino --verify --board $BD $PWD/examples/IRMQTTServer/IRMQTTServer.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnToshibaAC/TurnOnToshibaAC.ino
   - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino
+  - arduino --verify --board $BD $PWD/examples/TurnOnPanasonicAC/TurnOnPanasonicAC.ino
+
   # Also check the tools programs compile.
   - (cd tools; make all)
   # Check for lint issues.
