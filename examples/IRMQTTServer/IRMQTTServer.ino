@@ -261,7 +261,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.8.4"
+#define _MY_VERSION_ "v0.8.5"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -451,6 +451,7 @@ void handleRoot() {
         "<option value='43'>GICable</option>"
         "<option value='6'>JVC</option>"
         "<option value='36'>Lasertag</option>"
+        "<option value='58'>LEGOPF</option>"
         "<option value='10'>LG</option>"
         "<option value='51'>LG2</option>"
         "<option value='47'>Lutron</option>"
@@ -1641,6 +1642,13 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kTecoBits;
       irsend.sendTeco(code, bits, repeat);
+      break;
+#endif
+#if SEND_LEGOPF
+    case LEGOPF:  // 58
+      if (bits == 0)
+        bits = kLegoPfBits;
+      irsend.sendLegoPf(code, bits, repeat);
       break;
 #endif
     default:

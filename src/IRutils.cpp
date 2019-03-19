@@ -162,6 +162,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case KELVINATOR:
       result = "KELVINATOR";
       break;
+    case LEGOPF:
+      result = "LEGOPF";
+      break;
     case LG:
       result = "LG";
       break;

@@ -543,6 +543,11 @@ bool IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
       sendLasertag(data, nbits);
       break;
 #endif
+#if SEND_LEGOPF
+    case LEGOPF:
+      sendLegoPf(data, nbits);
+      break;
+#endif
 #if SEND_LG
     case LG:
       sendLG(data, nbits);
