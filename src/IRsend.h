@@ -327,6 +327,10 @@ class IRsend {
   void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
                 uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_LEGOPF
+  void sendLegoPf(const uint64_t data, const uint16_t nbits = kLegoPfBits,
+                  const uint16_t repeat = kLegoPfMinRepeat);
+#endif
 
 
  protected:

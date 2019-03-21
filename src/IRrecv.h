@@ -351,6 +351,10 @@ class IRrecv {
   bool decodeTeco(decode_results *results, uint16_t nbits = kTecoBits,
                   bool strict = false);
 #endif
+#if DECODE_LEGOPF
+  bool decodeLegoPf(decode_results *results, const uint16_t nbits = kLegoPfBits,
+                    const bool strict = true);
+#endif
 };
 
 #endif  // IRRECV_H_

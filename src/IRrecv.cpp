@@ -509,6 +509,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Teco decode");
   if (decodeTeco(results)) return true;
 #endif
+#if DECODE_LEGOPF
+  DPRINTLN("Attempting LEGOPF decode");
+  if (decodeLegoPf(results)) return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
