@@ -117,14 +117,18 @@ uint8_t IRTcl112Ac::getMode() {
 }
 
 // Set the requested climate operation mode of the a/c unit.
+// Note: Fan/Ventilation mode sets the fan speed to high.
+//       Unknown values default to Auto.
 void IRTcl112Ac::setMode(const uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
+    case kTcl112AcFan:
+      this->setFan(kTcl112AcFanHigh);
+      // FALLTHRU
     case kTcl112AcAuto:
     case kTcl112AcCool:
     case kTcl112AcHeat:
     case kTcl112AcDry:
-    case kTcl112AcFan:
       remote_state[6] &= 0xF0;
       remote_state[6] |= mode;
       break;
@@ -151,6 +155,108 @@ float IRTcl112Ac::getTemp() {
   float result = kTcl112AcTempMax - (remote_state[7] & 0xF);
   if (remote_state[12] & kTcl112AcHalfDegree) result += 0.5;
   return result;
+}
+
+// Set the speed of the fan.
+// Unknown speeds will default to Auto.
+void IRTcl112Ac::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kTcl112AcFanAuto:
+    case kTcl112AcFanLow:
+    case kTcl112AcFanMed:
+    case kTcl112AcFanHigh:
+      remote_state[8] &= ~kTcl112AcFanMask;
+      remote_state[8] |= speed;
+      break;
+    default:
+      this->setFan(kTcl112AcFanAuto);
+  }
+}
+
+// Return the currect fan speed.
+uint8_t IRTcl112Ac::getFan() {
+  return remote_state[8] & kTcl112AcFanMask;
+}
+
+// Control economy mode.
+void IRTcl112Ac::setEcono(const bool on) {
+  if (on)
+    remote_state[5] |= kTcl112AcBitEcono;
+  else
+    remote_state[5] &= ~kTcl112AcBitEcono;
+}
+
+// Return the economy state of the A/C.
+bool IRTcl112Ac::getEcono(void) {
+  return remote_state[5] & kTcl112AcBitEcono;
+}
+
+// Control Health mode.
+void IRTcl112Ac::setHealth(const bool on) {
+  if (on)
+    remote_state[6] |= kTcl112AcBitHealth;
+  else
+    remote_state[6] &= ~kTcl112AcBitHealth;
+}
+
+// Return the Health mode state of the A/C.
+bool IRTcl112Ac::getHealth(void) {
+  return remote_state[6] & kTcl112AcBitHealth;
+}
+
+// Control Light/Display mode.
+void IRTcl112Ac::setLight(const bool on) {
+  if (on)
+    remote_state[5] &= ~kTcl112AcBitLight;
+  else
+    remote_state[5] |= kTcl112AcBitLight;
+}
+
+// Return the Light/Display mode state of the A/C.
+bool IRTcl112Ac::getLight(void) {
+  return !(remote_state[5] & kTcl112AcBitLight);
+}
+
+// Control Horizontal Swing.
+void IRTcl112Ac::setSwingHorizontal(const bool on) {
+  if (on)
+    remote_state[12] |= kTcl112AcBitSwingH;
+  else
+    remote_state[12] &= ~kTcl112AcBitSwingH;
+}
+
+// Return the Horizontal Swing state of the A/C.
+bool IRTcl112Ac::getSwingHorizontal(void) {
+  return remote_state[12] & kTcl112AcBitSwingH;
+}
+
+// Control Vertical Swing.
+void IRTcl112Ac::setSwingVertical(const bool on) {
+  if (on)
+    remote_state[8] |= kTcl112AcBitSwingV;
+  else
+    remote_state[8] &= ~kTcl112AcBitSwingV;
+}
+
+// Return the Vertical Swing state of the A/C.
+bool IRTcl112Ac::getSwingVertical(void) {
+  return remote_state[8] & kTcl112AcBitSwingV;
+}
+
+// Control the Turbo setting.
+void IRTcl112Ac::setTurbo(const bool on) {
+  if (on) {
+    remote_state[6] |= kTcl112AcBitTurbo;
+    this->setFan(kTcl112AcFanHigh);
+    this->setSwingVertical(true);
+  } else {
+    remote_state[6] &= ~kTcl112AcBitTurbo;
+  }
+}
+
+// Return the Turbo setting state of the A/C.
+bool IRTcl112Ac::getTurbo(void) {
+  return remote_state[6] & kTcl112AcBitTurbo;
 }
 
 // Convert the internal state into a human readable string.
@@ -187,6 +293,33 @@ std::string IRTcl112Ac::toString() {
   result += ", Temp: " + uint64ToString(nrHalfDegrees / 2);
   if (nrHalfDegrees & 1) result += ".5";
   result += "C";
+  result += ", Fan: " + uint64ToString(getFan());
+  switch (getFan()) {
+    case kTcl112AcFanAuto:
+      result += " (Auto)";
+      break;
+    case kTcl112AcFanLow:
+      result += " (Low)";
+      break;
+    case kTcl112AcFanMed:
+      result += " (Med)";
+      break;
+    case kTcl112AcFanHigh:
+      result += " (High)";
+      break;
+  }
+  result += ", Econo: ";
+  result += (this->getEcono() ? "On" : "Off");
+  result += ", Health: ";
+  result += (this->getHealth() ? "On" : "Off");
+  result += ", Light: ";
+  result += (this->getLight() ? "On" : "Off");
+  result += ", Turbo: ";
+  result += (this->getTurbo() ? "On" : "Off");
+  result += ", Swing (H): ";
+  result += (this->getSwingHorizontal() ? "On" : "Off");
+  result += ", Swing (V): ";
+  result += (this->getSwingVertical() ? "On" : "Off");
   return result;
 }
 
