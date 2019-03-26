@@ -64,7 +64,10 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
 
   IRTcl112Ac ac(0);
   ac.setRaw(irsend.capture.state);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 24C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
 }
 
 // Decode a synthetic Tcl112Ac A/C example from Issue #619
@@ -103,13 +106,25 @@ TEST(TestTcl112AcClass, Temperature) {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xBC};
   IRTcl112Ac ac(0);
   ac.setRaw(temp16C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
   ac.setRaw(temp16point5C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16.5C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 16.5C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
   ac.setRaw(temp19point5C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 19.5C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 19.5C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
   ac.setRaw(temp31C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 31C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
 
   ac.setTemp(kTcl112AcTempMin);
   EXPECT_EQ(kTcl112AcTempMin, ac.getTemp());
@@ -158,8 +173,10 @@ TEST(TestTcl112AcClass, OperatingMode) {
   ac.setMode(kTcl112AcHeat);
   EXPECT_EQ(kTcl112AcHeat, ac.getMode());
 
-  ac.setMode(kTcl112AcFan);
+  ac.setFan(kTcl112AcFanAuto);
+  ac.setMode(kTcl112AcFan);  // Should set fan speed to High.
   EXPECT_EQ(kTcl112AcFan, ac.getMode());
+  EXPECT_EQ(kTcl112AcFanHigh, ac.getFan());
 
   ac.setMode(kTcl112AcDry);
   EXPECT_EQ(kTcl112AcDry, ac.getMode());
@@ -185,7 +202,10 @@ TEST(TestTcl112AcClass, OperatingMode) {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x08,
       0x07, 0x00, 0x00, 0x00, 0x00, 0x80, 0x48};
   ac.setRaw(automode);
-  EXPECT_EQ("Power: On, Mode: 8 (AUTO), Temp: 24C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 8 (AUTO), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
 }
 
 TEST(TestTcl112AcClass, Power) {
@@ -211,13 +231,19 @@ TEST(TestTcl112AcClass, Power) {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
       0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(on);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
 
   const uint8_t off[kTcl112AcStateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x03,
       0x07, 0x40, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(off);
-  EXPECT_EQ("Power: Off, Mode: 3 (COOL), Temp: 24C", ac.toString());
+  EXPECT_EQ(
+      "Power: Off, Mode: 3 (COOL), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
 }
 
 
@@ -231,9 +257,15 @@ TEST(TestTcl112AcClass, Checksum) {
   IRTcl112Ac ac(0);
   EXPECT_EQ(0xCB, ac.calcChecksum(temp16C));
   ac.setRaw(temp16C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 16C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
   ac.setRaw(temp31C);
-  EXPECT_EQ("Power: On, Mode: 3 (COOL), Temp: 31C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
   EXPECT_EQ(0xBC, ac.calcChecksum(temp31C));
 
   EXPECT_TRUE(IRTcl112Ac::validChecksum(temp16C));
@@ -244,4 +276,109 @@ TEST(TestTcl112AcClass, Checksum) {
   ac.setTemp(31);
   EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
   EXPECT_EQ(0xBC, ac.calcChecksum(ac.getRaw()));
+}
+
+TEST(TestTcl112AcClass, Econo) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_EQ(false, ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+}
+
+TEST(TestTcl112AcClass, Health) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setHealth(true);
+  EXPECT_TRUE(ac.getHealth());
+  ac.setHealth(false);
+  EXPECT_EQ(false, ac.getHealth());
+  ac.setHealth(true);
+  EXPECT_TRUE(ac.getHealth());
+}
+
+TEST(TestTcl112AcClass, Light) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_EQ(false, ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+}
+
+TEST(TestTcl112AcClass, SwingHorizontal) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setSwingHorizontal(true);
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  ac.setSwingHorizontal(false);
+  EXPECT_EQ(false, ac.getSwingHorizontal());
+  ac.setSwingHorizontal(true);
+  EXPECT_TRUE(ac.getSwingHorizontal());
+}
+
+TEST(TestTcl112AcClass, SwingVertical) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(false);
+  EXPECT_EQ(false, ac.getSwingVertical());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+}
+
+TEST(TestTcl112AcClass, Turbo) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  ac.setFan(kTcl112AcFanLow);
+  ac.setSwingHorizontal(false);
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  EXPECT_FALSE(ac.getSwingVertical());
+  EXPECT_EQ(kTcl112AcFanLow, ac.getFan());
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_TRUE(ac.getSwingVertical());
+  EXPECT_EQ(kTcl112AcFanHigh, ac.getFan());
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestTcl112AcClass, FanSpeed) {
+  IRTcl112Ac ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kTcl112AcFanAuto, ac.getFan());
+
+  ac.setFan(kTcl112AcFanLow);
+  EXPECT_EQ(kTcl112AcFanLow, ac.getFan());
+  ac.setFan(kTcl112AcFanMed);
+  EXPECT_EQ(kTcl112AcFanMed, ac.getFan());
+  ac.setFan(kTcl112AcFanHigh);
+  EXPECT_EQ(kTcl112AcFanHigh, ac.getFan());
+  ac.setFan(kTcl112AcFanAuto);
+  EXPECT_EQ(kTcl112AcFanAuto, ac.getFan());
+
+  // Beyond High should default to Auto.
+  ac.setFan(kTcl112AcFanHigh + 1);
+  EXPECT_EQ(kTcl112AcFanAuto, ac.getFan());
 }
