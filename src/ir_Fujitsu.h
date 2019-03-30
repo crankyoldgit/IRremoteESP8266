@@ -13,6 +13,9 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // FUJITSU A/C support added by Jonny Graham
 
@@ -99,15 +102,21 @@ class IRFujitsuAC {
   uint8_t getStateLength();
   static bool validChecksum(uint8_t* state, uint16_t length);
   bool getPower();
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
-  uint8_t remote_state[kFujitsuAcStateLength];
   IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint8_t remote_state[kFujitsuAcStateLength];
   uint8_t _temp;
   uint8_t _fanSpeed;
   uint8_t _mode;

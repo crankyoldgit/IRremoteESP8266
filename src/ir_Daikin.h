@@ -12,6 +12,9 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // Option to disable the additional Daikin debug info to conserve memory
 #define DAIKIN_DEBUG false
@@ -229,6 +232,8 @@ class IRDaikinESP {
   void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
   static String renderTime(uint16_t timemins);
@@ -236,8 +241,10 @@ class IRDaikinESP {
   std::string toString();
   static std::string renderTime(uint16_t timemins);
 #endif
+#ifndef UNIT_TEST
 
  private:
+#endif
   // # of bytes per command
   uint8_t daikin[kDaikinStateLength];
   void stateReset();
@@ -245,7 +252,11 @@ class IRDaikinESP {
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);
   uint8_t getBit(uint8_t byte, uint8_t bitmask);
+#ifndef UNIT_TEST
   IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
 };
 
 // Class to emulate a Daikin ARC477A1 remote.
@@ -317,6 +328,9 @@ class IRDaikin2 {
   void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin2StateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
   String toString();
   static String renderTime(uint16_t timemins);
@@ -324,15 +338,21 @@ class IRDaikin2 {
   std::string toString();
   static std::string renderTime(uint16_t timemins);
 #endif
+#ifndef UNIT_TEST
 
  private:
+#endif
   // # of bytes per command
   uint8_t remote_state[kDaikin2StateLength];
   void stateReset();
   void checksum();
   void clearOnTimerFlag();
   void clearSleepTimerFlag();
+#ifndef UNIT_TEST
   IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
 };
 
 #endif  // IR_DAIKIN_H_

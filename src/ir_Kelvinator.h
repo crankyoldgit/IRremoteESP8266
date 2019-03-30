@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // KK  KK EEEEEEE LL     VV     VV IIIII NN   NN   AAA   TTTTTTT  OOOOO  RRRRRR
 // KK KK  EE      LL     VV     VV  III  NNN  NN  AAAAA    TTT   OO   OO RR   RR
@@ -163,18 +166,25 @@ class IRKelvinatorAC {
       const uint8_t* block, const uint16_t length = kKelvinatorStateLength / 2);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kKelvinatorStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+#endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kKelvinatorStateLength];
   void checksum(const uint16_t length = kKelvinatorStateLength);
   void fixup();
+#ifdef UNIT_TEST
+  IRsendTest _irsend;
+#else
   IRsend _irsend;
+#endif
 };
 
 #endif  // IR_KELVINATOR_H_

@@ -17,7 +17,7 @@
 
 #ifdef UNIT_TEST
 // Used to help simulate elapsed time in unit tests.
-uint32_t _IRtimer_unittest_now = 0;
+extern uint32_t _IRtimer_unittest_now;
 #endif  // UNIT_TEST
 
 class IRsendTest : public IRsend {
