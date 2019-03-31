@@ -321,7 +321,7 @@ ir_Whynter_test : $(COMMON_OBJ) ir_Whynter_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Coolix.o : $(USER_DIR)/ir_Coolix.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Coolix.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Coolix.cpp
 
 ir_Coolix_test.o : ir_Coolix_test.cpp $(USER_DIR)/ir_Coolix.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Coolix_test.cpp

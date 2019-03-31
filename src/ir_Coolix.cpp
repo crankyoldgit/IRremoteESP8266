@@ -305,6 +305,38 @@ void IRCoolixAC::setFan(const uint8_t speed) {
   remote_state |= ((newspeed << 13) & kCoolixFanMask);
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRCoolixAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kCoolixCool;
+    case stdAc::opmode_t::kHeat:
+      return kCoolixHeat;
+    case stdAc::opmode_t::kDry:
+      return kCoolixDry;
+    case stdAc::opmode_t::kFan:
+      return kCoolixFan;
+    default:
+      return kCoolixAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRCoolixAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kCoolixFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kCoolixFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kCoolixFanMax;
+    default:
+      return kCoolixFanAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRCoolixAC::toString() {

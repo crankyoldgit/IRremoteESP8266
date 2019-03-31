@@ -10,6 +10,7 @@
 #include <string>
 #endif
 #include "IRremoteESP8266.h"
+#include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Kelvinator.h"
@@ -29,12 +30,11 @@ class IRac {
  private:
 #endif
   uint8_t _pin;
-  void kelvinator(IRKelvinatorAC *ac,
-                  bool on, stdAc::opmode_t mode, float degrees,
-                  stdAc::fanspeed_t fan,
-                  stdAc::swingv_t swingv, stdAc::swingh_t swingh,
-                  bool quiet, bool turbo, bool light,
-                  bool filter, bool clean);
+  void coolix(IRCoolixAC *ac,
+              bool on, stdAc::opmode_t mode, float degrees,
+              stdAc::fanspeed_t fan,
+              stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+              bool turbo, bool light, bool clean, int16_t sleep = -1);
   void daikin(IRDaikinESP *ac,
               bool on, stdAc::opmode_t mode, float degrees,
               stdAc::fanspeed_t fan,
@@ -51,5 +51,11 @@ class IRac {
                stdAc::fanspeed_t fan,
                stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                bool quiet);
+  void kelvinator(IRKelvinatorAC *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan,
+                  stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+                  bool quiet, bool turbo, bool light,
+                  bool filter, bool clean);
 };
 #endif  // IRAC_H_

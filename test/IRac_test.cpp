@@ -13,6 +13,35 @@
 
 // Tests for IRac class.
 
+TEST(TestIRac, Coolix) {
+  IRCoolixAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 3 (HEAT), Fan: 1 (MAX), Temp: 21C, Zone Follow: Off, "
+      "Sensor Temp: Ignored";
+
+  ac.begin();
+  irac.coolix(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kHeat,      // Mode
+              21,                          // Celsius
+              stdAc::fanspeed_t::kHigh,    // Fan speed
+              stdAc::swingv_t::kOff,       // Veritcal swing
+              stdAc::swingh_t::kOff,       // Horizontal swing
+              false,                       // Turbo
+              false,                       // Light
+              false,                       // Clean
+              -1);                         // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.value);
+  ASSERT_EQ(expected, ac.toString());
+}
+
 TEST(TestIRac, Daikin) {
   IRDaikinESP ac(0);
   IRac irac(0);
@@ -34,7 +63,6 @@ TEST(TestIRac, Daikin) {
               false,                       // Turbo
               true,                        // Filter
               true);                       // Clean
-
   ASSERT_EQ(expected, ac.toString());
 }
 

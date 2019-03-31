@@ -14,11 +14,55 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Kelvinator.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
+
+void IRac::coolix(IRCoolixAC *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan,
+                  stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+                  bool turbo, bool light, bool clean, int16_t sleep) {
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Clock setting available.
+  // No Econo setting available.
+  // No Quiet setting available.
+  if (swingv != stdAc::swingv_t::kOff || swingh != stdAc::swingh_t::kOff) {
+    // Swing has a special command that needs to be sent independently.
+    ac->setSwing();
+    ac->send();
+  }
+  if (turbo) {
+    // Turbo has a special command that needs to be sent independently.
+    ac->setTurbo();
+    ac->send();
+  }
+  if (sleep > 0) {
+    // Sleep has a special command that needs to be sent independently.
+    ac->setSleep();
+    ac->send();
+  }
+  if (light) {
+    // Light has a special command that needs to be sent independently.
+    ac->setLed();
+    ac->send();
+  }
+  if (clean) {
+    // Clean has a special command that needs to be sent independently.
+    ac->setClean();
+    ac->send();
+  }
+  // Power gets done last, as off has a special command.
+  ac->setPower(on);
+  ac->send();
+}
 
 void IRac::daikin(IRDaikinESP *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
@@ -154,6 +198,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
 
   // Per vendor settings & setup.
   switch (vendor) {
+#if SEND_COOLIX
+    case COOLIX:
+    {
+      IRCoolixAC ac(_pin);
+      coolix(&ac, on, mode, degC, fan, swingv, swingh,
+             quiet, turbo, econo, clean);
+      break;
+    }
+#endif  // SEND_DAIKIN
 #if SEND_DAIKIN
     case DAIKIN:
     {
