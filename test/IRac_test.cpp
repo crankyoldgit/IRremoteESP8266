@@ -2,6 +2,7 @@
 
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
+#include "ir_Gree.h"
 #include "ir_Kelvinator.h"
 #include "IRac.h"
 #include "IRrecv.h"
@@ -45,7 +46,6 @@ TEST(TestIRac, Coolix) {
 TEST(TestIRac, Daikin) {
   IRDaikinESP ac(0);
   IRac irac(0);
-  IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 2, Powerful: Off, "
       "Quiet: Off, Sensor: Off, Eye: Off, Mold: On, Swing (Horizontal): Off, "
@@ -144,6 +144,35 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Gree) {
+  IRGreeAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 2, Turbo: Off, XFan: On, "
+      "Light: On, Sleep: On, Swing Vertical Mode: Manual, "
+      "Swing Vertical Pos: 3";
+
+  ac.begin();
+  irac.gree(&ac,
+            true,                        // Power
+            stdAc::opmode_t::kCool,      // Mode
+            22,                          // Celsius
+            stdAc::fanspeed_t::kMedium,  // Fan speed
+            stdAc::swingv_t::kHigh,      // Veritcal swing
+            false,                       // Turbo
+            true,                        // Light
+            true,                        // Clean (aka Mold/XFan)
+            8 * 60 + 0);                 // Sleep time
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(GREE, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kGreeBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }
 

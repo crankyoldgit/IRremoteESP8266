@@ -137,6 +137,28 @@ void IRac::fujitsu(IRFujitsuAC *ac, fujitsu_ac_remote_model_t model,
   ac->send();
 }
 
+void IRac::gree(IRGreeAC *ac,
+                bool on, stdAc::opmode_t mode, float degrees,
+                stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                bool turbo, bool light, bool clean, int16_t sleep) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
+                       ac->convertSwingV(swingv));
+  ac->setLight(light);
+  ac->setTurbo(turbo);
+  ac->setXFan(clean);
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Horizontal Swing setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  ac->send();
+}
+
 void IRac::kelvinator(IRKelvinatorAC *ac,
                       bool on, stdAc::opmode_t mode, float degrees,
                       stdAc::fanspeed_t fan,
@@ -235,6 +257,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_FUJITSU_AC
+#if SEND_GREE
+    case GREE:
+    {
+      IRGreeAC ac(_pin);
+      ac.begin();
+      gree(&ac, on, mode, degC, fan, swingv, light, turbo, clean, sleep);
+      break;
+    }
+#endif  // SEND_GREE
 #if SEND_KELVINATOR
     case KELVINATOR:
     {

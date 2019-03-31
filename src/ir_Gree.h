@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //                      GGGG  RRRRRR  EEEEEEE EEEEEEE
 //                     GG  GG RR   RR EE      EE
@@ -44,6 +47,8 @@ const uint8_t kGreeSwingPosMask = 0b00001111;
 
 const uint8_t kGreeMinTemp = 16;  // Celsius
 const uint8_t kGreeMaxTemp = 30;  // Celsius
+const uint8_t kGreeFanAuto = 0;
+const uint8_t kGreeFanMin = 1;
 const uint8_t kGreeFanMax = 3;
 
 const uint8_t kGreeSwingLastPos = 0b00000000;
@@ -108,7 +113,9 @@ class IRGreeAC {
   void setSwingVertical(const bool automatic, const uint8_t position);
   bool getSwingVerticalAuto();
   uint8_t getSwingVerticalPosition();
-
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t swingv);
   uint8_t* getRaw();
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],
@@ -118,13 +125,17 @@ class IRGreeAC {
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else  // UNIT_TEST
+  IRsendTest _irsend;
+#endif  // UNIT_TEST
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kGreeStateLength];
   void checksum(const uint16_t length = kGreeStateLength);
   void fixup();
-  IRsend _irsend;
 };
 
 #endif  // IR_GREE_H_

@@ -13,6 +13,7 @@
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
+#include "ir_Gree.h"
 #include "ir_Kelvinator.h"
 
 class IRac {
@@ -51,6 +52,10 @@ class IRac {
                stdAc::fanspeed_t fan,
                stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                bool quiet);
+  void gree(IRGreeAC *ac,
+            bool on, stdAc::opmode_t mode, float degrees,
+            stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+            bool turbo, bool light, bool clean, int16_t sleep);
   void kelvinator(IRKelvinatorAC *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
                   stdAc::fanspeed_t fan,
