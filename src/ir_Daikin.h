@@ -160,7 +160,7 @@ const uint8_t kDaikin2SwingVCirculate = 0xD;
 const uint8_t kDaikin2SwingVAuto = 0xE;
 const uint8_t kDaikin2SwingHAuto = 0xBE;
 const uint8_t kDaikin2SwingHSwing = 0xBF;
-const uint8_t kDaikin2MinTemp = 18;  // Celsius
+const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
 
 // Legacy defines.
