@@ -1085,6 +1085,43 @@ TEST(TestDaikin2Class, CleanSetting) {
   ac.setClean(false);
   ASSERT_FALSE(ac.getClean());
 }
+
+
+TEST(TestDaikin2Class, Temperature) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikin2MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin2MinTemp);
+  EXPECT_EQ(kDaikin2MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin2MinTemp - 1);
+  EXPECT_EQ(kDaikin2MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin2MinTemp + 1);
+  EXPECT_EQ(kDaikin2MinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
 // Test Fresh Air settings.
 TEST(TestDaikin2Class, FreshAirSettings) {
   IRDaikin2 ac(0);

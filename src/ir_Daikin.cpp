@@ -905,7 +905,7 @@ void IRDaikin2::setMode(const uint8_t desired_mode) {
 
 // Set the temp in deg C
 void IRDaikin2::setTemp(const uint8_t desired) {
-  uint8_t temp = std::max(kDaikinMinTemp, desired);
+  uint8_t temp = std::max(kDaikin2MinTemp, desired);
   temp = std::min(kDaikinMaxTemp, temp);
   remote_state[26] = temp * 2;
 }
