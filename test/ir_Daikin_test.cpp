@@ -1085,6 +1085,57 @@ TEST(TestDaikin2Class, CleanSetting) {
   ac.setClean(false);
   ASSERT_FALSE(ac.getClean());
 }
+
+
+TEST(TestDaikin2Class, Temperature) {
+  IRDaikin2 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp + 1);
+  EXPECT_EQ(kDaikinMinTemp + 1, ac.getTemp());
+
+  // Now try it with Cool mode, which should set the temp to kDaikin2MinCoolTemp
+  ASSERT_TRUE(kDaikinMinTemp + 1 < kDaikin2MinCoolTemp);
+  ac.setMode(kDaikinCool);
+  EXPECT_EQ(kDaikin2MinCoolTemp, ac.getTemp());
+  ac.setTemp(kDaikin2MinCoolTemp - 1);
+  EXPECT_EQ(kDaikin2MinCoolTemp, ac.getTemp());
+  ac.setTemp(kDaikin2MinCoolTemp + 1);
+  EXPECT_EQ(kDaikin2MinCoolTemp + 1, ac.getTemp());
+  // Should be released from that requirement in other modes.
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(kDaikin2MinCoolTemp - 1);
+  EXPECT_EQ(kDaikin2MinCoolTemp - 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
 // Test Fresh Air settings.
 TEST(TestDaikin2Class, FreshAirSettings) {
   IRDaikin2 ac(0);

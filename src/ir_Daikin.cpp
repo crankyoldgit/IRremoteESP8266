@@ -901,11 +901,16 @@ void IRDaikin2::setMode(const uint8_t desired_mode) {
   }
   remote_state[25] &= 0b10001111;
   remote_state[25] |= (mode << 4);
+  // Redo the temp setting as Cool mode has a different min temp.
+  if (mode == kDaikinCool) this->setTemp(this->getTemp());
 }
 
 // Set the temp in deg C
 void IRDaikin2::setTemp(const uint8_t desired) {
-  uint8_t temp = std::max(kDaikinMinTemp, desired);
+  // The A/C has a different min temp if in cool mode.
+  uint8_t temp = std::max(
+      (this->getMode() == kDaikinCool) ? kDaikin2MinCoolTemp : kDaikinMinTemp,
+      desired);
   temp = std::min(kDaikinMaxTemp, temp);
   remote_state[26] = temp * 2;
 }
