@@ -6,6 +6,10 @@
 
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
+
 
 //  ARGO Ulisse DCI
 
@@ -55,7 +59,7 @@ const uint8_t kArgoFlapFull = 7;  // 0b111
 #define ARGO_COOL_ON              kArgoCoolOn
 #define ARGO_COOL_OFF             kArgoCoolOff
 #define ARGO_COOL_AUTO            kArgoCoolAuto
-#define ARGO_COOl_HUM             kArgoCoolHum
+#define ARGO_COOL_HUM             kArgoCoolHum
 #define ARGO_HEAT_ON              kArgoHeatOn
 #define ARGO_HEAT_AUTO            kArgoHeatAuto
 #define ARGO_HEAT_BLINK           kArgoHeatBlink
@@ -118,13 +122,19 @@ class IRArgoAC {
   void setRoomTemp(uint8_t temp);
 
   uint8_t* getRaw();
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;  // instance of the IR send class
+#else
+  IRsendTest _irsend;  // instance of the testing IR send class
+#endif
   // # of bytes per command
   uint8_t argo[kArgoStateLength];  // Defined in IRremoteESP8266.h
   void stateReset();
   void checksum();
-  IRsend _irsend;  // instance of the IR send class
 
   // Attributes
   uint8_t set_temp;

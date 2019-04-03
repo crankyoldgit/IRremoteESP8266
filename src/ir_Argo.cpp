@@ -228,3 +228,37 @@ void IRArgoAC::setRoomTemp(uint8_t temp) {
   argo[3] += temp << 5;  // Append to bit 5,6,7
   argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
 }
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRArgoAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kArgoFan1;
+    case stdAc::fanspeed_t::kMedium:
+      return kArgoFan2;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kArgoFan3;
+    default:
+      return kArgoFanAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRArgoAC::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+      return kArgoFlapFull;
+    case stdAc::swingv_t::kHigh:
+      return kArgoFlap5;
+    case stdAc::swingv_t::kMiddle:
+      return kArgoFlap4;
+    case stdAc::swingv_t::kLow:
+      return kArgoFlap3;
+    case stdAc::swingv_t::kLowest:
+      return kArgoFlap1;
+    default:
+      return kArgoFlapAuto;
+  }
+}

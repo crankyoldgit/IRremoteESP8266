@@ -10,6 +10,7 @@
 #include <string>
 #endif
 #include "IRremoteESP8266.h"
+#include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
@@ -31,6 +32,9 @@ class IRac {
  private:
 #endif
   uint8_t _pin;
+  void argo(IRArgoAC *ac,
+            bool on, stdAc::opmode_t mode, float degrees, stdAc::fanspeed_t fan,
+            stdAc::swingv_t swingv, bool turbo, int16_t sleep = -1);
   void coolix(IRCoolixAC *ac,
               bool on, stdAc::opmode_t mode, float degrees,
               stdAc::fanspeed_t fan,

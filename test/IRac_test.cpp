@@ -1,5 +1,6 @@
 // Copyright 2019 David Conran
 
+#include "ir_Argo.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Gree.h"
@@ -13,6 +14,27 @@
 #include "gtest/gtest.h"
 
 // Tests for IRac class.
+
+TEST(TestIRac, Argo) {
+  IRArgoAC ac(0);
+  IRac irac(0);
+
+  ac.begin();
+  irac.argo(&ac,
+            true,                        // Power
+            stdAc::opmode_t::kHeat,      // Mode
+            21,                          // Celsius
+            stdAc::fanspeed_t::kHigh,    // Fan speed
+            stdAc::swingv_t::kOff,       // Veritcal swing
+            false,                       // Turbo
+            -1);                         // Sleep
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(1, ac.getMode());
+  EXPECT_EQ(21, ac.getTemp());
+  EXPECT_EQ(kArgoFlapAuto, ac.getFlap());
+  EXPECT_FALSE(ac.getMax());  // Turbo
+  EXPECT_FALSE(ac.getNight());  // Sleep
+}
 
 TEST(TestIRac, Coolix) {
   IRCoolixAC ac(0);

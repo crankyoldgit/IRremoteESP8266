@@ -14,12 +14,47 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Kelvinator.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
+
+#if SEND_ARGO
+void IRac::argo(IRArgoAC *ac,
+                bool on, stdAc::opmode_t mode, float degrees,
+                stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                bool turbo, int16_t sleep) {
+  ac->setPower(on);
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      ac->setCoolMode(kArgoCoolOn);
+      break;
+    case stdAc::opmode_t::kHeat:
+      ac->setHeatMode(kArgoHeatOn);
+      break;
+    case stdAc::opmode_t::kDry:
+      ac->setCoolMode(kArgoCoolHum);
+      break;
+    default:  // No idea how to set Fan mode.
+      ac->setCoolMode(kArgoCoolAuto);
+  }
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setFlap(ac->convertSwingV(swingv));
+  // No Quiet setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  ac->setMax(turbo);
+  // No Economy setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setNight(sleep >= 0);  // Convert to a boolean.
+  ac->send();
+}
+#endif  // SEND_ARGO
 
 void IRac::coolix(IRCoolixAC *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
@@ -220,6 +255,14 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
 
   // Per vendor settings & setup.
   switch (vendor) {
+#if SEND_ARGO
+    case ARGO:
+    {
+      IRArgoAC ac(_pin);
+      argo(&ac, on, mode, degC, fan, swingv, turbo, sleep);
+      break;
+    }
+#endif  // SEND_DAIKIN
 #if SEND_COOLIX
     case COOLIX:
     {
