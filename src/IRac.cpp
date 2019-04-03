@@ -56,6 +56,7 @@ void IRac::argo(IRArgoAC *ac,
 }
 #endif  // SEND_ARGO
 
+#if SEND_COOLIX
 void IRac::coolix(IRCoolixAC *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
                   stdAc::fanspeed_t fan,
@@ -98,7 +99,9 @@ void IRac::coolix(IRCoolixAC *ac,
   ac->setPower(on);
   ac->send();
 }
+#endif  // SEND_COOLIX
 
+#if SEND_DAIKIN
 void IRac::daikin(IRDaikinESP *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
                   stdAc::fanspeed_t fan,
@@ -121,7 +124,9 @@ void IRac::daikin(IRDaikinESP *ac,
   // No Clock setting available.
   ac->send();
 }
+#endif  // SEND_DAIKIN
 
+#if SEND_DAIKIN2
 void IRac::daikin2(IRDaikin2 *ac,
                    bool on, stdAc::opmode_t mode, float degrees,
                    stdAc::fanspeed_t fan,
@@ -145,7 +150,9 @@ void IRac::daikin2(IRDaikin2 *ac,
   if (clock >= 0) ac->setCurrentTime(sleep);
   ac->send();
 }
+#endif  // SEND_DAIKIN2
 
+#if SEND_FUJITSU_AC
 void IRac::fujitsu(IRFujitsuAC *ac, fujitsu_ac_remote_model_t model,
                    bool on, stdAc::opmode_t mode, float degrees,
                    stdAc::fanspeed_t fan,
@@ -171,7 +178,9 @@ void IRac::fujitsu(IRFujitsuAC *ac, fujitsu_ac_remote_model_t model,
   if (!on) ac->off();
   ac->send();
 }
+#endif  // SEND_FUJITSU_AC
 
+#if SEND_GREE
 void IRac::gree(IRGreeAC *ac,
                 bool on, stdAc::opmode_t mode, float degrees,
                 stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
@@ -193,7 +202,9 @@ void IRac::gree(IRGreeAC *ac,
   // No Clock setting available.
   ac->send();
 }
+#endif  // SEND_GREE
 
+#if SEND_KELVINATOR
 void IRac::kelvinator(IRKelvinatorAC *ac,
                       bool on, stdAc::opmode_t mode, float degrees,
                       stdAc::fanspeed_t fan,
@@ -216,6 +227,7 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
   // No Clock setting available.
   ac->send();
 }
+#endif  // SEND_KELVINATOR
 
 // Send A/C message for a given device using common A/C settings.
 // Args:

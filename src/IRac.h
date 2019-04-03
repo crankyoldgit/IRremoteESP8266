@@ -32,39 +32,53 @@ class IRac {
  private:
 #endif
   uint8_t _pin;
+#if SEND_ARGO
   void argo(IRArgoAC *ac,
             bool on, stdAc::opmode_t mode, float degrees, stdAc::fanspeed_t fan,
             stdAc::swingv_t swingv, bool turbo, int16_t sleep = -1);
+#endif  // SEND_ARGO
+#if SEND_COOLIX
   void coolix(IRCoolixAC *ac,
               bool on, stdAc::opmode_t mode, float degrees,
               stdAc::fanspeed_t fan,
               stdAc::swingv_t swingv, stdAc::swingh_t swingh,
               bool turbo, bool light, bool clean, int16_t sleep = -1);
+#endif  // SEND_COOLIX
+#if SEND_DAIKIN
   void daikin(IRDaikinESP *ac,
               bool on, stdAc::opmode_t mode, float degrees,
               stdAc::fanspeed_t fan,
               stdAc::swingv_t swingv, stdAc::swingh_t swingh,
               bool quiet, bool turbo, bool econo, bool clean);
+#endif  // SEND_DAIKIN
+#if SEND_DAIKIN2
   void daikin2(IRDaikin2 *ac,
                bool on, stdAc::opmode_t mode, float degrees,
                stdAc::fanspeed_t fan,
                stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                bool quiet, bool turbo, bool light, bool econo, bool filter,
                bool clean, bool beep, int16_t sleep = -1, int32_t clock = -1);
+#endif  // SEND_DAIKIN2
+#if SEND_FUJITSU_AC
   void fujitsu(IRFujitsuAC *ac, fujitsu_ac_remote_model_t model,
                bool on, stdAc::opmode_t mode, float degrees,
                stdAc::fanspeed_t fan,
                stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                bool quiet);
+#endif  // SEND_FUJITSU_AC
+#if SEND_GREE
   void gree(IRGreeAC *ac,
             bool on, stdAc::opmode_t mode, float degrees,
             stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
             bool turbo, bool light, bool clean, int16_t sleep);
+#endif  // SEND_GREE
+#if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,
                   bool on, stdAc::opmode_t mode, float degrees,
                   stdAc::fanspeed_t fan,
                   stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                   bool quiet, bool turbo, bool light,
                   bool filter, bool clean);
+#endif  // SEND_KELVINATOR
 };
 #endif  // IRAC_H_
