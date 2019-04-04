@@ -231,6 +231,28 @@ void IRac::haier(IRHaierAC *ac,
 }
 #endif  // SEND_HAIER_AC
 
+#if SEND_HAIER_AC_YRW02
+void IRac::haierYrwo2(IRHaierACYRW02 *ac,
+                      bool on, stdAc::opmode_t mode, float degrees,
+                      stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                      bool turbo, bool filter, int16_t sleep) {
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(ac->convertSwingV(swingv));
+  // No Horizontal Swing setting available.
+  // No Quiet setting available.
+  ac->setTurbo(turbo);
+  // No Light setting available.
+  ac->setHealth(filter);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  ac->setPower(on);
+  ac->send();
+}
+#endif  // SEND_HAIER_AC_YRW02
+
 #if SEND_KELVINATOR
 void IRac::kelvinator(IRKelvinatorAC *ac,
                       bool on, stdAc::opmode_t mode, float degrees,
@@ -357,6 +379,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_HAIER_AC
+#if SEND_HAIER_AC_YRW02
+    case HAIER_AC_YRW02:
+    {
+      IRHaierACYRW02 ac(_pin);
+      ac.begin();
+      haierYrwo2(&ac, on, mode, degC, fan, swingv, turbo, filter, sleep);
+      break;
+    }
+#endif  // SEND_HAIER_AC_YRW02
 #if SEND_KELVINATOR
     case KELVINATOR:
     {

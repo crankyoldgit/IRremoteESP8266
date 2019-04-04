@@ -79,6 +79,12 @@ void haier(IRHaierAC *ac,
            stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
            bool filter, int16_t sleep = -1, int16_t clock = -1);
 #endif  // SEND_HAIER_AC
+#if SEND_HAIER_AC_YRW02
+void haierYrwo2(IRHaierACYRW02 *ac,
+                bool on, stdAc::opmode_t mode, float degrees,
+                stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                bool turbo, bool filter, int16_t sleep = -1);
+#endif  // SEND_HAIER_AC_YRW02
 #if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,
                   bool on, stdAc::opmode_t mode, float degrees,

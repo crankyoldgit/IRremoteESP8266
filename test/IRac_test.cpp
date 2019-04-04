@@ -227,6 +227,34 @@ TEST(TestIRac, Haier) {
   ASSERT_EQ(expected, ac.toString());
 }
 
+
+TEST(TestIRac, HaierYrwo2) {
+  IRHaierACYRW02 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Button: 5 (Power), Mode: 2 (Cool), Temp: 23C, Fan: 4 (Med), "
+      "Turbo: 1 (High), Swing: 1 (Top), Sleep: On, Health: On";
+
+  ac.begin();
+  irac.haierYrwo2(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kCool,      // Mode
+             23,                          // Celsius
+             stdAc::fanspeed_t::kMedium,  // Fan speed
+             stdAc::swingv_t::kHigh,      // Veritcal swing
+             true,                        // Turbo
+             true,                        // Filter
+             8 * 60 + 0);                 // Sleep time
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC_YRW02, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHaierACYRW02Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
 TEST(TestIRac, Kelvinator) {
   IRKelvinatorAC ac(0);
   IRac irac(0);

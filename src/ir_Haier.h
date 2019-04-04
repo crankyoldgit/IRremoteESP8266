@@ -293,6 +293,8 @@ class IRHaierACYRW02 {
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kHaierACYRW02StateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
   String toString();
 #else

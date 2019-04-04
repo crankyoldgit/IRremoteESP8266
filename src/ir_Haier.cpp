@@ -693,6 +693,41 @@ uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kHaierAcYrw02FanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kHaierAcYrw02FanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kHaierAcYrw02FanHigh;
+    default:
+      return kHaierAcYrw02FanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+      return kHaierAcYrw02SwingTop;
+    case stdAc::swingv_t::kMiddle:
+      return kHaierAcYrw02SwingMiddle;
+    case stdAc::swingv_t::kLow:
+      return kHaierAcYrw02SwingDown;
+    case stdAc::swingv_t::kLowest:
+      return kHaierAcYrw02SwingBottom;
+    case stdAc::swingv_t::kOff:
+      return kHaierAcYrw02SwingOff;
+    default:
+      return kHaierAcYrw02SwingAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRHaierACYRW02::toString() {
