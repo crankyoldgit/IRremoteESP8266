@@ -59,33 +59,50 @@
  *
  * or
  *
- * Send a MQTT message to the topic 'ir_server/send' using the following
- * format (Order is important):
- *   protocol_num,hexcode  e.g. 7,E0E09966 which is Samsung(7), Power On code,
- *                              default bit size, default nr. of repeats.
- *   protocol_num,hexcode,bits  e.g. 4,f50,12 which is Sony(4), Power Off code,
- *                               12 bits & default nr. of repeats.
- *   protocol_num,hexcode,bits,repeats  e.g. 19,C1A2E21D,0,8 which is
- *                                      Sherwood(19), Vol Up, default bit size &
- *                                      repeated 8 times.
- *   30,frequency,raw_string  e.g. 30,38000,9000,4500,500,1500,500,750,500,750
- *                             Raw (30) @ 38kHz with a raw code of "9000,4500,500,1500,500,750,500,750"
- *   31,code_string  e.g. 31,40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
- *                        GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
- *   25,Rrepeats,hex_code_string  e.g. 25,R1,0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040,0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40
- *                               Pronto (25), 1 repeat, & "0000 006E 0022 0002 ..." (Sherwood Amp Tape Input)
- *   ac_protocol_num,really_long_hexcode  e.g. 18,190B8050000000E0190B8070000010F0
- *                           Kelvinator (18) Air Con on, Low Fan, 25 deg etc.
- *                           NOTE: Ensure you zero-pad to the correct number of
- *                                 digits for the bit/byte size you want to send
- *                                 as some A/C units have units have different
- *                                 sized messages. e.g. Fujitsu A/C units.
+ * Send a MQTT message to the topic 'ir_server/send' (or 'ir_server/send_0' etc)
+ * using the following format (Order is important):
+ *   protocol_num,hexcode
+ *     e.g. 7,E0E09966
+ *          which is: Samsung(7), Power On code, default bit size,
+ *                    default nr. of repeats.
+ *
+ *   protocol_num,hexcode,bits
+ *     e.g. 4,f50,12
+ *          which is: Sony(4), Power Off code, 12 bits & default nr. of repeats.
+ *
+ *   protocol_num,hexcode,bits,repeats
+ *     e.g. 19,C1A2E21D,0,8
+ *          which is: Sherwood(19), Vol Up, default bit size & repeated 8 times.
+ *
+ *   30,frequency,raw_string
+ *     e.g. 30,38000,9000,4500,500,1500,500,750,500,750
+ *          which is: Raw (30) @ 38kHz with a raw code of
+ *            "9000,4500,500,1500,500,750,500,750"
+ *
+ *   31,code_string
+ *     e.g. 31,40000,1,1,96,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,48,24,24,24,24,24,24,24,24,1058
+ *          which is: GlobalCache (31) & "40000,1,1,96,..." (Sony Vol Up)
+ *
+ *   25,Rrepeats,hex_code_string
+ *     e.g. 25,R1,0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040,0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40
+ *          which is: Pronto (25), 1 repeat, & "0000 006E 0022 0002 ..."
+ *             aka a "Sherwood Amp Tape Input" message.
+ *
+ *   ac_protocol_num,really_long_hexcode
+ *     e.g. 18,190B8050000000E0190B8070000010F0
+ *          which is: Kelvinator (18) Air Con on, Low Fan, 25 deg etc.
+ *          NOTE: Ensure you zero-pad to the correct number of digits for the
+ *                bit/byte size you want to send as some A/C units have units
+ *                have different sized messages. e.g. Fujitsu A/C units.
+ *
  *   In short:
  *     No spaces after/before commas.
  *     Values are comma separated.
  *     The first value is always in Decimal.
  *     For simple protocols, the next value (hexcode) is always hexadecimal.
  *     The optional bit size is in decimal.
+ *     CAUTION: Some AC protocols DO NOT use the really_long_hexcode method.
+ *              e.g. < 64bit AC protocols.
  *
  *   Unix command line usage example:
  *     # Install a MQTT client
@@ -189,8 +206,8 @@
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define IR_LED 4  // <=- CHANGE_ME (optional)
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
-//
-// GPIO the IR RX module is connected to/controlled by. GPIO 14 = D5.
+
+// GPIO the IR RX module is connected to/controlled by. e.g. GPIO 14 = D5.
 // Comment this out to disable receiving/decoding IR messages entirely.
 #define IR_RX 14  // <=- CHANGE_ME (optional)
 #define IR_RX_PULLUP false
@@ -258,10 +275,22 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
+// ADVANCED USAGE ONLY
+
+// Change if you need multiple independent send gpio/topics.
+const uint8_t gpioTable[] = {
+  IR_LED,  // Default GPIO. e.g. ir_server/send or ir_server/send_0
+  // Uncomment the following as needed.
+  // NOTE: Remember to disable DEBUG if you are using one of the serial pins.
+  // 5,  // GPIO 5 / D1 e.g. ir_server/send_1
+  // 14,  // GPIO 14 / D5 e.g. ir_server/send_2
+  // 16,  // GPIO 16 / D0 e.g. ir_server/send_3
+};
+
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.8.5"
+#define _MY_VERSION_ "v0.9.0"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -269,7 +298,6 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define argRepeat "repeats"
 
 ESP8266WebServer server(kHttpPort);
-IRsend irsend = IRsend(IR_LED);
 #ifdef IR_RX
 IRrecv irrecv(IR_RX, kCaptureBufferSize, kCaptureTimeout, true);
 decode_results capture;  // Somewhere to store inbound IR messages.
@@ -295,6 +323,7 @@ uint32_t irRecvCounter = 0;
 
 #if MQTT_ENABLE
 String lastMqttCmd = "None";
+String lastMqttCmdTopic = "None";
 uint32_t lastMqttCmdTime = 0;
 uint32_t lastConnectedTime = 0;
 uint32_t lastDisconnectedTime = 0;
@@ -306,6 +335,9 @@ void callback(char* topic, byte* payload, unsigned int length);
 PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
+const uint8_t kSendTableSize = sizeof(gpioTable);
+IRsend *IrSendTable[kSendTableSize];
+
 #endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
@@ -351,6 +383,25 @@ String timeSince(uint32_t const start) {
   return result + " ago";
 }
 
+// Return a string containing the comma separated list of sending gpios.
+String listOfSendGpios(void) {
+  String result = String(gpioTable[0]);
+  if (kSendTableSize > 1) result += " (default)";
+  for (uint8_t i = 1; i < kSendTableSize; i++) {
+    result += ", " + String(gpioTable[1]);
+  }
+  return result;
+}
+
+// Return a string containing the comma separated list of MQTT command topics.
+String listOfCommandTopics(void) {
+  String result = MQTTcommand;
+  for (uint8_t i = 0; i < kSendTableSize; i++) {
+    result += ", " MQTTcommand "_" + String(gpioTable[1]);
+  }
+  return result;
+}
+
 // Quick and dirty check for any unsafe chars in a string
 // that may cause HTML shenanigans. e.g. An XSS.
 bool hasUnsafeHTMLChars(String input) {
@@ -380,7 +431,7 @@ void handleRoot() {
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
-    "IR Send GPIO: " + String(IR_LED) + "<br>"
+    "IR Send GPIO(s): " + listOfSendGpios() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
@@ -403,12 +454,12 @@ void handleRoot() {
     ")</i><br>"
     "Disconnections: " + String(mqttDisconnectCounter - 1) + "<br>"
     "Client id: " + mqtt_clientid + "<br>"
-    "Command topic: " MQTTcommand "<br>"
+    "Command topic(s): " + listOfCommandTopics() + "<br>"
     "Acknowledgements topic: " MQTTack "<br>"
 #ifdef IR_RX
     "IR Received topic: " MQTTrecv "<br>"
 #endif  // IR_RX
-    "Last MQTT command seen: " +
+    "Last MQTT command seen: " + lastMqttCmdTopic + " : " +
     // lastMqttCmd is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
     (hasUnsafeHTMLChars(lastMqttCmd) ?
@@ -617,11 +668,13 @@ void handleReset() {
 
 // Parse an Air Conditioner A/C Hex String/code and send it.
 // Args:
+//   irsend: A Ptr to the IRsend object to transmit via.
 //   irType: Nr. of the protocol we need to send.
 //   str: A hexadecimal string containing the state to be sent.
 // Returns:
 //   bool: Successfully sent or not.
-bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
+bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
+                              const String str) {
   uint8_t strOffset = 0;
   uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
   uint16_t stateSize = 0;
@@ -767,102 +820,102 @@ bool parseStringAndSendAirCon(const uint16_t irType, const String str) {
   switch (irType) {
 #if SEND_KELVINATOR
     case KELVINATOR:
-      irsend.sendKelvinator(reinterpret_cast<uint8_t *>(state));
+      irsend->sendKelvinator(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_TOSHIBA_AC
     case TOSHIBA_AC:
-      irsend.sendToshibaAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendToshibaAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_DAIKIN
     case DAIKIN:
-      irsend.sendDaikin(reinterpret_cast<uint8_t *>(state));
+      irsend->sendDaikin(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_DAIKIN2
     case DAIKIN2:
-      irsend.sendDaikin2(reinterpret_cast<uint8_t *>(state));
+      irsend->sendDaikin2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_MITSUBISHI_AC
     case MITSUBISHI_AC:
-      irsend.sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_TROTEC
     case TROTEC:
-      irsend.sendTrotec(reinterpret_cast<uint8_t *>(state));
+      irsend->sendTrotec(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_ARGO
     case ARGO:
-      irsend.sendArgo(reinterpret_cast<uint8_t *>(state));
+      irsend->sendArgo(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_GREE
     case GREE:
-      irsend.sendGree(reinterpret_cast<uint8_t *>(state));
+      irsend->sendGree(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_FUJITSU_AC
     case FUJITSU_AC:
-      irsend.sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
+      irsend->sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
 #if SEND_HAIER_AC
     case HAIER_AC:
-      irsend.sendHaierAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendHaierAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_HAIER_AC_YRW02
     case HAIER_AC_YRW02:
-      irsend.sendHaierACYRW02(reinterpret_cast<uint8_t *>(state));
+      irsend->sendHaierACYRW02(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_HITACHI_AC
     case HITACHI_AC:
-      irsend.sendHitachiAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendHitachiAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_HITACHI_AC1
     case HITACHI_AC1:
-      irsend.sendHitachiAC1(reinterpret_cast<uint8_t *>(state));
+      irsend->sendHitachiAC1(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_HITACHI_AC2
     case HITACHI_AC2:
-      irsend.sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
+      irsend->sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_WHIRLPOOL_AC
     case WHIRLPOOL_AC:
-      irsend.sendWhirlpoolAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendWhirlpoolAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
-      irsend.sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
+      irsend->sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
-      irsend.sendElectraAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendElectraAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_PANASONIC_AC
     case PANASONIC_AC:
-      irsend.sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
+      irsend->sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
 #if SEND_MWM
     case MWM:
-      irsend.sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
+      irsend->sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
 #if SEND_TCL112AC
     case TCL112AC:
-      irsend.sendTcl112Ac(reinterpret_cast<uint8_t *>(state));
+      irsend->sendTcl112Ac(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
     default:
@@ -912,6 +965,7 @@ uint16_t * newCodeArray(const uint16_t size) {
 #if SEND_GLOBALCACHE
 // Parse a GlobalCache String/code and send it.
 // Args:
+//   irsend: A ptr to the IRsend object to transmit via.
 //   str: A GlobalCache formatted String of comma separated numbers.
 //        e.g. "38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,
 //              20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,
@@ -920,7 +974,7 @@ uint16_t * newCodeArray(const uint16_t size) {
 //        Note: The leading "1:1,1," of normal GC codes should be removed.
 // Returns:
 //   bool: Successfully sent or not.
-bool parseStringAndSendGC(const String str) {
+bool parseStringAndSendGC(IRsend *irsend, const String str) {
   uint16_t count;
   uint16_t *code_array;
   String tmp_str;
@@ -948,7 +1002,7 @@ bool parseStringAndSendGC(const String str) {
     count++;
   } while (index != -1);
 
-  irsend.sendGC(code_array, count);  // All done. Send it.
+  irsend->sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
   if (count > 0)
     return true;  // We sent something.
@@ -959,6 +1013,7 @@ bool parseStringAndSendGC(const String str) {
 #if SEND_PRONTO
 // Parse a Pronto Hex String/code and send it.
 // Args:
+//   irsend: A ptr to the IRsend object to transmit via.
 //   str: A comma-separated String of nr. of repeats, then hexadecimal numbers.
 //        e.g. "R1,0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,
 //              0030,0018,0018,0018,0030,0018,0018,0018,0018,0018,0030,0018,
@@ -972,7 +1027,8 @@ bool parseStringAndSendGC(const String str) {
 //             This value is ignored if an embeddd repeat is found in str.
 // Returns:
 //   bool: Successfully sent or not.
-bool parseStringAndSendPronto(const String str, uint16_t repeats) {
+bool parseStringAndSendPronto(IRsend *irsend, const String str,
+                              uint16_t repeats) {
   uint16_t count;
   uint16_t *code_array;
   int16_t index = -1;
@@ -1008,7 +1064,7 @@ bool parseStringAndSendPronto(const String str, uint16_t repeats) {
     count++;
   } while (index != -1);
 
-  irsend.sendPronto(code_array, count, repeats);  // All done. Send it.
+  irsend->sendPronto(code_array, count, repeats);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
   if (count > 0)
     return true;  // We sent something.
@@ -1019,13 +1075,14 @@ bool parseStringAndSendPronto(const String str, uint16_t repeats) {
 #if SEND_RAW
 // Parse an IRremote Raw Hex String/code and send it.
 // Args:
+//   irsend: A ptr to the IRsend object to transmit via.
 //   str: A comma-separated String containing the freq and raw IR data.
 //        e.g. "38000,9000,4500,600,1450,600,900,650,1500,..."
 //        Requires at least two comma-separated values.
 //        First value is the transmission frequency in Hz or kHz.
 // Returns:
 //   bool: Successfully sent or not.
-bool parseStringAndSendRaw(const String str) {
+bool parseStringAndSendRaw(IRsend *irsend, const String str) {
   uint16_t count;
   uint16_t freq = 38000;  // Default to 38kHz.
   uint16_t *raw_array;
@@ -1055,7 +1112,7 @@ bool parseStringAndSendRaw(const String str) {
     count++;
   } while (index != -1);
 
-  irsend.sendRaw(raw_array, count, freq);  // All done. Send it.
+  irsend->sendRaw(raw_array, count, freq);  // All done. Send it.
   free(raw_array);  // Free up the memory allocated.
   if (count > 0)
     return true;  // We sent something.
@@ -1090,8 +1147,8 @@ void handleIr() {
       repeat = atoi(server.arg(i).c_str());
   }
   debug("New code received via HTTP");
-  lastSendSucceeded = sendIRCode(ir_type, data, data_str.c_str(), nbits,
-                                 repeat);
+  lastSendSucceeded = sendIRCode(IrSendTable[0], ir_type, data,
+                                 data_str.c_str(), nbits, repeat);
   handleRoot();
 }
 
@@ -1130,8 +1187,12 @@ void setup_wifi() {
 }
 
 void setup(void) {
-  irsend.begin();
-  offset = irsend.calibrate();
+  // Initialise all the IR transmitters.
+  for (uint8_t i = 0; i < kSendTableSize; i++) {
+    IrSendTable[i] = new IRsend(gpioTable[i]);
+    IrSendTable[i]->begin();
+    offset = IrSendTable[i]->calibrate();
+  }
 #ifdef IR_RX
 #if IR_RX_PULLUP
   pinMode(IR_RX, INPUT_PULLUP);
@@ -1223,9 +1284,10 @@ void setup(void) {
 // MQTT subscribing to topic
 void subscribing(const String topic_name) {
   // subscription to topic for receiving data
-  if (mqtt_client.subscribe(topic_name.c_str())) {
+  if (mqtt_client.subscribe(topic_name.c_str()))
     debug("Subscription OK to " + topic_name);
-  }
+  else
+    debug("Subscription FAILED to " + topic_name);
 }
 
 bool reconnect() {
@@ -1247,6 +1309,9 @@ bool reconnect() {
       debug("connected.");
       // Subscribing to topic(s)
       subscribing(MQTTcommand);
+      for (uint8_t i = 0; i < kSendTableSize; i++) {
+        subscribing(String(MQTTcommand "_") + String(static_cast<int>(i)));
+      }
     } else {
       debug("failed, rc=" + String(mqtt_client.state()) +
             " Try again in a bit.");
@@ -1359,6 +1424,7 @@ uint64_t getUInt64fromHex(char const *str) {
 // Transmit the given IR message.
 //
 // Args:
+//   irsend:   A pointer to a IRsend object to transmit via.
 //   ir_type:  enum of the protocol to be sent.
 //   code:     Numeric payload of the IR message. Most protocols use this.
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
@@ -1366,8 +1432,9 @@ uint64_t getUInt64fromHex(char const *str) {
 //   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
 // Returns:
 //   bool: Successfully sent or not.
-bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
-                uint16_t bits, uint16_t repeat) {
+bool sendIRCode(IRsend *irsend, int const ir_type,
+                uint64_t const code, char const * code_str, uint16_t bits,
+                uint16_t repeat) {
   // Create a pseudo-lock so we don't try to send two codes at the same time.
   while (ir_lock)
     delay(20);
@@ -1381,21 +1448,21 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case RC5:  // 1
       if (bits == 0)
         bits = kRC5Bits;
-      irsend.sendRC5(code, bits, repeat);
+      irsend->sendRC5(code, bits, repeat);
       break;
 #endif
 #if SEND_RC6
     case RC6:  // 2
       if (bits == 0)
         bits = kRC6Mode0Bits;
-      irsend.sendRC6(code, bits, repeat);
+      irsend->sendRC6(code, bits, repeat);
       break;
 #endif
 #if SEND_NEC
     case NEC:  // 3
       if (bits == 0)
         bits = kNECBits;
-      irsend.sendNEC(code, bits, repeat);
+      irsend->sendNEC(code, bits, repeat);
       break;
 #endif
 #if SEND_SONY
@@ -1403,42 +1470,42 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kSony12Bits;
       repeat = std::max(repeat, kSonyMinRepeat);
-      irsend.sendSony(code, bits, repeat);
+      irsend->sendSony(code, bits, repeat);
       break;
 #endif
 #if SEND_PANASONIC
     case PANASONIC:  // 5
       if (bits == 0)
         bits = kPanasonicBits;
-      irsend.sendPanasonic64(code, bits, repeat);
+      irsend->sendPanasonic64(code, bits, repeat);
       break;
 #endif
 #if SEND_JVC
     case JVC:  // 6
       if (bits == 0)
         bits = kJvcBits;
-      irsend.sendJVC(code, bits, repeat);
+      irsend->sendJVC(code, bits, repeat);
       break;
 #endif
 #if SEND_SAMSUNG
     case SAMSUNG:  // 7
       if (bits == 0)
         bits = kSamsungBits;
-      irsend.sendSAMSUNG(code, bits, repeat);
+      irsend->sendSAMSUNG(code, bits, repeat);
       break;
 #endif
 #if SEND_SAMSUNG36
     case SAMSUNG36:  // 56
       if (bits == 0)
         bits = kSamsung36Bits;
-      irsend.sendSamsung36(code, bits, repeat);
+      irsend->sendSamsung36(code, bits, repeat);
       break;
 #endif
 #if SEND_WHYNTER
     case WHYNTER:  // 8
       if (bits == 0)
         bits = kWhynterBits;
-      irsend.sendWhynter(code, bits, repeat);
+      irsend->sendWhynter(code, bits, repeat);
       break;
 #endif
 #if SEND_AIWA_RC_T501
@@ -1446,14 +1513,14 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kAiwaRcT501Bits;
       repeat = std::max(repeat, kAiwaRcT501MinRepeats);
-      irsend.sendAiwaRCT501(code, bits, repeat);
+      irsend->sendAiwaRCT501(code, bits, repeat);
       break;
 #endif
 #if SEND_LG
     case LG:  // 10
       if (bits == 0)
         bits = kLgBits;
-      irsend.sendLG(code, bits, repeat);
+      irsend->sendLG(code, bits, repeat);
       break;
 #endif
 #if SEND_MITSUBISHI
@@ -1461,7 +1528,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kMitsubishiBits;
       repeat = std::max(repeat, kMitsubishiMinRepeat);
-      irsend.sendMitsubishi(code, bits, repeat);
+      irsend->sendMitsubishi(code, bits, repeat);
       break;
 #endif
 #if SEND_DISH
@@ -1469,21 +1536,21 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kDishBits;
       repeat = std::max(repeat, kDishMinRepeat);
-      irsend.sendDISH(code, bits, repeat);
+      irsend->sendDISH(code, bits, repeat);
       break;
 #endif
 #if SEND_SHARP
     case SHARP:  // 14
       if (bits == 0)
         bits = kSharpBits;
-      irsend.sendSharpRaw(code, bits, repeat);
+      irsend->sendSharpRaw(code, bits, repeat);
       break;
 #endif
 #if SEND_COOLIX
     case COOLIX:  // 15
       if (bits == 0)
         bits = kCoolixBits;
-      irsend.sendCOOLIX(code, bits, repeat);
+      irsend->sendCOOLIX(code, bits, repeat);
       break;
 #endif
     case DAIKIN:  // 16
@@ -1505,13 +1572,13 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
     case ELECTRA_AC:  // 48
     case PANASONIC_AC:  // 49
     case MWM:  // 52
-      success = parseStringAndSendAirCon(ir_type, code_str);
+      success = parseStringAndSendAirCon(irsend, ir_type, code_str);
       break;
 #if SEND_DENON
     case DENON:  // 17
       if (bits == 0)
         bits = DENON_BITS;
-      irsend.sendDenon(code, bits, repeat);
+      irsend->sendDenon(code, bits, repeat);
       break;
 #endif
 #if SEND_SHERWOOD
@@ -1519,78 +1586,78 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kSherwoodBits;
       repeat = std::max(repeat, kSherwoodMinRepeat);
-      irsend.sendSherwood(code, bits, repeat);
+      irsend->sendSherwood(code, bits, repeat);
       break;
 #endif
 #if SEND_RCMM
     case RCMM:  // 21
       if (bits == 0)
         bits = kRCMMBits;
-      irsend.sendRCMM(code, bits, repeat);
+      irsend->sendRCMM(code, bits, repeat);
       break;
 #endif
 #if SEND_SANYO
     case SANYO_LC7461:  // 22
       if (bits == 0)
         bits = kSanyoLC7461Bits;
-      irsend.sendSanyoLC7461(code, bits, repeat);
+      irsend->sendSanyoLC7461(code, bits, repeat);
       break;
 #endif
 #if SEND_RC5
     case RC5X:  // 23
       if (bits == 0)
         bits = kRC5XBits;
-      irsend.sendRC5(code, bits, repeat);
+      irsend->sendRC5(code, bits, repeat);
       break;
 #endif
 #if SEND_PRONTO
     case PRONTO:  // 25
-      success = parseStringAndSendPronto(code_str, repeat);
+      success = parseStringAndSendPronto(irsend, code_str, repeat);
       break;
 #endif
 #if SEND_NIKAI
     case NIKAI:  // 29
       if (bits == 0)
         bits = kNikaiBits;
-      irsend.sendNikai(code, bits, repeat);
+      irsend->sendNikai(code, bits, repeat);
       break;
 #endif
 #if SEND_RAW
     case RAW:  // 30
-      success = parseStringAndSendRaw(code_str);
+      success = parseStringAndSendRaw(irsend, code_str);
       break;
 #endif
 #if SEND_GLOBALCACHE
     case GLOBALCACHE:  // 31
-      success = parseStringAndSendGC(code_str);
+      success = parseStringAndSendGC(irsend, code_str);
       break;
 #endif
 #if SEND_MIDEA
     case MIDEA:  // 34
       if (bits == 0)
         bits = kMideaBits;
-      irsend.sendMidea(code, bits, repeat);
+      irsend->sendMidea(code, bits, repeat);
       break;
 #endif
 #if SEND_MAGIQUEST
     case MAGIQUEST:  // 35
       if (bits == 0)
         bits = kMagiquestBits;
-      irsend.sendMagiQuest(code, bits, repeat);
+      irsend->sendMagiQuest(code, bits, repeat);
       break;
 #endif
 #if SEND_LASERTAG
     case LASERTAG:  // 36
       if (bits == 0)
         bits = kLasertagBits;
-      irsend.sendLasertag(code, bits, repeat);
+      irsend->sendLasertag(code, bits, repeat);
       break;
 #endif
 #if SEND_CARRIER_AC
     case CARRIER_AC:  // 37
       if (bits == 0)
         bits = kCarrierAcBits;
-      irsend.sendCarrierAC(code, bits, repeat);
+      irsend->sendCarrierAC(code, bits, repeat);
       break;
 #endif
 #if SEND_MITSUBISHI2
@@ -1598,7 +1665,7 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kMitsubishiBits;
       repeat = std::max(repeat, kMitsubishiMinRepeat);
-      irsend.sendMitsubishi2(code, bits, repeat);
+      irsend->sendMitsubishi2(code, bits, repeat);
       break;
 #endif
 #if SEND_GICABLE
@@ -1606,49 +1673,49 @@ bool sendIRCode(int const ir_type, uint64_t const code, char const * code_str,
       if (bits == 0)
         bits = kGicableBits;
       repeat = std::max(repeat, kGicableMinRepeat);
-      irsend.sendGICable(code, bits, repeat);
+      irsend->sendGICable(code, bits, repeat);
       break;
 #endif
 #if SEND_LUTRON
     case LUTRON:  // 47
       if (bits == 0)
         bits = kLutronBits;
-      irsend.sendLutron(code, bits, repeat);
+      irsend->sendLutron(code, bits, repeat);
       break;
 #endif
 #if SEND_PIONEER
     case PIONEER:  // 50
       if (bits == 0)
         bits = kPioneerBits;
-      irsend.sendPioneer(code, bits, repeat);
+      irsend->sendPioneer(code, bits, repeat);
       break;
 #endif
 #if SEND_LG
     case LG2:  // 51
       if (bits == 0)
         bits = kLgBits;
-      irsend.sendLG2(code, bits, repeat);
+      irsend->sendLG2(code, bits, repeat);
       break;
 #endif
 #if SEND_VESTEL_AC
     case VESTEL_AC:  // 54
       if (bits == 0)
         bits = kVestelAcBits;
-      irsend.sendVestelAc(code, bits, repeat);
+      irsend->sendVestelAc(code, bits, repeat);
       break;
 #endif
 #if SEND_TECO
     case TECO:  // 55
       if (bits == 0)
         bits = kTecoBits;
-      irsend.sendTeco(code, bits, repeat);
+      irsend->sendTeco(code, bits, repeat);
       break;
 #endif
 #if SEND_LEGOPF
     case LEGOPF:  // 58
       if (bits == 0)
         bits = kLegoPfBits;
-      irsend.sendLegoPf(code, bits, repeat);
+      irsend->sendLegoPf(code, bits, repeat);
       break;
 #endif
     default:
@@ -1707,13 +1774,26 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   uint64_t code = 0;
   uint16_t nbits = 0;
   uint16_t repeat = 0;
+  uint8_t channel = 0;  // Default to the first channel. e.g. "*_0"
 
   debug("Receiving data by MQTT topic " + topic_name);
+  // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
+  for (int i = 0; i < kSendTableSize; i++) {
+    debug("Checking if " + topic_name + " ends with _" + String(i));
+    if (topic_name.endsWith("_" + String(i))) {
+      channel = i;
+      debug("It does!");
+      break;
+    }
+  }
 
+  debug("Using transmit channel " + String(static_cast<int>(channel)) +
+        " / GPIO " + String(static_cast<int>(gpioTable[channel])));
   // Make a copy of the callback string as strtok destroys it.
   char* callback_c_str = strdup(callback_str.c_str());
   debug("MQTT Payload (raw): " + callback_str);
   // Save the message as the last command seen (global).
+  lastMqttCmdTopic = topic_name;
   lastMqttCmd = callback_str;
   lastMqttCmdTime = millis();
 
@@ -1742,12 +1822,12 @@ void receivingMQTT(String const topic_name, String const callback_str) {
 
   // send received MQTT value by IR signal
   lastSendSucceeded = sendIRCode(
-      ir_type, code,
+      IrSendTable[channel], ir_type, code,
       callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
       nbits, repeat);
 }
 
-// Callback function, when the gateway receive an MQTT value on the topics
+// Callback function, when we receive an MQTT value on the topics
 // subscribed this function is called
 void callback(char* topic, byte* payload, unsigned int length) {
   // In order to republish this payload, a copy must be made
