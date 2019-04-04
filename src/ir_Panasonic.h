@@ -12,6 +12,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //       PPPP    AAA   N   N   AAA    SSSS   OOO   N   N  IIIII   CCCC
 //       P   P  A   A  NN  N  A   A  S      O   O  NN  N    I    C
@@ -123,6 +126,10 @@ class IRPanasonicAc {
                    const bool enable = true);
   void cancelOffTimer();
   bool isOffTimerEnabled();
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
+  uint8_t convertSwingH(const stdAc::swingh_t position);
 #ifdef ARDUINO
   String toString();
   static String timeToString(const uint16_t mins_since_midnight);
@@ -133,6 +140,9 @@ class IRPanasonicAc {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   uint8_t remote_state[kPanasonicAcStateLength];
   uint8_t _swingh;
@@ -140,7 +150,6 @@ class IRPanasonicAc {
   void fixChecksum(const uint16_t length = kPanasonicAcStateLength);
   static uint8_t calcChecksum(const uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);
-  IRsend _irsend;
 };
 
 #endif  // IR_PANASONIC_H_

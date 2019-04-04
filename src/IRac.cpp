@@ -23,6 +23,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
+#include "ir_Panasonic.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -151,7 +152,7 @@ void IRac::daikin2(IRDaikin2 *ac,
   ac->setMold(clean);
   ac->setBeep(beep);
   if (sleep > 0) ac->enableSleepTimer(sleep);
-  if (clock >= 0) ac->setCurrentTime(sleep);
+  if (clock >= 0) ac->setCurrentTime(clock);
   ac->send();
 }
 #endif  // SEND_DAIKIN2
@@ -349,6 +350,32 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
 }
 #endif  // SEND_MITSUBISHI_AC
 
+#if SEND_PANASONIC_AC
+void IRac::panasonic(IRPanasonicAc *ac, panasonic_ac_remote_model_t model,
+                     bool on, stdAc::opmode_t mode, float degrees,
+                     stdAc::fanspeed_t fan,
+                     stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+                     bool quiet, bool turbo, int16_t clock) {
+  ac->setModel(model);
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  ac->setQuiet(quiet);
+  ac->setPowerful(turbo);
+  // No Light setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  if (clock >= 0) ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_PANASONIC_AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -496,6 +523,16 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_PANASONIC_AC
+    case PANASONIC_AC:
+    {
+      IRPanasonicAc ac(_pin);
+      ac.begin();
+      panasonic(&ac, (panasonic_ac_remote_model_t)model, on, mode, degC, fan,
+                swingv, swingh, quiet, turbo, clock);
+      break;
+    }
+#endif  // SEND_PANASONIC_AC
     default:
       return false;  // Fail, didn't match anything.
   }

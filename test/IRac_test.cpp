@@ -9,6 +9,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
+#include "ir_Panasonic.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -364,4 +365,58 @@ TEST(TestIRac, Mitsubishi) {
   ASSERT_EQ(kMitsubishiACBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Panasonic) {
+  IRPanasonicAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected_nke[] =
+      "Model: 2 (NKE), Power: On, Mode: 4 (HEAT), Temp: 28C, Fan: 2 (UNKNOWN), "
+      "Swing (Vertical): 15 (AUTO), Swing (Horizontal): 6 (Middle), Quiet: On, "
+      "Powerful: Off, Clock: 19:17, On Timer: Off, Off Timer: Off";
+
+  ac.begin();
+  irac.panasonic(&ac,
+                 kPanasonicNke,               // Model
+                 true,                        // Power
+                 stdAc::opmode_t::kHeat,      // Mode
+                 28,                          // Celsius
+                 stdAc::fanspeed_t::kMedium,  // Fan speed
+                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingh_t::kLeft,      // Horizontal swing
+                 true,                        // Quiet
+                 false,                       // Turbo
+                 19 * 60 + 17);               // Clock
+  ASSERT_EQ(expected_nke, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(PANASONIC_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kPanasonicAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected_nke, ac.toString());
+
+  char expected_dke[] =
+      "Model: 3 (DKE), Power: On, Mode: 3 (COOL), Temp: 18C, Fan: 4 (MAX), "
+      "Swing (Vertical): 1 (Full Up), Swing (Horizontal): 6 (Middle), "
+      "Quiet: Off, Powerful: On, Clock: 19:17, On Timer: Off, Off Timer: Off";
+  ac._irsend.reset();
+  irac.panasonic(&ac,
+               kPanasonicDke,               // Model
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               18,                          // Celsius
+               stdAc::fanspeed_t::kMax,     // Fan speed
+               stdAc::swingv_t::kHigh,      // Veritcal swing
+               stdAc::swingh_t::kMiddle,    // Horizontal swing
+               false,                       // Quiet
+               true,                        // Turbo
+               19 * 60 + 17);               // Clock
+  ASSERT_EQ(expected_dke, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(PANASONIC_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kPanasonicAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected_dke, ac.toString());
 }

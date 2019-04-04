@@ -294,7 +294,7 @@ ir_RC5_RC6_test : $(COMMON_OBJ) ir_RC5_RC6_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Panasonic.o : $(USER_DIR)/ir_Panasonic.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Panasonic.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Panasonic.cpp
 
 ir_Panasonic_test.o : ir_Panasonic_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Panasonic_test.cpp

@@ -618,6 +618,74 @@ std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
   return result + uint64ToString(mins);
 }
 
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kPanasonicAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kPanasonicAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kPanasonicAcDry;
+    case stdAc::opmode_t::kFan:
+      return kPanasonicAcFan;
+    default:
+      return kPanasonicAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kPanasonicAcFanMin;
+    case stdAc::fanspeed_t::kLow:
+      return kPanasonicAcFanMin + 1;
+    case stdAc::fanspeed_t::kMedium:
+      return kPanasonicAcFanMin + 2;
+    case stdAc::fanspeed_t::kHigh:
+      return kPanasonicAcFanMin + 3;
+    case stdAc::fanspeed_t::kMax:
+      return kPanasonicAcFanMax;
+    default:
+      return kPanasonicAcFanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+      return kPanasonicAcSwingVUp;
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return kPanasonicAcSwingVDown;
+    default:
+      return kPanasonicAcSwingVAuto;
+  }
+}
+
+// Convert a standard A/C horizontal swing into its native setting.
+uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kLeftMax:
+      return kPanasonicAcSwingHFullLeft;
+    case stdAc::swingh_t::kLeft:
+      return kPanasonicAcSwingHLeft;
+    case stdAc::swingh_t::kMiddle:
+      return kPanasonicAcSwingHMiddle;
+    case stdAc::swingh_t::kRight:
+    return kPanasonicAcSwingHRight;
+    case stdAc::swingh_t::kRightMax:
+      return kPanasonicAcSwingHFullRight;
+    default:
+      return kPanasonicAcSwingHAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRPanasonicAc::toString() {

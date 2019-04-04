@@ -125,7 +125,7 @@ ir_RC5_RC6.o : $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_RC5_RC6.cpp
 
 ir_Panasonic.o : $(USER_DIR)/ir_Panasonic.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Panasonic.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Panasonic.cpp
 
 ir_Dish.o : $(USER_DIR)/ir_Dish.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Dish.cpp
