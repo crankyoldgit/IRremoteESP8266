@@ -176,7 +176,7 @@ ir_Haier.o : $(USER_DIR)/ir_Haier.cpp $(USER_DIR)/ir_Haier.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Haier.cpp
 
 ir_Hitachi.o : $(USER_DIR)/ir_Hitachi.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Hitachi.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Hitachi.cpp
 
 ir_GICable.o : $(USER_DIR)/ir_GICable.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_GICable.cpp

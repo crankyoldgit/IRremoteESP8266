@@ -5,6 +5,7 @@
 #include "ir_Fujitsu.h"
 #include "ir_Gree.h"
 #include "ir_Haier.h"
+#include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
 #include "IRac.h"
 #include "IRrecv.h"
@@ -251,6 +252,32 @@ TEST(TestIRac, HaierYrwo2) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(HAIER_AC_YRW02, ac._irsend.capture.decode_type);
   ASSERT_EQ(kHaierACYRW02Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Hitachi) {
+  IRHitachiAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 2 (AUTO), Temp: 22C, Fan: 3 (UNKNOWN), "
+      "Swing (Vertical): Off, Swing (Horizontal): On";
+
+  ac.begin();
+  irac.hitachi(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kAuto,      // Mode
+               22,                          // Celsius
+               stdAc::fanspeed_t::kMedium,  // Fan speed
+               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingh_t::kAuto);     // Horizontal swing
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

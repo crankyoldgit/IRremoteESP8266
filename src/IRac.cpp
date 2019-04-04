@@ -19,6 +19,7 @@
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Haier.h"
+#include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
@@ -253,6 +254,29 @@ void IRac::haierYrwo2(IRHaierACYRW02 *ac,
 }
 #endif  // SEND_HAIER_AC_YRW02
 
+#if SEND_HITACHI_AC
+void IRac::hitachi(IRHitachiAc *ac,
+                   bool on, stdAc::opmode_t mode, float degrees,
+                   stdAc::fanspeed_t fan,
+                   stdAc::swingv_t swingv, stdAc::swingh_t swingh) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingHorizontal(swingh != stdAc::swingh_t::kOff);
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_HITACHI_AC
+
 #if SEND_KELVINATOR
 void IRac::kelvinator(IRKelvinatorAC *ac,
                       bool on, stdAc::opmode_t mode, float degrees,
@@ -388,6 +412,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02
+#if SEND_HITACHI_AC
+    case HITACHI_AC:
+    {
+      IRHitachiAc ac(_pin);
+      ac.begin();
+      hitachi(&ac, on, mode, degC, fan, swingv, swingh);
+      break;
+    }
+#endif  // SEND_HITACHI_AC
 #if SEND_KELVINATOR
     case KELVINATOR:
     {
