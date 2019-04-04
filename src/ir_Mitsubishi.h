@@ -12,6 +12,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
 //    M M M    I     T    S      U   U  B   B    I    S      H   H    I
@@ -89,13 +92,21 @@ class IRMitsubishiAC {
   void setStopClock(uint8_t clock);
   uint8_t getTimer();
   void setTimer(uint8_t timer);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
 #ifdef ARDUINO
   String timeToString(uint64_t time);
 #else
@@ -103,7 +114,6 @@ class IRMitsubishiAC {
 #endif
   uint8_t remote_state[kMitsubishiACStateLength];
   void checksum();
-  IRsend _irsend;
 };
 
 #endif  // IR_MITSUBISHI_H_

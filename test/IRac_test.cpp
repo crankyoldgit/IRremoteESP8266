@@ -8,6 +8,7 @@
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
+#include "ir_Mitsubishi.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -336,5 +337,31 @@ TEST(TestIRac, Midea) {
   ASSERT_EQ(MIDEA, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMideaBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.value);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Mitsubishi) {
+  IRMitsubishiAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On (COOL), Temp: 20C, FAN: 2, VANE: AUTO, Time: 14:30, "
+      "On timer: 00:00, Off timer: 00:00, Timer: -";
+
+  ac.begin();
+  irac.mitsubishi(&ac,
+                  true,                        // Power
+                  stdAc::opmode_t::kCool,      // Mode
+                  20,                          // Celsius
+                  stdAc::fanspeed_t::kMedium,  // Fan speed
+                  stdAc::swingv_t::kOff,       // Veritcal swing
+                  false,                       // Silent
+                  14 * 60 + 35);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MITSUBISHI_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiACBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

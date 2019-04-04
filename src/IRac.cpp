@@ -22,6 +22,7 @@
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
+#include "ir_Mitsubishi.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -325,6 +326,29 @@ void IRac::midea(IRMideaAC *ac,
 }
 #endif  // SEND_MIDEA
 
+#if SEND_MITSUBISHI_AC
+void IRac::mitsubishi(IRMitsubishiAC *ac,
+                      bool on, stdAc::opmode_t mode, float degrees,
+                      stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                      bool quiet, int16_t clock) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setVane(ac->convertSwingV(swingv));
+  // No Horizontal swing setting available.
+  if (quiet) ac->setFan(kMitsubishiAcFanSilent);
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  if (clock >= 0) ac->setClock(clock / 10);  // Clock is in 10 min increments.
+  ac->send();
+}
+#endif  // SEND_MITSUBISHI_AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -463,6 +487,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_MIDEA
+#if SEND_MITSUBISHI_AC
+    case MITSUBISHI_AC:
+    {
+      IRMitsubishiAC ac(_pin);
+      ac.begin();
+      mitsubishi(&ac, on, mode, degC, fan, swingv, quiet, clock);
+      break;
+    }
+#endif  // SEND_MITSUBISHI_AC
     default:
       return false;  // Fail, didn't match anything.
   }

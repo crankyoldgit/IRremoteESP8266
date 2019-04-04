@@ -175,16 +175,14 @@ class IRKelvinatorAC {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kKelvinatorStateLength];
   void checksum(const uint16_t length = kKelvinatorStateLength);
   void fixup();
-#ifdef UNIT_TEST
-  IRsendTest _irsend;
-#else
-  IRsend _irsend;
-#endif
 };
 
 #endif  // IR_KELVINATOR_H_

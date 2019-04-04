@@ -258,7 +258,7 @@ ir_LG_test : $(COMMON_OBJ) ir_LG_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Mitsubishi.o : $(USER_DIR)/ir_Mitsubishi.h $(USER_DIR)/ir_Mitsubishi.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Mitsubishi.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Mitsubishi.cpp
 
 ir_Mitsubishi_test.o : ir_Mitsubishi_test.cpp $(USER_DIR)/ir_Mitsubishi.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Mitsubishi_test.cpp

@@ -19,6 +19,7 @@
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
+#include "ir_Mitsubishi.h"
 
 class IRac {
  public:
@@ -106,5 +107,11 @@ class IRac {
              bool on, stdAc::opmode_t mode, float degrees,
              stdAc::fanspeed_t fan, int16_t sleep);
 #endif  // SEND_MIDEA
+#if SEND_MITSUBISHI_AC
+  void mitsubishi(IRMitsubishiAC *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                  bool quiet, int16_t clock = -1);
+#endif  // SEND_MITSUBISHI_AC
 };
 #endif  // IRAC_H_

@@ -615,6 +615,52 @@ void IRMitsubishiAC::setTimer(uint8_t timer) {
   remote_state[13] = timer & 0b111;
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRMitsubishiAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kMitsubishiAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kMitsubishiAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kMitsubishiAcDry;
+    default:
+      return kMitsubishiAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kMitsubishiAcFanSilent;
+    case stdAc::fanspeed_t::kLow:
+      return kMitsubishiAcFanRealMax - 3;
+    case stdAc::fanspeed_t::kMedium:
+      return kMitsubishiAcFanRealMax - 2;
+    case stdAc::fanspeed_t::kHigh:
+      return kMitsubishiAcFanRealMax - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kMitsubishiAcFanRealMax;
+    default:
+      return kMitsubishiAcFanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return kMitsubishiAcVaneAutoMove;
+    default:
+      return kMitsubishiAcVaneAuto;
+  }
+}
+
 #ifdef ARDUINO
 String IRMitsubishiAC::timeToString(uint64_t time) {
   String result = "";

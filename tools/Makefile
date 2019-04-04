@@ -113,7 +113,7 @@ ir_LG.o : $(USER_DIR)/ir_LG.h $(USER_DIR)/ir_LG.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_LG.cpp
 
 ir_Mitsubishi.o : $(USER_DIR)/ir_Mitsubishi.h $(USER_DIR)/ir_Mitsubishi.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Mitsubishi.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Mitsubishi.cpp
 
 ir_Fujitsu.o : $(USER_DIR)/ir_Fujitsu.h $(USER_DIR)/ir_Fujitsu.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Fujitsu.cpp
