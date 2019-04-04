@@ -635,7 +635,6 @@ uint8_t IRDaikinESP::convertFan(stdAc::fanspeed_t speed) {
 }
 
 #if DECODE_DAIKIN
-
 void addbit(bool val, unsigned char data[]) {
   uint8_t curbit = data[kDaikinCurBit];
   uint8_t curindex = data[kDaikinCurIndex];

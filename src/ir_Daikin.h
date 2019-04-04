@@ -244,6 +244,9 @@ class IRDaikinESP {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   // # of bytes per command
   uint8_t daikin[kDaikinStateLength];
@@ -252,11 +255,6 @@ class IRDaikinESP {
   void setBit(uint8_t byte, uint8_t bitmask);
   void clearBit(uint8_t byte, uint8_t bitmask);
   uint8_t getBit(uint8_t byte, uint8_t bitmask);
-#ifndef UNIT_TEST
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
 };
 
 // Class to emulate a Daikin ARC477A1 remote.
@@ -341,6 +339,9 @@ class IRDaikin2 {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin2StateLength];
@@ -348,11 +349,6 @@ class IRDaikin2 {
   void checksum();
   void clearOnTimerFlag();
   void clearSleepTimerFlag();
-#ifndef UNIT_TEST
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
 };
 
 #endif  // IR_DAIKIN_H_

@@ -438,7 +438,7 @@ ir_Carrier_test : $(COMMON_OBJ) ir_Carrier_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Haier.o : $(USER_DIR)/ir_Haier.cpp $(USER_DIR)/ir_Haier.h $(COMMON_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Haier.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Haier.cpp
 
 ir_Haier_test.o : ir_Haier_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Haier_test.cpp
@@ -510,7 +510,7 @@ ir_MWM_test : $(COMMON_OBJ) ir_MWM_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Vestel.o : $(USER_DIR)/ir_Vestel.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Vestel.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Vestel.cpp
 
 ir_Vestel_test.o : ir_Vestel_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Vestel_test.cpp

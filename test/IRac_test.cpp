@@ -4,6 +4,7 @@
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
 #include "ir_Gree.h"
+#include "ir_Haier.h"
 #include "ir_Kelvinator.h"
 #include "IRac.h"
 #include "IRrecv.h"
@@ -194,6 +195,34 @@ TEST(TestIRac, Gree) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(GREE, ac._irsend.capture.decode_type);
   ASSERT_EQ(kGreeBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Haier) {
+  IRHaierAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Command: 1 (On), Mode: 3 (HEAT), Temp: 24C, Fan: 2, Swing: 1 (Up), "
+      "Sleep: On, Health: On, Current Time: 13:45, On Timer: Off, "
+      "Off Timer: Off";
+
+  ac.begin();
+  irac.haier(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kCool,      // Mode
+             24,                          // Celsius
+             stdAc::fanspeed_t::kMedium,  // Fan speed
+             stdAc::swingv_t::kHigh,      // Veritcal swing
+             true,                        // Filter
+             8 * 60 + 0,                  // Sleep time
+             13 * 60 + 45);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHaierACBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

@@ -18,6 +18,7 @@
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
+#include "ir_Haier.h"
 #include "ir_Kelvinator.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
@@ -204,6 +205,32 @@ void IRac::gree(IRGreeAC *ac,
 }
 #endif  // SEND_GREE
 
+#if SEND_HAIER_AC
+void IRac::haier(IRHaierAC *ac,
+                 bool on, stdAc::opmode_t mode, float degrees,
+                 stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                 bool filter, int16_t sleep, int16_t clock) {
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(ac->convertSwingV(swingv));
+  // No Horizontal Swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  ac->setHealth(filter);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  if (clock >=0) ac->setCurrTime(clock);
+  if (on)
+    ac->setCommand(kHaierAcCmdOn);
+  else
+    ac->setCommand(kHaierAcCmdOff);
+  ac->send();
+}
+#endif  // SEND_HAIER_AC
+
 #if SEND_KELVINATOR
 void IRac::kelvinator(IRKelvinatorAC *ac,
                       bool on, stdAc::opmode_t mode, float degrees,
@@ -321,6 +348,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_GREE
+#if SEND_HAIER_AC
+    case HAIER_AC:
+    {
+      IRHaierAC ac(_pin);
+      ac.begin();
+      haier(&ac, on, mode, degC, fan, swingv, filter, sleep, clock);
+      break;
+    }
+#endif  // SEND_HAIER_AC
 #if SEND_KELVINATOR
     case KELVINATOR:
     {
