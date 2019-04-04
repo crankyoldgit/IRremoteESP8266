@@ -257,6 +257,39 @@ void IRMideaAC::checksum() {
   remote_state |= calcChecksum(remote_state);
 }
 
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kMideaACCool;
+    case stdAc::opmode_t::kHeat:
+      return kMideaACHeat;
+    case stdAc::opmode_t::kDry:
+      return kMideaACDry;
+    case stdAc::opmode_t::kFan:
+      return kMideaACFan;
+    default:
+      return kMideaACAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kMideaACFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kMideaACFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kMideaACFanHigh;
+    default:
+      return kMideaACFanAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRMideaAC::toString() {

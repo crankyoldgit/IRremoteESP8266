@@ -7,6 +7,7 @@
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
+#include "ir_Midea.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -311,5 +312,29 @@ TEST(TestIRac, Kelvinator) {
   ASSERT_EQ(KELVINATOR, ac._irsend.capture.decode_type);
   ASSERT_EQ(kKelvinatorBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Midea) {
+  IRMideaAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (DRY), Temp: 27C/81F, Fan: 2 (MED), Sleep: On";
+
+  ac.begin();
+  irac.midea(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kDry,       // Mode
+             27,                          // Celsius
+             stdAc::fanspeed_t::kMedium,  // Fan speed
+             8 * 60 + 0);                 // Sleep time
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MIDEA, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMideaBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.value);
   ASSERT_EQ(expected, ac.toString());
 }

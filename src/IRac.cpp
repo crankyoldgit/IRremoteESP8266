@@ -21,6 +21,7 @@
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
+#include "ir_Midea.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -302,6 +303,28 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 }
 #endif  // SEND_KELVINATOR
 
+#if SEND_MIDEA
+void IRac::midea(IRMideaAC *ac,
+                 bool on, stdAc::opmode_t mode, float degrees,
+                 stdAc::fanspeed_t fan, int16_t sleep) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, true);  // true means use Celsius.
+  ac->setFan(ac->convertFan(fan));
+  // No Vertical swing setting available.
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_MIDEA
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -431,6 +454,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_KELVINATOR
+#if SEND_MIDEA
+    case MIDEA:
+    {
+      IRMideaAC ac(_pin);
+      ac.begin();
+      midea(&ac, on, mode, degC, fan, sleep);
+      break;
+    }
+#endif  // SEND_MIDEA
     default:
       return false;  // Fail, didn't match anything.
   }

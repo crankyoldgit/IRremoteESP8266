@@ -18,6 +18,7 @@
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
+#include "ir_Midea.h"
 
 class IRac {
  public:
@@ -75,22 +76,22 @@ class IRac {
             bool turbo, bool light, bool clean, int16_t sleep);
 #endif  // SEND_GREE
 #if SEND_HAIER_AC
-void haier(IRHaierAC *ac,
-           bool on, stdAc::opmode_t mode, float degrees,
-           stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
-           bool filter, int16_t sleep = -1, int16_t clock = -1);
+  void haier(IRHaierAC *ac,
+             bool on, stdAc::opmode_t mode, float degrees,
+             stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+             bool filter, int16_t sleep = -1, int16_t clock = -1);
 #endif  // SEND_HAIER_AC
 #if SEND_HAIER_AC_YRW02
-void haierYrwo2(IRHaierACYRW02 *ac,
-                bool on, stdAc::opmode_t mode, float degrees,
-                stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
-                bool turbo, bool filter, int16_t sleep = -1);
+  void haierYrwo2(IRHaierACYRW02 *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                  bool turbo, bool filter, int16_t sleep = -1);
 #endif  // SEND_HAIER_AC_YRW02
 #if SEND_HITACHI_AC
-void hitachi(IRHitachiAc *ac,
-             bool on, stdAc::opmode_t mode, float degrees,
-             stdAc::fanspeed_t fan,
-             stdAc::swingv_t swingv, stdAc::swingh_t swingh);
+  void hitachi(IRHitachiAc *ac,
+               bool on, stdAc::opmode_t mode, float degrees,
+               stdAc::fanspeed_t fan,
+               stdAc::swingv_t swingv, stdAc::swingh_t swingh);
 #endif  // SEND_HITACHI_AC
 #if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,
@@ -100,5 +101,10 @@ void hitachi(IRHitachiAc *ac,
                   bool quiet, bool turbo, bool light,
                   bool filter, bool clean);
 #endif  // SEND_KELVINATOR
+#if SEND_MIDEA
+  void midea(IRMideaAC *ac,
+             bool on, stdAc::opmode_t mode, float degrees,
+             stdAc::fanspeed_t fan, int16_t sleep);
+#endif  // SEND_MIDEA
 };
 #endif  // IRAC_H_

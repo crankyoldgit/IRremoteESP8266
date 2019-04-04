@@ -161,7 +161,7 @@ ir_Toshiba.o : $(USER_DIR)/ir_Toshiba.h $(USER_DIR)/ir_Toshiba.cpp $(COMMON_DEPS
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Toshiba.cpp
 
 ir_Midea.o : $(USER_DIR)/ir_Midea.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Midea.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Midea.cpp
 
 ir_Magiquest.o : $(USER_DIR)/ir_Magiquest.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Magiquest.cpp
