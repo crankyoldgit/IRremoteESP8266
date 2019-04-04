@@ -113,7 +113,7 @@
  * This server will send (back) what ever IR message it just transmitted to
  * the MQTT topic 'ir_server/sent' to confirm it has been performed. This works
  * for messages requested via MQTT or via HTTP.
-
+ *
  *   Unix command line usage example:
  *     # Listen to MQTT acknowledgements.
  *     $ mosquitto_sub -h 10.0.0.4 -t ir_server/sent
@@ -131,8 +131,8 @@
  *     # Listen via MQTT for IR messages captured by this server.
  *     $ mosquitto_sub -h 10.0.0.4 -t ir_server/received
  *
- * Note: General status/error messages are also sent to 'ir_server/status' from
- * time to time.
+ * Note: General logging messages are also sent to 'ir_server/log' from
+ *       time to time.
  *
  * If DEBUG is turned on, there is additional information printed on the Serial
  * Port.
@@ -239,10 +239,10 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
                              // independent of the hostname.
-#define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
-#define MQTTcommand MQTTprefix "/send"  // Topic we get new commands from.
+#define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on.
+#define MQTTcommand MQTTprefix "/send"   // Topic we get new commands from.
 #define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
-#define MQTTlog MQTTprefix "/log"  // Topic we send log messages to.
+#define MQTTlog MQTTprefix "/log"        // Topic we send log messages to.
 #define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
 #endif  // MQTT_ENABLE
 
