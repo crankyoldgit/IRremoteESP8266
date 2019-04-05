@@ -28,6 +28,7 @@
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
+#include "ir_Trotec.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -484,6 +485,28 @@ void IRac::toshiba(IRToshibaAC *ac,
 }
 #endif  // SEND_TOSHIBA_AC
 
+#if SEND_TROTEC
+void IRac::trotec(IRTrotecESP *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan, int16_t sleep) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setSpeed(ac->convertFan(fan));
+  // No Vertical swing setting available.
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_TROTEC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -678,6 +701,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_TOSHIBA_AC
+#if SEND_TROTEC
+    case TROTEC:
+    {
+      IRTrotecESP ac(_pin);
+      ac.begin();
+      trotec(&ac, on, mode, degC, fan, sleep);
+      break;
+    }
+#endif  // SEND_TROTEC
     default:
       return false;  // Fail, didn't match anything.
   }

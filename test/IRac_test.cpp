@@ -14,6 +14,7 @@
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
+#include "ir_Trotec.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -553,4 +554,22 @@ TEST(TestIRac, Toshiba) {
   ASSERT_EQ(kToshibaACBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Trotec) {
+  IRTrotecESP ac(0);
+  IRac irac(0);
+
+  ac.begin();
+  irac.trotec(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kCool,      // Mode
+              18,                          // Celsius
+              stdAc::fanspeed_t::kHigh,    // Fan speed
+              8 * 60 + 17);                // Sleep
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(kTrotecCool, ac.getMode());
+  EXPECT_EQ(18, ac.getTemp());
+  EXPECT_EQ(kTrotecFanHigh, ac.getSpeed());
+  EXPECT_TRUE(ac.getSleep());
 }

@@ -25,6 +25,7 @@
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
+#include "ir_Trotec.h"
 
 class IRac {
  public:
@@ -149,5 +150,10 @@ class IRac {
                bool on, stdAc::opmode_t mode, float degrees,
                stdAc::fanspeed_t fan);
 #endif  // SEND_TOSHIBA_AC
+#if SEND_TROTEC
+  void trotec(IRTrotecESP *ac,
+              bool on, stdAc::opmode_t mode, float degrees,
+              stdAc::fanspeed_t fan, int16_t sleep = -1);
+#endif  // SEND_TROTEC
 };
 #endif  // IRAC_H_
