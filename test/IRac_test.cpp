@@ -10,6 +10,7 @@
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
+#include "ir_Samsung.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -419,4 +420,59 @@ TEST(TestIRac, Panasonic) {
   ASSERT_EQ(kPanasonicAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected_dke, ac.toString());
+}
+
+TEST(TestIRac, Samsung) {
+  IRSamsungAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 0 (AUTO), Temp: 28C, Fan: 6 (AUTO), Swing: On, "
+      "Beep: On, Clean: On, Quiet: On";
+
+  ac.begin();
+  irac.samsung(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kAuto,      // Mode
+               28,                          // Celsius
+               stdAc::fanspeed_t::kMedium,  // Fan speed
+               stdAc::swingv_t::kAuto,      // Veritcal swing
+               true,                        // Quiet
+               false,                       // Turbo
+               true,                        // Clean
+               true,                        // Beep
+               false);                      // with the Hack Off
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kSamsungAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+
+
+  ac._irsend.reset();
+  irac.samsung(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kAuto,      // Mode
+               28,                          // Celsius
+               stdAc::fanspeed_t::kMedium,  // Fan speed
+               stdAc::swingv_t::kAuto,      // Veritcal swing
+               true,                        // Quiet
+               false,                       // Turbo
+               true,                        // Clean
+               true,                        // Beep
+               true);                       // with the Hack On
+  ASSERT_EQ(expected, ac.toString());  // Class should be in the desired mode.
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  // However, we expect a plain "on" state as it should be sent before the
+  // desired state.
+  char expected_on[] =
+      "Power: On, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off";
+  ASSERT_EQ(expected_on, ac.toString());
 }

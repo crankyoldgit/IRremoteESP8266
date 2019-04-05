@@ -98,7 +98,7 @@ ir_Sony.o : $(USER_DIR)/ir_Sony.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sony.cpp
 
 ir_Samsung.o : $(USER_DIR)/ir_Samsung.cpp $(USER_DIR)/ir_Samsung.h $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Samsung.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Samsung.cpp
 
 ir_Kelvinator.o : $(USER_DIR)/ir_Kelvinator.cpp $(USER_DIR)/ir_Kelvinator.h $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Kelvinator.cpp

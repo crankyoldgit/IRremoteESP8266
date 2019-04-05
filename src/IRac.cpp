@@ -24,6 +24,7 @@
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
+#include "ir_Samsung.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -376,6 +377,41 @@ void IRac::panasonic(IRPanasonicAc *ac, panasonic_ac_remote_model_t model,
 }
 #endif  // SEND_PANASONIC_AC
 
+#if SEND_SAMSUNG_AC
+void IRac::samsung(IRSamsungAc *ac,
+                   bool on, stdAc::opmode_t mode, float degrees,
+                   stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                   bool quiet, bool turbo, bool clean, bool beep,
+                   bool sendOnOffHack) {
+  if (sendOnOffHack) {
+    // Use a hack to for the unit on or off.
+    // See: https://github.com/markszabo/IRremoteESP8266/issues/604#issuecomment-475020036
+    if (on)
+      ac->sendOn();
+    else
+      ac->sendOff();
+  }
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  // No Horizontal swing setting available.
+  ac->setQuiet(quiet);
+  if (turbo) ac->setFan(kSamsungAcFanTurbo);
+  // No Light setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  ac->setClean(clean);
+  ac->setBeep(beep);
+  // No Sleep setting available.
+  // No Clock setting available.
+  // Do setMode() again as it can affect fan speed.
+  ac->setMode(ac->convertMode(mode));
+  ac->send();
+}
+#endif  // SEND_SAMSUNG_AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -533,6 +569,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_PANASONIC_AC
+#if SEND_SAMSUNG_AC
+    case SAMSUNG_AC:
+    {
+      IRSamsungAc ac(_pin);
+      ac.begin();
+      samsung(&ac, on, mode, degC, fan, swingv, quiet, turbo, clean, beep);
+      break;
+    }
+#endif  // SEND_SAMSUNG_AC
     default:
       return false;  // Fail, didn't match anything.
   }

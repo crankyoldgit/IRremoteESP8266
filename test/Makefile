@@ -213,7 +213,7 @@ ir_Sony_test : $(COMMON_OBJ) ir_Sony_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Samsung.o : $(USER_DIR)/ir_Samsung.cpp $(USER_DIR)/ir_Samsung.h $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Samsung.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Samsung.cpp
 
 ir_Samsung_test.o : ir_Samsung_test.cpp $(USER_DIR)/ir_Samsung.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Samsung_test.cpp

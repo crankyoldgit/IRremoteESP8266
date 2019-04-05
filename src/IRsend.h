@@ -139,9 +139,9 @@ class IRsend {
                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SAMSUNG_AC
-  void sendSamsungAC(unsigned char data[],
-                     uint16_t nbytes = kSamsungAcStateLength,
-                     uint16_t repeat = kSamsungAcDefaultRepeat);
+  void sendSamsungAC(const unsigned char data[],
+                     const uint16_t nbytes = kSamsungAcStateLength,
+                     const uint16_t repeat = kSamsungAcDefaultRepeat);
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,

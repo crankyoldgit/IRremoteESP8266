@@ -301,7 +301,8 @@ bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
-void IRsend::sendSamsungAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
+void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
   if (nbytes < kSamsungAcStateLength && nbytes % kSamsungACSectionLength)
     return;  // Not an appropriate number of bytes to send a proper message.
 
@@ -385,9 +386,7 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
   _irsend.sendSamsungAC(remote_state, kSamsungAcStateLength, repeat);
 }
-#endif  // SEND_SAMSUNG_AC
 
-#if SEND_SAMSUNG_AC
 // Use this for when you need to power on/off the device.
 // Samsung A/C requires an extended length message when you want to
 // change the power operating mode of the A/C unit.
@@ -405,6 +404,28 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   // extended_state[8] seems special. This is a guess on how to calculate it.
   extended_state[8] = (extended_state[1] & 0x9F) | 0x40;
   // Send it.
+  _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
+}
+
+// Send the special extended "On" message as the library can't seem to reproduce
+// this message automatically.
+// See: https://github.com/markszabo/IRremoteESP8266/issues/604#issuecomment-475020036
+void IRSamsungAc::sendOn(const uint16_t repeat) {
+  const uint8_t extended_state[21] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xE2, 0xFE, 0x71, 0x80, 0x11, 0xF0};
+  _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
+}
+
+// Send the special extended "Off" message as the library can't seem to
+// reproduce this message automatically.
+// See: https://github.com/markszabo/IRremoteESP8266/issues/604#issuecomment-475020036
+void IRSamsungAc::sendOff(const uint16_t repeat) {
+  const uint8_t extended_state[21] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0x02, 0xFF, 0x71, 0x80, 0x11, 0xC0};
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
 }
 #endif  // SEND_SAMSUNG_AC
@@ -553,6 +574,39 @@ void IRSamsungAc::setQuiet(const bool state) {
     setFan(kSamsungAcFanAuto);  // Quiet mode seems to set fan speed to auto.
   } else {
     remote_state[11] &= ~kSamsungAcQuietMask11;
+  }
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kSamsungAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kSamsungAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kSamsungAcDry;
+    case stdAc::opmode_t::kFan:
+      return kSamsungAcFan;
+    default:
+      return kSamsungAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kSamsungAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kSamsungAcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+      return kSamsungAcFanHigh;
+    case stdAc::fanspeed_t::kMax:
+      return kSamsungAcFanTurbo;
+    default:
+      return kSamsungAcFanAuto;
   }
 }
 

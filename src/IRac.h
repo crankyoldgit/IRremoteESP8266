@@ -21,6 +21,7 @@
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
+#include "ir_Samsung.h"
 
 class IRac {
  public:
@@ -121,5 +122,12 @@ class IRac {
                  stdAc::swingv_t swingv, stdAc::swingh_t swingh,
                  bool quiet, bool turbo, int16_t clock = -1);
 #endif  // SEND_PANASONIC_AC
+#if SEND_SAMSUNG_AC
+void samsung(IRSamsungAc *ac,
+             bool on, stdAc::opmode_t mode, float degrees,
+             stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+             bool quiet, bool turbo, bool clean, bool beep,
+             bool sendOnOffHack = true);
+#endif  // SEND_SAMSUNG_AC
 };
 #endif  // IRAC_H_

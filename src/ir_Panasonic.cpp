@@ -618,7 +618,6 @@ std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
   return result + uint64ToString(mins);
 }
 
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
