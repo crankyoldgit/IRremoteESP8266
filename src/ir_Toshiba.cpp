@@ -233,6 +233,39 @@ void IRToshibaAC::setMode(uint8_t mode) {
   }
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRToshibaAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kToshibaAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kToshibaAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kToshibaAcDry;
+    // No Fan mode.
+    default:
+      return kToshibaAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRToshibaAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kToshibaAcFanMax - 4;
+    case stdAc::fanspeed_t::kLow:
+      return kToshibaAcFanMax - 3;
+    case stdAc::fanspeed_t::kMedium:
+      return kToshibaAcFanMax - 2;
+    case stdAc::fanspeed_t::kHigh:
+      return kToshibaAcFanMax - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kToshibaAcFanMax;
+    default:
+      return kToshibaAcFanAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRToshibaAC::toString() {

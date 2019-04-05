@@ -27,6 +27,7 @@
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
+#include "ir_Toshiba.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -461,6 +462,28 @@ void IRac::teco(IRTecoAc *ac,
 }
 #endif  // SEND_TECO
 
+#if SEND_TOSHIBA_AC
+void IRac::toshiba(IRToshibaAC *ac,
+                   bool on, stdAc::opmode_t mode, float degrees,
+                   stdAc::fanspeed_t fan) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Vertical swing setting available.
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_TOSHIBA_AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -646,6 +669,15 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_TECO
+#if SEND_TOSHIBA_AC
+    case TOSHIBA_AC:
+    {
+      IRToshibaAC ac(_pin);
+      ac.begin();
+      toshiba(&ac, on, mode, degC, fan);
+      break;
+    }
+#endif  // SEND_TOSHIBA_AC
     default:
       return false;  // Fail, didn't match anything.
   }

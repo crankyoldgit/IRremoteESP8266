@@ -393,7 +393,7 @@ ir_Nikai_test : $(COMMON_OBJ) ir_Nikai_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Toshiba.o : $(USER_DIR)/ir_Toshiba.cpp $(USER_DIR)/ir_Toshiba.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Toshiba.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Toshiba.cpp
 
 ir_Toshiba_test.o : ir_Toshiba_test.cpp $(USER_DIR)/ir_Toshiba.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Toshiba_test.cpp

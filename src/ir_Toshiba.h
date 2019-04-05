@@ -11,6 +11,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //     TTTTTTT  OOOOO   SSSSS  HH   HH IIIII BBBBB     AAA
 //       TTT   OO   OO SS      HH   HH  III  BB   B   AAAAA
@@ -65,6 +68,8 @@ class IRToshibaAC {
   uint8_t* getRaw();
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kToshibaACStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
@@ -73,13 +78,15 @@ class IRToshibaAC {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   uint8_t remote_state[kToshibaACStateLength];
   void checksum(const uint16_t length = kToshibaACStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kToshibaACStateLength);
   uint8_t mode_state;
-  IRsend _irsend;
 };
 
 #endif  // IR_TOSHIBA_H_

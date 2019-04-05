@@ -24,6 +24,7 @@
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
+#include "ir_Toshiba.h"
 
 class IRac {
  public:
@@ -125,23 +126,28 @@ class IRac {
                  bool quiet, bool turbo, int16_t clock = -1);
 #endif  // SEND_PANASONIC_AC
 #if SEND_SAMSUNG_AC
-void samsung(IRSamsungAc *ac,
-             bool on, stdAc::opmode_t mode, float degrees,
-             stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
-             bool quiet, bool turbo, bool clean, bool beep,
-             bool sendOnOffHack = true);
+  void samsung(IRSamsungAc *ac,
+               bool on, stdAc::opmode_t mode, float degrees,
+               stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+               bool quiet, bool turbo, bool clean, bool beep,
+               bool sendOnOffHack = true);
 #endif  // SEND_SAMSUNG_AC
 #if SEND_TCL112AC
-void tcl112(IRTcl112Ac *ac,
-            bool on, stdAc::opmode_t mode, float degrees,
-            stdAc::fanspeed_t fan,
-            stdAc::swingv_t swingv, stdAc::swingh_t swingh,
-            bool turbo, bool light, bool econo, bool filter);
+  void tcl112(IRTcl112Ac *ac,
+              bool on, stdAc::opmode_t mode, float degrees,
+              stdAc::fanspeed_t fan,
+              stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+              bool turbo, bool light, bool econo, bool filter);
 #endif  // SEND_TCL112AC
 #if SEND_TECO
-void teco(IRTecoAc *ac,
-          bool on, stdAc::opmode_t mode, float degrees,
-          stdAc::fanspeed_t fan, stdAc::swingv_t swingv, int16_t sleep = -1);
+  void teco(IRTecoAc *ac,
+            bool on, stdAc::opmode_t mode, float degrees,
+            stdAc::fanspeed_t fan, stdAc::swingv_t swingv, int16_t sleep = -1);
 #endif  // SEND_TECO
+#if SEND_TOSHIBA_AC
+  void toshiba(IRToshibaAC *ac,
+               bool on, stdAc::opmode_t mode, float degrees,
+               stdAc::fanspeed_t fan);
+#endif  // SEND_TOSHIBA_AC
 };
 #endif  // IRAC_H_

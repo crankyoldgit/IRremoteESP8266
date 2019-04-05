@@ -12,6 +12,8 @@
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
+#include "ir_Teco.h"
+#include "ir_Toshiba.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -507,7 +509,6 @@ TEST(TestIRac, Tcl112) {
   ASSERT_EQ(expected, ac.toString());
 }
 
-
 TEST(TestIRac, Teco) {
   IRTecoAc ac(0);
   IRac irac(0);
@@ -530,5 +531,26 @@ TEST(TestIRac, Teco) {
   ASSERT_EQ(TECO, ac._irsend.capture.decode_type);
   ASSERT_EQ(kTecoBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.value);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Toshiba) {
+  IRToshibaAC ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] = "Power: On, Mode: 2 (DRY), Temp: 29C, Fan: 2";
+
+  ac.begin();
+  irac.toshiba(&ac,
+               true,                      // Power
+               stdAc::opmode_t::kDry,     // Mode
+               29,                        // Celsius
+               stdAc::fanspeed_t::kLow);  // Fan speed
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TOSHIBA_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kToshibaACBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }
