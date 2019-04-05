@@ -13,6 +13,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //                 VV     VV  EEEEEEE   SSSSS  TTTTTTTT  EEEEEEE  LL
 //                 VV     VV  EE       S          TT     EE       LL
@@ -100,6 +103,8 @@ const uint8_t kVestelAcOffTimerFlagOffset = kVestelAcHourOffset + 6;
 const uint8_t kVestelAcTimerFlagOffset = kVestelAcHourOffset + 7;
 const uint8_t kVestelAcMinuteOffset = 44;
 
+const uint64_t kVestelAcStateDefault = 0x0F00D9001FEF201ULL;
+const uint64_t kVestelAcTimeStateDefault = 0x201ULL;
 
 class IRVestelAc {
  public:
@@ -149,18 +154,24 @@ class IRVestelAc {
   bool isTimerActive(void);
   void setTimerActive(const bool on);
   static uint8_t calcChecksum(const uint64_t state);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   uint64_t remote_state;
   uint64_t remote_time_state;
   bool use_time_state;
   void checksum();
-  IRsend _irsend;
 };
 
 #endif  // IR_VESTEL_H_

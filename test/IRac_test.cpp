@@ -15,6 +15,7 @@
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
+#include "ir_Vestel.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -454,7 +455,6 @@ TEST(TestIRac, Samsung) {
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 
-
   ac._irsend.reset();
   irac.samsung(&ac,
                true,                        // Power
@@ -572,4 +572,92 @@ TEST(TestIRac, Trotec) {
   EXPECT_EQ(18, ac.getTemp());
   EXPECT_EQ(kTrotecFanHigh, ac.getSpeed());
   EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestIRac, Vestel) {
+  IRVestelAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 0 (AUTO), Temp: 22C, Fan: 5 (LOW), Sleep: On, "
+      "Turbo: Off, Ion: On, Swing: On";
+
+  ac.begin();
+  irac.vestel(&ac,
+              true,                      // Power
+              stdAc::opmode_t::kAuto,    // Mode
+              22,                        // Celsius
+              stdAc::fanspeed_t::kLow,   // Fan speed
+              stdAc::swingv_t::kHigh,    // Veritcal swing
+              false,                     // Turbo
+              true,                      // Filter
+              8 * 60 + 0);               // Sleep time
+              // 13 * 60 + 45);             // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(VESTEL_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kVestelAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+
+  ac._irsend.reset();
+  char expected_clocks[] =
+      "Time: 13:45, Timer: Off, On Timer: Off, Off Timer: Off";
+
+  ac.begin();
+  irac.vestel(&ac,
+              true,                      // Power
+              stdAc::opmode_t::kAuto,    // Mode
+              22,                        // Celsius
+              stdAc::fanspeed_t::kLow,   // Fan speed
+              stdAc::swingv_t::kHigh,    // Veritcal swing
+              false,                     // Turbo
+              true,                      // Filter
+              8 * 60 + 0,                // Sleep time
+              13 * 60 + 45,              // Clock
+              false);                    // Don't send the normal message.
+                                         // Just for testing purposes.
+  ASSERT_EQ(expected_clocks, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(VESTEL_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kVestelAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected_clocks, ac.toString());
+
+  // Now check it sends both messages during normal operation when the
+  // clock is set.
+  ac._irsend.reset();
+  ac.begin();
+  irac.vestel(&ac,
+              true,                      // Power
+              stdAc::opmode_t::kAuto,    // Mode
+              22,                        // Celsius
+              stdAc::fanspeed_t::kLow,   // Fan speed
+              stdAc::swingv_t::kHigh,    // Veritcal swing
+              false,                     // Turbo
+              true,                      // Filter
+              8 * 60 + 0,                // Sleep time
+              13 * 60 + 45);             // Clock
+
+  EXPECT_EQ(
+      "m3110s9066"
+      "m520s1535m520s480m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s480m520s1535m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s1535m520s1535m520s1535m520s1535m520s480m520s1535m520s480m520s1535"
+      "m520s1535m520s1535m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s480m520s480m520s480m520s480m520s480m520s1535m520s1535m520s480"
+      "m520s1535m520s480m520s1535m520s480m520s480m520s480m520s480m520s480"
+      "m520s480m520s480m520s1535m520s480m520s1535m520s1535m520s1535m520s1535"
+      "m520s100000"
+      "m3110s9066"
+      "m520s1535m520s480m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s480m520s1535m520s480m520s480m520s480m520s1535m520s1535m520s480"
+      "m520s1535m520s1535m520s1535m520s1535m520s480m520s480m520s480m520s480"
+      "m520s480m520s480m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s480m520s480m520s480m520s480m520s1535m520s480m520s1535m520s1535"
+      "m520s480m520s480m520s480m520s480m520s1535m520s480m520s1535m520s1535"
+      "m520s480m520s1535m520s480m520s480m520s480m520s480m520s480m520s480"
+      "m520s100000", ac._irsend.outputStr());
 }
