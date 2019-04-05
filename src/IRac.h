@@ -22,6 +22,7 @@
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Tcl.h"
 
 class IRac {
  public:
@@ -129,5 +130,12 @@ void samsung(IRSamsungAc *ac,
              bool quiet, bool turbo, bool clean, bool beep,
              bool sendOnOffHack = true);
 #endif  // SEND_SAMSUNG_AC
+#if SEND_TCL112AC
+void tcl112(IRTcl112Ac *ac,
+            bool on, stdAc::opmode_t mode, float degrees,
+            stdAc::fanspeed_t fan,
+            stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+            bool turbo, bool light, bool econo, bool filter);
+#endif  // SEND_TCL112AC
 };
 #endif  // IRAC_H_

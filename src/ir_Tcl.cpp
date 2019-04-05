@@ -259,6 +259,38 @@ bool IRTcl112Ac::getTurbo(void) {
   return remote_state[6] & kTcl112AcBitTurbo;
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRTcl112Ac::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kTcl112AcCool;
+    case stdAc::opmode_t::kHeat:
+      return kTcl112AcHeat;
+    case stdAc::opmode_t::kDry:
+      return kTcl112AcDry;
+    case stdAc::opmode_t::kFan:
+      return kTcl112AcFan;
+    default:
+      return kTcl112AcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRTcl112Ac::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kTcl112AcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kTcl112AcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kTcl112AcFanHigh;
+    default:
+      return kTcl112AcFanAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRTcl112Ac::toString() {

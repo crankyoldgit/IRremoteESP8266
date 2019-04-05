@@ -11,6 +11,7 @@
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Tcl.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -475,4 +476,33 @@ TEST(TestIRac, Samsung) {
       "Power: On, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
       "Beep: Off, Clean: Off, Quiet: Off";
   ASSERT_EQ(expected_on, ac.toString());
+}
+
+TEST(TestIRac, Tcl112) {
+  IRTcl112Ac ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 3 (COOL), Temp: 20C, Fan: 3 (Med), Econo: On, "
+      "Health: On, Light: On, Turbo: Off, Swing (H): On, Swing (V): Off";
+
+  ac.begin();
+  irac.tcl112(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kCool,      // Mode
+              20,                          // Celsius
+              stdAc::fanspeed_t::kMedium,  // Fan speed
+              stdAc::swingv_t::kOff,       // Veritcal swing
+              stdAc::swingh_t::kAuto,      // Horizontal swing
+              false,                       // Turbo
+              true,                        // Light
+              true,                        // Econo
+              true);                       // Filter (aka. Health)
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
 }

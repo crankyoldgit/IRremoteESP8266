@@ -25,6 +25,7 @@
 #include "ir_Mitsubishi.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Tcl.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -412,6 +413,31 @@ void IRac::samsung(IRSamsungAc *ac,
 }
 #endif  // SEND_SAMSUNG_AC
 
+#if SEND_TCL112AC
+void IRac::tcl112(IRTcl112Ac *ac,
+                  bool on, stdAc::opmode_t mode, float degrees,
+                  stdAc::fanspeed_t fan,
+                  stdAc::swingv_t swingv, stdAc::swingh_t swingh,
+                  bool turbo, bool light, bool econo, bool filter) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingHorizontal(swingh != stdAc::swingh_t::kOff);
+  // No Quiet setting available.
+  ac->setTurbo(turbo);
+  ac->setLight(light);
+  ac->setEcono(econo);
+  ac->setHealth(filter);
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_TCL112AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -578,6 +604,16 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_SAMSUNG_AC
+#if SEND_TCL112AC
+    case TCL112AC:
+    {
+      IRTcl112Ac ac(_pin);
+      ac.begin();
+      tcl112(&ac, on, mode, degC, fan, swingv, swingh, turbo, light, econo,
+             filter);
+      break;
+    }
+#endif  // SEND_TCL112AC
     default:
       return false;  // Fail, didn't match anything.
   }

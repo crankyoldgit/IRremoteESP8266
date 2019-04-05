@@ -203,7 +203,7 @@ ir_Teco.o : $(USER_DIR)/ir_Teco.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Teco.cpp
 
 ir_Tcl.o : $(USER_DIR)/ir_Tcl.cpp $(USER_DIR)/ir_Tcl.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Tcl.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(INCLUDES) $(USER_DIR)/ir_Tcl.cpp
 
 ir_Lego.o : $(USER_DIR)/ir_Lego.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lego.cpp
