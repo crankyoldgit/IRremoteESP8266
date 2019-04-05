@@ -30,6 +30,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Whirlpool.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
@@ -535,6 +536,30 @@ void IRac::vestel(IRVestelAc *ac,
 }
 #endif  // SEND_VESTEL_AC
 
+#if SEND_WHIRLPOOL_AC
+void IRac::whirlpool(IRWhirlpoolAc *ac, whirlpool_ac_remote_model_t model,
+                     bool on, stdAc::opmode_t mode, float degrees,
+                     stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                     bool turbo, bool light, int16_t sleep, int16_t clock) {
+  ac->setModel(model);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  ac->setSuper(turbo);
+  ac->setLight(light);
+  // No Filter setting available
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
+  if (clock >= 0) ac->setClock(clock);
+  ac->setPowerToggle(on);
+  ac->send();
+}
+#endif  // SEND_WHIRLPOOL_AC
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -747,6 +772,16 @@ bool IRac::sendAc(decode_type_t vendor, uint16_t model,
       break;
     }
 #endif  // SEND_VESTEL_AC
+#if SEND_WHIRLPOOL_AC
+    case WHIRLPOOL_AC:
+    {
+      IRWhirlpoolAc ac(_pin);
+      ac.begin();
+      whirlpool(&ac, (whirlpool_ac_remote_model_t)model, on, mode, degC, fan,
+                swingv, turbo, light, sleep, clock);
+      break;
+    }
+#endif  // SEND_WHIRLPOOL_AC
     default:
       return false;  // Fail, didn't match anything.
   }

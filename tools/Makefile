@@ -182,7 +182,7 @@ ir_GICable.o : $(USER_DIR)/ir_GICable.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_GICable.cpp
 
 ir_Whirlpool.o : $(USER_DIR)/ir_Whirlpool.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Whirlpool.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Whirlpool.cpp
 
 ir_Lutron.o : $(USER_DIR)/ir_Lutron.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lutron.cpp

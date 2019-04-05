@@ -16,6 +16,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Whirlpool.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -660,4 +661,35 @@ TEST(TestIRac, Vestel) {
       "m520s480m520s480m520s480m520s480m520s1535m520s480m520s1535m520s1535"
       "m520s480m520s1535m520s480m520s480m520s480m520s480m520s480m520s480"
       "m520s100000", ac._irsend.outputStr());
+}
+
+
+TEST(TestIRac, Whirlpool) {
+  IRWhirlpoolAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Model: 1 (DG11J13A), Power toggle: On, Mode: 1 (AUTO), Temp: 21C, "
+      "Fan: 3 (LOW), Swing: On, Light: On, Clock: 23:58, On Timer: Off, "
+      "Off Timer: Off, Sleep: On, Super: Off, Command: 1 (POWER)";
+
+  ac.begin();
+  irac.whirlpool(&ac,
+                 DG11J13A,
+                 true,                        // Power
+                 stdAc::opmode_t::kAuto,      // Mode
+                 21,                          // Celsius
+                 stdAc::fanspeed_t::kMedium,  // Fan speed
+                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 false,                       // Turbo
+                 true,                        // Light
+                 8 * 60 + 30,                 // Sleep
+                 23 * 60 + 58);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(WHIRLPOOL_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kWhirlpoolAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
 }

@@ -466,7 +466,7 @@ ir_GICable_test : $(COMMON_OBJ) ir_GICable_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Whirlpool.o : $(USER_DIR)/ir_Whirlpool.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Whirlpool.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Whirlpool.cpp
 
 ir_Whirlpool_test.o : ir_Whirlpool_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Whirlpool_test.cpp

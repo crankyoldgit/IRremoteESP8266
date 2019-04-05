@@ -27,6 +27,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Whirlpool.h"
 
 class IRac {
  public:
@@ -163,5 +164,12 @@ class IRac {
               bool turbo, bool filter, int16_t sleep = -1, int16_t clock = -1,
               bool sendNormal = true);
 #endif  // SEND_VESTEL_AC
+#if SEND_WHIRLPOOL_AC
+  void whirlpool(IRWhirlpoolAc *ac, whirlpool_ac_remote_model_t model,
+                 bool on, stdAc::opmode_t mode, float degrees,
+                 stdAc::fanspeed_t fan, stdAc::swingv_t swingv,
+                 bool turbo, bool light,
+                 int16_t sleep = -1, int16_t clock = -1);
+#endif  // SEND_WHIRLPOOL_AC
 };
 #endif  // IRAC_H_
