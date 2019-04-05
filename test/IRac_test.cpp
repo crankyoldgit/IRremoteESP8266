@@ -506,3 +506,29 @@ TEST(TestIRac, Tcl112) {
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }
+
+
+TEST(TestIRac, Teco) {
+  IRTecoAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 0 (AUTO), Temp: 21C, Fan: 2 (Med), Sleep: On, "
+      "Swing: On";
+
+  ac.begin();
+  irac.teco(&ac,
+            true,                        // Power
+            stdAc::opmode_t::kAuto,      // Mode
+            21,                          // Celsius
+            stdAc::fanspeed_t::kMedium,  // Fan speed
+            stdAc::swingv_t::kAuto,      // Veritcal swing
+            8 * 60 + 30);                // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TECO, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTecoBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.value);
+  ASSERT_EQ(expected, ac.toString());
+}

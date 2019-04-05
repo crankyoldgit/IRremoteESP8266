@@ -23,6 +23,7 @@
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
+#include "ir_Teco.h"
 
 class IRac {
  public:
@@ -137,5 +138,10 @@ void tcl112(IRTcl112Ac *ac,
             stdAc::swingv_t swingv, stdAc::swingh_t swingh,
             bool turbo, bool light, bool econo, bool filter);
 #endif  // SEND_TCL112AC
+#if SEND_TECO
+void teco(IRTecoAc *ac,
+          bool on, stdAc::opmode_t mode, float degrees,
+          stdAc::fanspeed_t fan, stdAc::swingv_t swingv, int16_t sleep = -1);
+#endif  // SEND_TECO
 };
 #endif  // IRAC_H_
