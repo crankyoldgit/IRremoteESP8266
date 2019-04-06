@@ -21,7 +21,7 @@ INCLUDES = -I$(USER_DIR) -I$(TEST_DIR)
 CPPFLAGS += -DUNIT_TEST
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread
+CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
 
 all : gc_decode mode2_decode
 
