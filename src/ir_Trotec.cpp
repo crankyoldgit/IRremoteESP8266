@@ -1,6 +1,7 @@
 // Copyright 2017 stufisher
 
 #include "ir_Trotec.h"
+#include <algorithm>
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
