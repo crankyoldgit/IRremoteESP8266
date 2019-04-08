@@ -219,13 +219,16 @@
 #define DECODE_LEGOPF          true
 #define SEND_LEGOPF            true
 
+#define DECODE_MITSUBISHIHEAVY true
+#define SEND_MITSUBISHIHEAVY   true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
-     DECODE_VESTEL_AC || DECODE_TCL112AC)
+     DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -303,6 +306,8 @@ enum decode_type_t {
   SAMSUNG36,
   TCL112AC,
   LEGOPF,
+  MITSUBISHI_HEAVY_88,
+  MITSUBISHI_HEAVY_152,  // 60
 };
 
 // Message lengths & required repeat values
@@ -375,6 +380,12 @@ const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiACStateLength = 18;
 const uint16_t kMitsubishiACBits = kMitsubishiACStateLength * 8;
 const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
+const uint16_t kMitsubishiHeavy88StateLength = 11;
+const uint16_t kMitsubishiHeavy88Bits = kMitsubishiHeavy88StateLength * 8;
+const uint16_t kMitsubishiHeavy88MinRepeat = kNoRepeat;
+const uint16_t kMitsubishiHeavy152StateLength = 19;
+const uint16_t kMitsubishiHeavy152Bits = kMitsubishiHeavy152StateLength * 8;
+const uint16_t kMitsubishiHeavy152MinRepeat = kNoRepeat;
 const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
 const uint16_t kPanasonicBits = 48;

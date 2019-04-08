@@ -513,6 +513,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting LEGOPF decode");
   if (decodeLegoPf(results)) return true;
 #endif
+#if DECODE_MITSUBISHIHEAVY
+  DPRINTLN("Attempting MITSUBISHIHEAVY (152 bit) decode");
+  if (decodeMitsubishiHeavy(results, kMitsubishiHeavy152Bits)) return true;
+  DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
+  if (decodeMitsubishiHeavy(results, kMitsubishiHeavy88Bits)) return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

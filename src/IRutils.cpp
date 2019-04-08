@@ -192,6 +192,12 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case MITSUBISHI_AC:
       result = F("MITSUBISHI_AC");
       break;
+    case MITSUBISHI_HEAVY_88:
+      result = "MITSUBISHI_HEAVY_88";
+      break;
+    case MITSUBISHI_HEAVY_152:
+      result = "MITSUBISHI_HEAVY_152";
+      break;
     case MWM:
       result = F("MWM");
       break;
@@ -296,6 +302,8 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI_AC:
+    case MITSUBISHI_HEAVY_88:
+    case MITSUBISHI_HEAVY_152:
     case MWM:
     case PANASONIC_AC:
     case SAMSUNG_AC:

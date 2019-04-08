@@ -624,6 +624,8 @@ void handleRoot() {
         "<option value='42'>Hitachi2 (53 bytes)</option>"
         "<option selected='selected' value='18'>Kelvinator</option>"  // Default
         "<option value='20'>Mitsubishi</option>"
+        "<option value='59'>Mitsubishi Heavy (11 bytes)</option>"
+        "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
         "<option value='52'>MWM</option>"
         "<option value='46'>Samsung</option>"
         "<option value='57'>TCL112</option>"
@@ -720,6 +722,12 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       break;
     case MITSUBISHI_AC:
       stateSize = kMitsubishiACStateLength;
+      break;
+    case MITSUBISHI_HEAVY_88:
+      stateSize = kMitsubishiHeavy88StateLength;
+      break;
+    case MITSUBISHI_HEAVY_152:
+      stateSize = kMitsubishiHeavy152StateLength;
       break;
     case PANASONIC_AC:
       stateSize = kPanasonicAcStateLength;
@@ -857,6 +865,14 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       irsend->sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_MITSUBISHIHEAVY
+    case MITSUBISHI_HEAVY_88:  // 59
+      irsend->sendMitsubishiHeavy88(reinterpret_cast<uint8_t *>(state));
+      break;
+    case MITSUBISHI_HEAVY_152:  // 60
+      irsend->sendMitsubishiHeavy152(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif  // SEND_MITSUBISHIHEAVY
 #if SEND_TROTEC
     case TROTEC:
       irsend->sendTrotec(reinterpret_cast<uint8_t *>(state));

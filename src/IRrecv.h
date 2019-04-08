@@ -181,6 +181,10 @@ class IRrecv {
                           uint16_t nbits = kMitsubishiACBits,
                           bool strict = false);
 #endif
+#if DECODE_MITSUBISHIHEAVY
+  bool decodeMitsubishiHeavy(decode_results *results, const uint16_t nbits,
+                             const bool strict = true);
+#endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
                      uint16_t bitTime, uint8_t tolerance = kTolerance,
