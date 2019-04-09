@@ -156,6 +156,11 @@ void dumpACInfo(decode_results *results) {
   }
 #endif  // DECODE_MITSUBISHI_AC
 #if DECODE_MITSUBISHIHEAVY
+  if (results->decode_type == MITSUBISHI_HEAVY_88) {
+    IRMitsubishiHeavy88Ac ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
   if (results->decode_type == MITSUBISHI_HEAVY_152) {
     IRMitsubishiHeavy152Ac ac(0);
     ac.setRaw(results->state);

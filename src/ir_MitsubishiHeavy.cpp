@@ -86,12 +86,10 @@ void IRMitsubishiHeavy152Ac::send(const uint16_t repeat) {
 #endif  // SEND_MITSUBISHIHEAVY
 
 void IRMitsubishiHeavy152Ac::stateReset(void) {
-  for (uint8_t i = 0; i < kMitsubishiHeavySigLength; i++)
+  uint8_t i = 0;
+  for (; i < kMitsubishiHeavySigLength; i++)
     remote_state[i] = kMitsubishiHeavyZmsSig[i];
-
-  for (uint8_t i = kMitsubishiHeavySigLength;
-       i < kMitsubishiHeavy152StateLength - 3; i += 2)
-    remote_state[i] = 0;
+  for (; i < kMitsubishiHeavy152StateLength - 3; i += 2) remote_state[i] = 0;
   remote_state[17] = 0x80;
 }
 
@@ -101,9 +99,8 @@ uint8_t *IRMitsubishiHeavy152Ac::getRaw(void) {
 }
 
 void IRMitsubishiHeavy152Ac::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < kMitsubishiHeavy152StateLength; i++) {
+  for (uint8_t i = 0; i < kMitsubishiHeavy152StateLength; i++)
     remote_state[i] = data[i];
-  }
 }
 
 void IRMitsubishiHeavy152Ac::on(void) {
@@ -181,7 +178,7 @@ uint8_t IRMitsubishiHeavy152Ac::getMode(void) {
 
 void IRMitsubishiHeavy152Ac::setSwingVertical(const uint8_t pos) {
   uint8_t newpos = std::min(pos, kMitsubishiHeavy152SwingVOff);
-  remote_state[11] &= ~kMitsubishiHeavySwingVMask;
+  remote_state[11] &= ~kMitsubishiHeavy152SwingVMask;
   remote_state[11] |= (newpos << 5);
 }
 
@@ -191,12 +188,12 @@ uint8_t IRMitsubishiHeavy152Ac::getSwingVertical(void) {
 
 void IRMitsubishiHeavy152Ac::setSwingHorizontal(const uint8_t pos) {
   uint8_t newpos = std::min(pos, kMitsubishiHeavy152SwingHOff);
-  remote_state[13] &= ~kMitsubishiHeavySwingHMask;
-  remote_state[13] |= (newpos & kMitsubishiHeavySwingHMask);
+  remote_state[13] &= ~kMitsubishiHeavy152SwingHMask;
+  remote_state[13] |= (newpos & kMitsubishiHeavy152SwingHMask);
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
-  return remote_state[13] & kMitsubishiHeavySwingHMask;
+  return remote_state[13] & kMitsubishiHeavy152SwingHMask;
 }
 
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
@@ -279,13 +276,6 @@ bool IRMitsubishiHeavy152Ac::getEcono(void) {
 bool IRMitsubishiHeavy152Ac::checkZmsSig(const uint8_t *state) {
   for (uint8_t i = 0; i < kMitsubishiHeavySigLength; i++)
     if (state[i] != kMitsubishiHeavyZmsSig[i]) return false;
-  return true;
-}
-
-// Verify the given state has a ZJ-S signature.
-bool IRMitsubishiHeavy152Ac::checkZjsSig(const uint8_t *state) {
-  for (uint8_t i = 0; i < kMitsubishiHeavySigLength; i++)
-    if (state[i] != kMitsubishiHeavyZjsSig[i]) return false;
   return true;
 }
 
@@ -445,6 +435,349 @@ std::string IRMitsubishiHeavy152Ac::toString(void) {
   return result;
 }
 
+
+// Class for decoding and constructing MitsubishiHeavy88 AC messages.
+IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(
+    const uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRMitsubishiHeavy88Ac::begin() { _irsend.begin(); }
+
+#if SEND_MITSUBISHIHEAVY
+void IRMitsubishiHeavy88Ac::send(const uint16_t repeat) {
+  _irsend.sendMitsubishiHeavy88(this->getRaw(), kMitsubishiHeavy88StateLength,
+                                repeat);
+}
+#endif  // SEND_MITSUBISHIHEAVY
+
+void IRMitsubishiHeavy88Ac::stateReset(void) {
+  uint8_t i = 0;
+  for (; i < kMitsubishiHeavySigLength; i++)
+    remote_state[i] = kMitsubishiHeavyZjsSig[i];
+  for (; i < kMitsubishiHeavy88StateLength; i++) remote_state[i] = 0;
+}
+
+uint8_t *IRMitsubishiHeavy88Ac::getRaw(void) {
+  checksum();
+  return remote_state;
+}
+
+void IRMitsubishiHeavy88Ac::setRaw(const uint8_t *data) {
+  for (uint8_t i = 0; i < kMitsubishiHeavy88StateLength; i++)
+    remote_state[i] = data[i];
+}
+
+void IRMitsubishiHeavy88Ac::on(void) {
+  remote_state[9] |= kMitsubishiHeavyPowerBit;
+}
+
+void IRMitsubishiHeavy88Ac::off(void) {
+  remote_state[9] &= ~kMitsubishiHeavyPowerBit;
+}
+
+void IRMitsubishiHeavy88Ac::setPower(const bool on) {
+  if (on)
+    this->on();
+  else
+    this->off();
+}
+
+bool IRMitsubishiHeavy88Ac::getPower(void) {
+  return remote_state[9] & kMitsubishiHeavyPowerBit;
+}
+
+void IRMitsubishiHeavy88Ac::setTemp(const uint8_t temp) {
+  uint8_t newtemp = temp;
+  newtemp = std::min(newtemp, kMitsubishiHeavyMaxTemp);
+  newtemp = std::max(newtemp, kMitsubishiHeavyMinTemp);
+
+  remote_state[9] &= kMitsubishiHeavyTempMask;
+  remote_state[9] |= ((newtemp - kMitsubishiHeavyMinTemp) << 4);
+}
+
+uint8_t IRMitsubishiHeavy88Ac::getTemp(void) {
+  return (remote_state[9] >> 4) + kMitsubishiHeavyMinTemp;
+}
+
+// Set the speed of the fan
+void IRMitsubishiHeavy88Ac::setFan(const uint8_t speed) {
+  uint8_t newspeed = speed;
+  switch (speed) {
+    case kMitsubishiHeavy88FanLow:
+    case kMitsubishiHeavy88FanMed:
+    case kMitsubishiHeavy88FanHigh:
+    case kMitsubishiHeavy88FanTurbo:
+    case kMitsubishiHeavy88FanEcono:
+      break;
+    default:
+      newspeed = kMitsubishiHeavy88FanAuto;
+  }
+  remote_state[7] &= ~kMitsubishiHeavy88FanMask;
+  remote_state[7] |= (newspeed << 5);
+}
+
+uint8_t IRMitsubishiHeavy88Ac::getFan(void) {
+  return remote_state[7] >> 5;
+}
+
+void IRMitsubishiHeavy88Ac::setMode(const uint8_t mode) {
+  uint8_t newmode = mode;
+  switch (mode) {
+    case kMitsubishiHeavyCool:
+    case kMitsubishiHeavyDry:
+    case kMitsubishiHeavyFan:
+    case kMitsubishiHeavyHeat:
+      break;
+    default:
+      newmode = kMitsubishiHeavyAuto;
+  }
+  remote_state[9] &= ~kMitsubishiHeavyModeMask;
+  remote_state[9] |= newmode;
+}
+
+uint8_t IRMitsubishiHeavy88Ac::getMode(void) {
+  return remote_state[9] & kMitsubishiHeavyModeMask;
+}
+
+void IRMitsubishiHeavy88Ac::setSwingVertical(const uint8_t pos) {
+  uint8_t newpos;
+  switch (pos) {
+    case kMitsubishiHeavy88SwingVAuto:
+    case kMitsubishiHeavy88SwingVHighest:
+    case kMitsubishiHeavy88SwingVHigh:
+    case kMitsubishiHeavy88SwingVMiddle:
+    case kMitsubishiHeavy88SwingVLow:
+    case kMitsubishiHeavy88SwingVLowest:
+      newpos = pos;
+      break;
+    default:
+      newpos = kMitsubishiHeavy88SwingVOff;
+  }
+  remote_state[5] &= ~kMitsubishiHeavy88SwingVMaskByte5;
+  remote_state[5] |= (newpos & kMitsubishiHeavy88SwingVMaskByte5);
+  remote_state[7] &= ~kMitsubishiHeavy88SwingVMaskByte7;
+  remote_state[7] |= (newpos & kMitsubishiHeavy88SwingVMaskByte7);
+}
+
+uint8_t IRMitsubishiHeavy88Ac::getSwingVertical(void) {
+  return (remote_state[5] & kMitsubishiHeavy88SwingVMaskByte5) |
+         (remote_state[7] & kMitsubishiHeavy88SwingVMaskByte7);
+}
+
+void IRMitsubishiHeavy88Ac::setSwingHorizontal(const uint8_t pos) {
+  uint8_t newpos;
+  switch (pos) {
+    case kMitsubishiHeavy88SwingHAuto:
+    case kMitsubishiHeavy88SwingHLeftMax:
+    case kMitsubishiHeavy88SwingHLeft:
+    case kMitsubishiHeavy88SwingHMiddle:
+    case kMitsubishiHeavy88SwingHRight:
+    case kMitsubishiHeavy88SwingHRightMax:
+    case kMitsubishiHeavy88SwingHLeftRight:
+    case kMitsubishiHeavy88SwingHRightLeft:
+    case kMitsubishiHeavy88SwingH3D:
+      newpos = pos;
+      break;
+    default:
+      newpos = kMitsubishiHeavy88SwingHOff;
+  }
+  remote_state[5] &= ~kMitsubishiHeavy88SwingHMask;
+  remote_state[5] |= newpos;
+}
+
+uint8_t IRMitsubishiHeavy88Ac::getSwingHorizontal(void) {
+  return remote_state[5] & kMitsubishiHeavy88SwingHMask;
+}
+
+void IRMitsubishiHeavy88Ac::setTurbo(const bool on) {
+  if (on)
+    this->setFan(kMitsubishiHeavy88FanTurbo);
+  else if (this->getTurbo()) this->setFan(kMitsubishiHeavy88FanAuto);
+}
+
+bool IRMitsubishiHeavy88Ac::getTurbo(void) {
+  return this->getFan() == kMitsubishiHeavy88FanTurbo;
+}
+
+void IRMitsubishiHeavy88Ac::setEcono(const bool on) {
+  if (on)
+    this->setFan(kMitsubishiHeavy88FanEcono);
+  else if (this->getEcono()) this->setFan(kMitsubishiHeavy88FanAuto);
+}
+
+bool IRMitsubishiHeavy88Ac::getEcono(void) {
+  return this->getFan() == kMitsubishiHeavy88FanEcono;
+}
+
+void IRMitsubishiHeavy88Ac::set3D(const bool on) {
+  if (on)
+    this->setSwingHorizontal(kMitsubishiHeavy88SwingH3D);
+  else if (this->get3D())
+    this->setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
+}
+
+bool IRMitsubishiHeavy88Ac::get3D(void) {
+  return this->getSwingHorizontal() == kMitsubishiHeavy88SwingH3D;
+}
+
+void IRMitsubishiHeavy88Ac::setClean(const bool on) {
+  if (on)
+    remote_state[5] |= kMitsubishiHeavy88CleanBit;
+  else
+    remote_state[5] &= ~kMitsubishiHeavy88CleanBit;
+}
+
+bool IRMitsubishiHeavy88Ac::getClean(void) {
+  return remote_state[5] & kMitsubishiHeavy88CleanBit;
+}
+
+// Verify the given state has a ZJ-S signature.
+bool IRMitsubishiHeavy88Ac::checkZjsSig(const uint8_t *state) {
+  for (uint8_t i = 0; i < kMitsubishiHeavySigLength; i++)
+    if (state[i] != kMitsubishiHeavyZjsSig[i]) return false;
+  return true;
+}
+
+// Protocol technically has no checksum, but does has inverted byte pairs.
+void IRMitsubishiHeavy88Ac::checksum(void) {
+  for (uint8_t i = kMitsubishiHeavySigLength - 2;
+       i < kMitsubishiHeavy88StateLength;
+       i += 2) {
+    remote_state[i + 1] = ~remote_state[i];
+  }
+}
+
+// Protocol technically has no checksum, but does has inverted byte pairs.
+bool IRMitsubishiHeavy88Ac::validChecksum(const uint8_t *state,
+                                           const uint16_t length) {
+  return IRMitsubishiHeavy152Ac::validChecksum(state, length);
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRMitsubishiHeavy88Ac::toString(void) {
+  String result = "";
+#else
+std::string IRMitsubishiHeavy88Ac::toString(void) {
+  std::string result = "";
+#endif  // ARDUINO
+  result += "Power: ";
+  result += (this->getPower() ? "On" : "Off");
+  result += ", Mode: " + uint64ToString(this->getMode());
+  switch (this->getMode()) {
+    case kMitsubishiHeavyAuto:
+      result += " (Auto)";
+      break;
+    case kMitsubishiHeavyCool:
+      result += " (Cool)";
+      break;
+    case kMitsubishiHeavyHeat:
+      result += " (Heat)";
+      break;
+    case kMitsubishiHeavyDry:
+      result += " (Dry)";
+      break;
+    case kMitsubishiHeavyFan:
+      result += " (Fan)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
+  result += ", Fan: " + uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kMitsubishiHeavy88FanAuto:
+      result += " (Auto)";
+      break;
+    case kMitsubishiHeavy88FanHigh:
+      result += " (High)";
+      break;
+    case kMitsubishiHeavy88FanLow:
+      result += " (Low)";
+      break;
+    case kMitsubishiHeavy88FanMed:
+      result += " (Med)";
+      break;
+    case kMitsubishiHeavy88FanEcono:
+      result += " (Econo)";
+      break;
+    case kMitsubishiHeavy88FanTurbo:
+      result += " (Turbo)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Swing (V): " + uint64ToString(this->getSwingVertical());
+  switch (this->getSwingVertical()) {
+    case kMitsubishiHeavy88SwingVAuto:
+      result += " (Auto)";
+      break;
+    case kMitsubishiHeavy88SwingVHighest:
+      result += " (Highest)";
+      break;
+    case kMitsubishiHeavy88SwingVHigh:
+      result += " (High)";
+      break;
+    case kMitsubishiHeavy88SwingVMiddle:
+      result += " (Middle)";
+      break;
+    case kMitsubishiHeavy88SwingVLow:
+      result += " (Low)";
+      break;
+    case kMitsubishiHeavy88SwingVLowest:
+      result += " (Lowest)";
+      break;
+    case kMitsubishiHeavy88SwingVOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Swing (H): " + uint64ToString(this->getSwingHorizontal());
+  switch (this->getSwingHorizontal()) {
+    case kMitsubishiHeavy88SwingHAuto:
+      result += " (Auto)";
+      break;
+    case kMitsubishiHeavy88SwingHLeftMax:
+      result += " (Max Left)";
+      break;
+    case kMitsubishiHeavy88SwingHLeft:
+      result += " (Left)";
+      break;
+    case kMitsubishiHeavy88SwingHMiddle:
+      result += " (Middle)";
+      break;
+    case kMitsubishiHeavy88SwingHRight:
+      result += " (Right)";
+      break;
+    case kMitsubishiHeavy88SwingHRightMax:
+      result += " (Max Right)";
+      break;
+    case kMitsubishiHeavy88SwingHLeftRight:
+      result += " (Left Right)";
+      break;
+    case kMitsubishiHeavy88SwingHRightLeft:
+      result += " (Right Left)";
+      break;
+    case kMitsubishiHeavy88SwingH3D:
+      result += " (3D)";
+      break;
+    case kMitsubishiHeavy88SwingHOff:
+      result += " (Off)";
+      break;
+    default:
+      result += " (UNKNOWN)";
+  }
+  result += ", Turbo: ";
+  result += (this->getTurbo() ? "On" : "Off");
+  result += ", Econo: ";
+  result += (this->getEcono() ? "On" : "Off");
+  result += ", 3D: ";
+  result += (this->get3D() ? "On" : "Off");
+  result += ", Clean: ";
+  result += (this->getClean() ? "On" : "Off");
+  return result;
+}
+
 #if DECODE_MITSUBISHIHEAVY
 // Decode the supplied MitsubishiHeavy message.
 //
@@ -507,10 +840,8 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
   if (strict && actualBits != nbits) return false;  // Not as we expected.
   switch (actualBits) {
     case kMitsubishiHeavy88Bits:
-      if (strict && !(
-          IRMitsubishiHeavy152Ac::checkZjsSig(results->state) &&
-          IRMitsubishiHeavy152Ac::validChecksum(results->state,
-                                                kMitsubishiHeavy88StateLength)))
+      if (strict && !(IRMitsubishiHeavy88Ac::checkZjsSig(results->state) &&
+                      IRMitsubishiHeavy88Ac::validChecksum(results->state)))
         return false;
       results->decode_type = MITSUBISHI_HEAVY_88;
       break;

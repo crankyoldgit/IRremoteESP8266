@@ -355,7 +355,6 @@ TEST(TestMitsubishiHeavy152AcClass, HumanReadable) {
       ac.toString());
 }
 
-
 TEST(TestMitsubishiHeavy152AcClass, ReconstructKnownExample) {
   IRMitsubishiHeavy152Ac ac(0);
 
@@ -388,6 +387,307 @@ TEST(TestMitsubishiHeavy152AcClass, ReconstructKnownExample) {
       0xF8, 0x04, 0xFB, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0x80, 0x7F};
   EXPECT_STATE_EQ(expected, ac.getRaw(), kMitsubishiHeavy152Bits);
+}
+
+// Tests for IRMitsubishiHeavy88Ac class.
+
+TEST(TestMitsubishiHeavy88AcClass, Power) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, Temperature) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setMode(kMitsubishiHeavyCool);
+
+  ac.setTemp(0);
+  EXPECT_EQ(kMitsubishiHeavyMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kMitsubishiHeavyMaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishiHeavyMinTemp);
+  EXPECT_EQ(kMitsubishiHeavyMinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishiHeavyMaxTemp);
+  EXPECT_EQ(kMitsubishiHeavyMaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishiHeavyMinTemp - 1);
+  EXPECT_EQ(kMitsubishiHeavyMinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishiHeavyMaxTemp + 1);
+  EXPECT_EQ(kMitsubishiHeavyMaxTemp, ac.getTemp());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, OperatingMode) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setMode(kMitsubishiHeavyAuto);
+  EXPECT_EQ(kMitsubishiHeavyAuto, ac.getMode());
+
+  ac.setMode(kMitsubishiHeavyCool);
+  EXPECT_EQ(kMitsubishiHeavyCool, ac.getMode());
+
+  ac.setMode(kMitsubishiHeavyHeat);
+  EXPECT_EQ(kMitsubishiHeavyHeat, ac.getMode());
+
+  ac.setMode(kMitsubishiHeavyDry);
+  EXPECT_EQ(kMitsubishiHeavyDry, ac.getMode());
+
+  ac.setMode(kMitsubishiHeavyFan);
+  EXPECT_EQ(kMitsubishiHeavyFan, ac.getMode());
+
+  ac.setMode(kMitsubishiHeavyHeat + 1);
+  EXPECT_EQ(kMitsubishiHeavyAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kMitsubishiHeavyAuto, ac.getMode());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, Turbo) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, Econo) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, 3D) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.set3D(true);
+  EXPECT_TRUE(ac.get3D());
+
+  ac.set3D(false);
+  EXPECT_FALSE(ac.get3D());
+
+  ac.set3D(true);
+  EXPECT_TRUE(ac.get3D());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, Clean) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+
+  ac.setClean(false);
+  EXPECT_FALSE(ac.getClean());
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, FanSpeed) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  ac.setFan(kMitsubishiHeavy88FanLow);
+  EXPECT_EQ(kMitsubishiHeavy88FanLow, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanAuto);
+  EXPECT_EQ(kMitsubishiHeavy88FanAuto, ac.getFan());
+
+
+  ac.setFan(255);
+  EXPECT_EQ(kMitsubishiHeavy88FanAuto, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanHigh);
+  EXPECT_EQ(kMitsubishiHeavy88FanHigh, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanHigh + 1);
+  EXPECT_EQ(kMitsubishiHeavy88FanAuto, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanHigh - 1);
+  EXPECT_EQ(kMitsubishiHeavy88FanHigh - 1, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanLow + 1);
+  EXPECT_EQ(kMitsubishiHeavy88FanLow + 1, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanEcono);
+  EXPECT_EQ(kMitsubishiHeavy88FanEcono, ac.getFan());
+
+  ac.setFan(kMitsubishiHeavy88FanTurbo);
+  EXPECT_EQ(kMitsubishiHeavy88FanTurbo, ac.getFan());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, VerticalSwing) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVAuto);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVAuto, ac.getSwingVertical());
+
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVHighest);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVHighest, ac.getSwingVertical());
+
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVOff);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
+
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVHighest + 1);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
+
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVOff + 1);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
+
+  // Out of bounds.
+  ac.setSwingVertical(255);
+  EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, HorizontalSwing) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHAuto);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHAuto, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftMax);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHLeftMax, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftMax + 1);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHRightMax, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax - 1);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHOff + 1);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
+
+  // Out of bounds.
+  ac.setSwingHorizontal(255);
+  EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
+}
+
+TEST(TestMitsubishiHeavy88AcClass, Checksums) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.begin();
+
+  EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
+
+  uint8_t expected[kMitsubishiHeavy88StateLength] = {
+      0xAD, 0x51, 0x3C, 0xD9, 0x26, 0x48, 0xB7, 0x00, 0xFF, 0x8A, 0x75};
+  EXPECT_TRUE(IRMitsubishiHeavy88Ac::validChecksum(expected));
+
+  // Screw up the "checksum" to test it fails.
+  expected[kMitsubishiHeavy88StateLength - 1] = 0x55;
+  EXPECT_FALSE(IRMitsubishiHeavy88Ac::validChecksum(expected));
+  // getting the after getRaw() should repair it.
+  ac.setRaw(expected);
+  EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
+  EXPECT_TRUE(IRMitsubishiHeavy88Ac::validChecksum(ac.getRaw()));
+}
+
+TEST(TestMitsubishiHeavy88AcClass, HumanReadable) {
+  IRMitsubishiHeavy88Ac ac(0);
+
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto), "
+      "Swing (V): 0 (Off), Swing (H): 0 (Off), "
+      "Turbo: Off, Econo: Off, 3D: Off, Clean: Off",
+      ac.toString());
+  ac.on();
+  ac.setMode(kMitsubishiHeavyCool);
+  ac.setTemp(kMitsubishiHeavyMinTemp);
+  ac.setFan(kMitsubishiHeavy88FanHigh);
+  ac.setTurbo(false);
+  ac.setEcono(false);
+  ac.set3D(true);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVAuto);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 17C, Fan: 4 (High), "
+      "Swing (V): 16 (Auto), Swing (H): 200 (3D), "
+      "Turbo: Off, Econo: Off, 3D: On, Clean: Off",
+      ac.toString());
+
+  ac.setMode(kMitsubishiHeavyHeat);
+  ac.setTemp(kMitsubishiHeavyMaxTemp);
+  ac.setTurbo(true);
+  ac.setEcono(false);
+  ac.set3D(false);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVLowest);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftMax);
+
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 31C, Fan: 6 (Turbo), "
+      "Swing (V): 26 (Lowest), Swing (H): 4 (Max Left), Turbo: On, Econo: Off, "
+      "3D: Off, Clean: Off",
+      ac.toString());
+
+  ac.setClean(true);
+  ac.setEcono(true);
+  ac.setMode(kMitsubishiHeavyAuto);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVOff);
+
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Auto), Temp: 31C, Fan: 7 (Econo), "
+      "Swing (V): 0 (Off), Swing (H): 4 (Max Left), Turbo: Off, Econo: On, "
+      "3D: Off, Clean: On",
+      ac.toString());
+
+  ac.setClean(false);
+  ac.setTemp(25);
+  ac.setEcono(false);
+  ac.setMode(kMitsubishiHeavyDry);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftRight);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 0 (Auto), "
+      "Swing (V): 0 (Off), Swing (H): 72 (Left Right), Turbo: Off, Econo: Off, "
+      "3D: Off, Clean: Off",
+      ac.toString());
 }
 
 // Tests for decodeMitsubishiHeavy().
@@ -529,10 +829,11 @@ TEST(TestDecodeMitsubishiHeavy, ZmsRealExample2) {
 TEST(TestDecodeMitsubishiHeavy, ZjsSyntheticExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
+  IRMitsubishiHeavy88Ac ac(0);
   irsend.begin();
 
   uint8_t expected[kMitsubishiHeavy88StateLength] = {
-      0xAD, 0x51, 0x3C, 0xD9, 0x26, 0xEE, 0x11, 0xF8, 0x07, 0xFF, 0x00};
+      0xAD, 0x51, 0x3C, 0xD9, 0x26, 0x48, 0xB7, 0x00, 0xFF, 0x8A, 0x75};
 
   irsend.reset();
   irsend.sendMitsubishiHeavy88(expected);
@@ -541,4 +842,10 @@ TEST(TestDecodeMitsubishiHeavy, ZjsSyntheticExample) {
   ASSERT_EQ(MITSUBISHI_HEAVY_88, irsend.capture.decode_type);
   ASSERT_EQ(kMitsubishiHeavy88Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 0 (Auto), "
+      "Swing (V): 0 (Off), Swing (H): 72 (Left Right), Turbo: Off, Econo: Off, "
+      "3D: Off, Clean: Off",
+      ac.toString());
 }
