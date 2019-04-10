@@ -113,8 +113,7 @@
  * This server will send (back) what ever IR message it just transmitted to
  * the MQTT topic 'ir_server/sent' to confirm it has been performed. This works
  * for messages requested via MQTT or via HTTP.
- * Note: Other status messages are also sent to 'ir_server/sent' from time to
- * time.
+ *
  *   Unix command line usage example:
  *     # Listen to MQTT acknowledgements.
  *     $ mosquitto_sub -h 10.0.0.4 -t ir_server/sent
@@ -131,6 +130,9 @@
  *   Unix command line usage example:
  *     # Listen via MQTT for IR messages captured by this server.
  *     $ mosquitto_sub -h 10.0.0.4 -t ir_server/received
+ *
+ * Note: General logging messages are also sent to 'ir_server/log' from
+ *       time to time.
  *
  * If DEBUG is turned on, there is additional information printed on the Serial
  * Port.
@@ -237,9 +239,11 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
                              // independent of the hostname.
-#define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on
-#define MQTTcommand MQTTprefix "/send"  // Topic we get new commands from.
+#define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on.
+#define MQTTcommand MQTTprefix "/send"   // Topic we get new commands from.
 #define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
+#define MQTTlog MQTTprefix "/log"        // Topic we send log messages to.
+#define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
 #endif  // MQTT_ENABLE
 
 const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
@@ -275,7 +279,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
-// ADVANCED USAGE ONLY
+// ------------------------ Advanced Usage Only --------------------------------
 
 // Change if you need multiple independent send gpio/topics.
 const uint8_t gpioTable[] = {
@@ -287,15 +291,22 @@ const uint8_t gpioTable[] = {
   // 16,  // GPIO 16 / D0 e.g. ir_server/send_3
 };
 
+#define QOS 1  // MQTT broker should queue up any unreceived messages for us
+// #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
+
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.9.0"
+#define _MY_VERSION_ "v0.9.1"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
 #define argBits "bits"
 #define argRepeat "repeats"
+
+// Text for Last Will & Testament status messages.
+#define LWT_ONLINE  "Online"
+#define LWT_OFFLINE "Offline"
 
 ESP8266WebServer server(kHttpPort);
 #ifdef IR_RX
@@ -459,6 +470,9 @@ void handleRoot() {
 #ifdef IR_RX
     "IR Received topic: " MQTTrecv "<br>"
 #endif  // IR_RX
+    "Log topic: " MQTTlog "<br>"
+    "LWT topic: " MQTTstatus "<br>"
+    "QoS: " + String(QOS) + "<br>"
     "Last MQTT command seen: " + lastMqttCmdTopic + " : " +
     // lastMqttCmd is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
@@ -1283,8 +1297,8 @@ void setup(void) {
 #if MQTT_ENABLE
 // MQTT subscribing to topic
 void subscribing(const String topic_name) {
-  // subscription to topic for receiving data
-  if (mqtt_client.subscribe(topic_name.c_str()))
+  // subscription to topic for receiving data with QoS.
+  if (mqtt_client.subscribe(topic_name.c_str(), QOS))
     debug("Subscription OK to " + topic_name);
   else
     debug("Subscription FAILED to " + topic_name);
@@ -1300,13 +1314,19 @@ bool reconnect() {
           "... ");
     if (kMqttUsername && kMqttPassword)
       connected = mqtt_client.connect(mqtt_clientid.c_str(), kMqttUsername,
-                                      kMqttPassword);
+                                      kMqttPassword, MQTTstatus, QOS, true,
+                                      LWT_OFFLINE);
     else
-      connected = mqtt_client.connect(mqtt_clientid.c_str());
+      connected = mqtt_client.connect(mqtt_clientid.c_str(), MQTTstatus, QOS,
+                                      true, LWT_OFFLINE);
     if (connected) {
     // Once connected, publish an announcement...
-      mqtt_client.publish(MQTTack, "Connected");
-      debug("connected.");
+      mqtt_client.publish(MQTTlog, "(Re)Connected");
+      debug("reconnected.");
+
+      // Update Last Will & Testament to say we are back online.
+      mqtt_client.publish(MQTTstatus, LWT_ONLINE, true);
+
       // Subscribing to topic(s)
       subscribing(MQTTcommand);
       for (uint8_t i = 0; i < kSendTableSize; i++) {
@@ -1345,12 +1365,12 @@ void loop(void) {
         lastReconnectAttempt = 0;
         wasConnected = true;
         if (boot) {
-          mqtt_client.publish(MQTTack, "IR Server just booted");
+          mqtt_client.publish(MQTTlog, "IR Server just booted");
           boot = false;
         } else {
           String text = "IR Server just (re)connected to MQTT. "
               "Lost connection about " + timeSince(lastConnectedTime);
-          mqtt_client.publish(MQTTack, text.c_str());
+          mqtt_client.publish(MQTTlog, text.c_str());
         }
         lastConnectedTime = now;
         debug("successful client mqtt connection");
