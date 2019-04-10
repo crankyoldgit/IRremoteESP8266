@@ -267,59 +267,59 @@ String IRTcl112Ac::toString() {
 std::string IRTcl112Ac::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
-  result += (this->getPower() ? "On" : "Off");
-  result += ", Mode: " + uint64ToString(getMode());
+  result += F("Power: ");
+  result += (this->getPower() ? F("On") : F("Off"));
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (this->getMode()) {
     case kTcl112AcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kTcl112AcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kTcl112AcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kTcl112AcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kTcl112AcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
   uint16_t nrHalfDegrees = this->getTemp() * 2;
-  result += ", Temp: " + uint64ToString(nrHalfDegrees / 2);
-  if (nrHalfDegrees & 1) result += ".5";
-  result += "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(nrHalfDegrees / 2);
+  if (nrHalfDegrees & 1) result += F(".5");
+  result += F("C");
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kTcl112AcFanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kTcl112AcFanLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kTcl112AcFanMed:
-      result += " (Med)";
+      result += F(" (Med)");
       break;
     case kTcl112AcFanHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
   }
-  result += ", Econo: ";
-  result += (this->getEcono() ? "On" : "Off");
+  result += F(", Econo: ") ;
+  result += (this->getEcono() ? F("On") : F("Off"));
   result += ", Health: ";
-  result += (this->getHealth() ? "On" : "Off");
-  result += ", Light: ";
-  result += (this->getLight() ? "On" : "Off");
-  result += ", Turbo: ";
-  result += (this->getTurbo() ? "On" : "Off");
+  result += (this->getHealth() ? F("On") : F("Off"));
+  result += F(", Light: ");
+  result += (this->getLight() ? F("On") : F("Off"));
+  result += F(", Turbo: ");
+  result += (this->getTurbo() ? F("On") : F("Off"));
   result += ", Swing (H): ";
-  result += (this->getSwingHorizontal() ? "On" : "Off");
-  result += ", Swing (V): ";
-  result += (this->getSwingVertical() ? "On" : "Off");
+  result += (this->getSwingHorizontal() ? F("On") : F("Off"));
+  result += F(", Swing (V): ");
+  result += (this->getSwingVertical() ? F("On") : F("Off"));
   return result;
 }
 

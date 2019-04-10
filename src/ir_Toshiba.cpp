@@ -241,36 +241,36 @@ String IRToshibaAC::toString() {
 std::string IRToshibaAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kToshibaAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kToshibaAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kToshibaAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kToshibaAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kToshibaAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kToshibaAcFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
   }
   return result;

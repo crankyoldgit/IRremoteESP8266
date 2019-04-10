@@ -97,187 +97,187 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
   switch (protocol) {
     default:
     case UNKNOWN:
-      result = "UNKNOWN";
+      result = F("UNKNOWN");
       break;
     case UNUSED:
-      result = "UNUSED";
+      result = F("UNUSED");
       break;
     case AIWA_RC_T501:
-      result = "AIWA_RC_T501";
+      result = F("AIWA_RC_T501");
       break;
     case ARGO:
-      result = "ARGO";
+      result = F("ARGO");
       break;
     case CARRIER_AC:
-      result = "CARRIER_AC";
+      result = F("CARRIER_AC");
       break;
     case COOLIX:
-      result = "COOLIX";
+      result = F("COOLIX");
       break;
     case DAIKIN:
-      result = "DAIKIN";
+      result = F("DAIKIN");
       break;
     case DAIKIN2:
-      result = "DAIKIN2";
+      result = F("DAIKIN2");
       break;
     case DENON:
-      result = "DENON";
+      result = F("DENON");
       break;
     case DISH:
-      result = "DISH";
+      result = F("DISH");
       break;
     case ELECTRA_AC:
-      result = "ELECTRA_AC";
+      result = F("ELECTRA_AC");
       break;
     case FUJITSU_AC:
-      result = "FUJITSU_AC";
+      result = F("FUJITSU_AC");
       break;
     case GICABLE:
-      result = "GICABLE";
+      result = F("GICABLE");
       break;
     case GLOBALCACHE:
-      result = "GLOBALCACHE";
+      result = F("GLOBALCACHE");
       break;
     case GREE:
-      result = "GREE";
+      result = F("GREE");
       break;
     case HAIER_AC:
-      result = "HAIER_AC";
+      result = F("HAIER_AC");
       break;
     case HAIER_AC_YRW02:
-      result = "HAIER_AC_YRW02";
+      result = F("HAIER_AC_YRW02");
       break;
     case HITACHI_AC:
-      result = "HITACHI_AC";
+      result = F("HITACHI_AC");
       break;
     case HITACHI_AC1:
-      result = "HITACHI_AC1";
+      result = F("HITACHI_AC1");
       break;
     case HITACHI_AC2:
-      result = "HITACHI_AC2";
+      result = F("HITACHI_AC2");
       break;
     case JVC:
-      result = "JVC";
+      result = F("JVC");
       break;
     case KELVINATOR:
-      result = "KELVINATOR";
+      result = F("KELVINATOR");
       break;
     case LEGOPF:
-      result = "LEGOPF";
+      result = F("LEGOPF");
       break;
     case LG:
-      result = "LG";
+      result = F("LG");
       break;
     case LG2:
-      result = "LG2";
+      result = F("LG2");
       break;
     case LASERTAG:
-      result = "LASERTAG";
+      result = F("LASERTAG");
       break;
     case LUTRON:
-      result = "LUTRON";
+      result = F("LUTRON");
       break;
     case MAGIQUEST:
-      result = "MAGIQUEST";
+      result = F("MAGIQUEST");
       break;
     case MIDEA:
-      result = "MIDEA";
+      result = F("MIDEA");
       break;
     case MITSUBISHI:
-      result = "MITSUBISHI";
+      result = F("MITSUBISHI");
       break;
     case MITSUBISHI2:
-      result = "MITSUBISHI2";
+      result = F("MITSUBISHI2");
       break;
     case MITSUBISHI_AC:
-      result = "MITSUBISHI_AC";
+      result = F("MITSUBISHI_AC");
       break;
     case MWM:
-      result = "MWM";
+      result = F("MWM");
       break;
     case NEC:
-      result = "NEC";
+      result = F("NEC");
       break;
     case NEC_LIKE:
-      result = "NEC (non-strict)";
+      result = F("NEC (non-strict)");
       break;
     case NIKAI:
-      result = "NIKAI";
+      result = F("NIKAI");
       break;
     case PANASONIC:
-      result = "PANASONIC";
+      result = F("PANASONIC");
       break;
     case PANASONIC_AC:
-      result = "PANASONIC_AC";
+      result = F("PANASONIC_AC");
       break;
     case PIONEER:
-      result = "PIONEER";
+      result = F("PIONEER");
       break;
     case PRONTO:
-      result = "PRONTO";
+      result = F("PRONTO");
       break;
     case RAW:
-      result = "RAW";
+      result = F("RAW");
       break;
     case RC5:
-      result = "RC5";
+      result = F("RC5");
       break;
     case RC5X:
-      result = "RC5X";
+      result = F("RC5X");
       break;
     case RC6:
-      result = "RC6";
+      result = F("RC6");
       break;
     case RCMM:
-      result = "RCMM";
+      result = F("RCMM");
       break;
     case SAMSUNG:
-      result = "SAMSUNG";
+      result = F("SAMSUNG");
       break;
     case SAMSUNG36:
-      result = "SAMSUNG36";
+      result = F("SAMSUNG36");
       break;
     case SAMSUNG_AC:
-      result = "SAMSUNG_AC";
+      result = F("SAMSUNG_AC");
       break;
     case SANYO:
-      result = "SANYO";
+      result = F("SANYO");
       break;
     case SANYO_LC7461:
-      result = "SANYO_LC7461";
+      result = F("SANYO_LC7461");
       break;
     case SHARP:
-      result = "SHARP";
+      result = F("SHARP");
       break;
     case SHERWOOD:
-      result = "SHERWOOD";
+      result = F("SHERWOOD");
       break;
     case SONY:
-      result = "SONY";
+      result = F("SONY");
       break;
     case TCL112AC:
-      result = "TCL112AC";
+      result = F("TCL112AC");
       break;
     case TECO:
-      result = "TECO";
+      result = F("TECO");
       break;
     case TOSHIBA_AC:
-      result = "TOSHIBA_AC";
+      result = F("TOSHIBA_AC");
       break;
     case TROTEC:
-      result = "TROTEC";
+      result = F("TROTEC");
       break;
     case VESTEL_AC:
-      result = "VESTEL_AC";
+      result = F("VESTEL_AC");
       break;
     case WHIRLPOOL_AC:
-      result = "WHIRLPOOL_AC";
+      result = F("WHIRLPOOL_AC");
       break;
     case WHYNTER:
-      result = "WHYNTER";
+      result = F("WHYNTER");
       break;
   }
-  if (isRepeat) result += " (Repeat)";
+  if (isRepeat) result += F(" (Repeat)");
   return result;
 }
 
@@ -334,11 +334,11 @@ std::string resultToSourceCode(const decode_results *results) {
   std::string output = "";
 #endif
   // Start declaration
-  output += "uint16_t ";  // variable type
-  output += "rawData[";   // array name
+  output += F("uint16_t ");  // variable type
+  output += F("rawData[");   // array name
   output += uint64ToString(getCorrectedRawLength(results), 10);
   // array size
-  output += "] = {";  // Start declaration
+  output += F("] = {");  // Start declaration
 
   // Dump data
   for (uint16_t i = 1; i < results->rawlen; i++) {
@@ -347,9 +347,9 @@ std::string resultToSourceCode(const decode_results *results) {
          usecs -= UINT16_MAX) {
       output += uint64ToString(UINT16_MAX);
       if (i % 2)
-        output += ", 0,  ";
+        output += String(F(", 0,  "));
       else
-        output += ",  0, ";
+        output += String(F(",  0, "));
     }
     output += uint64ToString(usecs, 10);
     if (i < results->rawlen - 1)
@@ -365,21 +365,21 @@ std::string resultToSourceCode(const decode_results *results) {
   // Only display the value if the decode type doesn't have an A/C state.
   if (!hasACState(results->decode_type))
     output += " " + uint64ToString(results->value, 16);
-  output += "\n";
+  output += F("\n");
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
     if (hasACState(results->decode_type)) {
 #if DECODE_AC
       uint16_t nbytes = results->bits / 8;
-      output += "uint8_t state[" + uint64ToString(nbytes) + "] = {";
+      output += String(F("uint8_t state[")) + uint64ToString(nbytes) + String(F("] = {"));
       for (uint16_t i = 0; i < nbytes; i++) {
-        output += "0x";
-        if (results->state[i] < 0x10) output += "0";
+        output += String(F("0x"));
+        if (results->state[i] < 0x10) output += F("0");
         output += uint64ToString(results->state[i], 16);
         if (i < nbytes - 1) output += ", ";
       }
-      output += "};\n";
+      output += F("};\n");
 #endif  // DECODE_AC
     } else {
       // Simple protocols
@@ -387,14 +387,14 @@ std::string resultToSourceCode(const decode_results *results) {
       // NOTE: It will ignore the atypical case when a message has been
       // decoded but the address & the command are both 0.
       if (results->address > 0 || results->command > 0) {
-        output += "uint32_t address = 0x" +
-                  uint64ToString(results->address, 16) + ";\n";
-        output += "uint32_t command = 0x" +
-                  uint64ToString(results->command, 16) + ";\n";
+        output += String(F("uint32_t address = 0x")) +
+                  uint64ToString(results->address, 16) + String(F(";\n"));
+        output += String(F("uint32_t command = 0x")) +
+                  uint64ToString(results->command, 16) + String(F(";\n"));
       }
       // Most protocols have data
       output +=
-          "uint64_t data = 0x" + uint64ToString(results->value, 16) + ";\n";
+          String(F("uint64_t data = 0x")) + uint64ToString(results->value, 16) + String(F(";\n"));
     }
   }
   return output;
@@ -411,7 +411,7 @@ std::string resultToTimingInfo(const decode_results *results) {
   std::string output = "";
   std::string value = "";
 #endif
-  output += "Raw Timing[" + uint64ToString(results->rawlen - 1, 10) + "]:\n";
+  output += String(F("Raw Timing[")) + uint64ToString(results->rawlen - 1, 10) + String(F("]:\n"));
 
   for (uint16_t i = 1; i < results->rawlen; i++) {
     if (i % 2 == 0)
@@ -423,9 +423,9 @@ std::string resultToTimingInfo(const decode_results *results) {
     while (value.length() < 6) value = " " + value;
     output += value;
     if (i < results->rawlen - 1) output += ", ";  // ',' not needed for last one
-    if (!(i % 8)) output += "\n";                 // Newline every 8 entries.
+    if (!(i % 8)) output += F("\n");                 // Newline every 8 entries.
   }
-  output += "\n";
+  output += F("\n");
   return output;
 }
 
@@ -441,7 +441,7 @@ std::string resultToHexidecimal(const decode_results *result) {
   if (hasACState(result->decode_type)) {
 #if DECODE_AC
     for (uint16_t i = 0; result->bits > i * 8; i++) {
-      if (result->state[i] < 0x10) output += "0";  // Zero pad
+      if (result->state[i] < 0x10) output += F("0");  // Zero pad
       output += uint64ToString(result->state[i], 16);
     }
 #endif  // DECODE_AC
@@ -462,13 +462,13 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
 #endif
   // Show Encoding standard
   output +=
-      "Encoding  : " + typeToString(results->decode_type, results->repeat) +
-      "\n";
+      String(F("Encoding  : ")) + typeToString(results->decode_type, results->repeat) +
+      String(F("\n"));
 
   // Show Code & length
-  output += "Code      : ";
+  output += F("Code      : ");
   output += resultToHexidecimal(results);
-  output += " (" + uint64ToString(results->bits) + " bits)\n";
+  output += String(F(" (")) + uint64ToString(results->bits) + String(F(" bits)\n"));
   return output;
 }
 

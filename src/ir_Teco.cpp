@@ -144,50 +144,50 @@ String IRTecoAc::toString(void) {
 std::string IRTecoAc::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
-  result += (this->getPower() ? "On" : "Off");
-  result += ", Mode: " + uint64ToString(this->getMode());
+  result += F("Power: ");
+  result += (this->getPower() ? F("On") : F("Off"));
+  result += String(F(", Mode: ")) + uint64ToString(this->getMode());
   switch (this->getMode()) {
     case kTecoAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kTecoCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kTecoHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kTecoDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kTecoFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(this->getFan());
+  result += String(F(", Temp: ")) + uint64ToString(this->getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(this->getFan());
   switch (this->getFan()) {
     case kTecoFanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kTecoFanHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kTecoFanLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kTecoFanMed:
-      result += " (Med)";
+      result += F(" (Med)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Sleep: ";
-  result += (this->getSleep() ? "On" : "Off");
-  result += ", Swing: ";
-  result += (this->getSwing() ? "On" : "Off");
+  result += F(", Sleep: ");
+  result += (this->getSleep() ? F("On") : F("Off"));
+  result += F(", Swing: ");
+  result += (this->getSwing() ? F("On") : F("Off"));
   return result;
 }
 

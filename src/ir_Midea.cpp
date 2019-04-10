@@ -265,53 +265,53 @@ String IRMideaAC::toString() {
 std::string IRMideaAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kMideaACAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kMideaACCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kMideaACHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kMideaACDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kMideaACFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp(true)) + "C/" +
-            uint64ToString(getTemp(false)) + "F";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp(true)) + String(F("C/")) +
+            uint64ToString(getTemp(false)) + String(F("F"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kMideaACFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kMideaACFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     case kMideaACFanMed:
-      result += " (MED)";
+      result += F(" (MED)");
       break;
     case kMideaACFanHigh:
-      result += " (HI)";
+      result += F(" (HI)");
       break;
   }
-  result += ", Sleep: ";
+  result += F(", Sleep: ");
   if (getSleep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
   return result;
 }
 

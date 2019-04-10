@@ -304,10 +304,10 @@ std::string IRHaierAC::timeToString(const uint16_t nr_mins) {
   std::string result = "";
 #endif  // ARDUINO
 
-  if (nr_mins / 24 < 10) result += "0";  // Zero pad.
+  if (nr_mins / 24 < 10) result += F("0");  // Zero pad.
   result += uint64ToString(nr_mins / 60);
   result += ":";
-  if (nr_mins % 60 < 10) result += "0";  // Zero pad.
+  if (nr_mins % 60 < 10) result += F("0");  // Zero pad.
   result += uint64ToString(nr_mins % 60);
   return result;
 }
@@ -321,114 +321,114 @@ std::string IRHaierAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
   uint8_t cmd = getCommand();
-  result += "Command: " + uint64ToString(cmd) + " (";
+  result += String(F("Command: ")) + uint64ToString(cmd) + String(F(" ("));
   switch (cmd) {
     case kHaierAcCmdOff:
-      result += "Off";
+      result += F("Off");
       break;
     case kHaierAcCmdOn:
-      result += "On";
+      result += F("On");
       break;
     case kHaierAcCmdMode:
-      result += "Mode";
+      result += F("Mode");
       break;
     case kHaierAcCmdFan:
-      result += "Fan";
+      result += F("Fan");
       break;
     case kHaierAcCmdTempUp:
-      result += "Temp Up";
+      result += F("Temp Up");
       break;
     case kHaierAcCmdTempDown:
-      result += "Temp Down";
+      result += F("Temp Down");
       break;
     case kHaierAcCmdSleep:
-      result += "Sleep";
+      result += F("Sleep");
       break;
     case kHaierAcCmdTimerSet:
-      result += "Timer Set";
+      result += F("Timer Set");
       break;
     case kHaierAcCmdTimerCancel:
-      result += "Timer Cancel";
+      result += F("Timer Cancel");
       break;
     case kHaierAcCmdHealth:
-      result += "Health";
+      result += F("Health");
       break;
     case kHaierAcCmdSwing:
-      result += "Swing";
+      result += F("Swing");
       break;
     default:
-      result += "Unknown";
+      result += F("Unknown");
   }
-  result += ")";
-  result += ", Mode: " + uint64ToString(getMode());
+  result += F(")");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kHaierAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kHaierAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kHaierAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kHaierAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kHaierAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kHaierAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kHaierAcFanHigh:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
   }
-  result += ", Swing: " + uint64ToString(getSwing()) + " (";
+  result += String(F(", Swing: ")) + uint64ToString(getSwing()) + String(F(" ("));
   switch (getSwing()) {
     case kHaierAcSwingOff:
-      result += "Off";
+      result += F("Off");
       break;
     case kHaierAcSwingUp:
-      result += "Up";
+      result += F("Up");
       break;
     case kHaierAcSwingDown:
-      result += "Down";
+      result += F("Down");
       break;
     case kHaierAcSwingChg:
-      result += "Chg";
+      result += F("Chg");
       break;
     default:
-      result += "Unknown";
+      result += F("Unknown");
   }
-  result += ")";
-  result += ", Sleep: ";
+  result += F(")");
+  result += F(", Sleep: ");
   if (getSleep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Health: ";
+    result += F("Off");
+  result += F(", Health: ");
   if (getHealth())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Current Time: " + timeToString(getCurrTime());
-  result += ", On Timer: ";
+    result += F("Off");
+  result += String(F(", Current Time: ")) + timeToString(getCurrTime());
+  result += F(", On Timer: ");
   if (getOnTimer() >= 0)
     result += timeToString(getOnTimer());
   else
-    result += "Off";
-  result += ", Off Timer: ";
+    result += F("Off");
+  result += F(", Off Timer: ");
   if (getOffTimer() >= 0)
     result += timeToString(getOffTimer());
   else
-    result += "Off";
+    result += F("Off");
 
   return result;
 }
@@ -636,132 +636,132 @@ String IRHaierACYRW02::toString() {
 std::string IRHaierACYRW02::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
   uint8_t cmd = getButton();
-  result += ", Button: " + uint64ToString(cmd) + " (";
+  result += String(F(", Button: ")) + uint64ToString(cmd) + String(F(" ("));
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
-      result += "Power";
+      result += F("Power");
       break;
     case kHaierAcYrw02ButtonMode:
-      result += "Mode";
+      result += F("Mode");
       break;
     case kHaierAcYrw02ButtonFan:
-      result += "Fan";
+      result += F("Fan");
       break;
     case kHaierAcYrw02ButtonTempUp:
-      result += "Temp Up";
+      result += F("Temp Up");
       break;
     case kHaierAcYrw02ButtonTempDown:
-      result += "Temp Down";
+      result += F("Temp Down");
       break;
     case kHaierAcYrw02ButtonSleep:
-      result += "Sleep";
+      result += F("Sleep");
       break;
     case kHaierAcYrw02ButtonHealth:
       result += "Health";
       break;
     case kHaierAcYrw02ButtonSwing:
-      result += "Swing";
+      result += F("Swing");
       break;
     case kHaierAcYrw02ButtonTurbo:
-      result += "Turbo";
+      result += F("Turbo");
       break;
     default:
-      result += "Unknown";
+      result += F("Unknown");
   }
-  result += ")";
-  result += ", Mode: " + uint64ToString(getMode());
+  result += F(")");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kHaierAcYrw02Auto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kHaierAcYrw02Cool:
-      result += " (Cool)";
+      result += F(" (Cool)");
       break;
     case kHaierAcYrw02Heat:
-      result += " (Heat)";
+      result += F(" (Heat)");
       break;
     case kHaierAcYrw02Dry:
-      result += " (Dry)";
+      result += F(" (Dry)");
       break;
     case kHaierAcYrw02Fan:
-      result += " (Fan)";
+      result += F(" (Fan)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kHaierAcYrw02FanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kHaierAcYrw02FanHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kHaierAcYrw02FanLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kHaierAcYrw02FanMed:
-      result += " (Med)";
+      result += F(" (Med)");
       break;
     default:
-      result += " (Unknown)";
+      result += F(" (Unknown)");
   }
-  result += ", Turbo: " + uint64ToString(getTurbo()) + " (";
+  result += String(F(", Turbo: ")) + uint64ToString(getTurbo()) + String(F(" ("));
   switch (getTurbo()) {
     case kHaierAcYrw02TurboOff:
-      result += "Off";
+      result += F("Off");
       break;
     case kHaierAcYrw02TurboLow:
-      result += "Low";
+      result += F("Low");
       break;
     case kHaierAcYrw02TurboHigh:
-      result += "High";
+      result += F("High");
       break;
     default:
-      result += "Unknown";
+      result += F("Unknown");
   }
-  result += ")";
-  result += ", Swing: " + uint64ToString(getSwing()) + " (";
+  result += F(")");
+  result += String(F(", Swing: ")) + uint64ToString(getSwing()) + String(F(" ("));
   switch (getSwing()) {
     case kHaierAcYrw02SwingOff:
-      result += "Off";
+      result += F("Off");
       break;
     case kHaierAcYrw02SwingAuto:
-      result += "Auto";
+      result += F("Auto");
       break;
     case kHaierAcYrw02SwingBottom:
-      result += "Bottom";
+      result += F("Bottom");
       break;
     case kHaierAcYrw02SwingDown:
-      result += "Down";
+      result += F("Down");
       break;
     case kHaierAcYrw02SwingTop:
-      result += "Top";
+      result += F("Top");
       break;
     case kHaierAcYrw02SwingMiddle:
-      result += "Middle";
+      result += F("Middle");
       break;
     default:
-      result += "Unknown";
+      result += F("Unknown");
   }
-  result += ")";
-  result += ", Sleep: ";
+  result += F(")");
+  result += F(", Sleep: ");
   if (getSleep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Health: ";
+    result += F("Off");
+  result += F(", Health: ");
   if (getHealth())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
 
   return result;
 }

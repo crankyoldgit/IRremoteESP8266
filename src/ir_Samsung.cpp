@@ -564,74 +564,74 @@ String IRSamsungAc::toString() {
 std::string IRSamsungAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kSamsungAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kSamsungAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kSamsungAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kSamsungAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kSamsungAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kSamsungAcFanAuto:
     case kSamsungAcFanAuto2:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kSamsungAcFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     case kSamsungAcFanMed:
-      result += " (MED)";
+      result += F(" (MED)");
       break;
     case kSamsungAcFanHigh:
-      result += " (HIGH)";
+      result += F(" (HIGH)");
       break;
     case kSamsungAcFanTurbo:
-      result += " (TURBO)";
+      result += F(" (TURBO)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
-  result += ", Swing: ";
+  result += F(", Swing: ");
   if (getSwing())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Beep: ";
+    result += F("Off");
+  result += F(", Beep: ");
   if (getBeep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Clean: ";
+    result += F("Off");
+  result += F(", Clean: ");
   if (getBeep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Quiet: ";
+    result += F("Off");
+  result += F(", Quiet: ");
   if (getQuiet())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
   return result;
 }
 

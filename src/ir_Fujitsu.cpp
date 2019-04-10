@@ -327,77 +327,77 @@ String IRFujitsuAC::toString() {
 std::string IRFujitsuAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kFujitsuAcModeAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kFujitsuAcModeCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kFujitsuAcModeHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kFujitsuAcModeDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kFujitsuAcModeFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFanSpeed());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFanSpeed());
   switch (getFanSpeed()) {
     case kFujitsuAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kFujitsuAcFanHigh:
-      result += " (HIGH)";
+      result += F(" (HIGH)");
       break;
     case kFujitsuAcFanMed:
-      result += " (MED)";
+      result += F(" (MED)");
       break;
     case kFujitsuAcFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     case kFujitsuAcFanQuiet:
-      result += " (QUIET)";
+      result += F(" (QUIET)");
       break;
   }
-  result += ", Swing: ";
+  result += F(", Swing: ");
   switch (getSwing()) {
     case kFujitsuAcSwingOff:
-      result += "Off";
+      result += F("Off");
       break;
     case kFujitsuAcSwingVert:
-      result += "Vert";
+      result += F("Vert");
       break;
     case kFujitsuAcSwingHoriz:
-      result += "Horiz";
+      result += F("Horiz");
       break;
     case kFujitsuAcSwingBoth:
-      result += "Vert + Horiz";
+      result += F("Vert + Horiz");
       break;
     default:
-      result += "UNKNOWN";
+      result += F("UNKNOWN");
   }
-  result += ", Command: ";
+  result += F(", Command: ");
   switch (getCmd()) {
     case kFujitsuAcCmdStepHoriz:
-      result += "Step vane horizontally";
+      result += F("Step vane horizontally");
       break;
     case kFujitsuAcCmdStepVert:
-      result += "Step vane vertically";
+      result += F("Step vane vertically");
       break;
     default:
-      result += "N/A";
+      result += F("N/A");
   }
   return result;
 }

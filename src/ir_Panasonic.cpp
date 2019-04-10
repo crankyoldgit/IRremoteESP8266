@@ -614,7 +614,7 @@ std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
 #endif  // ARDUINO
   result += uint64ToString(mins_since_midnight / 60) + ":";
   uint8_t mins = mins_since_midnight % 60;
-  if (mins < 10) result += "0";  // Zero pad the minutes.
+  if (mins < 10) result += F("0");  // Zero pad the minutes.
   return result + uint64ToString(mins);
 }
 
@@ -626,87 +626,87 @@ String IRPanasonicAc::toString() {
 std::string IRPanasonicAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Model: " + uint64ToString(getModel());
+  result += String(F("Model: ")) + uint64ToString(getModel());
   switch (getModel()) {
     case kPanasonicDke:
-      result += " (DKE)";
+      result += F(" (DKE)");
       break;
     case kPanasonicJke:
-      result += " (JKE)";
+      result += F(" (JKE)");
       break;
     case kPanasonicNke:
-      result += " (NKE)";
+      result += F(" (NKE)");
       break;
     case kPanasonicLke:
-      result += " (LKE)";
+      result += F(" (LKE)");
       break;
     case kPanasonicCkp:
-      result += " (CKP)";
+      result += F(" (CKP)");
       break;
     case kPanasonicRkr:
-      result += " (RKR)";
+      result += F(" (RKR)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Power: ";
+  result += F(", Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += String(F(", Mode: ")) + uint64ToString(getMode());
   switch (getMode()) {
     case kPanasonicAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kPanasonicAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kPanasonicAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kPanasonicAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kPanasonicAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += String(F(", Fan: ")) + uint64ToString(getFan());
   switch (getFan()) {
     case kPanasonicAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kPanasonicAcFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
     case kPanasonicAcFanMin:
-      result += " (MIN)";
+      result +=F( " (MIN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
-  result += ", Swing (Vertical): " + uint64ToString(getSwingVertical());
+  result += String(F(", Swing (Vertical): ")) + uint64ToString(getSwingVertical());
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kPanasonicAcSwingVUp:
-      result += " (Full Up)";
+      result += F(" (Full Up)");
       break;
     case kPanasonicAcSwingVDown:
-      result += " (Full Down)";
+      result += F(" (Full Down)");
       break;
     case 2:
     case 3:
     case 4:
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
   switch (getModel()) {
@@ -714,52 +714,52 @@ std::string IRPanasonicAc::toString() {
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += ", Swing (Horizontal): " + uint64ToString(getSwingHorizontal());
+      result += String(F(", Swing (Horizontal): ")) + uint64ToString(getSwingHorizontal());
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
-          result += " (AUTO)";
+          result += F(" (AUTO)");
           break;
         case kPanasonicAcSwingHFullLeft:
-          result += " (Full Left)";
+          result += F(" (Full Left)");
           break;
         case kPanasonicAcSwingHLeft:
-          result += " (Left)";
+          result += F(" (Left)");
           break;
         case kPanasonicAcSwingHMiddle:
-          result += " (Middle)";
+          result += F(" (Middle)");
           break;
         case kPanasonicAcSwingHFullRight:
-          result += " (Full Right)";
+          result += F(" (Full Right)");
           break;
         case kPanasonicAcSwingHRight:
-          result += " (Right)";
+          result += F(" (Right)");
           break;
         default:
-          result += " (UNKNOWN)";
+          result += F(" (UNKNOWN)");
           break;
       }
   }
-  result += ", Quiet: ";
+  result += F(", Quiet: ");
   if (getQuiet())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Powerful: ";
+    result += F("Off");
+  result += F(", Powerful: ");
   if (getPowerful())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Clock: " + timeToString(getClock());
-  result += ", On Timer: ";
+    result += F("Off");
+  result += String(F(", Clock: ")) + timeToString(getClock());
+  result += F(", On Timer: ");
   if (isOnTimerEnabled())
     result += timeToString(getOnTimer());
   else
-    result += "Off";
-  result += ", Off Timer: ";
+    result += F("Off");
+  result += F(", Off Timer: ");
   if (isOffTimerEnabled())
     result += timeToString(getOffTimer());
   else
-    result += "Off";
+    result += F("Off");
   return result;
 }
 
