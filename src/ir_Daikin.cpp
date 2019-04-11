@@ -1260,7 +1260,8 @@ std::string IRDaikin2::toString() {
     default:
       result += F(" (Unknown)");
   }
-  result += String(", Swing (H): ") + uint64ToString(getSwingHorizontal());
+  result += F(", Swing (H): ");
+  result += uint64ToString(getSwingHorizontal());
   switch (getSwingHorizontal()) {
     case kDaikin2SwingHAuto:
       result += F(" (Auto)");
