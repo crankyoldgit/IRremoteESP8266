@@ -612,9 +612,9 @@ String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
 std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
   std::string result = "";
 #endif  // ARDUINO
-  result += uint64ToString(mins_since_midnight / 60) + ":";
+  result += uint64ToString(mins_since_midnight / 60) + ':';
   uint8_t mins = mins_since_midnight % 60;
-  if (mins < 10) result += F("0");  // Zero pad the minutes.
+  if (mins < 10) result += '0';  // Zero pad the minutes.
   return result + uint64ToString(mins);
 }
 
@@ -626,7 +626,8 @@ String IRPanasonicAc::toString() {
 std::string IRPanasonicAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += String(F("Model: ")) + uint64ToString(getModel());
+  result += F("Model: ");
+  result += uint64ToString(getModel());
   switch (getModel()) {
     case kPanasonicDke:
       result += F(" (DKE)");
@@ -654,7 +655,8 @@ std::string IRPanasonicAc::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kPanasonicAcAuto:
       result += F(" (AUTO)");
@@ -674,8 +676,10 @@ std::string IRPanasonicAc::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kPanasonicAcFanAuto:
       result += F(" (AUTO)");
@@ -690,7 +694,8 @@ std::string IRPanasonicAc::toString() {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += String(F(", Swing (Vertical): ")) + uint64ToString(getSwingVertical());
+  result += F(", Swing (Vertical): ");
+  result += uint64ToString(getSwingVertical());
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
       result += F(" (AUTO)");
@@ -714,7 +719,8 @@ std::string IRPanasonicAc::toString() {
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += String(F(", Swing (Horizontal): ")) + uint64ToString(getSwingHorizontal());
+      result += F(", Swing (Horizontal): ");
+      result += uint64ToString(getSwingHorizontal());
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
           result += F(" (AUTO)");
@@ -749,7 +755,8 @@ std::string IRPanasonicAc::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Clock: ")) + timeToString(getClock());
+  result += F(", Clock: ");
+  result += timeToString(getClock());
   result += F(", On Timer: ");
   if (isOnTimerEnabled())
     result += timeToString(getOnTimer());

@@ -341,7 +341,8 @@ std::string IRCoolixAC::toString() {
     result += F(", Clean: Toggle");
     return result;
   }
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kCoolixAuto:
       result += F(" (AUTO)");
@@ -361,7 +362,8 @@ std::string IRCoolixAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kCoolixFanAuto:
       result += F(" (AUTO)");
@@ -388,7 +390,9 @@ std::string IRCoolixAC::toString() {
       result += F(" (UNKNOWN)");
   }
   if (getMode() != kCoolixFan)  // Fan mode doesn't have a temperature.
-    result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += 'C';
   result += F(", Zone Follow: ");
   if (getZoneFollow())
     result += F("On");

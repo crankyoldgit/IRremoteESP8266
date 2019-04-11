@@ -347,9 +347,9 @@ std::string resultToSourceCode(const decode_results *results) {
          usecs -= UINT16_MAX) {
       output += uint64ToString(UINT16_MAX);
       if (i % 2)
-        output += String(F(", 0,  "));
+        output += F(", 0,  ");
       else
-        output += String(F(",  0, "));
+        output += F(",  0, ");
     }
     output += uint64ToString(usecs, 10);
     if (i < results->rawlen - 1)
@@ -364,7 +364,7 @@ std::string resultToSourceCode(const decode_results *results) {
   output += "  // " + typeToString(results->decode_type, results->repeat);
   // Only display the value if the decode type doesn't have an A/C state.
   if (!hasACState(results->decode_type))
-    output += " " + uint64ToString(results->value, 16);
+    output += ' ' + uint64ToString(results->value, 16);
   output += F("\n");
 
   // Now dump "known" codes
@@ -372,10 +372,12 @@ std::string resultToSourceCode(const decode_results *results) {
     if (hasACState(results->decode_type)) {
 #if DECODE_AC
       uint16_t nbytes = results->bits / 8;
-      output += String(F("uint8_t state[")) + uint64ToString(nbytes) + String(F("] = {"));
+      output += F("uint8_t state[");
+      output += uint64ToString(nbytes);
+	  output += F("] = {");
       for (uint16_t i = 0; i < nbytes; i++) {
-        output += String(F("0x"));
-        if (results->state[i] < 0x10) output += F("0");
+        output += F("0x");
+        if (results->state[i] < 0x10) output += '0';
         output += uint64ToString(results->state[i], 16);
         if (i < nbytes - 1) output += ", ";
       }
@@ -387,14 +389,17 @@ std::string resultToSourceCode(const decode_results *results) {
       // NOTE: It will ignore the atypical case when a message has been
       // decoded but the address & the command are both 0.
       if (results->address > 0 || results->command > 0) {
-        output += String(F("uint32_t address = 0x")) +
-                  uint64ToString(results->address, 16) + String(F(";\n"));
-        output += String(F("uint32_t command = 0x")) +
-                  uint64ToString(results->command, 16) + String(F(";\n"));
+        output += F("uint32_t address = 0x");
+		output += uint64ToString(results->address, 16);
+		output += F(";\n");
+        output += F("uint32_t command = 0x");
+		output += uint64ToString(results->command, 16);
+		output += F(";\n");
       }
       // Most protocols have data
-      output +=
-          String(F("uint64_t data = 0x")) + uint64ToString(results->value, 16) + String(F(";\n"));
+      output += F("uint64_t data = 0x");
+	  output += uint64ToString(results->value, 16);
+	  output += F(";\n");
     }
   }
   return output;
@@ -411,11 +416,13 @@ std::string resultToTimingInfo(const decode_results *results) {
   std::string output = "";
   std::string value = "";
 #endif
-  output += String(F("Raw Timing[")) + uint64ToString(results->rawlen - 1, 10) + String(F("]:\n"));
+  output += F("Raw Timing[");
+  output += uint64ToString(results->rawlen - 1, 10);
+  output += F("]:\n");
 
   for (uint16_t i = 1; i < results->rawlen; i++) {
     if (i % 2 == 0)
-      output += "-";  // even
+      output += '-';  // even
     else
       output += "   +";  // odd
     value = uint64ToString(results->rawbuf[i] * kRawTick);
@@ -441,7 +448,7 @@ std::string resultToHexidecimal(const decode_results *result) {
   if (hasACState(result->decode_type)) {
 #if DECODE_AC
     for (uint16_t i = 0; result->bits > i * 8; i++) {
-      if (result->state[i] < 0x10) output += F("0");  // Zero pad
+      if (result->state[i] < 0x10) output += '0';  // Zero pad
       output += uint64ToString(result->state[i], 16);
     }
 #endif  // DECODE_AC
@@ -461,14 +468,16 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
   std::string output = "";
 #endif
   // Show Encoding standard
-  output +=
-      String(F("Encoding  : ")) + typeToString(results->decode_type, results->repeat) +
-      String(F("\n"));
+  output += F("Encoding  : ");
+  output += typeToString(results->decode_type, results->repeat);
+  output += F("\n");
 
   // Show Code & length
   output += F("Code      : ");
   output += resultToHexidecimal(results);
-  output += String(F(" (")) + uint64ToString(results->bits) + String(F(" bits)\n"));
+  output += F(" (");
+  output += uint64ToString(results->bits);
+  output += F(" bits)\n");
   return output;
 }
 

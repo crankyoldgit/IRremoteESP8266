@@ -318,7 +318,8 @@ std::string IRGreeAC::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kGreeAuto:
       result += F(" (AUTO)");
@@ -338,8 +339,10 @@ std::string IRGreeAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case 0:
       result += F(" (AUTO)");
@@ -373,8 +376,8 @@ std::string IRGreeAC::toString() {
     result += F("Auto");
   else
     result += F("Manual");
-  result +=
-      String(F(", Swing Vertical Pos: ")) + uint64ToString(getSwingVerticalPosition());
+	result += F(", Swing Vertical Pos: ");
+    result += uint64ToString(getSwingVerticalPosition());
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
       result += F(" (Last Pos)");

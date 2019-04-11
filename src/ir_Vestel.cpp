@@ -407,7 +407,8 @@ std::string IRVestelAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
   if (isTimeCommand()) {
-    result += String(F("Time: ")) + IRHaierAC::timeToString(getTime());
+    result += F("Time: ");
+    result += IRHaierAC::timeToString(getTime());
 
     result += F(", Timer: ");
     result += isTimerActive() ? IRHaierAC::timeToString(getTimer()) : F("Off");
@@ -425,7 +426,8 @@ std::string IRVestelAc::toString() {
   // Not a time command, it's a normal command.
   result += F("Power: ");
   result += (getPower() ? F("On") : F("Off"));
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kVestelAcAuto:
       result += F(" (AUTO)");
@@ -445,8 +447,10 @@ std::string IRVestelAc::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kVestelAcFanAuto:
       result += F(" (AUTO)");

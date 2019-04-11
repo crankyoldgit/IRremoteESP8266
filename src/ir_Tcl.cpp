@@ -269,7 +269,8 @@ std::string IRTcl112Ac::toString() {
 #endif  // ARDUINO
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (this->getMode()) {
     case kTcl112AcAuto:
       result += F(" (AUTO)");
@@ -290,10 +291,11 @@ std::string IRTcl112Ac::toString() {
       result += F(" (UNKNOWN)");
   }
   uint16_t nrHalfDegrees = this->getTemp() * 2;
-  result += String(F(", Temp: ")) + uint64ToString(nrHalfDegrees / 2);
+  result += F(", Temp: ");
+  result += uint64ToString(nrHalfDegrees / 2);
   if (nrHalfDegrees & 1) result += F(".5");
-  result += F("C");
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kTcl112AcFanAuto:
       result += F(" (Auto)");

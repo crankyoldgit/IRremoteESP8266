@@ -146,7 +146,8 @@ std::string IRTecoAc::toString(void) {
 #endif  // ARDUINO
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));
-  result += String(F(", Mode: ")) + uint64ToString(this->getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
   switch (this->getMode()) {
     case kTecoAuto:
       result += F(" (AUTO)");
@@ -166,8 +167,10 @@ std::string IRTecoAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(this->getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(this->getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (this->getFan()) {
     case kTecoFanAuto:
       result += F(" (Auto)");

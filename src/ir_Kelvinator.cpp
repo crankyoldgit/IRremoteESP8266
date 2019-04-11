@@ -360,7 +360,8 @@ std::string IRKelvinatorAC::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kKelvinatorAuto:
       result += F(" (AUTO)");
@@ -380,8 +381,10 @@ std::string IRKelvinatorAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kKelvinatorFanAuto:
       result += F(" (AUTO)");

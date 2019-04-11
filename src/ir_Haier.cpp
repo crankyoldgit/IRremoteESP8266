@@ -304,10 +304,10 @@ std::string IRHaierAC::timeToString(const uint16_t nr_mins) {
   std::string result = "";
 #endif  // ARDUINO
 
-  if (nr_mins / 24 < 10) result += F("0");  // Zero pad.
+  if (nr_mins / 24 < 10) result += '0';  // Zero pad.
   result += uint64ToString(nr_mins / 60);
-  result += ":";
-  if (nr_mins % 60 < 10) result += F("0");  // Zero pad.
+  result += ':';
+  if (nr_mins % 60 < 10) result += '0';  // Zero pad.
   result += uint64ToString(nr_mins % 60);
   return result;
 }
@@ -321,7 +321,9 @@ std::string IRHaierAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
   uint8_t cmd = getCommand();
-  result += String(F("Command: ")) + uint64ToString(cmd) + String(F(" ("));
+  result += F("Command: ");
+  result += uint64ToString(cmd);
+  result += F(" (");
   switch (cmd) {
     case kHaierAcCmdOff:
       result += F("Off");
@@ -359,8 +361,9 @@ std::string IRHaierAC::toString() {
     default:
       result += F("Unknown");
   }
-  result += F(")");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += ')';
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kHaierAcAuto:
       result += F(" (AUTO)");
@@ -380,8 +383,10 @@ std::string IRHaierAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kHaierAcFanAuto:
       result += F(" (AUTO)");
@@ -390,7 +395,9 @@ std::string IRHaierAC::toString() {
       result += F(" (MAX)");
       break;
   }
-  result += String(F(", Swing: ")) + uint64ToString(getSwing()) + String(F(" ("));
+  result += F(", Swing: ");
+  result += uint64ToString(getSwing());
+  result += F(", Swing: ");
   switch (getSwing()) {
     case kHaierAcSwingOff:
       result += F("Off");
@@ -407,7 +414,7 @@ std::string IRHaierAC::toString() {
     default:
       result += F("Unknown");
   }
-  result += F(")");
+  result += ')';
   result += F(", Sleep: ");
   if (getSleep())
     result += F("On");
@@ -418,7 +425,8 @@ std::string IRHaierAC::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Current Time: ")) + timeToString(getCurrTime());
+  result += F(", Current Time: ");
+  result += timeToString(getCurrTime());
   result += F(", On Timer: ");
   if (getOnTimer() >= 0)
     result += timeToString(getOnTimer());
@@ -642,7 +650,9 @@ std::string IRHaierACYRW02::toString() {
   else
     result += F("Off");
   uint8_t cmd = getButton();
-  result += String(F(", Button: ")) + uint64ToString(cmd) + String(F(" ("));
+  result += F(", Button: ");
+  result += uint64ToString(cmd);
+  result += F(" (");
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
       result += F("Power");
@@ -674,8 +684,9 @@ std::string IRHaierACYRW02::toString() {
     default:
       result += F("Unknown");
   }
-  result += F(")");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += ')';
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kHaierAcYrw02Auto:
       result += F(" (Auto)");
@@ -695,8 +706,10 @@ std::string IRHaierACYRW02::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kHaierAcYrw02FanAuto:
       result += F(" (Auto)");
@@ -713,7 +726,9 @@ std::string IRHaierACYRW02::toString() {
     default:
       result += F(" (Unknown)");
   }
-  result += String(F(", Turbo: ")) + uint64ToString(getTurbo()) + String(F(" ("));
+  result += F(", Turbo: ");
+  result += uint64ToString(getTurbo());
+  result += F(" (");
   switch (getTurbo()) {
     case kHaierAcYrw02TurboOff:
       result += F("Off");
@@ -727,8 +742,10 @@ std::string IRHaierACYRW02::toString() {
     default:
       result += F("Unknown");
   }
-  result += F(")");
-  result += String(F(", Swing: ")) + uint64ToString(getSwing()) + String(F(" ("));
+  result += ')';
+  result += F(", Swing: ");
+  result += uint64ToString(getSwing());
+  result += F(" (");
   switch (getSwing()) {
     case kHaierAcYrw02SwingOff:
       result += F("Off");
@@ -751,7 +768,7 @@ std::string IRHaierACYRW02::toString() {
     default:
       result += F("Unknown");
   }
-  result += F(")");
+  result += ')';
   result += F(", Sleep: ");
   if (getSleep())
     result += F("On");

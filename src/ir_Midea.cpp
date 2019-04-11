@@ -270,7 +270,8 @@ std::string IRMideaAC::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kMideaACAuto:
       result += F(" (AUTO)");
@@ -290,9 +291,12 @@ std::string IRMideaAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp(true)) + String(F("C/")) +
-            uint64ToString(getTemp(false)) + String(F("F"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp(true));
+  result += F("C/");
+  result += uint64ToString(getTemp(false));
+  result += F("F, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kMideaACFanAuto:
       result += F(" (AUTO)");

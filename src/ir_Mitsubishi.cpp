@@ -622,10 +622,10 @@ String IRMitsubishiAC::timeToString(uint64_t time) {
 std::string IRMitsubishiAC::timeToString(uint64_t time) {
   std::string result = "";
 #endif  // ARDUINO
-  if (time / 6 < 10) result += F("0");
+  if (time / 6 < 10) result += '0';
   result += uint64ToString(time / 6);
-  result += ":";
-  if (time * 10 % 60 < 10) result += F("0");
+  result += ':';
+  if (time * 10 % 60 < 10) result += '0';
   result += uint64ToString(time * 10 % 60);
   return result;
 }
@@ -659,8 +659,9 @@ std::string IRMitsubishiAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += F(", FAN: ");
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
   switch (getFan()) {
     case MITSUBISHI_AC_FAN_AUTO:
       result += F("AUTO");
@@ -694,7 +695,7 @@ std::string IRMitsubishiAC::toString() {
   result += F(", Timer: ");
   switch (getTimer()) {
     case kMitsubishiAcNoTimer:
-      result += F("-");
+      result += '-';
       break;
     case kMitsubishiAcStartTimer:
       result += F("Start");

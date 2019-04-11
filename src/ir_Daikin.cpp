@@ -407,9 +407,9 @@ std::string IRDaikinESP::renderTime(uint16_t timemins) {
 #endif  // ARDUINO
   uint16_t hours, mins;
   hours = timemins / 60;
-  ret = uint64ToString(hours) + ":";
+  ret = uint64ToString(hours) + ':';
   mins = timemins - (hours * 60);
-  if (mins < 10) ret += F("0");
+  if (mins < 10) ret += '0';
   ret += uint64ToString(mins);
   return ret;
 }
@@ -427,7 +427,8 @@ std::string IRDaikinESP::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kDaikinAuto:
       result += F(" (AUTO)");
@@ -447,8 +448,10 @@ std::string IRDaikinESP::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kDaikinFanAuto:
       result += F(" (AUTO)");
@@ -497,8 +500,9 @@ std::string IRDaikinESP::toString() {
   if (getSwingVertical())
     result += F("On");
   else
-    result += F("Off");
-  result += String(F(", Current Time: ")) + renderTime(getCurrentTime());
+  result += F("Off");
+  result += F(", Current Time: ");
+  result += renderTime(getCurrentTime());
   result += F(", On Time: ");
   if (getOnTimerEnabled())
     result += renderTime(getOnTime());
@@ -524,7 +528,7 @@ void IRDaikinESP::printState() {
   DPRINTLN("Raw Bits:");
   for (uint8_t i = 0; i < kDaikinStateLength; i++) {
     strbits = uint64ToString(daikin[i], BIN);
-    while (strbits.length() < 8) strbits = F("0") + strbits;
+    while (strbits.length() < 8) strbits = '0' + strbits;
     DPRINT(strbits);
     DPRINT(" ");
   }
@@ -1191,7 +1195,8 @@ std::string IRDaikin2::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kDaikinAuto:
       result += F(" (AUTO)");
@@ -1211,8 +1216,10 @@ std::string IRDaikin2::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kDaikinFanAuto:
       result += F(" (Auto)");
@@ -1227,7 +1234,8 @@ std::string IRDaikin2::toString() {
       result += F(" (Max)");
       break;
   }
-  result += String(F(", Swing (V): ")) + uint64ToString(getSwingVertical());
+  result += F(", Swing (V): ");
+  result += uint64ToString(getSwingVertical());
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
       result += F(" (Highest)");
@@ -1261,7 +1269,8 @@ std::string IRDaikin2::toString() {
       result += F(" (Swing)");
       break;
   }
-  result += String(F(", Clock: ")) + IRDaikinESP::renderTime(getCurrentTime());
+  result += F(", Clock: ");
+  result += IRDaikinESP::renderTime(getCurrentTime());
   result += F(", On Time: ");
   if (getOnTimerEnabled())
     result += IRDaikinESP::renderTime(getOnTime());
@@ -1277,7 +1286,8 @@ std::string IRDaikin2::toString() {
     result += IRDaikinESP::renderTime(getSleepTime());
   else
     result += F("Off");
-  result += String(F(", Beep: ")) + uint64ToString(getBeep());
+	result += F(", Beep: ");
+    result += uint64ToString(getBeep());
   switch (getBeep()) {
     case kDaikinBeepLoud:
       result += F(" (Loud)");
@@ -1291,7 +1301,8 @@ std::string IRDaikin2::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Light: ")) + uint64ToString(getLight());
+  result += F(", Light: ");
+  result += uint64ToString(getLight());
   switch (getLight()) {
     case kDaikinLightBright:
       result += F(" (Bright)");

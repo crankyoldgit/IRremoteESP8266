@@ -332,7 +332,8 @@ std::string IRFujitsuAC::toString() {
     result += F("On");
   else
     result += F("Off");
-  result += String(F(", Mode: ")) + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kFujitsuAcModeAuto:
       result += F(" (AUTO)");
@@ -352,8 +353,10 @@ std::string IRFujitsuAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += String(F(", Temp: ")) + uint64ToString(getTemp()) + String(F("C"));
-  result += String(F(", Fan: ")) + uint64ToString(getFanSpeed());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFanSpeed());
   switch (getFanSpeed()) {
     case kFujitsuAcFanAuto:
       result += F(" (AUTO)");
