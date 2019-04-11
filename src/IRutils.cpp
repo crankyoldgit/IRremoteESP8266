@@ -374,7 +374,7 @@ std::string resultToSourceCode(const decode_results *results) {
       uint16_t nbytes = results->bits / 8;
       output += F("uint8_t state[");
       output += uint64ToString(nbytes);
-	  output += F("] = {");
+      output += F("] = {");
       for (uint16_t i = 0; i < nbytes; i++) {
         output += F("0x");
         if (results->state[i] < 0x10) output += '0';
@@ -390,16 +390,16 @@ std::string resultToSourceCode(const decode_results *results) {
       // decoded but the address & the command are both 0.
       if (results->address > 0 || results->command > 0) {
         output += F("uint32_t address = 0x");
-		output += uint64ToString(results->address, 16);
-		output += F(";\n");
+        output += uint64ToString(results->address, 16);
+        output += F(";\n");
         output += F("uint32_t command = 0x");
-		output += uint64ToString(results->command, 16);
-		output += F(";\n");
+        output += uint64ToString(results->command, 16);
+        output += F(";\n");
       }
       // Most protocols have data
       output += F("uint64_t data = 0x");
-	  output += uint64ToString(results->value, 16);
-	  output += F(";\n");
+      output += uint64ToString(results->value, 16);
+      output += F(";\n");
     }
   }
   return output;

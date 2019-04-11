@@ -688,7 +688,7 @@ std::string IRPanasonicAc::toString() {
       result += F(" (MAX)");
       break;
     case kPanasonicAcFanMin:
-      result +=F( " (MIN)");
+      result += F( " (MIN)");
       break;
     default:
       result += F(" (UNKNOWN)");

@@ -422,7 +422,8 @@ String IRWhirlpoolAc::toString() {
 std::string IRWhirlpoolAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += String(F("Model: ")) + uint64ToString(getModel());
+  result += F("Model: ");
+  result += uint64ToString(getModel());
   switch (getModel()) {
     case DG11J191:
       result += F(" (DG11J191)");

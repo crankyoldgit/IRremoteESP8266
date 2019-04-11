@@ -310,7 +310,7 @@ std::string IRTcl112Ac::toString() {
       result += F(" (High)");
       break;
   }
-  result += F(", Econo: ") ;
+  result += F(", Econo: ");
   result += (this->getEcono() ? F("On") : F("Off"));
   result += ", Health: ";
   result += (this->getHealth() ? F("On") : F("Off"));

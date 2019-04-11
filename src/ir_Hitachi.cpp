@@ -268,7 +268,7 @@ std::string IRHitachiAc::toString() {
   result += F("Power: ");
   if (getPower())
     result += F("On");
-  else 
+  else
     result += F("Off");
   result += F(", Mode: ");
   result += uint64ToString(getMode());

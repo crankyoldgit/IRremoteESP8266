@@ -375,7 +375,7 @@ std::string IRCoolixAC::toString() {
       result += F(" (MAX)");
       break;
     case kCoolixFanMin:
-      result +=F( " (MIN)");
+      result += F( " (MIN)");
       break;
     case kCoolixFanMed:
       result += F(" (MED)");

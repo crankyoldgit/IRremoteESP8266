@@ -460,7 +460,7 @@ std::string IRDaikinESP::toString() {
       result += F(" (QUIET)");
       break;
     case kDaikinFanMin:
-      result +=F( " (MIN)");
+      result += F( " (MIN)");
       break;
     case kDaikinFanMax:
       result += F(" (MAX)");
@@ -1228,7 +1228,7 @@ std::string IRDaikin2::toString() {
       result += F(" (Quiet)");
       break;
     case kDaikinFanMin:
-      result +=F( " (Min)");
+      result += F( " (Min)");
       break;
     case kDaikinFanMax:
       result += F(" (Max)");
@@ -1287,7 +1287,7 @@ std::string IRDaikin2::toString() {
     result += IRDaikinESP::renderTime(getSleepTime());
   else
     result += F("Off");
-	result += F(", Beep: ");
+    result += F(", Beep: ");
     result += uint64ToString(getBeep());
   switch (getBeep()) {
     case kDaikinBeepLoud:
