@@ -577,25 +577,26 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
-//   model:   The specific model of A/C if applicable.
-//   on:      Should the unit be powered on?
+//   model:   The specific model of A/C if supported/applicable.
+//   on:      Should the unit be powered on? (or in some cases, toggled)
 //   mode:    What operating mode should the unit perform? e.g. Cool, Heat etc.
 //   degrees: What temperature should the unit be set to?
 //   celsius: Use degreees Celsius, otherwise Fahrenheit.
 //   fan:     Fan speed.
+// The following args are all "if supported" by the underlying A/C classes.
 //   swingv:  Control the vertical swing of the vanes.
 //   swingh:  Control the horizontal swing of the vanes.
 //   quiet:   Set the unit to quiet (fan) operation mode.
 //   turbo:   Set the unit to turbo operating mode. e.g. Max fan & cooling etc.
 //   econo:   Set the unit to economical operating mode.
 //   light:   Turn on the display/LEDs etc.
-//   filter:  Turn on any particle/ion filter etc.
+//   filter:  Turn on any particle/ion/allergy filter etc.
 //   clean:   Turn on any settings to reduce mold etc. (Not self-clean mode.)
 //   beep:    Control if the unit beeps upon receiving commands.
-//   sleep:   Nr. of mins of sleep mode, or use sleep mode. (<= 0 means off.)
+//   sleep:   Nr. of mins of sleep mode, or use sleep mode. (< 0 means off.)
 //   clock:   Nr. of mins past midnight to set the clock to. (< 0 means off.)
 // Returns:
-//   boolean: True is accepted/converted/attempted. False is unsupported.
+//   boolean: True, if accepted/converted/attempted. False, if unsupported.
 bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const bool celsius,
