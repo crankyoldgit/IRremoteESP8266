@@ -397,6 +397,38 @@ void IRWhirlpoolAc::setCommand(const uint8_t code) {
   remote_state[kWhirlpoolAcCommandPos] = code;
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRWhirlpoolAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kWhirlpoolAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kWhirlpoolAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kWhirlpoolAcDry;
+    case stdAc::opmode_t::kFan:
+      return kWhirlpoolAcFan;
+    default:
+      return kWhirlpoolAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRWhirlpoolAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kWhirlpoolAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kWhirlpoolAcFanMedium;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kWhirlpoolAcFanHigh;
+    default:
+      return kWhirlpoolAcFanAuto;
+  }
+}
+
 #ifdef ARDUINO
 String IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
   String result = "";

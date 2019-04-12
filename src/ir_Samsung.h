@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //              SSSS   AAA    MMM    SSSS  U   U  N   N   GGGG
 //             S      A   A  M M M  S      U   U  NN  N  G
@@ -66,6 +69,8 @@ class IRSamsungAc {
             const bool calcchecksum = true);
   void sendExtended(const uint16_t repeat = kSamsungAcDefaultRepeat,
                     const bool calcchecksum = true);
+  void sendOn(const uint16_t repeat = kSamsungAcDefaultRepeat);
+  void sendOff(const uint16_t repeat = kSamsungAcDefaultRepeat);
 #endif  // SEND_SAMSUNG_AC
   void begin();
   void on();
@@ -93,17 +98,23 @@ class IRSamsungAc {
                             const uint16_t length = kSamsungAcStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kSamsungAcStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kSamsungAcExtendedStateLength];
   void checksum(const uint16_t length = kSamsungAcStateLength);
-  IRsend _irsend;
 };
 
 #endif  // IR_SAMSUNG_H_

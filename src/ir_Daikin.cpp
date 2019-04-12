@@ -16,6 +16,9 @@ Copyright 2018-2019 crankyoldgit
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 #include "IRutils.h"
 
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
@@ -601,8 +604,41 @@ void IRDaikinESP::setCommand(uint32_t value) {
   setCurrentTime(value);
 }
 
-#if DECODE_DAIKIN
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kDaikinCool;
+    case stdAc::opmode_t::kHeat:
+      return kDaikinHeat;
+    case stdAc::opmode_t::kDry:
+      return kDaikinDry;
+    case stdAc::opmode_t::kFan:
+      return kDaikinFan;
+    default:
+      return kDaikinAuto;
+  }
+}
 
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikinESP::convertFan(stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kDaikinFanQuiet;
+    case stdAc::fanspeed_t::kLow:
+      return kDaikinFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kHigh:
+      return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kDaikinFanMax;
+    default:
+      return kDaikinFanAuto;
+  }
+}
+
+#if DECODE_DAIKIN
 void addbit(bool val, unsigned char data[]) {
   uint8_t curbit = data[kDaikinCurBit];
   uint8_t curindex = data[kDaikinCurIndex];
@@ -1181,6 +1217,54 @@ void IRDaikin2::setPurify(const bool on) {
 }
 
 bool IRDaikin2::getPurify() { return remote_state[36] & kDaikin2BitPurify; }
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kDaikinCool;
+    case stdAc::opmode_t::kHeat:
+      return kDaikinHeat;
+    case stdAc::opmode_t::kDry:
+      return kDaikinDry;
+    case stdAc::opmode_t::kFan:
+      return kDaikinFan;
+    default:
+      return kDaikinAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kDaikinFanQuiet;
+    case stdAc::fanspeed_t::kLow:
+      return kDaikinFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kHigh:
+      return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kDaikinFanMax;
+    default:
+      return kDaikinFanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native version.
+uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return (uint8_t)position + kDaikin2SwingVHigh;
+    default:
+      return kDaikin2SwingVAuto;
+  }
+}
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO

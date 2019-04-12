@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // Constants
 const uint8_t kHitachiAcAuto = 2;
@@ -59,17 +62,23 @@ class IRHitachiAc {
                             const uint16_t length = kHitachiAcStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kHitachiAcStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAcStateLength];
   void checksum(const uint16_t length = kHitachiAcStateLength);
-  IRsend _irsend;
   uint8_t _previoustemp;
 };
 

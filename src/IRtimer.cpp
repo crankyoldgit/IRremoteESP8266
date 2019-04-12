@@ -7,7 +7,7 @@
 
 #ifdef UNIT_TEST
 // Used to help simulate elapsed time in unit tests.
-extern uint32_t _IRtimer_unittest_now;
+uint32_t _IRtimer_unittest_now = 0;
 #endif  // UNIT_TEST
 
 // This class performs a simple time in useconds since instantiated.

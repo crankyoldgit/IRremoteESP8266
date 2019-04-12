@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //             CCCCC   OOOOO   OOOOO  LL      IIIII XX    XX
 //            CC    C OO   OO OO   OO LL       III   XX  XX
@@ -30,11 +33,11 @@
 
 // Constants
 // Modes
-const uint8_t kCoolixCool = 0b00;
-const uint8_t kCoolixDry = 0b01;
-const uint8_t kCoolixAuto = 0b10;
-const uint8_t kCoolixHeat = 0b11;
-const uint8_t kCoolixFan = 4;                                 // Synthetic.
+const uint8_t kCoolixCool = 0b000;
+const uint8_t kCoolixDry = 0b001;
+const uint8_t kCoolixAuto = 0b010;
+const uint8_t kCoolixHeat = 0b011;
+const uint8_t kCoolixFan = 0b100;                                 // Synthetic.
 const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
 const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000;  // 0x80000
 // Fan Control
@@ -120,17 +123,22 @@ class IRCoolixAC {
   bool getZoneFollow();
   uint32_t getRaw();
   void setRaw(const uint32_t new_code);
-
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   uint32_t remote_state;  // The state of the IR remote in IR code form.
   uint32_t saved_state;   // Copy of the state if we required a special mode.
-  IRsend _irsend;
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
   void setSensorTempRaw(const uint8_t code);

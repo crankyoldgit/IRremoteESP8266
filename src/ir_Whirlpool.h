@@ -14,6 +14,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //    WW      WW HH   HH IIIII RRRRRR  LL      PPPPPP   OOOOO   OOOOO  LL
 //    WW      WW HH   HH  III  RR   RR LL      PP   PP OO   OO OO   OO LL
@@ -129,19 +132,22 @@ class IRWhirlpoolAc {
               const uint16_t length = kWhirlpoolAcStateLength);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kWhirlpoolAcStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
-
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kWhirlpoolAcStateLength];
-  IRsend _irsend;
   uint8_t _desiredtemp;
   void checksum(const uint16_t length = kWhirlpoolAcStateLength);
   uint16_t getTime(const uint16_t pos);

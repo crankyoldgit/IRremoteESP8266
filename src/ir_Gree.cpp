@@ -305,6 +305,57 @@ uint8_t IRGreeAC::getSwingVerticalPosition() {
   return remote_state[4] & kGreeSwingPosMask;
 }
 
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kGreeCool;
+    case stdAc::opmode_t::kHeat:
+      return kGreeHeat;
+    case stdAc::opmode_t::kDry:
+      return kGreeDry;
+    case stdAc::opmode_t::kFan:
+      return kGreeFan;
+    default:
+      return kGreeAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kGreeFanMin;
+    case stdAc::fanspeed_t::kLow:
+    case stdAc::fanspeed_t::kMedium:
+      return kGreeFanMax - 1;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kGreeFanMax;
+    default:
+      return kGreeFanAuto;
+  }
+}
+
+// Convert a standard A/C Vertical Swing into its native version.
+uint8_t IRGreeAC::convertSwingV(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kHighest:
+      return kGreeSwingUp;
+    case stdAc::swingv_t::kHigh:
+      return kGreeSwingMiddleUp;
+    case stdAc::swingv_t::kMiddle:
+      return kGreeSwingMiddle;
+    case stdAc::swingv_t::kLow:
+      return kGreeSwingMiddleDown;
+    case stdAc::swingv_t::kLowest:
+      return kGreeSwingDown;
+    default:
+      return kGreeSwingAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRGreeAC::toString() {

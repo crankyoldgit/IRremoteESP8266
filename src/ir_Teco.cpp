@@ -136,6 +136,38 @@ void IRTecoAc::setSleep(const bool on) {
 
 bool IRTecoAc::getSleep(void) { return remote_state & kTecoSleep; }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kTecoCool;
+    case stdAc::opmode_t::kHeat:
+      return kTecoHeat;
+    case stdAc::opmode_t::kDry:
+      return kTecoDry;
+    case stdAc::opmode_t::kFan:
+      return kTecoFan;
+    default:
+      return kTecoAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRTecoAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kTecoFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kTecoFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kTecoFanHigh;
+    default:
+      return kTecoFanAuto;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRTecoAc::toString(void) {

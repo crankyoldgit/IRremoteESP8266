@@ -58,8 +58,8 @@ IRVestelAc::IRVestelAc(uint16_t pin) : _irsend(pin) { stateReset(); }
 // Reset the state of the remote to a known good state/sequence.
 void IRVestelAc::stateReset() {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
-  remote_state = 0x0F00D9001FEF201ULL;
-  remote_time_state = 0x201ULL;
+  remote_state = kVestelAcStateDefault;
+  remote_time_state = kVestelAcTimeStateDefault;
   use_time_state = false;
 }
 
@@ -93,13 +93,19 @@ void IRVestelAc::setRaw(uint8_t* newState) {
   uint64_t upState = 0;
   for (int i = 0; i < 7; i++)
     upState |= static_cast<uint64_t>(newState[i]) << (i * 8);
-  remote_state = upState;
-  remote_time_state = upState;
+  this->setRaw(upState);
 }
 
 void IRVestelAc::setRaw(const uint64_t newState) {
+  use_time_state = false;
   remote_state = newState;
   remote_time_state = newState;
+  if (this->isTimeCommand()) {
+    use_time_state = true;
+    remote_state = kVestelAcStateDefault;
+  } else {
+    remote_time_state = kVestelAcTimeStateDefault;
+  }
 }
 
 // Set the requested power state of the A/C to on.
@@ -396,6 +402,39 @@ void IRVestelAc::checksum() {
 
 bool IRVestelAc::isTimeCommand() {
   return (remote_state >> kVestelAcPowerOffset == 0x00 || use_time_state);
+}
+
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRVestelAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kVestelAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kVestelAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kVestelAcDry;
+    case stdAc::opmode_t::kFan:
+      return kVestelAcFan;
+    default:
+      return kVestelAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRVestelAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kVestelAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kVestelAcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kVestelAcFanHigh;
+    default:
+      return kVestelAcFanAuto;
+  }
 }
 
 // Convert the internal state into a human readable string.

@@ -11,6 +11,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //                      HH   HH   AAA   IIIII EEEEEEE RRRRRR
 //                      HH   HH  AAAAA   III  EE      RR   RR
@@ -223,6 +226,10 @@ class IRHaierAC {
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kHaierACStateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
+
 #ifdef ARDUINO
   String toString();
   static String timeToString(const uint16_t nr_mins);
@@ -230,14 +237,18 @@ class IRHaierAC {
   std::string toString();
   static std::string timeToString(const uint16_t nr_mins);
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   uint8_t remote_state[kHaierACStateLength];
   void stateReset();
   void checksum();
   static uint16_t getTime(const uint8_t ptr[]);
   static void setTime(uint8_t ptr[], const uint16_t nr_mins);
-  IRsend _irsend;
 };
 
 class IRHaierACYRW02 {
@@ -281,17 +292,24 @@ class IRHaierACYRW02 {
   void setRaw(uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kHaierACYRW02StateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   uint8_t remote_state[kHaierACYRW02StateLength];
   void stateReset();
   void checksum();
-  IRsend _irsend;
 };
 
 #endif  // IR_HAIER_H_

@@ -19,6 +19,7 @@
 #ifndef ARDUINO
 #include <string>
 #endif
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
@@ -345,6 +346,22 @@ void IRKelvinatorAC::setTurbo(bool state) {
 
 bool IRKelvinatorAC::getTurbo() {
   return ((remote_state[2] & kKelvinatorTurbo) != 0);
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kKelvinatorCool;
+    case stdAc::opmode_t::kHeat:
+      return kKelvinatorHeat;
+    case stdAc::opmode_t::kDry:
+      return kKelvinatorDry;
+    case stdAc::opmode_t::kFan:
+      return kKelvinatorFan;
+    default:
+      return kKelvinatorAuto;
+  }
 }
 
 // Convert the internal state into a human readable string.

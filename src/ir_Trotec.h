@@ -5,6 +5,9 @@
 
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // Constants
 // Byte 0
@@ -19,8 +22,7 @@ const uint8_t kTrotecCool = 1;
 const uint8_t kTrotecDry = 2;
 const uint8_t kTrotecFan = 3;
 
-const uint8_t kTrotecOn = 1;
-const uint8_t kTrotecOff = 0;
+const uint8_t kTrotecPowerBit = 0b00001000;
 
 const uint8_t kTrotecFanLow = 1;
 const uint8_t kTrotecFanMed = 2;
@@ -31,13 +33,12 @@ const uint8_t kTrotecMinTemp = 18;
 const uint8_t kTrotecDefTemp = 25;
 const uint8_t kTrotecMaxTemp = 32;
 
-const uint8_t kTrotecSleepOn = 1;
+const uint8_t kTrotecSleepBit = 0b10000000;
 
 // Byte 5
-const uint8_t kTrotecTimerOn = 1;
+const uint8_t kTrotecTimerBit = 0b01000000;
 
 // Byte 6
-const uint8_t kTrotecMinTimer = 0;
 const uint8_t kTrotecMaxTimer = 23;
 
 // Legacy defines. (Deperecated)
@@ -50,7 +51,6 @@ const uint8_t kTrotecMaxTimer = 23;
 #define TROTEC_FAN_HIGH kTrotecFanHigh
 #define TROTEC_MIN_TEMP kTrotecMinTemp
 #define TROTEC_MAX_TEMP kTrotecMaxTemp
-#define TROTEC_MIN_TIMER kTrotecMinTimer
 #define TROTEC_MAX_TIMER kTrotecMaxTimer
 
 class IRTrotecESP {
@@ -62,31 +62,38 @@ class IRTrotecESP {
 #endif  // SEND_TROTEC
   void begin();
 
-  void setPower(bool state);
-  uint8_t getPower();
+  void setPower(const bool state);
+  bool getPower();
 
-  void setTemp(uint8_t temp);
+  void setTemp(const uint8_t celsius);
   uint8_t getTemp();
 
-  void setSpeed(uint8_t fan);
+  void setSpeed(const uint8_t fan);
   uint8_t getSpeed();
 
   uint8_t getMode();
-  void setMode(uint8_t mode);
+  void setMode(const uint8_t mode);
 
   bool getSleep();
   void setSleep(bool sleep);
 
   uint8_t getTimer();
-  void setTimer(uint8_t timer);
+  void setTimer(const uint8_t timer);
 
   uint8_t* getRaw();
 
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+#ifndef UNIT_TEST
+
  private:
-  uint8_t trotec[kTrotecStateLength];
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint8_t remote_state[kTrotecStateLength];
   void stateReset();
   void checksum();
-  IRsend _irsend;
 };
 
 #endif  // IR_TROTEC_H_

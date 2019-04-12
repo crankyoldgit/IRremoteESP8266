@@ -31,6 +31,46 @@ const uint16_t kMaxAccurateUsecDelay = 16383;
 //  Usecs to wait between messages we don't know the proper gap time.
 const uint32_t kDefaultMessageGap = 100000;
 
+
+namespace stdAc {
+  enum class opmode_t {
+    kAuto = 0,
+    kCool = 1,
+    kHeat = 2,
+    kDry  = 3,
+    kFan  = 4,
+  };
+
+  enum class fanspeed_t {
+    kAuto = 0,
+    kMin =  1,
+    kLow =  2,
+    kMedium =  3,
+    kHigh = 4,
+    kMax =  5,
+  };
+
+  enum class swingv_t {
+    kOff =    -1,
+    kAuto =    0,
+    kHighest = 1,
+    kHigh =    2,
+    kMiddle =  3,
+    kLow =     4,
+    kLowest =  5,
+  };
+
+  enum class swingh_t {
+    kOff =     -1,
+    kAuto =     0,  // a.k.a. On.
+    kLeftMax =  1,
+    kLeft =     2,
+    kMiddle =   3,
+    kRight =    4,
+    kRightMax = 5,
+  };
+};  // namespace stdAc
+
 // Classes
 class IRsend {
  public:
@@ -99,9 +139,9 @@ class IRsend {
                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SAMSUNG_AC
-  void sendSamsungAC(unsigned char data[],
-                     uint16_t nbytes = kSamsungAcStateLength,
-                     uint16_t repeat = kSamsungAcDefaultRepeat);
+  void sendSamsungAC(const unsigned char data[],
+                     const uint16_t nbytes = kSamsungAcStateLength,
+                     const uint16_t repeat = kSamsungAcDefaultRepeat);
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,

@@ -10,6 +10,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // Constants
 const uint16_t kTcl112AcHdrMark = 3000;
@@ -80,17 +83,23 @@ class IRTcl112Ac {
   bool getSwingVertical(void);
   void setTurbo(const bool on);
   bool getTurbo(void);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
   std::string toString();
 #endif
+#ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
   uint8_t remote_state[kTcl112AcStateLength];
   void stateReset();
   void checksum(const uint16_t length = kTcl112AcStateLength);
-  IRsend _irsend;
 };
 
 #endif  // IR_TCL_H_

@@ -281,6 +281,7 @@ void IRFujitsuAC::setMode(uint8_t mode) {
 }
 
 uint8_t IRFujitsuAC::getMode() { return _mode; }
+
 // Set the requested swing operation mode of the a/c unit.
 void IRFujitsuAC::setSwing(uint8_t swingMode) {
   switch (_model) {
@@ -317,6 +318,39 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
       return true;  // Assume the checksum is valid for other lengths.
   }
   return checksum == (uint8_t)(sum_complement - sum);  // Does it match?
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRFujitsuAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kFujitsuAcModeCool;
+    case stdAc::opmode_t::kHeat:
+      return kFujitsuAcModeHeat;
+    case stdAc::opmode_t::kDry:
+      return kFujitsuAcModeDry;
+    case stdAc::opmode_t::kFan:
+      return kFujitsuAcModeFan;
+    default:
+      return kFujitsuAcModeAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRFujitsuAC::convertFan(stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kFujitsuAcFanQuiet;
+    case stdAc::fanspeed_t::kLow:
+      return kFujitsuAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kFujitsuAcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kFujitsuAcFanHigh;
+    default:
+      return kFujitsuAcFanAuto;
+  }
 }
 
 // Convert the internal state into a human readable string.

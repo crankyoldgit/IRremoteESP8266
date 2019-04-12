@@ -106,7 +106,7 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 }
 #endif  // SEND_HITACHI_AC2
 
-// Class for handling the remote control oh a Hitachi 28 byte A/C message.
+// Class for handling the remote control on a Hitachi 28 byte A/C message.
 // Inspired by:
 // https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
 
@@ -255,6 +255,40 @@ void IRHitachiAc::setSwingHorizontal(const bool on) {
     remote_state[15] |= 0x80;
   else
     remote_state[15] &= 0x7F;
+}
+
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kHitachiAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kHitachiAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kHitachiAcDry;
+    case stdAc::opmode_t::kFan:
+      return kHitachiAcFan;
+    default:
+      return kHitachiAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kHitachiAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kHitachiAcFanLow + 1;
+    case stdAc::fanspeed_t::kHigh:
+      return kHitachiAcFanHigh - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kHitachiAcFanHigh;
+    default:
+      return kHitachiAcFanAuto;
+  }
 }
 
 // Convert the internal state into a human readable string.

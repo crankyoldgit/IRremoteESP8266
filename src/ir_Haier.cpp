@@ -312,6 +312,55 @@ std::string IRHaierAC::timeToString(const uint16_t nr_mins) {
   return result;
 }
 
+// Convert a standard A/C mode into its native mode.
+uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kHaierAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kHaierAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kHaierAcDry;
+    case stdAc::opmode_t::kFan:
+      return kHaierAcFan;
+    default:
+      return kHaierAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHaierAC::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kHaierAcFanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kHaierAcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kHaierAcFanHigh;
+    default:
+      return kHaierAcFanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRHaierAC::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+      return kHaierAcSwingUp;
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return kHaierAcSwingDown;
+    case stdAc::swingv_t::kOff:
+      return kHaierAcSwingOff;
+    default:
+      return kHaierAcSwingChg;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRHaierAC::toString() {
@@ -634,6 +683,57 @@ void IRHaierACYRW02::setSwing(uint8_t state) {
 
   remote_state[1] &= 0b11110000;
   remote_state[1] |= newstate;
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kHaierAcYrw02Cool;
+    case stdAc::opmode_t::kHeat:
+      return kHaierAcYrw02Heat;
+    case stdAc::opmode_t::kDry:
+      return kHaierAcYrw02Dry;
+    case stdAc::opmode_t::kFan:
+      return kHaierAcYrw02Fan;
+    default:
+      return kHaierAcYrw02Auto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kHaierAcYrw02FanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kHaierAcYrw02FanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kHaierAcYrw02FanHigh;
+    default:
+      return kHaierAcYrw02FanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+      return kHaierAcYrw02SwingTop;
+    case stdAc::swingv_t::kMiddle:
+      return kHaierAcYrw02SwingMiddle;
+    case stdAc::swingv_t::kLow:
+      return kHaierAcYrw02SwingDown;
+    case stdAc::swingv_t::kLowest:
+      return kHaierAcYrw02SwingBottom;
+    case stdAc::swingv_t::kOff:
+      return kHaierAcYrw02SwingOff;
+    default:
+      return kHaierAcYrw02SwingAuto;
+  }
 }
 
 // Convert the internal state into a human readable string.

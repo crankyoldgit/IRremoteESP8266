@@ -11,6 +11,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 //                  MM    MM IIIII DDDDD   EEEEEEE   AAA
 //                  MMM  MMM  III  DD  DD  EE       AAAAA
@@ -85,6 +88,8 @@ class IRMideaAC {
   static bool validChecksum(const uint64_t state);
   void setSleep(const bool state);
   bool getSleep();
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString();
 #else
@@ -93,11 +98,13 @@ class IRMideaAC {
 #ifndef UNIT_TEST
 
  private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
 #endif
   uint64_t remote_state;
   void checksum();
   static uint8_t calcChecksum(const uint64_t state);
-  IRsend _irsend;
 };
 
 #endif  // IR_MIDEA_H_
