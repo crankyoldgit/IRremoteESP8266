@@ -313,74 +313,77 @@ String IRGreeAC::toString() {
 std::string IRGreeAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kGreeAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kGreeCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kGreeHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kGreeDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kGreeFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case 0:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kGreeFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
   }
-  result += ", Turbo: ";
+  result += F(", Turbo: ");
   if (getTurbo())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", XFan: ";
+    result += F("Off");
+  result += F(", XFan: ");
   if (getXFan())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Light: ";
+    result += F("Off");
+  result += F(", Light: ");
   if (getLight())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Sleep: ";
+    result += F("Off");
+  result += F(", Sleep: ");
   if (getSleep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing Vertical Mode: ";
+    result += F("Off");
+  result += F(", Swing Vertical Mode: ");
   if (getSwingVerticalAuto())
-    result += "Auto";
+    result += F("Auto");
   else
-    result += "Manual";
-  result +=
-      ", Swing Vertical Pos: " + uint64ToString(getSwingVerticalPosition());
+    result += F("Manual");
+  result += F(", Swing Vertical Pos: ");
+  result += uint64ToString(getSwingVerticalPosition());
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
-      result += " (Last Pos)";
+      result += F(" (Last Pos)");
       break;
     case kGreeSwingAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
   }
   return result;

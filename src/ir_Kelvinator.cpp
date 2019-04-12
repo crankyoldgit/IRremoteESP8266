@@ -355,76 +355,79 @@ String IRKelvinatorAC::toString() {
 std::string IRKelvinatorAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kKelvinatorAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kKelvinatorCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kKelvinatorHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kKelvinatorDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kKelvinatorFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kKelvinatorFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kKelvinatorFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
   }
-  result += ", Turbo: ";
+  result += F(", Turbo: ");
   if (getTurbo())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Quiet: ";
+    result += F("Off");
+  result += F(", Quiet: ");
   if (getQuiet())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", XFan: ";
+    result += F("Off");
+  result += F(", XFan: ");
   if (getXFan())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", IonFilter: ";
+    result += F("Off");
+  result += F(", IonFilter: ");
   if (getIonFilter())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Light: ";
+    result += F("Off");
+  result += F(", Light: ");
   if (getLight())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing (Horizontal): ";
+    result += F("Off");
+  result += F(", Swing (Horizontal): ");
   if (getSwingHorizontal())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing (Vertical): ";
+    result += F("Off");
+  result += F(", Swing (Vertical): ");
   if (getSwingVertical())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
   return result;
 }
 

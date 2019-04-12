@@ -265,57 +265,60 @@ String IRHitachiAc::toString() {
 std::string IRHitachiAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kHitachiAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kHitachiAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kHitachiAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kHitachiAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kHitachiAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kHitachiAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kHitachiAcFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     case kHitachiAcFanHigh:
-      result += " (HIGH)";
+      result += F(" (HIGH)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
-  result += ", Swing (Vertical): ";
+  result += F(", Swing (Vertical): ");
   if (getSwingVertical())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing (Horizontal): ";
+    result += F("Off");
+  result += F(", Swing (Horizontal): ");
   if (getSwingHorizontal())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
+    result += F("Off");
   return result;
 }
 

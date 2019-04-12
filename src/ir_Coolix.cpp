@@ -313,92 +313,97 @@ String IRCoolixAC::toString() {
 std::string IRCoolixAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower()) {
-    result += "On";
+    result += F("On");
   } else {
-    result += "Off";
+    result += F("Off");
     return result;  // If it's off, there is no other info.
   }
   // Special modes.
   if (getSwing()) {
-    result += ", Swing: Toggle";
+    result += F(", Swing: Toggle");
     return result;
   }
   if (getSleep()) {
-    result += ", Sleep: Toggle";
+    result += F(", Sleep: Toggle");
     return result;
   }
   if (getTurbo()) {
-    result += ", Turbo: Toggle";
+    result += F(", Turbo: Toggle");
     return result;
   }
   if (getLed()) {
-    result += ", Led: Toggle";
+    result += F(", Led: Toggle");
     return result;
   }
   if (getClean()) {
-    result += ", Clean: Toggle";
+    result += F(", Clean: Toggle");
     return result;
   }
-  result += ", Mode: " + uint64ToString(getMode());
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kCoolixAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kCoolixCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kCoolixHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kCoolixDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kCoolixFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kCoolixFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kCoolixFanAuto0:
-      result += " (AUTO0)";
+      result += F(" (AUTO0)");
       break;
     case kCoolixFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
     case kCoolixFanMin:
-      result += " (MIN)";
+      result += F(" (MIN)");
       break;
     case kCoolixFanMed:
-      result += " (MED)";
+      result += F(" (MED)");
       break;
     case kCoolixFanZoneFollow:
-      result += " (ZONEFOLLOW)";
+      result += F(" (ZONEFOLLOW)");
       break;
     case kCoolixFanFixed:
-      result += " (FIXED)";
+      result += F(" (FIXED)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  if (getMode() != kCoolixFan)  // Fan mode doesn't have a temperature.
-    result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Zone Follow: ";
+  if (getMode() != kCoolixFan) {  // Fan mode doesn't have a temperature.
+    result += F(", Temp: ");
+    result += uint64ToString(getTemp());
+    result += 'C';
+  }
+  result += F(", Zone Follow: ");
   if (getZoneFollow())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Sensor Temp: ";
+    result += F("Off");
+  result += F(", Sensor Temp: ");
   if (getSensorTemp() > kCoolixSensorTempMax)
-    result += "Ignored";
+    result += F("Ignored");
   else
-    result += uint64ToString(getSensorTemp()) + "C";
+    result += uint64ToString(getSensorTemp()) + F("C");
   return result;
 }
 

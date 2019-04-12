@@ -405,11 +405,11 @@ std::string IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
   std::string result = "";
 #endif  // ARDUINO
   uint8_t hours = minspastmidnight / 60;
-  if (hours < 10) result += "0";
+  if (hours < 10) result += '0';
   result += uint64ToString(hours);
-  result += ":";
+  result += ':';
   uint8_t mins = minspastmidnight % 60;
-  if (mins < 10) result += "0";
+  if (mins < 10) result += '0';
   result += uint64ToString(mins);
   return result;
 }
@@ -422,133 +422,138 @@ String IRWhirlpoolAc::toString() {
 std::string IRWhirlpoolAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Model: " + uint64ToString(getModel());
+  result += F("Model: ");
+  result += uint64ToString(getModel());
   switch (getModel()) {
     case DG11J191:
-      result += " (DG11J191)";
+      result += F(" (DG11J191)");
       break;
     case DG11J13A:
-      result += " (DG11J13A)";
+      result += F(" (DG11J13A)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Power toggle: ";
+  result += F(", Power toggle: ");
   if (getPowerToggle())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kWhirlpoolAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kWhirlpoolAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kWhirlpoolAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kWhirlpoolAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kWhirlpoolAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kWhirlpoolAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kWhirlpoolAcFanHigh:
-      result += " (HIGH)";
+      result += F(" (HIGH)");
       break;
     case kWhirlpoolAcFanMedium:
-      result += " (MEDIUM)";
+      result += F(" (MEDIUM)");
       break;
     case kWhirlpoolAcFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
-  result += ", Swing: ";
+  result += F(", Swing: ");
   if (getSwing())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Light: ";
+    result += F("Off");
+  result += F(", Light: ");
   if (getLight())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Clock: ";
+    result += F("Off");
+  result += F(", Clock: ");
   result += timeToString(getClock());
-  result += ", On Timer: ";
+  result += F(", On Timer: ");
   if (isOnTimerEnabled())
     result += timeToString(getOnTimer());
   else
-    result += "Off";
-  result += ", Off Timer: ";
+    result += F("Off");
+  result += F(", Off Timer: ");
   if (isOffTimerEnabled())
     result += timeToString(getOffTimer());
   else
-    result += "Off";
-  result += ", Sleep: ";
+    result += F("Off");
+  result += F(", Sleep: ");
   if (getSleep())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Super: ";
+    result += F("Off");
+  result += F(", Super: ");
   if (getSuper())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Command: " + uint64ToString(getCommand());
+    result += F("Off");
+  result += F(", Command: ");
+  result += uint64ToString(getCommand());
   switch (getCommand()) {
     case kWhirlpoolAcCommandLight:
-      result += " (LIGHT)";
+      result += F(" (LIGHT)");
       break;
     case kWhirlpoolAcCommandPower:
-      result += " (POWER)";
+      result += F(" (POWER)");
       break;
     case kWhirlpoolAcCommandTemp:
-      result += " (TEMP)";
+      result += F(" (TEMP)");
       break;
     case kWhirlpoolAcCommandSleep:
-      result += " (SLEEP)";
+      result += F(" (SLEEP)");
       break;
     case kWhirlpoolAcCommandSuper:
-      result += " (SUPER)";
+      result += F(" (SUPER)");
       break;
     case kWhirlpoolAcCommandOnTimer:
-      result += " (ONTIMER)";
+      result += F(" (ONTIMER)");
       break;
     case kWhirlpoolAcCommandMode:
-      result += " (MODE)";
+      result += F(" (MODE)");
       break;
     case kWhirlpoolAcCommandSwing:
-      result += " (SWING)";
+      result += F(" (SWING)");
       break;
     case kWhirlpoolAcCommandIFeel:
-      result += " (IFEEL)";
+      result += F(" (IFEEL)");
       break;
     case kWhirlpoolAcCommandFanSpeed:
-      result += " (FANSPEED)";
+      result += F(" (FANSPEED)");
       break;
     case kWhirlpoolAcCommand6thSense:
-      result += " (6THSENSE)";
+      result += F(" (6THSENSE)");
       break;
     case kWhirlpoolAcCommandOffTimer:
-      result += " (OFFTIMER)";
+      result += F(" (OFFTIMER)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
       break;
   }
   return result;

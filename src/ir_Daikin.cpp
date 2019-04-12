@@ -407,9 +407,9 @@ std::string IRDaikinESP::renderTime(uint16_t timemins) {
 #endif  // ARDUINO
   uint16_t hours, mins;
   hours = timemins / 60;
-  ret = uint64ToString(hours) + ":";
+  ret = uint64ToString(hours) + ':';
   mins = timemins - (hours * 60);
-  if (mins < 10) ret += "0";
+  if (mins < 10) ret += '0';
   ret += uint64ToString(mins);
   return ret;
 }
@@ -422,93 +422,97 @@ String IRDaikinESP::toString() {
 std::string IRDaikinESP::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kDaikinAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kDaikinCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kDaikinHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kDaikinDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kDaikinFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kDaikinFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kDaikinFanQuiet:
-      result += " (QUIET)";
+      result += F(" (QUIET)");
       break;
     case kDaikinFanMin:
-      result += " (MIN)";
+      result += F(" (MIN)");
       break;
     case kDaikinFanMax:
-      result += " (MAX)";
+      result += F(" (MAX)");
       break;
   }
-  result += ", Powerful: ";
+  result += F(", Powerful: ");
   if (getPowerful())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Quiet: ";
+    result += F("Off");
+  result += F(", Quiet: ");
   if (getQuiet())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Sensor: ";
+    result += F("Off");
+  result += F(", Sensor: ");
   if (getSensor())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Eye: ";
+    result += F("Off");
+  result += F(", Eye: ");
   if (getEye())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mold: ";
+    result += F("Off");
+  result += F(", Mold: ");
   if (getMold())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing (Horizontal): ";
+    result += F("Off");
+  result += F(", Swing (Horizontal): ");
   if (getSwingHorizontal())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Swing (Vertical): ";
+    result += F("Off");
+  result += F(", Swing (Vertical): ");
   if (getSwingVertical())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Current Time: " + renderTime(getCurrentTime());
-  result += ", On Time: ";
+  result += F("Off");
+  result += F(", Current Time: ");
+  result += renderTime(getCurrentTime());
+  result += F(", On Time: ");
   if (getOnTimerEnabled())
     result += renderTime(getOnTime());
   else
-    result += "Off";
-  result += ", Off Time: ";
+    result += F("Off");
+  result += F(", Off Time: ");
   if (getOffTimerEnabled())
     result += renderTime(getOffTime());
   else
-    result += "Off";
+    result += F("Off");
 
   return result;
 }
@@ -524,7 +528,7 @@ void IRDaikinESP::printState() {
   DPRINTLN("Raw Bits:");
   for (uint8_t i = 0; i < kDaikinStateLength; i++) {
     strbits = uint64ToString(daikin[i], BIN);
-    while (strbits.length() < 8) strbits = "0" + strbits;
+    while (strbits.length() < 8) strbits = '0' + strbits;
     DPRINT(strbits);
     DPRINT(" ");
   }
@@ -1186,51 +1190,55 @@ String IRDaikin2::toString() {
 std::string IRDaikin2::toString() {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
+  result += F("Power: ");
   if (getPower())
-    result += "On";
+    result += F("On");
   else
-    result += "Off";
-  result += ", Mode: " + uint64ToString(getMode());
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kDaikinAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kDaikinCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kDaikinHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kDaikinDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kDaikinFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kDaikinFanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kDaikinFanQuiet:
-      result += " (Quiet)";
+      result += F(" (Quiet)");
       break;
     case kDaikinFanMin:
-      result += " (Min)";
+      result += F(" (Min)");
       break;
     case kDaikinFanMax:
-      result += " (Max)";
+      result += F(" (Max)");
       break;
   }
-  result += ", Swing (V): " + uint64ToString(getSwingVertical());
+  result += F(", Swing (V): ");
+  result += uint64ToString(getSwingVertical());
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
-      result += " (Highest)";
+      result += F(" (Highest)");
       break;
     case 2:
     case 3:
@@ -1238,94 +1246,98 @@ std::string IRDaikin2::toString() {
     case 5:
       break;
     case kDaikin2SwingVLow:
-      result += " (Lowest)";
+      result += F(" (Lowest)");
       break;
     case kDaikin2SwingVBreeze:
-      result += " (Breeze)";
+      result += F(" (Breeze)");
       break;
     case kDaikin2SwingVCirculate:
-      result += " (Circulate)";
+      result += F(" (Circulate)");
       break;
     case kDaikin2SwingVAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     default:
-      result += " (Unknown)";
+      result += F(" (Unknown)");
   }
-  result += ", Swing (H): " + uint64ToString(getSwingHorizontal());
+  result += F(", Swing (H): ");
+  result += uint64ToString(getSwingHorizontal());
   switch (getSwingHorizontal()) {
     case kDaikin2SwingHAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kDaikin2SwingHSwing:
-      result += " (Swing)";
+      result += F(" (Swing)");
       break;
   }
-  result += ", Clock: " + IRDaikinESP::renderTime(getCurrentTime());
-  result += ", On Time: ";
+  result += F(", Clock: ");
+  result += IRDaikinESP::renderTime(getCurrentTime());
+  result += F(", On Time: ");
   if (getOnTimerEnabled())
     result += IRDaikinESP::renderTime(getOnTime());
   else
-    result += "Off";
-  result += ", Off Time: ";
+    result += F("Off");
+  result += F(", Off Time: ");
   if (getOffTimerEnabled())
     result += IRDaikinESP::renderTime(getOffTime());
   else
-    result += "Off";
-  result += ", Sleep Time: ";
+    result += F("Off");
+  result += F(", Sleep Time: ");
   if (getSleepTimerEnabled())
     result += IRDaikinESP::renderTime(getSleepTime());
   else
-    result += "Off";
-  result += ", Beep: " + uint64ToString(getBeep());
+    result += F("Off");
+  result += F(", Beep: ");
+  result += uint64ToString(getBeep());
   switch (getBeep()) {
     case kDaikinBeepLoud:
-      result += " (Loud)";
+      result += F(" (Loud)");
       break;
     case kDaikinBeepQuiet:
-      result += " (Quiet)";
+      result += F(" (Quiet)");
       break;
     case kDaikinBeepOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Light: " + uint64ToString(getLight());
+  result += F(", Light: ");
+  result += uint64ToString(getLight());
   switch (getLight()) {
     case kDaikinLightBright:
-      result += " (Bright)";
+      result += F(" (Bright)");
       break;
     case kDaikinLightDim:
-      result += " (Dim)";
+      result += F(" (Dim)");
       break;
     case kDaikinLightOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Mold: ";
-  result += (getMold() ? "On" : "Off");
-  result += ", Clean: ";
-  result += (getClean() ? "On" : "Off");
-  result += ", Fresh Air: ";
+  result += F(", Mold: ");
+  result += (getMold() ? F("On") : F("Off"));
+  result += F(", Clean: ");
+  result += (getClean() ? F("On") : F("Off"));
+  result += F(", Fresh Air: ");
   if (getFreshAir())
     result += (getFreshAirHigh() ? "High" : "On");
   else
-    result += "Off";
-  result += ", Eye: ";
-  result += (getEye() ? "On" : "Off");
-  result += ", Eye Auto: ";
-  result += (getEyeAuto() ? "On" : "Off");
-  result += ", Quiet: ";
-  result += (getQuiet() ? "On" : "Off");
-  result += ", Powerful: ";
-  result += (getPowerful() ? "On" : "Off");
+    result += F("Off");
+  result += F(", Eye: ");
+  result += (getEye() ? F("On") : F("Off"));
+  result += F(", Eye Auto: ");
+  result += (getEyeAuto() ? F("On") : F("Off"));
+  result += F(", Quiet: ");
+  result += (getQuiet() ? F("On") : F("Off"));
+  result += F(", Powerful: ");
+  result += (getPowerful() ? F("On") : F("Off"));
   result += ", Purify: ";
-  result += (getPurify() ? "On" : "Off");
-  result += ", Econo: ";
-  result += (getEcono() ? "On" : "Off");
+  result += (getPurify() ? F("On") : F("Off"));
+  result += F(", Econo: ");
+  result += (getEcono() ? F("On") : F("Off"));
   return result;
 }
 

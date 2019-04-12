@@ -407,76 +407,80 @@ std::string IRVestelAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
   if (isTimeCommand()) {
-    result += "Time: " + IRHaierAC::timeToString(getTime());
+    result += F("Time: ");
+    result += IRHaierAC::timeToString(getTime());
 
-    result += ", Timer: ";
-    result += isTimerActive() ? IRHaierAC::timeToString(getTimer()) : "Off";
+    result += F(", Timer: ");
+    result += isTimerActive() ? IRHaierAC::timeToString(getTimer()) : F("Off");
 
-    result += ", On Timer: ";
+    result += F(", On Timer: ");
     result += (isOnTimerActive() && !isTimerActive())
                   ? IRHaierAC::timeToString(getOnTimer())
-                  : "Off";
+                  : F("Off");
 
-    result += ", Off Timer: ";
+    result += F(", Off Timer: ");
     result +=
-        isOffTimerActive() ? IRHaierAC::timeToString(getOffTimer()) : "Off";
+        isOffTimerActive() ? IRHaierAC::timeToString(getOffTimer()) : F("Off");
     return result;
   }
   // Not a time command, it's a normal command.
-  result += "Power: ";
-  result += (getPower() ? "On" : "Off");
-  result += ", Mode: " + uint64ToString(getMode());
+  result += F("Power: ");
+  result += (getPower() ? F("On") : F("Off"));
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
   switch (getMode()) {
     case kVestelAcAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kVestelAcCool:
-      result += " (COOL)";
+      result += F(" (COOL)");
       break;
     case kVestelAcHeat:
-      result += " (HEAT)";
+      result += F(" (HEAT)");
       break;
     case kVestelAcDry:
-      result += " (DRY)";
+      result += F(" (DRY)");
       break;
     case kVestelAcFan:
-      result += " (FAN)";
+      result += F(" (FAN)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(getFan());
   switch (getFan()) {
     case kVestelAcFanAuto:
-      result += " (AUTO)";
+      result += F(" (AUTO)");
       break;
     case kVestelAcFanLow:
-      result += " (LOW)";
+      result += F(" (LOW)");
       break;
     case kVestelAcFanMed:
-      result += " (MEDIUM)";
+      result += F(" (MEDIUM)");
       break;
     case kVestelAcFanHigh:
-      result += " (HIGH)";
+      result += F(" (HIGH)");
       break;
     case kVestelAcFanAutoCool:
-      result += " (AUTO COOL)";
+      result += F(" (AUTO COOL)");
       break;
     case kVestelAcFanAutoHot:
-      result += " (AUTO HOT)";
+      result += F(" (AUTO HOT)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Sleep: ";
-  result += (getSleep() ? "On" : "Off");
-  result += ", Turbo: ";
-  result += (getTurbo() ? "On" : "Off");
-  result += ", Ion: ";
-  result += (getIon() ? "On" : "Off");
-  result += ", Swing: ";
-  result += (getSwing() ? "On" : "Off");
+  result += F(", Sleep: ");
+  result += (getSleep() ? F("On") : F("Off"));
+  result += F(", Turbo: ");
+  result += (getTurbo() ? F("On") : F("Off"));
+  result += F(", Ion: ");
+  result += (getIon() ? F("On") : F("Off"));
+  result += F(", Swing: ");
+  result += (getSwing() ? F("On") : F("Off"));
   return result;
 }
 
