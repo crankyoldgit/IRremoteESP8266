@@ -311,127 +311,132 @@ String IRMitsubishiHeavy152Ac::toString(void) {
 std::string IRMitsubishiHeavy152Ac::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
-  result += (this->getPower() ? "On" : "Off");
-  result += ", Mode: " + uint64ToString(this->getMode());
+  result += F("Power: ");
+  result += (this->getPower() ? F("On") : F("Off"));
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
   switch (this->getMode()) {
     case kMitsubishiHeavyAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavyCool:
-      result += " (Cool)";
+      result += F(" (Cool)");
       break;
     case kMitsubishiHeavyHeat:
-      result += " (Heat)";
+      result += F(" (Heat)");
       break;
     case kMitsubishiHeavyDry:
-      result += " (Dry)";
+      result += F(" (Dry)");
       break;
     case kMitsubishiHeavyFan:
-      result += " (Fan)";
+      result += F(" (Fan)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(this->getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp()) + 'C';
+  result += F(", Fan: ");
+  result += uint64ToString(this->getFan());
   switch (this->getFan()) {
     case kMitsubishiHeavy152FanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy152FanHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kMitsubishiHeavy152FanLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kMitsubishiHeavy152FanMed:
-      result += " (Med)";
+      result += F(" (Med)");
       break;
     case kMitsubishiHeavy152FanMax:
-      result += " (Max)";
+      result += F(" (Max)");
       break;
     case kMitsubishiHeavy152FanEcono:
-      result += " (Econo)";
+      result += F(" (Econo)");
       break;
     case kMitsubishiHeavy152FanTurbo:
-      result += " (Turbo)";
+      result += F(" (Turbo)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Swing (V): " + uint64ToString(this->getSwingVertical());
+  result += F(", Swing (V): ");
+  result += uint64ToString(this->getSwingVertical());
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy152SwingVAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy152SwingVHighest:
-      result += " (Highest)";
+      result += F(" (Highest)");
       break;
     case kMitsubishiHeavy152SwingVHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kMitsubishiHeavy152SwingVMiddle:
-      result += " (Middle)";
+      result += F(" (Middle)");
       break;
     case kMitsubishiHeavy152SwingVLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kMitsubishiHeavy152SwingVLowest:
-      result += " (Lowest)";
+      result += F(" (Lowest)");
       break;
     case kMitsubishiHeavy152SwingVOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Swing (H): " + uint64ToString(this->getSwingHorizontal());
+  result += F(", Swing (H): ");
+  result += uint64ToString(this->getSwingHorizontal());
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy152SwingHAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy152SwingHLeftMax:
-      result += " (Max Left)";
+      result += F(" (Max Left)");
       break;
     case kMitsubishiHeavy152SwingHLeft:
-      result += " (Left)";
+      result += F(" (Left)");
       break;
     case kMitsubishiHeavy152SwingHMiddle:
-      result += " (Middle)";
+      result += F(" (Middle)");
       break;
     case kMitsubishiHeavy152SwingHRight:
-      result += " (Right)";
+      result += F(" (Right)");
       break;
     case kMitsubishiHeavy152SwingHRightMax:
-      result += " (Max Right)";
+      result += F(" (Max Right)");
       break;
     case kMitsubishiHeavy152SwingHLeftRight:
-      result += " (Left Right)";
+      result += F(" (Left Right)");
       break;
     case kMitsubishiHeavy152SwingHRightLeft:
-      result += " (Right Left)";
+      result += F(" (Right Left)");
       break;
     case kMitsubishiHeavy152SwingHOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Silent: ";
-  result += (this->getSilent() ? "On" : "Off");
-  result += ", Turbo: ";
-  result += (this->getTurbo() ? "On" : "Off");
-  result += ", Econo: ";
-  result += (this->getEcono() ? "On" : "Off");
-  result += ", Night: ";
-  result += (this->getNight() ? "On" : "Off");
-  result += ", Filter: ";
-  result += (this->getFilter() ? "On" : "Off");
-  result += ", 3D: ";
-  result += (this->get3D() ? "On" : "Off");
-  result += ", Clean: ";
-  result += (this->getClean() ? "On" : "Off");
+  result += F(", Silent: ");
+  result += (this->getSilent() ? F("On") : F("Off"));
+  result += F(", Turbo: ");
+  result += (this->getTurbo() ? F("On") : F("Off"));
+  result += F(", Econo: ");
+  result += (this->getEcono() ? F("On") : F("Off"));
+  result += F(", Night: ");
+  result += (this->getNight() ? F("On") : F("Off"));
+  result += F(", Filter: ");
+  result += (this->getFilter() ? F("On") : F("Off"));
+  result += F(", 3D: ");
+  result += (this->get3D() ? F("On") : F("Off"));
+  result += F(", Clean: ");
+  result += (this->getClean() ? F("On") : F("Off"));
   return result;
 }
 
@@ -660,121 +665,126 @@ String IRMitsubishiHeavy88Ac::toString(void) {
 std::string IRMitsubishiHeavy88Ac::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
-  result += "Power: ";
-  result += (this->getPower() ? "On" : "Off");
-  result += ", Mode: " + uint64ToString(this->getMode());
+  result += F("Power: ");
+  result += (this->getPower() ? F("On") : F("Off"));
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
   switch (this->getMode()) {
     case kMitsubishiHeavyAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavyCool:
-      result += " (Cool)";
+      result += F(" (Cool)");
       break;
     case kMitsubishiHeavyHeat:
-      result += " (Heat)";
+      result += F(" (Heat)");
       break;
     case kMitsubishiHeavyDry:
-      result += " (Dry)";
+      result += F(" (Dry)");
       break;
     case kMitsubishiHeavyFan:
-      result += " (Fan)";
+      result += F(" (Fan)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Temp: " + uint64ToString(this->getTemp()) + "C";
-  result += ", Fan: " + uint64ToString(this->getFan());
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp()) + 'C';
+  result += F(", Fan: ");
+  result += uint64ToString(this->getFan());
   switch (this->getFan()) {
     case kMitsubishiHeavy88FanAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy88FanHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kMitsubishiHeavy88FanLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kMitsubishiHeavy88FanMed:
-      result += " (Med)";
+      result += F(" (Med)");
       break;
     case kMitsubishiHeavy88FanEcono:
-      result += " (Econo)";
+      result += F(" (Econo)");
       break;
     case kMitsubishiHeavy88FanTurbo:
-      result += " (Turbo)";
+      result += F(" (Turbo)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Swing (V): " + uint64ToString(this->getSwingVertical());
+  result += F(", Swing (V): ");
+  result += uint64ToString(this->getSwingVertical());
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy88SwingVAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy88SwingVHighest:
-      result += " (Highest)";
+      result += F(" (Highest)");
       break;
     case kMitsubishiHeavy88SwingVHigh:
-      result += " (High)";
+      result += F(" (High)");
       break;
     case kMitsubishiHeavy88SwingVMiddle:
-      result += " (Middle)";
+      result += F(" (Middle)");
       break;
     case kMitsubishiHeavy88SwingVLow:
-      result += " (Low)";
+      result += F(" (Low)");
       break;
     case kMitsubishiHeavy88SwingVLowest:
-      result += " (Lowest)";
+      result += F(" (Lowest)");
       break;
     case kMitsubishiHeavy88SwingVOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Swing (H): " + uint64ToString(this->getSwingHorizontal());
+  result += F(", Swing (H): ");
+  result += uint64ToString(this->getSwingHorizontal());
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy88SwingHAuto:
-      result += " (Auto)";
+      result += F(" (Auto)");
       break;
     case kMitsubishiHeavy88SwingHLeftMax:
-      result += " (Max Left)";
+      result += F(" (Max Left)");
       break;
     case kMitsubishiHeavy88SwingHLeft:
-      result += " (Left)";
+      result += F(" (Left)");
       break;
     case kMitsubishiHeavy88SwingHMiddle:
-      result += " (Middle)";
+      result += F(" (Middle)");
       break;
     case kMitsubishiHeavy88SwingHRight:
-      result += " (Right)";
+      result += F(" (Right)");
       break;
     case kMitsubishiHeavy88SwingHRightMax:
-      result += " (Max Right)";
+      result += F(" (Max Right)");
       break;
     case kMitsubishiHeavy88SwingHLeftRight:
-      result += " (Left Right)";
+      result += F(" (Left Right)");
       break;
     case kMitsubishiHeavy88SwingHRightLeft:
-      result += " (Right Left)";
+      result += F(" (Right Left)");
       break;
     case kMitsubishiHeavy88SwingH3D:
-      result += " (3D)";
+      result += F(" (3D)");
       break;
     case kMitsubishiHeavy88SwingHOff:
-      result += " (Off)";
+      result += F(" (Off)");
       break;
     default:
-      result += " (UNKNOWN)";
+      result += F(" (UNKNOWN)");
   }
-  result += ", Turbo: ";
-  result += (this->getTurbo() ? "On" : "Off");
-  result += ", Econo: ";
-  result += (this->getEcono() ? "On" : "Off");
-  result += ", 3D: ";
-  result += (this->get3D() ? "On" : "Off");
-  result += ", Clean: ";
-  result += (this->getClean() ? "On" : "Off");
+  result += F(", Turbo: ");
+  result += (this->getTurbo() ? F("On") : F("Off"));
+  result += F(", Econo: ");
+  result += (this->getEcono() ? F("On") : F("Off"));
+  result += F(", 3D: ");
+  result += (this->get3D() ? F("On") : F("Off"));
+  result += F(", Clean: ");
+  result += (this->getClean() ? F("On") : F("Off"));
   return result;
 }
 

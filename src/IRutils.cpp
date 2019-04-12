@@ -193,10 +193,10 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       result = F("MITSUBISHI_AC");
       break;
     case MITSUBISHI_HEAVY_88:
-      result = "MITSUBISHI_HEAVY_88";
+      result = F("MITSUBISHI_HEAVY_88");
       break;
     case MITSUBISHI_HEAVY_152:
-      result = "MITSUBISHI_HEAVY_152";
+      result = F("MITSUBISHI_HEAVY_152");
       break;
     case MWM:
       result = F("MWM");
@@ -361,15 +361,16 @@ std::string resultToSourceCode(const decode_results *results) {
     }
     output += uint64ToString(usecs, 10);
     if (i < results->rawlen - 1)
-      output += ", ";               // ',' not needed on the last one
-    if (i % 2 == 0) output += " ";  // Extra if it was even.
+      output += F(", ");            // ',' not needed on the last one
+    if (i % 2 == 0) output += ' ';  // Extra if it was even.
   }
 
   // End declaration
-  output += "};";
+  output += F("};");
 
   // Comment
-  output += "  // " + typeToString(results->decode_type, results->repeat);
+  output += F("  // ");
+  output += typeToString(results->decode_type, results->repeat);
   // Only display the value if the decode type doesn't have an A/C state.
   if (!hasACState(results->decode_type))
     output += ' ' + uint64ToString(results->value, 16);
@@ -387,7 +388,7 @@ std::string resultToSourceCode(const decode_results *results) {
         output += F("0x");
         if (results->state[i] < 0x10) output += '0';
         output += uint64ToString(results->state[i], 16);
-        if (i < nbytes - 1) output += ", ";
+        if (i < nbytes - 1) output += F(", ");
       }
       output += F("};\n");
 #endif  // DECODE_AC
@@ -432,15 +433,16 @@ std::string resultToTimingInfo(const decode_results *results) {
     if (i % 2 == 0)
       output += '-';  // even
     else
-      output += "   +";  // odd
+      output += F("   +");  // odd
     value = uint64ToString(results->rawbuf[i] * kRawTick);
     // Space pad the value till it is at least 6 chars long.
-    while (value.length() < 6) value = " " + value;
+    while (value.length() < 6) value = ' ' + value;
     output += value;
-    if (i < results->rawlen - 1) output += ", ";  // ',' not needed for last one
-    if (!(i % 8)) output += F("\n");                 // Newline every 8 entries.
+    if (i < results->rawlen - 1)
+      output += F(", ");  // ',' not needed for last one
+    if (!(i % 8)) output += '\n';  // Newline every 8 entries.
   }
-  output += F("\n");
+  output += '\n';
   return output;
 }
 
@@ -478,7 +480,7 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
   // Show Encoding standard
   output += F("Encoding  : ");
   output += typeToString(results->decode_type, results->repeat);
-  output += F("\n");
+  output += '\n';
 
   // Show Code & length
   output += F("Code      : ");
