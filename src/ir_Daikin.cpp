@@ -460,7 +460,7 @@ std::string IRDaikinESP::toString() {
       result += F(" (QUIET)");
       break;
     case kDaikinFanMin:
-      result += F( " (MIN)");
+      result += F(" (MIN)");
       break;
     case kDaikinFanMax:
       result += F(" (MAX)");
@@ -1228,7 +1228,7 @@ std::string IRDaikin2::toString() {
       result += F(" (Quiet)");
       break;
     case kDaikinFanMin:
-      result += F( " (Min)");
+      result += F(" (Min)");
       break;
     case kDaikinFanMax:
       result += F(" (Max)");
@@ -1287,8 +1287,8 @@ std::string IRDaikin2::toString() {
     result += IRDaikinESP::renderTime(getSleepTime());
   else
     result += F("Off");
-    result += F(", Beep: ");
-    result += uint64ToString(getBeep());
+  result += F(", Beep: ");
+  result += uint64ToString(getBeep());
   switch (getBeep()) {
     case kDaikinBeepLoud:
       result += F(" (Loud)");
@@ -1328,7 +1328,7 @@ std::string IRDaikin2::toString() {
     result += F("Off");
   result += F(", Eye: ");
   result += (getEye() ? F("On") : F("Off"));
-  result += F(", Eye Auto: ") ;
+  result += F(", Eye Auto: ");
   result += (getEyeAuto() ? F("On") : F("Off"));
   result += F(", Quiet: ");
   result += (getQuiet() ? F("On") : F("Off"));
@@ -1336,7 +1336,7 @@ std::string IRDaikin2::toString() {
   result += (getPowerful() ? F("On") : F("Off"));
   result += ", Purify: ";
   result += (getPurify() ? F("On") : F("Off"));
-  result += F(", Econo: ") ;
+  result += F(", Econo: ");
   result += (getEcono() ? F("On") : F("Off"));
   return result;
 }

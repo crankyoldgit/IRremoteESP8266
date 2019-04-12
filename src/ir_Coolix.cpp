@@ -375,7 +375,7 @@ std::string IRCoolixAC::toString() {
       result += F(" (MAX)");
       break;
     case kCoolixFanMin:
-      result += F( " (MIN)");
+      result += F(" (MIN)");
       break;
     case kCoolixFanMed:
       result += F(" (MED)");
@@ -389,10 +389,11 @@ std::string IRCoolixAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  if (getMode() != kCoolixFan)  // Fan mode doesn't have a temperature.
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += 'C';
+  if (getMode() != kCoolixFan) {  // Fan mode doesn't have a temperature.
+    result += F(", Temp: ");
+    result += uint64ToString(getTemp());
+    result += 'C';
+  }
   result += F(", Zone Follow: ");
   if (getZoneFollow())
     result += F("On");

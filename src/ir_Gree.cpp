@@ -376,8 +376,8 @@ std::string IRGreeAC::toString() {
     result += F("Auto");
   else
     result += F("Manual");
-    result += F(", Swing Vertical Pos: ");
-    result += uint64ToString(getSwingVerticalPosition());
+  result += F(", Swing Vertical Pos: ");
+  result += uint64ToString(getSwingVerticalPosition());
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
       result += F(" (Last Pos)");

@@ -661,7 +661,7 @@ std::string IRMitsubishiAC::toString() {
   }
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
+  result += F("C, FAN: ");
   switch (getFan()) {
     case MITSUBISHI_AC_FAN_AUTO:
       result += F("AUTO");

@@ -397,7 +397,7 @@ std::string IRHaierAC::toString() {
   }
   result += F(", Swing: ");
   result += uint64ToString(getSwing());
-  result += F(", Swing: ");
+  result += F(" (");
   switch (getSwing()) {
     case kHaierAcSwingOff:
       result += F("Off");
