@@ -37,12 +37,8 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
         ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
 	ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test \
 	ir_Whirlpool_test ir_Lutron_test ir_Electra_test ir_Pioneer_test \
-<<<<<<< HEAD
-  ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test IRac_test
-=======
-  ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test \
+  ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test IRac_test \
 	ir_MitsubishiHeavy_test
->>>>>>> First draft of support for Mitsubishi Heavy Industries A/Cs.
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -86,13 +82,8 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 	ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
 	ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
 	ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
-<<<<<<< HEAD
 	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o ir_Argo.o \
-	ir_Trotec.o
-=======
-	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o \
-	ir_MitsubishiHeavy.o
->>>>>>> First draft of support for Mitsubishi Heavy Industries A/Cs.
+	ir_Trotec.o ir_MitsubishiHeavy.o
 
 # All the IR Protocol header files.
 PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
