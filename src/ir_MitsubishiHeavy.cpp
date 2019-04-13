@@ -303,6 +303,81 @@ bool IRMitsubishiHeavy152Ac::validChecksum(const uint8_t *state,
   return true;
 }
 
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRMitsubishiHeavy152Ac::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kMitsubishiHeavyCool;
+    case stdAc::opmode_t::kHeat:
+      return kMitsubishiHeavyHeat;
+    case stdAc::opmode_t::kDry:
+      return kMitsubishiHeavyDry;
+    case stdAc::opmode_t::kFan:
+      return kMitsubishiHeavyFan;
+    default:
+      return kMitsubishiHeavyAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRMitsubishiHeavy152Ac::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kMitsubishiHeavy152FanEcono;  // Assumes Econo is slower than Low.
+    case stdAc::fanspeed_t::kLow:
+      return kMitsubishiHeavy152FanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kMitsubishiHeavy152FanMed;
+    case stdAc::fanspeed_t::kHigh:
+      return kMitsubishiHeavy152FanHigh;
+    case stdAc::fanspeed_t::kMax:
+      return kMitsubishiHeavy152FanMax;
+    default:
+      return kMitsubishiHeavy152FanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRMitsubishiHeavy152Ac::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kAuto:
+      return kMitsubishiHeavy152SwingVAuto;
+    case stdAc::swingv_t::kHighest:
+      return kMitsubishiHeavy152SwingVHighest;
+    case stdAc::swingv_t::kHigh:
+      return kMitsubishiHeavy152SwingVHigh;
+    case stdAc::swingv_t::kMiddle:
+      return kMitsubishiHeavy152SwingVMiddle;
+    case stdAc::swingv_t::kLow:
+      return kMitsubishiHeavy152SwingVLow;
+    case stdAc::swingv_t::kLowest:
+      return kMitsubishiHeavy152SwingVLowest;
+    default:
+      return kMitsubishiHeavy152SwingVOff;
+  }
+}
+
+// Convert a standard A/C horizontal swing into its native setting.
+uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kAuto:
+      return kMitsubishiHeavy152SwingHAuto;
+    case stdAc::swingh_t::kLeftMax:
+      return kMitsubishiHeavy152SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:
+      return kMitsubishiHeavy152SwingHLeft;
+    case stdAc::swingh_t::kMiddle:
+      return kMitsubishiHeavy152SwingHMiddle;
+    case stdAc::swingh_t::kRight:
+    return kMitsubishiHeavy152SwingHRight;
+    case stdAc::swingh_t::kRightMax:
+      return kMitsubishiHeavy152SwingHRightMax;
+    default:
+      return kMitsubishiHeavy152SwingHOff;
+  }
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRMitsubishiHeavy152Ac::toString(void) {
@@ -655,6 +730,70 @@ void IRMitsubishiHeavy88Ac::checksum(void) {
 bool IRMitsubishiHeavy88Ac::validChecksum(const uint8_t *state,
                                            const uint16_t length) {
   return IRMitsubishiHeavy152Ac::validChecksum(state, length);
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRMitsubishiHeavy88Ac::convertMode(const stdAc::opmode_t mode) {
+  return IRMitsubishiHeavy152Ac::convertMode(mode);
+}
+
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRMitsubishiHeavy88Ac::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kMitsubishiHeavy88FanEcono;  // Assumes Econo is slower than Low.
+    case stdAc::fanspeed_t::kLow:
+      return kMitsubishiHeavy88FanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kMitsubishiHeavy88FanMed;
+    case stdAc::fanspeed_t::kHigh:
+      return kMitsubishiHeavy88FanHigh;
+    case stdAc::fanspeed_t::kMax:
+      return kMitsubishiHeavy88FanTurbo;
+    default:
+      return kMitsubishiHeavy88FanAuto;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRMitsubishiHeavy88Ac::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kAuto:
+      return kMitsubishiHeavy88SwingVAuto;
+    case stdAc::swingv_t::kHighest:
+      return kMitsubishiHeavy88SwingVHighest;
+    case stdAc::swingv_t::kHigh:
+      return kMitsubishiHeavy88SwingVHigh;
+    case stdAc::swingv_t::kMiddle:
+      return kMitsubishiHeavy88SwingVMiddle;
+    case stdAc::swingv_t::kLow:
+      return kMitsubishiHeavy88SwingVLow;
+    case stdAc::swingv_t::kLowest:
+      return kMitsubishiHeavy88SwingVLowest;
+    default:
+      return kMitsubishiHeavy88SwingVOff;
+  }
+}
+
+// Convert a standard A/C horizontal swing into its native setting.
+uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kAuto:
+      return kMitsubishiHeavy88SwingHAuto;
+    case stdAc::swingh_t::kLeftMax:
+      return kMitsubishiHeavy88SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:
+      return kMitsubishiHeavy88SwingHLeft;
+    case stdAc::swingh_t::kMiddle:
+      return kMitsubishiHeavy88SwingHMiddle;
+    case stdAc::swingh_t::kRight:
+    return kMitsubishiHeavy88SwingHRight;
+    case stdAc::swingh_t::kRightMax:
+      return kMitsubishiHeavy88SwingHRightMax;
+    default:
+      return kMitsubishiHeavy88SwingHOff;
+  }
 }
 
 // Convert the internal state into a human readable string.

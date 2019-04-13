@@ -9,6 +9,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
+#include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
@@ -370,6 +371,67 @@ TEST(TestIRac, Mitsubishi) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(MITSUBISHI_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMitsubishiACBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, MitsubishiHeavy88) {
+  IRMitsubishiHeavy88Ac ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (Cool), Temp: 21C, Fan: 3 (Med), "
+      "Swing (V): 16 (Auto), Swing (H): 0 (Off), Turbo: Off, Econo: Off, "
+      "3D: Off, Clean: On";
+
+  ac.begin();
+  irac.mitsubishiHeavy88(&ac,
+                         true,                        // Power
+                         stdAc::opmode_t::kCool,      // Mode
+                         21,                          // Celsius
+                         stdAc::fanspeed_t::kMedium,  // Fan speed
+                         stdAc::swingv_t::kAuto,      // Veritcal swing
+                         stdAc::swingh_t::kOff,       // Horizontal swing
+                         false,                       // Turbo
+                         false,                       // Econo
+                         true);                       // Clean
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_88, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy88Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, MitsubishiHeavy152) {
+  IRMitsubishiHeavy152Ac ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 6 (Econo), "
+      "Swing (V): 6 (Off), Swing (H): 0 (Auto), Silent: On, Turbo: Off, "
+      "Econo: On, Night: On, Filter: On, 3D: Off, Clean: Off";
+
+  ac.begin();
+  irac.mitsubishiHeavy152(&ac,
+                          true,                        // Power
+                          stdAc::opmode_t::kCool,      // Mode
+                          20,                          // Celsius
+                          stdAc::fanspeed_t::kLow,     // Fan speed
+                          stdAc::swingv_t::kOff,       // Veritcal swing
+                          stdAc::swingh_t::kAuto,      // Horizontal swing
+                          true,                        // Silent
+                          false,                       // Turbo
+                          true,                        // Econo
+                          true,                        // Filter
+                          false,                       // Clean
+                          8 * 60);                     // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_152, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy152Bits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

@@ -10,9 +10,9 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
-// #ifdef UNIT_TEST
-// #include "IRsend_test.h"
-// #endif  // UNIT_TEST
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/660
@@ -172,17 +172,22 @@ class IRMitsubishiHeavy152Ac {
   static bool validChecksum(
       const uint8_t *state,
       const uint16_t length = kMitsubishiHeavy152StateLength);
-
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
 #ifdef ARDUINO
   String toString(void);
-#else
+#else  // ARDUINO
   std::string toString(void);
-#endif
+#endif  // ARDUINO
 #ifndef UNIT_TEST
 
  private:
-#endif  // UNIT_TEST
   IRsend _irsend;
+#else  // UNIT_TEST
+  IRsendTest _irsend;
+#endif  // UNIT_TEST
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kMitsubishiHeavy152StateLength];
   void checksum();
@@ -236,17 +241,22 @@ class IRMitsubishiHeavy88Ac {
   static bool validChecksum(
       const uint8_t *state,
       const uint16_t length = kMitsubishiHeavy88StateLength);
-
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
 #ifdef ARDUINO
   String toString(void);
-#else
+#else  // ARDUINO
   std::string toString(void);
-#endif
+#endif  // ARDUINO
 #ifndef UNIT_TEST
 
  private:
-#endif  // UNIT_TEST
   IRsend _irsend;
+#else  // UNIT_TEST
+  IRsendTest _irsend;
+#endif  // UNIT_TEST
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kMitsubishiHeavy152StateLength];
   void checksum();

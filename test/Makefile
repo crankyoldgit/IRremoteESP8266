@@ -270,10 +270,10 @@ ir_Mitsubishi_test : $(COMMON_OBJ) ir_Mitsubishi_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_MitsubishiHeavy.o : $(USER_DIR)/ir_MitsubishiHeavy.h $(USER_DIR)/ir_MitsubishiHeavy.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_MitsubishiHeavy.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_MitsubishiHeavy.cpp
 
 ir_MitsubishiHeavy_test.o : ir_MitsubishiHeavy_test.cpp $(USER_DIR)/ir_MitsubishiHeavy.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -I$(USER_DIR) -c ir_MitsubishiHeavy_test.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_MitsubishiHeavy_test.cpp
 
 ir_MitsubishiHeavy_test : $(COMMON_OBJ) ir_MitsubishiHeavy_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

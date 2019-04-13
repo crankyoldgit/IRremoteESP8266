@@ -20,6 +20,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
+#include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
@@ -132,6 +133,22 @@ class IRac {
                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                   const bool quiet, const int16_t clock = -1);
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_MITSUBISHIHEAVY
+  void mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
+                         const bool on, const stdAc::opmode_t mode,
+                         const float degrees, const stdAc::fanspeed_t fan,
+                         const stdAc::swingv_t swingv,
+                         const stdAc::swingh_t swingh,
+                         const bool turbo, const bool econo, const bool clean);
+  void mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
+                          const bool on, const stdAc::opmode_t mode,
+                          const float degrees, const stdAc::fanspeed_t fan,
+                          const stdAc::swingv_t swingv,
+                          const stdAc::swingh_t swingh,
+                          const bool quiet, const bool turbo, const bool econo,
+                          const bool filter, const bool clean,
+                          const int16_t sleep = -1);
+#endif  // SEND_MITSUBISHIHEAVY
 #if SEND_PANASONIC_AC
   void panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
                  const bool on, const stdAc::opmode_t mode, const float degrees,
