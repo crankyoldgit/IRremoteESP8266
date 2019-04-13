@@ -117,7 +117,7 @@ ir_Mitsubishi.o : $(USER_DIR)/ir_Mitsubishi.h $(USER_DIR)/ir_Mitsubishi.cpp $(CO
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Mitsubishi.cpp
 
 ir_MitsubishiHeavy.o : $(USER_DIR)/ir_MitsubishiHeavy.h $(USER_DIR)/ir_MitsubishiHeavy.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_MitsubishiHeavy.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_MitsubishiHeavy.cpp
 
 ir_Fujitsu.o : $(USER_DIR)/ir_Fujitsu.h $(USER_DIR)/ir_Fujitsu.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Fujitsu.cpp
