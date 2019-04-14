@@ -34,7 +34,7 @@ class IRac {
  public:
   explicit IRac(uint8_t pin);
   bool sendAc(const decode_type_t vendor, const uint16_t model,
-              const bool on, const stdAc::opmode_t mode, const float degrees,
+              const bool power, const stdAc::opmode_t mode, const float degrees,
               const bool celsius, const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
               const bool quiet, const bool turbo, const bool econo,
@@ -202,5 +202,16 @@ class IRac {
                  const bool turbo, const bool light,
                  const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_WHIRLPOOL_AC
-};
+  static bool strToBool(const char *str, const bool def = false);
+  static int16_t strToModel(const char *str, const int16_t def = -1);
+  static stdAc::opmode_t strToOpmode(
+      const char *str, const stdAc::opmode_t def = stdAc::opmode_t::kAuto);
+  static stdAc::fanspeed_t strToFanspeed(
+      const char *str,
+      const stdAc::fanspeed_t def = stdAc::fanspeed_t::kAuto);
+  static stdAc::swingv_t strToSwingV(
+      const char *str, const stdAc::swingv_t def = stdAc::swingv_t::kOff);
+  static stdAc::swingh_t strToSwingH(
+      const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
+};  // IRac class
 #endif  // IRAC_H_

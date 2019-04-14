@@ -755,3 +755,83 @@ TEST(TestIRac, Whirlpool) {
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }
+
+TEST(TestIRac, strToBool) {
+  EXPECT_TRUE(IRac::strToBool("ON"));
+  EXPECT_TRUE(IRac::strToBool("1"));
+  EXPECT_TRUE(IRac::strToBool("TRUE"));
+  EXPECT_TRUE(IRac::strToBool("YES"));
+  EXPECT_FALSE(IRac::strToBool("OFF"));
+  EXPECT_FALSE(IRac::strToBool("0"));
+  EXPECT_FALSE(IRac::strToBool("FALSE"));
+  EXPECT_FALSE(IRac::strToBool("NO"));
+  EXPECT_FALSE(IRac::strToBool("FOOBAR"));
+  EXPECT_TRUE(IRac::strToBool("FOOBAR", true));
+}
+
+TEST(TestIRac, strToOpmode) {
+  EXPECT_EQ(stdAc::opmode_t::kAuto, IRac::strToOpmode("AUTO"));
+  EXPECT_EQ(stdAc::opmode_t::kCool, IRac::strToOpmode("COOL"));
+  EXPECT_EQ(stdAc::opmode_t::kHeat, IRac::strToOpmode("HEAT"));
+  EXPECT_EQ(stdAc::opmode_t::kDry, IRac::strToOpmode("DRY"));
+  EXPECT_EQ(stdAc::opmode_t::kFan, IRac::strToOpmode("FAN"));
+  EXPECT_EQ(stdAc::opmode_t::kFan, IRac::strToOpmode("FAN_ONLY"));
+  EXPECT_EQ(stdAc::opmode_t::kAuto, IRac::strToOpmode("FOOBAR"));
+  EXPECT_EQ(stdAc::opmode_t::kOff, IRac::strToOpmode("OFF"));
+  EXPECT_EQ(stdAc::opmode_t::kOff, IRac::strToOpmode("FOOBAR",
+                                                     stdAc::opmode_t::kOff));
+}
+
+TEST(TestIRac, strToFanspeed) {
+  EXPECT_EQ(stdAc::fanspeed_t::kAuto, IRac::strToFanspeed("AUTO"));
+  EXPECT_EQ(stdAc::fanspeed_t::kMin, IRac::strToFanspeed("MIN"));
+  EXPECT_EQ(stdAc::fanspeed_t::kLow, IRac::strToFanspeed("LOW"));
+  EXPECT_EQ(stdAc::fanspeed_t::kMedium, IRac::strToFanspeed("MEDIUM"));
+  EXPECT_EQ(stdAc::fanspeed_t::kHigh, IRac::strToFanspeed("HIGH"));
+  EXPECT_EQ(stdAc::fanspeed_t::kMax, IRac::strToFanspeed("MAX"));
+  EXPECT_EQ(stdAc::fanspeed_t::kAuto, IRac::strToFanspeed("FOOBAR"));
+  EXPECT_EQ(stdAc::fanspeed_t::kMin,
+            IRac::strToFanspeed("FOOBAR", stdAc::fanspeed_t::kMin));
+}
+
+TEST(TestIRac, strToSwingV) {
+  EXPECT_EQ(stdAc::swingv_t::kAuto, IRac::strToSwingV("AUTO"));
+  EXPECT_EQ(stdAc::swingv_t::kLowest, IRac::strToSwingV("LOWEST"));
+  EXPECT_EQ(stdAc::swingv_t::kLow, IRac::strToSwingV("LOW"));
+  EXPECT_EQ(stdAc::swingv_t::kMiddle, IRac::strToSwingV("MIDDLE"));
+  EXPECT_EQ(stdAc::swingv_t::kHigh, IRac::strToSwingV("HIGH"));
+  EXPECT_EQ(stdAc::swingv_t::kHighest, IRac::strToSwingV("HIGHEST"));
+  EXPECT_EQ(stdAc::swingv_t::kOff, IRac::strToSwingV("OFF"));
+  EXPECT_EQ(stdAc::swingv_t::kOff, IRac::strToSwingV("FOOBAR"));
+  EXPECT_EQ(stdAc::swingv_t::kAuto,
+            IRac::strToSwingV("FOOBAR", stdAc::swingv_t::kAuto));
+}
+
+TEST(TestIRac, strToSwingH) {
+  EXPECT_EQ(stdAc::swingh_t::kAuto, IRac::strToSwingH("AUTO"));
+  EXPECT_EQ(stdAc::swingh_t::kLeftMax, IRac::strToSwingH("MAX LEFT"));
+  EXPECT_EQ(stdAc::swingh_t::kLeft, IRac::strToSwingH("LEFT"));
+  EXPECT_EQ(stdAc::swingh_t::kMiddle, IRac::strToSwingH("CENTRE"));
+  EXPECT_EQ(stdAc::swingh_t::kRight, IRac::strToSwingH("RIGHT"));
+  EXPECT_EQ(stdAc::swingh_t::kRightMax, IRac::strToSwingH("RIGHTMAX"));
+  EXPECT_EQ(stdAc::swingh_t::kOff, IRac::strToSwingH("OFF"));
+  EXPECT_EQ(stdAc::swingh_t::kOff, IRac::strToSwingH("FOOBAR"));
+  EXPECT_EQ(stdAc::swingh_t::kAuto,
+            IRac::strToSwingH("FOOBAR", stdAc::swingh_t::kAuto));
+}
+
+TEST(TestIRac, strToModel) {
+  EXPECT_EQ(panasonic_ac_remote_model_t::kPanasonicLke,
+            IRac::strToModel("LKE"));
+  EXPECT_EQ(panasonic_ac_remote_model_t::kPanasonicLke,
+            IRac::strToModel("PANASONICLKE"));
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARRAH2E,
+            IRac::strToModel("ARRAH2E"));
+  EXPECT_EQ(whirlpool_ac_remote_model_t::DG11J13A,
+            IRac::strToModel("DG11J13A"));
+  EXPECT_EQ(1, IRac::strToModel("1"));
+  EXPECT_EQ(10, IRac::strToModel("10"));
+  EXPECT_EQ(-1, IRac::strToModel("0"));
+  EXPECT_EQ(-1, IRac::strToModel("FOOBAR"));
+  EXPECT_EQ(0, IRac::strToModel("FOOBAR", 0));
+}

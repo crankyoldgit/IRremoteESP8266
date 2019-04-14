@@ -34,11 +34,12 @@ const uint32_t kDefaultMessageGap = 100000;
 
 namespace stdAc {
   enum class opmode_t {
-    kAuto = 0,
-    kCool = 1,
-    kHeat = 2,
-    kDry  = 3,
-    kFan  = 4,
+    kOff  = -1,
+    kAuto =  0,
+    kCool =  1,
+    kHeat =  2,
+    kDry  =  3,
+    kFan  =  4,
   };
 
   enum class fanspeed_t {

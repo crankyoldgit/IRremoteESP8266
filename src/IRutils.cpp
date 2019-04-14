@@ -7,6 +7,7 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <string.h>
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -80,6 +81,132 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
   Serial.print(uint64ToString(input, base));
 }
 #endif
+
+// Convert a c-style str to a decode_type_t
+// Note: Assumes str is upper case.
+//
+// Args:
+//   str:  An upper-case C-style string.
+// Returns:
+//  A decode_type_t enum.
+decode_type_t strToDecodeType(const char *str) {
+  if (!strcmp(str, F("AIWA_RC_T501")))
+    return decode_type_t::AIWA_RC_T501;
+  else if (!strcmp(str, F("ARGO")))
+    return decode_type_t::ARGO;
+  else if (!strcmp(str, F("CARRIER_AC")))
+    return decode_type_t::CARRIER_AC;
+  else if (!strcmp(str, F("COOLIX")))
+    return decode_type_t::COOLIX;
+  else if (!strcmp(str, F("DAIKIN")))
+    return decode_type_t::DAIKIN;
+  else if (!strcmp(str, F("DAIKIN2")))
+    return decode_type_t::DAIKIN2;
+  else if (!strcmp(str, F("DENON")))
+    return decode_type_t::DENON;
+  else if (!strcmp(str, F("DISH")))
+    return decode_type_t::DISH;
+  else if (!strcmp(str, F("ELECTRA_AC")))
+    return decode_type_t::ELECTRA_AC;
+  else if (!strcmp(str, F("FUJITSU_AC")))
+    return decode_type_t::FUJITSU_AC;
+  else if (!strcmp(str, F("GICABLE")))
+    return decode_type_t::GICABLE;
+  else if (!strcmp(str, F("GLOBALCACHE")))
+    return decode_type_t::GLOBALCACHE;
+  else if (!strcmp(str, F("GREE")))
+    return decode_type_t::GREE;
+  else if (!strcmp(str, F("HAIER_AC")))
+    return decode_type_t::HAIER_AC;
+  else if (!strcmp(str, F("HAIER_AC_YRW02")))
+    return decode_type_t::HAIER_AC_YRW02;
+  else if (!strcmp(str, F("HITACHI_AC")))
+    return decode_type_t::HITACHI_AC;
+  else if (!strcmp(str, F("HITACHI_AC1")))
+    return decode_type_t::HITACHI_AC1;
+  else if (!strcmp(str, F("HITACHI_AC2")))
+    return decode_type_t::HITACHI_AC2;
+  else if (!strcmp(str, F("JVC")))
+    return decode_type_t::JVC;
+  else if (!strcmp(str, F("KELVINATOR")))
+    return decode_type_t::KELVINATOR;
+  else if (!strcmp(str, F("LEGOPF")))
+    return decode_type_t::LEGOPF;
+  else if (!strcmp(str, F("LG")))
+    return decode_type_t::LG;
+  else if (!strcmp(str, F("LG2")))
+    return decode_type_t::LG2;
+  else if (!strcmp(str, F("LASERTAG")))
+    return decode_type_t::LASERTAG;
+  else if (!strcmp(str, F("LUTRON")))
+    return decode_type_t::LUTRON;
+  else if (!strcmp(str, F("MAGIQUEST")))
+    return decode_type_t::MAGIQUEST;
+  else if (!strcmp(str, F("MIDEA")))
+    return decode_type_t::MIDEA;
+  else if (!strcmp(str, F("MITSUBISHI")))
+    return decode_type_t::MITSUBISHI;
+  else if (!strcmp(str, F("MITSUBISHI2")))
+    return decode_type_t::MITSUBISHI2;
+  else if (!strcmp(str, F("MITSUBISHI_AC")))
+    return decode_type_t::MITSUBISHI_AC;
+  else if (!strcmp(str, F("MWM")))
+    return decode_type_t::MWM;
+  else if (!strcmp(str, F("NEC")) || !strcmp(str, F("NEC (NON-STRICT)")))
+    return decode_type_t::NEC;
+  else if (!strcmp(str, F("NIKAI")))
+    return decode_type_t::NIKAI;
+  else if (!strcmp(str, F("PANASONIC")))
+    return decode_type_t::PANASONIC;
+  else if (!strcmp(str, F("PANASONIC_AC")))
+    return decode_type_t::PANASONIC_AC;
+  else if (!strcmp(str, F("PIONEER")))
+    return decode_type_t::PIONEER;
+  else if (!strcmp(str, F("PRONTO")))
+    return decode_type_t::PRONTO;
+  else if (!strcmp(str, F("RAW")))
+    return decode_type_t::RAW;
+  else if (!strcmp(str, F("RC5")))
+    return decode_type_t::RC5;
+  else if (!strcmp(str, F("RC5X")))
+    return decode_type_t::RC5X;
+  else if (!strcmp(str, F("RC6")))
+    return decode_type_t::RC6;
+  else if (!strcmp(str, F("RCMM")))
+    return decode_type_t::RCMM;
+  else if (!strcmp(str, F("SAMSUNG")))
+    return decode_type_t::SAMSUNG;
+  else if (!strcmp(str, F("SAMSUNG36")))
+    return decode_type_t::SAMSUNG36;
+  else if (!strcmp(str, F("SAMSUNG_AC")))
+    return decode_type_t::SAMSUNG_AC;
+  else if (!strcmp(str, F("SANYO")))
+    return decode_type_t::SANYO;
+  else if (!strcmp(str, F("SANYO_LC7461")))
+    return decode_type_t::SANYO_LC7461;
+  else if (!strcmp(str, F("SHARP")))
+    return decode_type_t::SHARP;
+  else if (!strcmp(str, F("SHERWOOD")))
+    return decode_type_t::SHERWOOD;
+  else if (!strcmp(str, F("SONY")))
+    return decode_type_t::SONY;
+  else if (!strcmp(str, F("TCL112AC")))
+    return decode_type_t::TCL112AC;
+  else if (!strcmp(str, F("TECO")))
+    return decode_type_t::TECO;
+  else if (!strcmp(str, F("TOSHIBA_AC")))
+    return decode_type_t::TOSHIBA_AC;
+  else if (!strcmp(str, F("TROTEC")))
+    return decode_type_t::TROTEC;
+  else if (!strcmp(str, F("VESTEL_AC")))
+    return decode_type_t::VESTEL_AC;
+  else if (!strcmp(str, F("WHIRLPOOL_AC")))
+    return decode_type_t::WHIRLPOOL_AC;
+  else if (!strcmp(str, F("WHYNTER")))
+    return decode_type_t::WHYNTER;
+  else
+    return decode_type_t::UNKNOWN;
+}
 
 // Convert a protocol type (enum etc) to a human readable string.
 // Args:
