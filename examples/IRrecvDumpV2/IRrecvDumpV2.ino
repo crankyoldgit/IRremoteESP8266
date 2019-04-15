@@ -35,6 +35,7 @@
 #include <ir_Kelvinator.h>
 #include <ir_Midea.h>
 #include <ir_Mitsubishi.h>
+#include <ir_MitsubishiHeavy.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
 #include <ir_Tcl.h>
@@ -154,6 +155,18 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHIHEAVY
+  if (results->decode_type == MITSUBISHI_HEAVY_88) {
+    IRMitsubishiHeavy88Ac ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+  if (results->decode_type == MITSUBISHI_HEAVY_152) {
+    IRMitsubishiHeavy152Ac ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_MITSUBISHIHEAVY
 #if DECODE_TOSHIBA_AC
   if (results->decode_type == TOSHIBA_AC) {
     IRToshibaAC ac(0);

@@ -42,6 +42,7 @@ script:
   - arduino --verify --board $BD $PWD/examples/TurnOnToshibaAC/TurnOnToshibaAC.ino
   - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnPanasonicAC/TurnOnPanasonicAC.ino
+  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiHeavyAc/TurnOnMitsubishiHeavyAc.ino
 
   # Also check the tools programs compile.
   - (cd tools; make all)

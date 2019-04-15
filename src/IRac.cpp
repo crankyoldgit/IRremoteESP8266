@@ -23,6 +23,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
+#include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Tcl.h"
@@ -363,6 +364,61 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->send();
 }
 #endif  // SEND_MITSUBISHI_AC
+
+#if SEND_MITSUBISHIHEAVY
+void IRac::mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
+                             const bool on, const stdAc::opmode_t mode,
+                             const float degrees,
+                             const stdAc::fanspeed_t fan,
+                             const stdAc::swingv_t swingv,
+                             const stdAc::swingh_t swingh,
+                             const bool turbo, const bool econo,
+                             const bool clean) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  // No Quiet setting available.
+  ac->setTurbo(turbo);
+  // No Light setting available.
+  ac->setEcono(econo);
+  // No Filter setting available.
+  ac->setClean(clean);
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+
+void IRac::mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
+                              const bool on, const stdAc::opmode_t mode,
+                              const float degrees,
+                              const stdAc::fanspeed_t fan,
+                              const stdAc::swingv_t swingv,
+                              const stdAc::swingh_t swingh,
+                              const bool quiet, const bool turbo,
+                              const bool econo, const bool filter,
+                              const bool clean, const int16_t sleep) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  ac->setSilent(quiet);
+  ac->setTurbo(turbo);
+  // No Light setting available.
+  ac->setEcono(econo);
+  ac->setClean(clean);
+  ac->setFilter(filter);
+  // No Beep setting available.
+  ac->setNight(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_MITSUBISHIHEAVY
 
 #if SEND_PANASONIC_AC
 void IRac::panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
@@ -723,6 +779,24 @@ bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_MITSUBISHIHEAVY
+    case MITSUBISHI_HEAVY_88:
+    {
+      IRMitsubishiHeavy88Ac ac(_pin);
+      ac.begin();
+      mitsubishiHeavy88(&ac, on, mode, degC, fan, swingv, swingh,
+                        turbo, econo, clean);
+      break;
+    }
+    case MITSUBISHI_HEAVY_152:
+    {
+      IRMitsubishiHeavy152Ac ac(_pin);
+      ac.begin();
+      mitsubishiHeavy152(&ac, on, mode, degC, fan, swingv, swingh,
+                         quiet, turbo, econo, filter, clean, sleep);
+      break;
+    }
+#endif  // SEND_MITSUBISHIHEAVY
 #if SEND_PANASONIC_AC
     case PANASONIC_AC:
     {
