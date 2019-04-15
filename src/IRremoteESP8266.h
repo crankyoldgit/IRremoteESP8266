@@ -513,6 +513,7 @@ const uint8_t  kVestelAcBits = 56;
 #define DPRINTLN(x)
 #endif  // DEBUG
 
+#ifdef UNIT_TEST
 #ifndef F
 // Create a no-op F() macro so the code base still compiles outside of the
 // Arduino framework. Thus we can safely use the Arduino 'F()' macro through-out
@@ -520,5 +521,6 @@ const uint8_t  kVestelAcBits = 56;
 // See: https://github.com/markszabo/IRremoteESP8266/issues/667
 #define F(x) x
 #endif  // F
+#endif  // UNIT_TEST
 
 #endif  // IRREMOTEESP8266_H_
