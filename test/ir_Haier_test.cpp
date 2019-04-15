@@ -987,3 +987,81 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
       " Health: On",
       haier.toString());
 }
+
+// Ref: https://github.com/markszabo/IRremoteESP8266/issues/668
+TEST(TestHaierAcIssues, Issue668) {
+  IRHaierAC ac(0);
+  IRHaierAC acText(1);
+  IRrecv irrecv(0);
+  ac.begin();
+
+  // Turn on the AC.
+  ac._irsend.reset();
+  char expected_on[] =
+      "Command: 1 (On), Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  ac.setCommand(kHaierAcCmdOn);
+  EXPECT_EQ(expected_on, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  EXPECT_FALSE(ac._irsend.capture.repeat);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_on, acText.toString());
+
+  // Set the temp to 25C
+  ac._irsend.reset();
+  char expected_temp25[] =
+      "Command: 1 (On), Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  ac.setTemp(25);
+  EXPECT_EQ(expected_temp25, ac.toString());
+  ASSERT_EQ(25, ac.getTemp());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_temp25, acText.toString());
+
+  // Increase the temp by 1.
+  ac._irsend.reset();
+  char expected_temp_plus_one[] =
+      "Command: 6 (Temp Up), Mode: 0 (AUTO), Temp: 26C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  ASSERT_EQ(25, ac.getTemp());
+  ac.setTemp(ac.getTemp() + 1);
+  ASSERT_EQ(26, ac.getTemp());
+  EXPECT_EQ(expected_temp_plus_one, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_temp_plus_one, acText.toString());
+
+  // Decrease the temp by 1.
+  ac._irsend.reset();
+  char expected_temp_minus_one[] =
+      "Command: 7 (Temp Down), Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  ASSERT_EQ(26, ac.getTemp());
+  ac.setTemp(ac.getTemp() - 1);
+  ASSERT_EQ(25, ac.getTemp());
+  EXPECT_EQ(expected_temp_minus_one, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_temp_minus_one, acText.toString());
+}
