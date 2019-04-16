@@ -45,7 +45,7 @@ const uint32_t kHaierAcMinGap = 150000;  // Completely made up value.
 //   nbytes: Nr. of bytes of data in the array. (>=kHaierACStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: Beta / Probably working.
+// Status: STABLE / Known to be working.
 //
 void IRsend::sendHaierAC(unsigned char data[], uint16_t nbytes,
                          uint16_t repeat) {
@@ -104,7 +104,10 @@ bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
 void IRHaierAC::stateReset() {
   for (uint8_t i = 1; i < kHaierACStateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = kHaierAcPrefix;
-  remote_state[2] = 0b00100000;
+  remote_state[2] = 0x20;
+  remote_state[4] = 0x0C;
+  remote_state[5] = 0xC0;
+  remote_state[6] = 0x20;
 
   setTemp(kHaierAcDefTemp);
   setFan(kHaierAcFanAuto);
@@ -894,7 +897,7 @@ std::string IRHaierACYRW02::toString() {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Appears to be working.
+// Status: STABLE / Known to be working.
 //
 bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
                            bool strict) {
