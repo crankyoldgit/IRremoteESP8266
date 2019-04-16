@@ -654,7 +654,7 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 //   clock:   Nr. of mins past midnight to set the clock to. (< 0 means off.)
 // Returns:
 //   boolean: True, if accepted/converted/attempted. False, if unsupported.
-bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
+bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
                   const bool power, const stdAc::opmode_t mode,
                   const float degrees, const bool celsius,
                   const stdAc::fanspeed_t fan,
@@ -883,19 +883,19 @@ bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
 
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                 const stdAc::opmode_t def) {
-  if (!strcmp(str, F("AUTO")) || !strcmp(str, F("AUTOMATIC")))
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
     return stdAc::opmode_t::kAuto;
-  else if (!strcmp(str, F("OFF")) || !strcmp(str, F("STOP")))
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
     return stdAc::opmode_t::kOff;
-  else if (!strcmp(str, F("COOL")) || !strcmp(str, F("COOLING")))
+  else if (!strcmp(str, "COOL") || !strcmp(str, "COOLING"))
     return stdAc::opmode_t::kCool;
-  else if (!strcmp(str, F("HEAT")) || !strcmp(str, F("HEATING")))
+  else if (!strcmp(str, "HEAT") || !strcmp(str, "HEATING"))
     return stdAc::opmode_t::kHeat;
-  else if (!strcmp(str, F("DRY")) || !strcmp(str, F("DRYING")) ||
-           !strcmp(str, F("DEHUMIDIFY")))
+  else if (!strcmp(str, "DRY") || !strcmp(str, "DRYING") ||
+           !strcmp(str, "DEHUMIDIFY"))
     return stdAc::opmode_t::kDry;
-  else if (!strcmp(str, F("FAN")) || !strcmp(str, F("FANONLY")) ||
-           !strcmp(str, F("FAN_ONLY")))
+  else if (!strcmp(str, "FAN") || !strcmp(str, "FANONLY") ||
+           !strcmp(str, "FAN_ONLY"))
     return stdAc::opmode_t::kFan;
   else
     return def;
@@ -903,20 +903,20 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
-  if (!strcmp(str, F("AUTO")) || !strcmp(str, F("AUTOMATIC")))
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
     return stdAc::fanspeed_t::kAuto;
-  else if (!strcmp(str, F("MIN")) || !strcmp(str, F("MINIMUM")) ||
-           !strcmp(str, F("LOWEST")))
+  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
+           !strcmp(str, "LOWEST"))
     return stdAc::fanspeed_t::kMin;
-  else if (!strcmp(str, F("LOW")))
+  else if (!strcmp(str, "LOW"))
     return stdAc::fanspeed_t::kLow;
-  else if (!strcmp(str, F("MED")) || !strcmp(str, F("MEDIUM")) ||
-           !strcmp(str, F("MID")))
+  else if (!strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "MID"))
     return stdAc::fanspeed_t::kMedium;
-  else if (!strcmp(str, F("HIGH")) || !strcmp(str, F("HI")))
+  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
     return stdAc::fanspeed_t::kHigh;
-  else if (!strcmp(str, F("MAX")) || !strcmp(str, F("MAXIMUM")) ||
-           !strcmp(str, F("HIGHEST")))
+  else if (!strcmp(str, "MAX") || !strcmp(str, "MAXIMUM") ||
+           !strcmp(str, "HIGHEST"))
     return stdAc::fanspeed_t::kMax;
   else
     return def;
@@ -924,26 +924,26 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
-  if (!strcmp(str, F("AUTO")) || !strcmp(str, F("AUTOMATIC")) ||
-      !strcmp(str, F("ON")) || !strcmp(str, F("SWING")))
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
+      !strcmp(str, "ON") || !strcmp(str, "SWING"))
     return stdAc::swingv_t::kAuto;
-  else if (!strcmp(str, F("OFF")) || !strcmp(str, F("STOP")))
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
     return stdAc::swingv_t::kOff;
-  else if (!strcmp(str, F("MIN")) || !strcmp(str, F("MINIMUM")) ||
-           !strcmp(str, F("LOWEST")) || !strcmp(str, F("BOTTOM")) ||
-           !strcmp(str, F("DOWN")))
+  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
+           !strcmp(str, "LOWEST") || !strcmp(str, "BOTTOM") ||
+           !strcmp(str, "DOWN"))
     return stdAc::swingv_t::kLowest;
-  else if (!strcmp(str, F("LOW")))
+  else if (!strcmp(str, "LOW"))
     return stdAc::swingv_t::kLow;
-  else if (!strcmp(str, F("MID")) || !strcmp(str, F("MIDDLE")) ||
-           !strcmp(str, F("MED")) || !strcmp(str, F("MEDIUM")) ||
-           !strcmp(str, F("CENTRE")) || !strcmp(str, F("CENTER")))
+  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
+           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
     return stdAc::swingv_t::kMiddle;
-  else if (!strcmp(str, F("HIGH")) || !strcmp(str, F("HI")))
+  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
     return stdAc::swingv_t::kHigh;
-  else if (!strcmp(str, F("HIGHEST")) || !strcmp(str, F("MAX")) ||
-           !strcmp(str, F("MAXIMUM")) || !strcmp(str, F("TOP")) ||
-           !strcmp(str, F("UP")))
+  else if (!strcmp(str, "HIGHEST") || !strcmp(str, "MAX") ||
+           !strcmp(str, "MAXIMUM") || !strcmp(str, "TOP") ||
+           !strcmp(str, "UP"))
     return stdAc::swingv_t::kHighest;
   else
     return def;
@@ -951,26 +951,26 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
-  if (!strcmp(str, F("AUTO")) || !strcmp(str, F("AUTOMATIC")) ||
-      !strcmp(str, F("ON")) || !strcmp(str, F("SWING")))
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
+      !strcmp(str, "ON") || !strcmp(str, "SWING"))
     return stdAc::swingh_t::kAuto;
-  else if (!strcmp(str, F("OFF")) || !strcmp(str, F("STOP")))
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
     return stdAc::swingh_t::kOff;
-  else if (!strcmp(str, F("LEFTMAX")) || !strcmp(str, F("LEFT MAX")) ||
-           !strcmp(str, F("MAXLEFT")) || !strcmp(str, F("MAX LEFT")) ||
-           !strcmp(str, F("FARLEFT")) || !strcmp(str, F("FAR LEFT")))
+  else if (!strcmp(str, "LEFTMAX") || !strcmp(str, "LEFT MAX") ||
+           !strcmp(str, "MAXLEFT") || !strcmp(str, "MAX LEFT") ||
+           !strcmp(str, "FARLEFT") || !strcmp(str, "FAR LEFT"))
     return stdAc::swingh_t::kLeftMax;
-  else if (!strcmp(str, F("LEFT")))
+  else if (!strcmp(str, "LEFT"))
     return stdAc::swingh_t::kLeft;
-  else if (!strcmp(str, F("MID")) || !strcmp(str, F("MIDDLE")) ||
-           !strcmp(str, F("MED")) || !strcmp(str, F("MEDIUM")) ||
-           !strcmp(str, F("CENTRE")) || !strcmp(str, F("CENTER")))
+  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
+           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
     return stdAc::swingh_t::kMiddle;
-  else if (!strcmp(str, F("RIGHT")))
+  else if (!strcmp(str, "RIGHT"))
     return stdAc::swingh_t::kRight;
-  else if (!strcmp(str, F("RIGHTMAX")) || !strcmp(str, F("RIGHT MAX")) ||
-           !strcmp(str, F("MAXRIGHT")) || !strcmp(str, F("MAX RIGHT")) ||
-           !strcmp(str, F("FARRIGHT")) || !strcmp(str, F("FAR RIGHT")))
+  else if (!strcmp(str, "RIGHTMAX") || !strcmp(str, "RIGHT MAX") ||
+           !strcmp(str, "MAXRIGHT") || !strcmp(str, "MAX RIGHT") ||
+           !strcmp(str, "FARRIGHT") || !strcmp(str, "FAR RIGHT"))
     return stdAc::swingh_t::kRightMax;
   else
     return def;
@@ -979,28 +979,28 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 // Assumes str is upper case or an integer >= 1.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Fujitsu A/C models
-  if (!strcmp(str, F("ARRAH2E"))) {
+  if (!strcmp(str, "ARRAH2E")) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
-  } else if (!strcmp(str, F("ARDB1"))) {
+  } else if (!strcmp(str, "ARDB1")) {
     return fujitsu_ac_remote_model_t::ARDB1;
   // Panasonic A/C families
-  } else if (!strcmp(str, F("LKE")) || !strcmp(str, F("PANASONICLKE"))) {
+  } else if (!strcmp(str, "LKE") || !strcmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
-  } else if (!strcmp(str, F("NKE")) || !strcmp(str, F("PANASONICNKE"))) {
+  } else if (!strcmp(str, "NKE") || !strcmp(str, "PANASONICNKE")) {
     return panasonic_ac_remote_model_t::kPanasonicNke;
-  } else if (!strcmp(str, F("DKE")) || !strcmp(str, F("PANASONICDKE"))) {
+  } else if (!strcmp(str, "DKE") || !strcmp(str, "PANASONICDKE")) {
     return panasonic_ac_remote_model_t::kPanasonicDke;
-  } else if (!strcmp(str, F("JKE")) || !strcmp(str, F("PANASONICJKE"))) {
+  } else if (!strcmp(str, "JKE") || !strcmp(str, "PANASONICJKE")) {
     return panasonic_ac_remote_model_t::kPanasonicJke;
-  } else if (!strcmp(str, F("CKP")) || !strcmp(str, F("PANASONICCKP"))) {
+  } else if (!strcmp(str, "CKP") || !strcmp(str, "PANASONICCKP")) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
-  } else if (!strcmp(str, F("RKR")) || !strcmp(str, F("PANASONICRKR"))) {
+  } else if (!strcmp(str, "RKR") || !strcmp(str, "PANASONICRKR")) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
   // Whirlpool A/C models
-  } else if (!strcmp(str, F("DG11J13A")) || !strcmp(str, F("DG11J104")) ||
-             !strcmp(str, F("DG11J1-04"))) {
+  } else if (!strcmp(str, "DG11J13A") || !strcmp(str, "DG11J104") ||
+             !strcmp(str, "DG11J1-04")) {
     return whirlpool_ac_remote_model_t::DG11J13A;
-  } else if (!strcmp(str, F("DG11J191"))) {
+  } else if (!strcmp(str, "DG11J191")) {
     return whirlpool_ac_remote_model_t::DG11J191;
   } else {
     int16_t number = atoi(str);
@@ -1013,11 +1013,11 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 
 // Assumes str is upper case.
 bool IRac::strToBool(const char *str, const bool def) {
-  if (!strcmp(str, F("ON")) || !strcmp(str, F("1")) || !strcmp(str, F("YES")) ||
-      !strcmp(str, F("TRUE")))
+  if (!strcmp(str, "ON") || !strcmp(str, "1") || !strcmp(str, "YES") ||
+      !strcmp(str, "TRUE"))
     return true;
-  else if (!strcmp(str, F("OFF")) || !strcmp(str, F("0")) ||
-           !strcmp(str, F("NO")) || !strcmp(str, F("FALSE")))
+  else if (!strcmp(str, "OFF") || !strcmp(str, "0") ||
+           !strcmp(str, "NO") || !strcmp(str, "FALSE"))
     return false;
   else
     return def;

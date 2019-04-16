@@ -28,7 +28,7 @@
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
- *     #define MQTT_MAX_PACKET_SIZE 512
+ *     #define MQTT_MAX_PACKET_SIZE 768
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
  *     the accompanying platformio.ini file.
@@ -193,11 +193,12 @@
 #include <IRrecv.h>
 #include <IRsend.h>
 #include <IRutils.h>
+#include <IRac.h>
 #if MQTT_ENABLE
 // --------------------------------------------------------------------
 // * * * IMPORTANT * * *
 // You must change <PubSubClient.h> to have the following value.
-// #define MQTT_MAX_PACKET_SIZE 512
+// #define MQTT_MAX_PACKET_SIZE 768
 // --------------------------------------------------------------------
 #include <PubSubClient.h>
 #endif  // MQTT_ENABLE
@@ -244,6 +245,50 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
 #define MQTTlog MQTTprefix "/log"        // Topic we send log messages to.
 #define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
+#define MQTTclimateprefix MQTTprefix "/ac"
+
+#define MQTTwildcardcmd "/cmd/+"
+#define MQTTprotocolcmd "/cmd/protocol"
+#define MQTTmodelcmd "/cmd/model"
+#define MQTTpowercmd "/cmd/power"
+#define MQTTmodecmd "/cmd/mode"
+#define MQTTtempcmd "/cmd/temp"
+#define MQTTfanspeedcmd "/cmd/fanspeed"
+#define MQTTswingvcmd "/cmd/swingv"
+#define MQTTswinghcmd "/cmd/swingh"
+#define MQTTquietcmd "/cmd/quiet"
+#define MQTTturbocmd "/cmd/turbo"
+#define MQTTlightcmd "/cmd/light"
+#define MQTTbeepcmd "/cmd/beep"
+#define MQTTeconocmd "/cmd/econo"
+#define MQTTsleepcmd "/cmd/sleep"
+#define MQTTclockcmd "/cmd/clock"
+#define MQTTfiltercmd "/cmd/filter"
+#define MQTTcleancmd "/cmd/clean"
+#define MQTTcelsiuscmd "/cmd/use_celsius"
+
+#define MQTTprotocolstat "/stat/protocol"
+#define MQTTmodelstat "/stat/model"
+#define MQTTpowerstat "/stat/power"
+#define MQTTmodestat "/stat/mode"
+#define MQTTtempstat "/stat/temp"
+#define MQTTfanspeedstat "/stat/fanspeed"
+#define MQTTswingvstat "/stat/swingv"
+#define MQTTswinghstat "/stat/swingh"
+#define MQTTquietstat "/stat/quiet"
+#define MQTTturbostat "/stat/turbo"
+#define MQTTlightstat "/stat/light"
+#define MQTTbeepstat "/stat/beep"
+#define MQTTeconostat "/stat/econo"
+#define MQTTsleepstat "/stat/sleep"
+#define MQTTclockstat "/stat/clock"
+#define MQTTfilterstat "/stat/filter"
+#define MQTTcleanstat "/stat/clean"
+#define MQTTcelsiusstat "/stat/use_celsius"
+
+#define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
+#define MQTTHomeAssistantName HOSTNAME "_aircon"
+#define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts
 #endif  // MQTT_ENABLE
 
 const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
@@ -297,7 +342,7 @@ const uint8_t gpioTable[] = {
 // ----------------- End of User Configuration Section -------------------------
 
 // Globals
-#define _MY_VERSION_ "v0.9.1"
+#define _MY_VERSION_ "v1.0.0-alpha"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -307,6 +352,7 @@ const uint8_t gpioTable[] = {
 // Text for Last Will & Testament status messages.
 #define LWT_ONLINE  "Online"
 #define LWT_OFFLINE "Offline"
+
 
 ESP8266WebServer server(kHttpPort);
 #ifdef IR_RX
@@ -349,6 +395,11 @@ String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 const uint8_t kSendTableSize = sizeof(gpioTable);
 IRsend *IrSendTable[kSendTableSize];
 
+// Climate stuff
+commonAcState_t climate;
+IRac commonAc(IR_LED);
+uint32_t lastBroadcast = 0;
+const uint32_t kBroadcastPeriod = MQTTbroadcastInterval * 1000;  // mSeconds.
 #endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
@@ -682,6 +733,67 @@ void handleReset() {
   delay(1000);
 }
 
+// Reboot web page
+void handleReboot() {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+    debug("Basic HTTP authentication failure for /quitquitquit.");
+    return server.requestAuthentication();
+  }
+#endif
+  server.send(200, "text/html",
+    "<html><head><title>Rebooting</title></head>"
+    "<body>"
+    "<h1>Device restarting.</h1>"
+    "<p>Try connecting in a few seconds.</p>"
+    "<script type=\"text/javascript\">\n"
+    "<!--\n"
+    "  function Redirect() {\n"
+    "    window.location=\"/\";\n"
+    "  }\n"
+    "\n"
+    "  document.write(\"You will be redirected to main page in 10 sec.\");\n"
+    "  setTimeout('Redirect()', 10000);\n"
+    "//-->\n"
+    "</script>"
+    "</body></html>");
+  // Do the reset.
+  delay(1000);
+  ESP.restart();
+  delay(1000);
+}
+
+// MQTT Discovery web page
+void handleSendMqttDiscovery() {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+    debug("Basic HTTP authentication failure for /send_discovery.");
+    return server.requestAuthentication();
+  }
+#endif
+  server.send(200, "text/html",
+    "<html><head><title>Sending MQTT Discovery message</title></head>"
+    "<body>"
+    "<h1>Sending MQTT Discovery message.</h1>"
+    "<p>The Home Assistant MQTT Discovery message is being sent to topic: "
+    MQTTdiscovery ". It will show up in Home Assistant in a few seconds.</p>"
+    "<h3>Warning!</h3>"
+    "<p>Home Assistant's config for this device is reset each time this is "
+    " is sent.</p>"
+    "<script type=\"text/javascript\">\n"
+    "<!--\n"
+    "  function Redirect() {\n"
+    "    window.location=\"/\";\n"
+    "  }\n"
+    "\n"
+    "  document.write(\"You will be redirected to main page in 10 sec.\");\n"
+    "  setTimeout('Redirect()', 10000);\n"
+    "//-->\n"
+    "</script>"
+    "</body></html>");
+  sendMQTTDiscovery(MQTTdiscovery);
+  delay(1000);
+}
 // Parse an Air Conditioner A/C Hex String/code and send it.
 // Args:
 //   irsend: A Ptr to the IRsend object to transmit via.
@@ -1217,6 +1329,26 @@ void setup_wifi() {
 }
 
 void setup(void) {
+  // Set the default climate settings.
+  climate.protocol = KELVINATOR;
+  climate.model = -1;  // Unknown.
+  climate.power = false;
+  climate.mode = stdAc::opmode_t::kAuto;
+  climate.celsius = true;
+  climate.degrees = 25;  // 25C
+  climate.fanspeed = stdAc::fanspeed_t::kAuto;
+  climate.swingv = stdAc::swingv_t::kAuto;
+  climate.swingh = stdAc::swingh_t::kAuto;
+  climate.quiet = false;
+  climate.turbo = false;
+  climate.econo = false;
+  climate.light = false;
+  climate.filter = false;
+  climate.clean = false;
+  climate.beep = false;
+  climate.sleep = -1;  // Off
+  climate.clock = -1;  // Don't set.
+
   // Initialise all the IR transmitters.
   for (uint8_t i = 0; i < kSendTableSize; i++) {
     IrSendTable[i] = new IRsend(gpioTable[i]);
@@ -1260,6 +1392,10 @@ void setup(void) {
   server.on("/ir", handleIr);
   // Setup a reset page to cause WiFiManager information to be reset.
   server.on("/reset", handleReset);
+  // Reboot url
+  server.on("/quitquitquit", handleReboot);
+  // MQTT Discovery url
+  server.on("/send_discovery", handleSendMqttDiscovery);
 
 #if FIRMWARE_OTA
   // Setup the URL to allow Over-The-Air (OTA) firmware updates.
@@ -1348,6 +1484,8 @@ bool reconnect() {
       for (uint8_t i = 0; i < kSendTableSize; i++) {
         subscribing(String(MQTTcommand "_") + String(static_cast<int>(i)));
       }
+      // Climate topics.
+      subscribing(MQTTclimateprefix MQTTwildcardcmd);
     } else {
       debug("failed, rc=" + String(mqtt_client.state()) +
             " Try again in a bit.");
@@ -1390,12 +1528,18 @@ void loop(void) {
         }
         lastConnectedTime = now;
         debug("successful client mqtt connection");
+        // Force sending all of the current climate state.
+        lastBroadcast = doBroadcast(lastBroadcast, kBroadcastPeriod, climate,
+                                    false, true);
       }
     }
   } else {
     lastConnectedTime = now;
     // MQTT loop
     mqtt_client.loop();
+    // Periodically send all of the climate state via MQTT.
+    lastBroadcast = doBroadcast(lastBroadcast, kBroadcastPeriod, climate,
+                                false, false);
   }
 #endif  // MQTT_ENABLE
 #ifdef IR_RX
@@ -1812,7 +1956,20 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   uint16_t repeat = 0;
   uint8_t channel = 0;  // Default to the first channel. e.g. "*_0"
 
-  debug("Receiving data by MQTT topic " + topic_name);
+  debug("Receiving data by MQTT topic: " + topic_name + " with payload:" +
+        callback_str);
+  // Save the message as the last command seen (global).
+  lastMqttCmdTopic = topic_name;
+  lastMqttCmd = callback_str;
+  lastMqttCmdTime = millis();
+
+  if (topic_name.startsWith(MQTTclimateprefix)) {
+    debug("It's a climate data topic");
+    commonAcState_t updated = updateClimate(climate, topic_name, callback_str);
+    sendClimate(climate, updated, true, false, false);
+    climate = updated;
+    return;  // We are done for now.
+  }
   // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
   for (int i = 0; i < kSendTableSize; i++) {
     debug("Checking if " + topic_name + " ends with _" + String(i));
@@ -1828,10 +1985,6 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   // Make a copy of the callback string as strtok destroys it.
   char* callback_c_str = strdup(callback_str.c_str());
   debug("MQTT Payload (raw): " + callback_str);
-  // Save the message as the last command seen (global).
-  lastMqttCmdTopic = topic_name;
-  lastMqttCmd = callback_str;
-  lastMqttCmdTime = millis();
 
   // Get the numeric protocol type.
   int ir_type = strtoul(strtok_r(callback_c_str, ",", &tok_ptr), NULL, 10);
@@ -1884,5 +2037,283 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   // Free the memory
   free(payload_copy);
+}
+
+void sendMQTTDiscovery(const char *topic) {
+  if (mqtt_client.publish(
+      topic,
+      "{"
+      "\"~\":\"" MQTTclimateprefix "\","
+      "\"name\":\"" MQTTHomeAssistantName "\","
+      "\"pow_cmd_t\":\"~" MQTTpowercmd "\","
+      "\"mode_cmd_t\":\"~" MQTTmodecmd "\","
+      "\"mode_stat_t\":\"~" MQTTmodestat "\","
+      "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
+      "\"temp_cmd_t\":\"~" MQTTtempcmd "\","
+      "\"temp_stat_t\":\"~" MQTTtempstat "\","
+      "\"min_temp\":\"16\","
+      "\"max_temp\":\"30\","
+      "\"temp_step\":\"1\","
+      "\"fan_mode_cmd_t\":\"~" MQTTfanspeedcmd "\","
+      "\"fan_mode_stat_t\":\"~" MQTTfanspeedstat "\","
+      "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
+      "\"swing_mode_cmd_t\":\"~" MQTTswingvcmd "\","
+      "\"swing_mode_stat_t\":\"~" MQTTswingvstat "\","
+      "\"swing_modes\":["
+        "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
+      "]"
+      "}"))
+    debug("MQTT climate discovery successful sent.");
+  else
+    debug("MQTT climate discovery FAILED to send.");
+}
+
+String opmodeToString(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kOff:
+      return F("off");
+    case stdAc::opmode_t::kAuto:
+      return F("auto");
+    case stdAc::opmode_t::kCool:
+      return F("cool");
+    case stdAc::opmode_t::kHeat:
+      return F("heat");
+    case stdAc::opmode_t::kDry:
+      return F("dry");
+    case stdAc::opmode_t::kFan:
+      return F("fan_only");
+    default:
+      return F("unknown");
+  }
+}
+
+bool sendFloat(const char *topic, const float_t temp, const bool retain) {
+  return mqtt_client.publish(topic, String(temp).c_str(), retain);
+}
+
+String fanspeedToString(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kAuto:
+      return F("auto");
+    case stdAc::fanspeed_t::kMax:
+      return F("max");
+    case stdAc::fanspeed_t::kHigh:
+      return F("high");
+    case stdAc::fanspeed_t::kMedium:
+      return F("medium");
+    case stdAc::fanspeed_t::kLow:
+      return F("low");
+    case stdAc::fanspeed_t::kMin:
+      return F("min");
+    default:
+      return F("unknown");
+  }
+}
+
+String swingvToString(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kOff:
+      return F("off");
+    case stdAc::swingv_t::kAuto:
+      return F("auto");
+    case stdAc::swingv_t::kHighest:
+      return F("highest");
+    case stdAc::swingv_t::kHigh:
+      return F("high");
+    case stdAc::swingv_t::kMiddle:
+      return F("middle");
+    case stdAc::swingv_t::kLow:
+      return F("low");
+    case stdAc::swingv_t::kLowest:
+      return F("lowest");
+    default:
+      return F("unknown");
+  }
+}
+
+String swinghToString(const stdAc::swingh_t swingh) {
+  switch (swingh) {
+    case stdAc::swingh_t::kOff:
+      return F("off");
+    case stdAc::swingh_t::kAuto:
+      return F("auto");
+    case stdAc::swingh_t::kLeftMax:
+      return F("leftmax");
+    case stdAc::swingh_t::kLeft:
+      return F("left");
+    case stdAc::swingh_t::kMiddle:
+      return F("middle");
+    case stdAc::swingh_t::kRight:
+      return F("right");
+    case stdAc::swingh_t::kRightMax:
+      return F("rightmax");
+    default:
+      return F("unknown");
+  }
+}
+
+bool sendInt(const char *topic, const int32_t num, const bool retain) {
+  return mqtt_client.publish(topic, String(num).c_str(), retain);
+}
+
+bool sendBool(const char *topic, const bool on, const bool retain) {
+  return mqtt_client.publish(topic, (on ? "on" : "off"), retain);
+}
+
+bool sendString(const char *topic, const String str, const bool retain) {
+  return mqtt_client.publish(topic, str.c_str(), retain);
+}
+
+commonAcState_t updateClimate(commonAcState_t current, const String topic,
+                              const String message) {
+  commonAcState_t result = current;
+  String umesg = message;
+  umesg.toUpperCase();
+  if (topic.endsWith(MQTTprotocolcmd))
+    result.protocol = strToDecodeType(umesg.c_str());
+  else if (topic.endsWith(MQTTmodelcmd))
+    result.model = IRac::strToModel(umesg.c_str());
+  else if (topic.endsWith(MQTTpowercmd))
+    result.power = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTmodecmd))
+    result.mode = IRac::strToOpmode(umesg.c_str());
+  else if (topic.endsWith(MQTTtempcmd))
+    result.degrees = umesg.toFloat();
+  else if (topic.endsWith(MQTTfanspeedcmd))
+    result.fanspeed = IRac::strToFanspeed(umesg.c_str());
+  else if (topic.endsWith(MQTTswingvcmd))
+    result.swingv = IRac::strToSwingV(umesg.c_str());
+  else if (topic.endsWith(MQTTswinghcmd))
+    result.swingh = IRac::strToSwingH(umesg.c_str());
+  else if (topic.endsWith(MQTTquietcmd))
+    result.quiet = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTturbocmd))
+    result.turbo = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTeconocmd))
+    result.econo = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTlightcmd))
+    result.light = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTbeepcmd))
+    result.beep = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTfiltercmd))
+    result.filter = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTcleancmd))
+    result.clean = IRac::strToBool(umesg.c_str());
+  else if (topic.endsWith(MQTTsleepcmd))
+    result.sleep = umesg.toInt();
+  else if (topic.endsWith(MQTTclockcmd))
+    result.clock = umesg.toInt();
+
+  return result;
+}
+
+bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
+                 const bool retain, const bool forceMQTT, const bool forceIR) {
+  bool diff = false;
+  bool success = true;
+  if (prev.protocol != next.protocol || forceMQTT) {
+    diff = true;
+    success &= sendString(MQTTclimateprefix MQTTprotocolstat,
+                       typeToString(next.protocol), retain);
+  }
+  if (prev.model != next.model || forceMQTT) {
+    diff = true;
+    success &= sendInt(MQTTclimateprefix MQTTmodelstat, next.model, retain);
+  }
+  if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTpowerstat, next.power, retain);
+    success &= sendString(MQTTclimateprefix MQTTmodestat,
+                      (next.power ? opmodeToString(next.mode) : F("off")),
+                      retain);
+  }
+  if (prev.degrees != next.degrees || forceMQTT) {
+    diff = true;
+    success &= sendFloat(MQTTclimateprefix MQTTtempstat, next.degrees, retain);
+  }
+  if (prev.celsius != next.celsius || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTcelsiusstat, next.celsius,
+                        retain);
+  }
+  if (prev.fanspeed != next.fanspeed || forceMQTT) {
+    diff = true;
+    success &= sendString(MQTTclimateprefix MQTTfanspeedstat,
+                       fanspeedToString(next.fanspeed), retain);
+  }
+  if (prev.swingv != next.swingv || forceMQTT) {
+    diff = true;
+    success &= sendString(MQTTclimateprefix MQTTswingvstat,
+                       swingvToString(next.swingv), retain);
+  }
+  if (prev.swingh != next.swingh || forceMQTT) {
+    diff = true;
+    success &= sendString(MQTTclimateprefix MQTTswinghstat,
+                       swinghToString(next.swingh), retain);
+  }
+  if (prev.quiet != next.quiet || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTquietstat, next.quiet,
+                        retain);
+  }
+  if (prev.turbo != next.turbo || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTturbostat, next.turbo,
+                        retain);
+  }
+  if (prev.econo != next.econo || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTeconostat, next.econo,
+                        retain);
+  }
+  if (prev.light != next.light || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTlightstat, next.light,
+                        retain);
+  }
+  if (prev.filter != next.filter || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTfilterstat, next.filter,
+                        retain);
+  }
+  if (prev.clean != next.clean || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTcleanstat, next.clean,
+                        retain);
+  }
+  if (prev.beep != next.beep || forceMQTT) {
+    diff = true;
+    success &= sendBool(MQTTclimateprefix MQTTbeepstat, next.beep,
+                        retain);
+  }
+  if (prev.sleep != next.sleep || forceMQTT) {
+    diff = true;
+    success &= sendInt(MQTTclimateprefix MQTTsleepstat, next.sleep, retain);
+  }
+  if (diff && !forceMQTT)
+    debug("Difference in common A/C state detected.");
+  else
+    debug("NO difference in common A/C state detected.");
+  // Only send an IR message if we need to.
+  if ((diff && !forceMQTT) || forceIR) {
+    debug("Sending common A/C state via IR.");
+    success &= commonAc.sendAc(next.protocol, next.model, next.power, next.mode,
+                               next.degrees, next.celsius, next.fanspeed,
+                               next.swingv, next.swingh, next.quiet, next.turbo,
+                               next.econo, next.light, next.filter, next.clean,
+                               next.beep, next.sleep, -1);
+  }
+  return success;
+}
+
+uint32_t doBroadcast(const uint32_t oldtick, const uint32_t interval,
+                     const commonAcState_t state, const bool retain,
+                     const bool force) {
+  uint32_t newtick = millis() / interval;
+  if (force || newtick != oldtick) {
+    debug("Sending MQTT update broadcast.");
+    sendClimate(state, state, retain, true, false);
+  }
+  return newtick;
 }
 #endif  // MQTT_ENABLE
