@@ -105,7 +105,7 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits, bool strict) {
   for (; offset < results->rawlen && results->bits < 8 * kStateSizeMax;
        frame_bits++) {
     DPRINT("DEBUG: decodeMWM: offset = ");
-    DPRINTLN(uint64ToString(offset));
+    DPRINTLN(offset);
     int16_t level = getRClevel(results, &offset, &used, kMWMTick, kMWMTolerance,
                                kMWMExcess, kMWMDelta, kMWMMaxWidth);
     if (level < 0) {
@@ -129,7 +129,7 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits, bool strict) {
           DPRINT("DEBUG: decodeMWM: data_bits = ");
           DPRINTLN(data_bits);
           DPRINT("DEBUG: decodeMWM: Finished byte: ");
-          DPRINTLN(data);
+          DPRINTLN(uint64ToString(data));
           results->state[data_bits / 8 - 1] = data & 0xFF;
           results->bits = data_bits;
           data = 0;
