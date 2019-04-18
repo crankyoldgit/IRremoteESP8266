@@ -247,28 +247,28 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
 #define MQTTclimateprefix MQTTprefix "/ac"
 
-#define MQTTcmdprefix "/cmd"
-#define MQTTstatprefix "/stat"
+#define MQTTcmdprefix "/cmd/"
+#define MQTTstatprefix "/stat/"
 
-#define MQTTwildcard "/+"
-#define MQTTprotocol "/protocol"
-#define MQTTmodel "/model"
-#define MQTTpower "/power"
-#define MQTTmode "/mode"
-#define MQTTtemp "/temp"
-#define MQTTfanspeed "/fanspeed"
-#define MQTTswingv "/swingv"
-#define MQTTswingh "/swingh"
-#define MQTTquiet "/quiet"
-#define MQTTturbo "/turbo"
-#define MQTTlight "/light"
-#define MQTTbeep "/beep"
-#define MQTTecono "/econo"
-#define MQTTsleep "/sleep"
-#define MQTTclock "/clock"
-#define MQTTfilter "/filter"
-#define MQTTclean "/clean"
-#define MQTTcelsius "/use_celsius"
+#define MQTTwildcard "+"
+#define KEY_PROTOCOL "protocol"
+#define KEY_MODEL "model"
+#define KEY_POWER "power"
+#define KEY_MODE "mode"
+#define KEY_TEMP "temp"
+#define KEY_FANSPEED "fanspeed"
+#define KEY_SWINGV "swingv"
+#define KEY_SWINGH "swingh"
+#define KEY_QUIET "quiet"
+#define KEY_TURBO "turbo"
+#define KEY_LIGHT "light"
+#define KEY_BEEP "beep"
+#define KEY_ECONO "econo"
+#define KEY_SLEEP "sleep"
+#define KEY_CLOCK "clock"
+#define KEY_FILTER "filter"
+#define KEY_CLEAN "clean"
+#define KEY_CELSIUS "use_celsius"
 
 #define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
 #define MQTTHomeAssistantName HOSTNAME "_aircon"
@@ -877,7 +877,7 @@ void handleAirCon() {
       "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
       "<table style='width:33%'>"
       "<tr><td>Protocol</td><td>"
-      "<select name='type'>";
+      "<select name='" KEY_PROTOCOL "'>";
   for (uint16_t i = 0; i < 255; i++) {
     if (IRac::isProtocolSupported((decode_type_t)i)) {
       html += F("<option value='");
@@ -890,40 +890,40 @@ void handleAirCon() {
     }
   }
   html += "</select></td></tr>"
-      "<tr><td>Model</td><td>" + htmlSelectModel("model", climate.model) +
+      "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate.model) +
           "</td></tr>"
-      "<tr><td>Power</td><td>" + htmlSelectBool("power", climate.power) +
+      "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate.power) +
           "</td></tr>"
-      "<tr><td>Mode</td><td>" + htmlSelectMode("mode", climate.mode) +
+      "<tr><td>Mode</td><td>" + htmlSelectMode(KEY_MODE, climate.mode) +
           "</td></tr>"
       "<tr><td>Temp</td><td>"
-          "<input type='number' name='degrees' min='16' max='86' step='0.5' "
-          "value='" + String(climate.degrees, 1) + "'>"
-          "<select name='use_celcius'>"
+          "<input type='number' name='" KEY_TEMP "' min='16' max='90' "
+          "step='0.5' value='" + String(climate.degrees, 1) + "'>"
+          "<select name='" KEY_CELSIUS "'>"
               "<option value='on'" +
               (climate.celsius ? " selected='selected'" : "") + ">C</option>"
               "<option value='off'" +
               (!climate.celsius ? " selected='selected'" : "") + ">F</option>"
           "</select></td></tr>"
       "<tr><td>Fan Speed</td><td>" +
-          htmlSelectFanspeed("fanspeed", climate.fanspeed) + "</td></tr>"
+          htmlSelectFanspeed(KEY_FANSPEED, climate.fanspeed) + "</td></tr>"
       "<tr><td>Swing (V)</td><td>" +
-          htmlSelectSwingv("swingv", climate.swingv) + "</td></tr>"
+          htmlSelectSwingv(KEY_SWINGV, climate.swingv) + "</td></tr>"
       "<tr><td>Swing (H)</td><td>" +
-          htmlSelectSwingh("swingh", climate.swingh) + "</td></tr>"
-      "<tr><td>Quiet</td><td>" + htmlSelectBool("quiet", climate.quiet) +
+          htmlSelectSwingh(KEY_SWINGH, climate.swingh) + "</td></tr>"
+      "<tr><td>Quiet</td><td>" + htmlSelectBool(KEY_QUIET, climate.quiet) +
           "</td></tr>"
-      "<tr><td>Turbo</td><td>" + htmlSelectBool("turbo", climate.turbo) +
+      "<tr><td>Turbo</td><td>" + htmlSelectBool(KEY_TURBO, climate.turbo) +
           "</td></tr>"
-      "<tr><td>Econo</td><td>" + htmlSelectBool("econo", climate.econo) +
+      "<tr><td>Econo</td><td>" + htmlSelectBool(KEY_ECONO, climate.econo) +
           "</td></tr>"
-      "<tr><td>Light</td><td>" + htmlSelectBool("light", climate.light) +
+      "<tr><td>Light</td><td>" + htmlSelectBool(KEY_LIGHT, climate.light) +
           "</td></tr>"
-      "<tr><td>Filter</td><td>" + htmlSelectBool("filter", climate.filter) +
+      "<tr><td>Filter</td><td>" + htmlSelectBool(KEY_FILTER, climate.filter) +
           "</td></tr>"
-      "<tr><td>Clean</td><td>" + htmlSelectBool("clean", climate.clean) +
+      "<tr><td>Clean</td><td>" + htmlSelectBool(KEY_CLEAN, climate.clean) +
           "</td></tr>"
-      "<tr><td>Beep</td><td>" + htmlSelectBool("beep", climate.beep) +
+      "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate.beep) +
           "</td></tr>"
       "</table>"
       "<input type='submit' value='Update'>"
@@ -931,6 +931,33 @@ void handleAirCon() {
 
   // Display the current settings.
   html += "</body></html>";
+  server.send(200, "text/html", html);
+}
+
+// Parse the URL args to find the Common A/C arguments.
+void handleAirConSet() {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+    debug("Basic HTTP authentication failure for /aircon/set.");
+    return server.requestAuthentication();
+  }
+#endif
+  commonAcState_t result = climate;
+  debug("New common a/c received via HTTP");
+  for (uint16_t i = 0; i < server.args(); i++)
+    result = updateClimate(result, server.argName(i), "", server.arg(i));
+
+  sendClimate(climate, result, MQTTclimateprefix MQTTstatprefix,
+              true, false, false);
+  // Update the old climate state with the new one.
+  climate = result;
+  // Redirect back to the aircon page.
+  String html = F(
+      "<html><head><title>Update Aircon</title></head>"
+      "<body>"
+      "<center><h1>Aircon updated!</h1></center>");
+  html += addJsReloadUrl("/aircon", 2, false);
+  html += F("</body></html>");
   server.send(200, "text/html", html);
 }
 
@@ -1707,6 +1734,8 @@ void setup(void) {
   server.on("/ir", handleIr);
   // Setup the aircon page.
   server.on("/aircon", handleAirCon);
+  // Setup the aircon update page.
+  server.on("/aircon/set", handleAirConSet);
   // Setup the info page.
   server.on("/info", handleInfo);
   // Setup the admin page.
@@ -2385,20 +2414,20 @@ void sendMQTTDiscovery(const char *topic) {
       "{"
       "\"~\":\"" MQTTclimateprefix "\","
       "\"name\":\"" MQTTHomeAssistantName "\","
-      "\"pow_cmd_t\":\"~" MQTTcmdprefix MQTTpower "\","
-      "\"mode_cmd_t\":\"~" MQTTcmdprefix MQTTmode "\","
-      "\"mode_stat_t\":\"~" MQTTstatprefix MQTTmode "\","
+      "\"pow_cmd_t\":\"~" MQTTcmdprefix KEY_POWER "\","
+      "\"mode_cmd_t\":\"~" MQTTcmdprefix KEY_MODE "\","
+      "\"mode_stat_t\":\"~" MQTTstatprefix KEY_MODE "\","
       "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
-      "\"temp_cmd_t\":\"~" MQTTcmdprefix MQTTtemp "\","
-      "\"temp_stat_t\":\"~" MQTTstatprefix MQTTtemp "\","
+      "\"temp_cmd_t\":\"~" MQTTcmdprefix KEY_TEMP "\","
+      "\"temp_stat_t\":\"~" MQTTstatprefix KEY_TEMP "\","
       "\"min_temp\":\"16\","
       "\"max_temp\":\"30\","
       "\"temp_step\":\"1\","
-      "\"fan_mode_cmd_t\":\"~" MQTTcmdprefix MQTTfanspeed "\","
-      "\"fan_mode_stat_t\":\"~" MQTTstatprefix MQTTfanspeed "\","
+      "\"fan_mode_cmd_t\":\"~" MQTTcmdprefix KEY_FANSPEED "\","
+      "\"fan_mode_stat_t\":\"~" MQTTstatprefix KEY_FANSPEED "\","
       "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
-      "\"swing_mode_cmd_t\":\"~" MQTTcmdprefix MQTTswingv "\","
-      "\"swing_mode_stat_t\":\"~" MQTTstatprefix MQTTswingv "\","
+      "\"swing_mode_cmd_t\":\"~" MQTTcmdprefix KEY_SWINGV "\","
+      "\"swing_mode_stat_t\":\"~" MQTTstatprefix KEY_SWINGV "\","
       "\"swing_modes\":["
         "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
       "]"
@@ -2424,45 +2453,45 @@ bool sendFloat(const String topic, const float_t temp, const bool retain) {
   return mqtt_client.publish(topic.c_str(), String(temp).c_str(), retain);
 }
 
-commonAcState_t updateClimate(commonAcState_t current, const String topic,
-                              const String prefix, const String message) {
+commonAcState_t updateClimate(commonAcState_t current, const String str,
+                              const String prefix, const String payload) {
   commonAcState_t result = current;
-  String umesg = message;
-  umesg.toUpperCase();
-  if (topic.endsWith(prefix + MQTTprotocol))
-    result.protocol = strToDecodeType(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTmodel))
-    result.model = IRac::strToModel(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTpower))
-    result.power = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTmode))
-    result.mode = IRac::strToOpmode(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTtemp))
-    result.degrees = umesg.toFloat();
-  else if (topic.endsWith(prefix + MQTTfanspeed))
-    result.fanspeed = IRac::strToFanspeed(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTswingv))
-    result.swingv = IRac::strToSwingV(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTswingh))
-    result.swingh = IRac::strToSwingH(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTquiet))
-    result.quiet = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTturbo))
-    result.turbo = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTecono))
-    result.econo = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTlight))
-    result.light = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTbeep))
-    result.beep = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTfilter))
-    result.filter = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTclean))
-    result.clean = IRac::strToBool(umesg.c_str());
-  else if (topic.endsWith(prefix + MQTTsleep))
-    result.sleep = umesg.toInt();
-  else if (topic.endsWith(prefix + MQTTclock))
-    result.clock = umesg.toInt();
+  String value = payload;
+  value.toUpperCase();
+  if (str.equals(prefix + KEY_PROTOCOL))
+    result.protocol = strToDecodeType(value.c_str());
+  else if (str.equals(prefix + KEY_MODEL))
+    result.model = IRac::strToModel(value.c_str());
+  else if (str.equals(prefix + KEY_POWER))
+    result.power = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_MODE))
+    result.mode = IRac::strToOpmode(value.c_str());
+  else if (str.equals(prefix + KEY_TEMP))
+    result.degrees = value.toFloat();
+  else if (str.equals(prefix + KEY_FANSPEED))
+    result.fanspeed = IRac::strToFanspeed(value.c_str());
+  else if (str.equals(prefix + KEY_SWINGV))
+    result.swingv = IRac::strToSwingV(value.c_str());
+  else if (str.equals(prefix + KEY_SWINGH))
+    result.swingh = IRac::strToSwingH(value.c_str());
+  else if (str.equals(prefix + KEY_QUIET))
+    result.quiet = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_TURBO))
+    result.turbo = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_ECONO))
+    result.econo = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_LIGHT))
+    result.light = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_BEEP))
+    result.beep = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_FILTER))
+    result.filter = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_CLEAN))
+    result.clean = IRac::strToBool(value.c_str());
+  else if (str.equals(prefix + KEY_SLEEP))
+    result.sleep = value.toInt();
+  else if (str.equals(prefix + KEY_CLOCK))
+    result.clock = value.toInt();
   return result;
 }
 
@@ -2473,74 +2502,74 @@ bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
   bool success = true;
   if (prev.protocol != next.protocol || forceMQTT) {
     diff = true;
-    success &= sendString(topic_prefix + MQTTprotocol,
+    success &= sendString(topic_prefix + KEY_PROTOCOL,
                           typeToString(next.protocol), retain);
   }
   if (prev.model != next.model || forceMQTT) {
     diff = true;
-    success &= sendInt(topic_prefix + MQTTmodel, next.model, retain);
+    success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
   if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTpower, next.power, retain);
-    success &= sendString(topic_prefix + MQTTmode,
+    success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
+    success &= sendString(topic_prefix + KEY_MODE,
                           (next.power ? opmodeToString(next.mode) : F("off")),
                           retain);
   }
   if (prev.degrees != next.degrees || forceMQTT) {
     diff = true;
-    success &= sendFloat(topic_prefix + MQTTtemp, next.degrees, retain);
+    success &= sendFloat(topic_prefix + KEY_TEMP, next.degrees, retain);
   }
   if (prev.celsius != next.celsius || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTcelsius, next.celsius, retain);
+    success &= sendBool(topic_prefix + KEY_CELSIUS, next.celsius, retain);
   }
   if (prev.fanspeed != next.fanspeed || forceMQTT) {
     diff = true;
-    success &= sendString(topic_prefix + MQTTfanspeed,
+    success &= sendString(topic_prefix + KEY_FANSPEED,
                           fanspeedToString(next.fanspeed), retain);
   }
   if (prev.swingv != next.swingv || forceMQTT) {
     diff = true;
-    success &= sendString(topic_prefix + MQTTswingv,
+    success &= sendString(topic_prefix + KEY_SWINGV,
                           swingvToString(next.swingv), retain);
   }
   if (prev.swingh != next.swingh || forceMQTT) {
     diff = true;
-    success &= sendString(topic_prefix + MQTTswingh,
+    success &= sendString(topic_prefix + KEY_SWINGH,
                           swinghToString(next.swingh), retain);
   }
   if (prev.quiet != next.quiet || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTquiet, next.quiet, retain);
+    success &= sendBool(topic_prefix + KEY_QUIET, next.quiet, retain);
   }
   if (prev.turbo != next.turbo || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTturbo, next.turbo, retain);
+    success &= sendBool(topic_prefix + KEY_TURBO, next.turbo, retain);
   }
   if (prev.econo != next.econo || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTecono, next.econo, retain);
+    success &= sendBool(topic_prefix + KEY_ECONO, next.econo, retain);
   }
   if (prev.light != next.light || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTlight, next.light, retain);
+    success &= sendBool(topic_prefix + KEY_LIGHT, next.light, retain);
   }
   if (prev.filter != next.filter || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTfilter, next.filter, retain);
+    success &= sendBool(topic_prefix + KEY_FILTER, next.filter, retain);
   }
   if (prev.clean != next.clean || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTclean, next.clean, retain);
+    success &= sendBool(topic_prefix + KEY_CLEAN, next.clean, retain);
   }
   if (prev.beep != next.beep || forceMQTT) {
     diff = true;
-    success &= sendBool(topic_prefix + MQTTbeep, next.beep, retain);
+    success &= sendBool(topic_prefix + KEY_BEEP, next.beep, retain);
   }
   if (prev.sleep != next.sleep || forceMQTT) {
     diff = true;
-    success &= sendInt(topic_prefix + MQTTsleep, next.sleep, retain);
+    success &= sendInt(topic_prefix + KEY_SLEEP, next.sleep, retain);
   }
   if (diff && !forceMQTT)
     debug("Difference in common A/C state detected.");

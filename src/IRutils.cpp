@@ -90,7 +90,11 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 // Returns:
 //  A decode_type_t enum.
 decode_type_t strToDecodeType(const char *str) {
-  if (!strcmp(str, "AIWA_RC_T501"))
+  if (!strcmp(str, "UNKNOWN"))
+    return decode_type_t::UNKNOWN;
+  else if (!strcmp(str, "UNUSED"))
+    return decode_type_t::UNUSED;
+  else if (!strcmp(str, "AIWA_RC_T501"))
     return decode_type_t::AIWA_RC_T501;
   else if (!strcmp(str, "ARGO"))
     return decode_type_t::ARGO;
@@ -204,6 +208,11 @@ decode_type_t strToDecodeType(const char *str) {
     return decode_type_t::WHIRLPOOL_AC;
   else if (!strcmp(str, "WHYNTER"))
     return decode_type_t::WHYNTER;
+  // Handle integer values of the type by converting to a string and back again.
+  decode_type_t result = strToDecodeType(
+      typeToString((decode_type_t)atoi(str)).c_str());
+  if (result > 0)
+    return result;
   else
     return decode_type_t::UNKNOWN;
 }
@@ -222,10 +231,6 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
   std::string result = "";
 #endif
   switch (protocol) {
-    default:
-    case UNKNOWN:
-      result = F("UNKNOWN");
-      break;
     case UNUSED:
       result = F("UNUSED");
       break;
@@ -408,6 +413,10 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case WHYNTER:
       result = F("WHYNTER");
+      break;
+    case UNKNOWN:
+    default:
+      result = F("UNKNOWN");
       break;
   }
   if (isRepeat) result += F(" (Repeat)");
