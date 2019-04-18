@@ -36,6 +36,79 @@
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
 
+// Is the given protocol supported by the IRac class?
+bool IRac::isProtocolSupported(const decode_type_t protocol) {
+  switch (protocol) {
+#if SEND_ARGO
+    case decode_type_t::ARGO:
+#endif
+#if SEND_COOLIX
+    case decode_type_t::COOLIX:
+#endif
+#if SEND_DAIKIN
+    case decode_type_t::DAIKIN:
+#endif
+#if SEND_DAIKIN2
+    case decode_type_t::DAIKIN2:
+#endif
+#if SEND_FUJITSU_AC
+    case decode_type_t::FUJITSU_AC:
+#endif
+#if SEND_GREE
+    case decode_type_t::GREE:
+#endif
+#if SEND_HAIER_AC
+    case decode_type_t::HAIER_AC:
+#endif
+#if SEND_HAIER_AC_YRW02
+    case decode_type_t::HAIER_AC_YRW02:
+#endif
+#if SEND_HITACHI_AC
+    case decode_type_t::HITACHI_AC:
+#endif
+#if SEND_KELVINATOR
+    case decode_type_t::KELVINATOR:
+#endif
+#if SEND_MIDEA
+    case decode_type_t::MIDEA:
+#endif
+#if SEND_MITSUBISHI_AC
+    case decode_type_t::MITSUBISHI_AC:
+#endif
+#if SEND_MITSUBISHIHEAVY
+    case decode_type_t::MITSUBISHI_HEAVY_88:
+    case decode_type_t::MITSUBISHI_HEAVY_152:
+#endif
+#if SEND_PANASONIC_AC
+    case decode_type_t::PANASONIC_AC:
+#endif
+#if SEND_SAMSUNG_AC
+    case decode_type_t::SAMSUNG_AC:
+#endif
+#if SEND_TCL112AC
+    case decode_type_t::TCL112AC:
+#endif
+#if SEND_TECO
+    case decode_type_t::TECO:
+#endif
+#if SEND_TOSHIBA_AC
+    case decode_type_t::TOSHIBA_AC:
+#endif
+#if SEND_TROTEC
+    case decode_type_t::TROTEC:
+#endif
+#if SEND_VESTEL_AC
+    case decode_type_t::VESTEL_AC:
+#endif
+#if SEND_WHIRLPOOL_AC
+    case decode_type_t::WHIRLPOOL_AC:
+#endif
+      return true;
+    default:
+      return false;
+  }
+}
+
 #if SEND_ARGO
 void IRac::argo(IRArgoAC *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,

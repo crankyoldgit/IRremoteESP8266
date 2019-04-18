@@ -464,6 +464,10 @@ String htmlMenu(void) {
           "Home"
         "</button>"
         "<button type='button' "
+          "onclick='window.location=\"/aircon\"'>"
+          "Aircon"
+        "</button>"
+        "<button type='button' "
           "onclick='window.location=\"/info\"'>"
           "System Info"
         "</button>"
@@ -675,6 +679,259 @@ String addJsReloadUrl(const String url, const uint16_t timeout_s,
       "//-->\n"
       "</script>\n");
   return html;
+}
+
+String boolToString(const bool value) {
+  return String(value ? "on" : "off");
+}
+
+
+String opmodeToString(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kOff:
+      return F("off");
+    case stdAc::opmode_t::kAuto:
+      return F("auto");
+    case stdAc::opmode_t::kCool:
+      return F("cool");
+    case stdAc::opmode_t::kHeat:
+      return F("heat");
+    case stdAc::opmode_t::kDry:
+      return F("dry");
+    case stdAc::opmode_t::kFan:
+      return F("fan_only");
+    default:
+      return F("unknown");
+  }
+}
+
+String fanspeedToString(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kAuto:
+      return F("auto");
+    case stdAc::fanspeed_t::kMax:
+      return F("max");
+    case stdAc::fanspeed_t::kHigh:
+      return F("high");
+    case stdAc::fanspeed_t::kMedium:
+      return F("medium");
+    case stdAc::fanspeed_t::kLow:
+      return F("low");
+    case stdAc::fanspeed_t::kMin:
+      return F("min");
+    default:
+      return F("unknown");
+  }
+}
+
+String swingvToString(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kOff:
+      return F("off");
+    case stdAc::swingv_t::kAuto:
+      return F("auto");
+    case stdAc::swingv_t::kHighest:
+      return F("highest");
+    case stdAc::swingv_t::kHigh:
+      return F("high");
+    case stdAc::swingv_t::kMiddle:
+      return F("middle");
+    case stdAc::swingv_t::kLow:
+      return F("low");
+    case stdAc::swingv_t::kLowest:
+      return F("lowest");
+    default:
+      return F("unknown");
+  }
+}
+
+String swinghToString(const stdAc::swingh_t swingh) {
+  switch (swingh) {
+    case stdAc::swingh_t::kOff:
+      return F("off");
+    case stdAc::swingh_t::kAuto:
+      return F("auto");
+    case stdAc::swingh_t::kLeftMax:
+      return F("leftmax");
+    case stdAc::swingh_t::kLeft:
+      return F("left");
+    case stdAc::swingh_t::kMiddle:
+      return F("middle");
+    case stdAc::swingh_t::kRight:
+      return F("right");
+    case stdAc::swingh_t::kRightMax:
+      return F("rightmax");
+    default:
+      return F("unknown");
+  }
+}
+
+String htmlSelectBool(const String name, const bool def) {
+  String html = "<select name='" + name + "'>";
+  for (uint16_t i = 0; i < 2; i++) {
+    html += F("<option value='");
+    html += boolToString(i);
+    html += '\'';
+    if (i == def) html += F(" selected='selected'");
+    html += '>';
+    html += boolToString(i);
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+String htmlSelectModel(const String name, const int16_t def) {
+  String html = "<select name='" + name + "'>";
+  for (int16_t i = -1; i <= 6; i++) {
+    String num = String(i);
+    html += F("<option value='");
+    html += num;
+    html += '\'';
+    if (i == def) html += F(" selected='selected'");
+    html += '>';
+    if (i == -1)
+      html += F("Default");
+    else if (i == 0)
+      html += F("Unknown");
+    else
+      html += num;
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+String htmlSelectMode(const String name, const stdAc::opmode_t def) {
+  String html = "<select name='" + name + "'>";
+  for (int8_t i = -1; i <= 4; i++) {
+    String mode = opmodeToString((stdAc::opmode_t)i);
+    html += F("<option value='");
+    html += mode;
+    html += '\'';
+    if ((stdAc::opmode_t)i == def) html += F(" selected='selected'");
+    html += '>';
+    html += mode;
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
+  String html = "<select name='" + name + "'>";
+  for (int8_t i = 0; i <= 5; i++) {
+    String speed = fanspeedToString((stdAc::fanspeed_t)i);
+    html += F("<option value='");
+    html += speed;
+    html += '\'';
+    if ((stdAc::fanspeed_t)i == def) html += F(" selected='selected'");
+    html += '>';
+    html += speed;
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
+  String html = "<select name='" + name + "'>";
+  for (int8_t i = -1; i <= 5; i++) {
+    String swing = swingvToString((stdAc::swingv_t)i);
+    html += F("<option value='");
+    html += swing;
+    html += '\'';
+    if ((stdAc::swingv_t)i == def) html += F(" selected='selected'");
+    html += '>';
+    html += swing;
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
+  String html = "<select name='" + name + "'>";
+  for (int8_t i = -1; i <= 5; i++) {
+    String swing = swinghToString((stdAc::swingh_t)i);
+    html += F("<option value='");
+    html += swing;
+    html += '\'';
+    if ((stdAc::swingh_t)i == def) html += F(" selected='selected'");
+    html += '>';
+    html += swing;
+    html += F("</option>");
+  }
+  html += F("</select>");
+  return html;
+}
+
+// Admin web page
+void handleAirCon() {
+  String html = F(
+    "<html><head><title>AirCon control</title></head>"
+    "<body>"
+    "<center><h1>Air Conditioner Control</h1></center>");
+  html += htmlMenu();
+  html += "<h3>Current Settings</h3>"
+      "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
+      "<table style='width:33%'>"
+      "<tr><td>Protocol</td><td>"
+      "<select name='type'>";
+  for (uint16_t i = 0; i < 255; i++) {
+    if (IRac::isProtocolSupported((decode_type_t)i)) {
+      html += F("<option value='");
+      html += String(i);
+      html += '\'';
+      if (i == climate.protocol) html += " selected='selected'";
+      html += '>';
+      html += typeToString((decode_type_t)i);
+      html += "</option>";
+    }
+  }
+  html += "</select></td></tr>"
+      "<tr><td>Model</td><td>" + htmlSelectModel("model", climate.model) +
+          "</td></tr>"
+      "<tr><td>Power</td><td>" + htmlSelectBool("power", climate.power) +
+          "</td></tr>"
+      "<tr><td>Mode</td><td>" + htmlSelectMode("mode", climate.mode) +
+          "</td></tr>"
+      "<tr><td>Temp</td><td>"
+          "<input type='number' name='degrees' min='16' max='86' step='0.5' "
+          "value='" + String(climate.degrees, 1) + "'>"
+          "<select name='use_celcius'>"
+              "<option value='on'" +
+              (climate.celsius ? " selected='selected'" : "") + ">C</option>"
+              "<option value='off'" +
+              (!climate.celsius ? " selected='selected'" : "") + ">F</option>"
+          "</select></td></tr>"
+      "<tr><td>Fan Speed</td><td>" +
+          htmlSelectFanspeed("fanspeed", climate.fanspeed) + "</td></tr>"
+      "<tr><td>Swing (V)</td><td>" +
+          htmlSelectSwingv("swingv", climate.swingv) + "</td></tr>"
+      "<tr><td>Swing (H)</td><td>" +
+          htmlSelectSwingh("swingh", climate.swingh) + "</td></tr>"
+      "<tr><td>Quiet</td><td>" + htmlSelectBool("quiet", climate.quiet) +
+          "</td></tr>"
+      "<tr><td>Turbo</td><td>" + htmlSelectBool("turbo", climate.turbo) +
+          "</td></tr>"
+      "<tr><td>Econo</td><td>" + htmlSelectBool("econo", climate.econo) +
+          "</td></tr>"
+      "<tr><td>Light</td><td>" + htmlSelectBool("light", climate.light) +
+          "</td></tr>"
+      "<tr><td>Filter</td><td>" + htmlSelectBool("filter", climate.filter) +
+          "</td></tr>"
+      "<tr><td>Clean</td><td>" + htmlSelectBool("clean", climate.clean) +
+          "</td></tr>"
+      "<tr><td>Beep</td><td>" + htmlSelectBool("beep", climate.beep) +
+          "</td></tr>"
+      "</table>"
+      "<input type='submit' value='Update'>"
+      "</form>";
+
+  // Display the current settings.
+  html += "</body></html>";
+  server.send(200, "text/html", html);
 }
 
 // Admin web page
@@ -1448,6 +1705,8 @@ void setup(void) {
   server.on("/", handleRoot);
   // Setup the page to handle web-based IR codes.
   server.on("/ir", handleIr);
+  // Setup the aircon page.
+  server.on("/aircon", handleAirCon);
   // Setup the info page.
   server.on("/info", handleInfo);
   // Setup the admin page.
@@ -1478,7 +1737,7 @@ void setup(void) {
             "<p>The firmware upload seems to have " +
             String(Update.hasError() ? "FAILED!" : "SUCCEEDED!") +
             " Rebooting! </p>" +
-            addJsReloadUrl("/", 30, true) +
+            addJsReloadUrl("/", 20, true) +
             "</body></html>");
         delay(1000);
         ESP.restart();
@@ -2147,86 +2406,6 @@ void sendMQTTDiscovery(const char *topic) {
     debug("MQTT climate discovery successful sent.");
   else
     debug("MQTT climate discovery FAILED to send.");
-}
-
-String opmodeToString(const stdAc::opmode_t mode) {
-  switch (mode) {
-    case stdAc::opmode_t::kOff:
-      return F("off");
-    case stdAc::opmode_t::kAuto:
-      return F("auto");
-    case stdAc::opmode_t::kCool:
-      return F("cool");
-    case stdAc::opmode_t::kHeat:
-      return F("heat");
-    case stdAc::opmode_t::kDry:
-      return F("dry");
-    case stdAc::opmode_t::kFan:
-      return F("fan_only");
-    default:
-      return F("unknown");
-  }
-}
-
-String fanspeedToString(const stdAc::fanspeed_t speed) {
-  switch (speed) {
-    case stdAc::fanspeed_t::kAuto:
-      return F("auto");
-    case stdAc::fanspeed_t::kMax:
-      return F("max");
-    case stdAc::fanspeed_t::kHigh:
-      return F("high");
-    case stdAc::fanspeed_t::kMedium:
-      return F("medium");
-    case stdAc::fanspeed_t::kLow:
-      return F("low");
-    case stdAc::fanspeed_t::kMin:
-      return F("min");
-    default:
-      return F("unknown");
-  }
-}
-
-String swingvToString(const stdAc::swingv_t swingv) {
-  switch (swingv) {
-    case stdAc::swingv_t::kOff:
-      return F("off");
-    case stdAc::swingv_t::kAuto:
-      return F("auto");
-    case stdAc::swingv_t::kHighest:
-      return F("highest");
-    case stdAc::swingv_t::kHigh:
-      return F("high");
-    case stdAc::swingv_t::kMiddle:
-      return F("middle");
-    case stdAc::swingv_t::kLow:
-      return F("low");
-    case stdAc::swingv_t::kLowest:
-      return F("lowest");
-    default:
-      return F("unknown");
-  }
-}
-
-String swinghToString(const stdAc::swingh_t swingh) {
-  switch (swingh) {
-    case stdAc::swingh_t::kOff:
-      return F("off");
-    case stdAc::swingh_t::kAuto:
-      return F("auto");
-    case stdAc::swingh_t::kLeftMax:
-      return F("leftmax");
-    case stdAc::swingh_t::kLeft:
-      return F("left");
-    case stdAc::swingh_t::kMiddle:
-      return F("middle");
-    case stdAc::swingh_t::kRight:
-      return F("right");
-    case stdAc::swingh_t::kRightMax:
-      return F("rightmax");
-    default:
-      return F("unknown");
-  }
 }
 
 bool sendInt(const String topic, const int32_t num, const bool retain) {

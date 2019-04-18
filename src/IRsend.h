@@ -43,12 +43,12 @@ namespace stdAc {
   };
 
   enum class fanspeed_t {
-    kAuto = 0,
-    kMin =  1,
-    kLow =  2,
-    kMedium =  3,
-    kHigh = 4,
-    kMax =  5,
+    kAuto =   0,
+    kMin =    1,
+    kLow =    2,
+    kMedium = 3,
+    kHigh =   4,
+    kMax =    5,
   };
 
   enum class swingv_t {

@@ -33,6 +33,7 @@
 class IRac {
  public:
   explicit IRac(uint8_t pin);
+  static bool isProtocolSupported(const decode_type_t protocol);
   bool sendAc(const decode_type_t vendor, const int16_t model,
               const bool power, const stdAc::opmode_t mode, const float degrees,
               const bool celsius, const stdAc::fanspeed_t fan,
