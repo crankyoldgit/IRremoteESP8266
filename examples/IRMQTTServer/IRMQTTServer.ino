@@ -249,27 +249,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTcmdprefix "/cmd/"
 #define MQTTstatprefix "/stat/"
-
 #define MQTTwildcard "+"
-#define KEY_PROTOCOL "protocol"
-#define KEY_MODEL "model"
-#define KEY_POWER "power"
-#define KEY_MODE "mode"
-#define KEY_TEMP "temp"
-#define KEY_FANSPEED "fanspeed"
-#define KEY_SWINGV "swingv"
-#define KEY_SWINGH "swingh"
-#define KEY_QUIET "quiet"
-#define KEY_TURBO "turbo"
-#define KEY_LIGHT "light"
-#define KEY_BEEP "beep"
-#define KEY_ECONO "econo"
-#define KEY_SLEEP "sleep"
-#define KEY_CLOCK "clock"
-#define KEY_FILTER "filter"
-#define KEY_CLEAN "clean"
-#define KEY_CELSIUS "use_celsius"
-
 #define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
 #define MQTTHomeAssistantName HOSTNAME "_aircon"
 #define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts
@@ -323,9 +303,27 @@ const uint8_t gpioTable[] = {
 #define QOS 1  // MQTT broker should queue up any unreceived messages for us
 // #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
 
+#define KEY_PROTOCOL "protocol"
+#define KEY_MODEL "model"
+#define KEY_POWER "power"
+#define KEY_MODE "mode"
+#define KEY_TEMP "temp"
+#define KEY_FANSPEED "fanspeed"
+#define KEY_SWINGV "swingv"
+#define KEY_SWINGH "swingh"
+#define KEY_QUIET "quiet"
+#define KEY_TURBO "turbo"
+#define KEY_LIGHT "light"
+#define KEY_BEEP "beep"
+#define KEY_ECONO "econo"
+#define KEY_SLEEP "sleep"
+#define KEY_CLOCK "clock"
+#define KEY_FILTER "filter"
+#define KEY_CLEAN "clean"
+#define KEY_CELSIUS "use_celsius"
 // ----------------- End of User Configuration Section -------------------------
 
-// Globals
+// Constants
 #define _MY_VERSION_ "v1.0.0-alpha"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
@@ -337,6 +335,9 @@ const uint8_t gpioTable[] = {
 #define LWT_ONLINE  "Online"
 #define LWT_OFFLINE "Offline"
 
+const uint8_t kSendTableSize = sizeof(gpioTable);
+
+// Globals
 ESP8266WebServer server(kHttpPort);
 #ifdef IR_RX
 IRrecv irrecv(IR_RX, kCaptureBufferSize, kCaptureTimeout, true);
@@ -354,12 +355,17 @@ uint32_t sendReqCounter = 0;
 bool lastSendSucceeded = false;  // Store the success status of the last send.
 uint32_t lastSendTime = 0;
 int8_t offset;  // The calculated period offset for this chip and library.
+IRsend *IrSendTable[kSendTableSize];
 
 #ifdef IR_RX
 String lastIrReceived = "None";
 uint32_t lastIrReceivedTime = 0;
 uint32_t irRecvCounter = 0;
 #endif  // IR_RX
+
+// Climate stuff
+commonAcState_t climate;
+IRac commonAc(gpioTable[0]);
 
 #if MQTT_ENABLE
 String lastMqttCmd = "None";
@@ -375,12 +381,7 @@ void callback(char* topic, byte* payload, unsigned int length);
 PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
-const uint8_t kSendTableSize = sizeof(gpioTable);
-IRsend *IrSendTable[kSendTableSize];
 
-// Climate stuff
-commonAcState_t climate;
-IRac commonAc(gpioTable[0]);
 uint32_t lastBroadcast = 0;
 const uint32_t kBroadcastPeriod = MQTTbroadcastInterval * 1000;  // mSeconds.
 #endif  // MQTT_ENABLE
@@ -438,6 +439,7 @@ String listOfSendGpios(void) {
   return result;
 }
 
+#if MQTT_ENABLE
 // Return a string containing the comma separated list of MQTT command topics.
 String listOfCommandTopics(void) {
   String result = MQTTcommand;
@@ -446,6 +448,7 @@ String listOfCommandTopics(void) {
   }
   return result;
 }
+#endif  // MQTT_ENABLE
 
 // Quick and dirty check for any unsafe chars in a string
 // that may cause HTML shenanigans. e.g. An XSS.
@@ -947,8 +950,12 @@ void handleAirConSet() {
   for (uint16_t i = 0; i < server.args(); i++)
     result = updateClimate(result, server.argName(i), "", server.arg(i));
 
+#if MQTT_ENABLE
   sendClimate(climate, result, MQTTclimateprefix MQTTstatprefix,
               true, false, false);
+#else  // MQTT_ENABLE
+  sendClimate(climate, result, "", false, false, false);
+#endif  // MQTT_ENABLE
   // Update the old climate state with the new one.
   climate = result;
   // Redirect back to the aircon page.
@@ -1106,7 +1113,7 @@ void handleReboot() {
     "</body></html>");
 #if MQTT_ENABLE
   mqtt_client.publish(MQTTlog, "Reboot requested");
-#endif
+#endif  // MQTT_ENABLE
   debug("Rebooting...");
   // Do the reset.
   delay(1000);
@@ -1114,6 +1121,7 @@ void handleReboot() {
   delay(1000);
 }
 
+#if MQTT_ENABLE
 // MQTT Discovery web page
 void handleSendMqttDiscovery() {
 #if HTML_PASSWORD_ENABLE
@@ -1121,7 +1129,7 @@ void handleSendMqttDiscovery() {
     debug("Basic HTTP authentication failure for /send_discovery.");
     return server.requestAuthentication();
   }
-#endif
+#endif  // HTML_PASSWORD_ENABLE
   server.send(200, "text/html",
       "<html><head><title>Sending MQTT Discovery message</title></head>"
       "<body>"
@@ -1136,6 +1144,8 @@ void handleSendMqttDiscovery() {
       "</body></html>");
   sendMQTTDiscovery(MQTTdiscovery);
 }
+#endif  // MQTT_ENABLE
+
 // Parse an Air Conditioner A/C Hex String/code and send it.
 // Args:
 //   irsend: A Ptr to the IRsend object to transmit via.
@@ -1744,8 +1754,10 @@ void setup(void) {
   server.on("/reset", handleReset);
   // Reboot url
   server.on("/quitquitquit", handleReboot);
+#if MQTT_ENABLE
   // MQTT Discovery url
   server.on("/send_discovery", handleSendMqttDiscovery);
+#endif  // MQTT_ENABLE
 
 #if FIRMWARE_OTA
   // Setup the URL to allow Over-The-Air (OTA) firmware updates.
@@ -1754,7 +1766,7 @@ void setup(void) {
 #if MQTT_ENABLE
         mqtt_client.publish(MQTTlog, "Attempting firmware update & reboot");
         delay(1000);
-#endif
+#endif  // MQTT_ENABLE
         server.send(200, "text/html",
             "<html><head><title>Updating firmware.</title></head>"
             "<body>"
@@ -1913,7 +1925,7 @@ void loop(void) {
   // Check if an IR code has been received via the IR RX module.
 #if REPORT_UNKNOWNS
   if (irrecv.decode(&capture)) {
-#else
+#else  // REPORT_UNKNOWNS
   if (irrecv.decode(&capture) && capture.decode_type != UNKNOWN) {
 #endif  // REPORT_UNKNOWNS
     lastIrReceivedTime = millis();
@@ -1940,7 +1952,7 @@ void loop(void) {
       lastIrReceived += "," + String(capture.bits);
 #if MQTT_ENABLE
     mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
-#endif
+#endif  // MQTT_ENABLE
     irRecvCounter++;
     debug("Incoming IR message sent to MQTT: " + lastIrReceived);
   }
@@ -2377,7 +2389,6 @@ void receivingMQTT(String const topic_name, String const callback_str) {
 
   free(callback_c_str);
 
-
   // send received MQTT value by IR signal
   lastSendSucceeded = sendIRCode(
       IrSendTable[channel], ir_type, code,
@@ -2436,21 +2447,38 @@ void sendMQTTDiscovery(const char *topic) {
   else
     debug("MQTT climate discovery FAILED to send.");
 }
+#endif  // MQTT_ENABLE
 
 bool sendInt(const String topic, const int32_t num, const bool retain) {
+#if MQTT_ENABLE
   return mqtt_client.publish(topic.c_str(), String(num).c_str(), retain);
+#else  // MQTT_ENABLE
+  return true;
+#endif  // MQTT_ENABLE
 }
 
 bool sendBool(const String topic, const bool on, const bool retain) {
+#if MQTT_ENABLE
   return mqtt_client.publish(topic.c_str(), (on ? "on" : "off"), retain);
+#else  // MQTT_ENABLE
+  return true;
+#endif  // MQTT_ENABLE
 }
 
 bool sendString(const String topic, const String str, const bool retain) {
+#if MQTT_ENABLE
   return mqtt_client.publish(topic.c_str(), str.c_str(), retain);
+#else  // MQTT_ENABLE
+  return true;
+#endif  // MQTT_ENABLE
 }
 
 bool sendFloat(const String topic, const float_t temp, const bool retain) {
+#if MQTT_ENABLE
   return mqtt_client.publish(topic.c_str(), String(temp).c_str(), retain);
+#else  // MQTT_ENABLE
+  return true;
+#endif  // MQTT_ENABLE
 }
 
 commonAcState_t updateClimate(commonAcState_t current, const String str,
@@ -2500,6 +2528,7 @@ bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
                  const bool forceMQTT, const bool forceIR) {
   bool diff = false;
   bool success = true;
+
   if (prev.protocol != next.protocol || forceMQTT) {
     diff = true;
     success &= sendString(topic_prefix + KEY_PROTOCOL,
@@ -2587,6 +2616,7 @@ bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
   return success;
 }
 
+#if MQTT_ENABLE
 uint32_t doBroadcast(const uint32_t oldtick, const uint32_t interval,
                      const commonAcState_t state, const bool retain,
                      const bool force) {
