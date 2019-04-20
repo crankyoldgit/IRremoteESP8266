@@ -1118,6 +1118,8 @@ void handleInfo() {
     "<p>IP address: " + WiFi.localIP().toString() + "<br>"
     "Booted: " + timeSince(1) + "<br>" +
     "Version: " _MY_VERSION_ "<br>"
+    "Built: " __DATE__
+      " " __TIME__ "<br>"
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
