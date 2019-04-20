@@ -302,7 +302,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
 #define MQTTclimateprefix MQTTprefix "/ac"
 
-#define MQTTcmdprefix "/cmnd/"
+#define MQTTcmndprefix "/cmnd/"
 #define MQTTstatprefix "/stat/"
 #define MQTTwildcard "+"
 #define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
@@ -1180,7 +1180,7 @@ void handleInfo() {
             timeElapsed(lastDiscovery.elapsed()) :
             String("<i>Never</i>"))) +
         "<br>"
-    "Command topics: " MQTTprefix MQTTcmdprefix
+    "Command topics: " MQTTprefix MQTTcmndprefix
       "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
           KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
           KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
@@ -2005,7 +2005,7 @@ bool reconnect() {
         subscribing(String(MQTTcommand "_") + String(static_cast<int>(i)));
       }
       // Climate command topics.
-      subscribing(MQTTclimateprefix MQTTcmdprefix MQTTwildcard);
+      subscribing(MQTTclimateprefix MQTTcmndprefix MQTTwildcard);
     } else {
       debug("failed, rc=" + String(mqtt_client.state()) +
             " Try again in a bit.");
@@ -2502,10 +2502,10 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   mqttRecvCounter++;
 
   if (topic_name.startsWith(MQTTclimateprefix)) {
-    if (topic_name.startsWith(MQTTclimateprefix MQTTcmdprefix)) {
+    if (topic_name.startsWith(MQTTclimateprefix MQTTcmndprefix)) {
       debug("It's a climate command topic");
       commonAcState_t updated = updateClimate(
-          climate, topic_name, MQTTclimateprefix MQTTcmdprefix, callback_str);
+          climate, topic_name, MQTTclimateprefix MQTTcmndprefix, callback_str);
       sendClimate(climate, updated, MQTTclimateprefix MQTTstatprefix,
                   true, false, false);
       climate = updated;
@@ -2590,19 +2590,19 @@ void sendMQTTDiscovery(const char *topic) {
       "{"
       "\"~\":\"" MQTTclimateprefix "\","
       "\"name\":\"" MQTTHomeAssistantName "\","
-      "\"pow_cmd_t\":\"~" MQTTcmdprefix KEY_POWER "\","
-      "\"mode_cmd_t\":\"~" MQTTcmdprefix KEY_MODE "\","
+      "\"pow_cmd_t\":\"~" MQTTcmndprefix KEY_POWER "\","
+      "\"mode_cmd_t\":\"~" MQTTcmndprefix KEY_MODE "\","
       "\"mode_stat_t\":\"~" MQTTstatprefix KEY_MODE "\","
       "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
-      "\"temp_cmd_t\":\"~" MQTTcmdprefix KEY_TEMP "\","
+      "\"temp_cmd_t\":\"~" MQTTcmndprefix KEY_TEMP "\","
       "\"temp_stat_t\":\"~" MQTTstatprefix KEY_TEMP "\","
       "\"min_temp\":\"16\","
       "\"max_temp\":\"30\","
       "\"temp_step\":\"1\","
-      "\"fan_mode_cmd_t\":\"~" MQTTcmdprefix KEY_FANSPEED "\","
+      "\"fan_mode_cmd_t\":\"~" MQTTcmndprefix KEY_FANSPEED "\","
       "\"fan_mode_stat_t\":\"~" MQTTstatprefix KEY_FANSPEED "\","
       "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
-      "\"swing_mode_cmd_t\":\"~" MQTTcmdprefix KEY_SWINGV "\","
+      "\"swing_mode_cmd_t\":\"~" MQTTcmndprefix KEY_SWINGV "\","
       "\"swing_mode_stat_t\":\"~" MQTTstatprefix KEY_SWINGV "\","
       "\"swing_modes\":["
         "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
