@@ -227,7 +227,9 @@
 #define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
 #define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
                                    // MQTT_MAX_PACKET_SIZE of 1024 or more
+#ifndef MQTT_ENABLE
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
+#endif  // MQTT_ENABLE
 // 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
 #define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
                            // Less secure if enabled.
