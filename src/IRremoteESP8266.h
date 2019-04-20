@@ -324,10 +324,10 @@ const uint16_t kCoolixBits = 24;
 const uint16_t kCoolixDefaultRepeat = 1;
 const uint16_t kCarrierAcBits = 32;
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
-// Daikin has a lot of static stuff that is discarded
-const uint16_t kDaikinRawBits = 583;
-const uint16_t kDaikinStateLength = 27;
+const uint16_t kDaikinStateLength = 35;
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
+const uint16_t kDaikinStateLengthShort = kDaikinStateLength - 8;
+const uint16_t kDaikinBitsShort = kDaikinStateLengthShort * 8;
 const uint16_t kDaikinDefaultRepeat = kNoRepeat;
 const uint16_t kDaikin2StateLength = 39;
 const uint16_t kDaikin2Bits = kDaikin2StateLength * 8;

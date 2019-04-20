@@ -255,8 +255,9 @@ class IRsend {
                       uint16_t repeat = kKelvinatorDefaultRepeat);
 #endif
 #if SEND_DAIKIN
-  void sendDaikin(unsigned char data[], uint16_t nbytes = kDaikinStateLength,
-                  uint16_t repeat = kDaikinDefaultRepeat);
+  void sendDaikin(const unsigned char data[],
+                  const uint16_t nbytes = kDaikinStateLength,
+                  const uint16_t repeat = kDaikinDefaultRepeat);
 #endif
 #if SEND_DAIKIN2
   void sendDaikin2(unsigned char data[], uint16_t nbytes = kDaikin2StateLength,

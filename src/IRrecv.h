@@ -266,8 +266,8 @@ class IRrecv {
                         uint16_t nbits = kKelvinatorBits, bool strict = true);
 #endif
 #if DECODE_DAIKIN
-  bool decodeDaikin(decode_results *results, uint16_t nbits = kDaikinRawBits,
-                    bool strict = true);
+  bool decodeDaikin(decode_results *results, const uint16_t nbits = kDaikinBits,
+                    const bool strict = true);
 #endif
 #if DECODE_DAIKIN2
   bool decodeDaikin2(decode_results *results, uint16_t nbits = kDaikin2Bits,

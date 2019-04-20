@@ -1305,7 +1305,21 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       stateSize = kToshibaACStateLength;
       break;
     case DAIKIN:
-      stateSize = kDaikinStateLength;
+      // Daikin has 2 different possible size states.
+      // (The correct size, and a legacy shorter size.)
+      // Guess which one we are being presented with based on the number of
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      // This should provide backward compatiblity with legacy messages.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize, kDaikinStateLengthShort);
+      // If we think it isn't a "short" message.
+      if (stateSize > kDaikinStateLengthShort)
+        // Then it has to be at least the version of the "normal" size.
+        stateSize = std::max(stateSize, kDaikinStateLength);
+      // Lastly, it should never exceed the "normal" size.
+      stateSize = std::min(stateSize, kDaikinStateLength);
       break;
     case DAIKIN2:
       stateSize = kDaikin2StateLength;

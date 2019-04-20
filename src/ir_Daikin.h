@@ -16,9 +16,6 @@
 #include "IRsend_test.h"
 #endif
 
-// Option to disable the additional Daikin debug info to conserve memory
-#define DAIKIN_DEBUG false
-
 //                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
 //                DD  DD   AAAAA   III  KK KK   III  NNN  NN
 //                DD   DD AA   AA  III  KKKK    III  NN N NN
@@ -27,11 +24,14 @@
 
 /*
         Daikin AC map
-        byte 5=Current time, mins past midnight, low bits
-        byte 6
-        b0-b3=Current time, mins past midnight, high bits
+        byte 6=
+          b4:Comfort
         byte 7= checksum of the first part (and last byte before a 29ms pause)
-        byte 13=mode
+        byte 13=Current time, mins past midnight, low bits
+        byte 14
+        b0-b3=Current time, mins past midnight, high bits
+        byte 15= checksum of the second part (and last byte before a 29ms pause)
+        byte 21=mode
                 b7 = 0
                 b6+b5+b4 = Mode
                         Modes: b6+b5+b4
@@ -44,8 +44,8 @@
                 b2 = OFF timer set
                 b1 = ON timer set
                 b0 = Air Conditioner ON
-        byte 14=temp*2   (Temp should be between 10 - 32)
-        byte 16=Fan
+        byte 22=temp*2   (Temp should be between 10 - 32)
+        byte 24=Fan
                 FAN control
                 b7+b6+b5+b4 = Fan speed
                         Fan: b7+b6+b5+b4
@@ -60,23 +60,23 @@
                         Swing control up/down:
                         0000 = Swing up/down off
                         1111 = Swing up/down on
-        byte 17
+        byte 25
                         Swing control left/right:
                         0000 = Swing left/right off
                         1111 = Swing left/right on
-        byte 18=On timer mins past midnight, low bits
-        byte 19
+        byte 26=On timer mins past midnight, low bits
+        byte 27
         b0-b3=On timer mins past midnight, high bits
         b4-b7=Off timer mins past midnight, low bits
-        byte 20=Off timer mins past midnight, high bits
-        byte 21=Aux  -> Powerful (bit 1), Silent (bit 5)
-        byte 24=Aux2
+        byte 28=Off timer mins past midnight, high bits
+        byte 29=Aux  -> Powerful (bit 1), Silent (bit 5)
+        byte 32=Aux2
         b1: Sensor
         b2: Econo mode
         b7: Intelligent eye on
-        byte 25=Aux3
+        byte 33=Aux3
         b1: Mold Proof
-        byte 26= checksum of the second part
+        byte 34= checksum of the third part
 */
 
 // Constants
@@ -91,24 +91,44 @@ const uint8_t kDaikinFanMin = 1;
 const uint8_t kDaikinFanMax = 5;
 const uint8_t kDaikinFanAuto = 0b1010;
 const uint8_t kDaikinFanQuiet = 0b1011;
-const uint8_t kDaikinBytePower = 13;
+const uint16_t kDaikinHeaderLength = 5;
+const uint8_t kDaikinSections = 3;
+const uint8_t kDaikinSection1Length = 8;
+const uint8_t kDaikinSection2Length = 8;
+const uint8_t kDaikinSection3Length =
+    kDaikinStateLength - kDaikinSection1Length - kDaikinSection2Length;
+const uint8_t kDaikinByteComfort = 6;
+const uint8_t kDaikinByteChecksum1 = 7;
+const uint8_t kDaikinBitComfort = 0b00010000;
+const uint8_t kDaikinByteClockMinsLow = 13;
+const uint8_t kDaikinByteClockMinsHigh = 14;
+const uint8_t kDaikinByteChecksum2 = 15;
+const uint8_t kDaikinBytePower = 21;
 const uint8_t kDaikinBitPower = 0b00000001;
-const uint8_t kDaikinBytePowerful = 21;
+const uint8_t kDaikinByteTemp = 22;
+const uint8_t kDaikinByteFan = 24;
+const uint8_t kDaikinByteSwingH = 25;
+const uint8_t kDaikinByteOnTimerMinsLow = 26;
+const uint8_t kDaikinByteOnTimerMinsHigh = 27;
+const uint8_t kDaikinByteOffTimerMinsLow = kDaikinByteOnTimerMinsHigh;
+const uint8_t kDaikinByteOffTimerMinsHigh = 28;
+const uint8_t kDaikinBytePowerful = 29;
 const uint8_t kDaikinBitPowerful = 0b00000001;
-const uint8_t kDaikinByteSilent = 21;
+const uint8_t kDaikinByteSilent = kDaikinBytePowerful;
 const uint8_t kDaikinBitSilent = 0b00100000;
-const uint8_t kDaikinByteSensor = 24;
+const uint8_t kDaikinByteSensor = 32;
 const uint8_t kDaikinBitSensor = 0b00000010;
-const uint8_t kDaikinByteEcono = 24;
+const uint8_t kDaikinByteEcono = kDaikinByteSensor;
 const uint8_t kDaikinBitEcono = 0b00000100;
-const uint8_t kDaikinByteEye = 24;
+const uint8_t kDaikinByteEye = kDaikinByteSensor;
 const uint8_t kDaikinBitEye = 0b10000000;
-const uint8_t kDaikinByteMold = 25;
+const uint8_t kDaikinByteMold = 33;
 const uint8_t kDaikinBitMold = 0b00000010;
-const uint8_t kDaikinByteOffTimer = 13;
+const uint8_t kDaikinByteOffTimer = kDaikinBytePower;
 const uint8_t kDaikinBitOffTimer = 0b00000100;
-const uint8_t kDaikinByteOnTimer = 13;
+const uint8_t kDaikinByteOnTimer = kDaikinByteOffTimer;
 const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint8_t kDaikinByteChecksum3 = kDaikinStateLength - 1;
 const uint16_t kDaikinUnusedTime = 0x600;
 const uint8_t kDaikinBeepQuiet = 1;
 const uint8_t kDaikinBeepLoud = 2;
@@ -186,60 +206,58 @@ class IRDaikinESP {
 #if SEND_DAIKIN
   void send(const uint16_t repeat = kDaikinDefaultRepeat);
 #endif
-  void begin();
-  void on();
-  void off();
-  void setPower(bool state);
-  bool getPower();
-  void setTemp(uint8_t temp);
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
   uint8_t getTemp();
-  void setFan(uint8_t fan);
-  uint8_t getFan();
-  uint8_t getMode();
-  void setMode(uint8_t mode);
-  void setSwingVertical(bool state);
-  bool getSwingVertical();
-  void setSwingHorizontal(bool state);
-  bool getSwingHorizontal();
-  bool getQuiet();
-  void setQuiet(bool state);
-  bool getPowerful();
-  void setPowerful(bool state);
-  void setSensor(bool state);
-  bool getSensor();
-  void setEcono(bool state);
-  bool getEcono();
-  void setEye(bool state);
-  bool getEye();
-  void setMold(bool state);
-  bool getMold();
-  void enableOnTimer(uint16_t starttime);
-  void disableOnTimer();
-  uint16_t getOnTime();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void);
+  void setSwingHorizontal(const bool on);
+  bool getSwingHorizontal(void);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  bool getPowerful(void);
+  void setPowerful(const bool on);
+  void setSensor(const bool on);
+  bool getSensor(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
+  void setEye(const bool on);
+  bool getEye(void);
+  void setMold(const bool on);
+  bool getMold(void);
+  void setComfort(const bool on);
+  bool getComfort(void);
+  void enableOnTimer(const uint16_t starttime);
+  void disableOnTimer(void);
+  uint16_t getOnTime(void);
   bool getOnTimerEnabled();
-  void enableOffTimer(uint16_t endtime);
-  void disableOffTimer();
-  uint16_t getOffTime();
-  bool getOffTimerEnabled();
-  void setCurrentTime(uint16_t time);
-  uint16_t getCurrentTime();
-  uint8_t* getRaw();
-  void setRaw(uint8_t new_code[]);
-#if DAIKIN_DEBUG
-  void printState();
-#endif  // DAIKIN_DEBUG
-  uint32_t getCommand();
-  void setCommand(uint32_t value);
+  void enableOffTimer(const uint16_t endtime);
+  void disableOffTimer(void);
+  uint16_t getOffTime(void);
+  bool getOffTimerEnabled(void);
+  void setCurrentTime(const uint16_t mins_since_midnight);
+  uint16_t getCurrentTime(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kDaikinStateLength);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
-  String toString();
-  static String renderTime(uint16_t timemins);
+  String toString(void);
+  static String renderTime(const uint16_t timemins);
 #else
-  std::string toString();
-  static std::string renderTime(uint16_t timemins);
+  std::string toString(void);
+  static std::string renderTime(const uint16_t timemins);
 #endif
 #ifndef UNIT_TEST
 
@@ -249,12 +267,9 @@ class IRDaikinESP {
   IRsendTest _irsend;
 #endif
   // # of bytes per command
-  uint8_t daikin[kDaikinStateLength];
-  void stateReset();
-  void checksum();
-  void setBit(uint8_t byte, uint8_t bitmask);
-  void clearBit(uint8_t byte, uint8_t bitmask);
-  uint8_t getBit(uint8_t byte, uint8_t bitmask);
+  uint8_t remote[kDaikinStateLength];
+  void stateReset(void);
+  void checksum(void);
 };
 
 // Class to emulate a Daikin ARC477A1 remote.
