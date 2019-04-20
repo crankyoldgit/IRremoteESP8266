@@ -502,7 +502,7 @@ String timeSince(uint32_t const start) {
     diff = now - start;
   else
     diff = UINT32_MAX - start + now;
-  return msToHumanString(diff);
+  return msToHumanString(diff) + " ago";
 }
 
 // Return a string containing the comma separated list of sending gpios.
