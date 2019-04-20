@@ -308,6 +308,8 @@ enum decode_type_t {
   LEGOPF,
   MITSUBISHI_HEAVY_88,
   MITSUBISHI_HEAVY_152,  // 60
+  // Add new entries before this one, and update it to point to the last entry.
+  kLastDecodeType = MITSUBISHI_HEAVY_152,
 };
 
 // Message lengths & required repeat values

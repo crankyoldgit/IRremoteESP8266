@@ -395,3 +395,9 @@ TEST(TestCountBits, Integer) {
   ASSERT_EQ(64, countBits(data, 64));
   ASSERT_EQ(0, countBits(data, 64, false));
 }
+
+TEST(TestStrToDecodeType, strToDecodeType) {
+  EXPECT_EQ(decode_type_t::NEC, strToDecodeType("NEC"));
+  EXPECT_EQ(decode_type_t::KELVINATOR, strToDecodeType("KELVINATOR"));
+  EXPECT_EQ(decode_type_t::UNKNOWN, strToDecodeType("foo"));
+}

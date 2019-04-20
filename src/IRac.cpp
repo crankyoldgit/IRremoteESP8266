@@ -9,6 +9,7 @@
 #include <Arduino.h>
 #endif
 
+#include <string.h>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -34,6 +35,79 @@
 #include "ir_Whirlpool.h"
 
 IRac::IRac(uint8_t pin) { _pin = pin; }
+
+// Is the given protocol supported by the IRac class?
+bool IRac::isProtocolSupported(const decode_type_t protocol) {
+  switch (protocol) {
+#if SEND_ARGO
+    case decode_type_t::ARGO:
+#endif
+#if SEND_COOLIX
+    case decode_type_t::COOLIX:
+#endif
+#if SEND_DAIKIN
+    case decode_type_t::DAIKIN:
+#endif
+#if SEND_DAIKIN2
+    case decode_type_t::DAIKIN2:
+#endif
+#if SEND_FUJITSU_AC
+    case decode_type_t::FUJITSU_AC:
+#endif
+#if SEND_GREE
+    case decode_type_t::GREE:
+#endif
+#if SEND_HAIER_AC
+    case decode_type_t::HAIER_AC:
+#endif
+#if SEND_HAIER_AC_YRW02
+    case decode_type_t::HAIER_AC_YRW02:
+#endif
+#if SEND_HITACHI_AC
+    case decode_type_t::HITACHI_AC:
+#endif
+#if SEND_KELVINATOR
+    case decode_type_t::KELVINATOR:
+#endif
+#if SEND_MIDEA
+    case decode_type_t::MIDEA:
+#endif
+#if SEND_MITSUBISHI_AC
+    case decode_type_t::MITSUBISHI_AC:
+#endif
+#if SEND_MITSUBISHIHEAVY
+    case decode_type_t::MITSUBISHI_HEAVY_88:
+    case decode_type_t::MITSUBISHI_HEAVY_152:
+#endif
+#if SEND_PANASONIC_AC
+    case decode_type_t::PANASONIC_AC:
+#endif
+#if SEND_SAMSUNG_AC
+    case decode_type_t::SAMSUNG_AC:
+#endif
+#if SEND_TCL112AC
+    case decode_type_t::TCL112AC:
+#endif
+#if SEND_TECO
+    case decode_type_t::TECO:
+#endif
+#if SEND_TOSHIBA_AC
+    case decode_type_t::TOSHIBA_AC:
+#endif
+#if SEND_TROTEC
+    case decode_type_t::TROTEC:
+#endif
+#if SEND_VESTEL_AC
+    case decode_type_t::VESTEL_AC:
+#endif
+#if SEND_WHIRLPOOL_AC
+    case decode_type_t::WHIRLPOOL_AC:
+#endif
+      return true;
+    default:
+      return false;
+  }
+}
 
 #if SEND_ARGO
 void IRac::argo(IRArgoAC *ac,
@@ -653,8 +727,8 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 //   clock:   Nr. of mins past midnight to set the clock to. (< 0 means off.)
 // Returns:
 //   boolean: True, if accepted/converted/attempted. False, if unsupported.
-bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
-                  const bool on, const stdAc::opmode_t mode,
+bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
+                  const bool power, const stdAc::opmode_t mode,
                   const float degrees, const bool celsius,
                   const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
@@ -663,11 +737,13 @@ bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
                   const bool beep, const int16_t sleep, const int16_t clock) {
   // Convert the temperature to Celsius.
   float degC;
+  bool on = power;
   if (celsius)
     degC = degrees;
   else
     degC = (degrees - 32.0) * (5.0 / 9.0);
-
+  // A hack for Home Assistant, it appears to need/want an Off opmode.
+  if (mode == stdAc::opmode_t::kOff) on = false;
   // Per vendor settings & setup.
   switch (vendor) {
 #if SEND_ARGO
@@ -876,4 +952,146 @@ bool IRac::sendAc(const decode_type_t vendor, const uint16_t model,
       return false;  // Fail, didn't match anything.
   }
   return true;  // Success.
+}
+
+stdAc::opmode_t IRac::strToOpmode(const char *str,
+                                const stdAc::opmode_t def) {
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
+    return stdAc::opmode_t::kAuto;
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+    return stdAc::opmode_t::kOff;
+  else if (!strcmp(str, "COOL") || !strcmp(str, "COOLING"))
+    return stdAc::opmode_t::kCool;
+  else if (!strcmp(str, "HEAT") || !strcmp(str, "HEATING"))
+    return stdAc::opmode_t::kHeat;
+  else if (!strcmp(str, "DRY") || !strcmp(str, "DRYING") ||
+           !strcmp(str, "DEHUMIDIFY"))
+    return stdAc::opmode_t::kDry;
+  else if (!strcmp(str, "FAN") || !strcmp(str, "FANONLY") ||
+           !strcmp(str, "FAN_ONLY"))
+    return stdAc::opmode_t::kFan;
+  else
+    return def;
+}
+
+stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
+                                      const stdAc::fanspeed_t def) {
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
+    return stdAc::fanspeed_t::kAuto;
+  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
+           !strcmp(str, "LOWEST"))
+    return stdAc::fanspeed_t::kMin;
+  else if (!strcmp(str, "LOW"))
+    return stdAc::fanspeed_t::kLow;
+  else if (!strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "MID"))
+    return stdAc::fanspeed_t::kMedium;
+  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
+    return stdAc::fanspeed_t::kHigh;
+  else if (!strcmp(str, "MAX") || !strcmp(str, "MAXIMUM") ||
+           !strcmp(str, "HIGHEST"))
+    return stdAc::fanspeed_t::kMax;
+  else
+    return def;
+}
+
+stdAc::swingv_t IRac::strToSwingV(const char *str,
+                                  const stdAc::swingv_t def) {
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
+      !strcmp(str, "ON") || !strcmp(str, "SWING"))
+    return stdAc::swingv_t::kAuto;
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+    return stdAc::swingv_t::kOff;
+  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
+           !strcmp(str, "LOWEST") || !strcmp(str, "BOTTOM") ||
+           !strcmp(str, "DOWN"))
+    return stdAc::swingv_t::kLowest;
+  else if (!strcmp(str, "LOW"))
+    return stdAc::swingv_t::kLow;
+  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
+           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
+    return stdAc::swingv_t::kMiddle;
+  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
+    return stdAc::swingv_t::kHigh;
+  else if (!strcmp(str, "HIGHEST") || !strcmp(str, "MAX") ||
+           !strcmp(str, "MAXIMUM") || !strcmp(str, "TOP") ||
+           !strcmp(str, "UP"))
+    return stdAc::swingv_t::kHighest;
+  else
+    return def;
+}
+
+stdAc::swingh_t IRac::strToSwingH(const char *str,
+                                  const stdAc::swingh_t def) {
+  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
+      !strcmp(str, "ON") || !strcmp(str, "SWING"))
+    return stdAc::swingh_t::kAuto;
+  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+    return stdAc::swingh_t::kOff;
+  else if (!strcmp(str, "LEFTMAX") || !strcmp(str, "LEFT MAX") ||
+           !strcmp(str, "MAXLEFT") || !strcmp(str, "MAX LEFT") ||
+           !strcmp(str, "FARLEFT") || !strcmp(str, "FAR LEFT"))
+    return stdAc::swingh_t::kLeftMax;
+  else if (!strcmp(str, "LEFT"))
+    return stdAc::swingh_t::kLeft;
+  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
+           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
+           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
+    return stdAc::swingh_t::kMiddle;
+  else if (!strcmp(str, "RIGHT"))
+    return stdAc::swingh_t::kRight;
+  else if (!strcmp(str, "RIGHTMAX") || !strcmp(str, "RIGHT MAX") ||
+           !strcmp(str, "MAXRIGHT") || !strcmp(str, "MAX RIGHT") ||
+           !strcmp(str, "FARRIGHT") || !strcmp(str, "FAR RIGHT"))
+    return stdAc::swingh_t::kRightMax;
+  else
+    return def;
+}
+
+// Assumes str is upper case or an integer >= 1.
+int16_t IRac::strToModel(const char *str, const int16_t def) {
+  // Fujitsu A/C models
+  if (!strcmp(str, "ARRAH2E")) {
+    return fujitsu_ac_remote_model_t::ARRAH2E;
+  } else if (!strcmp(str, "ARDB1")) {
+    return fujitsu_ac_remote_model_t::ARDB1;
+  // Panasonic A/C families
+  } else if (!strcmp(str, "LKE") || !strcmp(str, "PANASONICLKE")) {
+    return panasonic_ac_remote_model_t::kPanasonicLke;
+  } else if (!strcmp(str, "NKE") || !strcmp(str, "PANASONICNKE")) {
+    return panasonic_ac_remote_model_t::kPanasonicNke;
+  } else if (!strcmp(str, "DKE") || !strcmp(str, "PANASONICDKE")) {
+    return panasonic_ac_remote_model_t::kPanasonicDke;
+  } else if (!strcmp(str, "JKE") || !strcmp(str, "PANASONICJKE")) {
+    return panasonic_ac_remote_model_t::kPanasonicJke;
+  } else if (!strcmp(str, "CKP") || !strcmp(str, "PANASONICCKP")) {
+    return panasonic_ac_remote_model_t::kPanasonicCkp;
+  } else if (!strcmp(str, "RKR") || !strcmp(str, "PANASONICRKR")) {
+    return panasonic_ac_remote_model_t::kPanasonicRkr;
+  // Whirlpool A/C models
+  } else if (!strcmp(str, "DG11J13A") || !strcmp(str, "DG11J104") ||
+             !strcmp(str, "DG11J1-04")) {
+    return whirlpool_ac_remote_model_t::DG11J13A;
+  } else if (!strcmp(str, "DG11J191")) {
+    return whirlpool_ac_remote_model_t::DG11J191;
+  } else {
+    int16_t number = atoi(str);
+    if (number > 0)
+      return number;
+    else
+      return def;
+  }
+}
+
+// Assumes str is upper case.
+bool IRac::strToBool(const char *str, const bool def) {
+  if (!strcmp(str, "ON") || !strcmp(str, "1") || !strcmp(str, "YES") ||
+      !strcmp(str, "TRUE"))
+    return true;
+  else if (!strcmp(str, "OFF") || !strcmp(str, "0") ||
+           !strcmp(str, "NO") || !strcmp(str, "FALSE"))
+    return false;
+  else
+    return def;
 }

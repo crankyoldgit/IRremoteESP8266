@@ -24,7 +24,7 @@ String resultToSourceCode(const decode_results *results);
 String resultToTimingInfo(const decode_results *results);
 String resultToHumanReadableBasic(const decode_results *results);
 String resultToHexidecimal(const decode_results *result);
-#else
+#else  // ARDUINO
 std::string uint64ToString(uint64_t input, uint8_t base = 10);
 std::string typeToString(const decode_type_t protocol,
                          const bool isRepeat = false);
@@ -32,7 +32,7 @@ std::string resultToSourceCode(const decode_results *results);
 std::string resultToTimingInfo(const decode_results *results);
 std::string resultToHumanReadableBasic(const decode_results *results);
 std::string resultToHexidecimal(const decode_results *result);
-#endif
+#endif  // ARDUINO
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results *results);
 uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init = 0);
@@ -42,5 +42,5 @@ uint16_t countBits(const uint8_t *start, const uint16_t length,
 uint16_t countBits(const uint64_t data, const uint8_t length,
                    const bool ones = true, const uint16_t init = 0);
 uint64_t invertBits(const uint64_t data, const uint16_t nbits);
-
+decode_type_t strToDecodeType(const char *str);
 #endif  // IRUTILS_H_

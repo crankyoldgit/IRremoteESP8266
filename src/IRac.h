@@ -33,14 +33,27 @@
 class IRac {
  public:
   explicit IRac(uint8_t pin);
-  bool sendAc(const decode_type_t vendor, const uint16_t model,
-              const bool on, const stdAc::opmode_t mode, const float degrees,
+  static bool isProtocolSupported(const decode_type_t protocol);
+  bool sendAc(const decode_type_t vendor, const int16_t model,
+              const bool power, const stdAc::opmode_t mode, const float degrees,
               const bool celsius, const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
               const bool quiet, const bool turbo, const bool econo,
               const bool light, const bool filter, const bool clean,
               const bool beep, const int16_t sleep = -1,
               const int16_t clock = -1);
+
+  static bool strToBool(const char *str, const bool def = false);
+  static int16_t strToModel(const char *str, const int16_t def = -1);
+  static stdAc::opmode_t strToOpmode(
+    const char *str, const stdAc::opmode_t def = stdAc::opmode_t::kAuto);
+  static stdAc::fanspeed_t strToFanspeed(
+    const char *str,
+    const stdAc::fanspeed_t def = stdAc::fanspeed_t::kAuto);
+  static stdAc::swingv_t strToSwingV(
+    const char *str, const stdAc::swingv_t def = stdAc::swingv_t::kOff);
+  static stdAc::swingh_t strToSwingH(
+    const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
 #ifndef UNIT_TEST
 
  private:
@@ -202,5 +215,27 @@ class IRac {
                  const bool turbo, const bool light,
                  const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_WHIRLPOOL_AC
-};
+};  // IRac class
+
+// Structure to hold a common A/C state.
+typedef struct {
+  decode_type_t protocol;
+  int16_t model;
+  bool power;
+  stdAc::opmode_t mode;
+  float degrees;
+  bool celsius;
+  stdAc::fanspeed_t fanspeed;
+  stdAc::swingv_t swingv;
+  stdAc::swingh_t swingh;
+  bool quiet;
+  bool turbo;
+  bool econo;
+  bool light;
+  bool filter;
+  bool clean;
+  bool beep;
+  int16_t sleep;
+  int16_t clock;
+} commonAcState_t;
 #endif  // IRAC_H_

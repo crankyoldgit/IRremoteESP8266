@@ -7,6 +7,7 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <string.h>
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -81,6 +82,141 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 }
 #endif
 
+// Convert a c-style str to a decode_type_t
+// Note: Assumes str is upper case.
+//
+// Args:
+//   str:  An upper-case C-style string.
+// Returns:
+//  A decode_type_t enum.
+decode_type_t strToDecodeType(const char *str) {
+  if (!strcmp(str, "UNKNOWN"))
+    return decode_type_t::UNKNOWN;
+  else if (!strcmp(str, "UNUSED"))
+    return decode_type_t::UNUSED;
+  else if (!strcmp(str, "AIWA_RC_T501"))
+    return decode_type_t::AIWA_RC_T501;
+  else if (!strcmp(str, "ARGO"))
+    return decode_type_t::ARGO;
+  else if (!strcmp(str, "CARRIER_AC"))
+    return decode_type_t::CARRIER_AC;
+  else if (!strcmp(str, "COOLIX"))
+    return decode_type_t::COOLIX;
+  else if (!strcmp(str, "DAIKIN"))
+    return decode_type_t::DAIKIN;
+  else if (!strcmp(str, "DAIKIN2"))
+    return decode_type_t::DAIKIN2;
+  else if (!strcmp(str, "DENON"))
+    return decode_type_t::DENON;
+  else if (!strcmp(str, "DISH"))
+    return decode_type_t::DISH;
+  else if (!strcmp(str, "ELECTRA_AC"))
+    return decode_type_t::ELECTRA_AC;
+  else if (!strcmp(str, "FUJITSU_AC"))
+    return decode_type_t::FUJITSU_AC;
+  else if (!strcmp(str, "GICABLE"))
+    return decode_type_t::GICABLE;
+  else if (!strcmp(str, "GLOBALCACHE"))
+    return decode_type_t::GLOBALCACHE;
+  else if (!strcmp(str, "GREE"))
+    return decode_type_t::GREE;
+  else if (!strcmp(str, "HAIER_AC"))
+    return decode_type_t::HAIER_AC;
+  else if (!strcmp(str, "HAIER_AC_YRW02"))
+    return decode_type_t::HAIER_AC_YRW02;
+  else if (!strcmp(str, "HITACHI_AC"))
+    return decode_type_t::HITACHI_AC;
+  else if (!strcmp(str, "HITACHI_AC1"))
+    return decode_type_t::HITACHI_AC1;
+  else if (!strcmp(str, "HITACHI_AC2"))
+    return decode_type_t::HITACHI_AC2;
+  else if (!strcmp(str, "JVC"))
+    return decode_type_t::JVC;
+  else if (!strcmp(str, "KELVINATOR"))
+    return decode_type_t::KELVINATOR;
+  else if (!strcmp(str, "LEGOPF"))
+    return decode_type_t::LEGOPF;
+  else if (!strcmp(str, "LG"))
+    return decode_type_t::LG;
+  else if (!strcmp(str, "LG2"))
+    return decode_type_t::LG2;
+  else if (!strcmp(str, "LASERTAG"))
+    return decode_type_t::LASERTAG;
+  else if (!strcmp(str, "LUTRON"))
+    return decode_type_t::LUTRON;
+  else if (!strcmp(str, "MAGIQUEST"))
+    return decode_type_t::MAGIQUEST;
+  else if (!strcmp(str, "MIDEA"))
+    return decode_type_t::MIDEA;
+  else if (!strcmp(str, "MITSUBISHI"))
+    return decode_type_t::MITSUBISHI;
+  else if (!strcmp(str, "MITSUBISHI2"))
+    return decode_type_t::MITSUBISHI2;
+  else if (!strcmp(str, "MITSUBISHI_AC"))
+    return decode_type_t::MITSUBISHI_AC;
+  else if (!strcmp(str, "MWM"))
+    return decode_type_t::MWM;
+  else if (!strcmp(str, "NEC") || !strcmp(str, "NEC (NON-STRICT"))
+    return decode_type_t::NEC;
+  else if (!strcmp(str, "NIKAI"))
+    return decode_type_t::NIKAI;
+  else if (!strcmp(str, "PANASONIC"))
+    return decode_type_t::PANASONIC;
+  else if (!strcmp(str, "PANASONIC_AC"))
+    return decode_type_t::PANASONIC_AC;
+  else if (!strcmp(str, "PIONEER"))
+    return decode_type_t::PIONEER;
+  else if (!strcmp(str, "PRONTO"))
+    return decode_type_t::PRONTO;
+  else if (!strcmp(str, "RAW"))
+    return decode_type_t::RAW;
+  else if (!strcmp(str, "RC5"))
+    return decode_type_t::RC5;
+  else if (!strcmp(str, "RC5X"))
+    return decode_type_t::RC5X;
+  else if (!strcmp(str, "RC6"))
+    return decode_type_t::RC6;
+  else if (!strcmp(str, "RCMM"))
+    return decode_type_t::RCMM;
+  else if (!strcmp(str, "SAMSUNG"))
+    return decode_type_t::SAMSUNG;
+  else if (!strcmp(str, "SAMSUNG36"))
+    return decode_type_t::SAMSUNG36;
+  else if (!strcmp(str, "SAMSUNG_AC"))
+    return decode_type_t::SAMSUNG_AC;
+  else if (!strcmp(str, "SANYO"))
+    return decode_type_t::SANYO;
+  else if (!strcmp(str, "SANYO_LC7461"))
+    return decode_type_t::SANYO_LC7461;
+  else if (!strcmp(str, "SHARP"))
+    return decode_type_t::SHARP;
+  else if (!strcmp(str, "SHERWOOD"))
+    return decode_type_t::SHERWOOD;
+  else if (!strcmp(str, "SONY"))
+    return decode_type_t::SONY;
+  else if (!strcmp(str, "TCL112AC"))
+    return decode_type_t::TCL112AC;
+  else if (!strcmp(str, "TECO"))
+    return decode_type_t::TECO;
+  else if (!strcmp(str, "TOSHIBA_AC"))
+    return decode_type_t::TOSHIBA_AC;
+  else if (!strcmp(str, "TROTEC"))
+    return decode_type_t::TROTEC;
+  else if (!strcmp(str, "VESTEL_AC"))
+    return decode_type_t::VESTEL_AC;
+  else if (!strcmp(str, "WHIRLPOOL_AC"))
+    return decode_type_t::WHIRLPOOL_AC;
+  else if (!strcmp(str, "WHYNTER"))
+    return decode_type_t::WHYNTER;
+  // Handle integer values of the type by converting to a string and back again.
+  decode_type_t result = strToDecodeType(
+      typeToString((decode_type_t)atoi(str)).c_str());
+  if (result > 0)
+    return result;
+  else
+    return decode_type_t::UNKNOWN;
+}
+
 // Convert a protocol type (enum etc) to a human readable string.
 // Args:
 //   protocol: Nr. (enum) of the protocol.
@@ -95,10 +231,6 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
   std::string result = "";
 #endif
   switch (protocol) {
-    default:
-    case UNKNOWN:
-      result = F("UNKNOWN");
-      break;
     case UNUSED:
       result = F("UNUSED");
       break;
@@ -281,6 +413,10 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case WHYNTER:
       result = F("WHYNTER");
+      break;
+    case UNKNOWN:
+    default:
+      result = F("UNKNOWN");
       break;
   }
   if (isRepeat) result += F(" (Repeat)");
