@@ -134,8 +134,62 @@
  * Note: General logging messages are also sent to 'ir_server/log' from
  *       time to time.
  *
+ * ## Climate (AirCon) interface. (Advanced use)
+ * You can now control Air Conditioner devices that have full/detailed support
+ * from the IRremoteESP8266 library. See the "Aircon" page for list of supported
+ * devices. You can do this via HTTP/HTML or via MQTT.
+ *
+ * NOTE: It will only change the attributes you change/set. It's up to you to
+ *       maintain a consistent set of attributes for your particular aircon.
+ *
+ * TIP: Use "-1" for 'model' if your A/C doesn't have a specific `setModel()`
+ *      or IR class attribute. Most don't. Some do.
+ *      e.g. PANASONIC_AC, FUJITSU_AC, WHIRLPOOL_AC
+ *
+ * ### via MQTT:
+ * The code listen for commands (via wildcard) on the MQTT topics at the
+ * `ir_server/ac/cmnd/+` level, such as:
+ * i.e. protocol, model, power, mode, temp, fanspeed, swingv, swingh, quiet,
+ *      turbo, light, beep, econo, sleep, filter, clean, use_celsius
+ * e.g. ir_server/ac/cmnd/power, ir_server/ac/cmnd/temp, etc.
+ * It will process them, and if successful and it caused a change, it will
+ * acknowledge this via the relevant state topic for that command.
+ * e.g. If the aircon/climate changes from power off to power on, it will
+ *      send an "on" payload to "ir_server/ac/stat/power"
+ * NOTE: These "stat" messages have the MQTT retain flag set to on. Thus the
+ *       MQTT broker will remember them until reset/restarted etc.
+ *
+ * The code will also periodically broadcast all possible aircon/climate state
+ * attributes to their corresponding "ir_server/ac/stat" topics. This ensures
+ * any updates to the ESP's knowledge that may have been lost in transmission
+ * are re-communicated. e.g. The MQTT broker being offline.
+ * This also helps with Home Assistant MQTT discovery.
+ *
+ * The program on boot & first successful connection to the MQTT broker, will
+ * try to re-acquire any previous aircon/climate state information and act
+ * accordingly. This will typically result in A/C IR message being sent as and
+ * saved state will probably be different from the defaults.
+ *
+ * NOTE: Command attributes are processed sequentially.
+ *       e.g. Going from "25C, cool, fan low" to "27C, heat, fan high" may go
+ *       via "27C, cool, fan low" & "27C, heat, fan low" depending on the order
+ *       of arrival & processing of the MQTT commands.
+ *
+ * ### via HTTP:
+ *   Use the "http://<your_esp8266's_ip_address>/aircon/set" URL and pass on
+ *   the arguments as needed to control your device. See the `KEY_*` #defines
+ *   in the code for all the parameters.
+ *   i.e. protocol, model, power, mode, temp, fanspeed, swingv, swingh, quiet,
+ *        turbo, light, beep, econo, sleep, filter, clean, use_celsius
+ *   Example:
+ *     http://<your_esp8266's_ip_address>/aircon/set?protocol=PANASONIC_AC&model=LKE&power=on&mode=auto&fanspeed=min&temp=23
+ *
+ * ## Debugging & Logging
  * If DEBUG is turned on, there is additional information printed on the Serial
- * Port.
+ * Port. Serial Port output may be disabled if the GPIO is used for IR.
+ *
+ * If MQTT is enabled, some information/logging is sent to the MQTT topic:
+ *   `ir_server/log`
  *
  * ## Updates
  * You can upload new firmware over the air (OTA) via the form on the device's
@@ -325,7 +379,7 @@ const uint8_t gpioTable[] = {
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.0.0-alpha"
+#define _MY_VERSION_ "v1.0.0-beta"
 // HTML arguments we will parse for IR code information.
 #define argType "type"
 #define argData "code"
@@ -401,7 +455,7 @@ bool hasDiscoveryBeenSent = false;
 TimerMs statListenTime = TimerMs();  // How long we've been listening for.
 
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
-const uint32_t kStatListenPeriodMs = 10 * 1000;  // mSeconds
+const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
 #endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
@@ -541,6 +595,14 @@ void handleRoot() {
         "Sherwood Amp Input TAPE (Pronto)</a></p>"
     "<p><a href=\"ir?type=7&code=E0E09966\">TV on (Samsung)</a></p>"
     "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Power Off (Sony 12bit)</a></p>"
+    "<p><a href=\"aircon/set?protocol=PANASONIC_AC&model=LKE&power=on&"
+      "mode=auto&fanspeed=min&temp=23\">"
+      "Panasonic A/C LKE model, On, Auto mode, Min fan, 23C"
+      " <i>(via HTTP aircon interface)</i></a></p>"
+    "<p><a href=\"aircon/set?temp=27\">"
+      "Change just the temp to 27C <i>(via HTTP aircon interface)</i></a></p>"
+    "<p><a href=\"aircon/set?power=off&mode=off\">"
+      "Turn OFF the current A/C <i>(via HTTP aircon interface)</i></a></p>"
     "<br><hr>"
     "<h3>Send a simple IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
@@ -2586,7 +2648,7 @@ bool sendString(const String topic, const String str, const bool retain) {
 bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqtt_client.publish(topic.c_str(), String(temp).c_str(), retain);
+  return mqtt_client.publish(topic.c_str(), String(temp, 1).c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
