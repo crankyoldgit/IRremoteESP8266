@@ -192,6 +192,7 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
+#include <IRtimer.h>
 #include <IRutils.h>
 #include <IRac.h>
 #if MQTT_ENABLE
@@ -247,7 +248,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
 #define MQTTclimateprefix MQTTprefix "/ac"
 
-#define MQTTcmdprefix "/cmd/"
+#define MQTTcmdprefix "/cmnd/"
 #define MQTTstatprefix "/stat/"
 #define MQTTwildcard "+"
 #define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
@@ -350,7 +351,7 @@ WiFiManager wifiManager;
 uint16_t *codeArray;
 uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
-bool ir_lock = false;  // Primitive locking for gating the IR LED.
+bool lockIr = false;  // Primitive locking for gating the IR LED.
 uint32_t sendReqCounter = 0;
 bool lastSendSucceeded = false;  // Store the success status of the last send.
 uint32_t lastSendTime = 0;
@@ -365,7 +366,13 @@ uint32_t irRecvCounter = 0;
 
 // Climate stuff
 commonAcState_t climate;
+commonAcState_t climate_prev;
 IRac commonAc(gpioTable[0]);
+TimerMs lastClimateIr = TimerMs();  // When we last sent the IR Climate mesg.
+uint32_t irClimateCounter = 0;  // How many have we sent?
+// Store the success status of the last climate send.
+bool lastClimateSucceeded = false;
+bool hasClimateBeenSent = false;  // Has the Climate ever been sent?
 
 #if MQTT_ENABLE
 String lastMqttCmd = "None";
@@ -374,6 +381,9 @@ uint32_t lastMqttCmdTime = 0;
 uint32_t lastConnectedTime = 0;
 uint32_t lastDisconnectedTime = 0;
 uint32_t mqttDisconnectCounter = 0;
+uint32_t mqttSentCounter = 0;
+uint32_t mqttRecvCounter = 0;
+
 bool wasConnected = true;
 
 // MQTT client parameters
@@ -382,8 +392,16 @@ PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 
-uint32_t lastBroadcast = 0;
-const uint32_t kBroadcastPeriod = MQTTbroadcastInterval * 1000;  // mSeconds.
+// Primative lock file for gating MQTT state broadcasts.
+bool lockMqttBroadcast = true;
+TimerMs lastBroadcast = TimerMs();  // When we last sent a broadcast.
+bool hasBroadcastBeenSent = false;
+TimerMs lastDiscovery = TimerMs();  // When we last sent a Discovery.
+bool hasDiscoveryBeenSent = false;
+TimerMs statListenTime = TimerMs();  // How long we've been listening for.
+
+const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
+const uint32_t kStatListenPeriodMs = 10 * 1000;  // mSeconds
 #endif  // MQTT_ENABLE
 
 // Debug messages get sent to the serial port.
@@ -392,6 +410,33 @@ void debug(String str) {
   uint32_t now = millis();
   Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
 #endif  // DEBUG
+}
+
+String msToHumanString(uint32_t const msecs) {
+  uint32_t totalseconds = msecs / 1000;
+  if (totalseconds == 0) return "Now";
+
+  // Note: millis() can only count up to 45 days, so uint8_t is safe.
+  uint8_t days = totalseconds / (60 * 60 * 24);
+  uint8_t hours = (totalseconds / (60 * 60)) % 24;
+  uint8_t minutes = (totalseconds / 60) % 60;
+  uint8_t seconds = totalseconds % 60;
+
+  String result = "";
+  if (days) result += String(days) + " day";
+  if (days > 1) result += "s";
+  if (hours) result += " " + String(hours) + " hour";
+  if (hours > 1) result += "s";
+  if (minutes) result += " " + String(minutes) + " minute";
+  if (minutes > 1) result += "s";
+  if (seconds) result += " " + String(seconds) + " second";
+  if (seconds > 1) result += "s";
+  result.trim();
+  return result;
+}
+
+String timeElapsed(uint32_t const msec) {
+  return msToHumanString(msec) + " ago";
 }
 
 String timeSince(uint32_t const start) {
@@ -403,30 +448,7 @@ String timeSince(uint32_t const start) {
     diff = now - start;
   else
     diff = UINT32_MAX - start + now;
-  diff /= 1000;  // Convert to seconds.
-  if (diff == 0)  return "Now";
-
-  // Note: millis() can only count up to 45 days, so uint8_t is safe.
-  uint8_t days = diff / (60 * 60 * 24);
-  uint8_t hours = (diff / (60 * 60)) % 24;
-  uint8_t minutes = (diff / 60) % 60;
-  uint8_t seconds = diff % 60;
-
-  String result = "";
-  if (days)
-    result += String(days) + " day";
-  if (days > 1)  result += "s";
-  if (hours)
-    result += " " + String(hours) + " hour";
-  if (hours > 1)  result += "s";
-  if (minutes)
-    result += " " + String(minutes) + " minute";
-  if (minutes > 1)  result += "s";
-  if (seconds)
-    result += " " + String(seconds) + " second";
-  if (seconds > 1)  result += "s";
-  result.trim();
-  return result + " ago";
+  return msToHumanString(diff);
 }
 
 // Return a string containing the comma separated list of sending gpios.
@@ -784,6 +806,23 @@ String htmlSelectBool(const String name, const bool def) {
   return html;
 }
 
+String htmlSelectProtocol(const String name, const decode_type_t def) {
+  String html = "<select name='" + name + "'>";
+  for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
+    if (IRac::isProtocolSupported((decode_type_t)i)) {
+      html += F("<option value='");
+      html += String(i);
+      html += '\'';
+      if (i == def) html += F(" selected='selected'");
+      html += '>';
+      html += typeToString((decode_type_t)i);
+      html += F("</option>");
+    }
+  }
+  html += F("</select>");
+  return html;
+}
+
 String htmlSelectModel(const String name, const int16_t def) {
   String html = "<select name='" + name + "'>";
   for (int16_t i = -1; i <= 6; i++) {
@@ -879,20 +918,8 @@ void handleAirCon() {
   html += "<h3>Current Settings</h3>"
       "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
       "<table style='width:33%'>"
-      "<tr><td>Protocol</td><td>"
-      "<select name='" KEY_PROTOCOL "'>";
-  for (uint16_t i = 0; i < 255; i++) {
-    if (IRac::isProtocolSupported((decode_type_t)i)) {
-      html += F("<option value='");
-      html += String(i);
-      html += '\'';
-      if (i == climate.protocol) html += " selected='selected'";
-      html += '>';
-      html += typeToString((decode_type_t)i);
-      html += "</option>";
-    }
-  }
-  html += "</select></td></tr>"
+      "<tr><td>Protocol</td><td>" +
+          htmlSelectProtocol(KEY_PROTOCOL, climate.protocol) + "</td></tr>"
       "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate.model) +
           "</td></tr>"
       "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate.power) +
@@ -929,7 +956,7 @@ void handleAirCon() {
       "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate.beep) +
           "</td></tr>"
       "</table>"
-      "<input type='submit' value='Update'>"
+      "<input type='submit' value='Update & Send'>"
       "</form>";
 
   // Display the current settings.
@@ -1061,13 +1088,49 @@ void handleInfo() {
     "Log topic: " MQTTlog "<br>"
     "LWT topic: " MQTTstatus "<br>"
     "QoS: " + String(QOS) + "<br>"
-    "Last MQTT command seen: " + lastMqttCmdTopic + " : " +
+    "Last MQTT command seen: (topic) '" + lastMqttCmdTopic + "' (payload) '" +
     // lastMqttCmd is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
     (hasUnsafeHTMLChars(lastMqttCmd) ?
         "<i>Contains unsafe HTML characters</i>" : lastMqttCmd) +
-    " <i>(" + timeSince(lastMqttCmdTime) + ")</i></p>"
+    "' <i>(" + timeSince(lastMqttCmdTime) + ")</i><br>"
+    "Total published: " + String(mqttSentCounter) + "<br>"
+    "Total received: " + String(mqttRecvCounter) + "<br>"
+    "</p>"
 #endif  // MQTT_ENABLE
+    "<h4>Climate Information</h4>"
+    "<p>"
+    "IR Send GPIO: " + String(gpioTable[0]) + "<br>"
+    "Total sent: " + String(irClimateCounter) + "<br>"
+    "Last send: " + String(hasClimateBeenSent ?
+        (String(lastClimateSucceeded ? "Ok" : "FAILED") +
+         " <i>(" + timeElapsed(lastClimateIr.elapsed()) + ")</i>") :
+        "<i>Never</i>") + "<br>"
+#if MQTT_ENABLE
+    "State listen period: " + msToHumanString(kStatListenPeriodMs) + "<br>"
+    "State broadcast period: " + msToHumanString(kBroadcastPeriodMs) + "<br>"
+    "Last state broadcast: " + (hasBroadcastBeenSent ?
+        timeElapsed(lastBroadcast.elapsed()) :
+        String("<i>Never</i>")) + "<br>"
+    "Last discovery sent: " + (lockMqttBroadcast ?
+        String("<b>Locked</b>") :
+        (hasDiscoveryBeenSent ?
+            timeElapsed(lastDiscovery.elapsed()) :
+            String("<i>Never</i>"))) +
+        "<br>"
+    "Command topics: " MQTTprefix MQTTcmdprefix
+      "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
+          KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
+          KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
+          KEY_CLOCK "|" KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS ")<br>"
+    "State topics: " MQTTprefix MQTTstatprefix
+      "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
+          KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
+          KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
+          KEY_CLOCK "|" KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS ")<br>"
+#endif  // MQTT_ENABLE
+    "</p>"
+    // Page footer
     "<hr><p><small><center>"
       "<i>(Note: Page will refresh every 60 seconds.)</i>"
     "<centre></small></p>";
@@ -1112,9 +1175,8 @@ void handleReboot() {
     addJsReloadUrl("/", 15, true) +
     "</body></html>");
 #if MQTT_ENABLE
-  mqtt_client.publish(MQTTlog, "Reboot requested");
+  mqttLog("Reboot requested");
 #endif  // MQTT_ENABLE
-  debug("Rebooting...");
   // Do the reset.
   delay(1000);
   ESP.restart();
@@ -1122,6 +1184,7 @@ void handleReboot() {
 }
 
 #if MQTT_ENABLE
+// FOOBAR
 // MQTT Discovery web page
 void handleSendMqttDiscovery() {
 #if HTML_PASSWORD_ENABLE
@@ -1682,7 +1745,7 @@ void setup_wifi() {
 
 void setup(void) {
   // Set the default climate settings.
-  climate.protocol = KELVINATOR;
+  climate.protocol = decode_type_t::UNKNOWN;
   climate.model = -1;  // Unknown.
   climate.power = false;
   climate.mode = stdAc::opmode_t::kAuto;
@@ -1700,6 +1763,7 @@ void setup(void) {
   climate.beep = false;
   climate.sleep = -1;  // Off
   climate.clock = -1;  // Don't set.
+  climate_prev = climate;
 
   // Initialise all the IR transmitters.
   for (uint8_t i = 0; i < kSendTableSize; i++) {
@@ -1764,7 +1828,7 @@ void setup(void) {
   if (strcmp(kHtmlPassword, kDefaultPassword)) {  // Allow if password changed.
     server.on("/update", HTTP_POST, [](){
 #if MQTT_ENABLE
-        mqtt_client.publish(MQTTlog, "Attempting firmware update & reboot");
+        mqttLog("Attempting firmware update & reboot");
         delay(1000);
 #endif  // MQTT_ENABLE
         server.send(200, "text/html",
@@ -1835,6 +1899,21 @@ void subscribing(const String topic_name) {
     debug("Subscription FAILED to " + topic_name);
 }
 
+// Un-subscribe from a MQTT topic
+void unsubscribing(const String topic_name) {
+  // subscription to topic for receiving data with QoS.
+  if (mqtt_client.unsubscribe(topic_name.c_str()))
+    debug("Unsubscribed OK from " + topic_name);
+  else
+    debug("FAILED to unsubscribe from " + topic_name);
+}
+
+void mqttLog(String mesg) {
+  debug(mesg);
+  mqtt_client.publish(MQTTlog, mesg.c_str());
+  mqttSentCounter++;
+}
+
 bool reconnect() {
   // Loop a few times or until we're reconnected
   uint16_t tries = 1;
@@ -1852,11 +1931,11 @@ bool reconnect() {
                                       true, LWT_OFFLINE);
     if (connected) {
     // Once connected, publish an announcement...
-      mqtt_client.publish(MQTTlog, "(Re)Connected");
-      debug("reconnected.");
+      mqttLog("(Re)Connected.");
 
       // Update Last Will & Testament to say we are back online.
       mqtt_client.publish(MQTTstatus, LWT_ONLINE, true);
+      mqttSentCounter++;
 
       // Subscribing to topic(s)
       subscribing(MQTTcommand);
@@ -1898,27 +1977,40 @@ void loop(void) {
         lastReconnectAttempt = 0;
         wasConnected = true;
         if (boot) {
-          mqtt_client.publish(MQTTlog, "IR Server just booted");
+          mqttLog("IR Server just booted");
           boot = false;
         } else {
-          String text = "IR Server just (re)connected to MQTT. "
-              "Lost connection about " + timeSince(lastConnectedTime);
-          mqtt_client.publish(MQTTlog, text.c_str());
+          mqttLog("IR Server just (re)connected to MQTT. "
+                  "Lost connection about " + timeSince(lastConnectedTime));
         }
         lastConnectedTime = now;
         debug("successful client mqtt connection");
-        // Force sending all of the current climate state.
-        lastBroadcast = doBroadcast(lastBroadcast, kBroadcastPeriod, climate,
-                                    false, true);
+        if (lockMqttBroadcast) {
+          // Attempt to fetch back any Climate state stored in MQTT retained
+          // messages on the MQTT broker.
+          mqttLog("Started listening for previous state.");
+          climate_prev = climate;  // Make a copy so we can compare afterwards.
+          subscribing(MQTTclimateprefix MQTTstatprefix MQTTwildcard);
+          statListenTime.reset();
+        }
       }
     }
   } else {
-    lastConnectedTime = now;
     // MQTT loop
+    lastConnectedTime = now;
     mqtt_client.loop();
+    if (lockMqttBroadcast && statListenTime.elapsed() > kStatListenPeriodMs) {
+      unsubscribing(MQTTclimateprefix MQTTstatprefix MQTTwildcard);
+      mqttLog("Finished listening for previous state.");
+      if (cmpClimate(climate, climate_prev)) {  // Something changed.
+        mqttLog("The state was recovered from MQTT broker. Updating.");
+        sendClimate(climate_prev, climate, MQTTclimateprefix MQTTstatprefix,
+                    true, false, false);
+      }
+      lockMqttBroadcast = false;  // Release the lock so we can broadcast again.
+    }
     // Periodically send all of the climate state via MQTT.
-    lastBroadcast = doBroadcast(lastBroadcast, kBroadcastPeriod, climate,
-                                false, false);
+    doBroadcast(&lastBroadcast, kBroadcastPeriodMs, climate, false, false);
   }
 #endif  // MQTT_ENABLE
 #ifdef IR_RX
@@ -1952,6 +2044,7 @@ void loop(void) {
       lastIrReceived += "," + String(capture.bits);
 #if MQTT_ENABLE
     mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
+    mqttSentCounter++;
 #endif  // MQTT_ENABLE
     irRecvCounter++;
     debug("Incoming IR message sent to MQTT: " + lastIrReceived);
@@ -1995,9 +2088,9 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
                 uint64_t const code, char const * code_str, uint16_t bits,
                 uint16_t repeat) {
   // Create a pseudo-lock so we don't try to send two codes at the same time.
-  while (ir_lock)
+  while (lockIr)
     delay(20);
-  ir_lock = true;
+  lockIr = true;
 
   bool success = true;  // Assume success.
 
@@ -2283,7 +2376,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
   }
   lastSendTime = millis();
   // Release the lock.
-  ir_lock = false;
+  lockIr = false;
 
   // Indicate that we sent the message or not.
   if (success) {
@@ -2310,6 +2403,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       else
         mqtt_client.publish(MQTTack, (String(ir_type) + "," +
                                       String(code_str)).c_str());
+      mqttSentCounter++;
     }
 #endif  // MQTT_ENABLE
   } else {  // For "short" codes, we break it down a bit more before we report.
@@ -2317,11 +2411,13 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
     debug("Bits: " + String(bits));
     debug("Repeats: " + String(repeat));
 #if MQTT_ENABLE
-    if (success)
+    if (success) {
       mqtt_client.publish(MQTTack, (String(ir_type) + "," +
                                     uint64ToString(code, 16)
                                     + "," + String(bits) + "," +
                                     String(repeat)).c_str());
+      mqttSentCounter++;
+    }
 #endif  // MQTT_ENABLE
   }
   return success;
@@ -2335,20 +2431,27 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   uint16_t repeat = 0;
   uint8_t channel = 0;  // Default to the first channel. e.g. "*_0"
 
-  debug("Receiving data by MQTT topic: " + topic_name + " with payload:" +
+  debug("Receiving data by MQTT topic: " + topic_name + " with payload: " +
         callback_str);
   // Save the message as the last command seen (global).
   lastMqttCmdTopic = topic_name;
   lastMqttCmd = callback_str;
   lastMqttCmdTime = millis();
+  mqttRecvCounter++;
 
   if (topic_name.startsWith(MQTTclimateprefix)) {
-    debug("It's a climate data topic");
-    commonAcState_t updated = updateClimate(
-        climate, topic_name, MQTTclimateprefix MQTTcmdprefix, callback_str);
-    sendClimate(climate, updated, MQTTclimateprefix MQTTstatprefix,
-                true, false, false);
-    climate = updated;
+    if (topic_name.startsWith(MQTTclimateprefix MQTTcmdprefix)) {
+      debug("It's a climate command topic");
+      commonAcState_t updated = updateClimate(
+          climate, topic_name, MQTTclimateprefix MQTTcmdprefix, callback_str);
+      sendClimate(climate, updated, MQTTclimateprefix MQTTstatprefix,
+                  true, false, false);
+      climate = updated;
+    } else if (topic_name.startsWith(MQTTclimateprefix MQTTstatprefix)) {
+      debug("It's a climate state topic. Update internal state and DON'T send");
+      climate = updateClimate(
+          climate, topic_name, MQTTclimateprefix MQTTstatprefix, callback_str);
+    }
     return;  // We are done for now.
   }
   // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
@@ -2442,15 +2545,20 @@ void sendMQTTDiscovery(const char *topic) {
       "\"swing_modes\":["
         "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
       "]"
-      "}"))
-    debug("MQTT climate discovery successful sent.");
-  else
-    debug("MQTT climate discovery FAILED to send.");
+      "}")) {
+    mqttLog("MQTT climate discovery successful sent.");
+    hasDiscoveryBeenSent = true;
+    lastDiscovery.reset();
+    mqttSentCounter++;
+  } else {
+    mqttLog("MQTT climate discovery FAILED to send.");
+  }
 }
 #endif  // MQTT_ENABLE
 
 bool sendInt(const String topic, const int32_t num, const bool retain) {
 #if MQTT_ENABLE
+  mqttSentCounter++;
   return mqtt_client.publish(topic.c_str(), String(num).c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
@@ -2459,6 +2567,7 @@ bool sendInt(const String topic, const int32_t num, const bool retain) {
 
 bool sendBool(const String topic, const bool on, const bool retain) {
 #if MQTT_ENABLE
+  mqttSentCounter++;
   return mqtt_client.publish(topic.c_str(), (on ? "on" : "off"), retain);
 #else  // MQTT_ENABLE
   return true;
@@ -2467,6 +2576,7 @@ bool sendBool(const String topic, const bool on, const bool retain) {
 
 bool sendString(const String topic, const String str, const bool retain) {
 #if MQTT_ENABLE
+  mqttSentCounter++;
   return mqtt_client.publish(topic.c_str(), str.c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
@@ -2475,6 +2585,7 @@ bool sendString(const String topic, const String str, const bool retain) {
 
 bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #if MQTT_ENABLE
+  mqttSentCounter++;
   return mqtt_client.publish(topic.c_str(), String(temp).c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
@@ -2521,6 +2632,17 @@ commonAcState_t updateClimate(commonAcState_t current, const String str,
   else if (str.equals(prefix + KEY_CLOCK))
     result.clock = value.toInt();
   return result;
+}
+
+// Compare two AirCon states (climates).
+// Returns: True if they differ, False if they don't.
+bool cmpClimate(const commonAcState_t a, const commonAcState_t b) {
+  return a.protocol != b.protocol || a.model != b.model || a.power != b.power ||
+      a.mode != b.mode || a.degrees != b.degrees || a.celsius != b.celsius ||
+      a.fanspeed != b.fanspeed || a.swingv != b.swingv ||
+      a.swingh != b.swingh || a.quiet != b.quiet || a.turbo != b.turbo ||
+      a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
+      a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep;
 }
 
 bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
@@ -2607,25 +2729,30 @@ bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
   // Only send an IR message if we need to.
   if ((diff && !forceMQTT) || forceIR) {
     debug("Sending common A/C state via IR.");
-    success &= commonAc.sendAc(next.protocol, next.model, next.power, next.mode,
-                               next.degrees, next.celsius, next.fanspeed,
-                               next.swingv, next.swingh, next.quiet, next.turbo,
-                               next.econo, next.light, next.filter, next.clean,
-                               next.beep, next.sleep, -1);
+    lastClimateSucceeded = commonAc.sendAc(
+        next.protocol, next.model, next.power, next.mode,
+        next.degrees, next.celsius, next.fanspeed, next.swingv, next.swingh,
+        next.quiet, next.turbo, next.econo, next.light, next.filter, next.clean,
+        next.beep, next.sleep, -1);
+    if (lastClimateSucceeded) hasClimateBeenSent = true;
+    success &= lastClimateSucceeded;
+    lastClimateIr.reset();
+    irClimateCounter++;
+    sendReqCounter++;
   }
   return success;
 }
 
 #if MQTT_ENABLE
-uint32_t doBroadcast(const uint32_t oldtick, const uint32_t interval,
-                     const commonAcState_t state, const bool retain,
-                     const bool force) {
-  uint32_t newtick = millis() / interval;
-  if (force || newtick != oldtick) {
+void doBroadcast(TimerMs *timer, const uint32_t interval,
+                 const commonAcState_t state, const bool retain,
+                 const bool force) {
+  if (force || (!lockMqttBroadcast && timer->elapsed() > interval)) {
     debug("Sending MQTT stat update broadcast.");
     sendClimate(state, state, MQTTclimateprefix MQTTstatprefix,
                 retain, true, false);
+    timer->reset();  // It's been sent, so reset the timer.
+    hasBroadcastBeenSent = true;
   }
-  return newtick;
 }
 #endif  // MQTT_ENABLE
