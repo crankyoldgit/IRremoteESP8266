@@ -24,8 +24,9 @@
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
+ *     - ArduinoJson (https://arduinojson.org/)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
@@ -228,6 +229,8 @@
 #endif  // MQTT_ENABLE
 
 #include <Arduino.h>
+#include <FS.h>
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <DNSServer.h>
@@ -301,13 +304,6 @@ const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME (required)
 
 // ----------------------- MQTT Related Settings -------------------------------
 #if MQTT_ENABLE
-// Address of your MQTT server.
-#define MQTT_SERVER "10.0.0.4"  // <=- CHANGE_ME
-const uint16_t kMqttPort = 1883;  // Default port used by MQTT servers.
-// Set if your MQTT server requires a Username & Password to connect
-// ... and it probably should if you want to be more secure.
-const char* kMqttUsername = "";  // <=- CHANGE_ME (optional)
-const char* kMqttPassword = "";  // <=- CHANGE_ME (optional)
 const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
@@ -409,7 +405,8 @@ const uint8_t kSendTableSize = sizeof(gpioTable);
 // Firmware uploads are blocked until the user changes kHtmlPassword to a
 // different value than this.
 const char* kDefaultPassword = "esp8266";  // Do NOT change this.
-
+// Name of the json config file in SPIFFS.
+const char* kConfigFile = "/config.json";
 // Globals
 ESP8266WebServer server(kHttpPort);
 #ifdef IR_RX
@@ -418,7 +415,9 @@ decode_results capture;  // Somewhere to store inbound IR messages.
 #endif  // IR_RX
 MDNSResponder mdns;
 WiFiClient espClient;
+
 WiFiManager wifiManager;
+bool flagSaveWifiConfig = false;
 
 uint16_t *codeArray;
 uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
@@ -455,12 +454,21 @@ uint32_t lastDisconnectedTime = 0;
 uint32_t mqttDisconnectCounter = 0;
 uint32_t mqttSentCounter = 0;
 uint32_t mqttRecvCounter = 0;
-
 bool wasConnected = true;
+
+const uint8_t kMaxMqttServerSize = 40;
+char MqttServer[kMaxMqttServerSize + 1] = "";
+const uint8_t kMaxMqttPortSize = 6;  // Largest value of uint16_t is "65535".
+uint16_t MqttPort = 1883;
+const uint8_t kMaxMqttUsernameSize = 20;
+char MqttUsername[kMaxMqttUsernameSize + 1] = "";
+const uint8_t kMaxMqttPasswordSize = 40;
+char MqttPassword[kMaxMqttPasswordSize + 1] = "";
 
 // MQTT client parameters
 void callback(char* topic, byte* payload, unsigned int length);
-PubSubClient mqtt_client(MQTT_SERVER, kMqttPort, callback, espClient);
+PubSubClient mqtt_client(espClient);
+
 // Create a unique MQTT client id.
 String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
 
@@ -499,6 +507,81 @@ void debug(String str) {
   uint32_t now = millis();
   Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
 #endif  // DEBUG
+}
+
+// callback notifying us of the need to save the wifi config
+void saveWifiConfigCallback(void) {
+  debug("saveWifiConfigCallback called.");
+  flagSaveWifiConfig = true;
+}
+
+void saveWifiConfig() {
+  debug("Saving the wifi config.");
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+#if MQTT_ENABLE
+  json["mqtt_server"] = MqttServer;
+  json["mqtt_port"] = String(MqttPort).c_str();
+  json["mqtt_username"] = MqttUsername;
+  json["mqtt_pass"] = MqttPassword;
+#endif  // MQTT_ENABLE
+  if (SPIFFS.begin()) {
+    File configFile = SPIFFS.open(kConfigFile, "w");
+    if (!configFile) {
+      debug("Failed to open config file for writing.");
+    } else {
+      debug("Writing out the config file.");
+      json.printTo(configFile);
+      configFile.close();
+      debug("Finished writing config file.");
+    }
+    SPIFFS.end();
+  }
+}
+
+void loadWifiConfigFile() {
+  debug("Trying to mount SPIFFS");
+  if (SPIFFS.begin()) {
+    debug("mounted file system");
+    if (SPIFFS.exists(kConfigFile)) {
+      debug("config file exists");
+
+      File configFile = SPIFFS.open(kConfigFile, "r");
+      if (configFile) {
+        debug("Opened config file");
+        size_t size = configFile.size();
+        // Allocate a buffer to store contents of the file.
+        std::unique_ptr<char[]> buf(new char[size]);
+
+        configFile.readBytes(buf.get(), size);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& json = jsonBuffer.parseObject(buf.get());
+        if (json.success()) {
+          debug("Json config file parsed ok.");
+#if MQTT_ENABLE
+          if (json["mqtt_server"] != NULL)
+            strncpy(MqttServer, json["mqtt_server"], kMaxMqttServerSize);
+          if (json["mqtt_port"] != NULL)
+            MqttPort = atoi(json["mqtt_port"]);
+          if (json["mqtt_username"] != NULL)
+            strncpy(MqttUsername, json["mqtt_username"], kMaxMqttUsernameSize);
+          if (json["mqtt_password"] != NULL)
+            strncpy(MqttPassword, json["mqtt_password"], kMaxMqttPasswordSize);
+#endif  // MQTT_ENABLE
+        } else {
+          debug("Failed to load json config");
+        }
+        debug("Closing the config file.");
+        configFile.close();
+      }
+    } else {
+      debug("Config file doesn't exist!");
+    }
+    debug("Unmounting SPIFFS.");
+    SPIFFS.end();
+  } else {
+    debug("Failed to mount SPIFFS");
+  }
 }
 
 String msToHumanString(uint32_t const msecs) {
@@ -1189,7 +1272,7 @@ void handleInfo() {
     "</p>"
 #if MQTT_ENABLE
     "<h4>MQTT Information</h4>"
-    "<p>Server: " MQTT_SERVER ":" + String(kMqttPort) + " <i>(" +
+    "<p>Server: " + String(MqttServer) + ":" + String(MqttPort) + " <i>(" +
     (mqtt_client.connected() ? "Connected " + timeSince(lastDisconnectedTime)
                              : "Disconnected " + timeSince(lastConnectedTime)) +
     ")</i><br>"
@@ -1267,9 +1350,21 @@ void handleReset() {
     "<h1>Resetting the WiFiManager config back to defaults.</h1>"
     "<p>Device restarting. Try connecting in a few seconds.</p>"
     "</body></html>");
-    // Do the reset.
+  // Do the reset.
+#if MQTT_ENABLE
+  mqttLog("Wiping all saved config settings.");
+#endif  // MQTT_ENABLE
+  debug("Trying to mount SPIFFS");
+  if (SPIFFS.begin()) {
+    debug("Removing JSON config file");
+    SPIFFS.remove(kConfigFile);
+    SPIFFS.end();
+  }
+  delay(1000);
+  debug("Reseting wifiManager's settings.");
   wifiManager.resetSettings();
-  delay(10);
+  delay(1000);
+  debug("rebooting...");
   ESP.restart();
   delay(1000);
 }
@@ -1840,9 +1935,29 @@ void handleNotFound() {
 
 void setup_wifi() {
   delay(10);
+  loadWifiConfigFile();
   // We start by connecting to a WiFi network
-
   wifiManager.setTimeout(300);  // Time out after 5 mins.
+  // Set up additional parameters for WiFiManager config menu page.
+#if MQTT_ENABLE
+  wifiManager.setSaveConfigCallback(saveWifiConfigCallback);
+  WiFiManagerParameter custom_mqtt_text(
+      "<br><center>MQTT Broker details</center>");
+  wifiManager.addParameter(&custom_mqtt_text);
+  WiFiManagerParameter custom_mqtt_server(
+      "mqtt_server", "mqtt server", MqttServer, kMaxMqttServerSize);
+  wifiManager.addParameter(&custom_mqtt_server);
+  WiFiManagerParameter custom_mqtt_port(
+      "mqtt_port", "mqtt port", String(MqttPort).c_str(), kMaxMqttPortSize);
+  wifiManager.addParameter(&custom_mqtt_port);
+  WiFiManagerParameter custom_mqtt_user(
+      "mqtt_user", "mqtt username", MqttUsername, kMaxMqttUsernameSize);
+  wifiManager.addParameter(&custom_mqtt_user);
+  WiFiManagerParameter custom_mqtt_pass(
+      "mqtt_pass", "mqtt password", MqttPassword, kMaxMqttPasswordSize);
+  wifiManager.addParameter(&custom_mqtt_pass);
+  #endif  // MQTT_ENABLE
+
 #if USE_STATIC_IP
   // Use a static IP config rather than the one supplied via DHCP.
   wifiManager.setSTAStaticIPConfig(kIPAddress, kGateway, kSubnetMask);
@@ -1853,13 +1968,22 @@ void setup_wifi() {
   wifiManager.setRemoveDuplicateAPs(HIDE_DUPLIATE_NETWORKS);
 
   if (!wifiManager.autoConnect()) {
-    debug("Wifi failed to connect and hit timeout.");
+    debug("Wifi failed to connect and hit timeout. Rebooting...");
     delay(3000);
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
     ESP.reset();
     delay(5000);
   }
 
+#if MQTT_ENABLE
+  strncpy(MqttServer, custom_mqtt_server.getValue(), kMaxMqttServerSize);
+  MqttPort = atoi(custom_mqtt_port.getValue());
+  strncpy(MqttUsername, custom_mqtt_user.getValue(), kMaxMqttUsernameSize);
+  strncpy(MqttPassword, custom_mqtt_pass.getValue(), kMaxMqttPasswordSize);
+#endif  // MQTT_ENABLE
+  if (flagSaveWifiConfig) {
+    saveWifiConfig();
+  }
   debug("WiFi connected. IP address: " + WiFi.localIP().toString());
 }
 
@@ -1943,6 +2067,9 @@ void setup(void) {
 #if MQTT_ENABLE
   // MQTT Discovery url
   server.on("/send_discovery", handleSendMqttDiscovery);
+  // Finish setup of the mqtt clent object.
+  mqtt_client.setServer(MqttServer, MqttPort);
+  mqtt_client.setCallback(callback);
 #endif  // MQTT_ENABLE
 
 #if FIRMWARE_OTA
@@ -2044,15 +2171,18 @@ bool reconnect() {
   while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
     // Attempt to connect
-    debug("Attempting MQTT connection to " MQTT_SERVER ":" + String(kMqttPort) +
-          "... ");
-    if (kMqttUsername && kMqttPassword)
-      connected = mqtt_client.connect(mqtt_clientid.c_str(), kMqttUsername,
-                                      kMqttPassword, MQTTstatus, QOS, true,
+    debug("Attempting MQTT connection to " + String(MqttServer) + ":" +
+          String(MqttPort) + "... ");
+    if (strcmp(MqttUsername, "") && strcmp(MqttPassword, "")) {
+      debug("Using mqtt username/password to connect.");
+      connected = mqtt_client.connect(mqtt_clientid.c_str(), MqttUsername,
+                                      MqttPassword, MQTTstatus, QOS, true,
                                       LWT_OFFLINE);
-    else
+    } else {
+      debug("Using password-less mqtt connection.");
       connected = mqtt_client.connect(mqtt_clientid.c_str(), MQTTstatus, QOS,
                                       true, LWT_OFFLINE);
+    }
     if (connected) {
     // Once connected, publish an announcement...
       mqttLog("(Re)Connected.");
