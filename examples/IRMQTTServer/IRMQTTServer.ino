@@ -222,21 +222,10 @@
  *   Likewise, feel free to borrow from this as much as you want.
  */
 // ---------------- Start of User Configuration Section ------------------------
-// Change to 'true'/'false' if you do/don't want these features or functions.
-#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
-#define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
-#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
-                                   // MQTT_MAX_PACKET_SIZE of 1024 or more
+
 #ifndef MQTT_ENABLE
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
 #endif  // MQTT_ENABLE
-// 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
-#define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
-                           // Less secure if enabled.
-                           // Note: Firmware OTA is also disabled until
-                           //       'kHtmlPassword' is changed from the default.
-#define HTML_PASSWORD_ENABLE false  // Protect access to the HTML interface.
-                                    // Note: OTA update is always passworded.
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -262,7 +251,10 @@
 #include <algorithm>
 #include <string>
 
-// Configuration parameters
+// ---------------------- Board Related Settings -------------------------------
+// NOTE: Make sure you set your Serial Monitor to the same speed.
+#define BAUD_RATE 115200  // Serial port Baud rate.
+
 // GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 #define IR_LED 4  // <=- CHANGE_ME (optional)
 // define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
@@ -271,12 +263,15 @@
 // Comment this out to disable receiving/decoding IR messages entirely.
 #define IR_RX 14  // <=- CHANGE_ME (optional)
 #define IR_RX_PULLUP false
+
+// --------------------- Network Related Settings ------------------------------
 const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
 // Name of the device you want in mDNS.
 // NOTE: Changing this will change the MQTT path too unless you override it
 //       via MQTTprefix below.
 #define HOSTNAME "ir_server"  // <=- CHANGE_ME (optional)
-
+// Change to 'true'/'false' if you do/don't want these features or functions.
+#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
 // We obtain our network config via DHCP by default but allow an easy way to
 // use a static IP config.
 #if USE_STATIC_IP
@@ -285,6 +280,26 @@ const IPAddress kGateway = IPAddress(10, 0, 1, 1);
 const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
 #endif  // USE_STATIC_IP
 
+// See: https://github.com/tzapu/WiFiManager#filter-networks for these settings.
+#define HIDE_DUPLIATE_NETWORKS false  // Should WifiManager hide duplicate SSIDs
+// #define MIN_SIGNAL_STRENGTH 20  // Minimum WiFi signal stength (percentage)
+                                   // before we will connect.
+                                   // The unset default is 8%.
+                                   // (Uncomment to enable)
+
+// ----------------------- HTTP Related Settings -------------------------------
+// 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
+#define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
+                           // Less secure if enabled.
+                           // Note: Firmware OTA is also disabled until
+                           //       'kHtmlPassword' is changed from the default.
+#define HTML_PASSWORD_ENABLE false  // Protect access to the HTML interface.
+                                    // Note: OTA update is always passworded.
+const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
+const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME (required)
+// If you do not change 'kHtmlPassword', Firmware OTA updates will be blocked.
+
+// ----------------------- MQTT Related Settings -------------------------------
 #if MQTT_ENABLE
 // Address of your MQTT server.
 #define MQTT_SERVER "10.0.0.4"  // <=- CHANGE_ME
@@ -310,17 +325,12 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
 #define MQTTHomeAssistantName HOSTNAME "_aircon"
 #define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts
+
+#define QOS 1  // MQTT broker should queue up any unreceived messages for us
+// #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
 #endif  // MQTT_ENABLE
 
-const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
-const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME (required)
-// If you do not change 'kHtmlPassword', Firmware OTA updates will be blocked.
-
-// This is what the default password is. People should NEVER use this password.
-// Firmware uploads are blocked until the user changes kHtmlPassword to a
-// different value than this.
-const char* kDefaultPassword = "esp8266";  // Do NOT change this.
-
+// ------------------------ IR Capture Settings --------------------------------
 // Let's use a larger than normal buffer so we can handle AirCon remote codes.
 const uint16_t kCaptureBufferSize = 1024;
 #if DECODE_AC
@@ -333,20 +343,11 @@ const uint8_t kCaptureTimeout = 15;  // Milliseconds
 #endif  // DECODE_AC
 // Ignore unknown messages with <10 pulses (see also REPORT_UNKNOWNS)
 const uint16_t kMinUnknownSize = 2 * 10;
-
-// Disable debug output if any of the IR pins are on the TX (D1) pin.
-#if (IR_LED != 1 && IR_RX != 1)
-#undef DEBUG
-#define DEBUG true  // Change to 'false' to disable all serial output.
-#else
-#undef DEBUG
-#define DEBUG false
-#endif
-// NOTE: Make sure you set your Serial Monitor to the same speed.
-#define BAUD_RATE 115200  // Serial port Baud rate.
+#define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
+#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
+                                   // MQTT_MAX_PACKET_SIZE of 1024 or more
 
 // ------------------------ Advanced Usage Only --------------------------------
-
 // Change if you need multiple independent send gpio/topics.
 const uint8_t gpioTable[] = {
   IR_LED,  // Default GPIO. e.g. ir_server/send or ir_server/send_0
@@ -356,9 +357,6 @@ const uint8_t gpioTable[] = {
   // 14,  // GPIO 14 / D5 e.g. ir_server/send_2
   // 16,  // GPIO 16 / D0 e.g. ir_server/send_3
 };
-
-#define QOS 1  // MQTT broker should queue up any unreceived messages for us
-// #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
 
 #define KEY_PROTOCOL "protocol"
 #define KEY_MODEL "model"
@@ -378,6 +376,20 @@ const uint8_t gpioTable[] = {
 #define KEY_FILTER "filter"
 #define KEY_CLEAN "clean"
 #define KEY_CELSIUS "use_celsius"
+
+// -------------------------- Debug Settings -----------------------------------
+// Disable debug output if any of the IR pins are on the TX (D1) pin.
+// Note: This is a crude method to catch the common use cases.
+// See `isSerialGpioUsedByIr()` for the better method.
+#if (IR_LED != 1 && IR_RX != 1)
+#ifndef DEBUG
+#define DEBUG true  // Change to 'false' to disable all serial output.
+#endif  // DEBUG
+#else  // (IR_LED != 1 && IR_RX != 1)
+#undef DEBUG
+#define DEBUG false
+#endif
+
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
@@ -393,6 +405,10 @@ const uint8_t gpioTable[] = {
 #define LWT_OFFLINE "Offline"
 
 const uint8_t kSendTableSize = sizeof(gpioTable);
+// This is what the default password is. People should NEVER use this password.
+// Firmware uploads are blocked until the user changes kHtmlPassword to a
+// different value than this.
+const char* kDefaultPassword = "esp8266";  // Do NOT change this.
 
 // Globals
 ESP8266WebServer server(kHttpPort);
@@ -460,9 +476,26 @@ const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
 const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
 #endif  // MQTT_ENABLE
 
+#if DEBUG
+bool isSerialGpioUsedByIr(void) {
+  const uint8_t kSerialTxGpio = 1;  // The GPIO serial output is sent too.
+                                    // Note: *DOES NOT* control Serial output.
+  // Ensure we are not trodding on anything IR related.
+#ifdef IR_RX
+  if (IR_RX == kSerialTxGpio)
+    return true;  // Serial port is in use by IR capture. Abort.
+#endif  // IR_RX
+  for (uint8_t i = 0; i < kSendTableSize; i++)
+    if (gpioTable[i] == kSerialTxGpio)
+      return true;  // Serial port is in use for IR sending. Abort.
+  return false;  // Not in use as far as we can tell.
+}
+#endif  // DEBUG
+
 // Debug messages get sent to the serial port.
 void debug(String str) {
 #if DEBUG
+  if (isSerialGpioUsedByIr()) return;  // Abort.
   uint32_t now = millis();
   Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
 #endif  // DEBUG
@@ -1137,6 +1170,22 @@ void handleInfo() {
     "Last IR Received: " + lastIrReceived +
     " <i>(" + timeSince(lastIrReceivedTime) + ")</i><br>"
 #endif  // IR_RX
+    "Duplicate Wifi networks: " +
+        String(HIDE_DUPLIATE_NETWORKS ? "Hide" : "Show") + "<br>"
+    "Min Wifi signal required: "
+#ifdef MIN_SIGNAL_STRENGTH
+        + String(static_cast<int>(MIN_SIGNAL_STRENGTH)) +
+#else  // MIN_SIGNAL_STRENGTH
+        "8"
+#endif  // MIN_SIGNAL_STRENGTH
+        "%<br>"
+    "Serial debugging: "
+#if DEBUG
+        + String(isSerialGpioUsedByIr() ? "Off" : "On") +
+#else  // DEBUG
+        "Off"
+#endif  // DEBUG
+        "<br>"
     "</p>"
 #if MQTT_ENABLE
     "<h4>MQTT Information</h4>"
@@ -1798,6 +1847,11 @@ void setup_wifi() {
   // Use a static IP config rather than the one supplied via DHCP.
   wifiManager.setSTAStaticIPConfig(kIPAddress, kGateway, kSubnetMask);
 #endif  // USE_STATIC_IP
+#if MIN_SIGNAL_STRENGTH
+  wifiManager.setMinimumSignalQuality(MIN_SIGNAL_STRENGTH);
+#endif  // MIN_SIGNAL_STRENGTH
+  wifiManager.setRemoveDuplicateAPs(HIDE_DUPLIATE_NETWORKS);
+
   if (!wifiManager.autoConnect()) {
     debug("Wifi failed to connect and hit timeout.");
     delay(3000);
@@ -1849,12 +1903,14 @@ void setup(void) {
 #endif  // IR_RX
 
 #if DEBUG
-  // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
-  Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
-  while (!Serial)  // Wait for the serial connection to be establised.
-    delay(50);
-  Serial.println();
-  debug("IRMQTTServer " _MY_VERSION_" has booted.");
+  if (!isSerialGpioUsedByIr()) {
+    // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
+    Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
+    while (!Serial)  // Wait for the serial connection to be establised.
+      delay(50);
+    Serial.println();
+    debug("IRMQTTServer " _MY_VERSION_" has booted.");
+  }
 #endif  // DEBUG
 
   setup_wifi();
@@ -1926,14 +1982,16 @@ void setup(void) {
               0xFFFFF000;
           if (!Update.begin(maxSketchSpace)) {  // start with max available size
 #if DEBUG
-            Update.printError(Serial);
+            if (!isSerialGpioUsedByIr())
+              Update.printError(Serial);
 #endif  // DEBUG
           }
         } else if (upload.status == UPLOAD_FILE_WRITE) {
           if (Update.write(upload.buf, upload.currentSize) !=
               upload.currentSize) {
 #if DEBUG
-            Update.printError(Serial);
+            if (!isSerialGpioUsedByIr())
+              Update.printError(Serial);
 #endif  // DEBUG
           }
         } else if (upload.status == UPLOAD_FILE_END) {
@@ -2521,7 +2579,7 @@ void receivingMQTT(String const topic_name, String const callback_str) {
     return;  // We are done for now.
   }
   // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
-  for (int i = 0; i < kSendTableSize; i++) {
+  for (uint8_t i = 0; i < kSendTableSize; i++) {
     debug("Checking if " + topic_name + " ends with _" + String(i));
     if (topic_name.endsWith("_" + String(i))) {
       channel = i;
