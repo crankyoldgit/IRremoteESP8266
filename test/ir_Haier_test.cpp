@@ -404,7 +404,7 @@ TEST(TestHaierACClass, MessageConstuction) {
       haier.toString());
 
   uint8_t expectedState[kHaierACStateLength] = {0xA5, 0x96, 0xEA, 0xCF, 0x32,
-                                                0x2D, 0x0D, 0x74, 0xD4};
+                                                0xED, 0x2D, 0x74, 0xB4};
   EXPECT_STATE_EQ(expectedState, haier.getRaw(), kHaierACBits);
 
   // Check that the checksum is valid.
@@ -986,4 +986,92 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
       " Fan: 2 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
       " Health: On",
       haier.toString());
+}
+
+// Default state of the remote needed to include hidden data.
+// Ref: https://github.com/markszabo/IRremoteESP8266/issues/668
+TEST(TestHaierAcIssues, Issue668) {
+  IRHaierAC ac(0);
+  IRHaierAC acText(1);
+  IRrecv irrecv(0);
+  ac.begin();
+
+  // Turn on the AC.
+  ac._irsend.reset();
+  char expected_on[] =
+      "Command: 1 (On), Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  // State taken from real capture:
+  //   https://github.com/markszabo/IRremoteESP8266/issues/668#issuecomment-483531895
+  uint8_t expected_on_state[9] = {
+      0xA5, 0x91, 0x20, 0x00, 0x0C, 0xC0, 0x20, 0x00, 0x42};
+  ac.setCommand(kHaierAcCmdOn);
+  EXPECT_EQ(expected_on, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  EXPECT_STATE_EQ(expected_on_state,
+                  ac._irsend.capture.state, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_on, acText.toString());
+
+  // Set the temp to 25C
+  ac._irsend.reset();
+  ac.setTemp(25);
+  EXPECT_EQ(expected_on, ac.toString());
+  ASSERT_EQ(25, ac.getTemp());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  EXPECT_STATE_EQ(expected_on_state,
+                  ac._irsend.capture.state, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_on, acText.toString());
+
+  // Increase the temp by 1.
+  ac._irsend.reset();
+  char expected_temp_plus_one[] =
+      "Command: 6 (Temp Up), Mode: 0 (AUTO), Temp: 26C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  // State taken from real capture:
+  //   https://github.com/markszabo/IRremoteESP8266/issues/668#issuecomment-483531895
+  uint8_t expected_temp_plus_one_state[9] = {
+      0xA5, 0xA6, 0x20, 0x00, 0x0C, 0xC0, 0x20, 0x00, 0x57};
+  ASSERT_EQ(25, ac.getTemp());
+  ac.setTemp(ac.getTemp() + 1);
+  ASSERT_EQ(26, ac.getTemp());
+  EXPECT_EQ(expected_temp_plus_one, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  EXPECT_STATE_EQ(expected_temp_plus_one_state,
+                  ac._irsend.capture.state, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_temp_plus_one, acText.toString());
+
+  // Decrease the temp by 1.
+  ac._irsend.reset();
+  char expected_temp_minus_one[] =
+      "Command: 7 (Temp Down), Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), "
+      "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
+      "On Timer: Off, Off Timer: Off";
+  ASSERT_EQ(26, ac.getTemp());
+  ac.setTemp(ac.getTemp() - 1);
+  ASSERT_EQ(25, ac.getTemp());
+  EXPECT_EQ(expected_temp_minus_one, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kHaierACBits, ac._irsend.capture.bits);
+  acText.setRaw(ac._irsend.capture.state);
+  EXPECT_EQ(expected_temp_minus_one, acText.toString());
 }
