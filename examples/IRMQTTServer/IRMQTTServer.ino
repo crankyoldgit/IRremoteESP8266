@@ -29,7 +29,7 @@
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - ArduinoJson (https://arduinojson.org/)
+ *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.x and < 6)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
