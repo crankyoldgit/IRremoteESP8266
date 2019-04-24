@@ -1,26 +1,31 @@
 /*
  * Send & receive arbitrary IR codes via a web server or MQTT.
- * Copyright David Conran 2016, 2017, 2018
+ * Copyright David Conran 2016, 2017, 2018, 2019
  *
- * NOTE: An IR LED circuit *MUST* be connected to ESP8266 GPIO4 (D2) if
- *       you want to send IR messages. See IR_LED below.
- *       A compatible IR RX modules *MUST* be connected to ESP8266 GPIO14 (D5)
- *       if you want to capture & decode IR nessages. See IR_RX below.
+ * Copyright:
+ *   Code for this has been borrowed from lots of other OpenSource projects &
+ *   resources. I'm *NOT* claiming complete Copyright ownership of all the code.
+ *   Likewise, feel free to borrow from this as much as you want.
  *
- * WARN: This is very advanced & complicated example code. Not for beginners.
- *       You are strongly suggested to try & look at other example code first.
+ * NOTE: An IR LED circuit SHOULD be connected to ESP8266 GPIO4 (D2) if
+ *       you want to send IR messages.
+ *       A compatible IR RX modules SHOULD be connected to ESP8266 GPIO14 (D5)
+ *       if you want to capture & decode IR nessages.
+ *       See 'IR_LED' & 'IR_RX' in IRMQTTServer.h.
+ *
+ * WARN: This is *very* advanced & complicated example code. Not for beginners.
+ *       You are strongly suggested to try & look at other example code first
+ *       to understand how this library works.
  *
  * # Instructions
  *
  * ## Before First Boot (i.e. Compile time)
- * - Either:
- *   o Set the MQTT_SERVER define below to the address of your MQTT server.
- *   or
- *   o Disable MQTT (see '#define MQTT_ENABLE' below).
+ * - Disable MQTT if desired. (see '#define MQTT_ENABLE' in IRMQTTServer.h).
  *
  * - Site specific settings:
- *   o Search for 'CHANGE_ME' for the things you probably need to change for
- *     your particular situation.
+ *   o Search for 'CHANGE_ME' in IRMQTTServer.h for the things you probably
+ *     need to change for your particular situation.
+ *   o All user changable settings are in the file IRMQTTServer.h.
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
@@ -38,15 +43,16 @@
  * The ESP8266 board will boot into the WiFiManager's AP mode.
  * i.e. It will create a WiFi Access Point with a SSID like: "ESP123456" etc.
  * Connect to that SSID. Then point your browser to http://192.168.4.1/ and
- * configure the ESP8266 to connect to your desired WiFi network.
- * It will remember the new WiFi connection details on next boot.
+ * configure the ESP8266 to connect to your desired WiFi network and associated
+ * required settings. It will remember these details on next boot if the device
+ * connects successfully.
  * More information can be found here:
  *   https://github.com/tzapu/WiFiManager#how-it-works
  *
- * If you need to reset the WiFi settings, visit:
- *   http://<your_esp8266's_ip_address>/reset
+ * If you need to reset the WiFi and saved settings to go back to "First Boot",
+ * visit:  http://<your_esp8266's_ip_address>/reset
  *
- * ## Normal Use (After setup)
+ * ## Normal Use (After initial setup)
  * Enter 'http://<your_esp8266's_ip_address/' in your browser & follow the
  * instructions there to send IR codes via HTTP/HTML.
  * You can send URLs like the following, with similar data type limitations as
@@ -211,23 +217,14 @@
  * potentially compromise your network. OTA updates are password protected by
  * default. If you are sufficiently paranoid, you SHOULD disable uploading
  * firmware via OTA. (see 'FIRMWARE_OTA')
- * You SHOULD also (re)set/change all usernames & passwords. (See `CHANGE_ME`s)
+ * You SHOULD also set/change all usernames & passwords.
  * For extra bonus points: Use a separate untrusted SSID/vlan/network/ segment
  * for your IoT stuff, including this device.
  *             Caveat Emptor. You have now been suitably warned.
  * </security-hat>
- *
- * Copyright Notice:
- *   Code for this has been borrowed from lots of other OpenSource projects &
- *   resources. I'm *NOT* claiming complete Copyright ownership of all the code.
- *   Likewise, feel free to borrow from this as much as you want.
  */
-// ---------------- Start of User Configuration Section ------------------------
 
-#ifndef MQTT_ENABLE
-#define MQTT_ENABLE true  // Whether or not MQTT is used at all.
-#endif  // MQTT_ENABLE
-
+#include "IRMQTTServer.h"
 #include <Arduino.h>
 #include <FS.h>
 #include <ArduinoJson.h>
@@ -251,162 +248,9 @@
 // --------------------------------------------------------------------
 #include <PubSubClient.h>
 #endif  // MQTT_ENABLE
-#include <algorithm>
+#include <algorithm>  // NOLINT(build/include)
 #include <string>
 
-// ---------------------- Board Related Settings -------------------------------
-// NOTE: Make sure you set your Serial Monitor to the same speed.
-#define BAUD_RATE 115200  // Serial port Baud rate.
-
-// GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
-#define IR_LED 4  // <=- CHANGE_ME (optional)
-// define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
-
-// GPIO the IR RX module is connected to/controlled by. e.g. GPIO 14 = D5.
-// Comment this out to disable receiving/decoding IR messages entirely.
-#define IR_RX 14  // <=- CHANGE_ME (optional)
-#define IR_RX_PULLUP false
-
-// --------------------- Network Related Settings ------------------------------
-const uint16_t kHttpPort = 80;  // The TCP port the HTTP server is listening on.
-// Name of the device you want in mDNS.
-// NOTE: Changing this will change the MQTT path too unless you override it
-//       via MQTTprefix below.
-#define HOSTNAME "ir_server"  // <=- CHANGE_ME (optional)
-// Change to 'true'/'false' if you do/don't want these features or functions.
-#define USE_STATIC_IP false  // Change to 'true' if you don't want to use DHCP.
-// We obtain our network config via DHCP by default but allow an easy way to
-// use a static IP config.
-#if USE_STATIC_IP
-const IPAddress kIPAddress = IPAddress(10, 0, 1, 78);
-const IPAddress kGateway = IPAddress(10, 0, 1, 1);
-const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
-#endif  // USE_STATIC_IP
-
-// See: https://github.com/tzapu/WiFiManager#filter-networks for these settings.
-#define HIDE_DUPLIATE_NETWORKS false  // Should WifiManager hide duplicate SSIDs
-// #define MIN_SIGNAL_STRENGTH 20  // Minimum WiFi signal stength (percentage)
-                                   // before we will connect.
-                                   // The unset default is 8%.
-                                   // (Uncomment to enable)
-
-// ----------------------- HTTP Related Settings -------------------------------
-// 'kHtmlUsername' & 'kHtmlPassword' are used by the following two items:
-#define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
-                           // Less secure if enabled.
-                           // Note: Firmware OTA is also disabled until
-                           //       'kHtmlPassword' is changed from the default.
-#define HTML_PASSWORD_ENABLE false  // Protect access to the HTML interface.
-                                    // Note: OTA update is always passworded.
-const char* kHtmlUsername = "admin";    // <=- CHANGE_ME (optional)
-const char* kHtmlPassword = "esp8266";  // <=- CHANGE_ME (required)
-// If you do not change 'kHtmlPassword', Firmware OTA updates will be blocked.
-
-// ----------------------- MQTT Related Settings -------------------------------
-#if MQTT_ENABLE
-const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
-
-#define MQTTprefix HOSTNAME  // Change this if you want the MQTT topic to be
-                             // independent of the hostname.
-#define MQTTack MQTTprefix "/sent"  // Topic we send back acknowledgements on.
-#define MQTTcommand MQTTprefix "/send"   // Topic we get new commands from.
-#define MQTTrecv MQTTprefix "/received"  // Topic we send received IRs to.
-#define MQTTlog MQTTprefix "/log"        // Topic we send log messages to.
-#define MQTTstatus MQTTprefix "/status"  // Topic for the Last Will & Testament.
-#define MQTTclimateprefix MQTTprefix "/ac"
-
-#define MQTTcmndprefix "/cmnd/"
-#define MQTTstatprefix "/stat/"
-#define MQTTwildcard "+"
-#define MQTTdiscovery "homeassistant/climate/" HOSTNAME "/config"
-#define MQTTHomeAssistantName HOSTNAME "_aircon"
-#define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts
-
-#define QOS 1  // MQTT broker should queue up any unreceived messages for us
-// #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
-#endif  // MQTT_ENABLE
-
-// ------------------------ IR Capture Settings --------------------------------
-// Let's use a larger than normal buffer so we can handle AirCon remote codes.
-const uint16_t kCaptureBufferSize = 1024;
-#if DECODE_AC
-// Some A/C units have gaps in their protocols of ~40ms. e.g. Kelvinator
-// A value this large may swallow repeats of some protocols
-const uint8_t kCaptureTimeout = 50;  // Milliseconds
-#else  // DECODE_AC
-// Suits most messages, while not swallowing many repeats.
-const uint8_t kCaptureTimeout = 15;  // Milliseconds
-#endif  // DECODE_AC
-// Ignore unknown messages with <10 pulses (see also REPORT_UNKNOWNS)
-const uint16_t kMinUnknownSize = 2 * 10;
-#define REPORT_UNKNOWNS false  // Report inbound IR messages that we don't know.
-#define REPORT_RAW_UNKNOWNS false  // Report the whole buffer, recommended:
-                                   // MQTT_MAX_PACKET_SIZE of 1024 or more
-
-// ------------------------ Advanced Usage Only --------------------------------
-// Change if you need multiple independent send gpio/topics.
-const uint8_t gpioTable[] = {
-  IR_LED,  // Default GPIO. e.g. ir_server/send or ir_server/send_0
-  // Uncomment the following as needed.
-  // NOTE: Remember to disable DEBUG if you are using one of the serial pins.
-  // 5,  // GPIO 5 / D1 e.g. ir_server/send_1
-  // 14,  // GPIO 14 / D5 e.g. ir_server/send_2
-  // 16,  // GPIO 16 / D0 e.g. ir_server/send_3
-};
-
-#define KEY_PROTOCOL "protocol"
-#define KEY_MODEL "model"
-#define KEY_POWER "power"
-#define KEY_MODE "mode"
-#define KEY_TEMP "temp"
-#define KEY_FANSPEED "fanspeed"
-#define KEY_SWINGV "swingv"
-#define KEY_SWINGH "swingh"
-#define KEY_QUIET "quiet"
-#define KEY_TURBO "turbo"
-#define KEY_LIGHT "light"
-#define KEY_BEEP "beep"
-#define KEY_ECONO "econo"
-#define KEY_SLEEP "sleep"
-#define KEY_CLOCK "clock"
-#define KEY_FILTER "filter"
-#define KEY_CLEAN "clean"
-#define KEY_CELSIUS "use_celsius"
-
-// -------------------------- Debug Settings -----------------------------------
-// Disable debug output if any of the IR pins are on the TX (D1) pin.
-// Note: This is a crude method to catch the common use cases.
-// See `isSerialGpioUsedByIr()` for the better method.
-#if (IR_LED != 1 && IR_RX != 1)
-#ifndef DEBUG
-#define DEBUG true  // Change to 'false' to disable all serial output.
-#endif  // DEBUG
-#else  // (IR_LED != 1 && IR_RX != 1)
-#undef DEBUG
-#define DEBUG false
-#endif
-
-// ----------------- End of User Configuration Section -------------------------
-
-// Constants
-#define _MY_VERSION_ "v1.0.0-beta"
-// HTML arguments we will parse for IR code information.
-#define argType "type"
-#define argData "code"
-#define argBits "bits"
-#define argRepeat "repeats"
-
-// Text for Last Will & Testament status messages.
-#define LWT_ONLINE  "Online"
-#define LWT_OFFLINE "Offline"
-
-const uint8_t kSendTableSize = sizeof(gpioTable);
-// This is what the default password is. People should NEVER use this password.
-// Firmware uploads are blocked until the user changes kHtmlPassword to a
-// different value than this.
-const char* kDefaultPassword = "esp8266";  // Do NOT change this.
-// Name of the json config file in SPIFFS.
-const char* kConfigFile = "/config.json";
 // Globals
 ESP8266WebServer server(kHttpPort);
 #ifdef IR_RX
@@ -415,10 +259,11 @@ decode_results capture;  // Somewhere to store inbound IR messages.
 #endif  // IR_RX
 MDNSResponder mdns;
 WiFiClient espClient;
-
 WiFiManager wifiManager;
 bool flagSaveWifiConfig = false;
-
+char HttpUsername[kUsernameLength + 1] = "admin";  // Default HTT username.
+char HttpPassword[kPasswordLength + 1] = "";  // No HTTP password by default.
+char Hostname[kHostnameLength + 1] = "ir_server";  // Default hostname.
 uint16_t *codeArray;
 uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
@@ -446,6 +291,7 @@ bool lastClimateSucceeded = false;
 bool hasClimateBeenSent = false;  // Has the Climate ever been sent?
 
 #if MQTT_ENABLE
+PubSubClient mqtt_client(espClient);
 String lastMqttCmd = "None";
 String lastMqttCmdTopic = "None";
 uint32_t lastMqttCmdTime = 0;
@@ -456,21 +302,23 @@ uint32_t mqttSentCounter = 0;
 uint32_t mqttRecvCounter = 0;
 bool wasConnected = true;
 
-const uint8_t kMaxMqttServerSize = 40;
-char MqttServer[kMaxMqttServerSize + 1] = "";
-const uint8_t kMaxMqttPortSize = 6;  // Largest value of uint16_t is "65535".
-uint16_t MqttPort = 1883;
-const uint8_t kMaxMqttUsernameSize = 20;
-char MqttUsername[kMaxMqttUsernameSize + 1] = "";
-const uint8_t kMaxMqttPasswordSize = 40;
-char MqttPassword[kMaxMqttPasswordSize + 1] = "";
+char MqttServer[kHostnameLength + 1] = "10.0.0.4";
+char MqttPort[kPortLength + 1] = "1883";
+char MqttUsername[kUsernameLength + 1] = "";
+char MqttPassword[kPasswordLength + 1] = "";
+char MqttPrefix[kHostnameLength + 1] = "";
 
-// MQTT client parameters
-void callback(char* topic, byte* payload, unsigned int length);
-PubSubClient mqtt_client(espClient);
-
-// Create a unique MQTT client id.
-String mqtt_clientid = MQTTprefix + String(ESP.getChipId(), HEX);
+String MqttAck;  // Sub-topic we send back acknowledgements on.
+String MqttSend;  // Sub-topic we get new commands from.
+String MqttRecv;  // Topic we send received IRs to.
+String MqttLog;  // Topic we send log messages to.
+String MqttLwt;  // Topic for the Last Will & Testament.
+String MqttClimate;  // Sub-topic for the climate topics.
+String MqttClimateCmnd;  // Sub-topic for the climate command topics.
+String MqttClimateStat;  // Sub-topic for the climate stat topics.
+String MqttDiscovery;
+String MqttHAName;
+String MqttClientId;
 
 // Primative lock file for gating MQTT state broadcasts.
 bool lockMqttBroadcast = true;
@@ -479,12 +327,8 @@ bool hasBroadcastBeenSent = false;
 TimerMs lastDiscovery = TimerMs();  // When we last sent a Discovery.
 bool hasDiscoveryBeenSent = false;
 TimerMs statListenTime = TimerMs();  // How long we've been listening for.
-
-const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
-const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
 #endif  // MQTT_ENABLE
 
-#if DEBUG
 bool isSerialGpioUsedByIr(void) {
   const uint8_t kSerialTxGpio = 1;  // The GPIO serial output is sent too.
                                     // Note: *DOES NOT* control Serial output.
@@ -498,14 +342,13 @@ bool isSerialGpioUsedByIr(void) {
       return true;  // Serial port is in use for IR sending. Abort.
   return false;  // Not in use as far as we can tell.
 }
-#endif  // DEBUG
 
 // Debug messages get sent to the serial port.
-void debug(String str) {
+void debug(const char *str) {
 #if DEBUG
   if (isSerialGpioUsedByIr()) return;  // Abort.
   uint32_t now = millis();
-  Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str.c_str());
+  Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str);
 #endif  // DEBUG
 }
 
@@ -515,16 +358,21 @@ void saveWifiConfigCallback(void) {
   flagSaveWifiConfig = true;
 }
 
-void saveWifiConfig() {
+void saveWifiConfig(void) {
   debug("Saving the wifi config.");
   DynamicJsonBuffer jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 #if MQTT_ENABLE
-  json["mqtt_server"] = MqttServer;
-  json["mqtt_port"] = String(MqttPort).c_str();
-  json["mqtt_username"] = MqttUsername;
-  json["mqtt_pass"] = MqttPassword;
+  json[kMqttServerKey] = MqttServer;
+  json[kMqttPortKey] = MqttPort;
+  json[kMqttUserKey] = MqttUsername;
+  json[kMqttPassKey] = MqttPassword;
+  json[kMqttPrefixKey] = MqttPrefix;
 #endif  // MQTT_ENABLE
+  json[kHostnameKey] = Hostname;
+  json[kHttpUserKey] = HttpUsername;
+  json[kHttpPassKey] = HttpPassword;
+
   if (SPIFFS.begin()) {
     File configFile = SPIFFS.open(kConfigFile, "w");
     if (!configFile) {
@@ -539,7 +387,7 @@ void saveWifiConfig() {
   }
 }
 
-void loadWifiConfigFile() {
+void loadWifiConfigFile(void) {
   debug("Trying to mount SPIFFS");
   if (SPIFFS.begin()) {
     debug("mounted file system");
@@ -559,15 +407,16 @@ void loadWifiConfigFile() {
         if (json.success()) {
           debug("Json config file parsed ok.");
 #if MQTT_ENABLE
-          if (json["mqtt_server"] != NULL)
-            strncpy(MqttServer, json["mqtt_server"], kMaxMqttServerSize);
-          if (json["mqtt_port"] != NULL)
-            MqttPort = atoi(json["mqtt_port"]);
-          if (json["mqtt_username"] != NULL)
-            strncpy(MqttUsername, json["mqtt_username"], kMaxMqttUsernameSize);
-          if (json["mqtt_password"] != NULL)
-            strncpy(MqttPassword, json["mqtt_password"], kMaxMqttPasswordSize);
+          strncpy(MqttServer, json[kMqttServerKey] | "", kHostnameLength);
+          strncpy(MqttPort, json[kMqttPortKey] | "1883", kPortLength);
+          strncpy(MqttUsername, json[kMqttUserKey] | "", kUsernameLength);
+          strncpy(MqttPassword, json[kMqttPassKey] | "", kPasswordLength);
+          strncpy(MqttPrefix, json[kMqttPrefixKey] | "", kHostnameLength);
 #endif  // MQTT_ENABLE
+          strncpy(Hostname, json[kHostnameKey] | "", kHostnameLength);
+          strncpy(HttpUsername, json[kHttpUserKey] | "", kUsernameLength);
+          strncpy(HttpPassword, json[kHttpPassKey] | "", kPasswordLength);
+          debug("Recovered Json fields.");
         } else {
           debug("Failed to load json config");
         }
@@ -596,19 +445,23 @@ String msToHumanString(uint32_t const msecs) {
 
   String result = "";
   if (days) result += String(days) + " day";
-  if (days > 1) result += "s";
-  if (hours) result += " " + String(hours) + " hour";
-  if (hours > 1) result += "s";
-  if (minutes) result += " " + String(minutes) + " minute";
-  if (minutes > 1) result += "s";
-  if (seconds) result += " " + String(seconds) + " second";
-  if (seconds > 1) result += "s";
+  if (days > 1) result += 's';
+  if (hours) result += ' ' + String(hours) + " hour";
+  if (hours > 1) result += 's';
+  if (minutes) result += ' ' + String(minutes) + " minute";
+  if (minutes > 1) result += 's';
+  if (seconds) result += ' ' + String(seconds) + " second";
+  if (seconds > 1) result += 's';
   result.trim();
   return result;
 }
 
 String timeElapsed(uint32_t const msec) {
-  return msToHumanString(msec) + " ago";
+  String result = msToHumanString(msec);
+  if (result.equalsIgnoreCase("Now"))
+    return result;
+  else
+    return result + " ago";
 }
 
 String timeSince(uint32_t const start) {
@@ -628,21 +481,10 @@ String listOfSendGpios(void) {
   String result = String(gpioTable[0]);
   if (kSendTableSize > 1) result += " (default)";
   for (uint8_t i = 1; i < kSendTableSize; i++) {
-    result += ", " + String(gpioTable[1]);
+    result += ", " + String(gpioTable[i]);
   }
   return result;
 }
-
-#if MQTT_ENABLE
-// Return a string containing the comma separated list of MQTT command topics.
-String listOfCommandTopics(void) {
-  String result = MQTTcommand;
-  for (uint8_t i = 0; i < kSendTableSize; i++) {
-    result += ", " MQTTcommand "_" + String(gpioTable[1]);
-  }
-  return result;
-}
-#endif  // MQTT_ENABLE
 
 // Quick and dirty check for any unsafe chars in a string
 // that may cause HTML shenanigans. e.g. An XSS.
@@ -665,6 +507,10 @@ String htmlMenu(void) {
           "Aircon"
         "</button>"
         "<button type='button' "
+          "onclick='window.location=\"/examples\"'>"
+          "Examples"
+        "</button>"
+        "<button type='button' "
           "onclick='window.location=\"/info\"'>"
           "System Info"
         "</button>"
@@ -677,51 +523,20 @@ String htmlMenu(void) {
 }
 
 // Root web page with example usage etc.
-void handleRoot() {
+void handleRoot(void) {
 #if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
     debug("Basic HTTP authentication failure for /.");
     return server.requestAuthentication();
   }
 #endif
-  String html =
+  String html = F(
     "<html><head><title>IR MQTT server</title></head>"
     "<body>"
     "<center><h1>ESP8266 IR MQTT Server</h1></center>"
-    "<center><small><i>" _MY_VERSION_ "</i></small></center>";
+    "<center><small><i>" _MY_VERSION_ "</i></small></center>");
   html += htmlMenu();
-  html +=
-    "<h3>Hardcoded examples</h3>"
-    "<p><a href=\"ir?code=38000,1,69,341,171,21,64,21,64,21,21,21,21,21,21,21,"
-        "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
-        "21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,"
-        "21,21,64,21,64,21,64,21,1600,341,85,21,3647&type=31\">"
-        "Sherwood Amp On (GlobalCache)</a></p>"
-    "<p><a href=\"ir?code=38000,8840,4446,546,1664,546,1664,546,546,546,546,"
-        "546,546,546,546,546,546,546,1664,546,1664,546,546,546,1664,546,546,"
-        "546,546,546,546,546,1664,546,546,546,1664,546,546,546,1664,546,1664,"
-        "546,1664,546,546,546,546,546,546,546,546,546,1664,546,546,546,546,546,"
-        "546,546,1664,546,1664,546,1664,546,41600,8840,2210,546&type=30\">"
-        "Sherwood Amp Off (Raw)</a></p>"
-    "<p><a href=\"ir?code=0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040"
-        ",0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040"
-        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015"
-        ",0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015"
-        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040"
-        ",0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40"
-        "&type=25&repeats=1\">"
-        "Sherwood Amp Input TAPE (Pronto)</a></p>"
-    "<p><a href=\"ir?type=7&code=E0E09966\">TV on (Samsung)</a></p>"
-    "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Power Off (Sony 12bit)</a></p>"
-    "<p><a href=\"aircon/set?protocol=PANASONIC_AC&model=LKE&power=on&"
-      "mode=auto&fanspeed=min&temp=23\">"
-      "Panasonic A/C LKE model, On, Auto mode, Min fan, 23C"
-      " <i>(via HTTP aircon interface)</i></a></p>"
-    "<p><a href=\"aircon/set?temp=27\">"
-      "Change just the temp to 27C <i>(via HTTP aircon interface)</i></a></p>"
-    "<p><a href=\"aircon/set?power=off&mode=off\">"
-      "Turn OFF the current A/C <i>(via HTTP aircon interface)</i></a></p>"
-    "<br><hr>"
+  html += F(
     "<h3>Send a simple IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "Type: "
@@ -787,6 +602,42 @@ void handleRoot() {
       " <input type='submit' value='Send IR'>"
     "</form>"
     "<br><hr>"
+    "<h3>Send a complex (Air Conditioner) IR message</h3><p>"
+    "<form method='POST' action='/ir' enctype='multipart/form-data'>"
+      "Type: "
+      "<select name='type'>"
+        "<option value='27'>Argo</option>"
+        "<option value='16'>Daikin</option>"
+        "<option value='53'>Daikin2</option>"
+        "<option value='48'>Electra</option>"
+        "<option value='33'>Fujitsu</option>"
+        "<option value='24'>Gree</option>"
+        "<option value='38'>Haier (9 bytes)</option>"
+        "<option value='44'>Haier (14 bytes/YR-W02)</option>"
+        "<option value='40'>Hitachi (28 bytes)</option>"
+        "<option value='41'>Hitachi1 (13 bytes)</option>"
+        "<option value='42'>Hitachi2 (53 bytes)</option>"
+        "<option selected='selected' value='18'>Kelvinator</option>"  // Default
+        "<option value='20'>Mitsubishi</option>"
+        "<option value='59'>Mitsubishi Heavy (11 bytes)</option>"
+        "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
+        "<option value='52'>MWM</option>"
+        "<option value='46'>Samsung</option>"
+        "<option value='57'>TCL112</option>"
+        "<option value='32'>Toshiba</option>"
+        "<option value='28'>Trotec</option>"
+        "<option value='45'>Whirlpool</option>"
+      "</select>"
+      " State code: 0x"
+      "<input type='text' name='code' size='");
+  html += String(kStateSizeMax * 2);
+  html += F("' maxlength='");
+  html += String(kStateSizeMax * 2);
+  html += F("'"
+          " value='190B8050000000E0190B8070000010F0'>"
+      " <input type='submit' value='Send A/C State'>"
+    "</form>"
+    "<br><hr>"
     "<h3>Send an IRremote Raw IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='30'>"
@@ -824,41 +675,7 @@ void handleRoot() {
           "size='2' maxlength='2'>"
       " <input type='submit' value='Send Pronto'>"
     "</form>"
-    "<br><hr>"
-    "<h3>Send an Air Conditioner IR message</h3><p>"
-    "<form method='POST' action='/ir' enctype='multipart/form-data'>"
-      "Type: "
-      "<select name='type'>"
-        "<option value='27'>Argo</option>"
-        "<option value='16'>Daikin</option>"
-        "<option value='53'>Daikin2</option>"
-        "<option value='48'>Electra</option>"
-        "<option value='33'>Fujitsu</option>"
-        "<option value='24'>Gree</option>"
-        "<option value='38'>Haier (9 bytes)</option>"
-        "<option value='44'>Haier (14 bytes/YR-W02)</option>"
-        "<option value='40'>Hitachi (28 bytes)</option>"
-        "<option value='41'>Hitachi1 (13 bytes)</option>"
-        "<option value='42'>Hitachi2 (53 bytes)</option>"
-        "<option selected='selected' value='18'>Kelvinator</option>"  // Default
-        "<option value='20'>Mitsubishi</option>"
-        "<option value='59'>Mitsubishi Heavy (11 bytes)</option>"
-        "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
-        "<option value='52'>MWM</option>"
-        "<option value='46'>Samsung</option>"
-        "<option value='57'>TCL112</option>"
-        "<option value='32'>Toshiba</option>"
-        "<option value='28'>Trotec</option>"
-        "<option value='45'>Whirlpool</option>"
-      "</select>"
-      " State code: 0x"
-      "<input type='text' name='code' size='" + String(kStateSizeMax * 2) +
-          "' maxlength='" + String(kStateSizeMax * 2) + "'"
-          " value='190B8050000000E0190B8070000010F0'>"
-      " <input type='submit' value='Send A/C State'>"
-    "</form>"
-    "<br>";
-  html += "</body></html>";
+    "<br></body></html>");
   server.send(200, "text/html", html);
 }
 
@@ -886,8 +703,57 @@ String addJsReloadUrl(const String url, const uint16_t timeout_s,
   return html;
 }
 
+// Web page with hardcoded example usage etc.
+void handleExamples(void) {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
+    debug("Basic HTTP authentication failure for /examples.");
+    return server.requestAuthentication();
+  }
+#endif
+  String html = F(
+    "<html><head><title>IR MQTT examples</title></head>"
+    "<body>"
+    "<center><h1>ESP8266 IR MQTT Server</h1></center>"
+    "<center><small><i>" _MY_VERSION_ "</i></small></center>");
+  html += htmlMenu();
+  html += F(
+    "<h3>Hardcoded examples</h3>"
+    "<p><a href=\"ir?code=38000,1,69,341,171,21,64,21,64,21,21,21,21,21,21,21,"
+        "21,21,21,21,64,21,64,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,"
+        "21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,64,21,64,21,"
+        "21,21,64,21,64,21,64,21,1600,341,85,21,3647&type=31\">"
+        "Sherwood Amp On (GlobalCache)</a></p>"
+    "<p><a href=\"ir?code=38000,8840,4446,546,1664,546,1664,546,546,546,546,"
+        "546,546,546,546,546,546,546,1664,546,1664,546,546,546,1664,546,546,"
+        "546,546,546,546,546,1664,546,546,546,1664,546,546,546,1664,546,1664,"
+        "546,1664,546,546,546,546,546,546,546,546,546,1664,546,546,546,546,546,"
+        "546,546,1664,546,1664,546,1664,546,41600,8840,2210,546&type=30\">"
+        "Sherwood Amp Off (Raw)</a></p>"
+    "<p><a href=\"ir?code=0000,006E,0022,0002,0155,00AA,0015,0040,0015,0040"
+        ",0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0015,0040,0015,0040"
+        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0015,0015,0040,0015,0015"
+        ",0015,0015,0015,0040,0015,0040,0015,0015,0015,0015,0015,0015,0015,0015"
+        ",0015,0015,0015,0040,0015,0015,0015,0015,0015,0040,0015,0040,0015,0040"
+        ",0015,0040,0015,0040,0015,0640,0155,0055,0015,0E40"
+        "&type=25&repeats=1\">"
+        "Sherwood Amp Input TAPE (Pronto)</a></p>"
+    "<p><a href=\"ir?type=7&code=E0E09966\">TV on (Samsung)</a></p>"
+    "<p><a href=\"ir?type=4&code=0xf50&bits=12\">Power Off (Sony 12bit)</a></p>"
+    "<p><a href=\"aircon/set?protocol=PANASONIC_AC&model=LKE&power=on&"
+      "mode=auto&fanspeed=min&temp=23\">"
+      "Panasonic A/C LKE model, On, Auto mode, Min fan, 23C"
+      " <i>(via HTTP aircon interface)</i></a></p>"
+    "<p><a href=\"aircon/set?temp=27\">"
+      "Change just the temp to 27C <i>(via HTTP aircon interface)</i></a></p>"
+    "<p><a href=\"aircon/set?power=off&mode=off\">"
+      "Turn OFF the current A/C <i>(via HTTP aircon interface)</i></a></p>"
+    "<br><hr></body></html>");
+  server.send(200, "text/html", html);
+}
+
 String boolToString(const bool value) {
-  return String(value ? "on" : "off");
+  return value ? F("on") : F("off");
 }
 
 
@@ -1089,7 +955,7 @@ String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
 }
 
 // Admin web page
-void handleAirCon() {
+void handleAirCon(void) {
   String html = F(
     "<html><head><title>AirCon control</title></head>"
     "<body>"
@@ -1145,9 +1011,9 @@ void handleAirCon() {
 }
 
 // Parse the URL args to find the Common A/C arguments.
-void handleAirConSet() {
+void handleAirConSet(void) {
 #if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
     debug("Basic HTTP authentication failure for /aircon/set.");
     return server.requestAuthentication();
   }
@@ -1158,7 +1024,7 @@ void handleAirConSet() {
     result = updateClimate(result, server.argName(i), "", server.arg(i));
 
 #if MQTT_ENABLE
-  sendClimate(climate, result, MQTTclimateprefix MQTTstatprefix,
+  sendClimate(climate, result, MqttClimateStat,
               true, false, false);
 #else  // MQTT_ENABLE
   sendClimate(climate, result, "", false, false, false);
@@ -1176,7 +1042,7 @@ void handleAirConSet() {
 }
 
 // Admin web page
-void handleAdmin() {
+void handleAdmin(void) {
   String html = F(
     "<html><head><title>IR MQTT server admin</title></head>"
     "<body>"
@@ -1205,9 +1071,8 @@ void handleAdmin() {
 #if FIRMWARE_OTA
   html += F("<hr><h3>Update firmware</h3><p>"
           "<b><mark>Warning:</mark></b><br> ");
-  if (!strcmp(kHtmlPassword, kDefaultPassword))  // Deny if password unchanged
-    html += F("<i>OTA firmware is disabled until you change the password. "
-              "(See 'kHtmlPassword' in the source code.)</i><br>");
+  if (!strlen(HttpPassword))  // Deny if password not set
+    html += F("<i>OTA firmware is disabled until you set a password.</i><br>");
   else  // default password has been changed, so allow it.
     html += F(
         "<i>Updating your firmware may screw up your access to the device. "
@@ -1223,7 +1088,7 @@ void handleAdmin() {
 }
 
 // Info web page
-void handleInfo() {
+void handleInfo(void) {
   String html =
     "<html><head><title>IR MQTT server info</title></head>"
     "<body>"
@@ -1231,7 +1096,8 @@ void handleInfo() {
   html += htmlMenu();
   html +=
     "<h3>General</h3>"
-    "<p>IP address: " + WiFi.localIP().toString() + "<br>"
+    "<p>Hostname: " + String(Hostname) + "<br>"
+    "IP address: " + WiFi.localIP().toString() + "<br>"
     "Booted: " + timeSince(1) + "<br>" +
     "Version: " _MY_VERSION_ "<br>"
     "Built: " __DATE__
@@ -1277,14 +1143,14 @@ void handleInfo() {
                              : "Disconnected " + timeSince(lastConnectedTime)) +
     ")</i><br>"
     "Disconnections: " + String(mqttDisconnectCounter - 1) + "<br>"
-    "Client id: " + mqtt_clientid + "<br>"
+    "Client id: " + MqttClientId + "<br>"
     "Command topic(s): " + listOfCommandTopics() + "<br>"
-    "Acknowledgements topic: " MQTTack "<br>"
+    "Acknowledgements topic: " + MqttAck + "<br>"
 #ifdef IR_RX
-    "IR Received topic: " MQTTrecv "<br>"
+    "IR Received topic: " + MqttRecv + "<br>"
 #endif  // IR_RX
-    "Log topic: " MQTTlog "<br>"
-    "LWT topic: " MQTTstatus "<br>"
+    "Log topic: " + MqttLog + "<br>"
+    "LWT topic: " + MqttLwt + "<br>"
     "QoS: " + String(QOS) + "<br>"
     "Last MQTT command seen: (topic) '" + lastMqttCmdTopic + "' (payload) '" +
     // lastMqttCmd is unescaped untrusted input.
@@ -1316,12 +1182,12 @@ void handleInfo() {
             timeElapsed(lastDiscovery.elapsed()) :
             String("<i>Never</i>"))) +
         "<br>"
-    "Command topics: " MQTTprefix MQTTcmndprefix
+    "Command topics: " + MqttClimateCmnd +
       "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
           KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
           KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
           KEY_CLOCK "|" KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS ")<br>"
-    "State topics: " MQTTprefix MQTTstatprefix
+    "State topics: " + MqttClimateStat +
       "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
           KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
           KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
@@ -1337,9 +1203,9 @@ void handleInfo() {
   server.send(200, "text/html", html);
 }
 // Reset web page
-void handleReset() {
+void handleReset(void) {
 #if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
     debug("Basic HTTP authentication failure for /reset.");
     return server.requestAuthentication();
   }
@@ -1348,7 +1214,8 @@ void handleReset() {
     "<html><head><title>Reset WiFi Config</title></head>"
     "<body>"
     "<h1>Resetting the WiFiManager config back to defaults.</h1>"
-    "<p>Device restarting. Try connecting in a few seconds.</p>"
+    "<p>Device restarting. Try connecting in a few seconds.</p>" +
+    addJsReloadUrl("/", 10, true) +
     "</body></html>");
   // Do the reset.
 #if MQTT_ENABLE
@@ -1372,7 +1239,7 @@ void handleReset() {
 // Reboot web page
 void handleReboot() {
 #if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
     debug("Basic HTTP authentication failure for /quitquitquit.");
     return server.requestAuthentication();
   }
@@ -1392,32 +1259,6 @@ void handleReboot() {
   ESP.restart();
   delay(1000);
 }
-
-#if MQTT_ENABLE
-// FOOBAR
-// MQTT Discovery web page
-void handleSendMqttDiscovery() {
-#if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
-    debug("Basic HTTP authentication failure for /send_discovery.");
-    return server.requestAuthentication();
-  }
-#endif  // HTML_PASSWORD_ENABLE
-  server.send(200, "text/html",
-      "<html><head><title>Sending MQTT Discovery message</title></head>"
-      "<body>"
-      "<h1>Sending MQTT Discovery message.</h1>" +
-      htmlMenu() +
-      "<p>The Home Assistant MQTT Discovery message is being sent to topic: "
-      MQTTdiscovery ". It will show up in Home Assistant in a few seconds.</p>"
-      "<h3>Warning!</h3>"
-      "<p>Home Assistant's config for this device is reset each time this is "
-      " is sent.</p>" +
-      addJsReloadUrl("/", 15, true) +
-      "</body></html>");
-  sendMQTTDiscovery(MQTTdiscovery);
-}
-#endif  // MQTT_ENABLE
 
 // Parse an Air Conditioner A/C Hex String/code and send it.
 // Args:
@@ -1564,7 +1405,8 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       else
         c = c - 'a' + 10;
     } else {
-      debug("Aborting! Non-hexadecimal char found in AirCon state: " + str);
+      debug("Aborting! Non-hexadecimal char found in AirCon state:");
+      debug(str.c_str());
       return false;
     }
     if (i % 2 == 1) {  // Odd: Upper half of the byte.
@@ -1888,38 +1730,45 @@ bool parseStringAndSendRaw(IRsend *irsend, const String str) {
 #endif  // SEND_RAW
 
 // Parse the URL args to find the IR code.
-void handleIr() {
+void handleIr(void) {
 #if HTML_PASSWORD_ENABLE
-  if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
     debug("Basic HTTP authentication failure for /ir.");
     return server.requestAuthentication();
   }
 #endif
   uint64_t data = 0;
   String data_str = "";
-  int ir_type = 3;  // Default to NEC codes.
+  int16_t ir_type = decode_type_t::NEC;  // Default to NEC codes.
   uint16_t nbits = 0;
   uint16_t repeat = 0;
 
   for (uint16_t i = 0; i < server.args(); i++) {
-    if (server.argName(i) == argType)
-      ir_type = atoi(server.arg(i).c_str());
-    if (server.argName(i) == argData) {
+    if (server.argName(i).equals(KEY_TYPE) ||
+        server.argName(i).equals(KEY_PROTOCOL)) {
+      ir_type = strToDecodeType(server.arg(i).c_str());
+    } else if (server.argName(i).equals(KEY_CODE)) {
       data = getUInt64fromHex(server.arg(i).c_str());
       data_str = server.arg(i);
+    } else if (server.argName(i).equals(KEY_BITS)) {
+      nbits = server.arg(i).toInt();
+    } else if (server.argName(i).equals(KEY_REPEAT)) {
+      repeat = server.arg(i).toInt();
     }
-    if (server.argName(i) == argBits)
-      nbits = atoi(server.arg(i).c_str());
-    if (server.argName(i) == argRepeat)
-      repeat = atoi(server.arg(i).c_str());
   }
   debug("New code received via HTTP");
   lastSendSucceeded = sendIRCode(IrSendTable[0], ir_type, data,
                                  data_str.c_str(), nbits, repeat);
-  handleRoot();
+  String html = F(
+     "<html><head><title>Send IR command</title></head>"
+     "<body>"
+     "<center><h1>IR command sent!</h1></center>");
+  html += addJsReloadUrl("/", 2, true);
+  html += F("</body></html>");
+  server.send(200, "text/html", html);
 }
 
-void handleNotFound() {
+void handleNotFound(void) {
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -1933,31 +1782,55 @@ void handleNotFound() {
   server.send(404, "text/plain", message);
 }
 
-void setup_wifi() {
+void setup_wifi(void) {
   delay(10);
   loadWifiConfigFile();
   // We start by connecting to a WiFi network
   wifiManager.setTimeout(300);  // Time out after 5 mins.
   // Set up additional parameters for WiFiManager config menu page.
-#if MQTT_ENABLE
   wifiManager.setSaveConfigCallback(saveWifiConfigCallback);
+  WiFiManagerParameter custom_hostname_text(
+      "<br><center>Hostname</center>");
+  wifiManager.addParameter(&custom_hostname_text);
+  WiFiManagerParameter custom_hostname(
+      kHostnameKey, kHostnameKey, Hostname, kHostnameLength);
+  wifiManager.addParameter(&custom_hostname);
+  WiFiManagerParameter custom_authentication_text(
+      "<br><center>Web/OTA authentication</center>");
+  wifiManager.addParameter(&custom_authentication_text);
+  WiFiManagerParameter custom_http_username(
+      kHttpUserKey, "username", HttpUsername, kUsernameLength);
+  wifiManager.addParameter(&custom_http_username);
+  WiFiManagerParameter custom_http_password(
+      kHttpPassKey, "password", HttpPassword, kPasswordLength,
+      " type='password'");
+  wifiManager.addParameter(&custom_http_password);
+#if MQTT_ENABLE
   WiFiManagerParameter custom_mqtt_text(
       "<br><center>MQTT Broker details</center>");
   wifiManager.addParameter(&custom_mqtt_text);
   WiFiManagerParameter custom_mqtt_server(
-      "mqtt_server", "mqtt server", MqttServer, kMaxMqttServerSize);
+      kMqttServerKey, "mqtt server", MqttServer, kHostnameLength);
   wifiManager.addParameter(&custom_mqtt_server);
   WiFiManagerParameter custom_mqtt_port(
-      "mqtt_port", "mqtt port", String(MqttPort).c_str(), kMaxMqttPortSize);
+      kMqttPortKey, "mqtt port", MqttPort, kPortLength,
+      " input type='number' min='1' max='65535'");
   wifiManager.addParameter(&custom_mqtt_port);
   WiFiManagerParameter custom_mqtt_user(
-      "mqtt_user", "mqtt username", MqttUsername, kMaxMqttUsernameSize);
+      kMqttUserKey, "mqtt username", MqttUsername, kUsernameLength);
   wifiManager.addParameter(&custom_mqtt_user);
   WiFiManagerParameter custom_mqtt_pass(
-      "mqtt_pass", "mqtt password", MqttPassword, kMaxMqttPasswordSize);
+      kMqttPassKey, "mqtt password", MqttPassword, kPasswordLength,
+      " type='password'");
   wifiManager.addParameter(&custom_mqtt_pass);
+  WiFiManagerParameter custom_prefix_text(
+      "<br><center>MQTT Prefix</center>");
+  wifiManager.addParameter(&custom_prefix_text);
+  WiFiManagerParameter custom_mqtt_prefix(
+      kMqttPrefixKey, "Leave empty to use Hostname", MqttPrefix,
+      kHostnameLength);
+  wifiManager.addParameter(&custom_mqtt_prefix);
   #endif  // MQTT_ENABLE
-
 #if USE_STATIC_IP
   // Use a static IP config rather than the one supplied via DHCP.
   wifiManager.setSTAStaticIPConfig(kIPAddress, kGateway, kSubnetMask);
@@ -1976,15 +1849,47 @@ void setup_wifi() {
   }
 
 #if MQTT_ENABLE
-  strncpy(MqttServer, custom_mqtt_server.getValue(), kMaxMqttServerSize);
-  MqttPort = atoi(custom_mqtt_port.getValue());
-  strncpy(MqttUsername, custom_mqtt_user.getValue(), kMaxMqttUsernameSize);
-  strncpy(MqttPassword, custom_mqtt_pass.getValue(), kMaxMqttPasswordSize);
+  strncpy(MqttServer, custom_mqtt_server.getValue(), kHostnameLength);
+  strncpy(MqttPort, custom_mqtt_port.getValue(), kPortLength);
+  strncpy(MqttUsername, custom_mqtt_user.getValue(), kUsernameLength);
+  strncpy(MqttPassword, custom_mqtt_pass.getValue(), kPasswordLength);
+  strncpy(MqttPrefix, custom_mqtt_prefix.getValue(), kHostnameLength);
 #endif  // MQTT_ENABLE
+  strncpy(Hostname, custom_hostname.getValue(), kHostnameLength);
+  strncpy(HttpUsername, custom_http_username.getValue(), kUsernameLength);
+  strncpy(HttpPassword, custom_http_password.getValue(), kPasswordLength);
   if (flagSaveWifiConfig) {
     saveWifiConfig();
   }
-  debug("WiFi connected. IP address: " + WiFi.localIP().toString());
+  debug("WiFi connected. IP address:");
+  debug(WiFi.localIP().toString().c_str());
+}
+
+void init_vars(void) {
+#if MQTT_ENABLE
+  // If we have a prefix already, use it. Otherwise use the hostname.
+  if (!strlen(MqttPrefix)) strncpy(MqttPrefix, Hostname, kHostnameLength);
+  // Topic we send back acknowledgements on.
+  MqttAck = String(MqttPrefix) + '/' + MQTT_ACK;
+  // Sub-topic we get new commands from.
+  MqttSend = String(MqttPrefix) + '/' + MQTT_SEND;
+  // Topic we send received IRs to.
+  MqttRecv = String(MqttPrefix) + '/' + MQTT_RECV;
+  // Topic we send log messages to.
+  MqttLog = String(MqttPrefix) + '/' + MQTT_LOG;
+  // Topic for the Last Will & Testament.
+  MqttLwt = String(MqttPrefix) + '/' + MQTT_LWT;
+  // Sub-topic for the climate topics.
+  MqttClimate = String(MqttPrefix) + '/' + MQTT_CLIMATE;
+  // Sub-topic for the climate command topics.
+  MqttClimateCmnd = MqttClimate + '/' + MQTT_CLIMATE_CMND + '/';
+  // Sub-topic for the climate stat topics.
+  MqttClimateStat = MqttClimate + '/' + MQTT_CLIMATE_STAT + '/';
+  MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
+  MqttHAName = String(Hostname) + "_aircon";
+  // Create a unique MQTT client id.
+  MqttClientId = String(Hostname) + String(ESP.getChipId(), HEX);
+#endif  // MQTT_ENABLE
 }
 
 void setup(void) {
@@ -2040,16 +1945,18 @@ void setup(void) {
   setup_wifi();
 
   // Wait a bit for things to settle.
-  delay(1500);
+  delay(500);
 
   lastReconnectAttempt = 0;
 
-  if (mdns.begin(HOSTNAME, WiFi.localIP())) {
+  if (mdns.begin(Hostname, WiFi.localIP())) {
     debug("MDNS responder started");
   }
 
   // Setup the root web page.
   server.on("/", handleRoot);
+  // Setup the examples web page.
+  server.on("/examples", handleExamples);
   // Setup the page to handle web-based IR codes.
   server.on("/ir", handleIr);
   // Setup the aircon page.
@@ -2068,13 +1975,15 @@ void setup(void) {
   // MQTT Discovery url
   server.on("/send_discovery", handleSendMqttDiscovery);
   // Finish setup of the mqtt clent object.
-  mqtt_client.setServer(MqttServer, MqttPort);
-  mqtt_client.setCallback(callback);
+  mqtt_client.setServer(MqttServer, atoi(MqttPort));
+  mqtt_client.setCallback(mqttCallback);
+  // Set various variables
+  init_vars();
 #endif  // MQTT_ENABLE
 
 #if FIRMWARE_OTA
   // Setup the URL to allow Over-The-Air (OTA) firmware updates.
-  if (strcmp(kHtmlPassword, kDefaultPassword)) {  // Allow if password changed.
+  if (strlen(HttpPassword)) {  // Allow if password is set.
     server.on("/update", HTTP_POST, [](){
 #if MQTT_ENABLE
         mqttLog("Attempting firmware update & reboot");
@@ -2097,14 +2006,15 @@ void setup(void) {
         ESP.restart();
         delay(1000);
       }, [](){
-        if (!server.authenticate(kHtmlUsername, kHtmlPassword)) {
+        if (!server.authenticate(HttpUsername, HttpPassword)) {
           debug("Basic HTTP authentication failure for /update.");
           return server.requestAuthentication();
         }
         HTTPUpload& upload = server.upload();
         if (upload.status == UPLOAD_FILE_START) {
           WiFiUDP::stopAll();
-          debug("Update: " + upload.filename);
+          debug("Update:");
+          debug(upload.filename.c_str());
           uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
               0xFFFFF000;
           if (!Update.begin(maxSketchSpace)) {  // start with max available size
@@ -2124,8 +2034,9 @@ void setup(void) {
         } else if (upload.status == UPLOAD_FILE_END) {
           // true to set the size to the current progress
           if (Update.end(true)) {
-            debug("Update Success: " + (String) upload.totalSize +
-                  "\nRebooting...");
+            debug("Update Success:");
+            debug(String(upload.totalSize).c_str());
+            debug("Rebooting...");
           }
         }
         yield();
@@ -2145,68 +2056,257 @@ void setup(void) {
 void subscribing(const String topic_name) {
   // subscription to topic for receiving data with QoS.
   if (mqtt_client.subscribe(topic_name.c_str(), QOS))
-    debug("Subscription OK to " + topic_name);
+    debug("Subscription OK to:");
   else
-    debug("Subscription FAILED to " + topic_name);
+    debug("Subscription FAILED to:");
+  debug(topic_name.c_str());
 }
 
 // Un-subscribe from a MQTT topic
 void unsubscribing(const String topic_name) {
   // subscription to topic for receiving data with QoS.
   if (mqtt_client.unsubscribe(topic_name.c_str()))
-    debug("Unsubscribed OK from " + topic_name);
+    debug("Unsubscribed OK from:");
   else
-    debug("FAILED to unsubscribe from " + topic_name);
+    debug("FAILED to unsubscribe from:");
+  debug(topic_name.c_str());
 }
 
-void mqttLog(String mesg) {
-  debug(mesg);
-  mqtt_client.publish(MQTTlog, mesg.c_str());
+void mqttLog(const String mesg) {
+  debug(mesg.c_str());
+  mqtt_client.publish(MqttLog.c_str(), mesg.c_str());
   mqttSentCounter++;
 }
 
-bool reconnect() {
+bool reconnect(void) {
   // Loop a few times or until we're reconnected
   uint16_t tries = 1;
   while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
     // Attempt to connect
-    debug("Attempting MQTT connection to " + String(MqttServer) + ":" +
-          String(MqttPort) + "... ");
+    debug(("Attempting MQTT connection to " + String(MqttServer) + ":" +
+           String(MqttPort) + "... ").c_str());
     if (strcmp(MqttUsername, "") && strcmp(MqttPassword, "")) {
       debug("Using mqtt username/password to connect.");
-      connected = mqtt_client.connect(mqtt_clientid.c_str(), MqttUsername,
-                                      MqttPassword, MQTTstatus, QOS, true,
-                                      LWT_OFFLINE);
+      connected = mqtt_client.connect(MqttClientId.c_str(),
+                                      MqttUsername, MqttPassword,
+                                      MqttLwt.c_str(),
+                                      QOS, true, kLwtOffline);
+
     } else {
       debug("Using password-less mqtt connection.");
-      connected = mqtt_client.connect(mqtt_clientid.c_str(), MQTTstatus, QOS,
-                                      true, LWT_OFFLINE);
+      connected = mqtt_client.connect(MqttClientId.c_str(), MqttLwt.c_str(),
+                                      QOS, true, kLwtOffline);
     }
     if (connected) {
     // Once connected, publish an announcement...
       mqttLog("(Re)Connected.");
 
       // Update Last Will & Testament to say we are back online.
-      mqtt_client.publish(MQTTstatus, LWT_ONLINE, true);
+      mqtt_client.publish(MqttLwt.c_str(), kLwtOnline, true);
       mqttSentCounter++;
 
       // Subscribing to topic(s)
-      subscribing(MQTTcommand);
+      subscribing(MqttSend);
       for (uint8_t i = 0; i < kSendTableSize; i++) {
-        subscribing(String(MQTTcommand "_") + String(static_cast<int>(i)));
+        subscribing(MqttSend + '_' + String(static_cast<int>(i)));
       }
       // Climate command topics.
-      subscribing(MQTTclimateprefix MQTTcmndprefix MQTTwildcard);
+      subscribing(MqttClimateCmnd + '+');
     } else {
-      debug("failed, rc=" + String(mqtt_client.state()) +
-            " Try again in a bit.");
+      debug(("failed, rc=" + String(mqtt_client.state()) +
+            " Try again in a bit.").c_str());
       // Wait for a bit before retrying
       delay(tries << 7);  // Linear increasing back-off (x128)
     }
     tries++;
   }
   return mqtt_client.connected();
+}
+
+// Return a string containing the comma separated list of MQTT command topics.
+String listOfCommandTopics(void) {
+  String result = MqttSend;
+  for (uint16_t i = 0; i < kSendTableSize; i++) {
+    result += ", " + MqttSend + '_' + String(i);
+  }
+  return result;
+}
+
+// MQTT Discovery web page
+void handleSendMqttDiscovery(void) {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
+    debug("Basic HTTP authentication failure for /send_discovery.");
+    return server.requestAuthentication();
+  }
+#endif  // HTML_PASSWORD_ENABLE
+  server.send(200, "text/html",
+      "<html><head><title>Sending MQTT Discovery message</title></head>"
+      "<body>"
+      "<h1>Sending MQTT Discovery message.</h1>" +
+      htmlMenu() +
+      "<p>The Home Assistant MQTT Discovery message is being sent to topic: " +
+      MqttDiscovery + ". It will show up in Home Assistant in a few seconds."
+      "</p>"
+      "<h3>Warning!</h3>"
+      "<p>Home Assistant's config for this device is reset each time this is "
+      " is sent.</p>" +
+      addJsReloadUrl("/", 15, true) +
+      "</body></html>");
+  sendMQTTDiscovery(MqttDiscovery.c_str());
+}
+
+void doBroadcast(TimerMs *timer, const uint32_t interval,
+                 const commonAcState_t state, const bool retain,
+                 const bool force) {
+  if (force || (!lockMqttBroadcast && timer->elapsed() > interval)) {
+    debug("Sending MQTT stat update broadcast.");
+    sendClimate(state, state, MqttClimateStat,
+                retain, true, false);
+    timer->reset();  // It's been sent, so reset the timer.
+    hasBroadcastBeenSent = true;
+  }
+}
+
+void receivingMQTT(String const topic_name, String const callback_str) {
+  char* tok_ptr;
+  uint64_t code = 0;
+  uint16_t nbits = 0;
+  uint16_t repeat = 0;
+  uint8_t channel = 0;  // Default to the first channel. e.g. "*_0"
+
+  debug("Receiving data by MQTT topic:");
+  debug(topic_name.c_str());
+  debug("with payload:");
+  debug(callback_str.c_str());
+  // Save the message as the last command seen (global).
+  lastMqttCmdTopic = topic_name;
+  lastMqttCmd = callback_str;
+  lastMqttCmdTime = millis();
+  mqttRecvCounter++;
+
+  if (topic_name.startsWith(MqttClimate)) {
+    if (topic_name.startsWith(MqttClimateCmnd)) {
+      debug("It's a climate command topic");
+      commonAcState_t updated = updateClimate(
+          climate, topic_name, MqttClimateCmnd, callback_str);
+      sendClimate(climate, updated, MqttClimateStat,
+                  true, false, false);
+      climate = updated;
+    } else if (topic_name.startsWith(MqttClimateStat)) {
+      debug("It's a climate state topic. Update internal state and DON'T send");
+      climate = updateClimate(
+          climate, topic_name, MqttClimateStat, callback_str);
+    }
+    return;  // We are done for now.
+  }
+  // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
+  for (uint8_t i = 0; i < kSendTableSize; i++) {
+    debug(("Checking if " + topic_name + " ends with _" + String(i)).c_str());
+    if (topic_name.endsWith("_" + String(i))) {
+      channel = i;
+      debug("It does!");
+      break;
+    }
+  }
+
+  debug(("Using transmit channel " + String(static_cast<int>(channel)) +
+         " / GPIO " + String(static_cast<int>(gpioTable[channel]))).c_str());
+  // Make a copy of the callback string as strtok destroys it.
+  char* callback_c_str = strdup(callback_str.c_str());
+  debug("MQTT Payload (raw):");
+  debug(callback_c_str);
+
+  // Get the numeric protocol type.
+  int ir_type = strtoul(strtok_r(callback_c_str, ",", &tok_ptr), NULL, 10);
+  char* next = strtok_r(NULL, ",", &tok_ptr);
+  // If there is unparsed string left, try to convert it assuming it's hex.
+  if (next != NULL) {
+    code = getUInt64fromHex(next);
+    next = strtok_r(NULL, ",", &tok_ptr);
+  } else {
+    // We require at least two value in the string. Give up.
+    return;
+  }
+  // If there is still string left, assume it is the bit size.
+  if (next != NULL) {
+    nbits = atoi(next);
+    next = strtok_r(NULL, ",", &tok_ptr);
+  }
+  // If there is still string left, assume it is the repeat count.
+  if (next != NULL)
+    repeat = atoi(next);
+
+  free(callback_c_str);
+
+  // send received MQTT value by IR signal
+  lastSendSucceeded = sendIRCode(
+      IrSendTable[channel], ir_type, code,
+      callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
+      nbits, repeat);
+}
+
+// Callback function, when we receive an MQTT value on the topics
+// subscribed this function is called
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  // In order to republish this payload, a copy must be made
+  // as the orignal payload buffer will be overwritten whilst
+  // constructing the PUBLISH packet.
+  // Allocate the correct amount of memory for the payload copy
+  byte* payload_copy = reinterpret_cast<byte*>(malloc(length + 1));
+  // Copy the payload to the new buffer
+  memcpy(payload_copy, payload, length);
+
+  // Conversion to a printable string
+  payload_copy[length] = '\0';
+  String callback_string = String(reinterpret_cast<char*>(payload_copy));
+  String topic_name = String(reinterpret_cast<char*>(topic));
+
+  // launch the function to treat received data
+  receivingMQTT(topic_name, callback_string);
+
+  // Free the memory
+  free(payload_copy);
+}
+
+void sendMQTTDiscovery(const char *topic) {
+  if (mqtt_client.publish(
+      topic, String(
+      "{"
+      "\"~\":\"" + MqttClimate + "\","
+      "\"name\":\"" + MqttHAName + "\","
+      "\"pow_cmd_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_CMND "/" KEY_POWER "\","
+      "\"mode_cmd_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_CMND "/" KEY_MODE "\","
+      "\"mode_stat_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_STAT "/" KEY_MODE
+          "\","
+      "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
+      "\"temp_cmd_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_CMND "/" KEY_TEMP "\","
+      "\"temp_stat_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_STAT "/" KEY_TEMP
+          "\","
+      "\"min_temp\":\"16\","
+      "\"max_temp\":\"30\","
+      "\"temp_step\":\"1\","
+      "\"fan_mode_cmd_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_CMND "/"
+          KEY_FANSPEED "\","
+      "\"fan_mode_stat_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_STAT "/"
+          KEY_FANSPEED "\","
+      "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
+      "\"swing_mode_cmd_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_CMND "/"
+          KEY_SWINGV "\","
+      "\"swing_mode_stat_t\":\"~" MQTT_CLIMATE "/" MQTT_CLIMATE_STAT "/"
+          KEY_SWINGV "\","
+      "\"swing_modes\":["
+        "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
+      "]"
+      "}").c_str())) {
+    mqttLog("MQTT climate discovery successful sent.");
+    hasDiscoveryBeenSent = true;
+    lastDiscovery.reset();
+    mqttSentCounter++;
+  } else {
+    mqttLog("MQTT climate discovery FAILED to send.");
+  }
 }
 #endif  // MQTT_ENABLE
 
@@ -2244,7 +2344,7 @@ void loop(void) {
           // messages on the MQTT broker.
           mqttLog("Started listening for previous state.");
           climate_prev = climate;  // Make a copy so we can compare afterwards.
-          subscribing(MQTTclimateprefix MQTTstatprefix MQTTwildcard);
+          subscribing(MqttClimateStat + '+');
           statListenTime.reset();
         }
       }
@@ -2254,11 +2354,11 @@ void loop(void) {
     lastConnectedTime = now;
     mqtt_client.loop();
     if (lockMqttBroadcast && statListenTime.elapsed() > kStatListenPeriodMs) {
-      unsubscribing(MQTTclimateprefix MQTTstatprefix MQTTwildcard);
+      unsubscribing(MqttClimateStat + '+');
       mqttLog("Finished listening for previous state.");
       if (cmpClimate(climate, climate_prev)) {  // Something changed.
         mqttLog("The state was recovered from MQTT broker. Updating.");
-        sendClimate(climate_prev, climate, MQTTclimateprefix MQTTstatprefix,
+        sendClimate(climate_prev, climate, MqttClimateStat,
                     true, false, false);
       }
       lockMqttBroadcast = false;  // Release the lock so we can broadcast again.
@@ -2297,11 +2397,12 @@ void loop(void) {
     if (!hasACState(capture.decode_type))
       lastIrReceived += "," + String(capture.bits);
 #if MQTT_ENABLE
-    mqtt_client.publish(MQTTrecv, lastIrReceived.c_str());
+    mqtt_client.publish(MqttRecv.c_str(), lastIrReceived.c_str());
     mqttSentCounter++;
 #endif  // MQTT_ENABLE
     irRecvCounter++;
-    debug("Incoming IR message sent to MQTT: " + lastIrReceived);
+    debug("Incoming IR message sent to MQTT:");
+    debug(lastIrReceived.c_str());
   }
 #endif  // IR_RX
   delay(100);
@@ -2639,7 +2740,8 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
   } else {
     debug("Failed to send IR Message:");
   }
-  debug("Type: " + String(ir_type));
+  debug("Type:");
+  debug(String(ir_type).c_str());
   // For "long" codes we basically repeat what we got.
   if (hasACState((decode_type_t) ir_type) ||
       ir_type == PRONTO ||
@@ -2651,164 +2753,31 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 #if MQTT_ENABLE
     if (success) {
       if (ir_type == PRONTO && repeat > 0)
-        mqtt_client.publish(MQTTack, (String(ir_type) + ",R" +
-                                      String(repeat) + "," +
-                                      String(code_str)).c_str());
+        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + ",R" +
+                                              String(repeat) + "," +
+                                              String(code_str)).c_str());
       else
-        mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                      String(code_str)).c_str());
+        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + "," +
+                                              String(code_str)).c_str());
       mqttSentCounter++;
     }
 #endif  // MQTT_ENABLE
   } else {  // For "short" codes, we break it down a bit more before we report.
-    debug("Code: 0x" + uint64ToString(code, 16));
-    debug("Bits: " + String(bits));
-    debug("Repeats: " + String(repeat));
+    debug(("Code: 0x" + uint64ToString(code, 16)).c_str());
+    debug(("Bits: " + String(bits)).c_str());
+    debug(("Repeats: " + String(repeat)).c_str());
 #if MQTT_ENABLE
     if (success) {
-      mqtt_client.publish(MQTTack, (String(ir_type) + "," +
-                                    uint64ToString(code, 16)
-                                    + "," + String(bits) + "," +
-                                    String(repeat)).c_str());
+      mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + "," +
+                                            uint64ToString(code, 16)
+                                            + "," + String(bits) + "," +
+                                            String(repeat)).c_str());
       mqttSentCounter++;
     }
 #endif  // MQTT_ENABLE
   }
   return success;
 }
-
-#if MQTT_ENABLE
-void receivingMQTT(String const topic_name, String const callback_str) {
-  char* tok_ptr;
-  uint64_t code = 0;
-  uint16_t nbits = 0;
-  uint16_t repeat = 0;
-  uint8_t channel = 0;  // Default to the first channel. e.g. "*_0"
-
-  debug("Receiving data by MQTT topic: " + topic_name + " with payload: " +
-        callback_str);
-  // Save the message as the last command seen (global).
-  lastMqttCmdTopic = topic_name;
-  lastMqttCmd = callback_str;
-  lastMqttCmdTime = millis();
-  mqttRecvCounter++;
-
-  if (topic_name.startsWith(MQTTclimateprefix)) {
-    if (topic_name.startsWith(MQTTclimateprefix MQTTcmndprefix)) {
-      debug("It's a climate command topic");
-      commonAcState_t updated = updateClimate(
-          climate, topic_name, MQTTclimateprefix MQTTcmndprefix, callback_str);
-      sendClimate(climate, updated, MQTTclimateprefix MQTTstatprefix,
-                  true, false, false);
-      climate = updated;
-    } else if (topic_name.startsWith(MQTTclimateprefix MQTTstatprefix)) {
-      debug("It's a climate state topic. Update internal state and DON'T send");
-      climate = updateClimate(
-          climate, topic_name, MQTTclimateprefix MQTTstatprefix, callback_str);
-    }
-    return;  // We are done for now.
-  }
-  // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
-  for (uint8_t i = 0; i < kSendTableSize; i++) {
-    debug("Checking if " + topic_name + " ends with _" + String(i));
-    if (topic_name.endsWith("_" + String(i))) {
-      channel = i;
-      debug("It does!");
-      break;
-    }
-  }
-
-  debug("Using transmit channel " + String(static_cast<int>(channel)) +
-        " / GPIO " + String(static_cast<int>(gpioTable[channel])));
-  // Make a copy of the callback string as strtok destroys it.
-  char* callback_c_str = strdup(callback_str.c_str());
-  debug("MQTT Payload (raw): " + callback_str);
-
-  // Get the numeric protocol type.
-  int ir_type = strtoul(strtok_r(callback_c_str, ",", &tok_ptr), NULL, 10);
-  char* next = strtok_r(NULL, ",", &tok_ptr);
-  // If there is unparsed string left, try to convert it assuming it's hex.
-  if (next != NULL) {
-    code = getUInt64fromHex(next);
-    next = strtok_r(NULL, ",", &tok_ptr);
-  } else {
-    // We require at least two value in the string. Give up.
-    return;
-  }
-  // If there is still string left, assume it is the bit size.
-  if (next != NULL) {
-    nbits = atoi(next);
-    next = strtok_r(NULL, ",", &tok_ptr);
-  }
-  // If there is still string left, assume it is the repeat count.
-  if (next != NULL)
-    repeat = atoi(next);
-
-  free(callback_c_str);
-
-  // send received MQTT value by IR signal
-  lastSendSucceeded = sendIRCode(
-      IrSendTable[channel], ir_type, code,
-      callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
-      nbits, repeat);
-}
-
-// Callback function, when we receive an MQTT value on the topics
-// subscribed this function is called
-void callback(char* topic, byte* payload, unsigned int length) {
-  // In order to republish this payload, a copy must be made
-  // as the orignal payload buffer will be overwritten whilst
-  // constructing the PUBLISH packet.
-  // Allocate the correct amount of memory for the payload copy
-  byte* payload_copy = reinterpret_cast<byte*>(malloc(length + 1));
-  // Copy the payload to the new buffer
-  memcpy(payload_copy, payload, length);
-
-  // Conversion to a printable string
-  payload_copy[length] = '\0';
-  String callback_string = String(reinterpret_cast<char*>(payload_copy));
-  String topic_name = String(reinterpret_cast<char*>(topic));
-
-  // launch the function to treat received data
-  receivingMQTT(topic_name, callback_string);
-
-  // Free the memory
-  free(payload_copy);
-}
-
-void sendMQTTDiscovery(const char *topic) {
-  if (mqtt_client.publish(
-      topic,
-      "{"
-      "\"~\":\"" MQTTclimateprefix "\","
-      "\"name\":\"" MQTTHomeAssistantName "\","
-      "\"pow_cmd_t\":\"~" MQTTcmndprefix KEY_POWER "\","
-      "\"mode_cmd_t\":\"~" MQTTcmndprefix KEY_MODE "\","
-      "\"mode_stat_t\":\"~" MQTTstatprefix KEY_MODE "\","
-      "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
-      "\"temp_cmd_t\":\"~" MQTTcmndprefix KEY_TEMP "\","
-      "\"temp_stat_t\":\"~" MQTTstatprefix KEY_TEMP "\","
-      "\"min_temp\":\"16\","
-      "\"max_temp\":\"30\","
-      "\"temp_step\":\"1\","
-      "\"fan_mode_cmd_t\":\"~" MQTTcmndprefix KEY_FANSPEED "\","
-      "\"fan_mode_stat_t\":\"~" MQTTstatprefix KEY_FANSPEED "\","
-      "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
-      "\"swing_mode_cmd_t\":\"~" MQTTcmndprefix KEY_SWINGV "\","
-      "\"swing_mode_stat_t\":\"~" MQTTstatprefix KEY_SWINGV "\","
-      "\"swing_modes\":["
-        "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\""
-      "]"
-      "}")) {
-    mqttLog("MQTT climate discovery successful sent.");
-    hasDiscoveryBeenSent = true;
-    lastDiscovery.reset();
-    mqttSentCounter++;
-  } else {
-    mqttLog("MQTT climate discovery FAILED to send.");
-  }
-}
-#endif  // MQTT_ENABLE
 
 bool sendInt(const String topic, const int32_t num, const bool retain) {
 #if MQTT_ENABLE
@@ -2996,17 +2965,3 @@ bool sendClimate(const commonAcState_t prev, const commonAcState_t next,
   }
   return success;
 }
-
-#if MQTT_ENABLE
-void doBroadcast(TimerMs *timer, const uint32_t interval,
-                 const commonAcState_t state, const bool retain,
-                 const bool force) {
-  if (force || (!lockMqttBroadcast && timer->elapsed() > interval)) {
-    debug("Sending MQTT stat update broadcast.");
-    sendClimate(state, state, MQTTclimateprefix MQTTstatprefix,
-                retain, true, false);
-    timer->reset();  // It's been sent, so reset the timer.
-    hasBroadcastBeenSent = true;
-  }
-}
-#endif  // MQTT_ENABLE
