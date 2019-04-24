@@ -1005,9 +1005,8 @@ void handleAirCon(void) {
       "</table>"
       "<input type='submit' value='Update & Send'>"
       "</form>";
-
   // Display the current settings.
-  html += "</body></html>";
+  html += F("</body></html>");
   server.send(200, "text/html", html);
 }
 
@@ -1050,30 +1049,32 @@ void handleAdmin(void) {
     "<center><h1>Administration</h1></center>");
   html += htmlMenu();
   html += F(
-    "<h3>Special commands</h3>");
+    "<h3>Special commands</h3>"
 #if MQTT_ENABLE
-  html += F(
       "<button type='button' "
         "onclick='window.location=\"/send_discovery\"'>"
         "Send MQTT Discovery"
       "</button> "
-      "Send a Climate MQTT discovery message to Home Assistant.<br><br>");
+      "Send a Climate MQTT discovery message to Home Assistant.<br><br>"
 #endif  // MQTT_ENABLE
-  html += F(
       "<button type='button' "
         "onclick='window.location=\"/quitquitquit\"'>"
         "Reboot"
-      "</button> Simple reboot of the ESP8266. (No changes)<br><br>"
+      "</button> A simple reboot of the ESP8266. "
+          "<small>ie. No changes</small><br><br>"
       "<button type='button' "
         "onclick='window.location=\"/reset\"'>"
-        "Wipe WiFi Settings"
+        "Wipe Settings"
       "</button> <mark>Warning:</mark> "
-      "Resets WiFi back to original settings. ie. Back to AP mode.<br><br>");
+      "Resets the device back to original settings. "
+          "<small>ie. Goes back to AP/Setup mode.</small><br>");
 #if FIRMWARE_OTA
   html += F("<hr><h3>Update firmware</h3><p>"
           "<b><mark>Warning:</mark></b><br> ");
   if (!strlen(HttpPassword))  // Deny if password not set
-    html += F("<i>OTA firmware is disabled until you set a password.</i><br>");
+    html += F("<i>OTA firmware is disabled until you set a password. "
+              "You will need to <a href='/reset'>wipe & reset</a> to set one."
+              "</i><br><br>");
   else  // default password has been changed, so allow it.
     html += F(
         "<i>Updating your firmware may screw up your access to the device. "
@@ -1084,7 +1085,7 @@ void handleAdmin(void) {
           "<input type='submit' value='Update'>"
         "</form>");
 #endif  // FIRMWARE_OTA
-  html += "</body></html>";
+  html += F("</body></html>");
   server.send(200, "text/html", html);
 }
 
@@ -1797,18 +1798,18 @@ void setup_wifi(void) {
       kHostnameKey, kHostnameKey, Hostname, kHostnameLength);
   wifiManager.addParameter(&custom_hostname);
   WiFiManagerParameter custom_authentication_text(
-      "<br><center>Web/OTA authentication</center>");
+      "<br><br><center>Web/OTA authentication</center>");
   wifiManager.addParameter(&custom_authentication_text);
   WiFiManagerParameter custom_http_username(
       kHttpUserKey, "username", HttpUsername, kUsernameLength);
   wifiManager.addParameter(&custom_http_username);
   WiFiManagerParameter custom_http_password(
-      kHttpPassKey, "password", HttpPassword, kPasswordLength,
+      kHttpPassKey, "password (No OTA if blank)", HttpPassword, kPasswordLength,
       " type='password'");
   wifiManager.addParameter(&custom_http_password);
 #if MQTT_ENABLE
   WiFiManagerParameter custom_mqtt_text(
-      "<br><center>MQTT Broker details</center>");
+      "<br><br><center>MQTT Broker details</center>");
   wifiManager.addParameter(&custom_mqtt_text);
   WiFiManagerParameter custom_mqtt_server(
       kMqttServerKey, "mqtt server", MqttServer, kHostnameLength);
@@ -1825,7 +1826,7 @@ void setup_wifi(void) {
       " type='password'");
   wifiManager.addParameter(&custom_mqtt_pass);
   WiFiManagerParameter custom_prefix_text(
-      "<br><center>MQTT Prefix</center>");
+      "<br><br><center>MQTT Prefix</center>");
   wifiManager.addParameter(&custom_prefix_text);
   WiFiManagerParameter custom_mqtt_prefix(
       kMqttPrefixKey, "Leave empty to use Hostname", MqttPrefix,
