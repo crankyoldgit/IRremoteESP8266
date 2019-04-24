@@ -15,6 +15,7 @@ install:
   - ln -s $PWD /usr/local/share/arduino/libraries/
   - git clone https://github.com/tzapu/WiFiManager.git /usr/local/share/arduino/libraries/WiFiManager
   - git clone https://github.com/knolleary/pubsubclient.git /usr/local/share/arduino/libraries/PubSubClient
+  - git clone https://github.com/bblanchon/ArduinoJson.git --branch 5.x /usr/local/share/arduino/libraries/ArduinoJson
   - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
   - arduino --install-boards esp8266:esp8266
   - arduino --board $BD --save-prefs
