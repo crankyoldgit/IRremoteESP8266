@@ -249,6 +249,7 @@
 #include <PubSubClient.h>
 #endif  // MQTT_ENABLE
 #include <algorithm>  // NOLINT(build/include)
+#include <memory>
 #include <string>
 
 // Globals
