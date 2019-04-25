@@ -182,6 +182,57 @@
  *       via "27C, cool, fan low" & "27C, heat, fan low" depending on the order
  *       of arrival & processing of the MQTT commands.
  *
+ * ### Home Assistant (HA) MQTT climate integration
+ * After you have set the Protocol (required) & Model (if needed) and any of
+ * the other misc aircon settings you desire, you can then add the following to
+ * your Home Assistant configuration, and it should allow you to
+ * control most of the important settings. Google Home/Assistant (via HA)
+ * can also control the device, but you will need to configure Home Assistant
+ * via it's documentation for that. It has even more limited control.
+ * It's far beyond the scope of these instructions to guide you through setting
+ * up HA and Google Home integration. See https://www.home-assistant.io/
+ *
+ * In HA's configuration.yaml, add:
+ *
+ * climate:
+ *   platform: mqtt
+ *   name: Living Room Aircon
+ *   modes:
+ *     - "off"
+ *     - "auto"
+ *     - "cool"
+ *     - "heat"
+ *     - "dry"
+ *     - "fan_only"
+ *   fan_modes:
+ *     - "auto"
+ *     - "min"
+ *     - "low"
+ *     - "medium"
+ *     - "high"
+ *     - "max"
+ *   swing_modes:
+ *     - "off"
+ *     - "auto"
+ *     - "highest"
+ *     - "high"
+ *     - "middle"
+ *     - "low"
+ *     - "lowest"
+ *   power_command_topic: "ir_server/ac/cmnd/power"
+ *   mode_command_topic: "ir_server/ac/cmnd/mode"
+ *   mode_state_topic: "ir_server/ac/stat/mode"
+ *   temperature_command_topic: "ir_server/ac/cmnd/temp"
+ *   temperature_state_topic: "ir_server/ac/stat/temp"
+ *   fan_mode_command_topic: "ir_server/ac/cmnd/fanspeed"
+ *   fan_mode_state_topic: "ir_server/ac/stat/fanspeed"
+ *   swing_mode_command_topic: "ir_server/ac/cmnd/swingv"
+ *   swing_mode_state_topic: "ir_server/ac/stat/swingv"
+ *   min_temp: 16
+ *   max_temp: 32
+ *   temp_step: 1
+ *   retain: false
+ *
  * ### via HTTP:
  *   Use the "http://<your_esp8266's_ip_address>/aircon/set" URL and pass on
  *   the arguments as needed to control your device. See the `KEY_*` #defines
