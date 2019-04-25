@@ -217,6 +217,73 @@ decode_type_t strToDecodeType(const char *str) {
     return decode_type_t::UNKNOWN;
 }
 
+// Escape any special HTML (unsafe) characters in a string. e.g. anti-XSS.
+// Args:
+//   unescaped: A string containing text to make HTML safe.
+// Returns:
+//   A string that is HTML safe.
+#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
+String htmlEscape(const String unescaped) {
+  String result = "";
+#else
+std::string htmlEscape(const std::string unescaped) {
+  std::string result = "";
+#endif
+  uint16_t ulen = unescaped.length();
+  result.reserve(ulen);  // The result will be at least the size of input.
+  for (size_t i = 0; i < ulen; i++) {
+    char c = unescaped[i];
+    switch (c) {
+      // ';!-"<>=&#{}() are all unsafe.
+      case '\'':
+        result += F("&apos;");
+        break;
+      case ';':
+        result += F("&semi;");
+        break;
+      case '!':
+        result += F("&excl;");
+        break;
+      case '-':
+        result += F("&dash;");
+        break;
+      case '\"':
+        result += F("&quot;");
+        break;
+      case '<':
+        result += F("&lt;");
+        break;
+      case '>':
+        result += F("&gt;");
+        break;
+      case '=':
+        result += F("&#equals;");
+        break;
+      case '&':
+        result += F("&amp;");
+        break;
+      case '#':
+        result += F("&num;");
+        break;
+      case '{':
+        result += F("&lcub;");
+        break;
+      case '}':
+        result += F("&rcub;");
+        break;
+      case '(':
+        result += F("&lpar;");
+        break;
+      case ')':
+        result += F("&rpar;");
+        break;
+      default:
+        result += c;
+    }
+  }
+  return result;
+}
+
 // Convert a protocol type (enum etc) to a human readable string.
 // Args:
 //   protocol: Nr. (enum) of the protocol.
