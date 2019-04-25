@@ -24,6 +24,7 @@ String resultToSourceCode(const decode_results *results);
 String resultToTimingInfo(const decode_results *results);
 String resultToHumanReadableBasic(const decode_results *results);
 String resultToHexidecimal(const decode_results *result);
+String htmlEscape(const String unescaped);
 #else  // ARDUINO
 std::string uint64ToString(uint64_t input, uint8_t base = 10);
 std::string typeToString(const decode_type_t protocol,
@@ -32,6 +33,7 @@ std::string resultToSourceCode(const decode_results *results);
 std::string resultToTimingInfo(const decode_results *results);
 std::string resultToHumanReadableBasic(const decode_results *results);
 std::string resultToHexidecimal(const decode_results *result);
+std::string htmlEscape(const std::string unescaped);
 #endif  // ARDUINO
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results *results);

@@ -487,15 +487,6 @@ String listOfSendGpios(void) {
   return result;
 }
 
-// Quick and dirty check for any unsafe chars in a string
-// that may cause HTML shenanigans. e.g. An XSS.
-bool hasUnsafeHTMLChars(String input) {
-  static char unsafe[] = "';!-\"<>=&{}()";
-  for (uint8_t i = 0; unsafe[i]; i++)
-    if (input.indexOf(unsafe[i]) != -1) return true;
-  return false;
-}
-
 String htmlMenu(void) {
   return F(
       "<center>"
@@ -1154,12 +1145,11 @@ void handleInfo(void) {
     "Log topic: " + MqttLog + "<br>"
     "LWT topic: " + MqttLwt + "<br>"
     "QoS: " + String(QOS) + "<br>"
-    "Last MQTT command seen: (topic) '" + lastMqttCmdTopic + "' (payload) '" +
-    // lastMqttCmd is unescaped untrusted input.
+    // lastMqttCmd* is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
-    (hasUnsafeHTMLChars(lastMqttCmd) ?
-        "<i>Contains unsafe HTML characters</i>" : lastMqttCmd) +
-    "' <i>(" + timeSince(lastMqttCmdTime) + ")</i><br>"
+    "Last MQTT command seen: (topic) '" + htmlEscape(lastMqttCmdTopic) +
+         "' (payload) '" + htmlEscape(lastMqttCmd) + "' <i>(" +
+         timeSince(lastMqttCmdTime) + ")</i><br>"
     "Total published: " + String(mqttSentCounter) + "<br>"
     "Total received: " + String(mqttRecvCounter) + "<br>"
     "</p>"
