@@ -27,7 +27,7 @@
 // Constants
 // Ref: https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.h
 const uint16_t kGreeHdrMark = 9000;
-const uint16_t kGreeHdrSpace = 4000;
+const uint16_t kGreeHdrSpace = 4500;  // See #684 and real example in unit tests
 const uint16_t kGreeBitMark = 620;
 const uint16_t kGreeOneSpace = 1600;
 const uint16_t kGreeZeroSpace = 540;
