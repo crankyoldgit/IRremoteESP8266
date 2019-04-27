@@ -59,7 +59,7 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
     // Footer #1
     sendGeneric(0, 0,  // No Header
                 kGreeBitMark, kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
-                kGreeBitMark, kGreeMsgSpace, 0b010, 3, 38, true, 0, false);
+                kGreeBitMark, kGreeMsgSpace, 0b010, 3, 38, false, 0, 50);
 
     // Block #2
     sendGeneric(0, 0,  // No Header for Block #2
