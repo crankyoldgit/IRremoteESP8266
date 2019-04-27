@@ -32,6 +32,7 @@ TEST(TestSendPanasonic64, SendDataOnly) {
   irsend.reset();
   irsend.sendPanasonic64(0x0);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s432m432s432m432s432"
@@ -45,6 +46,7 @@ TEST(TestSendPanasonic64, SendDataOnly) {
   irsend.reset();
   irsend.sendPanasonic64(0x40040190ED7C);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s1296m432s432m432s432"
@@ -58,6 +60,7 @@ TEST(TestSendPanasonic64, SendDataOnly) {
   irsend.reset();
   irsend.sendPanasonic64(0xFFFFFFFFFFFF);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296"
       "m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296m432s1296"
@@ -77,6 +80,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
   irsend.reset();
   irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 0);  // 0 repeats.
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s1296m432s432m432s432"
@@ -90,6 +94,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
   irsend.reset();
   irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s1296m432s432m432s432"
@@ -110,6 +115,7 @@ TEST(TestSendPanasonic64, SendWithRepeats) {
 
   irsend.sendPanasonic64(0x40040190ED7C, kPanasonicBits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s1296m432s432m432s432"
@@ -145,6 +151,7 @@ TEST(TestSendPanasonic64, SendUnusualSize) {
   irsend.reset();
   irsend.sendPanasonic64(0x0, 8);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s150768",
@@ -153,6 +160,7 @@ TEST(TestSendPanasonic64, SendUnusualSize) {
   irsend.reset();
   irsend.sendPanasonic64(0x1234567890ABCDEF, 64);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s432m432s1296m432s432m432s432m432s1296m432s432"
       "m432s432m432s432m432s1296m432s1296m432s432m432s1296m432s432m432s432"
@@ -483,6 +491,7 @@ TEST(TestSendPanasonicAC, SendDataOnly) {
       0x00, 0x06, 0x60, 0x00, 0x00, 0x80, 0x00, 0x06, 0x83};
   irsend.sendPanasonicAC(state);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s1296m432s432m432s432m432s432m432s432m432s432m432s432"
       "m432s432m432s432m432s432m432s432m432s432m432s1296m432s432m432s432"

@@ -18,6 +18,7 @@ TEST(TestSendElectraAC, SendDataOnly) {
 
   irsend.sendElectraAC(data);
   EXPECT_EQ(
+      "f38000d50"
       "m9166s4470"
       "m646s1647m646s1647m646s547m646s547m646s547m646s547m646s1647m646s1647"
       "m646s1647m646s1647m646s1647m646s547m646s547m646s547m646s547m646s1647"

@@ -17,6 +17,7 @@ TEST(TestSendMitsubishi, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishi(0xE242);
   EXPECT_EQ(
+      "f33000d50"
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080"
@@ -28,6 +29,7 @@ TEST(TestSendMitsubishi, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishi(0x0);
   EXPECT_EQ(
+      "f33000d50"
       "m300s900m300s900m300s900m300s900m300s900m300s900m300s900m300s900"
       "m300s900m300s900m300s900m300s900m300s900m300s900m300s900m300s900"
       "m300s34080"
@@ -39,6 +41,7 @@ TEST(TestSendMitsubishi, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishi(0x4321);
   EXPECT_EQ(
+      "f33000d50"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s2100"
       "m300s900m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100"
       "m300s28080"
@@ -56,6 +59,7 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
   irsend.reset();
   irsend.sendMitsubishi(0xE242, kMitsubishiBits, 0);  // 0 repeat.
   EXPECT_EQ(
+      "f33000d50"
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080",
@@ -64,6 +68,7 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
   irsend.reset();
   irsend.sendMitsubishi(0xE242, kMitsubishiBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f33000d50"
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080"
@@ -73,6 +78,7 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
       irsend.outputStr());
   irsend.sendMitsubishi(0xE242, kMitsubishiBits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f33000d50"
       "m300s2100m300s2100m300s2100m300s900m300s900m300s900m300s2100m300s900"
       "m300s900m300s2100m300s900m300s900m300s900m300s900m300s2100m300s900"
       "m300s28080"
@@ -93,6 +99,7 @@ TEST(TestSendMitsubishi, SendUnusualSize) {
   irsend.reset();
   irsend.sendMitsubishi(0x0, 8);
   EXPECT_EQ(
+      "f33000d50"
       "m300s900m300s900m300s900m300s900m300s900m300s900m300s900m300s900"
       "m300s43680"
       "m300s900m300s900m300s900m300s900m300s900m300s900m300s900m300s900"
@@ -102,6 +109,7 @@ TEST(TestSendMitsubishi, SendUnusualSize) {
   irsend.reset();
   irsend.sendMitsubishi(0x1234567890ABCDEF, 64);
   EXPECT_EQ(
+      "f33000d50"
       "m300s900m300s900m300s900m300s2100m300s900m300s900m300s2100m300s900"
       "m300s900m300s900m300s2100m300s2100m300s900m300s2100m300s900m300s900"
       "m300s900m300s2100m300s900m300s2100m300s900m300s2100m300s2100m300s900"
@@ -305,6 +313,7 @@ TEST(TestSendMitsubishiAC, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishiAC(mitsub_code);
   EXPECT_EQ(
+      "f38000d50"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
       "m450s1300m450s1300m450s420m450s1300m450s420m450s420m450s1300m450s1300"
@@ -360,6 +369,7 @@ TEST(TestSendMitsubishiAC, SendWithRepeats) {
 
   irsend.sendMitsubishiAC(mitsub_code, kMitsubishiACStateLength, 0);
   EXPECT_EQ(
+      "f38000d50"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
       "m450s1300m450s1300m450s420m450s1300m450s420m450s420m450s1300m450s1300"
@@ -385,6 +395,7 @@ TEST(TestSendMitsubishiAC, SendWithRepeats) {
   irsend.reset();
   irsend.sendMitsubishiAC(mitsub_code, kMitsubishiACStateLength, 2);
   EXPECT_EQ(
+      "f38000d50"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
       "m450s1300m450s1300m450s420m450s1300m450s420m450s420m450s1300m450s1300"
@@ -466,6 +477,7 @@ TEST(TestSendMitsubishiAC, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendMitsubishiAC(mitsub_long_code, 19);
   ASSERT_EQ(
+      "f38000d50"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
       "m450s1300m450s1300m450s420m450s1300m450s420m450s420m450s1300m450s1300"
@@ -665,6 +677,7 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   irsend.reset();
   irsend.sendMitsubishiAC(mitsub.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
       "m450s1300m450s1300m450s420m450s1300m450s420m450s420m450s1300m450s1300"
@@ -984,6 +997,7 @@ TEST(TestSendMitsubishi2, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishi2(0xF82);
   EXPECT_EQ(
+      "f33000d50"
       "m8400s4200"
       "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
       "m560s4200"
@@ -999,6 +1013,7 @@ TEST(TestSendMitsubishi2, SendDataOnly) {
   irsend.reset();
   irsend.sendMitsubishi2(0x0);
   EXPECT_EQ(
+      "f33000d50"
       "m8400s4200"
       "m560s520m560s520m560s520m560s520m560s520m560s520m560s520m560s520"
       "m560s4200"
@@ -1020,6 +1035,7 @@ TEST(TestSendMitsubishi2, Repeats) {
   irsend.reset();
   irsend.sendMitsubishi2(0xF82, kMitsubishiBits, 0);
   EXPECT_EQ(
+      "f33000d50"
       "m8400s4200"
       "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
       "m560s4200"
@@ -1030,6 +1046,7 @@ TEST(TestSendMitsubishi2, Repeats) {
   irsend.reset();
   irsend.sendMitsubishi2(0xF82, kMitsubishiBits, 2);
   EXPECT_EQ(
+      "f33000d50"
       "m8400s4200"
       "m560s520m560s520m560s520m560s520m560s1560m560s1560m560s1560m560s1560"
       "m560s4200"

@@ -15,6 +15,7 @@ TEST(TestSendMidea, SendDataOnly) {
   irsend.reset();
   irsend.sendMidea(0x0);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
@@ -36,6 +37,7 @@ TEST(TestSendMidea, SendDataOnly) {
   irsend.reset();
   irsend.sendMidea(0x55AA55AA55AA);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -57,6 +59,7 @@ TEST(TestSendMidea, SendDataOnly) {
   irsend.reset();
   irsend.sendMidea(0xFFFFFFFFFFFF);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
@@ -84,6 +87,7 @@ TEST(TestSendMidea, SendWithRepeats) {
   irsend.reset();
   irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -119,6 +123,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       irsend.outputStr());
   irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -178,6 +183,7 @@ TEST(TestSendMidea, SendUnusualSize) {
   irsend.reset();
   irsend.sendMidea(0x0, 8);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s5600"
@@ -189,6 +195,7 @@ TEST(TestSendMidea, SendUnusualSize) {
   irsend.reset();
   irsend.sendMidea(0x1234567890ABCDEF, 64);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s1680m560s560"
       "m560s560m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s560"

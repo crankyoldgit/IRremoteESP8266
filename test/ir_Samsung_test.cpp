@@ -24,6 +24,7 @@ TEST(TestSendSamsung, SendDataOnly) {
   irsend.reset();
   irsend.sendSAMSUNG(0xE0E09966);  // Samsung TV Power On.
   EXPECT_EQ(
+      "f38000d33"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560"
       "m560s560m560s1680m560s1680m560s1680m560s560m560s560m560s560"
@@ -43,6 +44,7 @@ TEST(TestSendSamsung, SendWithRepeats) {
   irsend.reset();
   irsend.sendSAMSUNG(0xE0E09966, kSamsungBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d33"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560"
       "m560s560m560s1680m560s1680m560s1680m560s560m560s560m560s560"
@@ -58,6 +60,7 @@ TEST(TestSendSamsung, SendWithRepeats) {
       irsend.outputStr());
   irsend.sendSAMSUNG(0xE0E09966, kSamsungBits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f38000d33"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560"
       "m560s560m560s1680m560s1680m560s1680m560s560m560s560m560s560"
@@ -305,6 +308,7 @@ TEST(TestSendSamsungAC, SendDataOnly) {
       0x01, 0x02, 0xAF, 0x71, 0x00, 0x15, 0xF0};
   irsend.sendSamsungAC(data);
   EXPECT_EQ(
+      "f38000d50"
       "m690s17844"
       "m3086s8864"
       "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
@@ -338,6 +342,7 @@ TEST(TestSendSamsungAC, SendExtendedData) {
       0x01, 0x02, 0xFF, 0x71, 0x80, 0x11, 0xC0};
   irsend.sendSamsungAC(data, kSamsungAcExtendedStateLength);
   EXPECT_EQ(
+      "f38000d50"
       "m690s17844"
       "m3086s8864"
       "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
@@ -997,6 +1002,7 @@ TEST(TestSendSamsung36, SendDataOnly) {
   irsend.reset();
   irsend.sendSamsung36(0);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
@@ -1008,6 +1014,7 @@ TEST(TestSendSamsung36, SendDataOnly) {
       irsend.outputStr());
   irsend.sendSamsung36(0x400E00FF);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
@@ -1034,6 +1041,7 @@ TEST(TestSendSamsung36, SendWithRepeats) {
   irsend.reset();
   irsend.sendSamsung36(0x400E00FF, kSamsung36Bits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
@@ -1053,6 +1061,7 @@ TEST(TestSendSamsung36, SendWithRepeats) {
       irsend.outputStr());
       irsend.sendSamsung36(0x400E00FF, kSamsung36Bits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"

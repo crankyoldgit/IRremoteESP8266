@@ -18,6 +18,7 @@ TEST(TestSendToshibaAC, SendDataOnly) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba_code);
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -54,6 +55,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
 
   irsend.sendToshibaAC(toshiba_code, kToshibaACStateLength, 0);
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -70,6 +72,7 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba_code, kToshibaACStateLength, 2);
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -122,6 +125,7 @@ TEST(TestSendToshibaAC, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba_long_code, kToshibaACStateLength + 1);
   ASSERT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s472m543s1623"
       "m543s472m543s472m543s472m543s472m543s472m543s472m543s1623m543s472"
@@ -380,6 +384,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -415,6 +420,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"
@@ -450,6 +456,7 @@ TEST(TestToshibaACClass, MessageConstuction) {
   irsend.reset();
   irsend.sendToshibaAC(toshiba.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m4400s4300"
       "m543s1623m543s1623m543s1623m543s1623m543s472m543s472m543s1623m543s472"
       "m543s472m543s472m543s472m543s472m543s1623m543s1623m543s472m543s1623"

@@ -397,8 +397,12 @@ class IRsend {
   uint8_t outputOff;
   VIRTUAL void ledOff();
   VIRTUAL void ledOn();
+#ifndef UNIT_TEST
 
  private:
+#else
+  uint32_t _freq_unittest;
+#endif  // UNIT_TEST
   uint16_t onTimePeriod;
   uint16_t offTimePeriod;
   uint16_t IRpin;
