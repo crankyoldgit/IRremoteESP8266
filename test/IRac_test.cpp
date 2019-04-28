@@ -83,8 +83,9 @@ TEST(TestIRac, Daikin) {
   IRac irac(0);
   char expected[] =
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 2, Powerful: Off, "
-      "Quiet: Off, Sensor: Off, Eye: Off, Mold: On, Swing (Horizontal): Off, "
-      "Swing (Vertical): Off, Current Time: 0:00, On Time: Off, Off Time: Off";
+      "Quiet: Off, Sensor: Off, Eye: Off, Mold: On, Comfort: Off, "
+      "Swing (Horizontal): Off, Swing (Vertical): Off, "
+      "Current Time: 0:00, On Time: Off, Off Time: Off";
 
   ac.begin();
   irac.daikin(&ac,
