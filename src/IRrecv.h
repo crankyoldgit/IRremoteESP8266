@@ -273,6 +273,11 @@ class IRrecv {
   bool decodeDaikin2(decode_results *results, uint16_t nbits = kDaikin2Bits,
                      bool strict = true);
 #endif
+#if DECODE_DAIKIN216
+  bool decodeDaikin216(decode_results *results,
+                       const uint16_t nbits = kDaikin216Bits,
+                       const bool strict = true);
+#endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
                        uint16_t nbytes = kToshibaACBits, bool strict = true);

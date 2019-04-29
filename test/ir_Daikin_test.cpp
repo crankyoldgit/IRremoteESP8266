@@ -1494,11 +1494,18 @@ TEST(TestDaikin2Class, KnownConstruction) {
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin2Bits);
 }
 
-TEST(TestUtils, Misc) {
-  ASSERT_EQ("DAIKIN", typeToString(DAIKIN));
-  ASSERT_TRUE(hasACState(DAIKIN));
-  ASSERT_EQ("DAIKIN2", typeToString(DAIKIN2));
-  ASSERT_TRUE(hasACState(DAIKIN2));
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("DAIKIN", typeToString(decode_type_t::DAIKIN));
+  ASSERT_EQ(decode_type_t::DAIKIN, strToDecodeType("DAIKIN"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN));
+
+  ASSERT_EQ("DAIKIN2", typeToString(decode_type_t::DAIKIN2));
+  ASSERT_EQ(decode_type_t::DAIKIN2, strToDecodeType("DAIKIN2"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN2));
+
+  ASSERT_EQ("DAIKIN216", typeToString(decode_type_t::DAIKIN216));
+  ASSERT_EQ(decode_type_t::DAIKIN216, strToDecodeType("DAIKIN216"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN216));
 }
 
 // https://github.com/markszabo/IRremoteESP8266/issues/582#issuecomment-453863879
@@ -1585,4 +1592,80 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/689
+TEST(TestDecodeDaikin216, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  uint16_t rawData[439] = {
+      3402, 1770, 382, 1340, 382, 480, 382, 478, 382, 480, 380, 1342, 382, 478,
+      356, 504, 382, 480, 380, 478, 384, 1342, 380, 480, 380, 1342, 382, 1342,
+      382, 478, 382, 1340, 382, 1340, 384, 1340, 382, 1342, 382, 1340, 380, 480,
+      382, 480, 382, 1296, 426, 480, 380, 480, 382, 480, 380, 480, 382, 480,
+      382, 478, 382, 1342, 382, 1342, 382, 1340, 356, 1368, 382, 478, 382, 480,
+      382, 478, 380, 480, 382, 480, 382, 480, 382, 478, 382, 480, 382, 478, 358,
+      504, 382, 480, 380, 480, 382, 480, 382, 480, 380, 480, 382, 478, 382, 480,
+      382, 478, 382, 480, 354, 506, 354, 506, 380, 480, 382, 480, 382, 480, 382,
+      480, 380, 1342, 382, 480, 382, 480, 382, 478, 382, 478, 382, 478, 384,
+      478, 382, 29652, 3426, 1772, 382, 1340, 382, 480, 380, 478, 382, 480, 382,
+      1342, 382, 480, 382, 480, 382, 478, 356, 506, 382, 1342, 380, 480, 382,
+      1340, 382, 1340, 382, 478, 356, 1366, 382, 1340, 384, 1340, 382, 1340,
+      382, 1342, 382, 478, 382, 478, 382, 1340, 382, 478, 382, 478, 382, 478,
+      382, 480, 382, 480, 384, 478, 358, 504, 382, 478, 382, 480, 382, 478, 382,
+      480, 382, 480, 382, 478, 382, 480, 382, 478, 382, 478, 382, 478, 382, 478,
+      384, 478, 382, 478, 360, 500, 358, 504, 382, 478, 382, 480, 382, 480, 382,
+      478, 382, 478, 382, 1340, 382, 1342, 382, 480, 380, 480, 382, 1342, 382,
+      478, 382, 480, 356, 506, 382, 478, 382, 480, 382, 480, 356, 506, 382, 478,
+      382, 480, 382, 478, 382, 480, 382, 478, 382, 480, 380, 480, 380, 480, 382,
+      1342, 382, 478, 382, 1342, 382, 480, 382, 480, 382, 478, 382, 478, 382,
+      480, 382, 478, 382, 480, 356, 504, 384, 478, 382, 480, 382, 480, 380, 480,
+      382, 478, 382, 480, 382, 480, 382, 478, 356, 504, 384, 478, 380, 480, 382,
+      480, 382, 480, 382, 478, 356, 506, 382, 478, 382, 480, 380, 480, 382, 478,
+      382, 480, 382, 478, 382, 480, 358, 504, 382, 478, 382, 478, 356, 504, 382,
+      478, 382, 480, 382, 478, 382, 478, 382, 478, 382, 480, 380, 480, 382, 480,
+      380, 480, 356, 506, 356, 504, 382, 480, 382, 478, 382, 478, 382, 478, 382,
+      478, 382, 480, 382, 478, 382, 480, 382, 480, 382, 1340, 382, 1342, 382,
+      478, 384, 478, 382, 478, 382, 480, 380, 480, 382, 478, 382, 480, 356, 506,
+      382, 478, 382, 480, 382, 478, 356, 506, 380, 480, 382, 478, 382, 478, 382,
+      478, 382, 480, 382, 480, 380, 480, 382, 1342, 382, 1340, 382, 480, 356,
+      504, 382, 1342, 382};  // UNKNOWN E0E32232
+  uint8_t expectedState[kDaikin216StateLength] = {
+      // 8 bytes
+      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
+      // 19 bytes
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x26, 0x00, 0xA0, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x98};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 439, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN216, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin216Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/689
+TEST(TestDecodeDaikin216, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  uint8_t expectedState[kDaikin216StateLength] = {
+      // 8 bytes
+      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
+      // 19 bytes
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x26, 0x00, 0xA0, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x98};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin216(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN216, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin216Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

@@ -185,6 +185,18 @@ const uint8_t kDaikin2SwingHAuto = 0xBE;
 const uint8_t kDaikin2SwingHSwing = 0xBF;
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
+// Another variant of the protocol for the Daikin ARC433B69 remote.
+const uint16_t kDaikin216Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin216HdrMark = 3400;
+const uint16_t kDaikin216HdrSpace = 1800;
+const uint16_t kDaikin216BitMark = 380;
+const uint16_t kDaikin216OneSpace = 1350;
+const uint16_t kDaikin216ZeroSpace = 480;
+const uint16_t kDaikin216Gap = 29650;
+const uint16_t kDaikin216Sections = 2;
+const uint16_t kDaikin216Section1Length = 8;
+const uint16_t kDaikin216Section2Length = kDaikin216StateLength -
+                                          kDaikin216Section1Length;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -364,6 +376,34 @@ class IRDaikin2 {
   void checksum();
   void clearOnTimerFlag();
   void clearSleepTimerFlag();
+};
+
+// Class to emulate a Daikin ARC433B69 remote.
+class IRDaikin216 {
+ public:
+  explicit IRDaikin216(uint16_t pin);
+
+#if SEND_DAIKIN2
+  void send(const uint16_t repeat = kDaikin216DefaultRepeat);
+#endif
+  void begin();
+
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin216StateLength);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin216StateLength];
+  void stateReset();
+  void checksum();
 };
 
 #endif  // IR_DAIKIN_H_
