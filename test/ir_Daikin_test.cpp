@@ -22,6 +22,7 @@ TEST(TestSendDaikin, SendDataOnly) {
   irsend.reset();
   irsend.sendDaikin(daikin_code);
   EXPECT_EQ(
+      "f38000d50"
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428"
       "m3650s1623"
@@ -82,6 +83,7 @@ TEST(TestSendDaikin, SendWithRepeats) {
 
   irsend.sendDaikin(daikin_code, kDaikinStateLengthShort, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
@@ -186,6 +188,7 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendDaikin(daikin_long_code, kDaikinStateLengthShort + 1);
   ASSERT_EQ(
+      "f38000d50"
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"
@@ -734,6 +737,7 @@ TEST(TestDaikinClass, MessageConstuction) {
   irsend.reset();
   irsend.sendDaikin(ac.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m428s428m428s428m428s428m428s428m428s428"
       "m428s29428m3650s1623"
       "m428s1280m428s428m428s428m428s428m428s1280m428s428m428s428m428s428"

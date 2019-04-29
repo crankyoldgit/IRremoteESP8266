@@ -22,6 +22,7 @@ TEST(TestSendLegoPf, SendDataOnly) {
   irsend.reset();
   irsend.sendLegoPf(0x1234);
   EXPECT_EQ(
+      "f38000d50"
       "m158s1026"
       "m158s263m158s263m158s263m158s553m158s263m158s263m158s553m158s263"
       "m158s263m158s263m158s553m158s553m158s263m158s553m158s263m158s263"
@@ -30,6 +31,7 @@ TEST(TestSendLegoPf, SendDataOnly) {
   irsend.reset();
   irsend.send(LEGOPF, 0x1234, kLegoPfBits);
   EXPECT_EQ(
+      "f38000d50"
       "m158s1026"
       "m158s263m158s263m158s263m158s553m158s263m158s263m158s553m158s263"
       "m158s263m158s263m158s553m158s553m158s263m158s553m158s263m158s263"
@@ -44,6 +46,7 @@ TEST(TestSendLegoPf, SendDataWithRepeats) {
   irsend.reset();
   irsend.sendLegoPf(0x1234, kLegoPfBits, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m0s32000"
       "m158s1026"
       "m158s263m158s263m158s263m158s553m158s263m158s263m158s553m158s263"
@@ -69,6 +72,7 @@ TEST(TestSendLegoPf, SendDataWithRepeats) {
   irsend.reset();
   irsend.sendLegoPf(0x2345, kLegoPfBits, 2);
   EXPECT_EQ(
+      "f38000d50"
       "m0s16000"
       "m158s1026"
       "m158s263m158s263m158s553m158s263m158s263m158s263m158s553m158s553"
@@ -94,6 +98,7 @@ TEST(TestSendLegoPf, SendDataWithRepeats) {
   irsend.reset();
   irsend.sendLegoPf(0x3456, kLegoPfBits, 7);
   EXPECT_EQ(
+      "f38000d50"
       "m158s1026"
       "m158s263m158s263m158s553m158s553m158s263m158s553m158s263m158s263"
       "m158s263m158s553m158s263m158s553m158s263m158s553m158s553m158s263"

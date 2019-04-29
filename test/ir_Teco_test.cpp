@@ -23,6 +23,7 @@ TEST(TestSendTeco, SendDataOnly) {
   irsend.reset();
   irsend.sendTeco(0x250002BC9);
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4440"
       "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
       "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"
@@ -41,6 +42,7 @@ TEST(TestSendTeco, SendWithRepeats) {
   irsend.reset();
   irsend.sendTeco(0x250002BC9, kTecoBits, 2);  // two repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4440"
       "m620s1650m620s580m620s580m620s1650m620s580m620s580m620s1650m620s1650"
       "m620s1650m620s1650m620s580m620s1650m620s580m620s1650m620s580m620s580"

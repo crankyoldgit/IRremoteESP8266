@@ -15,6 +15,7 @@ TEST(TestSendCoolix, SendDataOnly) {
   irsend.reset();
   irsend.sendCOOLIX(0x0);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
@@ -36,6 +37,7 @@ TEST(TestSendCoolix, SendDataOnly) {
   irsend.reset();
   irsend.sendCOOLIX(0xAA55AA);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
@@ -57,6 +59,7 @@ TEST(TestSendCoolix, SendDataOnly) {
   irsend.reset();
   irsend.sendCOOLIX(0xFFFFFF);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
@@ -84,6 +87,7 @@ TEST(TestSendCoolix, SendWithRepeats) {
   irsend.reset();
   irsend.sendCOOLIX(0xAA55AA, kCoolixBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
@@ -103,6 +107,7 @@ TEST(TestSendCoolix, SendWithRepeats) {
       irsend.outputStr());
   irsend.sendCOOLIX(0xAA55AA, kCoolixBits, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
@@ -138,6 +143,7 @@ TEST(TestSendCoolix, SendUnusualSize) {
   irsend.reset();
   irsend.sendCOOLIX(0x0, 8);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
@@ -151,6 +157,7 @@ TEST(TestSendCoolix, SendUnusualSize) {
   irsend.reset();
   irsend.sendCOOLIX(0x1234567890ABCDEF, 64);
   EXPECT_EQ(
+      "f38000d50"
       "m4480s4480"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s1680m560s560"
       "m560s1680m560s1680m560s1680m560s560m560s1680m560s1680m560s560m560s1680"

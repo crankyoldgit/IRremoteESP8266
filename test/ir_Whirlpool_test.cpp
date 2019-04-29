@@ -19,6 +19,7 @@ TEST(TestSendWhirlpoolAC, SendDataOnly) {
 
   irsend.sendWhirlpoolAC(data);
   EXPECT_EQ(
+      "f38000d50"
       "m8950s4484"
       "m597s1649m597s1649m597s533m597s533m597s533m597s533m597s533m597s1649"
       "m597s533m597s1649m597s1649m597s533m597s533m597s533m597s533m597s533"

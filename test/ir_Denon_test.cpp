@@ -14,6 +14,7 @@ TEST(TestSendDenon, SendDataOnly) {
   irsend.reset();
   irsend.sendDenon(0x2278);  // Denon AVR Power On. (Sharp)
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s1820m260s780m260s780m260s780m260s1820m260s780m260s780"
       "m260s1820m260s1820m260s1820m260s1820m260s780m260s780m260s780"
       "m260s43602"
@@ -26,6 +27,7 @@ TEST(TestSendDenon, SendDataOnly) {
   // Denon Eco Mode On. (Panasonic/Kaseikyo)
   irsend.sendDenon(0x2A4C028D6CE3, DENON_48_BITS);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s1296m432s432m432s1296m432s432m432s1296m432s432"
       "m432s432m432s1296m432s432m432s432m432s1296m432s1296m432s432m432s432"
@@ -45,6 +47,7 @@ TEST(TestSendDenon, SendNormalWithRepeats) {
   irsend.reset();
   irsend.sendDenon(0x2278, DENON_BITS, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s1820m260s780m260s780m260s780m260s1820m260s780m260s780"
       "m260s1820m260s1820m260s1820m260s1820m260s780m260s780m260s780"
       "m260s43602"
@@ -60,6 +63,7 @@ TEST(TestSendDenon, SendNormalWithRepeats) {
       irsend.outputStr());
   irsend.sendDenon(0x2278, DENON_BITS, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s1820m260s780m260s780m260s780m260s1820m260s780m260s780"
       "m260s1820m260s1820m260s1820m260s1820m260s780m260s780m260s780"
       "m260s43602"
@@ -88,6 +92,7 @@ TEST(TestSendDenon, Send48BitWithRepeats) {
   irsend.reset();
   irsend.sendDenon(0x2A4C028D6CE3, DENON_48_BITS, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s1296m432s432m432s1296m432s432m432s1296m432s432"
       "m432s432m432s1296m432s432m432s432m432s1296m432s1296m432s432m432s432"
@@ -107,6 +112,7 @@ TEST(TestSendDenon, Send48BitWithRepeats) {
       irsend.outputStr());
   irsend.sendDenon(0x2A4C028D6CE3, DENON_48_BITS, 2);  // 2 repeats.
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s1296m432s432m432s1296m432s432m432s1296m432s432"
       "m432s432m432s1296m432s432m432s432m432s1296m432s1296m432s432m432s432"
@@ -142,6 +148,7 @@ TEST(TestSendDenon, SendUnusualSize) {
   irsend.reset();
   irsend.sendDenon(0x12, 8);
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s780m260s780m260s1820m260s780m260s780m260s1820m260s780"
       "m260s43602"
       "m260s1820m260s1820m260s1820m260s780m260s1820m260s1820m260s780m260s1820"
@@ -151,6 +158,7 @@ TEST(TestSendDenon, SendUnusualSize) {
   irsend.reset();
   irsend.sendDenon(0x1234567890ABCDEF, 64);
   EXPECT_EQ(
+      "f36700d50"
       "m3456s1728"
       "m432s432m432s432m432s432m432s1296m432s432m432s432m432s1296m432s432"
       "m432s432m432s432m432s1296m432s1296m432s432m432s1296m432s432m432s432"

@@ -22,6 +22,7 @@ TEST(TestSendHitachiAC, SendData) {
   irsend.reset();
   irsend.sendHitachiAC(hitachi_code);
   EXPECT_EQ(
+      "f38000d50"
       "m3300s1700"
       "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
       "m400s500m400s500m400s500m400s500m400s1250m400s500m400s500m400s500"
@@ -68,6 +69,7 @@ TEST(TestSendHitachiAC, SendWithRepeats) {
 
   irsend.sendHitachiAC(hitachi_code, kHitachiAcStateLength, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m3300s1700"
       "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
       "m400s500m400s500m400s500m400s500m400s1250m400s500m400s500m400s500"
@@ -151,6 +153,7 @@ TEST(TestSendHitachiAC, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendHitachiAC(hitachi_long_code, kHitachiAcStateLength + 1);
   ASSERT_EQ(
+      "f38000d50"
       "m3300s1700"
       "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
       "m400s500m400s500m400s500m400s500m400s1250m400s500m400s500m400s500"
@@ -511,6 +514,7 @@ TEST(TestSendHitachiAC1, SendData) {
   irsend.reset();
   irsend.sendHitachiAC1(hitachi_code);
   EXPECT_EQ(
+      "f38000d50"
       "m3400s3400"
       "m400s1250m400s500m400s1250m400s1250m400s500m400s500m400s1250m400s500"
       "m400s1250m400s500m400s1250m400s500m400s1250m400s1250m400s1250m400s500"
@@ -585,6 +589,7 @@ TEST(TestSendHitachiAC2, SendData) {
   irsend.reset();
   irsend.sendHitachiAC2(hitachi_code);
   EXPECT_EQ(
+      "f38000d50"
       "m3300s1700"
       "m400s1250m400s500m400s500m400s500m400s500m400s500m400s500m400s500"
       "m400s500m400s500m400s500m400s500m400s1250m400s500m400s500m400s500"

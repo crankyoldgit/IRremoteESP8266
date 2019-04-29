@@ -47,6 +47,7 @@ TEST(TestSendSharp, SendDataOnly) {
   irsend.reset();
   irsend.sendSharp(0x11, 0x52);
   EXPECT_EQ(
+      "f38000d33"
       "m260s1820m260s780m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s1820m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s43602"
@@ -64,6 +65,7 @@ TEST(TestSendSharp, SendWithRepeats) {
   irsend.reset();
   irsend.sendSharp(0x11, 0x52, kSharpBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d33"
       "m260s1820m260s780m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s1820m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s43602"
@@ -87,6 +89,7 @@ TEST(TestSendSharp, SendUnusualSize) {
   irsend.reset();
   irsend.sendSharp(0x0, 0x0, 8);
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
@@ -96,6 +99,7 @@ TEST(TestSendSharp, SendUnusualSize) {
   irsend.reset();
   irsend.sendSharp(0x0, 0x0, 16);
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s780m260s780"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"
@@ -115,6 +119,7 @@ TEST(TestSendSharpRaw, SendDataOnly) {
   irsend.reset();
   irsend.sendSharpRaw(0x454A);
   EXPECT_EQ(
+      "f38000d33"
       "m260s1820m260s780m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s1820m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s43602"
@@ -132,6 +137,7 @@ TEST(TestSendSharpRaw, SendWithRepeats) {
   irsend.reset();
   irsend.sendSharpRaw(0x454A, kSharpBits, 1);  // 1 repeat.
   EXPECT_EQ(
+      "f38000d33"
       "m260s1820m260s780m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s1820m260s780m260s780m260s1820m260s780m260s1820m260s780"
       "m260s43602"
@@ -155,6 +161,7 @@ TEST(TestSendSharpRaw, SendUnusualSize) {
   irsend.reset();
   irsend.sendSharpRaw(0x2, 8);
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"
       "m260s1820m260s1820m260s1820m260s1820m260s1820m260s1820m260s780m260s1820"
@@ -164,6 +171,7 @@ TEST(TestSendSharpRaw, SendUnusualSize) {
   irsend.reset();
   irsend.sendSharpRaw(0x2, 16);
   EXPECT_EQ(
+      "f38000d33"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s780m260s780"
       "m260s780m260s780m260s780m260s780m260s780m260s780m260s1820m260s780"
       "m260s43602"

@@ -19,6 +19,7 @@ TEST(TestSendHaierAC, SendDataOnly) {
   irsend.reset();
   irsend.sendHaierAC(haier_zero);
   EXPECT_EQ(
+      "f38000d50"
       "m3000s3000m3000s4300"
       "m520s650m520s650m520s650m520s650m520s650m520s650m520s650m520s650"
       "m520s650m520s650m520s650m520s650m520s650m520s650m520s650m520s650"
@@ -37,6 +38,7 @@ TEST(TestSendHaierAC, SendDataOnly) {
   irsend.reset();
   irsend.sendHaierAC(haier_test);
   EXPECT_EQ(
+      "f38000d50"
       "m3000s3000m3000s4300"
       "m520s1650m520s650m520s1650m520s650m520s650m520s1650m520s650m520s1650"
       "m520s650m520s650m520s650m520s650m520s650m520s650m520s650m520s1650"
@@ -62,6 +64,7 @@ TEST(TestSendHaierAC, SendWithRepeats) {
   irsend.reset();
   irsend.sendHaierAC(haier_test, kHaierACStateLength, 2);  // two repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m3000s3000m3000s4300"
       "m520s1650m520s650m520s1650m520s650m520s650m520s1650m520s650m520s1650"
       "m520s650m520s650m520s650m520s650m520s650m520s650m520s650m520s1650"

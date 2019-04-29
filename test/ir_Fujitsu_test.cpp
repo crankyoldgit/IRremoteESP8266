@@ -183,6 +183,7 @@ TEST(TestSendFujitsuAC, GenerateMessage) {
   irsend.reset();
   irsend.sendFujitsuAC(fujitsu.getRaw(), kFujitsuAcStateLength);
   EXPECT_EQ(
+  "f38000d50"
   "m3324s1574"
   "m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448s390"
   "m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
@@ -217,6 +218,7 @@ TEST(TestSendFujitsuAC, GenerateShortMessage) {
   irsend.reset();
   irsend.sendFujitsuAC(fujitsu.getRaw(), kFujitsuAcStateLengthShort);
   EXPECT_EQ(
+  "f38000d50"
   "m3324s1574m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448"
   "s390m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
   "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
@@ -238,6 +240,7 @@ TEST(TestSendFujitsuAC, Issue275) {
   fujitsu.setCmd(kFujitsuAcCmdTurnOff);
   irsend.sendFujitsuAC(fujitsu.getRaw(), kFujitsuAcStateLengthShort);
   EXPECT_EQ(
+      "f38000d50"
       // Header
       "m3324s1574"
       //  0       0       1        0       1        0       0       0     (0x28)
@@ -272,6 +275,7 @@ TEST(TestSendFujitsuAC, Issue275) {
       450, 1250, 450};
   irsend.sendRaw(off, 115, 38);
   EXPECT_EQ(
+      "f38000d50"
       // Header
       "m3350s1650"
       //  0       0       1        0       1        0       0       0     (0x28)
@@ -534,6 +538,7 @@ TEST(TestDecodeFujitsuAC, Issue414) {
   ASSERT_EQ(kFujitsuAcBits, irsend.capture.bits);
   EXPECT_TRUE(ArraysMatch(state, irsend.capture.state));
   EXPECT_EQ(
+      "f38000d50"
       "m3324s1574"
       "m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448s390"
       "m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"

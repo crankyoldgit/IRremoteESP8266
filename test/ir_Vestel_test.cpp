@@ -17,6 +17,7 @@ TEST(TestSendVestelAc, SendDataOnly) {
   irsend.reset();
   irsend.sendVestelAc(0x0F00D9001FEF201ULL);
   EXPECT_EQ(
+      "f38000d50"
       "m3110s9066"
       "m520s1535m520s480m520s480m520s480m520s480m520s480m520s480m520s480"
       "m520s480m520s1535m520s480m520s480m520s1535m520s1535m520s1535m520s1535"
@@ -37,6 +38,7 @@ TEST(TestSendVestelAc, SendWithRepeats) {
   irsend.reset();
   irsend.sendVestelAc(0x0F00D9001FEF201ULL, kVestelAcBits, 2);  // two repeats.
   EXPECT_EQ(
+      "f38000d50"
       "m3110s9066"
       "m520s1535m520s480m520s480m520s480m520s480m520s480m520s480m520s480"
       "m520s480m520s1535m520s480m520s480m520s1535m520s1535m520s1535m520s1535"

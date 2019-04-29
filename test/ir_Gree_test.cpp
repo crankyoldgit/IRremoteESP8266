@@ -20,6 +20,7 @@ TEST(TestSendGreeChars, SendData) {
   irsend.reset();
   irsend.sendGree(gree_code);
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4500"
       "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
       "m620s540m620s540m620s1600m620s540m620s1600m620s1600m620s540m620s540"
@@ -42,6 +43,7 @@ TEST(TestSendGreeUint64, SendData) {
   irsend.reset();
   irsend.sendGree(0x1234567890ABCDEF);
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4500"
       "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
       "m620s540m620s540m620s1600m620s540m620s1600m620s1600m620s540m620s540"
@@ -69,6 +71,7 @@ TEST(TestSendGreeChars, SendWithRepeats) {
 
   irsend.sendGree(gree_code, kGreeStateLength, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4500"
       "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
       "m620s540m620s540m620s1600m620s540m620s1600m620s1600m620s540m620s540"
@@ -103,6 +106,7 @@ TEST(TestSendGreeUint64, SendWithRepeats) {
   irsend.reset();
   irsend.sendGree(0x1234567890ABCDEF, kGreeBits, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m9000s4500"
       "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
       "m620s540m620s540m620s1600m620s540m620s1600m620s1600m620s540m620s540"
@@ -146,6 +150,7 @@ TEST(TestSendGreeChars, SendUnexpectedSizes) {
   irsend.reset();
   irsend.sendGree(gree_long_code, kGreeStateLength + 1);
   ASSERT_EQ(
+      "f38000d50"
       "m9000s4500"
       "m620s540m620s1600m620s540m620s540m620s1600m620s540m620s540m620s540"
       "m620s540m620s540m620s1600m620s540m620s1600m620s1600m620s540m620s540"

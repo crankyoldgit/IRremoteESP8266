@@ -20,9 +20,9 @@ TEST(TestSendData, SendSingleBit) {
   IRsendTest irsend(4);
   irsend.begin();
   irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
-  EXPECT_EQ("m1s2", irsend.outputStr());
+  EXPECT_EQ("d50m1s2", irsend.outputStr());
   irsend.sendData(1, 2, 3, 4, 0b0, 1, true);
-  EXPECT_EQ("m3s4", irsend.outputStr());
+  EXPECT_EQ("d50m3s4", irsend.outputStr());
 }
 
 // Test sending bit order.
@@ -30,11 +30,11 @@ TEST(TestSendData, TestingBitSendOrder) {
   IRsendTest irsend(4);
   irsend.begin();
   irsend.sendData(1, 2, 3, 4, 0b10, 2, true);
-  EXPECT_EQ("m1s2m3s4", irsend.outputStr());
+  EXPECT_EQ("d50m1s2m3s4", irsend.outputStr());
   irsend.sendData(1, 2, 3, 4, 0b10, 2, false);
-  EXPECT_EQ("m3s4m1s2", irsend.outputStr());
+  EXPECT_EQ("d50m3s4m1s2", irsend.outputStr());
   irsend.sendData(1, 2, 3, 4, 0b0001, 4, false);
-  EXPECT_EQ("m1s2m3s4m3s4m3s4", irsend.outputStr());
+  EXPECT_EQ("d50m1s2m3s4m3s4m3s4", irsend.outputStr());
 }
 
 // Test sending typical data.
@@ -42,10 +42,12 @@ TEST(TestSendData, SendTypicalData) {
   IRsendTest irsend(4);
   irsend.begin();
   irsend.sendData(1, 2, 3, 4, 0b1010110011110000, 16, true);
-  EXPECT_EQ("m1s2m3s4m1s2m3s4m1s2m1s2m3s4m3s4m1s2m1s2m1s2m1s2m3s4m3s4m3s4m3s4",
-            irsend.outputStr());
+  EXPECT_EQ(
+      "d50m1s2m3s4m1s2m3s4m1s2m1s2m3s4m3s4m1s2m1s2m1s2m1s2m3s4m3s4m3s4m3s4",
+      irsend.outputStr());
   irsend.sendData(1, 2, 3, 4, 0x1234567890ABCDEF, 64, true);
   EXPECT_EQ(
+      "d50"
       "m3s4m3s4m3s4m1s2m3s4m3s4m1s2m3s4m3s4m3s4m1s2m1s2m3s4m1s2m3s4m3s4"
       "m3s4m1s2m3s4m1s2m3s4m1s2m1s2m3s4m3s4m1s2m1s2m1s2m1s2m3s4m3s4m3s4"
       "m1s2m3s4m3s4m1s2m3s4m3s4m3s4m3s4m1s2m3s4m1s2m3s4m1s2m3s4m1s2m1s2"
@@ -59,6 +61,7 @@ TEST(TestSendData, SendOverLargeData) {
   irsend.begin();
   irsend.sendData(1, 2, 3, 4, 0xFFFFFFFFFFFFFFFF, 70, true);
   EXPECT_EQ(
+      "d50"
       "m3s4m3s4m3s4m3s4m3s4m3s4"
       "m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2"
       "m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2m1s2"
@@ -72,9 +75,92 @@ TEST(TestIRSend, InvertedOutput) {
   IRsendTest irsend(4, true);
   irsend.begin();
   irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
-  EXPECT_EQ("s1m2", irsend.outputStr());
+  EXPECT_EQ("d50s1m2", irsend.outputStr());
   irsend.sendData(1, 2, 3, 4, 0b0, 1, true);
-  EXPECT_EQ("s3m4", irsend.outputStr());
+  EXPECT_EQ("d50s3m4", irsend.outputStr());
+}
+
+// Test we correctly pick up frequency changes.
+TEST(TestIRSend, DetectFreqChanges) {
+  IRsendTest irsend(0);
+
+  irsend.begin();
+  irsend.enableIROut(40);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(38);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(40);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(38);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  EXPECT_EQ(
+      "f40000d50"
+      "m1s2"
+      "f38000"
+      "m1s2"
+      "f40000"
+      "m1s2"
+      "f38000"
+      "m1s2",
+      irsend.outputStr());
+  irsend.reset();
+  irsend.enableIROut(40);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(40);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(38);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  irsend.enableIROut(38);  // 40kHz
+  irsend.sendData(1, 2, 3, 4, 0b1, 1, true);
+  EXPECT_EQ(
+      "f40000d50"
+      "m1s2m1s2"
+      "f38000m1s2m1s2",
+      irsend.outputStr());
+}
+
+// Test we correctly pick up duty cycle changes.
+TEST(TestIRSend, DetectDutyChanges) {
+  IRsendTest irsend(0);
+
+  irsend.begin();
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 33);
+  EXPECT_EQ(
+      "f38000d33"
+      "m1s2m3s4m7s8",
+      irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 50);
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 33);
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 25);
+  EXPECT_EQ(
+      "f38000d50"
+      "m1s2m3s4m7s8"
+      "d33"
+      "m1s2m3s4m7s8"
+      "d25"
+      "m1s2m3s4m7s8",
+      irsend.outputStr());
+}
+
+
+// Test we correctly pick up frequency AND duty changes.
+TEST(TestIRSend, DetectFreqAndDutyChanges) {
+  IRsendTest irsend(0);
+
+  irsend.begin();
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 50);
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 38000, true, 0, 33);
+  irsend.sendGeneric(1, 2, 3, 4, 5, 6, 7, 8, 0b1, 1, 40000, true, 0, 25);
+  EXPECT_EQ(
+      "f38000d50"
+      "m1s2m3s4m7s8"
+      "d33"
+      "m1s2m3s4m7s8"
+      "f40000d25"
+      "m1s2m3s4m7s8",
+      irsend.outputStr());
 }
 
 // Test typical use of sendRaw().
@@ -94,6 +180,7 @@ TEST(TestSendRaw, GeneralUse) {
 
   irsend.sendRaw(rawData, 67, 38);
   EXPECT_EQ(
+      "f38000d50"
       "m8950s4500"
       "m550s1650m600s1650m550s550m600s500m600s550m550s550m600s1650m550s1650"
       "m600s1650m600s1650m550s1700m550s550m600s550m550s550m600s500m600s550"
@@ -110,6 +197,7 @@ TEST(TestSendRaw, GeneralUse) {
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0xC3E0E0E8, irsend.capture.value);
   EXPECT_EQ(
+      "f38000d50"
       "m8950s4500"
       "m550s1650m600s1650m550s550m600s500m600s550m550s550m600s1650m550s1650"
       "m600s1650m600s1650m550s1700m550s550m600s550m550s550m600s500m600s550"

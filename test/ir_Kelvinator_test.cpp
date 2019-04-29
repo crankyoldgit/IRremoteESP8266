@@ -21,6 +21,7 @@ TEST(TestSendKelvinator, SendDataOnly) {
   irsend.reset();
   irsend.sendKelvinator(kelv_code);
   EXPECT_EQ(
+      "f38000d50"
       "m9010s4505"
       "m680s1530m680s510m680s510m680s1530m680s1530m680s510m680s510m680s510"
       "m680s1530m680s1530m680s510m680s1530m680s510m680s510m680s510m680s510"
@@ -61,6 +62,7 @@ TEST(TestSendKelvinator, SendWithRepeats) {
 
   irsend.sendKelvinator(kelv_code, kKelvinatorStateLength, 1);
   EXPECT_EQ(
+      "f38000d50"
       "m9010s4505"
       "m680s1530m680s510m680s510m680s1530m680s1530m680s510m680s510m680s510"
       "m680s1530m680s1530m680s510m680s1530m680s510m680s510m680s510m680s510"
@@ -131,6 +133,7 @@ TEST(TestSendKelvinator, SendUnexpectedSizes) {
   // extra data.
   irsend.sendKelvinator(kelv_long_code, 17);
   ASSERT_EQ(
+      "f38000d50"
       "m9010s4505"
       "m680s1530m680s510m680s510m680s1530m680s1530m680s510m680s510m680s510"
       "m680s1530m680s1530m680s510m680s1530m680s510m680s510m680s510m680s510"
@@ -472,6 +475,7 @@ TEST(TestKelvinatorClass, MessageConstuction) {
   irsend.reset();
   irsend.sendKelvinator(irkelv.getRaw());
   EXPECT_EQ(
+      "f38000d50"
       "m9010s4505"
       "m680s1530m680s510m680s510m680s1530m680s1530m680s510m680s1530m680s510"
       "m680s1530m680s1530m680s510m680s1530m680s510m680s510m680s510m680s510"
