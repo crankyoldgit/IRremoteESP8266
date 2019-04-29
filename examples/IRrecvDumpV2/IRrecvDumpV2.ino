@@ -134,6 +134,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN216
+  if (results->decode_type == DAIKIN216) {
+    IRDaikin216 ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_DAIKIN216
 #if DECODE_FUJITSU_AC
   if (results->decode_type == FUJITSU_AC) {
     IRFujitsuAC ac(0);

@@ -197,6 +197,10 @@ const uint16_t kDaikin216Sections = 2;
 const uint16_t kDaikin216Section1Length = 8;
 const uint16_t kDaikin216Section2Length = kDaikin216StateLength -
                                           kDaikin216Section1Length;
+const uint8_t kDaikin216BytePower = 13;
+const uint8_t kDaikin216ByteMode = kDaikin216BytePower;
+const uint8_t kDaikin216MaskMode = 0b01110000;
+const uint8_t kDaikin216ByteTemp = 14;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -262,7 +266,7 @@ class IRDaikinESP {
               const uint16_t length = kDaikinStateLength);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString(void);
@@ -353,7 +357,7 @@ class IRDaikin2 {
   void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin2StateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
@@ -387,12 +391,28 @@ class IRDaikin216 {
   void send(const uint16_t repeat = kDaikin216DefaultRepeat);
 #endif
   void begin();
-
   uint8_t* getRaw();
   void setRaw(const uint8_t new_code[]);
-
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin216StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+#ifdef ARDUINO
+  String toString(void);
+  static String renderTime(const uint16_t timemins);
+#else
+  std::string toString(void);
+  static std::string renderTime(const uint16_t timemins);
+#endif
 #ifndef UNIT_TEST
 
  private:

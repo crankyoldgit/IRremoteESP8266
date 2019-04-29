@@ -1594,6 +1594,89 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       ac.toString());
 }
 
+// Tests for IRDaikin216 class.
+
+TEST(TestDaikin216Class, Power) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestDaikin216Class, Temperature) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp + 1);
+  EXPECT_EQ(kDaikinMinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestDaikin216Class, OperatingMode) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(kDaikinCool);
+  EXPECT_EQ(kDaikinCool, ac.getMode());
+
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+
+  ac.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+
+  ac.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikinFan, ac.getMode());
+
+  ac.setMode(kDaikinFan + 1);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(kDaikinAuto + 1);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+}
+
 // https://github.com/markszabo/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, RealExample) {
   IRsendTest irsend(0);
@@ -1646,6 +1729,12 @@ TEST(TestDecodeDaikin216, RealExample) {
   ASSERT_EQ(DAIKIN216, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin216Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRDaikin216 ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C",
+      ac.toString());
 }
 
 // https://github.com/markszabo/IRremoteESP8266/issues/689

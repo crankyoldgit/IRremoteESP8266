@@ -1069,18 +1069,7 @@ bool IRDaikin2::getPurify() { return remote_state[36] & kDaikin2BitPurify; }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
-  switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kDaikinCool;
-    case stdAc::opmode_t::kHeat:
-      return kDaikinHeat;
-    case stdAc::opmode_t::kDry:
-      return kDaikinDry;
-    case stdAc::opmode_t::kFan:
-      return kDaikinFan;
-    default:
-      return kDaikinAuto;
-  }
+  return IRDaikinESP::convertMode(mode);
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
@@ -1474,6 +1463,101 @@ uint8_t *IRDaikin216::getRaw() {
 void IRDaikin216::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kDaikin216StateLength; i++)
     remote_state[i] = new_code[i];
+}
+
+
+void IRDaikin216::on() {
+  remote_state[kDaikin216BytePower] |= kDaikinBitPower;
+}
+
+void IRDaikin216::off() {
+  remote_state[kDaikin216BytePower] &= ~kDaikinBitPower;
+}
+
+void IRDaikin216::setPower(const bool state) {
+  if (state)
+    on();
+  else
+    off();
+}
+
+bool IRDaikin216::getPower() {
+  return remote_state[kDaikin216BytePower] & kDaikinBitPower;
+}
+
+uint8_t IRDaikin216::getMode() {
+  return (remote_state[kDaikin216ByteMode] & kDaikin216MaskMode) >> 4;
+}
+
+void IRDaikin216::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinAuto:
+    case kDaikinCool:
+    case kDaikinHeat:
+    case kDaikinFan:
+    case kDaikinDry:
+      remote_state[kDaikin216ByteMode] &= ~kDaikin216MaskMode;
+      remote_state[kDaikin216ByteMode] |= (mode << 4);
+      break;
+    default:
+      this->setMode(kDaikinAuto);
+  }
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikin216::convertMode(const stdAc::opmode_t mode) {
+  return IRDaikinESP::convertMode(mode);
+}
+
+// Set the temp in deg C
+void IRDaikin216::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(temp, kDaikinMinTemp);
+  degrees = std::min(degrees, kDaikinMaxTemp);
+  remote_state[kDaikin216ByteTemp] = degrees << 1;
+}
+
+uint8_t IRDaikin216::getTemp(void) {
+  return remote_state[kDaikin216ByteTemp] >> 1;
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRDaikin216::toString() {
+  String result = "";
+#else   // ARDUINO
+std::string IRDaikin216::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result += F("Power: ");
+  if (this->getPower())
+    result += F("On");
+  else
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
+  switch (getMode()) {
+    case kDaikinAuto:
+      result += F(" (AUTO)");
+      break;
+    case kDaikinCool:
+      result += F(" (COOL)");
+      break;
+    case kDaikinHeat:
+      result += F(" (HEAT)");
+      break;
+    case kDaikinDry:
+      result += F(" (DRY)");
+      break;
+    case kDaikinFan:
+      result += F(" (FAN)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp());
+  result += F("C");
+  return result;
 }
 
 #if DECODE_DAIKIN216
