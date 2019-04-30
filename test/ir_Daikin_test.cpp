@@ -1773,6 +1773,29 @@ TEST(TestDaikin216Class, ExampleStates) {
       ac.toString());
 }
 
+TEST(TestDaikin216Class, ReconstructKnownState) {
+  IRDaikin216 ac(0);
+  ac.begin();
+  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  uint8_t expectedState[kDaikin216StateLength] = {
+      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x26, 0x00, 0xA0, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x98};
+  ac.setPower(false);
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(19);
+  ac.setFan(kDaikinFanAuto);
+  ac.setSwingHorizontal(false);
+  ac.setSwingVertical(false);
+  ac.setQuiet(false);
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (AUTO), "
+      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
+      ac.toString());
+
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin216Bits);
+}
+
 // https://github.com/markszabo/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, RealExample) {
   IRsendTest irsend(0);

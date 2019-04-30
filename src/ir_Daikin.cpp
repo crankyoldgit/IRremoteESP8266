@@ -1429,17 +1429,17 @@ void IRDaikin216::checksum() {
 }
 
 void IRDaikin216::stateReset() {
-  for (uint8_t i = 0; i < kDaikin216StateLength; i++) remote_state[i] = 0x0;
-
+  for (uint8_t i = 0; i < kDaikin216StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
   remote_state[1] =  0xDA;
   remote_state[2] =  0x27;
+  remote_state[3] =  0xF0;
   // remote_state[7] is a checksum byte, it will be set by checksum().
   remote_state[8] =  0x11;
   remote_state[9] =  0xDA;
   remote_state[10] = 0x27;
+  remote_state[23] = 0xC0;
   // remote_state[26] is a checksum byte, it will be set by checksum().
-  checksum();
 }
 
 uint8_t *IRDaikin216::getRaw() {
