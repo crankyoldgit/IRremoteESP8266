@@ -222,13 +222,17 @@
 #define DECODE_MITSUBISHIHEAVY true
 #define SEND_MITSUBISHIHEAVY   true
 
+#define DECODE_DAIKIN216       true
+#define SEND_DAIKIN216         true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
-     DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY)
+     DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
+     DECODE_DAIKIN216)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -308,8 +312,9 @@ enum decode_type_t {
   LEGOPF,
   MITSUBISHI_HEAVY_88,
   MITSUBISHI_HEAVY_152,  // 60
+  DAIKIN216,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MITSUBISHI_HEAVY_152,
+  kLastDecodeType = DAIKIN216,
 };
 
 // Message lengths & required repeat values
@@ -332,6 +337,9 @@ const uint16_t kDaikinDefaultRepeat = kNoRepeat;
 const uint16_t kDaikin2StateLength = 39;
 const uint16_t kDaikin2Bits = kDaikin2StateLength * 8;
 const uint16_t kDaikin2DefaultRepeat = kNoRepeat;
+const uint16_t kDaikin216StateLength = 27;
+const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
+const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;

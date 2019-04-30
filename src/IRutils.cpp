@@ -106,6 +106,8 @@ decode_type_t strToDecodeType(const char *str) {
     return decode_type_t::DAIKIN;
   else if (!strcmp(str, "DAIKIN2"))
     return decode_type_t::DAIKIN2;
+  else if (!strcmp(str, "DAIKIN216"))
+    return decode_type_t::DAIKIN216;
   else if (!strcmp(str, "DENON"))
     return decode_type_t::DENON;
   else if (!strcmp(str, "DISH"))
@@ -319,6 +321,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case DAIKIN2:
       result = F("DAIKIN2");
       break;
+    case DAIKIN216:
+      result = F("DAIKIN216");
+      break;
     case DENON:
       result = F("DENON");
       break;
@@ -495,6 +500,7 @@ bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
     case DAIKIN:
     case DAIKIN2:
+    case DAIKIN216:
     case ELECTRA_AC:
     case FUJITSU_AC:
     case GREE:

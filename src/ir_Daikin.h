@@ -185,6 +185,30 @@ const uint8_t kDaikin2SwingHAuto = 0xBE;
 const uint8_t kDaikin2SwingHSwing = 0xBF;
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
+// Another variant of the protocol for the Daikin ARC433B69 remote.
+const uint16_t kDaikin216Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin216HdrMark = 3400;
+const uint16_t kDaikin216HdrSpace = 1800;
+const uint16_t kDaikin216BitMark = 380;
+const uint16_t kDaikin216OneSpace = 1350;
+const uint16_t kDaikin216ZeroSpace = 480;
+const uint16_t kDaikin216Gap = 29650;
+const uint16_t kDaikin216Sections = 2;
+const uint16_t kDaikin216Section1Length = 8;
+const uint16_t kDaikin216Section2Length = kDaikin216StateLength -
+                                          kDaikin216Section1Length;
+const uint8_t kDaikin216BytePower = 13;
+const uint8_t kDaikin216ByteMode = kDaikin216BytePower;
+const uint8_t kDaikin216MaskMode = 0b01110000;
+const uint8_t kDaikin216ByteTemp = 14;
+const uint8_t kDaikin216MaskTemp = 0b01111110;
+const uint8_t kDaikin216ByteFan = 16;
+const uint8_t kDaikin216MaskFan = 0b11110000;
+const uint8_t kDaikin216ByteSwingV = 16;
+const uint8_t kDaikin216MaskSwingV = 0b00001111;
+const uint8_t kDaikin216ByteSwingH = 17;
+const uint8_t kDaikin216MaskSwingH = kDaikin216MaskSwingV;
+
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -250,8 +274,8 @@ class IRDaikinESP {
               const uint16_t length = kDaikinStateLength);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikinStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);
@@ -341,8 +365,8 @@ class IRDaikin2 {
   void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin2StateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
 #ifdef ARDUINO
   String toString();
@@ -364,6 +388,57 @@ class IRDaikin2 {
   void checksum();
   void clearOnTimerFlag();
   void clearSleepTimerFlag();
+};
+
+// Class to emulate a Daikin ARC433B69 remote.
+class IRDaikin216 {
+ public:
+  explicit IRDaikin216(uint16_t pin);
+
+#if SEND_DAIKIN216
+  void send(const uint16_t repeat = kDaikin216DefaultRepeat);
+#endif
+  void begin();
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin216StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void);
+  void setSwingHorizontal(const bool on);
+  bool getSwingHorizontal(void);
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+#ifdef ARDUINO
+  String toString(void);
+  static String renderTime(const uint16_t timemins);
+#else
+  std::string toString(void);
+  static std::string renderTime(const uint16_t timemins);
+#endif
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin216StateLength];
+  void stateReset();
+  void checksum();
 };
 
 #endif  // IR_DAIKIN_H_

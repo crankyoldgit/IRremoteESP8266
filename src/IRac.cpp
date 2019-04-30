@@ -51,6 +51,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN2
     case decode_type_t::DAIKIN2:
 #endif
+#if SEND_DAIKIN216
+    case decode_type_t::DAIKIN216:
+#endif
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
 #endif
@@ -241,6 +244,23 @@ void IRac::daikin2(IRDaikin2 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN2
+
+#if SEND_DAIKIN216
+void IRac::daikin216(IRDaikin216 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                     const bool quiet) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setSwingHorizontal((int8_t)swingh >= 0);
+  ac->setQuiet(quiet);
+  ac->send();
+}
+#endif  // SEND_DAIKIN216
 
 #if SEND_FUJITSU_AC
 void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
@@ -780,7 +800,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
               light, econo, filter, clean, beep, sleep, clock);
       break;
     }
-#endif  // SEND_DAIKIN2
+#endif  // SEND_DAIKIN216
+#if SEND_DAIKIN216
+    case DAIKIN216:
+    {
+      IRDaikin216 ac(_pin);
+      daikin216(&ac, on, mode, degC, fan, swingv, swingh, quiet);
+      break;
+    }
+#endif  // SEND_DAIKIN216
 #if SEND_FUJITSU_AC
     case FUJITSU_AC:
     {

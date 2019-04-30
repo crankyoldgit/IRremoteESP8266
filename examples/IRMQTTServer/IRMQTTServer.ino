@@ -652,6 +652,7 @@ void handleRoot(void) {
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin</option>"
         "<option value='53'>Daikin2</option>"
+        "<option value='61'>Daikin216 (27 bytes)</option>"
         "<option value='48'>Electra</option>"
         "<option value='33'>Fujitsu</option>"
         "<option value='24'>Gree</option>"
@@ -1352,6 +1353,9 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
     case DAIKIN2:
       stateSize = kDaikin2StateLength;
       break;
+    case DAIKIN216:
+      stateSize = kDaikin216StateLength;
+      break;
     case ELECTRA_AC:
       stateSize = kElectraAcStateLength;
       break;
@@ -1496,6 +1500,11 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       irsend->sendDaikin2(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_DAIKIN216
+    case DAIKIN216:
+      irsend->sendDaikin216(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif  // SEND_DAIKIN216
 #if SEND_MITSUBISHI_AC
     case MITSUBISHI_AC:
       irsend->sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
@@ -2619,6 +2628,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 #endif
     case DAIKIN:  // 16
     case DAIKIN2:  // 53
+    case DAIKIN216:  // 61
     case KELVINATOR:  // 18
     case MITSUBISHI_AC:  // 20
     case GREE:  // 24

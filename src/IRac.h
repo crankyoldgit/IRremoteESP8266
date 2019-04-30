@@ -91,6 +91,13 @@ class IRac {
                const bool beep, const int16_t sleep = -1,
                const int16_t clock = -1);
 #endif  // SEND_DAIKIN2
+#if SEND_DAIKIN216
+void daikin216(IRDaikin216 *ac,
+               const bool on, const stdAc::opmode_t mode,
+               const float degrees, const stdAc::fanspeed_t fan,
+               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+               const bool quiet);
+#endif  // SEND_DAIKIN216
 #if SEND_FUJITSU_AC
   void fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                const bool on, const stdAc::opmode_t mode, const float degrees,
