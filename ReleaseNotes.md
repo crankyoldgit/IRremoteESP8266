@@ -1,5 +1,47 @@
 # Release Notes
 
+## _v2.6.0 (20190430)_
+
+**[Bug Fixes]**
+- Fixed problem where LG protocol used wrong duty cycle for repeat. (#687)
+- Fix checksum calculation for Daikin protocols. (#678)
+- Fix the byte array version of sendGree() (#684, #685)
+- Fix artificial vs. real state creation on HaierAC. (#668, #671)
+- Fix issues caused by having `MQTT_ENABLE` set to false. (#677)
+- Fix compile problem when DEBUG is defined. (#673, #674)
+- Fix Minor bug with MQTT_ENABLE False condition (#654)
+
+**[Features]**
+- Experimental support for DAIKIN216 (ARC433B69) (#690)
+- Experimental support for Mitsubishi Heavy Industries A/Cs. (#660, #665, #667)
+- Support more features of TCL A/C (#656)
+- Add LEGO(TM) Power Functions IR protocol. (#655)
+- Add Panasonic AC RKR model & Example (#649)
+- DAIKIN/IRDaikinESP overhaul and add Comfort mode support. (#678)
+  **WARNING**: Previous `sendDaikin()` calls may not work.
+               Please recapture codes or use `kDaikinStateLengthShort` for
+               `nbytes` in those calls.
+- IRMQTTServer: Move MQTT server and other parameters to WifiManager. (#680)
+  **WARNING**: Previous users may need to fully wipe/reset the
+               SPIFFS/WifiManager settings by visiting
+               `http://<your_esp8266's_ip_address>/reset` prior to or
+               after update.
+- Add Wifi filtering options to IRMQTTServer. (#679)
+- Add advanced aircon/climate functionality to IRMQTTServer (#677)
+- Initial prototype of a common interface for all A/Cs. (#664)
+- Improve MQTT topic usage for feedback messages. (#663)
+- Add multiple independent GPIO sending support via MQTT. (#661)
+
+**[Misc]**
+- Adjust kGreeHdrSpace to 4500 (#684, #686)
+- Add Home Assistant mqtt climate instructions. (#682)
+- Implement htmlEscape() to prevent XSS etc. (#681)
+- Add F() Macros (#670)
+- Update Daikin2's Cool mode min temp to 18C (#658)
+- Change per byte bit-order in Electra protocol. (#648)
+- Improve Daikin2 power on/off. (#647)
+
+
 ## _v2.5.6 (20190316)_
 
 **[Bug Fixes]**
