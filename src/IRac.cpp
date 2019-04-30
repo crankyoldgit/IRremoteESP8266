@@ -51,6 +51,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN2
     case decode_type_t::DAIKIN2:
 #endif
+#if SEND_DAIKIN216
+    case decode_type_t::DAIKIN216:
+#endif
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
 #endif
