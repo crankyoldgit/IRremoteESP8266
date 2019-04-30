@@ -1702,7 +1702,6 @@ TEST(TestDaikin216Class, VaneSwing) {
   EXPECT_FALSE(ac.getSwingVertical());
 }
 
-
 TEST(TestDaikin216Class, FanSpeed) {
   IRDaikin216 ac(0);
   ac.begin();
@@ -1743,6 +1742,20 @@ TEST(TestDaikin216Class, FanSpeed) {
 
   ac.setFan(kDaikinFanQuiet);
   EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin216Class, Quiet) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
 }
 
 TEST(TestDaikin216Class, ExampleStates) {
