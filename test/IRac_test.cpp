@@ -138,6 +138,32 @@ TEST(TestIRac, Daikin2) {
   ASSERT_EQ(expected, ac.toString());
 }
 
+TEST(TestIRac, Daikin216) {
+  IRDaikin216 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 4 (HEAT), Temp: 31C, Fan: 11 (QUIET), "
+      "Swing (Horizontal): On, Swing (Vertical): On, Quiet: On";
+
+  ac.begin();
+  irac.daikin216(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kHeat,      // Mode
+                 31,                          // Celsius
+                 stdAc::fanspeed_t::kMedium,  // Fan speed
+                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingh_t::kLeft,      // Horizontal swing
+                 true);                       // Quiet
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN216, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin216Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
 TEST(TestIRac, Fujitsu) {
   IRFujitsuAC ac(0);
   IRac irac(0);

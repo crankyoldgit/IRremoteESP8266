@@ -1074,20 +1074,7 @@ uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
-  switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kDaikinFanQuiet;
-    case stdAc::fanspeed_t::kLow:
-      return kDaikinFanMin;
-    case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kHigh:
-      return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kDaikinFanMax;
-    default:
-      return kDaikinFanAuto;
-  }
+  return IRDaikinESP::convertFan(speed);
 }
 
 // Convert a standard A/C vertical swing into its native version.
@@ -1437,7 +1424,7 @@ bool IRDaikin216::validChecksum(uint8_t state[], const uint16_t length) {
 void IRDaikin216::checksum() {
   remote_state[kDaikin216Section1Length - 1] = sumBytes(
       remote_state, kDaikin216Section1Length - 1);
-  remote_state[kDaikin216StateLength -1 ] = sumBytes(
+  remote_state[kDaikin216StateLength - 1] = sumBytes(
       remote_state + kDaikin216Section1Length, kDaikin216Section2Length - 1);
 }
 
@@ -1513,11 +1500,72 @@ uint8_t IRDaikin216::convertMode(const stdAc::opmode_t mode) {
 void IRDaikin216::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
-  remote_state[kDaikin216ByteTemp] = degrees << 1;
+  remote_state[kDaikin216ByteTemp] &= ~kDaikin216MaskTemp;
+  remote_state[kDaikin216ByteTemp] |= (degrees << 1);
 }
 
 uint8_t IRDaikin216::getTemp(void) {
-  return remote_state[kDaikin216ByteTemp] >> 1;
+  return (remote_state[kDaikin216ByteTemp] & kDaikin216MaskTemp) >> 1;
+}
+
+// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+void IRDaikin216::setFan(const uint8_t fan) {
+  // Set the fan speed bits, leave low 4 bits alone
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  remote_state[kDaikin216ByteFan] &= ~kDaikin216MaskFan;
+  remote_state[kDaikin216ByteFan] |= (fanset << 4);
+}
+
+uint8_t IRDaikin216::getFan() {
+  uint8_t fan = remote_state[kDaikin216ByteFan] >> 4;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  return fan;
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin216::convertFan(const stdAc::fanspeed_t speed) {
+  return IRDaikinESP::convertFan(speed);
+}
+
+void IRDaikin216::setSwingVertical(const bool on) {
+  if (on)
+    remote_state[kDaikin216ByteSwingV] |= kDaikin216MaskSwingV;
+  else
+    remote_state[kDaikin216ByteSwingV] &= ~kDaikin216MaskSwingV;
+}
+
+bool IRDaikin216::getSwingVertical(void) {
+  return remote_state[kDaikin216ByteSwingV] & kDaikin216MaskSwingV;
+}
+
+void IRDaikin216::setSwingHorizontal(const bool on) {
+  if (on)
+    remote_state[kDaikin216ByteSwingH] |= kDaikin216MaskSwingH;
+  else
+    remote_state[kDaikin216ByteSwingH] &= ~kDaikin216MaskSwingH;
+}
+
+bool IRDaikin216::getSwingHorizontal(void) {
+  return remote_state[kDaikin216ByteSwingH] & kDaikin216MaskSwingH;
+}
+
+// This is a horrible hack till someone works out the quiet mode bit.
+void IRDaikin216::setQuiet(const bool on) {
+  if (on)
+    this->setFan(kDaikinFanQuiet);
+  else if (this->getFan() == kDaikinFanQuiet)
+    this->setFan(kDaikinFanAuto);
+}
+
+// This is a horrible hack till someone works out the quiet mode bit.
+bool IRDaikin216::getQuiet(void) {
+  return this->getFan() == kDaikinFanQuiet;
 }
 
 // Convert the internal state into a human readable string.
@@ -1556,7 +1604,28 @@ std::string IRDaikin216::toString() {
   }
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
-  result += F("C");
+  result += F("C, Fan: ");
+  result += uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kDaikinFanAuto:
+      result += F(" (AUTO)");
+      break;
+    case kDaikinFanQuiet:
+      result += F(" (QUIET)");
+      break;
+    case kDaikinFanMin:
+      result += F(" (MIN)");
+      break;
+    case kDaikinFanMax:
+      result += F(" (MAX)");
+      break;
+  }
+  result += F(", Swing (Horizontal): ");
+  result += this->getSwingHorizontal() ? F("On") : F("Off");
+  result += F(", Swing (Vertical): ");
+  result += this->getSwingVertical() ? F("On") : F("Off");
+  result += F(", Quiet: ");
+  result += (getQuiet() ? F("On") : F("Off"));
   return result;
 }
 

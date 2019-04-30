@@ -1677,6 +1677,89 @@ TEST(TestDaikin216Class, OperatingMode) {
   EXPECT_EQ(kDaikinAuto, ac.getMode());
 }
 
+
+TEST(TestDaikin216Class, VaneSwing) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  ac.setSwingHorizontal(true);
+  ac.setSwingVertical(false);
+
+  ac.setSwingHorizontal(true);
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  EXPECT_FALSE(ac.getSwingVertical());
+
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingHorizontal());
+  EXPECT_TRUE(ac.getSwingVertical());
+
+  ac.setSwingHorizontal(false);
+  EXPECT_FALSE(ac.getSwingHorizontal());
+  EXPECT_TRUE(ac.getSwingVertical());
+
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingHorizontal());
+  EXPECT_FALSE(ac.getSwingVertical());
+}
+
+
+TEST(TestDaikin216Class, FanSpeed) {
+  IRDaikin216 ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax);
+  EXPECT_EQ(kDaikinFanMax, ac.getFan());
+
+  // Beyond Max should default to Auto.
+  ac.setFan(kDaikinFanMax + 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax - 1);
+  EXPECT_EQ(kDaikinFanMax - 1, ac.getFan());
+
+  ac.setFan(kDaikinFanMin);
+  EXPECT_EQ(kDaikinFanMin, ac.getFan());
+
+  ac.setFan(kDaikinFanMin + 1);
+  EXPECT_EQ(kDaikinFanMin + 1, ac.getFan());
+
+  // Beyond Min should default to Auto.
+  ac.setFan(kDaikinFanMin - 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
+
+  ac.setFan(kDaikinFanAuto);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanQuiet);
+  EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin216Class, ExampleStates) {
+  IRDaikin216 ac(0);
+  ac.begin();
+  // https://github.com/markszabo/IRremoteESP8266/pull/690#issuecomment-487770194
+  uint8_t state[kDaikin216StateLength] = {
+      0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x21, 0xC0, 0x00, 0xA0, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x53};
+  ac.setRaw(state);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (DRY), Temp: 32C, Fan: 10 (AUTO), "
+      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
+      ac.toString());
+}
+
 // https://github.com/markszabo/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, RealExample) {
   IRsendTest irsend(0);
@@ -1733,7 +1816,8 @@ TEST(TestDecodeDaikin216, RealExample) {
   IRDaikin216 ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 19C",
+      "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (AUTO), "
+      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
       ac.toString());
 }
 
