@@ -1128,3 +1128,88 @@ TEST(TestDecodeSamsung36, SyntheticExample) {
   EXPECT_EQ(0xE00FF, irsend.capture.command);
   EXPECT_EQ(0x400, irsend.capture.address);
 }
+
+// https://github.com/markszabo/IRremoteESP8266/issues/604
+TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
+  IRSamsungAc ac(0);
+  ac.begin();
+
+  std::string freqduty = "f38000d50";
+
+  std::string poweron =
+      "m690s17844"
+      "m3086s8864"
+      "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s436m586s1432"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s2886"
+      "m3086s8864"
+      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s1432m586s1432"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s2886"
+      "m3086s8864"
+      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432"
+      "m586s436m586s1432m586s1432m586s1432m586s1432m586s1432m586s1432m586s1432"
+      "m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s1432"
+      "m586s1432m586s436m586s436m586s436m586s1432m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s100000";
+  std::string settings =
+      "m690s17844"
+      "m3086s8864"
+      "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s436m586s1432"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s2886"
+      "m3086s8864"
+      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s1432m586s1432"
+      "m586s436m586s1432m586s1432m586s1432m586s436m586s1432m586s436m586s1432"
+      "m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s436"
+      "m586s1432m586s436m586s436m586s1432m586s1432m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
+      "m586s100000";
+  std::string text = "Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 4 (MED), "
+                     "Swing: On, Beep: Off, Clean: Off, Quiet: Off";
+  // Don't do a setPower()/on()/off() as that will trigger the special message.
+  // So it should only be the normal "settings" message.
+  ac.setTemp(23);
+  ac.setMode(kSamsungAcCool);
+  ac.setFan(kSamsungAcFanMed);
+  ac.send();
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  ac._irsend.reset();
+  // Now trigger a special power message by using a power method.
+  ac.on();
+  ac.send();  // This should result in two messages. 1 x extended + 1 x normal.
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
+  ac._irsend.reset();
+  // Subsequent sending should be just the "settings" message.
+  ac.send();
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  ac._irsend.reset();
+  // Now trigger a special power message by using a power method (again).
+  ac.setPower(true);
+  ac.send();  // This should result in two messages. 1 x extended + 1 x normal.
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
+}

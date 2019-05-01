@@ -63,7 +63,7 @@ class IRSamsungAc {
  public:
   explicit IRSamsungAc(uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_SAMSUNG_AC
   void send(const uint16_t repeat = kSamsungAcDefaultRepeat,
             const bool calcchecksum = true);
@@ -72,26 +72,26 @@ class IRSamsungAc {
   void sendOn(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendOff(const uint16_t repeat = kSamsungAcDefaultRepeat);
 #endif  // SEND_SAMSUNG_AC
-  void begin();
-  void on();
-  void off();
-  void setPower(const bool state);
-  bool getPower();
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
   void setTemp(const uint8_t temp);
-  uint8_t getTemp();
+  uint8_t getTemp(void);
   void setFan(const uint8_t speed);
-  uint8_t getFan();
+  uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode();
-  void setSwing(const bool state);
-  bool getSwing();
-  void setBeep(const bool state);
-  bool getBeep();
-  void setClean(const bool state);
-  bool getClean();
-  void setQuiet(const bool state);
-  bool getQuiet();
-  uint8_t* getRaw();
+  uint8_t getMode(void);
+  void setSwing(const bool on);
+  bool getSwing(void);
+  void setBeep(const bool on);
+  bool getBeep(void);
+  void setClean(const bool on);
+  bool getClean(void);
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+  uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
   static bool validChecksum(const uint8_t state[],
@@ -101,9 +101,9 @@ class IRSamsungAc {
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -114,6 +114,7 @@ class IRSamsungAc {
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kSamsungAcExtendedStateLength];
+  bool _sendpower;  // Hack to know when we need to send a special power mesg.
   void checksum(const uint16_t length = kSamsungAcStateLength);
 };
 

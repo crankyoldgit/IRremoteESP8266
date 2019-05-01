@@ -536,7 +536,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Turbo
                true,                        // Clean
                true,                        // Beep
-               false);                      // with the Hack Off
+               false);                      // with dopower Off
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -556,7 +556,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Turbo
                true,                        // Clean
                true,                        // Beep
-               true);                       // with the Hack On
+               true);                       // with dopower On
   ASSERT_EQ(expected, ac.toString());  // Class should be in the desired mode.
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
