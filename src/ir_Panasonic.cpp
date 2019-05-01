@@ -693,6 +693,7 @@ String IRPanasonicAc::toString() {
 std::string IRPanasonicAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(180);  // Reserve some heap for the string to reduce fragging.
   result += F("Model: ");
   result += uint64ToString(getModel());
   switch (getModel()) {

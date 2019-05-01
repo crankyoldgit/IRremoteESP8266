@@ -618,6 +618,7 @@ String IRSamsungAc::toString() {
 std::string IRSamsungAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

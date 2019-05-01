@@ -386,6 +386,7 @@ String IRMitsubishiHeavy152Ac::toString(void) {
 std::string IRMitsubishiHeavy152Ac::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(180);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));
   result += F(", Mode: ");
@@ -804,6 +805,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
 std::string IRMitsubishiHeavy88Ac::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));
   result += F(", Mode: ");

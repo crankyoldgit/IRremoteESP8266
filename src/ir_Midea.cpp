@@ -298,6 +298,7 @@ String IRMideaAC::toString() {
 std::string IRMideaAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

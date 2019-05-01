@@ -345,6 +345,7 @@ String IRCoolixAC::toString() {
 std::string IRCoolixAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower()) {
     result += F("On");
