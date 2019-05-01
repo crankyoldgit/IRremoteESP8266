@@ -1669,7 +1669,8 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
 
     // Section Header
     if (!matchMark(results->rawbuf[offset++], kDaikin216HdrMark)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikin2HdrSpace)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin216HdrSpace))
+      return false;
 
     // Section Data
     for (; offset <= results->rawlen - 16 && i < pos;
@@ -1678,13 +1679,15 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
       data_result =
           matchData(&(results->rawbuf[offset]), 8, kDaikin216BitMark,
                     kDaikin216OneSpace, kDaikin216BitMark,
-                    kDaikin216ZeroSpace, kTolerance, kMarkExcess, false);
+                    kDaikin216ZeroSpace, kDaikinTolerance, kDaikinMarkExcess,
+                    false);
       if (data_result.success == false) break;  // Fail
       results->state[i] = (uint8_t)data_result.data;
     }
 
     // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikin216BitMark)) return false;
+    if (!matchMark(results->rawbuf[offset++], kDaikin216BitMark,
+                   kDaikinTolerance, kDaikinMarkExcess)) return false;
     if (section < kDaikin216Sections - 1) {  // Inter-section gaps.
       if (!matchSpace(results->rawbuf[offset++], kDaikin216Gap)) return false;
     } else {  // Last section / End of message gap.
