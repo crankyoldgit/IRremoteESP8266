@@ -187,11 +187,11 @@ const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
 // Another variant of the protocol for the Daikin ARC433B69 remote.
 const uint16_t kDaikin216Freq = 38000;  // Modulation Frequency in Hz.
-const uint16_t kDaikin216HdrMark = 3400;
-const uint16_t kDaikin216HdrSpace = 1800;
-const uint16_t kDaikin216BitMark = 380;
-const uint16_t kDaikin216OneSpace = 1350;
-const uint16_t kDaikin216ZeroSpace = 480;
+const uint16_t kDaikin216HdrMark = 3440;
+const uint16_t kDaikin216HdrSpace = 1750;
+const uint16_t kDaikin216BitMark = 420;
+const uint16_t kDaikin216OneSpace = 1300;
+const uint16_t kDaikin216ZeroSpace = 450;
 const uint16_t kDaikin216Gap = 29650;
 const uint16_t kDaikin216Sections = 2;
 const uint16_t kDaikin216Section1Length = 8;
@@ -208,6 +208,7 @@ const uint8_t kDaikin216ByteSwingV = 16;
 const uint8_t kDaikin216MaskSwingV = 0b00001111;
 const uint8_t kDaikin216ByteSwingH = 17;
 const uint8_t kDaikin216MaskSwingH = kDaikin216MaskSwingV;
+const uint8_t kDaikin216BytePowerful = 21;
 
 
 // Legacy defines.
@@ -421,6 +422,8 @@ class IRDaikin216 {
   bool getSwingHorizontal(void);
   void setQuiet(const bool on);
   bool getQuiet(void);
+  void setPowerful(const bool on);
+  bool getPowerful(void);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);

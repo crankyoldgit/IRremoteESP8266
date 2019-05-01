@@ -1744,15 +1744,34 @@ TEST(TestDaikin216Class, FanSpeed) {
   EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
 }
 
-TEST(TestDaikin216Class, Quiet) {
+TEST(TestDaikin216Class, QuietAndPowerful) {
   IRDaikin216 ac(0);
   ac.begin();
 
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+
   ac.setQuiet(true);
   EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_TRUE(ac.getPowerful());
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
 
   ac.setQuiet(false);
   EXPECT_FALSE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_TRUE(ac.getPowerful());
 
   ac.setQuiet(true);
   EXPECT_TRUE(ac.getQuiet());
@@ -1769,7 +1788,8 @@ TEST(TestDaikin216Class, ExampleStates) {
   ac.setRaw(state);
   EXPECT_EQ(
       "Power: On, Mode: 2 (DRY), Temp: 32C, Fan: 10 (AUTO), "
-      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
+      "Swing (Horizontal): Off, Swing (Vertical): Off, "
+      "Quiet: Off, Powerful: Off",
       ac.toString());
 }
 
@@ -1790,7 +1810,8 @@ TEST(TestDaikin216Class, ReconstructKnownState) {
   ac.setQuiet(false);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (AUTO), "
-      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
+      "Swing (Horizontal): Off, Swing (Vertical): Off, "
+      "Quiet: Off, Powerful: Off",
       ac.toString());
 
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin216Bits);
@@ -1853,7 +1874,8 @@ TEST(TestDecodeDaikin216, RealExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (AUTO), "
-      "Swing (Horizontal): Off, Swing (Vertical): Off, Quiet: Off",
+      "Swing (Horizontal): Off, Swing (Vertical): Off, "
+      "Quiet: Off, Powerful: Off",
       ac.toString());
 }
 

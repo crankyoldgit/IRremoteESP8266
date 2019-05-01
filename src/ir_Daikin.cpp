@@ -1557,15 +1557,32 @@ bool IRDaikin216::getSwingHorizontal(void) {
 
 // This is a horrible hack till someone works out the quiet mode bit.
 void IRDaikin216::setQuiet(const bool on) {
-  if (on)
+  if (on) {
     this->setFan(kDaikinFanQuiet);
-  else if (this->getFan() == kDaikinFanQuiet)
+    // Powerful & Quiet mode being on are mutually exclusive.
+    this->setPowerful(false);
+  } else if (this->getFan() == kDaikinFanQuiet) {
     this->setFan(kDaikinFanAuto);
+  }
 }
 
 // This is a horrible hack till someone works out the quiet mode bit.
 bool IRDaikin216::getQuiet(void) {
   return this->getFan() == kDaikinFanQuiet;
+}
+
+void IRDaikin216::setPowerful(const bool on) {
+  if (on) {
+    remote_state[kDaikin216BytePowerful] |= kDaikinBitPowerful;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    this->setQuiet(false);
+  } else {
+    remote_state[kDaikin216BytePowerful] &= ~kDaikinBitPowerful;
+  }
+}
+
+bool IRDaikin216::getPowerful() {
+  return remote_state[kDaikin216BytePowerful] & kDaikinBitPowerful;
 }
 
 // Convert the internal state into a human readable string.
@@ -1625,7 +1642,9 @@ std::string IRDaikin216::toString() {
   result += F(", Swing (Vertical): ");
   result += this->getSwingVertical() ? F("On") : F("Off");
   result += F(", Quiet: ");
-  result += (getQuiet() ? F("On") : F("Off"));
+  result += (this->getQuiet() ? F("On") : F("Off"));
+  result += F(", Powerful: ");
+  result += (this->getPowerful() ? F("On") : F("Off"));
   return result;
 }
 
@@ -1669,7 +1688,8 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
 
     // Section Header
     if (!matchMark(results->rawbuf[offset++], kDaikin216HdrMark)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikin2HdrSpace)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin216HdrSpace))
+      return false;
 
     // Section Data
     for (; offset <= results->rawlen - 16 && i < pos;
@@ -1678,13 +1698,15 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
       data_result =
           matchData(&(results->rawbuf[offset]), 8, kDaikin216BitMark,
                     kDaikin216OneSpace, kDaikin216BitMark,
-                    kDaikin216ZeroSpace, kTolerance, kMarkExcess, false);
+                    kDaikin216ZeroSpace, kDaikinTolerance, kDaikinMarkExcess,
+                    false);
       if (data_result.success == false) break;  // Fail
       results->state[i] = (uint8_t)data_result.data;
     }
 
     // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikin216BitMark)) return false;
+    if (!matchMark(results->rawbuf[offset++], kDaikin216BitMark,
+                   kDaikinTolerance, kDaikinMarkExcess)) return false;
     if (section < kDaikin216Sections - 1) {  // Inter-section gaps.
       if (!matchSpace(results->rawbuf[offset++], kDaikin216Gap)) return false;
     } else {  // Last section / End of message gap.
