@@ -364,6 +364,7 @@ String IRGreeAC::toString() {
 std::string IRGreeAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

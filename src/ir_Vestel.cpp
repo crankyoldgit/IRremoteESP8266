@@ -445,6 +445,7 @@ String IRVestelAc::toString() {
 std::string IRVestelAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (isTimeCommand()) {
     result += F("Time: ");
     result += IRHaierAC::timeToString(getTime());

@@ -299,6 +299,7 @@ String IRHitachiAc::toString() {
 std::string IRHitachiAc::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

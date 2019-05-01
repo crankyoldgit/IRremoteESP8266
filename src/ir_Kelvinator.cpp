@@ -372,6 +372,7 @@ String IRKelvinatorAC::toString() {
 std::string IRKelvinatorAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

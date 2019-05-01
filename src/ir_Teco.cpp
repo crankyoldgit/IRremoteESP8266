@@ -176,6 +176,7 @@ String IRTecoAc::toString(void) {
 std::string IRTecoAc::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));
   result += F(", Mode: ");

@@ -372,6 +372,7 @@ String IRHaierAC::toString() {
 std::string IRHaierAC::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   uint8_t cmd = getCommand();
   result += F("Command: ");
   result += uint64ToString(cmd);
@@ -747,6 +748,7 @@ String IRHaierACYRW02::toString() {
 std::string IRHaierACYRW02::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(130);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");

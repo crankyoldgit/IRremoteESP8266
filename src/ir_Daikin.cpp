@@ -426,6 +426,7 @@ String IRDaikinESP::toString(void) {
 std::string IRDaikinESP::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += this->getPower() ? F("On") : F("Off");
   result += F(", Mode: ");
@@ -1099,6 +1100,7 @@ String IRDaikin2::toString() {
 std::string IRDaikin2::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(310);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
     result += F("On");
@@ -1576,6 +1578,7 @@ String IRDaikin216::toString() {
 std::string IRDaikin216::toString() {
   std::string result = "";
 #endif  // ARDUINO
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (this->getPower())
     result += F("On");
