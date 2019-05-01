@@ -208,6 +208,7 @@ const uint8_t kDaikin216ByteSwingV = 16;
 const uint8_t kDaikin216MaskSwingV = 0b00001111;
 const uint8_t kDaikin216ByteSwingH = 17;
 const uint8_t kDaikin216MaskSwingH = kDaikin216MaskSwingV;
+const uint8_t kDaikin216BytePowerful = 21;
 
 
 // Legacy defines.
@@ -421,6 +422,8 @@ class IRDaikin216 {
   bool getSwingHorizontal(void);
   void setQuiet(const bool on);
   bool getQuiet(void);
+  void setPowerful(const bool on);
+  bool getPowerful(void);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);

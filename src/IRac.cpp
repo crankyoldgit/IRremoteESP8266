@@ -250,7 +250,7 @@ void IRac::daikin216(IRDaikin216 *ac,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                     const bool quiet) {
+                     const bool quiet, const bool turbo) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -258,6 +258,7 @@ void IRac::daikin216(IRDaikin216 *ac,
   ac->setSwingVertical((int8_t)swingv >= 0);
   ac->setSwingHorizontal((int8_t)swingh >= 0);
   ac->setQuiet(quiet);
+  ac->setPowerful(turbo);
   ac->send();
 }
 #endif  // SEND_DAIKIN216
@@ -805,7 +806,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case DAIKIN216:
     {
       IRDaikin216 ac(_pin);
-      daikin216(&ac, on, mode, degC, fan, swingv, swingh, quiet);
+      daikin216(&ac, on, mode, degC, fan, swingv, swingh, quiet, turbo);
       break;
     }
 #endif  // SEND_DAIKIN216

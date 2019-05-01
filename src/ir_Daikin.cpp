@@ -1557,15 +1557,32 @@ bool IRDaikin216::getSwingHorizontal(void) {
 
 // This is a horrible hack till someone works out the quiet mode bit.
 void IRDaikin216::setQuiet(const bool on) {
-  if (on)
+  if (on) {
     this->setFan(kDaikinFanQuiet);
-  else if (this->getFan() == kDaikinFanQuiet)
+    // Powerful & Quiet mode being on are mutually exclusive.
+    this->setPowerful(false);
+  } else if (this->getFan() == kDaikinFanQuiet) {
     this->setFan(kDaikinFanAuto);
+  }
 }
 
 // This is a horrible hack till someone works out the quiet mode bit.
 bool IRDaikin216::getQuiet(void) {
   return this->getFan() == kDaikinFanQuiet;
+}
+
+void IRDaikin216::setPowerful(const bool on) {
+  if (on) {
+    remote_state[kDaikin216BytePowerful] |= kDaikinBitPowerful;
+    // Powerful & Quiet mode being on are mutually exclusive.
+    this->setQuiet(false);
+  } else {
+    remote_state[kDaikin216BytePowerful] &= ~kDaikinBitPowerful;
+  }
+}
+
+bool IRDaikin216::getPowerful() {
+  return remote_state[kDaikin216BytePowerful] & kDaikinBitPowerful;
 }
 
 // Convert the internal state into a human readable string.
@@ -1625,7 +1642,9 @@ std::string IRDaikin216::toString() {
   result += F(", Swing (Vertical): ");
   result += this->getSwingVertical() ? F("On") : F("Off");
   result += F(", Quiet: ");
-  result += (getQuiet() ? F("On") : F("Off"));
+  result += (this->getQuiet() ? F("On") : F("Off"));
+  result += F(", Powerful: ");
+  result += (this->getPowerful() ? F("On") : F("Off"));
   return result;
 }
 

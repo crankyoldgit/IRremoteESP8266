@@ -144,7 +144,7 @@ TEST(TestIRac, Daikin216) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 4 (HEAT), Temp: 31C, Fan: 11 (QUIET), "
-      "Swing (Horizontal): On, Swing (Vertical): On, Quiet: On";
+      "Swing (Horizontal): On, Swing (Vertical): On, Quiet: On, Powerful: Off";
 
   ac.begin();
   irac.daikin216(&ac,
@@ -154,7 +154,8 @@ TEST(TestIRac, Daikin216) {
                  stdAc::fanspeed_t::kMedium,  // Fan speed
                  stdAc::swingv_t::kAuto,      // Veritcal swing
                  stdAc::swingh_t::kLeft,      // Horizontal swing
-                 true);                       // Quiet
+                 true,                        // Quiet
+                 false);                      // Turbo (Powerful)
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
