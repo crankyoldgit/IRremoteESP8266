@@ -328,7 +328,7 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
 
 IRSamsungAc::IRSamsungAc(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRSamsungAc::stateReset() {
+void IRSamsungAc::stateReset(void) {
   for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = 0x02;
@@ -341,9 +341,10 @@ void IRSamsungAc::stateReset() {
   remote_state[10] = 0x71;
   remote_state[12] = 0x15;
   remote_state[13] = 0xF0;
+  _sendpower = false;
 }
 
-void IRSamsungAc::begin() { _irsend.begin(); }
+void IRSamsungAc::begin(void) { _irsend.begin(); }
 
 uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
@@ -384,6 +385,13 @@ void IRSamsungAc::checksum(uint16_t length) {
 // i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) checksum();
+  if (_sendpower) {  // Do we need to send a the special power on/off message?
+    if (this->getPower())
+      this->sendOn();
+    else
+      this->sendOff();
+    _sendpower = false;  // It's now been sent.
+  }
   _irsend.sendSamsungAC(remote_state, kSamsungAcStateLength, repeat);
 }
 
@@ -430,7 +438,7 @@ void IRSamsungAc::sendOff(const uint16_t repeat) {
 }
 #endif  // SEND_SAMSUNG_AC
 
-uint8_t *IRSamsungAc::getRaw() {
+uint8_t *IRSamsungAc::getRaw(void) {
   checksum();
   return remote_state;
 }
@@ -446,24 +454,26 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   }
 }
 
-void IRSamsungAc::on() {
+void IRSamsungAc::on(void) {
   remote_state[1] &= ~kSamsungAcPowerMask1;
   remote_state[6] |= kSamsungAcPowerMask2;
+  _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
-void IRSamsungAc::off() {
+void IRSamsungAc::off(void) {
   remote_state[1] |= kSamsungAcPowerMask1;
   remote_state[6] &= ~kSamsungAcPowerMask2;
+  _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
-void IRSamsungAc::setPower(const bool state) {
-  if (state)
-    on();
+void IRSamsungAc::setPower(const bool on) {
+  if (on)
+    this->on();
   else
-    off();
+    this->off();
 }
 
-bool IRSamsungAc::getPower() {
+bool IRSamsungAc::getPower(void) {
   return ((remote_state[6] & kSamsungAcPowerMask2) != 0) &&
          ((remote_state[1] & kSamsungAcPowerMask1) == 0);
 }
@@ -477,7 +487,7 @@ void IRSamsungAc::setTemp(const uint8_t temp) {
 }
 
 // Return the set temp. in deg C
-uint8_t IRSamsungAc::getTemp() {
+uint8_t IRSamsungAc::getTemp(void) {
   return ((remote_state[11] & kSamsungAcTempMask) >> 4) + kSamsungAcMinTemp;
 }
 
@@ -496,7 +506,7 @@ void IRSamsungAc::setMode(const uint8_t mode) {
   }
 }
 
-uint8_t IRSamsungAc::getMode() {
+uint8_t IRSamsungAc::getMode(void) {
   return (remote_state[12] & kSamsungAcModeMask) >> 4;
 }
 
@@ -518,42 +528,44 @@ void IRSamsungAc::setFan(const uint8_t speed) {
   remote_state[12] = (remote_state[12] & ~kSamsungAcFanMask) | (speed << 1);
 }
 
-uint8_t IRSamsungAc::getFan() {
+uint8_t IRSamsungAc::getFan(void) {
   return ((remote_state[12] & kSamsungAcFanMask) >> 1);
 }
 
-bool IRSamsungAc::getSwing() {
+bool IRSamsungAc::getSwing(void) {
   // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
   // e.g. 0xAE or 0XAF for swing move.
   return ((remote_state[9] & kSamsungAcSwingMask) >> 4) == kSamsungAcSwingMove;
 }
 
-void IRSamsungAc::setSwing(const bool state) {
+void IRSamsungAc::setSwing(const bool on) {
   // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
   // e.g. 0xAE or 0XAF for swing move.
   remote_state[9] &= ~kSamsungAcSwingMask;  // Clear the previous swing state.
-  if (state)
+  if (on)
     remote_state[9] |= (kSamsungAcSwingMove << 4);
   else
     remote_state[9] |= (kSamsungAcSwingStop << 4);
 }
 
-bool IRSamsungAc::getBeep() { return remote_state[13] & kSamsungAcBeepMask; }
+bool IRSamsungAc::getBeep(void) {
+  return remote_state[13] & kSamsungAcBeepMask;
+}
 
-void IRSamsungAc::setBeep(const bool state) {
-  if (state)
+void IRSamsungAc::setBeep(const bool on) {
+  if (on)
     remote_state[13] |= kSamsungAcBeepMask;
   else
     remote_state[13] &= ~kSamsungAcBeepMask;
 }
 
-bool IRSamsungAc::getClean() {
+bool IRSamsungAc::getClean(void) {
   return (remote_state[10] & kSamsungAcCleanMask10) &&
          (remote_state[11] & kSamsungAcCleanMask11);
 }
 
-void IRSamsungAc::setClean(const bool state) {
-  if (state) {
+void IRSamsungAc::setClean(const bool on) {
+  if (on) {
     remote_state[10] |= kSamsungAcCleanMask10;
     remote_state[11] |= kSamsungAcCleanMask11;
   } else {
@@ -563,13 +575,13 @@ void IRSamsungAc::setClean(const bool state) {
 }
 
 // Very unsure this is correct.
-bool IRSamsungAc::getQuiet() {
+bool IRSamsungAc::getQuiet(void) {
   return remote_state[11] & kSamsungAcQuietMask11;
 }
 
 // Very unsure this is correct.
-void IRSamsungAc::setQuiet(const bool state) {
-  if (state) {
+void IRSamsungAc::setQuiet(const bool on) {
+  if (on) {
     remote_state[11] |= kSamsungAcQuietMask11;
     setFan(kSamsungAcFanAuto);  // Quiet mode seems to set fan speed to auto.
   } else {
@@ -612,10 +624,10 @@ uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
 
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRSamsungAc::toString() {
+String IRSamsungAc::toString(void) {
   String result = "";
 #else
-std::string IRSamsungAc::toString() {
+std::string IRSamsungAc::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
