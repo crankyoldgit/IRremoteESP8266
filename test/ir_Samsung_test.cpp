@@ -1,5 +1,6 @@
 // Copyright 2017, 2018, 2019 David Conran
 
+#include <string>
 #include "ir_Samsung.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
