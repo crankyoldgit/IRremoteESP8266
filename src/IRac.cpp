@@ -27,6 +27,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Sharp.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
@@ -87,6 +88,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_SAMSUNG_AC
     case decode_type_t::SAMSUNG_AC:
+#endif
+#if SEND_SHARP_AC
+    case decode_type_t::SHARP_AC:
 #endif
 #if SEND_TCL112AC
     case decode_type_t::TCL112AC:
@@ -570,6 +574,31 @@ void IRac::samsung(IRSamsungAc *ac,
 }
 #endif  // SEND_SAMSUNG_AC
 
+#if SEND_SHARP_AC
+void IRac::sharp(IRSharpAc *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees, const stdAc::fanspeed_t fan) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Vertical swing setting available.
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  // Do setMode() again as it can affect fan speed and temp.
+  ac->setMode(ac->convertMode(mode));
+  ac->send();
+}
+#endif  // SEND_SHARP_AC
+
 #if SEND_TCL112AC
 void IRac::tcl112(IRTcl112Ac *ac,
                   const bool on, const stdAc::opmode_t mode,
@@ -914,6 +943,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_SAMSUNG_AC
+#if SEND_SHARP_AC
+    case SHARP_AC:
+    {
+      IRSharpAc ac(_pin);
+      ac.begin();
+      sharp(&ac, on, mode, degC, fan);
+      break;
+    }
+#endif  // SEND_SHARP_AC
 #if SEND_TCL112AC
     case TCL112AC:
     {

@@ -117,6 +117,9 @@
 #define DECODE_SHARP           true
 #define SEND_SHARP             true
 
+#define DECODE_SHARP_AC        true
+#define SEND_SHARP_AC          true
+
 #define DECODE_DENON           true
 #define SEND_DENON             true
 
@@ -232,7 +235,7 @@
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
      DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
-     DECODE_DAIKIN216)
+     DECODE_DAIKIN216 || DECODE_SHARP_AC)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -313,8 +316,9 @@ enum decode_type_t {
   MITSUBISHI_HEAVY_88,
   MITSUBISHI_HEAVY_152,  // 60
   DAIKIN216,
+  SHARP_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DAIKIN216,
+  kLastDecodeType = SHARP_AC,
 };
 
 // Message lengths & required repeat values
@@ -428,6 +432,9 @@ const uint16_t kSanyoLC7461Bits = (kSanyoLC7461AddressBits +
 const uint8_t  kSharpAddressBits = 5;
 const uint8_t  kSharpCommandBits = 8;
 const uint16_t kSharpBits = kSharpAddressBits + kSharpCommandBits + 2;  // 15
+const uint16_t kSharpAcStateLength = 13;
+const uint16_t kSharpAcBits = kSharpAcStateLength * 8;  // 104
+const uint16_t kSharpAcDefaultRepeat = kNoRepeat;
 const uint8_t  kSherwoodBits = kNECBits;
 const uint16_t kSherwoodMinRepeat = kSingleRepeat;
 const uint16_t kSony12Bits = 12;

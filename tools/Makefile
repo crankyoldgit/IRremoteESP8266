@@ -122,8 +122,8 @@ ir_MitsubishiHeavy.o : $(USER_DIR)/ir_MitsubishiHeavy.h $(USER_DIR)/ir_Mitsubish
 ir_Fujitsu.o : $(USER_DIR)/ir_Fujitsu.h $(USER_DIR)/ir_Fujitsu.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Fujitsu.cpp
 
-ir_Sharp.o : $(USER_DIR)/ir_Sharp.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sharp.cpp
+ir_Sharp.o : $(USER_DIR)/ir_Sharp.h $(USER_DIR)/ir_Sharp.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Sharp.cpp
 
 ir_RC5_RC6.o : $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_RC5_RC6.cpp

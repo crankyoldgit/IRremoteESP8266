@@ -23,6 +23,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Sharp.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
@@ -183,6 +184,11 @@ void daikin216(IRDaikin216 *ac,
                const bool quiet, const bool turbo, const bool clean,
                const bool beep, const bool dopower = true);
 #endif  // SEND_SAMSUNG_AC
+#if SEND_SHARP_AC
+  void sharp(IRSharpAc *ac,
+             const bool on, const stdAc::opmode_t mode,
+             const float degrees, const stdAc::fanspeed_t fan);
+#endif  // SEND_SHARP_AC
 #if SEND_TCL112AC
   void tcl112(IRTcl112Ac *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,

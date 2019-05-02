@@ -98,6 +98,7 @@ PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_Mitsubishi.h \
 		$(USER_DIR)/ir_MitsubishiHeavy.h \
 		$(USER_DIR)/ir_NEC.h \
+		$(USER_DIR)/ir_Sharp.h \
 		$(USER_DIR)/ir_Samsung.h \
 		$(USER_DIR)/ir_Trotec.h \
 		$(USER_DIR)/ir_Fujitsu.h \
@@ -288,7 +289,7 @@ ir_Fujitsu_test : $(COMMON_OBJ) ir_Fujitsu_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_Sharp.o : $(USER_DIR)/ir_Sharp.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Sharp.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Sharp.cpp
 
 ir_Sharp_test.o : ir_Sharp_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Sharp_test.cpp

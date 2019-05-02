@@ -667,6 +667,7 @@ void handleRoot(void) {
         "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
         "<option value='52'>MWM</option>"
         "<option value='46'>Samsung</option>"
+        "<option value='62'>Sharp</option>"
         "<option value='57'>TCL112</option>"
         "<option value='32'>Toshiba</option>"
         "<option value='28'>Trotec</option>"
@@ -1430,6 +1431,9 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       // Lastly, it should never exceed the maximum "extended" size.
       stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;
+    case SHARP_AC:
+      stateSize = kSharpAcStateLength;
+      break;
     case MWM:
       // MWM has variable size states, so make a best guess
       // which one we are being presented with based on the number of
@@ -1501,7 +1505,7 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       break;
 #endif
 #if SEND_DAIKIN216
-    case DAIKIN216:
+    case DAIKIN216:  // 61
       irsend->sendDaikin216(reinterpret_cast<uint8_t *>(state));
       break;
 #endif  // SEND_DAIKIN216
@@ -1573,6 +1577,11 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       irsend->sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
       break;
 #endif
+#if SEND_SHARP_AC
+    case SHARP_AC:  // 62
+      irsend->sendSharpAc(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif  // SEND_SHARP_AC
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
       irsend->sendElectraAC(reinterpret_cast<uint8_t *>(state));
@@ -2643,6 +2652,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
     case HITACHI_AC2:  // 42
     case WHIRLPOOL_AC:  // 45
     case SAMSUNG_AC:  // 46
+    case SHARP_AC:  // 62
     case ELECTRA_AC:  // 48
     case PANASONIC_AC:  // 49
     case MWM:  // 52
