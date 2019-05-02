@@ -542,7 +542,6 @@ std::string IRSharpAc::toString(void) {
 bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
                            const bool strict) {
   // Is there enough data to match successfully?
-  DPRINTLN(2 * nbits + kHeader + kFooter - 1);
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;
 
@@ -557,7 +556,7 @@ bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kSharpAcHdrSpace)) return false;
 
   // Data
-  // Keep reading bytes until we either run out of state to fill.
+  // Keep reading bytes until we run out of state to fill.
   for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits;
        i++, dataBitsSoFar += 8, offset += data_result.used) {
     // Read in a byte at a time.
