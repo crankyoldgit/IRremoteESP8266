@@ -192,6 +192,8 @@ decode_type_t strToDecodeType(const char *str) {
     return decode_type_t::SANYO_LC7461;
   else if (!strcmp(str, "SHARP"))
     return decode_type_t::SHARP;
+  else if (!strcmp(str, "SHARP_AC"))
+    return decode_type_t::SHARP_AC;
   else if (!strcmp(str, "SHERWOOD"))
     return decode_type_t::SHERWOOD;
   else if (!strcmp(str, "SONY"))
@@ -459,6 +461,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case SHARP:
       result = F("SHARP");
       break;
+    case SHARP_AC:
+      result = F("SHARP_AC");
+      break;
     case SHERWOOD:
       result = F("SHERWOOD");
       break;
@@ -516,6 +521,7 @@ bool hasACState(const decode_type_t protocol) {
     case MWM:
     case PANASONIC_AC:
     case SAMSUNG_AC:
+    case SHARP_AC:
     case TCL112AC:
     case TOSHIBA_AC:
     case WHIRLPOOL_AC:

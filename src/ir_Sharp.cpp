@@ -1,7 +1,11 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017 David Conran
+// Copyright 2017, 2019 David Conran
 
+#include "ir_Sharp.h"
 #include <algorithm>
+#ifndef ARDUINO
+#include <string>
+#endif
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
@@ -265,3 +269,326 @@ bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
   return true;
 }
 #endif  // (DECODE_SHARP || DECODE_DENON)
+
+#if SEND_SHARP_AC
+// Send a Sharp A/C message.
+//
+// Args:
+//   data: An array of kSharpAcStateLength bytes containing the IR command.
+//   nbytes: Nr. of bytes of data to send. i.e. length of `data`.
+//   repeat: Nr. of times the message should be repeated.
+//
+// Status: Alpha / Untested.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/638
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
+void IRsend::sendSharpAc(const unsigned char data[], const uint16_t nbytes,
+                         const uint16_t repeat) {
+  if (nbytes < kSharpAcStateLength)
+    return;  // Not enough bytes to send a proper message.
+
+  sendGeneric(kSharpAcHdrMark, kSharpAcHdrSpace,
+              kSharpAcBitMark, kSharpAcOneSpace,
+              kSharpAcBitMark, kSharpAcZeroSpace,
+              kSharpAcBitMark, kSharpAcGap,
+              data, nbytes, 38000, false, repeat, 50);
+}
+#endif  // SEND_SHARP_AC
+
+IRSharpAc::IRSharpAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRSharpAc::begin(void) { _irsend.begin(); }
+
+#if SEND_SHARP_AC
+void IRSharpAc::send(const uint16_t repeat) {
+  this->checksum();
+  _irsend.sendSharpAc(remote, kSharpAcStateLength, repeat);
+}
+#endif  // SEND_SHARP_AC
+
+// Calculate the checksum for a given state.
+// Args:
+//   state:  The array to verify the checksums of.
+//   length: The size of the state.
+// Returns:
+//   The 4 bit checksum.
+uint8_t IRSharpAc::calcChecksum(uint8_t state[], const uint16_t length) {
+  uint8_t xorsum = xorBytes(state, length - 1);
+  xorsum ^= (state[length - 1] & 0xF);
+  xorsum ^= xorsum >> 4;
+  return xorsum & 0xF;
+}
+
+// Verify the checksums are valid for a given state.
+// Args:
+//   state:  The array to verify the checksums of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRSharpAc::validChecksum(uint8_t state[], const uint16_t length) {
+  return (state[length - 1] >> 4) == calcChecksum(state, length);
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRSharpAc::checksum(void) {
+  remote[kSharpAcStateLength - 1] &= 0x0F;
+  remote[kSharpAcStateLength - 1] |= calcChecksum(remote) << 4;
+}
+
+void IRSharpAc::stateReset(void) {
+  static const uint8_t reset[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x01, 0x00, 0x00, 0x08, 0x80, 0x00, 0xE0,
+      0x01};
+  for (uint8_t i = 0; i < kSharpAcStateLength; i++) remote[i] = reset[i];
+}
+
+uint8_t *IRSharpAc::getRaw(void) {
+  this->checksum();  // Ensure correct settings before sending.
+  return remote;
+}
+
+void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
+  for (uint8_t i = 0; i < length && i < kSharpAcStateLength; i++)
+    remote[i] = new_code[i];
+}
+
+void IRSharpAc::on(void) { remote[kSharpAcBytePower] |= kSharpAcBitPower; }
+
+void IRSharpAc::off(void) { remote[kSharpAcBytePower] &= ~kSharpAcBitPower; }
+
+void IRSharpAc::setPower(const bool on) {
+  if (on)
+    this->on();
+  else
+    this->off();
+}
+
+bool IRSharpAc::getPower(void) {
+  return remote[kSharpAcBytePower] & kSharpAcBitPower;
+}
+
+// Set the temp in deg C
+void IRSharpAc::setTemp(const uint8_t temp) {
+  switch (this->getMode()) {
+    // Auto & Dry don't allow temp changes and have a special temp.
+    case kSharpAcAuto:
+    case kSharpAcDry:
+      remote[kSharpAcByteTemp] = 0;
+      remote[kSharpAcByteManual] = 0;  // When in Dry/Auto this byte is 0.
+      return;
+    default:
+      remote[kSharpAcByteTemp] = 0xC0;
+      remote[kSharpAcByteManual] |= kSharpAcBitTempManual;
+  }
+  uint8_t degrees = std::max(temp, kSharpAcMinTemp);
+  degrees = std::min(degrees, kSharpAcMaxTemp);
+  remote[kSharpAcByteTemp] &= ~kSharpAcMaskTemp;
+  remote[kSharpAcByteTemp] |= (degrees - kSharpAcMinTemp);
+}
+
+uint8_t IRSharpAc::getTemp(void) {
+  return (remote[kSharpAcByteTemp] & kSharpAcMaskTemp) + kSharpAcMinTemp;
+}
+
+uint8_t IRSharpAc::getMode(void) {
+  return remote[kSharpAcByteMode] & kSharpAcMaskMode;
+}
+
+void IRSharpAc::setMode(const uint8_t mode) {
+  const uint8_t special = 0x20;  // Non-auto modes have this bit set.
+  remote[kSharpAcBytePower] |= special;
+  switch (mode) {
+    case kSharpAcAuto:
+      remote[kSharpAcBytePower] &= ~special;  // Auto has this bit cleared.
+      // FALLTHRU
+    case kSharpAcDry:
+      this->setTemp(0);  // Dry/Auto have no temp setting.
+      // FALLTHRU
+    case kSharpAcCool:
+    case kSharpAcHeat:
+      remote[kSharpAcByteMode] &= ~kSharpAcMaskMode;
+      remote[kSharpAcByteMode] |= mode;
+
+      break;
+    default:
+      this->setMode(kSharpAcAuto);
+  }
+}
+
+// Set the speed of the fan
+void IRSharpAc::setFan(const uint8_t speed) {
+  remote[kSharpAcByteManual] |= kSharpAcBitFanManual;  // Manual fan mode.
+  switch (speed) {
+    case kSharpAcFanAuto:
+      // Clear the manual fan bit.
+      remote[kSharpAcByteManual] &= ~kSharpAcBitFanManual;
+      // FALLTHRU
+    case kSharpAcFanMin:
+    case kSharpAcFanMed:
+    case kSharpAcFanHigh:
+    case kSharpAcFanMax:
+      remote[kSharpAcByteFan] &= ~kSharpAcMaskFan;
+      remote[kSharpAcByteFan] |= (speed << 4);
+      break;
+    default:
+      this->setFan(kSharpAcFanAuto);
+  }
+}
+
+uint8_t IRSharpAc::getFan(void) {
+  return (remote[kSharpAcByteFan] & kSharpAcMaskFan) >> 4;
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kSharpAcCool;
+    case stdAc::opmode_t::kHeat:
+      return kSharpAcHeat;
+    case stdAc::opmode_t::kDry:
+      return kSharpAcDry;
+    // No Fan mode.
+    default:
+      return kSharpAcAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRSharpAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kSharpAcFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kSharpAcFanMed;
+    case stdAc::fanspeed_t::kHigh:
+      return kSharpAcFanHigh;
+    case stdAc::fanspeed_t::kMax:
+      return kSharpAcFanMax;
+    default:
+      return kSharpAcFanAuto;
+  }
+}
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRSharpAc::toString(void) {
+  String result = "";
+#else   // ARDUINO
+std::string IRSharpAc::toString(void) {
+  std::string result = "";
+#endif  // ARDUINO
+  result.reserve(60);  // Reserve some heap for the string to reduce fragging.
+  result += F("Power: ");
+  result += this->getPower() ? F("On") : F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
+  switch (this->getMode()) {
+    case kSharpAcAuto:
+      result += F(" (AUTO)");
+      break;
+    case kSharpAcCool:
+      result += F(" (COOL)");
+      break;
+    case kSharpAcHeat:
+      result += F(" (HEAT)");
+      break;
+    case kSharpAcDry:
+      result += F(" (DRY)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kSharpAcFanAuto:
+      result += F(" (AUTO)");
+      break;
+    case kSharpAcFanMin:
+      result += F(" (MIN)");
+      break;
+    case kSharpAcFanMed:
+      result += F(" (MED)");
+      break;
+    case kSharpAcFanHigh:
+      result += F(" (HIGH)");
+      break;
+    case kSharpAcFanMax:
+      result += F(" (MAX)");
+      break;
+  }
+  return result;
+}
+
+#if DECODE_SHARP_AC
+// Decode the supplied Sharp A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kSharpAcBits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / Should be working.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/638
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
+bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
+                           const bool strict) {
+  // Is there enough data to match successfully?
+  DPRINTLN(2 * nbits + kHeader + kFooter - 1);
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
+    return false;
+
+  // Compliance
+  if (strict && nbits != kSharpAcBits) return false;
+
+  uint16_t offset = kStartOffset;
+  match_result_t data_result;
+  uint16_t dataBitsSoFar = 0;
+  // Header
+  if (!matchMark(results->rawbuf[offset++], kSharpAcHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kSharpAcHdrSpace)) return false;
+
+  // Data
+  // Keep reading bytes until we either run out of state to fill.
+  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits;
+       i++, dataBitsSoFar += 8, offset += data_result.used) {
+    // Read in a byte at a time.
+    data_result =
+        matchData(&(results->rawbuf[offset]), 8,
+                  kSharpAcBitMark, kSharpAcOneSpace,
+                  kSharpAcBitMark, kSharpAcZeroSpace,
+                  kTolerance, kMarkExcess, false);
+    if (data_result.success == false) break;  // Fail
+    results->state[i] = (uint8_t)data_result.data;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], kSharpAcBitMark)) return false;
+  if (offset < results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], kSharpAcGap))
+    return false;
+
+  // Compliance
+  if (strict) {
+    // Re-check we got the correct size/length due to the way we read the data.
+    if (dataBitsSoFar != kSharpAcBits) return false;
+    if (!IRSharpAc::validChecksum(results->state)) return false;
+  }
+
+  // Success
+  results->decode_type = SHARP_AC;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_SHARP_AC

@@ -249,6 +249,11 @@ class IRrecv {
   bool decodeSharp(decode_results *results, uint16_t nbits = kSharpBits,
                    bool strict = true, bool expansion = true);
 #endif
+#if DECODE_SHARP_AC
+  bool decodeSharpAc(decode_results *results,
+                     const uint16_t nbits = kSharpAcBits,
+                     const bool strict = true);
+#endif
 #if DECODE_AIWA_RC_T501
   bool decodeAiwaRCT501(decode_results *results,
                         uint16_t nbits = kAiwaRcT501Bits, bool strict = true);

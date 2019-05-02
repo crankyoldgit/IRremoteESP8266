@@ -12,6 +12,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Sharp.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
@@ -572,6 +573,27 @@ TEST(TestIRac, Samsung) {
   ASSERT_EQ(expected_on, ac.toString());
 }
 
+TEST(TestIRac, Sharp) {
+  IRSharpAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 3 (MED)";
+
+  ac.begin();
+  irac.sharp(&ac,
+             true,                         // Power
+             stdAc::opmode_t::kCool,       // Mode
+             28,                           // Celsius
+             stdAc::fanspeed_t::kMedium);  // Fan speed
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(SHARP_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kSharpAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
 TEST(TestIRac, Tcl112) {
   IRTcl112Ac ac(0);
   IRac irac(0);

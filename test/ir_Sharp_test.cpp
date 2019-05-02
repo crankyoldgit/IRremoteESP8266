@@ -1,5 +1,8 @@
 // Copyright 2017 David Conran
 
+#include "ir_Sharp.h"
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -359,4 +362,318 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
 
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture));
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, false));
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+TEST(TestDecodeSharpAc, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  // cool-auto-27.txt
+  uint16_t rawData[211] = {
+      3804, 1892, 466, 486, 466, 1388, 466, 486, 466, 1386, 468, 486, 468, 1388,
+      466, 486, 466, 1386, 468, 488, 466, 1388, 466, 488, 466, 1386, 468, 1388,
+      466, 486, 466, 1388, 466, 486, 468, 1384, 468, 1388, 468, 1388, 466, 1388,
+      466, 486, 468, 484, 468, 1386, 468, 1386, 468, 486, 466, 486, 468, 486,
+      466, 488, 466, 1388, 466, 486, 466, 486, 468, 486, 466, 488, 466, 488,
+      466, 1386, 468, 1388, 466, 486, 468, 486, 466, 1388, 464, 1388, 466, 1386,
+      468, 486, 466, 486, 468, 486, 466, 1388, 468, 1384, 470, 486, 466, 486,
+      468, 486, 468, 1386, 468, 486, 468, 486, 468, 486, 468, 1388, 466, 486,
+      466, 486, 466, 486, 466, 488, 466, 486, 468, 486, 468, 486, 468, 486, 466,
+      486, 466, 486, 466, 488, 466, 486, 466, 486, 466, 1388, 466, 486, 468,
+      486, 466, 486, 468, 486, 468, 486, 466, 486, 466, 488, 466, 486, 466, 486,
+      466, 488, 466, 486, 468, 1386, 468, 486, 466, 486, 466, 1390, 464, 488,
+      466, 486, 468, 486, 468, 486, 466, 486, 466, 486, 466, 486, 468, 486, 468,
+      486, 466, 486, 466, 1386, 468, 1390, 466, 1388, 466, 1388, 468, 486, 466,
+      486, 468, 486, 466, 486, 466, 486, 466, 1390, 464, 486, 414};
+      // UNKNOWN F2B82C78
+  uint8_t expectedState[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
+      0x41};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 211, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SHARP_AC, irsend.capture.decode_type);
+  ASSERT_EQ(kSharpAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSharpAc ac(0);
+  ac.begin();
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 27C, Fan: 2 (AUTO)",
+            ac.toString());
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+TEST(TestDecodeSharpAc, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  // cool-auto-27.txt
+  uint8_t expectedState[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
+      0x41};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendSharpAc(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SHARP_AC, irsend.capture.decode_type);
+  ASSERT_EQ(kSharpAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestIRUtils, Sharp) {
+  ASSERT_EQ("SHARP", typeToString(decode_type_t::SHARP));
+  ASSERT_EQ(decode_type_t::SHARP, strToDecodeType("SHARP"));
+  ASSERT_FALSE(hasACState(decode_type_t::SHARP));
+}
+
+TEST(TestIRUtils, SharpAc) {
+  ASSERT_EQ("SHARP_AC", typeToString(decode_type_t::SHARP_AC));
+  ASSERT_EQ(decode_type_t::SHARP_AC, strToDecodeType("SHARP_AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::SHARP_AC));
+}
+
+// Tests for IRSharpAc class.
+
+TEST(TestSharpAcClass, Power) {
+  IRSharpAc ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestSharpAcClass, Checksum) {
+  uint8_t state[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
+      0x41};
+  EXPECT_EQ(0x4, IRSharpAc::calcChecksum(state));
+  EXPECT_TRUE(IRSharpAc::validChecksum(state));
+  // Change the state so it is not valid.
+  state[3] = 0;
+  EXPECT_FALSE(IRSharpAc::validChecksum(state));
+}
+
+TEST(TestSharpAcClass, Temperature) {
+  IRSharpAc ac(0);
+  ac.begin();
+  ac.setMode(kSharpAcCool);  // Cool mode doesn't have temp restrictions.
+
+  ac.setTemp(0);
+  EXPECT_EQ(kSharpAcMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kSharpAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(kSharpAcMinTemp);
+  EXPECT_EQ(kSharpAcMinTemp, ac.getTemp());
+
+  ac.setTemp(kSharpAcMaxTemp);
+  EXPECT_EQ(kSharpAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(kSharpAcMinTemp - 1);
+  EXPECT_EQ(kSharpAcMinTemp, ac.getTemp());
+
+  ac.setTemp(kSharpAcMaxTemp + 1);
+  EXPECT_EQ(kSharpAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(kSharpAcMinTemp + 1);
+  EXPECT_EQ(kSharpAcMinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestSharpAcClass, OperatingMode) {
+  IRSharpAc ac(0);
+  ac.begin();
+
+  ac.setTemp(25);
+  ac.setMode(kSharpAcAuto);
+  EXPECT_EQ(kSharpAcAuto, ac.getMode());
+
+  ac.setMode(kSharpAcCool);
+  EXPECT_EQ(kSharpAcCool, ac.getMode());
+
+  ac.setMode(kSharpAcHeat);
+  EXPECT_EQ(kSharpAcHeat, ac.getMode());
+
+  ac.setMode(kSharpAcDry);
+  EXPECT_EQ(kSharpAcDry, ac.getMode());
+  ASSERT_EQ(kSharpAcMinTemp, ac.getTemp());  // Dry mode restricts the temp.
+  ac.setTemp(25);
+  ASSERT_EQ(kSharpAcMinTemp, ac.getTemp());
+
+  ac.setMode(kSharpAcDry + 1);
+  EXPECT_EQ(kSharpAcAuto, ac.getMode());
+
+  ac.setMode(kSharpAcCool);
+  EXPECT_EQ(kSharpAcCool, ac.getMode());
+  // We are no longer restricted.
+  ac.setTemp(25);
+  ASSERT_EQ(25, ac.getTemp());
+
+  ac.setMode(255);
+  EXPECT_EQ(kSharpAcAuto, ac.getMode());
+}
+
+
+TEST(TestSharpAcClass, FanSpeed) {
+  IRSharpAc ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  ac.setFan(kSharpAcFanMax);
+  EXPECT_EQ(kSharpAcFanMax, ac.getFan());
+
+  // Beyond Max should default to Auto.
+  ac.setFan(kSharpAcFanMax + 1);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  ac.setFan(kSharpAcFanMed);
+  EXPECT_EQ(kSharpAcFanMed, ac.getFan());
+
+  ac.setFan(kSharpAcFanMin);
+  EXPECT_EQ(kSharpAcFanMin, ac.getFan());
+
+  ac.setFan(kSharpAcFanAuto - 1);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  ac.setFan(kSharpAcFanMax + 1);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  ac.setFan(kSharpAcFanAuto);
+  EXPECT_EQ(kSharpAcFanAuto, ac.getFan());
+}
+
+TEST(TestSharpAcClass, ReconstructKnownState) {
+  IRSharpAc ac(0);
+  ac.begin();
+
+  uint8_t on_auto_auto[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
+      0x01};
+  ac.on();
+  ac.setMode(kSharpAcAuto);
+  ac.setTemp(kSharpAcMinTemp);
+  ac.setFan(kSharpAcFanAuto);
+  EXPECT_STATE_EQ(on_auto_auto, ac.getRaw(), kSharpAcBits);
+  EXPECT_EQ("Power: On, Mode: 0 (AUTO), Temp: 15C, Fan: 2 (AUTO)",
+            ac.toString());
+
+  uint8_t cool_auto_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
+      0x51};
+  ac.stateReset();
+  ac.on();
+  ac.setMode(kSharpAcCool);
+  ac.setTemp(28);
+  ac.setFan(kSharpAcFanAuto);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 2 (AUTO)",
+            ac.toString());
+  EXPECT_STATE_EQ(cool_auto_28, ac.getRaw(), kSharpAcBits);
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+TEST(TestSharpAcClass, KnownStates) {
+  IRSharpAc ac(0);
+  ac.begin();
+
+  uint8_t off_auto_auto[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x21, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
+      0x31};
+  ASSERT_TRUE(ac.validChecksum(off_auto_auto));
+  ac.setRaw(off_auto_auto);
+  EXPECT_EQ("Power: Off, Mode: 0 (AUTO), Temp: 15C, Fan: 2 (AUTO)",
+            ac.toString());
+  uint8_t on_auto_auto[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
+      0x01};
+  ASSERT_TRUE(ac.validChecksum(on_auto_auto));
+  ac.setRaw(on_auto_auto);
+  EXPECT_EQ("Power: On, Mode: 0 (AUTO), Temp: 15C, Fan: 2 (AUTO)",
+            ac.toString());
+  uint8_t cool_auto_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
+      0x51};
+  ASSERT_TRUE(ac.validChecksum(cool_auto_28));
+  ac.setRaw(cool_auto_28);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 2 (AUTO)",
+            ac.toString());
+  uint8_t cool_fan1_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x42, 0x00, 0x08, 0x80, 0x05, 0xE0,
+      0x21};
+  ASSERT_TRUE(ac.validChecksum(cool_fan1_28));
+  ac.setRaw(cool_fan1_28);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 4 (MIN)",
+            ac.toString());
+  uint8_t cool_fan2_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x32, 0x00, 0x08, 0x80, 0x05, 0xE0,
+      0x51};
+  ASSERT_TRUE(ac.validChecksum(cool_fan2_28));
+  ac.setRaw(cool_fan2_28);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 3 (MED)",
+            ac.toString());
+  uint8_t cool_fan3_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x52, 0x00, 0x08, 0x80, 0x05, 0xE0,
+      0x31};
+  ASSERT_TRUE(ac.validChecksum(cool_fan3_28));
+  ac.setRaw(cool_fan3_28);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 5 (HIGH)",
+            ac.toString());
+  uint8_t cool_fan4_28[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x72, 0x00, 0x08, 0x80, 0x05, 0xE0,
+      0x11};
+  ASSERT_TRUE(ac.validChecksum(cool_fan4_28));
+  ac.setRaw(cool_fan4_28);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 7 (MAX)",
+            ac.toString());
+  /* Unsupported / Not yet reverse engineered.
+  uint8_t cool_fan4_28_ion_on[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x61, 0x72, 0x08, 0x08, 0x80, 0x00, 0xE4,
+      0xD1};
+  ASSERT_TRUE(ac.validChecksum(cool_fan4_28_ion_on));
+  ac.setRaw(cool_fan4_28_ion_on);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 7 (MAX)",
+            ac.toString());
+  uint8_t cool_fan4_28_eco1[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x61, 0x72, 0x18, 0x08, 0x80, 0x00, 0xE8,
+      0x01};
+  ASSERT_TRUE(ac.validChecksum(cool_fan4_28_eco1));
+  ac.setRaw(cool_fan4_28_eco1);
+  EXPECT_EQ("Power: On, Mode: 2 (COOL), Temp: 28C, Fan: 7 (MAX)",
+            ac.toString()); */
+  uint8_t dry_auto[kSharpAcStateLength] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x31, 0x23, 0x00, 0x08, 0x80, 0x00, 0xE0,
+      0x11};
+  ASSERT_TRUE(ac.validChecksum(dry_auto));
+  ac.setRaw(dry_auto);
+  EXPECT_EQ("Power: On, Mode: 3 (DRY), Temp: 15C, Fan: 2 (AUTO)",
+            ac.toString());
 }

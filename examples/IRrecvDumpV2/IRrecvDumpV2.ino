@@ -38,6 +38,7 @@
 #include <ir_MitsubishiHeavy.h>
 #include <ir_Panasonic.h>
 #include <ir_Samsung.h>
+#include <ir_Sharp.h>
 #include <ir_Tcl.h>
 #include <ir_Teco.h>
 #include <ir_Toshiba.h>
@@ -216,6 +217,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_SAMSUNG_AC
+#if DECODE_SHARP_AC
+  if (results->decode_type == SHARP_AC) {
+    IRSharpAc ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_SHARP_AC
 #if DECODE_COOLIX
   if (results->decode_type == COOLIX) {
     IRCoolixAC ac(0);

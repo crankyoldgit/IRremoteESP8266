@@ -160,6 +160,11 @@ class IRsend {
   void sendSharpRaw(uint64_t data, uint16_t nbits = kSharpBits,
                     uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_SHARP_AC
+  void sendSharpAc(const unsigned char data[],
+                   const uint16_t nbytes = kSharpAcStateLength,
+                   const uint16_t repeat = kSharpAcDefaultRepeat);
+#endif  // SEND_SHARP_AC
 #if SEND_JVC
   void sendJVC(uint64_t data, uint16_t nbits = kJvcBits,
                uint16_t repeat = kNoRepeat);
