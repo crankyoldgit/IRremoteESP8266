@@ -120,6 +120,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::GICABLE;
   else if (!strcmp(str, "GLOBALCACHE"))
     return decode_type_t::GLOBALCACHE;
+  else if (!strcmp(str, "GOODWEATHER"))
+    return decode_type_t::GOODWEATHER;
   else if (!strcmp(str, "GREE"))
     return decode_type_t::GREE;
   else if (!strcmp(str, "HAIER_AC"))
@@ -343,6 +345,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case GLOBALCACHE:
       result = F("GLOBALCACHE");
+      break;
+    case GOODWEATHER:
+      result = F("GOODWEATHER");
       break;
     case GREE:
       result = F("GREE");

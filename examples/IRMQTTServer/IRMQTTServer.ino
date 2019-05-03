@@ -591,6 +591,7 @@ void handleRoot(void) {
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
         "<option value='43'>GICable</option>"
+        "<option value='63'>Goodweather</option>"
         "<option value='6'>JVC</option>"
         "<option value='36'>Lasertag</option>"
         "<option value='58'>LEGOPF</option>"
@@ -2811,6 +2812,13 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       irsend->sendLegoPf(code, bits, repeat);
       break;
 #endif
+#if SEND_GOODWEATHER
+    case GOODWEATHER:  // 63
+      if (bits == 0) bits = kGoodweatherBits;
+      repeat = std::max(repeat, kGoodweatherMinRepeat);
+      irsend->sendGoodweather(code, bits, repeat);
+      break;
+#endif  // SEND_GOODWEATHER
     default:
       // If we got here, we didn't know how to send it.
       success = false;

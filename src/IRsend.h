@@ -307,6 +307,11 @@ class IRsend {
   void sendGree(uint8_t data[], uint16_t nbytes = kGreeStateLength,
                 uint16_t repeat = kGreeDefaultRepeat);
 #endif
+#if SEND_GOODWEATHER
+  void sendGoodweather(const uint64_t data,
+                       const uint16_t nbits = kGoodweatherBits,
+                       const uint16_t repeat = kGoodweatherMinRepeat);
+#endif  // SEND_GOODWEATHER
 #if SEND_PRONTO
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif

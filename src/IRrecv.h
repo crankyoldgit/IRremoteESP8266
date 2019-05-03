@@ -307,6 +307,11 @@ class IRrecv {
   bool decodeCarrierAC(decode_results *results, uint16_t nbits = kCarrierAcBits,
                        bool strict = true);
 #endif
+#if DECODE_GOODWEATHER
+  bool decodeGoodweather(decode_results *results,
+                         const uint16_t nbits = kGoodweatherBits,
+                         const bool strict = true);
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
   bool decodeGree(decode_results *results, uint16_t nbits = kGreeBits,
                   bool strict = true);
