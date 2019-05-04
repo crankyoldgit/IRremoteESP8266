@@ -394,13 +394,13 @@ void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
   remote[kDaikinByteClockMinsLow] = mins;
-  // only keep 4 bits
-  remote[kDaikinByteClockMinsHigh] &= 0xF0;
-  remote[kDaikinByteClockMinsHigh] |= ((mins >> 8) & 0x0F);
+  // only keep 3 bits
+  remote[kDaikinByteClockMinsHigh] &= 0xF8;
+  remote[kDaikinByteClockMinsHigh] |= ((mins >> 8) & 0x07);
 }
 
 uint16_t IRDaikinESP::getCurrentTime(void) {
-  return ((remote[kDaikinByteClockMinsHigh] & 0x0F) << 8) +
+  return ((remote[kDaikinByteClockMinsHigh] & 0x07) << 8) +
       remote[kDaikinByteClockMinsLow];
 }
 

@@ -29,7 +29,7 @@
         byte 7= checksum of the first part (and last byte before a 29ms pause)
         byte 13=Current time, mins past midnight, low bits
         byte 14
-        b0-b3=Current time, mins past midnight, high bits
+                b2-b0=Current time, mins past midnight, high bits
         byte 15= checksum of the second part (and last byte before a 29ms pause)
         byte 21=mode
                 b7 = 0
