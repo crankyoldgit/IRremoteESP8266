@@ -29,6 +29,7 @@
         byte 7= checksum of the first part (and last byte before a 29ms pause)
         byte 13=Current time, mins past midnight, low bits
         byte 14
+                b5-b3=Day of the week (SUN=1, MON=2, ..., SAT=7)
                 b2-b0=Current time, mins past midnight, high bits
         byte 15= checksum of the second part (and last byte before a 29ms pause)
         byte 21=mode
@@ -270,6 +271,8 @@ class IRDaikinESP {
   bool getOffTimerEnabled(void);
   void setCurrentTime(const uint16_t mins_since_midnight);
   uint16_t getCurrentTime(void);
+  void setCurrentDay(const uint8_t day_of_week);
+  uint8_t getCurrentDay(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kDaikinStateLength);
