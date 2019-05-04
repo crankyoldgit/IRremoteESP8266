@@ -515,6 +515,8 @@ std::string IRDaikinESP::toString(void) {
     result +=F("FRI"); break;
   case 7:
     result +=F("SAT"); break;
+  default:
+    result +=F("(UNKNOWN)"); break;
   }
   result += F(", On Time: ");
   if (this->getOnTimerEnabled())
