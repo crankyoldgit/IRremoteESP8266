@@ -859,7 +859,8 @@ TEST(TestDecodeDaikin, RealExample) {
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
       "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), On Time: 21:30, Off Time: 6:10", ac.toString());
+      "Current Time: 22:18, Current Day: (UNKNOWN), "
+      "On Time: 21:30, Off Time: 6:10", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -891,7 +892,8 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
       "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), On Time: 21:30, Off Time: 6:10", ac.toString());
+      "Current Time: 22:18, Current Day: (UNKNOWN), "
+      "On Time: 21:30, Off Time: 6:10", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -919,7 +921,8 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
       "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), On Time: 21:30, Off Time: 6:10", ac.toString());
+      "Current Time: 22:18, Current Day: (UNKNOWN), "
+      "On Time: 21:30, Off Time: 6:10", ac.toString());
 }
 
 // Test decoding a message captured from a real IR remote.
