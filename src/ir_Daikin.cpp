@@ -500,7 +500,7 @@ std::string IRDaikinESP::toString(void) {
   result += F(", Current Time: ");
   result += this->renderTime(this->getCurrentTime());
   result += F(", Current Day: ");
-  switch(this->getCurrentDay()) {
+  switch (this->getCurrentDay()) {
   case 1:
     result +=F("SUN"); break;
   case 2:
