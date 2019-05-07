@@ -394,14 +394,27 @@ void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
   remote[kDaikinByteClockMinsLow] = mins;
-  // only keep 4 bits
-  remote[kDaikinByteClockMinsHigh] &= 0xF0;
-  remote[kDaikinByteClockMinsHigh] |= ((mins >> 8) & 0x0F);
+  // only keep 3 bits
+  remote[kDaikinByteClockMinsHigh] &= 0xF8;
+  remote[kDaikinByteClockMinsHigh] |= ((mins >> 8) & 0x07);
 }
 
 uint16_t IRDaikinESP::getCurrentTime(void) {
-  return ((remote[kDaikinByteClockMinsHigh] & 0x0F) << 8) +
+  return ((remote[kDaikinByteClockMinsHigh] & 0x07) << 8) +
       remote[kDaikinByteClockMinsLow];
+}
+
+void IRDaikinESP::setCurrentDay(const uint8_t day_of_week) {
+  // 1 is SUN, 2 is MON, ..., 7 is SAT
+  uint8_t days = day_of_week;
+  if (days > 7) days = 0;  // Enforce the limit
+  // Update bits 5-3
+  remote[kDaikinByteClockMinsHigh] &= 0xc7;
+  remote[kDaikinByteClockMinsHigh] |= days << 3;
+}
+
+uint8_t IRDaikinESP::getCurrentDay(void) {
+  return ((remote[kDaikinByteClockMinsHigh] & 0x38) >> 3);
 }
 
 #ifdef ARDUINO
@@ -486,6 +499,25 @@ std::string IRDaikinESP::toString(void) {
   result += this->getSwingVertical() ? F("On") : F("Off");
   result += F(", Current Time: ");
   result += this->renderTime(this->getCurrentTime());
+  result += F(", Current Day: ");
+  switch (this->getCurrentDay()) {
+  case 1:
+    result +=F("SUN"); break;
+  case 2:
+    result +=F("MON"); break;
+  case 3:
+    result +=F("TUE"); break;
+  case 4:
+    result +=F("WED"); break;
+  case 5:
+    result +=F("THU"); break;
+  case 6:
+    result +=F("FRI"); break;
+  case 7:
+    result +=F("SAT"); break;
+  default:
+    result +=F("(UNKNOWN)"); break;
+  }
   result += F(", On Time: ");
   if (this->getOnTimerEnabled())
     result += this->renderTime(this->getOnTime());
