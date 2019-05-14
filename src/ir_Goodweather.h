@@ -27,29 +27,18 @@
 // Constants
 
 // Timing
-const uint16_t kGoodweatherTick = 620;
-const uint16_t kGoodweatherBitMarkTicks = 1;
-const uint16_t kGoodweatherBitMark = kGoodweatherBitMarkTicks *
-    kGoodweatherTick;
-const uint16_t kGoodweatherOneSpaceTicks = 1;
-const uint16_t kGoodweatherOneSpace = kGoodweatherOneSpaceTicks *
-    kGoodweatherTick;
-const uint16_t kGoodweatherZeroSpaceTicks = 3;
-const uint16_t kGoodweatherZeroSpace = kGoodweatherZeroSpaceTicks *
-    kGoodweatherTick;
-const uint16_t kGoodweatherHdrMarkTicks = 11;
-const uint16_t kGoodweatherHdrMark = kGoodweatherHdrMarkTicks *
-    kGoodweatherTick;
-const uint16_t kGoodweatherHdrSpaceTicks = 11;
-const uint16_t kGoodweatherHdrSpace = kGoodweatherHdrSpaceTicks *
-    kGoodweatherTick;
+const uint16_t kGoodweatherBitMark = 640;
+const uint16_t kGoodweatherOneSpace = 580;
+const uint16_t kGoodweatherZeroSpace = 1600;
+const uint16_t kGoodweatherHdrMark = 6800;
+const uint16_t kGoodweatherHdrSpace = 6800;
 
 // Masks
 const uint8_t kGoodweatherBitLight = 8;
 const uint64_t kGoodweatherLightMask = 0x1ULL << kGoodweatherBitLight;
-const uint8_t kGoodweatherBitTurbo = 11;
+const uint8_t kGoodweatherBitTurbo = kGoodweatherBitLight + 3;  // 11
 const uint64_t kGoodweatherTurboMask = 0x1ULL << kGoodweatherBitTurbo;
-const uint8_t kGoodweatherBitSleep = 24;
+const uint8_t kGoodweatherBitSleep = kGoodweatherBitTurbo + 13;  // 24
 const uint64_t kGoodweatherSleepMask = 0x1ULL << kGoodweatherBitSleep;
 const uint8_t kGoodweatherBitPower = kGoodweatherBitSleep + 1;  // 25
 const uint64_t kGoodweatherPowerMask = 0x1ULL << kGoodweatherBitPower;

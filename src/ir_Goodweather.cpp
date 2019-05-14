@@ -22,7 +22,7 @@
 // Args:
 //   data: The raw message to be sent.
 //   nbits: Nr. of bits of data in the message. (Default is kGoodweatherBits)
-//   repeat: Nr. of times the message is to be repeated. (Default = 1).
+//   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
 // Status: ALPHA / Untested.
 //
@@ -51,6 +51,8 @@ void IRsend::sendGoodweather(const uint64_t data, const uint16_t nbits,
     // Footer
     mark(kGoodweatherBitMark);
     space(kGoodweatherHdrSpace);
+    mark(kGoodweatherBitMark);
+    space(kDefaultMessageGap);
   }
 }
 #endif  // SEND_GOODWEATHER
@@ -329,7 +331,7 @@ std::string IRGoodweatherAc::toString() {
 bool IRrecv::decodeGoodweather(decode_results* results,
                                const uint16_t nbits,
                                const bool strict) {
-  if (results->rawlen < 2 * (2 * nbits + kHeader + kFooter) - 1)
+  if (results->rawlen < 2 * (2 * nbits) + kHeader + 2 * kFooter - 1)
     return false;  // Can't possibly be a valid Goodweather message.
   if (strict && nbits != kGoodweatherBits)
     return false;  // Not strictly a Goodweather message.
@@ -377,6 +379,9 @@ bool IRrecv::decodeGoodweather(decode_results* results,
   }
 
   // Footer.
+  if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kGoodweatherHdrSpace))
+    return false;
   if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark)) return false;
   if (offset <= results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], kGoodweatherHdrSpace))
