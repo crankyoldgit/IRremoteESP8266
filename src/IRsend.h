@@ -70,6 +70,28 @@ namespace stdAc {
     kRight =    4,
     kRightMax = 5,
   };
+
+  // Structure to hold a common A/C state.
+  typedef struct {
+    decode_type_t protocol;
+    int16_t model;
+    bool power;
+    stdAc::opmode_t mode;
+    float degrees;
+    bool celsius;
+    stdAc::fanspeed_t fanspeed;
+    stdAc::swingv_t swingv;
+    stdAc::swingh_t swingh;
+    bool quiet;
+    bool turbo;
+    bool econo;
+    bool light;
+    bool filter;
+    bool clean;
+    bool beep;
+    int16_t sleep;
+    int16_t clock;
+  } state_t;
 };  // namespace stdAc
 
 // Classes
