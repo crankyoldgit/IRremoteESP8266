@@ -1904,3 +1904,107 @@ TEST(TestDecodeDaikin216, SyntheticExample) {
   ASSERT_EQ(kDaikin216Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
+
+TEST(TestDaikinClass, toCommon) {
+  IRDaikinESP ac(0);
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(20);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(true);
+  ac.setSwingHorizontal(true);
+  ac.setQuiet(false);
+  ac.setPowerful(true);
+  ac.setEcono(false);
+  ac.setMold(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::DAIKIN, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDaikin2Class, toCommon) {
+  IRDaikin2 ac(0);
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(20);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(kDaikin2SwingVHigh + 3);
+  ac.setSwingHorizontal(kDaikin2SwingHAuto);
+  ac.setQuiet(false);
+  ac.setPowerful(true);
+  ac.setEcono(false);
+  ac.setMold(true);
+  ac.setLight(true);
+  ac.setPurify(true);
+  ac.setBeep(true);
+  ac.enableSleepTimer(6 * 60);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::DAIKIN2, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_TRUE(ac.toCommon().light);
+  ASSERT_TRUE(ac.toCommon().filter);
+  ASSERT_TRUE(ac.toCommon().beep);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(6 * 60, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDaikin216Class, toCommon) {
+  IRDaikin216 ac(0);
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(20);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(true);
+  ac.setSwingHorizontal(true);
+  ac.setQuiet(false);
+  ac.setPowerful(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::DAIKIN216, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

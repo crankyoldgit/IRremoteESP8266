@@ -3068,6 +3068,30 @@ bool decodeCommonAc(const decode_results *decode) {
   stdAc::state_t state = climate;
   debug("Converting inbound IR A/C message to common A/C");
   switch (decode->decode_type) {
+#if DECODE_DAIKIN
+    case decode_type_t::DAIKIN: {
+      IRDaikinESP ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN2
+    case decode_type_t::DAIKIN2: {
+      IRDaikin2 ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN216
+    case decode_type_t::DAIKIN216: {
+      IRDaikin216 ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN216
 #if DECODE_FUJITSU_AC
     case decode_type_t::FUJITSU_AC: {
       IRFujitsuAC ac(IR_LED);

@@ -280,6 +280,9 @@ class IRDaikinESP {
                             const uint16_t length = kDaikinStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);
@@ -372,6 +375,9 @@ class IRDaikin2 {
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString();
   static String renderTime(uint16_t timemins);
@@ -427,6 +433,7 @@ class IRDaikin216 {
   bool getQuiet(void);
   void setPowerful(const bool on);
   bool getPowerful(void);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);

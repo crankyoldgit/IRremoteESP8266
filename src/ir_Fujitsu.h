@@ -106,8 +106,8 @@ class IRFujitsuAC {
   bool getPower(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(stdAc::fanspeed_t speed);
-  stdAc::opmode_t toCommonMode(const uint8_t mode);
-  stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString(void);
