@@ -558,3 +558,70 @@ TEST(TestDecodeFujitsuAC, Issue414) {
       "m448s1182m448s1182m448s390m448s1182m448s390m448s1182m448s390m448s390"
       "m448s8100", irsend.outputStr());
 }
+
+
+TEST(TestIRFujitsuACClass, toCommon) {
+  IRFujitsuAC ac(0);
+  ac.setMode(kFujitsuAcModeCool);
+  ac.setTemp(20);
+  ac.setFanSpeed(kFujitsuAcFanQuiet);
+  ac.setSwing(kFujitsuAcSwingBoth);
+
+  // Now test it.
+  ASSERT_EQ(decode_type_t::FUJITSU_AC, ac.toCommon().protocol);
+  ASSERT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_TRUE(ac.toCommon().quiet);
+
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+
+  // Check off mode which is special.
+  ac.off();
+  ASSERT_FALSE(ac.toCommon().power);
+  ac.send();
+  ac.stateReset();
+  IRrecv irrecv(0);
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
+  ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
+
+  // Now test it.
+  EXPECT_EQ(    // Off mode technically has no temp, mode, fan, etc.
+      "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), "
+      "Swing: Off, Command: N/A", ac.toString());
+  ASSERT_EQ(decode_type_t::FUJITSU_AC, ac.toCommon().protocol);
+  ASSERT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
+  ASSERT_FALSE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(16, ac.toCommon().degrees);
+  ASSERT_FALSE(ac.toCommon().quiet);
+
+  ASSERT_EQ(stdAc::opmode_t::kAuto, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kAuto, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

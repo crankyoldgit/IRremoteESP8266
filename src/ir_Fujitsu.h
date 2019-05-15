@@ -76,38 +76,43 @@ enum fujitsu_ac_remote_model_t {
 
 class IRFujitsuAC {
  public:
-  explicit IRFujitsuAC(uint16_t pin, fujitsu_ac_remote_model_t model = ARRAH2E);
+  explicit IRFujitsuAC(const uint16_t pin,
+                       const fujitsu_ac_remote_model_t model = ARRAH2E);
 
-  void setModel(fujitsu_ac_remote_model_t model);
-  void stateReset();
+  void setModel(const fujitsu_ac_remote_model_t model);
+  fujitsu_ac_remote_model_t getModel(void);
+  void stateReset(void);
 #if SEND_FUJITSU_AC
   void send(const uint16_t repeat = kFujitsuAcMinRepeat);
 #endif  // SEND_FUJITSU_AC
-  void begin();
-  void off();
-  void stepHoriz();
-  void stepVert();
-  void setCmd(uint8_t cmd);
-  uint8_t getCmd();
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
-  void setFanSpeed(uint8_t fan);
-  uint8_t getFanSpeed();
-  void setMode(uint8_t mode);
-  uint8_t getMode();
-  void setSwing(uint8_t mode);
-  uint8_t getSwing();
-  uint8_t* getRaw();
+  void begin(void);
+  void off(void);
+  void stepHoriz(void);
+  void stepVert(void);
+  void setCmd(const uint8_t cmd);
+  uint8_t getCmd(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void);
+  void setFanSpeed(const uint8_t fan);
+  uint8_t getFanSpeed(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwing(const uint8_t mode);
+  uint8_t getSwing(void);
+  uint8_t* getRaw(void);
   bool setRaw(const uint8_t newState[], const uint16_t length);
-  uint8_t getStateLength();
-  static bool validChecksum(uint8_t* state, uint16_t length);
-  bool getPower();
+  uint8_t getStateLength(void);
+  static bool validChecksum(uint8_t* state, const uint16_t length);
+  bool getPower(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(stdAc::fanspeed_t speed);
+  stdAc::opmode_t toCommonMode(const uint8_t mode);
+  stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -125,7 +130,7 @@ class IRFujitsuAC {
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
-  void buildState();
+  void buildState(void);
   void buildFromState(const uint16_t length);
 };
 

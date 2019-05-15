@@ -3068,6 +3068,14 @@ bool decodeCommonAc(const decode_results *decode) {
   stdAc::state_t state = climate;
   debug("Converting inbound IR A/C message to common A/C");
   switch (decode->decode_type) {
+#if DECODE_FUJITSU_AC
+    case decode_type_t::FUJITSU_AC: {
+      IRFujitsuAC ac(IR_LED);
+      ac.setRaw(decode->state, decode->bits / 8);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_FUJITSU_AC
 #if DECODE_KELVINATOR
     case decode_type_t::KELVINATOR: {
       IRKelvinatorAC ac(IR_LED);

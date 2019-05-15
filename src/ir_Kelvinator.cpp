@@ -375,7 +375,7 @@ uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert the a native mode to it's common equivalent.
+// Convert a native mode to it's common equivalent.
 stdAc::opmode_t IRKelvinatorAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kKelvinatorCool: return stdAc::opmode_t::kCool;
@@ -386,7 +386,7 @@ stdAc::opmode_t IRKelvinatorAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert the a native fan speed to it's common equivalent.
+// Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRKelvinatorAC::toCommonFanSpeed(const uint8_t speed) {
   return (stdAc::fanspeed_t)speed;
 }
