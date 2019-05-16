@@ -312,6 +312,7 @@ void IRac::gree(IRGreeAC *ac,
   ac->setXFan(clean);
   ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
   // No Horizontal Swing setting available.
+  // No Econo setting available.
   // No Filter setting available.
   // No Beep setting available.
   // No Quiet setting available.

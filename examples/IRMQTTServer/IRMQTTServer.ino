@@ -3108,6 +3108,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_GREE
+    case decode_type_t::GREE: {
+      IRGreeAC ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_GREE
 #if DECODE_KELVINATOR
     case decode_type_t::KELVINATOR: {
       IRKelvinatorAC ac(IR_LED);

@@ -112,7 +112,7 @@ void IRsend::sendGree(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
 IRGreeAC::IRGreeAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRGreeAC::stateReset() {
+void IRGreeAC::stateReset(void) {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.
   for (uint8_t i = 0; i < kGreeStateLength; i++) remote_state[i] = 0x0;
   remote_state[1] = 0x09;
@@ -122,11 +122,11 @@ void IRGreeAC::stateReset() {
   remote_state[7] = 0x50;
 }
 
-void IRGreeAC::fixup() {
+void IRGreeAC::fixup(void) {
   checksum();  // Calculate the checksums
 }
 
-void IRGreeAC::begin() { _irsend.begin(); }
+void IRGreeAC::begin(void) { _irsend.begin(); }
 
 #if SEND_GREE
 void IRGreeAC::send(const uint16_t repeat) {
@@ -135,12 +135,12 @@ void IRGreeAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_GREE
 
-uint8_t* IRGreeAC::getRaw() {
+uint8_t* IRGreeAC::getRaw(void) {
   fixup();  // Ensure correct settings before sending.
   return remote_state;
 }
 
-void IRGreeAC::setRaw(uint8_t new_code[]) {
+void IRGreeAC::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kGreeStateLength; i++) {
     remote_state[i] = new_code[i];
   }
@@ -167,24 +167,24 @@ bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
     return false;
 }
 
-void IRGreeAC::on() {
+void IRGreeAC::on(void) {
   remote_state[0] |= kGreePower1Mask;
   remote_state[2] |= kGreePower2Mask;
 }
 
-void IRGreeAC::off() {
+void IRGreeAC::off(void) {
   remote_state[0] &= ~kGreePower1Mask;
   remote_state[2] &= ~kGreePower2Mask;
 }
 
-void IRGreeAC::setPower(const bool state) {
-  if (state)
-    on();
+void IRGreeAC::setPower(const bool on) {
+  if (on)
+    this->on();
   else
-    off();
+    this->off();
 }
 
-bool IRGreeAC::getPower() {
+bool IRGreeAC::getPower(void) {
   return (remote_state[0] & kGreePower1Mask) &&
          (remote_state[2] & kGreePower2Mask);
 }
@@ -198,7 +198,7 @@ void IRGreeAC::setTemp(const uint8_t temp) {
 }
 
 // Return the set temp. in deg C
-uint8_t IRGreeAC::getTemp() {
+uint8_t IRGreeAC::getTemp(void) {
   return ((remote_state[1] & 0xFU) + kGreeMinTemp);
 }
 
@@ -212,7 +212,7 @@ void IRGreeAC::setFan(const uint8_t speed) {
   remote_state[0] |= (fan << 4);
 }
 
-uint8_t IRGreeAC::getFan() { return ((remote_state[0] & kGreeFanMask) >> 4); }
+uint8_t IRGreeAC::getFan(void) { return (remote_state[0] & kGreeFanMask) >> 4; }
 
 void IRGreeAC::setMode(const uint8_t new_mode) {
   uint8_t mode = new_mode;
@@ -237,35 +237,35 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
   remote_state[0] |= mode;
 }
 
-uint8_t IRGreeAC::getMode() { return (remote_state[0] & kGreeModeMask); }
+uint8_t IRGreeAC::getMode(void) { return (remote_state[0] & kGreeModeMask); }
 
-void IRGreeAC::setLight(const bool state) {
+void IRGreeAC::setLight(const bool on) {
   remote_state[2] &= ~kGreeLightMask;
-  remote_state[2] |= (state << 5);
+  remote_state[2] |= (on << 5);
 }
 
-bool IRGreeAC::getLight() { return remote_state[2] & kGreeLightMask; }
+bool IRGreeAC::getLight(void) { return remote_state[2] & kGreeLightMask; }
 
-void IRGreeAC::setXFan(const bool state) {
+void IRGreeAC::setXFan(const bool on) {
   remote_state[2] &= ~kGreeXfanMask;
-  remote_state[2] |= (state << 7);
+  remote_state[2] |= (on << 7);
 }
 
-bool IRGreeAC::getXFan() { return remote_state[2] & kGreeXfanMask; }
+bool IRGreeAC::getXFan(void) { return remote_state[2] & kGreeXfanMask; }
 
-void IRGreeAC::setSleep(const bool state) {
+void IRGreeAC::setSleep(const bool on) {
   remote_state[0] &= ~kGreeSleepMask;
-  remote_state[0] |= (state << 7);
+  remote_state[0] |= (on << 7);
 }
 
-bool IRGreeAC::getSleep() { return remote_state[0] & kGreeSleepMask; }
+bool IRGreeAC::getSleep(void) { return remote_state[0] & kGreeSleepMask; }
 
-void IRGreeAC::setTurbo(const bool state) {
+void IRGreeAC::setTurbo(const bool on) {
   remote_state[2] &= ~kGreeTurboMask;
-  remote_state[2] |= (state << 4);
+  remote_state[2] |= (on << 4);
 }
 
-bool IRGreeAC::getTurbo() { return remote_state[2] & kGreeTurboMask; }
+bool IRGreeAC::getTurbo(void) { return remote_state[2] & kGreeTurboMask; }
 
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
   remote_state[0] &= ~kGreeSwingAutoMask;
@@ -297,11 +297,11 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
   remote_state[4] |= new_position;
 }
 
-bool IRGreeAC::getSwingVerticalAuto() {
+bool IRGreeAC::getSwingVerticalAuto(void) {
   return remote_state[0] & kGreeSwingAutoMask;
 }
 
-uint8_t IRGreeAC::getSwingVerticalPosition() {
+uint8_t IRGreeAC::getSwingVerticalPosition(void) {
   return remote_state[4] & kGreeSwingPosMask;
 }
 
@@ -356,12 +356,73 @@ uint8_t IRGreeAC::convertSwingV(const stdAc::swingv_t swingv) {
   }
 }
 
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRGreeAC::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kGreeCool: return stdAc::opmode_t::kCool;
+    case kGreeHeat: return stdAc::opmode_t::kHeat;
+    case kGreeDry: return stdAc::opmode_t::kDry;
+    case kGreeFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kGreeFanMax: return stdAc::fanspeed_t::kMax;
+    case kGreeFanMax - 1: return stdAc::fanspeed_t::kMedium;
+    case kGreeFanMin: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kGreeSwingUp: return stdAc::swingv_t::kHighest;
+    case kGreeSwingMiddleUp: return stdAc::swingv_t::kHigh;
+    case kGreeSwingMiddle: return stdAc::swingv_t::kMiddle;
+    case kGreeSwingMiddleDown: return stdAc::swingv_t::kLow;
+    case kGreeSwingDown: return stdAc::swingv_t::kLowest;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRGreeAC::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::GREE;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  if (this->getSwingVerticalAuto())
+    result.swingv = stdAc::swingv_t::kAuto;
+  else
+    result.swingv = this->toCommonSwingV(this->getSwingVerticalPosition());
+  result.turbo = this->getTurbo();
+  result.light = this->getLight();
+  result.clean = this->getXFan();
+  result.sleep = this->getSleep() ? 0 : -1;
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.econo = false;
+  result.filter = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRGreeAC::toString() {
+String IRGreeAC::toString(void) {
   String result = "";
 #else
-std::string IRGreeAC::toString() {
+std::string IRGreeAC::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
