@@ -343,13 +343,14 @@ class IRsend {
                      uint16_t repeat = kCarrierAcMinRepeat);
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
-  void sendHaierAC(unsigned char data[], uint16_t nbytes = kHaierACStateLength,
-                   uint16_t repeat = kHaierAcDefaultRepeat);
+  void sendHaierAC(const unsigned char data[],
+                   const uint16_t nbytes = kHaierACStateLength,
+                   const uint16_t repeat = kHaierAcDefaultRepeat);
 #endif
 #if SEND_HAIER_AC_YRW02
-  void sendHaierACYRW02(unsigned char data[],
-                        uint16_t nbytes = kHaierACYRW02StateLength,
-                        uint16_t repeat = kHaierAcYrw02DefaultRepeat);
+  void sendHaierACYRW02(const unsigned char data[],
+                        const uint16_t nbytes = kHaierACYRW02StateLength,
+                        const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif
 #if SEND_HITACHI_AC
   void sendHitachiAC(unsigned char data[],
