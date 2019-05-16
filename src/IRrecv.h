@@ -317,12 +317,14 @@ class IRrecv {
                           bool strict = true);
 #endif
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
-  bool decodeHitachiAC(decode_results *results, uint16_t nbits = kHitachiAcBits,
-                       bool strict = true);
+  bool decodeHitachiAC(decode_results *results,
+                       const uint16_t nbits = kHitachiAcBits,
+                       const bool strict = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results,
-                        uint16_t nbits = kHitachiAc1Bits, bool strict = true);
+                        const uint16_t nbits = kHitachiAc1Bits,
+                        const bool strict = true);
 #endif
 #if DECODE_GICABLE
   bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,

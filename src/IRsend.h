@@ -353,19 +353,19 @@ class IRsend {
                         const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif
 #if SEND_HITACHI_AC
-  void sendHitachiAC(unsigned char data[],
-                     uint16_t nbytes = kHitachiAcStateLength,
-                     uint16_t repeat = kHitachiAcDefaultRepeat);
+  void sendHitachiAC(const unsigned char data[],
+                     const uint16_t nbytes = kHitachiAcStateLength,
+                     const uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif
 #if SEND_HITACHI_AC1
-  void sendHitachiAC1(unsigned char data[],
-                      uint16_t nbytes = kHitachiAc1StateLength,
-                      uint16_t repeat = kNoRepeat);
+  void sendHitachiAC1(const unsigned char data[],
+                      const uint16_t nbytes = kHitachiAc1StateLength,
+                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_HITACHI_AC2
-  void sendHitachiAC2(unsigned char data[],
-                      uint16_t nbytes = kHitachiAc2StateLength,
-                      uint16_t repeat = kNoRepeat);
+  void sendHitachiAC2(const unsigned char data[],
+                      const uint16_t nbytes = kHitachiAc2StateLength,
+                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_GICABLE
   void sendGICable(uint64_t data, uint16_t nbits = kGicableBits,
