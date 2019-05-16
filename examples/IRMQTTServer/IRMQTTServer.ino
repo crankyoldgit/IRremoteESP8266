@@ -3164,6 +3164,20 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHIHEAVY
+    case decode_type_t::MITSUBISHI_HEAVY_88: {
+      IRMitsubishiHeavy88Ac ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+    case decode_type_t::MITSUBISHI_HEAVY_152: {
+      IRMitsubishiHeavy152Ac ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_MITSUBISHIHEAVY
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
