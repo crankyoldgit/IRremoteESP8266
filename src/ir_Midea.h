@@ -66,34 +66,37 @@ const uint64_t kMideaACChecksumMask = 0x0000FFFFFFFFFF00;
 
 class IRMideaAC {
  public:
-  explicit IRMideaAC(uint16_t pin);
+  explicit IRMideaAC(const uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_MIDEA
   void send(const uint16_t repeat = kMideaMinRepeat);
 #endif  // SEND_MIDEA
-  void begin();
-  void on();
-  void off();
-  void setPower(const bool state);
-  bool getPower();
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
   void setTemp(const uint8_t temp, const bool useCelsius = false);
   uint8_t getTemp(const bool useCelsius = false);
   void setFan(const uint8_t fan);
-  uint8_t getFan();
+  uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode();
-  void setRaw(uint64_t newState);
-  uint64_t getRaw();
+  uint8_t getMode(void);
+  void setRaw(const uint64_t newState);
+  uint64_t getRaw(void);
   static bool validChecksum(const uint64_t state);
-  void setSleep(const bool state);
-  bool getSleep();
+  void setSleep(const bool on);
+  bool getSleep(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -103,7 +106,7 @@ class IRMideaAC {
   IRsendTest _irsend;
 #endif
   uint64_t remote_state;
-  void checksum();
+  void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
 };
 

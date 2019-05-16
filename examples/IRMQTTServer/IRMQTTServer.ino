@@ -3148,6 +3148,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_KELVINATOR
+#if DECODE_MIDEA
+    case decode_type_t::MIDEA: {
+      IRMideaAC ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_MIDEA
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
