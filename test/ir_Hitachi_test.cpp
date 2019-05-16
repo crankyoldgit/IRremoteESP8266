@@ -769,7 +769,6 @@ TEST(TestDecodeHitachiAC2, NormalRealExample) {
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc2Bits);
 }
 
-
 TEST(TestIRHitachiAcClass, toCommon) {
   IRHitachiAc ac(0);
   ac.setPower(true);
