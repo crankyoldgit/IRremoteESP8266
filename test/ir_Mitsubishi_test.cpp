@@ -1139,7 +1139,7 @@ TEST(TestMitsubishiACClass, toCommon) {
   ac.setPower(true);
   ac.setMode(kMitsubishiAcCool);
   ac.setTemp(20);
-  ac.setFan(kMitsubishiAcFanMax);
+  ac.setFan(kMitsubishiAcFanSilent);
   ac.setVane(kMitsubishiAcVaneAuto);
   // Now test it.
   ASSERT_EQ(decode_type_t::MITSUBISHI_AC, ac.toCommon().protocol);
@@ -1148,14 +1148,14 @@ TEST(TestMitsubishiACClass, toCommon) {
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
-  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_TRUE(ac.toCommon().quiet);
   // Unsupported.
   ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
   ASSERT_FALSE(ac.toCommon().light);
-  ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_FALSE(ac.toCommon().econo);
   ASSERT_FALSE(ac.toCommon().filter);
   ASSERT_FALSE(ac.toCommon().beep);
