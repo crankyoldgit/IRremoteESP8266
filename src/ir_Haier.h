@@ -56,6 +56,7 @@ const uint8_t kHaierAcSwingDown = 0b00000010;
 const uint8_t kHaierAcSwingChg = 0b00000011;
 
 // Byte 6
+const uint8_t kHaierAcModeMask = 0b11100000;
 const uint8_t kHaierAcAuto = 0;
 const uint8_t kHaierAcCool = 1;
 const uint8_t kHaierAcDry = 2;
@@ -68,6 +69,9 @@ const uint8_t kHaierAcFanMed = 2;
 const uint8_t kHaierAcFanHigh = 3;
 
 const uint16_t kHaierAcMaxTime = (23 * 60) + 59;
+
+// Byte 7
+const uint8_t kHaierAcSleepBit = 0b01000000;
 
 // Legacy Haier AC defines.
 #define HAIER_AC_MIN_TEMP kHaierAcMinTemp
@@ -229,7 +233,10 @@ class IRHaierAC {
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
-
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString();
   static String timeToString(const uint16_t nr_mins);
@@ -295,6 +302,10 @@ class IRHaierACYRW02 {
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString();
 #else

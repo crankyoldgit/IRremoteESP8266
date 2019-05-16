@@ -245,7 +245,7 @@ TEST(TestIRac, Haier) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Command: 1 (On), Mode: 3 (HEAT), Temp: 24C, Fan: 2, Swing: 1 (Up), "
+      "Command: 1 (On), Mode: 1 (COOL), Temp: 24C, Fan: 2, Swing: 1 (Up), "
       "Sleep: On, Health: On, Current Time: 13:45, On Timer: Off, "
       "Off Timer: Off";
 

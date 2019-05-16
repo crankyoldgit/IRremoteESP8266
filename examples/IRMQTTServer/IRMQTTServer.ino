@@ -3116,6 +3116,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_GREE
+#if DECODE_HAIER_AC
+    case decode_type_t::HAIER_AC: {
+      IRHaierAC ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_HAIER_AC
 #if DECODE_KELVINATOR
     case decode_type_t::KELVINATOR: {
       IRKelvinatorAC ac(IR_LED);

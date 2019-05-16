@@ -107,7 +107,6 @@ void IRHaierAC::stateReset() {
   remote_state[2] = 0x20;
   remote_state[4] = 0x0C;
   remote_state[5] = 0xC0;
-  remote_state[6] = 0x20;
 
   setTemp(kHaierAcDefTemp);
   setFan(kHaierAcFanAuto);
@@ -185,11 +184,13 @@ void IRHaierAC::setMode(uint8_t mode) {
   setCommand(kHaierAcCmdMode);
   if (mode > kHaierAcFan)  // If out of range, default to auto mode.
     new_mode = kHaierAcAuto;
-  remote_state[7] &= 0b00011111;
-  remote_state[7] |= (new_mode << 5);
+  remote_state[6] &= ~kHaierAcModeMask;
+  remote_state[6] |= (new_mode << 5);
 }
 
-uint8_t IRHaierAC::getMode() { return (remote_state[7] & 0b11100000) >> 5; }
+uint8_t IRHaierAC::getMode() {
+  return (remote_state[6] & kHaierAcModeMask) >> 5;
+}
 
 void IRHaierAC::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
@@ -221,13 +222,15 @@ void IRHaierAC::setHealth(bool state) {
 
 bool IRHaierAC::getHealth(void) { return remote_state[4] & (1 << 5); }
 
-void IRHaierAC::setSleep(bool state) {
+void IRHaierAC::setSleep(bool on) {
   setCommand(kHaierAcCmdSleep);
-  remote_state[7] &= 0b10111111;
-  remote_state[7] |= (state << 6);
+  if (on)
+    remote_state[7] |= kHaierAcSleepBit;
+  else
+    remote_state[7] &= ~kHaierAcSleepBit;
 }
 
-bool IRHaierAC::getSleep(void) { return remote_state[7] & 0b01000000; }
+bool IRHaierAC::getSleep(void) { return remote_state[7] & kHaierAcSleepBit; }
 
 uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
   return (ptr[0] & 0b00011111) * 60 + (ptr[1] & 0b00111111);
@@ -362,6 +365,63 @@ uint8_t IRHaierAC::convertSwingV(const stdAc::swingv_t position) {
     default:
       return kHaierAcSwingChg;
   }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRHaierAC::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kHaierAcCool: return stdAc::opmode_t::kCool;
+    case kHaierAcHeat: return stdAc::opmode_t::kHeat;
+    case kHaierAcDry: return stdAc::opmode_t::kDry;
+    case kHaierAcFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRHaierAC::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kHaierAcFanHigh: return stdAc::fanspeed_t::kMax;
+    case kHaierAcFanMed: return stdAc::fanspeed_t::kMedium;
+    case kHaierAcFanLow: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kHaierAcSwingUp: return stdAc::swingv_t::kHighest;
+    case kHaierAcSwingDown: return stdAc::swingv_t::kLowest;
+    case kHaierAcSwingOff: return stdAc::swingv_t::kOff;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRHaierAC::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::HAIER_AC;
+  result.model = -1;  // No models used.
+  result.power = true;
+  if (this->getCommand() == kHaierAcCmdOff) result.power = false;
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->toCommonSwingV(this->getSwing());
+  result.filter = this->getHealth();
+  result.sleep = this->getSleep() ? 0 : -1;
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.turbo = false;
+  result.econo = false;
+  result.light = false;
+  result.clean = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.
