@@ -183,6 +183,17 @@ uint8_t IRGoodweatherAc::getSwing() {
   return (remote & kGoodweatherSwingMask) >> kGoodweatherBitSwing;
 }
 
+void IRGoodweatherAc::setCommand(const uint8_t cmd) {
+  if (cmd <= kGoodweatherCmdLight) {
+    remote &= ~kGoodweatherCommandMask;
+    remote |= (cmd << kGoodweatherBitCommand);
+  }
+}
+
+uint8_t IRGoodweatherAc::getCommand() {
+  return (remote & kGoodweatherCommandMask) >> kGoodweatherBitCommand;
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRGoodweatherAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -310,6 +321,48 @@ std::string IRGoodweatherAc::toString() {
       break;
     case kGoodweatherSwingOff:
       result += F(" (Off)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Command: ");
+  result += uint64ToString(this->getCommand());
+  switch (this->getCommand()) {
+    case kGoodweatherCmdPower:
+      result += F(" (Power)");
+      break;
+    case kGoodweatherCmdMode:
+      result += F(" (Mode)");
+      break;
+    case kGoodweatherCmdUpTemp:
+      result += F(" (Temp Up)");
+      break;
+    case kGoodweatherCmdDownTemp:
+      result += F(" (Temp Down)");
+      break;
+    case kGoodweatherCmdSwing:
+      result += F(" (Swing)");
+      break;
+    case kGoodweatherCmdFan:
+      result += F(" (Fan)");
+      break;
+    case kGoodweatherCmdTimer:
+      result += F(" (Timer)");
+      break;
+    case kGoodweatherCmdAirFlow:
+      result += F(" (Air Flow)");
+      break;
+    case kGoodweatherCmdHold:
+      result += F(" (Hold)");
+      break;
+    case kGoodweatherCmdSleep:
+      result += F(" (Sleep)");
+      break;
+    case kGoodweatherCmdTurbo:
+      result += F(" (Turbo)");
+      break;
+    case kGoodweatherCmdLight:
+      result += F(" (Light)");
       break;
     default:
       result += F(" (UNKNOWN)");

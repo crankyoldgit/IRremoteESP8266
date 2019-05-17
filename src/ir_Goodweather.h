@@ -38,7 +38,9 @@ const uint8_t kGoodweatherBitLight = 8;
 const uint64_t kGoodweatherLightMask = 0x1ULL << kGoodweatherBitLight;
 const uint8_t kGoodweatherBitTurbo = kGoodweatherBitLight + 3;  // 11
 const uint64_t kGoodweatherTurboMask = 0x1ULL << kGoodweatherBitTurbo;
-const uint8_t kGoodweatherBitSleep = kGoodweatherBitTurbo + 13;  // 24
+const uint8_t kGoodweatherBitCommand = kGoodweatherBitTurbo + 5;  // 16
+const uint64_t kGoodweatherCommandMask = 0xFULL << kGoodweatherBitCommand;
+const uint8_t kGoodweatherBitSleep = kGoodweatherBitCommand + 8;  // 24
 const uint64_t kGoodweatherSleepMask = 0x1ULL << kGoodweatherBitSleep;
 const uint8_t kGoodweatherBitPower = kGoodweatherBitSleep + 1;  // 25
 const uint64_t kGoodweatherPowerMask = 0x1ULL << kGoodweatherBitPower;
@@ -48,7 +50,7 @@ const uint8_t kGoodweatherBitFan = kGoodweatherBitSwing + 3;  // 29
 const uint64_t kGoodweatherFanMask = 0x3ULL << kGoodweatherBitFan;
 const uint8_t kGoodweatherBitTemp = kGoodweatherBitFan + 3;  // 32
 const uint64_t kGoodweatherTempMask = 0xFULL << kGoodweatherBitTemp;
-const uint8_t kGoodweatherBitMode = kGoodweatherBitFan + 8;  // 37
+const uint8_t kGoodweatherBitMode = kGoodweatherBitTemp + 5;  // 37
 const uint64_t kGoodweatherModeMask = 0x7ULL << kGoodweatherBitMode;
 
 // Modes
@@ -65,10 +67,22 @@ const uint8_t kGoodweatherFanAuto = 0b00;
 const uint8_t kGoodweatherFanHigh = 0b01;
 const uint8_t kGoodweatherFanMed =  0b10;
 const uint8_t kGoodweatherFanLow =  0b11;
-
 // Temperature
 const uint8_t kGoodweatherTempMin = 16;  // Celsius
 const uint8_t kGoodweatherTempMax = 31;  // Celsius
+// Commands
+const uint8_t kGoodweatherCmdPower    = 0x00;
+const uint8_t kGoodweatherCmdMode     = 0x01;
+const uint8_t kGoodweatherCmdUpTemp   = 0x02;
+const uint8_t kGoodweatherCmdDownTemp = 0x03;
+const uint8_t kGoodweatherCmdSwing    = 0x04;
+const uint8_t kGoodweatherCmdFan      = 0x05;
+const uint8_t kGoodweatherCmdTimer    = 0x06;
+const uint8_t kGoodweatherCmdAirFlow  = 0x07;
+const uint8_t kGoodweatherCmdHold     = 0x08;
+const uint8_t kGoodweatherCmdSleep    = 0x09;
+const uint8_t kGoodweatherCmdTurbo    = 0x0A;
+const uint8_t kGoodweatherCmdLight    = 0x0B;
 
 
 // Classes
@@ -99,6 +113,8 @@ class IRGoodweatherAc {
   bool getTurbo(void);
   void setLight(const bool toggle);
   bool getLight(void);
+  void setCommand(const uint8_t cmd);
+  uint8_t getCommand(void);
   uint64_t getRaw(void);
   void setRaw(const uint64_t state);
   uint8_t convertMode(const stdAc::opmode_t mode);
