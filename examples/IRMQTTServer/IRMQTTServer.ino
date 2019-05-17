@@ -3242,6 +3242,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_VESTEL_AC
+#if DECODE_WHIRLPOOL_AC
+    case decode_type_t::WHIRLPOOL_AC: {
+      IRWhirlpoolAc ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_WHIRLPOOL_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;

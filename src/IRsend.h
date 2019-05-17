@@ -375,9 +375,9 @@ class IRsend {
                    uint16_t repeat = kGicableMinRepeat);
 #endif
 #if SEND_WHIRLPOOL_AC
-  void sendWhirlpoolAC(unsigned char data[],
-                       uint16_t nbytes = kWhirlpoolAcStateLength,
-                       uint16_t repeat = kWhirlpoolAcDefaultRepeat);
+  void sendWhirlpoolAC(const unsigned char data[],
+                       const uint16_t nbytes = kWhirlpoolAcStateLength,
+                       const uint16_t repeat = kWhirlpoolAcDefaultRepeat);
 #endif
 #if SEND_LUTRON
   void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,

@@ -336,7 +336,8 @@ class IRrecv {
 #endif
 #if DECODE_WHIRLPOOL_AC
   bool decodeWhirlpoolAC(decode_results *results,
-                         uint16_t nbits = kWhirlpoolAcBits, bool strict = true);
+                         const uint16_t nbits = kWhirlpoolAcBits,
+                         const bool strict = true);
 #endif
 #if DECODE_LUTRON
   bool decodeLutron(decode_results *results, uint16_t nbits = kLutronBits,
