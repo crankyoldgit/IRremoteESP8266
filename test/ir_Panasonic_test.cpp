@@ -1142,3 +1142,36 @@ TEST(TestDecodePanasonicAC, CkpModelSpecifics) {
   EXPECT_EQ(kPanasonicCkp, pana.getModel());
   EXPECT_STATE_EQ(ckpPowerfulOn, pana.getRaw(), kPanasonicAcBits);
 }
+
+TEST(TestIRPanasonicAcClass, toCommon) {
+  IRPanasonicAc ac(0);
+  ac.setModel(panasonic_ac_remote_model_t::kPanasonicDke);
+  ac.setPower(true);
+  ac.setMode(kPanasonicAcCool);
+  ac.setTemp(20);
+  ac.setFan(kPanasonicAcFanMax);
+  ac.setSwingVertical(kPanasonicAcSwingVAuto);
+  ac.setSwingHorizontal(kPanasonicAcSwingHMiddle);
+  ac.setPowerful(true);
+  ac.setQuiet(false);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::PANASONIC_AC, ac.toCommon().protocol);
+  ASSERT_EQ(panasonic_ac_remote_model_t::kPanasonicDke, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kMiddle, ac.toCommon().swingh);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

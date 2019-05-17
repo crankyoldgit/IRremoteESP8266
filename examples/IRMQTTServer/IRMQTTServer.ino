@@ -3178,6 +3178,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_MITSUBISHIHEAVY
+#if DECODE_PANASONIC_AC
+    case decode_type_t::PANASONIC_AC: {
+      IRPanasonicAc ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_PANASONIC_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;

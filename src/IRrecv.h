@@ -204,9 +204,10 @@ class IRrecv {
                   bool strict = false);
 #endif
 #if (DECODE_PANASONIC || DECODE_DENON)
-  bool decodePanasonic(decode_results *results, uint16_t nbits = kPanasonicBits,
-                       bool strict = false,
-                       uint32_t manufacturer = kPanasonicManufacturer);
+  bool decodePanasonic(decode_results *results,
+                       const uint16_t nbits = kPanasonicBits,
+                       const bool strict = false,
+                       const uint32_t manufacturer = kPanasonicManufacturer);
 #endif
 #if DECODE_LG
   bool decodeLG(decode_results *results, uint16_t nbits = kLgBits,
@@ -344,7 +345,8 @@ class IRrecv {
 #endif
 #if DECODE_PANASONIC_AC
   bool decodePanasonicAC(decode_results *results,
-                         uint16_t nbits = kPanasonicAcBits, bool strict = true);
+                         const uint16_t nbits = kPanasonicAcBits,
+                         const bool strict = true);
 #endif
 #if DECODE_PIONEER
   bool decodePioneer(decode_results *results,

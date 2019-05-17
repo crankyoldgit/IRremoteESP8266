@@ -210,13 +210,14 @@ class IRsend {
                 uint16_t repeat = kDishMinRepeat);
 #endif
 #if (SEND_PANASONIC || SEND_DENON)
-  void sendPanasonic64(uint64_t data, uint16_t nbits = kPanasonicBits,
-                       uint16_t repeat = kNoRepeat);
-  void sendPanasonic(uint16_t address, uint32_t data,
-                     uint16_t nbits = kPanasonicBits,
-                     uint16_t repeat = kNoRepeat);
-  uint64_t encodePanasonic(uint16_t manufacturer, uint8_t device,
-                           uint8_t subdevice, uint8_t function);
+  void sendPanasonic64(const uint64_t data,
+                       const uint16_t nbits = kPanasonicBits,
+                       const uint16_t repeat = kNoRepeat);
+  void sendPanasonic(const uint16_t address, const uint32_t data,
+                     const uint16_t nbits = kPanasonicBits,
+                     const uint16_t repeat = kNoRepeat);
+  uint64_t encodePanasonic(const uint16_t manufacturer, const uint8_t device,
+                           const uint8_t subdevice, const uint8_t function);
 #endif
 #if SEND_RC5
   void sendRC5(uint64_t data, uint16_t nbits = kRC5XBits,
@@ -386,9 +387,9 @@ class IRsend {
                      uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_PANASONIC_AC
-  void sendPanasonicAC(unsigned char data[],
-                       uint16_t nbytes = kPanasonicAcStateLength,
-                       uint16_t repeat = kPanasonicAcDefaultRepeat);
+  void sendPanasonicAC(const unsigned char data[],
+                       const uint16_t nbytes = kPanasonicAcStateLength,
+                       const uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif
 #if SEND_PIONEER
   void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,

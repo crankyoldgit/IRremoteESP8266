@@ -81,60 +81,65 @@ enum panasonic_ac_remote_model_t {
 
 class IRPanasonicAc {
  public:
-  explicit IRPanasonicAc(uint16_t pin);
+  explicit IRPanasonicAc(const uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_PANASONIC
   void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif  // SEND_PANASONIC
-  void begin();
-  void on();
-  void off();
-  void setPower(const bool state);
-  bool getPower();
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
   void setTemp(const uint8_t temp, const bool remember = true);
-  uint8_t getTemp();
+  uint8_t getTemp(void);
   void setFan(const uint8_t fan);
-  uint8_t getFan();
+  uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(void);
   void setRaw(const uint8_t state[]);
-  uint8_t *getRaw();
+  uint8_t *getRaw(void);
   static bool validChecksum(uint8_t *state,
                             const uint16_t length = kPanasonicAcStateLength);
   static uint8_t calcChecksum(uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);
-  void setQuiet(const bool state);
-  bool getQuiet();
-  void setPowerful(const bool state);
-  bool getPowerful();
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+  void setPowerful(const bool on);
+  bool getPowerful(void);
   void setModel(const panasonic_ac_remote_model_t model);
-  panasonic_ac_remote_model_t getModel();
+  panasonic_ac_remote_model_t getModel(void);
   void setSwingVertical(const uint8_t elevation);
-  uint8_t getSwingVertical();
+  uint8_t getSwingVertical(void);
   void setSwingHorizontal(const uint8_t direction);
-  uint8_t getSwingHorizontal();
+  uint8_t getSwingHorizontal(void);
   static uint16_t encodeTime(const uint8_t hours, const uint8_t mins);
-  uint16_t getClock();
+  uint16_t getClock(void);
   void setClock(const uint16_t mins_since_midnight);
-  uint16_t getOnTimer();
+  uint16_t getOnTimer(void);
   void setOnTimer(const uint16_t mins_since_midnight, const bool enable = true);
-  void cancelOnTimer();
-  bool isOnTimerEnabled();
-  uint16_t getOffTimer();
+  void cancelOnTimer(void);
+  bool isOnTimerEnabled(void);
+  uint16_t getOffTimer(void);
   void setOffTimer(const uint16_t mins_since_midnight,
                    const bool enable = true);
-  void cancelOffTimer();
-  bool isOffTimerEnabled();
+  void cancelOffTimer(void);
+  bool isOffTimerEnabled(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
   uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
   static String timeToString(const uint16_t mins_since_midnight);
 #else
-  std::string toString();
+  std::string toString(void);
   static std::string timeToString(const uint16_t mins_since_midnight);
 #endif
 #ifndef UNIT_TEST
