@@ -68,7 +68,8 @@ const uint16_t kSamsungAcZeroSpace = 436;
 // Status: BETA / Should be working.
 //
 // Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-void IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits, uint16_t repeat) {
+void IRsend::sendSAMSUNG(const uint64_t data, const uint16_t nbits,
+                         const uint16_t repeat) {
   sendGeneric(kSamsungHdrMark, kSamsungHdrSpace, kSamsungBitMark,
               kSamsungOneSpace, kSamsungBitMark, kSamsungZeroSpace,
               kSamsungBitMark, kSamsungMinGap, kSamsungMinMessageLength, data,
@@ -85,11 +86,11 @@ void IRsend::sendSAMSUNG(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   A raw 32-bit Samsung message suitable for sendSAMSUNG().
 //
 // Status: BETA / Should be working.
-uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
-  customer = reverseBits(customer, sizeof(customer) * 8);
-  command = reverseBits(command, sizeof(command) * 8);
-  return ((command ^ 0xFF) | (command << 8) | (customer << 16) |
-          (customer << 24));
+uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
+  uint8_t revcustomer = reverseBits(customer, sizeof(customer) * 8);
+  uint8_t revcommand = reverseBits(command, sizeof(command) * 8);
+  return ((revcommand ^ 0xFF) | (revcommand << 8) | (revcustomer << 16) |
+          (revcustomer << 24));
 }
 #endif
 
@@ -113,8 +114,8 @@ uint32_t IRsend::encodeSAMSUNG(uint8_t customer, uint8_t command) {
 //   They differ on their compliance criteria and how they repeat.
 // Ref:
 //  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t nbits,
-                           bool strict) {
+bool IRrecv::decodeSAMSUNG(decode_results *results, const uint16_t nbits,
+                           const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid Samsung message.
   if (strict && nbits != kSamsungBits)
@@ -326,7 +327,9 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_SAMSUNG_AC
 
-IRSamsungAc::IRSamsungAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRSamsungAc::IRSamsungAc(const uint16_t pin) : _irsend(pin) {
+  this->stateReset();
+}
 
 void IRSamsungAc::stateReset(void) {
   for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
@@ -366,25 +369,26 @@ bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
     return true;  // No checksum to compare with. Assume okay.
   uint8_t offset = 0;
   if (length >= kSamsungAcExtendedStateLength) offset = 7;
-  return ((state[length - 6] >> 4) == calcChecksum(state, length) &&
-          (state[length - (13 + offset)] >> 4) == calcChecksum(state, length -
-                                                               (7 + offset)));
+  return ((state[length - 6] >> 4) == IRSamsungAc::calcChecksum(state, length)
+          && (state[length - (13 + offset)] >> 4) == IRSamsungAc::calcChecksum(
+                 state, length - (7 + offset)));
 }
 
 // Update the checksum for the internal state.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 13) return;
   remote_state[length - 6] &= 0x0F;
-  remote_state[length - 6] |= (calcChecksum(remote_state, length) << 4);
+  remote_state[length - 6] |= (this->calcChecksum(remote_state, length) << 4);
   remote_state[length - 13] &= 0x0F;
-  remote_state[length - 13] |= (calcChecksum(remote_state, length - 7) << 4);
+  remote_state[length - 13] |= (this->calcChecksum(remote_state,
+                                                   length - 7) << 4);
 }
 
 #if SEND_SAMSUNG_AC
 // Use for most function/mode/settings changes to the unit.
 // i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
-  if (calcchecksum) checksum();
+  if (calcchecksum) this->checksum();
   if (_sendpower) {  // Do we need to send a the special power on/off message?
     if (this->getPower())
       this->sendOn();
@@ -399,7 +403,7 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
 // Samsung A/C requires an extended length message when you want to
 // change the power operating mode of the A/C unit.
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
-  if (calcchecksum) checksum();
+  if (calcchecksum) this->checksum();
   uint8_t extended_state[kSamsungAcExtendedStateLength] = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
@@ -439,7 +443,7 @@ void IRSamsungAc::sendOff(const uint16_t repeat) {
 #endif  // SEND_SAMSUNG_AC
 
 uint8_t *IRSamsungAc::getRaw(void) {
-  checksum();
+  this->checksum();
   return remote_state;
 }
 
@@ -499,10 +503,11 @@ void IRSamsungAc::setMode(const uint8_t mode) {
 
   // Auto mode has a special fan setting valid only in auto mode.
   if (newmode == kSamsungAcAuto) {
-    setFan(kSamsungAcFanAuto2);
+    this->setFan(kSamsungAcFanAuto2);
   } else {
-    if (getFan() == kSamsungAcFanAuto2)  // Non-Auto can't have this fan setting
-      setFan(kSamsungAcFanAuto);         // Default to something safe.
+    // Non-Auto can't have this fan setting
+    if (this->getFan() == kSamsungAcFanAuto2)
+      this->setFan(kSamsungAcFanAuto);  // Default to something safe.
   }
 }
 
@@ -517,10 +522,10 @@ void IRSamsungAc::setFan(const uint8_t speed) {
     case kSamsungAcFanMed:
     case kSamsungAcFanHigh:
     case kSamsungAcFanTurbo:
-      if (getMode() == kSamsungAcAuto) return;  // Not valid in Auto mode.
+      if (this->getMode() == kSamsungAcAuto) return;  // Not valid in Auto mode.
       break;
     case kSamsungAcFanAuto2:  // Special fan setting for when in Auto mode.
-      if (getMode() != kSamsungAcAuto) return;
+      if (this->getMode() != kSamsungAcAuto) return;
       break;
     default:
       return;
@@ -583,7 +588,8 @@ bool IRSamsungAc::getQuiet(void) {
 void IRSamsungAc::setQuiet(const bool on) {
   if (on) {
     remote_state[11] |= kSamsungAcQuietMask11;
-    setFan(kSamsungAcFanAuto);  // Quiet mode seems to set fan speed to auto.
+    // Quiet mode seems to set fan speed to auto.
+    this->setFan(kSamsungAcFanAuto);
   } else {
     remote_state[11] &= ~kSamsungAcQuietMask11;
   }
@@ -620,6 +626,54 @@ uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
     default:
       return kSamsungAcFanAuto;
   }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRSamsungAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kSamsungAcCool: return stdAc::opmode_t::kCool;
+    case kSamsungAcHeat: return stdAc::opmode_t::kHeat;
+    case kSamsungAcDry: return stdAc::opmode_t::kDry;
+    case kSamsungAcFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kSamsungAcFanTurbo: return stdAc::fanspeed_t::kMax;
+    case kSamsungAcFanHigh: return stdAc::fanspeed_t::kHigh;
+    case kSamsungAcFanMed: return stdAc::fanspeed_t::kMedium;
+    case kSamsungAcFanLow: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRSamsungAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::SAMSUNG_AC;
+  result.model = -1;  // Not supported.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
+                                     stdAc::swingv_t::kOff;
+  result.quiet = this->getQuiet();
+  result.turbo = this->getFan() == kSamsungAcFanTurbo;
+  result.clean = this->getClean();
+  result.beep = this->getBeep();
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.
@@ -719,8 +773,8 @@ std::string IRSamsungAc::toString(void) {
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
-bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t nbits,
-                             bool strict) {
+bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1)
     return false;  // Can't possibly be a valid Samsung A/C message.
   if (nbits != kSamsungAcBits && nbits != kSamsungAcExtendedBits) return false;

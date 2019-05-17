@@ -2670,7 +2670,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 #if SEND_DENON
     case DENON:  // 17
       if (bits == 0)
-        bits = DENON_BITS;
+        bits = kDenonBits;
       irsend->sendDenon(code, bits, repeat);
       break;
 #endif
@@ -3186,6 +3186,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_SAMSUNG_AC
+    case decode_type_t::SAMSUNG_AC: {
+      IRSamsungAc ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_SAMSUNG_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;

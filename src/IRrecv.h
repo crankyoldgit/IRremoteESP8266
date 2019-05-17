@@ -218,8 +218,9 @@ class IRrecv {
                  bool strict = true);
 #endif
 #if DECODE_SAMSUNG
-  bool decodeSAMSUNG(decode_results *results, uint16_t nbits = kSamsungBits,
-                     bool strict = true);
+  bool decodeSAMSUNG(decode_results *results,
+                     const uint16_t nbits = kSamsungBits,
+                     const bool strict = true);
 #endif
 #if DECODE_SAMSUNG
   bool decodeSamsung36(decode_results *results,
@@ -227,8 +228,9 @@ class IRrecv {
                        const bool strict = true);
 #endif
 #if DECODE_SAMSUNG_AC
-  bool decodeSamsungAC(decode_results *results, uint16_t nbits = kSamsungAcBits,
-                       bool strict = true);
+  bool decodeSamsungAC(decode_results *results,
+                       const uint16_t nbits = kSamsungAcBits,
+                       const bool strict = true);
 #endif
 #if DECODE_WHYNTER
   bool decodeWhynter(decode_results *results, uint16_t nbits = kWhynterBits,
@@ -239,7 +241,7 @@ class IRrecv {
                     bool strict = true);
 #endif
 #if DECODE_DENON
-  bool decodeDenon(decode_results *results, uint16_t nbits = DENON_BITS,
+  bool decodeDenon(decode_results *results, uint16_t nbits = kDenonBits,
                    bool strict = true);
 #endif
 #if DECODE_DISH

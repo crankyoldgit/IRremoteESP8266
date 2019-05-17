@@ -153,9 +153,9 @@ class IRsend {
                     uint16_t repeat = kSherwoodMinRepeat);
 #endif
 #if SEND_SAMSUNG
-  void sendSAMSUNG(uint64_t data, uint16_t nbits = kSamsungBits,
-                   uint16_t repeat = kNoRepeat);
-  uint32_t encodeSAMSUNG(uint8_t customer, uint8_t command);
+  void sendSAMSUNG(const uint64_t data, const uint16_t nbits = kSamsungBits,
+                   const uint16_t repeat = kNoRepeat);
+  uint32_t encodeSAMSUNG(const uint8_t customer, const uint8_t command);
 #endif
 #if SEND_SAMSUNG36
   void sendSamsung36(const uint64_t data, const uint16_t nbits = kSamsung36Bits,
@@ -193,7 +193,7 @@ class IRsend {
   uint16_t encodeJVC(uint8_t address, uint8_t command);
 #endif
 #if SEND_DENON
-  void sendDenon(uint64_t data, uint16_t nbits = DENON_BITS,
+  void sendDenon(uint64_t data, uint16_t nbits = kDenonBits,
                  uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SANYO

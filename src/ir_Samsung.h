@@ -61,7 +61,7 @@ const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
 // Classes
 class IRSamsungAc {
  public:
-  explicit IRSamsungAc(uint16_t pin);
+  explicit IRSamsungAc(const uint16_t pin);
 
   void stateReset(void);
 #if SEND_SAMSUNG_AC
@@ -100,6 +100,9 @@ class IRSamsungAc {
                               const uint16_t length = kSamsungAcStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString(void);
 #else

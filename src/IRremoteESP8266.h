@@ -345,6 +345,7 @@ const uint16_t kDaikin216StateLength = 27;
 const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
 const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
+const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
@@ -466,7 +467,7 @@ const uint8_t  kVestelAcBits = 56;
 #define CARRIER_AC_BITS               kCarrierAcBits
 #define DAIKIN_COMMAND_LENGTH         kDaikinStateLength
 #define DENON_BITS                    kDenonBits
-#define DENON_48_BITS                 kPanasonicBits
+#define DENON_48_BITS                 kDenon48Bits
 #define DENON_LEGACY_BITS             kDenonLegacyBits
 #define DISH_BITS                     kDishBits
 #define FUJITSU_AC_MIN_REPEAT         kFujitsuAcMinRepeat
