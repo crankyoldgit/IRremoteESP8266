@@ -411,8 +411,8 @@ class IRsend {
                     const uint16_t repeat = kTcl112AcDefaultRepeat);
 #endif
 #if SEND_TECO
-  void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
-                uint16_t repeat = kNoRepeat);
+  void sendTeco(const uint64_t data, const uint16_t nbits = kTecoBits,
+                const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_LEGOPF
   void sendLegoPf(const uint64_t data, const uint16_t nbits = kLegoPfBits,

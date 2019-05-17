@@ -3210,6 +3210,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_TCL112AC
+#if DECODE_TECO
+    case decode_type_t::TECO: {
+      IRTecoAc ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_TECO
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;

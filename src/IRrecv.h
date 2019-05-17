@@ -369,8 +369,8 @@ class IRrecv {
                       const bool strict = true);
 #endif
 #if DECODE_TECO
-  bool decodeTeco(decode_results *results, uint16_t nbits = kTecoBits,
-                  bool strict = false);
+  bool decodeTeco(decode_results *results, const uint16_t nbits = kTecoBits,
+                  const bool strict = false);
 #endif
 #if DECODE_LEGOPF
   bool decodeLegoPf(decode_results *results, const uint16_t nbits = kLegoPfBits,
