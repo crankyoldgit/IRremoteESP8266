@@ -323,9 +323,9 @@ class IRsend {
                  uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_TOSHIBA_AC
-  void sendToshibaAC(unsigned char data[],
-                     uint16_t nbytes = kToshibaACStateLength,
-                     uint16_t repeat = kToshibaACMinRepeat);
+  void sendToshibaAC(const unsigned char data[],
+                     const uint16_t nbytes = kToshibaACStateLength,
+                     const uint16_t repeat = kToshibaACMinRepeat);
 #endif
 #if SEND_MIDEA
   void sendMidea(uint64_t data, uint16_t nbits = kMideaBits,

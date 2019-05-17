@@ -47,33 +47,36 @@ const uint8_t kToshibaAcMaxTemp = 30;  // 30C
 
 class IRToshibaAC {
  public:
-  explicit IRToshibaAC(uint16_t pin);
+  explicit IRToshibaAC(const uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_TOSHIBA_AC
   void send(const uint16_t repeat = kToshibaACMinRepeat);
 #endif  // SEND_TOSHIBA_AC
-  void begin();
-  void on();
-  void off();
-  void setPower(bool state);
-  bool getPower();
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
-  void setFan(uint8_t fan);
-  uint8_t getFan();
-  void setMode(uint8_t mode);
-  uint8_t getMode(bool useRaw = false);
-  void setRaw(uint8_t newState[]);
-  uint8_t* getRaw();
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(const bool useRaw = false);
+  void setRaw(const uint8_t newState[]);
+  uint8_t* getRaw(void);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kToshibaACStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 

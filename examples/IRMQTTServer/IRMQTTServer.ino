@@ -3218,6 +3218,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_TECO
+#if DECODE_TOSHIBA_AC
+    case decode_type_t::TOSHIBA_AC: {
+      IRToshibaAC ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_TOSHIBA_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;

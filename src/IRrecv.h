@@ -288,7 +288,8 @@ class IRrecv {
 #endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results,
-                       uint16_t nbytes = kToshibaACBits, bool strict = true);
+                       const uint16_t nbytes = kToshibaACBits,
+                       const bool strict = true);
 #endif
 #if DECODE_MIDEA
   bool decodeMidea(decode_results *results, uint16_t nbits = kMideaBits,
