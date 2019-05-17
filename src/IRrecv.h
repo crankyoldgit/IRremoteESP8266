@@ -361,8 +361,9 @@ class IRrecv {
                  bool strict = true);
 #endif
 #if DECODE_VESTEL_AC
-  bool decodeVestelAc(decode_results *results, uint16_t nbits = kVestelAcBits,
-                      bool strict = true);
+  bool decodeVestelAc(decode_results *results,
+                      const uint16_t nbits = kVestelAcBits,
+                      const bool strict = true);
 #endif
 #if DECODE_TCL112AC
   bool decodeTcl112Ac(decode_results *results,

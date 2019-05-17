@@ -3234,6 +3234,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_TROTEC
+#if DECODE_VESTEL_AC
+    case decode_type_t::VESTEL_AC: {
+      IRVestelAc ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_VESTEL_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
