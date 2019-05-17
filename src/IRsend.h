@@ -311,8 +311,9 @@ class IRsend {
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_ARGO
-  void sendArgo(unsigned char data[], uint16_t nbytes = kArgoStateLength,
-                uint16_t repeat = kArgoDefaultRepeat);
+  void sendArgo(const unsigned char data[],
+                const uint16_t nbytes = kArgoStateLength,
+                const uint16_t repeat = kArgoDefaultRepeat);
 #endif
 #if SEND_TROTEC
   void sendTrotec(const unsigned char data[],

@@ -2,6 +2,7 @@
 Node MCU/ESP8266 Sketch to emulate Argo Ulisse 13 DCI remote
 Controls Argo Ulisse 13 DCI A/C
 Copyright 2017 Schmolders
+Copyright 2019 crankyoldgit
 */
 
 #include "ir_Argo.h"
@@ -25,7 +26,8 @@ const uint16_t kArgoZeroSpace = 900;
 //
 // Status: ALPHA / Untested.
 
-void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
+void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
+                      const uint16_t repeat) {
   // Check if we have enough bytes to send a proper message.
   if (nbytes < kArgoStateLength) return;
   // TODO(kaschmo): validate
@@ -35,24 +37,23 @@ void IRsend::sendArgo(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
 }
 #endif  // SEND_ARGO
 
-IRArgoAC::IRArgoAC(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRArgoAC::IRArgoAC(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
 
-void IRArgoAC::begin() { _irsend.begin(); }
+void IRArgoAC::begin(void) { _irsend.begin(); }
 
 #if SEND_ARGO
 void IRArgoAC::send(const uint16_t repeat) {
-  checksum();  // Create valid checksum before sending
+  this->checksum();  // Create valid checksum before sending
   _irsend.sendArgo(argo, kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
 
-void IRArgoAC::checksum() {
+void IRArgoAC::checksum(void) {
   uint8_t sum = 2;  // Corresponds to byte 11 being constant 0b01
-  uint8_t i;
 
   // Only add up bytes to 9. byte 10 is 0b01 constant anyway.
   // Assume that argo array is MSB first (left)
-  for (i = 0; i < 10; i++) sum += argo[i];
+  for (uint8_t i = 0; i < 10; i++) sum += argo[i];
 
   sum = sum % 256;  // modulo 256
   // Append sum to end of array
@@ -62,7 +63,7 @@ void IRArgoAC::checksum() {
   argo[11] = sum >> 6;   // Shift down 6 bits and add in two LSBs of bit 11
 }
 
-void IRArgoAC::stateReset() {
+void IRArgoAC::stateReset(void) {
   for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = 0x0;
 
   // Argo Message. Store MSB left.
@@ -76,157 +77,167 @@ void IRArgoAC::stateReset() {
   this->off();
   this->setTemp(20);
   this->setRoomTemp(25);
-  this->setCoolMode(kArgoCoolAuto);
+  this->setMode(kArgoAuto);
   this->setFan(kArgoFanAuto);
 }
 
-uint8_t* IRArgoAC::getRaw() {
-  checksum();  // Ensure correct bit array before returning
+uint8_t* IRArgoAC::getRaw(void) {
+  this->checksum();  // Ensure correct bit array before returning
   return argo;
 }
 
-void IRArgoAC::on() {
-  // state = ON;
-  ac_state = 1;
+void IRArgoAC::setRaw(const char state[]) {
+  for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = state[i];
+}
+
+void IRArgoAC::on(void) {
   // Bit 5 of byte 9 is on/off
   // in MSB first
-  argo[9] = argo[9] | 0b00100000;  // Set ON/OFF bit to 1
+  argo[9]|= kArgoPowerBit;  // Set ON/OFF bit to 1
 }
 
-void IRArgoAC::off() {
-  // state = OFF;
-  ac_state = 0;
+void IRArgoAC::off(void) {
   // in MSB first
   // bit 5 of byte 9 to off
-  argo[9] = argo[9] & 0b11011111;  // Set on/off bit to 0
+  argo[9] &= ~kArgoPowerBit;  // Set on/off bit to 0
 }
 
-void IRArgoAC::setPower(bool state) {
-  if (state)
-    on();
+void IRArgoAC::setPower(const bool on) {
+  if (on)
+    this->on();
   else
-    off();
+    this->off();
 }
 
-uint8_t IRArgoAC::getPower() { return ac_state; }
+bool IRArgoAC::getPower(void) { return argo[9] & kArgoPowerBit; }
 
-void IRArgoAC::setMax(bool state) {
-  max_mode = state;
-  if (max_mode)
-    argo[9] |= 0b00001000;
+void IRArgoAC::setMax(const bool on) {
+  if (on)
+    argo[9] |= kArgoMaxBit;
   else
-    argo[9] &= 0b11110111;
+    argo[9] &= ~kArgoMaxBit;
 }
 
-bool IRArgoAC::getMax() { return max_mode; }
+bool IRArgoAC::getMax(void) { return argo[9] & kArgoMaxBit; }
 
 // Set the temp in deg C
 // Sending 0 equals +4
-void IRArgoAC::setTemp(uint8_t temp) {
-  if (temp < kArgoMinTemp)
-    temp = kArgoMinTemp;
-  else if (temp > kArgoMaxTemp)
-    temp = kArgoMaxTemp;
+void IRArgoAC::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max(kArgoMinTemp, degrees);
+  temp = std::min(kArgoMaxTemp, temp);
 
-  // Store in attributes
-  set_temp = temp;
   // offset 4 degrees. "If I want 12 degrees, I need to send 8"
-  temp -= 4;
+  temp -= kArgoTempOffset;
   // Settemp = Bit 6,7 of byte 2, and bit 0-2 of byte 3
   // mask out bits
   // argo[13] & 0x00000100;  // mask out ON/OFF Bit
-  argo[2] &= 0b00111111;
-  argo[3] &= 0b11111000;
+  argo[2] &= ~kArgoTempLowMask;
+  argo[3] &= ~kArgoTempHighMask;
 
-  argo[2] += temp << 6;  // append to bit 6,7
-  argo[3] += temp >> 2;  // remove lowest to bits and append in 0-2
+  // append to bit 6,7
+  argo[2] += temp << 6;
+  // remove lowest to bits and append in 0-2
+  argo[3] += ((temp >> 2) & kArgoTempHighMask);
 }
 
-uint8_t IRArgoAC::getTemp() { return set_temp; }
+uint8_t IRArgoAC::getTemp(void) {
+  return (((argo[3] & kArgoTempHighMask) << 2 ) | (argo[2] >> 6)) +
+      kArgoTempOffset;
+}
 
 // Set the speed of the fan
-void IRArgoAC::setFan(uint8_t fan) {
-  // Set the fan speed bits, leave low 4 bits alone
-  fan_mode = fan;
+void IRArgoAC::setFan(const uint8_t fan) {
   // Mask out bits
-  argo[3] &= 0b11100111;
+  argo[3] &= ~kArgoFanMask;
   // Set fan mode at bit positions
-  argo[3] += fan << 3;
+  argo[3] |= (std::min(fan, kArgoFan3) << 3);
 }
 
-uint8_t IRArgoAC::getFan() { return fan_mode; }
+uint8_t IRArgoAC::getFan(void) { return (argo[3] & kArgoFanMask) >> 3; }
 
-void IRArgoAC::setFlap(uint8_t flap) {
+void IRArgoAC::setFlap(const uint8_t flap) {
   flap_mode = flap;
   // TODO(kaschmo): set correct bits for flap mode
 }
 
-uint8_t IRArgoAC::getFlap() { return flap_mode; }
+uint8_t IRArgoAC::getFlap(void) { return flap_mode; }
 
-uint8_t IRArgoAC::getMode() {
-  // return cooling 0, heating 1
-  return ac_mode;
+uint8_t IRArgoAC::getMode(void) {
+  return (argo[2] & kArgoModeMask) >> 3;
 }
 
-void IRArgoAC::setCoolMode(uint8_t mode) {
-  ac_mode = 0;  // Set ac mode to cooling
-  cool_mode = mode;
-  // Mask out bits, also leave bit 5 on 0 for cooling
-  argo[2] &= 0b11000111;
-
-  // Set cool mode at bit positions
-  argo[2] += mode << 3;
+void IRArgoAC::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kArgoCool:
+    case kArgoDry:
+    case kArgoAuto:
+    case kArgoOff:
+    case kArgoHeat:
+    case kArgoHeatAuto:
+      // Mask out bits
+      argo[2] &= ~kArgoModeMask;
+      // Set the mode at bit positions
+      argo[2] |= ((mode << 3) & kArgoModeMask);
+      return;
+    default:
+      this->setMode(kArgoAuto);
+  }
 }
 
-uint8_t IRArgoAC::getCoolMode() { return cool_mode; }
-
-void IRArgoAC::setHeatMode(uint8_t mode) {
-  ac_mode = 1;  // Set ac mode to heating
-  heat_mode = mode;
-  // Mask out bits
-  argo[2] &= 0b11000111;
-  // Set heating bit
-  argo[2] |= 0b00100000;
-  // Set cool mode at bit positions
-  argo[2] += mode << 3;
-}
-
-uint8_t IRArgoAC::getHeatMode() { return heat_mode; }
-
-void IRArgoAC::setNight(bool state) {
-  night_mode = state;
-  if (night_mode)
+void IRArgoAC::setNight(const bool on) {
+  if (on)
     // Set bit at night position: bit 2
-    argo[9] |= 0b00000100;
+    argo[9] |= kArgoNightBit;
   else
-    argo[9] &= 0b11111011;
+    argo[9] &= ~kArgoNightBit;
 }
 
-bool IRArgoAC::getNight() { return night_mode; }
+bool IRArgoAC::getNight(void) { return argo[9] & kArgoNightBit; }
 
-void IRArgoAC::setiFeel(bool state) {
-  ifeel_mode = state;
-  if (ifeel_mode)
+void IRArgoAC::setiFeel(const bool on) {
+  if (on)
     // Set bit at iFeel position: bit 7
-    argo[9] |= 0b10000000;
+    argo[9] |= kArgoIFeelBit;
   else
-    argo[9] &= 0b01111111;
+    argo[9] &= ~kArgoIFeelBit;
 }
 
-bool IRArgoAC::getiFeel() { return ifeel_mode; }
+bool IRArgoAC::getiFeel(void) { return argo[9] & kArgoIFeelBit; }
 
-void IRArgoAC::setTime() {
+void IRArgoAC::setTime(void) {
   // TODO(kaschmo): use function call from checksum to set time first
 }
 
-void IRArgoAC::setRoomTemp(uint8_t temp) {
-  temp -= 4;
+void IRArgoAC::setRoomTemp(const uint8_t degrees) {
+  uint8_t temp = degrees - kArgoTempOffset;
   // Mask out bits
-  argo[3] &= 0b00011111;
-  argo[4] &= 0b11111100;
+  argo[3] &= ~kArgoRoomTempLowMask;
+  argo[4] &= ~kArgoRoomTempHighMask;
 
   argo[3] += temp << 5;  // Append to bit 5,6,7
   argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
+}
+
+uint8_t IRArgoAC::getRoomTemp(void) {
+  return ((argo[4] & kArgoRoomTempHighMask) << 3 | (argo[3] >> 5)) +
+      kArgoTempOffset;
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRArgoAC::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kArgoCool;
+    case stdAc::opmode_t::kHeat:
+      return kArgoHeat;
+    case stdAc::opmode_t::kDry:
+      return kArgoDry;
+    case stdAc::opmode_t::kOff:
+      return kArgoOff;
+    // No fan mode.
+    default:
+      return kArgoAuto;
+  }
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
@@ -261,4 +272,50 @@ uint8_t IRArgoAC::convertSwingV(const stdAc::swingv_t position) {
     default:
       return kArgoFlapAuto;
   }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRArgoAC::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kArgoCool: return stdAc::opmode_t::kCool;
+    case kArgoHeat: return stdAc::opmode_t::kHeat;
+    case kArgoDry: return stdAc::opmode_t::kDry;
+    // No fan mode.
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRArgoAC::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kArgoFan3: return stdAc::fanspeed_t::kMax;
+    case kArgoFan2: return stdAc::fanspeed_t::kMedium;
+    case kArgoFan1: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRArgoAC::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::ARGO;
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.turbo = this->getMax();
+  result.sleep = this->getNight() ? 0 : -1;
+  // Not supported.
+  result.model = -1;  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.light = false;
+  result.filter = false;
+  result.econo = false;
+  result.quiet = false;
+  result.clean = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
 }

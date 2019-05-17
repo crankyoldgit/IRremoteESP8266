@@ -43,7 +43,7 @@ TEST(TestIRac, Argo) {
             false,                       // Turbo
             -1);                         // Sleep
   EXPECT_TRUE(ac.getPower());
-  EXPECT_EQ(1, ac.getMode());
+  EXPECT_EQ(kArgoHeat, ac.getMode());
   EXPECT_EQ(21, ac.getTemp());
   EXPECT_EQ(kArgoFlapAuto, ac.getFlap());
   EXPECT_FALSE(ac.getMax());  // Turbo

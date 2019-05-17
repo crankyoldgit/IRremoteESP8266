@@ -33,19 +33,41 @@
 
 // Constants. Store MSB left.
 
-const uint8_t kArgoCoolOn = 0;  // 0b000
-const uint8_t kArgoCoolOff = 3;  // 0b110
-const uint8_t kArgoCoolAuto = 2;  // 0b010
-const uint8_t kArgoCoolHum = 1;  // 0b100
-const uint8_t kArgoHeatOn = 0;  // 0b001
-const uint8_t kArgoHeatAuto = 1;  // 0b101
-const uint8_t kArgoHeatBlink = 2;  // 0b011  // ??no idea what mode that is
-const uint8_t kArgoMinTemp = 10;  // Celsius offset +4
-const uint8_t kArgoMaxTemp = 32;  // Celsius
+// byte[2]
+const uint8_t kArgoHeatBit =      0b00100000;
+const uint8_t kArgoModeMask =     0b00111000;
+const uint8_t kArgoTempLowMask =  0b11000000;
+const uint8_t kArgoCool =           0b000;  // 0b000 (LSB) 0
+const uint8_t kArgoDry =            0b001;  // 0b100 (LSB) 1
+const uint8_t kArgoAuto =           0b010;  // 0b010 (LSB) 2
+const uint8_t kArgoOff =            0b011;  // 0b110 (LSB) 3
+const uint8_t kArgoHeat =           0b100;  // 0b001 (LSB) 4
+const uint8_t kArgoHeatAuto =       0b101;  // 0b101 (LSB) 5
+// ?no idea what mode that is
+const uint8_t kArgoHeatBlink = 0b110;  // 0b011 (LSB) 6
+
+// byte[3]
+const uint8_t kArgoTempHighMask =    0b00000111;
+const uint8_t kArgoFanMask =         0b00011000;
+const uint8_t kArgoRoomTempLowMask = 0b11100000;
 const uint8_t kArgoFanAuto = 0;  // 0b00
 const uint8_t kArgoFan3 = 3;  // 0b11
 const uint8_t kArgoFan2 = 2;  // 0b01
 const uint8_t kArgoFan1 = 1;  // 0b10
+
+// byte[4]
+const uint8_t kArgoRoomTempHighMask = 0b00000011;
+
+// byte[9]
+const uint8_t kArgoPowerBit = 0b00100000;
+const uint8_t kArgoMaxBit =   0b00001000;
+const uint8_t kArgoNightBit = 0b00000100;
+const uint8_t kArgoIFeelBit = 0b10000000;
+
+const uint8_t kArgoTempOffset = 4;
+const uint8_t kArgoMinTemp = 10;  // Celsius offset +4
+const uint8_t kArgoMaxTemp = 32;  // Celsius
+
 const uint8_t kArgoFlapAuto = 0;  // 0b000
 const uint8_t kArgoFlap1 = 1;  // 0b100
 const uint8_t kArgoFlap2 = 2;  // 0b010
@@ -81,49 +103,51 @@ const uint8_t kArgoFlapFull = 7;  // 0b111
 
 class IRArgoAC {
  public:
-  explicit IRArgoAC(uint16_t pin);
+  explicit IRArgoAC(const uint16_t pin);
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);
 #endif  // SEND_ARGO
-  void begin();
-  void on();
-  void off();
+  void begin(void);
+  void on(void);
+  void off(void);
 
-  void setPower(bool state);
-  uint8_t getPower();
+  void setPower(const bool on);
+  bool getPower(void);
 
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
 
-  void setFan(uint8_t fan);
-  uint8_t getFan();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
 
-  void setFlap(uint8_t flap);
-  uint8_t getFlap();
+  void setFlap(const uint8_t flap);
+  uint8_t getFlap(void);
 
-  void setCoolMode(uint8_t mode);
-  uint8_t getCoolMode();
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
 
-  void setHeatMode(uint8_t mode);
-  uint8_t getHeatMode();
-  uint8_t getMode();
+  void setMax(const bool on);
+  bool getMax(void);
 
-  void setMax(bool state);
-  bool getMax();
+  void setNight(const bool on);
+  bool getNight(void);
 
-  void setNight(bool state);
-  bool getNight();
+  void setiFeel(const bool on);
+  bool getiFeel(void);
 
-  void setiFeel(bool state);
-  bool getiFeel();
+  void setTime(void);
+  void setRoomTemp(const uint8_t degrees);
+  uint8_t getRoomTemp(void);
 
-  void setTime();
-  void setRoomTemp(uint8_t temp);
-
-  uint8_t* getRaw();
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  uint8_t* getRaw(void);
+  void setRaw(const char state[]);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifndef UNIT_TEST
 
  private:
@@ -133,20 +157,13 @@ class IRArgoAC {
 #endif
   // # of bytes per command
   uint8_t argo[kArgoStateLength];  // Defined in IRremoteESP8266.h
-  void stateReset();
-  void checksum();
+  void stateReset(void);
+  void checksum(void);
 
   // Attributes
-  uint8_t set_temp;
-  uint8_t fan_mode;
   uint8_t flap_mode;
-  uint8_t ac_state;
-  uint8_t ac_mode;  // heat 1, cool 0
   uint8_t heat_mode;
   uint8_t cool_mode;
-  uint8_t night_mode;  // on/off
-  uint8_t max_mode;  // on/off
-  uint8_t ifeel_mode;  // on/off
 };
 
 #endif  // IR_ARGO_H_

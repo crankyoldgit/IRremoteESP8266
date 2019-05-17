@@ -122,19 +122,7 @@ void IRac::argo(IRArgoAC *ac,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool turbo, const int16_t sleep) {
   ac->setPower(on);
-  switch (mode) {
-    case stdAc::opmode_t::kCool:
-      ac->setCoolMode(kArgoCoolOn);
-      break;
-    case stdAc::opmode_t::kHeat:
-      ac->setHeatMode(kArgoHeatOn);
-      break;
-    case stdAc::opmode_t::kDry:
-      ac->setCoolMode(kArgoCoolHum);
-      break;
-    default:  // No idea how to set Fan mode.
-      ac->setCoolMode(kArgoCoolAuto);
-  }
+  ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setFlap(ac->convertSwingV(swingv));
