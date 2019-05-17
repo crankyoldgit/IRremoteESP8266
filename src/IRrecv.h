@@ -249,8 +249,8 @@ class IRrecv {
                   bool strict = true);
 #endif
 #if (DECODE_SHARP || DECODE_DENON)
-  bool decodeSharp(decode_results *results, uint16_t nbits = kSharpBits,
-                   bool strict = true, bool expansion = true);
+  bool decodeSharp(decode_results *results, const uint16_t nbits = kSharpBits,
+                   const bool strict = true, const bool expansion = true);
 #endif
 #if DECODE_SHARP_AC
   bool decodeSharpAc(decode_results *results,

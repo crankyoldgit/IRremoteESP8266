@@ -63,7 +63,9 @@ const uint64_t kSharpCommandMask = ((uint64_t)1 << kSharpCommandBits) - 1;
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
-void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
+void IRsend::sendSharpRaw(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  uint64_t tempdata = data;
   for (uint16_t i = 0; i <= repeat; i++) {
     // Protocol demands that the data be sent twice; once normally,
     // then with all but the address bits inverted.
@@ -72,12 +74,12 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
     for (uint8_t n = 0; n < 2; n++) {
       sendGeneric(0, 0,  // No Header
                   kSharpBitMark, kSharpOneSpace, kSharpBitMark, kSharpZeroSpace,
-                  kSharpBitMark, kSharpGap, data, nbits, 38, true,
+                  kSharpBitMark, kSharpGap, tempdata, nbits, 38, true,
                   0,  // Repeats are handled already.
                   33);
       // Invert the data per protocol. This is always called twice, so it's
       // retured to original upon exiting the inner loop.
-      data ^= kSharpToggleMask;
+      tempdata ^= kSharpToggleMask;
     }
   }
 }
@@ -106,22 +108,22 @@ void IRsend::sendSharpRaw(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://www.sbprojects.com/knowledge/ir/sharp.htm
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
-uint32_t IRsend::encodeSharp(uint16_t address, uint16_t command,
-                             uint16_t expansion, uint16_t check,
-                             bool MSBfirst) {
+uint32_t IRsend::encodeSharp(const uint16_t address, const uint16_t command,
+                             const uint16_t expansion, const uint16_t check,
+                             const bool MSBfirst) {
   // Mask any unexpected bits.
-  address &= ((1 << kSharpAddressBits) - 1);
-  command &= ((1 << kSharpCommandBits) - 1);
-  expansion &= 1;
-  check &= 1;
+  uint16_t tempaddress = address & ((1 << kSharpAddressBits) - 1);
+  uint16_t tempcommand = command & ((1 << kSharpCommandBits) - 1);
+  uint16_t tempexpansion = expansion & 1;
+  uint16_t tempcheck = check & 1;
 
   if (!MSBfirst) {  // Correct bit order if needed.
-    address = reverseBits(address, kSharpAddressBits);
-    command = reverseBits(command, kSharpCommandBits);
+    tempaddress = reverseBits(tempaddress, kSharpAddressBits);
+    tempcommand = reverseBits(tempcommand, kSharpCommandBits);
   }
   // Concatinate all the bits.
-  return (address << (kSharpCommandBits + 2)) | (command << 2) |
-         (expansion << 1) | check;
+  return (tempaddress << (kSharpCommandBits + 2)) | (tempcommand << 2) |
+         (tempexpansion << 1) | tempcheck;
 }
 
 // Send a Sharp message
@@ -148,8 +150,8 @@ uint32_t IRsend::encodeSharp(uint16_t address, uint16_t command,
 //   http://www.sbprojects.com/knowledge/ir/sharp.htm
 //   http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
-void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
-                       uint16_t repeat) {
+void IRsend::sendSharp(const uint16_t address, uint16_t const command,
+                       const uint16_t nbits, const uint16_t repeat) {
   sendSharpRaw(encodeSharp(address, command, 1, 0, true), nbits, repeat);
 }
 #endif  // (SEND_SHARP || SEND_DENON)
@@ -176,8 +178,8 @@ void IRsend::sendSharp(uint16_t address, uint16_t command, uint16_t nbits,
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
-bool IRrecv::decodeSharp(decode_results *results, uint16_t nbits, bool strict,
-                         bool expansion) {
+bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
+                         const bool strict, const bool expansion) {
   if (results->rawlen < 2 * nbits + kFooter - 1)
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
@@ -296,7 +298,7 @@ void IRsend::sendSharpAc(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_SHARP_AC
 
-IRSharpAc::IRSharpAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRSharpAc::IRSharpAc(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
 
 void IRSharpAc::begin(void) { _irsend.begin(); }
 
@@ -327,13 +329,13 @@ uint8_t IRSharpAc::calcChecksum(uint8_t state[], const uint16_t length) {
 // Returns:
 //   A boolean.
 bool IRSharpAc::validChecksum(uint8_t state[], const uint16_t length) {
-  return (state[length - 1] >> 4) == calcChecksum(state, length);
+  return (state[length - 1] >> 4) == IRSharpAc::calcChecksum(state, length);
 }
 
 // Calculate and set the checksum values for the internal state.
 void IRSharpAc::checksum(void) {
   remote[kSharpAcStateLength - 1] &= 0x0F;
-  remote[kSharpAcStateLength - 1] |= calcChecksum(remote) << 4;
+  remote[kSharpAcStateLength - 1] |= this->calcChecksum(remote) << 4;
 }
 
 void IRSharpAc::stateReset(void) {
@@ -470,6 +472,52 @@ uint8_t IRSharpAc::convertFan(const stdAc::fanspeed_t speed) {
     default:
       return kSharpAcFanAuto;
   }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRSharpAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kSharpAcCool: return stdAc::opmode_t::kCool;
+    case kSharpAcHeat: return stdAc::opmode_t::kHeat;
+    case kSharpAcDry: return stdAc::opmode_t::kDry;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRSharpAc::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kSharpAcFanMax: return stdAc::fanspeed_t::kMax;
+    case kSharpAcFanHigh: return stdAc::fanspeed_t::kHigh;
+    case kSharpAcFanMed: return stdAc::fanspeed_t::kMedium;
+    case kSharpAcFanMin: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRSharpAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::SHARP_AC;
+  result.model = -1;  // Not supported.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.turbo = false;
+  result.clean = false;
+  result.beep = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.

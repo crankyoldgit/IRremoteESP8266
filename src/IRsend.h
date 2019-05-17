@@ -174,13 +174,14 @@ class IRsend {
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
 #if (SEND_SHARP || SEND_DENON)
-  uint32_t encodeSharp(uint16_t address, uint16_t command,
-                       uint16_t expansion = 1, uint16_t check = 0,
-                       bool MSBfirst = false);
-  void sendSharp(uint16_t address, uint16_t command,
-                 uint16_t nbits = kSharpBits, uint16_t repeat = kNoRepeat);
-  void sendSharpRaw(uint64_t data, uint16_t nbits = kSharpBits,
-                    uint16_t repeat = kNoRepeat);
+  uint32_t encodeSharp(const uint16_t address, const uint16_t command,
+                       const uint16_t expansion = 1, const uint16_t check = 0,
+                       const bool MSBfirst = false);
+  void sendSharp(const uint16_t address, const uint16_t command,
+                 const uint16_t nbits = kSharpBits,
+                 const uint16_t repeat = kNoRepeat);
+  void sendSharpRaw(const uint64_t data, const uint16_t nbits = kSharpBits,
+                    const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SHARP_AC
   void sendSharpAc(const unsigned char data[],

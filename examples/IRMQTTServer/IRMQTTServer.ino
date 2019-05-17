@@ -3194,6 +3194,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_SAMSUNG_AC
+#if DECODE_SHARP_AC
+    case decode_type_t::SHARP_AC: {
+      IRSharpAc ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_SHARP_AC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
