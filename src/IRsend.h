@@ -315,8 +315,9 @@ class IRsend {
                 uint16_t repeat = kArgoDefaultRepeat);
 #endif
 #if SEND_TROTEC
-  void sendTrotec(unsigned char data[], uint16_t nbytes = kTrotecStateLength,
-                  uint16_t repeat = kTrotecDefaultRepeat);
+  void sendTrotec(const unsigned char data[],
+                  const uint16_t nbytes = kTrotecStateLength,
+                  const uint16_t repeat = kTrotecDefaultRepeat);
 #endif
 #if SEND_NIKAI
   void sendNikai(uint64_t data, uint16_t nbits = kNikaiBits,

@@ -3226,6 +3226,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_TOSHIBA_AC
+#if DECODE_TROTEC
+    case decode_type_t::TROTEC: {
+      IRTrotecESP ac(IR_LED);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_TROTEC
     default:
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
