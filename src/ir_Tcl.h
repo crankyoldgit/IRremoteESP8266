@@ -48,7 +48,7 @@ const uint8_t kTcl112AcBitTurbo  = 0b01000000;
 
 class IRTcl112Ac {
  public:
-  explicit IRTcl112Ac(uint16_t pin);
+  explicit IRTcl112Ac(const uint16_t pin);
 
 #if SEND_TCL112AC
   void send(const uint16_t repeat = kTcl112AcDefaultRepeat);
@@ -85,10 +85,13 @@ class IRTcl112Ac {
   bool getTurbo(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -98,7 +101,7 @@ class IRTcl112Ac {
   IRsendTest _irsend;
 #endif
   uint8_t remote_state[kTcl112AcStateLength];
-  void stateReset();
+  void stateReset(void);
   void checksum(const uint16_t length = kTcl112AcStateLength);
 };
 
