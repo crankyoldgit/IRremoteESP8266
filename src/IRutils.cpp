@@ -556,6 +556,8 @@ String resultToSourceCode(const decode_results *results) {
 std::string resultToSourceCode(const decode_results *results) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(1536);  // 1.5KB should cover most cases.
   // Start declaration
   output += F("uint16_t ");  // variable type
   output += F("rawData[");   // array name
@@ -640,6 +642,8 @@ std::string resultToTimingInfo(const decode_results *results) {
   std::string output = "";
   std::string value = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2048);  // 2KB should cover most cases.
   output += F("Raw Timing[");
   output += uint64ToString(results->rawlen - 1, 10);
   output += F("]:\n");
@@ -670,6 +674,8 @@ String resultToHexidecimal(const decode_results *result) {
 std::string resultToHexidecimal(const decode_results *result) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2 * kStateSizeMax);  // Should cover worst cases.
   if (hasACState(result->decode_type)) {
 #if DECODE_AC
     for (uint16_t i = 0; result->bits > i * 8; i++) {
@@ -692,6 +698,8 @@ String resultToHumanReadableBasic(const decode_results *results) {
 std::string resultToHumanReadableBasic(const decode_results *results) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
   // Show Encoding standard
   output += F("Encoding  : ");
   output += typeToString(results->decode_type, results->repeat);
