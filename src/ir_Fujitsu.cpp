@@ -12,6 +12,7 @@
 // Equipment it seems compatible with:
 //  * Fujitsu ASYG30LFCA with remote AR-RAH2E
 //  * Fujitsu AST9RSGCW with remote AR-DB1
+//  * Fujitsu AR-RAE1E remote.
 //  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Ref:
