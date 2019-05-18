@@ -70,7 +70,7 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
 enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,
+  ARRAH2E = 1,  // ARRAE1E
   ARDB1,
 };
 
