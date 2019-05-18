@@ -57,6 +57,11 @@ std::string uint64ToString(uint64_t input, uint8_t base) {
   // i.e. [0-9A-Z] == 36
   if (base > 36) base = 10;
 
+  // Reserve some string space to reduce fragmentation.
+  // 16 bytes should store a uint64 in hex text which is the likely worst case.
+  // 64 bytes would be the worst case (base 2).
+  result.reserve(16);
+
   do {
     char c = input % base;
     input /= base;
