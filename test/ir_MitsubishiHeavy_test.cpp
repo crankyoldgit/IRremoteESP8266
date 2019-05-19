@@ -849,3 +849,72 @@ TEST(TestDecodeMitsubishiHeavy, ZjsSyntheticExample) {
       "3D: Off, Clean: Off",
       ac.toString());
 }
+
+TEST(TestMitsubishiHeavy152AcClass, toCommon) {
+  IRMitsubishiHeavy152Ac ac(0);
+  ac.setPower(true);
+  ac.setMode(kMitsubishiHeavyCool);
+  ac.setTemp(20);
+  ac.setFan(kMitsubishiHeavy152FanLow);
+  ac.setSwingVertical(kMitsubishiHeavy152SwingVHighest);
+  ac.setSwingHorizontal(kMitsubishiHeavy152SwingHRightMax);
+  ac.setTurbo(false);
+  ac.setEcono(true);
+  ac.setClean(true);
+  ac.setFilter(true);
+  ac.setSilent(true);
+  ac.setNight(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::MITSUBISHI_HEAVY_152, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kHighest, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kRightMax, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().econo);
+  ASSERT_TRUE(ac.toCommon().clean);
+  ASSERT_TRUE(ac.toCommon().quiet);
+  ASSERT_TRUE(ac.toCommon().filter);
+  ASSERT_EQ(0, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestMitsubishiHeavy88AcClass, toCommon) {
+  IRMitsubishiHeavy88Ac ac(0);
+  ac.setPower(true);
+  ac.setMode(kMitsubishiHeavyCool);
+  ac.setTemp(20);
+  ac.setFan(kMitsubishiHeavy88FanLow);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVHighest);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax);
+  ac.setTurbo(false);
+  ac.setEcono(true);
+  ac.setClean(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::MITSUBISHI_HEAVY_88, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kHighest, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kRightMax, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().econo);
+  ASSERT_TRUE(ac.toCommon().clean);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

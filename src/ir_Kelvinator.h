@@ -131,46 +131,49 @@ class IRKelvinatorAC {
  public:
   explicit IRKelvinatorAC(uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_KELVINATOR
   void send(const uint16_t repeat = kKelvinatorDefaultRepeat);
 #endif  // SEND_KELVINATOR
-  void begin();
-  void on();
-  void off();
-  void setPower(bool state);
-  bool getPower();
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
-  void setFan(uint8_t fan);
-  uint8_t getFan();
-  void setMode(uint8_t mode);
-  uint8_t getMode();
-  void setSwingVertical(bool state);
-  bool getSwingVertical();
-  void setSwingHorizontal(bool state);
-  bool getSwingHorizontal();
-  void setQuiet(bool state);
-  bool getQuiet();
-  void setIonFilter(bool state);
-  bool getIonFilter();
-  void setLight(bool state);
-  bool getLight();
-  void setXFan(bool state);
-  bool getXFan();
-  void setTurbo(bool state);
-  bool getTurbo();
-  uint8_t* getRaw();
-  void setRaw(uint8_t new_code[]);
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void);
+  void setSwingHorizontal(const bool on);
+  bool getSwingHorizontal(void);
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+  void setIonFilter(const bool on);
+  bool getIonFilter(void);
+  void setLight(const bool on);
+  bool getLight(void);
+  void setXFan(const bool on);
+  bool getXFan(void);
+  void setTurbo(const bool on);
+  bool getTurbo(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[]);
   static uint8_t calcBlockChecksum(
       const uint8_t* block, const uint16_t length = kKelvinatorStateLength / 2);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kKelvinatorStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -182,7 +185,7 @@ class IRKelvinatorAC {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kKelvinatorStateLength];
   void checksum(const uint16_t length = kKelvinatorStateLength);
-  void fixup();
+  void fixup(void);
 };
 
 #endif  // IR_KELVINATOR_H_

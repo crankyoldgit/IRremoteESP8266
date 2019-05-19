@@ -61,44 +61,48 @@ const uint8_t kMitsubishiAcStartStopTimer = 7;
 
 class IRMitsubishiAC {
  public:
-  explicit IRMitsubishiAC(uint16_t pin);
+  explicit IRMitsubishiAC(const uint16_t pin);
 
-  static uint8_t calculateChecksum(uint8_t* data);
+  static uint8_t calculateChecksum(const uint8_t* data);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
 #endif  // SEND_MITSUBISHI_AC
-  void begin();
-  void on();
-  void off();
-  void setPower(bool state);
-  bool getPower();
-  void setTemp(uint8_t temp);
-  uint8_t getTemp();
-  void setFan(uint8_t fan);
-  uint8_t getFan();
-  void setMode(uint8_t mode);
-  uint8_t getMode();
-  void setVane(uint8_t mode);
-  uint8_t getVane();
-  uint8_t* getRaw();
-  void setRaw(uint8_t* data);
-  uint8_t getClock();
-  void setClock(uint8_t clock);
-  uint8_t getStartClock();
-  void setStartClock(uint8_t clock);
-  uint8_t getStopClock();
-  void setStopClock(uint8_t clock);
-  uint8_t getTimer();
-  void setTimer(uint8_t timer);
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setVane(const uint8_t position);
+  uint8_t getVane(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t* data);
+  uint8_t getClock(void);
+  void setClock(const uint8_t clock);
+  uint8_t getStartClock(void);
+  void setStartClock(const uint8_t clock);
+  uint8_t getStopClock(void);
+  void setStopClock(const uint8_t clock);
+  uint8_t getTimer(void);
+  void setTimer(const uint8_t timer);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -108,12 +112,12 @@ class IRMitsubishiAC {
   IRsendTest _irsend;
 #endif
 #ifdef ARDUINO
-  String timeToString(uint64_t time);
+  String timeToString(const uint64_t time);
 #else
-  std::string timeToString(uint64_t time);
+  std::string timeToString(const uint64_t time);
 #endif
   uint8_t remote_state[kMitsubishiACStateLength];
-  void checksum();
+  void checksum(void);
 };
 
 #endif  // IR_MITSUBISHI_H_

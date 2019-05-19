@@ -60,30 +60,33 @@ class IRTrotecESP {
 #if SEND_TROTEC
   void send(const uint16_t repeat = kTrotecDefaultRepeat);
 #endif  // SEND_TROTEC
-  void begin();
+  void begin(void);
 
   void setPower(const bool state);
-  bool getPower();
+  bool getPower(void);
 
   void setTemp(const uint8_t celsius);
-  uint8_t getTemp();
+  uint8_t getTemp(void);
 
   void setSpeed(const uint8_t fan);
-  uint8_t getSpeed();
+  uint8_t getSpeed(void);
 
-  uint8_t getMode();
+  uint8_t getMode(void);
   void setMode(const uint8_t mode);
 
-  bool getSleep();
-  void setSleep(bool sleep);
+  bool getSleep(void);
+  void setSleep(const bool on);
 
-  uint8_t getTimer();
+  uint8_t getTimer(void);
   void setTimer(const uint8_t timer);
 
-  uint8_t* getRaw();
+  uint8_t* getRaw(void);
 
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifndef UNIT_TEST
 
  private:
@@ -92,8 +95,8 @@ class IRTrotecESP {
   IRsendTest _irsend;
 #endif
   uint8_t remote_state[kTrotecStateLength];
-  void stateReset();
-  void checksum();
+  void stateReset(void);
+  void checksum(void);
 };
 
 #endif  // IR_TROTEC_H_

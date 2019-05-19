@@ -583,3 +583,36 @@ TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
       ac.toString());
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);
 }
+
+TEST(TestIRWhirlpoolAcClass, toCommon) {
+  IRWhirlpoolAc ac(0);
+  ac.setModel(whirlpool_ac_remote_model_t::DG11J13A);
+  ac.setPowerToggle(true);
+  ac.setMode(kWhirlpoolAcCool);
+  ac.setTemp(18);
+  ac.setFan(kWhirlpoolAcFanHigh);
+  ac.setSwing(true);
+  ac.setSuper(true);
+  ac.setLight(true);
+  ac.setSleep(false);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::WHIRLPOOL_AC, ac.toCommon().protocol);
+  ASSERT_EQ(whirlpool_ac_remote_model_t::DG11J13A, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(18, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().light);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

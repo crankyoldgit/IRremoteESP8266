@@ -76,7 +76,7 @@ void IRsend::sendMitsubishiHeavy152(const unsigned char data[],
 IRMitsubishiHeavy152Ac::IRMitsubishiHeavy152Ac(
     const uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRMitsubishiHeavy152Ac::begin() { _irsend.begin(); }
+void IRMitsubishiHeavy152Ac::begin(void) { _irsend.begin(); }
 
 #if SEND_MITSUBISHIHEAVY
 void IRMitsubishiHeavy152Ac::send(const uint16_t repeat) {
@@ -303,7 +303,6 @@ bool IRMitsubishiHeavy152Ac::validChecksum(const uint8_t *state,
   return true;
 }
 
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRMitsubishiHeavy152Ac::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -376,6 +375,80 @@ uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
     default:
       return kMitsubishiHeavy152SwingHOff;
   }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kMitsubishiHeavyCool: return stdAc::opmode_t::kCool;
+    case kMitsubishiHeavyHeat: return stdAc::opmode_t::kHeat;
+    case kMitsubishiHeavyDry: return stdAc::opmode_t::kDry;
+    case kMitsubishiHeavyFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRMitsubishiHeavy152Ac::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kMitsubishiHeavy152FanMax: return stdAc::fanspeed_t::kMax;
+    case kMitsubishiHeavy152FanHigh: return stdAc::fanspeed_t::kHigh;
+    case kMitsubishiHeavy152FanMed: return stdAc::fanspeed_t::kMedium;
+    case kMitsubishiHeavy152FanLow: return stdAc::fanspeed_t::kLow;
+    case kMitsubishiHeavy152FanEcono: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingh_t IRMitsubishiHeavy152Ac::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case kMitsubishiHeavy152SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
+    case kMitsubishiHeavy152SwingHLeft: return stdAc::swingh_t::kLeft;
+    case kMitsubishiHeavy152SwingHMiddle: return stdAc::swingh_t::kMiddle;
+    case kMitsubishiHeavy152SwingHRight: return stdAc::swingh_t::kRight;
+    case kMitsubishiHeavy152SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kMitsubishiHeavy152SwingHOff: return stdAc::swingh_t::kOff;
+    default: return stdAc::swingh_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRMitsubishiHeavy152Ac::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kMitsubishiHeavy152SwingVHighest: return stdAc::swingv_t::kHighest;
+    case kMitsubishiHeavy152SwingVHigh: return stdAc::swingv_t::kHigh;
+    case kMitsubishiHeavy152SwingVMiddle: return stdAc::swingv_t::kMiddle;
+    case kMitsubishiHeavy152SwingVLow: return stdAc::swingv_t::kLow;
+    case kMitsubishiHeavy152SwingVLowest: return stdAc::swingv_t::kLowest;
+    case kMitsubishiHeavy152SwingVOff: return stdAc::swingv_t::kOff;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::MITSUBISHI_HEAVY_152;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->toCommonSwingV(this->getSwingVertical());
+  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
+  result.turbo = this->getTurbo();
+  result.econo = this->getEcono();
+  result.clean = this->getClean();
+  result.quiet = this->getSilent();
+  result.filter = this->getFilter();
+  result.sleep = this->getNight() ? 0 : -1;
+  // Not supported.
+  result.light = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.
@@ -521,7 +594,7 @@ std::string IRMitsubishiHeavy152Ac::toString(void) {
 IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(
     const uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRMitsubishiHeavy88Ac::begin() { _irsend.begin(); }
+void IRMitsubishiHeavy88Ac::begin(void) { _irsend.begin(); }
 
 #if SEND_MITSUBISHIHEAVY
 void IRMitsubishiHeavy88Ac::send(const uint16_t repeat) {
@@ -738,7 +811,6 @@ uint8_t IRMitsubishiHeavy88Ac::convertMode(const stdAc::opmode_t mode) {
   return IRMitsubishiHeavy152Ac::convertMode(mode);
 }
 
-
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRMitsubishiHeavy88Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
@@ -795,6 +867,69 @@ uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
     default:
       return kMitsubishiHeavy88SwingHOff;
   }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRMitsubishiHeavy88Ac::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kMitsubishiHeavy88FanTurbo: return stdAc::fanspeed_t::kMax;
+    case kMitsubishiHeavy88FanHigh: return stdAc::fanspeed_t::kHigh;
+    case kMitsubishiHeavy88FanMed: return stdAc::fanspeed_t::kMedium;
+    case kMitsubishiHeavy88FanLow: return stdAc::fanspeed_t::kLow;
+    case kMitsubishiHeavy88FanEcono: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingh_t IRMitsubishiHeavy88Ac::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case kMitsubishiHeavy88SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
+    case kMitsubishiHeavy88SwingHLeft: return stdAc::swingh_t::kLeft;
+    case kMitsubishiHeavy88SwingHMiddle: return stdAc::swingh_t::kMiddle;
+    case kMitsubishiHeavy88SwingHRight: return stdAc::swingh_t::kRight;
+    case kMitsubishiHeavy88SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kMitsubishiHeavy88SwingHOff: return stdAc::swingh_t::kOff;
+    default: return stdAc::swingh_t::kAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRMitsubishiHeavy88Ac::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kMitsubishiHeavy88SwingVHighest: return stdAc::swingv_t::kHighest;
+    case kMitsubishiHeavy88SwingVHigh: return stdAc::swingv_t::kHigh;
+    case kMitsubishiHeavy88SwingVMiddle: return stdAc::swingv_t::kMiddle;
+    case kMitsubishiHeavy88SwingVLow: return stdAc::swingv_t::kLow;
+    case kMitsubishiHeavy88SwingVLowest: return stdAc::swingv_t::kLowest;
+    case kMitsubishiHeavy88SwingVOff: return stdAc::swingv_t::kOff;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::MITSUBISHI_HEAVY_88;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = IRMitsubishiHeavy152Ac::toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->toCommonSwingV(this->getSwingVertical());
+  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
+  result.turbo = this->getTurbo();
+  result.econo = this->getEcono();
+  result.clean = this->getClean();
+  // Not supported.
+  result.quiet = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.

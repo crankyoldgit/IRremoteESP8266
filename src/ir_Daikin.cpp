@@ -417,6 +417,91 @@ uint8_t IRDaikinESP::getCurrentDay(void) {
   return ((remote[kDaikinByteClockMinsHigh] & 0x38) >> 3);
 }
 
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kDaikinCool;
+    case stdAc::opmode_t::kHeat:
+      return kDaikinHeat;
+    case stdAc::opmode_t::kDry:
+      return kDaikinDry;
+    case stdAc::opmode_t::kFan:
+      return kDaikinFan;
+    default:
+      return kDaikinAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+      return kDaikinFanQuiet;
+    case stdAc::fanspeed_t::kLow:
+      return kDaikinFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kHigh:
+      return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax:
+      return kDaikinFanMax;
+    default:
+      return kDaikinFanAuto;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinCool: return stdAc::opmode_t::kCool;
+    case kDaikinHeat: return stdAc::opmode_t::kHeat;
+    case kDaikinDry: return stdAc::opmode_t::kDry;
+    case kDaikinFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDaikinFanMax: return stdAc::fanspeed_t::kMax;
+    case kDaikinFanMax - 1: return stdAc::fanspeed_t::kHigh;
+    case kDaikinFanMin + 1: return stdAc::fanspeed_t::kMedium;
+    case kDaikinFanMin: return stdAc::fanspeed_t::kLow;
+    case kDaikinFanQuiet: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikinESP::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::DAIKIN;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
+                                             stdAc::swingv_t::kOff;
+  result.swingh = this->getSwingHorizontal() ? stdAc::swingh_t::kAuto :
+                                               stdAc::swingh_t::kOff;
+  result.quiet = this->getQuiet();
+  result.turbo = this->getPowerful();
+  result.clean = this->getMold();
+  result.econo = this->getEcono();
+  // Not supported.
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
 #ifdef ARDUINO
 String IRDaikinESP::renderTime(const uint16_t timemins) {
   String ret;
@@ -529,40 +614,6 @@ std::string IRDaikinESP::toString(void) {
   else
     result += F("Off");
   return result;
-}
-
-// Convert a standard A/C mode into its native mode.
-uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
-  switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kDaikinCool;
-    case stdAc::opmode_t::kHeat:
-      return kDaikinHeat;
-    case stdAc::opmode_t::kDry:
-      return kDaikinDry;
-    case stdAc::opmode_t::kFan:
-      return kDaikinFan;
-    default:
-      return kDaikinAuto;
-  }
-}
-
-// Convert a standard A/C Fan speed into its native fan speed.
-uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
-  switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kDaikinFanQuiet;
-    case stdAc::fanspeed_t::kLow:
-      return kDaikinFanMin;
-    case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kHigh:
-      return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kDaikinFanMax;
-    default:
-      return kDaikinFanAuto;
-  }
 }
 
 #if DECODE_DAIKIN
@@ -1124,6 +1175,53 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
+    case kDaikin2SwingVHigh + 1: return stdAc::swingv_t::kHigh;
+    case kDaikin2SwingVHigh + 2:
+    case kDaikin2SwingVHigh + 3: return stdAc::swingv_t::kMiddle;
+    case kDaikin2SwingVLow - 1: return stdAc::swingv_t::kLow;
+    case kDaikin2SwingVLow: return stdAc::swingv_t::kLowest;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert a native horizontal swing to it's common equivalent.
+stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin2SwingHSwing:
+    case kDaikin2SwingHAuto: return stdAc::swingh_t::kAuto;
+    default: return stdAc::swingh_t::kOff;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin2::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::DAIKIN2;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.swingv = this->toCommonSwingV(this->getSwingVertical());
+  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
+  result.quiet = this->getQuiet();
+  result.light = this->getLight();
+  result.turbo = this->getPowerful();
+  result.clean = this->getMold();
+  result.econo = this->getEcono();
+  result.filter = this->getPurify();
+  result.beep = this->getBeep();
+  result.sleep = this->getSleepTimerEnabled() ? this->getSleepTime() : -1;
+  // Not supported.
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRDaikin2::toString() {
@@ -1617,6 +1715,33 @@ void IRDaikin216::setPowerful(const bool on) {
 
 bool IRDaikin216::getPowerful() {
   return remote_state[kDaikin216BytePowerful] & kDaikinBitPowerful;
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin216::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::DAIKIN216;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
+                                             stdAc::swingv_t::kOff;
+  result.swingh = this->getSwingHorizontal() ? stdAc::swingh_t::kAuto :
+                                               stdAc::swingh_t::kOff;
+  result.quiet = this->getQuiet();
+  result.turbo = this->getPowerful();
+  // Not supported.
+  result.light = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
 }
 
 // Convert the internal state into a human readable string.

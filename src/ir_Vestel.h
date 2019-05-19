@@ -108,17 +108,17 @@ const uint64_t kVestelAcTimeStateDefault = 0x201ULL;
 
 class IRVestelAc {
  public:
-  explicit IRVestelAc(uint16_t pin);
+  explicit IRVestelAc(const uint16_t pin);
 
-  void stateReset();
+  void stateReset(void);
 #if SEND_VESTEL_AC
-  void send();
+  void send(void);
 #endif  // SEND_VESTEL_AC
   void begin(void);
   void on(void);
   void off(void);
-  void setPower(const bool state);
-  bool getPower();
+  void setPower(const bool on);
+  bool getPower(void);
   void setAuto(const int8_t autoLevel);
   void setTimer(const uint16_t minutes);
   uint16_t getTimer(void);
@@ -134,17 +134,17 @@ class IRVestelAc {
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
-  void setRaw(uint8_t* newState);
+  void setRaw(const uint8_t* newState);
   void setRaw(const uint64_t newState);
   uint64_t getRaw(void);
   static bool validChecksum(const uint64_t state);
-  void setSwing(const bool state);
+  void setSwing(const bool on);
   bool getSwing(void);
-  void setSleep(const bool state);
+  void setSleep(const bool on);
   bool getSleep(void);
-  void setTurbo(const bool state);
+  void setTurbo(const bool on);
   bool getTurbo(void);
-  void setIon(const bool state);
+  void setIon(const bool on);
   bool getIon(void);
   bool isTimeCommand(void);
   bool isOnTimerActive(void);
@@ -154,12 +154,15 @@ class IRVestelAc {
   bool isTimerActive(void);
   void setTimerActive(const bool on);
   static uint8_t calcChecksum(const uint64_t state);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
-  String toString();
+  String toString(void);
 #else
-  std::string toString();
+  std::string toString(void);
 #endif
 #ifndef UNIT_TEST
 
@@ -171,7 +174,7 @@ class IRVestelAc {
   uint64_t remote_state;
   uint64_t remote_time_state;
   bool use_time_state;
-  void checksum();
+  void checksum(void);
 };
 
 #endif  // IR_VESTEL_H_

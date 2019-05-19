@@ -70,6 +70,28 @@ namespace stdAc {
     kRight =    4,
     kRightMax = 5,
   };
+
+  // Structure to hold a common A/C state.
+  typedef struct {
+    decode_type_t protocol;
+    int16_t model;
+    bool power;
+    stdAc::opmode_t mode;
+    float degrees;
+    bool celsius;
+    stdAc::fanspeed_t fanspeed;
+    stdAc::swingv_t swingv;
+    stdAc::swingh_t swingh;
+    bool quiet;
+    bool turbo;
+    bool econo;
+    bool light;
+    bool filter;
+    bool clean;
+    bool beep;
+    int16_t sleep;
+    int16_t clock;
+  } state_t;
 };  // namespace stdAc
 
 // Classes
@@ -131,9 +153,9 @@ class IRsend {
                     uint16_t repeat = kSherwoodMinRepeat);
 #endif
 #if SEND_SAMSUNG
-  void sendSAMSUNG(uint64_t data, uint16_t nbits = kSamsungBits,
-                   uint16_t repeat = kNoRepeat);
-  uint32_t encodeSAMSUNG(uint8_t customer, uint8_t command);
+  void sendSAMSUNG(const uint64_t data, const uint16_t nbits = kSamsungBits,
+                   const uint16_t repeat = kNoRepeat);
+  uint32_t encodeSAMSUNG(const uint8_t customer, const uint8_t command);
 #endif
 #if SEND_SAMSUNG36
   void sendSamsung36(const uint64_t data, const uint16_t nbits = kSamsung36Bits,
@@ -152,13 +174,14 @@ class IRsend {
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
 #if (SEND_SHARP || SEND_DENON)
-  uint32_t encodeSharp(uint16_t address, uint16_t command,
-                       uint16_t expansion = 1, uint16_t check = 0,
-                       bool MSBfirst = false);
-  void sendSharp(uint16_t address, uint16_t command,
-                 uint16_t nbits = kSharpBits, uint16_t repeat = kNoRepeat);
-  void sendSharpRaw(uint64_t data, uint16_t nbits = kSharpBits,
-                    uint16_t repeat = kNoRepeat);
+  uint32_t encodeSharp(const uint16_t address, const uint16_t command,
+                       const uint16_t expansion = 1, const uint16_t check = 0,
+                       const bool MSBfirst = false);
+  void sendSharp(const uint16_t address, const uint16_t command,
+                 const uint16_t nbits = kSharpBits,
+                 const uint16_t repeat = kNoRepeat);
+  void sendSharpRaw(const uint64_t data, const uint16_t nbits = kSharpBits,
+                    const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SHARP_AC
   void sendSharpAc(const unsigned char data[],
@@ -171,7 +194,7 @@ class IRsend {
   uint16_t encodeJVC(uint8_t address, uint8_t command);
 #endif
 #if SEND_DENON
-  void sendDenon(uint64_t data, uint16_t nbits = DENON_BITS,
+  void sendDenon(uint64_t data, uint16_t nbits = kDenonBits,
                  uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_SANYO
@@ -188,13 +211,14 @@ class IRsend {
                 uint16_t repeat = kDishMinRepeat);
 #endif
 #if (SEND_PANASONIC || SEND_DENON)
-  void sendPanasonic64(uint64_t data, uint16_t nbits = kPanasonicBits,
-                       uint16_t repeat = kNoRepeat);
-  void sendPanasonic(uint16_t address, uint32_t data,
-                     uint16_t nbits = kPanasonicBits,
-                     uint16_t repeat = kNoRepeat);
-  uint64_t encodePanasonic(uint16_t manufacturer, uint8_t device,
-                           uint8_t subdevice, uint8_t function);
+  void sendPanasonic64(const uint64_t data,
+                       const uint16_t nbits = kPanasonicBits,
+                       const uint16_t repeat = kNoRepeat);
+  void sendPanasonic(const uint16_t address, const uint32_t data,
+                     const uint16_t nbits = kPanasonicBits,
+                     const uint16_t repeat = kNoRepeat);
+  uint64_t encodePanasonic(const uint16_t manufacturer, const uint8_t device,
+                           const uint8_t subdevice, const uint8_t function);
 #endif
 #if SEND_RC5
   void sendRC5(uint64_t data, uint16_t nbits = kRC5XBits,
@@ -287,21 +311,23 @@ class IRsend {
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_ARGO
-  void sendArgo(unsigned char data[], uint16_t nbytes = kArgoStateLength,
-                uint16_t repeat = kArgoDefaultRepeat);
+  void sendArgo(const unsigned char data[],
+                const uint16_t nbytes = kArgoStateLength,
+                const uint16_t repeat = kArgoDefaultRepeat);
 #endif
 #if SEND_TROTEC
-  void sendTrotec(unsigned char data[], uint16_t nbytes = kTrotecStateLength,
-                  uint16_t repeat = kTrotecDefaultRepeat);
+  void sendTrotec(const unsigned char data[],
+                  const uint16_t nbytes = kTrotecStateLength,
+                  const uint16_t repeat = kTrotecDefaultRepeat);
 #endif
 #if SEND_NIKAI
   void sendNikai(uint64_t data, uint16_t nbits = kNikaiBits,
                  uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_TOSHIBA_AC
-  void sendToshibaAC(unsigned char data[],
-                     uint16_t nbytes = kToshibaACStateLength,
-                     uint16_t repeat = kToshibaACMinRepeat);
+  void sendToshibaAC(const unsigned char data[],
+                     const uint16_t nbytes = kToshibaACStateLength,
+                     const uint16_t repeat = kToshibaACMinRepeat);
 #endif
 #if SEND_MIDEA
   void sendMidea(uint64_t data, uint16_t nbits = kMideaBits,
@@ -321,37 +347,38 @@ class IRsend {
                      uint16_t repeat = kCarrierAcMinRepeat);
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
-  void sendHaierAC(unsigned char data[], uint16_t nbytes = kHaierACStateLength,
-                   uint16_t repeat = kHaierAcDefaultRepeat);
+  void sendHaierAC(const unsigned char data[],
+                   const uint16_t nbytes = kHaierACStateLength,
+                   const uint16_t repeat = kHaierAcDefaultRepeat);
 #endif
 #if SEND_HAIER_AC_YRW02
-  void sendHaierACYRW02(unsigned char data[],
-                        uint16_t nbytes = kHaierACYRW02StateLength,
-                        uint16_t repeat = kHaierAcYrw02DefaultRepeat);
+  void sendHaierACYRW02(const unsigned char data[],
+                        const uint16_t nbytes = kHaierACYRW02StateLength,
+                        const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif
 #if SEND_HITACHI_AC
-  void sendHitachiAC(unsigned char data[],
-                     uint16_t nbytes = kHitachiAcStateLength,
-                     uint16_t repeat = kHitachiAcDefaultRepeat);
+  void sendHitachiAC(const unsigned char data[],
+                     const uint16_t nbytes = kHitachiAcStateLength,
+                     const uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif
 #if SEND_HITACHI_AC1
-  void sendHitachiAC1(unsigned char data[],
-                      uint16_t nbytes = kHitachiAc1StateLength,
-                      uint16_t repeat = kNoRepeat);
+  void sendHitachiAC1(const unsigned char data[],
+                      const uint16_t nbytes = kHitachiAc1StateLength,
+                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_HITACHI_AC2
-  void sendHitachiAC2(unsigned char data[],
-                      uint16_t nbytes = kHitachiAc2StateLength,
-                      uint16_t repeat = kNoRepeat);
+  void sendHitachiAC2(const unsigned char data[],
+                      const uint16_t nbytes = kHitachiAc2StateLength,
+                      const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_GICABLE
   void sendGICable(uint64_t data, uint16_t nbits = kGicableBits,
                    uint16_t repeat = kGicableMinRepeat);
 #endif
 #if SEND_WHIRLPOOL_AC
-  void sendWhirlpoolAC(unsigned char data[],
-                       uint16_t nbytes = kWhirlpoolAcStateLength,
-                       uint16_t repeat = kWhirlpoolAcDefaultRepeat);
+  void sendWhirlpoolAC(const unsigned char data[],
+                       const uint16_t nbytes = kWhirlpoolAcStateLength,
+                       const uint16_t repeat = kWhirlpoolAcDefaultRepeat);
 #endif
 #if SEND_LUTRON
   void sendLutron(uint64_t data, uint16_t nbits = kLutronBits,
@@ -363,9 +390,9 @@ class IRsend {
                      uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_PANASONIC_AC
-  void sendPanasonicAC(unsigned char data[],
-                       uint16_t nbytes = kPanasonicAcStateLength,
-                       uint16_t repeat = kPanasonicAcDefaultRepeat);
+  void sendPanasonicAC(const unsigned char data[],
+                       const uint16_t nbytes = kPanasonicAcStateLength,
+                       const uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif
 #if SEND_PIONEER
   void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,
@@ -386,8 +413,8 @@ class IRsend {
                     const uint16_t repeat = kTcl112AcDefaultRepeat);
 #endif
 #if SEND_TECO
-  void sendTeco(uint64_t data, uint16_t nbits = kTecoBits,
-                uint16_t repeat = kNoRepeat);
+  void sendTeco(const uint64_t data, const uint16_t nbits = kTecoBits,
+                const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_LEGOPF
   void sendLegoPf(const uint64_t data, const uint16_t nbits = kLegoPfBits,

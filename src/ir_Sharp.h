@@ -48,7 +48,7 @@ const uint8_t kSharpAcBitTempManual = 0b00000100;
 
 class IRSharpAc {
  public:
-  explicit IRSharpAc(uint16_t pin);
+  explicit IRSharpAc(const uint16_t pin);
 
 #if SEND_SHARP_AC
   void send(const uint16_t repeat = kSharpAcDefaultRepeat);
@@ -59,39 +59,11 @@ class IRSharpAc {
   void setPower(const bool on);
   bool getPower(void);
   void setTemp(const uint8_t temp);
-  uint8_t getTemp();
+  uint8_t getTemp(void);
   void setFan(const uint8_t fan);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
-  void setSwingVertical(const bool on);
-  bool getSwingVertical(void);
-  void setSwingHorizontal(const bool on);
-  bool getSwingHorizontal(void);
-  bool getQuiet(void);
-  void setQuiet(const bool on);
-  bool getPowerful(void);
-  void setPowerful(const bool on);
-  void setSensor(const bool on);
-  bool getSensor(void);
-  void setEcono(const bool on);
-  bool getEcono(void);
-  void setEye(const bool on);
-  bool getEye(void);
-  void setMold(const bool on);
-  bool getMold(void);
-  void setComfort(const bool on);
-  bool getComfort(void);
-  void enableOnTimer(const uint16_t starttime);
-  void disableOnTimer(void);
-  uint16_t getOnTime(void);
-  bool getOnTimerEnabled();
-  void enableOffTimer(const uint16_t endtime);
-  void disableOffTimer(void);
-  uint16_t getOffTime(void);
-  bool getOffTimerEnabled(void);
-  void setCurrentTime(const uint16_t mins_since_midnight);
-  uint16_t getCurrentTime(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);
@@ -99,6 +71,9 @@ class IRSharpAc {
                             const uint16_t length = kSharpAcStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
 #ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);

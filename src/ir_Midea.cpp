@@ -91,52 +91,54 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Warning: Consider this very alpha code.
 
 // Initialise the object.
-IRMideaAC::IRMideaAC(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRMideaAC::IRMideaAC(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
-void IRMideaAC::stateReset() {
+void IRMideaAC::stateReset(void) {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state = 0xA1826FFFFF62;
 }
 
 // Configure the pin for output.
-void IRMideaAC::begin() { _irsend.begin(); }
+void IRMideaAC::begin(void) { _irsend.begin(); }
 
 #if SEND_MIDEA
 // Send the current desired state to the IR LED.
 void IRMideaAC::send(const uint16_t repeat) {
-  checksum();  // Ensure correct checksum before sending.
+  this->checksum();  // Ensure correct checksum before sending.
   _irsend.sendMidea(remote_state, kMideaBits, repeat);
 }
 #endif  // SEND_MIDEA
 
 // Return a pointer to the internal state date of the remote.
-uint64_t IRMideaAC::getRaw() {
-  checksum();
+uint64_t IRMideaAC::getRaw(void) {
+  this->checksum();
   return remote_state & kMideaACStateMask;
 }
 
 // Override the internal state with the new state.
-void IRMideaAC::setRaw(uint64_t newState) {
+void IRMideaAC::setRaw(const uint64_t newState) {
   remote_state = newState & kMideaACStateMask;
 }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::on() { remote_state |= kMideaACPower; }
+void IRMideaAC::on(void) { remote_state |= kMideaACPower; }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::off() { remote_state &= (kMideaACStateMask ^ kMideaACPower); }
+void IRMideaAC::off(void) {
+  remote_state &= (kMideaACStateMask ^ kMideaACPower);
+}
 
 // Set the requested power state of the A/C.
-void IRMideaAC::setPower(const bool state) {
-  if (state)
-    on();
+void IRMideaAC::setPower(const bool on) {
+  if (on)
+    this->on();
   else
-    off();
+    this->off();
 }
 
 // Return the requested power state of the A/C.
-bool IRMideaAC::getPower() { return (remote_state & kMideaACPower); }
+bool IRMideaAC::getPower(void) { return (remote_state & kMideaACPower); }
 
 // Set the temperature.
 // Args:
@@ -187,42 +189,39 @@ void IRMideaAC::setFan(const uint8_t fan) {
 }
 
 // Return the requested state of the unit's fan.
-uint8_t IRMideaAC::getFan() { return (remote_state >> 35) & 0b111; }
+uint8_t IRMideaAC::getFan(void) { return (remote_state >> 35) & 0b111; }
 
 // Get the requested climate operation mode of the a/c unit.
 // Returns:
 //   A uint8_t containing the A/C mode.
-uint8_t IRMideaAC::getMode() { return ((remote_state >> 32) & 0b111); }
+uint8_t IRMideaAC::getMode(void) { return ((remote_state >> 32) & 0b111); }
 
 // Set the requested climate operation mode of the a/c unit.
 void IRMideaAC::setMode(const uint8_t mode) {
-  // If we get an unexpected mode, default to AUTO.
-  uint64_t new_mode;
   switch (mode) {
     case kMideaACAuto:
     case kMideaACCool:
     case kMideaACHeat:
     case kMideaACDry:
     case kMideaACFan:
-      new_mode = mode;
-      break;
+      remote_state &= kMideaACModeMask;
+      remote_state |= ((uint64_t)mode << 32);
+      return;
     default:
-      new_mode = kMideaACAuto;
+      this->setMode(kMideaACAuto);
   }
-  remote_state &= kMideaACModeMask;
-  remote_state |= (new_mode << 32);
 }
 
 // Set the Sleep state of the A/C.
-void IRMideaAC::setSleep(const bool state) {
-  if (state)
+void IRMideaAC::setSleep(const bool on) {
+  if (on)
     remote_state |= kMideaACSleep;
   else
     remote_state &= (kMideaACStateMask ^ kMideaACSleep);
 }
 
 // Return the Sleep state of the A/C.
-bool IRMideaAC::getSleep() { return (remote_state & kMideaACSleep); }
+bool IRMideaAC::getSleep(void) { return (remote_state & kMideaACSleep); }
 
 // Calculate the checksum for a given array.
 // Args:
@@ -251,7 +250,7 @@ bool IRMideaAC::validChecksum(const uint64_t state) {
 }
 
 // Calculate & set the checksum for the current internal state of the remote.
-void IRMideaAC::checksum() {
+void IRMideaAC::checksum(void) {
   // Stored the checksum value in the last byte.
   remote_state &= kMideaACChecksumMask;
   remote_state |= calcChecksum(remote_state);
@@ -290,12 +289,58 @@ uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kMideaACCool: return stdAc::opmode_t::kCool;
+    case kMideaACHeat: return stdAc::opmode_t::kHeat;
+    case kMideaACDry: return stdAc::opmode_t::kDry;
+    case kMideaACFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kMideaACFanHigh: return stdAc::fanspeed_t::kMax;
+    case kMideaACFanMed: return stdAc::fanspeed_t::kMedium;
+    case kMideaACFanLow: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRMideaAC::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::MIDEA;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp(result.celsius);
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.sleep = this->getSleep() ? 0 : -1;
+  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRMideaAC::toString() {
+String IRMideaAC::toString(void) {
   String result = "";
 #else
-std::string IRMideaAC::toString() {
+std::string IRMideaAC::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.

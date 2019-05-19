@@ -44,8 +44,8 @@ const uint32_t kHitachiAcMinGap = kDefaultMessageGap;  // Just a guess.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/417
-void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
-                           uint16_t repeat) {
+void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
   if (nbytes < kHitachiAcStateLength)
     return;  // Not enough bytes to send a proper message.
   sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace, kHitachiAcBitMark,
@@ -71,8 +71,8 @@ void IRsend::sendHitachiAC(unsigned char data[], uint16_t nbytes,
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/453
 //   Basically the same as sendHitatchiAC() except different size and header.
-void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
-                            uint16_t repeat) {
+void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
+                            const uint16_t repeat) {
   if (nbytes < kHitachiAc1StateLength)
     return;  // Not enough bytes to send a proper message.
   sendGeneric(kHitachiAc1HdrMark, kHitachiAc1HdrSpace, kHitachiAcBitMark,
@@ -98,8 +98,8 @@ void IRsend::sendHitachiAC1(unsigned char data[], uint16_t nbytes,
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/417
 //   Basically the same as sendHitatchiAC() except different size.
-void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
-                            uint16_t repeat) {
+void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
+                            const uint16_t repeat) {
   if (nbytes < kHitachiAc2StateLength)
     return;  // Not enough bytes to send a proper message.
   sendHitachiAC(data, nbytes, repeat);
@@ -110,9 +110,9 @@ void IRsend::sendHitachiAC2(unsigned char data[], uint16_t nbytes,
 // Inspired by:
 // https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
 
-IRHitachiAc::IRHitachiAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRHitachiAc::IRHitachiAc(const uint16_t pin) : _irsend(pin) { stateReset(); }
 
-void IRHitachiAc::stateReset() {
+void IRHitachiAc::stateReset(void) {
   remote_state[0] = 0x80;
   remote_state[1] = 0x08;
   remote_state[2] = 0x0C;
@@ -130,7 +130,7 @@ void IRHitachiAc::stateReset() {
   setTemp(23);
 }
 
-void IRHitachiAc::begin() { _irsend.begin(); }
+void IRHitachiAc::begin(void) { _irsend.begin(); }
 
 uint8_t IRHitachiAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
@@ -148,7 +148,7 @@ bool IRHitachiAc::validChecksum(const uint8_t state[], const uint16_t length) {
   return (state[length - 1] == calcChecksum(state, length));
 }
 
-uint8_t *IRHitachiAc::getRaw() {
+uint8_t *IRHitachiAc::getRaw(void) {
   checksum();
   return remote_state;
 }
@@ -165,7 +165,7 @@ void IRHitachiAc::send(const uint16_t repeat) {
 }
 #endif  // SEND_HITACHI_AC
 
-bool IRHitachiAc::getPower() { return (remote_state[17] & 0x01); }
+bool IRHitachiAc::getPower(void) { return (remote_state[17] & 0x01); }
 
 void IRHitachiAc::setPower(const bool on) {
   if (on)
@@ -174,11 +174,11 @@ void IRHitachiAc::setPower(const bool on) {
     remote_state[17] &= 0xFE;
 }
 
-void IRHitachiAc::on() { setPower(true); }
+void IRHitachiAc::on(void) { setPower(true); }
 
-void IRHitachiAc::off() { setPower(false); }
+void IRHitachiAc::off(void) { setPower(false); }
 
-uint8_t IRHitachiAc::getMode() { return reverseBits(remote_state[10], 8); }
+uint8_t IRHitachiAc::getMode(void) { return reverseBits(remote_state[10], 8); }
 
 void IRHitachiAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
@@ -200,7 +200,9 @@ void IRHitachiAc::setMode(const uint8_t mode) {
   setFan(getFan());  // Reset the fan speed after the mode change.
 }
 
-uint8_t IRHitachiAc::getTemp() { return reverseBits(remote_state[11], 8) >> 1; }
+uint8_t IRHitachiAc::getTemp(void) {
+  return reverseBits(remote_state[11], 8) >> 1;
+}
 
 void IRHitachiAc::setTemp(const uint8_t celsius) {
   uint8_t temp;
@@ -220,7 +222,7 @@ void IRHitachiAc::setTemp(const uint8_t celsius) {
     remote_state[9] = 0x10;
 }
 
-uint8_t IRHitachiAc::getFan() { return reverseBits(remote_state[13], 8); }
+uint8_t IRHitachiAc::getFan(void) { return reverseBits(remote_state[13], 8); }
 
 void IRHitachiAc::setFan(const uint8_t speed) {
   uint8_t fanmin = kHitachiAcFanAuto;
@@ -239,7 +241,7 @@ void IRHitachiAc::setFan(const uint8_t speed) {
   remote_state[13] = reverseBits(newspeed, 8);
 }
 
-bool IRHitachiAc::getSwingVertical() { return remote_state[14] & 0x80; }
+bool IRHitachiAc::getSwingVertical(void) { return remote_state[14] & 0x80; }
 
 void IRHitachiAc::setSwingVertical(const bool on) {
   if (on)
@@ -248,7 +250,7 @@ void IRHitachiAc::setSwingVertical(const bool on) {
     remote_state[14] &= 0x7F;
 }
 
-bool IRHitachiAc::getSwingHorizontal() { return remote_state[15] & 0x80; }
+bool IRHitachiAc::getSwingHorizontal(void) { return remote_state[15] & 0x80; }
 
 void IRHitachiAc::setSwingHorizontal(const bool on) {
   if (on)
@@ -291,12 +293,61 @@ uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRHitachiAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAcCool: return stdAc::opmode_t::kCool;
+    case kHitachiAcHeat: return stdAc::opmode_t::kHeat;
+    case kHitachiAcDry: return stdAc::opmode_t::kDry;
+    case kHitachiAcFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kHitachiAcFanHigh: return stdAc::fanspeed_t::kMax;
+    case kHitachiAcFanHigh - 1: return stdAc::fanspeed_t::kHigh;
+    case kHitachiAcFanLow + 1: return stdAc::fanspeed_t::kMedium;
+    case kHitachiAcFanLow: return stdAc::fanspeed_t::kLow;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRHitachiAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::HITACHI_AC;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
+                                             stdAc::swingv_t::kOff;
+  result.swingh = this->getSwingHorizontal() ? stdAc::swingh_t::kAuto :
+                                               stdAc::swingh_t::kOff;
+  // Not supported.
+  result.quiet = false;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRHitachiAc::toString() {
+String IRHitachiAc::toString(void) {
   String result = "";
 #else
-std::string IRHitachiAc::toString() {
+std::string IRHitachiAc::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
@@ -376,8 +427,8 @@ std::string IRHitachiAc::toString() {
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/417
 //   https://github.com/markszabo/IRremoteESP8266/issues/453
-bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t nbits,
-                             bool strict) {
+bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
   const uint8_t kTolerance = 30;
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid HitachiAC message.

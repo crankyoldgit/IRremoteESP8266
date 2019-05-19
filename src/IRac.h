@@ -229,26 +229,4 @@ void daikin216(IRDaikin216 *ac,
                  const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_WHIRLPOOL_AC
 };  // IRac class
-
-// Structure to hold a common A/C state.
-typedef struct {
-  decode_type_t protocol;
-  int16_t model;
-  bool power;
-  stdAc::opmode_t mode;
-  float degrees;
-  bool celsius;
-  stdAc::fanspeed_t fanspeed;
-  stdAc::swingv_t swingv;
-  stdAc::swingh_t swingh;
-  bool quiet;
-  bool turbo;
-  bool econo;
-  bool light;
-  bool filter;
-  bool clean;
-  bool beep;
-  int16_t sleep;
-  int16_t clock;
-} commonAcState_t;
 #endif  // IRAC_H_

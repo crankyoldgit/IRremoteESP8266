@@ -51,13 +51,14 @@ void IRsend::sendFujitsuAC(unsigned char data[], uint16_t nbytes,
 // Code to emulate Fujitsu A/C IR remote control unit.
 
 // Initialise the object.
-IRFujitsuAC::IRFujitsuAC(uint16_t pin, fujitsu_ac_remote_model_t model)
+IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
+                         const fujitsu_ac_remote_model_t model)
     : _irsend(pin) {
   setModel(model);
   stateReset();
 }
 
-void IRFujitsuAC::setModel(fujitsu_ac_remote_model_t model) {
+void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
   _model = model;
   switch (model) {
     case ARDB1:
@@ -70,8 +71,10 @@ void IRFujitsuAC::setModel(fujitsu_ac_remote_model_t model) {
   }
 }
 
+fujitsu_ac_remote_model_t IRFujitsuAC::getModel(void) { return _model; }
+
 // Reset the state of the remote to a known good state/sequence.
-void IRFujitsuAC::stateReset() {
+void IRFujitsuAC::stateReset(void) {
   _temp = 24;
   _fanSpeed = kFujitsuAcFanHigh;
   _mode = kFujitsuAcModeCool;
@@ -81,7 +84,7 @@ void IRFujitsuAC::stateReset() {
 }
 
 // Configure the pin for output.
-void IRFujitsuAC::begin() { _irsend.begin(); }
+void IRFujitsuAC::begin(void) { _irsend.begin(); }
 
 #if SEND_FUJITSU_AC
 // Send the current desired state to the IR LED.
@@ -91,7 +94,7 @@ void IRFujitsuAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_FUJITSU_AC
 
-void IRFujitsuAC::buildState() {
+void IRFujitsuAC::buildState(void) {
   remote_state[0] = 0x14;
   remote_state[1] = 0x63;
   remote_state[2] = 0x00;
@@ -159,7 +162,7 @@ void IRFujitsuAC::buildState() {
   }
 }
 
-uint8_t IRFujitsuAC::getStateLength() {
+uint8_t IRFujitsuAC::getStateLength(void) {
   buildState();  // Force an update of the internal state.
   if ((_model == ARRAH2E && remote_state[5] != 0xFE) ||
       (_model == ARDB1 && remote_state[5] != 0xFC))
@@ -169,7 +172,7 @@ uint8_t IRFujitsuAC::getStateLength() {
 }
 
 // Return a pointer to the internal state date of the remote.
-uint8_t* IRFujitsuAC::getRaw() {
+uint8_t* IRFujitsuAC::getRaw(void) {
   buildState();
   return remote_state;
 }
@@ -221,9 +224,9 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
 }
 
 // Set the requested power state of the A/C to off.
-void IRFujitsuAC::off() { _cmd = kFujitsuAcCmdTurnOff; }
+void IRFujitsuAC::off(void) { _cmd = kFujitsuAcCmdTurnOff; }
 
-void IRFujitsuAC::stepHoriz() {
+void IRFujitsuAC::stepHoriz(void) {
   switch (_model) {
     case ARDB1:
       break;  // This remote doesn't have a horizontal option.
@@ -232,10 +235,10 @@ void IRFujitsuAC::stepHoriz() {
   }
 }
 
-void IRFujitsuAC::stepVert() { _cmd = kFujitsuAcCmdStepVert; }
+void IRFujitsuAC::stepVert(void) { _cmd = kFujitsuAcCmdStepVert; }
 
 // Set the requested command of the A/C.
-void IRFujitsuAC::setCmd(uint8_t cmd) {
+void IRFujitsuAC::setCmd(const uint8_t cmd) {
   switch (cmd) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdTurnOn:
@@ -253,54 +256,55 @@ void IRFujitsuAC::setCmd(uint8_t cmd) {
   }
 }
 
-uint8_t IRFujitsuAC::getCmd() { return _cmd; }
+uint8_t IRFujitsuAC::getCmd(void) { return _cmd; }
 
-bool IRFujitsuAC::getPower() { return _cmd != kFujitsuAcCmdTurnOff; }
+bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 
 // Set the temp. in deg C
-void IRFujitsuAC::setTemp(uint8_t temp) {
-  temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
-  temp = std::min((uint8_t)kFujitsuAcMaxTemp, temp);
-  _temp = temp;
+void IRFujitsuAC::setTemp(const uint8_t temp) {
+  _temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
+  _temp = std::min((uint8_t)kFujitsuAcMaxTemp, _temp);
 }
 
-uint8_t IRFujitsuAC::getTemp() { return _temp; }
+uint8_t IRFujitsuAC::getTemp(void) { return _temp; }
 
 // Set the speed of the fan
-void IRFujitsuAC::setFanSpeed(uint8_t fanSpeed) {
+void IRFujitsuAC::setFanSpeed(const uint8_t fanSpeed) {
   if (fanSpeed > kFujitsuAcFanQuiet)
-    fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
-  _fanSpeed = fanSpeed;
+    _fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
+  else
+    _fanSpeed = fanSpeed;
 }
-uint8_t IRFujitsuAC::getFanSpeed() { return _fanSpeed; }
+uint8_t IRFujitsuAC::getFanSpeed(void) { return _fanSpeed; }
 
 // Set the requested climate operation mode of the a/c unit.
-void IRFujitsuAC::setMode(uint8_t mode) {
+void IRFujitsuAC::setMode(const uint8_t mode) {
   if (mode > kFujitsuAcModeHeat)
-    mode = kFujitsuAcModeHeat;  // Set the mode to maximum if out of range.
-  _mode = mode;
+    _mode = kFujitsuAcModeHeat;  // Set the mode to maximum if out of range.
+  else
+    _mode = mode;
 }
 
-uint8_t IRFujitsuAC::getMode() { return _mode; }
+uint8_t IRFujitsuAC::getMode(void) { return _mode; }
 
 // Set the requested swing operation mode of the a/c unit.
-void IRFujitsuAC::setSwing(uint8_t swingMode) {
+void IRFujitsuAC::setSwing(const uint8_t swingMode) {
+  _swingMode = swingMode;
   switch (_model) {
     case ARDB1:
       // Set the mode to max if out of range
-      if (swingMode > kFujitsuAcSwingVert) swingMode = kFujitsuAcSwingVert;
+      if (swingMode > kFujitsuAcSwingVert) _swingMode = kFujitsuAcSwingVert;
       break;
     case ARRAH2E:
     default:
       // Set the mode to max if out of range
-      if (swingMode > kFujitsuAcSwingBoth) swingMode = kFujitsuAcSwingBoth;
+      if (swingMode > kFujitsuAcSwingBoth) _swingMode = kFujitsuAcSwingBoth;
   }
-  _swingMode = swingMode;
 }
 
-uint8_t IRFujitsuAC::getSwing() { return _swingMode; }
+uint8_t IRFujitsuAC::getSwing(void) { return _swingMode; }
 
-bool IRFujitsuAC::validChecksum(uint8_t state[], uint16_t length) {
+bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   uint8_t sum = 0;
   uint8_t sum_complement = 0;
   uint8_t checksum = state[length - 1];
@@ -354,12 +358,62 @@ uint8_t IRFujitsuAC::convertFan(stdAc::fanspeed_t speed) {
   }
 }
 
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRFujitsuAC::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kFujitsuAcModeCool: return stdAc::opmode_t::kCool;
+    case kFujitsuAcModeHeat: return stdAc::opmode_t::kHeat;
+    case kFujitsuAcModeDry: return stdAc::opmode_t::kDry;
+    case kFujitsuAcModeFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kFujitsuAcFanHigh: return stdAc::fanspeed_t::kMax;
+    case kFujitsuAcFanMed: return stdAc::fanspeed_t::kMedium;
+    case kFujitsuAcFanLow: return stdAc::fanspeed_t::kLow;
+    case kFujitsuAcFanQuiet: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRFujitsuAC::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::FUJITSU_AC;
+  result.model = this->getModel();
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFanSpeed());
+  uint8_t swing = this->getSwing();
+  result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto :
+                                                  stdAc::swingv_t::kOff;
+  result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto :
+                                                   stdAc::swingh_t::kOff;
+  result.quiet = (this->getFanSpeed() == kFujitsuAcFanQuiet);
+  // Not supported.
+  result.turbo = false;
+  result.light = false;
+  result.filter = false;
+  result.clean = false;
+  result.econo = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
-String IRFujitsuAC::toString() {
+String IRFujitsuAC::toString(void) {
   String result = "";
 #else
-std::string IRFujitsuAC::toString() {
+std::string IRFujitsuAC::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
