@@ -312,15 +312,23 @@ bool IRDaikinESP::getEcono(void) {
   return remote[kDaikinByteEcono] & kDaikinBitEcono;
 }
 
+// Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
+// TODO(crankyoldgit): Restore this when we have the correct bit for it.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void IRDaikinESP::setEye(const bool on) {
-  if (on)
-    remote[kDaikinByteEye] |= kDaikinBitEye;
-  else
-    remote[kDaikinByteEye] &= ~kDaikinBitEye;
+#pragma GCC diagnostic pop
+  // if (on)
+  //   remote[kDaikinByteEye] |= kDaikinBitEye;
+  // else
+  //   remote[kDaikinByteEye] &= ~kDaikinBitEye;
 }
 
 bool IRDaikinESP::getEye(void) {
-  return remote[kDaikinByteEye] & kDaikinBitEye;
+  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
+  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
+  // return remote[kDaikinByteEye] & kDaikinBitEye;
+  return false;
 }
 
 void IRDaikinESP::setMold(const bool on) {
@@ -417,6 +425,16 @@ uint8_t IRDaikinESP::getCurrentDay(void) {
   return ((remote[kDaikinByteClockMinsHigh] & 0x38) >> 3);
 }
 
+void IRDaikinESP::setWeeklyTimerEnable(const bool on) {
+  if (on)
+    remote[kDaikinByteWeeklyTimer] &= ~kDaikinBitWeeklyTimer;  // Clear the bit.
+  else
+    remote[kDaikinByteWeeklyTimer] |= kDaikinBitWeeklyTimer;  // Set the bit.
+}
+
+bool IRDaikinESP::getWeeklyTimerEnable(void) {
+  return !(remote[kDaikinByteWeeklyTimer] & kDaikinBitWeeklyTimer);
+}
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
@@ -572,8 +590,10 @@ std::string IRDaikinESP::toString(void) {
   result += this->getQuiet() ? F("On") : F("Off");
   result += F(", Sensor: ");
   result += this->getSensor() ? F("On") : F("Off");
-  result += F(", Eye: ");
-  result += this->getEye() ? F("On") : F("Off");
+  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
+  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
+  // result += F(", Eye: ");
+  // result += this->getEye() ? F("On") : F("Off");
   result += F(", Mold: ");
   result += this->getMold() ? F("On") : F("Off");
   result += F(", Comfort: ");
@@ -613,6 +633,8 @@ std::string IRDaikinESP::toString(void) {
     result += this->renderTime(this->getOffTime());
   else
     result += F("Off");
+  result += F(", Weekly Timer: ");
+  result += this->getWeeklyTimerEnable() ? F("On") : F("Off");
   return result;
 }
 

@@ -123,6 +123,8 @@ const uint8_t kDaikinByteEcono = kDaikinByteSensor;
 const uint8_t kDaikinBitEcono = 0b00000100;
 const uint8_t kDaikinByteEye = kDaikinByteSensor;
 const uint8_t kDaikinBitEye = 0b10000000;
+const uint8_t kDaikinByteWeeklyTimer = kDaikinByteSensor;
+const uint8_t kDaikinBitWeeklyTimer = 0b10000000;
 const uint8_t kDaikinByteMold = 33;
 const uint8_t kDaikinBitMold = 0b00000010;
 const uint8_t kDaikinByteOffTimer = kDaikinBytePower;
@@ -273,6 +275,8 @@ class IRDaikinESP {
   uint16_t getCurrentTime(void);
   void setCurrentDay(const uint8_t day_of_week);
   uint8_t getCurrentDay(void);
+  void setWeeklyTimerEnable(const bool on);
+  bool getWeeklyTimerEnable(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kDaikinStateLength);
