@@ -3269,6 +3269,14 @@ bool decodeCommonAc(const decode_results *decode) {
     state.model = climate.model;
   }
 #endif  // IGNORE_DECODED_AC_PROTOCOL
+// Continue to use the previously prefered temperature units.
+// i.e. Keep using Celsius or Fahrenheit.
+if (climate.celsius != state.celsius) {
+  // We've got a mismatch, so we need to convert.
+  state.degrees = climate.celsius ? fahrenheitToCelsius(state.degrees)
+                                  : celsiusToFahrenheit(state.degrees);
+  state.celsius = climate.celsius;
+}
 #if MQTT_ENABLE
   sendClimate(climate, state, MqttClimateStat, true, false, false,
               REPLAY_DECODED_AC_MESSAGE);

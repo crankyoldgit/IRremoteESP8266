@@ -149,7 +149,8 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
   if (useCelsius) {
     new_temp = std::max(kMideaACMinTempC, new_temp);
     new_temp = std::min(kMideaACMaxTempC, new_temp);
-    new_temp = (uint8_t)((new_temp * 1.8) + 32.5);  // 0.5 so we rounding.
+    // Convert and add 0.5 for rounding.
+    new_temp = celsiusToFahrenheit(new_temp) + 0.5;
   }
   new_temp = std::max(kMideaACMinTempF, new_temp);
   new_temp = std::min(kMideaACMaxTempF, new_temp);
@@ -166,7 +167,7 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
 uint8_t IRMideaAC::getTemp(const bool useCelsius) {
   uint8_t temp = ((remote_state >> 24) & 0x1F) + kMideaACMinTempF;
   if (useCelsius) {
-    temp = (uint8_t)((temp - 32) / 1.8);
+    temp = fahrenheitToCelsius(temp);
   }
   return temp;
 }

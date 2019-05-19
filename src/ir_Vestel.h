@@ -31,7 +31,7 @@
 //   Swing: 4 bits. (auto 0xA, stop 0xF)
 //   turbo_sleep_normal: 4bits. (normal 0x1, sleep 0x3, turbo 0x7)
 //   Unused: 8 bits. (0x00)
-//   Temperature: 4 bits. (Celcius, but offset by -16 degrees. e.g. 0x0 = 16C)
+//   Temperature: 4 bits. (Celsius, but offset by -16 degrees. e.g. 0x0 = 16C)
 //   Fan Speed: 4 bits (auto 0x1, low 0x5, mid 0x9, high 0xB, 0xD auto hot,
 //                    0xC auto cool)
 //   Mode: 3 bits. (auto 0x0, cold 0x1, dry 0x2, fan 0x3, hot 0x4)
