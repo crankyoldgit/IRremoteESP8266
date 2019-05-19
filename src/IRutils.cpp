@@ -89,7 +89,7 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 //   str:  An upper-case C-style string.
 // Returns:
 //  A decode_type_t enum.
-decode_type_t strToDecodeType(const char *str) {
+decode_type_t strToDecodeType(const char * const str) {
   if (!strcmp(str, "UNKNOWN"))
     return decode_type_t::UNKNOWN;
   else if (!strcmp(str, "UNUSED"))
@@ -537,7 +537,7 @@ bool hasACState(const decode_type_t protocol) {
 //   results: A ptr to a decode result.
 // Returns:
 //   A uint16_t containing the length.
-uint16_t getCorrectedRawLength(const decode_results *results) {
+uint16_t getCorrectedRawLength(const decode_results * const results) {
   uint16_t extended_length = results->rawlen - 1;
   for (uint16_t i = 0; i < results->rawlen - 1; i++) {
     uint32_t usecs = results->rawbuf[i] * kRawTick;
@@ -550,10 +550,10 @@ uint16_t getCorrectedRawLength(const decode_results *results) {
 // Return a string containing the key values of a decode_results structure
 // in a C/C++ code style format.
 #ifdef ARDUINO
-String resultToSourceCode(const decode_results *results) {
+String resultToSourceCode(const decode_results * const results) {
   String output = "";
 #else
-std::string resultToSourceCode(const decode_results *results) {
+std::string resultToSourceCode(const decode_results * const results) {
   std::string output = "";
 #endif
   // Start declaration
@@ -632,11 +632,11 @@ std::string resultToSourceCode(const decode_results *results) {
 // Dump out the decode_results structure.
 //
 #ifdef ARDUINO
-String resultToTimingInfo(const decode_results *results) {
+String resultToTimingInfo(const decode_results * const results) {
   String output = "";
   String value = "";
 #else
-std::string resultToTimingInfo(const decode_results *results) {
+std::string resultToTimingInfo(const decode_results * const results) {
   std::string output = "";
   std::string value = "";
 #endif
@@ -664,10 +664,10 @@ std::string resultToTimingInfo(const decode_results *results) {
 // Convert the decode_results structure's value/state to simple hexadecimal.
 //
 #ifdef ARDUINO
-String resultToHexidecimal(const decode_results *result) {
+String resultToHexidecimal(const decode_results * const result) {
   String output = "";
 #else
-std::string resultToHexidecimal(const decode_results *result) {
+std::string resultToHexidecimal(const decode_results * const result) {
   std::string output = "";
 #endif
   if (hasACState(result->decode_type)) {
@@ -686,10 +686,10 @@ std::string resultToHexidecimal(const decode_results *result) {
 // Dump out the decode_results structure.
 //
 #ifdef ARDUINO
-String resultToHumanReadableBasic(const decode_results *results) {
+String resultToHumanReadableBasic(const decode_results * const results) {
   String output = "";
 #else
-std::string resultToHumanReadableBasic(const decode_results *results) {
+std::string resultToHumanReadableBasic(const decode_results *const results) {
   std::string output = "";
 #endif
   // Show Encoding standard
@@ -706,16 +706,18 @@ std::string resultToHumanReadableBasic(const decode_results *results) {
   return output;
 }
 
-uint8_t sumBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
+uint8_t sumBytes(const uint8_t * const start, const uint16_t length,
+                 const uint8_t init) {
   uint8_t checksum = init;
-  uint8_t *ptr;
+  const uint8_t *ptr;
   for (ptr = start; ptr - start < length; ptr++) checksum += *ptr;
   return checksum;
 }
 
-uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
+uint8_t xorBytes(const uint8_t * const start, const uint16_t length,
+                 const uint8_t init) {
   uint8_t checksum = init;
-  uint8_t *ptr;
+  const uint8_t *ptr;
   for (ptr = start; ptr - start < length; ptr++) checksum ^= *ptr;
   return checksum;
 }
@@ -728,8 +730,8 @@ uint8_t xorBytes(uint8_t *start, const uint16_t length, const uint8_t init) {
 //   init: Start the counting from this value.
 // Returns:
 //   Nr. of bits found.
-uint16_t countBits(const uint8_t *start, const uint16_t length, const bool ones,
-                   const uint16_t init) {
+uint16_t countBits(const uint8_t * const start, const uint16_t length,
+                   const bool ones, const uint16_t init) {
   uint16_t count = init;
   for (uint16_t offset = 0; offset < length; offset++)
     for (uint8_t currentbyte = *(start + offset);
