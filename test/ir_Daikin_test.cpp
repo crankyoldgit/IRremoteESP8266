@@ -540,39 +540,6 @@ TEST(TestDaikinClass, OnOffTimers) {
   ASSERT_FALSE(ac.getPowerful());
 }
 
-// Test Eye mode.
-TEST(TestDaikinClass, EyeSetting) {
-  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
-  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
-  /*
-  IRDaikinESP ac(0);
-  ac.begin();
-
-  // The Eye setting is stored in the same byte as Econo mode.
-  // Econo mode tests are there to make sure it isn't harmed and vice-versa.
-  ac.setEcono(false);
-  ac.setEye(false);
-  ASSERT_FALSE(ac.getEye());
-  EXPECT_FALSE(ac.getEcono());
-
-  ac.setEye(true);
-  ASSERT_TRUE(ac.getEye());
-  EXPECT_FALSE(ac.getEcono());
-
-  ac.setEcono(false);
-  ASSERT_TRUE(ac.getEye());
-  EXPECT_FALSE(ac.getEcono());
-
-  ac.setEcono(true);
-  ASSERT_TRUE(ac.getEye());
-  EXPECT_TRUE(ac.getEcono());
-
-  ac.setEye(false);
-  ASSERT_FALSE(ac.getEye());
-  EXPECT_TRUE(ac.getEcono());
-  */
-}
-
 TEST(TestDaikinClass, WeeklyTimerEnable) {
   IRDaikinESP ac(0);
   ac.begin();
@@ -741,9 +708,6 @@ TEST(TestDaikinClass, HumanReadable) {
   ac.setFan(kDaikinFanAuto);
   ac.setQuiet(true);
   ac.setSensor(true);
-  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
-  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
-  // ac.setEye(true);
   ac.setMold(true);
   ac.setSwingVertical(true);
   ac.setSwingHorizontal(true);

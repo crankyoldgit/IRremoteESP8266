@@ -257,8 +257,6 @@ class IRDaikinESP {
   bool getSensor(void);
   void setEcono(const bool on);
   bool getEcono(void);
-  void setEye(const bool on);
-  bool getEye(void);
   void setMold(const bool on);
   bool getMold(void);
   void setComfort(const bool on);

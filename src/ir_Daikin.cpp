@@ -312,25 +312,6 @@ bool IRDaikinESP::getEcono(void) {
   return remote[kDaikinByteEcono] & kDaikinBitEcono;
 }
 
-// Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
-// TODO(crankyoldgit): Restore this when we have the correct bit for it.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-void IRDaikinESP::setEye(const bool on) {
-#pragma GCC diagnostic pop
-  // if (on)
-  //   remote[kDaikinByteEye] |= kDaikinBitEye;
-  // else
-  //   remote[kDaikinByteEye] &= ~kDaikinBitEye;
-}
-
-bool IRDaikinESP::getEye(void) {
-  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
-  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
-  // return remote[kDaikinByteEye] & kDaikinBitEye;
-  return false;
-}
-
 void IRDaikinESP::setMold(const bool on) {
   if (on)
     remote[kDaikinByteMold] |= kDaikinBitMold;
@@ -590,10 +571,6 @@ std::string IRDaikinESP::toString(void) {
   result += this->getQuiet() ? F("On") : F("Off");
   result += F(", Sensor: ");
   result += this->getSensor() ? F("On") : F("Off");
-  // Disabled due to https://github.com/markszabo/IRremoteESP8266/issues/704
-  // TODO(crankyoldgit): Restore this when we have the correct bit for it.
-  // result += F(", Eye: ");
-  // result += this->getEye() ? F("On") : F("Off");
   result += F(", Mold: ");
   result += this->getMold() ? F("On") : F("Off");
   result += F(", Comfort: ");
