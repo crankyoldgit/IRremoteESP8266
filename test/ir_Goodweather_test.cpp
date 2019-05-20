@@ -146,7 +146,7 @@ uint16_t rawData_FAD2BE31[197] = {
   EXPECT_FALSE(irsend.capture.repeat);
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 3 (LOW), Turbo: -, "
+      "Power: Off, Mode: 1 (COOL), Temp: 22C, Fan: 3 (LOW), Turbo: -, "
       "Light: -, Sleep: -, Swing: 2 (Off), Command: 0 (Power)",
       ac.toString());
 
@@ -281,4 +281,231 @@ uint16_t rawData_FAD2BE31[197] = {
       "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 3 (LOW), Turbo: -, Light: -, "
       "Sleep: -, Swing: 1 (Slow), Command: 4 (Swing)",
       ac.toString());
+}
+
+
+TEST(TestGoodweatherAcClass, toCommon) {
+  IRGoodweatherAc ac(0);
+  ac.setPower(true);
+  ac.setMode(kGoodweatherCool);
+  ac.setTemp(20);
+  ac.setFan(kGoodweatherFanHigh);
+  ac.setSwing(kGoodweatherSwingFast);
+  ac.setTurbo(true);
+  ac.setLight(true);
+  ac.setSleep(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::GOODWEATHER, ac.toCommon().protocol);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().light);
+  ASSERT_EQ(0, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+
+TEST(TestGoodweatherAcClass, Temperature) {
+  IRGoodweatherAc ac(0);
+
+  ac.setTemp(kGoodweatherTempMin);
+  EXPECT_EQ(kGoodweatherTempMin, ac.getTemp());
+
+  ac.setTemp(kGoodweatherTempMin + 1);
+  EXPECT_EQ(kGoodweatherTempMin + 1, ac.getTemp());
+
+  ac.setTemp(kGoodweatherTempMax);
+  EXPECT_EQ(kGoodweatherTempMax, ac.getTemp());
+
+  ac.setTemp(kGoodweatherTempMin - 1);
+  EXPECT_EQ(kGoodweatherTempMin, ac.getTemp());
+
+  ac.setTemp(kGoodweatherTempMax + 1);
+  EXPECT_EQ(kGoodweatherTempMax, ac.getTemp());
+
+  ac.setTemp(23);
+  EXPECT_EQ(23, ac.getTemp());
+
+  ac.setTemp(27);
+  EXPECT_EQ(27, ac.getTemp());
+
+  ac.setTemp(22);
+  EXPECT_EQ(22, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(0);
+  EXPECT_EQ(kGoodweatherTempMin, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kGoodweatherTempMax, ac.getTemp());
+}
+
+TEST(TestGoodweatherAcClass, OperatingMode) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setMode(kGoodweatherAuto);
+  EXPECT_EQ(kGoodweatherAuto, ac.getMode());
+
+  ac.setMode(kGoodweatherCool);
+  EXPECT_EQ(kGoodweatherCool, ac.getMode());
+
+  ac.setMode(kGoodweatherHeat);
+  EXPECT_EQ(kGoodweatherHeat, ac.getMode());
+
+  ac.setMode(kGoodweatherFan);  // Should set fan speed to High.
+  EXPECT_EQ(kGoodweatherFan, ac.getMode());
+
+  ac.setMode(kGoodweatherDry);
+  EXPECT_EQ(kGoodweatherDry, ac.getMode());
+
+  ac.setMode(kGoodweatherHeat + 1);
+  EXPECT_EQ(kGoodweatherAuto, ac.getMode());
+
+  ac.setMode(kGoodweatherCool);
+  EXPECT_EQ(kGoodweatherCool, ac.getMode());
+
+  ac.setMode(kGoodweatherAuto - 1);
+  EXPECT_EQ(kGoodweatherAuto, ac.getMode());
+
+  ac.setMode(kGoodweatherCool);
+  ac.setMode(255);
+  EXPECT_EQ(kGoodweatherAuto, ac.getMode());
+
+  ac.setMode(kGoodweatherCool);
+  ac.setMode(0);
+  EXPECT_EQ(kGoodweatherAuto, ac.getMode());
+}
+
+TEST(TestGoodweatherAcClass, Power) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_EQ(false, ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_EQ(false, ac.getPower());
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+}
+
+TEST(TestGoodweatherAcClass, Light) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_EQ(false, ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+}
+
+TEST(TestGoodweatherAcClass, Turbo) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_EQ(false, ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestGoodweatherAcClass, Sleep) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_EQ(false, ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestGoodweatherAcClass, FanSpeed) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kGoodweatherFanAuto, ac.getFan());
+
+  ac.setFan(kGoodweatherFanLow);
+  EXPECT_EQ(kGoodweatherFanLow, ac.getFan());
+  ac.setFan(kGoodweatherFanMed);
+  EXPECT_EQ(kGoodweatherFanMed, ac.getFan());
+  ac.setFan(kGoodweatherFanHigh);
+  EXPECT_EQ(kGoodweatherFanHigh, ac.getFan());
+  ac.setFan(kGoodweatherFanAuto);
+  EXPECT_EQ(kGoodweatherFanAuto, ac.getFan());
+
+  // Beyond Low should default to Auto.
+  ac.setFan(kGoodweatherFanLow + 1);
+  EXPECT_EQ(kGoodweatherFanAuto, ac.getFan());
+}
+
+
+TEST(TestGoodweatherAcClass, SwingSpeed) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Off.
+  ac.setSwing(255);
+  EXPECT_EQ(kGoodweatherSwingOff, ac.getSwing());
+
+  ac.setSwing(kGoodweatherSwingSlow);
+  EXPECT_EQ(kGoodweatherSwingSlow, ac.getSwing());
+  ac.setSwing(kGoodweatherSwingOff);
+  EXPECT_EQ(kGoodweatherSwingOff, ac.getSwing());
+  ac.setSwing(kGoodweatherSwingFast);
+  EXPECT_EQ(kGoodweatherSwingFast, ac.getSwing());
+
+  // Beyond Off should default to Off.
+  ac.setSwing(kGoodweatherSwingOff + 1);
+  EXPECT_EQ(kGoodweatherSwingOff, ac.getSwing());
+}
+
+TEST(TestGoodweatherAcClass, Command) {
+  IRGoodweatherAc ac(0);
+  ac.begin();
+
+  ac.setCommand(kGoodweatherCmdMode);
+  EXPECT_EQ(kGoodweatherCmdMode, ac.getCommand());
+  // Unexpected value should not change anything.
+  ac.setCommand(255);
+  EXPECT_EQ(kGoodweatherCmdMode, ac.getCommand());
+
+  ac.setCommand(kGoodweatherCmdPower);
+  EXPECT_EQ(kGoodweatherCmdPower, ac.getCommand());
+  ac.setCommand(kGoodweatherCmdLight);
+  EXPECT_EQ(kGoodweatherCmdLight, ac.getCommand());
+
+  // Beyond Light should be ignored.
+  ac.setCommand(kGoodweatherCmdLight + 1);
+  EXPECT_EQ(kGoodweatherCmdLight, ac.getCommand());
 }

@@ -3124,6 +3124,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_GOODWEATHER
+    case decode_type_t::GOODWEATHER: {
+      IRGoodweatherAc ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
     case decode_type_t::GREE: {
       IRGreeAC ac(IR_LED);

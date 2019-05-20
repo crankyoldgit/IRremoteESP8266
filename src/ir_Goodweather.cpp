@@ -74,23 +74,27 @@ uint64_t IRGoodweatherAc::getRaw(void) { return remote; }
 
 void IRGoodweatherAc::setRaw(const uint64_t state) { remote = state; }
 
-void IRGoodweatherAc::on(void) { remote |= kGoodweatherBitPower; }
+void IRGoodweatherAc::on(void) { this->setPower(true); }
 
-void IRGoodweatherAc::off(void) { remote &= ~kGoodweatherBitPower; }
+void IRGoodweatherAc::off(void) { this->setPower(false); }
 
 void IRGoodweatherAc::setPower(const bool on) {
+  this->setCommand(kGoodweatherCmdPower);
   if (on)
-    this->on();
+    remote |= kGoodweatherPowerMask;
   else
-    this->off();
+    remote &= ~kGoodweatherPowerMask;
 }
 
-bool IRGoodweatherAc::getPower(void) { return remote && kGoodweatherBitPower; }
+bool IRGoodweatherAc::getPower(void) { return remote & kGoodweatherPowerMask; }
 
 // Set the temp. in deg C
 void IRGoodweatherAc::setTemp(const uint8_t temp) {
-  uint8_t new_temp = std::max((uint8_t)kGoodweatherTempMin, temp);
-  new_temp = std::min((uint8_t)kGoodweatherTempMax, new_temp);
+  uint8_t new_temp = std::max(kGoodweatherTempMin, temp);
+  new_temp = std::min(kGoodweatherTempMax, new_temp);
+  if (new_temp > this->getTemp()) this->setCommand(kGoodweatherCmdUpTemp);
+  if (new_temp < this->getTemp()) this->setCommand(kGoodweatherCmdDownTemp);
+  remote &= ~kGoodweatherTempMask;
   remote |= (uint64_t)(new_temp - kGoodweatherTempMin) << kGoodweatherBitTemp;
 }
 
@@ -107,6 +111,7 @@ void IRGoodweatherAc::setFan(const uint8_t speed) {
     case kGoodweatherFanLow:
     case kGoodweatherFanMed:
     case kGoodweatherFanHigh:
+      this->setCommand(kGoodweatherCmdFan);
       remote &= ~kGoodweatherFanMask;
       remote |= ((uint64_t)speed << kGoodweatherBitFan);
       break;
@@ -126,6 +131,7 @@ void IRGoodweatherAc::setMode(const uint8_t mode) {
     case kGoodweatherCool:
     case kGoodweatherFan:
     case kGoodweatherHeat:
+      this->setCommand(kGoodweatherCmdMode);
       remote &= ~kGoodweatherModeMask;
       remote |= (uint64_t)mode << kGoodweatherBitMode;
       break;
@@ -140,6 +146,7 @@ uint8_t IRGoodweatherAc::getMode() {
 }
 
 void IRGoodweatherAc::setLight(const bool toggle) {
+  this->setCommand(kGoodweatherCmdLight);
   if (toggle)
     remote |= kGoodweatherLightMask;
   else
@@ -149,6 +156,7 @@ void IRGoodweatherAc::setLight(const bool toggle) {
 bool IRGoodweatherAc::getLight() { return remote & kGoodweatherLightMask; }
 
 void IRGoodweatherAc::setSleep(const bool toggle) {
+  this->setCommand(kGoodweatherCmdSleep);
   if (toggle)
     remote |= kGoodweatherSleepMask;
   else
@@ -158,6 +166,7 @@ void IRGoodweatherAc::setSleep(const bool toggle) {
 bool IRGoodweatherAc::getSleep() { return remote & kGoodweatherSleepMask; }
 
 void IRGoodweatherAc::setTurbo(const bool toggle) {
+  this->setCommand(kGoodweatherCmdTurbo);
   if (toggle)
     remote |= kGoodweatherTurboMask;
   else
@@ -171,6 +180,7 @@ void IRGoodweatherAc::setSwing(const uint8_t speed) {
     case kGoodweatherSwingOff:
     case kGoodweatherSwingSlow:
     case kGoodweatherSwingFast:
+      this->setCommand(kGoodweatherCmdSwing);
       remote &= ~kGoodweatherSwingMask;
       remote |= ((uint64_t)speed << kGoodweatherBitSwing);
       break;
@@ -242,6 +252,53 @@ uint8_t IRGoodweatherAc::convertSwingV(const stdAc::swingv_t swingv) {
   }
 }
 
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRGoodweatherAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kGoodweatherCool: return stdAc::opmode_t::kCool;
+    case kGoodweatherHeat: return stdAc::opmode_t::kHeat;
+    case kGoodweatherDry: return stdAc::opmode_t::kDry;
+    case kGoodweatherFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRGoodweatherAc::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kGoodweatherFanHigh: return stdAc::fanspeed_t::kMax;
+    case kGoodweatherFanMed: return stdAc::fanspeed_t::kMedium;
+    case kGoodweatherFanLow: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRGoodweatherAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::GOODWEATHER;
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwing() == kGoodweatherSwingOff ?
+      stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;
+  result.turbo = this->getTurbo();
+  result.light = this->getLight();
+  result.sleep = this->getSleep() ? 0: -1;
+  // Not supported.
+  result.model = -1;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.econo = false;
+  result.filter = false;
+  result.clean = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
+}
+
 // Convert the internal state into a human readable string.
 #ifdef ARDUINO
 String IRGoodweatherAc::toString() {
@@ -252,10 +309,7 @@ std::string IRGoodweatherAc::toString() {
 #endif  // ARDUINO
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
-  if (this->getPower())
-    result += F("On");
-  else
-    return result += F("Off");  // If it's off, there is no other info.
+  result += this->getPower() ? F("On") : F("Off");
   result += F(", Mode: ");
   result += uint64ToString(this->getMode());
   switch (this->getMode()) {
@@ -296,20 +350,11 @@ std::string IRGoodweatherAc::toString() {
       break;
   }
   result += F(", Turbo: ");
-  if (this->getTurbo())
-    result += F("Toggle");
-  else
-    result += F("-");
+  result += this->getTurbo() ? F("Toggle") : F("-");
   result += F(", Light: ");
-  if (this->getLight())
-    result += F("Toggle");
-  else
-    result += F("-");
+  result += this->getLight() ? F("Toggle") : F("-");
   result += F(", Sleep: ");
-  if (this->getSleep())
-    result += F("Toggle");
-  else
-    result += F("-");
+  result += this->getSleep() ? F("Toggle") : F("-");
   result += F(", Swing: ");
   result += uint64ToString(this->getSwing());
   switch (this->getSwing()) {
