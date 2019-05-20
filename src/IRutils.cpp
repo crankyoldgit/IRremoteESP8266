@@ -132,6 +132,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::HITACHI_AC1;
   else if (!strcmp(str, "HITACHI_AC2"))
     return decode_type_t::HITACHI_AC2;
+  else if (!strcmp(str, "INAX"))
+    return decode_type_t::INAX;
   else if (!strcmp(str, "JVC"))
     return decode_type_t::JVC;
   else if (!strcmp(str, "KELVINATOR"))
@@ -361,6 +363,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case HITACHI_AC2:
       result = F("HITACHI_AC2");
+      break;
+    case INAX:
+      result = F("INAX");
       break;
     case JVC:
       result = F("JVC");
