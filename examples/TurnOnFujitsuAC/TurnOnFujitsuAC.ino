@@ -31,7 +31,7 @@ void setup() {
   printState();
   Serial.println("Setting desired state for A/C.");
   ac.setCmd(kFujitsuAcCmdTurnOn);
-  ac.setSwing(kFujitsuAcSwingBoth);
+  ac.setSwing(kFujitsuAcSwingOff);
   ac.setMode(kFujitsuAcModeCool);
   ac.setFanSpeed(kFujitsuAcFanHigh);
   ac.setTemp(24);  // 24C
