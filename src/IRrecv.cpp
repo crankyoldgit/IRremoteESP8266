@@ -523,6 +523,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
   if (decodeMitsubishiHeavy(results, kMitsubishiHeavy88Bits)) return true;
 #endif
+#if DECODE_ARGO
+  DPRINTLN("Attempting Argo decode");
+  if (decodeArgo(results)) return true;
+#endif  // DECODE_ARGO
 #if DECODE_SHARP_AC
   DPRINTLN("Attempting SHARP_AC decode");
   if (decodeSharpAc(results)) return true;

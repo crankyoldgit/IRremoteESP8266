@@ -4,6 +4,11 @@
 #ifndef IR_ARGO_H_
 #define IR_ARGO_H_
 
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 #ifdef UNIT_TEST
@@ -57,6 +62,8 @@ const uint8_t kArgoFan1 = 1;  // 0b10
 
 // byte[4]
 const uint8_t kArgoRoomTempHighMask = 0b00000011;
+const uint8_t kArgoTempOffset = 4;
+const uint8_t kArgoMaxRoomTemp = ((1 << 5) - 1) + kArgoTempOffset;  // 35C
 
 // byte[9]
 const uint8_t kArgoPowerBit = 0b00100000;
@@ -64,7 +71,6 @@ const uint8_t kArgoMaxBit =   0b00001000;
 const uint8_t kArgoNightBit = 0b00000100;
 const uint8_t kArgoIFeelBit = 0b10000000;
 
-const uint8_t kArgoTempOffset = 4;
 const uint8_t kArgoMinTemp = 10;  // Celsius offset +4
 const uint8_t kArgoMaxTemp = 32;  // Celsius
 
@@ -141,13 +147,22 @@ class IRArgoAC {
   uint8_t getRoomTemp(void);
 
   uint8_t* getRaw(void);
-  void setRaw(const char state[]);
+  void setRaw(const uint8_t state[]);
+  static uint8_t calcChecksum(const uint8_t state[],
+                              const uint16_t length = kArgoStateLength);
+  static bool validChecksum(const uint8_t state[],
+                            const uint16_t length = kArgoStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
+#ifdef ARDUINO
+  String toString();
+#else
+  std::string toString();
+#endif
 #ifndef UNIT_TEST
 
  private:

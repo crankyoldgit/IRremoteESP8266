@@ -147,7 +147,7 @@
 #define DECODE_PRONTO          false  // Not written.
 #define SEND_PRONTO            true
 
-#define DECODE_ARGO            false  // Not written.
+#define DECODE_ARGO            true  // Experimental
 #define SEND_ARGO              true
 
 #define DECODE_TROTEC          false  // Not implemented.
@@ -328,6 +328,7 @@ const uint16_t kSingleRepeat = 1;
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
+const uint16_t kArgoBits = kArgoStateLength * 8;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kCoolixBits = 24;
 const uint16_t kCoolixDefaultRepeat = 1;
