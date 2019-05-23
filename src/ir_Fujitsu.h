@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2018 David Conran
+// Copyright 2018-2019 David Conran
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
 
@@ -70,8 +70,9 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
 enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  // ARRAE1E
-  ARDB1,
+  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAE1E (Default)
+  ARDB1,        // (2) AR-DB1
+  ARREB1E,      // (3) AR-REB1E
 };
 
 class IRFujitsuAC {

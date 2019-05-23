@@ -1,4 +1,5 @@
-// Copyright 2017 Jonny Graham, David Conran
+// Copyright 2017 Jonny Graham
+// Copyright 2017-2019 David Conran
 #include "ir_Fujitsu.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -12,6 +13,7 @@
 // Equipment it seems compatible with:
 //  * Fujitsu ASYG30LFCA with remote AR-RAH2E
 //  * Fujitsu AST9RSGCW with remote AR-DB1
+//  * Fujitsu ASYG7LMCA with remote AR-REB1E.
 //  * Fujitsu AR-RAE1E remote.
 //  * <Add models (A/C & remotes) you've gotten it working with here>
 
@@ -37,7 +39,7 @@ const uint16_t kFujitsuAcMinGap = 8100;
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = kFujitsuAcMinRepeat).
 //
-// Status: BETA / Appears to be working.
+// Status: STABLE / Known Good.
 //
 void IRsend::sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                            uint16_t repeat) {
@@ -65,6 +67,8 @@ void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
       _state_length = kFujitsuAcStateLength - 1;
       _state_length_short = kFujitsuAcStateLengthShort - 1;
       break;
+    case ARRAH2E:
+    case ARREB1E:
     default:
       _state_length = kFujitsuAcStateLength;
       _state_length_short = kFujitsuAcStateLengthShort;
@@ -114,6 +118,7 @@ void IRFujitsuAC::buildState(void) {
     default:
       switch (_model) {
         case ARRAH2E:
+        case ARREB1E:
           remote_state[5] = 0xFE;
           break;
         case ARDB1:
@@ -135,14 +140,14 @@ void IRFujitsuAC::buildState(void) {
     remote_state[11] = 0;  // timerOff values
     remote_state[12] = 0;  // timerOff/On values
     remote_state[13] = 0;  // timerOn values
-    if (_model == ARRAH2E)
+    if (_model == ARRAH2E || _model == ARREB1E)
       remote_state[14] = 0x20;
     else
       remote_state[14] = 0x00;
 
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
-    if (_model == ARRAH2E) {
+    if (_model == ARRAH2E || _model == ARREB1E) {
       checksum = sumBytes(remote_state + _state_length_short,
                           _state_length - _state_length_short - 1);
     } else if (_model == ARDB1) {
@@ -152,7 +157,7 @@ void IRFujitsuAC::buildState(void) {
     // and negate the checksum and store it in the last byte.
     remote_state[_state_length - 1] = checksum_complement - checksum;
   } else {  // short codes
-    if (_model == ARRAH2E)
+    if (_model == ARRAH2E || _model == ARREB1E)
       // The last byte is the inverse of penultimate byte
       remote_state[_state_length_short - 1] =
           ~remote_state[_state_length_short - 2];
@@ -164,7 +169,7 @@ void IRFujitsuAC::buildState(void) {
 
 uint8_t IRFujitsuAC::getStateLength(void) {
   buildState();  // Force an update of the internal state.
-  if ((_model == ARRAH2E && remote_state[5] != 0xFE) ||
+  if (((_model == ARRAH2E || _model == ARREB1E) && remote_state[5] != 0xFE) ||
       (_model == ARDB1 && remote_state[5] != 0xFC))
     return _state_length_short;
   else
@@ -229,7 +234,8 @@ void IRFujitsuAC::off(void) { _cmd = kFujitsuAcCmdTurnOff; }
 void IRFujitsuAC::stepHoriz(void) {
   switch (_model) {
     case ARDB1:
-      break;  // This remote doesn't have a horizontal option.
+    case ARREB1E:
+      break;  // These remotes doesn't have a horizontal option.
     default:
       _cmd = kFujitsuAcCmdStepHoriz;
   }
@@ -247,7 +253,8 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
       _cmd = cmd;
       break;
     case kFujitsuAcCmdStepHoriz:
-      if (_model != ARDB1)  // AR-DB1 remote doesn't have step horizontal.
+      // These remotes doesn't have step horizontal.
+      if (_model != ARDB1 && _model != ARREB1E)
         _cmd = cmd;
       // FALLTHRU
     default:
@@ -292,6 +299,7 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
   _swingMode = swingMode;
   switch (_model) {
     case ARDB1:
+    case ARREB1E:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingVert) _swingMode = kFujitsuAcSwingVert;
       break;
