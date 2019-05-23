@@ -527,6 +527,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting SHARP_AC decode");
   if (decodeSharpAc(results)) return true;
 #endif
+#if DECODE_TROTEC
+  DPRINTLN("Attempting Trotec decode");
+  if (decodeTrotec(results)) return true;
+#endif
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

@@ -524,6 +524,7 @@ bool hasACState(const decode_type_t protocol) {
     case SHARP_AC:
     case TCL112AC:
     case TOSHIBA_AC:
+    case TROTEC:
     case WHIRLPOOL_AC:
       return true;
     default:
