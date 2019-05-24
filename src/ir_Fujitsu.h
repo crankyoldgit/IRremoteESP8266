@@ -73,7 +73,7 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAE1E (Default)
-  ARDB1,        // (2) AR-DB1
+  ARDB1,        // (2) AR-DB1, AR-JW2
   ARREB1E,      // (3) AR-REB1E
 };
 
