@@ -56,8 +56,8 @@ void IRsend::sendFujitsuAC(unsigned char data[], uint16_t nbytes,
 IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
                          const fujitsu_ac_remote_model_t model)
     : _irsend(pin) {
-  setModel(model);
-  stateReset();
+  this->setModel(model);
+  this->stateReset();
 }
 
 void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
@@ -84,7 +84,7 @@ void IRFujitsuAC::stateReset(void) {
   _mode = kFujitsuAcModeCool;
   _swingMode = kFujitsuAcSwingBoth;
   _cmd = kFujitsuAcCmdTurnOn;
-  buildState();
+  this->buildState();
 }
 
 // Configure the pin for output.
@@ -93,7 +93,7 @@ void IRFujitsuAC::begin(void) { _irsend.begin(); }
 #if SEND_FUJITSU_AC
 // Send the current desired state to the IR LED.
 void IRFujitsuAC::send(const uint16_t repeat) {
-  getRaw();
+  this->buildState();
   _irsend.sendFujitsuAC(remote_state, getStateLength(), repeat);
 }
 #endif  // SEND_FUJITSU_AC
@@ -106,14 +106,20 @@ void IRFujitsuAC::buildState(void) {
   remote_state[4] = 0x10;
   bool fullCmd = false;
   switch (_cmd) {
-    case kFujitsuAcCmdTurnOff:
-      remote_state[5] = 0x02;
+    case kFujitsuAcCmdTurnOff:    // 0x02
+      remote_state[5] = kFujitsuAcCmdTurnOff;
       break;
-    case kFujitsuAcCmdStepHoriz:
-      remote_state[5] = 0x79;
+    case kFujitsuAcCmdEcono:      // 0x09
+      remote_state[5] = kFujitsuAcCmdEcono;
       break;
-    case kFujitsuAcCmdStepVert:
-      remote_state[5] = 0x6C;
+    case kFujitsuAcCmdPowerful:   // 0x39
+      remote_state[5] = kFujitsuAcCmdPowerful;
+      break;
+    case kFujitsuAcCmdStepVert:   // 0x6C
+      remote_state[5] = kFujitsuAcCmdStepVert;
+      break;
+    case kFujitsuAcCmdStepHoriz:  // 0x79
+      remote_state[5] = kFujitsuAcCmdStepHoriz;
       break;
     default:
       switch (_model) {
@@ -168,7 +174,7 @@ void IRFujitsuAC::buildState(void) {
 }
 
 uint8_t IRFujitsuAC::getStateLength(void) {
-  buildState();  // Force an update of the internal state.
+  this->buildState();  // Force an update of the internal state.
   if (((_model == ARRAH2E || _model == ARREB1E) && remote_state[5] != 0xFE) ||
       (_model == ARDB1 && remote_state[5] != 0xFC))
     return _state_length_short;
@@ -178,7 +184,7 @@ uint8_t IRFujitsuAC::getStateLength(void) {
 
 // Return a pointer to the internal state date of the remote.
 uint8_t* IRFujitsuAC::getRaw(void) {
-  buildState();
+  this->buildState();
   return remote_state;
 }
 
@@ -186,17 +192,25 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (length) {
     case kFujitsuAcStateLength - 1:
     case kFujitsuAcStateLengthShort - 1:
-      setModel(ARDB1);
+      this->setModel(ARDB1);
       break;
     default:
-      setModel(ARRAH2E);
+      switch (this->getCmd(true)) {
+        case kFujitsuAcCmdEcono:
+        case kFujitsuAcCmdPowerful:
+          this->setModel(fujitsu_ac_remote_model_t::ARREB1E);
+          break;
+        default:
+          this->setModel(fujitsu_ac_remote_model_t::ARRAH2E);
+      }
   }
   switch (remote_state[6]) {
     case 8:
-      setModel(ARDB1);
+      this->setModel(ARDB1);
       break;
     case 9:
-      setModel(ARRAH2E);
+      if (this->getModel() != fujitsu_ac_remote_model_t::ARREB1E)
+        this->setModel(ARRAH2E);
       break;
   }
   setTemp((remote_state[8] >> 4) + kFujitsuAcMinTemp);
@@ -211,6 +225,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdStepHoriz:
     case kFujitsuAcCmdStepVert:
+    case kFujitsuAcCmdEcono:
+    case kFujitsuAcCmdPowerful:
       setCmd(remote_state[5]);
       break;
   }
@@ -253,17 +269,33 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
       _cmd = cmd;
       break;
     case kFujitsuAcCmdStepHoriz:
-      // These remotes doesn't have step horizontal.
-      if (_model != ARDB1 && _model != ARREB1E)
+      // Only these remotes have step horizontal.
+      if (_model == ARRAH2E)
         _cmd = cmd;
-      // FALLTHRU
+      else
+        _cmd = kFujitsuAcCmdStayOn;
+      break;
+    case kFujitsuAcCmdEcono:
+    case kFujitsuAcCmdPowerful:
+      if (_model == ARREB1E)
+        _cmd = cmd;
+      else
+        _cmd = kFujitsuAcCmdStayOn;
+      break;
     default:
       _cmd = kFujitsuAcCmdStayOn;
-      break;
   }
 }
 
-uint8_t IRFujitsuAC::getCmd(void) { return _cmd; }
+// Get the special command part of the message.
+// Args:
+//   raw: Do we need to get it from first principles from the raw data?
+// Returns:
+//   A uint8_t containing the contents of the special command byte.
+uint8_t IRFujitsuAC::getCmd(const bool raw) {
+  if (raw) return remote_state[5];
+  return _cmd;
+}
 
 bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 
@@ -404,12 +436,12 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
   result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto :
                                                    stdAc::swingh_t::kOff;
   result.quiet = (this->getFanSpeed() == kFujitsuAcFanQuiet);
+  result.turbo = this->getCmd() == kFujitsuAcCmdPowerful;
+  result.econo = this->getCmd() == kFujitsuAcCmdEcono;
   // Not supported.
-  result.turbo = false;
   result.light = false;
   result.filter = false;
   result.clean = false;
-  result.econo = false;
   result.beep = false;
   result.sleep = -1;
   result.clock = -1;
@@ -425,14 +457,22 @@ std::string IRFujitsuAC::toString(void) {
   std::string result = "";
 #endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
+  result += F("Model: ");
+  result += uint64ToString(this->getModel());
+  switch (this->getModel()) {
+    case fujitsu_ac_remote_model_t::ARRAH2E: result += F(" (ARRAH2E)"); break;
+    case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
+    case fujitsu_ac_remote_model_t::ARREB1E: result += F(" (ARREB1E)"); break;
+    default: result += F(" (UNKNOWN)");
+  }
+  result += F(", Power: ");
   if (getPower())
     result += F("On");
   else
     result += F("Off");
   result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
+  result += uint64ToString(this->getMode());
+  switch (this->getMode()) {
     case kFujitsuAcModeAuto:
       result += F(" (AUTO)");
       break;
@@ -452,9 +492,9 @@ std::string IRFujitsuAC::toString(void) {
       result += F(" (UNKNOWN)");
   }
   result += F(", Temp: ");
-  result += uint64ToString(getTemp());
+  result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");
-  result += uint64ToString(getFanSpeed());
+  result += uint64ToString(this->getFanSpeed());
   switch (getFanSpeed()) {
     case kFujitsuAcFanAuto:
       result += F(" (AUTO)");
@@ -473,7 +513,7 @@ std::string IRFujitsuAC::toString(void) {
       break;
   }
   result += F(", Swing: ");
-  switch (getSwing()) {
+  switch (this->getSwing()) {
     case kFujitsuAcSwingOff:
       result += F("Off");
       break;
@@ -490,12 +530,18 @@ std::string IRFujitsuAC::toString(void) {
       result += F("UNKNOWN");
   }
   result += F(", Command: ");
-  switch (getCmd()) {
+  switch (this->getCmd()) {
     case kFujitsuAcCmdStepHoriz:
       result += F("Step vane horizontally");
       break;
     case kFujitsuAcCmdStepVert:
       result += F("Step vane vertically");
+      break;
+    case kFujitsuAcCmdEcono:
+      result += F("Economy");
+      break;
+    case kFujitsuAcCmdPowerful:
+      result += F("Powerful");
       break;
     default:
       result += F("N/A");

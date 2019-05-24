@@ -104,7 +104,7 @@ void daikin216(IRDaikin216 *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
                const stdAc::fanspeed_t fan,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-               const bool quiet);
+               const bool quiet, const bool turbo, const bool econo);
 #endif  // SEND_FUJITSU_AC
 #if SEND_GREE
   void gree(IRGreeAC *ac,

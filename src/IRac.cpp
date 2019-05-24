@@ -260,7 +260,7 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                   const bool quiet) {
+                   const bool quiet, const bool turbo, const bool econo) {
   ac->setModel(model);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -270,9 +270,20 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
   if (swingh > stdAc::swingh_t::kOff) swing |= kFujitsuAcSwingHoriz;
   ac->setSwing(swing);
   if (quiet) ac->setFanSpeed(kFujitsuAcFanQuiet);
-  // No Turbo setting available.
+  if (ac->getModel() == fujitsu_ac_remote_model_t::ARREB1E) {
+    // Some functions are only available on some models.
+    if (turbo) {
+      ac->setCmd(kFujitsuAcCmdPowerful);
+      // Powerful is a separate command.
+      ac->send();
+    }
+    if (econo) {
+      ac->setCmd(kFujitsuAcCmdEcono);
+      // Econo is a separate command.
+      ac->send();
+    }
+  }
   // No Light setting available.
-  // No Econo setting available.
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
@@ -827,7 +838,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       IRFujitsuAC ac(_pin);
       ac.begin();
       fujitsu(&ac, (fujitsu_ac_remote_model_t)model, on, mode, degC, fan,
-              swingv, swingh, quiet);
+              swingv, swingh, quiet, turbo, econo);
       break;
     }
 #endif  // SEND_FUJITSU_AC
