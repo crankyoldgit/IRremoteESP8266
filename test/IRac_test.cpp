@@ -1,5 +1,6 @@
 // Copyright 2019 David Conran
 
+#include <string>
 #include "ir_Argo.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
