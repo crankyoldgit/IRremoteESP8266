@@ -662,7 +662,8 @@ TEST(TestDecodeFujitsuAC, Issue716) {
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARREB1E, ac.getModel());
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 3 (ARREB1E), Power: On, Mode: 0 (AUTO), Temp: 16C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: Powerful", ac.toString());
+            "Fan: 0 (AUTO), Swing: Off, Command: Powerful, Outside Quiet: Off",
+            ac.toString());
 
   // Economy (just from the state)
   uint8_t econo[kFujitsuAcStateLengthShort] = {
@@ -675,5 +676,59 @@ TEST(TestDecodeFujitsuAC, Issue716) {
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARREB1E, ac.getModel());
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 3 (ARREB1E), Power: On, Mode: 0 (AUTO), Temp: 16C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: Economy", ac.toString());
+            "Fan: 0 (AUTO), Swing: Off, Command: Economy, Outside Quiet: Off",
+            ac.toString());
+}
+
+TEST(TestIRFujitsuACClass, OutsideQuiet) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRFujitsuAC ac(0);
+
+  ASSERT_NE(fujitsu_ac_remote_model_t::ARDB1,
+    fujitsu_ac_remote_model_t::ARREB1E);
+  ASSERT_NE(fujitsu_ac_remote_model_t::ARRAH2E,
+    fujitsu_ac_remote_model_t::ARREB1E);
+  // States as supplied by u4mzu4
+  // https://github.com/markszabo/IRremoteESP8266/issues/716#issuecomment-495852309
+  uint8_t off[kFujitsuAcStateLength] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30,
+      0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x2F};
+  uint8_t on[kFujitsuAcStateLength] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30,
+      0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0xA0, 0xAF};
+  // Make sure we can't accidentally inherit the correct model.
+  ac.setModel(fujitsu_ac_remote_model_t::ARDB1);
+  ac.setRaw(off, kFujitsuAcStateLength);
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.getModel());
+  EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
+  EXPECT_FALSE(ac.getOutsideQuiet());
+  // We can really only tell the difference between ARRAH2E & ARREB1E if
+  // the option is set. Otheriwse they appear the same.
+  EXPECT_EQ(
+      "Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
+      "Fan: 0 (AUTO), Swing: Off, Command: N/A", ac.toString());
+  ac.setModel(fujitsu_ac_remote_model_t::ARREB1E);
+  EXPECT_EQ(
+      "Model: 3 (ARREB1E), Power: On, Mode: 1 (COOL), Temp: 24C, "
+      "Fan: 0 (AUTO), Swing: Off, Command: N/A, Outside Quiet: Off",
+      ac.toString());
+
+  // Make sure we can't accidentally inherit the correct model.
+  ac.setModel(fujitsu_ac_remote_model_t::ARDB1);
+  ac.setRaw(on, kFujitsuAcStateLength);
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARREB1E, ac.getModel());
+  EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
+  EXPECT_TRUE(ac.getOutsideQuiet());
+  EXPECT_EQ(
+      "Model: 3 (ARREB1E), Power: On, Mode: 1 (COOL), Temp: 24C, "
+      "Fan: 0 (AUTO), Swing: Off, Command: N/A, Outside Quiet: On",
+      ac.toString());
+
+  ac.setOutsideQuiet(false);
+  EXPECT_FALSE(ac.getOutsideQuiet());
+  ac.setOutsideQuiet(true);
+  EXPECT_TRUE(ac.getOutsideQuiet());
+  ac.setOutsideQuiet(false);
+  EXPECT_FALSE(ac.getOutsideQuiet());
 }

@@ -108,6 +108,10 @@ class IRFujitsuAC {
   uint8_t getStateLength(void);
   static bool validChecksum(uint8_t* state, const uint16_t length);
   bool getPower(void);
+  void setOutsideQuiet(const bool on);
+
+  bool getOutsideQuiet(const bool raw = false);
+
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -134,6 +138,7 @@ class IRFujitsuAC {
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
+  bool _outsideQuiet;
   void buildState(void);
   void buildFromState(const uint16_t length);
 };

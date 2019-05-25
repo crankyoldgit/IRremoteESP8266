@@ -149,11 +149,12 @@ void IRFujitsuAC::buildState(void) {
     remote_state[11] = 0;  // timerOff values
     remote_state[12] = 0;  // timerOff/On values
     remote_state[13] = 0;  // timerOn values
-    if (_model == ARRAH2E || _model == ARREB1E)
+    if (_model == ARRAH2E || _model == ARREB1E) {
       remote_state[14] = 0x20;
-    else
+      if (_model == ARREB1E) remote_state[14] |= (_outsideQuiet << 7);
+    } else {
       remote_state[14] = 0x00;
-
+    }
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
     switch (_model) {
@@ -247,6 +248,7 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       setCmd(remote_state[5]);
       break;
   }
+  _outsideQuiet = this->getOutsideQuiet(true);
 }
 
 bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
@@ -315,6 +317,22 @@ uint8_t IRFujitsuAC::getCmd(const bool raw) {
 }
 
 bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
+
+void IRFujitsuAC::setOutsideQuiet(const bool on) { _outsideQuiet = on; }
+
+// Get the status of the Outside Quiet setting.
+// Args:
+//   raw: Do we get the result from base data?
+// Returns:
+//   A boolean for if it is set or not.
+bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
+  if (_state_length == kFujitsuAcStateLength && raw) {
+    _outsideQuiet = remote_state[14] & 0b10000000;
+    // Only ARREB1E seems to have this mode.
+    if (_outsideQuiet) this->setModel(fujitsu_ac_remote_model_t::ARREB1E);
+  }
+  return _outsideQuiet;
+}
 
 // Set the temp. in deg C
 void IRFujitsuAC::setTemp(const uint8_t temp) {
@@ -495,10 +513,7 @@ std::string IRFujitsuAC::toString(void) {
     default: result += F(" (UNKNOWN)");
   }
   result += F(", Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getPower() ? F("On") : F("Off");
   result += F(", Mode: ");
   result += uint64ToString(this->getMode());
   switch (this->getMode()) {
@@ -574,6 +589,10 @@ std::string IRFujitsuAC::toString(void) {
       break;
     default:
       result += F("N/A");
+  }
+  if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E) {
+    result += F(", Outside Quiet: ");
+    result += this->getOutsideQuiet() ? F("On") : F("Off");
   }
   return result;
 }
