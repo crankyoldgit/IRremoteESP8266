@@ -65,6 +65,7 @@ void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
   _model = model;
   switch (model) {
     case ARDB1:
+    case ARJW2:
       _state_length = kFujitsuAcStateLength - 1;
       _state_length_short = kFujitsuAcStateLengthShort - 1;
       break;
@@ -129,6 +130,7 @@ void IRFujitsuAC::buildState(void) {
           remote_state[5] = 0xFE;
           break;
         case ARDB1:
+        case ARJW2:
           remote_state[5] = 0xFC;
           break;
       }
@@ -154,20 +156,31 @@ void IRFujitsuAC::buildState(void) {
 
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
-    if (_model == ARRAH2E || _model == ARREB1E) {
-      checksum = sumBytes(remote_state + _state_length_short,
-                          _state_length - _state_length_short - 1);
-    } else if (_model == ARDB1) {
-      checksum = sumBytes(remote_state, _state_length - 1);
-      checksum_complement = 0x9B;
+    switch (_model) {
+      case ARDB1:
+      case ARJW2:
+        checksum = sumBytes(remote_state, _state_length - 1);
+        checksum_complement = 0x9B;
+        break;
+      case ARRAH2E:
+      case ARREB1E:
+      default:
+        checksum = sumBytes(remote_state + _state_length_short,
+                            _state_length - _state_length_short - 1);
     }
     // and negate the checksum and store it in the last byte.
     remote_state[_state_length - 1] = checksum_complement - checksum;
   } else {  // short codes
-    if (_model == ARRAH2E || _model == ARREB1E)
-      // The last byte is the inverse of penultimate byte
-      remote_state[_state_length_short - 1] =
-          ~remote_state[_state_length_short - 2];
+    switch (_model) {
+      case ARRAH2E:
+      case ARREB1E:
+        // The last byte is the inverse of penultimate byte
+        remote_state[_state_length_short - 1] =
+            ~remote_state[_state_length_short - 2];
+        break;
+      default:
+        {};  // We don't need to do anything for the others.
+    }
     // Zero the rest of the state.
     for (uint8_t i = _state_length_short; i < kFujitsuAcStateLength; i++)
       remote_state[i] = 0;
@@ -177,7 +190,7 @@ void IRFujitsuAC::buildState(void) {
 uint8_t IRFujitsuAC::getStateLength(void) {
   this->buildState();  // Force an update of the internal state.
   if (((_model == ARRAH2E || _model == ARREB1E) && remote_state[5] != 0xFE) ||
-      (_model == ARDB1 && remote_state[5] != 0xFC))
+      ((_model == ARDB1 || _model == ARJW2) && remote_state[5] != 0xFC))
     return _state_length_short;
   else
     return _state_length;
@@ -194,6 +207,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
     case kFujitsuAcStateLength - 1:
     case kFujitsuAcStateLengthShort - 1:
       this->setModel(ARDB1);
+      // ARJW2 has horizontal swing.
+      if (this->getSwing(true) > kFujitsuAcSwingVert) this->setModel(ARJW2);
       break;
     default:
       switch (this->getCmd(true)) {
@@ -207,7 +222,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   }
   switch (remote_state[6]) {
     case 8:
-      this->setModel(ARDB1);
+      if (this->getModel() != fujitsu_ac_remote_model_t::ARJW2)
+        this->setModel(ARDB1);
       break;
     case 9:
       if (this->getModel() != fujitsu_ac_remote_model_t::ARREB1E)
@@ -331,36 +347,47 @@ uint8_t IRFujitsuAC::getMode(void) { return _mode; }
 void IRFujitsuAC::setSwing(const uint8_t swingMode) {
   _swingMode = swingMode;
   switch (_model) {
+    // No Horizontal support.
     case ARDB1:
     case ARREB1E:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingVert) _swingMode = kFujitsuAcSwingVert;
       break;
+    // Has Horizontal support.
     case ARRAH2E:
+    case ARJW2:
     default:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingBoth) _swingMode = kFujitsuAcSwingBoth;
   }
 }
 
-uint8_t IRFujitsuAC::getSwing(void) { return _swingMode; }
+// Get what the swing part of the message should be.
+// Args:
+//   raw: Do we need to get it from first principles from the raw data?
+// Returns:
+//   A uint8_t containing the contents of the swing state.
+uint8_t IRFujitsuAC::getSwing(const bool raw) {
+  if (raw) _swingMode = remote_state[10] >> 4;
+  return _swingMode;
+}
 
 bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   uint8_t sum = 0;
   uint8_t sum_complement = 0;
   uint8_t checksum = state[length - 1];
   switch (length) {
-    case kFujitsuAcStateLengthShort:  // ARRAH2E
+    case kFujitsuAcStateLengthShort:  // ARRAH2E & ARREB1E
       return state[length - 1] == (uint8_t)~state[length - 2];
-    case kFujitsuAcStateLength - 1:  // ARDB1
+    case kFujitsuAcStateLength - 1:  // ARDB1 & ARJW2
       sum = sumBytes(state, length - 1);
       sum_complement = 0x9B;
       break;
-    case kFujitsuAcStateLength:  // ARRAH2E
+    case kFujitsuAcStateLength:  // ARRAH2E & ARREB1E
       sum = sumBytes(state + kFujitsuAcStateLengthShort,
                      length - 1 - kFujitsuAcStateLengthShort);
       break;
-    default:        // Includes ARDB1 short.
+    default:        // Includes ARDB1 & ARJW2 short.
       return true;  // Assume the checksum is valid for other lengths.
   }
   return checksum == (uint8_t)(sum_complement - sum);  // Does it match?
@@ -464,6 +491,7 @@ std::string IRFujitsuAC::toString(void) {
     case fujitsu_ac_remote_model_t::ARRAH2E: result += F(" (ARRAH2E)"); break;
     case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
     case fujitsu_ac_remote_model_t::ARREB1E: result += F(" (ARREB1E)"); break;
+    case fujitsu_ac_remote_model_t::ARJW2: result += F(" (ARJW2)"); break;
     default: result += F(" (UNKNOWN)");
   }
   result += F(", Power: ");

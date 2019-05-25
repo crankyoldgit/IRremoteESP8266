@@ -73,8 +73,9 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAE1E (Default)
-  ARDB1,        // (2) AR-DB1, AR-JW2
+  ARDB1,        // (2) AR-DB1
   ARREB1E,      // (3) AR-REB1E
+  ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
 };
 
 class IRFujitsuAC {
@@ -101,7 +102,7 @@ class IRFujitsuAC {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setSwing(const uint8_t mode);
-  uint8_t getSwing(void);
+  uint8_t getSwing(const bool raw = false);
   uint8_t* getRaw(void);
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength(void);
