@@ -15,6 +15,7 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "IRutils.h"
 #include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
@@ -743,7 +744,7 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 //   on:      Should the unit be powered on? (or in some cases, toggled)
 //   mode:    What operating mode should the unit perform? e.g. Cool, Heat etc.
 //   degrees: What temperature should the unit be set to?
-//   celsius: Use degreees Celsius, otherwise Fahrenheit.
+//   celsius: Use degrees Celsius, otherwise Fahrenheit.
 //   fan:     Fan speed.
 // The following args are all "if supported" by the underlying A/C classes.
 //   swingv:  Control the vertical swing of the vanes.
@@ -769,11 +770,11 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
                   const bool beep, const int16_t sleep, const int16_t clock) {
   // Convert the temperature to Celsius.
   float degC;
-  bool on = power;
   if (celsius)
     degC = degrees;
   else
-    degC = (degrees - 32.0) * (5.0 / 9.0);
+    degC = fahrenheitToCelsius(degrees);
+  bool on = power;
   // A hack for Home Assistant, it appears to need/want an Off opmode.
   if (mode == stdAc::opmode_t::kOff) on = false;
   // Per vendor settings & setup.

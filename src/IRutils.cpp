@@ -787,3 +787,7 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
   // Mask off any unwanted bits and return the result.
   return (result & ((1ULL << nbits) - 1));
 }
+
+float celsiusToFahrenheit(const float deg) { return (deg * 9.0) / 5.0 + 32.0; }
+
+float fahrenheitToCelsius(const float deg) { return (deg - 32.0) * 5.0 / 9.0; }

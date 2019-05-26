@@ -415,3 +415,17 @@ TEST(TestUtils, htmlEscape) {
       "&amp;quot&semi;&amp;lt&semi;&amp;apos&semi;&amp;gt&semi;&amp;amp&semi;",
       htmlEscape("&quot;&lt;&apos;&gt;&amp;"));
 }
+
+TEST(TestUtils, TemperatureConversion) {
+  // Freezing point of water.
+  ASSERT_EQ(32.0, celsiusToFahrenheit(0.0));
+  ASSERT_EQ(0.0, fahrenheitToCelsius(32.0));
+  // Boiling point of water.
+  ASSERT_EQ(212.0, celsiusToFahrenheit(100.0));
+  ASSERT_EQ(100.0, fahrenheitToCelsius(212.0));
+  // Room Temp. (RTP)
+  ASSERT_EQ(77.0, celsiusToFahrenheit(25.0));
+  ASSERT_EQ(25.0, fahrenheitToCelsius(77.0));
+  // Misc
+  ASSERT_EQ(-40.0, fahrenheitToCelsius(-40.0));
+}

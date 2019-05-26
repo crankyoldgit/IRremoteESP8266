@@ -406,7 +406,7 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
 
 uint8_t IRPanasonicAc::getTemp(void) { return remote_state[14] >> 1; }
 
-// Set the desitred temperature in Celcius.
+// Set the desitred temperature in Celsius.
 // Args:
 //   celsius: The temperature to set the A/C unit to.
 //   remember: A boolean flag for the class to remember the temperature.
