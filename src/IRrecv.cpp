@@ -136,18 +136,21 @@ static void USE_IRAM_ATTR gpio_intr() {
 //              (Range: 0-3. Default: kDefaultESP32Timer)
 // Returns:
 //   An IRrecv class object.
+#if defined(ESP32)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
                const uint8_t timer_num) {
+  // There are only 4 timers. 0 to 3.
+  _timer_num = std::min(timer_num, (uint8_t)3);
+#else  // ESP32
+IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
+               const uint8_t timeout, const bool save_buffer) {
+#endif  // ESP32
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
   irparams.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
-#if defined(ESP32)
-  // There are only 4 timers. 0 to 3.
-  _timer_num = std::min(timer_num, (uint8_t)3);
-#endif  // ESP32
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
     DPRINTLN(

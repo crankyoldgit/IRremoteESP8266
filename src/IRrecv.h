@@ -111,11 +111,17 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
+#if defined(ESP32)
   explicit IRrecv(const uint16_t recvpin, const uint16_t bufsize = kRawBuf,
                   const uint8_t timeout = kTimeoutMs,
                   const bool save_buffer = false,
                   const uint8_t timer_num = kDefaultESP32Timer);  // Constructor
-  ~IRrecv(void);                                                      // Destructor
+#else  // ESP32
+  explicit IRrecv(const uint16_t recvpin, const uint16_t bufsize = kRawBuf,
+                  const uint8_t timeout = kTimeoutMs,
+                  const bool save_buffer = false);                // Constructor
+#endif  // ESP32
+  ~IRrecv(void);                                                  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn(void);
   void disableIRIn(void);
