@@ -540,33 +540,47 @@ TEST(TestDaikinClass, OnOffTimers) {
   ASSERT_FALSE(ac.getPowerful());
 }
 
-// Test Eye mode.
-TEST(TestDaikinClass, EyeSetting) {
+TEST(TestDaikinClass, WeeklyTimerEnable) {
   IRDaikinESP ac(0);
   ac.begin();
 
-  // The Eye setting is stored in the same byte as Econo mode.
+  // The Weekly Timer Enabled flag is stored in the same byte as Econo mode.
   // Econo mode tests are there to make sure it isn't harmed and vice-versa.
   ac.setEcono(false);
-  ac.setEye(false);
-  ASSERT_FALSE(ac.getEye());
+  ac.setWeeklyTimerEnable(false);
+  ASSERT_FALSE(ac.getWeeklyTimerEnable());
   EXPECT_FALSE(ac.getEcono());
 
-  ac.setEye(true);
-  ASSERT_TRUE(ac.getEye());
+  ac.setWeeklyTimerEnable(true);
+  ASSERT_TRUE(ac.getWeeklyTimerEnable());
   EXPECT_FALSE(ac.getEcono());
 
   ac.setEcono(false);
-  ASSERT_TRUE(ac.getEye());
+  ASSERT_TRUE(ac.getWeeklyTimerEnable());
   EXPECT_FALSE(ac.getEcono());
 
   ac.setEcono(true);
-  ASSERT_TRUE(ac.getEye());
+  ASSERT_TRUE(ac.getWeeklyTimerEnable());
   EXPECT_TRUE(ac.getEcono());
 
-  ac.setEye(false);
-  ASSERT_FALSE(ac.getEye());
+  ac.setWeeklyTimerEnable(false);
+  ASSERT_FALSE(ac.getWeeklyTimerEnable());
   EXPECT_TRUE(ac.getEcono());
+
+  // Tests with real data from:
+  // https://github.com/markszabo/IRremoteESP8266/issues/704#issuecomment-493731421
+  uint8_t on[kDaikinStateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7, 0x11, 0xDA, 0x27, 0x00,
+      0x42, 0xE3, 0x0B, 0x42, 0x11, 0xDA, 0x27, 0x00, 0x00, 0x68, 0x32, 0x00,
+      0x30, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x00, 0x00, 0x03};
+  uint8_t off[kDaikinStateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7, 0x11, 0xDA, 0x27, 0x00,
+      0x42, 0xE3, 0x0B, 0x42, 0x11, 0xDA, 0x27, 0x00, 0x00, 0x68, 0x32, 0x00,
+      0x30, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x80, 0x00, 0x83};
+  ac.setRaw(on);
+  EXPECT_TRUE(ac.getWeeklyTimerEnable());
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getWeeklyTimerEnable());
 }
 
 // Test Mold mode.
@@ -684,16 +698,16 @@ TEST(TestDaikinClass, HumanReadable) {
 
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 15C, Fan: 11 (QUIET), "
-      "Powerful: Off, Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, "
+      "Powerful: Off, Quiet: Off, Sensor: Off, Mold: Off, "
       "Comfort: Off, Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 0:00, Current Day: (UNKNOWN), On Time: Off, Off Time: Off",
+      "Current Time: 0:00, Current Day: (UNKNOWN), On Time: Off, "
+      "Off Time: Off, Weekly Timer: On",
       ac.toString());
   ac.setMode(kDaikinAuto);
   ac.setTemp(25);
   ac.setFan(kDaikinFanAuto);
   ac.setQuiet(true);
   ac.setSensor(true);
-  ac.setEye(true);
   ac.setMold(true);
   ac.setSwingVertical(true);
   ac.setSwingHorizontal(true);
@@ -702,12 +716,14 @@ TEST(TestDaikinClass, HumanReadable) {
   ac.enableOnTimer(8 * 60 + 0);
   ac.enableOffTimer(17 * 60 + 30);
   ac.setComfort(true);
+  ac.setWeeklyTimerEnable(false);
   ac.off();
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 10 (AUTO), "
-      "Powerful: Off, Quiet: On, Sensor: On, Eye: On, Mold: On, Comfort: On, "
+      "Powerful: Off, Quiet: On, Sensor: On, Mold: On, Comfort: On, "
       "Swing (Horizontal): On, Swing (Vertical): On, "
-      "Current Time: 9:15, Current Day: WED, On Time: 8:00, Off Time: 17:30",
+      "Current Time: 9:15, Current Day: WED, On Time: 8:00, Off Time: 17:30, "
+      "Weekly Timer: Off",
       ac.toString());
 }
 
@@ -857,10 +873,10 @@ TEST(TestDecodeDaikin, RealExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
-      "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
+      "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10", ac.toString());
+      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -890,10 +906,10 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
-      "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
+      "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10", ac.toString());
+      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -919,10 +935,10 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (COOL), Temp: 29C, Fan: 10 (AUTO), Powerful: On, "
-      "Quiet: Off, Sensor: Off, Eye: Off, Mold: Off, Comfort: Off, "
+      "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10", ac.toString());
+      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
 }
 
 // Test decoding a message captured from a real IR remote.

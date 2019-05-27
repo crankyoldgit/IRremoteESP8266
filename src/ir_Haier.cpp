@@ -643,8 +643,8 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
 
 uint8_t IRHaierACYRW02::getMode(void) { return remote_state[7] >> 4; }
 
-void IRHaierACYRW02::setTemp(const uint8_t celcius) {
-  uint8_t temp = celcius;
+void IRHaierACYRW02::setTemp(const uint8_t celsius) {
+  uint8_t temp = celsius;
   if (temp < kHaierAcMinTemp)
     temp = kHaierAcMinTemp;
   else if (temp > kHaierAcMaxTemp)

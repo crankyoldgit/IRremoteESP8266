@@ -132,6 +132,9 @@
 #define DECODE_FUJITSU_AC      true
 #define SEND_FUJITSU_AC        true
 
+#define DECODE_INAX            true
+#define SEND_INAX              true
+
 #define DECODE_DAIKIN          true
 #define SEND_DAIKIN            true
 
@@ -321,8 +324,9 @@ enum decode_type_t {
   DAIKIN216,
   SHARP_AC,
   GOODWEATHER,
+  INAX,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = GOODWEATHER,
+  kLastDecodeType = INAX,
 };
 
 // Message lengths & required repeat values
@@ -380,6 +384,8 @@ const uint16_t kHitachiAc1StateLength = 13;
 const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
 const uint16_t kHitachiAc2StateLength = 53;
 const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
+const uint16_t kInaxBits = 24;
+const uint16_t kInaxMinRepeat = kSingleRepeat;
 const uint16_t kJvcBits = 16;
 const uint16_t kKelvinatorStateLength = 16;
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;

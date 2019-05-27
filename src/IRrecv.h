@@ -213,6 +213,10 @@ class IRrecv {
   bool decodeLG(decode_results *results, uint16_t nbits = kLgBits,
                 bool strict = false);
 #endif
+#if DECODE_INAX
+  bool decodeInax(decode_results *results, const uint16_t nbits = kInaxBits,
+                  const bool strict = true);
+#endif  // DECODE_INAX
 #if DECODE_JVC
   bool decodeJVC(decode_results *results, uint16_t nbits = kJvcBits,
                  bool strict = true);
