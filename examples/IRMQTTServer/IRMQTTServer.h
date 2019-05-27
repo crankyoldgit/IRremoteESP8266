@@ -78,6 +78,12 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #endif  // MQTT_ENABLE
 
 // ------------------------ IR Capture Settings --------------------------------
+// Should we stop listening for IR messages when we send a message via IR?
+// Set this to `true` if your IR demodulator is picking up self transmissions.
+// Use `false` if it isn't or can't see the self-sent transmissions
+// Using `true` may mean some incoming IR messages are lost or garbled.
+// i.e. `false` is better if you can get away with it.
+#define DISABLE_CAPTURE_WHILE_TRANSMITTING true
 // Let's use a larger than normal buffer so we can handle AirCon remote codes.
 const uint16_t kCaptureBufferSize = 1024;
 #if DECODE_AC
@@ -175,7 +181,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.1.0-alpha"
+#define _MY_VERSION_ "v1.1.0-beta"
 
 const uint8_t kSendTableSize = sizeof(gpioTable);
 // JSON stuff

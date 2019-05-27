@@ -1689,7 +1689,6 @@ bool parseStringAndSendGC(IRsend *irsend, const String str) {
     start_from = index + 1;
     count++;
   } while (index != -1);
-
   irsend->sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
   if (count > 0)
@@ -2534,6 +2533,10 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 
   bool success = true;  // Assume success.
 
+  // Turn off IR capture if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+  irrecv.disableIRIn();  // Stop the IR receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
   // send the IR message.
   switch (ir_type) {
 #if SEND_RC5
@@ -2824,6 +2827,10 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       // If we got here, we didn't know how to send it.
       success = false;
   }
+  // Turn IR capture back on if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+  irrecv.enableIRIn();  // Restart the receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
   lastSendTime = millis();
   // Release the lock.
   lockIr = false;
@@ -3048,11 +3055,19 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
   // Only send an IR message if we need to.
   if (enableIR && ((diff && !forceMQTT) || forceIR)) {
     debug("Sending common A/C state via IR.");
+    // Turn IR capture off if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+    irrecv.disableIRIn();  // Stop the IR receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
     lastClimateSucceeded = commonAc.sendAc(
         next.protocol, next.model, next.power, next.mode,
         next.degrees, next.celsius, next.fanspeed, next.swingv, next.swingh,
         next.quiet, next.turbo, next.econo, next.light, next.filter, next.clean,
         next.beep, next.sleep, -1);
+  // Turn IR capture back on if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+    irrecv.enableIRIn();  // Restart the receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
     if (lastClimateSucceeded) hasClimateBeenSent = true;
     success &= lastClimateSucceeded;
     lastClimateIr.reset();
