@@ -275,6 +275,10 @@ class IRsend {
   void sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                      uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
+#if SEND_INAX
+  void sendInax(const uint64_t data, const uint16_t nbits = kInaxBits,
+                const uint16_t repeat = kInaxMinRepeat);
+#endif  // SEND_INAX
 #if SEND_GLOBALCACHE
   void sendGC(uint16_t buf[], uint16_t len);
 #endif

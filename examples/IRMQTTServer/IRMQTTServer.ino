@@ -591,6 +591,7 @@ void handleRoot(void) {
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
         "<option value='43'>GICable</option>"
+        "<option value='64'>Inax</option>"
         "<option value='6'>JVC</option>"
         "<option value='36'>Lasertag</option>"
         "<option value='58'>LEGOPF</option>"
@@ -2569,6 +2570,14 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       if (bits == 0)
         bits = kPanasonicBits;
       irsend->sendPanasonic64(code, bits, repeat);
+      break;
+#endif
+#if SEND_INAX
+    case INAX:  // 64
+      if (bits == 0)
+        bits = kInaxBits;
+      repeat = std::max(repeat, kInaxMinRepeat);
+      irsend->sendInax(code, bits, repeat);
       break;
 #endif
 #if SEND_JVC
