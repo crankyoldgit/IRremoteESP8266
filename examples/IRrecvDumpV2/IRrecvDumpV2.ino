@@ -302,9 +302,9 @@ void dumpACInfo(const decode_results * const results) {
   if (description != "") Serial.println("Mesg Desc.: " + description);
 }
 
-// The section of code run only once at start-up.
+// This section of code runs only once at start-up.
 void setup() {
-#ifdef ESP8266
+#if defined(ESP8266)
   Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
 #else  // ESP8266
   Serial.begin(kBaudRate, SERIAL_8N1);

@@ -6,7 +6,7 @@
 #include "IRrecv.h"
 #include <stddef.h>
 #ifndef UNIT_TEST
-#ifdef ESP8266
+#if defined(ESP8266)
 extern "C" {
 #include <gpio.h>
 #include <user_interface.h>
@@ -24,13 +24,15 @@ extern "C" {
 #endif
 
 #ifndef USE_IRAM_ATTR
-#ifdef ESP8266
+#if defined(ESP8266)
 #define USE_IRAM_ATTR ICACHE_RAM_ATTR
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
 #define USE_IRAM_ATTR IRAM_ATTR
 #endif  // ESP32
 #endif  // USE_IRAM_ATTR
+
+#define ONCE 0
 
 // Updated by David Conran (https://github.com/crankyoldgit) for receiving IR
 // code on ESP32
@@ -41,34 +43,34 @@ extern "C" {
 
 // Globals
 #ifndef UNIT_TEST
-#ifdef ESP8266
+#if defined(ESP8266)
 static ETSTimer timer;
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
 static hw_timer_t * timer = NULL;
 #endif  // ESP32
 #endif  // UNIT_TEST
 
-#ifdef ESP32
+#if defined(ESP32)
 portMUX_TYPE irremote_mux = portMUX_INITIALIZER_UNLOCKED;
 #endif  // ESP32
 volatile irparams_t irparams;
 irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 
 #ifndef UNIT_TEST
-#ifdef ESP8266
+#if defined(ESP8266)
 static void USE_IRAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
 static void USE_IRAM_ATTR read_timeout(void) {
   portENTER_CRITICAL(&irremote_mux);
 #endif  // ESP32
   if (irparams.rawlen) irparams.rcvstate = kStopState;
-#ifdef ESP8266
+#if defined(ESP8266)
   os_intr_unlock();
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
   portEXIT_CRITICAL(&irremote_mux);
 #endif  // ESP32
 }
@@ -77,7 +79,7 @@ static void USE_IRAM_ATTR gpio_intr() {
   uint32_t now = micros();
   static uint32_t start = 0;
 
-#ifdef ESP8266
+#if defined(ESP8266)
   uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
   os_timer_disarm(&timer);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
@@ -111,11 +113,10 @@ static void USE_IRAM_ATTR gpio_intr() {
 
   start = now;
 
-#ifdef ESP8266
-#define ONCE 0
+#if defined(ESP8266)
   os_timer_arm(&timer, irparams.timeout, ONCE);
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
   timerWrite(timer, 0);  // Reset the timeout.
   timerAlarmEnable(timer);
 #endif  // ESP32
@@ -130,7 +131,9 @@ static void USE_IRAM_ATTR gpio_intr() {
 //   bufsize: Nr. of entries to have in the capture buffer. (Default: kRawBuf)
 //   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
 //            (Default: kTimeoutMs)
-//   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
+//   save_buffer: Use a second (save) buffer to decode from. (Default: false)
+//   timer_num: Which ESP32 timer number to use? ESP32 only, otherwise unused.
+//              (Range: 0-3. Default: kDefaultESP32Timer)
 // Returns:
 //   An IRrecv class object.
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
@@ -141,8 +144,9 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
   irparams.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
-#ifdef ESP32
-  _timer_num = timer_num;
+#if defined(ESP32)
+  // There are only 4 timers. 0 to 3.
+  _timer_num = std::min(timer_num, (uint8_t)3);
 #endif  // ESP32
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
@@ -182,24 +186,28 @@ IRrecv::~IRrecv(void) {
     delete irparams_save;
   }
   disableIRIn();
-#ifdef ESP32
-  if (timer != NULL) timerEnd(timer);  // Cleanup the timeout timer.
+#if defined(ESP32)
+  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
 }
 
 // initialization
 void IRrecv::enableIRIn(void) {
-#ifdef ESP32
-  timer = timerBegin(_timer_num, 80, true);
-  timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), false);
-  timerAttachInterrupt(timer, &read_timeout, 1);
+#if defined(ESP32)
+  // Initialize the ESP32 timer.
+  timer = timerBegin(_timer_num, 80, true);  // 80MHz / 80 = 1 uSec granularity.
+  // Set the timer so it only fires once, and set it's trigger in uSeconds.
+  timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), ONCE);
+  // Note: Interrupt needs to be attached before it can be enabled or disabled.
+  timerAttachInterrupt(timer, &read_timeout, true);
 #endif  // ESP32
-  // initialize state machine variables
+
+  // Initialize state machine variables
   resume();
 
 #ifndef UNIT_TEST
-#ifdef ESP8266
-  // Initialize timer
+#if defined(ESP8266)
+  // Initialize ESP8266 timer.
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
                  NULL);
@@ -211,10 +219,10 @@ void IRrecv::enableIRIn(void) {
 
 void IRrecv::disableIRIn(void) {
 #ifndef UNIT_TEST
-#ifdef ESP8266
+#if defined(ESP8266)
   os_timer_disarm(&timer);
 #endif  // ESP8266
-#ifdef ESP32
+#if defined(ESP32)
   timerAlarmDisable(timer);
 #endif  // ESP32
   detachInterrupt(irparams.recvpin);
@@ -225,7 +233,7 @@ void IRrecv::resume(void) {
   irparams.rcvstate = kIdleState;
   irparams.rawlen = 0;
   irparams.overflow = false;
-#ifdef ESP32
+#if defined(ESP32)
   timerAlarmDisable(timer);
 #endif  // ESP32
 }
