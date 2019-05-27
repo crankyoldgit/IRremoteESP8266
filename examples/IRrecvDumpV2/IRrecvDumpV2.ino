@@ -29,6 +29,7 @@
 #include <ir_Coolix.h>
 #include <ir_Daikin.h>
 #include <ir_Fujitsu.h>
+#include <ir_Goodweather.h>
 #include <ir_Gree.h>
 #include <ir_Haier.h>
 #include <ir_Hitachi.h>
@@ -182,6 +183,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_TOSHIBA_AC
+#if DECODE_GOODWEATHER
+  if (results->decode_type == GOODWEATHER) {
+    IRGoodweatherAc ac(0);
+    ac.setRaw(results->value);  // Goodweather uses value instead of state.
+    description = ac.toString();
+  }
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
   if (results->decode_type == GREE) {
     IRGreeAC ac(0);

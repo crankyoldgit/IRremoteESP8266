@@ -144,6 +144,9 @@
 #define DECODE_GLOBALCACHE     false  // Not written.
 #define SEND_GLOBALCACHE       true
 
+#define DECODE_GOODWEATHER     true
+#define SEND_GOODWEATHER       true
+
 #define DECODE_GREE            true
 #define SEND_GREE              true
 
@@ -363,6 +366,8 @@ const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
 const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
 const uint16_t kGicableBits = 16;
 const uint16_t kGicableMinRepeat = kSingleRepeat;
+const uint16_t kGoodweatherBits = 48;
+const uint16_t kGoodweatherMinRepeat = kNoRepeat;
 const uint16_t kGreeStateLength = 8;
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kGreeDefaultRepeat = kNoRepeat;

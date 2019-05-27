@@ -59,6 +59,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
 #endif
+#if SEND_GOODWEATHER
+    case decode_type_t::GOODWEATHER:
+#endif
 #if SEND_GREE
     case decode_type_t::GREE:
 #endif
@@ -283,6 +286,34 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_FUJITSU_AC
+
+#if SEND_GOODWEATHER
+void IRac::goodweather(IRGoodweatherAc *ac,
+                       const bool on, const stdAc::opmode_t mode,
+                       const float degrees,
+                       const stdAc::fanspeed_t fan,
+                       const stdAc::swingv_t swingv,
+                       const bool turbo, const bool light,
+                       const int16_t sleep) {
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv == stdAc::swingv_t::kOff ? kGoodweatherSwingOff
+                                               : kGoodweatherSwingSlow);
+  ac->setTurbo(turbo);
+  ac->setLight(light);
+  // No Clean setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Horizontal Swing setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  ac->setPower(on);
+  ac->send();
+}
+#endif  // SEND_GOODWEATHER
 
 #if SEND_GREE
 void IRac::gree(IRGreeAC *ac,
@@ -832,6 +863,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_FUJITSU_AC
+#if SEND_GOODWEATHER
+    case GOODWEATHER:
+    {
+      IRGoodweatherAc ac(_pin);
+      ac.begin();
+      goodweather(&ac, on, mode, degC, fan, swingv, turbo, light, sleep);
+      break;
+    }
+#endif  // SEND_GOODWEATHER
 #if SEND_GREE
     case GREE:
     {

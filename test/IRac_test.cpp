@@ -3,6 +3,7 @@
 #include "ir_Argo.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
+#include "ir_Goodweather.h"
 #include "ir_Gree.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
@@ -209,6 +210,33 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Goodweather) {
+  IRGoodweatherAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (COOL), Temp: 19C, Fan: 2 (MED), Turbo: Toggle, "
+      "Light: Toggle, Sleep: Toggle, Swing: 1 (Slow), Command: 0 (Power)";
+
+  ac.begin();
+  irac.goodweather(&ac,
+                   true,                        // Power
+                   stdAc::opmode_t::kCool,      // Mode
+                   19,                          // Celsius
+                   stdAc::fanspeed_t::kMedium,  // Fan speed
+                   stdAc::swingv_t::kHigh,      // Veritcal swing
+                   true,                        // Turbo
+                   true,                        // Light
+                   8 * 60 + 0);                 // Sleep time
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(GOODWEATHER, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kGoodweatherBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.value);
   ASSERT_EQ(expected, ac.toString());
 }
 

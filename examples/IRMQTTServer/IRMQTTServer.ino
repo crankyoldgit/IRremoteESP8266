@@ -591,6 +591,7 @@ void handleRoot(void) {
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
         "<option value='43'>GICable</option>"
+        "<option value='63'>Goodweather</option>"
         "<option value='64'>Inax</option>"
         "<option value='6'>JVC</option>"
         "<option value='36'>Lasertag</option>"
@@ -2823,6 +2824,13 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       irsend->sendLegoPf(code, bits, repeat);
       break;
 #endif
+#if SEND_GOODWEATHER
+    case GOODWEATHER:  // 63
+      if (bits == 0) bits = kGoodweatherBits;
+      repeat = std::max(repeat, kGoodweatherMinRepeat);
+      irsend->sendGoodweather(code, bits, repeat);
+      break;
+#endif  // SEND_GOODWEATHER
     default:
       // If we got here, we didn't know how to send it.
       success = false;
@@ -3140,6 +3148,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_GOODWEATHER
+    case decode_type_t::GOODWEATHER: {
+      IRGoodweatherAc ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
     case decode_type_t::GREE: {
       IRGreeAC ac(IR_LED);
