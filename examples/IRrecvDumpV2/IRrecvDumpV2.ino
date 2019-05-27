@@ -304,7 +304,11 @@ void dumpACInfo(const decode_results * const results) {
 
 // The section of code run only once at start-up.
 void setup() {
+#ifdef ESP8266
   Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
+#else  // ESP8266
+  Serial.begin(kBaudRate, SERIAL_8N1);
+#endif  // ESP8266
   while (!Serial)  // Wait for the serial connection to be establised.
     delay(50);
   Serial.println();

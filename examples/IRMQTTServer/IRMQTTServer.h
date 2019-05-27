@@ -5,6 +5,10 @@
 #ifndef EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 #define EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 
+#ifdef ESP32
+#error "This example code does NOT work with the ESP32 yet!"
+#endif
+
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>

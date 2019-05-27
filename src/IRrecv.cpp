@@ -1,15 +1,17 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2015 Mark Szabo
 // Copyright 2015 Sebastien Warin
-// Copyright 2017 David Conran
+// Copyright 2017, 2019 David Conran
 
 #include "IRrecv.h"
 #include <stddef.h>
 #ifndef UNIT_TEST
+#ifdef ESP8266
 extern "C" {
 #include <gpio.h>
 #include <user_interface.h>
 }
+#endif  // ESP8266
 #include <Arduino.h>
 #endif
 #include <algorithm>
@@ -20,6 +22,18 @@ extern "C" {
 #undef ICACHE_RAM_ATTR
 #define ICACHE_RAM_ATTR
 #endif
+
+#ifndef USE_IRAM_ATTR
+#ifdef ESP8266
+#define USE_IRAM_ATTR ICACHE_RAM_ATTR
+#endif  // ESP8266
+#ifdef ESP32
+#define USE_IRAM_ATTR IRAM_ATTR
+#endif  // ESP32
+#endif  // USE_IRAM_ATTR
+
+// Updated by David Conran (https://github.com/crankyoldgit) for receiving IR
+// code on ESP32
 // Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code
 // on ESP8266
 // Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
@@ -27,25 +41,47 @@ extern "C" {
 
 // Globals
 #ifndef UNIT_TEST
+#ifdef ESP8266
 static ETSTimer timer;
-#endif
+#endif  // ESP8266
+#ifdef ESP32
+static hw_timer_t * timer = NULL;
+#endif  // ESP32
+#endif  // UNIT_TEST
+
+#ifdef ESP32
+portMUX_TYPE irremote_mux = portMUX_INITIALIZER_UNLOCKED;
+#endif  // ESP32
 volatile irparams_t irparams;
 irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 
 #ifndef UNIT_TEST
-static void ICACHE_RAM_ATTR read_timeout(void *arg __attribute__((unused))) {
+#ifdef ESP8266
+static void USE_IRAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
+#endif  // ESP8266
+#ifdef ESP32
+static void USE_IRAM_ATTR read_timeout(void) {
+  portENTER_CRITICAL(&irremote_mux);
+#endif  // ESP32
   if (irparams.rawlen) irparams.rcvstate = kStopState;
+#ifdef ESP8266
   os_intr_unlock();
+#endif  // ESP8266
+#ifdef ESP32
+  portEXIT_CRITICAL(&irremote_mux);
+#endif  // ESP32
 }
 
-static void ICACHE_RAM_ATTR gpio_intr() {
-  uint32_t now = system_get_time();
-  uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
+static void USE_IRAM_ATTR gpio_intr() {
+  uint32_t now = micros();
   static uint32_t start = 0;
 
+#ifdef ESP8266
+  uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
   os_timer_disarm(&timer);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
+#endif  // ESP8266
 
   // Grab a local copy of rawlen to reduce instructions used in IRAM.
   // This is an ugly premature optimisation code-wise, but we do everything we
@@ -74,8 +110,15 @@ static void ICACHE_RAM_ATTR gpio_intr() {
   irparams.rawlen++;
 
   start = now;
+
+#ifdef ESP8266
 #define ONCE 0
   os_timer_arm(&timer, irparams.timeout, ONCE);
+#endif  // ESP8266
+#ifdef ESP32
+  timerWrite(timer, 0);  // Reset the timeout.
+  timerAlarmEnable(timer);
+#endif  // ESP32
 }
 #endif  // UNIT_TEST
 
@@ -90,13 +133,17 @@ static void ICACHE_RAM_ATTR gpio_intr() {
 //   save_buffer:  Use a second (save) buffer to decode from. (Def: false)
 // Returns:
 //   An IRrecv class object.
-IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
-               bool save_buffer) {
+IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
+               const uint8_t timeout, const bool save_buffer,
+               const uint8_t timer_num) {
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
   irparams.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
+#ifdef ESP32
+  _timer_num = timer_num;
+#endif  // ESP32
   irparams.rawbuf = new uint16_t[bufsize];
   if (irparams.rawbuf == NULL) {
     DPRINTLN(
@@ -123,7 +170,7 @@ IRrecv::IRrecv(uint16_t recvpin, uint16_t bufsize, uint8_t timeout,
     irparams_save = NULL;
   }
 #if DECODE_HASH
-  unknown_threshold = kUnknownThreshold;
+  _unknown_threshold = kUnknownThreshold;
 #endif  // DECODE_HASH
 }
 
@@ -134,35 +181,53 @@ IRrecv::~IRrecv(void) {
     delete[] irparams_save->rawbuf;
     delete irparams_save;
   }
+  disableIRIn();
+#ifdef ESP32
+  if (timer != NULL) timerEnd(timer);  // Cleanup the timeout timer.
+#endif  // ESP32
 }
 
 // initialization
-void IRrecv::enableIRIn() {
+void IRrecv::enableIRIn(void) {
+#ifdef ESP32
+  timer = timerBegin(_timer_num, 80, true);
+  timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), false);
+  timerAttachInterrupt(timer, &read_timeout, 1);
+#endif  // ESP32
   // initialize state machine variables
   resume();
 
 #ifndef UNIT_TEST
+#ifdef ESP8266
   // Initialize timer
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
                  NULL);
-
+#endif  // ESP8266
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
-#endif
+#endif  // UNIT_TEST
 }
 
-void IRrecv::disableIRIn() {
+void IRrecv::disableIRIn(void) {
 #ifndef UNIT_TEST
+#ifdef ESP8266
   os_timer_disarm(&timer);
+#endif  // ESP8266
+#ifdef ESP32
+  timerAlarmDisable(timer);
+#endif  // ESP32
   detachInterrupt(irparams.recvpin);
-#endif
+#endif  // UNIT_TEST
 }
 
-void IRrecv::resume() {
+void IRrecv::resume(void) {
   irparams.rcvstate = kIdleState;
   irparams.rawlen = 0;
   irparams.overflow = false;
+#ifdef ESP32
+  timerAlarmDisable(timer);
+#endif  // ESP32
 }
 
 // Make a copy of the interrupt state & buffer data.
@@ -196,12 +261,12 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
 
 // Obtain the maximum number of entries possible in the capture buffer.
 // i.e. It's size.
-uint16_t IRrecv::getBufSize() { return irparams.bufsize; }
+uint16_t IRrecv::getBufSize(void) { return irparams.bufsize; }
 
 #if DECODE_HASH
 // Set the minimum length we will consider for reporting UNKNOWN message types.
-void IRrecv::setUnknownThreshold(uint16_t length) {
-  unknown_threshold = length;
+void IRrecv::setUnknownThreshold(const uint16_t length) {
+  _unknown_threshold = length;
 }
 #endif  // DECODE_HASH
 
@@ -722,7 +787,7 @@ int16_t IRrecv::compare(uint16_t oldval, uint16_t newval) {
  */
 bool IRrecv::decodeHash(decode_results *results) {
   // Require at least some samples to prevent triggering on noise
-  if (results->rawlen < unknown_threshold) return false;
+  if (results->rawlen < _unknown_threshold) return false;
   int32_t hash = kFnvBasis32;
   // 'rawlen - 2' to avoid the look ahead from going out of bounds.
   // Should probably be -3 to avoid comparing the trailing space entry,
