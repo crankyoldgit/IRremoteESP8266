@@ -40,10 +40,12 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
-#ifdef ESP32
-#error "This example code does NOT work with the ESP32 yet!"
-#endif
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <WiFi.h>
+#endif  // ESP32
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <WiFiClient.h>
