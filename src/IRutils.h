@@ -37,6 +37,7 @@ std::string htmlEscape(const std::string unescaped);
 #endif  // ARDUINO
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results * const results);
+uint16_t * resultToRawArray(const decode_results * const decode);
 uint8_t sumBytes(const uint8_t * const start, const uint16_t length,
                  const uint8_t init = 0);
 uint8_t xorBytes(const uint8_t * const start, const uint16_t length,

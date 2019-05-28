@@ -3,6 +3,7 @@
 #include "IRutils.h"
 #include <stdint.h>
 #include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -428,4 +429,62 @@ TEST(TestUtils, TemperatureConversion) {
   ASSERT_EQ(25.0, fahrenheitToCelsius(77.0));
   // Misc
   ASSERT_EQ(-40.0, fahrenheitToCelsius(-40.0));
+}
+
+TEST(TestResultToRawArray, TypicalCase) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Generate a known message.
+  irsend.reset();
+  irsend.sendNikai(0xD0F2F);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(NIKAI, irsend.capture.decode_type);
+  ASSERT_EQ(kNikaiBits, irsend.capture.bits);
+  EXPECT_EQ(
+      "uint16_t rawData[52] = {4000, 4000,  500, 2000,  500, 2000,  "
+      "500, 2000,  500, 2000,  500, 1000,  500, 1000,  500, 2000,  500, 1000,  "
+      "500, 2000,  500, 2000,  500, 2000,  500, 2000,  500, 1000,  500, 1000,  "
+      "500, 1000,  500, 1000,  500, 2000,  500, 2000,  500, 1000,  500, 2000,  "
+      "500, 1000,  500, 1000,  500, 1000,  500, 1000,  500, 8500 };"
+      "  // NIKAI D0F2F\n"
+      "uint64_t data = 0xD0F2F;\n",
+      resultToSourceCode(&irsend.capture));
+  uint16_t rawData[52] = {  // Data taken from above.
+      4000, 4000, 500, 2000, 500, 2000, 500, 2000, 500, 2000, 500, 1000, 500,
+      1000, 500, 2000, 500, 1000, 500, 2000, 500, 2000, 500, 2000, 500, 2000,
+      500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 2000, 500, 2000, 500,
+      1000, 500, 2000, 500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 8500};
+  uint16_t * result = resultToRawArray(&irsend.capture);
+  ASSERT_EQ(52, getCorrectedRawLength(&irsend.capture));
+  EXPECT_STATE_EQ(rawData, result, getCorrectedRawLength(&irsend.capture));
+  if (result != NULL) delete[] result;
+}
+
+TEST(TestResultToRawArray, LargeValues) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  uint16_t test_data[7] = {10, 20, 30, 40, 50, 60, 70};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(test_data, 7, 38000);
+  irsend.makeDecodeResult();
+  irrecv.decode(&irsend.capture);
+  uint16_t * result = resultToRawArray(&irsend.capture);
+  ASSERT_EQ(7, getCorrectedRawLength(&irsend.capture));
+  EXPECT_STATE_EQ(test_data, result, 7);
+  if (result != NULL) delete[] result;
+  // Stick in some large values.
+  irsend.capture.rawbuf[3] = 60000;
+  EXPECT_EQ(
+      "uint16_t rawData[9] = {10, 20,  65535, 0,  54465, 40,"
+      "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
+      resultToSourceCode(&irsend.capture));
+  uint16_t large_test_data[9] = {10, 20, 65535, 0, 54465, 40, 50, 60, 70};
+  ASSERT_EQ(9, getCorrectedRawLength(&irsend.capture));
+  result = resultToRawArray(&irsend.capture);
+  EXPECT_STATE_EQ(large_test_data, result, 9);
+  if (result != NULL) delete[] result;
 }
