@@ -5,10 +5,6 @@
 #ifndef EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 #define EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 
-#ifdef ESP32
-#error "This example code does NOT work with the ESP32 yet!"
-#endif
-
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
@@ -235,6 +231,12 @@ const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
 const char * kSequenceDelimiter = ";";
 const char * kCommandDelimiter = ",";
 const char kPauseChar = 'P';
+#if defined(ESP8266)
+const uint32_t kChipId = ESP.getChipId();
+#endif  // ESP8266
+#if defined(ESP32)
+const uint32_t kChipId = ESP.getEfuseMac();  // Discard the top 16 bits.
+#endif  // ESP32
 
 const char* kClimateTopics =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"

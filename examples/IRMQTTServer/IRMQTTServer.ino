@@ -297,12 +297,21 @@
 #include <Arduino.h>
 #include <FS.h>
 #include <ArduinoJson.h>
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <ESPmDNS.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <SPIFFS.h>
+#include <Update.h>
+#endif  // ESP32
 #include <WiFiClient.h>
 #include <DNSServer.h>
-#include <ESP8266WebServer.h>
 #include <WiFiManager.h>
-#include <ESP8266mDNS.h>
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
@@ -322,6 +331,7 @@
 #include <string>
 
 // Globals
+#if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
 #if MDNS_ENABLE
 MDNSResponder mdns;
@@ -466,6 +476,9 @@ bool saveConfig(void) {
       success = true;
     }
     SPIFFS.end();
+  } else {
+    debug("Failed to mount SPIFFS!\nFormatting SPIFFS instead ...");
+    SPIFFS.format();
   }
   return success;
 }
@@ -523,7 +536,8 @@ bool loadConfigFile(void) {
     debug("Unmounting SPIFFS.");
     SPIFFS.end();
   } else {
-    debug("Failed to mount SPIFFS");
+    debug("Failed to mount SPIFFS!\nFormatting SPIFFS instead ...");
+    SPIFFS.format();
   }
   return success;
 }
@@ -1228,7 +1242,12 @@ void handleInfo(void) {
       " " __TIME__ "<br>"
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
+#if defined(ESP8266)
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
+#endif  // ESP8266
+#if defined(ESP32)
+    "ESP32 SDK Version: " + ESP.getSdkVersion() + "<br>"
+#endif  // ESP32
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
@@ -1341,6 +1360,9 @@ void handleReset(void) {
     debug("Removing JSON config file");
     SPIFFS.remove(kConfigFile);
     SPIFFS.end();
+  } else {
+    debug("Failed!\nFormatting SPIFFS instead ...");
+    SPIFFS.format();
   }
   delay(1000);
   debug("Reseting wifiManager's settings.");
@@ -2090,7 +2112,7 @@ void setup_wifi(void) {
     debug("Wifi failed to connect and hit timeout. Rebooting...");
     delay(3000);
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
-    ESP.reset();
+    ESP.restart();
     delay(5000);
   }
 
@@ -2134,7 +2156,7 @@ void init_vars(void) {
   MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
   MqttHAName = String(Hostname) + "_aircon";
   // Create a unique MQTT client id.
-  MqttClientId = String(Hostname) + String(ESP.getChipId(), HEX);
+  MqttClientId = String(Hostname) + String(kChipId, HEX);
 #endif  // MQTT_ENABLE
 }
 
@@ -2166,8 +2188,12 @@ void setup(void) {
 
 #if DEBUG
   if (!isSerialGpioUsedByIr()) {
+#if defined(ESP8266)
     // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
     Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
+#else  // ESP8266
+    Serial.begin(BAUD_RATE, SERIAL_8N1);
+#endif  // ESP8266
     while (!Serial)  // Wait for the serial connection to be establised.
       delay(50);
     Serial.println();
@@ -2214,7 +2240,13 @@ void setup(void) {
   lastReconnectAttempt = 0;
 
 #if MDNS_ENABLE
-  if (mdns.begin(Hostname, WiFi.localIP())) debug("MDNS responder started");
+#if defined(ESP8266)
+  if (mdns.begin(Hostname, WiFi.localIP())) {
+#else  // ESP8266
+  if (mdns.begin(Hostname)) {
+#endif  // ESP8266
+    debug("MDNS responder started");
+  }
 #endif  // MDNS_ENABLE
 
   // Setup the root web page.
@@ -2278,11 +2310,15 @@ void setup(void) {
         }
         HTTPUpload& upload = server.upload();
         if (upload.status == UPLOAD_FILE_START) {
-          WiFiUDP::stopAll();
           debug("Update:");
           debug(upload.filename.c_str());
+#if defined(ESP8266)
+          WiFiUDP::stopAll();
           uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
               0xFFFFF000;
+#else  // ESP8266
+          uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
+#endif  // ESP8266
           if (!Update.begin(maxSketchSpace)) {  // start with max available size
 #if DEBUG
             if (!isSerialGpioUsedByIr())
