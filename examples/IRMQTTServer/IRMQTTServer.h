@@ -250,6 +250,7 @@ void handleSendMqttDiscovery(void);
 void subscribing(const String topic_name);
 void unsubscribing(const String topic_name);
 void mqttLog(const String mesg);
+bool mountSpiffs(void);
 bool reconnect(void);
 void receivingMQTT(String const topic_name, String const callback_str);
 void callback(char* topic, byte* payload, unsigned int length);

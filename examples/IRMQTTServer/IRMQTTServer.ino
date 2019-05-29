@@ -442,6 +442,24 @@ void saveWifiConfigCallback(void) {
   flagSaveWifiConfig = true;
 }
 
+// Forcibly mount the SPIFFS. Formatting the SPIFFS if needed.
+//
+// Returns:
+//   A boolean indicating success or failure.
+bool mountSpiffs(void) {
+  debug("Mounting SPIFFS...");
+  if (SPIFFS.begin()) return true;  // We mounted it okay.
+  // We failed the first time.
+  debug("Failed to mount SPIFFS!\nFormatting SPIFFS and trying again...");
+  SPIFFS.format();
+  if (!SPIFFS.begin()) {  // Did we fail?
+    debug("DANGER: Failed to mount SPIFFS even after formatting!");
+    delay(10000);  // Make sure the debug message doesn't just float by.
+    return false;
+  }
+  return true;  // Success!
+}
+
 bool saveConfig(void) {
   debug("Saving the config.");
   bool success = false;
@@ -465,7 +483,7 @@ bool saveConfig(void) {
     json[key] = static_cast<int>(txGpioTable[i]);
   }
 
-  if (SPIFFS.begin()) {
+  if (mountSpiffs()) {
     File configFile = SPIFFS.open(kConfigFile, "w");
     if (!configFile) {
       debug("Failed to open config file for writing.");
@@ -477,18 +495,14 @@ bool saveConfig(void) {
       success = true;
     }
     SPIFFS.end();
-  } else {
-    debug("Failed to mount SPIFFS!\nFormatting SPIFFS instead ...");
-    SPIFFS.format();
   }
   return success;
 }
 
 bool loadConfigFile(void) {
-  debug("Trying to mount SPIFFS");
   bool success = false;
-  if (SPIFFS.begin()) {
-    debug("mounted file system");
+  if (mountSpiffs()) {
+    debug("mounted the file system");
     if (SPIFFS.exists(kConfigFile)) {
       debug("config file exists");
 
@@ -536,9 +550,6 @@ bool loadConfigFile(void) {
     }
     debug("Unmounting SPIFFS.");
     SPIFFS.end();
-  } else {
-    debug("Failed to mount SPIFFS!\nFormatting SPIFFS instead ...");
-    SPIFFS.format();
   }
   return success;
 }
@@ -1356,14 +1367,10 @@ void handleReset(void) {
 #if MQTT_ENABLE
   mqttLog("Wiping all saved config settings.");
 #endif  // MQTT_ENABLE
-  debug("Trying to mount SPIFFS");
-  if (SPIFFS.begin()) {
+  if (mountSpiffs()) {
     debug("Removing JSON config file");
     SPIFFS.remove(kConfigFile);
     SPIFFS.end();
-  } else {
-    debug("Failed!\nFormatting SPIFFS instead ...");
-    SPIFFS.format();
   }
   delay(1000);
   debug("Reseting wifiManager's settings.");
