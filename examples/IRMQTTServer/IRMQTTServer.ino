@@ -31,9 +31,10 @@
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.x and < 6)
+ *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.0 and < 6.0)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
- *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager)
+ *                   (ESP8266: Version >= 0.14, ESP32: 'development' branch.)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
@@ -42,10 +43,10 @@
  *     the accompanying platformio.ini file.
  *
  * ## First Boot (Initial setup)
- * The ESP8266 board will boot into the WiFiManager's AP mode.
+ * The ESP board will boot into the WiFiManager's AP mode.
  * i.e. It will create a WiFi Access Point with a SSID like: "ESP123456" etc.
  * Connect to that SSID. Then point your browser to http://192.168.4.1/ and
- * configure the ESP8266 to connect to your desired WiFi network and associated
+ * configure the ESP to connect to your desired WiFi network and associated
  * required settings. It will remember these details on next boot if the device
  * connects successfully.
  * More information can be found here:
@@ -1719,7 +1720,7 @@ uint16_t countValuesInStr(const String str, char sep) {
 // Args:
 //   size:  Nr. of uint16_t's need to be in the new array.
 // Returns:
-//   A Ptr to the new array. Restarts the ESP8266 if it fails.
+//   A Ptr to the new array. Restarts the ESP if it fails.
 uint16_t * newCodeArray(const uint16_t size) {
   uint16_t *result;
 
