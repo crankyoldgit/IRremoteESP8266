@@ -26,13 +26,15 @@ const uint8_t kFujitsuAcModeDry = 0x02;
 const uint8_t kFujitsuAcModeFan = 0x03;
 const uint8_t kFujitsuAcModeHeat = 0x04;
 
-const uint8_t kFujitsuAcCmdStayOn = 0x00;     // b00000000
-const uint8_t kFujitsuAcCmdTurnOn = 0x01;     // b00000001
-const uint8_t kFujitsuAcCmdTurnOff = 0x02;    // b00000010
-const uint8_t kFujitsuAcCmdEcono = 0x09;      // b00001001
-const uint8_t kFujitsuAcCmdPowerful = 0x39;   // b00111001
-const uint8_t kFujitsuAcCmdStepVert = 0x6C;   // b01101100
-const uint8_t kFujitsuAcCmdStepHoriz = 0x79;  // b01111001
+const uint8_t kFujitsuAcCmdStayOn = 0x00;            // b00000000
+const uint8_t kFujitsuAcCmdTurnOn = 0x01;            // b00000001
+const uint8_t kFujitsuAcCmdTurnOff = 0x02;           // b00000010
+const uint8_t kFujitsuAcCmdEcono = 0x09;             // b00001001
+const uint8_t kFujitsuAcCmdPowerful = 0x39;          // b00111001
+const uint8_t kFujitsuAcCmdStepVert = 0x6C;          // b01101100
+const uint8_t kFujitsuAcCmdToggleSwingVert = 0x6D;   // b01101101
+const uint8_t kFujitsuAcCmdStepHoriz = 0x79;         // b01111001
+const uint8_t kFujitsuAcCmdToggleSwingHoriz = 0x7A;  // b01111010
 
 const uint8_t kFujitsuAcFanAuto = 0x00;
 const uint8_t kFujitsuAcFanHigh = 0x01;
@@ -92,7 +94,9 @@ class IRFujitsuAC {
   void begin(void);
   void off(void);
   void stepHoriz(void);
+  void toggleSwingHoriz(void);
   void stepVert(void);
+  void toggleSwingVert(void);
   void setCmd(const uint8_t cmd);
   uint8_t getCmd(const bool raw = false);
   void setTemp(const uint8_t temp);

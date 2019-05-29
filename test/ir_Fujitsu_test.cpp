@@ -25,11 +25,11 @@ template<typename T, size_t size>
 // Test sending typical data only.
 TEST(TestIRFujitsuACClass, GetRawDefault) {
   IRFujitsuAC fujitsu = IRFujitsuAC(4);  // AR-RAH2E
-  fujitsu.setCmd(kFujitsuAcCmdTurnOn);
   fujitsu.setSwing(kFujitsuAcSwingBoth);
   fujitsu.setMode(kFujitsuAcModeCool);
   fujitsu.setFanSpeed(kFujitsuAcFanHigh);
   fujitsu.setTemp(24);
+  fujitsu.setCmd(kFujitsuAcCmdTurnOn);
   uint8_t expected_arrah2e[16] = {
       0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30,
       0x81, 0x01, 0x31, 0x00, 0x00, 0x00, 0x20, 0xFD};
@@ -731,4 +731,45 @@ TEST(TestIRFujitsuACClass, OutsideQuiet) {
   EXPECT_TRUE(ac.getOutsideQuiet());
   ac.setOutsideQuiet(false);
   EXPECT_FALSE(ac.getOutsideQuiet());
+}
+
+TEST(TestIRFujitsuACClass, toggleSwing) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRFujitsuAC ac(0);
+
+  ac.begin();
+  ac.setModel(ARJW2);
+  ac.setSwing(kFujitsuAcSwingOff);
+  ac.setCmd(kFujitsuAcCmdStayOn);
+  ASSERT_EQ(kFujitsuAcSwingOff, ac.getSwing());
+  ac.toggleSwingHoriz();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingHoriz, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingHoriz, ac.getSwing());
+  ac.toggleSwingHoriz();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingHoriz, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingOff, ac.getSwing());
+  ac.toggleSwingVert();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingVert, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingVert, ac.getSwing());
+  ac.toggleSwingVert();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingVert, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingOff, ac.getSwing());
+
+  // Both
+  ac.toggleSwingHoriz();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingHoriz, ac.getCmd());
+  ac.toggleSwingVert();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingVert, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
+  ac.toggleSwingHoriz();
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingHoriz, ac.getCmd());
+  EXPECT_EQ(kFujitsuAcSwingVert, ac.getSwing());
+  ac.toggleSwingHoriz();
+  EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
+
+  EXPECT_EQ(
+      "Model: 4 (ARJW2), Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 1 (HIGH), "
+      "Swing: Vert + Horiz, Command: Toggle horizontal swing",
+      ac.toString());
 }

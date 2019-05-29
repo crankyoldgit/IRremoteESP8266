@@ -108,20 +108,14 @@ void IRFujitsuAC::buildState(void) {
   remote_state[4] = 0x10;
   bool fullCmd = false;
   switch (_cmd) {
-    case kFujitsuAcCmdTurnOff:    // 0x02
-      remote_state[5] = kFujitsuAcCmdTurnOff;
-      break;
-    case kFujitsuAcCmdEcono:      // 0x09
-      remote_state[5] = kFujitsuAcCmdEcono;
-      break;
-    case kFujitsuAcCmdPowerful:   // 0x39
-      remote_state[5] = kFujitsuAcCmdPowerful;
-      break;
-    case kFujitsuAcCmdStepVert:   // 0x6C
-      remote_state[5] = kFujitsuAcCmdStepVert;
-      break;
-    case kFujitsuAcCmdStepHoriz:  // 0x79
-      remote_state[5] = kFujitsuAcCmdStepHoriz;
+    case kFujitsuAcCmdTurnOff:     // 0x02
+    case kFujitsuAcCmdEcono:       // 0x09
+    case kFujitsuAcCmdPowerful:    // 0x39
+    case kFujitsuAcCmdStepVert:    // 0x6C
+    case kFujitsuAcCmdToggleSwingVert:   // 0x6D
+    case kFujitsuAcCmdStepHoriz:   // 0x79
+    case kFujitsuAcCmdToggleSwingHoriz:  // 0x7A
+      remote_state[5] = _cmd;
       break;
     default:
       switch (_model) {
@@ -242,7 +236,9 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (remote_state[5]) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdStepHoriz:
+    case kFujitsuAcCmdToggleSwingHoriz:
     case kFujitsuAcCmdStepVert:
+    case kFujitsuAcCmdToggleSwingVert:
     case kFujitsuAcCmdEcono:
     case kFujitsuAcCmdPowerful:
       setCmd(remote_state[5]);
@@ -264,19 +260,25 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
 }
 
 // Set the requested power state of the A/C to off.
-void IRFujitsuAC::off(void) { _cmd = kFujitsuAcCmdTurnOff; }
+void IRFujitsuAC::off(void) { this->setCmd(kFujitsuAcCmdTurnOff); }
 
-void IRFujitsuAC::stepHoriz(void) {
-  switch (_model) {
-    case ARDB1:
-    case ARREB1E:
-      break;  // These remotes doesn't have a horizontal option.
-    default:
-      _cmd = kFujitsuAcCmdStepHoriz;
-  }
+void IRFujitsuAC::stepHoriz(void) { this->setCmd(kFujitsuAcCmdStepHoriz); }
+
+void IRFujitsuAC::toggleSwingHoriz(void) {
+  // Toggle the current setting.
+  this->setSwing(this->getSwing() ^ kFujitsuAcSwingHoriz);
+  // and set the appropriate special command.
+  this->setCmd(kFujitsuAcCmdToggleSwingHoriz);
 }
 
-void IRFujitsuAC::stepVert(void) { _cmd = kFujitsuAcCmdStepVert; }
+void IRFujitsuAC::stepVert(void) { this->setCmd(kFujitsuAcCmdStepVert); }
+
+void IRFujitsuAC::toggleSwingVert(void) {
+  // Toggle the current setting.
+  this->setSwing(this->getSwing() ^ kFujitsuAcSwingVert);
+  // and set the appropriate special command.
+  this->setCmd(kFujitsuAcCmdToggleSwingVert);
+}
 
 // Set the requested command of the A/C.
 void IRFujitsuAC::setCmd(const uint8_t cmd) {
@@ -285,21 +287,31 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
     case kFujitsuAcCmdTurnOn:
     case kFujitsuAcCmdStayOn:
     case kFujitsuAcCmdStepVert:
+    case kFujitsuAcCmdToggleSwingVert:
       _cmd = cmd;
       break;
     case kFujitsuAcCmdStepHoriz:
-      // Only these remotes have step horizontal.
-      if (_model == ARRAH2E)
-        _cmd = cmd;
-      else
-        _cmd = kFujitsuAcCmdStayOn;
+    case kFujitsuAcCmdToggleSwingHoriz:
+      switch (_model) {
+        // Only these remotes have step horizontal.
+        case ARRAH2E:
+        case ARJW2:
+          _cmd = cmd;
+          break;
+        default:
+          _cmd = kFujitsuAcCmdStayOn;
+      }
       break;
     case kFujitsuAcCmdEcono:
     case kFujitsuAcCmdPowerful:
-      if (_model == ARREB1E)
+      switch (_model) {
+        // Only these remotes have these commands.
+        case ARREB1E:
         _cmd = cmd;
-      else
+        break;
+      default:
         _cmd = kFujitsuAcCmdStayOn;
+      }
       break;
     default:
       _cmd = kFujitsuAcCmdStayOn;
@@ -318,7 +330,10 @@ uint8_t IRFujitsuAC::getCmd(const bool raw) {
 
 bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 
-void IRFujitsuAC::setOutsideQuiet(const bool on) { _outsideQuiet = on; }
+void IRFujitsuAC::setOutsideQuiet(const bool on) {
+  _outsideQuiet = on;
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+}
 
 // Get the status of the Outside Quiet setting.
 // Args:
@@ -338,6 +353,7 @@ bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
 void IRFujitsuAC::setTemp(const uint8_t temp) {
   _temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
   _temp = std::min((uint8_t)kFujitsuAcMaxTemp, _temp);
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 uint8_t IRFujitsuAC::getTemp(void) { return _temp; }
@@ -348,6 +364,7 @@ void IRFujitsuAC::setFanSpeed(const uint8_t fanSpeed) {
     _fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
   else
     _fanSpeed = fanSpeed;
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 uint8_t IRFujitsuAC::getFanSpeed(void) { return _fanSpeed; }
 
@@ -357,6 +374,7 @@ void IRFujitsuAC::setMode(const uint8_t mode) {
     _mode = kFujitsuAcModeHeat;  // Set the mode to maximum if out of range.
   else
     _mode = mode;
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 uint8_t IRFujitsuAC::getMode(void) { return _mode; }
@@ -378,6 +396,7 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingBoth) _swingMode = kFujitsuAcSwingBoth;
   }
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 // Get what the swing part of the message should be.
@@ -580,6 +599,12 @@ std::string IRFujitsuAC::toString(void) {
       break;
     case kFujitsuAcCmdStepVert:
       result += F("Step vane vertically");
+      break;
+    case kFujitsuAcCmdToggleSwingHoriz:
+      result += F("Toggle horizontal swing");
+      break;
+    case kFujitsuAcCmdToggleSwingVert:
+      result += F("Toggle vertically swing");
       break;
     case kFujitsuAcCmdEcono:
       result += F("Economy");
