@@ -518,6 +518,7 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
 // Does the given protocol use a complex state as part of the decode?
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
+    case ARGO:
     case DAIKIN:
     case DAIKIN2:
     case DAIKIN216:

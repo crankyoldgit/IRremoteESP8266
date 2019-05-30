@@ -7,6 +7,11 @@ Copyright 2019 crankyoldgit
 
 #include "ir_Argo.h"
 #include <algorithm>
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
@@ -17,6 +22,7 @@ const uint16_t kArgoHdrSpace = 3300;
 const uint16_t kArgoBitMark = 400;
 const uint16_t kArgoOneSpace = 2200;
 const uint16_t kArgoZeroSpace = 900;
+const uint32_t kArgoGap = kDefaultMessageGap;  // Made up value. Complete guess.
 
 #if SEND_ARGO
 // Send an Argo A/C message.
@@ -48,14 +54,20 @@ void IRArgoAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_ARGO
 
-void IRArgoAC::checksum(void) {
-  uint8_t sum = 2;  // Corresponds to byte 11 being constant 0b01
-
+uint8_t IRArgoAC::calcChecksum(const uint8_t state[], const uint16_t length) {
+  // Corresponds to byte 11 being constant 0b01
   // Only add up bytes to 9. byte 10 is 0b01 constant anyway.
   // Assume that argo array is MSB first (left)
-  for (uint8_t i = 0; i < 10; i++) sum += argo[i];
+  return sumBytes(state, length - 2, 2);
+}
 
-  sum = sum % 256;  // modulo 256
+bool IRArgoAC::validChecksum(const uint8_t state[], const uint16_t length) {
+  return ((state[length - 2] >> 2) + (state[length - 1] << 6)) ==
+      IRArgoAC::calcChecksum(state, length);
+}
+
+void IRArgoAC::checksum(void) {
+  uint8_t sum = IRArgoAC::calcChecksum(argo, kArgoStateLength);
   // Append sum to end of array
   // Set const part of checksum bit 10
   argo[10] = 0b00000010;
@@ -86,7 +98,7 @@ uint8_t* IRArgoAC::getRaw(void) {
   return argo;
 }
 
-void IRArgoAC::setRaw(const char state[]) {
+void IRArgoAC::setRaw(const uint8_t state[]) {
   for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = state[i];
 }
 
@@ -209,7 +221,9 @@ void IRArgoAC::setTime(void) {
 }
 
 void IRArgoAC::setRoomTemp(const uint8_t degrees) {
-  uint8_t temp = degrees - kArgoTempOffset;
+  uint8_t temp = std::min(degrees, kArgoMaxRoomTemp);
+  temp = std::max(temp, kArgoTempOffset);
+  temp -= kArgoTempOffset;;
   // Mask out bits
   argo[3] &= ~kArgoRoomTempLowMask;
   argo[4] &= ~kArgoRoomTempHighMask;
@@ -319,3 +333,135 @@ stdAc::state_t IRArgoAC::toCommon(void) {
   result.clock = -1;
   return result;
 }
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRArgoAC::toString() {
+  String result = "";
+#else
+std::string IRArgoAC::toString() {
+  std::string result = "";
+#endif  // ARDUINO
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result += F("Power: ");
+  result += getPower() ? F("On") : F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(getMode());
+  switch (getMode()) {
+    case kArgoAuto:
+      result += F(" (AUTO)");
+      break;
+    case kArgoCool:
+      result += F(" (COOL)");
+      break;
+    case kArgoHeat:
+      result += F(" (HEAT)");
+      break;
+    case kArgoDry:
+      result += F(" (DRY)");
+      break;
+    case kArgoHeatAuto:
+      result += F(" (HEATAUTO)");
+      break;
+    case kArgoOff:
+      result += F(" (OFF)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Fan: ");
+  result += uint64ToString(getFan());
+  switch (getFan()) {
+    case kArgoFanAuto:
+      result += F(" (AUTO)");
+      break;
+    case kArgoFan3:
+      result += F(" (MAX)");
+      break;
+    case kArgoFan1:
+      result += F(" (MIN)");
+      break;
+    case kArgoFan2:
+      result += F(" (MED)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(getTemp());
+  result += 'C';
+  result += F(", Room Temp: ");
+  result += uint64ToString(getRoomTemp());
+  result += 'C';
+  result += F(", Max: ");
+  result += getMax() ? F("On") : F("Off");
+  result += F(", iFeel: ");
+  result += getiFeel() ? F("On") : F("Off");
+  result += F(", Night: ");
+  result += getNight() ? F("On") : F("Off");
+  return result;
+}
+
+#if DECODE_ARGO
+// Decode the supplied Argo message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically kArgoBits.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: ALPHA / Probably doesn't work.
+//
+// Note:
+//   This decoder is based soley off sendArgo(). We have no actual captures
+//   to test this against. If you have one of these units, please let us know.
+bool IRrecv::decodeArgo(decode_results *results, const uint16_t nbits,
+                        const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
+    return false;  // Can't possibly be a valid Samsung A/C message.
+  if (strict && nbits != kArgoBits) return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t dataBitsSoFar = 0;
+  match_result_t data_result;
+
+  // Message Header
+  if (!matchMark(results->rawbuf[offset++], kArgoHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kArgoHdrSpace)) return false;
+
+  // Data
+  // Keep reading bytes until we either run out of data or state to fill.
+  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
+       i++, dataBitsSoFar += 8, offset += data_result.used) {
+    data_result = matchData(&(results->rawbuf[offset]), 8, kArgoBitMark,
+                            kArgoOneSpace, kArgoBitMark,
+                            kArgoZeroSpace, kTolerance, 0, false);
+    if (data_result.success == false) {
+      DPRINT("DEBUG: offset = ");
+      DPRINTLN(offset + data_result.used);
+      return false;  // Fail
+    }
+    results->state[i] = data_result.data;
+    DPRINT("DEBUG: Matched state[");
+    DPRINT(i);
+    DPRINTLN("]");
+  }
+
+  // Footer (None, allegedly. This seems very wrong.)
+
+  // Compliance
+  // Re-check we got the correct size/length due to the way we read the data.
+  if (dataBitsSoFar != nbits) return false;
+  // Verify we got a valid checksum.
+  if (strict && !IRArgoAC::validChecksum(results->state)) return false;
+  // Success
+  results->decode_type = decode_type_t::ARGO;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_ARGO

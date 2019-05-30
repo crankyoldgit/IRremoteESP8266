@@ -156,6 +156,10 @@ class IRrecv {
   bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
                  bool strict = true);
 #endif
+#if DECODE_ARGO
+  bool decodeArgo(decode_results *results, const uint16_t nbits = kArgoBits,
+                  const bool strict = true);
+#endif  // DECODE_ARGO
 #if DECODE_SONY
   bool decodeSony(decode_results *results, uint16_t nbits = kSonyMinBits,
                   bool strict = false);
