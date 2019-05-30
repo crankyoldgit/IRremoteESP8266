@@ -132,6 +132,9 @@
 #define DECODE_FUJITSU_AC      true
 #define SEND_FUJITSU_AC        true
 
+#define DECODE_INAX            true
+#define SEND_INAX              true
+
 #define DECODE_DAIKIN          true
 #define SEND_DAIKIN            true
 
@@ -140,6 +143,9 @@
 
 #define DECODE_GLOBALCACHE     false  // Not written.
 #define SEND_GLOBALCACHE       true
+
+#define DECODE_GOODWEATHER     true
+#define SEND_GOODWEATHER       true
 
 #define DECODE_GREE            true
 #define SEND_GREE              true
@@ -317,8 +323,10 @@ enum decode_type_t {
   MITSUBISHI_HEAVY_152,  // 60
   DAIKIN216,
   SHARP_AC,
+  GOODWEATHER,
+  INAX,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SHARP_AC,
+  kLastDecodeType = INAX,
 };
 
 // Message lengths & required repeat values
@@ -359,6 +367,8 @@ const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
 const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
 const uint16_t kGicableBits = 16;
 const uint16_t kGicableMinRepeat = kSingleRepeat;
+const uint16_t kGoodweatherBits = 48;
+const uint16_t kGoodweatherMinRepeat = kNoRepeat;
 const uint16_t kGreeStateLength = 8;
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kGreeDefaultRepeat = kNoRepeat;
@@ -375,6 +385,8 @@ const uint16_t kHitachiAc1StateLength = 13;
 const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
 const uint16_t kHitachiAc2StateLength = 53;
 const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
+const uint16_t kInaxBits = 24;
+const uint16_t kInaxMinRepeat = kSingleRepeat;
 const uint16_t kJvcBits = 16;
 const uint16_t kKelvinatorStateLength = 16;
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;

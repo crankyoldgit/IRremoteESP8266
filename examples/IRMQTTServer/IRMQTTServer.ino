@@ -591,6 +591,8 @@ void handleRoot(void) {
         "<option value='17'>Denon</option>"
         "<option value='13'>Dish</option>"
         "<option value='43'>GICable</option>"
+        "<option value='63'>Goodweather</option>"
+        "<option value='64'>Inax</option>"
         "<option value='6'>JVC</option>"
         "<option value='36'>Lasertag</option>"
         "<option value='58'>LEGOPF</option>"
@@ -1688,7 +1690,6 @@ bool parseStringAndSendGC(IRsend *irsend, const String str) {
     start_from = index + 1;
     count++;
   } while (index != -1);
-
   irsend->sendGC(code_array, count);  // All done. Send it.
   free(code_array);  // Free up the memory allocated.
   if (count > 0)
@@ -2533,6 +2534,10 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 
   bool success = true;  // Assume success.
 
+  // Turn off IR capture if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+  irrecv.disableIRIn();  // Stop the IR receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
   // send the IR message.
   switch (ir_type) {
 #if SEND_RC5
@@ -2569,6 +2574,14 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       if (bits == 0)
         bits = kPanasonicBits;
       irsend->sendPanasonic64(code, bits, repeat);
+      break;
+#endif
+#if SEND_INAX
+    case INAX:  // 64
+      if (bits == 0)
+        bits = kInaxBits;
+      repeat = std::max(repeat, kInaxMinRepeat);
+      irsend->sendInax(code, bits, repeat);
       break;
 #endif
 #if SEND_JVC
@@ -2811,10 +2824,21 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       irsend->sendLegoPf(code, bits, repeat);
       break;
 #endif
+#if SEND_GOODWEATHER
+    case GOODWEATHER:  // 63
+      if (bits == 0) bits = kGoodweatherBits;
+      repeat = std::max(repeat, kGoodweatherMinRepeat);
+      irsend->sendGoodweather(code, bits, repeat);
+      break;
+#endif  // SEND_GOODWEATHER
     default:
       // If we got here, we didn't know how to send it.
       success = false;
   }
+  // Turn IR capture back on if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+  irrecv.enableIRIn();  // Restart the receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
   lastSendTime = millis();
   // Release the lock.
   lockIr = false;
@@ -3039,11 +3063,19 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
   // Only send an IR message if we need to.
   if (enableIR && ((diff && !forceMQTT) || forceIR)) {
     debug("Sending common A/C state via IR.");
+    // Turn IR capture off if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+    irrecv.disableIRIn();  // Stop the IR receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
     lastClimateSucceeded = commonAc.sendAc(
         next.protocol, next.model, next.power, next.mode,
         next.degrees, next.celsius, next.fanspeed, next.swingv, next.swingh,
         next.quiet, next.turbo, next.econo, next.light, next.filter, next.clean,
         next.beep, next.sleep, -1);
+  // Turn IR capture back on if we need to.
+#if defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
+    irrecv.enableIRIn();  // Restart the receiver
+#endif  // defined (IR_RX) && DISABLE_CAPTURE_WHILE_TRANSMITTING
     if (lastClimateSucceeded) hasClimateBeenSent = true;
     success &= lastClimateSucceeded;
     lastClimateIr.reset();
@@ -3116,6 +3148,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_GOODWEATHER
+    case decode_type_t::GOODWEATHER: {
+      IRGoodweatherAc ac(IR_LED);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
     case decode_type_t::GREE: {
       IRGreeAC ac(IR_LED);
@@ -3269,6 +3309,14 @@ bool decodeCommonAc(const decode_results *decode) {
     state.model = climate.model;
   }
 #endif  // IGNORE_DECODED_AC_PROTOCOL
+// Continue to use the previously prefered temperature units.
+// i.e. Keep using Celsius or Fahrenheit.
+if (climate.celsius != state.celsius) {
+  // We've got a mismatch, so we need to convert.
+  state.degrees = climate.celsius ? fahrenheitToCelsius(state.degrees)
+                                  : celsiusToFahrenheit(state.degrees);
+  state.celsius = climate.celsius;
+}
 #if MQTT_ENABLE
   sendClimate(climate, state, MqttClimateStat, true, false, false,
               REPLAY_DECODED_AC_MESSAGE);

@@ -15,6 +15,7 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "IRutils.h"
 #include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
@@ -57,6 +58,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
+#endif
+#if SEND_GOODWEATHER
+    case decode_type_t::GOODWEATHER:
 #endif
 #if SEND_GREE
     case decode_type_t::GREE:
@@ -282,6 +286,34 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_FUJITSU_AC
+
+#if SEND_GOODWEATHER
+void IRac::goodweather(IRGoodweatherAc *ac,
+                       const bool on, const stdAc::opmode_t mode,
+                       const float degrees,
+                       const stdAc::fanspeed_t fan,
+                       const stdAc::swingv_t swingv,
+                       const bool turbo, const bool light,
+                       const int16_t sleep) {
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv == stdAc::swingv_t::kOff ? kGoodweatherSwingOff
+                                               : kGoodweatherSwingSlow);
+  ac->setTurbo(turbo);
+  ac->setLight(light);
+  // No Clean setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Horizontal Swing setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  ac->setPower(on);
+  ac->send();
+}
+#endif  // SEND_GOODWEATHER
 
 #if SEND_GREE
 void IRac::gree(IRGreeAC *ac,
@@ -743,7 +775,7 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 //   on:      Should the unit be powered on? (or in some cases, toggled)
 //   mode:    What operating mode should the unit perform? e.g. Cool, Heat etc.
 //   degrees: What temperature should the unit be set to?
-//   celsius: Use degreees Celsius, otherwise Fahrenheit.
+//   celsius: Use degrees Celsius, otherwise Fahrenheit.
 //   fan:     Fan speed.
 // The following args are all "if supported" by the underlying A/C classes.
 //   swingv:  Control the vertical swing of the vanes.
@@ -769,11 +801,11 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
                   const bool beep, const int16_t sleep, const int16_t clock) {
   // Convert the temperature to Celsius.
   float degC;
-  bool on = power;
   if (celsius)
     degC = degrees;
   else
-    degC = (degrees - 32.0) * (5.0 / 9.0);
+    degC = fahrenheitToCelsius(degrees);
+  bool on = power;
   // A hack for Home Assistant, it appears to need/want an Off opmode.
   if (mode == stdAc::opmode_t::kOff) on = false;
   // Per vendor settings & setup.
@@ -831,6 +863,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_FUJITSU_AC
+#if SEND_GOODWEATHER
+    case GOODWEATHER:
+    {
+      IRGoodweatherAc ac(_pin);
+      ac.begin();
+      goodweather(&ac, on, mode, degC, fan, swingv, turbo, light, sleep);
+      break;
+    }
+#endif  // SEND_GOODWEATHER
 #if SEND_GREE
     case GREE:
     {

@@ -536,6 +536,11 @@ bool IRsend::send(decode_type_t type, uint64_t data, uint16_t nbits) {
       sendGree(data, nbits);
       break;
 #endif
+#if SEND_INAX
+    case INAX:
+      sendInax(data, nbits);
+      break;
+#endif  // SEND_INAX
 #if SEND_JVC
     case JVC:
       sendJVC(data, nbits);
