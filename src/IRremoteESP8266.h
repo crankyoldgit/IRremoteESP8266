@@ -132,6 +132,9 @@
 #define DECODE_FUJITSU_AC      true
 #define SEND_FUJITSU_AC        true
 
+#define DECODE_INAX            true
+#define SEND_INAX              true
+
 #define DECODE_DAIKIN          true
 #define SEND_DAIKIN            true
 
@@ -141,13 +144,16 @@
 #define DECODE_GLOBALCACHE     false  // Not written.
 #define SEND_GLOBALCACHE       true
 
+#define DECODE_GOODWEATHER     true
+#define SEND_GOODWEATHER       true
+
 #define DECODE_GREE            true
 #define SEND_GREE              true
 
 #define DECODE_PRONTO          false  // Not written.
 #define SEND_PRONTO            true
 
-#define DECODE_ARGO            false  // Not written.
+#define DECODE_ARGO            true  // Experimental
 #define SEND_ARGO              true
 
 #define DECODE_TROTEC          true
@@ -317,8 +323,10 @@ enum decode_type_t {
   MITSUBISHI_HEAVY_152,  // 60
   DAIKIN216,
   SHARP_AC,
+  GOODWEATHER,
+  INAX,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SHARP_AC,
+  kLastDecodeType = INAX,
 };
 
 // Message lengths & required repeat values
@@ -328,6 +336,7 @@ const uint16_t kSingleRepeat = 1;
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
+const uint16_t kArgoBits = kArgoStateLength * 8;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kCoolixBits = 24;
 const uint16_t kCoolixDefaultRepeat = 1;
@@ -358,6 +367,8 @@ const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
 const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
 const uint16_t kGicableBits = 16;
 const uint16_t kGicableMinRepeat = kSingleRepeat;
+const uint16_t kGoodweatherBits = 48;
+const uint16_t kGoodweatherMinRepeat = kNoRepeat;
 const uint16_t kGreeStateLength = 8;
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kGreeDefaultRepeat = kNoRepeat;
@@ -374,6 +385,8 @@ const uint16_t kHitachiAc1StateLength = 13;
 const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
 const uint16_t kHitachiAc2StateLength = 53;
 const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
+const uint16_t kInaxBits = 24;
+const uint16_t kInaxMinRepeat = kSingleRepeat;
 const uint16_t kJvcBits = 16;
 const uint16_t kKelvinatorStateLength = 16;
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;

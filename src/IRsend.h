@@ -275,6 +275,10 @@ class IRsend {
   void sendFujitsuAC(unsigned char data[], uint16_t nbytes,
                      uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
+#if SEND_INAX
+  void sendInax(const uint64_t data, const uint16_t nbits = kInaxBits,
+                const uint16_t repeat = kInaxMinRepeat);
+#endif  // SEND_INAX
 #if SEND_GLOBALCACHE
   void sendGC(uint16_t buf[], uint16_t len);
 #endif
@@ -307,6 +311,11 @@ class IRsend {
   void sendGree(uint8_t data[], uint16_t nbytes = kGreeStateLength,
                 uint16_t repeat = kGreeDefaultRepeat);
 #endif
+#if SEND_GOODWEATHER
+  void sendGoodweather(const uint64_t data,
+                       const uint16_t nbits = kGoodweatherBits,
+                       const uint16_t repeat = kGoodweatherMinRepeat);
+#endif  // SEND_GOODWEATHER
 #if SEND_PRONTO
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif

@@ -57,6 +57,11 @@ std::string uint64ToString(uint64_t input, uint8_t base) {
   // i.e. [0-9A-Z] == 36
   if (base > 36) base = 10;
 
+  // Reserve some string space to reduce fragmentation.
+  // 16 bytes should store a uint64 in hex text which is the likely worst case.
+  // 64 bytes would be the worst case (base 2).
+  result.reserve(16);
+
   do {
     char c = input % base;
     input /= base;
@@ -120,6 +125,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::GICABLE;
   else if (!strcmp(str, "GLOBALCACHE"))
     return decode_type_t::GLOBALCACHE;
+  else if (!strcmp(str, "GOODWEATHER"))
+    return decode_type_t::GOODWEATHER;
   else if (!strcmp(str, "GREE"))
     return decode_type_t::GREE;
   else if (!strcmp(str, "HAIER_AC"))
@@ -132,6 +139,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::HITACHI_AC1;
   else if (!strcmp(str, "HITACHI_AC2"))
     return decode_type_t::HITACHI_AC2;
+  else if (!strcmp(str, "INAX"))
+    return decode_type_t::INAX;
   else if (!strcmp(str, "JVC"))
     return decode_type_t::JVC;
   else if (!strcmp(str, "KELVINATOR"))
@@ -344,6 +353,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
     case GLOBALCACHE:
       result = F("GLOBALCACHE");
       break;
+    case GOODWEATHER:
+      result = F("GOODWEATHER");
+      break;
     case GREE:
       result = F("GREE");
       break;
@@ -361,6 +373,9 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case HITACHI_AC2:
       result = F("HITACHI_AC2");
+      break;
+    case INAX:
+      result = F("INAX");
       break;
     case JVC:
       result = F("JVC");
@@ -503,6 +518,7 @@ std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
 // Does the given protocol use a complex state as part of the decode?
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
+    case ARGO:
     case DAIKIN:
     case DAIKIN2:
     case DAIKIN216:
@@ -557,6 +573,8 @@ String resultToSourceCode(const decode_results * const results) {
 std::string resultToSourceCode(const decode_results * const results) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(1536);  // 1.5KB should cover most cases.
   // Start declaration
   output += F("uint16_t ");  // variable type
   output += F("rawData[");   // array name
@@ -641,6 +659,8 @@ std::string resultToTimingInfo(const decode_results * const results) {
   std::string output = "";
   std::string value = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2048);  // 2KB should cover most cases.
   output += F("Raw Timing[");
   output += uint64ToString(results->rawlen - 1, 10);
   output += F("]:\n");
@@ -671,6 +691,8 @@ String resultToHexidecimal(const decode_results * const result) {
 std::string resultToHexidecimal(const decode_results * const result) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2 * kStateSizeMax);  // Should cover worst cases.
   if (hasACState(result->decode_type)) {
 #if DECODE_AC
     for (uint16_t i = 0; result->bits > i * 8; i++) {
@@ -693,6 +715,8 @@ String resultToHumanReadableBasic(const decode_results * const results) {
 std::string resultToHumanReadableBasic(const decode_results *const results) {
   std::string output = "";
 #endif
+  // Reserve some space for the string to reduce heap fragmentation.
+  output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
   // Show Encoding standard
   output += F("Encoding  : ");
   output += typeToString(results->decode_type, results->repeat);
@@ -775,3 +799,7 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
   // Mask off any unwanted bits and return the result.
   return (result & ((1ULL << nbits) - 1));
 }
+
+float celsiusToFahrenheit(const float deg) { return (deg * 9.0) / 5.0 + 32.0; }
+
+float fahrenheitToCelsius(const float deg) { return (deg - 32.0) * 5.0 / 9.0; }

@@ -156,6 +156,10 @@ class IRrecv {
   bool decodeNEC(decode_results *results, uint16_t nbits = kNECBits,
                  bool strict = true);
 #endif
+#if DECODE_ARGO
+  bool decodeArgo(decode_results *results, const uint16_t nbits = kArgoBits,
+                  const bool strict = true);
+#endif  // DECODE_ARGO
 #if DECODE_SONY
   bool decodeSony(decode_results *results, uint16_t nbits = kSonyMinBits,
                   bool strict = false);
@@ -213,6 +217,10 @@ class IRrecv {
   bool decodeLG(decode_results *results, uint16_t nbits = kLgBits,
                 bool strict = false);
 #endif
+#if DECODE_INAX
+  bool decodeInax(decode_results *results, const uint16_t nbits = kInaxBits,
+                  const bool strict = true);
+#endif  // DECODE_INAX
 #if DECODE_JVC
   bool decodeJVC(decode_results *results, uint16_t nbits = kJvcBits,
                  bool strict = true);
@@ -311,6 +319,11 @@ class IRrecv {
   bool decodeCarrierAC(decode_results *results, uint16_t nbits = kCarrierAcBits,
                        bool strict = true);
 #endif
+#if DECODE_GOODWEATHER
+  bool decodeGoodweather(decode_results *results,
+                         const uint16_t nbits = kGoodweatherBits,
+                         const bool strict = true);
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
   bool decodeGree(decode_results *results, uint16_t nbits = kGreeBits,
                   bool strict = true);

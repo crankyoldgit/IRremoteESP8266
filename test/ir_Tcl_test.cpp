@@ -246,7 +246,6 @@ TEST(TestTcl112AcClass, Power) {
       ac.toString());
 }
 
-
 TEST(TestTcl112AcClass, Checksum) {
   uint8_t temp16C[kTcl112AcStateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,

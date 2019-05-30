@@ -26,9 +26,11 @@
 #include <IRremoteESP8266.h>
 #include <IRutils.h>
 // The following are only needed for extended decoding of A/C Messages
+#include <ir_Argo.h>
 #include <ir_Coolix.h>
 #include <ir_Daikin.h>
 #include <ir_Fujitsu.h>
+#include <ir_Goodweather.h>
 #include <ir_Gree.h>
 #include <ir_Haier.h>
 #include <ir_Hitachi.h>
@@ -120,8 +122,15 @@ IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
 decode_results results;  // Somewhere to store the results
 
 // Display the human readable state of an A/C message if we can.
-void dumpACInfo(decode_results *results) {
+void dumpACInfo(const decode_results * const results) {
   String description = "";
+#if DECODE_ARGO
+  if (results->decode_type == ARGO) {
+    IRArgoAC ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_ARGO
 #if DECODE_DAIKIN
   if (results->decode_type == DAIKIN) {
     IRDaikinESP ac(0);
@@ -190,6 +199,13 @@ void dumpACInfo(decode_results *results) {
     description = ac.toString();
   }
 #endif  // DECODE_TROTEC
+#if DECODE_GOODWEATHER
+  if (results->decode_type == GOODWEATHER) {
+    IRGoodweatherAc ac(0);
+    ac.setRaw(results->value);  // Goodweather uses value instead of state.
+    description = ac.toString();
+  }
+#endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
   if (results->decode_type == GREE) {
     IRGreeAC ac(0);

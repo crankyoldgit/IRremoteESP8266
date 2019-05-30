@@ -14,6 +14,7 @@
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Fujitsu.h"
+#include "ir_Goodweather.h"
 #include "ir_Gree.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
@@ -106,6 +107,15 @@ void daikin216(IRDaikin216 *ac,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                const bool quiet);
 #endif  // SEND_FUJITSU_AC
+#if SEND_GOODWEATHER
+  void goodweather(IRGoodweatherAc *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const float degrees,
+                   const stdAc::fanspeed_t fan,
+                   const stdAc::swingv_t swingv,
+                   const bool turbo, const bool light,
+                   const int16_t sleep = -1);
+#endif  // SEND_GOODWEATHER
 #if SEND_GREE
   void gree(IRGreeAC *ac,
             const bool on, const stdAc::opmode_t mode, const float degrees,

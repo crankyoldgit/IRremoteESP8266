@@ -47,4 +47,6 @@ uint16_t countBits(const uint64_t data, const uint8_t length,
                    const bool ones = true, const uint16_t init = 0);
 uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 decode_type_t strToDecodeType(const char *str);
+float celsiusToFahrenheit(const float deg);
+float fahrenheitToCelsius(const float deg);
 #endif  // IRUTILS_H_

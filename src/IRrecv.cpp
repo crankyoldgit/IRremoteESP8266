@@ -523,14 +523,26 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
   if (decodeMitsubishiHeavy(results, kMitsubishiHeavy88Bits)) return true;
 #endif
+#if DECODE_ARGO
+  DPRINTLN("Attempting Argo decode");
+  if (decodeArgo(results)) return true;
+#endif  // DECODE_ARGO
 #if DECODE_SHARP_AC
   DPRINTLN("Attempting SHARP_AC decode");
   if (decodeSharpAc(results)) return true;
 #endif
+#if DECODE_GOODWEATHER
+  DPRINTLN("Attempting GOODWEATHER decode");
+  if (decodeGoodweather(results)) return true;
+#endif  // DECODE_GOODWEATHER
+#if DECODE_INAX
+  DPRINTLN("Attempting Inax decode");
+  if (decodeInax(results)) return true;
+#endif  // DECODE_INAX
 #if DECODE_TROTEC
   DPRINTLN("Attempting Trotec decode");
   if (decodeTrotec(results)) return true;
-#endif
+#endif  // DECODE_TROTEC
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
