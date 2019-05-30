@@ -299,6 +299,10 @@ class IRrecv {
                        const uint16_t nbytes = kToshibaACBits,
                        const bool strict = true);
 #endif
+#if DECODE_TROTEC
+  bool decodeTrotec(decode_results *results, const uint16_t nbits = kTrotecBits,
+                    const bool strict = true);
+#endif  // DECODE_TROTEC
 #if DECODE_MIDEA
   bool decodeMidea(decode_results *results, uint16_t nbits = kMideaBits,
                    bool strict = true);

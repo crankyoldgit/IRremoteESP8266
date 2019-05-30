@@ -44,6 +44,7 @@
 #include <ir_Tcl.h>
 #include <ir_Teco.h>
 #include <ir_Toshiba.h>
+#include <ir_Trotec.h>
 #include <ir_Vestel.h>
 #include <ir_Whirlpool.h>
 
@@ -191,6 +192,13 @@ void dumpACInfo(const decode_results * const results) {
     description = ac.toString();
   }
 #endif  // DECODE_TOSHIBA_AC
+#if DECODE_TROTEC
+  if (results->decode_type == TROTEC) {
+    IRTrotecESP ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_TROTEC
 #if DECODE_GOODWEATHER
   if (results->decode_type == GOODWEATHER) {
     IRGoodweatherAc ac(0);

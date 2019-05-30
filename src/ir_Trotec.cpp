@@ -1,16 +1,21 @@
 // Copyright 2017 stufisher
+// Copyright 2019 crankyoldgit
 
 #include "ir_Trotec.h"
 #include <algorithm>
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#else
+#include <string>
+#endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
 // Constants
 const uint16_t kTrotecHdrMark = 5952;
 const uint16_t kTrotecHdrSpace = 7364;
-const uint16_t kTrotecOneMark = 592;
+const uint16_t kTrotecBitMark = 592;
 const uint16_t kTrotecOneSpace = 1560;
-const uint16_t kTrotecZeroMark = 592;
 const uint16_t kTrotecZeroSpace = 592;
 const uint16_t kTrotecGap = 6184;
 const uint16_t kTrotecGapEnd = 1500;  // made up value
@@ -22,14 +27,14 @@ void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
   if (nbytes < kTrotecStateLength) return;
 
   for (uint16_t r = 0; r <= repeat; r++) {
-    sendGeneric(kTrotecHdrMark, kTrotecHdrSpace, kTrotecOneMark,
-                kTrotecOneSpace, kTrotecZeroMark, kTrotecZeroSpace,
-                kTrotecOneMark, kTrotecGap, data, nbytes, 36, false,
+    sendGeneric(kTrotecHdrMark, kTrotecHdrSpace, kTrotecBitMark,
+                kTrotecOneSpace, kTrotecBitMark, kTrotecZeroSpace,
+                kTrotecBitMark, kTrotecGap, data, nbytes, 36, false,
                 0,  // Repeats handled elsewhere
                 50);
     // More footer
     enableIROut(36);
-    mark(kTrotecOneMark);
+    mark(kTrotecBitMark);
     space(kTrotecGapEnd);
   }
 }
@@ -48,11 +53,18 @@ void IRTrotecESP::send(const uint16_t repeat) {
 }
 #endif  // SEND_TROTEC
 
-void IRTrotecESP::checksum(void) {
-  uint8_t sum = 0;
+uint8_t IRTrotecESP::calcChecksum(const uint8_t state[],
+                                  const uint16_t length) {
+  return sumBytes(state + 2, length - 3);
+}
 
-  for (uint8_t i = 2; i < 8; i++) sum += remote_state[i];
-  remote_state[8] = sum & 0xFF;
+bool IRTrotecESP::validChecksum(const uint8_t state[], const uint16_t length) {
+  return state[length - 1] == calcChecksum(state, length);
+}
+
+void IRTrotecESP::checksum(void) {
+  remote_state[kTrotecStateLength - 1] = sumBytes(remote_state + 2,
+                                                  kTrotecStateLength - 3);
 }
 
 void IRTrotecESP::stateReset(void) {
@@ -70,6 +82,10 @@ void IRTrotecESP::stateReset(void) {
 uint8_t* IRTrotecESP::getRaw(void) {
   this->checksum();
   return remote_state;
+}
+
+void IRTrotecESP::setRaw(const uint8_t state[]) {
+  for (uint16_t i = 0; i < kTrotecStateLength; i++) remote_state[i] = state[i];
 }
 
 void IRTrotecESP::setPower(const bool on) {
@@ -210,3 +226,115 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
   result.clock = -1;
   return result;
 }
+
+// Convert the internal state into a human readable string.
+#ifdef ARDUINO
+String IRTrotecESP::toString(void) {
+  String result = "";
+#else
+std::string IRTrotecESP::toString(void) {
+  std::string result = "";
+#endif  // ARDUINO
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result += F("Power: ");
+  result += (this->getPower() ? F("On") : F("Off"));
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
+  switch (this->getMode()) {
+    case kTrotecAuto:
+      result += F(" (AUTO)");
+      break;
+    case kTrotecCool:
+      result += F(" (COOL)");
+      break;
+    case kTrotecDry:
+      result += F(" (DRY)");
+      break;
+    case kTrotecFan:
+      result += F(" (FAN)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp());
+  result += F("C, Fan Speed: ");
+  result += uint64ToString(this->getSpeed());
+  switch (this->getSpeed()) {
+    case kTrotecFanLow:
+      result += F(" (Low)");
+      break;
+    case kTrotecFanMed:
+      result += F(" (Med)");
+      break;
+    case kTrotecFanHigh:
+      result += F(" (High)");
+      break;
+  }
+  result += F(", Sleep: ");
+  result += (this->getSleep() ? F("On") : F("Off"));
+  return result;
+}
+
+#if DECODE_TROTEC
+// Decode the supplied Trotec message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically kTrotecBits.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / Probably works. Untested on real devices.
+//
+// Ref:
+bool IRrecv::decodeTrotec(decode_results *results, const uint16_t nbits,
+                          const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + 2 * kFooter - 1)
+    return false;  // Can't possibly be a valid Samsung A/C message.
+  if (strict && nbits != kTrotecBits) return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t dataBitsSoFar = 0;
+  match_result_t data_result;
+
+  // Message Header
+  if (!matchMark(results->rawbuf[offset++], kTrotecHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kTrotecHdrSpace)) return false;
+
+  // Data
+  // Keep reading bytes until we either run out of data or state to fill.
+  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
+       i++, dataBitsSoFar += 8, offset += data_result.used) {
+    data_result = matchData(&(results->rawbuf[offset]), 8, kTrotecBitMark,
+                            kTrotecOneSpace, kTrotecBitMark,
+                            kTrotecZeroSpace, kTolerance, 0, false);
+    if (data_result.success == false) {
+      DPRINT("DEBUG: offset = ");
+      DPRINTLN(offset + data_result.used);
+      return false;  // Fail
+    }
+    results->state[i] = data_result.data;
+  }
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], kTrotecBitMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kTrotecGap)) return false;
+  if (!matchMark(results->rawbuf[offset++], kTrotecBitMark)) return false;
+  if (offset <= results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset++], kTrotecGapEnd)) return false;
+  // Compliance
+  // Re-check we got the correct size/length due to the way we read the data.
+  if (dataBitsSoFar != nbits) return false;
+  // Verify we got a valid checksum.
+  if (strict && !IRTrotecESP::validChecksum(results->state)) return false;
+  // Success
+  results->decode_type = TROTEC;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_TROTEC

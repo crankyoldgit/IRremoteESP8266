@@ -156,7 +156,7 @@
 #define DECODE_ARGO            true  // Experimental
 #define SEND_ARGO              true
 
-#define DECODE_TROTEC          false  // Not implemented.
+#define DECODE_TROTEC          true
 #define SEND_TROTEC            true
 
 #define DECODE_NIKAI           true
@@ -465,6 +465,7 @@ const uint16_t kToshibaACStateLength = 9;
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
 const uint16_t kTrotecStateLength = 9;
+const uint16_t kTrotecBits = kTrotecStateLength * 8;
 const uint16_t kTrotecDefaultRepeat = kNoRepeat;
 const uint16_t kWhirlpoolAcStateLength = 21;
 const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;

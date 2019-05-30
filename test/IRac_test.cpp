@@ -701,6 +701,9 @@ TEST(TestIRac, Toshiba) {
 TEST(TestIRac, Trotec) {
   IRTrotecESP ac(0);
   IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (COOL), Temp: 18C, Fan Speed: 3 (High), Sleep: On";
 
   ac.begin();
   irac.trotec(&ac,
@@ -714,6 +717,13 @@ TEST(TestIRac, Trotec) {
   EXPECT_EQ(18, ac.getTemp());
   EXPECT_EQ(kTrotecFanHigh, ac.getSpeed());
   EXPECT_TRUE(ac.getSleep());
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TROTEC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTrotecBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
 }
 
 TEST(TestIRac, Vestel) {
