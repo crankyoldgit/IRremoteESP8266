@@ -414,16 +414,29 @@ TimerMs statListenTime = TimerMs();  // How long we've been listening for.
 #endif  // MQTT_ENABLE
 
 bool isSerialGpioUsedByIr(void) {
-  const int8_t kSerialTxGpio = 1;  // The GPIO serial output is sent too.
-                                   // Note: *DOES NOT* control Serial output.
+  const uint8_t kSerialTxGpio = 1;  // The GPIO serial output is sent to.
+                                    // Note: *DOES NOT* control Serial output.
+#if defined(ESP32)
+  const uint8_t kSerialRxGpio = 3;  // The GPIO serial input is received on.
+#endif  // ESP32
   // Ensure we are not trodding on anything IR related.
-#if IR_RX
-  if (rx_gpio == kSerialTxGpio)
-    return true;  // Serial port is in use by IR capture. Abort.
+#ifdef IR_RX
+  switch (rx_gpio) {
+#if defined(ESP32)
+    case kSerialRxGpio:
+#endif  // ESP32
+    case kSerialTxGpio:
+      return true;  // Serial port is in use by IR capture. Abort.
+  }
 #endif  // IR_RX
   for (uint8_t i = 0; i < kNrOfIrTxGpios; i++)
-    if (txGpioTable[i] == kSerialTxGpio)
-      return true;  // Serial port is in use for IR sending. Abort.
+    switch (txGpioTable[i]) {
+#if defined(ESP32)
+      case kSerialRxGpio:
+#endif  // ESP32
+      case kSerialTxGpio:
+        return true;  // Serial port is in use for IR sending. Abort.
+    }
   return false;  // Not in use as far as we can tell.
 }
 
