@@ -102,6 +102,19 @@
  *                bit/byte size you want to send as some A/C units have units
  *                have different sized messages. e.g. Fujitsu A/C units.
  *
+ *   Sequences.
+ *     You can send a sequence of IR messages via MQTT using the above methods
+ *     if you separate them with a ';' character. In addition you can add a
+ *     pause/gap between sequenced messages by using 'P' followed immediately by
+ *     the number of milliseconds you wish to wait (up to a max of kMaxPauseMs).
+ *       e.g. 7,E0E09966;4,f50,12
+ *         Send a Samsung(7) TV Power on code, followed immediately by a Sony(4)
+ *         TV power off message.
+ *       or:  19,C1A28877;P500;19,C1A25AA5;P500;19,C1A2E21D,0,30
+ *         Turn on a Sherwood(19) Amplifier, Wait 1/2 a second, Switch the
+ *         Amplifier to Video input 2, wait 1/2 a second, then send the Sherwood
+ *         Amp the "Volume Up" message 30 times.
+ *
  *   In short:
  *     No spaces after/before commas.
  *     Values are comma separated.
@@ -2250,7 +2263,6 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
 }
 
 void receivingMQTT(String const topic_name, String const callback_str) {
-  char* tok_ptr;
   uint64_t code = 0;
   uint16_t nbits = 0;
   uint16_t repeat = 0;
@@ -2299,33 +2311,61 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   debug("MQTT Payload (raw):");
   debug(callback_c_str);
 
-  // Get the numeric protocol type.
-  int ir_type = strtoul(strtok_r(callback_c_str, ",", &tok_ptr), NULL, 10);
-  char* next = strtok_r(NULL, ",", &tok_ptr);
-  // If there is unparsed string left, try to convert it assuming it's hex.
-  if (next != NULL) {
-    code = getUInt64fromHex(next);
-    next = strtok_r(NULL, ",", &tok_ptr);
-  } else {
-    // We require at least two value in the string. Give up.
-    return;
+  // Chop up the str into command chunks.
+  // i.e. commands in a sequence are delimitered by ';'.
+  char* sequence_tok_ptr;
+  for (char* sequence_item = strtok_r(callback_c_str, kSequenceDelimiter,
+                                      &sequence_tok_ptr);
+       sequence_item != NULL;
+       sequence_item = strtok_r(NULL, kSequenceDelimiter, &sequence_tok_ptr)) {
+    // Now, process each command individually.
+    char* tok_ptr;
+    // Make a copy of the sequence_item str as strtok_r stomps on it.
+    char* ircommand = strdup(sequence_item);
+    // Check if it is a pause command.
+    switch (ircommand[0]) {
+      case kPauseChar:
+        {  // It's a pause. Everything after the 'P' should be a number.
+          int32_t msecs = std::min((int32_t) strtoul(ircommand + 1, NULL, 10),
+                                   kMaxPauseMs);
+          delay(msecs);
+          mqtt_client.publish(MqttAck.c_str(),
+                              String(kPauseChar + String(msecs)).c_str());
+          mqttSentCounter++;
+          break;
+        }
+      default:  // It's an IR command.
+        {
+          // Get the numeric protocol type.
+          int32_t ir_type = strtoul(strtok_r(ircommand, kCommandDelimiter,
+                                             &tok_ptr), NULL, 10);
+          char* next = strtok_r(NULL, kCommandDelimiter, &tok_ptr);
+          // If there is unparsed string left, try to convert it assuming it's
+          // hex.
+          if (next != NULL) {
+            code = getUInt64fromHex(next);
+            next = strtok_r(NULL, kCommandDelimiter, &tok_ptr);
+          } else {
+            // We require at least two value in the string. Give up.
+            break;
+          }
+          // If there is still string left, assume it is the bit size.
+          if (next != NULL) {
+            nbits = atoi(next);
+            next = strtok_r(NULL, kCommandDelimiter, &tok_ptr);
+          }
+          // If there is still string left, assume it is the repeat count.
+          if (next != NULL)
+            repeat = atoi(next);
+          // send received MQTT value by IR signal
+          lastSendSucceeded = sendIRCode(
+              IrSendTable[channel], ir_type, code,
+              strchr(sequence_item, kCommandDelimiter[0]), nbits, repeat);
+        }
+    }
+    free(ircommand);
   }
-  // If there is still string left, assume it is the bit size.
-  if (next != NULL) {
-    nbits = atoi(next);
-    next = strtok_r(NULL, ",", &tok_ptr);
-  }
-  // If there is still string left, assume it is the repeat count.
-  if (next != NULL)
-    repeat = atoi(next);
-
   free(callback_c_str);
-
-  // send received MQTT value by IR signal
-  lastSendSucceeded = sendIRCode(
-      IrSendTable[channel], ir_type, code,
-      callback_str.substring(callback_str.indexOf(",") + 1).c_str(),
-      nbits, repeat);
 }
 
 // Callback function, when we receive an MQTT value on the topics
@@ -2457,7 +2497,7 @@ void loop(void) {
   if (irrecv.decode(&capture) && capture.decode_type != UNKNOWN) {
 #endif  // REPORT_UNKNOWNS
     lastIrReceivedTime = millis();
-    lastIrReceived = String(capture.decode_type) + "," +
+    lastIrReceived = String(capture.decode_type) + kCommandDelimiter[0] +
         resultToHexidecimal(&capture);
 #if REPORT_RAW_UNKNOWNS
     if (capture.decode_type == UNKNOWN) {
@@ -2477,7 +2517,7 @@ void loop(void) {
 #endif  // REPORT_RAW_UNKNOWNS
     // If it isn't an AC code, add the bits.
     if (!hasACState(capture.decode_type))
-      lastIrReceived += "," + String(capture.bits);
+      lastIrReceived += kCommandDelimiter[0] + String(capture.bits);
 #if MQTT_ENABLE
     mqtt_client.publish(MqttRecv.c_str(), lastIrReceived.c_str());
     mqttSentCounter++;
@@ -2863,11 +2903,14 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 #if MQTT_ENABLE
     if (success) {
       if (ir_type == PRONTO && repeat > 0)
-        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + ",R" +
-                                              String(repeat) + "," +
+        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) +
+                                              kCommandDelimiter[0] + 'R' +
+                                              String(repeat) +
+                                              kCommandDelimiter[0] +
                                               String(code_str)).c_str());
       else
-        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + "," +
+        mqtt_client.publish(MqttAck.c_str(), (String(ir_type) +
+                                              kCommandDelimiter[0] +
                                               String(code_str)).c_str());
       mqttSentCounter++;
     }
@@ -2878,9 +2921,12 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
     debug(("Repeats: " + String(repeat)).c_str());
 #if MQTT_ENABLE
     if (success) {
-      mqtt_client.publish(MqttAck.c_str(), (String(ir_type) + "," +
-                                            uint64ToString(code, 16)
-                                            + "," + String(bits) + "," +
+      mqtt_client.publish(MqttAck.c_str(), (String(ir_type) +
+                                            kCommandDelimiter[0] +
+                                            uint64ToString(code, 16) +
+                                            kCommandDelimiter[0] +
+                                            String(bits) +
+                                            kCommandDelimiter[0] +
                                             String(repeat)).c_str());
       mqttSentCounter++;
     }
