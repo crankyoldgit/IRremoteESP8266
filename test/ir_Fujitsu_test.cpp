@@ -772,4 +772,12 @@ TEST(TestIRFujitsuACClass, toggleSwing) {
       "Model: 4 (ARJW2), Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 1 (HIGH), "
       "Swing: Vert + Horiz, Command: Toggle horizontal swing",
       ac.toString());
+
+  // Test without the update set.
+  ac.toggleSwingHoriz(false);
+  EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingHoriz, ac.getCmd());
+  ac.toggleSwingVert(false);
+  EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
+  EXPECT_EQ(kFujitsuAcCmdToggleSwingVert, ac.getCmd());
 }

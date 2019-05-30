@@ -94,9 +94,9 @@ class IRFujitsuAC {
   void begin(void);
   void off(void);
   void stepHoriz(void);
-  void toggleSwingHoriz(void);
+  void toggleSwingHoriz(const bool update = true);
   void stepVert(void);
-  void toggleSwingVert(void);
+  void toggleSwingVert(const bool update = true);
   void setCmd(const uint8_t cmd);
   uint8_t getCmd(const bool raw = false);
   void setTemp(const uint8_t temp);

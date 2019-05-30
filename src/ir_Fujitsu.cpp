@@ -264,18 +264,18 @@ void IRFujitsuAC::off(void) { this->setCmd(kFujitsuAcCmdTurnOff); }
 
 void IRFujitsuAC::stepHoriz(void) { this->setCmd(kFujitsuAcCmdStepHoriz); }
 
-void IRFujitsuAC::toggleSwingHoriz(void) {
+void IRFujitsuAC::toggleSwingHoriz(const bool update) {
   // Toggle the current setting.
-  this->setSwing(this->getSwing() ^ kFujitsuAcSwingHoriz);
+  if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingHoriz);
   // and set the appropriate special command.
   this->setCmd(kFujitsuAcCmdToggleSwingHoriz);
 }
 
 void IRFujitsuAC::stepVert(void) { this->setCmd(kFujitsuAcCmdStepVert); }
 
-void IRFujitsuAC::toggleSwingVert(void) {
+void IRFujitsuAC::toggleSwingVert(const bool update) {
   // Toggle the current setting.
-  this->setSwing(this->getSwing() ^ kFujitsuAcSwingVert);
+  if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingVert);
   // and set the appropriate special command.
   this->setCmd(kFujitsuAcCmdToggleSwingVert);
 }
