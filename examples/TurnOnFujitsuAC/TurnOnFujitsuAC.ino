@@ -30,11 +30,13 @@ void setup() {
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
-  ac.setCmd(kFujitsuAcCmdTurnOn);
+  // See `fujitsu_ac_remote_model_t` in `ir_Fujitsu.h` for a list of models.
+  ac.setModel(ARRAH2E);
   ac.setSwing(kFujitsuAcSwingOff);
   ac.setMode(kFujitsuAcModeCool);
   ac.setFanSpeed(kFujitsuAcFanHigh);
   ac.setTemp(24);  // 24C
+  ac.setCmd(kFujitsuAcCmdTurnOn);
 }
 
 void loop() {

@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2018 David Conran
+// Copyright 2018-2019 David Conran
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
 
@@ -26,11 +26,15 @@ const uint8_t kFujitsuAcModeDry = 0x02;
 const uint8_t kFujitsuAcModeFan = 0x03;
 const uint8_t kFujitsuAcModeHeat = 0x04;
 
-const uint8_t kFujitsuAcCmdStayOn = 0x00;
-const uint8_t kFujitsuAcCmdTurnOn = 0x01;
-const uint8_t kFujitsuAcCmdTurnOff = 0x02;
-const uint8_t kFujitsuAcCmdStepHoriz = 0x79;
-const uint8_t kFujitsuAcCmdStepVert = 0x6C;
+const uint8_t kFujitsuAcCmdStayOn = 0x00;            // b00000000
+const uint8_t kFujitsuAcCmdTurnOn = 0x01;            // b00000001
+const uint8_t kFujitsuAcCmdTurnOff = 0x02;           // b00000010
+const uint8_t kFujitsuAcCmdEcono = 0x09;             // b00001001
+const uint8_t kFujitsuAcCmdPowerful = 0x39;          // b00111001
+const uint8_t kFujitsuAcCmdStepVert = 0x6C;          // b01101100
+const uint8_t kFujitsuAcCmdToggleSwingVert = 0x6D;   // b01101101
+const uint8_t kFujitsuAcCmdStepHoriz = 0x79;         // b01111001
+const uint8_t kFujitsuAcCmdToggleSwingHoriz = 0x7A;  // b01111010
 
 const uint8_t kFujitsuAcFanAuto = 0x00;
 const uint8_t kFujitsuAcFanHigh = 0x01;
@@ -70,8 +74,10 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
 enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  // ARRAE1E
-  ARDB1,
+  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAE1E (Default)
+  ARDB1,        // (2) AR-DB1
+  ARREB1E,      // (3) AR-REB1E
+  ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
 };
 
 class IRFujitsuAC {
@@ -88,9 +94,11 @@ class IRFujitsuAC {
   void begin(void);
   void off(void);
   void stepHoriz(void);
+  void toggleSwingHoriz(const bool update = true);
   void stepVert(void);
+  void toggleSwingVert(const bool update = true);
   void setCmd(const uint8_t cmd);
-  uint8_t getCmd(void);
+  uint8_t getCmd(const bool raw = false);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFanSpeed(const uint8_t fan);
@@ -98,12 +106,16 @@ class IRFujitsuAC {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setSwing(const uint8_t mode);
-  uint8_t getSwing(void);
+  uint8_t getSwing(const bool raw = false);
   uint8_t* getRaw(void);
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength(void);
   static bool validChecksum(uint8_t* state, const uint16_t length);
   bool getPower(void);
+  void setOutsideQuiet(const bool on);
+
+  bool getOutsideQuiet(const bool raw = false);
+
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -130,6 +142,7 @@ class IRFujitsuAC {
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
+  bool _outsideQuiet;
   void buildState(void);
   void buildFromState(const uint16_t length);
 };
