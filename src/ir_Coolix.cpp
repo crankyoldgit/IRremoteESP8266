@@ -1,5 +1,5 @@
 // Copyright bakrus
-// Copyright 2017 David Conran
+// Copyright 2017,2019 David Conran
 
 #include "ir_Coolix.h"
 #include <algorithm>
@@ -20,6 +20,7 @@
 //
 // Supports:
 //   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
+//   MSABAU-07HRFN1-QRD0GW Midea aircon unit (circa 2016)
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/484
 
