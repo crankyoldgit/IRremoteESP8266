@@ -768,3 +768,31 @@ TEST(TestIRFujitsuACClass, toggleSwing) {
   EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
   EXPECT_EQ(kFujitsuAcCmdToggleSwingVert, ac.getCmd());
 }
+
+TEST(TestDecodeFujitsuAC, Issue726) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  IRFujitsuAC ac(0);
+
+  // fan:auto mode:auto temp:24 power：on
+  // Capture as supplied by huexpub
+  // Rawdata was very messy. Had to use `./auto_analyse_raw_data.py -r 250` to
+  // get it to parse due to timings being above tolerances.
+  uint8_t auto_auto_on_24[kFujitsuAcStateLength] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30,
+      0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x2F};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendFujitsuAC(auto_auto_on_24, 16);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAcStateLength * 8, irsend.capture.bits);
+  EXPECT_STATE_EQ(auto_auto_on_24, irsend.capture.state, irsend.capture.bits);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.getModel());
+  EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
+  EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 0 (AUTO), Temp: 24C, "
+            "Fan: 0 (AUTO), Swing: Off, Command: N/A",
+            ac.toString());
+}
