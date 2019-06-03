@@ -22,13 +22,20 @@
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
-// GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
-#define IR_LED 4  // <=- CHANGE_ME (optional)
-// define IR_LED 3  // For an ESP-01 we suggest you use RX/GPIO3/Pin 7.
+// Change if you need multiple independent send gpios & topics. (MQTT only)
+const uint8_t kNrOfIrTxGpios = 1;
+// Default GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
+// For an ESP-01 we suggest you use RX/GPIO3/Pin 7. i.e. kDefaultIrLed = 3
+// Note: A value of -1 means unused.
+const int8_t kDefaultIrLed = 4;  // <=- CHANGE_ME (optional)
+// Default GPIO the IR demodulator is connected to/controlled by. GPIO 14 = D5.
+const int8_t kDefaultIrRx = 14;  // <=- CHANGE_ME (optional)
 
-// GPIO the IR RX module is connected to/controlled by. e.g. GPIO 14 = D5.
-// Comment this out to disable receiving/decoding IR messages entirely.
-#define IR_RX 14  // <=- CHANGE_ME (optional)
+// Enable/disable receiving/decoding IR messages entirely.
+// Note: IR_RX costs about 40k+ of program memory.
+#define IR_RX true
+
+// Should we use PULLUP on the IR Rx gpio?
 #define IR_RX_PULLUP false
 
 // --------------------- Network Related Settings ------------------------------
@@ -49,6 +56,8 @@ const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
                                    // before we will connect.
                                    // The unset default is 8%.
                                    // (Uncomment to enable)
+// Do you want/need mdns enabled? (https://en.wikipedia.org/wiki/Multicast_DNS)
+#define MDNS_ENABLE true  // `false` to disable and save ~21k of program space.
 
 // ----------------------- HTTP Related Settings -------------------------------
 #define FIRMWARE_OTA true  // Allow remote update of the firmware via http.
@@ -56,8 +65,9 @@ const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
                            // Note: Firmware OTA is also disabled until
                            //       a password is set.
 #define HTML_PASSWORD_ENABLE false  // Protect access to the HTML interface.
-                                    // Note: OTA update is always passworded.
-// If you do not set a password, Firmware OTA updates will be blocked.
+                                    // Note: OTA & GPIO updates are always
+                                    //       passworded.
+// If you do not set a password, Firmware OTA & GPIO updates will be blocked.
 
 // ----------------------- MQTT Related Settings -------------------------------
 #if MQTT_ENABLE
@@ -121,15 +131,6 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define REPLAY_DECODED_AC_MESSAGE false
 
 // ------------------------ Advanced Usage Only --------------------------------
-// Change if you need multiple independent send gpio/topics.
-const uint8_t gpioTable[] = {
-  IR_LED,  // Default GPIO. e.g. ir_server/send or ir_server/send_0
-  // Uncomment the following as needed.
-  // NOTE: Remember to disable DEBUG if you are using one of the serial pins.
-  // 5,  // GPIO 5 / D1 e.g. ir_server/send_1
-  // 14,  // GPIO 14 / D5 e.g. ir_server/send_2
-  // 16,  // GPIO 16 / D0 e.g. ir_server/send_3
-};
 
 #define KEY_PROTOCOL "protocol"
 #define KEY_MODEL "model"
@@ -145,7 +146,6 @@ const uint8_t gpioTable[] = {
 #define KEY_BEEP "beep"
 #define KEY_ECONO "econo"
 #define KEY_SLEEP "sleep"
-#define KEY_CLOCK "clock"
 #define KEY_FILTER "filter"
 #define KEY_CLEAN "clean"
 #define KEY_CELSIUS "use_celsius"
@@ -155,6 +155,10 @@ const uint8_t gpioTable[] = {
 #define KEY_CODE "code"
 #define KEY_BITS "bits"
 #define KEY_REPEAT "repeats"
+
+// GPIO html/config keys
+#define KEY_TX_GPIO "tx"
+#define KEY_RX_GPIO "rx"
 
 // Text for Last Will & Testament status messages.
 const char* kLwtOnline = "Online";
@@ -166,24 +170,36 @@ const uint8_t kUsernameLength = 15;
 const uint8_t kPasswordLength = 20;
 
 // -------------------------- Debug Settings -----------------------------------
-// Disable debug output if any of the IR pins are on the TX (D1) pin.
-// Note: This is a crude method to catch the common use cases.
-// See `isSerialGpioUsedByIr()` for the better method.
-#if (IR_LED != 1 && IR_RX != 1)
+// Debug output is disabled if any of the IR pins are on the TX (D1) pin.
+// See `isSerialGpioUsedByIr()`.
+// Note: Debug costs ~6k of program space.
 #ifndef DEBUG
-#define DEBUG true  // Change to 'false' to disable all serial output.
+#define DEBUG false  // Change to 'true' for serial debug output.
 #endif  // DEBUG
-#else  // (IR_LED != 1 && IR_RX != 1)
-#undef DEBUG
-#define DEBUG false
-#endif
 
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.1.1"
+#define _MY_VERSION_ "v1.2.0-alpha"
 
-const uint8_t kSendTableSize = sizeof(gpioTable);
+const uint8_t kRebootTime = 15;  // Seconds
+const uint8_t kQuickDisplayTime = 2;  // Seconds
+
+// Gpio related
+const int8_t kGpioUnused = -1;
+#if defined(ESP8266)
+const int8_t kTxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
+const int8_t kRxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
+#endif  // ESP8266
+#if defined(ESP32)
+const int8_t kTxGpios[] = {
+    -1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31, 32, 33};
+const int8_t kRxGpios[] = {
+    -1, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+#endif  // ESP32
+
 // JSON stuff
 // Name of the json config file in SPIFFS.
 const char* kConfigFile = "/config.json";
@@ -196,6 +212,18 @@ const char* kHostnameKey = "hostname";
 const char* kHttpUserKey = "http_user";
 const char* kHttpPassKey = "http_pass";
 
+// URLs
+const char* kUrlRoot = "/";
+const char* kUrlAdmin = "/admin";
+const char* kUrlAircon = "/aircon";
+const char* kUrlSendDiscovery = "/send_discovery";
+const char* kUrlExamples = "/examples";
+const char* kUrlGpio = "/gpio";
+const char* kUrlGpioSet = "/gpio/set";
+const char* kUrlInfo = "/info";
+const char* kUrlReboot = "/quitquitquit";
+const char* kUrlWipe = "/reset";
+
 #if MQTT_ENABLE
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
 const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
@@ -203,6 +231,12 @@ const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
 const char * kSequenceDelimiter = ";";
 const char * kCommandDelimiter = ",";
 const char kPauseChar = 'P';
+
+const char* kClimateTopics =
+    "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
+    KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
+    KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
+    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS ")<br>";
 
 void mqttCallback(char* topic, byte* payload, unsigned int length);
 String listOfCommandTopics(void);
@@ -226,8 +260,16 @@ void loadWifiConfigFile(void);
 String msToHumanString(uint32_t const msecs);
 String timeElapsed(uint32_t const msec);
 String timeSince(uint32_t const start);
-String listOfSendGpios(void);
+String gpioToString(const int16_t gpio);
+uint8_t getDefaultIrSendIdx(void);
+IRsend* getDefaultIrSendPtr(void);
+int8_t getDefaultTxGpio(void);
+String listOfTxGpios(void);
 bool hasUnsafeHTMLChars(String input);
+String htmlHeader(const String title, const String h1_text = "");
+String htmlEnd(void);
+String htmlButton(const String url, const String button,
+                  const String text = "");
 String htmlMenu(void);
 void handleRoot(void);
 String addJsReloadUrl(const String url, const uint16_t timeout_s,
