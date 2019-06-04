@@ -731,6 +731,31 @@ std::string resultToHumanReadableBasic(const decode_results *const results) {
   return output;
 }
 
+// Convert a decode_results into an array suitable for `sendRaw()`.
+// Args:
+//   decode:  A pointer to an IR decode_results structure that contains a mesg.
+// Returns:
+//   A pointer to a dynamically allocated uint16_t sendRaw compatible array.
+// Note:
+//   Result needs to be delete[]'ed/free()'ed (deallocated) after use by caller.
+uint16_t * resultToRawArray(const decode_results * const decode) {
+  uint16_t *result = new uint16_t[getCorrectedRawLength(decode)];
+  if (result != NULL) {  // The memory was allocated successfully.
+    // Convert the decode data.
+    uint16_t pos = 0;
+    for (uint16_t i = 1; i < decode->rawlen; i++) {
+      uint32_t usecs = decode->rawbuf[i] * kRawTick;
+      while (usecs > UINT16_MAX) {  // Keep truncating till it fits.
+        result[pos++] = UINT16_MAX;
+        result[pos++] = 0;  // A 0 in a sendRaw() array basically means skip.
+        usecs -= UINT16_MAX;
+      }
+      result[pos++] = usecs;
+    }
+  }
+  return result;
+}
+
 uint8_t sumBytes(const uint8_t * const start, const uint16_t length,
                  const uint8_t init) {
   uint8_t checksum = init;
