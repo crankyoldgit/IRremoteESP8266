@@ -1273,6 +1273,7 @@ void handleInfo(void) {
 #if defined(ESP32)
     "ESP32 SDK Version: " + ESP.getSdkVersion() + "<br>"
 #endif  // ESP32
+    "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
