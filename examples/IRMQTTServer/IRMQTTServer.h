@@ -181,7 +181,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.1.0-beta"
+#define _MY_VERSION_ "v1.1.1-beta"
 
 const uint8_t kSendTableSize = sizeof(gpioTable);
 // JSON stuff
@@ -199,6 +199,10 @@ const char* kHttpPassKey = "http_pass";
 #if MQTT_ENABLE
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
 const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
+const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
+const char * kSequenceDelimiter = ";";
+const char * kCommandDelimiter = ",";
+const char kPauseChar = 'P';
 
 void mqttCallback(char* topic, byte* payload, unsigned int length);
 String listOfCommandTopics(void);
