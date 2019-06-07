@@ -233,6 +233,7 @@ class IRDaikinESP {
 
 #if SEND_DAIKIN
   void send(const uint16_t repeat = kDaikinDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif
   void begin(void);
   void on(void);
@@ -312,6 +313,7 @@ class IRDaikin2 {
 
 #if SEND_DAIKIN2
   void send(const uint16_t repeat = kDaikin2DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif
   void begin();
   void on();
@@ -409,6 +411,7 @@ class IRDaikin216 {
 
 #if SEND_DAIKIN216
   void send(const uint16_t repeat = kDaikin216DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif
   void begin();
   uint8_t* getRaw();

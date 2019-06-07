@@ -90,6 +90,7 @@ class IRGreeAC {
   void stateReset(void);
 #if SEND_GREE
   void send(const uint16_t repeat = kGreeDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GREE
   void begin(void);
   void on(void);

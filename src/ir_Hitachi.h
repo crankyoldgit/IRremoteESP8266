@@ -39,6 +39,7 @@ class IRHitachiAc {
   void stateReset(void);
 #if SEND_HITACHI_AC
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC
   void begin(void);
   void on(void);
