@@ -459,14 +459,14 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 void IRSamsungAc::on(void) {
-  remote_state[1] &= ~kSamsungAcPowerMask1;
-  remote_state[6] |= kSamsungAcPowerMask2;
+  remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
+  remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
   _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
 void IRSamsungAc::off(void) {
-  remote_state[1] |= kSamsungAcPowerMask1;
-  remote_state[6] &= ~kSamsungAcPowerMask2;
+  remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
+  remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
   _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
@@ -478,8 +478,8 @@ void IRSamsungAc::setPower(const bool on) {
 }
 
 bool IRSamsungAc::getPower(void) {
-  return ((remote_state[6] & kSamsungAcPowerMask2) != 0) &&
-         ((remote_state[1] & kSamsungAcPowerMask1) == 0);
+  return (remote_state[6] & kSamsungAcPowerMask6) &&
+         !(remote_state[1] & kSamsungAcPowerMask1);
 }
 
 // Set the temp. in deg C
@@ -579,19 +579,20 @@ void IRSamsungAc::setClean(const bool on) {
   }
 }
 
-// Very unsure this is correct.
 bool IRSamsungAc::getQuiet(void) {
-  return remote_state[11] & kSamsungAcQuietMask11;
+  return !(remote_state[1] & kSamsungAcQuietMask1) &&
+         (remote_state[5] & kSamsungAcQuietMask5);
 }
 
-// Very unsure this is correct.
 void IRSamsungAc::setQuiet(const bool on) {
   if (on) {
-    remote_state[11] |= kSamsungAcQuietMask11;
+    remote_state[1] &= ~kSamsungAcQuietMask1;  // Bit needs to be cleared.
+    remote_state[5] |= kSamsungAcQuietMask5;  // Bit needs to be set.
     // Quiet mode seems to set fan speed to auto.
     this->setFan(kSamsungAcFanAuto);
   } else {
-    remote_state[11] &= ~kSamsungAcQuietMask11;
+    remote_state[1] |= kSamsungAcQuietMask1;  // Bit needs to be set.
+    remote_state[5] &= ~kSamsungAcQuietMask5;  // Bit needs to be cleared.
   }
 }
 

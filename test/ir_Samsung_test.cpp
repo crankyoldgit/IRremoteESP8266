@@ -500,15 +500,29 @@ TEST(TestIRSamsungAcClass, SetAndGetFan) {
 }
 
 TEST(TestIRSamsungAcClass, SetAndGetQuiet) {
-  IRSamsungAc samsung(0);
-  samsung.setQuiet(false);
-  EXPECT_FALSE(samsung.getQuiet());
-  samsung.setFan(kSamsungAcFanHigh);
-  samsung.setQuiet(true);
-  EXPECT_TRUE(samsung.getQuiet());
-  EXPECT_EQ(kSamsungAcFanAuto, samsung.getFan());
-  samsung.setQuiet(false);
-  EXPECT_FALSE(samsung.getQuiet());
+  IRSamsungAc ac(0);
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setFan(kSamsungAcFanHigh);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+
+  // Actual quiet on & off states from:
+  // https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500071419
+  uint8_t on[14] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x20, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+  ac.setRaw(on, 14);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  uint8_t off[14] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+  ac.setRaw(off, 14);
+  EXPECT_FALSE(ac.getQuiet());
 }
 
 TEST(TestIRSamsungAcClass, ChecksumCalculation) {
@@ -1245,4 +1259,50 @@ TEST(TestIRSamsungAcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().filter);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // QUIET MODE ON data from:
+  //  https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-499791618
+  uint16_t quietOn[233] = {
+      624, 17360, 3076, 8902, 520, 476, 520, 1472, 520, 476, 520, 474, 520, 476,
+      520, 476, 520, 474, 522, 476, 520, 478, 518, 1476, 516, 500, 494, 502,
+      548, 448, 546, 450, 544, 452, 522, 1468, 520, 1474, 520, 1472, 520, 1472,
+      520, 1472, 520, 476, 520, 476, 518, 478, 516, 480, 516, 500, 496, 500,
+      494, 502, 550, 446, 546, 450, 544, 452, 524, 472, 522, 474, 518, 476, 520,
+      476, 520, 474, 522, 474, 520, 474, 520, 476, 520, 474, 520, 476, 518, 478,
+      518, 480, 516, 480, 516, 502, 494, 502, 548, 1444, 524, 472, 522, 472,
+      520, 474, 518, 478, 518, 476, 520, 476, 520, 1472, 520, 1470, 520, 1472,
+      520, 1474, 516, 2980, 2998, 8980, 498, 1498, 548, 448, 526, 470, 544, 452,
+      524, 472, 520, 474, 520, 476, 520, 476, 520, 476, 520, 1472, 520, 474,
+      520, 476, 520, 1474, 518, 1476, 516, 1496, 496, 1498, 548, 446, 546, 1446,
+      524, 1468, 518, 1474, 520, 1472, 520, 1472, 520, 1472, 520, 1474, 518,
+      1476, 518, 480, 516, 500, 496, 528, 520, 1446, 544, 1446, 524, 1470, 518,
+      476, 520, 476, 520, 474, 520, 476, 520, 474, 520, 476, 520, 474, 520, 476,
+      520, 476, 518, 1476, 516, 482, 514, 502, 548, 448, 548, 1442, 544, 452,
+      522, 474, 518, 476, 518, 476, 520, 476, 520, 474, 520, 476, 520, 1472,
+      520, 1470, 522, 1474, 518, 1476, 536};
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x20, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+
+  irsend.sendRaw(quietOn, 233, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc samsung(0);
+  samsung.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: On",
+      samsung.toString());
 }
