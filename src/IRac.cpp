@@ -266,34 +266,45 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                    const bool quiet, const bool turbo, const bool econo) {
   ac->setModel(model);
-  ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees);
-  ac->setFanSpeed(ac->convertFan(fan));
-  uint8_t swing = kFujitsuAcSwingOff;
-  if (swingv > stdAc::swingv_t::kOff) swing |= kFujitsuAcSwingVert;
-  if (swingh > stdAc::swingh_t::kOff) swing |= kFujitsuAcSwingHoriz;
-  ac->setSwing(swing);
-  if (quiet) ac->setFanSpeed(kFujitsuAcFanQuiet);
-  if (ac->getModel() == fujitsu_ac_remote_model_t::ARREB1E) {
-    // Some functions are only available on some models.
-    if (turbo) {
-      ac->setCmd(kFujitsuAcCmdPowerful);
-      // Powerful is a separate command.
-      ac->send();
+  if (on) {
+    // Do all special messages (except "Off") first,
+    // These need to be sent separately.
+    switch (ac->getModel()) {
+      // Some functions are only available on some models.
+      case fujitsu_ac_remote_model_t::ARREB1E:
+        if (turbo) {
+          ac->setCmd(kFujitsuAcCmdPowerful);
+          // Powerful is a separate command.
+          ac->send();
+        }
+        if (econo) {
+          ac->setCmd(kFujitsuAcCmdEcono);
+          // Econo is a separate command.
+          ac->send();
+        }
+        break;
+      default:
+        {};
     }
-    if (econo) {
-      ac->setCmd(kFujitsuAcCmdEcono);
-      // Econo is a separate command.
-      ac->send();
-    }
+    // Normal operation.
+    ac->setMode(ac->convertMode(mode));
+    ac->setTemp(degrees);
+    ac->setFanSpeed(ac->convertFan(fan));
+    uint8_t swing = kFujitsuAcSwingOff;
+    if (swingv > stdAc::swingv_t::kOff) swing |= kFujitsuAcSwingVert;
+    if (swingh > stdAc::swingh_t::kOff) swing |= kFujitsuAcSwingHoriz;
+    ac->setSwing(swing);
+    if (quiet) ac->setFanSpeed(kFujitsuAcFanQuiet);
+    // No Light setting available.
+    // No Filter setting available.
+    // No Clean setting available.
+    // No Beep setting available.
+    // No Sleep setting available.
+    // No Clock setting available.
+  } else {
+    // Off is special case/message. We don't need to send other messages.
+    ac->off();
   }
-  // No Light setting available.
-  // No Filter setting available.
-  // No Clean setting available.
-  // No Beep setting available.
-  // No Sleep setting available.
-  // No Clock setting available.
-  if (!on) ac->off();
   ac->send();
 }
 #endif  // SEND_FUJITSU_AC

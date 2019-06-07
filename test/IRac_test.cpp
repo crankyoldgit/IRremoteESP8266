@@ -173,8 +173,11 @@ TEST(TestIRac, Fujitsu) {
   IRFujitsuAC ac(0);
   IRac irac(0);
   IRrecv capture(0);
-  std::string expected =
-      "Power: On, Mode: 1 (COOL), Temp: 19C, Fan: 2 (MED), "
+  std::string ardb1_expected =
+      "Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 19C, Fan: 2 (MED), "
+      "Command: N/A";
+  std::string arrah2e_expected =
+      "Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 19C, Fan: 2 (MED), "
       "Swing: Off, Command: N/A";
 
   ac.begin();
@@ -189,13 +192,13 @@ TEST(TestIRac, Fujitsu) {
                false,                       // Quiet
                false,                       // Turbo (Powerful)
                false);                      // Econo
-  ASSERT_EQ("Model: 2 (ARDB1), " + expected, ac.toString());
+  ASSERT_EQ(ardb1_expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcBits - 8, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
-  ASSERT_EQ("Model: 2 (ARDB1), " + expected, ac.toString());
+  ASSERT_EQ(ardb1_expected, ac.toString());
 
   ac._irsend.reset();
   irac.fujitsu(&ac,
@@ -209,13 +212,13 @@ TEST(TestIRac, Fujitsu) {
                false,                       // Quiet
                false,                       // Turbo (Powerful)
                false);                      // Econo
-  ASSERT_EQ("Model: 1 (ARRAH2E), " + expected, ac.toString());
+  ASSERT_EQ(arrah2e_expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
-  ASSERT_EQ("Model: 1 (ARRAH2E), " + expected, ac.toString());
+  ASSERT_EQ(arrah2e_expected, ac.toString());
 }
 
 TEST(TestIRac, Goodweather) {

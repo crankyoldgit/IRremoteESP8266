@@ -139,16 +139,11 @@ void IRFujitsuAC::buildState(void) {
     remote_state[7] = 0x30;
     remote_state[8] = (_cmd == kFujitsuAcCmdTurnOn) | (tempByte << 4);
     remote_state[9] = _mode | 0 << 4;  // timer off
-    remote_state[10] = _fanSpeed | _swingMode << 4;
+    remote_state[10] = _fanSpeed;
     remote_state[11] = 0;  // timerOff values
     remote_state[12] = 0;  // timerOff/On values
     remote_state[13] = 0;  // timerOn values
-    if (_model == ARRAH2E || _model == ARREB1E) {
-      remote_state[14] = 0x20;
-      if (_model == ARREB1E) remote_state[14] |= (_outsideQuiet << 7);
-    } else {
-      remote_state[14] = 0x00;
-    }
+    remote_state[14] = 0;
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
     switch (_model) {
@@ -157,8 +152,13 @@ void IRFujitsuAC::buildState(void) {
         checksum = sumBytes(remote_state, _state_length - 1);
         checksum_complement = 0x9B;
         break;
-      case ARRAH2E:
       case ARREB1E:
+        remote_state[14] |= (_outsideQuiet << 7);
+        // FALL THRU
+      case ARRAH2E:
+        remote_state[14] |= 0x20;
+        remote_state[10] |= _swingMode << 4;
+        // FALL THRU
       default:
         checksum = sumBytes(remote_state + _state_length_short,
                             _state_length - _state_length_short - 1);
@@ -496,10 +496,21 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFanSpeed());
   uint8_t swing = this->getSwing();
-  result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto :
-                                                  stdAc::swingv_t::kOff;
-  result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto :
-                                                   stdAc::swingh_t::kOff;
+  switch (result.model) {
+    case fujitsu_ac_remote_model_t::ARREB1E:
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+      result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto :
+                                                      stdAc::swingv_t::kOff;
+      result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto :
+                                                       stdAc::swingh_t::kOff;
+      break;
+    case fujitsu_ac_remote_model_t::ARDB1:
+    case fujitsu_ac_remote_model_t::ARJW2:
+    default:
+      result.swingv = stdAc::swingv_t::kOff;
+      result.swingh = stdAc::swingh_t::kOff;
+  }
+
   result.quiet = (this->getFanSpeed() == kFujitsuAcFanQuiet);
   result.turbo = this->getCmd() == kFujitsuAcCmdPowerful;
   result.econo = this->getCmd() == kFujitsuAcCmdEcono;
@@ -523,8 +534,9 @@ std::string IRFujitsuAC::toString(void) {
 #endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Model: ");
-  result += uint64ToString(this->getModel());
-  switch (this->getModel()) {
+  fujitsu_ac_remote_model_t model = this->getModel();
+  result += uint64ToString(model);
+  switch (model) {
     case fujitsu_ac_remote_model_t::ARRAH2E: result += F(" (ARRAH2E)"); break;
     case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
     case fujitsu_ac_remote_model_t::ARREB1E: result += F(" (ARREB1E)"); break;
@@ -575,22 +587,29 @@ std::string IRFujitsuAC::toString(void) {
       result += F(" (QUIET)");
       break;
   }
-  result += F(", Swing: ");
-  switch (this->getSwing()) {
-    case kFujitsuAcSwingOff:
-      result += F("Off");
+  switch (model) {
+    // These models have no internal swing state.
+    case fujitsu_ac_remote_model_t::ARDB1:
+    case fujitsu_ac_remote_model_t::ARJW2:
       break;
-    case kFujitsuAcSwingVert:
-      result += F("Vert");
-      break;
-    case kFujitsuAcSwingHoriz:
-      result += F("Horiz");
-      break;
-    case kFujitsuAcSwingBoth:
-      result += F("Vert + Horiz");
-      break;
-    default:
-      result += F("UNKNOWN");
+    default:  // Assume everything else does.
+      result += F(", Swing: ");
+      switch (this->getSwing()) {
+        case kFujitsuAcSwingOff:
+          result += F("Off");
+          break;
+        case kFujitsuAcSwingVert:
+          result += F("Vert");
+          break;
+        case kFujitsuAcSwingHoriz:
+          result += F("Horiz");
+          break;
+        case kFujitsuAcSwingBoth:
+          result += F("Vert + Horiz");
+          break;
+        default:
+          result += F("UNKNOWN");
+      }
   }
   result += F(", Command: ");
   switch (this->getCmd()) {
