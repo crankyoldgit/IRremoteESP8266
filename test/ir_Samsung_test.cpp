@@ -1299,10 +1299,35 @@ TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
   EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
-  IRSamsungAc samsung(0);
-  samsung.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  IRSamsungAc ac(0);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
       "Beep: Off, Clean: Off, Quiet: On",
-      samsung.toString());
+      ac.toString());
+
+  // Make sure the ac class state is in something wildly different first.
+  ac.stateReset();
+  ac.setPower(false);
+  ac.setMode(kSamsungAcAuto);
+  ac.setTemp(30);
+  ac.setSwing(true);
+  ac.setBeep(true);
+  ac.setClean(true);
+  ac.setQuiet(false);
+  // See if we can build the state from scratch.
+  ac.setPower(true);
+  ac.setMode(kSamsungAcCool);
+  ac.setTemp(16);
+  ac.setSwing(false);
+  ac.setBeep(false);
+  ac.setClean(false);
+  ac.setQuiet(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: On",
+      ac.toString());
+  // Check it matches the known good/expected state.
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kSamsungAcBits);
+
 }
