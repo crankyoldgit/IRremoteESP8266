@@ -268,8 +268,8 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
 //
 // Status: BETA / Appears to be working.
 //
-void IRsend::sendMitsubishiAC(unsigned char data[], uint16_t nbytes,
-                              uint16_t repeat) {
+void IRsend::sendMitsubishiAC(const unsigned char data[], const uint16_t nbytes,
+                              const uint16_t repeat) {
   if (nbytes < kMitsubishiACStateLength)
     return;  // Not enough bytes to send a proper message.
 
