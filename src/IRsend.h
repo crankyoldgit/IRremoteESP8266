@@ -21,8 +21,14 @@
 // Constants
 // Offset (in microseconds) to use in Period time calculations to account for
 // code excution time in producing the software PWM signal.
-// Value was calculated on Wemos D1 mini using v2.4.1 with v2.4.0 ESP core
+#if (F_CPU == 160000000L)
+// Calculated on an ESP8266 NodeMCU v2 board using:
+// v2.6.0 with v2.5.2 ESP core @ 160MHz
+const int8_t kPeriodOffset = -2;
+#else  // (F_CPU == 160000000L)
+// Calculated on ESP8266 Wemos D1 mini using v2.4.1 with v2.4.0 ESP core @ 40MHz
 const int8_t kPeriodOffset = -5;
+#endif  // (F_CPU == 160000000L)
 const uint8_t kDutyDefault = 50;  // Percentage
 const uint8_t kDutyMax = 100;     // Percentage
 // delayMicroseconds() is only accurate to 16383us.
