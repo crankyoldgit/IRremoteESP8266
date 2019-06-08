@@ -113,6 +113,7 @@ class IRArgoAC {
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_ARGO
   void begin(void);
   void on(void);

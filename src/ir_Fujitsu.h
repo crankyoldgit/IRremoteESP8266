@@ -90,6 +90,7 @@ class IRFujitsuAC {
   void stateReset(void);
 #if SEND_FUJITSU_AC
   void send(const uint16_t repeat = kFujitsuAcMinRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_FUJITSU_AC
   void begin(void);
   void off(void);

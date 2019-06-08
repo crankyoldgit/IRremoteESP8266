@@ -52,6 +52,7 @@ class IRToshibaAC {
   void stateReset(void);
 #if SEND_TOSHIBA_AC
   void send(const uint16_t repeat = kToshibaACMinRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TOSHIBA_AC
   void begin(void);
   void on(void);
