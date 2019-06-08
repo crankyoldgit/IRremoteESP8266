@@ -1329,5 +1329,4 @@ TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
       ac.toString());
   // Check it matches the known good/expected state.
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kSamsungAcBits);
-
 }
