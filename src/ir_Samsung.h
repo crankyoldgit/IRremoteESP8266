@@ -24,6 +24,9 @@
 //                 S  A   A  M   M      S  U   U  N  NN  G   G
 //             SSSS   A   A  M   M  SSSS    UUU   N   N   GGG
 
+// Supported Samsung A/C models/remotes:
+// * Samsung AR12KSFPEWQNET
+
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
 

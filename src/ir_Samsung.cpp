@@ -298,7 +298,7 @@ bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
 //   nbytes: Nr. of bytes of data in the array. (>=kSamsungAcStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: Stable / Known working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
@@ -770,7 +770,7 @@ std::string IRSamsungAc::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Appears to mostly work.
+// Status: Stable / Known to be working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
