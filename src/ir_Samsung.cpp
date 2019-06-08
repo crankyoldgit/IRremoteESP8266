@@ -596,6 +596,26 @@ void IRSamsungAc::setQuiet(const bool on) {
   }
 }
 
+bool IRSamsungAc::getPowerful(void) {
+  return !(remote_state[8] & kSamsungAcPowerfulMask8) &&
+         (remote_state[10] & kSamsungAcPowerfulMask10) &&
+         this->getFan() == kSamsungAcFanTurbo;
+}
+
+void IRSamsungAc::setPowerful(const bool on) {
+  if (on) {
+    remote_state[8] &= ~kSamsungAcPowerfulMask8;  // Bit needs to be cleared.
+    remote_state[10] |= kSamsungAcPowerfulMask10;  // Bit needs to be set.
+    // Powerful mode sets fan speed to Turbo.
+    this->setFan(kSamsungAcFanTurbo);
+  } else {
+    remote_state[8] |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
+    remote_state[10] &= ~kSamsungAcPowerfulMask10;  // Bit needs to be cleared.
+    // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
+    if (this->getFan() == kSamsungAcFanTurbo) this->setFan(kSamsungAcFanAuto);
+  }
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -664,7 +684,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
   result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
                                      stdAc::swingv_t::kOff;
   result.quiet = this->getQuiet();
-  result.turbo = this->getFan() == kSamsungAcFanTurbo;
+  result.turbo = this->getPowerful();
   result.clean = this->getClean();
   result.beep = this->getBeep();
   // Not supported.
@@ -754,6 +774,11 @@ std::string IRSamsungAc::toString(void) {
     result += F("Off");
   result += F(", Quiet: ");
   if (getQuiet())
+    result += F("On");
+  else
+    result += F("Off");
+  result += F(", Powerful: ");
+  if (getPowerful())
     result += F("On");
   else
     result += F("Off");

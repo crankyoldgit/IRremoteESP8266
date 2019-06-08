@@ -603,7 +603,7 @@ void IRac::samsung(IRSamsungAc *ac,
   ac->setSwing(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
   ac->setQuiet(quiet);
-  if (turbo) ac->setFan(kSamsungAcFanTurbo);
+  ac->setPowerful(turbo);
   // No Light setting available.
   // No Econo setting available.
   // No Filter setting available.
