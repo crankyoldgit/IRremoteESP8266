@@ -1,5 +1,5 @@
 // Copyright bakrus
-// Copyright 2017 David Conran
+// Copyright 2017,2019 David Conran
 
 #include "ir_Coolix.h"
 #include <algorithm>
@@ -20,6 +20,7 @@
 //
 // Supports:
 //   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
+//   MSABAU-07HRFN1-QRD0GW Midea aircon unit (circa 2016)
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/484
 
@@ -200,6 +201,14 @@ void IRCoolixAC::setPower(const bool power) {
   }
 }
 
+void IRCoolixAC::on(void) {
+  this->setPower(true);
+}
+
+void IRCoolixAC::off(void) {
+  this->setPower(false);
+}
+
 bool IRCoolixAC::getSwing() { return remote_state == kCoolixSwing; }
 
 void IRCoolixAC::setSwing() {
@@ -260,18 +269,30 @@ void IRCoolixAC::clearSensorTemp() {
 
 void IRCoolixAC::setMode(const uint8_t mode) {
   uint32_t actualmode = mode;
+  switch (actualmode) {
+    case kCoolixAuto:
+    case kCoolixDry:
+      if (this->getFan() == kCoolixFanAuto)
+        //  No kCoolixFanAuto in Dry/Auto mode.
+        this->setFan(kCoolixFanAuto0, false);
+      break;
+    case kCoolixCool:
+    case kCoolixHeat:
+    case kCoolixFan:
+      if (this->getFan() == kCoolixFanAuto0)
+        // kCoolixFanAuto0 only in Dry/Auto mode.
+        this->setFan(kCoolixFanAuto, false);
+      break;
+    default:  // Anything else, go with Auto mode.
+      this->setMode(kCoolixAuto);
+      return;
+  }
   // Fan mode is a special case of Dry.
   if (mode == kCoolixFan) actualmode = kCoolixDry;
-  switch (actualmode) {
-    case kCoolixCool:
-    case kCoolixAuto:
-    case kCoolixHeat:
-    case kCoolixDry:
-      recoverSavedState();
-      remote_state = (remote_state & ~kCoolixModeMask) | (actualmode << 2);
-      // Force the temp into a known-good state.
-      setTemp(getTemp());
-  }
+  recoverSavedState();
+  remote_state = (remote_state & ~kCoolixModeMask) | (actualmode << 2);
+  // Force the temp into a known-good state.
+  setTemp(getTemp());
   if (mode == kCoolixFan) setTempRaw(kCoolixFanTempCode);
 }
 
@@ -286,15 +307,33 @@ uint8_t IRCoolixAC::getFan() {
   return (getNormalState() & kCoolixFanMask) >> 13;
 }
 
-void IRCoolixAC::setFan(const uint8_t speed) {
+void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
   recoverSavedState();
   uint8_t newspeed = speed;
   switch (speed) {
+    case kCoolixFanAuto:  // Dry & Auto mode can't have this speed.
+      if (modecheck) {
+        switch (this->getMode()) {
+          case kCoolixAuto:
+          case kCoolixDry:
+            newspeed = kCoolixFanAuto0;
+        }
+      }
+      break;
+    case kCoolixFanAuto0:  // Only Dry & Auto mode can have this speed.
+      if (modecheck) {
+        switch (this->getMode()) {
+          case kCoolixAuto:
+          case kCoolixDry:
+            break;
+          default:
+            newspeed = kCoolixFanAuto;
+        }
+      }
+      break;
     case kCoolixFanMin:
     case kCoolixFanMed:
     case kCoolixFanMax:
-    case kCoolixFanAuto:
-    case kCoolixFanAuto0:
     case kCoolixFanZoneFollow:
     case kCoolixFanFixed:
       break;

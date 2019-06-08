@@ -106,7 +106,7 @@ class IRCoolixAC {
   void setSensorTemp(const uint8_t desired);
   uint8_t getSensorTemp();
   void clearSensorTemp();
-  void setFan(const uint8_t fan);
+  void setFan(const uint8_t speed, const bool modecheck = true);
   uint8_t getFan();
   void setMode(const uint8_t mode);
   uint8_t getMode();
