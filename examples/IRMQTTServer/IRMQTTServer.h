@@ -181,7 +181,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.1.1-beta"
+#define _MY_VERSION_ "v1.1.1"
 
 const uint8_t kSendTableSize = sizeof(gpioTable);
 // JSON stuff
