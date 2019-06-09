@@ -1,5 +1,46 @@
 # Release Notes
 
+## _v2.6.1 (20190609)_
+
+**[Breaking Changes]**
+- Major rework/breaking changes to Argo A/C support. (#705)
+
+**[Bug Fixes]**
+- Correct `set/getQuiet` for Samsung A/C (#736)
+- Add missing `on/off()` to IRCoolixAC class. (#725)
+- Daikin `set/getEye()` uses wrong bit. (#711)
+- IRMQTTServer: Continue to use same Temperature units. (#710)
+- Fixed a bug with `setMode()`/`getMode()` for HAIER_AC. (#705)
+
+**[Features]**
+- Add set/getPowerful for Samsung A/C (#736)
+- Add `calibrate()` to all the A/C classes. (#735)
+- IRMQTTServer: Add sequencing for sending MQTT IR commands. (#723)
+- Add support for Fujitsu AR-REB1E & AR-JW2 remotes. (#718)
+- Add Beta `decodeTrotec()` support. (#719)
+- Add experimental `decodeArgo()` support. (#717)
+- Support for Goodweather A/Cs. (#715)
+- Add `DISABLE_CAPTURE_WHILE_TRANSMITTING` feature to IRMQTTServer. (#713)
+- Support for Lixil Inax Toilet protocol. (#712)
+- Add `set/getWeeklyTimerEnable()` to Daikin (#711)
+- IRMQTTServer: Update Common A/C settings based on received IR messages. (#705)
+- Add day of week to DAIKIN protocol (#699)
+- Add limited support for Sharp A/C (#696)
+- SAMSUNG_AC: Make sure special power mode messages are sent. (#695)
+- Add `set/getPowerful()` (turbo) to DAIKIN216 (#693)
+
+**[Misc]**
+- Add kPeriodOffset for CPU Freq of 160MHz. (#729)
+- Example code for a Dumb IR repeater. (#737)
+- Update swing handling for Fujitsu A/Cs. (#724)
+- Add function to convert `decode_results` to `sendRaw()` array. (#721)
+- Attempt to reduce heap fragmentation from strings. (#707)
+- Update Fujitsu A/C example code to safer settings (#716)
+- Enforce better `const` usage in IRUtils. (#708)
+- Attempt to reduce heap fragmentation by A/C `toString()`s. (#694)
+- Minor changes to DAIKIN216 timings and features. (#693)
+
+
 ## _v2.6.0 (20190430)_
 
 **[Bug Fixes]**
