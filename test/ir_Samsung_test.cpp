@@ -500,15 +500,66 @@ TEST(TestIRSamsungAcClass, SetAndGetFan) {
 }
 
 TEST(TestIRSamsungAcClass, SetAndGetQuiet) {
-  IRSamsungAc samsung(0);
-  samsung.setQuiet(false);
-  EXPECT_FALSE(samsung.getQuiet());
-  samsung.setFan(kSamsungAcFanHigh);
-  samsung.setQuiet(true);
-  EXPECT_TRUE(samsung.getQuiet());
-  EXPECT_EQ(kSamsungAcFanAuto, samsung.getFan());
-  samsung.setQuiet(false);
-  EXPECT_FALSE(samsung.getQuiet());
+  IRSamsungAc ac(0);
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setFan(kSamsungAcFanHigh);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+
+  // Actual quiet on & off states from:
+  // https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500071419
+  uint8_t on[14] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x20, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+  ac.setRaw(on, 14);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  uint8_t off[14] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+  ac.setRaw(off, 14);
+  EXPECT_FALSE(ac.getQuiet());
+}
+
+
+TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
+  IRSamsungAc ac(0);
+  ac.setFan(kSamsungAcFanMed);
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanMed, ac.getFan());
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanTurbo, ac.getFan());
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+
+  // Actual powerful on & off states from:
+  // https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500120270
+  uint8_t on[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xA2, 0xFE, 0x77, 0x00, 0x1F, 0xF0};
+  ac.setRaw(on, kSamsungAcStateLength);
+  EXPECT_TRUE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanTurbo, ac.getFan());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 7 (TURBO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: On", ac.toString());
+
+  uint8_t off[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+  ac.setRaw(off, kSamsungAcStateLength);
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_NE(kSamsungAcFanTurbo, ac.getFan());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off", ac.toString());
 }
 
 TEST(TestIRSamsungAcClass, ChecksumCalculation) {
@@ -552,7 +603,7 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   IRSamsungAc samsung(0);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: On, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
   samsung.setTemp(kSamsungAcMaxTemp);
   samsung.setMode(kSamsungAcHeat);
@@ -563,12 +614,18 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   samsung.setClean(true);
   EXPECT_EQ(
       "Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 5 (HIGH), Swing: Off, "
-      "Beep: On, Clean: On, Quiet: Off",
+      "Beep: On, Clean: On, Quiet: Off, Powerful: Off",
       samsung.toString());
   samsung.setQuiet(true);
   EXPECT_EQ(
       "Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: On, Clean: On, Quiet: On",
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off",
+      samsung.toString());
+  samsung.setQuiet(false);
+  samsung.setPowerful(true);
+  EXPECT_EQ(
+      "Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 7 (TURBO), Swing: Off, "
+      "Beep: On, Clean: On, Quiet: Off, Powerful: On",
       samsung.toString());
 }
 
@@ -672,7 +729,7 @@ TEST(TestDecodeSamsungAC, DecodeRealExample) {
   samsung.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 2 (LOW), Swing: On, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -721,7 +778,7 @@ TEST(TestDecodeSamsungAC, DecodeRealExample2) {
   samsung.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -780,7 +837,7 @@ TEST(TestDecodeSamsungAC, DecodePowerOnSample) {
   samsung.setRaw(irsend.capture.state, kSamsungAcExtendedStateLength);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -840,7 +897,7 @@ TEST(TestDecodeSamsungAC, DecodePowerOffSample) {
   samsung.setRaw(irsend.capture.state, kSamsungAcExtendedStateLength);
   EXPECT_EQ(
       "Power: Off, Mode: 1 (COOL), Temp: 24C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -887,7 +944,7 @@ TEST(TestDecodeSamsungAC, DecodeHeatSample) {
   samsung.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 17C, Fan: 0 (AUTO), Swing: On, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -934,7 +991,7 @@ TEST(TestDecodeSamsungAC, DecodeCoolSample) {
   samsung.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -992,7 +1049,7 @@ TEST(TestDecodeSamsungAC, Issue604DecodeExtended) {
   samsung.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(
       "Power: Off, Mode: 4 (HEAT), Temp: 30C, Fan: 0 (AUTO), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
       samsung.toString());
 }
 
@@ -1187,7 +1244,8 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
       "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
       "m586s100000";
   std::string text = "Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 4 (MED), "
-                     "Swing: On, Beep: Off, Clean: Off, Quiet: Off";
+                     "Swing: On, Beep: Off, Clean: Off, Quiet: Off, "
+                     "Powerful: Off";
   // Don't do a setPower()/on()/off() as that will trigger the special message.
   // So it should only be the normal "settings" message.
   ac.setTemp(23);
@@ -1245,4 +1303,122 @@ TEST(TestIRSamsungAcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().filter);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // QUIET MODE ON data from:
+  //  https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-499791618
+  uint16_t quietOn[233] = {
+      624, 17360, 3076, 8902, 520, 476, 520, 1472, 520, 476, 520, 474, 520, 476,
+      520, 476, 520, 474, 522, 476, 520, 478, 518, 1476, 516, 500, 494, 502,
+      548, 448, 546, 450, 544, 452, 522, 1468, 520, 1474, 520, 1472, 520, 1472,
+      520, 1472, 520, 476, 520, 476, 518, 478, 516, 480, 516, 500, 496, 500,
+      494, 502, 550, 446, 546, 450, 544, 452, 524, 472, 522, 474, 518, 476, 520,
+      476, 520, 474, 522, 474, 520, 474, 520, 476, 520, 474, 520, 476, 518, 478,
+      518, 480, 516, 480, 516, 502, 494, 502, 548, 1444, 524, 472, 522, 472,
+      520, 474, 518, 478, 518, 476, 520, 476, 520, 1472, 520, 1470, 520, 1472,
+      520, 1474, 516, 2980, 2998, 8980, 498, 1498, 548, 448, 526, 470, 544, 452,
+      524, 472, 520, 474, 520, 476, 520, 476, 520, 476, 520, 1472, 520, 474,
+      520, 476, 520, 1474, 518, 1476, 516, 1496, 496, 1498, 548, 446, 546, 1446,
+      524, 1468, 518, 1474, 520, 1472, 520, 1472, 520, 1472, 520, 1474, 518,
+      1476, 518, 480, 516, 500, 496, 528, 520, 1446, 544, 1446, 524, 1470, 518,
+      476, 520, 476, 520, 474, 520, 476, 520, 474, 520, 476, 520, 474, 520, 476,
+      520, 476, 518, 1476, 516, 482, 514, 502, 548, 448, 548, 1442, 544, 452,
+      522, 474, 518, 476, 518, 476, 520, 476, 520, 474, 520, 476, 520, 1472,
+      520, 1470, 522, 1474, 518, 1476, 536};
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x20, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+
+  irsend.sendRaw(quietOn, 233, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc ac(0);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off",
+      ac.toString());
+
+  // Make sure the ac class state is in something wildly different first.
+  ac.stateReset();
+  ac.setPower(false);
+  ac.setMode(kSamsungAcAuto);
+  ac.setTemp(30);
+  ac.setSwing(true);
+  ac.setBeep(true);
+  ac.setClean(true);
+  ac.setQuiet(false);
+  // See if we can build the state from scratch.
+  ac.setPower(true);
+  ac.setMode(kSamsungAcCool);
+  ac.setTemp(16);
+  ac.setSwing(false);
+  ac.setBeep(false);
+  ac.setClean(false);
+  ac.setQuiet(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off",
+      ac.toString());
+  // Check it matches the known good/expected state.
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kSamsungAcBits);
+}
+
+TEST(TestDecodeSamsungAC, Issue734PowerfulOff) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // 1st Powerful off data from:
+  //  https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500114580
+  uint16_t powerfulOff[233] = {
+      652, 17336, 3078, 8910, 562, 456, 546, 1448, 550, 446, 552, 444, 552, 444,
+      550, 446, 550, 446, 552, 446, 550, 446, 552, 1440, 550, 446, 550, 446,
+      550, 1470, 478, 518, 502, 492, 536, 1458, 542, 1450, 552, 1440, 552, 1442,
+      552, 1442, 550, 446, 550, 446, 550, 446, 552, 444, 550, 446, 550, 446,
+      550, 472, 524, 472, 480, 516, 510, 488, 538, 458, 542, 452, 548, 448, 550,
+      446, 550, 446, 550, 444, 552, 444, 552, 444, 552, 444, 552, 444, 552, 444,
+      552, 444, 550, 446, 550, 446, 550, 472, 524, 472, 482, 514, 510, 486, 536,
+      460, 542, 454, 546, 450, 550, 446, 552, 1442, 552, 1442, 550, 1442, 552,
+      1440, 508, 2994, 3030, 8932, 552, 1638, 450,  // <= (was 356)
+      // Above hack due to poor data.
+      470, 526, 470, 506, 492, 510,
+      486, 542, 454, 544, 450, 550, 446, 554, 444, 550, 1442, 550, 444, 550,
+      446, 550, 1442, 552, 1440, 550, 1442, 550, 1470, 524, 470, 480, 1512, 512,
+      1480, 546, 1448, 550, 1442, 552, 1442, 552, 1442, 550, 1440, 552, 1440,
+      552, 446, 550, 444, 552, 444, 550, 1468, 484, 1510, 512, 1482, 544, 452,
+      550, 446, 552, 442, 554, 444, 552, 444, 554, 442, 554, 442, 552, 444, 554,
+      442, 554, 1440, 552, 444, 554, 442, 554, 468, 528, 1466, 508, 488, 512,
+      484, 544, 450, 550, 446, 554, 442, 556, 442, 554, 442, 554, 1438, 554,
+      1438, 554, 1438, 554, 1438, 562};  // UNKNOWN 7B551B62};
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
+
+  irsend.sendRaw(powerfulOff, 233, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decodeSamsungAC(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRSamsungAc ac(0);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 0 (AUTO), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off",
+      ac.toString());
 }

@@ -298,7 +298,7 @@ bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
 //   nbytes: Nr. of bytes of data in the array. (>=kSamsungAcStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: Stable / Known working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
@@ -459,14 +459,14 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 void IRSamsungAc::on(void) {
-  remote_state[1] &= ~kSamsungAcPowerMask1;
-  remote_state[6] |= kSamsungAcPowerMask2;
+  remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
+  remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
   _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
 void IRSamsungAc::off(void) {
-  remote_state[1] |= kSamsungAcPowerMask1;
-  remote_state[6] &= ~kSamsungAcPowerMask2;
+  remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
+  remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
   _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
@@ -478,8 +478,8 @@ void IRSamsungAc::setPower(const bool on) {
 }
 
 bool IRSamsungAc::getPower(void) {
-  return ((remote_state[6] & kSamsungAcPowerMask2) != 0) &&
-         ((remote_state[1] & kSamsungAcPowerMask1) == 0);
+  return (remote_state[6] & kSamsungAcPowerMask6) &&
+         !(remote_state[1] & kSamsungAcPowerMask1);
 }
 
 // Set the temp. in deg C
@@ -579,19 +579,40 @@ void IRSamsungAc::setClean(const bool on) {
   }
 }
 
-// Very unsure this is correct.
 bool IRSamsungAc::getQuiet(void) {
-  return remote_state[11] & kSamsungAcQuietMask11;
+  return !(remote_state[1] & kSamsungAcQuietMask1) &&
+         (remote_state[5] & kSamsungAcQuietMask5);
 }
 
-// Very unsure this is correct.
 void IRSamsungAc::setQuiet(const bool on) {
   if (on) {
-    remote_state[11] |= kSamsungAcQuietMask11;
+    remote_state[1] &= ~kSamsungAcQuietMask1;  // Bit needs to be cleared.
+    remote_state[5] |= kSamsungAcQuietMask5;  // Bit needs to be set.
     // Quiet mode seems to set fan speed to auto.
     this->setFan(kSamsungAcFanAuto);
   } else {
-    remote_state[11] &= ~kSamsungAcQuietMask11;
+    remote_state[1] |= kSamsungAcQuietMask1;  // Bit needs to be set.
+    remote_state[5] &= ~kSamsungAcQuietMask5;  // Bit needs to be cleared.
+  }
+}
+
+bool IRSamsungAc::getPowerful(void) {
+  return !(remote_state[8] & kSamsungAcPowerfulMask8) &&
+         (remote_state[10] & kSamsungAcPowerfulMask10) &&
+         this->getFan() == kSamsungAcFanTurbo;
+}
+
+void IRSamsungAc::setPowerful(const bool on) {
+  if (on) {
+    remote_state[8] &= ~kSamsungAcPowerfulMask8;  // Bit needs to be cleared.
+    remote_state[10] |= kSamsungAcPowerfulMask10;  // Bit needs to be set.
+    // Powerful mode sets fan speed to Turbo.
+    this->setFan(kSamsungAcFanTurbo);
+  } else {
+    remote_state[8] |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
+    remote_state[10] &= ~kSamsungAcPowerfulMask10;  // Bit needs to be cleared.
+    // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
+    if (this->getFan() == kSamsungAcFanTurbo) this->setFan(kSamsungAcFanAuto);
   }
 }
 
@@ -663,7 +684,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
   result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
                                      stdAc::swingv_t::kOff;
   result.quiet = this->getQuiet();
-  result.turbo = this->getFan() == kSamsungAcFanTurbo;
+  result.turbo = this->getPowerful();
   result.clean = this->getClean();
   result.beep = this->getBeep();
   // Not supported.
@@ -756,6 +777,11 @@ std::string IRSamsungAc::toString(void) {
     result += F("On");
   else
     result += F("Off");
+  result += F(", Powerful: ");
+  if (getPowerful())
+    result += F("On");
+  else
+    result += F("Off");
   return result;
 }
 
@@ -769,7 +795,7 @@ std::string IRSamsungAc::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Appears to mostly work.
+// Status: Stable / Known to be working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505

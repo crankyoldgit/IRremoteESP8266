@@ -24,6 +24,9 @@
 //                 S  A   A  M   M      S  U   U  N  NN  G   G
 //             SSSS   A   A  M   M  SSSS    UUU   N   N   GGG
 
+// Supported Samsung A/C models/remotes:
+// * Samsung AR12KSFPEWQNET
+
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
 
@@ -33,7 +36,7 @@ const uint8_t kSamsungAcCool = 1;
 const uint8_t kSamsungAcDry = 2;
 const uint8_t kSamsungAcFan = 3;
 const uint8_t kSamsungAcHeat = 4;
-const uint8_t kSamsungAcModeMask = 0x70;
+const uint8_t kSamsungAcModeMask = 0x70;        // 0b01110000
 const uint8_t kSamsungAcFanAuto = 0;
 const uint8_t kSamsungAcFanLow = 2;
 const uint8_t kSamsungAcFanMed = 4;
@@ -43,17 +46,20 @@ const uint8_t kSamsungAcFanTurbo = 7;
 const uint8_t kSamsungAcMinTemp = 16;   // 16C
 const uint8_t kSamsungAcMaxTemp = 30;   // 30C
 const uint8_t kSamsungAcAutoTemp = 25;  // 25C
-const uint8_t kSamsungAcTempMask = 0xF0;
-const uint8_t kSamsungAcPowerMask1 = 0x20;
-const uint8_t kSamsungAcPowerMask2 = 0x30;
-const uint8_t kSamsungAcFanMask = 0x0E;
-const uint8_t kSamsungAcSwingMask = 0x70;
+const uint8_t kSamsungAcTempMask = 0xF0;        // 0b11110000
+const uint8_t kSamsungAcPowerMask1 = 0x20;      // 0b00100000
+const uint8_t kSamsungAcPowerMask6 = 0x30;      // 0b00110000
+const uint8_t kSamsungAcFanMask = 0x0E;         // 0b00001110
+const uint8_t kSamsungAcSwingMask = 0x70;       // 0b01110000
 const uint8_t kSamsungAcSwingMove = 0b010;
 const uint8_t kSamsungAcSwingStop = 0b111;
-const uint8_t kSamsungAcBeepMask = 0x02;
-const uint8_t kSamsungAcCleanMask10 = 0x80;
-const uint8_t kSamsungAcCleanMask11 = 0x02;
-const uint8_t kSamsungAcQuietMask11 = 0x01;
+const uint8_t kSamsungAcBeepMask = 0x02;        // 0b00000010
+const uint8_t kSamsungAcCleanMask10 = 0x80;     // 0b10000000
+const uint8_t kSamsungAcCleanMask11 = 0x02;     // 0b00000010
+const uint8_t kSamsungAcQuietMask1 = 0x10;      // 0b00010000
+const uint8_t kSamsungAcQuietMask5 = 0x20;      // 0b00100000
+const uint8_t kSamsungAcPowerfulMask8 = 0x50;   // 0b01010000
+const uint8_t kSamsungAcPowerfulMask10 = 0x06;  // 0b00000110
 
 const uint16_t kSamsungACSectionLength = 7;
 const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
@@ -92,6 +98,8 @@ class IRSamsungAc {
   bool getClean(void);
   void setQuiet(const bool on);
   bool getQuiet(void);
+  void setPowerful(const bool on);
+  bool getPowerful(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
