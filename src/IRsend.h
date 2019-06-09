@@ -21,7 +21,7 @@
 // Constants
 // Offset (in microseconds) to use in Period time calculations to account for
 // code excution time in producing the software PWM signal.
-#if defined (ESP32)
+#if defined(ESP32)
 // Calculated on a generic ESP-WROOM-32 board with v3.2-18 SDK @ 240MHz
 const int8_t kPeriodOffset = -2;
 #elif (defined(ESP8266) && F_CPU == 160000000L)
