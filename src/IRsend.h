@@ -24,7 +24,7 @@
 #if defined(ESP32)
 // Calculated on a generic ESP-WROOM-32 board with v3.2-18 SDK @ 240MHz
 const int8_t kPeriodOffset = -2;
-#elif (defined(ESP8266) && F_CPU == 160000000L)
+#elif (defined(ESP8266) && F_CPU == 160000000L)  // NOLINT(whitespace/parens)
 // Calculated on an ESP8266 NodeMCU v2 board using:
 // v2.6.0 with v2.5.2 ESP core @ 160MHz
 const int8_t kPeriodOffset = -2;
