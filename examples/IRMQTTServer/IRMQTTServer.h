@@ -211,6 +211,7 @@ const char* kMqttPrefixKey = "mqtt_prefix";
 const char* kHostnameKey = "hostname";
 const char* kHttpUserKey = "http_user";
 const char* kHttpPassKey = "http_pass";
+const char* kCommandDelimiter = ",";
 
 // URLs
 const char* kUrlRoot = "/";
@@ -228,8 +229,7 @@ const char* kUrlWipe = "/reset";
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
 const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
 const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
-const char * kSequenceDelimiter = ";";
-const char * kCommandDelimiter = ",";
+const char* kSequenceDelimiter = ";";
 const char kPauseChar = 'P';
 #if defined(ESP8266)
 const uint32_t kChipId = ESP.getChipId();
