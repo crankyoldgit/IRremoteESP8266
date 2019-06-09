@@ -590,6 +590,7 @@ void IRSamsungAc::setQuiet(const bool on) {
     remote_state[5] |= kSamsungAcQuietMask5;  // Bit needs to be set.
     // Quiet mode seems to set fan speed to auto.
     this->setFan(kSamsungAcFanAuto);
+    this->setPowerful(false);  // Quiet 'on' is mutually exclusive to Powerful.
   } else {
     remote_state[1] |= kSamsungAcQuietMask1;  // Bit needs to be set.
     remote_state[5] &= ~kSamsungAcQuietMask5;  // Bit needs to be cleared.
@@ -608,6 +609,7 @@ void IRSamsungAc::setPowerful(const bool on) {
     remote_state[10] |= kSamsungAcPowerfulMask10;  // Bit needs to be set.
     // Powerful mode sets fan speed to Turbo.
     this->setFan(kSamsungAcFanTurbo);
+    this->setQuiet(false);  // Powerful 'on' is mutually exclusive to Quiet.
   } else {
     remote_state[8] |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
     remote_state[10] &= ~kSamsungAcPowerfulMask10;  // Bit needs to be cleared.

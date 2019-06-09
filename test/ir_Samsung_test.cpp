@@ -562,6 +562,27 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
       "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off", ac.toString());
 }
 
+TEST(TestIRSamsungAcClass, QuietAndPowerfulAreMutuallyExclusive) {
+  IRSamsungAc ac(0);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_NE(kSamsungAcFanTurbo, ac.getFan());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_TRUE(ac.getPowerful());
+  EXPECT_EQ(kSamsungAcFanTurbo, ac.getFan());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_NE(kSamsungAcFanTurbo, ac.getFan());
+}
+
 TEST(TestIRSamsungAcClass, ChecksumCalculation) {
   IRSamsungAc samsung(0);
 
