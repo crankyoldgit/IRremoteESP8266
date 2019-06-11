@@ -2010,6 +2010,7 @@ void setup(void) {
   // Initialise all the IR transmitters.
   for (uint8_t i = 0; i < kSendTableSize; i++) {
     IrSendTable[i] = new IRsend(gpioTable[i]);
+    if (IrSendTable[i] == NULL) break;
     IrSendTable[i]->begin();
     offset = IrSendTable[i]->calibrate();
   }
@@ -2376,6 +2377,10 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   // constructing the PUBLISH packet.
   // Allocate the correct amount of memory for the payload copy
   byte* payload_copy = reinterpret_cast<byte*>(malloc(length + 1));
+  if (payload_copy == NULL) {
+    debug("Can't allocate memory for `payload_copy`. Skipping callback!");
+    return;
+  }
   // Copy the payload to the new buffer
   memcpy(payload_copy, payload, length);
 
