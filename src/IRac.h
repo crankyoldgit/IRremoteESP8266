@@ -56,6 +56,11 @@ class IRac {
     const char *str, const stdAc::swingv_t def = stdAc::swingv_t::kOff);
   static stdAc::swingh_t strToSwingH(
     const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
+  static IRSTRING boolToString(const bool value);
+  static IRSTRING opmodeToString(const stdAc::opmode_t mode);
+  static IRSTRING fanspeedToString(const stdAc::fanspeed_t speed);
+  static IRSTRING swingvToString(const stdAc::swingv_t swingv);
+  static IRSTRING swinghToString(const stdAc::swingh_t swingh);
 #ifndef UNIT_TEST
 
  private:

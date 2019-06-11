@@ -553,6 +553,13 @@ const uint8_t  kVestelAcBits = 56;
 // See: https://github.com/markszabo/IRremoteESP8266/issues/667
 #define F(x) x
 #endif  // F
+#ifndef IRSTRING
+#define IRSTRING std::string
+#endif  // IRSTRING
+#else  // UNIT_TEST
+#ifndef IRSTRING
+#define IRSTRING String
+#endif  // IRSTRING
 #endif  // UNIT_TEST
 
 #endif  // IRREMOTEESP8266_H_
