@@ -334,6 +334,10 @@
 // Globals
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
+#endif  // ESP8266
+#if defined(ESP32)
+WebServer server(kHttpPort);
+#endif  // ESP32
 #if MDNS_ENABLE
 MDNSResponder mdns;
 #endif  // MDNS_ENABLE
@@ -414,13 +418,13 @@ TimerMs statListenTime = TimerMs();  // How long we've been listening for.
 #endif  // MQTT_ENABLE
 
 bool isSerialGpioUsedByIr(void) {
-  const uint8_t kSerialTxGpio = 1;  // The GPIO serial output is sent to.
-                                    // Note: *DOES NOT* control Serial output.
+  const int8_t kSerialTxGpio = 1;  // The GPIO serial output is sent to.
+                                   // Note: *DOES NOT* control Serial output.
 #if defined(ESP32)
-  const uint8_t kSerialRxGpio = 3;  // The GPIO serial input is received on.
+  const int8_t kSerialRxGpio = 3;  // The GPIO serial input is received on.
 #endif  // ESP32
   // Ensure we are not trodding on anything IR related.
-#ifdef IR_RX
+#if IR_RX
   switch (rx_gpio) {
 #if defined(ESP32)
     case kSerialRxGpio:
@@ -2049,9 +2053,9 @@ void handleGpioSetting(void) {
   html += htmlEnd();
   server.send(200, "text/html", html);
   if (changed) {
-#if defined(MQTT_ENABLE)
+#if MQTT_ENABLE
     mqttLog("GPIOs were changed. Rebooting!");
-#endif  // MQTT
+#endif  // MQTT_ENABLE
     delay(1000);
     ESP.restart();
     delay(2000);
