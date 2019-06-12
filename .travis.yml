@@ -21,6 +21,7 @@ install:
   - arduino --board $BD --save-prefs
   - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
+  - sudo apt-get purge python-enum34
   - sudo pip install pylint
 script:
   # Check that everything compiles.
