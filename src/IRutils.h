@@ -15,7 +15,6 @@
 #include "IRrecv.h"
 
 uint64_t reverseBits(uint64_t input, uint16_t nbits);
-#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
 String uint64ToString(uint64_t input, uint8_t base = 10);
 String typeToString(const decode_type_t protocol,
                     const bool isRepeat = false);
@@ -25,16 +24,6 @@ String resultToTimingInfo(const decode_results * const results);
 String resultToHumanReadableBasic(const decode_results * const results);
 String resultToHexidecimal(const decode_results * const result);
 String htmlEscape(const String unescaped);
-#else  // ARDUINO
-std::string uint64ToString(uint64_t input, uint8_t base = 10);
-std::string typeToString(const decode_type_t protocol,
-                         const bool isRepeat = false);
-std::string resultToSourceCode(const decode_results * const results);
-std::string resultToTimingInfo(const decode_results * const results);
-std::string resultToHumanReadableBasic(const decode_results * const results);
-std::string resultToHexidecimal(const decode_results * const result);
-std::string htmlEscape(const std::string unescaped);
-#endif  // ARDUINO
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results * const results);
 uint16_t * resultToRawArray(const decode_results * const decode);

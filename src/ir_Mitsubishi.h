@@ -7,8 +7,6 @@
 #include <stdint.h>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -100,11 +98,7 @@ class IRMitsubishiAC {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
-#else
-  std::string toString(void);
-#endif
 #ifndef UNIT_TEST
 
  private:
@@ -112,11 +106,7 @@ class IRMitsubishiAC {
 #else
   IRsendTest _irsend;
 #endif
-#ifdef ARDUINO
   String timeToString(const uint64_t time);
-#else
-  std::string timeToString(const uint64_t time);
-#endif
   uint8_t remote_state[kMitsubishiACStateLength];
   void checksum(void);
 };

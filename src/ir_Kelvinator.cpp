@@ -419,13 +419,8 @@ stdAc::state_t IRKelvinatorAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRKelvinatorAC::toString(void) {
   String result = "";
-#else
-std::string IRKelvinatorAC::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += getPower() ? F("On") : F("Off");

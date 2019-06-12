@@ -6,9 +6,6 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
-#ifndef ARDUINO
-#include <string>
-#endif
 #include "IRremoteESP8266.h"
 #include "ir_Argo.h"
 #include "ir_Coolix.h"
@@ -56,11 +53,11 @@ class IRac {
     const char *str, const stdAc::swingv_t def = stdAc::swingv_t::kOff);
   static stdAc::swingh_t strToSwingH(
     const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
-  static IRSTRING boolToString(const bool value);
-  static IRSTRING opmodeToString(const stdAc::opmode_t mode);
-  static IRSTRING fanspeedToString(const stdAc::fanspeed_t speed);
-  static IRSTRING swingvToString(const stdAc::swingv_t swingv);
-  static IRSTRING swinghToString(const stdAc::swingh_t swingh);
+  static String boolToString(const bool value);
+  static String opmodeToString(const stdAc::opmode_t mode);
+  static String fanspeedToString(const stdAc::fanspeed_t speed);
+  static String swingvToString(const stdAc::swingv_t swingv);
+  static String swinghToString(const stdAc::swingh_t swingh);
 #ifndef UNIT_TEST
 
  private:

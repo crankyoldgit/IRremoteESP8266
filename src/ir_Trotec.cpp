@@ -5,8 +5,6 @@
 #include <algorithm>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
@@ -228,13 +226,8 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRTrotecESP::toString(void) {
   String result = "";
-#else
-std::string IRTrotecESP::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));

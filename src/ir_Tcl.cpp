@@ -340,13 +340,8 @@ stdAc::state_t IRTcl112Ac::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRTcl112Ac::toString(void) {
   String result = "";
-#else
-std::string IRTcl112Ac::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += (this->getPower() ? F("On") : F("Off"));

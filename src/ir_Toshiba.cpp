@@ -317,13 +317,9 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRToshibaAC::toString(void) {
   String result = "";
-#else
-std::string IRToshibaAC::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
+  result.reserve(40);
   result += F("Power: ");
   if (this->getPower())
     result += F("On");

@@ -9,9 +9,7 @@ Copyright 2019 crankyoldgit
 #include <algorithm>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
-#endif
+#endif  // UNIT_TEST
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
@@ -335,13 +333,8 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRArgoAC::toString() {
   String result = "";
-#else
-std::string IRArgoAC::toString() {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += getPower() ? F("On") : F("Off");

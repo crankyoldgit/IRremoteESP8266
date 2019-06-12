@@ -47,7 +47,8 @@
 #include <stdint.h>
 #ifdef UNIT_TEST
 #include <iostream>
-#endif
+#include <string>
+#endif  // UNIT_TEST
 
 // Library Version
 #define _IRREMOTEESP8266_VERSION_ "2.6.1"
@@ -553,13 +554,7 @@ const uint8_t  kVestelAcBits = 56;
 // See: https://github.com/markszabo/IRremoteESP8266/issues/667
 #define F(x) x
 #endif  // F
-#ifndef IRSTRING
-#define IRSTRING std::string
-#endif  // IRSTRING
-#else  // UNIT_TEST
-#ifndef IRSTRING
-#define IRSTRING String
-#endif  // IRSTRING
+typedef std::string String;
 #endif  // UNIT_TEST
 
 #endif  // IRREMOTEESP8266_H_

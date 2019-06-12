@@ -8,7 +8,6 @@
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
-
 #include <string.h>
 #ifndef ARDUINO
 #include <string>
@@ -1208,11 +1207,11 @@ bool IRac::strToBool(const char *str, const bool def) {
     return def;
 }
 
-IRSTRING IRac::boolToString(const bool value) {
+String IRac::boolToString(const bool value) {
   return value ? F("on") : F("off");
 }
 
-IRSTRING IRac::opmodeToString(const stdAc::opmode_t mode) {
+String IRac::opmodeToString(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kOff:
       return F("off");
@@ -1231,7 +1230,7 @@ IRSTRING IRac::opmodeToString(const stdAc::opmode_t mode) {
   }
 }
 
-IRSTRING IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
+String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kAuto:
       return F("auto");
@@ -1250,7 +1249,7 @@ IRSTRING IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   }
 }
 
-IRSTRING IRac::swingvToString(const stdAc::swingv_t swingv) {
+String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kOff:
       return F("off");
@@ -1271,7 +1270,7 @@ IRSTRING IRac::swingvToString(const stdAc::swingv_t swingv) {
   }
 }
 
-IRSTRING IRac::swinghToString(const stdAc::swingh_t swingh) {
+String IRac::swinghToString(const stdAc::swingh_t swingh) {
   switch (swingh) {
     case stdAc::swingh_t::kOff:
       return F("off");

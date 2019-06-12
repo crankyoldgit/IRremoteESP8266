@@ -300,13 +300,8 @@ stdAc::state_t IRGoodweatherAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRGoodweatherAc::toString() {
   String result = "";
-#else
-std::string IRGoodweatherAc::toString() {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += this->getPower() ? F("On") : F("Off");
