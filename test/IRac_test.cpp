@@ -79,6 +79,37 @@ TEST(TestIRac, Coolix) {
   ASSERT_EQ(kCoolixBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.value);
   ASSERT_EQ(expected, ac.toString());
+  // Confirm we are sending with a repeat of 1. i.e. two messages.
+  EXPECT_EQ(
+      "f38000d50"  // 38kHz Frequency and 50% duty-cycle.
+      // Start of message #1 (i.e. Repeat '0')
+      // Header
+      "m4480s4480"
+      // Data
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s560m560s560"
+      "m560s1680m560s560m560s560m560s1680m560s560m560s560m560s1680m560s1680"
+      // Footer
+      "m560s5040"
+      // End of message #1 (i.e. Repeat '0')
+      // Start of message #2 (i.e. Repeat '1')
+      // Header
+      "m4480s4480"
+      // Data
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s560m560s560"
+      "m560s1680m560s560m560s560m560s1680m560s560m560s560m560s1680m560s1680"
+      // Footer
+      "m560s5040",
+      // End of message #2 (i.e. Repeat '1')
+      // Note: the two messages (#1 & #2) are identical.
+      ac._irsend.outputStr());
 }
 
 TEST(TestIRac, Daikin) {
