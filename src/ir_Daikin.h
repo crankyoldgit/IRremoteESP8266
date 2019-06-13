@@ -1,6 +1,15 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
 // Copyright 2018-2019 crankyoldgit
+
+// Supports:
+//   Brand: Daikin,  Model: ARC433** remote
+//   Brand: Daikin,  Model: ARC477A1 remote
+//   Brand: Daikin,  Model: FTXZ25NV1B A/C
+//   Brand: Daikin,  Model: FTXZ35NV1B A/C
+//   Brand: Daikin,  Model: FTXZ50NV1B A/C
+//   Brand: Daikin,  Model: ARC433B69 remote
+
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
 
@@ -15,12 +24,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
-//                DD  DD   AAAAA   III  KK KK   III  NNN  NN
-//                DD   DD AA   AA  III  KKKK    III  NN N NN
-//                DD   DD AAAAAAA  III  KK KK   III  NN  NNN
-//                DDDDDD  AA   AA IIIII KK  KK IIIII NN   NN
 
 /*
         Daikin AC map

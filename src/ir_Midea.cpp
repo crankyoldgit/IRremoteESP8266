@@ -1,4 +1,5 @@
 // Copyright 2017 bwze, crankyoldgit
+// Midea
 
 #include "ir_Midea.h"
 #include <algorithm>
@@ -8,12 +9,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//                  MM    MM IIIII DDDDD   EEEEEEE   AAA
-//                  MMM  MMM  III  DD  DD  EE       AAAAA
-//                  MM MM MM  III  DD   DD EEEEE   AA   AA
-//                  MM    MM  III  DD   DD EE      AAAAAAA
-//                  MM    MM IIIII DDDDDD  EEEEEEE AA   AA
 
 // Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
 //

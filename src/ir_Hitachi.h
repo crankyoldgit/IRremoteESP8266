@@ -2,6 +2,11 @@
 //
 // Copyright 2018 David Conran
 
+// Supported:
+//   Brand: Hitachi,  Model: RAS-35THA6 remote
+//   Brand: Hitachi,  Model: LT0541-HTA remote
+//   Brand: Hitachi,  Model: Series VI A/C (Circa 2007)
+
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
 

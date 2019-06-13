@@ -1,5 +1,16 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2018-2019 David Conran
+
+// Supports:
+//   Brand: Fujitsu,  Model: AR-RAH2E remote
+//   Brand: Fujitsu,  Model: ASYG30LFCA A/C
+//   Brand: Fujitsu,  Model: AR-DB1 remote
+//   Brand: Fujitsu,  Model: AST9RSGCW A/C
+//   Brand: Fujitsu,  Model: AR-REB1E remote
+//   Brand: Fujitsu,  Model: ASYG7LMCA A/C
+//   Brand: Fujitsu,  Model: AR-RAE1E remote
+//   Brand: Fujitsu General,  Model: AR-JW2 remote
+
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
 

@@ -4,12 +4,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//          EEEEEEE LL      EEEEEEE  CCCCC  TTTTTTT RRRRRR    AAA
-//          EE      LL      EE      CC    C   TTT   RR   RR  AAAAA
-//          EEEEE   LL      EEEEE   CC        TTT   RRRRRR  AA   AA
-//          EE      LL      EE      CC    C   TTT   RR  RR  AAAAAAA
-//          EEEEEEE LLLLLLL EEEEEEE  CCCCC    TTT   RR   RR AA   AA
-
 // Electra A/C added by crankyoldgit
 //
 // Equipment it seems compatible with:

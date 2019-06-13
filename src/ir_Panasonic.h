@@ -1,5 +1,24 @@
 // Copyright 2018 David Conran
 
+// Supports:
+//   Brand: Panasonic,  Model: TV
+//   Brand: Panasonic,  Model: JKE series A/C
+//   Brand: Panasonic,  Model: DKE series A/C
+//   Brand: Panasonic,  Model: CKP series A/C
+//   Brand: Panasonic,  Model: CS-ME10CKPG A/C
+//   Brand: Panasonic,  Model: CS-ME12CKPG A/C
+//   Brand: Panasonic,  Model: CS-ME14CKPG A/C
+//   Brand: Panasonic,  Model: RKR series A/C
+//   Brand: Panasonic,  Model: CS-Z9RKR A/C
+//   Brand: Panasonic,  Model: NKE series A/C
+//   Brand: Panasonic,  Model: CS-YW9MKD A/C
+//   Brand: Panasonic,  Model: A75C3747 remote
+//   Brand: Panasonic,  Model: A75C3704 remote
+//   Brand: Panasonic,  Model: A75C2311 remote (CKP)
+//   Brand: Panasonic,  Model: A75C3747 remote
+//   Brand: Panasonic,  Model: A75C3747 remote
+//   Brand: Panasonic,  Model: A75C3747 remote
+
 #ifndef IR_PANASONIC_H_
 #define IR_PANASONIC_H_
 
@@ -15,12 +34,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//       PPPP    AAA   N   N   AAA    SSSS   OOO   N   N  IIIII   CCCC
-//       P   P  A   A  NN  N  A   A  S      O   O  NN  N    I    C
-//       PPPP   AAAAA  N N N  AAAAA   SSS   O   O  N N N    I    C
-//       P      A   A  N  NN  A   A      S  O   O  N  NN    I    C
-//       P      A   A  N   N  A   A  SSSS    OOO   N   N  IIIII   CCCC
 
 // Panasonic A/C support heavily influenced by:
 //   https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp

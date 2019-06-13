@@ -21,12 +21,6 @@ Copyright 2018-2019 crankyoldgit
 #endif
 #include "IRutils.h"
 
-//                DDDDD     AAA   IIIII KK  KK IIIII NN   NN
-//                DD  DD   AAAAA   III  KK KK   III  NNN  NN
-//                DD   DD AA   AA  III  KKKK    III  NN N NN
-//                DD   DD AAAAAAA  III  KK KK   III  NN  NNN
-//                DDDDDD  AA   AA IIIII KK  KK IIIII NN   NN
-
 // Constants
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote

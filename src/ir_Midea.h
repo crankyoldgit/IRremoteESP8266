@@ -1,4 +1,10 @@
 // Copyright 2017 David Conran
+// Midea
+
+// Supports:
+//   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU)
+//   Brand: Pioneer System,  Model: RUBO18GMFILCAD A/C (18K BTU)
+
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
 
@@ -14,12 +20,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//                  MM    MM IIIII DDDDD   EEEEEEE   AAA
-//                  MMM  MMM  III  DD  DD  EE       AAAAA
-//                  MM MM MM  III  DD   DD EEEEE   AA   AA
-//                  MM    MM  III  DD   DD EE      AAAAAAA
-//                  MM    MM IIIII DDDDDD  EEEEEEE AA   AA
 
 // Midea added by crankyoldgit & bwze
 // Ref:

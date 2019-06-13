@@ -1,6 +1,9 @@
 // Copyright 2018 Erdem U. Altinyurt
 // Copyright 2019 David Conran
 
+// Supports:
+//   Brand: Vestel,  Model: BIOX CXP-9 A/C (9K BTU)
+
 #ifndef IR_VESTEL_H_
 #define IR_VESTEL_H_
 
@@ -16,12 +19,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//                 VV     VV  EEEEEEE   SSSSS  TTTTTTTT  EEEEEEE  LL
-//                 VV     VV  EE       S          TT     EE       LL
-//                  VV   VV   EEEEE     SSSS      TT     EEEEE    LL
-//                   VV VV    EE            S     TT     EE       LL
-//                    VVV     EEEEEEE  SSSSS      TT     EEEEEEE  LLLLLLL
 
 // Vestel added by Erdem U. Altinyurt
 
