@@ -19,8 +19,11 @@
 // Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
 //
 // Supports:
-//   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
-//   MSABAU-07HRFN1-QRD0GW Midea aircon unit (circa 2016)
+//   Brand: Beko, Model: RG57K7(B)/BGEF Remote
+//   Brand: Beko, Model: BINR 070/071 split-type A/C
+//   Brand: Midea, Model: RG52D/BGE Remote
+//   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
+//   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/484
 
