@@ -2867,6 +2867,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
     case COOLIX:  // 15
       if (bits == 0)
         bits = kCoolixBits;
+      repeat = std::max(repeat, kCoolixDefaultRepeat);
       irsend->sendCOOLIX(code, bits, repeat);
       break;
 #endif
