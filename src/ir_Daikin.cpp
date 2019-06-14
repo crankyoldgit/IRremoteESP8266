@@ -1885,3 +1885,193 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN216
+
+#if SEND_DAIKIN160
+// Send a Daikin 160 bit A/C message.
+//
+// Args:
+//   data: An array of kDaikin160StateLength bytes containing the IR command.
+//
+// Status: Alpha/Untested on a real device.
+//
+// Supported devices:
+// - Daikin ARC423A5 remote.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/731
+void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  if (nbytes < kDaikin160Section1Length)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Section #1
+    sendGeneric(kDaikin160HdrMark, kDaikin160HdrSpace, kDaikin160BitMark,
+                kDaikin160OneSpace, kDaikin160BitMark, kDaikin160ZeroSpace,
+                kDaikin160BitMark, kDaikin160Gap, data,
+                kDaikin160Section1Length,
+                kDaikin160Freq, false, 0, kDutyDefault);
+    // Section #2
+    sendGeneric(kDaikin160HdrMark, kDaikin160HdrSpace, kDaikin160BitMark,
+                kDaikin160OneSpace, kDaikin160BitMark, kDaikin160ZeroSpace,
+                kDaikin160BitMark, kDaikin160Gap,
+                data + kDaikin160Section1Length,
+                nbytes - kDaikin160Section1Length,
+                kDaikin160Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN160
+
+// Class for handling Daikin 160 bit / 20 byte A/C messages.
+//
+// Code by crankyoldgit.
+//
+// Supported Remotes: Daikin ARC423A5 remote
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/731
+IRDaikin160::IRDaikin160(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRDaikin160::begin() { _irsend.begin(); }
+
+#if SEND_DAIKIN160
+void IRDaikin160::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin160(remote_state, kDaikin160StateLength, repeat);
+}
+#endif  // SEND_DAIKIN160
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin160::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin160Section1Length - 1 ||
+      state[kDaikin160Section1Length - 1] != sumBytes(
+          state, kDaikin160Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2 (a.k.a. the rest)
+  if (length <= kDaikin160Section1Length + 1 ||
+      state[length - 1] != sumBytes(state + kDaikin160Section1Length,
+                                    length - kDaikin160Section1Length - 1))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin160::checksum() {
+  remote_state[kDaikin160Section1Length - 1] = sumBytes(
+      remote_state, kDaikin160Section1Length - 1);
+  remote_state[kDaikin160StateLength - 1] = sumBytes(
+      remote_state + kDaikin160Section1Length, kDaikin160Section2Length - 1);
+}
+
+void IRDaikin160::stateReset() {
+  for (uint8_t i = 0; i < kDaikin160StateLength; i++) remote_state[i] = 0x00;
+  remote_state[0] =  0x11;
+  remote_state[1] =  0xDA;
+  remote_state[2] =  0x27;
+  remote_state[3] =  0xF0;
+  // remote_state[6] is a checksum byte, it will be set by checksum().
+  remote_state[7] =  0x11;
+  remote_state[8] =  0xDA;
+  remote_state[9] =  0x27;
+  // remote_state[19] is a checksum byte, it will be set by checksum().
+}
+
+uint8_t *IRDaikin160::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin160::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin160StateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+#if DECODE_DAIKIN160
+// Decode the supplied Daikin 160 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin160Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin ARC423A5 remote.
+//
+// Status: BETA / Probably works.
+//
+// Ref:
+//   https://github.com/markszabo/IRremoteESP8266/issues/731
+bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
+    return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin160Bits) return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t dataBitsSoFar = 0;
+  uint16_t i = 0;
+  match_result_t data_result;
+  uint8_t sectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
+                                             kDaikin160Section2Length};
+
+  // Sections
+  // Keep reading bytes until we either run out of section or state to fill.
+  for (uint8_t section = 0, pos = 0; section < kDaikin160Sections;
+       section++) {
+    pos += sectionSize[section];
+
+    // Section Header
+    if (!matchMark(results->rawbuf[offset++], kDaikin160HdrMark)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin160HdrSpace))
+      return false;
+
+    // Section Data
+    for (; offset <= results->rawlen - 16 && i < pos;
+         i++, dataBitsSoFar += 8, offset += data_result.used) {
+      // Read in a byte at a time.
+      data_result =
+          matchData(&(results->rawbuf[offset]), 8, kDaikin160BitMark,
+                    kDaikin160OneSpace, kDaikin160BitMark,
+                    kDaikin160ZeroSpace, kDaikinTolerance, kDaikinMarkExcess,
+                    false);
+      if (data_result.success == false) break;  // Fail
+      results->state[i] = (uint8_t)data_result.data;
+    }
+
+    // Section Footer
+    if (!matchMark(results->rawbuf[offset++], kDaikin160BitMark,
+                   kDaikinTolerance, kDaikinMarkExcess)) return false;
+    if (section < kDaikin160Sections - 1) {  // Inter-section gaps.
+      if (!matchSpace(results->rawbuf[offset++], kDaikin160Gap)) return false;
+    } else {  // Last section / End of message gap.
+      if (offset <= results->rawlen &&
+          !matchAtLeast(results->rawbuf[offset++], kDaikin160Gap)) return false;
+    }
+  }
+
+  // Compliance
+  if (strict) {
+    // Re-check we got the correct size/length due to the way we read the data.
+    if (dataBitsSoFar != kDaikin160Bits) return false;
+    // Validate the checksum.
+    if (!IRDaikin160::validChecksum(results->state)) return false;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN160;
+  results->bits = dataBitsSoFar;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN160

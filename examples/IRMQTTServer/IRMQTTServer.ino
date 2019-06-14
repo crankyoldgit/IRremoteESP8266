@@ -694,8 +694,9 @@ void handleRoot(void) {
       "Type: "
       "<select name='type'>"
         "<option value='27'>Argo</option>"
-        "<option value='16'>Daikin</option>"
-        "<option value='53'>Daikin2</option>"
+        "<option value='16'>Daikin (35 bytes)</option>"
+        "<option value='65'>Daikin160 (20 bytes)</option>"
+        "<option value='53'>Daikin2 (39 bytes)</option>"
         "<option value='61'>Daikin216 (27 bytes)</option>"
         "<option value='48'>Electra</option>"
         "<option value='33'>Fujitsu</option>"
@@ -1419,6 +1420,9 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       // Lastly, it should never exceed the "normal" size.
       stateSize = std::min(stateSize, kDaikinStateLength);
       break;
+    case DAIKIN160:
+      stateSize = kDaikin160StateLength;
+      break;
     case DAIKIN2:
       stateSize = kDaikin2StateLength;
       break;
@@ -1567,6 +1571,11 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       irsend->sendDaikin(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_DAIKIN160
+    case DAIKIN160:  // 65
+      irsend->sendDaikin160(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
     case DAIKIN2:
       irsend->sendDaikin2(reinterpret_cast<uint8_t *>(state));
@@ -2871,6 +2880,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       break;
 #endif
     case DAIKIN:  // 16
+    case DAIKIN160:  // 65
     case DAIKIN2:  // 53
     case DAIKIN216:  // 61
     case KELVINATOR:  // 18

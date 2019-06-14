@@ -1519,6 +1519,10 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::DAIKIN, strToDecodeType("DAIKIN"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN));
 
+  ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
+  ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN160));
+
   ASSERT_EQ("DAIKIN2", typeToString(decode_type_t::DAIKIN2));
   ASSERT_EQ(decode_type_t::DAIKIN2, strToDecodeType("DAIKIN2"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN2));
@@ -2023,4 +2027,72 @@ TEST(TestDaikin216Class, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+// https://github.com/markszabo/IRremoteESP8266/issues/731
+TEST(TestDecodeDaikin160, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t rawData[327] = {
+      5024, 2144, 342, 1786, 344, 706, 342, 706, 344, 706, 342, 1786, 342, 706,
+      342, 708, 342, 708, 342, 708, 342, 1786, 342, 708, 342, 1786, 342, 1788,
+      342, 708, 342, 1786, 344, 1786, 342, 1786, 342, 1786, 342, 1786, 342, 708,
+      342, 708, 340, 1786, 344, 706, 342, 708, 342, 706, 342, 708, 342, 708,
+      342, 706, 342, 1786, 342, 1788, 342, 1786, 342, 1786, 342, 1788, 342, 706,
+      342, 1788, 342, 1786, 342, 706, 342, 706, 342, 708, 342, 708, 342, 708,
+      342, 708, 342, 706, 342, 708, 342, 708, 342, 706, 342, 706, 342, 708, 342,
+      1786, 342, 1786, 342, 1786, 342, 1788, 342, 706, 342, 706, 342, 706, 342,
+      708, 342, 29442, 5022, 2146, 342, 1786, 342, 706, 342, 708, 342, 708, 342,
+      1788, 342, 706, 342, 706, 342, 706, 342, 706, 342, 1788, 342, 708, 342,
+      1786, 342, 1786, 342, 708, 342, 1786, 342, 1788, 342, 1786, 342, 1786,
+      342, 1786, 342, 706, 342, 706, 342, 1786, 344, 706, 342, 706, 344, 706,
+      342, 706, 342, 706, 342, 708, 342, 706, 342, 706, 342, 706, 342, 706, 342,
+      1786, 342, 1786, 342, 706, 342, 706, 342, 1788, 342, 708, 342, 1786, 342,
+      1786, 342, 706, 342, 706, 342, 706, 342, 708, 342, 1786, 342, 1786, 342,
+      708, 342, 708, 342, 1786, 342, 706, 342, 706, 344, 706, 342, 1786, 342,
+      708, 342, 706, 342, 706, 342, 708, 342, 706, 342, 708, 342, 706, 342, 708,
+      342, 706, 342, 704, 344, 706, 342, 706, 344, 706, 342, 706, 342, 708, 342,
+      706, 342, 706, 344, 706, 342, 706, 342, 706, 344, 1786, 342, 1786, 342,
+      1786, 342, 1786, 342, 706, 342, 706, 344, 706, 342, 706, 342, 1786, 344,
+      706, 342, 1786, 342, 706, 342, 708, 342, 706, 342, 706, 344, 706, 342,
+      706, 342, 706, 342, 1786, 342, 706, 344, 706, 342, 706, 342, 708, 342,
+      706, 342, 1788, 342, 1786, 342, 706, 344, 1786, 344, 706, 344, 1786, 342,
+      708, 342};  // UNKNOWN 99CC993
+
+  uint8_t expectedState[kDaikin160StateLength] = {
+      // 7 bytes
+      0x11, 0xDA, 0x27, 0xF0, 0x0D, 0x00, 0x0F,
+      // 13 bytes
+      0x11, 0xDA, 0x27, 0x00, 0xD3, 0x30, 0x11,
+      0x00, 0x00, 0x1E, 0x0A, 0x08, 0x56};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 327, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN160, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin160Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestDecodeDaikin160, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+
+  uint8_t expectedState[kDaikin160StateLength] = {
+      // 7 bytes
+      0x11, 0xDA, 0x27, 0xF0, 0x0D, 0x00, 0x0F,
+      // 13 bytes
+      0x11, 0xDA, 0x27, 0x00, 0xD3, 0x30, 0x11,
+      0x00, 0x00, 0x1E, 0x0A, 0x08, 0x56};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin160(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN160, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin160Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
