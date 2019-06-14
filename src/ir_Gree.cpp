@@ -18,12 +18,6 @@
 #include "IRutils.h"
 #include "ir_Kelvinator.h"
 
-//                      GGGG  RRRRRR  EEEEEEE EEEEEEE
-//                     GG  GG RR   RR EE      EE
-//                    GG      RRRRRR  EEEEE   EEEEE
-//                    GG   GG RR  RR  EE      EE
-//                     GGGGGG RR   RR EEEEEEE EEEEEEE
-
 // Constants
 // Ref: https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.h
 const uint16_t kGreeHdrMark = 9000;

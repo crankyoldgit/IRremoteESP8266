@@ -1,5 +1,12 @@
 // Copyright 2019 David Conran
 
+// Supports:
+//   Brand: Mitsubishi Heavy Industries,  Model: RLA502A700B remote
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZM-S A/C
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZMXA-S A/C
+//   Brand: Mitsubishi Heavy Industries,  Model: RKX502A001C remote
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZJ-S A/C
+
 #ifndef IR_MITSUBISHIHEAVY_H_
 #define IR_MITSUBISHIHEAVY_H_
 

@@ -1,16 +1,13 @@
 // Copyright 2018 Brett T. Warden
+
+// MWM
+
 // derived from ir_Lasertag.cpp, Copyright 2017 David Conran
 
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//                      MM   MM WW   WW MM   MM
-//                      MMM MMM WW   WW MMM MMM
-//                      MM M MM WW W WW MM M MM
-//                      MM   MM WWW WWW MM   MM
-//                      MM   MM WW   WW MM   MM
 
 // Constants
 const uint16_t kMWMMinSamples = 6;  // Msgs are >=3 bytes, bytes have >=2

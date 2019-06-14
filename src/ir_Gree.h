@@ -1,6 +1,9 @@
-// Kelvinator A/C
-//
 // Copyright 2016 David Conran
+// Gree A/C
+//
+// Supported:
+//   Brand: Ultimate,  Model: Heat Pump
+//   Brand: EKOKAI,  Model: A/C
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -17,12 +20,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//                      GGGG  RRRRRR  EEEEEEE EEEEEEE
-//                     GG  GG RR   RR EE      EE
-//                    GG      RRRRRR  EEEEE   EEEEE
-//                    GG   GG RR  RR  EE      EE
-//                     GGGGGG RR   RR EEEEEEE EEEEEEE
 
 // Constants
 const uint8_t kGreeAuto = 0;

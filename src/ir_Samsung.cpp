@@ -1,6 +1,8 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017, 2018, 2019 David Conran
 
+// Samsung remote emulation
+
 #include "ir_Samsung.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -9,12 +11,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//              SSSS   AAA    MMM    SSSS  U   U  N   N   GGGG
-//             S      A   A  M M M  S      U   U  NN  N  G
-//              SSS   AAAAA  M M M   SSS   U   U  N N N  G  GG
-//                 S  A   A  M   M      S  U   U  N  NN  G   G
-//             SSSS   A   A  M   M  SSSS    UUU   N   N   GGG
 
 // Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
 

@@ -1,6 +1,9 @@
-/* Copyright 2017 Schmolders
+// Copyright 2017 Schmolders
 // Adds support for Argo Ulisse 13 DCI Mobile Split ACs.
-*/
+
+// Supports:
+//   Brand: Argo,  Model: Ulisse 13 DCI Mobile Split A/C
+
 #ifndef IR_ARGO_H_
 #define IR_ARGO_H_
 

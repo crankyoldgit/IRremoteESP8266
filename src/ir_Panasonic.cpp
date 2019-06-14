@@ -1,6 +1,8 @@
 // Copyright 2015 Kristian Lauszus
 // Copyright 2017, 2018 David Conran
 
+// Panasonic devices
+
 #include "ir_Panasonic.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -9,12 +11,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//       PPPP    AAA   N   N   AAA    SSSS   OOO   N   N  IIIII   CCCC
-//       P   P  A   A  NN  N  A   A  S      O   O  NN  N    I    C
-//       PPPP   AAAAA  N N N  AAAAA   SSS   O   O  N N N    I    C
-//       P      A   A  N  NN  A   A      S  O   O  N  NN    I    C
-//       P      A   A  N   N  A   A  SSSS    OOO   N   N  IIIII   CCCC
 
 // Panasonic protocol originally added by Kristian Lauszus from:
 //   https://github.com/z3t0/Arduino-IRremote

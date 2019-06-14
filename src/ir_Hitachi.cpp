@@ -15,12 +15,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//              HH   HH IIIII TTTTTTT   AAA    CCCCC  HH   HH IIIII
-//              HH   HH  III    TTT    AAAAA  CC    C HH   HH  III
-//              HHHHHHH  III    TTT   AA   AA CC      HHHHHHH  III
-//              HH   HH  III    TTT   AAAAAAA CC    C HH   HH  III
-//              HH   HH IIIII   TTT   AA   AA  CCCCC  HH   HH IIIII
-
 // Constants
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/417
 const uint16_t kHitachiAcHdrMark = 3300;

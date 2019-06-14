@@ -2,25 +2,18 @@
 // Copyright 2015 cheaplin
 // Copyright 2017, 2018 David Conran
 
+// Supported:
+//   Brand: LG,  Model: 6711A20083V remote
+//   Brand: LG,  Model: AKB74395308 remote
+
 #include "ir_LG.h"
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
 
-//                               L       GGGG
-//                               L      G
-//                               L      G  GG
-//                               L      G   G
-//                               LLLLL   GGG
-
 // LG decode originally added by Darryl Smith (based on the JVC protocol)
 // LG send originally added by https://github.com/chaeplin
-//
-// Known supported devices:
-//   IR Remotes:
-//     6711A20083V
-//     AKB74395308
 
 // Constants
 const uint16_t kLgTick = 50;

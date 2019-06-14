@@ -2,6 +2,8 @@
 // Copyright 2017-2018 David Conran
 // Copyright 2018 Denes Varga
 
+// Mitsubishi
+
 #include "ir_Mitsubishi.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -10,12 +12,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
-//    M M M    I     T    S      U   U  B   B    I    S      H   H    I
-//    M M M    I     T     SSS   U   U  BBBB     I     SSS   HHHHH    I
-//    M   M    I     T        S  U   U  B   B    I        S  H   H    I
-//    M   M  IIIII   T    SSSS    UUU   BBBBB  IIIII  SSSS   H   H  IIIII
 
 // Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
 // Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
