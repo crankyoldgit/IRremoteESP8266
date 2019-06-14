@@ -19,7 +19,10 @@ ALL=$(cat src/IRremoteESP8266.h | while read a b; do
           fi;
           if [[ ${ENUM} -eq 1 ]]; then
             model=$(echo $a | cut -d' ' -f2)
-            [[ "$model" != "UNKNOWN" && "$model" != "UNUSED" && "$model" != "kLastDecodeType" && "$model" != "//" ]] && echo "$model" | sed 's/,//g';
+            [[ "$model" != "UNKNOWN" &&
+               "$model" != "UNUSED" &&
+               "$model" != "kLastDecodeType" &&
+               "$model" != "//" ]] && echo "$model" | sed 's/,//g';
           fi;
           if [[ ${a} == "enum" ]]; then
             ENUM=1;
@@ -72,5 +75,27 @@ for header in src/ir_*.h ; do
   if [[ $? -eq 0 ]]; then
     echo "- [${protocol}](${CODEURL}${protocol}.h)"
     [[ ! -z "${ENUMS}" ]] && echo "  - Models: ${ENUMS}"
+  fi
+done
+
+echo
+echo "## Known working devices:"
+echo
+cd src
+for protocol in $(ls -1 ir_*.{cpp,h} | cut -d_ -f2 | cut -d. -f1 | sort -du); do
+  case "${protocol}" in
+    "GlobalCache"|"Pronto")
+      continue
+      ;;
+  esac
+  echo "- [${protocol}](${CODEURL}${protocol}.cpp)"
+  # Get all the supported devices for the protocol.
+  devices=$(egrep -h "^// +Brand: [^\,]+, +Model: [^\,]+$" \
+                ir_${protocol}.{h,cpp} 2> /dev/null |
+                sed 's,^//  ,  -,' | sort -du)
+  if [[ -z "${devices}" ]]; then
+    echo "  - Brand: ${protocol},  Model: Unknown"
+  else
+    echo "${devices}"
   fi
 done
