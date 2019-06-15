@@ -29,7 +29,7 @@ run_tests : all
 	failed=""; \
 	for py_unittest in *_test.py; do \
 	  echo "RUNNING: $${py_unittest}"; \
-		python ./$${py_unittest} || failed="$${failed} $${py_unittest}"; \
+		python3 ./$${py_unittest} || failed="$${failed} $${py_unittest}"; \
 	done; \
 	if [ -n "$${failed}" ]; then \
 		echo "FAIL: :-( :-( Unit test(s)$${failed} failed! :-( :-("; exit 1; \
