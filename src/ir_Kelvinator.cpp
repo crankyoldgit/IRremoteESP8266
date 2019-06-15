@@ -76,8 +76,8 @@ const uint8_t kKelvinatorTurbo = 1 << kKelvinatorTurboOffset;
 //
 // Status: STABLE / Known working.
 //
-void IRsend::sendKelvinator(unsigned char data[], uint16_t nbytes,
-                            uint16_t repeat) {
+void IRsend::sendKelvinator(const unsigned char data[], const uint16_t nbytes,
+                            const uint16_t repeat) {
   if (nbytes < kKelvinatorStateLength)
     return;  // Not enough bytes to send a proper message.
 

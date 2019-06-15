@@ -45,6 +45,8 @@ script:
   - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnPanasonicAC/TurnOnPanasonicAC.ino
   - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiHeavyAc/TurnOnMitsubishiHeavyAc.ino
+  - arduino --verify --board $BD $PWD/examples/DumbIRRepeater/DumbIRRepeater.ino
+  - arduino --verify --board $BD $PWD/examples/SmartIRRepeater/SmartIRRepeater.ino
 
   # Also check the tools programs compile.
   - (cd tools; make all)

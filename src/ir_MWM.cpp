@@ -34,7 +34,8 @@ const int16_t kMark = 0;
 //
 // Status: Implemented.
 //
-void IRsend::sendMWM(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
+void IRsend::sendMWM(const uint8_t data[], const uint16_t nbytes,
+                     const uint16_t repeat) {
   if (nbytes < 3) return;  // Shortest possible message is 3 bytes
 
   // Set 38kHz IR carrier frequency & a 1/4 (25%) duty cycle.

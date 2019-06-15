@@ -712,8 +712,8 @@ bool IRrecv::decodeDaikin(decode_results *results, const uint16_t nbits,
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/582
-void IRsend::sendDaikin2(unsigned char data[], uint16_t nbytes,
-                        uint16_t repeat) {
+void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
+                         const uint16_t repeat) {
   if (nbytes < kDaikin2Section1Length)
     return;  // Not enough bytes to send a partial message.
 
