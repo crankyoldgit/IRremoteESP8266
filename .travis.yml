@@ -23,7 +23,8 @@ install:
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
   - sudo apt-get install python3-pip -y
-  - sudo pip3 install pylint
+  - pip install --upgrade pip
+  - pip3 install pylint
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
