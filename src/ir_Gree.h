@@ -1,7 +1,7 @@
 // Copyright 2016 David Conran
 // Gree A/C
 //
-// Supported:
+// Supports:
 //   Brand: Ultimate,  Model: Heat Pump
 //   Brand: EKOKAI,  Model: A/C
 

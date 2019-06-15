@@ -22,7 +22,7 @@ install:
   - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
-  - sudo pip install pylint
+  - sudo apt-get install pylint3
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
@@ -51,7 +51,7 @@ script:
   # Check for lint issues.
   - shopt -s nullglob
   - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
-  - pylint {src,test,tools}/*.py
+  - pylint3 -d F0001 {src,test,tools}/*.py
   - shopt -u nullglob
   # Build and run the unit tests.
   - (cd test; make run)
