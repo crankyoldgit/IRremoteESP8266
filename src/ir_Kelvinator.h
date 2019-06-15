@@ -2,7 +2,7 @@
 //
 // Copyright 2016 David Conran
 
-// Supported:
+// Supports:
 //   Brand: Kelvinator,  Model: YALIF Remote
 //   Brand: Kelvinator,  Model: KSV26CRC A/C
 //   Brand: Kelvinator,  Model: KSV26HRC A/C

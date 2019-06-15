@@ -1,7 +1,7 @@
 // Copyright 2018 crankyoldgit
 // The specifics of reverse engineering the protocol details by kuzin2006
 
-// Supported:
+// Supports:
 //   Brand: Haier,  Model: HSU07-HEA03 remote
 //   Brand: Haier,  Model: YR-W02 remote
 //   Brand: Haier,  Model: HSU-09HMC203 A/C

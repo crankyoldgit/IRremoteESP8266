@@ -8,7 +8,7 @@
 // LEGO
 // (LEGO is a Registrated Trademark of the Lego Group.)
 //
-// Supported:
+// Supports:
 //   Brand: LEGO Power Functions,  Model: IR Receiver
 //
 // Ref:
