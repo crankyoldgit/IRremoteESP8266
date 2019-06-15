@@ -29,6 +29,10 @@ something you likely should not have. You should be able to quickly determine
 the new name from the old. e.g. `CONSTANT_NAME` to `kConstantName`.
 Use common sense or examining the library's code if this does affect code.
 
+## Supported protocols
+You can find the details of which protocols & devices are supported
+[here](https://github.com/markszabo/IRremoteESP8266/blob/master/SupportedProtocols.md).
+
 ## Troubleshooting
 Before reporting an issue or asking for help, please try to follow our [Troubleshooting Guide](https://github.com/markszabo/IRremoteESP8266/wiki/Troubleshooting-Guide) first.
 
