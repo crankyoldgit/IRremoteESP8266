@@ -24,7 +24,7 @@ install:
   - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
-  - pip3 install pylint
+  - pip install pylint
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
