@@ -1,6 +1,4 @@
 language: c
-python:
-  - "3.6"
 env:
   - BD=esp8266:esp8266:nodemcuv2:xtal=80,eesz=4M3M,ip=lm2f,exception=disabled
   - BD=esp8266:esp8266:d1_mini:xtal=80,eesz=4M3M,ip=lm2f,exception=disabled
@@ -24,7 +22,8 @@ install:
   - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
-  - pip install pylint
+  - sudo apt-get install python3-pip -y
+  - pip3 install --user pylint
 script:
   # Check that everything compiles.
   - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
