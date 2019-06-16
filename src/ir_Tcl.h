@@ -1,5 +1,8 @@
 // Copyright 2019 David Conran
 
+// Supports:
+//   Brand: Leberg,  Model: LBS-TOR07 A/C
+
 #ifndef IR_TCL_H_
 #define IR_TCL_H_
 
