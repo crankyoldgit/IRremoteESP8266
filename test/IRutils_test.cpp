@@ -466,25 +466,26 @@ TEST(TestResultToRawArray, TypicalCase) {
 TEST(TestResultToRawArray, LargeValues) {
   IRsendTest irsend(0);
   IRrecv irrecv(1);
-  uint16_t test_data[7] = {10, 20, 30, 40, 50, 60, 70};
+  uint16_t test_data[9] = {10, 20, 30, 40, 50, 60, 70, 80, 90};
   irsend.begin();
   irsend.reset();
-  irsend.sendRaw(test_data, 7, 38000);
+  irsend.sendRaw(test_data, 9, 38000);
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
   uint16_t * result = resultToRawArray(&irsend.capture);
-  ASSERT_EQ(7, getCorrectedRawLength(&irsend.capture));
-  EXPECT_STATE_EQ(test_data, result, 7);
+  ASSERT_EQ(9, getCorrectedRawLength(&irsend.capture));
+  EXPECT_STATE_EQ(test_data, result, 9);
   if (result != NULL) delete[] result;
   // Stick in some large values.
   irsend.capture.rawbuf[3] = 60000;
   EXPECT_EQ(
-      "uint16_t rawData[9] = {10, 20,  65535, 0,  54465, 40,"
-      "  50, 60,  70};  // UNKNOWN A5E5F35D\n",
+      "uint16_t rawData[11] = {10, 20,  65535, 0,  54465, 40,  50, 60,  70, "
+      "80,  90};  // UNKNOWN 54051FFD\n",
       resultToSourceCode(&irsend.capture));
-  uint16_t large_test_data[9] = {10, 20, 65535, 0, 54465, 40, 50, 60, 70};
-  ASSERT_EQ(9, getCorrectedRawLength(&irsend.capture));
+  uint16_t large_test_data[11] = {
+      10, 20, 65535, 0, 54465, 40, 50, 60, 70, 80, 90};
+  ASSERT_EQ(11, getCorrectedRawLength(&irsend.capture));
   result = resultToRawArray(&irsend.capture);
-  EXPECT_STATE_EQ(large_test_data, result, 9);
+  EXPECT_STATE_EQ(large_test_data, result, 11);
   if (result != NULL) delete[] result;
 }
