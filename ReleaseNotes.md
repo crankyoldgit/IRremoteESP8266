@@ -1,5 +1,24 @@
 # Release Notes
 
+## _v2.6.2 (20190616)_
+
+**[Features]**
+- Initial support for the ESP32 architecture & boards. (#742)
+- Add changable GPIO settings to IRMQTTServer. (#730)
+- IRMQTTServer: Enforce a repeat for all Coolix calls (#752)
+- Basic DAIKIN 160bit send and decode. (#754)
+- Add example code for a Smart(er) IR Repeater. (#740)
+- Enforce Samsung A/C Quiet & Powerful mutual exclusivity.
+
+**[Misc]**
+- IRMQTTServer: Add some memory alloc safety checks. (#749)
+- Move some ToString() functions to IRac.cpp (#748)
+- Increase tolerance value for TCL112AC protocol. (#745)
+- Fix compiler warning in IRutils_test.cpp (#756)
+- Scrape Supported Protocols and generate SupportedProtocols.md (#755)
+- Make supported device info more organised. (#753)
+
+
 ## _v2.6.1 (20190609)_
 
 **[Breaking Changes]**
