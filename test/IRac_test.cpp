@@ -885,6 +885,113 @@ TEST(TestIRac, Whirlpool) {
   ASSERT_EQ(expected, ac.toString());
 }
 
+TEST(TestIRac, cmpStates) {
+  stdAc::state_t a, b;
+  a.protocol = decode_type_t::COOLIX;
+  a.model = -1;
+  a.power = true;
+  a.celsius = true;
+  a.degrees = 25;
+  a.mode = stdAc::opmode_t::kAuto;
+  a.fanspeed = stdAc::fanspeed_t::kAuto;
+  a.swingh = stdAc::swingh_t::kOff;
+  a.swingv = stdAc::swingv_t::kOff;
+  a.quiet = false;
+  a.turbo = false;
+  a.light = false;
+  a.econo = false;
+  a.beep = false;
+  a.filter = false;
+  a.clean = false;
+  a.quiet = false;
+  a.sleep = -1;
+  a.clock = -1;
+
+  ASSERT_FALSE(IRac::cmpStates(a, a));
+  ASSERT_TRUE(IRac::cmpStates(a, b));
+
+  b = a;
+  ASSERT_FALSE(IRac::cmpStates(a, b));
+
+  // Check we don't compare the clock.
+  b.clock = 1234;
+  ASSERT_FALSE(IRac::cmpStates(a, b));
+
+  // Now make them different.
+  b.power = false;
+  ASSERT_TRUE(IRac::cmpStates(a, b));
+}
+
+TEST(TestIRac, handleToggles) {
+  stdAc::state_t desired, prev, result;
+  desired.protocol = decode_type_t::COOLIX;
+  desired.model = -1;
+  desired.power = true;
+  desired.celsius = true;
+  desired.degrees = 25;
+  desired.mode = stdAc::opmode_t::kAuto;
+  desired.fanspeed = stdAc::fanspeed_t::kAuto;
+  desired.swingh = stdAc::swingh_t::kOff;
+  desired.swingv = stdAc::swingv_t::kOff;
+  desired.quiet = false;
+  desired.turbo = false;
+  desired.light = false;
+  desired.econo = false;
+  desired.beep = false;
+  desired.filter = false;
+  desired.clean = false;
+  desired.quiet = false;
+  desired.sleep = -1;
+  desired.clock = -1;
+
+  // The states should be the same as we gave no previous state.
+  EXPECT_FALSE(IRac::cmpStates(desired, IRac::handleToggles(desired)));
+  // The states should be the same as we gave no settings that changed.
+  prev = desired;
+  EXPECT_FALSE(IRac::cmpStates(desired, IRac::handleToggles(desired, &prev)));
+  // Change something that isn't a toggle.
+  desired.degrees = 26;
+  ASSERT_TRUE(IRac::cmpStates(desired, prev));
+  // Still shouldn't change.
+  EXPECT_FALSE(IRac::cmpStates(desired, IRac::handleToggles(desired, &prev)));
+  prev.turbo = true;  // This requires a toggle.
+  result = IRac::handleToggles(desired, &prev);
+  EXPECT_TRUE(IRac::cmpStates(desired, result));
+  EXPECT_TRUE(result.turbo);
+  desired.turbo = true;  // As the desired setting hasn't changed from previous
+                         // the result should not have turbo set, as it is
+                         // a toggle setting.
+  result = IRac::handleToggles(desired, &prev);
+  EXPECT_TRUE(IRac::cmpStates(desired, result));
+  EXPECT_FALSE(result.turbo);
+
+  // Go back to the same states.
+  prev = desired;
+  ASSERT_FALSE(IRac::cmpStates(desired, prev));
+  // Test swing, as it is more complicated.
+  result = IRac::handleToggles(desired, &prev);
+  EXPECT_EQ(stdAc::swingv_t::kOff, result.swingv);
+  desired.swingv = stdAc::swingv_t::kAuto;
+  result = IRac::handleToggles(desired, &prev);
+  EXPECT_NE(stdAc::swingv_t::kOff, result.swingv);
+
+  prev = desired;  // Pretend it was sent and time has passed.
+  ASSERT_FALSE(IRac::cmpStates(desired, prev));
+  ASSERT_NE(stdAc::swingv_t::kOff, desired.swingv);
+
+  // User changes setting but it's still an "on" setting, as this device
+  // only has a binary on/off for swingv. Nothing should change.
+  desired.swingv = stdAc::swingv_t::kHigh;
+  result = IRac::handleToggles(desired, &prev);
+  ASSERT_EQ(stdAc::swingv_t::kOff, result.swingv);  // i.e No toggle.
+
+  prev = desired;  // Pretend it was sent and time has passed.
+  // User changes setting to off. i.e. It is no longer on, so it should toggle.
+  desired.swingv = stdAc::swingv_t::kOff;
+  result = IRac::handleToggles(desired, &prev);
+  ASSERT_NE(stdAc::swingv_t::kOff, result.swingv);  // i.e A toggle.
+}
+
 TEST(TestIRac, strToBool) {
   EXPECT_TRUE(IRac::strToBool("ON"));
   EXPECT_TRUE(IRac::strToBool("1"));
