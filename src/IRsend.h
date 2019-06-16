@@ -304,6 +304,11 @@ class IRsend {
                   const uint16_t nbytes = kDaikinStateLength,
                   const uint16_t repeat = kDaikinDefaultRepeat);
 #endif
+#if SEND_DAIKIN160
+  void sendDaikin160(const unsigned char data[],
+                     const uint16_t nbytes = kDaikin160StateLength,
+                     const uint16_t repeat = kDaikin160DefaultRepeat);
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
   void sendDaikin2(const unsigned char data[],
                    const uint16_t nbytes = kDaikin2StateLength,

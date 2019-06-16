@@ -9,6 +9,7 @@
 //   Brand: Daikin,  Model: FTXZ35NV1B A/C
 //   Brand: Daikin,  Model: FTXZ50NV1B A/C
 //   Brand: Daikin,  Model: ARC433B69 remote
+//   Brand: Daikin,  Model: ARC423A5 remote
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -216,7 +217,18 @@ const uint8_t kDaikin216ByteSwingH = 17;
 const uint8_t kDaikin216MaskSwingH = kDaikin216MaskSwingV;
 const uint8_t kDaikin216BytePowerful = 21;
 
-
+// Another variant of the protocol for the Daikin ARC423A5 remote.
+const uint16_t kDaikin160Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin160HdrMark = 5000;
+const uint16_t kDaikin160HdrSpace = 2145;
+const uint16_t kDaikin160BitMark = 342;
+const uint16_t kDaikin160OneSpace = 1786;
+const uint16_t kDaikin160ZeroSpace = 700;
+const uint16_t kDaikin160Gap = 29650;
+const uint16_t kDaikin160Sections = 2;
+const uint16_t kDaikin160Section1Length = 7;
+const uint16_t kDaikin160Section2Length = kDaikin160StateLength -
+                                          kDaikin160Section1Length;
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
@@ -458,6 +470,33 @@ class IRDaikin216 {
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin216StateLength];
+  void stateReset();
+  void checksum();
+};
+
+// Class to emulate a Daikin ARC423A5 remote.
+class IRDaikin160 {
+ public:
+  explicit IRDaikin160(uint16_t pin);
+
+#if SEND_DAIKIN160
+  void send(const uint16_t repeat = kDaikin160DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif
+  void begin();
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin160StateLength);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin160StateLength];
   void stateReset();
   void checksum();
 };

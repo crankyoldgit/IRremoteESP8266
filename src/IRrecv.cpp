@@ -619,6 +619,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Trotec decode");
   if (decodeTrotec(results)) return true;
 #endif  // DECODE_TROTEC
+#if DECODE_DAIKIN160
+  DPRINTLN("Attempting Daikin160 decode");
+  if (decodeDaikin160(results)) return true;
+#endif  // DECODE_DAIKIN160
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
