@@ -37,9 +37,7 @@
  * can check your wifi router for it's address.
  */
 
-#ifndef UNIT_TEST
 #include <Arduino.h>
-#endif
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #endif  // ESP8266

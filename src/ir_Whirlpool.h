@@ -19,8 +19,6 @@
 #include <stdint.h>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -142,11 +140,7 @@ class IRWhirlpoolAc {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
-#else
-  std::string toString(void);
-#endif
 #ifndef UNIT_TEST
 
  private:
@@ -165,11 +159,7 @@ class IRWhirlpoolAc {
   void _setTemp(const uint8_t temp, const bool remember = true);
   void _setMode(const uint8_t mode);
   int8_t getTempOffset(void);
-#ifdef ARDUINO
   String timeToString(uint16_t minspastmidnight);
-#else
-  std::string timeToString(uint16_t minspastmidnight);
-#endif
 };
 
 #endif  // IR_WHIRLPOOL_H_

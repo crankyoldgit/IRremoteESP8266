@@ -44,13 +44,8 @@ uint64_t reverseBits(uint64_t input, uint16_t nbits) {
 // Returns:
 //   A string representation of the integer.
 // Note: Based on Arduino's Print::printNumber()
-#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
 String uint64ToString(uint64_t input, uint8_t base) {
   String result = "";
-#else
-std::string uint64ToString(uint64_t input, uint8_t base) {
-  std::string result = "";
-#endif
   // prevent issues if called with base <= 1
   if (base < 2) base = 10;
   // Check we have a base that we can actually print.
@@ -237,13 +232,8 @@ decode_type_t strToDecodeType(const char * const str) {
 //   unescaped: A string containing text to make HTML safe.
 // Returns:
 //   A string that is HTML safe.
-#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
 String htmlEscape(const String unescaped) {
   String result = "";
-#else
-std::string htmlEscape(const std::string unescaped) {
-  std::string result = "";
-#endif
   uint16_t ulen = unescaped.length();
   result.reserve(ulen);  // The result will be at least the size of input.
   for (size_t i = 0; i < ulen; i++) {
@@ -305,13 +295,8 @@ std::string htmlEscape(const std::string unescaped) {
 //   isRepeat: A flag indicating if it is a repeat message of the protocol.
 // Returns:
 //   A string containing the protocol name.
-#ifdef ARDUINO  // Arduino's & C++'s string implementations can't co-exist.
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
-#else
-std::string typeToString(const decode_type_t protocol, const bool isRepeat) {
-  std::string result = "";
-#endif
   switch (protocol) {
     case UNUSED:
       result = F("UNUSED");
@@ -572,13 +557,8 @@ uint16_t getCorrectedRawLength(const decode_results * const results) {
 
 // Return a string containing the key values of a decode_results structure
 // in a C/C++ code style format.
-#ifdef ARDUINO
 String resultToSourceCode(const decode_results * const results) {
   String output = "";
-#else
-std::string resultToSourceCode(const decode_results * const results) {
-  std::string output = "";
-#endif
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(1536);  // 1.5KB should cover most cases.
   // Start declaration
@@ -656,17 +636,12 @@ std::string resultToSourceCode(const decode_results * const results) {
 
 // Dump out the decode_results structure.
 //
-#ifdef ARDUINO
 String resultToTimingInfo(const decode_results * const results) {
   String output = "";
   String value = "";
-#else
-std::string resultToTimingInfo(const decode_results * const results) {
-  std::string output = "";
-  std::string value = "";
-#endif
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(2048);  // 2KB should cover most cases.
+  value.reserve(6);  // Max value should be 2^17 = 131072
   output += F("Raw Timing[");
   output += uint64ToString(results->rawlen - 1, 10);
   output += F("]:\n");
@@ -690,13 +665,8 @@ std::string resultToTimingInfo(const decode_results * const results) {
 
 // Convert the decode_results structure's value/state to simple hexadecimal.
 //
-#ifdef ARDUINO
 String resultToHexidecimal(const decode_results * const result) {
   String output = "";
-#else
-std::string resultToHexidecimal(const decode_results * const result) {
-  std::string output = "";
-#endif
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(2 * kStateSizeMax);  // Should cover worst cases.
   if (hasACState(result->decode_type)) {
@@ -714,13 +684,8 @@ std::string resultToHexidecimal(const decode_results * const result) {
 
 // Dump out the decode_results structure.
 //
-#ifdef ARDUINO
 String resultToHumanReadableBasic(const decode_results * const results) {
   String output = "";
-#else
-std::string resultToHumanReadableBasic(const decode_results *const results) {
-  std::string output = "";
-#endif
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
   // Show Encoding standard

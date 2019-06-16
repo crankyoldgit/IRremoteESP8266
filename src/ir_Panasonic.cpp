@@ -609,13 +609,9 @@ bool IRPanasonicAc::isOffTimerEnabled(void) {
   return remote_state[13] & kPanasonicAcOffTimer;
 }
 
-#ifdef ARDUINO
 String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
   String result = "";
-#else
-std::string IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
-  std::string result = "";
-#endif  // ARDUINO
+  result.reserve(6);
   result += uint64ToString(mins_since_midnight / 60) + ':';
   uint8_t mins = mins_since_midnight % 60;
   if (mins < 10) result += '0';  // Zero pad the minutes.
@@ -759,13 +755,8 @@ stdAc::state_t IRPanasonicAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRPanasonicAc::toString(void) {
   String result = "";
-#else
-std::string IRPanasonicAc::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
   result += F("Model: ");
   result += uint64ToString(getModel());

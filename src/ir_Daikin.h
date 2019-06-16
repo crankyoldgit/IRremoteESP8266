@@ -16,8 +16,6 @@
 
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
@@ -301,13 +299,8 @@ class IRDaikinESP {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);
-#else
-  std::string toString(void);
-  static std::string renderTime(const uint16_t timemins);
-#endif
 #ifndef UNIT_TEST
 
  private:
@@ -397,13 +390,8 @@ class IRDaikin2 {
   static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString();
   static String renderTime(uint16_t timemins);
-#else
-  std::string toString();
-  static std::string renderTime(uint16_t timemins);
-#endif
 #ifndef UNIT_TEST
 
  private:
@@ -454,13 +442,8 @@ class IRDaikin216 {
   void setPowerful(const bool on);
   bool getPowerful(void);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);
-#else
-  std::string toString(void);
-  static std::string renderTime(const uint16_t timemins);
-#endif
 #ifndef UNIT_TEST
 
  private:

@@ -28,9 +28,7 @@
  *   * ESP-01 modules are tricky. We suggest you use a module with more GPIOs
  *     for your first time. e.g. ESP-12 etc.
  */
-#ifndef UNIT_TEST
 #include <Arduino.h>
-#endif
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>

@@ -495,13 +495,8 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
   return result;
 }
 
-#ifdef ARDUINO
 String IRDaikinESP::renderTime(const uint16_t timemins) {
   String ret;
-#else   // ARDUINO
-std::string IRDaikinESP::renderTime(const uint16_t timemins) {
-  std::string ret;
-#endif  // ARDUINO
   ret = uint64ToString(timemins / 60) + ':';
   uint8_t mins = timemins % 60;
   if (mins < 10) ret += '0';
@@ -510,13 +505,8 @@ std::string IRDaikinESP::renderTime(const uint16_t timemins) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRDaikinESP::toString(void) {
   String result = "";
-#else   // ARDUINO
-std::string IRDaikinESP::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(230);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   result += this->getPower() ? F("On") : F("Off");
@@ -1216,13 +1206,8 @@ stdAc::state_t IRDaikin2::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRDaikin2::toString() {
   String result = "";
-#else   // ARDUINO
-std::string IRDaikin2::toString() {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())
@@ -1738,13 +1723,8 @@ stdAc::state_t IRDaikin216::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRDaikin216::toString() {
   String result = "";
-#else   // ARDUINO
-std::string IRDaikin216::toString() {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (this->getPower())

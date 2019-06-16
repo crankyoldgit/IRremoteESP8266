@@ -9,8 +9,6 @@
 
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
@@ -80,13 +78,8 @@ class IRSharpAc {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
   static String renderTime(const uint16_t timemins);
-#else
-  std::string toString(void);
-  static std::string renderTime(const uint16_t timemins);
-#endif
 #ifndef UNIT_TEST
 
  private:

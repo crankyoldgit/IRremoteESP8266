@@ -7,8 +7,6 @@
 #include <algorithm>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
@@ -483,13 +481,8 @@ stdAc::state_t IRVestelAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRVestelAc::toString(void) {
   String result = "";
-#else
-std::string IRVestelAc::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (this->isTimeCommand()) {
     result += F("Time: ");

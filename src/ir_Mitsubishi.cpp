@@ -725,13 +725,9 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
   return result;
 }
 
-#ifdef ARDUINO
 String IRMitsubishiAC::timeToString(const uint64_t time) {
   String result = "";
-#else
-std::string IRMitsubishiAC::timeToString(const uint64_t time) {
-  std::string result = "";
-#endif  // ARDUINO
+  result.reserve(6);
   if (time / 6 < 10) result += '0';
   result += uint64ToString(time / 6);
   result += ':';
@@ -741,13 +737,8 @@ std::string IRMitsubishiAC::timeToString(const uint64_t time) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRMitsubishiAC::toString(void) {
   String result = "";
-#else
-std::string IRMitsubishiAC::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (this->getPower())

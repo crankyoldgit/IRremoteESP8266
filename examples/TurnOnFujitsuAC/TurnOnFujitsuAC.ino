@@ -1,7 +1,5 @@
 // Copyright 2017 Jonny Graham, 2018 David Conran
-#ifndef UNIT_TEST
 #include <Arduino.h>
-#endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <ir_Fujitsu.h>

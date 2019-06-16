@@ -933,3 +933,35 @@ TEST(TestIRac, strToModel) {
   EXPECT_EQ(-1, IRac::strToModel("FOOBAR"));
   EXPECT_EQ(0, IRac::strToModel("FOOBAR", 0));
 }
+
+TEST(TestIRac, boolToString) {
+  EXPECT_EQ("on", IRac::boolToString(true));
+  EXPECT_EQ("off", IRac::boolToString(false));
+}
+
+TEST(TestIRac, opmodeToString) {
+  EXPECT_EQ("off", IRac::opmodeToString(stdAc::opmode_t::kOff));
+  EXPECT_EQ("auto", IRac::opmodeToString(stdAc::opmode_t::kAuto));
+  EXPECT_EQ("cool", IRac::opmodeToString(stdAc::opmode_t::kCool));
+  EXPECT_EQ("unknown", IRac::opmodeToString((stdAc::opmode_t)500));
+}
+
+TEST(TestIRac, fanspeedToString) {
+  EXPECT_EQ("low", IRac::fanspeedToString(stdAc::fanspeed_t::kLow));
+  EXPECT_EQ("auto", IRac::fanspeedToString(stdAc::fanspeed_t::kAuto));
+  EXPECT_EQ("unknown", IRac::fanspeedToString((stdAc::fanspeed_t)500));
+}
+
+TEST(TestIRac, swingvToString) {
+  EXPECT_EQ("off", IRac::swingvToString(stdAc::swingv_t::kOff));
+  EXPECT_EQ("low", IRac::swingvToString(stdAc::swingv_t::kLow));
+  EXPECT_EQ("auto", IRac::swingvToString(stdAc::swingv_t::kAuto));
+  EXPECT_EQ("unknown", IRac::swingvToString((stdAc::swingv_t)500));
+}
+
+TEST(TestIRac, swinghToString) {
+  EXPECT_EQ("off", IRac::swinghToString(stdAc::swingh_t::kOff));
+  EXPECT_EQ("left", IRac::swinghToString(stdAc::swingh_t::kLeft));
+  EXPECT_EQ("auto", IRac::swinghToString(stdAc::swingh_t::kAuto));
+  EXPECT_EQ("unknown", IRac::swinghToString((stdAc::swingh_t)500));
+}

@@ -696,13 +696,8 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRSamsungAc::toString(void) {
   String result = "";
-#else
-std::string IRSamsungAc::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())

@@ -476,13 +476,8 @@ stdAc::state_t IRWhirlpoolAc::toCommon(void) {
   return result;
 }
 
-#ifdef ARDUINO
 String IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
   String result = "";
-#else
-std::string IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
-  std::string result = "";
-#endif  // ARDUINO
   uint8_t hours = minspastmidnight / 60;
   if (hours < 10) result += '0';
   result += uint64ToString(hours);
@@ -494,13 +489,8 @@ std::string IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRWhirlpoolAc::toString(void) {
   String result = "";
-#else
-std::string IRWhirlpoolAc::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(200);  // Reserve some heap for the string to reduce fragging.
   result += F("Model: ");
   result += uint64ToString(this->getModel());

@@ -12,8 +12,6 @@
 #include <stdint.h>
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -122,11 +120,7 @@ class IRGreeAC {
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kGreeStateLength);
-#ifdef ARDUINO
   String toString(void);
-#else
-  std::string toString(void);
-#endif
 #ifndef UNIT_TEST
 
  private:

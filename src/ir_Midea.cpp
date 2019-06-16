@@ -332,13 +332,8 @@ stdAc::state_t IRMideaAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRMideaAC::toString(void) {
   String result = "";
-#else
-std::string IRMideaAC::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (getPower())

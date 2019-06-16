@@ -525,13 +525,8 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-#ifdef ARDUINO
 String IRFujitsuAC::toString(void) {
   String result = "";
-#else
-std::string IRFujitsuAC::toString(void) {
-  std::string result = "";
-#endif  // ARDUINO
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += F("Model: ");
   fujitsu_ac_remote_model_t model = this->getModel();

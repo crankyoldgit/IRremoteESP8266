@@ -26,8 +26,6 @@
 #include <stdint.h>
 #ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -149,13 +147,8 @@ class IRPanasonicAc {
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
   static String timeToString(const uint16_t mins_since_midnight);
-#else
-  std::string toString(void);
-  static std::string timeToString(const uint16_t mins_since_midnight);
-#endif
 #ifndef UNIT_TEST
 
  private:

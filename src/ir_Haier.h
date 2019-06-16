@@ -11,8 +11,6 @@
 
 #ifndef UNIT_TEST
 #include <Arduino.h>
-#else
-#include <string>
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
@@ -237,13 +235,8 @@ class IRHaierAC {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
   static String timeToString(const uint16_t nr_mins);
-#else
-  std::string toString(void);
-  static std::string timeToString(const uint16_t nr_mins);
-#endif
 #ifndef UNIT_TEST
 
  private:
@@ -306,11 +299,7 @@ class IRHaierACYRW02 {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void);
-#ifdef ARDUINO
   String toString(void);
-#else
-  std::string toString(void);
-#endif
 #ifndef UNIT_TEST
 
  private:
