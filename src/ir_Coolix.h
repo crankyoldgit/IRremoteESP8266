@@ -23,7 +23,11 @@
 //             CCCCC   OOOO0   OOOO0  LLLLLLL IIIII XX    XX
 
 // Supports:
-//   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
+//   Brand: Beko, Model: RG57K7(B)/BGEF Remote
+//   Brand: Beko, Model: BINR 070/071 split-type A/C
+//   Brand: Midea, Model: RG52D/BGE Remote
+//   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
+//   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/484
 // Kudos:
