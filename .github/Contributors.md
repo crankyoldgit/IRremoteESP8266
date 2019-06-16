@@ -2,7 +2,7 @@
 ### Main contributors & maintainers
 - [Mark Szabo](https://github.com/markszabo/) : Initial IR sending on ESP8266
 - [Sébastien Warin](https://github.com/sebastienwarin/) (http://sebastien.warin.fr) : Initial IR receiving on ESP8266
-- [David Conran](https://github.com/crankyoldgit/)
+- [David Conran](https://github.com/crankyoldgit/) : ESP32 support and pretty much everything else.
 - [Roi Dayan](https://github.com/roidayan/)
 - [Marcos de Alcântara Marinho](https://github.com/marcosamarinho/)
 - [Massimiliano Pinto](https://github.com/pintomax/)

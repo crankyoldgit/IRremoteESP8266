@@ -53,7 +53,11 @@ uint8_t samsungState[kSamsungAcStateLength] = {
 
 void setup() {
   irsend.begin();
+#if ESP8266
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
+#else  // ESP8266
+  Serial.begin(115200, SERIAL_8N1);
+#endif  // ESP8266
 }
 
 void loop() {

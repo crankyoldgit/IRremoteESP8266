@@ -211,6 +211,7 @@ const char* kMqttPrefixKey = "mqtt_prefix";
 const char* kHostnameKey = "hostname";
 const char* kHttpUserKey = "http_user";
 const char* kHttpPassKey = "http_pass";
+const char* kCommandDelimiter = ",";
 
 // URLs
 const char* kUrlRoot = "/";
@@ -228,9 +229,14 @@ const char* kUrlWipe = "/reset";
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
 const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
 const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
-const char * kSequenceDelimiter = ";";
-const char * kCommandDelimiter = ",";
+const char* kSequenceDelimiter = ";";
 const char kPauseChar = 'P';
+#if defined(ESP8266)
+const uint32_t kChipId = ESP.getChipId();
+#endif  // ESP8266
+#if defined(ESP32)
+const uint32_t kChipId = ESP.getEfuseMac();  // Discard the top 16 bits.
+#endif  // ESP32
 
 const char* kClimateTopics =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
@@ -244,6 +250,7 @@ void handleSendMqttDiscovery(void);
 void subscribing(const String topic_name);
 void unsubscribing(const String topic_name);
 void mqttLog(const String mesg);
+bool mountSpiffs(void);
 bool reconnect(void);
 void receivingMQTT(String const topic_name, String const callback_str);
 void callback(char* topic, byte* payload, unsigned int length);

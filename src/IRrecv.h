@@ -51,6 +51,9 @@ const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 const uint32_t kFnvPrime32 = 16777619UL;
 const uint32_t kFnvBasis32 = 2166136261UL;
 
+// Which of the ESP32 timers to use by default. (0-3)
+const uint8_t kDefaultESP32Timer = 3;
+
 #if DECODE_AC
 // Hitachi AC is the current largest state size.
 const uint16_t kStateSizeMax = kHitachiAc2StateLength;
@@ -108,17 +111,24 @@ class decode_results {
 // main class for receiving IR
 class IRrecv {
  public:
-  explicit IRrecv(uint16_t recvpin, uint16_t bufsize = kRawBuf,
-                  uint8_t timeout = kTimeoutMs,
-                  bool save_buffer = false);  // Constructor
-  ~IRrecv();                                  // Destructor
+#if defined(ESP32)
+  explicit IRrecv(const uint16_t recvpin, const uint16_t bufsize = kRawBuf,
+                  const uint8_t timeout = kTimeoutMs,
+                  const bool save_buffer = false,
+                  const uint8_t timer_num = kDefaultESP32Timer);  // Constructor
+#else  // ESP32
+  explicit IRrecv(const uint16_t recvpin, const uint16_t bufsize = kRawBuf,
+                  const uint8_t timeout = kTimeoutMs,
+                  const bool save_buffer = false);                // Constructor
+#endif  // ESP32
+  ~IRrecv(void);                                                  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
-  void enableIRIn();
-  void disableIRIn();
-  void resume();
-  uint16_t getBufSize();
+  void enableIRIn(void);
+  void disableIRIn(void);
+  void resume(void);
+  uint16_t getBufSize(void);
 #if DECODE_HASH
-  void setUnknownThreshold(uint16_t length);
+  void setUnknownThreshold(const uint16_t length);
 #endif
   static bool match(uint32_t measured, uint32_t desired,
                     uint8_t tolerance = kTolerance, uint16_t delta = 0);
@@ -133,8 +143,9 @@ class IRrecv {
  private:
 #endif
   irparams_t *irparams_save;
+  uint8_t _timer_num;
 #if DECODE_HASH
-  uint16_t unknown_threshold;
+  uint16_t _unknown_threshold;
 #endif
   // These are called by decode
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);

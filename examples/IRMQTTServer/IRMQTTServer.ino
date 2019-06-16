@@ -31,9 +31,10 @@
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.x and < 6)
+ *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.0 and < 6.0)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
- *     - WiFiManager (https://github.com/tzapu/WiFiManager) (Version >= 0.14)
+ *     - WiFiManager (https://github.com/tzapu/WiFiManager)
+ *                   (ESP8266: Version >= 0.14, ESP32: 'development' branch.)
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
@@ -42,10 +43,10 @@
  *     the accompanying platformio.ini file.
  *
  * ## First Boot (Initial setup)
- * The ESP8266 board will boot into the WiFiManager's AP mode.
+ * The ESP board will boot into the WiFiManager's AP mode.
  * i.e. It will create a WiFi Access Point with a SSID like: "ESP123456" etc.
  * Connect to that SSID. Then point your browser to http://192.168.4.1/ and
- * configure the ESP8266 to connect to your desired WiFi network and associated
+ * configure the ESP to connect to your desired WiFi network and associated
  * required settings. It will remember these details on next boot if the device
  * connects successfully.
  * More information can be found here:
@@ -297,12 +298,21 @@
 #include <Arduino.h>
 #include <FS.h>
 #include <ArduinoJson.h>
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <ESPmDNS.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <SPIFFS.h>
+#include <Update.h>
+#endif  // ESP32
 #include <WiFiClient.h>
 #include <DNSServer.h>
-#include <ESP8266WebServer.h>
 #include <WiFiManager.h>
-#include <ESP8266mDNS.h>
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
@@ -322,7 +332,12 @@
 #include <string>
 
 // Globals
+#if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
+#endif  // ESP8266
+#if defined(ESP32)
+WebServer server(kHttpPort);
+#endif  // ESP32
 #if MDNS_ENABLE
 MDNSResponder mdns;
 #endif  // MDNS_ENABLE
@@ -403,16 +418,29 @@ TimerMs statListenTime = TimerMs();  // How long we've been listening for.
 #endif  // MQTT_ENABLE
 
 bool isSerialGpioUsedByIr(void) {
-  const int8_t kSerialTxGpio = 1;  // The GPIO serial output is sent too.
+  const int8_t kSerialTxGpio = 1;  // The GPIO serial output is sent to.
                                    // Note: *DOES NOT* control Serial output.
+#if defined(ESP32)
+  const int8_t kSerialRxGpio = 3;  // The GPIO serial input is received on.
+#endif  // ESP32
   // Ensure we are not trodding on anything IR related.
 #if IR_RX
-  if (rx_gpio == kSerialTxGpio)
-    return true;  // Serial port is in use by IR capture. Abort.
+  switch (rx_gpio) {
+#if defined(ESP32)
+    case kSerialRxGpio:
+#endif  // ESP32
+    case kSerialTxGpio:
+      return true;  // Serial port is in use by IR capture. Abort.
+  }
 #endif  // IR_RX
   for (uint8_t i = 0; i < kNrOfIrTxGpios; i++)
-    if (txGpioTable[i] == kSerialTxGpio)
-      return true;  // Serial port is in use for IR sending. Abort.
+    switch (txGpioTable[i]) {
+#if defined(ESP32)
+      case kSerialRxGpio:
+#endif  // ESP32
+      case kSerialTxGpio:
+        return true;  // Serial port is in use for IR sending. Abort.
+    }
   return false;  // Not in use as far as we can tell.
 }
 
@@ -429,6 +457,24 @@ void debug(const char *str) {
 void saveWifiConfigCallback(void) {
   debug("saveWifiConfigCallback called.");
   flagSaveWifiConfig = true;
+}
+
+// Forcibly mount the SPIFFS. Formatting the SPIFFS if needed.
+//
+// Returns:
+//   A boolean indicating success or failure.
+bool mountSpiffs(void) {
+  debug("Mounting SPIFFS...");
+  if (SPIFFS.begin()) return true;  // We mounted it okay.
+  // We failed the first time.
+  debug("Failed to mount SPIFFS!\nFormatting SPIFFS and trying again...");
+  SPIFFS.format();
+  if (!SPIFFS.begin()) {  // Did we fail?
+    debug("DANGER: Failed to mount SPIFFS even after formatting!");
+    delay(10000);  // Make sure the debug message doesn't just float by.
+    return false;
+  }
+  return true;  // Success!
 }
 
 bool saveConfig(void) {
@@ -454,7 +500,7 @@ bool saveConfig(void) {
     json[key] = static_cast<int>(txGpioTable[i]);
   }
 
-  if (SPIFFS.begin()) {
+  if (mountSpiffs()) {
     File configFile = SPIFFS.open(kConfigFile, "w");
     if (!configFile) {
       debug("Failed to open config file for writing.");
@@ -471,10 +517,9 @@ bool saveConfig(void) {
 }
 
 bool loadConfigFile(void) {
-  debug("Trying to mount SPIFFS");
   bool success = false;
-  if (SPIFFS.begin()) {
-    debug("mounted file system");
+  if (mountSpiffs()) {
+    debug("mounted the file system");
     if (SPIFFS.exists(kConfigFile)) {
       debug("config file exists");
 
@@ -522,8 +567,6 @@ bool loadConfigFile(void) {
     }
     debug("Unmounting SPIFFS.");
     SPIFFS.end();
-  } else {
-    debug("Failed to mount SPIFFS");
   }
   return success;
 }
@@ -1228,7 +1271,13 @@ void handleInfo(void) {
       " " __TIME__ "<br>"
     "Period Offset: " + String(offset) + "us<br>"
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
+#if defined(ESP8266)
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
+#endif  // ESP8266
+#if defined(ESP32)
+    "ESP32 SDK Version: " + ESP.getSdkVersion() + "<br>"
+#endif  // ESP32
+    "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
@@ -1336,8 +1385,7 @@ void handleReset(void) {
 #if MQTT_ENABLE
   mqttLog("Wiping all saved config settings.");
 #endif  // MQTT_ENABLE
-  debug("Trying to mount SPIFFS");
-  if (SPIFFS.begin()) {
+  if (mountSpiffs()) {
     debug("Removing JSON config file");
     SPIFFS.remove(kConfigFile);
     SPIFFS.end();
@@ -1697,7 +1745,7 @@ uint16_t countValuesInStr(const String str, char sep) {
 // Args:
 //   size:  Nr. of uint16_t's need to be in the new array.
 // Returns:
-//   A Ptr to the new array. Restarts the ESP8266 if it fails.
+//   A Ptr to the new array. Restarts the ESP if it fails.
 uint16_t * newCodeArray(const uint16_t size) {
   uint16_t *result;
 
@@ -2005,9 +2053,9 @@ void handleGpioSetting(void) {
   html += htmlEnd();
   server.send(200, "text/html", html);
   if (changed) {
-#if defined(MQTT_ENABLE)
+#if MQTT_ENABLE
     mqttLog("GPIOs were changed. Rebooting!");
-#endif  // MQTT
+#endif  // MQTT_ENABLE
     delay(1000);
     ESP.restart();
     delay(2000);
@@ -2090,7 +2138,7 @@ void setup_wifi(void) {
     debug("Wifi failed to connect and hit timeout. Rebooting...");
     delay(3000);
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
-    ESP.reset();
+    ESP.restart();
     delay(5000);
   }
 
@@ -2134,7 +2182,7 @@ void init_vars(void) {
   MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
   MqttHAName = String(Hostname) + "_aircon";
   // Create a unique MQTT client id.
-  MqttClientId = String(Hostname) + String(ESP.getChipId(), HEX);
+  MqttClientId = String(Hostname) + String(kChipId, HEX);
 #endif  // MQTT_ENABLE
 }
 
@@ -2166,8 +2214,12 @@ void setup(void) {
 
 #if DEBUG
   if (!isSerialGpioUsedByIr()) {
+#if defined(ESP8266)
     // Use SERIAL_TX_ONLY so that the RX pin can be freed up for GPIO/IR use.
     Serial.begin(BAUD_RATE, SERIAL_8N1, SERIAL_TX_ONLY);
+#else  // ESP8266
+    Serial.begin(BAUD_RATE, SERIAL_8N1);
+#endif  // ESP8266
     while (!Serial)  // Wait for the serial connection to be establised.
       delay(50);
     Serial.println();
@@ -2214,7 +2266,13 @@ void setup(void) {
   lastReconnectAttempt = 0;
 
 #if MDNS_ENABLE
-  if (mdns.begin(Hostname, WiFi.localIP())) debug("MDNS responder started");
+#if defined(ESP8266)
+  if (mdns.begin(Hostname, WiFi.localIP())) {
+#else  // ESP8266
+  if (mdns.begin(Hostname)) {
+#endif  // ESP8266
+    debug("MDNS responder started");
+  }
 #endif  // MDNS_ENABLE
 
   // Setup the root web page.
@@ -2278,11 +2336,15 @@ void setup(void) {
         }
         HTTPUpload& upload = server.upload();
         if (upload.status == UPLOAD_FILE_START) {
-          WiFiUDP::stopAll();
           debug("Update:");
           debug(upload.filename.c_str());
+#if defined(ESP8266)
+          WiFiUDP::stopAll();
           uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
               0xFFFFF000;
+#else  // ESP8266
+          uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
+#endif  // ESP8266
           if (!Update.begin(maxSketchSpace)) {  // start with max available size
 #if DEBUG
             if (!isSerialGpioUsedByIr())
