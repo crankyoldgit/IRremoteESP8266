@@ -416,3 +416,47 @@ TEST(TestTcl112AcClass, toCommon) {
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
+
+TEST(TestDecodeTcl112Ac, Issue744) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[227] = {
+      3164, 1532, 584, 1082, 472, 1068, 580, 244, 602, 264, 542, 328, 530, 1034,
+      586, 262, 540, 326, 508, 1064, 582, 1082, 490, 328, 532, 1032, 586, 262,
+      544, 352, 478, 1060, 584, 1082, 486, 328, 502, 1058, 588, 1084, 472, 344,
+      530, 250, 600, 1086, 492, 322, 530, 258, 594, 1082, 494, 318, 510, 344,
+      530, 248, 600, 262, 544, 326, 504, 296, 578, 252, 598, 260, 550, 318, 506,
+      344, 530, 250, 600, 258, 546, 318, 508, 342, 532, 254, 596, 236, 606, 266,
+      524, 1066, 580, 242, 602, 266, 542, 1054, 574, 246, 604, 262, 550, 1088,
+      530, 1034, 588, 262, 542, 328, 504, 296, 582, 238, 606, 262, 546, 322,
+      508, 342, 530, 250, 602, 260, 544, 1052, 572, 252, 600, 260, 546, 320,
+      506, 344, 530, 254, 596, 264, 578, 268, 552, 316, 528, 256, 598, 260, 578,
+      272, 520, 372, 476, 294, 582, 240, 604, 266, 542, 328, 502, 294, 582, 238,
+      604, 268, 540, 322, 506, 346, 530, 244, 604, 260, 542, 354, 478, 298, 580,
+      240, 604, 262, 542, 326, 506, 342, 530, 250, 600, 260, 548, 318, 506, 344,
+      530, 250, 600, 260, 546, 320, 528, 322, 530, 254, 598, 262, 548, 316, 468,
+      380, 532, 250, 600, 260, 546, 1092, 500, 300, 578, 246, 602, 1082, 474,
+      346, 530, 248, 602, 260, 542, 1054, 570, 1090, 524};  // UNKNOWN 3338FACE
+
+  uint8_t expectedState[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x08, 0x00, 0x00, 0x00, 0x00, 0x80, 0xC4};
+
+  irsend.sendRaw(rawData, 227, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(TCL112AC, irsend.capture.decode_type);
+  EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+
+  IRTcl112Ac ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (COOL), Temp: 23C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      ac.toString());
+}
