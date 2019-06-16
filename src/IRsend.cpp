@@ -698,6 +698,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendDaikin(state, nbytes);
       break;
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN160
+    case DAIKIN160:
+      sendDaikin160(state, nbytes);
+      break;
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
     case DAIKIN2:
       sendDaikin2(state, nbytes);
