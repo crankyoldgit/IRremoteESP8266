@@ -1,6 +1,11 @@
 // Copyright 2018 crankyoldgit
 // The specifics of reverse engineering the protocol details by kuzin2006
 
+// Supports:
+//   Brand: Haier,  Model: HSU07-HEA03 remote
+//   Brand: Haier,  Model: YR-W02 remote
+//   Brand: Haier,  Model: HSU-09HMC203 A/C
+
 #ifndef IR_HAIER_H_
 #define IR_HAIER_H_
 
@@ -12,12 +17,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//                      HH   HH   AAA   IIIII EEEEEEE RRRRRR
-//                      HH   HH  AAAAA   III  EE      RR   RR
-//                      HHHHHHH AA   AA  III  EEEEE   RRRRRR
-//                      HH   HH AAAAAAA  III  EE      RR  RR
-//                      HH   HH AA   AA IIIII EEEEEEE RR   RR
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/404

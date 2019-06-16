@@ -8,8 +8,8 @@
 // LEGO
 // (LEGO is a Registrated Trademark of the Lego Group.)
 //
-// Supported Devices:
-// - LEGO Power Functions IR Receiver
+// Supports:
+//   Brand: LEGO Power Functions,  Model: IR Receiver
 //
 // Ref:
 // - https://github.com/markszabo/IRremoteESP8266/issues/641

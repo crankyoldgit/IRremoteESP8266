@@ -8,6 +8,7 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRrecv.h"
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
@@ -19,6 +20,7 @@ const uint16_t kTcl112AcBitMark = 500;
 const uint16_t kTcl112AcOneSpace = 1050;
 const uint16_t kTcl112AcZeroSpace = 325;
 const uint32_t kTcl112AcGap = kDefaultMessageGap;  // Just a guess.
+const uint8_t kTcl112AcTolerance = kTolerance + 5;  // Percent
 
 const uint8_t kTcl112AcHeat = 1;
 const uint8_t kTcl112AcDry =  2;

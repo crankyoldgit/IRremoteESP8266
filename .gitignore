@@ -8,6 +8,9 @@
 # vi/vim
 **/*.swp
 
+# vscode
+.vscode
+
 ## Build environments
 # Platformio
 **/.pio/

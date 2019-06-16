@@ -38,7 +38,12 @@
  */
 
 #include <Arduino.h>
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <WiFi.h>
+#endif  // ESP32
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <WiFiClient.h>

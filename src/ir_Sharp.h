@@ -1,4 +1,9 @@
 // Copyright 2019 crankyoldgit
+
+// Supports:
+//   Brand: Sharp,  Model: LC-52D62U TV
+//   Brand: Sharp,  Model: AY-ZP40KR A/C
+
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
 

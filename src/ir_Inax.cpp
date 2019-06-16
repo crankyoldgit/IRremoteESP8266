@@ -1,15 +1,13 @@
 // Copyright 2019 David Conran (crankyoldgit)
+// Support for an IR controlled Robot Toilet
 
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
 
-// Support for an IR controlled Robot Toilet
-//
-// Brand: Lixil
-// Model: Inax
-// Type: DT-BA283
+// Supports:
+//   Brand: Lixil,  Model: Inax DT-BA283 Toilet
 
 // Documentation:
 //   https://www.lixil-manual.com/GCW-1365-16050/GCW-1365-16050.pdf

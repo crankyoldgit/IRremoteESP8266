@@ -18,12 +18,6 @@
 #include "IRutils.h"
 #include "ir_Kelvinator.h"
 
-//                      GGGG  RRRRRR  EEEEEEE EEEEEEE
-//                     GG  GG RR   RR EE      EE
-//                    GG      RRRRRR  EEEEE   EEEEE
-//                    GG   GG RR  RR  EE      EE
-//                     GGGGGG RR   RR EEEEEEE EEEEEEE
-
 // Constants
 // Ref: https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.h
 const uint16_t kGreeHdrMark = 9000;
@@ -47,7 +41,8 @@ const uint8_t kGreeBlockFooterBits = 3;
 //
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
-void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
+void IRsend::sendGree(const unsigned char data[], const uint16_t nbytes,
+                      const uint16_t repeat) {
   if (nbytes < kGreeStateLength)
     return;  // Not enough bytes to send a proper message.
 
@@ -80,7 +75,8 @@ void IRsend::sendGree(unsigned char data[], uint16_t nbytes, uint16_t repeat) {
 //
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
-void IRsend::sendGree(uint64_t data, uint16_t nbits, uint16_t repeat) {
+void IRsend::sendGree(const uint64_t data, const uint16_t nbits,
+                      const uint16_t repeat) {
   if (nbits != kGreeBits)
     return;  // Wrong nr. of bits to send a proper message.
   // Set IR carrier frequency

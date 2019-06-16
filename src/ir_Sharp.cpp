@@ -1,6 +1,8 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017, 2019 David Conran
 
+// Sharp remote emulation
+
 #include "ir_Sharp.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -9,12 +11,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//                       SSSS  H   H   AAA   RRRR   PPPP
-//                      S      H   H  A   A  R   R  P   P
-//                       SSS   HHHHH  AAAAA  RRRR   PPPP
-//                          S  H   H  A   A  R  R   P
-//                      SSSS   H   H  A   A  R   R  P
 
 // Equipment it seems compatible with:
 //  * Sharp LC-52D62U

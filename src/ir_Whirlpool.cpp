@@ -24,12 +24,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//    WW      WW HH   HH IIIII RRRRRR  LL      PPPPPP   OOOOO   OOOOO  LL
-//    WW      WW HH   HH  III  RR   RR LL      PP   PP OO   OO OO   OO LL
-//    WW   W  WW HHHHHHH  III  RRRRRR  LL      PPPPPP  OO   OO OO   OO LL
-//     WW WWW WW HH   HH  III  RR  RR  LL      PP      OO   OO OO   OO LL
-//      WW   WW  HH   HH IIIII RR   RR LLLLLLL PP       OOOO0   OOOO0  LLLLLLL
-
 // Constants
 // Ref: https://github.com/markszabo/IRremoteESP8266/issues/509
 const uint16_t kWhirlpoolAcHdrMark = 8950;

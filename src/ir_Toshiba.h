@@ -1,4 +1,15 @@
 // Copyright 2017 David Conran
+
+// Toshiba A/C support added by David Conran
+
+// Supports:
+//   Brand: Toshiba,  Model: RAS-B13N3KV2
+//   Brand: Toshiba,  Model: Akita EVO II
+//   Brand: Toshiba,  Model: RAS-B13N3KVP-E
+//   Brand: Toshiba,  Model: RAS 18SKP-ES
+//   Brand: Toshiba,  Model: WH-TA04NE
+//   Brand: Toshiba,  Model: WC-L03SE
+
 #ifndef IR_TOSHIBA_H_
 #define IR_TOSHIBA_H_
 
@@ -12,14 +23,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//     TTTTTTT  OOOOO   SSSSS  HH   HH IIIII BBBBB     AAA
-//       TTT   OO   OO SS      HH   HH  III  BB   B   AAAAA
-//       TTT   OO   OO  SSSSS  HHHHHHH  III  BBBBBB  AA   AA
-//       TTT   OO   OO      SS HH   HH  III  BB   BB AAAAAAA
-//       TTT    OOOO0   SSSSS  HH   HH IIIII BBBBBB  AA   AA
-
-// Toshiba A/C support added by David Conran
 
 // Constants
 const uint8_t kToshibaAcAuto = 0;

@@ -1,4 +1,5 @@
 // Copyright 2018 crankyoldgit
+// Code to emulate Haier protocol compatible devices.
 // The specifics of reverse engineering the protocols details:
 // * HSU07-HEA03 by kuzin2006.
 // * YR-W02/HSU-09HMC203 by non7top.
@@ -9,12 +10,6 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
-
-//                      HH   HH   AAA   IIIII EEEEEEE RRRRRR
-//                      HH   HH  AAAAA   III  EE      RR   RR
-//                      HHHHHHH AA   AA  III  EEEEE   RRRRRR
-//                      HH   HH AAAAAAA  III  EE      RR  RR
-//                      HH   HH AA   AA IIIII EEEEEEE RR   RR
 
 // Supported devices:
 //   * Haier HSU07-HEA03 Remote control.

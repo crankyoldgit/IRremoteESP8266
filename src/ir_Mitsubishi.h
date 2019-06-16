@@ -1,5 +1,12 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
+
+// Mitsubishi
+
+// Supports:
+//   Brand: Mitsubishi,  Model: TV
+//   Brand: Mitsubishi,  Model: HC3000 Projector
+
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
 
@@ -13,12 +20,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//    MMMMM  IIIII TTTTT   SSSS  U   U  BBBB   IIIII   SSSS  H   H  IIIII
-//    M M M    I     T    S      U   U  B   B    I    S      H   H    I
-//    M M M    I     T     SSS   U   U  BBBB     I     SSS   HHHHH    I
-//    M   M    I     T        S  U   U  B   B    I        S  H   H    I
-//    M   M  IIIII   T    SSSS    UUU   BBBBB  IIIII  SSSS   H   H  IIIII
 
 // Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
 // Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran

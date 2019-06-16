@@ -2,6 +2,16 @@
 //
 // Copyright 2018 David Conran
 
+// Supports:
+//   Brand: Whirlpool,  Model: DG11J1-3A remote
+//   Brand: Whirlpool,  Model: DG11J1-04 remote
+//   Brand: Whirlpool,  Model: DG11J1-91 remote
+//   Brand: Whirlpool,  Model: SPIS409L A/C
+//   Brand: Whirlpool,  Model: SPIS412L A/C
+//   Brand: Whirlpool,  Model: SPIW409L A/C
+//   Brand: Whirlpool,  Model: SPIW412L A/C
+//   Brand: Whirlpool,  Model: SPIW418L A/C
+
 #ifndef IR_WHIRLPOOL_H_
 #define IR_WHIRLPOOL_H_
 
@@ -15,12 +25,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-//    WW      WW HH   HH IIIII RRRRRR  LL      PPPPPP   OOOOO   OOOOO  LL
-//    WW      WW HH   HH  III  RR   RR LL      PP   PP OO   OO OO   OO LL
-//    WW   W  WW HHHHHHH  III  RRRRRR  LL      PPPPPP  OO   OO OO   OO LL
-//     WW WWW WW HH   HH  III  RR  RR  LL      PP      OO   OO OO   OO LL
-//      WW   WW  HH   HH IIIII RR   RR LLLLLLL PP       OOOO0   OOOO0  LLLLLLL
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/509

@@ -4,12 +4,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//          EEEEEEE LL      EEEEEEE  CCCCC  TTTTTTT RRRRRR    AAA
-//          EE      LL      EE      CC    C   TTT   RR   RR  AAAAA
-//          EEEEE   LL      EEEEE   CC        TTT   RRRRRR  AA   AA
-//          EE      LL      EE      CC    C   TTT   RR  RR  AAAAAAA
-//          EEEEEEE LLLLLLL EEEEEEE  CCCCC    TTT   RR   RR AA   AA
-
 // Electra A/C added by crankyoldgit
 //
 // Equipment it seems compatible with:
@@ -37,7 +31,8 @@ const uint32_t kElectraAcMessageGap = kDefaultMessageGap;  // Just a guess.
 //
 // Status: Alpha / Needs testing against a real device.
 //
-void IRsend::sendElectraAC(uint8_t data[], uint16_t nbytes, uint16_t repeat) {
+void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++)
     sendGeneric(kElectraAcHdrMark, kElectraAcHdrSpace, kElectraAcBitMark,
                 kElectraAcOneSpace, kElectraAcBitMark, kElectraAcZeroSpace,

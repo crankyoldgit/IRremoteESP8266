@@ -21,14 +21,17 @@
 // Constants
 // Offset (in microseconds) to use in Period time calculations to account for
 // code excution time in producing the software PWM signal.
-#if (F_CPU == 160000000L)
+#if defined(ESP32)
+// Calculated on a generic ESP-WROOM-32 board with v3.2-18 SDK @ 240MHz
+const int8_t kPeriodOffset = -2;
+#elif (defined(ESP8266) && F_CPU == 160000000L)  // NOLINT(whitespace/parens)
 // Calculated on an ESP8266 NodeMCU v2 board using:
 // v2.6.0 with v2.5.2 ESP core @ 160MHz
 const int8_t kPeriodOffset = -2;
-#else  // (F_CPU == 160000000L)
+#else  // (defined(ESP8266) && F_CPU == 160000000L)
 // Calculated on ESP8266 Wemos D1 mini using v2.4.1 with v2.4.0 ESP core @ 40MHz
 const int8_t kPeriodOffset = -5;
-#endif  // (F_CPU == 160000000L)
+#endif  // (defined(ESP8266) && F_CPU == 160000000L)
 const uint8_t kDutyDefault = 50;  // Percentage
 const uint8_t kDutyMax = 100;     // Percentage
 // delayMicroseconds() is only accurate to 16383us.
@@ -137,7 +140,10 @@ class IRsend {
                    const uint8_t *dataptr, const uint16_t nbytes,
                    const uint16_t frequency, const bool MSBfirst,
                    const uint16_t repeat, const uint8_t dutycycle);
-  bool send(decode_type_t type, uint64_t data, uint16_t nbits);
+  bool send(const decode_type_t type, const uint64_t data,
+            const uint16_t nbits);
+  bool send(const decode_type_t type, const uint8_t state[],
+            const uint16_t nbytes);
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
   void sendNEC(uint64_t data, uint16_t nbits = kNECBits,
                uint16_t repeat = kNoRepeat);
@@ -263,9 +269,9 @@ class IRsend {
                        uint16_t repeat = kMitsubishiMinRepeat);
 #endif
 #if SEND_MITSUBISHI_AC
-  void sendMitsubishiAC(unsigned char data[],
-                        uint16_t nbytes = kMitsubishiACStateLength,
-                        uint16_t repeat = kMitsubishiACMinRepeat);
+  void sendMitsubishiAC(const unsigned char data[],
+                        const uint16_t nbytes = kMitsubishiACStateLength,
+                        const uint16_t repeat = kMitsubishiACMinRepeat);
 #endif
 #if SEND_MITSUBISHIHEAVY
   void sendMitsubishiHeavy88(
@@ -278,8 +284,8 @@ class IRsend {
       const uint16_t repeat = kMitsubishiHeavy152MinRepeat);
 #endif
 #if SEND_FUJITSU_AC
-  void sendFujitsuAC(unsigned char data[], uint16_t nbytes,
-                     uint16_t repeat = kFujitsuAcMinRepeat);
+  void sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
+                     const uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
 #if SEND_INAX
   void sendInax(const uint64_t data, const uint16_t nbits = kInaxBits,
@@ -289,18 +295,24 @@ class IRsend {
   void sendGC(uint16_t buf[], uint16_t len);
 #endif
 #if SEND_KELVINATOR
-  void sendKelvinator(unsigned char data[],
-                      uint16_t nbytes = kKelvinatorStateLength,
-                      uint16_t repeat = kKelvinatorDefaultRepeat);
+  void sendKelvinator(const unsigned char data[],
+                      const uint16_t nbytes = kKelvinatorStateLength,
+                      const uint16_t repeat = kKelvinatorDefaultRepeat);
 #endif
 #if SEND_DAIKIN
   void sendDaikin(const unsigned char data[],
                   const uint16_t nbytes = kDaikinStateLength,
                   const uint16_t repeat = kDaikinDefaultRepeat);
 #endif
+#if SEND_DAIKIN160
+  void sendDaikin160(const unsigned char data[],
+                     const uint16_t nbytes = kDaikin160StateLength,
+                     const uint16_t repeat = kDaikin160DefaultRepeat);
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
-  void sendDaikin2(unsigned char data[], uint16_t nbytes = kDaikin2StateLength,
-                   uint16_t repeat = kDaikin2DefaultRepeat);
+  void sendDaikin2(const unsigned char data[],
+                   const uint16_t nbytes = kDaikin2StateLength,
+                   const uint16_t repeat = kDaikin2DefaultRepeat);
 #endif
 #if SEND_DAIKIN216
   void sendDaikin216(const unsigned char data[],
@@ -312,10 +324,10 @@ class IRsend {
                       uint16_t repeat = kAiwaRcT501MinRepeats);
 #endif
 #if SEND_GREE
-  void sendGree(uint64_t data, uint16_t nbits = kGreeBits,
-                uint16_t repeat = kGreeDefaultRepeat);
-  void sendGree(uint8_t data[], uint16_t nbytes = kGreeStateLength,
-                uint16_t repeat = kGreeDefaultRepeat);
+  void sendGree(const uint64_t data, const uint16_t nbits = kGreeBits,
+                const uint16_t repeat = kGreeDefaultRepeat);
+  void sendGree(const uint8_t data[], const uint16_t nbytes = kGreeStateLength,
+                const uint16_t repeat = kGreeDefaultRepeat);
 #endif
 #if SEND_GOODWEATHER
   void sendGoodweather(const uint64_t data,
@@ -400,9 +412,9 @@ class IRsend {
                   uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_ELECTRA_AC
-  void sendElectraAC(unsigned char data[],
-                     uint16_t nbytes = kElectraAcStateLength,
-                     uint16_t repeat = kNoRepeat);
+  void sendElectraAC(const unsigned char data[],
+                     const uint16_t nbytes = kElectraAcStateLength,
+                     const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_PANASONIC_AC
   void sendPanasonicAC(const unsigned char data[],
@@ -415,8 +427,8 @@ class IRsend {
   uint64_t encodePioneer(uint16_t address, uint16_t command);
 #endif
 #if SEND_MWM
-  void sendMWM(unsigned char data[], uint16_t nbytes,
-               uint16_t repeat = kNoRepeat);
+  void sendMWM(const unsigned char data[], const uint16_t nbytes,
+               const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_VESTEL_AC
   void sendVestelAc(const uint64_t data, const uint16_t nbits = kVestelAcBits,

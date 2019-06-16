@@ -1,6 +1,8 @@
 // Copyright 2018 Erdem U. Altinyurt
 // Copyright 2019 David Conran
 
+// Vestel added by Erdem U. Altinyurt
+
 #include "ir_Vestel.h"
 #include <algorithm>
 #ifndef UNIT_TEST
@@ -11,14 +13,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 #include "ir_Haier.h"
-
-//                 VV     VV  EEEEEEE   SSSSS  TTTTTTTT  EEEEEEE  LL
-//                 VV     VV  EE       S          TT     EE       LL
-//                  VV   VV   EEEEE     SSSS      TT     EEEEE    LL
-//                   VV VV    EE            S     TT     EE       LL
-//                    VVV     EEEEEEE  SSSSS      TT     EEEEEEE  LLLLLLL
-
-// Vestel added by Erdem U. Altinyurt
 
 // Equipment it seems compatible with:
 //  * Vestel AC Model BIOX CXP-9 (9K BTU)

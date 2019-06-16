@@ -3,6 +3,9 @@
 // Copyright 2019 ribeirodanielf
 // Copyright 2019 David Conran
 
+// Supports:
+//   Brand: Goodweather,  Model: ZH/JT-03 remote
+
 #ifndef IR_GOODWEATHER_H_
 #define IR_GOODWEATHER_H_
 
@@ -17,8 +20,6 @@
 #include "IRsend_test.h"
 #endif
 
-// Supports:
-//   ZH/JT-03 remote controller
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/697
 

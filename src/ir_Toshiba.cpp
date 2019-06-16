@@ -1,5 +1,8 @@
 // Copyright 2017 David Conran
 
+// Toshiba A/C support added by David Conran
+
+
 #include "ir_Toshiba.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -9,13 +12,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//     TTTTTTT  OOOOO   SSSSS  HH   HH IIIII BBBBB     AAA
-//       TTT   OO   OO SS      HH   HH  III  BB   B   AAAAA
-//       TTT   OO   OO  SSSSS  HHHHHHH  III  BBBBBB  AA   AA
-//       TTT   OO   OO      SS HH   HH  III  BB   BB AAAAAAA
-//       TTT    OOOO0   SSSSS  HH   HH IIIII BBBBBB  AA   AA
-
-// Toshiba A/C support added by David Conran
 //
 // Equipment it seems compatible with:
 //  * Toshiba RAS-B13N3KV2 / Akita EVO II

@@ -1,15 +1,10 @@
 // Copyright 2017 David Conran
+// Lasertag
 
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-//   LL        AAA    SSSSS  EEEEEEE RRRRRR  TTTTTTT   AAA     GGGG
-//   LL       AAAAA  SS      EE      RR   RR   TTT    AAAAA   GG  GG
-//   LL      AA   AA  SSSSS  EEEEE   RRRRRR    TTT   AA   AA GG
-//   LL      AAAAAAA      SS EE      RR  RR    TTT   AAAAAAA GG   GG
-//   LLLLLLL AA   AA  SSSSS  EEEEEEE RR   RR   TTT   AA   AA  GGGGGG
 
 // Constants
 const uint16_t kLasertagMinSamples = 13;

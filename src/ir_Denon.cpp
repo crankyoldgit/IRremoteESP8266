@@ -6,12 +6,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//                    DDDD   EEEEE  N   N   OOO   N   N
-//                     D  D  E      NN  N  O   O  NN  N
-//                     D  D  EEE    N N N  O   O  N N N
-//                     D  D  E      N  NN  O   O  N  NN
-//                    DDDD   EEEEE  N   N   OOO   N   N
-
 // Original Denon support added by https://github.com/csBlueChip
 // Ported over by Massimiliano Pinto
 
