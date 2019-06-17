@@ -52,8 +52,17 @@ IRsend	KEYWORD1
 IRtimer	KEYWORD1
 TimerMs	KEYWORD1
 decode_results	KEYWORD1
-ir_params_t	KEYWORD1
+decode_type_t	KEYWORD1
+fanspeed_t	KEYWORD1
+fujitsu_ac_remote_model_t	KEYWORD1
+irparams_t	KEYWORD1
 match_result_t	KEYWORD1
+opmode_t	KEYWORD1
+panasonic_ac_remote_model_t	KEYWORD1
+state_t	KEYWORD1
+swingh_t	KEYWORD1
+swingv_t	KEYWORD1
+whirlpool_ac_remote_model_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -84,6 +93,10 @@ clearOnTimerFlag	KEYWORD2
 clearSensorTemp	KEYWORD2
 clearSleepTimerFlag	KEYWORD2
 compare	KEYWORD2
+convertFan	KEYWORD2
+convertMode	KEYWORD2
+convertSwingH	KEYWORD2
+convertSwingV	KEYWORD2
 coolix	KEYWORD2
 copyIrParams	KEYWORD2
 countBits	KEYWORD2
@@ -172,7 +185,7 @@ encodeSanyoLC7461	KEYWORD2
 encodeSharp	KEYWORD2
 encodeSony	KEYWORD2
 encodeTime	KEYWORD2
-fanspeed_t	KEYWORD2
+fanspeedToString	KEYWORD2
 fixChecksum	KEYWORD2
 fixup	KEYWORD2
 fujitsu	KEYWORD2
@@ -282,7 +295,7 @@ mitsubishiHeavy152	KEYWORD2
 mitsubishiHeavy88	KEYWORD2
 off	KEYWORD2
 on	KEYWORD2
-opmode_t	KEYWORD2
+opmodeToString	KEYWORD2
 panasonic	KEYWORD2
 recoverSavedState	KEYWORD2
 renderTime	KEYWORD2
@@ -442,8 +455,8 @@ stepVert	KEYWORD2
 strToBool	KEYWORD2
 strToModel	KEYWORD2
 sumBytes	KEYWORD2
-swingh_t	KEYWORD2
-swingv_t	KEYWORD2
+swinghToString	KEYWORD2
+swingvToString	KEYWORD2
 tcl112	KEYWORD2
 teco	KEYWORD2
 ticksHigh	KEYWORD2
@@ -901,6 +914,7 @@ TROTEC_MAX_TIMER	LITERAL1
 TROTEC_MIN_TEMP	LITERAL1
 UNKNOWN	LITERAL1
 UNUSED	LITERAL1
+USE_IRAM_ATTR	LITERAL1
 VESTEL_AC	LITERAL1
 WHIRLPOOL_AC	LITERAL1
 WHYNTER	LITERAL1
