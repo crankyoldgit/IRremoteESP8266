@@ -30,7 +30,7 @@ cat << EndOfTextEndOfTextEndOfText
 
 EndOfTextEndOfTextEndOfText
 
-CLASSES=$(egrep -h "(^ *(enum|class) |} [a-zA-Z0-9_]+_t;$)" src/*.h |
+CLASSES=$(egrep -h "^ *((enum|class) |} [a-zA-Z0-9_]+_t;$)" src/*.h |
           sed 's/^ *//;s/enum class//;s/\;$//' | cut -d' ' -f2 | sort -u)
 for i in ${CLASSES}; do
   echo -e "${i}\tKEYWORD1"
