@@ -865,4 +865,119 @@ match_result_t IRrecv::matchData(
   return result;
 }
 
+// Match & decode the typical data section of an IR message.
+// The bytes are stored at result_ptr. The first byte in the result equates to
+// the first byte encountered, and so on.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//   result_ptr: A pointer to where to start storing the bytes we decoded.
+//   remaining: The size of the capture buffer are remaining.
+//   nbytes:    Nr. of data bytes we expect.
+//   onemark:   Nr. of uSeconds in an expected mark signal for a '1' bit.
+//   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
+//   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
+//   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
+//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
+// Returns:
+//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
+                            const uint16_t remaining, const uint16_t nbytes,
+                            const uint16_t onemark, const uint32_t onespace,
+                            const uint16_t zeromark, const uint32_t zerospace,
+                            const uint8_t tolerance, const int16_t excess,
+                            const bool MSBfirst) {
+  // Check if there is enough capture buffer to possibly have the desired bytes.
+  if (remaining < nbytes * 8 * 2) return 0;  // Nope, so abort.
+  uint16_t offset = 0;
+  for (uint16_t byte_pos = 0; byte_pos < nbytes; byte_pos++) {
+    match_result_t result = matchData(data_ptr + offset, 8, onemark, onespace,
+                                      zeromark, zerospace, tolerance, excess,
+                                      MSBfirst);
+    if (result.success == false) return 0;  // Fail
+    result_ptr[byte_pos] = (uint8_t)result.data;
+    offset += result.used;
+  }
+  return offset;
+}
+
+// Match & decode a generic/typical > 64bit IR message.
+// The bytes are stored at result_ptr. The first byte in the result equates to
+// the first byte encountered, and so on.
+// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
+// that requirement.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//   result_ptr: A pointer to where to start storing the bytes we decoded.
+//   remaining: The size of the capture buffer are remaining.
+//   nbytes:       Nr. of data bytes we expect.
+//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
+//   hdrspace:     Nr. of uSeconds for the expected header space signal.
+//   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
+//   onespace:     Nr. of uSeconds in an expected space signal for a '1' bit.
+//   zeromark:     Nr. of uSeconds in an expected mark signal for a '0' bit.
+//   zerospace:    Nr. of uSeconds in an expected space signal for a '0' bit.
+//   footermark:   Nr. of uSeconds for the expected footer mark signal.
+//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
+//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
+//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
+// Returns:
+//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+uint16_t IRrecv::matchGenericBytes(volatile uint16_t *data_ptr,
+                                   uint8_t *result_ptr,
+                                   const uint16_t remaining,
+                                   const uint16_t nbytes,
+                                   const uint16_t hdrmark,
+                                   const uint32_t hdrspace,
+                                   const uint16_t onemark,
+                                   const uint32_t onespace,
+                                   const uint16_t zeromark,
+                                   const uint32_t zerospace,
+                                   const uint16_t footermark,
+                                   const uint32_t footerspace,
+                                   const bool atleast,
+                                   const uint8_t tolerance,
+                                   const int16_t excess,
+                                   const bool MSBfirst) {
+  // Calculate how much remaining buffer is required.
+  uint16_t min_remaining = nbytes * 8 * 2;
+  if (hdrmark) min_remaining++;
+  if (hdrspace) min_remaining++;
+  if (footermark) min_remaining++;
+  // Don't need to extend for footerspace because it could be the end of message
+
+  // Check if there is enough capture buffer to possibly have the message.
+  if (remaining < min_remaining) return 0;  // Nope, so abort.
+  uint16_t offset = 0;
+
+  // Header
+  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark)) return 0;
+  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace)) return 0;
+
+  // Data
+  uint16_t data_used = IRrecv::matchBytes(data_ptr + offset, result_ptr,
+                                          remaining - offset, nbytes,
+                                          onemark, onespace,
+                                          zeromark, zerospace, tolerance,
+                                          excess, MSBfirst);
+  if (data_used == 0) return 0;
+  offset += data_used;
+  // Footer
+  if (footermark && !matchMark(*(data_ptr + offset++), footermark)) return 0;
+  // If we have something still to match & haven't reached the end of the buffer
+  if (footerspace && offset < remaining) {
+      if (atleast) {
+        if (!matchAtLeast(*(data_ptr + offset), footerspace)) return 0;
+      } else {
+        if (!matchSpace(*(data_ptr + offset), footerspace)) return 0;
+      }
+      offset++;
+  }
+  return offset;
+}
 // End of IRrecv class -------------------

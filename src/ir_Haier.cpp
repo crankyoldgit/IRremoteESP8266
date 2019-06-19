@@ -1019,27 +1019,21 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
 
   uint16_t offset = kStartOffset;
 
-  // Header
+  // Pre-Header
   if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
   if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
-  if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kHaierAcHdrGap)) return false;
 
-  // Data
-  for (uint16_t i = 0; i < nbits / 8; i++) {
-    match_result_t data_result =
-        matchData(&(results->rawbuf[offset]), 8, kHaierAcBitMark,
-                  kHaierAcOneSpace, kHaierAcBitMark, kHaierAcZeroSpace);
-    if (data_result.success == false) return false;
-    offset += data_result.used;
-    results->state[i] = (uint8_t)data_result.data;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kHaierAcBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], kHaierAcMinGap))
-    return false;
+  // Match Header + Data + Footer
+  uint16_t used;
+  used = matchGenericBytes(results->rawbuf + offset, results->state,
+                           results->rawlen - offset, nbits / 8,
+                           kHaierAcHdr, kHaierAcHdrGap,
+                           kHaierAcBitMark, kHaierAcOneSpace,
+                           kHaierAcBitMark, kHaierAcZeroSpace,
+                           kHaierAcBitMark, kHaierAcMinGap, true,
+                           kTolerance, kMarkExcess);
+  if (used == 0) return false;
+  offset += used;
 
   // Compliance
   if (strict) {

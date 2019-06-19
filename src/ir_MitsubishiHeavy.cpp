@@ -1080,41 +1080,19 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
     }
   }
 
-  uint16_t actualBits = 0;
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
-
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kMitsubishiHeavyHdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kMitsubishiHeavyHdrSpace))
-    return false;
-  // Data
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (uint16_t i = 0;
-       offset <= results->rawlen - 16 && actualBits < nbits;
-       i++, actualBits += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8,
-                            kMitsubishiHeavyBitMark, kMitsubishiHeavyOneSpace,
-                            kMitsubishiHeavyBitMark, kMitsubishiHeavyZeroSpace,
-                            kTolerance, 0, false);
-    if (data_result.success == false) {
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset + data_result.used);
-      return false;  // Fail
-    }
-    results->state[i] = data_result.data;
-  }
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], kMitsubishiHeavyBitMark))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kMitsubishiHeavyGap)) return false;
-
+  uint16_t used;
+  used = matchGenericBytes(results->rawbuf + offset, results->state,
+                           results->rawlen - offset, nbits / 8,
+                           kMitsubishiHeavyHdrMark, kMitsubishiHeavyHdrSpace,
+                           kMitsubishiHeavyBitMark, kMitsubishiHeavyOneSpace,
+                           kMitsubishiHeavyBitMark, kMitsubishiHeavyZeroSpace,
+                           kMitsubishiHeavyBitMark, kMitsubishiHeavyGap, true,
+                           kTolerance, 0, false);
+  if (used == 0) return false;
+  offset += used;
   // Compliance
-  if (actualBits < nbits) return false;
-  if (strict && actualBits != nbits) return false;  // Not as we expected.
-  switch (actualBits) {
+  switch (nbits) {
     case kMitsubishiHeavy88Bits:
       if (strict && !(IRMitsubishiHeavy88Ac::checkZjsSig(results->state) &&
                       IRMitsubishiHeavy88Ac::validChecksum(results->state)))
@@ -1132,7 +1110,7 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
   }
 
   // Success
-  results->bits = actualBits;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
