@@ -511,31 +511,25 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
   if (strict && nbits != kGreeBits)
     return false;  // Not strictly a Gree message.
 
-  uint32_t data;
   uint16_t offset = kStartOffset;
 
   // There are two blocks back-to-back in a full Gree IR message
   // sequence.
-  int8_t state_pos = 0;
-  match_result_t data_result;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kGreeHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kGreeHdrSpace)) return false;
-  // Data Block #1 (32 bits)
-  data_result =
-      matchData(&(results->rawbuf[offset]), 32, kGreeBitMark, kGreeOneSpace,
-                kGreeBitMark, kGreeZeroSpace, kTolerance, kMarkExcess, false);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Record Data Block #1 in the state.
-  for (uint16_t i = 0; i < 4; i++, data >>= 8)
-    results->state[state_pos + i] = data & 0xFF;
-  state_pos += 4;
+  uint16_t used;
+  // Header + Data Block #1 (32 bits)
+  used = matchGenericBytes(results->rawbuf + offset, results->state,
+                           results->rawlen - offset, 4,
+                           kGreeHdrMark, kGreeHdrSpace,
+                           kGreeBitMark, kGreeOneSpace,
+                           kGreeBitMark, kGreeZeroSpace,
+                           0, 0, false,
+                           kTolerance, kMarkExcess, false);
+  if (used == 0) return false;
+  offset += used;
 
   // Block #1 footer (3 bits, B010)
+  match_result_t data_result;
   data_result = matchData(&(results->rawbuf[offset]), kGreeBlockFooterBits,
                           kGreeBitMark, kGreeOneSpace, kGreeBitMark,
                           kGreeZeroSpace, kTolerance, kMarkExcess, false);
@@ -547,36 +541,24 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
   if (!matchMark(results->rawbuf[offset++], kGreeBitMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kGreeMsgSpace)) return false;
 
-  // Data Block #2 (32 bits)
-  data_result =
-      matchData(&(results->rawbuf[offset]), 32, kGreeBitMark, kGreeOneSpace,
-                kGreeBitMark, kGreeZeroSpace, kTolerance, kMarkExcess, false);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Record Data Block #2 in the state.
-  for (uint16_t i = 0; i < 4; i++, data >>= 8)
-    results->state[state_pos + i] = data & 0xFF;
-  state_pos += 4;
-
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], kGreeBitMark)) return false;
-  if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kGreeMsgSpace))
-    return false;
+  // Data Block #2 (32 bits) + Footer
+  if (!matchGenericBytes(results->rawbuf + offset, results->state + 4,
+                         results->rawlen - offset, 4,
+                         0, 0,
+                         kGreeBitMark, kGreeOneSpace,
+                         kGreeBitMark, kGreeZeroSpace,
+                         kGreeBitMark, kGreeMsgSpace, true,
+                         kTolerance, kMarkExcess, false)) return false;
 
   // Compliance
   if (strict) {
-    // Correct size/length)
-    if (state_pos != kGreeStateLength) return false;
     // Verify the message's checksum is correct.
     if (!IRGreeAC::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = GREE;
-  results->bits = state_pos * 8;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

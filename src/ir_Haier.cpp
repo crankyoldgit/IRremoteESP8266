@@ -1024,16 +1024,13 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
 
   // Match Header + Data + Footer
-  uint16_t used;
-  used = matchGenericBytes(results->rawbuf + offset, results->state,
-                           results->rawlen - offset, nbits / 8,
-                           kHaierAcHdr, kHaierAcHdrGap,
-                           kHaierAcBitMark, kHaierAcOneSpace,
-                           kHaierAcBitMark, kHaierAcZeroSpace,
-                           kHaierAcBitMark, kHaierAcMinGap, true,
-                           kTolerance, kMarkExcess);
-  if (used == 0) return false;
-  offset += used;
+  if (!matchGenericBytes(results->rawbuf + offset, results->state,
+                         results->rawlen - offset, nbits / 8,
+                         kHaierAcHdr, kHaierAcHdrGap,
+                         kHaierAcBitMark, kHaierAcOneSpace,
+                         kHaierAcBitMark, kHaierAcZeroSpace,
+                         kHaierAcBitMark, kHaierAcMinGap, true,
+                         kTolerance, kMarkExcess)) return false;
 
   // Compliance
   if (strict) {

@@ -309,7 +309,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
   do {
     failure = false;
     // Header:
-    //  Somtime happens that junk signals arrives before the real message
+    //  Sometime happens that junk signals arrives before the real message
     bool headerFound = false;
     while (!headerFound &&
            offset < (results->rawlen - (kMitsubishiACBits * 2 + 2))) {

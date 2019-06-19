@@ -65,45 +65,26 @@ bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
       return false;  // Not strictly a ELECTRA_AC message.
   }
 
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid ELECTRA_AC message.
-
   uint16_t offset = kStartOffset;
-
-  // Message Header
-  if (!matchMark(results->rawbuf[offset++], kElectraAcHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kElectraAcHdrSpace)) return false;
-
-  // Data Section
-  match_result_t data_result;
-  uint16_t dataBitsSoFar = 0;
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8, kElectraAcBitMark,
-                            kElectraAcOneSpace, kElectraAcBitMark,
-                            kElectraAcZeroSpace, kTolerance, 0, false);
-    if (data_result.success == false) return false;  // Fail
-    results->state[i] = data_result.data;
-  }
-
-  // Message Footer
-  if (!matchMark(results->rawbuf[offset++], kElectraAcBitMark)) return false;
-  if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], kElectraAcMessageGap))
-    return false;
+  // Match Header + Data + Footer
+  if (!matchGenericBytes(results->rawbuf + offset, results->state,
+                         results->rawlen - offset, nbits / 8,
+                         kElectraAcHdrMark, kElectraAcHdrSpace,
+                         kElectraAcBitMark, kElectraAcOneSpace,
+                         kElectraAcBitMark, kElectraAcZeroSpace,
+                         kElectraAcBitMark, kElectraAcMessageGap, true,
+                         kTolerance, 0, false)) return false;
 
   // Compliance
   if (strict) {
-    if (dataBitsSoFar != nbits) return false;
     // Verify the checksum.
-    if (sumBytes(results->state, (dataBitsSoFar / 8) - 1) !=
-        results->state[(dataBitsSoFar / 8) - 1]) return false;
+    if (sumBytes(results->state, (nbits / 8) - 1) !=
+        results->state[(nbits / 8) - 1]) return false;
   }
 
   // Success
   results->decode_type = ELECTRA_AC;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

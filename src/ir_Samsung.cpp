@@ -799,51 +799,27 @@ bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
   if (nbits != kSamsungAcBits && nbits != kSamsungAcExtendedBits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  match_result_t data_result;
 
   // Message Header
   if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kSamsungAcHdrSpace)) return false;
   // Section(s)
-  for (uint16_t pos = kSamsungACSectionLength, i = 0; pos <= nbits / 8;
+  for (uint16_t pos = 0; pos <= (nbits / 8) - kSamsungACSectionLength;
        pos += kSamsungACSectionLength) {
-    uint64_t sectiondata = 0;
-    // Section Header
-    if (!matchMark(results->rawbuf[offset++], kSamsungAcSectionMark))
-      return false;
-    if (!matchSpace(results->rawbuf[offset++], kSamsungAcSectionSpace))
-      return false;
-    // Section Data
-    // Keep reading bytes until we either run out of section or state to fill.
-    for (; offset <= results->rawlen - 16 && i < pos;
-         i++, dataBitsSoFar += 8, offset += data_result.used) {
-      data_result = matchData(&(results->rawbuf[offset]), 8, kSamsungAcBitMark,
-                              kSamsungAcOneSpace, kSamsungAcBitMark,
-                              kSamsungAcZeroSpace, kTolerance, 0, false);
-      if (data_result.success == false) {
-        DPRINT("DEBUG: offset = ");
-        DPRINTLN(offset + data_result.used);
-        return false;  // Fail
-      }
-      results->state[i] = data_result.data;
-      sectiondata = (sectiondata << 8) + data_result.data;
-    }
-    DPRINTLN("DEBUG: sectiondata = 0x" + uint64ToString(sectiondata, 16));
-    // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark)) return false;
-    if (pos < nbits / 8) {  // Inter-section gap.
-      if (!matchSpace(results->rawbuf[offset++], kSamsungAcSectionGap))
-        return false;
-    } else {  // Last section / End of message gap.
-      if (offset <= results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], kSamsungAcSectionGap))
-        return false;
-    }
+    uint16_t used;
+    // Section Header + Section Data (7 bytes) + Section Footer
+    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
+                            results->rawlen - offset, kSamsungACSectionLength,
+                            kSamsungAcSectionMark, kSamsungAcSectionSpace,
+                            kSamsungAcBitMark, kSamsungAcOneSpace,
+                            kSamsungAcBitMark, kSamsungAcZeroSpace,
+                            kSamsungAcBitMark, kSamsungAcSectionGap,
+                            pos + kSamsungACSectionLength >= nbits / 8,
+                            kTolerance, 0, false);
+    if (used == 0) return false;
+    offset += used;
   }
   // Compliance
-  // Re-check we got the correct size/length due to the way we read the data.
-  if (dataBitsSoFar != nbits) return false;
   // Is the signature correct?
   DPRINTLN("DEBUG: Checking signature.");
   if (results->state[0] != 0x02 || results->state[2] != 0x0F) return false;
@@ -856,7 +832,7 @@ bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
   }
   // Success
   results->decode_type = SAMSUNG_AC;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

@@ -588,42 +588,25 @@ bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kSharpAcBits) return false;
 
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
-  uint16_t dataBitsSoFar = 0;
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kSharpAcHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kSharpAcHdrSpace)) return false;
-
-  // Data
-  // Keep reading bytes until we run out of state to fill.
-  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    // Read in a byte at a time.
-    data_result =
-        matchData(&(results->rawbuf[offset]), 8,
-                  kSharpAcBitMark, kSharpAcOneSpace,
-                  kSharpAcBitMark, kSharpAcZeroSpace,
-                  kTolerance, kMarkExcess, false);
-    if (data_result.success == false) break;  // Fail
-    results->state[i] = (uint8_t)data_result.data;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kSharpAcBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kSharpAcGap))
-    return false;
-
+  // Match Header + Data + Footer
+  uint16_t used;
+  used = matchGenericBytes(results->rawbuf + offset, results->state,
+                           results->rawlen - offset, nbits / 8,
+                           kSharpAcHdrMark, kSharpAcHdrSpace,
+                           kSharpAcBitMark, kSharpAcOneSpace,
+                           kSharpAcBitMark, kSharpAcZeroSpace,
+                           kSharpAcBitMark, kSharpAcGap, true,
+                           kTolerance, kMarkExcess, false);
+  if (used == 0) return false;
+  offset += used;
   // Compliance
   if (strict) {
-    // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kSharpAcBits) return false;
     if (!IRSharpAc::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = SHARP_AC;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

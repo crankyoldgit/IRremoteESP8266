@@ -624,8 +624,6 @@ bool IRrecv::decodeDaikin(decode_results *results, const uint16_t nbits,
 
   uint16_t offset = kStartOffset;
   match_result_t data_result;
-  uint16_t dataBitsSoFar = 0;
-  uint16_t i = 0;
 
   // Header #1 - Doesn't count as data.
   data_result = matchData(&(results->rawbuf[offset]), kDaikinHeaderLength,
@@ -635,56 +633,41 @@ bool IRrecv::decodeDaikin(decode_results *results, const uint16_t nbits,
   offset += data_result.used;
   if (data_result.success == false) return false;  // Fail
   if (data_result.data) return false;  // The header bits should be zero.
-
-  // Read the Data sections.
-  // Keep reading bytes until we either run out of section or state to fill.
-  const uint8_t kSectionSize[kDaikinSections] = {
-      kDaikinSection1Length, kDaikinSection2Length, kDaikinSection3Length};
-  for (uint8_t section = 0, pos = 0; section < kDaikinSections;
-       section++) {
-    pos += kSectionSize[section];
-    // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikinBitMark,
-                   kDaikinTolerance, kDaikinMarkExcess)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikinZeroSpace + kDaikinGap,
-                    kDaikinTolerance, kDaikinMarkExcess)) return false;
-    // Section Header
-    if (!matchMark(results->rawbuf[offset++], kDaikinHdrMark,
-                  kDaikinTolerance, kDaikinMarkExcess)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikinHdrSpace,
-                   kDaikinTolerance, kDaikinMarkExcess)) return false;
-
-    // Section Data
-    for (; offset <= results->rawlen - 16 && i < pos;
-         i++, dataBitsSoFar += 8, offset += data_result.used) {
-      // Read in a byte at a time.
-      data_result =
-          matchData(&(results->rawbuf[offset]), 8,
-                    kDaikinBitMark, kDaikinOneSpace,
-                    kDaikinBitMark, kDaikinZeroSpace,
-                    kDaikinTolerance, kDaikinMarkExcess, false);
-      if (data_result.success == false) break;  // Fail
-      results->state[i] = (uint8_t)data_result.data;
-    }
-  }
-
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kDaikinBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kDaikinGap))
-    return false;
-
+  if (!matchMark(results->rawbuf[offset++], kDaikinBitMark,
+                 kDaikinTolerance, kDaikinMarkExcess)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kDaikinZeroSpace + kDaikinGap,
+                  kDaikinTolerance, kDaikinMarkExcess)) return false;
+  // Sections
+  const uint8_t ksectionSize[kDaikinSections] = {
+      kDaikinSection1Length, kDaikinSection2Length, kDaikinSection3Length};
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikinSections; section++) {
+    uint16_t used;
+    // Section Header + Section Data (7 bytes) + Section Footer
+    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
+                             results->rawlen - offset, ksectionSize[section],
+                             kDaikinHdrMark, kDaikinHdrSpace,
+                             kDaikinBitMark, kDaikinOneSpace,
+                             kDaikinBitMark, kDaikinZeroSpace,
+                             kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
+                             section >= kDaikinSections - 1,
+                             kDaikinTolerance, kDaikinMarkExcess, false);
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
+  }
   // Compliance
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kDaikinBits) return false;
+    if (pos * 8 != kDaikinBits) return false;
     // Validate the checksum.
     if (!IRDaikinESP::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = DAIKIN;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
@@ -1386,11 +1369,8 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
   if (strict && nbits != kDaikin2Bits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  uint16_t i = 0;
-  match_result_t data_result;
-  uint8_t sectionSize[kDaikin2Sections] = {kDaikin2Section1Length,
-                                           kDaikin2Section2Length};
+  const uint8_t ksectionSize[kDaikin2Sections] = {kDaikin2Section1Length,
+                                                  kDaikin2Section2Length};
 
   // Leader
   if (!matchMark(results->rawbuf[offset++], kDaikin2LeaderMark,
@@ -1399,53 +1379,33 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
                   kDaikin2Tolerance)) return false;
 
   // Sections
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (uint8_t section = 0, pos = 0; section < kDaikin2Sections;
-       section++) {
-    pos += sectionSize[section];
-
-    // Section Header
-    if (!matchMark(results->rawbuf[offset++], kDaikin2HdrMark,
-                   kDaikin2Tolerance)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikin2HdrSpace,
-                    kDaikin2Tolerance)) return false;
-
-    // Section Data
-    for (; offset <= results->rawlen - 16 && i < pos;
-         i++, dataBitsSoFar += 8, offset += data_result.used) {
-      // Read in a byte at a time.
-      data_result =
-          matchData(&(results->rawbuf[offset]), 8, kDaikin2BitMark,
-                    kDaikin2OneSpace, kDaikin2BitMark,
-                    kDaikin2ZeroSpace, kDaikin2Tolerance, kMarkExcess, false);
-      if (data_result.success == false) break;  // Fail
-      results->state[i] = (uint8_t)data_result.data;
-    }
-
-    // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikin2BitMark,
-                   kDaikin2Tolerance)) return false;
-    if (section < kDaikin2Sections - 1) {  // Inter-section gaps.
-      if (!matchSpace(results->rawbuf[offset++], kDaikin2Gap,
-                      kDaikin2Tolerance)) return false;
-    } else {  // Last section / End of message gap.
-      if (offset <= results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], kDaikin2Gap,
-                        kDaikin2Tolerance)) return false;
-    }
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin2Sections; section++) {
+    uint16_t used;
+    // Section Header + Section Data + Section Footer
+    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
+                            results->rawlen - offset, ksectionSize[section],
+                            kDaikin2HdrMark, kDaikin2HdrSpace,
+                            kDaikin2BitMark, kDaikin2OneSpace,
+                            kDaikin2BitMark, kDaikin2ZeroSpace,
+                            kDaikin2BitMark, kDaikin2Gap,
+                            section >= kDaikin2Sections - 1,
+                            kDaikin2Tolerance, kDaikinMarkExcess, false);
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
   }
-
   // Compliance
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kDaikin2Bits) return false;
+    if (pos * 8 != kDaikin2Bits) return false;
     // Validate the checksum.
     if (!IRDaikin2::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = DAIKIN2;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
@@ -1807,58 +1767,35 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kDaikin216Bits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  uint16_t i = 0;
-  match_result_t data_result;
-  uint8_t sectionSize[kDaikin216Sections] = {kDaikin216Section1Length,
-                                             kDaikin216Section2Length};
-
+  const uint8_t ksectionSize[kDaikin216Sections] = {kDaikin216Section1Length,
+                                                    kDaikin216Section2Length};
   // Sections
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (uint8_t section = 0, pos = 0; section < kDaikin216Sections;
-       section++) {
-    pos += sectionSize[section];
-
-    // Section Header
-    if (!matchMark(results->rawbuf[offset++], kDaikin216HdrMark)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikin216HdrSpace))
-      return false;
-
-    // Section Data
-    for (; offset <= results->rawlen - 16 && i < pos;
-         i++, dataBitsSoFar += 8, offset += data_result.used) {
-      // Read in a byte at a time.
-      data_result =
-          matchData(&(results->rawbuf[offset]), 8, kDaikin216BitMark,
-                    kDaikin216OneSpace, kDaikin216BitMark,
-                    kDaikin216ZeroSpace, kDaikinTolerance, kDaikinMarkExcess,
-                    false);
-      if (data_result.success == false) break;  // Fail
-      results->state[i] = (uint8_t)data_result.data;
-    }
-
-    // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikin216BitMark,
-                   kDaikinTolerance, kDaikinMarkExcess)) return false;
-    if (section < kDaikin216Sections - 1) {  // Inter-section gaps.
-      if (!matchSpace(results->rawbuf[offset++], kDaikin216Gap)) return false;
-    } else {  // Last section / End of message gap.
-      if (offset <= results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], kDaikin216Gap)) return false;
-    }
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin216Sections; section++) {
+    uint16_t used;
+    // Section Header + Section Data + Section Footer
+    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
+                            results->rawlen - offset, ksectionSize[section],
+                            kDaikin216HdrMark, kDaikin216HdrSpace,
+                            kDaikin216BitMark, kDaikin216OneSpace,
+                            kDaikin216BitMark, kDaikin216ZeroSpace,
+                            kDaikin216BitMark, kDaikin216Gap,
+                            section >= kDaikin216Sections - 1,
+                            kDaikinTolerance, kDaikinMarkExcess, false);
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
   }
-
   // Compliance
   if (strict) {
-    // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kDaikin216Bits) return false;
+    if (pos * 8 != kDaikin216Bits) return false;
     // Validate the checksum.
     if (!IRDaikin216::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = decode_type_t::DAIKIN216;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
@@ -1997,58 +1934,35 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kDaikin160Bits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  uint16_t i = 0;
-  match_result_t data_result;
-  uint8_t sectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
-                                             kDaikin160Section2Length};
+  const uint8_t sectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
+                                                   kDaikin160Section2Length};
 
   // Sections
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (uint8_t section = 0, pos = 0; section < kDaikin160Sections;
-       section++) {
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin160Sections; section++) {
+    uint16_t used;
+    // Section Header + Section Data (7 bytes) + Section Footer
+    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
+                             results->rawlen - offset, sectionSize[section],
+                             kDaikin160HdrMark, kDaikin160HdrSpace,
+                             kDaikin160BitMark, kDaikin160OneSpace,
+                             kDaikin160BitMark, kDaikin160ZeroSpace,
+                             kDaikin160BitMark, kDaikin160Gap,
+                             section >= kDaikin160Sections - 1,
+                             kDaikinTolerance, kDaikinMarkExcess, false);
+    if (used == 0) return false;
+    offset += used;
     pos += sectionSize[section];
-
-    // Section Header
-    if (!matchMark(results->rawbuf[offset++], kDaikin160HdrMark)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kDaikin160HdrSpace))
-      return false;
-
-    // Section Data
-    for (; offset <= results->rawlen - 16 && i < pos;
-         i++, dataBitsSoFar += 8, offset += data_result.used) {
-      // Read in a byte at a time.
-      data_result =
-          matchData(&(results->rawbuf[offset]), 8, kDaikin160BitMark,
-                    kDaikin160OneSpace, kDaikin160BitMark,
-                    kDaikin160ZeroSpace, kDaikinTolerance, kDaikinMarkExcess,
-                    false);
-      if (data_result.success == false) break;  // Fail
-      results->state[i] = (uint8_t)data_result.data;
-    }
-
-    // Section Footer
-    if (!matchMark(results->rawbuf[offset++], kDaikin160BitMark,
-                   kDaikinTolerance, kDaikinMarkExcess)) return false;
-    if (section < kDaikin160Sections - 1) {  // Inter-section gaps.
-      if (!matchSpace(results->rawbuf[offset++], kDaikin160Gap)) return false;
-    } else {  // Last section / End of message gap.
-      if (offset <= results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], kDaikin160Gap)) return false;
-    }
   }
-
   // Compliance
   if (strict) {
-    // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kDaikin160Bits) return false;
     // Validate the checksum.
     if (!IRDaikin160::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = decode_type_t::DAIKIN160;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
