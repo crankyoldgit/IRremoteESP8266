@@ -113,40 +113,23 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits, bool strict) {
   uint16_t offset = kStartOffset;
   bool isRepeat = true;
 
-  uint32_t m_tick;
-  uint32_t s_tick;
   // Header
   // (Optional as repeat codes don't have the header)
   if (matchMark(results->rawbuf[offset], kJvcHdrMark)) {
     isRepeat = false;
-    m_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrMarkTicks;
+    offset++;
     if (results->rawlen < 2 * nbits + 4)
       return false;  // Can't possibly be a valid JVC message with a header.
-    if (!matchSpace(results->rawbuf[offset], kJvcHdrSpace)) return false;
-    s_tick = results->rawbuf[offset++] * kRawTick / kJvcHdrSpaceTicks;
-  } else {
-    // We can't easily auto-calibrate as there is no header, so assume
-    // the default tick time.
-    m_tick = kJvcTick;
-    s_tick = kJvcTick;
+    if (!matchSpace(results->rawbuf[offset++], kJvcHdrSpace)) return false;
   }
 
-  // Data
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits, kJvcBitMarkTicks * m_tick,
-                kJvcOneSpaceTicks * s_tick, kJvcBitMarkTicks * m_tick,
-                kJvcZeroSpaceTicks * s_tick);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kJvcBitMarkTicks * m_tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kJvcMinGapTicks * s_tick))
-    return false;
-
+  // Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    0, 0,
+                    kJvcBitMark, kJvcOneSpace,
+                    kJvcBitMark, kJvcZeroSpace,
+                    kJvcBitMark, kJvcMinGap, true)) return false;
   // Success
   results->decode_type = JVC;
   results->bits = nbits;

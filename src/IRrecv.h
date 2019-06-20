@@ -169,6 +169,17 @@ class IRrecv {
                       const uint8_t tolerance = kTolerance,
                       const int16_t excess = kMarkExcess,
                       const bool MSBfirst = true);
+  uint16_t matchGeneric(volatile uint16_t *data_ptr,
+                        uint64_t *result_ptr,
+                        const uint16_t remaining, const uint16_t nbits,
+                        const uint16_t hdrmark, const uint32_t hdrspace,
+                        const uint16_t onemark, const uint32_t onespace,
+                        const uint16_t zeromark, const uint32_t zerospace,
+                        const uint16_t footermark, const uint32_t footerspace,
+                        const bool atleast = false,
+                        const uint8_t tolerance = kTolerance,
+                        const int16_t excess = kMarkExcess,
+                        const bool MSBfirst = true);
   uint16_t matchGenericBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                              const uint16_t remaining, const uint16_t nbytes,
                              const uint16_t hdrmark, const uint32_t hdrspace,

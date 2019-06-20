@@ -81,32 +81,17 @@ bool IRrecv::decodeLegoPf(decode_results* results,
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kLegoPfBitMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kLegoPfHdrSpace)) return false;
-  // Data (Typically 16 bits)
-  data_result =
-      matchData(&(results->rawbuf[offset]), nbits,
-                kLegoPfBitMark, kLegoPfOneSpace,
-                kLegoPfBitMark, kLegoPfZeroSpace,
-                kTolerance, kMarkExcess, true);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-  uint16_t actualBits = data_result.used / 2;
-
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], kLegoPfBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kLegoPfMinCommandLength))
-    return false;
-
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kLegoPfBitMark, kLegoPfHdrSpace,
+                    kLegoPfBitMark, kLegoPfOneSpace,
+                    kLegoPfBitMark, kLegoPfZeroSpace,
+                    kLegoPfBitMark, kLegoPfMinCommandLength,
+                    true)) return false;
   // Compliance
-  if (actualBits < nbits) return false;
   if (strict) {
-    if (actualBits != nbits) return false;  // Not as we expected.
     // Verify the Longitudinal Redundancy Check (LRC)
     uint16_t lrc_data = data;
     uint8_t lrc = 0xF;
@@ -119,7 +104,7 @@ bool IRrecv::decodeLegoPf(decode_results* results,
 
   // Success
   results->decode_type = LEGOPF;
-  results->bits = actualBits;
+  results->bits = nbits;
   results->value = data;
   results->address = ((data >> (nbits - 4)) & 0b11) + 1;  // Channel Id
   results->command = (data >> 4) & 0xFF;  // Stuff between Channel Id and LRC.

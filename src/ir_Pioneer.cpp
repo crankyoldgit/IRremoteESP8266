@@ -83,28 +83,22 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
-
+  results->value = 0;
   for (uint16_t section = 0; section < 2; section++) {
-    // Header
-    if (!matchMark(results->rawbuf[offset], kNecHdrMark)) return false;
-    // Calculate how long the lowest tick time is based on the header mark.
-    uint32_t mark_tick =
-        results->rawbuf[offset++] * kRawTick / kNecHdrMarkTicks;
-    if (!matchSpace(results->rawbuf[offset], kNecHdrSpace)) return false;
-    // Calculate how long the common tick time is based on the header space.
-    uint32_t space_tick =
-        results->rawbuf[offset++] * kRawTick / kNecHdrSpaceTicks;
-    //
-    // Data
-    match_result_t data_result = matchData(
-        &(results->rawbuf[offset]), nbits / 2, kNecBitMarkTicks * mark_tick,
-        kNecOneSpaceTicks * space_tick, kNecBitMarkTicks * mark_tick,
-        kNecZeroSpaceTicks * space_tick);
-    if (data_result.success == false) return false;
-    uint8_t command = data_result.data >> 8;
-    uint8_t command_inverted = data_result.data;
-    uint8_t address = data_result.data >> 24;
-    uint8_t address_inverted = data_result.data >> 16;
+    // Match Header + Data + Footer
+    uint16_t used;
+    used = matchGeneric(results->rawbuf + offset, &data,
+                        results->rawlen - offset, nbits / 2,
+                        kNecHdrMark, kNecHdrSpace,
+                        kNecBitMark, kNecOneSpace,
+                        kNecBitMark, kNecZeroSpace,
+                        kNecBitMark, kNecMinGap, true);
+    if (!used) return false;
+    offset += used;
+    uint8_t command = data >> 8;
+    uint8_t command_inverted = data;
+    uint8_t address = data >> 24;
+    uint8_t address_inverted = data >> 16;
     // Compliance
     if (strict) {
       if (command != (command_inverted ^ 0xFF))
@@ -112,8 +106,7 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
       if (address != (address_inverted ^ 0xFF))
         return false;  // Address integrity failed.
     }
-    data = (data << (nbits / 2)) + data_result.data;
-    offset += data_result.used;
+    results->value = (results->value << (nbits / 2)) + data;
     // NEC-like commands and addresses are technically in LSB first order so the
     // final versions have to be reversed.
     uint16_t code = reverseBits((command << 8) + address, 16);
@@ -121,18 +114,10 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
       results->command = code;
     else
       results->address = code;
-
-    // Footer
-    if (!matchMark(results->rawbuf[offset++], kNecBitMarkTicks * mark_tick))
-      return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset++], kNecMinGapTicks * space_tick))
-      return false;
   }
 
   // Success
   results->bits = nbits;
-  results->value = data;
   results->decode_type = PIONEER;
   return true;
 }

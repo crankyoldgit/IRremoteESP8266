@@ -412,46 +412,26 @@ String IRArgoAC::toString() {
 //   to test this against. If you have one of these units, please let us know.
 bool IRrecv::decodeArgo(decode_results *results, const uint16_t nbits,
                         const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid Samsung A/C message.
   if (strict && nbits != kArgoBits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  match_result_t data_result;
 
-  // Message Header
-  if (!matchMark(results->rawbuf[offset++], kArgoHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kArgoHdrSpace)) return false;
-
-  // Data
-  // Keep reading bytes until we either run out of data or state to fill.
-  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8, kArgoBitMark,
-                            kArgoOneSpace, kArgoBitMark,
-                            kArgoZeroSpace, kTolerance, 0, false);
-    if (data_result.success == false) {
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset + data_result.used);
-      return false;  // Fail
-    }
-    results->state[i] = data_result.data;
-    DPRINT("DEBUG: Matched state[");
-    DPRINT(i);
-    DPRINTLN("]");
-  }
-
-  // Footer (None, allegedly. This seems very wrong.)
+  // Match Header + Data
+  if (!matchGenericBytes(results->rawbuf + offset, results->state,
+                         results->rawlen - offset, nbits / 8,
+                         kArgoHdrMark, kArgoHdrSpace,
+                         kArgoBitMark, kArgoOneSpace,
+                         kArgoBitMark, kArgoZeroSpace,
+                         // Footer (None, allegedly. This seems very wrong.)
+                         0, 0, true,
+                         kTolerance, 0, false)) return false;
 
   // Compliance
-  // Re-check we got the correct size/length due to the way we read the data.
-  if (dataBitsSoFar != nbits) return false;
   // Verify we got a valid checksum.
   if (strict && !IRArgoAC::validChecksum(results->state)) return false;
   // Success
   results->decode_type = decode_type_t::ARGO;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

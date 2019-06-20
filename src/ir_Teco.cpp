@@ -283,38 +283,22 @@ String IRTecoAc::toString(void) {
 // Status: STABLE / Tested.
 bool IRrecv::decodeTeco(decode_results* results,
                         const uint16_t nbits, const bool strict) {
-  // Check if can possibly be a valid Teco message.
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1) return false;
   if (strict && nbits != kTecoBits) return false;  // Not what is expected
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
-
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kTecoHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kTecoHdrSpace)) return false;
-  // Data (35 bits)
-  data_result =
-      matchData(&(results->rawbuf[offset]), 35, kTecoBitMark, kTecoOneSpace,
-                kTecoBitMark, kTecoZeroSpace, kTolerance, kMarkExcess, false);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-  uint16_t actualBits = data_result.used / 2;
-
-  // Footer.
-  if (!matchMark(results->rawbuf[offset++], kTecoBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kTecoGap)) return false;
-
-  // Compliance
-  if (actualBits < nbits) return false;
-  if (strict && actualBits != nbits) return false;  // Not as we expected.
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kTecoHdrMark, kTecoHdrSpace,
+                    kTecoBitMark, kTecoOneSpace,
+                    kTecoBitMark, kTecoZeroSpace,
+                    kTecoBitMark, kTecoGap, true,
+                    kTolerance, kMarkExcess, false)) return false;
 
   // Success
   results->decode_type = TECO;
-  results->bits = actualBits;
+  results->bits = nbits;
   results->value = data;
   results->address = 0;
   results->command = 0;

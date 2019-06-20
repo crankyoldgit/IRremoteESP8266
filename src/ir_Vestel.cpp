@@ -590,26 +590,17 @@ bool IRrecv::decodeVestelAc(decode_results* results, const uint16_t nbits,
   if (nbits > sizeof(data) * 8)
     return false;  // We can't possibly capture a Vestel packet that big.
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kVestelAcHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kVestelAcHdrSpace)) return false;
-
-  // Data (Normal)
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits, kVestelAcBitMark,
-                kVestelAcOneSpace, kVestelAcBitMark, kVestelAcZeroSpace,
-                kVestelAcTolerance, kMarkExcess, false);
-
-  if (data_result.success == false) return false;
-  offset += data_result.used;
-  data = data_result.data;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kVestelAcBitMark)) return false;
-
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kVestelAcHdrMark, kVestelAcHdrSpace,
+                    kVestelAcBitMark, kVestelAcOneSpace,
+                    kVestelAcBitMark, kVestelAcZeroSpace,
+                    kVestelAcBitMark, 0, false,
+                    kVestelAcTolerance, kMarkExcess, false)) return false;
   // Compliance
   if (strict)
-    if (!IRVestelAc::validChecksum(data_result.data)) return false;
+    if (!IRVestelAc::validChecksum(data)) return false;
 
   // Success
   results->decode_type = VESTEL_AC;

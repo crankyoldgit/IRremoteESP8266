@@ -142,40 +142,19 @@ uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, const uint16_t nbits,
                              const bool strict, const uint32_t manufacturer) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Not enough entries to be a Panasonic message.
   if (strict && nbits != kPanasonicBits)
     return false;  // Request is out of spec.
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick =
-      results->rawbuf[offset++] * kRawTick / kPanasonicHdrMarkTicks;
-  if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace)) return false;
-  // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick =
-      results->rawbuf[offset++] * kRawTick / kPanasonicHdrSpaceTicks;
-
-  // Data
-  match_result_t data_result = matchData(
-      &(results->rawbuf[offset]), nbits, kPanasonicBitMarkTicks * m_tick,
-      kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
-      kPanasonicZeroSpaceTicks * s_tick);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Footer
-  if (!match(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kPanasonicEndGap))
-    return false;
-
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kPanasonicHdrMark, kPanasonicHdrSpace,
+                    kPanasonicBitMark, kPanasonicOneSpace,
+                    kPanasonicBitMark, kPanasonicZeroSpace,
+                    kPanasonicBitMark, kPanasonicEndGap, true)) return false;
   // Compliance
   uint32_t address = data >> 32;
   uint32_t command = data & 0xFFFFFFFF;

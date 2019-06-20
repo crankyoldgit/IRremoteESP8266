@@ -192,31 +192,16 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
-  // No header
-  // But try to auto-calibrate off the initial mark signal.
-  if (!matchMark(results->rawbuf[offset], kSharpBitMark, 35)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset] * kRawTick / kSharpBitMarkTicks;
-  // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    // Use a higher tolerance value for kSharpBitMark as it is quite small.
-    if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
-      return false;
-    if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
-      data <<= 1;  // 0
-    else
-      return false;
-  }
-
-  // Footer
-  if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
-    return false;
-
+  // Match Data + Footer
+  uint16_t used;
+  used = matchGeneric(results->rawbuf + offset, &data,
+                      results->rawlen - offset, nbits,
+                      0, 0,  // No Header
+                      kSharpBitMark, kSharpOneSpace,
+                      kSharpBitMark, kSharpZeroSpace,
+                      kSharpBitMark, kSharpGap, true, 35);
+  if (!used) return false;
+  offset += used;
   // Compliance
   if (strict) {
     // Check the state of the expansion bit is what we expect.
@@ -226,31 +211,14 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
       // DISABLED - See TODO
 #ifdef UNIT_TEST
     // Grab the second copy of the data (i.e. inverted)
-    // Header
-    // i.e. The inter-data/command repeat gap.
-    if (!matchSpace(results->rawbuf[offset++], kSharpGapTicks * tick))
-      return false;
-
-    // Data
     uint64_t second_data = 0;
-    for (uint16_t i = 0; i < nbits; i++, offset++) {
-      // Use a higher tolerance value for kSharpBitMark as it is quite small.
-      if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
-        return false;
-      if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
-        second_data = (second_data << 1) | 1;  // 1
-      else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
-        second_data <<= 1;  // 0
-      else
-        return false;
-    }
-    // Footer
-    if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
-      return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
-      return false;
-
+    // Match Data + Footer
+    if (!matchGeneric(results->rawbuf + offset, &second_data,
+                      results->rawlen - offset, nbits,
+                      0, 0,
+                      kSharpBitMark, kSharpOneSpace,
+                      kSharpBitMark, kSharpZeroSpace,
+                      kSharpBitMark, kSharpGap, true, 35)) return false;
     // Check that second_data has been inverted correctly.
     if (data != (second_data ^ kSharpToggleMask)) return false;
 #endif  // UNIT_TEST
