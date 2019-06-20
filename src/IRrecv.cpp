@@ -917,8 +917,11 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
   uint16_t offset = 0;
 
   // Header
-  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark)) return 0;
-  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace)) return 0;
+  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
+    return 0;
+  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
+                              excess))
+    return 0;
 
   // Data
   match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
@@ -929,13 +932,17 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 
   offset += result.used;
   // Footer
-  if (footermark && !matchMark(*(data_ptr + offset++), footermark)) return 0;
+  if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
+                               excess))
+    return 0;
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
       if (atleast) {
-        if (!matchAtLeast(*(data_ptr + offset), footerspace)) return 0;
+        if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
       } else {
-        if (!matchSpace(*(data_ptr + offset), footerspace)) return 0;
+        if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
       }
       offset++;
   }
@@ -1034,8 +1041,11 @@ uint16_t IRrecv::matchGenericBytes(volatile uint16_t *data_ptr,
   uint16_t offset = 0;
 
   // Header
-  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark)) return 0;
-  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace)) return 0;
+  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
+    return 0;
+  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
+                              excess))
+    return 0;
 
   // Data
   uint16_t data_used = IRrecv::matchBytes(data_ptr + offset, result_ptr,
@@ -1046,13 +1056,17 @@ uint16_t IRrecv::matchGenericBytes(volatile uint16_t *data_ptr,
   if (data_used == 0) return 0;
   offset += data_used;
   // Footer
-  if (footermark && !matchMark(*(data_ptr + offset++), footermark)) return 0;
+  if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
+                               excess))
+    return 0;
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
       if (atleast) {
-        if (!matchAtLeast(*(data_ptr + offset), footerspace)) return 0;
+        if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
       } else {
-        if (!matchSpace(*(data_ptr + offset), footerspace)) return 0;
+        if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
       }
       offset++;
   }
