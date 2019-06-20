@@ -1067,19 +1067,19 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                 const stdAc::opmode_t def) {
-  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
     return stdAc::opmode_t::kAuto;
-  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
     return stdAc::opmode_t::kOff;
-  else if (!strcmp(str, "COOL") || !strcmp(str, "COOLING"))
+  else if (!strcasecmp(str, "COOL") || !strcasecmp(str, "COOLING"))
     return stdAc::opmode_t::kCool;
-  else if (!strcmp(str, "HEAT") || !strcmp(str, "HEATING"))
+  else if (!strcasecmp(str, "HEAT") || !strcasecmp(str, "HEATING"))
     return stdAc::opmode_t::kHeat;
-  else if (!strcmp(str, "DRY") || !strcmp(str, "DRYING") ||
-           !strcmp(str, "DEHUMIDIFY"))
+  else if (!strcasecmp(str, "DRY") || !strcasecmp(str, "DRYING") ||
+           !strcasecmp(str, "DEHUMIDIFY"))
     return stdAc::opmode_t::kDry;
-  else if (!strcmp(str, "FAN") || !strcmp(str, "FANONLY") ||
-           !strcmp(str, "FAN_ONLY"))
+  else if (!strcasecmp(str, "FAN") || !strcasecmp(str, "FANONLY") ||
+           !strcasecmp(str, "FAN_ONLY"))
     return stdAc::opmode_t::kFan;
   else
     return def;
@@ -1087,20 +1087,20 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
-  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
     return stdAc::fanspeed_t::kAuto;
-  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
-           !strcmp(str, "LOWEST"))
+  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
+           !strcasecmp(str, "LOWEST"))
     return stdAc::fanspeed_t::kMin;
-  else if (!strcmp(str, "LOW"))
+  else if (!strcasecmp(str, "LOW"))
     return stdAc::fanspeed_t::kLow;
-  else if (!strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
-           !strcmp(str, "MID"))
+  else if (!strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
+           !strcasecmp(str, "MID"))
     return stdAc::fanspeed_t::kMedium;
-  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
+  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
     return stdAc::fanspeed_t::kHigh;
-  else if (!strcmp(str, "MAX") || !strcmp(str, "MAXIMUM") ||
-           !strcmp(str, "HIGHEST"))
+  else if (!strcasecmp(str, "MAX") || !strcasecmp(str, "MAXIMUM") ||
+           !strcasecmp(str, "HIGHEST"))
     return stdAc::fanspeed_t::kMax;
   else
     return def;
@@ -1108,26 +1108,26 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
-  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
-      !strcmp(str, "ON") || !strcmp(str, "SWING"))
+  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
+      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
     return stdAc::swingv_t::kAuto;
-  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
     return stdAc::swingv_t::kOff;
-  else if (!strcmp(str, "MIN") || !strcmp(str, "MINIMUM") ||
-           !strcmp(str, "LOWEST") || !strcmp(str, "BOTTOM") ||
-           !strcmp(str, "DOWN"))
+  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
+           !strcasecmp(str, "LOWEST") || !strcasecmp(str, "BOTTOM") ||
+           !strcasecmp(str, "DOWN"))
     return stdAc::swingv_t::kLowest;
-  else if (!strcmp(str, "LOW"))
+  else if (!strcasecmp(str, "LOW"))
     return stdAc::swingv_t::kLow;
-  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
-           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
-           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
+  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
+           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
+           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
     return stdAc::swingv_t::kMiddle;
-  else if (!strcmp(str, "HIGH") || !strcmp(str, "HI"))
+  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
     return stdAc::swingv_t::kHigh;
-  else if (!strcmp(str, "HIGHEST") || !strcmp(str, "MAX") ||
-           !strcmp(str, "MAXIMUM") || !strcmp(str, "TOP") ||
-           !strcmp(str, "UP"))
+  else if (!strcasecmp(str, "HIGHEST") || !strcasecmp(str, "MAX") ||
+           !strcasecmp(str, "MAXIMUM") || !strcasecmp(str, "TOP") ||
+           !strcasecmp(str, "UP"))
     return stdAc::swingv_t::kHighest;
   else
     return def;
@@ -1135,56 +1135,56 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
-  if (!strcmp(str, "AUTO") || !strcmp(str, "AUTOMATIC") ||
-      !strcmp(str, "ON") || !strcmp(str, "SWING"))
+  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
+      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
     return stdAc::swingh_t::kAuto;
-  else if (!strcmp(str, "OFF") || !strcmp(str, "STOP"))
+  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
     return stdAc::swingh_t::kOff;
-  else if (!strcmp(str, "LEFTMAX") || !strcmp(str, "LEFT MAX") ||
-           !strcmp(str, "MAXLEFT") || !strcmp(str, "MAX LEFT") ||
-           !strcmp(str, "FARLEFT") || !strcmp(str, "FAR LEFT"))
+  else if (!strcasecmp(str, "LEFTMAX") || !strcasecmp(str, "LEFT MAX") ||
+           !strcasecmp(str, "MAXLEFT") || !strcasecmp(str, "MAX LEFT") ||
+           !strcasecmp(str, "FARLEFT") || !strcasecmp(str, "FAR LEFT"))
     return stdAc::swingh_t::kLeftMax;
-  else if (!strcmp(str, "LEFT"))
+  else if (!strcasecmp(str, "LEFT"))
     return stdAc::swingh_t::kLeft;
-  else if (!strcmp(str, "MID") || !strcmp(str, "MIDDLE") ||
-           !strcmp(str, "MED") || !strcmp(str, "MEDIUM") ||
-           !strcmp(str, "CENTRE") || !strcmp(str, "CENTER"))
+  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
+           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
+           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
     return stdAc::swingh_t::kMiddle;
-  else if (!strcmp(str, "RIGHT"))
+  else if (!strcasecmp(str, "RIGHT"))
     return stdAc::swingh_t::kRight;
-  else if (!strcmp(str, "RIGHTMAX") || !strcmp(str, "RIGHT MAX") ||
-           !strcmp(str, "MAXRIGHT") || !strcmp(str, "MAX RIGHT") ||
-           !strcmp(str, "FARRIGHT") || !strcmp(str, "FAR RIGHT"))
+  else if (!strcasecmp(str, "RIGHTMAX") || !strcasecmp(str, "RIGHT MAX") ||
+           !strcasecmp(str, "MAXRIGHT") || !strcasecmp(str, "MAX RIGHT") ||
+           !strcasecmp(str, "FARRIGHT") || !strcasecmp(str, "FAR RIGHT"))
     return stdAc::swingh_t::kRightMax;
   else
     return def;
 }
 
-// Assumes str is upper case or an integer >= 1.
+// Assumes str is the model or an integer >= 1.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Fujitsu A/C models
-  if (!strcmp(str, "ARRAH2E")) {
+  if (!strcasecmp(str, "ARRAH2E")) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
-  } else if (!strcmp(str, "ARDB1")) {
+  } else if (!strcasecmp(str, "ARDB1")) {
     return fujitsu_ac_remote_model_t::ARDB1;
   // Panasonic A/C families
-  } else if (!strcmp(str, "LKE") || !strcmp(str, "PANASONICLKE")) {
+  } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
-  } else if (!strcmp(str, "NKE") || !strcmp(str, "PANASONICNKE")) {
+  } else if (!strcasecmp(str, "NKE") || !strcasecmp(str, "PANASONICNKE")) {
     return panasonic_ac_remote_model_t::kPanasonicNke;
-  } else if (!strcmp(str, "DKE") || !strcmp(str, "PANASONICDKE")) {
+  } else if (!strcasecmp(str, "DKE") || !strcasecmp(str, "PANASONICDKE")) {
     return panasonic_ac_remote_model_t::kPanasonicDke;
-  } else if (!strcmp(str, "JKE") || !strcmp(str, "PANASONICJKE")) {
+  } else if (!strcasecmp(str, "JKE") || !strcasecmp(str, "PANASONICJKE")) {
     return panasonic_ac_remote_model_t::kPanasonicJke;
-  } else if (!strcmp(str, "CKP") || !strcmp(str, "PANASONICCKP")) {
+  } else if (!strcasecmp(str, "CKP") || !strcasecmp(str, "PANASONICCKP")) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
-  } else if (!strcmp(str, "RKR") || !strcmp(str, "PANASONICRKR")) {
+  } else if (!strcasecmp(str, "RKR") || !strcasecmp(str, "PANASONICRKR")) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
   // Whirlpool A/C models
-  } else if (!strcmp(str, "DG11J13A") || !strcmp(str, "DG11J104") ||
-             !strcmp(str, "DG11J1-04")) {
+  } else if (!strcasecmp(str, "DG11J13A") || !strcasecmp(str, "DG11J104") ||
+             !strcasecmp(str, "DG11J1-04")) {
     return whirlpool_ac_remote_model_t::DG11J13A;
-  } else if (!strcmp(str, "DG11J191")) {
+  } else if (!strcasecmp(str, "DG11J191")) {
     return whirlpool_ac_remote_model_t::DG11J191;
   } else {
     int16_t number = atoi(str);
@@ -1195,13 +1195,12 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
   }
 }
 
-// Assumes str is upper case.
 bool IRac::strToBool(const char *str, const bool def) {
-  if (!strcmp(str, "ON") || !strcmp(str, "1") || !strcmp(str, "YES") ||
-      !strcmp(str, "TRUE"))
+  if (!strcasecmp(str, "ON") || !strcasecmp(str, "1") ||
+      !strcasecmp(str, "YES") || !strcasecmp(str, "TRUE"))
     return true;
-  else if (!strcmp(str, "OFF") || !strcmp(str, "0") ||
-           !strcmp(str, "NO") || !strcmp(str, "FALSE"))
+  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "0") ||
+           !strcasecmp(str, "NO") || !strcasecmp(str, "FALSE"))
     return false;
   else
     return def;

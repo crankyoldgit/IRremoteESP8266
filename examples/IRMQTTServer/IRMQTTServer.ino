@@ -2412,6 +2412,9 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
     debug("Sending MQTT stat update broadcast.");
     sendClimate(state, state, MqttClimateStat,
                 retain, true, false);
+#if MQTT_CLIMATE_JSON
+    sendJsonState(state, MqttClimateStat + KEY_JSON);
+#endif  // MQTT_CLIMATE_JSON
     timer->reset();  // It's been sent, so reset the timer.
     hasBroadcastBeenSent = true;
   }
@@ -3134,43 +3137,128 @@ bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #endif  // MQTT_ENABLE
 }
 
+#if MQTT_CLIMATE_JSON
+void sendJsonState(const stdAc::state_t state, const String topic,
+                   const bool retain, const bool ha_mode) {
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  json[KEY_PROTOCOL] = typeToString(state.protocol);
+  json[KEY_MODEL] = state.model;
+  json[KEY_POWER] = IRac::boolToString(state.power);
+  json[KEY_MODE] = IRac::opmodeToString(state.mode);
+  // Home Assistant wants mode to be off if power is also off & vice-versa.
+  if (ha_mode && (state.mode == stdAc::opmode_t::kOff || !state.power)) {
+    json[KEY_MODE] = IRac::opmodeToString(stdAc::opmode_t::kOff);
+    json[KEY_POWER] = IRac::boolToString(false);
+  }
+  json[KEY_CELSIUS] = IRac::boolToString(state.celsius);
+  json[KEY_TEMP] = state.degrees;
+  json[KEY_FANSPEED] = IRac::fanspeedToString(state.fanspeed);
+  json[KEY_SWINGV] = IRac::swingvToString(state.swingv);
+  json[KEY_SWINGH] = IRac::swinghToString(state.swingh);
+  json[KEY_QUIET] = IRac::boolToString(state.quiet);
+  json[KEY_TURBO] = IRac::boolToString(state.turbo);
+  json[KEY_ECONO] = IRac::boolToString(state.econo);
+  json[KEY_LIGHT] = IRac::boolToString(state.light);
+  json[KEY_FILTER] = IRac::boolToString(state.filter);
+  json[KEY_CLEAN] = IRac::boolToString(state.clean);
+  json[KEY_BEEP] = IRac::boolToString(state.beep);
+  json[KEY_SLEEP] = state.sleep;
+
+  String payload = "";
+  payload.reserve(200);
+  json.printTo(payload);
+  sendString(topic, payload, retain);
+}
+
+stdAc::state_t jsonToState(const stdAc::state_t current, const String str) {
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& json = jsonBuffer.parseObject(str);
+  if (!json.success()) {
+    debug("json MQTT message did not parse. Skipping!");
+    return current;
+  }
+  stdAc::state_t result = current;
+  if (json.containsKey(KEY_PROTOCOL))
+    result.protocol = strToDecodeType(json[KEY_PROTOCOL]);
+  if (json.containsKey(KEY_MODEL))
+    result.model = IRac::strToModel(json[KEY_MODEL]);
+  if (json.containsKey(KEY_MODE))
+    result.mode = IRac::strToOpmode(json[KEY_MODE]);
+  if (json.containsKey(KEY_FANSPEED))
+    result.fanspeed = IRac::strToFanspeed(json[KEY_FANSPEED]);
+  if (json.containsKey(KEY_SWINGV))
+    result.swingv = IRac::strToSwingV(json[KEY_SWINGV]);
+  if (json.containsKey(KEY_SWINGH))
+    result.swingh = IRac::strToSwingH(json[KEY_SWINGH]);
+  if (json.containsKey(KEY_TEMP))
+    result.degrees = json[KEY_TEMP];
+  if (json.containsKey(KEY_SLEEP))
+    result.sleep = json[KEY_SLEEP];
+  if (json.containsKey(KEY_POWER))
+    result.power = IRac::strToBool(json[KEY_POWER]);
+  if (json.containsKey(KEY_QUIET))
+    result.quiet = IRac::strToBool(json[KEY_QUIET]);
+  if (json.containsKey(KEY_TURBO))
+    result.turbo = IRac::strToBool(json[KEY_TURBO]);
+  if (json.containsKey(KEY_ECONO))
+    result.econo = IRac::strToBool(json[KEY_ECONO]);
+  if (json.containsKey(KEY_LIGHT))
+    result.light = IRac::strToBool(json[KEY_LIGHT]);
+  if (json.containsKey(KEY_CLEAN))
+    result.clean = IRac::strToBool(json[KEY_CLEAN]);
+  if (json.containsKey(KEY_FILTER))
+    result.filter = IRac::strToBool(json[KEY_FILTER]);
+  if (json.containsKey(KEY_BEEP))
+    result.beep = IRac::strToBool(json[KEY_BEEP]);
+  if (json.containsKey(KEY_CELSIUS))
+    result.celsius = IRac::strToBool(json[KEY_CELSIUS]);
+  return result;
+}
+#endif  // MQTT_CLIMATE_JSON
+
 stdAc::state_t updateClimate(stdAc::state_t current, const String str,
                               const String prefix, const String payload) {
   stdAc::state_t result = current;
-  String value = payload;
-  value.toUpperCase();
+#if MQTT_CLIMATE_JSON
+  if (str.equals(prefix + KEY_JSON))
+    result = jsonToState(result, payload.c_str());
+  else
+#endif  // MQTT_CLIMATE_JSON
   if (str.equals(prefix + KEY_PROTOCOL))
-    result.protocol = strToDecodeType(value.c_str());
+    result.protocol = strToDecodeType(payload.c_str());
   else if (str.equals(prefix + KEY_MODEL))
-    result.model = IRac::strToModel(value.c_str());
+    result.model = IRac::strToModel(payload.c_str());
   else if (str.equals(prefix + KEY_POWER))
-    result.power = IRac::strToBool(value.c_str());
+    result.power = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_MODE))
-    result.mode = IRac::strToOpmode(value.c_str());
+    result.mode = IRac::strToOpmode(payload.c_str());
   else if (str.equals(prefix + KEY_TEMP))
-    result.degrees = value.toFloat();
+    result.degrees = payload.toFloat();
   else if (str.equals(prefix + KEY_FANSPEED))
-    result.fanspeed = IRac::strToFanspeed(value.c_str());
+    result.fanspeed = IRac::strToFanspeed(payload.c_str());
   else if (str.equals(prefix + KEY_SWINGV))
-    result.swingv = IRac::strToSwingV(value.c_str());
+    result.swingv = IRac::strToSwingV(payload.c_str());
   else if (str.equals(prefix + KEY_SWINGH))
-    result.swingh = IRac::strToSwingH(value.c_str());
+    result.swingh = IRac::strToSwingH(payload.c_str());
   else if (str.equals(prefix + KEY_QUIET))
-    result.quiet = IRac::strToBool(value.c_str());
+    result.quiet = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_TURBO))
-    result.turbo = IRac::strToBool(value.c_str());
+    result.turbo = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_ECONO))
-    result.econo = IRac::strToBool(value.c_str());
+    result.econo = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_LIGHT))
-    result.light = IRac::strToBool(value.c_str());
+    result.light = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_BEEP))
-    result.beep = IRac::strToBool(value.c_str());
+    result.beep = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_FILTER))
-    result.filter = IRac::strToBool(value.c_str());
+    result.filter = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_CLEAN))
-    result.clean = IRac::strToBool(value.c_str());
+    result.clean = IRac::strToBool(payload.c_str());
+  else if (str.equals(prefix + KEY_CELSIUS))
+    result.celsius = IRac::strToBool(payload.c_str());
   else if (str.equals(prefix + KEY_SLEEP))
-    result.sleep = value.toInt();
+    result.sleep = payload.toInt();
   return result;
 }
 
@@ -3264,10 +3352,14 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
     diff = true;
     success &= sendInt(topic_prefix + KEY_SLEEP, next.sleep, retain);
   }
-  if (diff && !forceMQTT)
+  if (diff && !forceMQTT) {
     debug("Difference in common A/C state detected.");
-  else
+#if MQTT_CLIMATE_JSON
+    sendJsonState(next, MqttClimateStat + KEY_JSON);
+#endif  // MQTT_CLIMATE_JSON
+  } else {
     debug("NO difference in common A/C state detected.");
+  }
   // Only send an IR message if we need to.
   if (enableIR && ((diff && !forceMQTT) || forceIR)) {
     debug("Sending common A/C state via IR.");

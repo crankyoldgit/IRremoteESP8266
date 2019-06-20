@@ -81,7 +81,9 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE "ac"  // Sub-topic for the climate topics.
 #define MQTT_CLIMATE_CMND "cmnd"  // Sub-topic for the climate command topics.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
-#define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts
+// Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
+#define MQTT_CLIMATE_JSON false
+#define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts.
 
 #define QOS 1  // MQTT broker should queue up any unreceived messages for us
 // #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
@@ -149,6 +151,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_FILTER "filter"
 #define KEY_CLEAN "clean"
 #define KEY_CELSIUS "use_celsius"
+#define KEY_JSON "json"
 
 // HTML arguments we will parse for IR code information.
 #define KEY_TYPE "type"  // KEY_PROTOCOL is also checked too.
@@ -180,7 +183,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.2.0"
+#define _MY_VERSION_ "v1.2.1-beta"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -242,7 +245,11 @@ const char* kClimateTopics =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
     KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
     KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
-    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS ")<br>";
+    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS
+#if MQTT_CLIMATE_JSON
+    "|" KEY_JSON
+#endif  // MQTT_CLIMATE_JSON
+    ")<br>";
 
 void mqttCallback(char* topic, byte* payload, unsigned int length);
 String listOfCommandTopics(void);
@@ -258,6 +265,11 @@ void sendMQTTDiscovery(const char *topic);
 void doBroadcast(TimerMs *timer, const uint32_t interval,
                  const stdAc::state_t state, const bool retain,
                  const bool force);
+#if MQTT_CLIMATE_JSON
+stdAc::state_t jsonToState(const stdAc::state_t current, const String str);
+void sendJsonState(const stdAc::state_t state, const String topic,
+                   const bool retain = false, const bool ha_mode = true);
+#endif  // MQTT_CLIMATE_JSON
 #endif  // MQTT_ENABLE
 bool isSerialGpioUsedByIr(void);
 void debug(const char *str);
