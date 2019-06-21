@@ -651,14 +651,14 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, const uint16_t nbits,
        section++) {
     uint16_t used;
     // Section Data
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                            results->rawlen - offset, sectionSize[section],
-                            0, 0,
-                            kWhirlpoolAcBitMark, kWhirlpoolAcOneSpace,
-                            kWhirlpoolAcBitMark, kWhirlpoolAcZeroSpace,
-                            kWhirlpoolAcBitMark, kWhirlpoolAcGap,
-                            section >= kWhirlpoolAcSections - 1,
-                            kTolerance, kMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, sectionSize[section] * 8,
+                        0, 0,
+                        kWhirlpoolAcBitMark, kWhirlpoolAcOneSpace,
+                        kWhirlpoolAcBitMark, kWhirlpoolAcZeroSpace,
+                        kWhirlpoolAcBitMark, kWhirlpoolAcGap,
+                        section >= kWhirlpoolAcSections - 1,
+                        kTolerance, kMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += sectionSize[section];

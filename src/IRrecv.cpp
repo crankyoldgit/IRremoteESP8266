@@ -915,7 +915,7 @@ uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
 //   result_bytes_ptr: A pointer to where to start storing the bytes we decoded.
 //   use_bits: A flag indicating if we are to decode bits or bytes.
 //   remaining: The size of the capture buffer are remaining.
-//   required:     Nr. of data bits or bytes we expect.
+//   nbits:        Nr. of data bits we expect.
 //   hdrmark:      Nr. of uSeconds for the expected header mark signal.
 //   hdrspace:     Nr. of uSeconds for the expected header space signal.
 //   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
@@ -935,7 +935,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               uint8_t *result_bytes_ptr,
                               const bool use_bits,
                               const uint16_t remaining,
-                              const uint16_t required,
+                              const uint16_t nbits,
                               const uint16_t hdrmark,
                               const uint32_t hdrspace,
                               const uint16_t onemark,
@@ -948,9 +948,10 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
+  // If we are expecting byte sizes, check it's a factor of 8 or fail.
+  if (!use_bits && nbits % 8 != 0)  return 0;
   // Calculate how much remaining buffer is required.
-  uint16_t min_remaining = use_bits ? required: required * 8;
-  min_remaining *= 2;
+  uint16_t min_remaining = nbits * 2;
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -970,7 +971,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
 
   // Data
   if (use_bits) {  // Bits.
-    match_result_t result = IRrecv::matchData(data_ptr + offset, required,
+    match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
                                               excess, MSBfirst);
@@ -979,7 +980,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
     offset += result.used;
   } else {  // bytes
     uint16_t data_used = IRrecv::matchBytes(data_ptr + offset, result_bytes_ptr,
-                                            remaining - offset, required,
+                                            remaining - offset, nbits / 8,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
                                             excess, MSBfirst);
@@ -1013,7 +1014,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
 //   data_ptr: A pointer to where we are at in the capture buffer.
 //   result_ptr: A pointer to where to start storing the bits we decoded.
 //   remaining: The size of the capture buffer are remaining.
-//   nbytes:       Nr. of data bytes we expect.
+//   nbits:        Nr. of data bits we expect.
 //   hdrmark:      Nr. of uSeconds for the expected header mark signal.
 //   hdrspace:     Nr. of uSeconds for the expected header space signal.
 //   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
@@ -1044,7 +1045,6 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
-
   return _matchGeneric(data_ptr, result_ptr, NULL, true, remaining, nbits,
                        hdrmark, hdrspace, onemark, onespace,
                        zeromark, zerospace, footermark, footerspace, atleast,
@@ -1061,7 +1061,7 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 //   data_ptr: A pointer to where we are at in the capture buffer.
 //   result_ptr: A pointer to where to start storing the bytes we decoded.
 //   remaining: The size of the capture buffer are remaining.
-//   nbytes:       Nr. of data bytes we expect.
+//   nbits:        Nr. of data bits we expect.
 //   hdrmark:      Nr. of uSeconds for the expected header mark signal.
 //   hdrspace:     Nr. of uSeconds for the expected header space signal.
 //   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
@@ -1076,23 +1076,23 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
 //  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchGenericBytes(volatile uint16_t *data_ptr,
-                                   uint8_t *result_ptr,
-                                   const uint16_t remaining,
-                                   const uint16_t nbytes,
-                                   const uint16_t hdrmark,
-                                   const uint32_t hdrspace,
-                                   const uint16_t onemark,
-                                   const uint32_t onespace,
-                                   const uint16_t zeromark,
-                                   const uint32_t zerospace,
-                                   const uint16_t footermark,
-                                   const uint32_t footerspace,
-                                   const bool atleast,
-                                   const uint8_t tolerance,
-                                   const int16_t excess,
-                                   const bool MSBfirst) {
-  return _matchGeneric(data_ptr, NULL, result_ptr, false, remaining, nbytes,
+uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
+                              uint8_t *result_ptr,
+                              const uint16_t remaining,
+                              const uint16_t nbits,
+                              const uint16_t hdrmark,
+                              const uint32_t hdrspace,
+                              const uint16_t onemark,
+                              const uint32_t onespace,
+                              const uint16_t zeromark,
+                              const uint32_t zerospace,
+                              const uint16_t footermark,
+                              const uint32_t footerspace,
+                              const bool atleast,
+                              const uint8_t tolerance,
+                              const int16_t excess,
+                              const bool MSBfirst) {
+  return _matchGeneric(data_ptr, NULL, result_ptr, false, remaining, nbits,
                        hdrmark, hdrspace, onemark, onespace,
                        zeromark, zerospace, footermark, footerspace, atleast,
                        tolerance, excess, MSBfirst);

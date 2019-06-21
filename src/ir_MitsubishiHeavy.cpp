@@ -1082,13 +1082,13 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
 
   uint16_t offset = kStartOffset;
   uint16_t used;
-  used = matchGenericBytes(results->rawbuf + offset, results->state,
-                           results->rawlen - offset, nbits / 8,
-                           kMitsubishiHeavyHdrMark, kMitsubishiHeavyHdrSpace,
-                           kMitsubishiHeavyBitMark, kMitsubishiHeavyOneSpace,
-                           kMitsubishiHeavyBitMark, kMitsubishiHeavyZeroSpace,
-                           kMitsubishiHeavyBitMark, kMitsubishiHeavyGap, true,
-                           kTolerance, 0, false);
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kMitsubishiHeavyHdrMark, kMitsubishiHeavyHdrSpace,
+                      kMitsubishiHeavyBitMark, kMitsubishiHeavyOneSpace,
+                      kMitsubishiHeavyBitMark, kMitsubishiHeavyZeroSpace,
+                      kMitsubishiHeavyBitMark, kMitsubishiHeavyGap, true,
+                      kTolerance, 0, false);
   if (used == 0) return false;
   offset += used;
   // Compliance

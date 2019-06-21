@@ -57,9 +57,6 @@ void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
 //
 bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
                              bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   if (strict) {
     if (nbits != kElectraAcBits)
       return false;  // Not strictly a ELECTRA_AC message.
@@ -67,13 +64,13 @@ bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
 
   uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         kElectraAcHdrMark, kElectraAcHdrSpace,
-                         kElectraAcBitMark, kElectraAcOneSpace,
-                         kElectraAcBitMark, kElectraAcZeroSpace,
-                         kElectraAcBitMark, kElectraAcMessageGap, true,
-                         kTolerance, 0, false)) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kElectraAcHdrMark, kElectraAcHdrSpace,
+                    kElectraAcBitMark, kElectraAcOneSpace,
+                    kElectraAcBitMark, kElectraAcZeroSpace,
+                    kElectraAcBitMark, kElectraAcMessageGap, true,
+                    kTolerance, 0, false)) return false;
 
   // Compliance
   if (strict) {

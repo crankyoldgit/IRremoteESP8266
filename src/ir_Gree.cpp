@@ -518,13 +518,13 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
 
   uint16_t used;
   // Header + Data Block #1 (32 bits)
-  used = matchGenericBytes(results->rawbuf + offset, results->state,
-                           results->rawlen - offset, 4,
-                           kGreeHdrMark, kGreeHdrSpace,
-                           kGreeBitMark, kGreeOneSpace,
-                           kGreeBitMark, kGreeZeroSpace,
-                           0, 0, false,
-                           kTolerance, kMarkExcess, false);
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits / 2,
+                      kGreeHdrMark, kGreeHdrSpace,
+                      kGreeBitMark, kGreeOneSpace,
+                      kGreeBitMark, kGreeZeroSpace,
+                      0, 0, false,
+                      kTolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
 
@@ -537,18 +537,14 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
   if (data_result.data != kGreeBlockFooter) return false;
   offset += data_result.used;
 
-  // Inter-block gap.
-  if (!matchMark(results->rawbuf[offset++], kGreeBitMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kGreeMsgSpace)) return false;
-
-  // Data Block #2 (32 bits) + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state + 4,
-                         results->rawlen - offset, 4,
-                         0, 0,
-                         kGreeBitMark, kGreeOneSpace,
-                         kGreeBitMark, kGreeZeroSpace,
-                         kGreeBitMark, kGreeMsgSpace, true,
-                         kTolerance, kMarkExcess, false)) return false;
+  // Inter-block gap + Data Block #2 (32 bits) + Footer
+  if (!matchGeneric(results->rawbuf + offset, results->state + 4,
+                    results->rawlen - offset, nbits / 2,
+                    kGreeBitMark, kGreeMsgSpace,
+                    kGreeBitMark, kGreeOneSpace,
+                    kGreeBitMark, kGreeZeroSpace,
+                    kGreeBitMark, kGreeMsgSpace, true,
+                    kTolerance, kMarkExcess, false)) return false;
 
   // Compliance
   if (strict) {

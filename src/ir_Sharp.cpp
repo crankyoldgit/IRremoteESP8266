@@ -558,13 +558,13 @@ bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
   uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
   uint16_t used;
-  used = matchGenericBytes(results->rawbuf + offset, results->state,
-                           results->rawlen - offset, nbits / 8,
-                           kSharpAcHdrMark, kSharpAcHdrSpace,
-                           kSharpAcBitMark, kSharpAcOneSpace,
-                           kSharpAcBitMark, kSharpAcZeroSpace,
-                           kSharpAcBitMark, kSharpAcGap, true,
-                           kTolerance, kMarkExcess, false);
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kSharpAcHdrMark, kSharpAcHdrSpace,
+                      kSharpAcBitMark, kSharpAcOneSpace,
+                      kSharpAcBitMark, kSharpAcZeroSpace,
+                      kSharpAcBitMark, kSharpAcGap, true,
+                      kTolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
   // Compliance

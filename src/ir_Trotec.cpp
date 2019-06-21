@@ -291,13 +291,13 @@ bool IRrecv::decodeTrotec(decode_results *results, const uint16_t nbits,
   uint16_t offset = kStartOffset;
   uint16_t used;
   // Header + Data + Footer #1
-  used = matchGenericBytes(results->rawbuf + offset, results->state,
-                           results->rawlen - offset, nbits / 8,
-                           kTrotecHdrMark, kTrotecHdrSpace,
-                           kTrotecBitMark, kTrotecOneSpace,
-                           kTrotecBitMark, kTrotecZeroSpace,
-                           kTrotecBitMark, kTrotecGap, true,
-                           kTolerance, 0, false);
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kTrotecHdrMark, kTrotecHdrSpace,
+                      kTrotecBitMark, kTrotecOneSpace,
+                      kTrotecBitMark, kTrotecZeroSpace,
+                      kTrotecBitMark, kTrotecGap, true,
+                      kTolerance, 0, false);
   if (used == 0) return false;
   offset += used;
 

@@ -417,14 +417,13 @@ bool IRrecv::decodeArgo(decode_results *results, const uint16_t nbits,
   uint16_t offset = kStartOffset;
 
   // Match Header + Data
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         kArgoHdrMark, kArgoHdrSpace,
-                         kArgoBitMark, kArgoOneSpace,
-                         kArgoBitMark, kArgoZeroSpace,
-                         // Footer (None, allegedly. This seems very wrong.)
-                         0, 0, true,
-                         kTolerance, 0, false)) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kArgoHdrMark, kArgoHdrSpace,
+                    kArgoBitMark, kArgoOneSpace,
+                    kArgoBitMark, kArgoZeroSpace,
+                    0, 0,  // Footer (None, allegedly. This seems very wrong.)
+                    true, kTolerance, 0, false)) return false;
 
   // Compliance
   // Verify we got a valid checksum.

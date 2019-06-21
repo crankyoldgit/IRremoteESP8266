@@ -768,14 +768,14 @@ bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
        pos += kSamsungACSectionLength) {
     uint16_t used;
     // Section Header + Section Data (7 bytes) + Section Footer
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                            results->rawlen - offset, kSamsungACSectionLength,
-                            kSamsungAcSectionMark, kSamsungAcSectionSpace,
-                            kSamsungAcBitMark, kSamsungAcOneSpace,
-                            kSamsungAcBitMark, kSamsungAcZeroSpace,
-                            kSamsungAcBitMark, kSamsungAcSectionGap,
-                            pos + kSamsungACSectionLength >= nbits / 8,
-                            kTolerance, 0, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, kSamsungACSectionLength * 8,
+                        kSamsungAcSectionMark, kSamsungAcSectionSpace,
+                        kSamsungAcBitMark, kSamsungAcOneSpace,
+                        kSamsungAcBitMark, kSamsungAcZeroSpace,
+                        kSamsungAcBitMark, kSamsungAcSectionGap,
+                        pos + kSamsungACSectionLength >= nbits / 8,
+                        kTolerance, 0, false);
     if (used == 0) return false;
     offset += used;
   }

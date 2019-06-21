@@ -377,13 +377,13 @@ bool IRrecv::decodeToshibaAC(decode_results* results, const uint16_t nbits,
     return false;  // Must be called with the correct nr. of bytes.
 
   // Match Header + Data + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         kToshibaAcHdrMark, kToshibaAcHdrSpace,
-                         kToshibaAcBitMark, kToshibaAcOneSpace,
-                         kToshibaAcBitMark, kToshibaAcZeroSpace,
-                         kToshibaAcBitMark, kToshibaAcMinGap, true,
-                         kTolerance, kMarkExcess)) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kToshibaAcHdrMark, kToshibaAcHdrSpace,
+                    kToshibaAcBitMark, kToshibaAcOneSpace,
+                    kToshibaAcBitMark, kToshibaAcZeroSpace,
+                    kToshibaAcBitMark, kToshibaAcMinGap, true,
+                    kTolerance, kMarkExcess)) return false;
   // Compliance
   if (strict) {
     // Check that the checksum of the message is correct.

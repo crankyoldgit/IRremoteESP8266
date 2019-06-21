@@ -421,14 +421,13 @@ bool IRrecv::decodeTcl112Ac(decode_results *results, const uint16_t nbits,
 
   uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         kTcl112AcHdrMark, kTcl112AcHdrSpace,
-                         kTcl112AcBitMark, kTcl112AcOneSpace,
-                         kTcl112AcBitMark, kTcl112AcZeroSpace,
-                         kTcl112AcBitMark, kTcl112AcGap, true,
-                         kTcl112AcTolerance, 0, false)) return false;
-
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kTcl112AcHdrMark, kTcl112AcHdrSpace,
+                    kTcl112AcBitMark, kTcl112AcOneSpace,
+                    kTcl112AcBitMark, kTcl112AcZeroSpace,
+                    kTcl112AcBitMark, kTcl112AcGap, true,
+                    kTcl112AcTolerance, 0, false)) return false;
   // Compliance
   // Verify we got a valid checksum.
   if (strict && !IRTcl112Ac::validChecksum(results->state)) return false;

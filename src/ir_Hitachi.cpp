@@ -442,13 +442,13 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
     hspace = kHitachiAcHdrSpace;
   }
   // Match Header + Data + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         hmark, hspace,
-                         kHitachiAcBitMark, kHitachiAcOneSpace,
-                         kHitachiAcBitMark, kHitachiAcZeroSpace,
-                         kHitachiAcBitMark, kHitachiAcMinGap, true,
-                         kTolerance)) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    hmark, hspace,
+                    kHitachiAcBitMark, kHitachiAcOneSpace,
+                    kHitachiAcBitMark, kHitachiAcZeroSpace,
+                    kHitachiAcBitMark, kHitachiAcMinGap, true,
+                    kTolerance)) return false;
 
   // Compliance
   if (strict) {

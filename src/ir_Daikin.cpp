@@ -645,14 +645,14 @@ bool IRrecv::decodeDaikin(decode_results *results, const uint16_t nbits,
   for (uint8_t section = 0; section < kDaikinSections; section++) {
     uint16_t used;
     // Section Header + Section Data (7 bytes) + Section Footer
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                             results->rawlen - offset, ksectionSize[section],
-                             kDaikinHdrMark, kDaikinHdrSpace,
-                             kDaikinBitMark, kDaikinOneSpace,
-                             kDaikinBitMark, kDaikinZeroSpace,
-                             kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                             section >= kDaikinSections - 1,
-                             kDaikinTolerance, kDaikinMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikinHdrMark, kDaikinHdrSpace,
+                        kDaikinBitMark, kDaikinOneSpace,
+                        kDaikinBitMark, kDaikinZeroSpace,
+                        kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
+                        section >= kDaikinSections - 1,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += ksectionSize[section];
@@ -1383,14 +1383,14 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
   for (uint8_t section = 0; section < kDaikin2Sections; section++) {
     uint16_t used;
     // Section Header + Section Data + Section Footer
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                            results->rawlen - offset, ksectionSize[section],
-                            kDaikin2HdrMark, kDaikin2HdrSpace,
-                            kDaikin2BitMark, kDaikin2OneSpace,
-                            kDaikin2BitMark, kDaikin2ZeroSpace,
-                            kDaikin2BitMark, kDaikin2Gap,
-                            section >= kDaikin2Sections - 1,
-                            kDaikin2Tolerance, kDaikinMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikin2HdrMark, kDaikin2HdrSpace,
+                        kDaikin2BitMark, kDaikin2OneSpace,
+                        kDaikin2BitMark, kDaikin2ZeroSpace,
+                        kDaikin2BitMark, kDaikin2Gap,
+                        section >= kDaikin2Sections - 1,
+                        kDaikin2Tolerance, kDaikinMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += ksectionSize[section];
@@ -1774,14 +1774,14 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
   for (uint8_t section = 0; section < kDaikin216Sections; section++) {
     uint16_t used;
     // Section Header + Section Data + Section Footer
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                            results->rawlen - offset, ksectionSize[section],
-                            kDaikin216HdrMark, kDaikin216HdrSpace,
-                            kDaikin216BitMark, kDaikin216OneSpace,
-                            kDaikin216BitMark, kDaikin216ZeroSpace,
-                            kDaikin216BitMark, kDaikin216Gap,
-                            section >= kDaikin216Sections - 1,
-                            kDaikinTolerance, kDaikinMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikin216HdrMark, kDaikin216HdrSpace,
+                        kDaikin216BitMark, kDaikin216OneSpace,
+                        kDaikin216BitMark, kDaikin216ZeroSpace,
+                        kDaikin216BitMark, kDaikin216Gap,
+                        section >= kDaikin216Sections - 1,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += ksectionSize[section];
@@ -1934,25 +1934,25 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kDaikin160Bits) return false;
 
   uint16_t offset = kStartOffset;
-  const uint8_t sectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
-                                                   kDaikin160Section2Length};
+  const uint8_t ksectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
+                                                    kDaikin160Section2Length};
 
   // Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin160Sections; section++) {
     uint16_t used;
     // Section Header + Section Data (7 bytes) + Section Footer
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                             results->rawlen - offset, sectionSize[section],
-                             kDaikin160HdrMark, kDaikin160HdrSpace,
-                             kDaikin160BitMark, kDaikin160OneSpace,
-                             kDaikin160BitMark, kDaikin160ZeroSpace,
-                             kDaikin160BitMark, kDaikin160Gap,
-                             section >= kDaikin160Sections - 1,
-                             kDaikinTolerance, kDaikinMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikin160HdrMark, kDaikin160HdrSpace,
+                        kDaikin160BitMark, kDaikin160OneSpace,
+                        kDaikin160BitMark, kDaikin160ZeroSpace,
+                        kDaikin160BitMark, kDaikin160Gap,
+                        section >= kDaikin160Sections - 1,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
     if (used == 0) return false;
     offset += used;
-    pos += sectionSize[section];
+    pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {

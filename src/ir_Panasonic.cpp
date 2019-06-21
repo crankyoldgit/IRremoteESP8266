@@ -902,9 +902,6 @@ String IRPanasonicAc::toString(void) {
 //     A75C3704
 bool IRrecv::decodePanasonicAC(decode_results *results, const uint16_t nbits,
                                const bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != kPanasonicAcBits && nbits != kPanasonicAcShortBits)
@@ -915,79 +912,31 @@ bool IRrecv::decodePanasonicAC(decode_results *results, const uint16_t nbits,
       min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1)
     return false;  // Can't possibly be a valid PANASONIC_AC message.
 
-  uint16_t dataBitsSoFar = 0;
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset], kPanasonicHdrMark,
-                 kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick =
-      results->rawbuf[offset++] * kRawTick / kPanasonicHdrMarkTicks;
-  if (!matchSpace(results->rawbuf[offset], kPanasonicHdrSpace,
-                  kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick =
-      results->rawbuf[offset++] * kRawTick / kPanasonicHdrSpaceTicks;
+  // Match Header + Data #1 + Footer
+  uint16_t used;
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, kPanasonicAcSection1Length * 8,
+                      kPanasonicHdrMark, kPanasonicHdrSpace,
+                      kPanasonicBitMark, kPanasonicOneSpace,
+                      kPanasonicBitMark, kPanasonicZeroSpace,
+                      kPanasonicBitMark, kPanasonicAcSectionGap, false,
+                      kPanasonicAcTolerance, kPanasonicAcExcess, false);
+  if (!used) return false;
+  offset += used;
 
-  uint16_t i = 0;
-  // Data (Section #1)
-  // Keep reading bytes until we either run out of section or state to fill.
-  for (; offset <= results->rawlen - 16 && i < kPanasonicAcSection1Length;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(
-        &(results->rawbuf[offset]), 8, kPanasonicBitMarkTicks * m_tick,
-        kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
-        kPanasonicZeroSpaceTicks * s_tick, kPanasonicAcTolerance,
-        kPanasonicAcExcess, false);
-    if (data_result.success == false) {
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset + data_result.used);
-      return false;  // Fail
-    }
-    results->state[i] = data_result.data;
-  }
-  // Section footer.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick,
-                 kPanasonicAcTolerance, kPanasonicAcExcess))
+  // Match Header + Data #2 + Footer
+  if (!matchGeneric(results->rawbuf + offset,
+                    results->state + kPanasonicAcSection1Length,
+                    results->rawlen - offset,
+                    nbits - kPanasonicAcSection1Length * 8,
+                    kPanasonicHdrMark, kPanasonicHdrSpace,
+                    kPanasonicBitMark, kPanasonicOneSpace,
+                    kPanasonicBitMark, kPanasonicZeroSpace,
+                    kPanasonicBitMark, kPanasonicAcMessageGap, true,
+                    kPanasonicAcTolerance, kPanasonicAcExcess, false))
     return false;
-  if (!matchSpace(results->rawbuf[offset++], kPanasonicAcSectionGap,
-                  kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  // Header.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicHdrMarkTicks * m_tick,
-                 kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kPanasonicHdrSpaceTicks * s_tick,
-                  kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  // Data (Section #2)
-  // Keep reading bytes until we either run out of data.
-  for (; offset <= results->rawlen - 16 && i < nbits / 8;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(
-        &(results->rawbuf[offset]), 8, kPanasonicBitMarkTicks * m_tick,
-        kPanasonicOneSpaceTicks * s_tick, kPanasonicBitMarkTicks * m_tick,
-        kPanasonicZeroSpaceTicks * s_tick, kPanasonicAcTolerance,
-        kPanasonicAcExcess, false);
-    if (data_result.success == false) {
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset + data_result.used);
-      return false;  // Fail
-    }
-    results->state[i] = data_result.data;
-  }
-  // Message Footer.
-  if (!matchMark(results->rawbuf[offset++], kPanasonicBitMarkTicks * m_tick,
-                 kPanasonicAcTolerance, kPanasonicAcExcess))
-    return false;
-  if (offset <= results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], kPanasonicAcMessageGap))
-    return false;
-
   // Compliance
   if (strict) {
     // Check the signatures of the section blocks. They start with 0x02& 0x20.

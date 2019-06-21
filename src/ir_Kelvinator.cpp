@@ -497,13 +497,13 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
 
     uint16_t used;
     // Header + Data Block #1 (32 bits)
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                             results->rawlen - offset, 4,
-                             kKelvinatorHdrMark, kKelvinatorHdrSpace,
-                             kKelvinatorBitMark, kKelvinatorOneSpace,
-                             kKelvinatorBitMark, kKelvinatorZeroSpace,
-                             0, 0, false,
-                             kTolerance, kMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, 32,
+                        kKelvinatorHdrMark, kKelvinatorHdrSpace,
+                        kKelvinatorBitMark, kKelvinatorOneSpace,
+                        kKelvinatorBitMark, kKelvinatorZeroSpace,
+                        0, 0, false,
+                        kTolerance, kMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += 4;
@@ -525,14 +525,14 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
       return false;
 
     // Data (Options) (32 bits)
-    used = matchGenericBytes(results->rawbuf + offset, results->state + pos,
-                             results->rawlen - offset, 4,
-                             0, 0,
-                             kKelvinatorBitMark, kKelvinatorOneSpace,
-                             kKelvinatorBitMark, kKelvinatorZeroSpace,
-                             kKelvinatorBitMark, kKelvinatorGapSpace * 2,
-                             (s > 0),
-                             kTolerance, kMarkExcess, false);
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, 32,
+                        0, 0,
+                        kKelvinatorBitMark, kKelvinatorOneSpace,
+                        kKelvinatorBitMark, kKelvinatorZeroSpace,
+                        kKelvinatorBitMark, kKelvinatorGapSpace * 2,
+                        s > 0,
+                        kTolerance, kMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += 4;

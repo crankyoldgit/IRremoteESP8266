@@ -402,9 +402,6 @@ String IRMideaAC::toString(void) {
 // Status: Alpha / Needs testing against a real device.
 //
 bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != kMideaBits) return false;  // Not strictly a MIDEA message.

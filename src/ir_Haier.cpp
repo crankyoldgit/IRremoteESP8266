@@ -1006,9 +1006,6 @@ String IRHaierACYRW02::toString(void) {
 //
 bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
                            bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   if (strict) {
     if (nbits != kHaierACBits)
       return false;  // Not strictly a HAIER_AC message.
@@ -1024,13 +1021,13 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
   if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
 
   // Match Header + Data + Footer
-  if (!matchGenericBytes(results->rawbuf + offset, results->state,
-                         results->rawlen - offset, nbits / 8,
-                         kHaierAcHdr, kHaierAcHdrGap,
-                         kHaierAcBitMark, kHaierAcOneSpace,
-                         kHaierAcBitMark, kHaierAcZeroSpace,
-                         kHaierAcBitMark, kHaierAcMinGap, true,
-                         kTolerance, kMarkExcess)) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kHaierAcHdr, kHaierAcHdrGap,
+                    kHaierAcBitMark, kHaierAcOneSpace,
+                    kHaierAcBitMark, kHaierAcZeroSpace,
+                    kHaierAcBitMark, kHaierAcMinGap, true,
+                    kTolerance, kMarkExcess)) return false;
 
   // Compliance
   if (strict) {
