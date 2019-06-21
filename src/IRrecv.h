@@ -459,6 +459,11 @@ class IRrecv {
   bool decodeLegoPf(decode_results *results, const uint16_t nbits = kLegoPfBits,
                     const bool strict = true);
 #endif
+#if DECODE_NEOCLIMA
+bool decodeNeoclima(decode_results *results,
+                    const uint16_t nbits = kNeoclimaBits,
+                    const bool strict = true);
+#endif  // DECODE_NEOCLIMA
 };
 
 #endif  // IRRECV_H_

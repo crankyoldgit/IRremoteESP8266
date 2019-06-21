@@ -754,6 +754,7 @@ void handleRoot(void) {
         "<option value='59'>Mitsubishi Heavy (11 bytes)</option>"
         "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
         "<option value='52'>MWM</option>"
+        "<option value='66'>Neoclima</option>"
         "<option value='46'>Samsung</option>"
         "<option value='62'>Sharp</option>"
         "<option value='57'>TCL112</option>"
@@ -1483,6 +1484,9 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
     case TCL112AC:
       stateSize = kTcl112AcStateLength;
       break;
+    case NEOCLIMA:
+      stateSize = kNeoclimaStateLength;
+      break;
     default:  // Not a protocol we expected. Abort.
       debug("Unexpected AirCon protocol detected. Ignoring.");
       return false;
@@ -1642,6 +1646,11 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       irsend->sendTcl112Ac(reinterpret_cast<uint8_t *>(state));
       break;
 #endif
+#if SEND_NEOCLIMA
+    case NEOCLIMA:  // 66
+      irsend->sendNeoclima(reinterpret_cast<uint8_t *>(state));
+      break;
+#endif  // SEND_NEOCLIMA
     default:
       debug("Unexpected AirCon type in send request. Not sent.");
       return false;
@@ -2862,28 +2871,32 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
       irsend->sendCOOLIX(code, bits, repeat);
       break;
 #endif
+    case ARGO:  // 27
     case DAIKIN:  // 16
     case DAIKIN160:  // 65
     case DAIKIN2:  // 53
     case DAIKIN216:  // 61
-    case KELVINATOR:  // 18
-    case MITSUBISHI_AC:  // 20
-    case GREE:  // 24
-    case ARGO:  // 27
-    case TROTEC:  // 28
-    case TOSHIBA_AC:  // 32
+    case ELECTRA_AC:  // 48
     case FUJITSU_AC:  // 33
+    case GREE:  // 24
     case HAIER_AC:  // 38
     case HAIER_AC_YRW02:  // 44
     case HITACHI_AC:  // 40
     case HITACHI_AC1:  // 41
     case HITACHI_AC2:  // 42
-    case WHIRLPOOL_AC:  // 45
+    case KELVINATOR:  // 18
+    case MITSUBISHI_AC:  // 20
+    case MITSUBISHI_HEAVY_88:  // 59
+    case MITSUBISHI_HEAVY_152:  // 60
+    case MWM:  // 52
+    case NEOCLIMA:  // 66
+    case PANASONIC_AC:  // 49
     case SAMSUNG_AC:  // 46
     case SHARP_AC:  // 62
-    case ELECTRA_AC:  // 48
-    case PANASONIC_AC:  // 49
-    case MWM:  // 52
+    case TCL112AC:  // 57
+    case TOSHIBA_AC:  // 32
+    case TROTEC:  // 28
+    case WHIRLPOOL_AC:  // 45
       success = parseStringAndSendAirCon(irsend, ir_type, code_str);
       break;
 #if SEND_DENON
