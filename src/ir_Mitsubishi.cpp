@@ -101,44 +101,23 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   GlobalCache's Control Tower's Mitsubishi TV data.
 bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
                               bool strict) {
-  if (results->rawlen < 2 * nbits + kFooter - 1)
-    return false;  // Shorter than shortest possibly expected.
   if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
   uint16_t offset = kStartOffset;
   uint64_t data = 0;
 
-  // No Header
-  // But try to auto-calibrate off the initial mark signal.
-  if (!matchMark(results->rawbuf[offset], kMitsubishiBitMark, 30)) return false;
-  // Calculate how long the common tick time is based on the initial mark.
-  uint32_t tick = results->rawbuf[offset] * kRawTick / kMitsubishiBitMarkTicks;
-
-  // Data
-  match_result_t data_result = matchData(
-      &(results->rawbuf[offset]), nbits, kMitsubishiBitMarkTicks * tick,
-      kMitsubishiOneSpaceTicks * tick, kMitsubishiBitMarkTicks * tick,
-      kMitsubishiZeroSpaceTicks * tick);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-  uint16_t actualBits = data_result.used / 2;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kMitsubishiBitMarkTicks * tick, 30))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kMitsubishiMinGapTicks * tick))
-    return false;
-
-  // Compliance
-  if (actualBits < nbits) return false;
-  if (strict && actualBits != nbits) return false;  // Not as we expected.
-
+  // Match Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    0, 0,  // No header
+                    kMitsubishiBitMark, kMitsubishiOneSpace,
+                    kMitsubishiBitMark, kMitsubishiZeroSpace,
+                    kMitsubishiBitMark, kMitsubishiMinGap,
+                    true, 30)) return false;
   // Success
   results->decode_type = MITSUBISHI;
-  results->bits = actualBits;
+  results->bits = nbits;
   results->value = data;
   results->address = 0;
   results->command = 0;
@@ -208,47 +187,34 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
     return false;  // Request is out of spec.
 
   uint16_t offset = kStartOffset;
-  uint64_t data = 0;
-  uint16_t actualBits = 0;
+  results->value = 0;
 
   // Header
   if (!matchMark(results->rawbuf[offset++], kMitsubishi2HdrMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kMitsubishi2HdrSpace))
     return false;
-  for (uint8_t i = 1; i <= 2; i++) {
-    // Data
-    match_result_t data_result = matchData(
-        &(results->rawbuf[offset]), nbits / 2, kMitsubishi2BitMark,
-        kMitsubishi2OneSpace, kMitsubishi2BitMark, kMitsubishi2ZeroSpace);
-    if (data_result.success == false) return false;
-    data <<= nbits / 2;
-    data += data_result.data;
-    offset += data_result.used;
-    actualBits += data_result.used / 2;
-
-    // Footer
-    if (!matchMark(results->rawbuf[offset++], kMitsubishi2BitMark))
-      return false;
-    if (i % 2) {  // Every odd data block, we expect a HDR space.
-      if (!matchSpace(results->rawbuf[offset++], kMitsubishi2HdrSpace))
-        return false;
-    } else {  // Every even data block, we expect Min Gap or end of the message.
-      if (offset < results->rawlen &&
-          !matchAtLeast(results->rawbuf[offset++], kMitsubishi2MinGap))
-        return false;
-    }
+  for (uint8_t i = 0; i < 2; i++) {
+    // Match Data + Footer
+    uint16_t used;
+    uint64_t data = 0;
+    used = matchGeneric(results->rawbuf + offset, &data,
+                        results->rawlen - offset, nbits / 2,
+                        0, 0,  // No header
+                        kMitsubishi2BitMark, kMitsubishi2OneSpace,
+                        kMitsubishi2BitMark, kMitsubishi2ZeroSpace,
+                        kMitsubishi2BitMark, kMitsubishi2HdrSpace,
+                        i % 2);
+    if (!used) return false;
+    offset += used;
+    results->value <<= (nbits / 2);
+    results->value += data;
   }
-
-  // Compliance
-  if (actualBits < nbits) return false;
-  if (strict && actualBits != nbits) return false;  // Not as we expected.
 
   // Success
   results->decode_type = MITSUBISHI2;
-  results->bits = actualBits;
-  results->value = data;
-  results->address = data >> actualBits / 2;
-  results->command = data & ((1 << (actualBits / 2)) - 1);
+  results->bits = nbits;
+  results->address = results->value >> (nbits / 2);
+  results->command = results->value & ((1 << (nbits / 2)) - 1);
   return true;
 }
 #endif  // DECODE_MITSUBISHI2
@@ -309,7 +275,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
   do {
     failure = false;
     // Header:
-    //  Somtime happens that junk signals arrives before the real message
+    //  Sometime happens that junk signals arrives before the real message
     bool headerFound = false;
     while (!headerFound &&
            offset < (results->rawlen - (kMitsubishiACBits * 2 + 2))) {

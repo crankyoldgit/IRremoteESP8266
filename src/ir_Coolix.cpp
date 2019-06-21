@@ -10,12 +10,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-//             CCCCC   OOOOO   OOOOO  LL      IIIII XX    XX
-//            CC    C OO   OO OO   OO LL       III   XX  XX
-//            CC      OO   OO OO   OO LL       III    XXXX
-//            CC    C OO   OO OO   OO LL       III   XX  XX
-//             CCCCC   OOOO0   OOOO0  LLLLLLL IIIII XX    XX
-
 // Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
 //
 // Supports:

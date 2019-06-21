@@ -74,22 +74,16 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
 
   for (uint8_t i = 0; i < 3; i++) {
     prev_data = data;
-    // Header
-    if (!matchMark(results->rawbuf[offset++], kCarrierAcHdrMark)) return false;
-    if (!matchSpace(results->rawbuf[offset++], kCarrierAcHdrSpace))
-      return false;
-    // Data
-    match_result_t data_result =
-        matchData(&(results->rawbuf[offset]), nbits, kCarrierAcBitMark,
-                  kCarrierAcOneSpace, kCarrierAcBitMark, kCarrierAcZeroSpace);
-    if (data_result.success == false) return false;
-    data = data_result.data;
-    offset += data_result.used;
-    // Footer
-    if (!matchMark(results->rawbuf[offset++], kCarrierAcBitMark)) return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset++], kCarrierAcGap))
-      return false;
+    // Match Header + Data + Footer
+    uint16_t used;
+    used = matchGeneric(results->rawbuf + offset, &data,
+                        results->rawlen - offset, nbits,
+                        kCarrierAcHdrMark, kCarrierAcHdrSpace,
+                        kCarrierAcBitMark, kCarrierAcOneSpace,
+                        kCarrierAcBitMark, kCarrierAcZeroSpace,
+                        kCarrierAcBitMark, kCarrierAcGap, true);
+    if (!used) return false;
+    offset += used;
     // Compliance.
     if (strict) {
       // Check if the data is an inverted copy of the previous data.

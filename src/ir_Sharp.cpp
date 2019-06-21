@@ -192,31 +192,16 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
-  // No header
-  // But try to auto-calibrate off the initial mark signal.
-  if (!matchMark(results->rawbuf[offset], kSharpBitMark, 35)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t tick = results->rawbuf[offset] * kRawTick / kSharpBitMarkTicks;
-  // Data
-  for (uint16_t i = 0; i < nbits; i++, offset++) {
-    // Use a higher tolerance value for kSharpBitMark as it is quite small.
-    if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
-      return false;
-    if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
-      data = (data << 1) | 1;  // 1
-    else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
-      data <<= 1;  // 0
-    else
-      return false;
-  }
-
-  // Footer
-  if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
-    return false;
-
+  // Match Data + Footer
+  uint16_t used;
+  used = matchGeneric(results->rawbuf + offset, &data,
+                      results->rawlen - offset, nbits,
+                      0, 0,  // No Header
+                      kSharpBitMark, kSharpOneSpace,
+                      kSharpBitMark, kSharpZeroSpace,
+                      kSharpBitMark, kSharpGap, true, 35);
+  if (!used) return false;
+  offset += used;
   // Compliance
   if (strict) {
     // Check the state of the expansion bit is what we expect.
@@ -226,31 +211,14 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
       // DISABLED - See TODO
 #ifdef UNIT_TEST
     // Grab the second copy of the data (i.e. inverted)
-    // Header
-    // i.e. The inter-data/command repeat gap.
-    if (!matchSpace(results->rawbuf[offset++], kSharpGapTicks * tick))
-      return false;
-
-    // Data
     uint64_t second_data = 0;
-    for (uint16_t i = 0; i < nbits; i++, offset++) {
-      // Use a higher tolerance value for kSharpBitMark as it is quite small.
-      if (!matchMark(results->rawbuf[offset++], kSharpBitMarkTicks * tick, 35))
-        return false;
-      if (matchSpace(results->rawbuf[offset], kSharpOneSpaceTicks * tick))
-        second_data = (second_data << 1) | 1;  // 1
-      else if (matchSpace(results->rawbuf[offset], kSharpZeroSpaceTicks * tick))
-        second_data <<= 1;  // 0
-      else
-        return false;
-    }
-    // Footer
-    if (!match(results->rawbuf[offset++], kSharpBitMarkTicks * tick))
-      return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], kSharpGapTicks * tick))
-      return false;
-
+    // Match Data + Footer
+    if (!matchGeneric(results->rawbuf + offset, &second_data,
+                      results->rawlen - offset, nbits,
+                      0, 0,
+                      kSharpBitMark, kSharpOneSpace,
+                      kSharpBitMark, kSharpZeroSpace,
+                      kSharpBitMark, kSharpGap, true, 35)) return false;
     // Check that second_data has been inverted correctly.
     if (data != (second_data ^ kSharpToggleMask)) return false;
 #endif  // UNIT_TEST
@@ -588,42 +556,25 @@ bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kSharpAcBits) return false;
 
   uint16_t offset = kStartOffset;
-  match_result_t data_result;
-  uint16_t dataBitsSoFar = 0;
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kSharpAcHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kSharpAcHdrSpace)) return false;
-
-  // Data
-  // Keep reading bytes until we run out of state to fill.
-  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    // Read in a byte at a time.
-    data_result =
-        matchData(&(results->rawbuf[offset]), 8,
-                  kSharpAcBitMark, kSharpAcOneSpace,
-                  kSharpAcBitMark, kSharpAcZeroSpace,
-                  kTolerance, kMarkExcess, false);
-    if (data_result.success == false) break;  // Fail
-    results->state[i] = (uint8_t)data_result.data;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kSharpAcBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kSharpAcGap))
-    return false;
-
+  // Match Header + Data + Footer
+  uint16_t used;
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kSharpAcHdrMark, kSharpAcHdrSpace,
+                      kSharpAcBitMark, kSharpAcOneSpace,
+                      kSharpAcBitMark, kSharpAcZeroSpace,
+                      kSharpAcBitMark, kSharpAcGap, true,
+                      kTolerance, kMarkExcess, false);
+  if (used == 0) return false;
+  offset += used;
   // Compliance
   if (strict) {
-    // Re-check we got the correct size/length due to the way we read the data.
-    if (dataBitsSoFar != kSharpAcBits) return false;
     if (!IRSharpAc::validChecksum(results->state)) return false;
   }
 
   // Success
   results->decode_type = SHARP_AC;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.

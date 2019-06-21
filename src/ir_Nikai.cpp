@@ -57,38 +57,19 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Status: STABLE / Working.
 //
 bool IRrecv::decodeNikai(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid Nikai message.
   if (strict && nbits != kNikaiBits)
     return false;  // We expect Nikai to be a certain sized message.
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset], kNikaiHdrMark)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kNikaiHdrMarkTicks;
-  if (!matchSpace(results->rawbuf[offset], kNikaiHdrSpace)) return false;
-  // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick / kNikaiHdrSpaceTicks;
-  // Data
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits, kNikaiBitMarkTicks * m_tick,
-                kNikaiOneSpaceTicks * s_tick, kNikaiBitMarkTicks * m_tick,
-                kNikaiZeroSpaceTicks * s_tick);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kNikaiBitMarkTicks * m_tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kNikaiMinGapTicks * s_tick))
-    return false;
-
-  // Compliance
-
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kNikaiHdrMark, kNikaiHdrSpace,
+                    kNikaiBitMark, kNikaiOneSpace,
+                    kNikaiBitMark, kNikaiZeroSpace,
+                    kNikaiBitMark, kNikaiMinGap, true)) return false;
   // Success
   results->bits = nbits;
   results->value = data;

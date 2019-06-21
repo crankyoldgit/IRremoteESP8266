@@ -1006,9 +1006,6 @@ String IRHaierACYRW02::toString(void) {
 //
 bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
                            bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   if (strict) {
     if (nbits != kHaierACBits)
       return false;  // Not strictly a HAIER_AC message.
@@ -1019,27 +1016,18 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
 
   uint16_t offset = kStartOffset;
 
-  // Header
+  // Pre-Header
   if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
   if (!matchSpace(results->rawbuf[offset++], kHaierAcHdr)) return false;
-  if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kHaierAcHdrGap)) return false;
 
-  // Data
-  for (uint16_t i = 0; i < nbits / 8; i++) {
-    match_result_t data_result =
-        matchData(&(results->rawbuf[offset]), 8, kHaierAcBitMark,
-                  kHaierAcOneSpace, kHaierAcBitMark, kHaierAcZeroSpace);
-    if (data_result.success == false) return false;
-    offset += data_result.used;
-    results->state[i] = (uint8_t)data_result.data;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kHaierAcBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset++], kHaierAcMinGap))
-    return false;
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kHaierAcHdr, kHaierAcHdrGap,
+                    kHaierAcBitMark, kHaierAcOneSpace,
+                    kHaierAcBitMark, kHaierAcZeroSpace,
+                    kHaierAcBitMark, kHaierAcMinGap, true,
+                    kTolerance, kMarkExcess)) return false;
 
   // Compliance
   if (strict) {

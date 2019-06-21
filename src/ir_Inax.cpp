@@ -55,36 +55,23 @@ void IRsend::sendInax(const uint64_t data, const uint16_t nbits,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be Working.
+// Status: Stable / Known working.
 //
 bool IRrecv::decodeInax(decode_results *results, const uint16_t nbits,
                         const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid Inax message.
   if (strict && nbits != kInaxBits)
     return false;  // We expect Inax to be a certain sized message.
 
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kInaxHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kInaxHdrSpace)) return false;
-  // Data
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits, kInaxBitMark,
-                kInaxOneSpace, kInaxBitMark, kInaxZeroSpace);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kInaxBitMark)) return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kInaxMinGap))
-    return false;
-
-  // Compliance
-
+  // Match Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kInaxHdrMark, kInaxHdrSpace,
+                    kInaxBitMark, kInaxOneSpace,
+                    kInaxBitMark, kInaxZeroSpace,
+                    kInaxBitMark, kInaxMinGap, true)) return false;
   // Success
   results->bits = nbits;
   results->value = data;

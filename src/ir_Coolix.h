@@ -16,12 +16,6 @@
 #include "IRsend_test.h"
 #endif
 
-//             CCCCC   OOOOO   OOOOO  LL      IIIII XX    XX
-//            CC    C OO   OO OO   OO LL       III   XX  XX
-//            CC      OO   OO OO   OO LL       III    XXXX
-//            CC    C OO   OO OO   OO LL       III   XX  XX
-//             CCCCC   OOOO0   OOOO0  LLLLLLL IIIII XX    XX
-
 // Supports:
 //   Brand: Beko, Model: RG57K7(B)/BGEF Remote
 //   Brand: Beko, Model: BINR 070/071 split-type A/C

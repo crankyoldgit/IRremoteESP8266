@@ -402,9 +402,6 @@ String IRMideaAC::toString(void) {
 // Status: Alpha / Needs testing against a real device.
 //
 bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
-  if (nbits % 8 != 0)  // nbits has to be a multiple of nr. of bits in a byte.
-    return false;
-
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != kMideaBits) return false;  // Not strictly a MIDEA message.
@@ -425,35 +422,16 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
     return false;  // We can't possibly capture a Midea packet that big.
 
   for (uint8_t i = 0; i < min_nr_of_messages; i++) {
-    // Header
-    if (!matchMark(results->rawbuf[offset], kMideaHdrMark)) return false;
-    // Calculate how long the common tick time is based on the header mark.
-    uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kMideaHdrMarkTicks;
-    if (!matchSpace(results->rawbuf[offset], kMideaHdrSpace)) return false;
-    // Calculate how long the common tick time is based on the header space.
-    uint32_t s_tick =
-        results->rawbuf[offset++] * kRawTick / kMideaHdrSpaceTicks;
-
-    // Data (Normal)
-    match_result_t data_result = matchData(
-        &(results->rawbuf[offset]), nbits, kMideaBitMarkTicks * m_tick,
-        kMideaOneSpaceTicks * s_tick, kMideaBitMarkTicks * m_tick,
-        kMideaZeroSpaceTicks * s_tick, kMideaTolerance);
-    if (data_result.success == false) return false;
-    offset += data_result.used;
-    if (i % 2 == 0)
-      data = data_result.data;
-    else
-      inverted = data_result.data;
-
-    // Footer
-    if (!matchMark(results->rawbuf[offset++], kMideaBitMarkTicks * m_tick,
-                   kMideaTolerance))
-      return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset++], kMideaMinGapTicks * s_tick,
-                      kMideaTolerance))
-      return false;
+    // Match Header + Data + Footer
+    uint16_t used;
+    used = matchGeneric(results->rawbuf + offset, i % 2 ? &inverted : &data,
+                        results->rawlen - offset, nbits,
+                        kMideaHdrMark, kMideaHdrSpace,
+                        kMideaBitMark, kMideaOneSpace,
+                        kMideaBitMark, kMideaZeroSpace,
+                        kMideaBitMark, kMideaMinGap, false, kMideaTolerance);
+    if (!used) return false;
+    offset += used;
   }
 
   // Compliance

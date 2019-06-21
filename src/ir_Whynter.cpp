@@ -88,39 +88,18 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
     return false;  // Incorrect nr. of bits per spec.
 
   uint16_t offset = kStartOffset;
-
-  // Header
+  uint64_t data = 0;
+  // Pre-Header
   // Sequence begins with a bit mark and a zero space.
-  // These are typically small, so we'll prefer to do the calibration
-  // on the much larger header mark & space that are next.
   if (!matchMark(results->rawbuf[offset++], kWhynterBitMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kWhynterZeroSpace)) return false;
-  // Main header mark and space
-  if (!matchMark(results->rawbuf[offset], kWhynterHdrMark)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kWhynterHdrMarkTicks;
-  if (!matchSpace(results->rawbuf[offset], kWhynterHdrSpace)) return false;
-  // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick =
-      results->rawbuf[offset++] * kRawTick / kWhynterHdrSpaceTicks;
-
-  // Data
-  uint64_t data = 0;
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits,
-                kWhynterBitMarkTicks * m_tick, kWhynterOneSpaceTicks * s_tick,
-                kWhynterBitMarkTicks * m_tick, kWhynterZeroSpaceTicks * s_tick);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kWhynterBitMarkTicks * m_tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kWhynterMinGapTicks * s_tick))
-    return false;
-
+  // Match Main Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                    results->rawlen - offset, nbits,
+                    kWhynterHdrMark, kWhynterHdrSpace,
+                    kWhynterBitMark, kWhynterOneSpace,
+                    kWhynterBitMark, kWhynterZeroSpaceTicks,
+                    kWhynterBitMark, kWhynterMinGap, true)) return false;
   // Success
   results->decode_type = WHYNTER;
   results->bits = nbits;

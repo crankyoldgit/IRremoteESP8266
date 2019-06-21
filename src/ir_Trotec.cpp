@@ -289,42 +289,28 @@ bool IRrecv::decodeTrotec(decode_results *results, const uint16_t nbits,
   if (strict && nbits != kTrotecBits) return false;
 
   uint16_t offset = kStartOffset;
-  uint16_t dataBitsSoFar = 0;
-  match_result_t data_result;
+  uint16_t used;
+  // Header + Data + Footer #1
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kTrotecHdrMark, kTrotecHdrSpace,
+                      kTrotecBitMark, kTrotecOneSpace,
+                      kTrotecBitMark, kTrotecZeroSpace,
+                      kTrotecBitMark, kTrotecGap, true,
+                      kTolerance, 0, false);
+  if (used == 0) return false;
+  offset += used;
 
-  // Message Header
-  if (!matchMark(results->rawbuf[offset++], kTrotecHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kTrotecHdrSpace)) return false;
-
-  // Data
-  // Keep reading bytes until we either run out of data or state to fill.
-  for (uint16_t i = 0; offset <= results->rawlen - 16 && i < nbits / 8;
-       i++, dataBitsSoFar += 8, offset += data_result.used) {
-    data_result = matchData(&(results->rawbuf[offset]), 8, kTrotecBitMark,
-                            kTrotecOneSpace, kTrotecBitMark,
-                            kTrotecZeroSpace, kTolerance, 0, false);
-    if (data_result.success == false) {
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset + data_result.used);
-      return false;  // Fail
-    }
-    results->state[i] = data_result.data;
-  }
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kTrotecBitMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kTrotecGap)) return false;
+  // Footer #2
   if (!matchMark(results->rawbuf[offset++], kTrotecBitMark)) return false;
   if (offset <= results->rawlen &&
       !matchAtLeast(results->rawbuf[offset++], kTrotecGapEnd)) return false;
   // Compliance
-  // Re-check we got the correct size/length due to the way we read the data.
-  if (dataBitsSoFar != nbits) return false;
   // Verify we got a valid checksum.
   if (strict && !IRTrotecESP::validChecksum(results->state)) return false;
   // Success
   results->decode_type = TROTEC;
-  results->bits = dataBitsSoFar;
+  results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
