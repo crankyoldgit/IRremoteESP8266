@@ -1072,3 +1072,138 @@ TEST(TestMatchGeneric, BitOrdering) {
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
   EXPECT_EQ(entries, entries_used);
 }
+
+TEST(TestMatchGeneric, UsingBytes) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  uint16_t entries = 32;
+  uint16_t data[entries] = {
+      // No header
+      500, 2000,   // Byte #0 Bit #0 (1)
+      500, 1000,   // Byte #0 Bit #1 (0)
+      500, 2000,   // Byte #0 Bit #2 (1)
+      500, 1000,   // Byte #0 Bit #3 (0)
+      500, 2000,   // Byte #0 Bit #4 (1)
+      500, 1000,   // Byte #0 Bit #5 (0)
+      500, 2000,   // Byte #0 Bit #6 (1)
+      500, 1000,   // Byte #0 Bit #7 (0)
+      500, 2000,   // Byte #1 Bit #0 (1)
+      500, 2000,   // Byte #1 Bit #1 (1)
+      500, 2000,   // Byte #1 Bit #2 (1)
+      500, 2000,   // Byte #1 Bit #3 (1)
+      500, 1000,   // Byte #1 Bit #4 (0)
+      500, 1000,   // Byte #1 Bit #5 (0)
+      500, 1000,   // Byte #1 Bit #6 (0)
+      500, 1000};  // Byte #1 Bit #7 (0) & No footer
+
+  uint16_t offset = kStartOffset;
+  irsend.reset();
+  irsend.sendRaw(data, entries, 38000);
+  irsend.makeDecodeResult();
+  uint16_t entries_used = 0;
+
+  uint8_t result_data[4] = {};  // Bigger than we need.
+
+  // MSB order
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      2 * 8,  // nbits
+      0, 0,  // No Header
+      500, 2000,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b10101010, result_data[0]);
+  EXPECT_EQ(0b11110000, result_data[1]);
+  EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
+  EXPECT_EQ(entries, entries_used);
+
+  // LSB order
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      2 * 8,  // nbits
+      0, 0,  // No Header
+      500, 2000,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      false);  // MSB first.
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b01010101, result_data[0]);
+  EXPECT_EQ(0b00001111, result_data[1]);
+  EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
+  EXPECT_EQ(entries, entries_used);
+
+  // Asking for too much.
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      3 * 8,  // nbits
+      0, 0,  // No Header
+      500, 2000,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_EQ(0, entries_used);
+
+  // Asking for less than what is there.
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      1 * 8,  // nbits
+      0, 0,  // No Header
+      500, 2000,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b10101010, result_data[0]);
+  EXPECT_GT(irsend.capture.rawlen - kStartOffset, entries_used);
+  EXPECT_EQ(16, entries_used);
+
+  // Asking for non mod-8 size should fail.
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      9,  // nbits
+      0, 0,  // No Header
+      500, 2000,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_EQ(0, entries_used);
+
+  // Expecting different timings should fail.
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, result_data,
+      irsend.capture.rawlen - offset,
+      8,  // nbits
+      0, 0,  // No Header
+      500, 900,  // one mark & space
+      500, 1000,  // zero mark & space
+      0, 0,  // No Footer
+      false,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_EQ(0, entries_used);
+}
