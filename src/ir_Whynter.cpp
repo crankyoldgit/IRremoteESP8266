@@ -98,7 +98,7 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
                     results->rawlen - offset, nbits,
                     kWhynterHdrMark, kWhynterHdrSpace,
                     kWhynterBitMark, kWhynterOneSpace,
-                    kWhynterBitMark, kWhynterZeroSpaceTicks,
+                    kWhynterBitMark, kWhynterZeroSpace,
                     kWhynterBitMark, kWhynterMinGap, true)) return false;
   // Success
   results->decode_type = WHYNTER;

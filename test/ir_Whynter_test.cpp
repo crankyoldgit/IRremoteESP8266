@@ -151,7 +151,7 @@ TEST(TestDecodeWhynter, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendWhynter(0x87654321);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeWhynter(&irsend.capture, kWhynterBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(WHYNTER, irsend.capture.decode_type);
   EXPECT_EQ(kWhynterBits, irsend.capture.bits);
   EXPECT_EQ(0x87654321, irsend.capture.value);
@@ -170,20 +170,20 @@ TEST(TestDecodeWhynter, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendWhynter(0x87654321, kWhynterBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeWhynter(&irsend.capture, kWhynterBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(WHYNTER, irsend.capture.decode_type);
   EXPECT_EQ(kWhynterBits, irsend.capture.bits);
   EXPECT_EQ(0x87654321, irsend.capture.value);
   EXPECT_FALSE(irsend.capture.repeat);
 
   irsend.makeDecodeResult(2 * kWhynterBits + 6);
-  ASSERT_TRUE(irrecv.decodeWhynter(&irsend.capture, kWhynterBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(WHYNTER, irsend.capture.decode_type);
   EXPECT_EQ(kWhynterBits, irsend.capture.bits);
   EXPECT_EQ(0x87654321, irsend.capture.value);
 
   irsend.makeDecodeResult(2 * (2 * kWhynterBits + 6));
-  ASSERT_TRUE(irrecv.decodeWhynter(&irsend.capture, kWhynterBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(WHYNTER, irsend.capture.decode_type);
   EXPECT_EQ(kWhynterBits, irsend.capture.bits);
   EXPECT_EQ(0x87654321, irsend.capture.value);

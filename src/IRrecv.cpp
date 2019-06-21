@@ -984,7 +984,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
                                             excess, MSBfirst);
-    if (data_used == 0) return 0;
+    if (!data_used) return 0;
     offset += data_used;
   }
   // Footer
