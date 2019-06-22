@@ -153,7 +153,7 @@ TEST(TestDecodeSony, NormalSonyDecodeWithStrict) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony20Bits, 0x1, 0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(kSony20Bits, irsend.capture.bits);
   EXPECT_EQ(0x81080, irsend.capture.value);
@@ -164,7 +164,7 @@ TEST(TestDecodeSony, NormalSonyDecodeWithStrict) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony15Bits, 21, 1), kSony15Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(kSony15Bits, irsend.capture.bits);
   EXPECT_EQ(0x5480, irsend.capture.value);
@@ -175,7 +175,7 @@ TEST(TestDecodeSony, NormalSonyDecodeWithStrict) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony12Bits, 21, 1), kSony12Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(kSony12Bits, irsend.capture.bits);
   EXPECT_EQ(0xA90, irsend.capture.value);
@@ -248,7 +248,7 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0xFF, irsend.capture.value);
@@ -264,7 +264,7 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(13, irsend.capture.bits);
   EXPECT_EQ(0x1FFF, irsend.capture.value);
@@ -280,7 +280,7 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(17, irsend.capture.bits);
   EXPECT_EQ(0x1FFFF, irsend.capture.value);
@@ -296,19 +296,18 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
   EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(21, irsend.capture.bits);
   EXPECT_EQ(0x1FFFFF, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-
   irsend.reset();
   // Illegal 64-bit (max) Sony-like message.
   irsend.sendSony(0xFFFFFFFFFFFFFFFF, 64, 0);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFFFFFFF, irsend.capture.value);
@@ -316,7 +315,6 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   EXPECT_EQ(0x0, irsend.capture.command);
 }
 
-// Decode unsupported Sony messages. i.e non-standard sizes.
 TEST(TestDecodeSony, DecodeGlobalCacheExample) {
   IRsendTest irsend(4);
   IRrecv irrecv(4);
@@ -331,7 +329,7 @@ TEST(TestDecodeSony, DecodeGlobalCacheExample) {
   irsend.makeDecodeResult();
 
   // Without strict.
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(12, irsend.capture.bits);
   EXPECT_EQ(0x750, irsend.capture.value);
