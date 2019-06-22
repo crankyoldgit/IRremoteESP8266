@@ -240,6 +240,18 @@ void IRGreeAC::setLight(const bool on) {
   remote_state[2] |= (on << 5);
 }
 
+void IRGreeAC::setIFeel(const bool on) {
+  remote_state[5] &= ~kGreeIFeelMask;
+  remote_state[5] |= (on << 2);
+}
+
+void IRGreeAC::setWiFi(const bool on) {
+  remote_state[5] &= ~kGreeWiFiMask;
+  remote_state[5] |= (on << 6);
+}
+
+
+
 bool IRGreeAC::getLight(void) { return remote_state[2] & kGreeLightMask; }
 
 void IRGreeAC::setXFan(const bool on) {
@@ -262,6 +274,8 @@ void IRGreeAC::setTurbo(const bool on) {
 }
 
 bool IRGreeAC::getTurbo(void) { return remote_state[2] & kGreeTurboMask; }
+bool IRGreeAC::getIFeel(void) { return remote_state[5] & kGreeIFeelMask; }
+bool IRGreeAC::getWiFi(void) { return remote_state[5] & kGreeWiFiMask; }
 
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
   remote_state[0] &= ~kGreeSwingAutoMask;
@@ -457,6 +471,16 @@ String IRGreeAC::toString(void) {
   }
   result += F(", Turbo: ");
   if (getTurbo())
+    result += F("On");
+  else
+    result += F("Off");
+  result += F(", IFeel: ");
+  if (getIFeel())
+    result += F("On");
+  else
+    result += F("Off");
+  result += F(", WiFi: ");
+  if (getWiFi())
     result += F("On");
   else
     result += F("Off");

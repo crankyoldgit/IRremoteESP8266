@@ -39,6 +39,10 @@ const uint8_t kGreePower2Mask = 0b01000000;
 const uint8_t kGreeXfanMask = 0b10000000;
 // Byte 4
 const uint8_t kGreeSwingPosMask = 0b00001111;
+// byte 6
+const uint8_t kGreeIFeelMask = 0b00000100;
+const uint8_t kGreeWiFiMask = 0b01000000;
+
 
 const uint8_t kGreeMinTemp = 16;  // Celsius
 const uint8_t kGreeMaxTemp = 30;  // Celsius
@@ -106,6 +110,10 @@ class IRGreeAC {
   bool getSleep(void);
   void setTurbo(const bool on);
   bool getTurbo(void);
+  void setIFeel(const bool on);
+  bool getIFeel(void);
+  void setWiFi(const bool on);
+  bool getWiFi(void);
   void setSwingVertical(const bool automatic, const uint8_t position);
   bool getSwingVerticalAuto(void);
   uint8_t getSwingVerticalPosition(void);
