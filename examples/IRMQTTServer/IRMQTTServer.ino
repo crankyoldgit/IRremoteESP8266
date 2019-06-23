@@ -270,8 +270,8 @@
  *
  * ## Updates
  * You can upload new firmware over the air (OTA) via the form on the device's
- * main page. No need to connect to the device again via USB. \o/
- * Your WiFi settings should be remembered between updates. \o/ \o/
+ * "Admin" page. No need to connect to the device again via USB. \o/
+ * Your settings should be remembered between updates. \o/ \o/
  *
  * ## Security
  * <security-hat="on">
