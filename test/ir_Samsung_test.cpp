@@ -602,7 +602,7 @@ TEST(TestIRSamsungAcClass, ChecksumCalculation) {
   EXPECT_TRUE(IRSamsungAc::validChecksum(examplestate));
   EXPECT_EQ(0, IRSamsungAc::calcChecksum(examplestate));
 
-  examplestate[8] = 0x12;  // Set an incoorect checksum.
+  examplestate[8] = 0x12;  // Set an incorrect checksum.
   EXPECT_FALSE(IRSamsungAc::validChecksum(examplestate));
   EXPECT_EQ(0, IRSamsungAc::calcChecksum(examplestate));
   samsung.setRaw(examplestate);

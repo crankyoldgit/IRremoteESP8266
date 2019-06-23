@@ -1,5 +1,6 @@
 // Copyright 2019 David Conran
 
+#include "ir_Neoclima.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "IRrecv.h"
@@ -74,6 +75,9 @@ TEST(TestDecodeNeoclima, RealExample) {
   ASSERT_EQ(decode_type_t::NEOCLIMA, irsend.capture.decode_type);
   ASSERT_EQ(kNeoclimaBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRNeoclimaAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Temp: 26C", ac.toString());
 }
 
 // Self decode.
@@ -93,4 +97,45 @@ TEST(TestDecodeNeoclima, SyntheticExample) {
   ASSERT_EQ(decode_type_t::NEOCLIMA, irsend.capture.decode_type);
   ASSERT_EQ(kNeoclimaBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
+  IRNeoclimaAc ac(0);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTemp);
+  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTemp - 1);
+  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTemp);
+  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTemp + 1);
+  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+}
+
+TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {
+  uint8_t examplestate[kNeoclimaStateLength] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x6A, 0x00, 0x2A, 0xA5, 0x39};
+  const uint8_t originalstate[kNeoclimaStateLength] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x6A, 0x00, 0x2A, 0xA5, 0x39};
+
+  EXPECT_TRUE(IRNeoclimaAc::validChecksum(examplestate));
+  EXPECT_EQ(0x39, IRNeoclimaAc::calcChecksum(examplestate));
+
+  examplestate[11] = 0x12;  // Set an incorrect checksum.
+  EXPECT_FALSE(IRNeoclimaAc::validChecksum(examplestate));
+  EXPECT_EQ(0x39, IRNeoclimaAc::calcChecksum(examplestate));
+  IRNeoclimaAc ac(0);
+  ac.setRaw(examplestate);
+  // Extracting the state from the object should have a correct checksum.
+  EXPECT_TRUE(IRNeoclimaAc::validChecksum(ac.getRaw()));
+  EXPECT_STATE_EQ(originalstate, ac.getRaw(), kNeoclimaBits);
+  examplestate[11] = 0x39;  // Restore old checksum value.
+
+  // Change the state to force a different checksum.
+  examplestate[8] = 0x01;
+  EXPECT_FALSE(IRNeoclimaAc::validChecksum(examplestate));
+  EXPECT_EQ(0x3A, IRNeoclimaAc::calcChecksum(examplestate));
 }
