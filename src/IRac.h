@@ -41,7 +41,8 @@ class IRac {
               const bool light, const bool filter, const bool clean,
               const bool beep, const int16_t sleep = -1,
               const int16_t clock = -1);
-
+  bool sendAc(const stdAc::state_t desired, const stdAc::state_t *prev = NULL);
+  static bool cmpStates(const stdAc::state_t a, const stdAc::state_t b);
   static bool strToBool(const char *str, const bool def = false);
   static int16_t strToModel(const char *str, const int16_t def = -1);
   static stdAc::opmode_t strToOpmode(
@@ -240,5 +241,7 @@ void daikin216(IRDaikin216 *ac,
                  const bool turbo, const bool light,
                  const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_WHIRLPOOL_AC
+static stdAc::state_t handleToggles(const stdAc::state_t desired,
+                                    const stdAc::state_t *prev = NULL);
 };  // IRac class
 #endif  // IRAC_H_

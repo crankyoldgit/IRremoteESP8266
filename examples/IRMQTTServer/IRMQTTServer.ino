@@ -2639,7 +2639,7 @@ void loop(void) {
     if (lockMqttBroadcast && statListenTime.elapsed() > kStatListenPeriodMs) {
       unsubscribing(MqttClimateStat + '+');
       mqttLog("Finished listening for previous state.");
-      if (cmpClimate(climate, climate_prev)) {  // Something changed.
+      if (IRac::cmpStates(climate, climate_prev)) {  // Something changed.
         mqttLog("The state was recovered from MQTT broker. Updating.");
         sendClimate(climate_prev, climate, MqttClimateStat,
                     true, false, false);
@@ -3262,17 +3262,6 @@ stdAc::state_t updateClimate(stdAc::state_t current, const String str,
   return result;
 }
 
-// Compare two AirCon states (climates).
-// Returns: True if they differ, False if they don't.
-bool cmpClimate(const stdAc::state_t a, const stdAc::state_t b) {
-  return a.protocol != b.protocol || a.model != b.model || a.power != b.power ||
-      a.mode != b.mode || a.degrees != b.degrees || a.celsius != b.celsius ||
-      a.fanspeed != b.fanspeed || a.swingv != b.swingv ||
-      a.swingh != b.swingh || a.quiet != b.quiet || a.turbo != b.turbo ||
-      a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
-      a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep;
-}
-
 bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
                  const String topic_prefix, const bool retain,
                  const bool forceMQTT, const bool forceIR,
@@ -3367,11 +3356,7 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
     // Turn IR capture off if we need to.
     if (irrecv != NULL) irrecv->disableIRIn();  // Stop the IR receiver
 #endif  // IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
-    lastClimateSucceeded = commonAc->sendAc(
-        next.protocol, next.model, next.power, next.mode,
-        next.degrees, next.celsius, next.fanspeed, next.swingv, next.swingh,
-        next.quiet, next.turbo, next.econo, next.light, next.filter, next.clean,
-        next.beep, next.sleep, -1);
+    lastClimateSucceeded = commonAc->sendAc(next, &prev);
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
     // Turn IR capture back on if we need to.
     if (irrecv != NULL) irrecv->enableIRIn();  // Restart the receiver

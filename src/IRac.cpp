@@ -789,6 +789,48 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
+// Create a new state base on desired & previous states but handle
+// any state changes for options that need to be toggled.
+// Args:
+//   desired: The state_t structure describing the desired a/c state.
+//   prev:    Ptr to the previous state_t structure.
+//
+// Returns:
+//   A stdAc::state_t with the needed settings.
+stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
+                                   const stdAc::state_t *prev) {
+  stdAc::state_t result = desired;
+  // If we've been given a previous state AND the it's the same A/C basically.
+  if (prev != NULL && desired.protocol == prev->protocol &&
+      desired.model == prev->model) {
+    // Check if we have to handle toggle settings for specific A/C protocols.
+    switch (desired.protocol) {
+      case decode_type_t::COOLIX:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        result.turbo = desired.turbo ^ prev->turbo;
+        result.light = desired.light ^ prev->light;
+        result.clean = desired.clean ^ prev->clean;
+        result.sleep = (desired.sleep ^ prev->sleep) ? 0 : -1;
+        break;
+      case decode_type_t::WHIRLPOOL_AC:
+        result.power = desired.power ^ prev->power;
+        break;
+      case decode_type_t::PANASONIC_AC:
+        // CKP models use a power mode toggle.
+        if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
+          result.power = desired.power ^ prev->power;
+        break;
+      default:
+        {};
+    }
+  }
+  return result;
+}
+
 // Send A/C message for a given device using common A/C settings.
 // Args:
 //   vendor:  The type of A/C protocol to use.
@@ -1063,6 +1105,34 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       return false;  // Fail, didn't match anything.
   }
   return true;  // Success.
+}
+
+// Send A/C message for a given device using state_t structures.
+// Args:
+//   desired: The state_t structure describing the desired new a/c state.
+//   prev:    Ptr to the previous state_t structure.
+//
+// Returns:
+//   boolean: True, if accepted/converted/attempted. False, if unsupported.
+bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
+  stdAc::state_t final = this->handleToggles(desired, prev);
+  return this->sendAc(final.protocol, final.model, final.power, final.mode,
+                      final.degrees, final.celsius, final.fanspeed,
+                      final.swingv, final.swingh, final.quiet, final.turbo,
+                      final.econo, final.light, final.filter, final.clean,
+                      final.beep, final.sleep, final.clock);
+}
+
+// Compare two AirCon states.
+// Returns: True if they differ, False if they don't.
+// Note: Excludes clock.
+bool IRac::cmpStates(const stdAc::state_t a, const stdAc::state_t b) {
+  return a.protocol != b.protocol || a.model != b.model || a.power != b.power ||
+      a.mode != b.mode || a.degrees != b.degrees || a.celsius != b.celsius ||
+      a.fanspeed != b.fanspeed || a.swingv != b.swingv ||
+      a.swingh != b.swingh || a.quiet != b.quiet || a.turbo != b.turbo ||
+      a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
+      a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep;
 }
 
 stdAc::opmode_t IRac::strToOpmode(const char *str,
