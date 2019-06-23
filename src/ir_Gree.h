@@ -4,6 +4,7 @@
 // Supports:
 //   Brand: Ultimate,  Model: Heat Pump
 //   Brand: EKOKAI,  Model: A/C
+//   Brand: RusClimate,  Model: EACS/I-09HAR_X/N3 A/C
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -39,7 +40,7 @@ const uint8_t kGreePower2Mask = 0b01000000;
 const uint8_t kGreeXfanMask = 0b10000000;
 // Byte 4
 const uint8_t kGreeSwingPosMask = 0b00001111;
-// byte 6
+// byte 5
 const uint8_t kGreeIFeelMask = 0b00000100;
 const uint8_t kGreeWiFiMask = 0b01000000;
 

@@ -338,6 +338,34 @@ TEST(TestGreeClass, Turbo) {
   EXPECT_TRUE(irgree.getTurbo());
 }
 
+TEST(TestGreeClass, IFeel) {
+  IRGreeAC ac(0);
+  ac.begin();
+
+  ac.setIFeel(true);
+  EXPECT_TRUE(ac.getIFeel());
+
+  ac.setIFeel(false);
+  EXPECT_FALSE(ac.getIFeel());
+
+  ac.setIFeel(true);
+  EXPECT_TRUE(ac.getIFeel());
+}
+
+TEST(TestGreeClass, WiFi) {
+  IRGreeAC ac(0);
+  ac.begin();
+
+  ac.setWiFi(true);
+  EXPECT_TRUE(ac.getWiFi());
+
+  ac.setWiFi(false);
+  EXPECT_FALSE(ac.getWiFi());
+
+  ac.setWiFi(true);
+  EXPECT_TRUE(ac.getWiFi());
+}
+
 TEST(TestGreeClass, Sleep) {
   IRGreeAC irgree(0);
   irgree.begin();
@@ -452,8 +480,8 @@ TEST(TestGreeClass, HumanReadable) {
 
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), Turbo: Off, "
-      "XFan: Off, Light: On, Sleep: Off, Swing Vertical Mode: Manual, "
-      "Swing Vertical Pos: 0 (Last Pos)",
+      "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Swing Vertical Mode: Manual, Swing Vertical Pos: 0 (Last Pos)",
       irgree.toString());
   irgree.on();
   irgree.setMode(kGreeCool);
@@ -463,11 +491,13 @@ TEST(TestGreeClass, HumanReadable) {
   irgree.setSleep(true);
   irgree.setLight(false);
   irgree.setTurbo(true);
+  irgree.setIFeel(true);
+  irgree.setWiFi(true);
   irgree.setSwingVertical(true, kGreeSwingAuto);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (MAX), Turbo: On, "
-      "XFan: On, Light: Off, Sleep: On, Swing Vertical Mode: Auto, "
-      "Swing Vertical Pos: 1 (Auto)",
+      "IFeel: On, WiFi: On, XFan: On, Light: Off, Sleep: On, "
+      "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
       irgree.toString());
 }
 
@@ -526,8 +556,8 @@ TEST(TestDecodeGree, NormalRealExample) {
   irgree.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1, Turbo: Off, "
-      "XFan: Off, Light: On, Sleep: Off, Swing Vertical Mode: Manual, "
-      "Swing Vertical Pos: 2",
+      "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Swing Vertical Mode: Manual, Swing Vertical Pos: 2",
       irgree.toString());
 }
 

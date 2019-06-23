@@ -284,8 +284,8 @@ TEST(TestIRac, Gree) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 2, Turbo: Off, XFan: On, "
-      "Light: On, Sleep: On, Swing Vertical Mode: Manual, "
+      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 2, Turbo: Off, IFeel: Off, "
+      "WiFi: Off, XFan: On, Light: On, Sleep: On, Swing Vertical Mode: Manual, "
       "Swing Vertical Pos: 3";
 
   ac.begin();

@@ -236,46 +236,58 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
 uint8_t IRGreeAC::getMode(void) { return (remote_state[0] & kGreeModeMask); }
 
 void IRGreeAC::setLight(const bool on) {
-  remote_state[2] &= ~kGreeLightMask;
-  remote_state[2] |= (on << 5);
+  if (on)
+    remote_state[2] |= kGreeLightMask;
+  else
+    remote_state[2] &= ~kGreeLightMask;
 }
-
-void IRGreeAC::setIFeel(const bool on) {
-  remote_state[5] &= ~kGreeIFeelMask;
-  remote_state[5] |= (on << 2);
-}
-
-void IRGreeAC::setWiFi(const bool on) {
-  remote_state[5] &= ~kGreeWiFiMask;
-  remote_state[5] |= (on << 6);
-}
-
-
 
 bool IRGreeAC::getLight(void) { return remote_state[2] & kGreeLightMask; }
 
+void IRGreeAC::setIFeel(const bool on) {
+  if (on)
+    remote_state[5] |= kGreeIFeelMask;
+  else
+    remote_state[5] &= ~kGreeIFeelMask;
+}
+
+bool IRGreeAC::getIFeel(void) { return remote_state[5] & kGreeIFeelMask; }
+
+void IRGreeAC::setWiFi(const bool on) {
+  if (on)
+    remote_state[5] |= kGreeWiFiMask;
+  else
+    remote_state[5] &= ~kGreeWiFiMask;
+}
+
+bool IRGreeAC::getWiFi(void) { return remote_state[5] & kGreeWiFiMask; }
+
 void IRGreeAC::setXFan(const bool on) {
-  remote_state[2] &= ~kGreeXfanMask;
-  remote_state[2] |= (on << 7);
+  if (on)
+    remote_state[2] |= kGreeXfanMask;
+  else
+    remote_state[2] &= ~kGreeXfanMask;
 }
 
 bool IRGreeAC::getXFan(void) { return remote_state[2] & kGreeXfanMask; }
 
 void IRGreeAC::setSleep(const bool on) {
-  remote_state[0] &= ~kGreeSleepMask;
-  remote_state[0] |= (on << 7);
+  if (on)
+    remote_state[0] |= kGreeSleepMask;
+  else
+    remote_state[0] &= ~kGreeSleepMask;
 }
 
 bool IRGreeAC::getSleep(void) { return remote_state[0] & kGreeSleepMask; }
 
 void IRGreeAC::setTurbo(const bool on) {
-  remote_state[2] &= ~kGreeTurboMask;
-  remote_state[2] |= (on << 4);
+  if (on)
+    remote_state[2] |= kGreeTurboMask;
+  else
+    remote_state[2] &= ~kGreeTurboMask;
 }
 
 bool IRGreeAC::getTurbo(void) { return remote_state[2] & kGreeTurboMask; }
-bool IRGreeAC::getIFeel(void) { return remote_state[5] & kGreeIFeelMask; }
-bool IRGreeAC::getWiFi(void) { return remote_state[5] & kGreeWiFiMask; }
 
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
   remote_state[0] &= ~kGreeSwingAutoMask;
@@ -432,10 +444,7 @@ String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getPower() ? F("On") : F("Off");
   result += F(", Mode: ");
   result += uint64ToString(getMode());
   switch (getMode()) {
@@ -470,40 +479,19 @@ String IRGreeAC::toString(void) {
       break;
   }
   result += F(", Turbo: ");
-  if (getTurbo())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getTurbo() ? F("On") : F("Off");
   result += F(", IFeel: ");
-  if (getIFeel())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getIFeel() ? F("On") : F("Off");
   result += F(", WiFi: ");
-  if (getWiFi())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getWiFi() ? F("On") : F("Off");
   result += F(", XFan: ");
-  if (getXFan())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getXFan() ? F("On") : F("Off");
   result += F(", Light: ");
-  if (getLight())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getLight() ? F("On") : F("Off");
   result += F(", Sleep: ");
-  if (getSleep())
-    result += F("On");
-  else
-    result += F("Off");
+  result += this->getSleep() ? F("On") : F("Off");
   result += F(", Swing Vertical Mode: ");
-  if (getSwingVerticalAuto())
-    result += F("Auto");
-  else
-    result += F("Manual");
+  result += this->getSwingVerticalAuto() ? F("Auto") : F("Manual");
   result += F(", Swing Vertical Pos: ");
   result += uint64ToString(getSwingVerticalPosition());
   switch (getSwingVerticalPosition()) {
