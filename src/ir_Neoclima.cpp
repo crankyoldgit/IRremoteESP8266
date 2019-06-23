@@ -28,7 +28,7 @@ const uint32_t kNeoclimaMinGap = kDefaultMessageGap;
 //   nbytes: Nr. of bytes of the message to be sent.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: Alpha / Untested.
+// Status: Beta / Known to be working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/764
@@ -42,7 +42,7 @@ void IRsend::sendNeoclima(const unsigned char data[], const uint16_t nbytes,
                 kNeoclimaBitMark, kNeoclimaOneSpace,
                 kNeoclimaBitMark, kNeoclimaZeroSpace,
                 kNeoclimaBitMark, kNeoclimaHdrSpace,
-                data, nbytes, 38, true, 0,  // Repeats are already handled.
+                data, nbytes, 38000, false, 0,  // Repeats are already handled.
                 50);
      // Extra footer.
      mark(kNeoclimaBitMark);
@@ -79,7 +79,8 @@ bool IRrecv::decodeNeoclima(decode_results *results, const uint16_t nbits,
                       kNeoclimaHdrMark, kNeoclimaHdrSpace,
                       kNeoclimaBitMark, kNeoclimaOneSpace,
                       kNeoclimaBitMark, kNeoclimaZeroSpace,
-                      kNeoclimaBitMark, kNeoclimaHdrSpace, false);
+                      kNeoclimaBitMark, kNeoclimaHdrSpace, false,
+                      kTolerance, 0, false);
   if (!used) return false;
   offset += used;
   // Extra footer.
