@@ -225,5 +225,5 @@ ir_Argo.o : $(USER_DIR)/ir_Argo.cpp $(USER_DIR)/ir_Argo.h $(GTEST_HEADERS)
 ir_Goodweather.o : $(USER_DIR)/ir_Goodweather.cpp $(USER_DIR)/ir_Goodweather.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Goodweather.cpp
 
-ir_Neoclima.o : $(USER_DIR)/ir_Neoclima.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Neoclima.cpp
+ir_Neoclima.o : $(USER_DIR)/ir_Neoclima.cpp $(USER_DIR)/ir_Neoclima.h $(COMMON_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Neoclima.cpp
