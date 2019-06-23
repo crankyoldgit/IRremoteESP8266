@@ -77,7 +77,9 @@ TEST(TestDecodeNeoclima, RealExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   IRNeoclimaAc ac(0);
   ac.setRaw(irsend.capture.state);
-  EXPECT_EQ("Temp: 26C", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low)",
+      ac.toString());
 }
 
 // Self decode.
@@ -99,6 +101,54 @@ TEST(TestDecodeNeoclima, SyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
+TEST(TestIRNeoclimaAcClass, Power) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRNeoclimaAcClass, OperatingMode) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+
+  ac.setMode(kNeoclimaAuto);
+  EXPECT_EQ(kNeoclimaAuto, ac.getMode());
+
+  ac.setMode(kNeoclimaCool);
+  EXPECT_EQ(kNeoclimaCool, ac.getMode());
+
+  ac.setMode(kNeoclimaHeat);
+  EXPECT_EQ(kNeoclimaHeat, ac.getMode());
+
+  ASSERT_NE(kNeoclimaFanHigh, 1);
+  ac.setFan(kNeoclimaFanHigh);
+  ac.setMode(kNeoclimaDry);  // Dry should lock the fan to speed LOW.
+  EXPECT_EQ(kNeoclimaDry, ac.getMode());
+  EXPECT_EQ(kNeoclimaFanLow, ac.getFan());
+  ac.setFan(kNeoclimaFanHigh);
+  EXPECT_EQ(kNeoclimaFanLow, ac.getFan());
+
+  ac.setMode(kNeoclimaFan);
+  EXPECT_EQ(kNeoclimaFan, ac.getMode());
+
+  ac.setMode(kNeoclimaHeat + 1);
+  EXPECT_EQ(kNeoclimaAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kNeoclimaAuto, ac.getMode());
+}
+
 TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
   IRNeoclimaAc ac(0);
   ac.setTemp(25);
@@ -111,6 +161,35 @@ TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
   EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
   ac.setTemp(kNeoclimaMaxTemp + 1);
   EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+}
+
+TEST(TestIRNeoclimaAcClass, FanSpeed) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+
+  ac.setFan(0);
+  EXPECT_EQ(0, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kNeoclimaFanAuto, ac.getFan());
+
+  ac.setFan(kNeoclimaFanHigh);
+  EXPECT_EQ(kNeoclimaFanHigh, ac.getFan());
+
+  ac.setFan(kNeoclimaFanHigh + 1);
+  EXPECT_EQ(kNeoclimaFanAuto, ac.getFan());
+
+  ac.setFan(kNeoclimaFanHigh - 1);
+  EXPECT_EQ(kNeoclimaFanHigh - 1, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
 }
 
 TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {

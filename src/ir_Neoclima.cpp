@@ -103,26 +103,126 @@ void IRNeoclimaAc::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote_state[i] = new_code[i];
 }
 
+
+void IRNeoclimaAc::on(void) { remote_state[7] |= kNeoclimaPowerMask; }
+
+void IRNeoclimaAc::off(void) { remote_state[7] &= ~kNeoclimaPowerMask; }
+
+void IRNeoclimaAc::setPower(const bool on) {
+  if (on)
+    this->on();
+  else
+    this->off();
+}
+
+bool IRNeoclimaAc::getPower(void) {
+  return remote_state[7] & kNeoclimaPowerMask;
+}
+
+void IRNeoclimaAc::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kNeoclimaDry:
+      // In this mode fan speed always LOW
+      this->setFan(kNeoclimaFanLow);
+      // FALL THRU
+    case kNeoclimaAuto:
+    case kNeoclimaCool:
+    case kNeoclimaFan:
+    case kNeoclimaHeat:
+    remote_state[9] &= ~kNeoclimaModeMask;
+    remote_state[9] |= (mode << 5);
+      break;
+    default:
+      // If we get an unexpected mode, default to AUTO.
+      this->setMode(kNeoclimaAuto);
+  }
+}
+
+uint8_t IRNeoclimaAc::getMode(void) {
+  return (remote_state[9] & kNeoclimaModeMask) >> 5;
+}
+
 // Set the temp. in deg C
 void IRNeoclimaAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = std::max(kNeoclimaMinTemp, temp);
   newtemp = std::min(kNeoclimaMaxTemp, newtemp);
   remote_state[9] = (remote_state[9] & ~kNeoclimaTempMask) |
-    (newtemp + kNeoclimaMinTemp);
+    (newtemp - kNeoclimaMinTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRNeoclimaAc::getTemp(void) {
-  return (remote_state[9] & kNeoclimaTempMask) - kNeoclimaMinTemp;
+  return (remote_state[9] & kNeoclimaTempMask) + kNeoclimaMinTemp;
 }
+
+// Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
+void IRNeoclimaAc::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kNeoclimaFanAuto:
+    case kNeoclimaFanHigh:
+    case kNeoclimaFanMed:
+      if (this->getMode() == kNeoclimaDry) {  // Dry mode only allows low speed.
+        this->setFan(kNeoclimaFanLow);
+        return;
+      }
+      // FALL-THRU
+    case kNeoclimaFanLow:
+    remote_state[7] &= ~kNeoclimaFanMask;
+    remote_state[7] |= (speed << 6);
+      break;
+    default:
+      // If we get an unexpected speed, default to Auto.
+      this->setFan(kNeoclimaFanAuto);
+  }
+}
+
+uint8_t IRNeoclimaAc::getFan(void) { return remote_state[7] >> 6; }
 
 // Convert the internal state into a human readable string.
 String IRNeoclimaAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C");
+  result += F("Power: ");
+  result += this->getPower() ? F("On") : F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
+  switch (this->getMode()) {
+    case kNeoclimaAuto:
+      result += F(" (AUTO)");
+      break;
+    case kNeoclimaCool:
+      result += F(" (COOL)");
+      break;
+    case kNeoclimaHeat:
+      result += F(" (HEAT)");
+      break;
+    case kNeoclimaDry:
+      result += F(" (DRY)");
+      break;
+    case kNeoclimaFan:
+      result += F(" (FAN)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kNeoclimaFanAuto:
+      result += F(" (Auto)");
+      break;
+    case kNeoclimaFanHigh:
+      result += F(" (High)");
+      break;
+    case kNeoclimaFanMed:
+      result += F(" (Med)");
+      break;
+    case kNeoclimaFanLow:
+      result += F(" (Low)");
+      break;
+  }
   return result;
 }
 
