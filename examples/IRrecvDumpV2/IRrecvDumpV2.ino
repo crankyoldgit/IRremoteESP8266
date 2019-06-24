@@ -136,6 +136,13 @@ void dumpACInfo(const decode_results * const results) {
     description = ac.toString();
   }
 #endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN160
+  if (results->decode_type == DAIKIN160) {
+    IRDaikin160 ac(0);
+    ac.setRaw(results->state);
+    description = ac.toString();
+  }
+#endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN2
   if (results->decode_type == DAIKIN2) {
     IRDaikin2 ac(0);

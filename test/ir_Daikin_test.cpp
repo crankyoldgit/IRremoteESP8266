@@ -1,5 +1,6 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2019 David Conran
 #include "ir_Daikin.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -1518,18 +1519,22 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN", typeToString(decode_type_t::DAIKIN));
   ASSERT_EQ(decode_type_t::DAIKIN, strToDecodeType("DAIKIN"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN));
 
   ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
   ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN160));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN160));
 
   ASSERT_EQ("DAIKIN2", typeToString(decode_type_t::DAIKIN2));
   ASSERT_EQ(decode_type_t::DAIKIN2, strToDecodeType("DAIKIN2"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN2));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN2));
 
   ASSERT_EQ("DAIKIN216", typeToString(decode_type_t::DAIKIN216));
   ASSERT_EQ(decode_type_t::DAIKIN216, strToDecodeType("DAIKIN216"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN216));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN216));
 }
 
 // https://github.com/markszabo/IRremoteESP8266/issues/582#issuecomment-453863879
@@ -1700,7 +1705,6 @@ TEST(TestDaikin216Class, OperatingMode) {
   ac.setMode(255);
   EXPECT_EQ(kDaikinAuto, ac.getMode());
 }
-
 
 TEST(TestDaikin216Class, VaneSwing) {
   IRDaikin216 ac(0);
@@ -2074,6 +2078,10 @@ TEST(TestDecodeDaikin160, RealExample) {
   ASSERT_EQ(DAIKIN160, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin160Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRDaikin160 ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ("Power: Off, Mode: 3 (COOL), Temp: 25C, Fan: 10 (AUTO), "
+            "Swing (Vertical): On", ac.toString());
 }
 
 TEST(TestDecodeDaikin160, SyntheticExample) {
@@ -2095,4 +2103,188 @@ TEST(TestDecodeDaikin160, SyntheticExample) {
   ASSERT_EQ(DAIKIN160, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin160Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestDaikin160Class, toCommon) {
+  IRDaikin160 ac(0);
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(20);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::DAIKIN160, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDaikin160Class, FanSpeed) {
+  IRDaikin160 ac(0);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax);
+  EXPECT_EQ(kDaikinFanMax, ac.getFan());
+
+  // Beyond Max should default to Auto.
+  ac.setFan(kDaikinFanMax + 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMax - 1);
+  EXPECT_EQ(kDaikinFanMax - 1, ac.getFan());
+
+  ac.setFan(kDaikinFanMin);
+  EXPECT_EQ(kDaikinFanMin, ac.getFan());
+
+  ac.setFan(kDaikinFanMin + 1);
+  EXPECT_EQ(kDaikinFanMin + 1, ac.getFan());
+
+  // Beyond Min should default to Auto.
+  ac.setFan(kDaikinFanMin - 1);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
+
+  ac.setFan(kDaikinFanAuto);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanQuiet);
+  EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin160Class, VaneSwing) {
+  IRDaikin160 ac(0);
+  ac.begin();
+
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+}
+
+TEST(TestDaikin160Class, Power) {
+  IRDaikin160 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestDaikin160Class, Temperature) {
+  IRDaikin160 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp + 1);
+  EXPECT_EQ(kDaikinMinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestDaikin160Class, OperatingMode) {
+  IRDaikin160 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(kDaikinCool);
+  EXPECT_EQ(kDaikinCool, ac.getMode());
+
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+
+  ac.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+
+  ac.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikinFan, ac.getMode());
+
+  ac.setMode(kDaikinFan + 1);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(kDaikinAuto + 1);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+}
+
+TEST(TestDaikin160Class, HumanReadable) {
+  IRDaikin160 ac(0);
+
+  EXPECT_EQ(
+      "Power: Off, Mode: 3 (COOL), Temp: 25C, Fan: 10 (AUTO), "
+      "Swing (Vertical): On",
+      ac.toString());
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(19);
+  ac.setFan(kDaikinFanMin);
+  ac.setSwingVertical(false);
+  ac.setPower(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (AUTO), Temp: 19C, Fan: 1 (MIN), "
+      "Swing (Vertical): Off",
+      ac.toString());
 }

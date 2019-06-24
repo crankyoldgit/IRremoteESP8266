@@ -86,6 +86,12 @@ class IRac {
               const bool quiet, const bool turbo, const bool econo,
               const bool clean);
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN160
+void daikin160(IRDaikin160 *ac,
+               const bool on, const stdAc::opmode_t mode,
+               const float degrees, const stdAc::fanspeed_t fan,
+               const stdAc::swingv_t swingv);
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
   void daikin2(IRDaikin2 *ac,
                const bool on, const stdAc::opmode_t mode,
