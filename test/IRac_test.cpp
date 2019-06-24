@@ -12,6 +12,7 @@
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
+#include "ir_Neoclima.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Sharp.h"
@@ -529,6 +530,36 @@ TEST(TestIRac, MitsubishiHeavy152) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(MITSUBISHI_HEAVY_152, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMitsubishiHeavy152Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Neoclima) {
+  IRNeoclimaAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 1 (Low), "
+      "Swing(V): Off, Swing(H): On, Sleep: On, Turbo: Off, Hold: Off, Ion: On, "
+      "Eye: Off, Light: On, Follow: Off, 8C Heat: Off, Button: 0 (Power)";
+
+  ac.begin();
+  irac.neoclima(&ac,
+                true,                        // Power
+                stdAc::opmode_t::kCool,      // Mode
+                20,                          // Celsius
+                stdAc::fanspeed_t::kLow,     // Fan speed
+                stdAc::swingv_t::kOff,       // Veritcal swing
+                stdAc::swingh_t::kAuto,      // Horizontal swing
+                false,                       // Turbo
+                true,                        // Light
+                true,                        // Filter
+                8 * 60);                     // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(decode_type_t::NEOCLIMA, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kNeoclimaBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

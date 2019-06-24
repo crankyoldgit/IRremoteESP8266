@@ -1,4 +1,4 @@
-// Copyright 2019 David Conran
+// Copyright 2019 David Conran (crankyoldgit)
 
 #include "ir_Neoclima.h"
 #include "IRsend.h"
@@ -78,7 +78,10 @@ TEST(TestDecodeNeoclima, RealExample) {
   IRNeoclimaAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low)",
+      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low), "
+      "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Hold: Off, "
+      "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, "
+      "Button: 0 (Power)",
       ac.toString());
 }
 
@@ -116,6 +119,8 @@ TEST(TestIRNeoclimaAcClass, Power) {
 
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
+
+  EXPECT_EQ(kNeoclimaButtonPower, ac.getButton());
 }
 
 TEST(TestIRNeoclimaAcClass, OperatingMode) {
@@ -124,6 +129,8 @@ TEST(TestIRNeoclimaAcClass, OperatingMode) {
 
   ac.setMode(kNeoclimaAuto);
   EXPECT_EQ(kNeoclimaAuto, ac.getMode());
+  EXPECT_EQ(kNeoclimaButtonMode, ac.getButton());
+
 
   ac.setMode(kNeoclimaCool);
   EXPECT_EQ(kNeoclimaCool, ac.getMode());
@@ -155,10 +162,12 @@ TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
   EXPECT_EQ(25, ac.getTemp());
   ac.setTemp(kNeoclimaMinTemp);
   EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
+  EXPECT_EQ(kNeoclimaButtonTempDown, ac.getButton());
   ac.setTemp(kNeoclimaMinTemp - 1);
   EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
   ac.setTemp(kNeoclimaMaxTemp);
   EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  EXPECT_EQ(kNeoclimaButtonTempUp, ac.getButton());
   ac.setTemp(kNeoclimaMaxTemp + 1);
   EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
 }
@@ -190,6 +199,103 @@ TEST(TestIRNeoclimaAcClass, FanSpeed) {
 
   ac.setFan(3);
   EXPECT_EQ(3, ac.getFan());
+  EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Sleep) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_EQ(kNeoclimaButtonSleep, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Turbo) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_EQ(kNeoclimaButtonTurbo, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Hold) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setHold(true);
+  EXPECT_TRUE(ac.getHold());
+  ac.setHold(false);
+  EXPECT_FALSE(ac.getHold());
+  ac.setHold(true);
+  EXPECT_TRUE(ac.getHold());
+  EXPECT_EQ(kNeoclimaButtonHold, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, 8CHeat) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.set8CHeat(true);
+  EXPECT_TRUE(ac.get8CHeat());
+  ac.set8CHeat(false);
+  EXPECT_FALSE(ac.get8CHeat());
+  ac.set8CHeat(true);
+  EXPECT_TRUE(ac.get8CHeat());
+  EXPECT_EQ(kNeoclimaButton8CHeat, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Light) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  EXPECT_EQ(kNeoclimaButtonLight, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Ion) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+  ac.setIon(false);
+  EXPECT_FALSE(ac.getIon());
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+  EXPECT_EQ(kNeoclimaButtonIon, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Eye) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setEye(true);
+  EXPECT_TRUE(ac.getEye());
+  ac.setEye(false);
+  EXPECT_FALSE(ac.getEye());
+  ac.setEye(true);
+  EXPECT_TRUE(ac.getEye());
+  EXPECT_EQ(kNeoclimaButtonEye, ac.getButton());
+}
+
+TEST(TestIRNeoclimaAcClass, Follow) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setFollow(true);
+  EXPECT_TRUE(ac.getFollow());
+  ac.setFollow(false);
+  EXPECT_FALSE(ac.getFollow());
+  ac.setFollow(true);
+  EXPECT_TRUE(ac.getFollow());
+  EXPECT_EQ(kNeoclimaButtonFollow, ac.getButton());
 }
 
 TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {
@@ -217,4 +323,38 @@ TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {
   examplestate[8] = 0x01;
   EXPECT_FALSE(IRNeoclimaAc::validChecksum(examplestate));
   EXPECT_EQ(0x3A, IRNeoclimaAc::calcChecksum(examplestate));
+}
+
+TEST(TestIRNeoclimaAcClass, toCommon) {
+  IRNeoclimaAc ac(0);
+  ac.setPower(true);
+  ac.setMode(kNeoclimaCool);
+  ac.setTemp(20);
+  ac.setFan(kNeoclimaFanHigh);
+  ac.setSwingV(true);
+  ac.setSwingH(true);
+  ac.setTurbo(false);
+  ac.setIon(true);
+  ac.setLight(true);
+  ac.setSleep(true);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::NEOCLIMA, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().filter);
+  ASSERT_TRUE(ac.toCommon().light);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(0, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
 }

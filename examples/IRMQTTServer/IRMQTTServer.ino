@@ -3540,6 +3540,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_MITSUBISHIHEAVY
+#if DECODE_NEOCLIMA
+    case decode_type_t::NEOCLIMA: {
+      IRNeoclimaAc ac(txgpio);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_NEOCLIMA
 #if DECODE_PANASONIC_AC
     case decode_type_t::PANASONIC_AC: {
       IRPanasonicAc ac(txgpio);
