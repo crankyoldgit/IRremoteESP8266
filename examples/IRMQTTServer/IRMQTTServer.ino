@@ -214,43 +214,43 @@
  * In HA's configuration.yaml, add:
  *
  * climate:
- *   platform: mqtt
- *   name: Living Room Aircon
- *   modes:
- *     - "off"
- *     - "auto"
- *     - "cool"
- *     - "heat"
- *     - "dry"
- *     - "fan_only"
- *   fan_modes:
- *     - "auto"
- *     - "min"
- *     - "low"
- *     - "medium"
- *     - "high"
- *     - "max"
- *   swing_modes:
- *     - "off"
- *     - "auto"
- *     - "highest"
- *     - "high"
- *     - "middle"
- *     - "low"
- *     - "lowest"
- *   power_command_topic: "ir_server/ac/cmnd/power"
- *   mode_command_topic: "ir_server/ac/cmnd/mode"
- *   mode_state_topic: "ir_server/ac/stat/mode"
- *   temperature_command_topic: "ir_server/ac/cmnd/temp"
- *   temperature_state_topic: "ir_server/ac/stat/temp"
- *   fan_mode_command_topic: "ir_server/ac/cmnd/fanspeed"
- *   fan_mode_state_topic: "ir_server/ac/stat/fanspeed"
- *   swing_mode_command_topic: "ir_server/ac/cmnd/swingv"
- *   swing_mode_state_topic: "ir_server/ac/stat/swingv"
- *   min_temp: 16
- *   max_temp: 32
- *   temp_step: 1
- *   retain: false
+ *   - platform: mqtt
+ *     name: Living Room Aircon
+ *     modes:
+ *       - "off"
+ *       - "auto"
+ *       - "cool"
+ *       - "heat"
+ *       - "dry"
+ *       - "fan_only"
+ *     fan_modes:
+ *       - "auto"
+ *       - "min"
+ *       - "low"
+ *       - "medium"
+ *       - "high"
+ *       - "max"
+ *     swing_modes:
+ *       - "off"
+ *       - "auto"
+ *       - "highest"
+ *       - "high"
+ *       - "middle"
+ *       - "low"
+ *       - "lowest"
+ *     power_command_topic: "ir_server/ac/cmnd/power"
+ *     mode_command_topic: "ir_server/ac/cmnd/mode"
+ *     mode_state_topic: "ir_server/ac/stat/mode"
+ *     temperature_command_topic: "ir_server/ac/cmnd/temp"
+ *     temperature_state_topic: "ir_server/ac/stat/temp"
+ *     fan_mode_command_topic: "ir_server/ac/cmnd/fanspeed"
+ *     fan_mode_state_topic: "ir_server/ac/stat/fanspeed"
+ *     swing_mode_command_topic: "ir_server/ac/cmnd/swingv"
+ *     swing_mode_state_topic: "ir_server/ac/stat/swingv"
+ *     min_temp: 16
+ *     max_temp: 32
+ *     temp_step: 1
+ *     retain: false
  *
  * ### via HTTP:
  *   Use the "http://<your_esp8266's_ip_address>/aircon/set" URL and pass on
