@@ -538,29 +538,10 @@ String IRFujitsuAC::toString(void) {
     case fujitsu_ac_remote_model_t::ARJW2: result += F(" (ARJW2)"); break;
     default: result += F(" (UNKNOWN)");
   }
-  result += F(", Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kFujitsuAcModeAuto:
-      result += F(" (AUTO)");
-      break;
-    case kFujitsuAcModeCool:
-      result += F(" (COOL)");
-      break;
-    case kFujitsuAcModeHeat:
-      result += F(" (HEAT)");
-      break;
-    case kFujitsuAcModeDry:
-      result += F(" (DRY)");
-      break;
-    case kFujitsuAcModeFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"));
+  result += IRutils::acModeToString(getMode(), kFujitsuAcModeAuto,
+                                    kFujitsuAcModeCool, kFujitsuAcModeHeat,
+                                    kFujitsuAcModeDry, kFujitsuAcModeFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");

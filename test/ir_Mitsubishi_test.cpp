@@ -984,7 +984,7 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeededButError) {
 TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
-      "Power: On (HEAT), Temp: 22C, FAN: SILENT, VANE: AUTO, "
+      "Power: On, Mode: 8 (HEAT), Temp: 22C, FAN: SILENT, VANE: AUTO, "
       "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
       irMitsu.toString());
 }

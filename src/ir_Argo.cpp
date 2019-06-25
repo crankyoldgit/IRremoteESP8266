@@ -336,8 +336,7 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 String IRArgoAC::toString() {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += getPower() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
   result += F(", Mode: ");
   result += uint64ToString(getMode());
   switch (getMode()) {
@@ -386,12 +385,9 @@ String IRArgoAC::toString() {
   result += F(", Room Temp: ");
   result += uint64ToString(getRoomTemp());
   result += 'C';
-  result += F(", Max: ");
-  result += getMax() ? F("On") : F("Off");
-  result += F(", iFeel: ");
-  result += getiFeel() ? F("On") : F("Off");
-  result += F(", Night: ");
-  result += getNight() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getMax(), F("Max"));
+  result += IRutils::acBoolToString(getiFeel(), F("iFeel"));
+  result += IRutils::acBoolToString(getNight(), F("Night"));
   return result;
 }
 

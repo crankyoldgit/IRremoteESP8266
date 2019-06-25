@@ -340,32 +340,10 @@ stdAc::state_t IRHitachiAc::toCommon(void) {
 String IRHitachiAc::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kHitachiAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kHitachiAcCool:
-      result += F(" (COOL)");
-      break;
-    case kHitachiAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kHitachiAcDry:
-      result += F(" (DRY)");
-      break;
-    case kHitachiAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kHitachiAcAuto,
+                                    kHitachiAcCool, kHitachiAcHeat,
+                                    kHitachiAcDry, kHitachiAcFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -384,16 +362,10 @@ String IRHitachiAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += F(", Swing (Vertical): ");
-  if (getSwingVertical())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Swing (Horizontal): ");
-  if (getSwingHorizontal())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += IRutils::acBoolToString(getSwingHorizontal(),
+                                    F("Swing (Horizontal)"));
+
   return result;
 }
 

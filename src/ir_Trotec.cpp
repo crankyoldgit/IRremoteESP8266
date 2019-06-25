@@ -229,26 +229,10 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 String IRTrotecESP::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kTrotecAuto:
-      result += F(" (AUTO)");
-      break;
-    case kTrotecCool:
-      result += F(" (COOL)");
-      break;
-    case kTrotecDry:
-      result += F(" (DRY)");
-      break;
-    case kTrotecFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kTrotecAuto,
+                                    kTrotecCool, kTrotecAuto,
+                                    kTrotecDry, kTrotecFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan Speed: ");
@@ -264,8 +248,7 @@ String IRTrotecESP::toString(void) {
       result += F(" (High)");
       break;
   }
-  result += F(", Sleep: ");
-  result += (this->getSleep() ? F("On") : F("Off"));
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
   return result;
 }
 

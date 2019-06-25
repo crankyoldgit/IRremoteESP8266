@@ -39,4 +39,11 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 decode_type_t strToDecodeType(const char *str);
 float celsiusToFahrenheit(const float deg);
 float fahrenheitToCelsius(const float deg);
+namespace IRutils {
+  String acBoolToString(const bool value, const String text,
+                        const bool precomma = true);
+  String acModeToString(const uint8_t mode, const uint8_t automatic,
+                        const uint8_t cool, const uint8_t heat,
+                        const uint8_t dry, const uint8_t fan);
+}  // namespace IRutils
 #endif  // IRUTILS_H_

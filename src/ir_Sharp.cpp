@@ -488,26 +488,10 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 String IRSharpAc::toString(void) {
   String result = "";
   result.reserve(60);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kSharpAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kSharpAcCool:
-      result += F(" (COOL)");
-      break;
-    case kSharpAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kSharpAcDry:
-      result += F(" (DRY)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kSharpAcAuto,
+                                    kSharpAcCool, kSharpAcHeat,
+                                    kSharpAcDry, kSharpAcAuto);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");

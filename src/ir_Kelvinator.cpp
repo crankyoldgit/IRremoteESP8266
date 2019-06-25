@@ -416,29 +416,10 @@ stdAc::state_t IRKelvinatorAC::toCommon(void) {
 String IRKelvinatorAC::toString(void) {
   String result = "";
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kKelvinatorAuto:
-      result += F(" (AUTO)");
-      break;
-    case kKelvinatorCool:
-      result += F(" (COOL)");
-      break;
-    case kKelvinatorHeat:
-      result += F(" (HEAT)");
-      break;
-    case kKelvinatorDry:
-      result += F(" (DRY)");
-      break;
-    case kKelvinatorFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kKelvinatorAuto, kKelvinatorCool,
+                                    kKelvinatorHeat, kKelvinatorDry,
+                                    kKelvinatorFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -451,20 +432,14 @@ String IRKelvinatorAC::toString(void) {
       result += F(" (MAX)");
       break;
   }
-  result += F(", Turbo: ");
-  result += getTurbo() ? F("On") : F("Off");
-  result += F(", Quiet: ");
-  result += getQuiet() ? F("On") : F("Off");
-  result += F(", XFan: ");
-  result += getXFan() ? F("On") : F("Off");
-  result += F(", IonFilter: ");
-  result += getIonFilter() ? F("On") : F("Off");
-  result += F(", Light: ");
-  result += getLight() ? F("On") : F("Off");
-  result += F(", Swing (Horizontal): ");
-  result += getSwingHorizontal() ? F("On") : F("Off");
-  result += F(", Swing (Vertical): ");
-  result += getSwingVertical() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
+  result += IRutils::acBoolToString(getXFan(), F("XFan"));
+  result += IRutils::acBoolToString(getIonFilter(), F("IonFilter"));
+  result += IRutils::acBoolToString(getLight(), F("Light"));
+  result += IRutils::acBoolToString(getSwingHorizontal(),
+                                    F("Swing (Horizontal)"));
+  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (Vertical)"));
   return result;
 }
 

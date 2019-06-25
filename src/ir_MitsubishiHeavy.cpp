@@ -455,29 +455,10 @@ stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
 String IRMitsubishiHeavy152Ac::toString(void) {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kMitsubishiHeavyAuto:
-      result += F(" (Auto)");
-      break;
-    case kMitsubishiHeavyCool:
-      result += F(" (Cool)");
-      break;
-    case kMitsubishiHeavyHeat:
-      result += F(" (Heat)");
-      break;
-    case kMitsubishiHeavyDry:
-      result += F(" (Dry)");
-      break;
-    case kMitsubishiHeavyFan:
-      result += F(" (Fan)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kMitsubishiHeavyAuto,
+                                    kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
+                                    kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp()) + 'C';
   result += F(", Fan: ");
@@ -567,20 +548,13 @@ String IRMitsubishiHeavy152Ac::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Silent: ");
-  result += (this->getSilent() ? F("On") : F("Off"));
-  result += F(", Turbo: ");
-  result += (this->getTurbo() ? F("On") : F("Off"));
-  result += F(", Econo: ");
-  result += (this->getEcono() ? F("On") : F("Off"));
-  result += F(", Night: ");
-  result += (this->getNight() ? F("On") : F("Off"));
-  result += F(", Filter: ");
-  result += (this->getFilter() ? F("On") : F("Off"));
-  result += F(", 3D: ");
-  result += (this->get3D() ? F("On") : F("Off"));
-  result += F(", Clean: ");
-  result += (this->getClean() ? F("On") : F("Off"));
+  result += IRutils::acBoolToString(getSilent(), F("Silent"));
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getEcono(), F("Econo"));
+  result += IRutils::acBoolToString(getNight(), F("Night"));
+  result += IRutils::acBoolToString(getFilter(), F("Filter"));
+  result += IRutils::acBoolToString(get3D(), F("3D"));
+  result += IRutils::acBoolToString(getClean(), F("Clean"));
   return result;
 }
 
@@ -931,29 +905,10 @@ stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
 String IRMitsubishiHeavy88Ac::toString(void) {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kMitsubishiHeavyAuto:
-      result += F(" (Auto)");
-      break;
-    case kMitsubishiHeavyCool:
-      result += F(" (Cool)");
-      break;
-    case kMitsubishiHeavyHeat:
-      result += F(" (Heat)");
-      break;
-    case kMitsubishiHeavyDry:
-      result += F(" (Dry)");
-      break;
-    case kMitsubishiHeavyFan:
-      result += F(" (Fan)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kMitsubishiHeavyAuto,
+                                    kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
+                                    kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp()) + 'C';
   result += F(", Fan: ");
@@ -1043,14 +998,10 @@ String IRMitsubishiHeavy88Ac::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Turbo: ");
-  result += (this->getTurbo() ? F("On") : F("Off"));
-  result += F(", Econo: ");
-  result += (this->getEcono() ? F("On") : F("Off"));
-  result += F(", 3D: ");
-  result += (this->get3D() ? F("On") : F("Off"));
-  result += F(", Clean: ");
-  result += (this->getClean() ? F("On") : F("Off"));
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getEcono(), F("Econo"));
+  result += IRutils::acBoolToString(get3D(), F("3D"));
+  result += IRutils::acBoolToString(getClean(), F("Clean"));
   return result;
 }
 

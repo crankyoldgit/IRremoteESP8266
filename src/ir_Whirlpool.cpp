@@ -504,29 +504,10 @@ String IRWhirlpoolAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Power toggle: ");
-  result += this->getPowerToggle() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kWhirlpoolAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kWhirlpoolAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kWhirlpoolAcCool:
-      result += F(" (COOL)");
-      break;
-    case kWhirlpoolAcDry:
-      result += F(" (DRY)");
-      break;
-    case kWhirlpoolAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPowerToggle(), F("Power toggle"));
+  result += IRutils::acModeToString(getMode(), kWhirlpoolAcAuto,
+                                    kWhirlpoolAcCool, kWhirlpoolAcHeat,
+                                    kWhirlpoolAcDry, kWhirlpoolAcFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");
@@ -548,10 +529,8 @@ String IRWhirlpoolAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += F(", Swing: ");
-  result += this->getSwing() ? F("On") : F("Off");
-  result += F(", Light: ");
-  result += this->getLight() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getSwing(), F("Swing"));
+  result += IRutils::acBoolToString(getLight(), F("Light"));
   result += F(", Clock: ");
   result += this->timeToString(this->getClock());
   result += F(", On Timer: ");
@@ -564,10 +543,8 @@ String IRWhirlpoolAc::toString(void) {
     result += this->timeToString(this->getOffTimer());
   else
     result += F("Off");
-  result += F(", Sleep: ");
-  result += this->getSleep() ? F("On") : F("Off");
-  result += F(", Super: ");
-  result += this->getSuper() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += IRutils::acBoolToString(getSuper(), F("Super"));
   result += F(", Command: ");
   result += uint64ToString(this->getCommand());
   switch (this->getCommand()) {

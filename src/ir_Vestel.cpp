@@ -503,29 +503,10 @@ String IRVestelAc::toString(void) {
     return result;
   }
   // Not a time command, it's a normal command.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kVestelAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kVestelAcCool:
-      result += F(" (COOL)");
-      break;
-    case kVestelAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kVestelAcDry:
-      result += F(" (DRY)");
-      break;
-    case kVestelAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kVestelAcAuto,
+                                    kVestelAcCool, kVestelAcHeat,
+                                    kVestelAcDry, kVestelAcFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");
@@ -552,14 +533,10 @@ String IRVestelAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Sleep: ");
-  result += this->getSleep() ? F("On") : F("Off");
-  result += F(", Turbo: ");
-  result += this->getTurbo() ? F("On") : F("Off");
-  result += F(", Ion: ");
-  result += this->getIon() ? F("On") : F("Off");
-  result += F(", Swing: ");
-  result += this->getSwing() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getIon(), F("Ion"));
+  result += IRutils::acBoolToString(getSwing(), F("Swing"));
   return result;
 }
 

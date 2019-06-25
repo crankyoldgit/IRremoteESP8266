@@ -335,32 +335,10 @@ stdAc::state_t IRMideaAC::toCommon(void) {
 String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kMideaACAuto:
-      result += F(" (AUTO)");
-      break;
-    case kMideaACCool:
-      result += F(" (COOL)");
-      break;
-    case kMideaACHeat:
-      result += F(" (HEAT)");
-      break;
-    case kMideaACDry:
-      result += F(" (DRY)");
-      break;
-    case kMideaACFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kMideaACAuto, kMideaACCool,
+                                    kMideaACHeat, kMideaACDry,
+                                    kMideaACFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp(true));
   result += F("C/");
@@ -381,11 +359,7 @@ String IRMideaAC::toString(void) {
       result += F(" (HI)");
       break;
   }
-  result += F(", Sleep: ");
-  if (getSleep())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
   return result;
 }
 
