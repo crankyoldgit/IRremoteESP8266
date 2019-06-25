@@ -126,16 +126,20 @@ void IRNeoclimaAc::setButton(const uint8_t button) {
     case kNeoclimaButtonEye:
     case kNeoclimaButtonFollow:
     case kNeoclimaButtonIon:
+    case kNeoclimaButtonFresh:
     case kNeoclimaButton8CHeat:
     case kNeoclimaButtonTurbo:
-      remote_state[5] = button;
+      remote_state[5] &= ~kNeoclimaButtonMask;
+      remote_state[5] |= button;
       break;
     default:
       this->setButton(kNeoclimaButtonPower);
   }
 }
 
-uint8_t IRNeoclimaAc::getButton(void) { return remote_state[5]; }
+uint8_t IRNeoclimaAc::getButton(void) {
+  return remote_state[5] & kNeoclimaButtonMask;
+}
 
 void IRNeoclimaAc::on(void) { this->setPower(true); }
 
@@ -235,7 +239,7 @@ void IRNeoclimaAc::setFan(const uint8_t speed) {
       // FALL-THRU
     case kNeoclimaFanLow:
       remote_state[7] &= ~kNeoclimaFanMask;
-      remote_state[7] |= (speed << 6);
+      remote_state[7] |= (speed << 5);
       this->setButton(kNeoclimaButtonFanSpeed);
       break;
     default:
@@ -244,7 +248,9 @@ void IRNeoclimaAc::setFan(const uint8_t speed) {
   }
 }
 
-uint8_t IRNeoclimaAc::getFan(void) { return remote_state[7] >> 6; }
+uint8_t IRNeoclimaAc::getFan(void) {
+  return (remote_state[7] & kNeoclimaFanMask) >> 5;
+}
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRNeoclimaAc::convertFan(const stdAc::fanspeed_t speed) {
@@ -318,6 +324,18 @@ void IRNeoclimaAc::setTurbo(const bool on) {
 
 bool IRNeoclimaAc::getTurbo(void) {
   return remote_state[3] & kNeoclimaTurboMask;
+}
+
+void IRNeoclimaAc::setFresh(const bool on) {
+  this->setButton(kNeoclimaButtonFresh);
+  if (on)
+    remote_state[5] |= kNeoclimaFreshMask;
+  else
+    remote_state[5] &= ~kNeoclimaFreshMask;
+}
+
+bool IRNeoclimaAc::getFresh(void) {
+  return remote_state[5] & kNeoclimaFreshMask;
 }
 
 void IRNeoclimaAc::setHold(const bool on) {
@@ -487,25 +505,28 @@ String IRNeoclimaAc::toString(void) {
   result += this->getFollow() ? F("On") : F("Off");
   result += F(", 8C Heat: ");
   result += this->get8CHeat() ? F("On") : F("Off");
+  result += F(", Fresh: ");
+  result += this->getFresh() ? F("On") : F("Off");
   result += F(", Button: ");
   result += uint64ToString(this->getButton());
   result += F(" (");
   switch (this->getButton()) {
-    case kNeoclimaButtonPower: result += F("Power"); break;
-    case kNeoclimaButtonMode: result += F("Mode"); break;
-    case kNeoclimaButtonTempUp: result += F("Temp Up"); break;
+    case kNeoclimaButtonPower:    result += F("Power"); break;
+    case kNeoclimaButtonMode:     result += F("Mode"); break;
+    case kNeoclimaButtonTempUp:   result += F("Temp Up"); break;
     case kNeoclimaButtonTempDown: result += F("Temp Down"); break;
-    case kNeoclimaButtonSwing: result += F("Swing"); break;
+    case kNeoclimaButtonSwing:    result += F("Swing"); break;
     case kNeoclimaButtonFanSpeed: result += F("Speed"); break;
-    case kNeoclimaButtonAirFlow: result += F("Air Flow"); break;
-    case kNeoclimaButtonHold: result += F("Hold"); break;
-    case kNeoclimaButtonSleep: result += F("Sleep"); break;
-    case kNeoclimaButtonLight: result += F("Light"); break;
-    case kNeoclimaButtonEye: result += F("Eye"); break;
-    case kNeoclimaButtonFollow: result += F("Follow"); break;
-    case kNeoclimaButtonIon: result += F("Ion"); break;
-    case kNeoclimaButton8CHeat: result += F("8C Heat"); break;
-    case kNeoclimaButtonTurbo: result += F("Turbo"); break;
+    case kNeoclimaButtonAirFlow:  result += F("Air Flow"); break;
+    case kNeoclimaButtonHold:     result += F("Hold"); break;
+    case kNeoclimaButtonSleep:    result += F("Sleep"); break;
+    case kNeoclimaButtonLight:    result += F("Light"); break;
+    case kNeoclimaButtonEye:      result += F("Eye"); break;
+    case kNeoclimaButtonFollow:   result += F("Follow"); break;
+    case kNeoclimaButtonIon:      result += F("Ion"); break;
+    case kNeoclimaButtonFresh:    result += F("Fresh"); break;
+    case kNeoclimaButton8CHeat:   result += F("8C Heat"); break;
+    case kNeoclimaButtonTurbo:    result += F("Turbo"); break;
     default:
       result += F("UNKNOWN");
   }

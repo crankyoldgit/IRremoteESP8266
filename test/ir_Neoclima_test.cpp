@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran (crankyoldgit)
 
 #include "ir_Neoclima.h"
+#include <algorithm>
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "IRrecv.h"
@@ -78,9 +79,9 @@ TEST(TestDecodeNeoclima, RealExample) {
   IRNeoclimaAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low), "
+      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 3 (Low), "
       "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Hold: Off, "
-      "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, "
+      "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
       "Button: 0 (Power)",
       ac.toString());
 }
@@ -138,7 +139,7 @@ TEST(TestIRNeoclimaAcClass, OperatingMode) {
   ac.setMode(kNeoclimaHeat);
   EXPECT_EQ(kNeoclimaHeat, ac.getMode());
 
-  ASSERT_NE(kNeoclimaFanHigh, 1);
+  ASSERT_NE(kNeoclimaFanHigh, kNeoclimaFanLow);
   ac.setFan(kNeoclimaFanHigh);
   ac.setMode(kNeoclimaDry);  // Dry should lock the fan to speed LOW.
   EXPECT_EQ(kNeoclimaDry, ac.getMode());
@@ -185,7 +186,7 @@ TEST(TestIRNeoclimaAcClass, FanSpeed) {
   ac.setFan(kNeoclimaFanHigh);
   EXPECT_EQ(kNeoclimaFanHigh, ac.getFan());
 
-  ac.setFan(kNeoclimaFanHigh + 1);
+  ac.setFan(std::max(kNeoclimaFanHigh, kNeoclimaFanLow) + 1);
   EXPECT_EQ(kNeoclimaFanAuto, ac.getFan());
 
   ac.setFan(kNeoclimaFanHigh - 1);
@@ -199,6 +200,29 @@ TEST(TestIRNeoclimaAcClass, FanSpeed) {
 
   ac.setFan(3);
   EXPECT_EQ(3, ac.getFan());
+  EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
+
+  // Data from:
+  //   https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
+  uint8_t fan_low[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x6A, 0x00, 0x29, 0xA5, 0x3D};
+  uint8_t fan_medium[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x4A, 0x00, 0x29, 0xA5, 0x1D};
+  uint8_t fan_high[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x2A, 0x00, 0x29, 0xA5, 0xFD};
+  uint8_t fan_auto[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x0A, 0x00, 0x29, 0xA5, 0xDD};
+  ac.setRaw(fan_low);
+  EXPECT_EQ(kNeoclimaFanLow, ac.getFan());
+  EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
+  ac.setRaw(fan_medium);
+  EXPECT_EQ(kNeoclimaFanMed, ac.getFan());
+  EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
+  ac.setRaw(fan_high);
+  EXPECT_EQ(kNeoclimaFanHigh, ac.getFan());
+  EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
+  ac.setRaw(fan_auto);
+  EXPECT_EQ(kNeoclimaFanAuto, ac.getFan());
   EXPECT_EQ(kNeoclimaButtonFanSpeed, ac.getButton());
 }
 
@@ -224,6 +248,42 @@ TEST(TestIRNeoclimaAcClass, Turbo) {
   ac.setTurbo(true);
   EXPECT_TRUE(ac.getTurbo());
   EXPECT_EQ(kNeoclimaButtonTurbo, ac.getButton());
+  // Data from:
+  //   https://drive.google.com/file/d/1tA09Gu_ZqDcHucscnqzv0V3cIUWOE0d1/view
+  uint8_t turbo_on[12] = {
+      0x00, 0x00, 0x00, 0x08, 0x00, 0x0A, 0x00, 0x6A, 0x00, 0x88, 0xA5, 0xA9};
+  uint8_t turbo_off[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x6A, 0x00, 0x88, 0xA5, 0xA1};
+  ac.setRaw(turbo_on);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_EQ(kNeoclimaButtonTurbo, ac.getButton());
+  ac.setRaw(turbo_off);
+  EXPECT_EQ(kNeoclimaButtonTurbo, ac.getButton());
+  EXPECT_FALSE(ac.getTurbo());
+}
+
+TEST(TestIRNeoclimaAcClass, Fresh) {
+  IRNeoclimaAc ac(0);
+  ac.begin();
+  ac.setFresh(true);
+  EXPECT_TRUE(ac.getFresh());
+  ac.setFresh(false);
+  EXPECT_FALSE(ac.getFresh());
+  ac.setFresh(true);
+  EXPECT_TRUE(ac.getFresh());
+  EXPECT_EQ(kNeoclimaButtonFresh, ac.getButton());
+  // Data from:
+  //   https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
+  uint8_t on[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x95, 0x00, 0x6A, 0x00, 0x29, 0xA5, 0xCD};
+  uint8_t off[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x15, 0x00, 0x6A, 0x00, 0x29, 0xA5, 0x4D};
+  ac.setRaw(on);
+  EXPECT_TRUE(ac.getFresh());
+  EXPECT_EQ(kNeoclimaButtonFresh, ac.getButton());
+  ac.setRaw(off);
+  EXPECT_EQ(kNeoclimaButtonFresh, ac.getButton());
+  EXPECT_FALSE(ac.getFresh());
 }
 
 TEST(TestIRNeoclimaAcClass, Hold) {

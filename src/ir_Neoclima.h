@@ -36,6 +36,8 @@ const uint8_t kNeoclimaHoldMask =   0b00000100;
 const uint8_t kNeoclimaTurboMask =  0b00001000;
 const uint8_t kNeoclimaEyeMask =    0b01000000;
 // state[5]
+const uint8_t kNeoclimaFreshMask =  0b10000000;
+const uint8_t kNeoclimaButtonMask = 0b00011111;
 const uint8_t kNeoclimaButtonPower =    0x00;
 const uint8_t kNeoclimaButtonMode =     0x01;
 const uint8_t kNeoclimaButtonTempUp =   0x02;
@@ -45,12 +47,13 @@ const uint8_t kNeoclimaButtonFanSpeed = 0x05;
 const uint8_t kNeoclimaButtonAirFlow =  0x07;
 const uint8_t kNeoclimaButtonHold =     0x08;
 const uint8_t kNeoclimaButtonSleep =    0x09;
+const uint8_t kNeoclimaButtonTurbo =    0x0A;
 const uint8_t kNeoclimaButtonLight =    0x0B;
 const uint8_t kNeoclimaButtonEye =      0x0E;
 const uint8_t kNeoclimaButtonFollow =   0x13;
 const uint8_t kNeoclimaButtonIon =      0x14;
+const uint8_t kNeoclimaButtonFresh =    0x15;
 const uint8_t kNeoclimaButton8CHeat =   0x1D;
-const uint8_t kNeoclimaButtonTurbo =    0x6A;
 // state[7]
 const uint8_t kNeoclimaSleepMask =  0b00000001;
 const uint8_t kNeoclimaPowerMask =  0b00000010;
@@ -58,13 +61,13 @@ const uint8_t kNeoclimaSwingVMask = 0b00001100;
 const uint8_t kNeoclimaSwingVOn =   0b00000100;
 const uint8_t kNeoclimaSwingVOff =  0b00001000;
 const uint8_t kNeoclimaSwingHMask = 0b00010000;
-const uint8_t kNeoclimaFanMask =    0b11000000;
-const uint8_t kNeoclimaFanAuto =    0b00;
-const uint8_t kNeoclimaFanLow =     0b01;
-const uint8_t kNeoclimaFanMed =     0b10;
-const uint8_t kNeoclimaFanHigh =    0b11;
+const uint8_t kNeoclimaFanMask =    0b01100000;
+const uint8_t kNeoclimaFanAuto =     0b00;
+const uint8_t kNeoclimaFanHigh =     0b01;
+const uint8_t kNeoclimaFanMed =      0b10;
+const uint8_t kNeoclimaFanLow =      0b11;
 // state[8]
-const uint8_t kNeoclimaFollowMe = 0x5D;
+const uint8_t kNeoclimaFollowMe = 0x5D;  // Also 0x5F
 // state[9]
 const uint8_t kNeoclimaTempMask = 0b00011111;
 const uint8_t kNeoclimaMinTemp = 16;   // 16C
@@ -107,6 +110,8 @@ class IRNeoclimaAc {
   bool getSleep(void);
   void setTurbo(const bool on);
   bool getTurbo(void);
+  void setFresh(const bool on);
+  bool getFresh(void);
   void setHold(const bool on);
   bool getHold(void);
   void setIon(const bool on);

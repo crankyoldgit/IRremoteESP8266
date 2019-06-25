@@ -539,9 +539,10 @@ TEST(TestIRac, Neoclima) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 1 (Low), "
+      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 3 (Low), "
       "Swing(V): Off, Swing(H): On, Sleep: On, Turbo: Off, Hold: Off, Ion: On, "
-      "Eye: Off, Light: On, Follow: Off, 8C Heat: Off, Button: 0 (Power)";
+      "Eye: Off, Light: On, Follow: Off, 8C Heat: Off, Fresh: Off, "
+      "Button: 0 (Power)";
 
   ac.begin();
   irac.neoclima(&ac,
