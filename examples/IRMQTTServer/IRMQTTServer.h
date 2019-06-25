@@ -183,7 +183,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.2.1-beta"
+#define _MY_VERSION_ "v1.2.2-testing"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -195,12 +195,13 @@ const int8_t kTxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
 const int8_t kRxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
 #endif  // ESP8266
 #if defined(ESP32)
+// Ref: https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 const int8_t kTxGpios[] = {
-    -1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    25, 26, 27, 28, 29, 30, 31, 32, 33};
+    -1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23,
+    25, 26, 27, 32, 33};
 const int8_t kRxGpios[] = {
-    -1, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+    -1, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23,
+    25, 26, 27, 32, 33, 34, 35, 36, 39};
 #endif  // ESP32
 
 // JSON stuff

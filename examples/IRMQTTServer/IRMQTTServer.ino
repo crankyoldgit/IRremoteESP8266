@@ -2170,14 +2170,11 @@ void setup(void) {
   if (rx_gpio != kGpioUnused)
     irrecv = new IRrecv(rx_gpio, kCaptureBufferSize, kCaptureTimeout, true);
   if (irrecv != NULL) {
-#if IR_RX_PULLUP
-    pinMode(rx_gpio, INPUT_PULLUP);
-#endif  // IR_RX_PULLUP
 #if DECODE_HASH
     // Ignore messages with less than minimum on or off pulses.
     irrecv->setUnknownThreshold(kMinUnknownSize);
 #endif  // DECODE_HASH
-    irrecv->enableIRIn();  // Start the receiver
+    irrecv->enableIRIn(IR_RX_PULLUP);  // Start the receiver
   }
 #endif  // IR_RX
   commonAc = new IRac(txGpioTable[0]);
