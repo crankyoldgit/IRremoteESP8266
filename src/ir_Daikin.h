@@ -10,6 +10,7 @@
 //   Brand: Daikin,  Model: FTXZ50NV1B A/C
 //   Brand: Daikin,  Model: ARC433B69 remote
 //   Brand: Daikin,  Model: ARC423A5 remote
+//   Brand: Daikin,  Model: FTE12HV2S A/C
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
