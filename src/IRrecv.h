@@ -123,7 +123,7 @@ class IRrecv {
 #endif  // ESP32
   ~IRrecv(void);                                                  // Destructor
   bool decode(decode_results *results, irparams_t *save = NULL);
-  void enableIRIn(void);
+  void enableIRIn(const bool pullup = false);
   void disableIRIn(void);
   void resume(void);
   uint16_t getBufSize(void);

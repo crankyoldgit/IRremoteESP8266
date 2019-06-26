@@ -194,8 +194,21 @@ IRrecv::~IRrecv(void) {
 #endif  // ESP32
 }
 
-// initialization
-void IRrecv::enableIRIn(void) {
+// Set up and (re)start the IR capture mechanism.
+//
+// Args:
+//   pullup: A flag indicating should the GPIO use the internal pullup resistor.
+//           (Default: `false`. i.e. No.)
+void IRrecv::enableIRIn(const bool pullup) {
+  // ESP32's seem to require explicitly setting the GPIO to INPUT etc.
+  // This wasn't required on the ESP8266s, but it shouldn't hurt to make sure.
+  if (pullup) {
+#ifndef UNIT_TEST
+    pinMode(irparams.recvpin, INPUT_PULLUP);
+  } else {
+    pinMode(irparams.recvpin, INPUT);
+#endif  // UNIT_TEST
+  }
 #if defined(ESP32)
   // Initialize the ESP32 timer.
   timer = timerBegin(_timer_num, 80, true);  // 80MHz / 80 = 1 uSec granularity.
