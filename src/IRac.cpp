@@ -225,7 +225,7 @@ void IRac::daikin160(IRDaikin160 *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setSwingVertical(ac->convertSwingV(swingv));
   ac->send();
 }
 #endif  // SEND_DAIKIN160

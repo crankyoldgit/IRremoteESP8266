@@ -1886,14 +1886,17 @@ void IRDaikin160::stateReset() {
   remote_state[1] =  0xDA;
   remote_state[2] =  0x27;
   remote_state[3] =  0xF0;
+  remote_state[4] =  0x0D;
   // remote_state[6] is a checksum byte, it will be set by checksum().
   remote_state[7] =  0x11;
   remote_state[8] =  0xDA;
   remote_state[9] =  0x27;
+  remote_state[11] = 0xD3;
   remote_state[12] = 0x30;
   remote_state[13] = 0x11;
   remote_state[16] = 0x1E;
   remote_state[17] = 0x0A;
+  remote_state[18] = 0x08;
   // remote_state[19] is a checksum byte, it will be set by checksum().
 }
 
@@ -1991,18 +1994,62 @@ uint8_t IRDaikin160::getFan() {
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
-  return IRDaikinESP::convertFan(speed);
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
+    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
+    default:
+      return kDaikinFanAuto;
+  }
 }
 
-void IRDaikin160::setSwingVertical(const bool on) {
-  if (on)
-    remote_state[kDaikin160ByteSwingV] |= kDaikin160MaskSwingV;
-  else
-    remote_state[kDaikin160ByteSwingV] &= ~kDaikin160MaskSwingV;
+void IRDaikin160::setSwingVertical(const uint8_t position) {
+  switch (position) {
+    case kDaikin160SwingVLowest:
+    case kDaikin160SwingVLow:
+    case kDaikin160SwingVMiddle:
+    case kDaikin160SwingVHigh:
+    case kDaikin160SwingVHighest:
+    case kDaikin160SwingVAuto:
+      remote_state[kDaikin160ByteSwingV] &= ~kDaikin160MaskSwingV;
+      remote_state[kDaikin160ByteSwingV] |= (position << 4);
+      break;
+    default:
+      setSwingVertical(kDaikin160SwingVAuto);
+  }
 }
 
-bool IRDaikin160::getSwingVertical(void) {
-  return remote_state[kDaikin160ByteSwingV] & kDaikin160MaskSwingV;
+uint8_t IRDaikin160::getSwingVertical(void) {
+  return remote_state[kDaikin160ByteSwingV] >> 4;
+}
+
+// Convert a standard A/C vertical swing into its native version.
+uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return (uint8_t)position;
+    default:
+      return kDaikin160SwingVAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin160SwingVHighest: return stdAc::swingv_t::kHighest;
+    case kDaikin160SwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kDaikin160SwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kDaikin160SwingVLow:     return stdAc::swingv_t::kLow;
+    case kDaikin160SwingVLowest:  return stdAc::swingv_t::kLowest;
+    default:
+      return stdAc::swingv_t::kAuto;
+  }
 }
 
 // Convert the A/C state to it's common equivalent.
@@ -2015,8 +2062,7 @@ stdAc::state_t IRDaikin160::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
-                                             stdAc::swingv_t::kOff;
+  result.swingv = this->toCommonSwingV(this->getSwingVertical());
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
@@ -2034,7 +2080,7 @@ stdAc::state_t IRDaikin160::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRDaikin160::toString() {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += F("Power: ");
   if (this->getPower())
     result += F("On");
@@ -2079,8 +2125,18 @@ String IRDaikin160::toString() {
       result += F(" (MAX)");
       break;
   }
-  result += F(", Swing (Vertical): ");
-  result += this->getSwingVertical() ? F("On") : F("Off");
+  result += F(", Vent Position (V): ");
+  result += uint64ToString(getSwingVertical());
+  switch (getSwingVertical()) {
+    case kDaikin160SwingVHighest: result += F(" (Highest)"); break;
+    case kDaikin160SwingVHigh:    result += F(" (High)"); break;
+    case kDaikin160SwingVMiddle:  result += F(" (Middle)"); break;
+    case kDaikin160SwingVLow:     result += F(" (Low)"); break;
+    case kDaikin160SwingVLowest:  result += F(" (Lowest)"); break;
+    case kDaikin160SwingVAuto:    result += F(" (Auto)"); break;
+    default:
+      result += F(" (Unknown)");
+  }
   return result;
 }
 
