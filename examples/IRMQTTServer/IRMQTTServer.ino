@@ -1097,6 +1097,8 @@ void handleAirCon(void) {
           "</td></tr>"
       "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate.beep) +
           "</td></tr>"
+      "<tr><td>Force resend</td><td>" + htmlSelectBool(KEY_RESEND, false) +
+          "</td></tr>"
       "</table>"
       "<input type='submit' value='Update & Send'>"
       "</form>";
@@ -1114,14 +1116,18 @@ void handleAirConSet(void) {
 #endif
   stdAc::state_t result = climate;
   debug("New common a/c received via HTTP");
-  for (uint16_t i = 0; i < server.args(); i++)
-    result = updateClimate(result, server.argName(i), "", server.arg(i));
+  bool force_resend = false;
+  for (uint16_t i = 0; i < server.args(); i++) {
+    if (server.argName(i).equals(KEY_RESEND))
+      force_resend = IRac::strToBool(server.arg(i).c_str());
+    else
+      result = updateClimate(result, server.argName(i), "", server.arg(i));
+  }
 
 #if MQTT_ENABLE
-  sendClimate(climate, result, MqttClimateStat,
-              true, false, false);
+  sendClimate(climate, result, MqttClimateStat, true, false, force_resend);
 #else  // MQTT_ENABLE
-  sendClimate(climate, result, "", false, false, false);
+  sendClimate(climate, result, "", false, false, force_resend);
 #endif  // MQTT_ENABLE
   lastClimateSource = F("HTTP");
   // Update the old climate state with the new one.
