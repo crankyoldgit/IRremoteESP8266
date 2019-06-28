@@ -25,28 +25,28 @@ install:
   - sudo apt-get install pylint3
 script:
   # Check that everything compiles.
-  - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino
-  - arduino --verify --board $BD $PWD/examples/IRGCSendDemo/IRGCSendDemo.ino
-  - arduino --verify --board $BD $PWD/examples/IRGCTCPServer/IRGCTCPServer.ino
-  - arduino --verify --board $BD $PWD/examples/IRServer/IRServer.ino
-  - arduino --verify --board $BD $PWD/examples/IRrecvDumpV2/IRrecvDumpV2.ino
-  - arduino --verify --board $BD $PWD/examples/IRsendDemo/IRsendDemo.ino
-  - arduino --verify --board $BD $PWD/examples/JVCPanasonicSendDemo/JVCPanasonicSendDemo.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnFujitsuAC/TurnOnFujitsuAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino
-  - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino
-  - arduino --verify --board $BD $PWD/examples/LGACSend/LGACSend.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnArgoAC/TurnOnArgoAC.ino
-  - arduino --verify --board $BD $PWD/examples/IRMQTTServer/IRMQTTServer.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnToshibaAC/TurnOnToshibaAC.ino
-  - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnPanasonicAC/TurnOnPanasonicAC.ino
-  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiHeavyAc/TurnOnMitsubishiHeavyAc.ino
-  - arduino --verify --board $BD $PWD/examples/DumbIRRepeater/DumbIRRepeater.ino
-  - arduino --verify --board $BD $PWD/examples/SmartIRRepeater/SmartIRRepeater.ino
+  - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRGCSendDemo/IRGCSendDemo.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRGCTCPServer/IRGCTCPServer.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRServer/IRServer.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRrecvDumpV2/IRrecvDumpV2.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRsendDemo/IRsendDemo.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/JVCPanasonicSendDemo/JVCPanasonicSendDemo.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnFujitsuAC/TurnOnFujitsuAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/LGACSend/LGACSend.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnArgoAC/TurnOnArgoAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/IRMQTTServer/IRMQTTServer.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnToshibaAC/TurnOnToshibaAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/ControlSamsungAC/ControlSamsungAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnPanasonicAC/TurnOnPanasonicAC.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiHeavyAc/TurnOnMitsubishiHeavyAc.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/DumbIRRepeater/DumbIRRepeater.ino 2> /dev/null
+  - arduino --verify --board $BD $PWD/examples/SmartIRRepeater/SmartIRRepeater.ino 2> /dev/null
 
   # Also check the tools programs compile.
   - (cd tools; make all)
