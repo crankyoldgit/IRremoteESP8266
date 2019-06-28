@@ -37,6 +37,7 @@
 | [Mitsubishi](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Mitsubishi.cpp) | **[Mitsubishi](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Mitsubishi.h)** | HC3000 Projector<BR>TV |  | Yes |
 | [MitsubishiHeavy](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_MitsubishiHeavy.cpp) | **[Mitsubishi Heavy Industries](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_MitsubishiHeavy.h)** | RKX502A001C remote<BR>RLA502A700B remote<BR>SRKxxZJ-S A/C<BR>SRKxxZM-S A/C<BR>SRKxxZMXA-S A/C |  | Yes |
 | [NEC](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_NEC.cpp) | **[Unknown](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_NEC.h)** |  |  | Yes |
+| [Neoclima](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Neoclima.cpp) | **Neoclima** | NS-09AHTI A/C<BR>ZH/TY-01 remote |  | - |
 | [Nikai](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Nikai.cpp) | **Unknown** |  |  | - |
 | [Panasonic](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Panasonic.cpp) | **[Panasonic](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Panasonic.h)** | A75C2311 remote (CKP)<BR>A75C3704 remote<BR>A75C3747 remote<BR>A75C3747 remote<BR>A75C3747 remote<BR>A75C3747 remote<BR>CKP series A/C<BR>CS-ME10CKPG A/C<BR>CS-ME12CKPG A/C<BR>CS-ME14CKPG A/C<BR>CS-YW9MKD A/C<BR>CS-Z9RKR A/C<BR>DKE series A/C<BR>JKE series A/C<BR>NKE series A/C<BR>RKR series A/C<BR>TV | CKP<BR>DKE<BR>JKE<BR>LKE<BR>NKE<BR>RKR | Yes |
 | [Pioneer](https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_Pioneer.cpp) | **Unknown** |  |  | - |
@@ -105,6 +106,7 @@
 - MWM
 - NEC
 - NEC_LIKE
+- NEOCLIMA
 - NIKAI
 - PANASONIC
 - PANASONIC_AC

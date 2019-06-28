@@ -776,6 +776,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendMWM(state, nbytes);
       break;
 #endif  // SEND_MWM
+#if SEND_NEOCLIMA
+    case NEOCLIMA:
+      sendNeoclima(state, nbytes);
+      break;
+#endif  // SEND_NEOCLIMA
 #if SEND_PANASONIC_AC
     case PANASONIC_AC:
       sendPanasonicAC(state, nbytes);

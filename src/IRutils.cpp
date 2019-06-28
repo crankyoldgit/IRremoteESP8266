@@ -163,6 +163,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::MITSUBISHI_AC;
   else if (!strcasecmp(str, "MWM"))
     return decode_type_t::MWM;
+  else if (!strcasecmp(str, "NEOCLIMA"))
+    return decode_type_t::NEOCLIMA;
   else if (!strcasecmp(str, "NEC") || !strcasecmp(str, "NEC (NON-STRICT"))
     return decode_type_t::NEC;
   else if (!strcasecmp(str, "NIKAI"))
@@ -411,6 +413,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
     case MWM:
       result = F("MWM");
       break;
+    case NEOCLIMA:
+      result = F("NEOCLIMA");
+      break;
     case NEC:
       result = F("NEC");
       break;
@@ -525,6 +530,7 @@ bool hasACState(const decode_type_t protocol) {
     case MITSUBISHI_HEAVY_88:
     case MITSUBISHI_HEAVY_152:
     case MWM:
+    case NEOCLIMA:
     case PANASONIC_AC:
     case SAMSUNG_AC:
     case SHARP_AC:

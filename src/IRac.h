@@ -19,6 +19,7 @@
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
+#include "ir_Neoclima.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
 #include "ir_Sharp.h"
@@ -183,6 +184,13 @@ void daikin216(IRDaikin216 *ac,
                           const bool filter, const bool clean,
                           const int16_t sleep = -1);
 #endif  // SEND_MITSUBISHIHEAVY
+#if SEND_NEOCLIMA
+  void neoclima(IRNeoclimaAc *ac, const bool on, const stdAc::opmode_t mode,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                const bool turbo, const bool light, const bool filter,
+                const int16_t sleep = -1);
+#endif  // SEND_NEOCLIMA
 #if SEND_PANASONIC_AC
   void panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
                  const bool on, const stdAc::opmode_t mode, const float degrees,
