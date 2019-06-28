@@ -2081,7 +2081,7 @@ TEST(TestDecodeDaikin160, RealExample) {
   IRDaikin160 ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ("Power: Off, Mode: 3 (COOL), Temp: 25C, Fan: 10 (AUTO), "
-            "Vent Position (V): 1 (Highest)", ac.toString());
+            "Vent Position (V): 1 (Lowest)", ac.toString());
 }
 
 TEST(TestDecodeDaikin160, SyntheticExample) {
@@ -2188,6 +2188,13 @@ TEST(TestDaikin160Class, VaneSwing) {
 
   ac.setSwingVertical(255);
   EXPECT_EQ(kDaikin160SwingVAuto, ac.getSwingVertical());
+
+  EXPECT_EQ(kDaikin160SwingVHighest,
+            IRDaikin160::convertSwingV(stdAc::swingv_t::kHighest));
+  EXPECT_EQ(kDaikin160SwingVLowest,
+            IRDaikin160::convertSwingV(stdAc::swingv_t::kLowest));
+  EXPECT_EQ(kDaikin160SwingVMiddle,
+            IRDaikin160::convertSwingV(stdAc::swingv_t::kMiddle));
 }
 
 TEST(TestDaikin160Class, Power) {
@@ -2276,7 +2283,7 @@ TEST(TestDaikin160Class, HumanReadable) {
 
   EXPECT_EQ(
       "Power: Off, Mode: 3 (COOL), Temp: 25C, Fan: 10 (AUTO), "
-      "Vent Position (V): 1 (Highest)",
+      "Vent Position (V): 1 (Lowest)",
       ac.toString());
   ac.setMode(kDaikinAuto);
   ac.setTemp(19);

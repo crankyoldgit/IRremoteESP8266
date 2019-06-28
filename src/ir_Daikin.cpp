@@ -2033,7 +2033,7 @@ uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kMiddle:
     case stdAc::swingv_t::kLow:
     case stdAc::swingv_t::kLowest:
-      return (uint8_t)position;
+      return kDaikin160SwingVHighest + 1 - (uint8_t)position;
     default:
       return kDaikin160SwingVAuto;
   }

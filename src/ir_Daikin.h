@@ -237,11 +237,11 @@ const uint8_t kDaikin160ByteFan = 17;
 const uint8_t kDaikin160MaskFan = 0b00001111;
 const uint8_t kDaikin160ByteSwingV = 13;
 const uint8_t kDaikin160MaskSwingV = 0b11110000;
-const uint8_t kDaikin160SwingVHighest = 0x1;
-const uint8_t kDaikin160SwingVHigh =    0x2;
+const uint8_t kDaikin160SwingVLowest =  0x1;
+const uint8_t kDaikin160SwingVLow =     0x2;
 const uint8_t kDaikin160SwingVMiddle =  0x3;
-const uint8_t kDaikin160SwingVLow =     0x4;
-const uint8_t kDaikin160SwingVLowest =  0x5;
+const uint8_t kDaikin160SwingVHigh =    0x4;
+const uint8_t kDaikin160SwingVHighest = 0x5;
 const uint8_t kDaikin160SwingVAuto =    0xF;
 
 // Legacy defines.
@@ -502,7 +502,7 @@ class IRDaikin160 {
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   void setSwingVertical(const uint8_t position);
   uint8_t getSwingVertical(void);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   stdAc::state_t toCommon(void);
   String toString(void);
