@@ -349,6 +349,7 @@ TEST(TestIRNeoclimaAcClass, Eye) {
 TEST(TestIRNeoclimaAcClass, Follow) {
   IRNeoclimaAc ac(0);
   ac.begin();
+  /*  DISABLED: See TODO in ir_Neoclima.cpp
   ac.setFollow(true);
   EXPECT_TRUE(ac.getFollow());
   ac.setFollow(false);
@@ -356,6 +357,19 @@ TEST(TestIRNeoclimaAcClass, Follow) {
   ac.setFollow(true);
   EXPECT_TRUE(ac.getFollow());
   EXPECT_EQ(kNeoclimaButtonFollow, ac.getButton());
+  */
+  uint8_t on_5F[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x13, 0x00, 0x0A, 0x5F, 0x89, 0xA5, 0xAA};
+  uint8_t on_5D[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x13, 0x00, 0x6A, 0x5D, 0x29, 0xA5, 0xA8};
+  uint8_t off[12] = {
+      0x00, 0x04, 0x00, 0x40, 0x00, 0x13, 0x00, 0x6B, 0x00, 0x29, 0xA5, 0x90};
+  ac.setRaw(on_5F);
+  EXPECT_TRUE(ac.getFollow());
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getFollow());
+  ac.setRaw(on_5D);
+  EXPECT_TRUE(ac.getFollow());
 }
 
 TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {

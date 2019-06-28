@@ -401,6 +401,8 @@ bool IRNeoclimaAc::getEye(void) {
   return remote_state[3] & kNeoclimaEyeMask;
 }
 
+/* DISABLED
+   TODO(someone): Work out why "on" is either 0x5D or 0x5F
 void IRNeoclimaAc::setFollow(const bool on) {
   this->setButton(kNeoclimaButtonFollow);
   if (on)
@@ -408,9 +410,10 @@ void IRNeoclimaAc::setFollow(const bool on) {
   else
     remote_state[8] = 0;
 }
+*/
 
 bool IRNeoclimaAc::getFollow(void) {
-  return remote_state[8] == kNeoclimaFollowMe;
+  return (remote_state[8] & kNeoclimaFollowMe) == kNeoclimaFollowMe;
 }
 
 // Convert the A/C state to it's common equivalent.

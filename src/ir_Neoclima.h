@@ -122,7 +122,8 @@ class IRNeoclimaAc {
   bool get8CHeat(void);
   void setEye(const bool on);
   bool getEye(void);
-  void setFollow(const bool on);
+  // DISABLED: See TODO in ir_Neoclima.cpp
+  // void setFollow(const bool on);
   bool getFollow(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
