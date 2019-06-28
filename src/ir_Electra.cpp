@@ -1,6 +1,7 @@
 // Copyright 2018, 2019 David Conran
 
 #include "ir_Electra.h"
+#include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
