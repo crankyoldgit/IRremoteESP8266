@@ -91,6 +91,7 @@ PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_Gree.h \
 		$(USER_DIR)/ir_Magiquest.h \
 		$(USER_DIR)/ir_Coolix.h \
+		$(USER_DIR)/ir_Electra.h \
 		$(USER_DIR)/ir_Haier.h \
 		$(USER_DIR)/ir_Midea.h \
 		$(USER_DIR)/ir_Toshiba.h \
@@ -499,8 +500,8 @@ ir_Lutron_test.o : ir_Lutron_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 ir_Lutron_test : $(COMMON_OBJ) ir_Lutron_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-ir_Electra.o : $(USER_DIR)/ir_Electra.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Electra.cpp
+ir_Electra.o : $(USER_DIR)/ir_Electra.h $(USER_DIR)/ir_Electra.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Electra.cpp
 
 ir_Electra_test.o : ir_Electra_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Electra_test.cpp
