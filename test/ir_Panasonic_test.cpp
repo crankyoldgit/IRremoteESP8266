@@ -543,7 +543,7 @@ TEST(TestIRPanasonicAcClass, ChecksumCalculation) {
   EXPECT_TRUE(IRPanasonicAc::validChecksum(examplestate));
   EXPECT_EQ(0x83, IRPanasonicAc::calcChecksum(examplestate));
 
-  examplestate[kPanasonicAcStateLength - 1] = 0x0;  // Set incoorect checksum.
+  examplestate[kPanasonicAcStateLength - 1] = 0x0;  // Set incorrect checksum.
   EXPECT_FALSE(IRPanasonicAc::validChecksum(examplestate));
   EXPECT_EQ(0x83, IRPanasonicAc::calcChecksum(examplestate));
   pana.setRaw(examplestate);
