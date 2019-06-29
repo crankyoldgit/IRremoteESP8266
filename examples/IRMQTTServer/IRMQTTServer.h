@@ -18,6 +18,11 @@
 #define MQTT_ENABLE true  // Whether or not MQTT is used at all.
 #endif  // MQTT_ENABLE
 
+#ifndef EXAMPLES_ENABLE
+// Whether or not examples are included. `false` saves ~2.5K of program space.
+#define EXAMPLES_ENABLE true
+#endif  // EXAMPLES_ENABLE
+
 // ---------------------- Board Related Settings -------------------------------
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.

@@ -646,7 +646,9 @@ String htmlMenu(void) {
   String html = F("<center>");
   html += htmlButton(kUrlRoot, F("Home"));
   html += htmlButton(kUrlAircon, F("Aircon"));
+#if EXAMPLES_ENABLE
   html += htmlButton(kUrlExamples, F("Examples"));
+#endif  // EXAMPLES_ENABLE
   html += htmlButton(kUrlInfo, F("System Info"));
   html += htmlButton(kUrlAdmin, F("Admin"));
   html += F("</center><hr>");
@@ -768,7 +770,11 @@ void handleRoot(void) {
   html += F("' maxlength='");
   html += String(kStateSizeMax * 2);
   html += F("'"
-          " value='190B8050000000E0190B8070000010F0'>"
+          " value='"
+#if EXAMPLES_ENABLE
+                "190B8050000000E0190B8070000010F0"
+#endif   // EXAMPLES_ENABLE
+                "'>"
       " <input type='submit' value='Send A/C State'>"
     "</form>"
     "<br><hr>"
@@ -776,11 +782,15 @@ void handleRoot(void) {
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='30'>"
       "String: (freq,array data) <input type='text' name='code' size='132'"
-      " value='38000,4420,4420,520,1638,520,1638,520,1638,520,520,520,520,520,"
+      " value='"
+#if EXAMPLES_ENABLE
+          "38000,4420,4420,520,1638,520,1638,520,1638,520,520,520,520,520,"
           "520,520,520,520,520,520,1638,520,1638,520,1638,520,520,520,"
           "520,520,520,520,520,520,520,520,520,520,1638,520,520,520,520,520,"
           "520,520,520,520,520,520,520,520,1638,520,520,520,1638,520,1638,520,"
-          "1638,520,1638,520,1638,520,1638,520'>"
+          "1638,520,1638,520,1638,520,1638,520"
+#endif   // EXAMPLES_ENABLE
+          "'>"
       " <input type='submit' value='Send Raw'>"
     "</form>"
     "<br><hr>"
@@ -789,10 +799,14 @@ void handleRoot(void) {
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='31'>"
       "String: 1:1,1,<input type='text' name='code' size='132'"
-      " value='38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,"
+      " value='"
+#if EXAMPLES_ENABLE
+          "38000,1,1,170,170,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,"
           "20,20,63,20,63,20,63,20,20,20,20,20,20,20,20,20,20,20,20,20,63,20,"
           "20,20,20,20,20,20,20,20,20,20,20,20,63,20,20,20,63,20,63,20,63,20,"
-          "63,20,63,20,63,20,1798'>"
+          "63,20,63,20,63,20,1798"
+#endif   // EXAMPLES_ENABLE
+          "'>"
       " <input type='submit' value='Send GlobalCache'>"
     "</form>"
     "<br><hr>"
@@ -801,10 +815,14 @@ void handleRoot(void) {
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
       "<input type='hidden' name='type' value='25'>"
       "String (comma separated): <input type='text' name='code' size='132'"
-      " value='0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,"
+      " value='"
+#if EXAMPLES_ENABLE
+          "0000,0067,0000,0015,0060,0018,0018,0018,0030,0018,0030,0018,"
           "0030,0018,0018,0018,0030,0018,0018,0018,0018,0018,0030,0018,0018,"
           "0018,0030,0018,0030,0018,0030,0018,0018,0018,0018,0018,0030,0018,"
-          "0018,0018,0018,0018,0030,0018,0018,03f6'>"
+          "0018,0018,0018,0018,0030,0018,0018,03f6"
+#endif   // EXAMPLES_ENABLE
+          "'>"
       " Repeats: <input type='number' name='repeats' min='0' max='99' value='0'"
           "size='2' maxlength='2'>"
       " <input type='submit' value='Send Pronto'>"
@@ -838,6 +856,7 @@ String addJsReloadUrl(const String url, const uint16_t timeout_s,
   return html;
 }
 
+#if EXAMPLES_ENABLE
 // Web page with hardcoded example usage etc.
 void handleExamples(void) {
 #if HTML_PASSWORD_ENABLE
@@ -883,6 +902,7 @@ void handleExamples(void) {
   html += htmlEnd();
   server.send(200, "text/html", html);
 }
+#endif  // EXAMPLES_ENABLE
 
 String htmlSelectBool(const String name, const bool def) {
   String html = "<select name='" + name + "'>";
@@ -2205,8 +2225,10 @@ void setup(void) {
 
   // Setup the root web page.
   server.on(kUrlRoot, handleRoot);
+#if EXAMPLES_ENABLE
   // Setup the examples web page.
   server.on(kUrlExamples, handleExamples);
+#endif  // EXAMPLES_ENABLE
   // Setup the page to handle web-based IR codes.
   server.on("/ir", handleIr);
   // Setup the aircon page.
