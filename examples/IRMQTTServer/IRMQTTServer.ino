@@ -1365,7 +1365,7 @@ void handleReboot() {
 //   str: A hexadecimal string containing the state to be sent.
 // Returns:
 //   bool: Successfully sent or not.
-bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
+bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
                               const String str) {
   uint8_t strOffset = 0;
   uint8_t state[kStateSizeMax] = {0};  // All array elements are set to 0.
@@ -1540,140 +1540,9 @@ bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
       *statePtr = c;
     }
   }
-
-  // Make the appropriate call for the protocol type.
-  switch (irType) {
-#if SEND_KELVINATOR
-    case KELVINATOR:
-      irsend->sendKelvinator(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_TOSHIBA_AC
-    case TOSHIBA_AC:
-      irsend->sendToshibaAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_DAIKIN
-    case DAIKIN:
-      irsend->sendDaikin(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_DAIKIN160
-    case DAIKIN160:  // 65
-      irsend->sendDaikin160(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif  // SEND_DAIKIN160
-#if SEND_DAIKIN2
-    case DAIKIN2:
-      irsend->sendDaikin2(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_DAIKIN216
-    case DAIKIN216:  // 61
-      irsend->sendDaikin216(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif  // SEND_DAIKIN216
-#if SEND_MITSUBISHI_AC
-    case MITSUBISHI_AC:
-      irsend->sendMitsubishiAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_MITSUBISHIHEAVY
-    case MITSUBISHI_HEAVY_88:  // 59
-      irsend->sendMitsubishiHeavy88(reinterpret_cast<uint8_t *>(state));
-      break;
-    case MITSUBISHI_HEAVY_152:  // 60
-      irsend->sendMitsubishiHeavy152(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif  // SEND_MITSUBISHIHEAVY
-#if SEND_TROTEC
-    case TROTEC:
-      irsend->sendTrotec(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_ARGO
-    case ARGO:
-      irsend->sendArgo(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_GREE
-    case GREE:
-      irsend->sendGree(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_FUJITSU_AC
-    case FUJITSU_AC:
-      irsend->sendFujitsuAC(reinterpret_cast<uint8_t *>(state), stateSize);
-      break;
-#endif
-#if SEND_HAIER_AC
-    case HAIER_AC:
-      irsend->sendHaierAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_HAIER_AC_YRW02
-    case HAIER_AC_YRW02:
-      irsend->sendHaierACYRW02(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_HITACHI_AC
-    case HITACHI_AC:
-      irsend->sendHitachiAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_HITACHI_AC1
-    case HITACHI_AC1:
-      irsend->sendHitachiAC1(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_HITACHI_AC2
-    case HITACHI_AC2:
-      irsend->sendHitachiAC2(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_WHIRLPOOL_AC
-    case WHIRLPOOL_AC:
-      irsend->sendWhirlpoolAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_SAMSUNG_AC
-    case SAMSUNG_AC:
-      irsend->sendSamsungAC(reinterpret_cast<uint8_t *>(state), stateSize);
-      break;
-#endif
-#if SEND_SHARP_AC
-    case SHARP_AC:  // 62
-      irsend->sendSharpAc(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif  // SEND_SHARP_AC
-#if SEND_ELECTRA_AC
-    case ELECTRA_AC:
-      irsend->sendElectraAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_PANASONIC_AC
-    case PANASONIC_AC:
-      irsend->sendPanasonicAC(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_MWM
-    case MWM:
-      irsend->sendMWM(reinterpret_cast<uint8_t *>(state), stateSize);
-      break;
-#endif
-#if SEND_TCL112AC
-    case TCL112AC:
-      irsend->sendTcl112Ac(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif
-#if SEND_NEOCLIMA
-    case NEOCLIMA:  // 66
-      irsend->sendNeoclima(reinterpret_cast<uint8_t *>(state));
-      break;
-#endif  // SEND_NEOCLIMA
-    default:
-      debug("Unexpected AirCon type in send request. Not sent.");
-      return false;
+  if (!irsend->send(irType, state, stateSize)) {
+    debug("Unexpected AirCon type in send request. Not sent.");
+    return false;
   }
   return true;  // We were successful as far as we can tell.
 }
@@ -1892,7 +1761,7 @@ void handleIr(void) {
 #endif
   uint64_t data = 0;
   String data_str = "";
-  int16_t ir_type = decode_type_t::NEC;  // Default to NEC codes.
+  decode_type_t ir_type = decode_type_t::NEC;  // Default to NEC codes.
   uint16_t nbits = 0;
   uint16_t repeat = 0;
 
@@ -2173,7 +2042,7 @@ void setup(void) {
     while (!Serial)  // Wait for the serial connection to be establised.
       delay(50);
     Serial.println();
-    debug("IRMQTTServer " _MY_VERSION_" has booted.");
+    debug("IRMQTTServer " _MY_VERSION_ " has booted.");
   }
 #endif  // DEBUG
 
@@ -2523,8 +2392,8 @@ void receivingMQTT(String const topic_name, String const callback_str) {
       default:  // It's an IR command.
         {
           // Get the numeric protocol type.
-          int32_t ir_type = strtoul(strtok_r(ircommand, kCommandDelimiter,
-                                             &tok_ptr), NULL, 10);
+          decode_type_t ir_type = (decode_type_t)atoi(strtok_r(
+              ircommand, kCommandDelimiter, &tok_ptr));
           char* next = strtok_r(NULL, kCommandDelimiter, &tok_ptr);
           // If there is unparsed string left, try to convert it assuming it's
           // hex.
@@ -2755,16 +2624,19 @@ uint64_t getUInt64fromHex(char const *str) {
 //   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
 // Returns:
 //   bool: Successfully sent or not.
-bool sendIRCode(IRsend *irsend, int const ir_type,
+bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
                 uint64_t const code, char const * code_str, uint16_t bits,
                 uint16_t repeat) {
   if (irsend == NULL) return false;
+  bool success = true;  // Assume success.
+  // Ensure we have enough repeats.
+  repeat = std::max(IRsend::minRepeats(ir_type), repeat);
+  if (bits == 0) bits = IRsend::defaultBits(ir_type);
   // Create a pseudo-lock so we don't try to send two codes at the same time.
   while (lockIr)
     delay(20);
   lockIr = true;
 
-  bool success = true;  // Assume success.
 
   // Turn off IR capture if we need to.
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
@@ -2772,306 +2644,26 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
 #endif  // IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
   // send the IR message.
   switch (ir_type) {
-#if SEND_RC5
-    case RC5:  // 1
-      if (bits == 0)
-        bits = kRC5Bits;
-      irsend->sendRC5(code, bits, repeat);
-      break;
-#endif
-#if SEND_RC6
-    case RC6:  // 2
-      if (bits == 0)
-        bits = kRC6Mode0Bits;
-      irsend->sendRC6(code, bits, repeat);
-      break;
-#endif
-#if SEND_NEC
-    case NEC:  // 3
-      if (bits == 0)
-        bits = kNECBits;
-      irsend->sendNEC(code, bits, repeat);
-      break;
-#endif
-#if SEND_SONY
-    case SONY:  // 4
-      if (bits == 0)
-        bits = kSony12Bits;
-      repeat = std::max(repeat, kSonyMinRepeat);
-      irsend->sendSony(code, bits, repeat);
-      break;
-#endif
-#if SEND_PANASONIC
-    case PANASONIC:  // 5
-      if (bits == 0)
-        bits = kPanasonicBits;
-      irsend->sendPanasonic64(code, bits, repeat);
-      break;
-#endif
-#if SEND_INAX
-    case INAX:  // 64
-      if (bits == 0)
-        bits = kInaxBits;
-      repeat = std::max(repeat, kInaxMinRepeat);
-      irsend->sendInax(code, bits, repeat);
-      break;
-#endif
-#if SEND_JVC
-    case JVC:  // 6
-      if (bits == 0)
-        bits = kJvcBits;
-      irsend->sendJVC(code, bits, repeat);
-      break;
-#endif
-#if SEND_SAMSUNG
-    case SAMSUNG:  // 7
-      if (bits == 0)
-        bits = kSamsungBits;
-      irsend->sendSAMSUNG(code, bits, repeat);
-      break;
-#endif
-#if SEND_SAMSUNG36
-    case SAMSUNG36:  // 56
-      if (bits == 0)
-        bits = kSamsung36Bits;
-      irsend->sendSamsung36(code, bits, repeat);
-      break;
-#endif
-#if SEND_WHYNTER
-    case WHYNTER:  // 8
-      if (bits == 0)
-        bits = kWhynterBits;
-      irsend->sendWhynter(code, bits, repeat);
-      break;
-#endif
-#if SEND_AIWA_RC_T501
-    case AIWA_RC_T501:  // 9
-      if (bits == 0)
-        bits = kAiwaRcT501Bits;
-      repeat = std::max(repeat, kAiwaRcT501MinRepeats);
-      irsend->sendAiwaRCT501(code, bits, repeat);
-      break;
-#endif
-#if SEND_LG
-    case LG:  // 10
-      if (bits == 0)
-        bits = kLgBits;
-      irsend->sendLG(code, bits, repeat);
-      break;
-#endif
-#if SEND_MITSUBISHI
-    case MITSUBISHI:  // 12
-      if (bits == 0)
-        bits = kMitsubishiBits;
-      repeat = std::max(repeat, kMitsubishiMinRepeat);
-      irsend->sendMitsubishi(code, bits, repeat);
-      break;
-#endif
-#if SEND_DISH
-    case DISH:  // 13
-      if (bits == 0)
-        bits = kDishBits;
-      repeat = std::max(repeat, kDishMinRepeat);
-      irsend->sendDISH(code, bits, repeat);
-      break;
-#endif
-#if SEND_SHARP
-    case SHARP:  // 14
-      if (bits == 0)
-        bits = kSharpBits;
-      irsend->sendSharpRaw(code, bits, repeat);
-      break;
-#endif
-#if SEND_COOLIX
-    case COOLIX:  // 15
-      if (bits == 0)
-        bits = kCoolixBits;
-      repeat = std::max(repeat, kCoolixDefaultRepeat);
-      irsend->sendCOOLIX(code, bits, repeat);
-      break;
-#endif
-    case ARGO:  // 27
-    case DAIKIN:  // 16
-    case DAIKIN160:  // 65
-    case DAIKIN2:  // 53
-    case DAIKIN216:  // 61
-    case ELECTRA_AC:  // 48
-    case FUJITSU_AC:  // 33
-    case GREE:  // 24
-    case HAIER_AC:  // 38
-    case HAIER_AC_YRW02:  // 44
-    case HITACHI_AC:  // 40
-    case HITACHI_AC1:  // 41
-    case HITACHI_AC2:  // 42
-    case KELVINATOR:  // 18
-    case MITSUBISHI_AC:  // 20
-    case MITSUBISHI_HEAVY_88:  // 59
-    case MITSUBISHI_HEAVY_152:  // 60
-    case MWM:  // 52
-    case NEOCLIMA:  // 66
-    case PANASONIC_AC:  // 49
-    case SAMSUNG_AC:  // 46
-    case SHARP_AC:  // 62
-    case TCL112AC:  // 57
-    case TOSHIBA_AC:  // 32
-    case TROTEC:  // 28
-    case WHIRLPOOL_AC:  // 45
-      success = parseStringAndSendAirCon(irsend, ir_type, code_str);
-      break;
-#if SEND_DENON
-    case DENON:  // 17
-      if (bits == 0)
-        bits = kDenonBits;
-      irsend->sendDenon(code, bits, repeat);
-      break;
-#endif
-#if SEND_SHERWOOD
-    case SHERWOOD:  // 19
-      if (bits == 0)
-        bits = kSherwoodBits;
-      repeat = std::max(repeat, kSherwoodMinRepeat);
-      irsend->sendSherwood(code, bits, repeat);
-      break;
-#endif
-#if SEND_RCMM
-    case RCMM:  // 21
-      if (bits == 0)
-        bits = kRCMMBits;
-      irsend->sendRCMM(code, bits, repeat);
-      break;
-#endif
-#if SEND_SANYO
-    case SANYO_LC7461:  // 22
-      if (bits == 0)
-        bits = kSanyoLC7461Bits;
-      irsend->sendSanyoLC7461(code, bits, repeat);
-      break;
-#endif
-#if SEND_RC5
-    case RC5X:  // 23
-      if (bits == 0)
-        bits = kRC5XBits;
-      irsend->sendRC5(code, bits, repeat);
-      break;
-#endif
 #if SEND_PRONTO
-    case PRONTO:  // 25
+    case decode_type_t::PRONTO:  // 25
       success = parseStringAndSendPronto(irsend, code_str, repeat);
       break;
-#endif
-#if SEND_NIKAI
-    case NIKAI:  // 29
-      if (bits == 0)
-        bits = kNikaiBits;
-      irsend->sendNikai(code, bits, repeat);
-      break;
-#endif
+#endif  // SEND_PRONTO
+    case decode_type_t::RAW:  // 30
 #if SEND_RAW
-    case RAW:  // 30
       success = parseStringAndSendRaw(irsend, code_str);
       break;
 #endif
 #if SEND_GLOBALCACHE
-    case GLOBALCACHE:  // 31
+    case decode_type_t::GLOBALCACHE:  // 31
       success = parseStringAndSendGC(irsend, code_str);
       break;
 #endif
-#if SEND_MIDEA
-    case MIDEA:  // 34
-      if (bits == 0)
-        bits = kMideaBits;
-      irsend->sendMidea(code, bits, repeat);
-      break;
-#endif
-#if SEND_MAGIQUEST
-    case MAGIQUEST:  // 35
-      if (bits == 0)
-        bits = kMagiquestBits;
-      irsend->sendMagiQuest(code, bits, repeat);
-      break;
-#endif
-#if SEND_LASERTAG
-    case LASERTAG:  // 36
-      if (bits == 0)
-        bits = kLasertagBits;
-      irsend->sendLasertag(code, bits, repeat);
-      break;
-#endif
-#if SEND_CARRIER_AC
-    case CARRIER_AC:  // 37
-      if (bits == 0)
-        bits = kCarrierAcBits;
-      irsend->sendCarrierAC(code, bits, repeat);
-      break;
-#endif
-#if SEND_MITSUBISHI2
-    case MITSUBISHI2:  // 39
-      if (bits == 0)
-        bits = kMitsubishiBits;
-      repeat = std::max(repeat, kMitsubishiMinRepeat);
-      irsend->sendMitsubishi2(code, bits, repeat);
-      break;
-#endif
-#if SEND_GICABLE
-    case GICABLE:  // 43
-      if (bits == 0)
-        bits = kGicableBits;
-      repeat = std::max(repeat, kGicableMinRepeat);
-      irsend->sendGICable(code, bits, repeat);
-      break;
-#endif
-#if SEND_LUTRON
-    case LUTRON:  // 47
-      if (bits == 0)
-        bits = kLutronBits;
-      irsend->sendLutron(code, bits, repeat);
-      break;
-#endif
-#if SEND_PIONEER
-    case PIONEER:  // 50
-      if (bits == 0)
-        bits = kPioneerBits;
-      irsend->sendPioneer(code, bits, repeat);
-      break;
-#endif
-#if SEND_LG
-    case LG2:  // 51
-      if (bits == 0)
-        bits = kLgBits;
-      irsend->sendLG2(code, bits, repeat);
-      break;
-#endif
-#if SEND_VESTEL_AC
-    case VESTEL_AC:  // 54
-      if (bits == 0)
-        bits = kVestelAcBits;
-      irsend->sendVestelAc(code, bits, repeat);
-      break;
-#endif
-#if SEND_TECO
-    case TECO:  // 55
-      if (bits == 0)
-        bits = kTecoBits;
-      irsend->sendTeco(code, bits, repeat);
-      break;
-#endif
-#if SEND_LEGOPF
-    case LEGOPF:  // 58
-      if (bits == 0)
-        bits = kLegoPfBits;
-      irsend->sendLegoPf(code, bits, repeat);
-      break;
-#endif
-#if SEND_GOODWEATHER
-    case GOODWEATHER:  // 63
-      if (bits == 0) bits = kGoodweatherBits;
-      repeat = std::max(repeat, kGoodweatherMinRepeat);
-      irsend->sendGoodweather(code, bits, repeat);
-      break;
-#endif  // SEND_GOODWEATHER
-    default:
-      // If we got here, we didn't know how to send it.
-      success = false;
+    default:  // Everything else.
+      if (hasACState(ir_type))  // protocols with > 64 bits
+        success = parseStringAndSendAirCon(irsend, ir_type, code_str);
+      else  // protocols with <= 64 bits
+        success = irsend->send(ir_type, code, bits, repeat);
   }
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
   // Turn IR capture back on if we need to.
@@ -3091,9 +2683,7 @@ bool sendIRCode(IRsend *irsend, int const ir_type,
   debug("Type:");
   debug(String(ir_type).c_str());
   // For "long" codes we basically repeat what we got.
-  if (hasACState((decode_type_t) ir_type) ||
-      ir_type == PRONTO ||
-      ir_type == RAW ||
+  if (hasACState(ir_type) || ir_type == PRONTO || ir_type == RAW ||
       ir_type == GLOBALCACHE) {
     debug("Code: ");
     debug(code_str);

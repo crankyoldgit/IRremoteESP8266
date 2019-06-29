@@ -140,8 +140,10 @@ class IRsend {
                    const uint8_t *dataptr, const uint16_t nbytes,
                    const uint16_t frequency, const bool MSBfirst,
                    const uint16_t repeat, const uint8_t dutycycle);
+  static uint16_t minRepeats(const decode_type_t protocol);
+  static uint16_t defaultBits(const decode_type_t protocol);
   bool send(const decode_type_t type, const uint64_t data,
-            const uint16_t nbits);
+            const uint16_t nbits, const uint16_t repeat = kNoRepeat);
   bool send(const decode_type_t type, const uint8_t state[],
             const uint16_t nbytes);
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)

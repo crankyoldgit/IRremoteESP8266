@@ -491,184 +491,330 @@ void IRsend::sendRaw(uint16_t buf[], uint16_t len, uint16_t hz) {
 }
 #endif  // SEND_RAW
 
+// Get the minimum number of repeats for a given protocol.
+// Args:
+//   protocol:  Protocol number/type of the message you want to send.
+// Returns:
+//   int16_t:  The number of repeats required.
+uint16_t IRsend::minRepeats(const decode_type_t protocol) {
+  switch (protocol) {
+    // Single repeats
+    case AIWA_RC_T501:
+    case COOLIX:
+    case GICABLE:
+    case INAX:
+    case MITSUBISHI:
+    case MITSUBISHI2:
+    case MITSUBISHI_AC:
+    case SHERWOOD:
+    case TOSHIBA_AC:
+      return kSingleRepeat;
+    // Special
+    case DISH:
+      return kDishMinRepeat;
+    case SONY:
+      return kSonyMinRepeat;
+    default:
+      return kNoRepeat;
+  }
+}
+
+// Get the default number of bits for a given protocol.
+// Args:
+//   protocol:  Protocol number/type you want the default nr. of bits for.
+// Returns:
+//   int16_t:  The number of bits.
+uint16_t IRsend::defaultBits(const decode_type_t protocol) {
+  switch (protocol) {
+    case LASERTAG:
+    case RC5:
+      return 13;
+    case AIWA_RC_T501:
+    case DENON:
+    case SHARP:
+      return 15;
+    case DISH:
+    case GICABLE:
+    case JVC:
+    case LEGOPF:
+    case MITSUBISHI:
+    case MITSUBISHI2:
+      return 16;
+    case RC6:
+    case SONY:
+      return 20;
+    case COOLIX:
+    case INAX:
+    case NIKAI:
+    case RCMM:
+      return 24;
+    case LG:
+    case LG2:
+      return 28;
+    case CARRIER_AC:
+    case NEC:
+    case NEC_LIKE:
+    case SAMSUNG:
+    case SHERWOOD:
+    case WHYNTER:
+      return 32;
+    case LUTRON:
+    case TECO:
+      return 35;
+    case SAMSUNG36:
+      return 36;
+    case SANYO_LC7461:
+      return kSanyoLC7461Bits;  // 42
+    case GOODWEATHER:
+    case MIDEA:
+    case PANASONIC:
+      return 48;
+    case MAGIQUEST:
+    case VESTEL_AC:
+      return 56;
+    case PIONEER:
+      return 64;
+    case ARGO:
+      return kArgoBits;
+    case DAIKIN:
+      return kDaikinBits;
+    case DAIKIN160:
+      return kDaikin160Bits;
+    case DAIKIN2:
+      return kDaikin2Bits;
+    case DAIKIN216:
+      return kDaikin216Bits;
+    case ELECTRA_AC:
+      return kElectraAcBits;
+    case GREE:
+      return kGreeBits;
+    case HAIER_AC:
+      return kHaierACBits;
+    case HAIER_AC_YRW02:
+      return kHaierACYRW02Bits;
+    case HITACHI_AC:
+      return kHitachiAcBits;
+    case HITACHI_AC1:
+      return kHitachiAc1Bits;
+    case HITACHI_AC2:
+      return kHitachiAc2Bits;
+    case KELVINATOR:
+      return kKelvinatorBits;
+    case MITSUBISHI_AC:
+      return kMitsubishiACBits;
+    case MITSUBISHI_HEAVY_152:
+      return kMitsubishiHeavy152Bits;
+    case MITSUBISHI_HEAVY_88:
+      return kMitsubishiHeavy88Bits;
+    case NEOCLIMA:
+      return kNeoclimaBits;
+    case PANASONIC_AC:
+      return kNeoclimaBits;
+    case SAMSUNG_AC:
+      return kSamsungAcBits;
+    case SHARP_AC:
+      return kSharpAcBits;
+    case TCL112AC:
+      return kTcl112AcBits;
+    case TOSHIBA_AC:
+      return kToshibaACBits;
+    case TROTEC:
+      return kTrotecBits;
+    case WHIRLPOOL_AC:
+      return kWhirlpoolAcBits;
+    // No default amount of bits.
+    case FUJITSU_AC:
+    case MWM:
+    default:
+      return 0;
+  }
+}
+
 // Send a simple (up to 64 bits) IR message of a given type.
 // An unknown/unsupported type will do nothing.
 // Args:
 //   type:  Protocol number/type of the message you want to send.
 //   data:  The data you want to send (up to 64 bits).
 //   nbits: How many bits long the message is to be.
+//   repeat: How many repeats to do?
 // Returns:
 //   bool: True if it is a type we can attempt to send, false if not.
 bool IRsend::send(const decode_type_t type, const uint64_t data,
-                  const uint16_t nbits) {
+                  const uint16_t nbits, const uint16_t repeat) {
+  uint16_t min_repeat = std::max(IRsend::minRepeats(type), repeat);
   switch (type) {
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501:
-      sendAiwaRCT501(data, nbits);
+      sendAiwaRCT501(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_CARRIER_AC
     case CARRIER_AC:
-      sendCarrierAC(data, nbits);
+      sendCarrierAC(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_COOLIX
     case COOLIX:
-      sendCOOLIX(data, nbits);
+      sendCOOLIX(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_DENON
     case DENON:
-      sendDenon(data, nbits);
+      sendDenon(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_DISH
     case DISH:
-      sendDISH(data, nbits);
+      sendDISH(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_GICABLE
     case GICABLE:
-      sendGICable(data, nbits);
+      sendGICable(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_GOODWEATHER
+    case GOODWEATHER:
+      sendGoodweather(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_GREE
     case GREE:
-      sendGree(data, nbits);
+      sendGree(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_INAX
     case INAX:
-      sendInax(data, nbits);
+      sendInax(data, nbits, min_repeat);
       break;
 #endif  // SEND_INAX
 #if SEND_JVC
     case JVC:
-      sendJVC(data, nbits);
+      sendJVC(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_LASERTAG
     case LASERTAG:
-      sendLasertag(data, nbits);
+      sendLasertag(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_LEGOPF
     case LEGOPF:
-      sendLegoPf(data, nbits);
+      sendLegoPf(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_LG
     case LG:
-      sendLG(data, nbits);
+      sendLG(data, nbits, min_repeat);
       break;
     case LG2:
-      sendLG2(data, nbits);
+      sendLG2(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_LUTRON
     case LUTRON:
-      sendLutron(data, nbits);
+      sendLutron(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_MAGIQUEST
     case MAGIQUEST:
-      sendMagiQuest(data, nbits);
+      sendMagiQuest(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_MIDEA
     case MIDEA:
-      sendMidea(data, nbits);
+      sendMidea(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_MITSUBISHI
     case MITSUBISHI:
-      sendMitsubishi(data, nbits);
+      sendMitsubishi(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_MITSUBISHI2
     case MITSUBISHI2:
-      sendMitsubishi2(data, nbits);
+      sendMitsubishi2(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_NIKAI
     case NIKAI:
-      sendNikai(data, nbits);
+      sendNikai(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_NEC
     case NEC:
     case NEC_LIKE:
-      sendNEC(data, nbits);
+      sendNEC(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_PANASONIC
     case PANASONIC:
-      sendPanasonic64(data, nbits);
+      sendPanasonic64(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_PIONEER
     case PIONEER:
-      sendPioneer(data, nbits);
+      sendPioneer(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_RC5
     case RC5:
-      sendRC5(data, nbits);
+      sendRC5(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_RC6
     case RC6:
-      sendRC6(data, nbits);
+      sendRC6(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_RCMM
     case RCMM:
-      sendRCMM(data, nbits);
+      sendRCMM(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SAMSUNG
     case SAMSUNG:
-      sendSAMSUNG(data, nbits);
+      sendSAMSUNG(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SAMSUNG36
     case SAMSUNG36:
-      sendSamsung36(data, nbits);
+      sendSamsung36(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SANYO
     case SANYO_LC7461:
-      sendSanyoLC7461(data, nbits);
+      sendSanyoLC7461(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SHARP
     case SHARP:
-      sendSharpRaw(data, nbits);
+      sendSharpRaw(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SHERWOOD
     case SHERWOOD:
-      sendSherwood(data, nbits);
+      sendSherwood(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_SONY
     case SONY:
-      sendSony(data, nbits);
+      sendSony(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_TECO
     case TECO:
-      sendTeco(data, nbits);
+      sendTeco(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_VESTEL_AC
     case VESTEL_AC:
-      sendVestelAc(data, nbits);
+      sendVestelAc(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_WHYNTER
     case WHYNTER:
-      sendWhynter(data, nbits);
+      sendWhynter(data, nbits, min_repeat);
       break;
 #endif
     default:

@@ -313,7 +313,7 @@ void handleAdmin(void);
 void handleInfo(void);
 void handleReset(void);
 void handleReboot(void);
-bool parseStringAndSendAirCon(IRsend *irsend, const uint16_t irType,
+bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
                               const String str);
 uint16_t countValuesInStr(const String str, char sep);
 uint16_t * newCodeArray(const uint16_t size);
@@ -334,7 +334,7 @@ void init_vars(void);
 void setup(void);
 void loop(void);
 uint64_t getUInt64fromHex(char const *str);
-bool sendIRCode(IRsend *irsend, int const ir_type,
+bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
                 uint64_t const code, char const * code_str, uint16_t bits,
                 uint16_t repeat);
 bool sendInt(const String topic, const int32_t num, const bool retain);
