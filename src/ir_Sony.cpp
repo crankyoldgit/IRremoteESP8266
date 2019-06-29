@@ -119,25 +119,20 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
   uint64_t data = 0;
   uint16_t offset = kStartOffset;
   uint16_t actualBits;
-  uint32_t timeSoFar = 0;  // Time in uSecs of the message length.
 
   // Header
-  timeSoFar += results->rawbuf[offset] * kRawTick;
   if (!matchMark(results->rawbuf[offset], kSonyHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
   uint32_t tick = results->rawbuf[offset++] * kRawTick / kSonyHdrMarkTicks;
 
   // Data
   for (actualBits = 0; offset < results->rawlen - 1; actualBits++, offset++) {
-    // The gap after a Sony packet for a repeat should be kSonyMinGap or
-    //   (kSonyRptLength - timeSoFar) according to the spec.
-    if (matchSpace(results->rawbuf[offset], kSonyMinGapTicks * tick) ||
-        matchAtLeast(results->rawbuf[offset], kSonyRptLength - timeSoFar))
+    // The gap after a Sony packet for a repeat should be kSonyMinGap according
+    // to the spec.
+    if (matchAtLeast(results->rawbuf[offset], kSonyMinGapTicks * tick))
       break;  // Found a repeat space.
-    timeSoFar += results->rawbuf[offset] * kRawTick;
     if (!matchSpace(results->rawbuf[offset++], kSonySpaceTicks * tick))
       return false;
-    timeSoFar += results->rawbuf[offset] * kRawTick;
     if (matchMark(results->rawbuf[offset], kSonyOneMarkTicks * tick))
       data = (data << 1) | 1;
     else if (matchMark(results->rawbuf[offset], kSonyZeroMarkTicks * tick))
