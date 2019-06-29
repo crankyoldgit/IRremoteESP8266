@@ -1308,6 +1308,19 @@ void handleInfo(void) {
   html += htmlEnd();
   server.send(200, "text/html", html);
 }
+
+void doRestart(const char* str, const bool serial_only) {
+#if MQTT_ENABLE
+  if (!serial_only)
+    mqttLog(str);
+  else
+#endif  // MQTT_ENABLE
+    debug(str);
+  delay(2000);  // Enough time for messages to be sent.
+  ESP.restart();
+  delay(5000);  // Enough time to ensure we don't return.
+}
+
 // Reset web page
 void handleReset(void) {
 #if HTML_PASSWORD_ENABLE
@@ -1334,10 +1347,7 @@ void handleReset(void) {
   delay(1000);
   debug("Reseting wifiManager's settings.");
   wifiManager.resetSettings();
-  delay(1000);
-  debug("rebooting...");
-  ESP.restart();
-  delay(1000);
+  doRestart("Rebooting...");
 }
 
 // Reboot web page
@@ -1353,13 +1363,7 @@ void handleReboot() {
     "<p>Try connecting in a few seconds.</p>" +
     addJsReloadUrl(kUrlRoot, kRebootTime, true) +
     htmlEnd());
-#if MQTT_ENABLE
-  mqttLog("Reboot requested");
-#endif  // MQTT_ENABLE
-  // Do the reset.
-  delay(1000);
-  ESP.restart();
-  delay(1000);
+  doRestart("Reboot requested");
 }
 
 // Parse an Air Conditioner A/C Hex String/code and send it.
@@ -1515,14 +1519,10 @@ uint16_t * newCodeArray(const uint16_t size) {
 
   result = reinterpret_cast<uint16_t*>(malloc(size * sizeof(uint16_t)));
   // Check we malloc'ed successfully.
-  if (result == NULL) {  // malloc failed, so give up.
-    debug("FATAL: Can't allocate memory for an array for a new message!");
-    debug("Giving up & forcing a reboot.");
-    delay(5000);
-    ESP.restart();  // Reboot.
-    delay(500);  // Wait for the restart to happen.
-    return result;  // Should never get here, but just in case.
-  }
+  if (result == NULL)  // malloc failed, so give up.
+    doRestart(
+        "FATAL: Can't allocate memory for an array for a new message! "
+        "Forcing a reboot!", true);  // Send to serial only as we are in low mem
   return result;
 }
 
@@ -1816,14 +1816,7 @@ void handleGpioSetting(void) {
                          true);
   html += htmlEnd();
   server.send(200, "text/html", html);
-  if (changed) {
-#if MQTT_ENABLE
-    mqttLog("GPIOs were changed. Rebooting!");
-#endif  // MQTT_ENABLE
-    delay(1000);
-    ESP.restart();
-    delay(2000);
-  }
+  if (changed) doRestart("GPIOs were changed. Rebooting!");
 }
 
 void handleNotFound(void) {
@@ -1898,13 +1891,9 @@ void setup_wifi(void) {
 #endif  // MIN_SIGNAL_STRENGTH
   wifiManager.setRemoveDuplicateAPs(HIDE_DUPLIATE_NETWORKS);
 
-  if (!wifiManager.autoConnect()) {
-    debug("Wifi failed to connect and hit timeout. Rebooting...");
-    delay(3000);
+  if (!wifiManager.autoConnect())
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
-    ESP.restart();
-    delay(5000);
-  }
+    doRestart("Wifi failed to connect and hit timeout. Rebooting...", true);
 
 #if MQTT_ENABLE
   strncpy(MqttServer, custom_mqtt_server.getValue(), kHostnameLength);
@@ -2091,9 +2080,7 @@ void setup(void) {
             " Rebooting! </p>" +
             addJsReloadUrl(kUrlRoot, 20, true) +
             htmlEnd());
-        delay(1000);
-        ESP.restart();
-        delay(1000);
+        doRestart("Post firmware reboot.");
       }, [](){
         if (!server.authenticate(HttpUsername, HttpPassword)) {
           debug("Basic HTTP authentication failure for /update.");
@@ -2165,9 +2152,9 @@ void unsubscribing(const String topic_name) {
   debug(topic_name.c_str());
 }
 
-void mqttLog(const String mesg) {
-  debug(mesg.c_str());
-  mqtt_client.publish(MqttLog.c_str(), mesg.c_str());
+void mqttLog(const char* str) {
+  debug(str);
+  mqtt_client.publish(MqttLog.c_str(), str);
   mqttSentCounter++;
 }
 
@@ -2464,8 +2451,9 @@ void loop(void) {
           mqttLog("IRMQTTServer " _MY_VERSION_ " just booted");
           boot = false;
         } else {
-          mqttLog("IRMQTTServer just (re)connected to MQTT. "
-                  "Lost connection about " + timeSince(lastConnectedTime));
+          mqttLog(String(
+              "IRMQTTServer just (re)connected to MQTT. Lost connection about "
+              + timeSince(lastConnectedTime)).c_str());
         }
         lastConnectedTime = now;
         debug("successful client mqtt connection");
