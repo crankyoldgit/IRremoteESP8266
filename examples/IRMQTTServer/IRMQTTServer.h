@@ -92,6 +92,9 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define QOS 1  // MQTT broker should queue up any unreceived messages for us
 // #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
+// Enable(true)/Disable(false) the option to send a MQTT Discovery message for
+// the AirCon/Climate system to Home Assistant. `false` saves ~1.5k.
+#define MQTT_DISCOVERY_ENABLE true
 #endif  // MQTT_ENABLE
 
 // ------------------------ IR Capture Settings --------------------------------

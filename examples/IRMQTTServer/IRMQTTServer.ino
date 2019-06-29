@@ -404,7 +404,9 @@ String MqttLwt;  // Topic for the Last Will & Testament.
 String MqttClimate;  // Sub-topic for the climate topics.
 String MqttClimateCmnd;  // Sub-topic for the climate command topics.
 String MqttClimateStat;  // Sub-topic for the climate stat topics.
+#if MQTT_DISCOVERY_ENABLE
 String MqttDiscovery;
+#endif  // MQTT_DISCOVERY_ENABLE
 String MqttHAName;
 String MqttClientId;
 
@@ -1162,9 +1164,11 @@ void handleAdmin(void) {
   html += htmlMenu();
   html += F("<h3>Special commands</h3>");
 #if MQTT_ENABLE
+#if MQTT_DISCOVERY_ENABLE
   html += htmlButton(
       kUrlSendDiscovery, F("Send MQTT Discovery"),
       F("Send a Climate MQTT discovery message to Home Assistant.<br><br>"));
+#endif  // MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_ENABLE
   html += htmlButton(
       kUrlReboot, F("Reboot"),
@@ -1381,12 +1385,6 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
   }
 
   switch (irType) {  // Get the correct state size for the protocol.
-    case KELVINATOR:
-      stateSize = kKelvinatorStateLength;
-      break;
-    case TOSHIBA_AC:
-      stateSize = kToshibaACStateLength;
-      break;
     case DAIKIN:
       // Daikin has 2 different possible size states.
       // (The correct size, and a legacy shorter size.)
@@ -1404,39 +1402,6 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // Lastly, it should never exceed the "normal" size.
       stateSize = std::min(stateSize, kDaikinStateLength);
       break;
-    case DAIKIN160:
-      stateSize = kDaikin160StateLength;
-      break;
-    case DAIKIN2:
-      stateSize = kDaikin2StateLength;
-      break;
-    case DAIKIN216:
-      stateSize = kDaikin216StateLength;
-      break;
-    case ELECTRA_AC:
-      stateSize = kElectraAcStateLength;
-      break;
-    case MITSUBISHI_AC:
-      stateSize = kMitsubishiACStateLength;
-      break;
-    case MITSUBISHI_HEAVY_88:
-      stateSize = kMitsubishiHeavy88StateLength;
-      break;
-    case MITSUBISHI_HEAVY_152:
-      stateSize = kMitsubishiHeavy152StateLength;
-      break;
-    case PANASONIC_AC:
-      stateSize = kPanasonicAcStateLength;
-      break;
-    case TROTEC:
-      stateSize = kTrotecStateLength;
-      break;
-    case ARGO:
-      stateSize = kArgoStateLength;
-      break;
-    case GREE:
-      stateSize = kGreeStateLength;
-      break;
     case FUJITSU_AC:
       // Fujitsu has four distinct & different size states, so make a best guess
       // which one we are being presented with based on the number of
@@ -1453,23 +1418,16 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, kFujitsuAcStateLength);
       break;
-    case HAIER_AC:
-      stateSize = kHaierACStateLength;
-      break;
-    case HAIER_AC_YRW02:
-      stateSize = kHaierACYRW02StateLength;
-      break;
-    case HITACHI_AC:
-      stateSize = kHitachiAcStateLength;
-      break;
-    case HITACHI_AC1:
-      stateSize = kHitachiAc1StateLength;
-      break;
-    case HITACHI_AC2:
-      stateSize = kHitachiAc2StateLength;
-      break;
-    case WHIRLPOOL_AC:
-      stateSize = kWhirlpoolAcStateLength;
+    case MWM:
+      // MWM has variable size states, so make a best guess
+      // which one we are being presented with based on the number of
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize, (uint16_t) 3);
+      // Cap the maximum size.
+      stateSize = std::min(stateSize, kStateSizeMax);
       break;
     case SAMSUNG_AC:
       // Samsung has two distinct & different size states, so make a best guess
@@ -1487,29 +1445,13 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // Lastly, it should never exceed the maximum "extended" size.
       stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;
-    case SHARP_AC:
-      stateSize = kSharpAcStateLength;
-      break;
-    case MWM:
-      // MWM has variable size states, so make a best guess
-      // which one we are being presented with based on the number of
-      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
-      // the correct length/byte size.
-      stateSize = inputLength / 2;  // Every two hex chars is a byte.
-      // Use at least the minimum size.
-      stateSize = std::max(stateSize, (uint16_t) 3);
-      // Cap the maximum size.
-      stateSize = std::min(stateSize, kStateSizeMax);
-      break;
-    case TCL112AC:
-      stateSize = kTcl112AcStateLength;
-      break;
-    case NEOCLIMA:
-      stateSize = kNeoclimaStateLength;
-      break;
-    default:  // Not a protocol we expected. Abort.
-      debug("Unexpected AirCon protocol detected. Ignoring.");
-      return false;
+    default:  // Everything else.
+      stateSize = IRsend::defaultBits(irType) / 8;
+      if (!stateSize || !hasACState(irType)) {
+        // Not a protocol we expected. Abort.
+        debug("Unexpected AirCon protocol detected. Ignoring.");
+        return false;
+      }
   }
   if (inputLength > stateSize * 2) {
     debug("AirCon code to large for the given protocol.");
@@ -2001,7 +1943,9 @@ void init_vars(void) {
   MqttClimateCmnd = MqttClimate + '/' + MQTT_CLIMATE_CMND + '/';
   // Sub-topic for the climate stat topics.
   MqttClimateStat = MqttClimate + '/' + MQTT_CLIMATE_STAT + '/';
+#if MQTT_DISCOVERY_ENABLE
   MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
+#endif  // MQTT_DISCOVERY_ENABLE
   MqttHAName = String(Hostname) + "_aircon";
   // Create a unique MQTT client id.
   MqttClientId = String(Hostname) + String(kChipId, HEX);
@@ -2117,8 +2061,10 @@ void setup(void) {
   // Parse and update the new gpios.
   server.on(kUrlGpioSet, handleGpioSetting);
 #if MQTT_ENABLE
+#if MQTT_DISCOVERY_ENABLE
   // MQTT Discovery url
   server.on(kUrlSendDiscovery, handleSendMqttDiscovery);
+#endif  // MQTT_DISCOVERY_ENABLE
   // Finish setup of the mqtt clent object.
   mqtt_client.setServer(MqttServer, atoi(MqttPort));
   mqtt_client.setCallback(mqttCallback);
@@ -2280,6 +2226,7 @@ String listOfCommandTopics(void) {
   return result;
 }
 
+#if MQTT_DISCOVERY_ENABLE
 // MQTT Discovery web page
 void handleSendMqttDiscovery(void) {
 #if HTML_PASSWORD_ENABLE
@@ -2301,6 +2248,7 @@ void handleSendMqttDiscovery(void) {
       htmlEnd());
   sendMQTTDiscovery(MqttDiscovery.c_str());
 }
+#endif  // MQTT_DISCOVERY_ENABLE
 
 void doBroadcast(TimerMs *timer, const uint32_t interval,
                  const stdAc::state_t state, const bool retain,
@@ -2450,6 +2398,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   free(payload_copy);
 }
 
+#if MQTT_DISCOVERY_ENABLE
 void sendMQTTDiscovery(const char *topic) {
   if (mqtt_client.publish(
       topic, String(
@@ -2488,6 +2437,7 @@ void sendMQTTDiscovery(const char *topic) {
     mqttLog("MQTT climate discovery FAILED to send.");
   }
 }
+#endif  // MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_ENABLE
 
 void loop(void) {
