@@ -5,6 +5,7 @@
 //   Brand: Ultimate,  Model: Heat Pump
 //   Brand: EKOKAI,  Model: A/C
 //   Brand: RusClimate,  Model: EACS/I-09HAR_X/N3 A/C
+//   Brand: RusClimate,  Model: YAW1F remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_

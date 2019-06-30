@@ -350,6 +350,14 @@ TEST(TestGreeClass, IFeel) {
 
   ac.setIFeel(true);
   EXPECT_TRUE(ac.getIFeel());
+
+  // https://github.com/markszabo/IRremoteESP8266/pull/770#issuecomment-504992209
+  uint8_t on[8] = {0x08, 0x09, 0x60, 0x50, 0x00, 0x44, 0x00, 0xF0};
+  uint8_t off[8] = {0x08, 0x09, 0x60, 0x50, 0x00, 0x40, 0x00, 0xF0};
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getIFeel());
+  ac.setRaw(on);
+  EXPECT_TRUE(ac.getIFeel());
 }
 
 TEST(TestGreeClass, WiFi) {
@@ -363,6 +371,14 @@ TEST(TestGreeClass, WiFi) {
   EXPECT_FALSE(ac.getWiFi());
 
   ac.setWiFi(true);
+  EXPECT_TRUE(ac.getWiFi());
+
+  // https://github.com/markszabo/IRremoteESP8266/pull/770#issuecomment-504992209
+  uint8_t on[8] = {0x09, 0x09, 0x60, 0x50, 0x00, 0x40, 0x00, 0x00};
+  uint8_t off[8] = {0x09, 0x09, 0x60, 0x50, 0x00, 0x00, 0x00, 0xC0};
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getWiFi());
+  ac.setRaw(on);
   EXPECT_TRUE(ac.getWiFi());
 }
 
