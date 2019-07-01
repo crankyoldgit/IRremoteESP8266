@@ -163,8 +163,7 @@ TEST(TestIRac, Daikin160) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(DAIKIN160, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDaikin160Bits, ac._irsend.capture.bits);
-  ac.setRaw(ac._irsend.capture.state);
-  ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Daikin2) {

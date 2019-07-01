@@ -1447,6 +1447,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN160
+      case decode_type_t::DAIKIN160: {
+        IRDaikin160 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN2
       case decode_type_t::DAIKIN2: {
         IRDaikin2 ac(0);
