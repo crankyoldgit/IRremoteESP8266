@@ -761,32 +761,10 @@ String IRPanasonicAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kPanasonicAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kPanasonicAcCool:
-      result += F(" (COOL)");
-      break;
-    case kPanasonicAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kPanasonicAcDry:
-      result += F(" (DRY)");
-      break;
-    case kPanasonicAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"));
+  result += IRutils::acModeToString(getMode(), kPanasonicAcAuto,
+                                    kPanasonicAcCool, kPanasonicAcHeat,
+                                    kPanasonicAcDry, kPanasonicAcFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -856,16 +834,8 @@ String IRPanasonicAc::toString(void) {
           break;
       }
   }
-  result += F(", Quiet: ");
-  if (getQuiet())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Powerful: ");
-  if (getPowerful())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
+  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
   result += F(", Clock: ");
   result += timeToString(getClock());
   result += F(", On Timer: ");

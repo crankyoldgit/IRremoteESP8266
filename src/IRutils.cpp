@@ -804,3 +804,30 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits) {
 float celsiusToFahrenheit(const float deg) { return (deg * 9.0) / 5.0 + 32.0; }
 
 float fahrenheitToCelsius(const float deg) { return (deg - 32.0) * 5.0 / 9.0; }
+
+namespace IRutils {
+  String acBoolToString(const bool value, const String text,
+                        const bool precomma) {
+    String result = "";
+    if (precomma) result += F(", ");
+    result += text;
+    result += F(": ");
+    return result + (value ? F("On") : F("Off"));
+  }
+
+  String acModeToString(const uint8_t mode, const uint8_t automatic,
+                        const uint8_t cool, const uint8_t heat,
+                        const uint8_t dry, const uint8_t fan) {
+    String result = ", Mode: ";
+    result += uint64ToString(mode);
+    result += F(" (");
+    if (mode == automatic) result += F("AUTO");
+    else if (mode == cool) result += F("COOL");
+    else if (mode == heat) result += F("HEAT");
+    else if (mode == dry) result += F("DRY");
+    else if (mode == fan) result += F("FAN");
+    else
+      result += F("UNKNOWN");
+    return result + ')';
+  }
+}  // namespace IRutils

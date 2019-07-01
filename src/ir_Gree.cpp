@@ -443,29 +443,10 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kGreeAuto:
-      result += F(" (AUTO)");
-      break;
-    case kGreeCool:
-      result += F(" (COOL)");
-      break;
-    case kGreeHeat:
-      result += F(" (HEAT)");
-      break;
-    case kGreeDry:
-      result += F(" (DRY)");
-      break;
-    case kGreeFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kGreeAuto,
+                                    kGreeCool, kGreeHeat,
+                                    kGreeDry, kGreeFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -478,18 +459,12 @@ String IRGreeAC::toString(void) {
       result += F(" (MAX)");
       break;
   }
-  result += F(", Turbo: ");
-  result += this->getTurbo() ? F("On") : F("Off");
-  result += F(", IFeel: ");
-  result += this->getIFeel() ? F("On") : F("Off");
-  result += F(", WiFi: ");
-  result += this->getWiFi() ? F("On") : F("Off");
-  result += F(", XFan: ");
-  result += this->getXFan() ? F("On") : F("Off");
-  result += F(", Light: ");
-  result += this->getLight() ? F("On") : F("Off");
-  result += F(", Sleep: ");
-  result += this->getSleep() ? F("On") : F("Off");
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getIFeel(), F("IFeel"));
+  result += IRutils::acBoolToString(getWiFi(), F("WiFi"));
+  result += IRutils::acBoolToString(getXFan(), F("XFan"));
+  result += IRutils::acBoolToString(getLight(), F("Light"));
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
   result += F(", Swing Vertical Mode: ");
   result += this->getSwingVerticalAuto() ? F("Auto") : F("Manual");
   result += F(", Swing Vertical Pos: ");

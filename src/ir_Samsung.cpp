@@ -659,32 +659,10 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 String IRSamsungAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kSamsungAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kSamsungAcCool:
-      result += F(" (COOL)");
-      break;
-    case kSamsungAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kSamsungAcDry:
-      result += F(" (DRY)");
-      break;
-    case kSamsungAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
+                                    kSamsungAcHeat, kSamsungAcDry,
+                                    kSamsungAcFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -710,31 +688,11 @@ String IRSamsungAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += F(", Swing: ");
-  if (getSwing())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Beep: ");
-  if (getBeep())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Clean: ");
-  if (getBeep())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Quiet: ");
-  if (getQuiet())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Powerful: ");
-  if (getPowerful())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getSwing(), F("Swing"));
+  result += IRutils::acBoolToString(getBeep(), F("Beep"));
+  result += IRutils::acBoolToString(getClean(), F("Clean"));
+  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
+  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
   return result;
 }
 

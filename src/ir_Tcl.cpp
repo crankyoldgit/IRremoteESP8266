@@ -343,29 +343,10 @@ stdAc::state_t IRTcl112Ac::toCommon(void) {
 String IRTcl112Ac::toString(void) {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (this->getMode()) {
-    case kTcl112AcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kTcl112AcCool:
-      result += F(" (COOL)");
-      break;
-    case kTcl112AcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kTcl112AcDry:
-      result += F(" (DRY)");
-      break;
-    case kTcl112AcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kTcl112AcAuto,
+                                    kTcl112AcCool, kTcl112AcHeat,
+                                    kTcl112AcDry, kTcl112AcFan);
   uint16_t nrHalfDegrees = this->getTemp() * 2;
   result += F(", Temp: ");
   result += uint64ToString(nrHalfDegrees / 2);
@@ -386,18 +367,12 @@ String IRTcl112Ac::toString(void) {
       result += F(" (High)");
       break;
   }
-  result += F(", Econo: ");
-  result += (this->getEcono() ? F("On") : F("Off"));
-  result += ", Health: ";
-  result += (this->getHealth() ? F("On") : F("Off"));
-  result += F(", Light: ");
-  result += (this->getLight() ? F("On") : F("Off"));
-  result += F(", Turbo: ");
-  result += (this->getTurbo() ? F("On") : F("Off"));
-  result += ", Swing (H): ";
-  result += (this->getSwingHorizontal() ? F("On") : F("Off"));
-  result += F(", Swing (V): ");
-  result += (this->getSwingVertical() ? F("On") : F("Off"));
+  result += IRutils::acBoolToString(getEcono(), F("Econo"));
+  result += IRutils::acBoolToString(getHealth(), F("Health"));
+  result += IRutils::acBoolToString(getLight(), F("Light"));
+  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
+  result += IRutils::acBoolToString(getSwingHorizontal(), F("Swing (H)"));
+  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (V)"));
   return result;
 }
 

@@ -459,27 +459,9 @@ String IRHaierAC::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kHaierAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kHaierAcCool:
-      result += F(" (COOL)");
-      break;
-    case kHaierAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kHaierAcDry:
-      result += F(" (DRY)");
-      break;
-    case kHaierAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acModeToString(getMode(), kHaierAcAuto,
+                                    kHaierAcCool, kHaierAcHeat,
+                                    kHaierAcDry, kHaierAcFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -512,16 +494,8 @@ String IRHaierAC::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += F(", Sleep: ");
-  if (getSleep())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Health: ");
-  if (getHealth())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += IRutils::acBoolToString(getHealth(), F("Health"));
   result += F(", Current Time: ");
   result += timeToString(getCurrTime());
   result += F(", On Timer: ");
@@ -534,7 +508,6 @@ String IRHaierAC::toString(void) {
     result += timeToString(getOffTimer());
   else
     result += F("Off");
-
   return result;
 }
 // End of IRHaierAC class.
@@ -852,11 +825,7 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) {
 String IRHaierACYRW02::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (getPower())
-    result += F("On");
-  else
-    result += F("Off");
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
   uint8_t cmd = getButton();
   result += F(", Button: ");
   result += uint64ToString(cmd);
@@ -893,27 +862,9 @@ String IRHaierACYRW02::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
-  switch (getMode()) {
-    case kHaierAcYrw02Auto:
-      result += F(" (Auto)");
-      break;
-    case kHaierAcYrw02Cool:
-      result += F(" (Cool)");
-      break;
-    case kHaierAcYrw02Heat:
-      result += F(" (Heat)");
-      break;
-    case kHaierAcYrw02Dry:
-      result += F(" (Dry)");
-      break;
-    case kHaierAcYrw02Fan:
-      result += F(" (Fan)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acModeToString(getMode(), kHaierAcYrw02Auto,
+                                    kHaierAcYrw02Cool, kHaierAcYrw02Heat,
+                                    kHaierAcYrw02Dry, kHaierAcYrw02Fan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -977,17 +928,8 @@ String IRHaierACYRW02::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += F(", Sleep: ");
-  if (getSleep())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Health: ");
-  if (getHealth())
-    result += F("On");
-  else
-    result += F("Off");
-
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += IRutils::acBoolToString(getHealth(), F("Health"));
   return result;
 }
 // End of IRHaierACYRW02 class.

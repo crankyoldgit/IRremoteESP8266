@@ -220,29 +220,10 @@ stdAc::state_t IRTecoAc::toCommon(void) {
 String IRTecoAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += (this->getPower() ? F("On") : F("Off"));
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kTecoAuto:
-      result += F(" (AUTO)");
-      break;
-    case kTecoCool:
-      result += F(" (COOL)");
-      break;
-    case kTecoHeat:
-      result += F(" (HEAT)");
-      break;
-    case kTecoDry:
-      result += F(" (DRY)");
-      break;
-    case kTecoFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kTecoAuto,
+                                    kTecoCool, kTecoHeat,
+                                    kTecoDry, kTecoFan);
   result += F(", Temp: ");
   result += uint64ToString(getTemp());
   result += F("C, Fan: ");
@@ -263,10 +244,8 @@ String IRTecoAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Sleep: ");
-  result += (this->getSleep() ? F("On") : F("Off"));
-  result += F(", Swing: ");
-  result += (this->getSwing() ? F("On") : F("Off"));
+  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += IRutils::acBoolToString(getSwing(), F("Swing"));
   return result;
 }
 

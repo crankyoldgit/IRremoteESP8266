@@ -303,29 +303,10 @@ stdAc::state_t IRGoodweatherAc::toCommon(void) {
 String IRGoodweatherAc::toString() {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kGoodweatherAuto:
-      result += F(" (AUTO)");
-      break;
-    case kGoodweatherCool:
-      result += F(" (COOL)");
-      break;
-    case kGoodweatherHeat:
-      result += F(" (HEAT)");
-      break;
-    case kGoodweatherDry:
-      result += F(" (DRY)");
-      break;
-    case kGoodweatherFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kGoodweatherAuto,
+                                    kGoodweatherCool, kGoodweatherHeat,
+                                    kGoodweatherDry, kGoodweatherFan);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");

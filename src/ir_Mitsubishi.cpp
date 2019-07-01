@@ -706,27 +706,10 @@ String IRMitsubishiAC::timeToString(const uint64_t time) {
 String IRMitsubishiAC::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (this->getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  switch (this->getMode()) {
-    case MITSUBISHI_AC_AUTO:
-      result += F(" (AUTO)");
-      break;
-    case MITSUBISHI_AC_COOL:
-      result += F(" (COOL)");
-      break;
-    case MITSUBISHI_AC_DRY:
-      result += F(" (DRY)");
-      break;
-    case MITSUBISHI_AC_HEAT:
-      result += F(" (HEAT)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kMitsubishiAcAuto,
+                                    kMitsubishiAcCool, kMitsubishiAcHeat,
+                                    kMitsubishiAcDry, kMitsubishiAcAuto);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, FAN: ");

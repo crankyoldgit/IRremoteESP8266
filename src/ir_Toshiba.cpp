@@ -316,29 +316,10 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
-  result += F("Power: ");
-  if (this->getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kToshibaAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kToshibaAcCool:
-      result += F(" (COOL)");
-      break;
-    case kToshibaAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kToshibaAcDry:
-      result += F(" (DRY)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += IRutils::acModeToString(getMode(), kToshibaAcAuto,
+                                    kToshibaAcCool, kToshibaAcHeat,
+                                    kToshibaAcDry, kToshibaAcAuto);
   result += F(", Temp: ");
   result += uint64ToString(this->getTemp());
   result += F("C, Fan: ");
