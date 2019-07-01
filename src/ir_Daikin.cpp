@@ -1731,7 +1731,7 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
 // Args:
 //   data: An array of kDaikin160StateLength bytes containing the IR command.
 //
-// Status: Alpha/Untested on a real device.
+// Status: STABLE / Confirmed working.
 //
 // Supported devices:
 // - Daikin ARC423A5 remote.
@@ -2073,7 +2073,7 @@ String IRDaikin160::toString() {
 // Supported devices:
 // - Daikin ARC423A5 remote.
 //
-// Status: BETA / Probably works.
+// Status: STABLE / Confirmed working.
 //
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/731
