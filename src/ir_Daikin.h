@@ -10,6 +10,7 @@
 //   Brand: Daikin,  Model: FTXZ50NV1B A/C
 //   Brand: Daikin,  Model: ARC433B69 remote
 //   Brand: Daikin,  Model: ARC423A5 remote
+//   Brand: Daikin,  Model: FTE12HV2S A/C
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -227,6 +228,22 @@ const uint16_t kDaikin160Sections = 2;
 const uint16_t kDaikin160Section1Length = 7;
 const uint16_t kDaikin160Section2Length = kDaikin160StateLength -
                                           kDaikin160Section1Length;
+const uint8_t kDaikin160BytePower = 12;
+const uint8_t kDaikin160ByteMode = kDaikin160BytePower;
+const uint8_t kDaikin160MaskMode = 0b01110000;
+const uint8_t kDaikin160ByteTemp = 16;
+const uint8_t kDaikin160MaskTemp = 0b01111110;
+const uint8_t kDaikin160ByteFan = 17;
+const uint8_t kDaikin160MaskFan = 0b00001111;
+const uint8_t kDaikin160ByteSwingV = 13;
+const uint8_t kDaikin160MaskSwingV = 0b11110000;
+const uint8_t kDaikin160SwingVLowest =  0x1;
+const uint8_t kDaikin160SwingVLow =     0x2;
+const uint8_t kDaikin160SwingVMiddle =  0x3;
+const uint8_t kDaikin160SwingVHigh =    0x4;
+const uint8_t kDaikin160SwingVHighest = 0x5;
+const uint8_t kDaikin160SwingVAuto =    0xF;
+
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
@@ -471,6 +488,24 @@ class IRDaikin160 {
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin160StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  void setSwingVertical(const uint8_t position);
+  uint8_t getSwingVertical(void);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
+  stdAc::state_t toCommon(void);
+  String toString(void);
 #ifndef UNIT_TEST
 
  private:

@@ -50,6 +50,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN
     case decode_type_t::DAIKIN:
 #endif
+#if SEND_DAIKIN160
+    case decode_type_t::DAIKIN160:
+#endif
 #if SEND_DAIKIN2
     case decode_type_t::DAIKIN2:
 #endif
@@ -216,6 +219,20 @@ void IRac::daikin(IRDaikinESP *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN
+
+#if SEND_DAIKIN160
+void IRac::daikin160(IRDaikin160 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->send();
+}
+#endif  // SEND_DAIKIN160
 
 #if SEND_DAIKIN2
 void IRac::daikin2(IRDaikin2 *ac,
@@ -929,6 +946,14 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN160
+    case DAIKIN160:
+    {
+      IRDaikin160 ac(_pin);
+      daikin160(&ac, on, mode, degC, fan, swingv);
+      break;
+    }
+#endif  // SEND_DAIKIN160
 #if SEND_DAIKIN2
     case DAIKIN2:
     {

@@ -3420,6 +3420,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN160
+    case decode_type_t::DAIKIN160: {
+      IRDaikin160 ac(txgpio);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN2
     case decode_type_t::DAIKIN2: {
       IRDaikin2 ac(txgpio);

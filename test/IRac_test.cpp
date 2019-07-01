@@ -138,6 +138,30 @@ TEST(TestIRac, Daikin) {
   ASSERT_EQ(expected, ac.toString());
 }
 
+TEST(TestIRac, Daikin160) {
+  IRDaikin160 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 2 (DRY), Temp: 23C, Fan: 1 (MIN), "
+      "Vent Position (V): 3 (Middle)";
+
+  ac.begin();
+  irac.daikin160(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kDry,       // Mode
+                 23,                          // Celsius
+                 stdAc::fanspeed_t::kMin,     // Fan speed
+                 stdAc::swingv_t::kMiddle);   // Veritcal swing
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN160, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin160Bits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
 TEST(TestIRac, Daikin2) {
   IRDaikin2 ac(0);
   IRac irac(0);
