@@ -12,6 +12,14 @@ before_install:
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
   - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
 install:
+  - ln -s $PWD /usr/local/share/arduino/libraries/
+  - git clone https://github.com/tzapu/WiFiManager.git /usr/local/share/arduino/libraries/WiFiManager
+  - git clone https://github.com/knolleary/pubsubclient.git /usr/local/share/arduino/libraries/PubSubClient
+  - git clone https://github.com/bblanchon/ArduinoJson.git --branch 5.x /usr/local/share/arduino/libraries/ArduinoJson
+  - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
+  - arduino --install-boards esp8266:esp8266
+  - arduino --board $BD --save-prefs
+  - arduino --pref "compiler.warning_level=all" --save-prefs
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
   - sudo apt-get install pylint3
@@ -23,15 +31,7 @@ notifications:
 jobs:
   include:
     - script:
-      - ln -s $PWD /usr/local/share/arduino/libraries/
-      - git clone https://github.com/tzapu/WiFiManager.git /usr/local/share/arduino/libraries/WiFiManager
-      - git clone https://github.com/knolleary/pubsubclient.git /usr/local/share/arduino/libraries/PubSubClient
-      - git clone https://github.com/bblanchon/ArduinoJson.git --branch 5.x /usr/local/share/arduino/libraries/ArduinoJson
-      - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
-      - arduino --install-boards esp8266:esp8266
-      - arduino --board $BD --save-prefs
-      - arduino --pref "compiler.warning_level=all" --save-prefs
-      # Check that everything compiles.
+      # Check that everything compiles. (Part 1)
       - arduino --verify --board $BD $PWD/examples/IRrecvDemo/IRrecvDemo.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/IRGCSendDemo/IRGCSendDemo.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/IRGCTCPServer/IRGCTCPServer.ino 2> /dev/null
@@ -42,17 +42,9 @@ jobs:
       - arduino --verify --board $BD $PWD/examples/TurnOnDaikinAC/TurnOnDaikinAC.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/TurnOnFujitsuAC/TurnOnFujitsuAC.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino 2> /dev/null
-    - script:
-      - ln -s $PWD /usr/local/share/arduino/libraries/
-      - git clone https://github.com/tzapu/WiFiManager.git /usr/local/share/arduino/libraries/WiFiManager
-      - git clone https://github.com/knolleary/pubsubclient.git /usr/local/share/arduino/libraries/PubSubClient
-      - git clone https://github.com/bblanchon/ArduinoJson.git --branch 5.x /usr/local/share/arduino/libraries/ArduinoJson
-      - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
-      - arduino --install-boards esp8266:esp8266
-      - arduino --board $BD --save-prefs
-      - arduino --pref "compiler.warning_level=all" --save-prefs
-      # Check that everything compiles.
       - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino 2> /dev/null
+    - script:
+      # Check that everything compiles. (Part 2)
       - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/TurnOnTrotecAC/TurnOnTrotecAC.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/LGACSend/LGACSend.ino 2> /dev/null
@@ -65,17 +57,17 @@ jobs:
       - arduino --verify --board $BD $PWD/examples/DumbIRRepeater/DumbIRRepeater.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/SmartIRRepeater/SmartIRRepeater.ino 2> /dev/null
     - script:
-      # Also check the tools programs compile.
+      # Check the version numbers match.
+      - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
+      - test ${LIB_VERSION} == "$(jq -r .version library.json)"
+      - grep -q "^version=${LIB_VERSION}$" library.properties
+      # Check the tools programs compile.
       - (cd tools; make all)
       # Check for lint issues.
       - shopt -s nullglob
       - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
       - pylint3 -d F0001 {src,test,tools}/*.py
       - shopt -u nullglob
-      # Check the version numbers match.
-      - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
-      - test ${LIB_VERSION} == "$(jq -r .version library.json)"
-      - grep -q "^version=${LIB_VERSION}$" library.properties
       # Build and run the unit tests.
       - (cd test; make run)
       - (cd tools; make run_tests)
