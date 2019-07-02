@@ -346,11 +346,13 @@ void IRSamsungAc::checksum(uint16_t length) {
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) this->checksum();
   if (_sendpower) {  // Do we need to send a the special power on/off message?
-    if (this->getPower())
+    _sendpower = false;  // It will now been sent.
+    if (this->getPower()) {
       this->sendOn();
-    else
+    } else {
       this->sendOff();
-    _sendpower = false;  // It's now been sent.
+      return;  // No point sending anything else if we are turning the unit off.
+    }
   }
   _irsend.sendSamsungAC(remote_state, kSamsungAcStateLength, repeat);
 }
