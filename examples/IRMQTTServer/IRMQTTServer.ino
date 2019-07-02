@@ -2291,7 +2291,7 @@ void receivingMQTT(String const topic_name, String const callback_str) {
       if (topic_name.equals(MqttClimateCmnd + KEY_RESEND) &&
           callback_str.equalsIgnoreCase(KEY_RESEND)) {
         force_resend = true;
-        mqttLog(F("Climate resend requested."));
+        mqttLog("Climate resend requested.");
       }
       if (sendClimate(climate, updated, MqttClimateStat,
                       true, false, force_resend) && !force_resend)
