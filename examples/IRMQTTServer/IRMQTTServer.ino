@@ -182,6 +182,13 @@
  * acknowledge this via the relevant state topic for that command.
  * e.g. If the aircon/climate changes from power off to power on, it will
  *      send an "on" payload to "ir_server/ac/stat/power"
+ *
+ * There is a special command available to force the ESP to resend the current
+ * A/C state in an IR message. To do so use the `resend` command MQTT topic,
+ * e.g. `ir_server/ac/cmnd/resend` with a payload message of `resend`.
+ * There is no corresponding "stat" message update for this particular topic,
+ * but a log message is produced indicating it was received.
+ *
  * NOTE: These "stat" messages have the MQTT retain flag set to on. Thus the
  *       MQTT broker will remember them until reset/restarted etc.
  *
@@ -1091,6 +1098,8 @@ void handleAirCon(void) {
           "</td></tr>"
       "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate.beep) +
           "</td></tr>"
+      "<tr><td>Force resend</td><td>" + htmlSelectBool(KEY_RESEND, false) +
+          "</td></tr>"
       "</table>"
       "<input type='submit' value='Update & Send'>"
       "</form>";
@@ -1108,14 +1117,18 @@ void handleAirConSet(void) {
 #endif
   stdAc::state_t result = climate;
   debug("New common a/c received via HTTP");
-  for (uint16_t i = 0; i < server.args(); i++)
-    result = updateClimate(result, server.argName(i), "", server.arg(i));
+  bool force_resend = false;
+  for (uint16_t i = 0; i < server.args(); i++) {
+    if (server.argName(i).equals(KEY_RESEND))
+      force_resend = IRac::strToBool(server.arg(i).c_str());
+    else
+      result = updateClimate(result, server.argName(i), "", server.arg(i));
+  }
 
 #if MQTT_ENABLE
-  sendClimate(climate, result, MqttClimateStat,
-              true, false, false);
+  sendClimate(climate, result, MqttClimateStat, true, false, force_resend);
 #else  // MQTT_ENABLE
-  sendClimate(climate, result, "", false, false, false);
+  sendClimate(climate, result, "", false, false, force_resend);
 #endif  // MQTT_ENABLE
   lastClimateSource = F("HTTP");
   // Update the old climate state with the new one.
@@ -2447,8 +2460,15 @@ void receivingMQTT(String const topic_name, String const callback_str) {
       debug("It's a climate command topic");
       stdAc::state_t updated = updateClimate(
           climate, topic_name, MqttClimateCmnd, callback_str);
+      // Handle the special command for forcing a resend of the state via IR.
+      bool force_resend = false;
+      if (topic_name.equals(MqttClimateCmnd + KEY_RESEND) &&
+          callback_str.equalsIgnoreCase(KEY_RESEND)) {
+        force_resend = true;
+        mqttLog(F("Climate resend requested."));
+      }
       if (sendClimate(climate, updated, MqttClimateStat,
-                      true, false, false))
+                      true, false, force_resend) && !force_resend)
         lastClimateSource = F("MQTT");
       climate = updated;
     } else if (topic_name.startsWith(MqttClimateStat)) {
@@ -2648,7 +2668,7 @@ void loop(void) {
       if (IRac::cmpStates(climate, climate_prev)) {  // Something changed.
         mqttLog("The state was recovered from MQTT broker. Updating.");
         sendClimate(climate_prev, climate, MqttClimateStat,
-                    true, false, false);
+                    true, false, false, MQTT_CLIMATE_IR_SEND_ON_RESTART);
         lastClimateSource = F("MQTT (via retain)");
       }
       lockMqttBroadcast = false;  // Release the lock so we can broadcast again.
@@ -3228,7 +3248,7 @@ stdAc::state_t jsonToState(const stdAc::state_t current, const String str) {
 #endif  // MQTT_CLIMATE_JSON
 
 stdAc::state_t updateClimate(stdAc::state_t current, const String str,
-                              const String prefix, const String payload) {
+                             const String prefix, const String payload) {
   stdAc::state_t result = current;
 #if MQTT_CLIMATE_JSON
   if (str.equals(prefix + KEY_JSON))
@@ -3630,11 +3650,10 @@ if (climate.celsius != state.celsius) {
   state.celsius = climate.celsius;
 }
 #if MQTT_ENABLE
-  sendClimate(climate, state, MqttClimateStat, true, false, false,
+  sendClimate(climate, state, MqttClimateStat, true, false,
               REPLAY_DECODED_AC_MESSAGE);
 #else  // MQTT_ENABLE
-  sendClimate(climate, state, "", false, false, false,
-              REPLAY_DECODED_AC_MESSAGE);
+  sendClimate(climate, state, "", false, false, REPLAY_DECODED_AC_MESSAGE);
 #endif  // MQTT_ENABLE
   climate = state;  // Copy over the new climate state.
   return true;

@@ -83,6 +83,11 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
 #define MQTT_CLIMATE_JSON false
+// Do we send an IR message when we reboot and recover the existing A/C state?
+// If set to `false` you may miss requested state changes while the ESP was
+// down. If set to `true`, it will resend the previous desired state sent to the
+// A/C. Depending on your circumstances, you may need to change this.
+#define MQTT_CLIMATE_IR_SEND_ON_RESTART false
 #define MQTTbroadcastInterval 10 * 60  // Seconds between rebroadcasts.
 
 #define QOS 1  // MQTT broker should queue up any unreceived messages for us
@@ -127,7 +132,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // `false` if you don't want to repeat the captured message.
 // e.g. Useful if the IR demodulator is located in the path between the remote
 //      and the A/C unit so the command isn't sent twice.
-// `true` if want it sent anyway.
+// `true` if you want it sent anyway.
 // e.g. The IR demodulator is in a completely different location than than the
 //      actual a/c unit.
 #define REPLAY_DECODED_AC_MESSAGE false
@@ -152,6 +157,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_CLEAN "clean"
 #define KEY_CELSIUS "use_celsius"
 #define KEY_JSON "json"
+#define KEY_RESEND "resend"
 
 // HTML arguments we will parse for IR code information.
 #define KEY_TYPE "type"  // KEY_PROTOCOL is also checked too.
@@ -183,7 +189,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.2.3-alpha"
+#define _MY_VERSION_ "v1.2.4-testing"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -246,7 +252,7 @@ const char* kClimateTopics =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
     KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
     KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
-    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS
+    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS "|" KEY_RESEND
 #if MQTT_CLIMATE_JSON
     "|" KEY_JSON
 #endif  // MQTT_CLIMATE_JSON
