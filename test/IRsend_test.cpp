@@ -739,3 +739,50 @@ TEST(TestSend, GenericComplexSendMethodFailure) {
       ASSERT_TRUE(irsend.send((decode_type_t)i, state, 0));
   }
 }
+
+TEST(TestSend, GenericSendExistsForEveryRealProtocol) {
+  IRsendTest irsend(0);
+  irsend.begin();
+
+  uint8_t state[kStateSizeMax] = {};
+  uint64_t value = 0;
+  for (int i = 1; i <= kLastDecodeType; i++) {
+    switch (i) {
+      // Protocols that don't have a generic send equiv.
+      case PRONTO:
+      case RAW:
+      case GLOBALCACHE:
+      // Protocols that are disabled because they don't work.
+      case SANYO:
+        break;
+      default:
+        EXPECT_TRUE(irsend.send((decode_type_t)i, state, 0) ||
+                    irsend.send((decode_type_t)i, value, 0)) <<
+            "Protocol " << typeToString((decode_type_t)i) << "(" << i <<
+            ") doesn't have a generic send option for it.";
+    }
+  }
+}
+
+TEST(TestSend, defaultBits) {
+  for (int i = 1; i <= kLastDecodeType; i++) {
+    switch (i) {
+      // Protocols that don't have have a default bit size.
+      case PRONTO:
+      case RAW:
+      case GLOBALCACHE:
+      case SANYO:  // Not implemented / disabled.
+      // Deliberate no default size.
+      case FUJITSU_AC:
+      case MWM:
+        EXPECT_EQ(IRsend::defaultBits((decode_type_t)i), 0) <<
+            "Protocol " << typeToString((decode_type_t)i) << "(" << i <<
+            ") doesn't have a correct value for it.";
+        break;
+      default:
+        EXPECT_GT(IRsend::defaultBits((decode_type_t)i), 0) <<
+            "Protocol " << typeToString((decode_type_t)i) << "(" << i <<
+            ") doesn't have a correct value for it.";
+    }
+  }
+}

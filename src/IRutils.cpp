@@ -161,12 +161,19 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::MITSUBISHI2;
   else if (!strcasecmp(str, "MITSUBISHI_AC"))
     return decode_type_t::MITSUBISHI_AC;
+  else if (!strcasecmp(str, "MITSUBISHI_HEAVY_88"))
+    return decode_type_t::MITSUBISHI_HEAVY_88;
+  else if (!strcasecmp(str, "MITSUBISHI_HEAVY_152"))
+    return decode_type_t::MITSUBISHI_HEAVY_152;
   else if (!strcasecmp(str, "MWM"))
     return decode_type_t::MWM;
   else if (!strcasecmp(str, "NEOCLIMA"))
     return decode_type_t::NEOCLIMA;
-  else if (!strcasecmp(str, "NEC") || !strcasecmp(str, "NEC (NON-STRICT"))
+  else if (!strcasecmp(str, "NEC"))
     return decode_type_t::NEC;
+  else if (!strcasecmp(str, "NEC_LIKE") ||
+           !strcasecmp(str, "NEC (NON-STRICT)"))
+    return decode_type_t::NEC_LIKE;
   else if (!strcasecmp(str, "NIKAI"))
     return decode_type_t::NIKAI;
   else if (!strcasecmp(str, "PANASONIC"))

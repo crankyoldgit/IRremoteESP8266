@@ -526,8 +526,10 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 //   int16_t:  The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
-    case LASERTAG:
     case RC5:
+      return 12;
+    case LASERTAG:
+    case RC5X:
       return 13;
     case AIWA_RC_T501:
     case DENON:
@@ -759,6 +761,7 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #endif
 #if SEND_RC5
     case RC5:
+    case RC5X:
       sendRC5(data, nbits, min_repeat);
       break;
 #endif
