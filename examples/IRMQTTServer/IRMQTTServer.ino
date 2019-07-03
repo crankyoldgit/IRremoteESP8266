@@ -38,6 +38,9 @@
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
+ *   o Use the smallest non-zero SPIFFS size you can for your board.
+ *     (See the Tools -> Flash Size menu)
+ *
  * - PlatformIO IDE:
  *     If you are using PlatformIO, this should already been done for you in
  *     the accompanying platformio.ini file.
@@ -276,9 +279,13 @@
  *   `ir_server/log`
  *
  * ## Updates
- * You can upload new firmware over the air (OTA) via the form on the device's
+ * You can upload new firmware Over The Air (OTA) via the form on the device's
  * "Admin" page. No need to connect to the device again via USB. \o/
  * Your settings should be remembered between updates. \o/ \o/
+ *
+ * On boards with 1 Meg of flash should use an SPIFFS size of 64k if you want a
+ * hope of being able to load a firmware via OTA.
+ * Boards with only 512k flash have no chance of OTA with this firmware.
  *
  * ## Security
  * <security-hat="on">
@@ -1187,6 +1194,14 @@ void handleAdmin(void) {
   server.send(200, "text/html", html);
 }
 
+uint32_t maxSketchSpace(void) {
+#if defined(ESP8266)
+  return (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+#else  // defined(ESP8266)
+  return UPDATE_SIZE_UNKNOWN;
+#endif  // defined(ESP8266)
+}
+
 // Info web page
 void handleInfo(void) {
   String html = htmlHeader(F("IR MQTT server info"));
@@ -1203,6 +1218,7 @@ void handleInfo(void) {
     "IR Lib Version: " _IRREMOTEESP8266_VERSION_ "<br>"
 #if defined(ESP8266)
     "ESP8266 Core Version: " + ESP.getCoreVersion() + "<br>"
+    "Free Sketch Space: " + String(maxSketchSpace() >> 10) + "k<br>"
 #endif  // ESP8266
 #if defined(ESP32)
     "ESP32 SDK Version: " + ESP.getSdkVersion() + "<br>"
@@ -2281,12 +2297,8 @@ void setup(void) {
           debug(upload.filename.c_str());
 #if defined(ESP8266)
           WiFiUDP::stopAll();
-          uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) &
-              0xFFFFF000;
-#else  // ESP8266
-          uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
-#endif  // ESP8266
-          if (!Update.begin(maxSketchSpace)) {  // start with max available size
+#endif  // defined(ESP8266)
+          if (!Update.begin(maxSketchSpace())) {  // start with max available
 #if DEBUG
             if (!isSerialGpioUsedByIr())
               Update.printError(Serial);
