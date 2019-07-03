@@ -20,6 +20,7 @@
 //   Brand: Samsung,  Model: UA55H6300 TV
 //   Brand: Samsung,  Model: IEC-R03 remote
 //   Brand: Samsung,  Model: AR12KSFPEWQNET A/C
+//   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C
 
 // Ref:
 //   https://github.com/markszabo/IRremoteESP8266/issues/505
