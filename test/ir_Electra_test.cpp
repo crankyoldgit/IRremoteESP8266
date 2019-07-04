@@ -2,6 +2,7 @@
 
 #include "ir_Electra.h"
 #include <algorithm>
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -98,11 +99,10 @@ TEST(TestDecodeElectraAC, RealExampleDecode) {
   ASSERT_EQ(ELECTRA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kElectraAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRElectraAc ac(0);
-  ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestIRElectraAcClass, Power) {
