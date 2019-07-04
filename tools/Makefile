@@ -196,7 +196,7 @@ ir_Lutron.o : $(USER_DIR)/ir_Lutron.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lutron.cpp
 
 ir_Electra.o : $(USER_DIR)/ir_Electra.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Electra.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Electra.cpp
 
 ir_Pioneer.o : $(USER_DIR)/ir_Pioneer.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Pioneer.cpp

@@ -3,6 +3,7 @@
 #include <string>
 #include "ir_Argo.h"
 #include "ir_Daikin.h"
+#include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"
@@ -225,6 +226,31 @@ TEST(TestIRac, Daikin216) {
   ASSERT_EQ(DAIKIN216, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDaikin216Bits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, Electra) {
+  IRElectraAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 6 (FAN), Temp: 26C, Fan: 1 (High), "
+      "Swing(V): On, Swing(H): On";
+
+  ac.begin();
+  irac.electra(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kFan,       // Mode
+                 26,                          // Celsius
+                 stdAc::fanspeed_t::kHigh,    // Fan speed
+                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingh_t::kLeft);     // Horizontal swing
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(ELECTRA_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kElectraAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
 }
 
 TEST(TestIRac, Fujitsu) {

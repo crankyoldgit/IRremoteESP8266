@@ -3014,6 +3014,14 @@ bool decodeCommonAc(const decode_results *decode) {
       break;
     }
 #endif  // DECODE_DAIKIN216
+#if DECODE_ELECTRA_AC
+    case decode_type_t::ELECTRA_AC: {
+      IRElectraAc ac(txgpio);
+      ac.setRaw(decode->state);
+      state = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_ELECTRA_AC
 #if DECODE_FUJITSU_AC
     case decode_type_t::FUJITSU_AC: {
       IRFujitsuAC ac(txgpio);

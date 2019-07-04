@@ -18,6 +18,7 @@
 #include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
+#include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
@@ -58,6 +59,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_DAIKIN216
     case decode_type_t::DAIKIN216:
+#endif
+#if SEND_ELECTRA_AC
+    case decode_type_t::ELECTRA_AC:
 #endif
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
@@ -278,6 +282,31 @@ void IRac::daikin216(IRDaikin216 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN216
+
+#if SEND_ELECTRA_AC
+void IRac::electra(IRElectraAc *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const float degrees, const stdAc::fanspeed_t fan,
+                   const stdAc::swingv_t swingv,
+                   const stdAc::swingh_t swingh) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_ELECTRA_AC
 
 #if SEND_FUJITSU_AC
 void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
@@ -971,6 +1000,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_DAIKIN216
+#if SEND_ELECTRA_AC
+    case ELECTRA_AC:
+    {
+      IRElectraAc ac(_pin);
+      ac.begin();
+      electra(&ac, on, mode, degC, fan, swingv, swingh);
+      break;
+    }
+#endif  // SEND_ELECTRA_AC
 #if SEND_FUJITSU_AC
     case FUJITSU_AC:
     {
@@ -1468,6 +1506,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN216
+#if DECODE_ELECTRA_AC
+      case decode_type_t::ELECTRA_AC: {
+        IRElectraAc ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_ELECTRA_AC
 #if DECODE_FUJITSU_AC
       case decode_type_t::FUJITSU_AC: {
         IRFujitsuAC ac(0);
