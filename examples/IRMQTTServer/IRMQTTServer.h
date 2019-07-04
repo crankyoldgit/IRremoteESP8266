@@ -197,13 +197,12 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.3.0-alpha"
+#define _MY_VERSION_ "v1.3.0-beta"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
 
 // Gpio related
-const int8_t kGpioUnused = -1;
 #if defined(ESP8266)
 const int8_t kTxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
 const int8_t kRxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
