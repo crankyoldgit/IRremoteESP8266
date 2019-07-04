@@ -1297,8 +1297,9 @@ void handleInfo(void) {
     "QoS: " + String(QOS) + "<br>"
     // lastMqttCmd* is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
-    "Last MQTT command seen: (topic) '" + htmlEscape(lastMqttCmdTopic) +
-         "' (payload) '" + htmlEscape(lastMqttCmd) + "' <i>(" +
+    "Last MQTT command seen: (topic) '" +
+        IRutils::htmlEscape(lastMqttCmdTopic) +
+         "' (payload) '" + IRutils::htmlEscape(lastMqttCmd) + "' <i>(" +
          timeSince(lastMqttCmdTime) + ")</i><br>"
     "Total published: " + String(mqttSentCounter) + "<br>"
     "Total received: " + String(mqttRecvCounter) + "<br>"

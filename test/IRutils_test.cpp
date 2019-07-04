@@ -1,4 +1,4 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2019 David Conran
 
 #include "IRutils.h"
 #include <stdint.h>
@@ -404,17 +404,19 @@ TEST(TestStrToDecodeType, strToDecodeType) {
 }
 
 TEST(TestUtils, htmlEscape) {
-  EXPECT_EQ("", htmlEscape(""));
-  EXPECT_EQ("No Changes", htmlEscape("No Changes"));
-  EXPECT_EQ("No\tChanges+_%^$@~`\n:\\", htmlEscape("No\tChanges+_%^$@~`\n:\\"));
-  EXPECT_EQ("&quot;With Changes&quot;", htmlEscape("\"With Changes\""));
+  EXPECT_EQ("", IRutils::htmlEscape(""));
+  EXPECT_EQ("No Changes", IRutils::htmlEscape("No Changes"));
+  EXPECT_EQ("No\tChanges+_%^$@~`\n:\\",
+            IRutils::htmlEscape("No\tChanges+_%^$@~`\n:\\"));
+  EXPECT_EQ("&quot;With Changes&quot;",
+            IRutils::htmlEscape("\"With Changes\""));
   EXPECT_EQ(
       "&apos;&semi;&excl;&dash;&quot;&lt;&gt;&#equals;&amp;&num;&lcub;&rcub;"
-      "&lpar;&rpar;", htmlEscape("';!-\"<>=&#{}()"));
-  EXPECT_EQ("&quot;&quot;", htmlEscape("\"\""));
+      "&lpar;&rpar;", IRutils::htmlEscape("';!-\"<>=&#{}()"));
+  EXPECT_EQ("&quot;&quot;", IRutils::htmlEscape("\"\""));
   EXPECT_EQ(
       "&amp;quot&semi;&amp;lt&semi;&amp;apos&semi;&amp;gt&semi;&amp;amp&semi;",
-      htmlEscape("&quot;&lt;&apos;&gt;&amp;"));
+      IRutils::htmlEscape("&quot;&lt;&apos;&gt;&amp;"));
 }
 
 TEST(TestUtils, TemperatureConversion) {

@@ -23,10 +23,9 @@ String resultToSourceCode(const decode_results * const results);
 String resultToTimingInfo(const decode_results * const results);
 String resultToHumanReadableBasic(const decode_results * const results);
 String resultToHexidecimal(const decode_results * const result);
-String htmlEscape(const String unescaped);
 bool hasACState(const decode_type_t protocol);
 uint16_t getCorrectedRawLength(const decode_results * const results);
-uint16_t * resultToRawArray(const decode_results * const decode);
+uint16_t *resultToRawArray(const decode_results * const decode);
 uint8_t sumBytes(const uint8_t * const start, const uint16_t length,
                  const uint8_t init = 0);
 uint8_t xorBytes(const uint8_t * const start, const uint16_t length,
@@ -45,5 +44,6 @@ namespace IRutils {
   String acModeToString(const uint8_t mode, const uint8_t automatic,
                         const uint8_t cool, const uint8_t heat,
                         const uint8_t dry, const uint8_t fan);
+  String htmlEscape(const String unescaped);
 }  // namespace IRutils
 #endif  // IRUTILS_H_
