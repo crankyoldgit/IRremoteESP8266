@@ -489,3 +489,15 @@ TEST(TestResultToRawArray, LargeValues) {
   EXPECT_STATE_EQ(large_test_data, result, 11);
   if (result != NULL) delete[] result;
 }
+
+TEST(TestUtils, TypeStringConversionRangeTests) {
+  ASSERT_EQ("UNKNOWN", typeToString((decode_type_t)(kLastDecodeType + 1)));
+  ASSERT_EQ("UNKNOWN", typeToString(decode_type_t::UNKNOWN));
+  for (int i = 0; i <= kLastDecodeType; i++) {
+    EXPECT_NE("UNKNOWN", typeToString((decode_type_t)i)) << "Protocol " << i <<
+        " doesn't have a valid string for it.";
+    EXPECT_EQ(i, strToDecodeType(typeToString((decode_type_t)i).c_str())) <<
+        "Protocol " << typeToString((decode_type_t)i) <<
+        " doesn't decode from a string correctly";
+  }
+}

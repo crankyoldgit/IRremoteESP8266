@@ -258,4 +258,8 @@ void daikin216(IRDaikin216 *ac,
 static stdAc::state_t handleToggles(const stdAc::state_t desired,
                                     const stdAc::state_t *prev = NULL);
 };  // IRac class
+
+namespace IRAcUtils {
+  String resultAcToString(const decode_results * const results);
+}  // namespace IRAcUtils
 #endif  // IRAC_H_

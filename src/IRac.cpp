@@ -1424,3 +1424,207 @@ String IRac::swinghToString(const stdAc::swingh_t swingh) {
       return F("unknown");
   }
 }
+
+namespace IRAcUtils {
+  // Display the human readable state of an A/C message if we can.
+  // Args:
+  //   result: A Ptr to the captured `decode_results` that contains an A/C mesg.
+  // Returns:
+  //   A string with the human description of the A/C message. "" if we can't.
+  String resultAcToString(const decode_results * const result) {
+    switch (result->decode_type) {
+#if DECODE_ARGO
+      case decode_type_t::ARGO: {
+        IRArgoAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_ARGO
+#if DECODE_DAIKIN
+      case decode_type_t::DAIKIN: {
+        IRDaikinESP ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN160
+      case decode_type_t::DAIKIN160: {
+        IRDaikin160 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN160
+#if DECODE_DAIKIN2
+      case decode_type_t::DAIKIN2: {
+        IRDaikin2 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN216
+      case decode_type_t::DAIKIN216: {
+        IRDaikin216 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN216
+#if DECODE_FUJITSU_AC
+      case decode_type_t::FUJITSU_AC: {
+        IRFujitsuAC ac(0);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
+#endif  // DECODE_FUJITSU_AC
+#if DECODE_KELVINATOR
+      case decode_type_t::KELVINATOR: {
+        IRKelvinatorAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_KELVINATOR
+#if DECODE_MITSUBISHI_AC
+      case decode_type_t::MITSUBISHI_AC: {
+        IRMitsubishiAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHIHEAVY
+      case decode_type_t::MITSUBISHI_HEAVY_88: {
+        IRMitsubishiHeavy88Ac ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+      case decode_type_t::MITSUBISHI_HEAVY_152: {
+        IRMitsubishiHeavy152Ac ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_MITSUBISHIHEAVY
+#if DECODE_NEOCLIMA
+      case decode_type_t::NEOCLIMA: {
+        IRNeoclimaAc ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_NEOCLIMA
+#if DECODE_TOSHIBA_AC
+      case decode_type_t::TOSHIBA_AC: {
+        IRToshibaAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_TOSHIBA_AC
+#if DECODE_TROTEC
+      case decode_type_t::TROTEC: {
+        IRTrotecESP ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_TROTEC
+#if DECODE_GOODWEATHER
+      case decode_type_t::GOODWEATHER: {
+        IRGoodweatherAc ac(0);
+        ac.setRaw(result->value);  // Goodweather uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_GOODWEATHER
+#if DECODE_GREE
+      case decode_type_t::GREE: {
+        IRGreeAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_GREE
+#if DECODE_MIDEA
+      case decode_type_t::MIDEA: {
+        IRMideaAC ac(0);
+        ac.setRaw(result->value);  // Midea uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_MIDEA
+#if DECODE_HAIER_AC
+      case decode_type_t::HAIER_AC: {
+        IRHaierAC ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC_YRW02
+      case decode_type_t::HAIER_AC_YRW02: {
+        IRHaierACYRW02 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HAIER_AC_YRW02
+#if DECODE_SAMSUNG_AC
+      case decode_type_t::SAMSUNG_AC: {
+        IRSamsungAc ac(0);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
+#endif  // DECODE_SAMSUNG_AC
+#if DECODE_SHARP_AC
+      case decode_type_t::SHARP_AC: {
+        IRSharpAc ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_SHARP_AC
+#if DECODE_COOLIX
+      case decode_type_t::COOLIX: {
+        IRCoolixAC ac(0);
+        ac.setRaw(result->value);  // Coolix uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_COOLIX
+#if DECODE_PANASONIC_AC
+      case decode_type_t::PANASONIC_AC: {
+        if (result->bits > kPanasonicAcShortBits) {
+          IRPanasonicAc ac(0);
+          ac.setRaw(result->state);
+          return ac.toString();
+        }
+        return "";
+      }
+#endif  // DECODE_PANASONIC_AC
+#if DECODE_HITACHI_AC
+      case decode_type_t::HITACHI_AC: {
+        IRHitachiAc ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HITACHI_AC
+#if DECODE_WHIRLPOOL_AC
+      case decode_type_t::WHIRLPOOL_AC: {
+        IRWhirlpoolAc ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_VESTEL_AC
+      case decode_type_t::VESTEL_AC: {
+        IRVestelAc ac(0);
+        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_VESTEL_AC
+#if DECODE_TECO
+      case decode_type_t::TECO: {
+        IRTecoAc ac(0);
+        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_TECO
+#if DECODE_TCL112AC
+      case decode_type_t::TCL112AC: {
+        IRTcl112Ac ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_TCL112AC
+      default:
+        return "";
+    }
+  }
+}  // namespace IRAcUtils
