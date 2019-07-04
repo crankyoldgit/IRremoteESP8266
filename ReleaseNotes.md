@@ -1,5 +1,33 @@
 # Release Notes
 
+## _v2.6.3 (20190704)_
+
+**[Bug Fixes]**
+- IRMQTTServer: REPLAY_DECODED_AC_MESSAGE not working. (#784, #797)
+- ESP32: Ensure `IRrecv`'s GPIO is set to input mode. (#774)
+
+**[Features]**
+- IRMQTTServer: Show available sketch space for OTA uploads. (#795)
+- Experimental detailed support for Electra/AUX protocol (#788)
+- IRMQTTServer: Ability to resend existing climate state via MQTT & HTTP (#784)
+- Daikin160: Add detailed & common a/c support. (#777)
+- Experimental detailed support for Neoclima protocol. (#767)
+- Gree: add WiFi and IFeel bits (#770)
+- Handle A/Cs with toggles better. (#758)
+- IRMQTTServer: Allow sending/receiving climate via JSON over MQTT. (#763)
+
+**[Misc]**
+- Move converting of IR A/C messages out of example code. (#798)
+- Reduce example code size and complexity (#790)
+- Change `ControlSamsungAC` example to not use `sendExtended()` (#792)
+- IRMQTTServer: Add MQTT_CLIMATE_IR_SEND_ON_RESTART compile-time flag. (#784)
+- Refactor A/C's toString()'s to reduce code size. Saves ~3.5k (#782)
+- Add sanity tests for unexpected conditions in IRrecv. (#773)
+- IRMQTTServer: Fixed the HA config documentation (missing '-') (#776)
+- Improve `mkkeywords` tool. (#766)
+- Refactor with generic decode routines in `IRrecv` class. Saves ~7k. (#765)
+
+
 ## _v2.6.2 (20190616)_
 
 **[Features]**
