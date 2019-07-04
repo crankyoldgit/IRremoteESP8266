@@ -3221,9 +3221,10 @@ if (climate.celsius != state.celsius) {
 }
 #if MQTT_ENABLE
   sendClimate(climate, state, MqttClimateStat, true, false,
-              REPLAY_DECODED_AC_MESSAGE);
+              REPLAY_DECODED_AC_MESSAGE, REPLAY_DECODED_AC_MESSAGE);
 #else  // MQTT_ENABLE
-  sendClimate(climate, state, "", false, false, REPLAY_DECODED_AC_MESSAGE);
+  sendClimate(climate, state, "", false, false, REPLAY_DECODED_AC_MESSAGE,
+              REPLAY_DECODED_AC_MESSAGE);
 #endif  // MQTT_ENABLE
   climate = state;  // Copy over the new climate state.
   return true;
