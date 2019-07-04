@@ -721,7 +721,7 @@ String resultToHumanReadableBasic(const decode_results * const results) {
 //   A pointer to a dynamically allocated uint16_t sendRaw compatible array.
 // Note:
 //   Result needs to be delete[]'ed/free()'ed (deallocated) after use by caller.
-uint16_t * resultToRawArray(const decode_results * const decode) {
+uint16_t* resultToRawArray(const decode_results * const decode) {
   uint16_t *result = new uint16_t[getCorrectedRawLength(decode)];
   if (result != NULL) {  // The memory was allocated successfully.
     // Convert the decode data.
