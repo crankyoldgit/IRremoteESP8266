@@ -31,6 +31,10 @@
 #include "ir_Vestel.h"
 #include "ir_Whirlpool.h"
 
+// Constants
+const int8_t kGpioUnused = -1;
+
+// Class
 class IRac {
  public:
   explicit IRac(uint8_t pin);
@@ -269,5 +273,6 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
 
 namespace IRAcUtils {
   String resultAcToString(const decode_results * const results);
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result);
 }  // namespace IRAcUtils
 #endif  // IRAC_H_
