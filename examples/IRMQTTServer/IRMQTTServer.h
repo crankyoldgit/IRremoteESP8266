@@ -343,6 +343,7 @@ void setup_wifi(void);
 void init_vars(void);
 void setup(void);
 void loop(void);
+uint32_t maxSketchSpace(void);
 uint64_t getUInt64fromHex(char const *str);
 bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
                 uint64_t const code, char const * code_str, uint16_t bits,
