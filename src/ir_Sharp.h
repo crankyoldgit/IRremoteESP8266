@@ -79,7 +79,6 @@ class IRSharpAc {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
-  static String renderTime(const uint16_t timemins);
 #ifndef UNIT_TEST
 
  private:

@@ -486,19 +486,19 @@ String IRVestelAc::toString(void) {
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (this->isTimeCommand()) {
     result += F("Time: ");
-    result += IRHaierAC::timeToString(getTime());
+    result += IRutils::minsToString(getTime());
 
     result += F(", Timer: ");
-    result += this->isTimerActive() ? IRHaierAC::timeToString(this->getTimer())
+    result += this->isTimerActive() ? IRutils::minsToString(this->getTimer())
                                     : F("Off");
     result += F(", On Timer: ");
     result += (this->isOnTimerActive() && !this->isTimerActive())
-                  ? IRHaierAC::timeToString(this->getOnTimer())
+                  ? IRutils::minsToString(this->getOnTimer())
                   : F("Off");
 
     result += F(", Off Timer: ");
     result +=
-        this->isOffTimerActive() ? IRHaierAC::timeToString(this->getOffTimer())
+        this->isOffTimerActive() ? IRutils::minsToString(this->getOffTimer())
                                  : F("Off");
     return result;
   }

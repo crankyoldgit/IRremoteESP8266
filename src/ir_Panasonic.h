@@ -148,7 +148,6 @@ class IRPanasonicAc {
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void);
   String toString(void);
-  static String timeToString(const uint16_t mins_since_midnight);
 #ifndef UNIT_TEST
 
  private:

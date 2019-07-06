@@ -588,15 +588,6 @@ bool IRPanasonicAc::isOffTimerEnabled(void) {
   return remote_state[13] & kPanasonicAcOffTimer;
 }
 
-String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
-  String result = "";
-  result.reserve(6);
-  result += uint64ToString(mins_since_midnight / 60) + ':';
-  uint8_t mins = mins_since_midnight % 60;
-  if (mins < 10) result += '0';  // Zero pad the minutes.
-  return result + uint64ToString(mins);
-}
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -837,15 +828,15 @@ String IRPanasonicAc::toString(void) {
   result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
   result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
   result += F(", Clock: ");
-  result += timeToString(getClock());
+  result += IRutils::minsToString(getClock());
   result += F(", On Timer: ");
   if (isOnTimerEnabled())
-    result += timeToString(getOnTimer());
+    result += IRutils::minsToString(getOnTimer());
   else
     result += F("Off");
   result += F(", Off Timer: ");
   if (isOffTimerEnabled())
-    result += timeToString(getOffTimer());
+    result += IRutils::minsToString(getOffTimer());
   else
     result += F("Off");
   return result;

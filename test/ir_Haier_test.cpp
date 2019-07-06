@@ -343,19 +343,6 @@ TEST(TestHaierACClass, Timers) {
   EXPECT_EQ(kHaierAcCmdTimerCancel, haier.getCommand());
 }
 
-TEST(TestHaierACClass, TimeToString) {
-  EXPECT_EQ("00:00", IRHaierAC::timeToString(0));
-  EXPECT_EQ("00:01", IRHaierAC::timeToString(1));
-  EXPECT_EQ("00:10", IRHaierAC::timeToString(10));
-  EXPECT_EQ("00:59", IRHaierAC::timeToString(59));
-
-  EXPECT_EQ("01:00", IRHaierAC::timeToString(60));
-  EXPECT_EQ("01:01", IRHaierAC::timeToString(61));
-  EXPECT_EQ("01:59", IRHaierAC::timeToString(60 + 59));
-  EXPECT_EQ("18:59", IRHaierAC::timeToString(18 * 60 + 59));
-  EXPECT_EQ("23:59", IRHaierAC::timeToString(23 * 60 + 59));
-}
-
 TEST(TestHaierACClass, MessageConstuction) {
   IRHaierAC haier(0);
 

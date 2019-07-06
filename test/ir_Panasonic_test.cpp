@@ -739,7 +739,7 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
   EXPECT_EQ(
       "Model: 4 (JKE), Power: Off, Mode: 0 (AUTO), Temp: 0C, "
       "Fan: 253 (UNKNOWN), Swing (Vertical): 0 (UNKNOWN), Quiet: Off, "
-      "Powerful: Off, Clock: 0:00, On Timer: Off, Off Timer: Off",
+      "Powerful: Off, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
   pana.setPower(true);
   pana.setTemp(kPanasonicAcMaxTemp);
@@ -750,7 +750,7 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
   EXPECT_EQ(
       "Model: 4 (JKE), Power: On, Mode: 4 (HEAT), Temp: 30C, "
       "Fan: 4 (MAX), Swing (Vertical): 15 (AUTO), Quiet: Off, "
-      "Powerful: On, Clock: 0:00, On Timer: Off, Off Timer: Off",
+      "Powerful: On, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
   pana.setQuiet(true);
   pana.setModel(kPanasonicLke);
@@ -758,7 +758,7 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
       "Model: 1 (LKE), Power: Off, Mode: 4 (HEAT), Temp: 30C, "
       "Fan: 4 (MAX), Swing (Vertical): 15 (AUTO), "
       "Swing (Horizontal): 6 (Middle), Quiet: On, Powerful: Off, "
-      "Clock: 0:00, On Timer: 0:00, Off Timer: Off",
+      "Clock: 00:00, On Timer: 00:00, Off Timer: Off",
       pana.toString());
   pana.setModel(kPanasonicDke);
   pana.setSwingHorizontal(kPanasonicAcSwingHRight);
@@ -766,7 +766,7 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
       "Model: 3 (DKE), Power: Off, Mode: 4 (HEAT), Temp: 30C, "
       "Fan: 4 (MAX), Swing (Vertical): 15 (AUTO), "
       "Swing (Horizontal): 11 (Right), Quiet: On, Powerful: Off, "
-      "Clock: 0:00, On Timer: Off, Off Timer: Off",
+      "Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
 
@@ -858,7 +858,7 @@ TEST(TestDecodePanasonicAC, SyntheticExample) {
   EXPECT_EQ(
       "Model: 4 (JKE), Power: Off, Mode: 3 (COOL), Temp: 25C, "
       "Fan: 7 (AUTO), Swing (Vertical): 15 (AUTO), Quiet: Off, "
-      "Powerful: Off, Clock: 0:00, On Timer: Off, Off Timer: Off",
+      "Powerful: Off, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
 
@@ -938,7 +938,7 @@ TEST(TestDecodePanasonicAC, Issue540) {
       "Model: 0 (UNKNOWN), Power: On, Mode: 3 (COOL), Temp: 26C, "
       "Fan: 7 (AUTO), Swing (Vertical): 15 (AUTO), "
       "Swing (Horizontal): 13 (AUTO), Quiet: Off, Powerful: Off, "
-      "Clock: 0:00, On Timer: Off, Off Timer: Off",
+      "Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
 
@@ -948,20 +948,10 @@ TEST(TestIRPanasonicAcClass, TimeBasics) {
   EXPECT_EQ(0x448, IRPanasonicAc::encodeTime(18, 16));
   EXPECT_EQ(0, IRPanasonicAc::encodeTime(0, 0));
   EXPECT_EQ(kPanasonicAcTimeMax, IRPanasonicAc::encodeTime(23, 59));
-  EXPECT_EQ("16:10",
-            IRPanasonicAc::timeToString(IRPanasonicAc::encodeTime(16, 10)));
-  EXPECT_EQ("6:30",
-            IRPanasonicAc::timeToString(IRPanasonicAc::encodeTime(6, 30)));
-  EXPECT_EQ("18:16",
-            IRPanasonicAc::timeToString(IRPanasonicAc::encodeTime(18, 16)));
-  EXPECT_EQ("1:01",
-            IRPanasonicAc::timeToString(IRPanasonicAc::encodeTime(1, 1)));
   EXPECT_EQ(kPanasonicAcTimeMax, IRPanasonicAc::encodeTime(23, 59));
   EXPECT_EQ(kPanasonicAcTimeMax, IRPanasonicAc::encodeTime(25, 72));
   EXPECT_EQ(59, IRPanasonicAc::encodeTime(0, 72));
   EXPECT_EQ(23 * 60, IRPanasonicAc::encodeTime(27, 0));
-  EXPECT_EQ("0:00", IRPanasonicAc::timeToString(0));
-  EXPECT_EQ("23:59", IRPanasonicAc::timeToString(kPanasonicAcTimeMax));
 }
 
 TEST(TestIRPanasonicAcClass, TimersAndClock) {
@@ -1127,7 +1117,7 @@ TEST(TestDecodePanasonicAC, CkpModelSpecifics) {
   EXPECT_EQ(
       "Model: 5 (CKP), Power: Off, Mode: 4 (HEAT), Temp: 23C, "
       "Fan: 7 (AUTO), Swing (Vertical): 15 (AUTO), Quiet: Off, "
-      "Powerful: On, Clock: 0:00, On Timer: 0:00, Off Timer: 0:00",
+      "Powerful: On, Clock: 00:00, On Timer: 00:00, Off Timer: 00:00",
       pana.toString());
 
   pana.setQuiet(true);

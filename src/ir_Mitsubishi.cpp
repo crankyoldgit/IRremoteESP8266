@@ -691,17 +691,6 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
   return result;
 }
 
-String IRMitsubishiAC::timeToString(const uint64_t time) {
-  String result = "";
-  result.reserve(6);
-  if (time / 6 < 10) result += '0';
-  result += uint64ToString(time / 6);
-  result += ':';
-  if (time * 10 % 60 < 10) result += '0';
-  result += uint64ToString(time * 10 % 60);
-  return result;
-}
-
 // Convert the internal state into a human readable string.
 String IRMitsubishiAC::toString(void) {
   String result = "";
@@ -738,11 +727,11 @@ String IRMitsubishiAC::toString(void) {
       result += uint64ToString(this->getVane());
   }
   result += F(", Time: ");
-  result += this->timeToString(this->getClock());
+  result += IRutils::minsToString(this->getClock() * 10);
   result += F(", On timer: ");
-  result += this->timeToString(this->getStartClock());
+  result += IRutils::minsToString(this->getStartClock() * 10);
   result += F(", Off timer: ");
-  result += this->timeToString(this->getStopClock());
+  result += IRutils::minsToString(this->getStopClock() * 10);
   result += F(", Timer: ");
   switch (this->getTimer()) {
     case kMitsubishiAcNoTimer:

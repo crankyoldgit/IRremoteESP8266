@@ -476,18 +476,6 @@ stdAc::state_t IRWhirlpoolAc::toCommon(void) {
   return result;
 }
 
-String IRWhirlpoolAc::timeToString(const uint16_t minspastmidnight) {
-  String result = "";
-  uint8_t hours = minspastmidnight / 60;
-  if (hours < 10) result += '0';
-  result += uint64ToString(hours);
-  result += ':';
-  uint8_t mins = minspastmidnight % 60;
-  if (mins < 10) result += '0';
-  result += uint64ToString(mins);
-  return result;
-}
-
 // Convert the internal state into a human readable string.
 String IRWhirlpoolAc::toString(void) {
   String result = "";
@@ -532,15 +520,15 @@ String IRWhirlpoolAc::toString(void) {
   result += IRutils::acBoolToString(getSwing(), F("Swing"));
   result += IRutils::acBoolToString(getLight(), F("Light"));
   result += F(", Clock: ");
-  result += this->timeToString(this->getClock());
+  result += IRutils::minsToString(this->getClock());
   result += F(", On Timer: ");
   if (this->isOnTimerEnabled())
-    result += this->timeToString(this->getOnTimer());
+    result += IRutils::minsToString(this->getOnTimer());
   else
     result += F("Off");
   result += F(", Off Timer: ");
   if (this->isOffTimerEnabled())
-    result += this->timeToString(this->getOffTimer());
+    result += IRutils::minsToString(this->getOffTimer());
   else
     result += F("Off");
   result += IRutils::acBoolToString(getSleep(), F("Sleep"));

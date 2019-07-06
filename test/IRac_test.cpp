@@ -121,7 +121,7 @@ TEST(TestIRac, Daikin) {
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 2, Powerful: Off, "
       "Quiet: Off, Sensor: Off, Mold: On, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 0:00, Current Day: (UNKNOWN), On Time: Off, "
+      "Current Time: 00:00, Current Day: (UNKNOWN), On Time: Off, "
       "Off Time: Off, Weekly Timer: On";
 
   ac.begin();
@@ -173,7 +173,7 @@ TEST(TestIRac, Daikin2) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 2, Swing (V): 14 (Auto), "
-      "Swing (H): 0, Clock: 0:00, On Time: Off, Off Time: Off, "
+      "Swing (H): 0, Clock: 00:00, On Time: Off, Off Time: Off, "
       "Sleep Time: Off, Beep: 1 (Quiet), Light: 1 (Bright), Mold: On, "
       "Clean: Off, Fresh Air: Off, Eye: Off, Eye Auto: Off, Quiet: Off, "
       "Powerful: Off, Purify: On, Econo: Off";

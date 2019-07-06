@@ -496,15 +496,6 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
   return result;
 }
 
-String IRDaikinESP::renderTime(const uint16_t timemins) {
-  String ret;
-  ret = uint64ToString(timemins / 60) + ':';
-  uint8_t mins = timemins % 60;
-  if (mins < 10) ret += '0';
-  ret += uint64ToString(mins);
-  return ret;
-}
-
 // Convert the internal state into a human readable string.
 String IRDaikinESP::toString(void) {
   String result = "";
@@ -541,7 +532,7 @@ String IRDaikinESP::toString(void) {
   result += IRutils::acBoolToString(getSwingVertical(),
                                     F("Swing (Vertical)"));
   result += F(", Current Time: ");
-  result += this->renderTime(this->getCurrentTime());
+  result += IRutils::minsToString(this->getCurrentTime());
   result += F(", Current Day: ");
   switch (this->getCurrentDay()) {
   case 1:
@@ -563,12 +554,12 @@ String IRDaikinESP::toString(void) {
   }
   result += F(", On Time: ");
   if (this->getOnTimerEnabled())
-    result += this->renderTime(this->getOnTime());
+    result += IRutils::minsToString(this->getOnTime());
   else
     result += F("Off");
   result += F(", Off Time: ");
   if (this->getOffTimerEnabled())
-    result += this->renderTime(this->getOffTime());
+    result += IRutils::minsToString(this->getOffTime());
   else
     result += F("Off");
   result += F(", Weekly Timer: ");
@@ -1228,20 +1219,20 @@ String IRDaikin2::toString() {
       break;
   }
   result += F(", Clock: ");
-  result += IRDaikinESP::renderTime(getCurrentTime());
+  result += IRutils::minsToString(getCurrentTime());
   result += F(", On Time: ");
   if (getOnTimerEnabled())
-    result += IRDaikinESP::renderTime(getOnTime());
+    result += IRutils::minsToString(getOnTime());
   else
     result += F("Off");
   result += F(", Off Time: ");
   if (getOffTimerEnabled())
-    result += IRDaikinESP::renderTime(getOffTime());
+    result += IRutils::minsToString(getOffTime());
   else
     result += F("Off");
   result += F(", Sleep Time: ");
   if (getSleepTimerEnabled())
-    result += IRDaikinESP::renderTime(getSleepTime());
+    result += IRutils::minsToString(getSleepTime());
   else
     result += F("Off");
   result += F(", Beep: ");

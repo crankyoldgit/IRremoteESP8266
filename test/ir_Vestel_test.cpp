@@ -368,19 +368,19 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setTimer(8 * 60 + 0);
   EXPECT_TRUE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Time: 23:59, Timer: 8:00, On Timer: Off, Off Timer: Off",
+      "Time: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setOnTimer(7 * 60 + 40);
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: 7:40, Off Timer: Off",
+      "Time: 23:59, Timer: Off, On Timer: 07:40, Off Timer: Off",
       ac.toString());
   ac.setOffTimer(17 * 60 + 10);
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: 7:40, Off Timer: 17:10",
+      "Time: 23:59, Timer: Off, On Timer: 07:40, Off Timer: 17:10",
       ac.toString());
   ac.setTimer(8 * 60 + 0);
   EXPECT_EQ(
-      "Time: 23:59, Timer: 8:00, On Timer: Off, Off Timer: Off",
+      "Time: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setTimer(0);
   EXPECT_EQ(
@@ -502,7 +502,7 @@ TEST(TestDecodeVestelAc, RealTimerExample) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Time: 5:45, Timer: Off, On Timer: 14:00, Off Timer: 23:00",
+      "Time: 05:45, Timer: Off, On Timer: 14:00, Off Timer: 23:00",
       ac.toString());
 }
 

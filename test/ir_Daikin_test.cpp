@@ -629,13 +629,6 @@ TEST(TestDaikinClass, SensorSetting) {
   ASSERT_FALSE(ac.getSensor());
 }
 
-TEST(TestDaikinClass, RenderTime) {
-  EXPECT_EQ("0:00", IRDaikinESP::renderTime(0));
-  EXPECT_EQ("0:10", IRDaikinESP::renderTime(10));
-  EXPECT_EQ("1:00", IRDaikinESP::renderTime(1 * 60 + 0));
-  EXPECT_EQ("23:59", IRDaikinESP::renderTime(23 * 60 + 59));
-}
-
 TEST(TestDaikinClass, SetAndGetRaw) {
   IRDaikinESP ac(0);
   uint8_t shortState[kDaikinStateLengthShort] = {
@@ -701,7 +694,7 @@ TEST(TestDaikinClass, HumanReadable) {
       "Power: On, Mode: 4 (HEAT), Temp: 15C, Fan: 11 (QUIET), "
       "Powerful: Off, Quiet: Off, Sensor: Off, Mold: Off, "
       "Comfort: Off, Swing (Horizontal): Off, Swing (Vertical): Off, "
-      "Current Time: 0:00, Current Day: (UNKNOWN), On Time: Off, "
+      "Current Time: 00:00, Current Day: (UNKNOWN), On Time: Off, "
       "Off Time: Off, Weekly Timer: On",
       ac.toString());
   ac.setMode(kDaikinAuto);
@@ -723,7 +716,7 @@ TEST(TestDaikinClass, HumanReadable) {
       "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 10 (AUTO), "
       "Powerful: Off, Quiet: On, Sensor: On, Mold: On, Comfort: On, "
       "Swing (Horizontal): On, Swing (Vertical): On, "
-      "Current Time: 9:15, Current Day: WED, On Time: 8:00, Off Time: 17:30, "
+      "Current Time: 09:15, Current Day: WED, On Time: 08:00, Off Time: 17:30, "
       "Weekly Timer: Off",
       ac.toString());
 }
@@ -877,7 +870,7 @@ TEST(TestDecodeDaikin, RealExample) {
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
+      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -910,7 +903,7 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
+      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -939,7 +932,7 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off, "
       "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 6:10, Weekly Timer: On", ac.toString());
+      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Test decoding a message captured from a real IR remote.
@@ -1451,7 +1444,7 @@ TEST(TestDaikin2Class, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (COOL), Temp: 21C, Fan: 5 (Max), "
       "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 12:34, "
-      "On Time: Off, Off Time: 20:00, Sleep Time: 4:00, Beep: 2 (Loud), "
+      "On Time: Off, Off Time: 20:00, Sleep Time: 04:00, Beep: 2 (Loud), "
       "Light: 2 (Dim), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
       "Eye Auto: On, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
       ac.toString());
@@ -1466,7 +1459,7 @@ TEST(TestDaikin2Class, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 32C, Fan: 1 (Min), "
       "Swing (V): 14 (Auto), Swing (H): 191 (Swing), Clock: 23:45, "
-      "On Time: 9:11, Off Time: 20:00, Sleep Time: Off, Beep: 1 (Quiet), "
+      "On Time: 09:11, Off Time: 20:00, Sleep Time: Off, Beep: 1 (Quiet), "
       "Light: 1 (Bright), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
       "Eye Auto: On, Quiet: On, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
@@ -1553,10 +1546,10 @@ TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
   ASSERT_TRUE(ac.getPurify());
   EXPECT_EQ(
       "Power: On, Mode: 0 (AUTO), Temp: 19C, Fan: 10 (Auto), "
-      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 9:20, On Time: Off, "
-      "Off Time: Off, Sleep Time: Off, Beep: 3 (Off), Light: 3 (Off), "
-      "Mold: On, Clean: On, Fresh Air: Off, Eye: On, Eye Auto: Off, "
-      "Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Swing (V): 14 (Auto), Swing (H): 190 (Auto), Clock: 09:20, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: On, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }
 

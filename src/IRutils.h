@@ -45,5 +45,6 @@ namespace IRutils {
                         const uint8_t cool, const uint8_t heat,
                         const uint8_t dry, const uint8_t fan);
   String htmlEscape(const String unescaped);
+  String minsToString(const uint16_t mins);
 }  // namespace IRutils
 #endif  // IRUTILS_H_

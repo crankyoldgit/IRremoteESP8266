@@ -503,3 +503,16 @@ TEST(TestUtils, TypeStringConversionRangeTests) {
         " doesn't decode from a string correctly";
   }
 }
+
+TEST(TestUtils, MinsToString) {
+  EXPECT_EQ("00:00", IRutils::minsToString(0));
+  EXPECT_EQ("00:01", IRutils::minsToString(1));
+  EXPECT_EQ("00:10", IRutils::minsToString(10));
+  EXPECT_EQ("00:59", IRutils::minsToString(59));
+
+  EXPECT_EQ("01:00", IRutils::minsToString(60));
+  EXPECT_EQ("01:01", IRutils::minsToString(61));
+  EXPECT_EQ("01:59", IRutils::minsToString(60 + 59));
+  EXPECT_EQ("18:59", IRutils::minsToString(18 * 60 + 59));
+  EXPECT_EQ("23:59", IRutils::minsToString(23 * 60 + 59));
+}

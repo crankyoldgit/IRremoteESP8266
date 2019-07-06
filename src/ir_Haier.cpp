@@ -296,17 +296,6 @@ void IRHaierAC::setSwing(const uint8_t state) {
   }
 }
 
-// Convert a Haier time into a human readable string.
-String IRHaierAC::timeToString(const uint16_t nr_mins) {
-  String result = "";
-  if (nr_mins / 24 < 10) result += '0';  // Zero pad.
-  result += uint64ToString(nr_mins / 60);
-  result += ':';
-  if (nr_mins % 60 < 10) result += '0';  // Zero pad.
-  result += uint64ToString(nr_mins % 60);
-  return result;
-}
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -497,15 +486,15 @@ String IRHaierAC::toString(void) {
   result += IRutils::acBoolToString(getSleep(), F("Sleep"));
   result += IRutils::acBoolToString(getHealth(), F("Health"));
   result += F(", Current Time: ");
-  result += timeToString(getCurrTime());
+  result += IRutils::minsToString(getCurrTime());
   result += F(", On Timer: ");
   if (getOnTimer() >= 0)
-    result += timeToString(getOnTimer());
+    result += IRutils::minsToString(getOnTimer());
   else
     result += F("Off");
   result += F(", Off Timer: ");
   if (getOffTimer() >= 0)
-    result += timeToString(getOffTimer());
+    result += IRutils::minsToString(getOffTimer());
   else
     result += F("Off");
   return result;

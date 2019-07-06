@@ -107,7 +107,6 @@ class IRMitsubishiAC {
 #else
   IRsendTest _irsend;
 #endif
-  String timeToString(const uint64_t time);
   uint8_t remote_state[kMitsubishiACStateLength];
   void checksum(void);
 };

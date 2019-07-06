@@ -838,4 +838,13 @@ namespace IRutils {
     return result;
   }
 
+  String minsToString(const uint16_t mins) {
+    String result = "";
+    result.reserve(5);  // 23:59 is the typical worst case.
+    if (mins / 60 < 10) result += '0';  // Zero pad the hours
+    result += uint64ToString(mins / 60) + ':';
+    if (mins % 60 < 10) result += '0';  // Zero pad the minutes.
+    result += uint64ToString(mins % 60);
+    return result;
+  }
 }  // namespace IRutils

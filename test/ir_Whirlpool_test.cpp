@@ -324,25 +324,18 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
   IRWhirlpoolAc ac(0);
   ac.setClock(0);
   EXPECT_EQ(0, ac.getClock());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getClock()));
   ac.setClock(1);
   EXPECT_EQ(1, ac.getClock());
-  EXPECT_EQ("00:01", ac.timeToString(ac.getClock()));
   ac.setClock(12 * 60 + 34);
   EXPECT_EQ(12 * 60 + 34, ac.getClock());
-  EXPECT_EQ("12:34", ac.timeToString(ac.getClock()));
   ac.setClock(7 * 60 + 5);
   EXPECT_EQ(7 * 60 + 5, ac.getClock());
-  EXPECT_EQ("07:05", ac.timeToString(ac.getClock()));
   ac.setClock(23 * 60 + 59);
   EXPECT_EQ(23 * 60 + 59, ac.getClock());
-  EXPECT_EQ("23:59", ac.timeToString(ac.getClock()));
   ac.setClock(24 * 60 + 0);
   EXPECT_EQ(0, ac.getClock());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getClock()));
   ac.setClock(25 * 60 + 23);
   EXPECT_EQ(1 * 60 + 23, ac.getClock());
-  EXPECT_EQ("01:23", ac.timeToString(ac.getClock()));
 }
 
 TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
@@ -353,56 +346,42 @@ TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
   ac.enableOnTimer(false);
   ac.setOnTimer(0);
   EXPECT_EQ(0, ac.getOnTimer());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
   EXPECT_FALSE(ac.isOnTimerEnabled());
   EXPECT_EQ(kWhirlpoolAcCommandOnTimer, ac.getCommand());
   ac.setOnTimer(1);
   EXPECT_EQ(1, ac.getOnTimer());
-  EXPECT_EQ("00:01", ac.timeToString(ac.getOnTimer()));
   ac.enableOnTimer(true);
   ac.setOnTimer(12 * 60 + 34);
   EXPECT_EQ(12 * 60 + 34, ac.getOnTimer());
-  EXPECT_EQ("12:34", ac.timeToString(ac.getOnTimer()));
   EXPECT_TRUE(ac.isOnTimerEnabled());
   ac.setOnTimer(7 * 60 + 5);
   EXPECT_EQ(7 * 60 + 5, ac.getOnTimer());
-  EXPECT_EQ("07:05", ac.timeToString(ac.getOnTimer()));
   ac.setOnTimer(23 * 60 + 59);
   EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
-  EXPECT_EQ("23:59", ac.timeToString(ac.getOnTimer()));
   ac.setOnTimer(24 * 60 + 0);
   EXPECT_EQ(0, ac.getOnTimer());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getOnTimer()));
   ac.setOnTimer(25 * 60 + 23);
   EXPECT_EQ(1 * 60 + 23, ac.getOnTimer());
-  EXPECT_EQ("01:23", ac.timeToString(ac.getOnTimer()));
   // Off Timer
   ac.enableOffTimer(false);
   ac.setOffTimer(0);
   EXPECT_EQ(0, ac.getOffTimer());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getOffTimer()));
   EXPECT_FALSE(ac.isOffTimerEnabled());
   EXPECT_EQ(kWhirlpoolAcCommandOffTimer, ac.getCommand());
   ac.setOffTimer(1);
   EXPECT_EQ(1, ac.getOffTimer());
-  EXPECT_EQ("00:01", ac.timeToString(ac.getOffTimer()));
   ac.enableOffTimer(true);
   ac.setOffTimer(12 * 60 + 34);
   EXPECT_EQ(12 * 60 + 34, ac.getOffTimer());
-  EXPECT_EQ("12:34", ac.timeToString(ac.getOffTimer()));
   EXPECT_TRUE(ac.isOffTimerEnabled());
   ac.setOffTimer(7 * 60 + 5);
   EXPECT_EQ(7 * 60 + 5, ac.getOffTimer());
-  EXPECT_EQ("07:05", ac.timeToString(ac.getOffTimer()));
   ac.setOffTimer(23 * 60 + 59);
   EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
-  EXPECT_EQ("23:59", ac.timeToString(ac.getOffTimer()));
   ac.setOffTimer(24 * 60 + 0);
   EXPECT_EQ(0, ac.getOffTimer());
-  EXPECT_EQ("00:00", ac.timeToString(ac.getOffTimer()));
   ac.setOffTimer(25 * 60 + 23);
   EXPECT_EQ(1 * 60 + 23, ac.getOffTimer());
-  EXPECT_EQ("01:23", ac.timeToString(ac.getOffTimer()));
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetCommand) {
