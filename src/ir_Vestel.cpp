@@ -21,6 +21,13 @@
 // Ref:
 //   None. Totally reverse engineered.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if SEND_VESTEL_AC
 // Send a Vestel message
 //
@@ -485,32 +492,25 @@ String IRVestelAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (this->isTimeCommand()) {
-    result += F("Time: ");
-    result += IRutils::minsToString(getTime());
-
-    result += F(", Timer: ");
-    result += this->isTimerActive() ? IRutils::minsToString(this->getTimer())
-                                    : F("Off");
-    result += F(", On Timer: ");
-    result += (this->isOnTimerActive() && !this->isTimerActive())
-                  ? IRutils::minsToString(this->getOnTimer())
-                  : F("Off");
-
-    result += F(", Off Timer: ");
-    result +=
-        this->isOffTimerActive() ? IRutils::minsToString(this->getOffTimer())
-                                 : F("Off");
+    result += addLabeledString(minsToString(getTime()), F("Time"), false);
+    result += addLabeledString(
+        isTimerActive() ? minsToString(getTimer()) : F("Off"),
+        F("Timer"));
+    result += addLabeledString(
+        (isOnTimerActive() && !isTimerActive()) ?
+          minsToString(this->getOnTimer()) : F("Off"),
+        F("On Timer"));
+    result += addLabeledString(
+        isOffTimerActive() ? minsToString(getOffTimer()) : F("Off"),
+        F("Off Timer"));
     return result;
   }
   // Not a time command, it's a normal command.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kVestelAcAuto,
-                                    kVestelAcCool, kVestelAcHeat,
-                                    kVestelAcDry, kVestelAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kVestelAcAuto, kVestelAcCool,
+                            kVestelAcHeat,   kVestelAcDry, kVestelAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (this->getFan()) {
     case kVestelAcFanAuto:
       result += F(" (AUTO)");
@@ -533,10 +533,10 @@ String IRVestelAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
-  result += IRutils::acBoolToString(getIon(), F("Ion"));
-  result += IRutils::acBoolToString(getSwing(), F("Swing"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getTurbo(), F("Turbo"));
+  result += addBoolToString(getIon(), F("Ion"));
+  result += addBoolToString(getSwing(), F("Swing"));
   return result;
 }
 

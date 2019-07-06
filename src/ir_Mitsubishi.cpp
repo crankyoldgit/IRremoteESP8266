@@ -59,6 +59,13 @@ const uint16_t kMitsubishiAcZeroSpace = 420;
 const uint16_t kMitsubishiAcRptMark = 440;
 const uint16_t kMitsubishiAcRptSpace = 17100;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if SEND_MITSUBISHI
 // Send a Mitsubishi message
 //
@@ -695,13 +702,12 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
 String IRMitsubishiAC::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kMitsubishiAcAuto,
-                                    kMitsubishiAcCool, kMitsubishiAcHeat,
-                                    kMitsubishiAcDry, kMitsubishiAcAuto);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, FAN: ");
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kMitsubishiAcAuto, kMitsubishiAcCool,
+                            kMitsubishiAcHeat, kMitsubishiAcDry,
+                            kMitsubishiAcAuto);
+  result += addTempToString(getTemp());
+  result += F(", FAN: ");
   switch (this->getFan()) {
     case MITSUBISHI_AC_FAN_AUTO:
       result += F("AUTO");
@@ -726,12 +732,9 @@ String IRMitsubishiAC::toString(void) {
     default:
       result += uint64ToString(this->getVane());
   }
-  result += F(", Time: ");
-  result += IRutils::minsToString(this->getClock() * 10);
-  result += F(", On timer: ");
-  result += IRutils::minsToString(this->getStartClock() * 10);
-  result += F(", Off timer: ");
-  result += IRutils::minsToString(this->getStopClock() * 10);
+  result += addLabeledString(minsToString(getClock() * 10), F("Time"));
+  result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));
+  result += addLabeledString(minsToString(getStopClock() * 10), F("Off timer"));
   result += F(", Timer: ");
   switch (this->getTimer()) {
     case kMitsubishiAcNoTimer:

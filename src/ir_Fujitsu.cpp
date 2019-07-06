@@ -27,6 +27,12 @@ const uint16_t kFujitsuAcOneSpace = 1182;
 const uint16_t kFujitsuAcZeroSpace = 390;
 const uint16_t kFujitsuAcMinGap = 8100;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_FUJITSU_AC
 // Send a Fujitsu A/C message.
 //
@@ -528,9 +534,8 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
 String IRFujitsuAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Model: ");
   fujitsu_ac_remote_model_t model = this->getModel();
-  result += uint64ToString(model);
+  result += addIntToString(model, F("Model"), false);
   switch (model) {
     case fujitsu_ac_remote_model_t::ARRAH2E: result += F(" (ARRAH2E)"); break;
     case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
@@ -538,14 +543,12 @@ String IRFujitsuAC::toString(void) {
     case fujitsu_ac_remote_model_t::ARJW2: result += F(" (ARJW2)"); break;
     default: result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getPower(), F("Power"));
-  result += IRutils::acModeToString(getMode(), kFujitsuAcModeAuto,
-                                    kFujitsuAcModeCool, kFujitsuAcModeHeat,
-                                    kFujitsuAcModeDry, kFujitsuAcModeFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFanSpeed());
+  result += addBoolToString(getPower(), F("Power"));
+  result += addModeToString(getMode(), kFujitsuAcModeAuto, kFujitsuAcModeCool,
+                            kFujitsuAcModeHeat, kFujitsuAcModeDry,
+                            kFujitsuAcModeFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFanSpeed(), F("Fan"));
   switch (getFanSpeed()) {
     case kFujitsuAcFanAuto:
       result += F(" (AUTO)");
@@ -610,10 +613,8 @@ String IRFujitsuAC::toString(void) {
     default:
       result += F("N/A");
   }
-  if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E) {
-    result += F(", Outside Quiet: ");
-    result += this->getOutsideQuiet() ? F("On") : F("Off");
-  }
+  if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E)
+    result += addBoolToString(getOutsideQuiet(), F("Outside Quiet"));
   return result;
 }
 

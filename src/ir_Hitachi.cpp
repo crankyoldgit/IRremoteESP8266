@@ -26,6 +26,12 @@ const uint16_t kHitachiAcOneSpace = 1250;
 const uint16_t kHitachiAcZeroSpace = 500;
 const uint32_t kHitachiAcMinGap = kDefaultMessageGap;  // Just a guess.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
 //
@@ -340,14 +346,11 @@ stdAc::state_t IRHitachiAc::toCommon(void) {
 String IRHitachiAc::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kHitachiAcAuto,
-                                    kHitachiAcCool, kHitachiAcHeat,
-                                    kHitachiAcDry, kHitachiAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kHitachiAcAuto, kHitachiAcCool,
+                            kHitachiAcHeat, kHitachiAcDry, kHitachiAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kHitachiAcFanAuto:
       result += F(" (AUTO)");
@@ -362,10 +365,8 @@ String IRHitachiAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (Vertical)"));
-  result += IRutils::acBoolToString(getSwingHorizontal(),
-                                    F("Swing (Horizontal)"));
-
+  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
   return result;
 }
 

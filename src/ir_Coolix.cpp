@@ -39,6 +39,12 @@ const uint16_t kCoolixHdrSpace = kCoolixHdrSpaceTicks * kCoolixTick;
 const uint16_t kCoolixMinGapTicks = kCoolixHdrMarkTicks + kCoolixZeroSpaceTicks;
 const uint16_t kCoolixMinGap = kCoolixMinGapTicks * kCoolixTick;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_COOLIX
 // Send a Coolix message
 //
@@ -425,7 +431,7 @@ stdAc::state_t IRCoolixAC::toCommon(void) {
 String IRCoolixAC::toString() {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), F("Power"), false);
   if (!getPower()) return result;  // If it's off, there is no other info.
   // Special modes.
   if (getSwing()) {
@@ -448,11 +454,10 @@ String IRCoolixAC::toString() {
     result += F(", Clean: Toggle");
     return result;
   }
-  result += IRutils::acModeToString(getMode(), kCoolixAuto,
+  result += addModeToString(getMode(), kCoolixAuto,
                                     kCoolixCool, kCoolixHeat,
                                     kCoolixDry, kCoolixFan);
-  result += F(", Fan: ");
-  result += uint64ToString(getFan());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kCoolixFanAuto:
       result += F(" (AUTO)");
@@ -478,12 +483,9 @@ String IRCoolixAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  if (getMode() != kCoolixFan) {  // Fan mode doesn't have a temperature.
-    result += F(", Temp: ");
-    result += uint64ToString(getTemp());
-    result += 'C';
-  }
-  result += IRutils::acBoolToString(getZoneFollow(), F("Zone Follow"));
+  // Fan mode doesn't have a temperature.
+  if (getMode() != kCoolixFan) result += addTempToString(getTemp());
+  result += addBoolToString(getZoneFollow(), F("Zone Follow"));
   result += F(", Sensor Temp: ");
   if (getSensorTemp() > kCoolixSensorTempMax)
     result += F("Ignored");

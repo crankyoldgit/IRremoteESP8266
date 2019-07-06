@@ -31,6 +31,12 @@ const uint16_t kToshibaAcOneSpace = 1623;
 const uint16_t kToshibaAcZeroSpace = 472;
 const uint16_t kToshibaAcMinGap = 7048;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
 //
@@ -316,14 +322,11 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kToshibaAcAuto,
-                                    kToshibaAcCool, kToshibaAcHeat,
-                                    kToshibaAcDry, kToshibaAcAuto);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
+                            kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (this->getFan()) {
     case kToshibaAcFanAuto:
       result += F(" (AUTO)");

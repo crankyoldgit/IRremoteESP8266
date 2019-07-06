@@ -50,6 +50,12 @@ const uint16_t kSamsungAcBitMark = 586;
 const uint16_t kSamsungAcOneSpace = 1432;
 const uint16_t kSamsungAcZeroSpace = 436;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_SAMSUNG
 // Send a Samsung formatted message.
 // Samsung has a separate message to indicate a repeat, like NEC does.
@@ -662,14 +668,12 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 String IRSamsungAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
-                                    kSamsungAcHeat, kSamsungAcDry,
-                                    kSamsungAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
+                            kSamsungAcHeat, kSamsungAcDry,
+                            kSamsungAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kSamsungAcFanAuto:
     case kSamsungAcFanAuto2:
@@ -691,11 +695,11 @@ String IRSamsungAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += IRutils::acBoolToString(getSwing(), F("Swing"));
-  result += IRutils::acBoolToString(getBeep(), F("Beep"));
-  result += IRutils::acBoolToString(getClean(), F("Clean"));
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
+  result += addBoolToString(getSwing(), F("Swing"));
+  result += addBoolToString(getBeep(), F("Beep"));
+  result += addBoolToString(getClean(), F("Clean"));
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getPowerful(), F("Powerful"));
   return result;
 }
 

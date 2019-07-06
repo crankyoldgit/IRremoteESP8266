@@ -23,6 +23,12 @@ const uint16_t kElectraAcOneSpace = 1647;
 const uint16_t kElectraAcZeroSpace = 547;
 const uint32_t kElectraAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_ELECTRA_AC
 // Send a Electra message
 //
@@ -269,33 +275,11 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 String IRElectraAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kElectraAcAuto:
-      result += F(" (AUTO)");
-      break;
-    case kElectraAcCool:
-      result += F(" (COOL)");
-      break;
-    case kElectraAcHeat:
-      result += F(" (HEAT)");
-      break;
-    case kElectraAcDry:
-      result += F(" (DRY)");
-      break;
-    case kElectraAcFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
+                            kElectraAcHeat, kElectraAcDry, kElectraAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (this->getFan()) {
     case kElectraAcFanAuto:
       result += F(" (Auto)");
@@ -310,10 +294,8 @@ String IRElectraAc::toString(void) {
       result += F(" (Low)");
       break;
   }
-  result += F(", Swing(V): ");
-  result += this->getSwingV() ? F("On") : F("Off");
-  result += F(", Swing(H): ");
-  result += this->getSwingH() ? F("On") : F("Off");
+  result += addBoolToString(getSwingV(), F("Swing(V)"));
+  result += addBoolToString(getSwingH(), F("Swing(H)"));
   return result;
 }
 

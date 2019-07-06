@@ -35,6 +35,13 @@ const uint16_t kWhirlpoolAcGap = 7920;
 const uint32_t kWhirlpoolAcMinGap = kDefaultMessageGap;  // Just a guess.
 const uint8_t kWhirlpoolAcSections = 3;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if SEND_WHIRLPOOL_AC
 // Send a Whirlpool A/C message.
 //
@@ -492,14 +499,11 @@ String IRWhirlpoolAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getPowerToggle(), F("Power toggle"));
-  result += IRutils::acModeToString(getMode(), kWhirlpoolAcAuto,
-                                    kWhirlpoolAcCool, kWhirlpoolAcHeat,
-                                    kWhirlpoolAcDry, kWhirlpoolAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
+  result += addBoolToString(getPowerToggle(), F("Power toggle"));
+  result += addModeToString(getMode(), kWhirlpoolAcAuto, kWhirlpoolAcCool,
+                            kWhirlpoolAcHeat, kWhirlpoolAcDry, kWhirlpoolAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kWhirlpoolAcFanAuto:
       result += F(" (AUTO)");
@@ -517,24 +521,18 @@ String IRWhirlpoolAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += IRutils::acBoolToString(getSwing(), F("Swing"));
-  result += IRutils::acBoolToString(getLight(), F("Light"));
-  result += F(", Clock: ");
-  result += IRutils::minsToString(this->getClock());
-  result += F(", On Timer: ");
-  if (this->isOnTimerEnabled())
-    result += IRutils::minsToString(this->getOnTimer());
-  else
-    result += F("Off");
-  result += F(", Off Timer: ");
-  if (this->isOffTimerEnabled())
-    result += IRutils::minsToString(this->getOffTimer());
-  else
-    result += F("Off");
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += IRutils::acBoolToString(getSuper(), F("Super"));
-  result += F(", Command: ");
-  result += uint64ToString(this->getCommand());
+  result += addBoolToString(getSwing(), F("Swing"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addLabeledString(
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : F("Off"),
+      F("On Timer"));
+  result += addLabeledString(
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : F("Off"),
+      F("Off Timer"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getSuper(), F("Super"));
+  result += addIntToString(getCommand(), F("Command"));
   switch (this->getCommand()) {
     case kWhirlpoolAcCommandLight:
       result += F(" (LIGHT)");

@@ -20,6 +20,12 @@ const uint16_t kTecoOneSpace = 1650;
 const uint16_t kTecoZeroSpace = 580;
 const uint32_t kTecoGap = kDefaultMessageGap;  // Made-up value. Just a guess.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_TECO
 // Send a Teco A/C message.
 //
@@ -220,14 +226,11 @@ stdAc::state_t IRTecoAc::toCommon(void) {
 String IRTecoAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kTecoAuto,
-                                    kTecoCool, kTecoHeat,
-                                    kTecoDry, kTecoFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kTecoAuto, kTecoCool, kTecoHeat,
+                            kTecoDry, kTecoFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (this->getFan()) {
     case kTecoFanAuto:
       result += F(" (Auto)");
@@ -244,8 +247,8 @@ String IRTecoAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += IRutils::acBoolToString(getSwing(), F("Swing"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getSwing(), F("Swing"));
   return result;
 }
 

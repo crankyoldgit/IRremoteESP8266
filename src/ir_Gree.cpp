@@ -29,6 +29,12 @@ const uint16_t kGreeMsgSpace = 19000;
 const uint8_t kGreeBlockFooter = 0b010;
 const uint8_t kGreeBlockFooterBits = 3;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_GREE
 // Send a Gree Heat Pump message.
 //
@@ -443,14 +449,11 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kGreeAuto,
-                                    kGreeCool, kGreeHeat,
-                                    kGreeDry, kGreeFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
+                            kGreeDry, kGreeFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case 0:
       result += F(" (AUTO)");
@@ -459,16 +462,15 @@ String IRGreeAC::toString(void) {
       result += F(" (MAX)");
       break;
   }
-  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
-  result += IRutils::acBoolToString(getIFeel(), F("IFeel"));
-  result += IRutils::acBoolToString(getWiFi(), F("WiFi"));
-  result += IRutils::acBoolToString(getXFan(), F("XFan"));
-  result += IRutils::acBoolToString(getLight(), F("Light"));
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += F(", Swing Vertical Mode: ");
-  result += this->getSwingVerticalAuto() ? F("Auto") : F("Manual");
-  result += F(", Swing Vertical Pos: ");
-  result += uint64ToString(getSwingVerticalPosition());
+  result += addBoolToString(getTurbo(), F("Turbo"));
+  result += addBoolToString(getIFeel(), F("IFeel"));
+  result += addBoolToString(getWiFi(), F("WiFi"));
+  result += addBoolToString(getXFan(), F("XFan"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addLabeledString(getSwingVerticalAuto() ? F("Auto") : F("Manual"),
+                             F("Swing Vertical Mode"));
+  result += addIntToString(getSwingVerticalPosition(), F("Swing Vertical Pos"));
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
       result += F(" (Last Pos)");

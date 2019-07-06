@@ -61,6 +61,13 @@ const uint16_t kPanasonicAcSectionGap = 10000;
 const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
 //
@@ -752,14 +759,11 @@ String IRPanasonicAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getPower(), F("Power"));
-  result += IRutils::acModeToString(getMode(), kPanasonicAcAuto,
-                                    kPanasonicAcCool, kPanasonicAcHeat,
-                                    kPanasonicAcDry, kPanasonicAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
+  result += addBoolToString(getPower(), F("Power"));
+  result += addModeToString(getMode(), kPanasonicAcAuto, kPanasonicAcCool,
+                            kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
+  result += addTempToString(getTemp());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kPanasonicAcFanAuto:
       result += F(" (AUTO)");
@@ -774,8 +778,7 @@ String IRPanasonicAc::toString(void) {
       result += F(" (UNKNOWN)");
       break;
   }
-  result += F(", Swing (Vertical): ");
-  result += uint64ToString(getSwingVertical());
+  result += addIntToString(getSwingVertical(), F("Swing (Vertical)"));
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
       result += F(" (AUTO)");
@@ -799,8 +802,7 @@ String IRPanasonicAc::toString(void) {
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += F(", Swing (Horizontal): ");
-      result += uint64ToString(getSwingHorizontal());
+      result += addIntToString(getSwingHorizontal(), F("Swing (Horizontal)"));
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
           result += F(" (AUTO)");
@@ -825,20 +827,15 @@ String IRPanasonicAc::toString(void) {
           break;
       }
   }
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
-  result += F(", Clock: ");
-  result += IRutils::minsToString(getClock());
-  result += F(", On Timer: ");
-  if (isOnTimerEnabled())
-    result += IRutils::minsToString(getOnTimer());
-  else
-    result += F("Off");
-  result += F(", Off Timer: ");
-  if (isOffTimerEnabled())
-    result += IRutils::minsToString(getOffTimer());
-  else
-    result += F("Off");
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addLabeledString(
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : F("Off"),
+      F("On Timer"));
+  result += addLabeledString(
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : F("Off"),
+      F("Off Timer"));
   return result;
 }
 
