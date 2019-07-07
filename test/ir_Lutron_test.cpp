@@ -120,7 +120,7 @@ TEST(TestDecodeLutron, DocumentedExampleFullOff) {
   irsend.begin();
 
   // Full Off code.
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/515
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/515
   uint16_t rawData[14] = {20518, 6839, 2280, 6839, 2280, 2280, 9119,
                           2280,  2280, 6839, 2280, 4560, 2280, 11399};
   irsend.reset();

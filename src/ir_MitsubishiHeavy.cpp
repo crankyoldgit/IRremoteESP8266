@@ -22,7 +22,7 @@
 #endif
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/660
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/660
 //   https://github.com/ToniA/Raw-IR-decoder-for-Arduino/blob/master/MitsubishiHeavy.cpp
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/MitsubishiHeavyHeatpumpIR.cpp
 

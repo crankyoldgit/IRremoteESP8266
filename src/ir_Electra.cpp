@@ -10,9 +10,9 @@
 //
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/527
-//   https://github.com/markszabo/IRremoteESP8266/issues/642
-//   https://github.com/markszabo/IRremoteESP8266/issues/778
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/527
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/642
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/778
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
 
 // Constants

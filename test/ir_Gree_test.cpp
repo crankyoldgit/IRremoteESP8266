@@ -351,7 +351,7 @@ TEST(TestGreeClass, IFeel) {
   ac.setIFeel(true);
   EXPECT_TRUE(ac.getIFeel());
 
-  // https://github.com/markszabo/IRremoteESP8266/pull/770#issuecomment-504992209
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/770#issuecomment-504992209
   uint8_t on[8] = {0x08, 0x09, 0x60, 0x50, 0x00, 0x44, 0x00, 0xF0};
   uint8_t off[8] = {0x08, 0x09, 0x60, 0x50, 0x00, 0x40, 0x00, 0xF0};
   ac.setRaw(off);
@@ -373,7 +373,7 @@ TEST(TestGreeClass, WiFi) {
   ac.setWiFi(true);
   EXPECT_TRUE(ac.getWiFi());
 
-  // https://github.com/markszabo/IRremoteESP8266/pull/770#issuecomment-504992209
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/770#issuecomment-504992209
   uint8_t on[8] = {0x09, 0x09, 0x60, 0x50, 0x00, 0x40, 0x00, 0x00};
   uint8_t off[8] = {0x09, 0x09, 0x60, 0x50, 0x00, 0x00, 0x00, 0xC0};
   ac.setRaw(off);
@@ -547,7 +547,7 @@ TEST(TestDecodeGree, NormalRealExample) {
   uint8_t gree_code[kGreeStateLength] = {0x19, 0x0A, 0x60, 0x50,
                                          0x02, 0x23, 0x00, 0xF0};
 
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/386
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/386
   uint16_t rawData[139] = {
       9008, 4496,  644, 1660, 676, 530,  648, 558,  672, 1636, 646, 1660,
       644,  556,   650, 584,  626, 560,  644, 580,  628, 1680, 624, 560,

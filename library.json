@@ -6,12 +6,13 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/markszabo/IRremoteESP8266.git"
+    "url": "https://github.com/crankyoldgit/IRremoteESP8266.git"
   },
   "authors": [
     {
-      "name": "Ken Shirriff",
-      "email": "zetoslab@gmail.com"
+      "name": "David Conran",
+      "url": "https://plus.google.com/+davidconran",
+      "maintainer": true
     },
     {
       "name": "Mark Szabo",
@@ -24,9 +25,8 @@
       "maintainer": true
     },
     {
-      "name": "David Conran",
-      "url": "https://plus.google.com/+davidconran",
-      "maintainer": true
+      "name": "Ken Shirriff",
+      "email": "zetoslab@gmail.com"
     },
     {
       "name": "Roi Dayan",

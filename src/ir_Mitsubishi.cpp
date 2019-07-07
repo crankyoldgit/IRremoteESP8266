@@ -38,7 +38,7 @@ const uint16_t kMitsubishiMinGap = kMitsubishiMinGapTicks * kMitsubishiTick;
 
 // Mitsubishi Projector (HC3000)
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/441
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/441
 
 const uint16_t kMitsubishi2HdrMark = 8400;
 const uint16_t kMitsubishi2HdrSpace = kMitsubishi2HdrMark / 2;
@@ -143,7 +143,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
 //   i.e. Allegedly, the real remote requires the "Off" button pressed twice.
 //        You will need to add a suitable gap yourself.
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/441
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/441
 void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t i = 0; i <= repeat; i++) {
     // First half of the data.
@@ -178,7 +178,7 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //     * Mitsubishi HC3000 projector's remote.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/441
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/441
 bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
                                bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + (kFooter * 2) - 1)

@@ -161,7 +161,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   irsend.begin();
 
   // Real WhirlpoolAC message.
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/509
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/509
   uint16_t rawData[343] = {
       8950, 4484, 598, 1642, 598, 1646, 594, 534,  594, 538,  602, 532,
       598,  540,  600, 542,  598, 1650, 600, 522,  598, 1644, 596, 1650,

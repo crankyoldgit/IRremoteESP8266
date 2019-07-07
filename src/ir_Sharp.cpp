@@ -247,7 +247,7 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
 // Status: Alpha / Untested.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/638
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/638
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
 void IRsend::sendSharpAc(const unsigned char data[], const uint16_t nbytes,
                          const uint16_t repeat) {
@@ -528,7 +528,7 @@ String IRSharpAc::toString(void) {
 // Status: BETA / Should be working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/638
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/638
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
 bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
                            const bool strict) {

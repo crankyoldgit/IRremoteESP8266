@@ -26,7 +26,7 @@
  * DISH decode by marcosamarinho
  * Gree Heatpump sending added by Ville Skyttä (scop)
  *     (derived from https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp)
- * Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for sending IR code on ESP8266
+ * Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for sending IR code on ESP8266
  * Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code on ESP8266
  *
  * Updated by sillyfrog for Daikin, adopted from
@@ -257,7 +257,7 @@
 // Use millisecond 'delay()' calls where we can to avoid tripping the WDT.
 // Note: If you plan to send IR messages in the callbacks of the AsyncWebserver
 //       library, you need to set ALLOW_DELAY_CALLS to false.
-//       Ref: https://github.com/markszabo/IRremoteESP8266/issues/430
+//       Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/430
 #define ALLOW_DELAY_CALLS true
 
 /*
@@ -566,7 +566,7 @@ const uint8_t  kVestelAcBits = 56;
 // Create a no-op F() macro so the code base still compiles outside of the
 // Arduino framework. Thus we can safely use the Arduino 'F()' macro through-out
 // the code base. That macro stores constants in Flash (PROGMEM) memory.
-// See: https://github.com/markszabo/IRremoteESP8266/issues/667
+// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/667
 #define F(x) x
 #endif  // F
 typedef std::string String;

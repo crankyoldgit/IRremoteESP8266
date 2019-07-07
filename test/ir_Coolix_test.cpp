@@ -566,7 +566,7 @@ TEST(TestCoolixACClass, RealCaptureExample) {
 
 
 // Tests to debug/fix:
-//   https://github.com/markszabo/IRremoteESP8266/issues/624
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/624
 TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   IRCoolixAC ac(0);
   ac.begin();

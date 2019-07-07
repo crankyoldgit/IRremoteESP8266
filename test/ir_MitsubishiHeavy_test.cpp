@@ -704,7 +704,7 @@ TEST(TestDecodeMitsubishiHeavy, ZmsRealExample) {
       0xF8, 0x04, 0xFB, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0x80, 0x7F};
 
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/660#issuecomment-480571466
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/660#issuecomment-480571466
   uint16_t rawData[307] = {
       3136, 1638, 364, 428, 366, 1224, 362, 432, 364, 430, 364, 1226, 362, 432,
       364, 1224, 366, 428, 366, 430, 366, 1224, 362, 1228, 362, 1228, 362, 432,
@@ -784,7 +784,7 @@ TEST(TestDecodeMitsubishiHeavy, ZmsRealExample2) {
       0xF8, 0x04, 0xFB, 0x00, 0xFF, 0x00, 0xFF, 0x00,
       0xFF, 0x80, 0x7F};
 
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/660#issuecomment-480571466
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/660#issuecomment-480571466
   uint16_t rawData[307] = {
       3196, 1580, 398, 390, 404, 1190, 400, 390, 402, 390, 402, 1192, 402, 388,
       402, 1192, 400, 390, 402, 392, 402, 1192, 400, 1188, 400, 1188, 400, 390,

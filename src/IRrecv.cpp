@@ -41,7 +41,7 @@ extern "C" {
 // code on ESP32
 // Updated by Sebastien Warin (http://sebastien.warin.fr) for receiving IR code
 // on ESP8266
-// Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
+// Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
 // sending IR code on ESP8266
 
 // Globals

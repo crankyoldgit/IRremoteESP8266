@@ -12,8 +12,8 @@
 //   Brand: LEGO Power Functions,  Model: IR Receiver
 //
 // Ref:
-// - https://github.com/markszabo/IRremoteESP8266/issues/641
-// - https://github.com/markszabo/IRremoteESP8266/files/2974525/LEGO_Power_Functions_RC_v120.pdf
+// - https://github.com/crankyoldgit/IRremoteESP8266/issues/641
+// - https://github.com/crankyoldgit/IRremoteESP8266/files/2974525/LEGO_Power_Functions_RC_v120.pdf
 
 // Constants
 const uint16_t kLegoPfBitMark = 158;

@@ -14,7 +14,7 @@
 
 // Constants
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/385
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/385
 const uint16_t kCarrierAcHdrMark = 8532;
 const uint16_t kCarrierAcHdrSpace = 4228;
 const uint16_t kCarrierAcBitMark = 628;

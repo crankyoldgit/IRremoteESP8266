@@ -14,7 +14,7 @@
 
 // Constants
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/706
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/706
 const uint16_t kInaxTick = 500;
 const uint16_t kInaxHdrMark = 9000;
 const uint16_t kInaxHdrSpace = 4500;
@@ -33,7 +33,7 @@ const uint16_t kInaxMinGap = 40000;
 //
 // Status: BETA / Should be working.
 //
-// Ref: https://github.com/markszabo/IRremoteESP8266/issues/706
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/706
 void IRsend::sendInax(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
   sendGeneric(kInaxHdrMark, kInaxHdrSpace,

@@ -15,6 +15,6 @@
 - [Fabien Valthier](https://github.com/hcoohb)
 - [Ajay Pala](https://github.com/ajaypala/)
 
-All contributors can be found on the [contributors site](https://github.com/markszabo/IRremoteESP8266/graphs/contributors).
+All contributors can be found on the [contributors site](https://github.com/crankyoldgit/IRremoteESP8266/graphs/contributors).
 
 ### Contributors of the [original project](https://github.com/z3t0/Arduino-IRremote) can be found on the [original project's contributors page](https://github.com/z3t0/Arduino-IRremote/blob/master/Contributors.md)

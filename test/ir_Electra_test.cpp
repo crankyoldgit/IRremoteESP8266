@@ -68,7 +68,7 @@ TEST(TestDecodeElectraAC, RealExampleDecode) {
   irsend.begin();
 
   // Real ElectraAC message.
-  // Ref: https://github.com/markszabo/IRremoteESP8266/issues/527
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/527
   uint16_t rawData[211] = {
       9166, 4470, 642, 1632, 642, 1632, 668, 534,  666, 534,  668, 534,
       614,  536,  640, 1636, 640, 1646, 694, 1662, 612, 1628, 642, 1666,
@@ -225,7 +225,7 @@ TEST(TestIRElectraAcClass, toCommon) {
 TEST(TestIRElectraAcClass, HumanReadable) {
   IRElectraAc ac(0);
   // Data from:
-  //   https://github.com/markszabo/IRremoteESP8266/issues/778#issue-460052080
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/778#issue-460052080
   uint8_t on_cool_32C_auto_voff[13] = {
       0xC3, 0xC7, 0xE0, 0x00, 0xA0, 0x00, 0x20,
       0x00, 0x00, 0x20, 0x00, 0x40, 0x8A};

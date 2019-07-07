@@ -21,7 +21,7 @@
 #endif
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/697
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/697
 
 // Constants
 

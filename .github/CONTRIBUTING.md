@@ -33,8 +33,8 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-* **Check the [Troubleshooting Guide](https://github.com/markszabo/IRremoteESP8266/wiki/Troubleshooting-Guide).** You might be able to find the cause of the problem and fix it yourself. Most importantly, check if you can reproduce the problem in the latest version (a.k.a. 'master') of the library.
-* **Perform a [cursory search](https://github.com/issues?q=+is%3Aissue+repo%3Amarkszabo/IRremoteESP8266)** to see if the problem is already reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+* **Check the [Troubleshooting Guide](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Troubleshooting-Guide).** You might be able to find the cause of the problem and fix it yourself. Most importantly, check if you can reproduce the problem in the latest version (a.k.a. 'master') of the library.
+* **Perform a [cursory search](https://github.com/issues?q=+is%3Aissue+repo%3Acrankyoldgit/IRremoteESP8266)** to see if the problem is already reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
 
@@ -53,7 +53,7 @@ Provide more context by answering these questions:
 
 * **Can you reproduce the problem in one of the code examples?**
 * **Did the problem start happening recently** (e.g. after updating to a new version of Arduino or the library) or was this always a problem?
-* If the problem started happening recently, **can you reproduce the problem in an older version of the library?** What's the most recent version in which the problem doesn't happen? You can download older versions of the library from [the releases page](https://github.com/markszabo/IRremoteESP8266/releases).
+* If the problem started happening recently, **can you reproduce the problem in an older version of the library?** What's the most recent version in which the problem doesn't happen? You can download older versions of the library from [the releases page](https://github.com/crankyoldgit/IRremoteESP8266/releases).
 * **Can you reliably reproduce the issue?** If not, provide details about how often the problem happens and under which conditions it normally happens.
 
 Include details about your configuration, circuit and environment:

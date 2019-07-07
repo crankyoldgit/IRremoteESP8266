@@ -10,7 +10,7 @@
 
 // Constants
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/309
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/309
 const uint16_t kNikaiTick = 500;
 const uint16_t kNikaiHdrMarkTicks = 8;
 const uint16_t kNikaiHdrMark = kNikaiHdrMarkTicks * kNikaiTick;
@@ -35,7 +35,7 @@ const uint16_t kNikaiMinGap = kNikaiMinGapTicks * kNikaiTick;
 //
 // Status: STABLE / Working.
 //
-// Ref: https://github.com/markszabo/IRremoteESP8266/issues/309
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/309
 void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kNikaiHdrMark, kNikaiHdrSpace, kNikaiBitMark, kNikaiOneSpace,
               kNikaiBitMark, kNikaiZeroSpace, kNikaiBitMark, kNikaiMinGap, data,

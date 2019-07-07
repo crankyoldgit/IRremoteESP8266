@@ -44,7 +44,7 @@ TEST(TestSendNeoclima, SendDataOnly) {
       irsend.outputStr());
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/764#issuecomment-503755096
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/764#issuecomment-503755096
 TEST(TestDecodeNeoclima, RealExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);

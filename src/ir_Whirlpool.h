@@ -27,7 +27,7 @@
 #endif
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/509
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/509
 
 // Constants
 const uint8_t kWhirlpoolAcChecksumByte1 = 13;
