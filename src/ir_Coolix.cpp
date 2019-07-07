@@ -19,7 +19,7 @@
 //   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/484
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 
 // Constants
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
@@ -88,7 +88,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Supports:
 //   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/484
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 IRCoolixAC::IRCoolixAC(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRCoolixAC::stateReset() { setRaw(kCoolixDefaultState); }

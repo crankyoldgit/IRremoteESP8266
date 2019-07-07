@@ -162,7 +162,7 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, const uint16_t nbits,
 //   Protocol is used by Samsung Bluray Remote: ak59-00167a
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/621
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/621
 void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
                            const uint16_t repeat) {
   if (nbits < 16) return;  // To small to send.
@@ -202,7 +202,7 @@ void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
 //   Protocol is used by Samsung Bluray Remote: ak59-00167a
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/621
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/621
 bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + kFooter * 2 - 1)
@@ -257,7 +257,7 @@ bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
 // Status: Stable / Known working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/505
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kSamsungAcStateLength && nbytes % kSamsungACSectionLength)
@@ -379,7 +379,7 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
 
 // Send the special extended "On" message as the library can't seem to reproduce
 // this message automatically.
-// See: https://github.com/markszabo/IRremoteESP8266/issues/604#issuecomment-475020036
+// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOn(const uint16_t repeat) {
   const uint8_t extended_state[21] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
@@ -390,7 +390,7 @@ void IRSamsungAc::sendOn(const uint16_t repeat) {
 
 // Send the special extended "Off" message as the library can't seem to
 // reproduce this message automatically.
-// See: https://github.com/markszabo/IRremoteESP8266/issues/604#issuecomment-475020036
+// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOff(const uint16_t repeat) {
   const uint8_t extended_state[21] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
@@ -711,7 +711,7 @@ String IRSamsungAc::toString(void) {
 // Status: Stable / Known to be working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/505
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1)

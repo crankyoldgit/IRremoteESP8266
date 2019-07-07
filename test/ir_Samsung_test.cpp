@@ -415,7 +415,7 @@ TEST(TestIRSamsungAcClass, SetAndGetSwing) {
   EXPECT_TRUE(samsung.getSwing());
 
   // Real examples from:
-  // https://github.com/markszabo/IRremoteESP8266/issues/505#issuecomment-424036602
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/505#issuecomment-424036602
   // TODO(Hollako): Explain why state[9] lowest bit changes between on and off.
   const uint8_t expected_off[kSamsungAcStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
@@ -511,7 +511,7 @@ TEST(TestIRSamsungAcClass, SetAndGetQuiet) {
   EXPECT_FALSE(ac.getQuiet());
 
   // Actual quiet on & off states from:
-  // https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500071419
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/734#issuecomment-500071419
   uint8_t on[14] = {
       0x02, 0x82, 0x0F, 0x00, 0x00, 0x20, 0xF0,
       0x01, 0xF2, 0xFE, 0x71, 0x00, 0x11, 0xF0};
@@ -540,7 +540,7 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
   EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
 
   // Actual powerful on & off states from:
-  // https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500120270
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/734#issuecomment-500120270
   uint8_t on[kSamsungAcStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
       0x01, 0xA2, 0xFE, 0x77, 0x00, 0x1F, 0xF0};
@@ -804,7 +804,7 @@ TEST(TestDecodeSamsungAC, DecodeRealExample2) {
 }
 
 // Decode a real Samsung A/C example from:
-// https://github.com/markszabo/IRremoteESP8266/issues/505#issuecomment-424036602
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/505#issuecomment-424036602
 TEST(TestDecodeSamsungAC, DecodePowerOnSample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
@@ -863,7 +863,7 @@ TEST(TestDecodeSamsungAC, DecodePowerOnSample) {
 }
 
 // Decode a real Samsung A/C example from:
-// https://github.com/markszabo/IRremoteESP8266/issues/505#issuecomment-424036602
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/505#issuecomment-424036602
 TEST(TestDecodeSamsungAC, DecodePowerOffSample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
@@ -1208,7 +1208,7 @@ TEST(TestDecodeSamsung36, SyntheticExample) {
   EXPECT_EQ(0x400, irsend.capture.address);
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/604
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/604
 TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   IRSamsungAc ac(0);
   ac.begin();
@@ -1333,7 +1333,7 @@ TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
 
   irsend.reset();
   // QUIET MODE ON data from:
-  //  https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-499791618
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/734#issuecomment-499791618
   uint16_t quietOn[233] = {
       624, 17360, 3076, 8902, 520, 476, 520, 1472, 520, 476, 520, 474, 520, 476,
       520, 476, 520, 474, 522, 476, 520, 478, 518, 1476, 516, 500, 494, 502,
@@ -1403,7 +1403,7 @@ TEST(TestDecodeSamsungAC, Issue734PowerfulOff) {
 
   irsend.reset();
   // 1st Powerful off data from:
-  //  https://github.com/markszabo/IRremoteESP8266/issues/734#issuecomment-500114580
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/734#issuecomment-500114580
   uint16_t powerfulOff[233] = {
       652, 17336, 3078, 8910, 562, 456, 546, 1448, 550, 446, 552, 444, 552, 444,
       550, 446, 550, 446, 552, 446, 550, 446, 552, 1440, 550, 446, 550, 446,

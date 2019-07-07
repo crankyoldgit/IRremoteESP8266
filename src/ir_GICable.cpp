@@ -10,7 +10,7 @@
 
 // Ref:
 //   https://github.com/cyborg5/IRLib2/blob/master/IRLibProtocols/IRLib_P09_GICable.h
-//   https://github.com/markszabo/IRremoteESP8266/issues/447
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/447
 
 // Constants
 const uint16_t kGicableHdrMark = 9000;

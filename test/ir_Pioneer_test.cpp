@@ -61,7 +61,7 @@ TEST(TestEncodePioneer, SimpleEncoding) {
   EXPECT_EQ(0xA55A6A95F50A04FB, irsend.encodePioneer(0xA556, 0xAF20));
 
   // "Source" from
-  // https://github.com/markszabo/IRremoteESP8266/pull/547#issuecomment-429616582
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/547#issuecomment-429616582
   EXPECT_EQ(0x659A05FAF50AC53A, irsend.encodePioneer(0xA6A0, 0xAFA3));
 }
 
@@ -92,7 +92,7 @@ TEST(TestDecodePioneer, RealExampleLongDecodeSourceButton) {
 
   irsend.reset();
   // "Source" button.
-  // https://github.com/markszabo/IRremoteESP8266/pull/547#issuecomment-429616582
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/547#issuecomment-429616582
   uint16_t rawData[135] = {
       8552, 4184, 596, 472,  592, 1524, 594, 1524,  594,  472,  592, 472,
       598,  1520, 596, 472,  594, 1524, 592, 1524,  592,  472,  592, 472,
@@ -119,7 +119,7 @@ TEST(TestDecodePioneer, RealExampleLongDecodeSourceButton) {
 
 // Synthetic Pioneer message.
 // For:
-// https://github.com/markszabo/IRremoteESP8266/pull/547#issuecomment-430800734
+// https://github.com/crankyoldgit/IRremoteESP8266/pull/547#issuecomment-430800734
 TEST(TestDecodePioneer, SyntheticPioneerMessage) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);

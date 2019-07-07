@@ -364,7 +364,7 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, false));
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165
 TEST(TestDecodeSharpAc, RealExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
@@ -406,7 +406,7 @@ TEST(TestDecodeSharpAc, RealExample) {
             ac.toString());
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165
 TEST(TestDecodeSharpAc, SyntheticExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
@@ -600,7 +600,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   EXPECT_STATE_EQ(cool_auto_28, ac.getRaw(), kSharpAcBits);
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/638#issue-421064165
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165
 TEST(TestSharpAcClass, KnownStates) {
   IRSharpAc ac(0);
   ac.begin();

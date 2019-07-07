@@ -17,9 +17,9 @@
 //   * Haier HSU-09HMC203 A/C unit.
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/404
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/404
 //   https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
-//   https://github.com/markszabo/IRremoteESP8266/issues/485
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/485
 //   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants

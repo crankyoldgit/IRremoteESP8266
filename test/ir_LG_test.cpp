@@ -429,7 +429,7 @@ TEST(TestDecodeLG2, RealLG2Example) {
 }
 
 // Tests for issue reported in
-// https://github.com/markszabo/IRremoteESP8266/issues/620
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/620
 TEST(TestDecodeLG, Issue620) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);

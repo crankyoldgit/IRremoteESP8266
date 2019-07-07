@@ -23,7 +23,7 @@
 //   Brand: Neoclima,  Model: ZH/TY-01 remote
 
 // Ref:
-//  https://github.com/markszabo/IRremoteESP8266/issues/764
+//  https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 //  https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
 
 // Constants

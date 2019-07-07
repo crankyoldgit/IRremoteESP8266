@@ -389,7 +389,7 @@ String IRTcl112Ac::toString(void) {
 // Status: BETA / Appears to mostly work.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/619
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/619
 bool IRrecv::decodeTcl112Ac(decode_results *results, const uint16_t nbits,
                             const bool strict) {
   if (strict && nbits != kTcl112AcBits) return false;

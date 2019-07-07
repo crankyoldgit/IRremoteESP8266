@@ -23,7 +23,7 @@
 //   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/484
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 // Kudos:
 //   Hamper: For the breakdown and mapping of the bit values.
 

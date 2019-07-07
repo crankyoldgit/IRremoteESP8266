@@ -76,7 +76,7 @@ TEST(TestDecodeGoodweather, SyntheticDecode) {
 }
 
 // Decode a real example of a Goodweather message.
-// https://github.com/markszabo/IRremoteESP8266/issues/697#issuecomment-490209819
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/697#issuecomment-490209819
 TEST(TestDecodeGoodweather, RealExampleDecode) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);

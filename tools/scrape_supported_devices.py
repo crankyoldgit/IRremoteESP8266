@@ -6,7 +6,7 @@ import sys
 import re
 import time
 
-CODE_URL = "https://github.com/markszabo/IRremoteESP8266/blob/master/src/ir_"
+CODE_URL = "https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_"
 
 BRAND_MODEL = re.compile(r"Brand: *(?P<brand>.+), *Model: *(?P<model>.+)")
 ENUMS = re.compile(r"enum \w+ {(.+?)};", re.DOTALL)

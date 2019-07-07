@@ -677,7 +677,7 @@ TEST(TestIRFujitsuACClass, OutsideQuiet) {
   ASSERT_NE(fujitsu_ac_remote_model_t::ARRAH2E,
     fujitsu_ac_remote_model_t::ARREB1E);
   // States as supplied by u4mzu4
-  // https://github.com/markszabo/IRremoteESP8266/issues/716#issuecomment-495852309
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/716#issuecomment-495852309
   uint8_t off[kFujitsuAcStateLength] = {
       0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x30,
       0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x2F};

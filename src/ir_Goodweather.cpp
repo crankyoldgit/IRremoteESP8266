@@ -27,7 +27,7 @@
 // Status: ALPHA / Untested.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/697
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/697
 void IRsend::sendGoodweather(const uint64_t data, const uint16_t nbits,
                              const uint16_t repeat) {
   if (nbits != kGoodweatherBits)

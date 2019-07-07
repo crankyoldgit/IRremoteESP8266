@@ -23,7 +23,7 @@
 //   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C
 
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/505
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 
 // Constants
 const uint8_t kSamsungAcAuto = 0;

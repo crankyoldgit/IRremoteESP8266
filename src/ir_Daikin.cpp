@@ -26,7 +26,7 @@ Copyright 2019 pasna (IRDaikin160 class)
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 //   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
-//   https://github.com/markszabo/IRremoteESP8266/issues/582
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 
 #if SEND_DAIKIN
 // Send a Daikin A/C message.
@@ -661,7 +661,7 @@ bool IRrecv::decodeDaikin(decode_results *results, const uint16_t nbits,
 // Status: BETA/Appears to work.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/582
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
                          const uint16_t repeat) {
   if (nbytes < kDaikin2Section1Length)
@@ -694,7 +694,7 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
 // Supported Remotes: Daikin ARC477A1 remote
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/582
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
 //   https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
 IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
@@ -1372,7 +1372,7 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
 // - Daikin ARC433B69 remote.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/689
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 //   https://github.com/danny-source/Arduino_DY_IRDaikin
 void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
@@ -1404,7 +1404,7 @@ void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
 // Supported Remotes: Daikin ARC433B69 remote
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/689
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 //   https://github.com/danny-source/Arduino_DY_IRDaikin
 IRDaikin216::IRDaikin216(uint16_t pin) : _irsend(pin) { stateReset(); }
 
@@ -1678,7 +1678,7 @@ String IRDaikin216::toString() {
 // Status: BETA / Should be working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/689
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 //   https://github.com/danny-source/Arduino_DY_IRDaikin
 bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
                              const bool strict) {
@@ -1737,7 +1737,7 @@ bool IRrecv::decodeDaikin216(decode_results *results, const uint16_t nbits,
 // - Daikin ARC423A5 remote.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/731
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin160Section1Length)
@@ -1768,7 +1768,7 @@ void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
 // Supported Remotes: Daikin ARC423A5 remote
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/731
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 IRDaikin160::IRDaikin160(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRDaikin160::begin() { _irsend.begin(); }
@@ -2076,7 +2076,7 @@ String IRDaikin160::toString() {
 // Status: STABLE / Confirmed working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/731
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)

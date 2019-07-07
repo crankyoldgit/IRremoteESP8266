@@ -569,7 +569,7 @@ TEST(TestDaikinClass, WeeklyTimerEnable) {
   EXPECT_TRUE(ac.getEcono());
 
   // Tests with real data from:
-  // https://github.com/markszabo/IRremoteESP8266/issues/704#issuecomment-493731421
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/704#issuecomment-493731421
   uint8_t on[kDaikinStateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7, 0x11, 0xDA, 0x27, 0x00,
       0x42, 0xE3, 0x0B, 0x42, 0x11, 0xDA, 0x27, 0x00, 0x00, 0x68, 0x32, 0x00,
@@ -953,7 +953,7 @@ TEST(TestDecodeDaikin2, RealExample) {
       0x80, 0x04, 0xB0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xD5, 0xF5,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x08, 0x26, 0x00, 0xA0, 0x00,
       0x00, 0x06, 0x60, 0x00, 0x00, 0xC1, 0x80, 0x60, 0xE7};
-  // "Off" Data from https://github.com/markszabo/IRremoteESP8266/issues/582
+  // "Off" Data from https://github.com/crankyoldgit/IRremoteESP8266/issues/582
   uint16_t rawData[633] = {  // Data supplied by @sheppy99
       10024, 25180, 3494, 1732, 436, 1300, 436, 436,  432, 438,  430, 438,
       426,   1306,  430,  442,  430, 438,  428, 440,  430, 440,  430, 1304,
@@ -1537,7 +1537,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN216));
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/582#issuecomment-453863879
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/582#issuecomment-453863879
 TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
   IRDaikin2 ac(0);
 
@@ -1808,7 +1808,7 @@ TEST(TestDaikin216Class, QuietAndPowerful) {
 TEST(TestDaikin216Class, ExampleStates) {
   IRDaikin216 ac(0);
   ac.begin();
-  // https://github.com/markszabo/IRremoteESP8266/pull/690#issuecomment-487770194
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/690#issuecomment-487770194
   uint8_t state[kDaikin216StateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x21, 0xC0, 0x00, 0xA0, 0x00,
@@ -1824,7 +1824,7 @@ TEST(TestDaikin216Class, ExampleStates) {
 TEST(TestDaikin216Class, ReconstructKnownState) {
   IRDaikin216 ac(0);
   ac.begin();
-  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint8_t expectedState[kDaikin216StateLength] = {
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x26, 0x00, 0xA0, 0x00,
@@ -1845,11 +1845,11 @@ TEST(TestDaikin216Class, ReconstructKnownState) {
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin216Bits);
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/689
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, RealExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
-  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint16_t rawData[439] = {
       3402, 1770, 382, 1340, 382, 480, 382, 478, 382, 480, 380, 1342, 382, 478,
       356, 504, 382, 480, 380, 478, 384, 1342, 380, 480, 380, 1342, 382, 1342,
@@ -1907,11 +1907,11 @@ TEST(TestDecodeDaikin216, RealExample) {
       ac.toString());
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/689
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, SyntheticExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
-  // https://github.com/markszabo/IRremoteESP8266/issues/689#issue-438086949
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint8_t expectedState[kDaikin216StateLength] = {
       // 8 bytes
       0x11, 0xDA, 0x27, 0xF0, 0x00, 0x00, 0x00, 0x02,
@@ -2033,7 +2033,7 @@ TEST(TestDaikin216Class, toCommon) {
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
 
-// https://github.com/markszabo/IRremoteESP8266/issues/731
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 TEST(TestDecodeDaikin160, RealExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);

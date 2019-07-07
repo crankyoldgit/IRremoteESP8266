@@ -5,7 +5,7 @@
 // Analysis by crankyoldgit & AndreyShpilevoy
 // Code by crankyoldgit
 // Ref:
-//    https://github.com/markszabo/IRremoteESP8266/issues/764
+//    https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 //    https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
 
 
@@ -39,7 +39,7 @@ const uint32_t kNeoclimaMinGap = kDefaultMessageGap;
 // Status: Beta / Known to be working.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/764
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 void IRsend::sendNeoclima(const unsigned char data[], const uint16_t nbytes,
                           const uint16_t repeat) {
   // Set IR carrier frequency
@@ -550,7 +550,7 @@ String IRNeoclimaAc::toString(void) {
 // Status: BETA / Known working
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/764
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 bool IRrecv::decodeNeoclima(decode_results *results, const uint16_t nbits,
                             const bool strict) {
   // Compliance

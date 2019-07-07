@@ -6,7 +6,7 @@
  * Copyright 2017-2019 David Conran
  *
  * Example circuit diagram:
- *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
+ *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-receiving
  *
  * Changes:
  *   Version 0.5 June, 2019

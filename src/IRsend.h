@@ -9,7 +9,7 @@
 #include "IRremoteESP8266.h"
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
-// Updated by markszabo (https://github.com/markszabo/IRremoteESP8266) for
+// Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
 // sending IR code on ESP8266
 
 #if TEST || UNIT_TEST

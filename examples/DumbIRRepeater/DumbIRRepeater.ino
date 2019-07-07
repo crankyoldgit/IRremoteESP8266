@@ -22,8 +22,8 @@
  * An IR LED circuit must be connected to the output, kIrLedPin.
  *
  * Example circuit diagrams (both are needed):
- *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-receiving
- *  https://github.com/markszabo/IRremoteESP8266/wiki#ir-sending
+ *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-receiving
+ *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-sending
  *
  * Common mistakes & tips:
  *   * Don't just connect the IR LED directly to the pin, it won't

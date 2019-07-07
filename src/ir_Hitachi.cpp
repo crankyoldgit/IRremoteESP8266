@@ -16,7 +16,7 @@
 #include "IRutils.h"
 
 // Constants
-// Ref: https://github.com/markszabo/IRremoteESP8266/issues/417
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 const uint16_t kHitachiAcHdrMark = 3300;
 const uint16_t kHitachiAcHdrSpace = 1700;
 const uint16_t kHitachiAc1HdrMark = 3400;
@@ -37,7 +37,7 @@ const uint32_t kHitachiAcMinGap = kDefaultMessageGap;  // Just a guess.
 // Status: ALPHA / Untested.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/417
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kHitachiAcStateLength)
@@ -63,7 +63,7 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
 // Status: BETA / Appears to work.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/453
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 //   Basically the same as sendHitatchiAC() except different size and header.
 void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
                             const uint16_t repeat) {
@@ -90,7 +90,7 @@ void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
 // Status: BETA / Appears to work.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/417
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 //   Basically the same as sendHitatchiAC() except different size.
 void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
                             const uint16_t repeat) {
@@ -386,8 +386,8 @@ String IRHitachiAc::toString(void) {
 //  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/417
-//   https://github.com/markszabo/IRremoteESP8266/issues/453
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   const uint8_t kTolerance = 30;

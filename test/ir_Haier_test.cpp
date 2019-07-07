@@ -992,7 +992,7 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
 }
 
 // Default state of the remote needed to include hidden data.
-// Ref: https://github.com/markszabo/IRremoteESP8266/issues/668
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/668
 TEST(TestHaierAcIssues, Issue668) {
   IRHaierAC ac(0);
   IRHaierAC acText(1);
@@ -1006,7 +1006,7 @@ TEST(TestHaierAcIssues, Issue668) {
       "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
       "On Timer: Off, Off Timer: Off";
   // State taken from real capture:
-  //   https://github.com/markszabo/IRremoteESP8266/issues/668#issuecomment-483531895
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/668#issuecomment-483531895
   uint8_t expected_on_state[9] = {
       0xA5, 0x91, 0x20, 0x00, 0x0C, 0xC0, 0x20, 0x00, 0x42};
   ac.setMode(kHaierAcCool);
@@ -1044,7 +1044,7 @@ TEST(TestHaierAcIssues, Issue668) {
       "Swing: 0 (Off), Sleep: Off, Health: Off, Current Time: 00:00, "
       "On Timer: Off, Off Timer: Off";
   // State taken from real capture:
-  //   https://github.com/markszabo/IRremoteESP8266/issues/668#issuecomment-483531895
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/668#issuecomment-483531895
   uint8_t expected_temp_plus_one_state[9] = {
       0xA5, 0xA6, 0x20, 0x00, 0x0C, 0xC0, 0x20, 0x00, 0x57};
   ASSERT_EQ(25, ac.getTemp());

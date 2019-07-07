@@ -25,7 +25,7 @@
 #include "IRutils.h"
 
 // Constants
-// Ref: https://github.com/markszabo/IRremoteESP8266/issues/509
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/509
 const uint16_t kWhirlpoolAcHdrMark = 8950;
 const uint16_t kWhirlpoolAcHdrSpace = 4484;
 const uint16_t kWhirlpoolAcBitMark = 597;
@@ -46,7 +46,7 @@ const uint8_t kWhirlpoolAcSections = 3;
 // Status: ALPHA / Untested.
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/509
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/509
 void IRsend::sendWhirlpoolAC(const unsigned char data[], const uint16_t nbytes,
                              const uint16_t repeat) {
   if (nbytes < kWhirlpoolAcStateLength)
@@ -605,7 +605,7 @@ String IRWhirlpoolAc::toString(void) {
 //
 //
 // Ref:
-//   https://github.com/markszabo/IRremoteESP8266/issues/509
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/509
 bool IRrecv::decodeWhirlpoolAC(decode_results *results, const uint16_t nbits,
                                const bool strict) {
   if (results->rawlen < 2 * nbits + 4 + kHeader + kFooter - 1)
