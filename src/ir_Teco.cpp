@@ -21,6 +21,7 @@ const uint16_t kTecoZeroSpace = 580;
 const uint32_t kTecoGap = kDefaultMessageGap;  // Made-up value. Just a guess.
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -230,23 +231,8 @@ String IRTecoAc::toString(void) {
   result += addModeToString(getMode(), kTecoAuto, kTecoCool, kTecoHeat,
                             kTecoDry, kTecoFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kTecoFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kTecoFanHigh:
-      result += F(" (High)");
-      break;
-    case kTecoFanLow:
-      result += F(" (Low)");
-      break;
-    case kTecoFanMed:
-      result += F(" (Med)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
+  result += addFanToString(getFan(), kTecoFanHigh, kTecoFanLow,
+                           kTecoFanAuto, kTecoFanAuto, kTecoFanMed);
   result += addBoolToString(getSleep(), F("Sleep"));
   result += addBoolToString(getSwing(), F("Swing"));
   return result;

@@ -19,6 +19,7 @@ const uint16_t kTrotecGap = 6184;
 const uint16_t kTrotecGapEnd = 1500;  // made up value
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -239,18 +240,8 @@ String IRTrotecESP::toString(void) {
   result += addModeToString(getMode(), kTrotecAuto, kTrotecCool, kTrotecAuto,
                             kTrotecDry, kTrotecFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getSpeed(), F("Fan Speed"));
-  switch (this->getSpeed()) {
-    case kTrotecFanLow:
-      result += F(" (Low)");
-      break;
-    case kTrotecFanMed:
-      result += F(" (Med)");
-      break;
-    case kTrotecFanHigh:
-      result += F(" (High)");
-      break;
-  }
+  result += addFanToString(getSpeed(), kTrotecFanHigh, kTrotecFanLow,
+                           kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
   result += addBoolToString(getSleep(), F("Sleep"));
   return result;
 }

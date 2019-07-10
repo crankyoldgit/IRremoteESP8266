@@ -32,6 +32,7 @@ const uint16_t kToshibaAcZeroSpace = 472;
 const uint16_t kToshibaAcMinGap = 7048;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -326,15 +327,9 @@ String IRToshibaAC::toString(void) {
   result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
                             kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kToshibaAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kToshibaAcFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
+                           kToshibaAcFanAuto, kToshibaAcFanAuto,
+                           kToshibaAcFanMed);
   return result;
 }
 

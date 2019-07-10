@@ -70,7 +70,7 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
-      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
+      "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
       "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
       ac.toString());
 }
@@ -94,7 +94,7 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
-      "Fan: 0 (AUTO), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
+      "Fan: 0 (Auto), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
       "Off Timer: Off, Sleep: Off, Super: Off, Command: 7 (SWING)",
       ac.toString());
 }
@@ -149,7 +149,7 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
-      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
+      "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
       "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
       ac.toString());
 }
@@ -207,7 +207,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
-      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
+      "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
       "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
       ac.toString());
 }
@@ -557,7 +557,7 @@ TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
 
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
-      "Fan: 0 (AUTO), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
+      "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
       "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
       ac.toString());
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);

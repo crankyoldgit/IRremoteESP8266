@@ -38,6 +38,7 @@ const uint64_t kSharpAddressMask = ((uint64_t)1 << kSharpAddressBits) - 1;
 const uint64_t kSharpCommandMask = ((uint64_t)1 << kSharpCommandBits) - 1;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -498,24 +499,8 @@ String IRSharpAc::toString(void) {
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kSharpAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kSharpAcFanMin:
-      result += F(" (MIN)");
-      break;
-    case kSharpAcFanMed:
-      result += F(" (MED)");
-      break;
-    case kSharpAcFanHigh:
-      result += F(" (HIGH)");
-      break;
-    case kSharpAcFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
+                           kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);
   return result;
 }
 

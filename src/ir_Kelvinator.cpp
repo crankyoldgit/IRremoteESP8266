@@ -70,6 +70,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if SEND_KELVINATOR
@@ -426,15 +427,9 @@ String IRKelvinatorAC::toString(void) {
   result += addModeToString(getMode(), kKelvinatorAuto, kKelvinatorCool,
                             kKelvinatorHeat, kKelvinatorDry, kKelvinatorFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kKelvinatorFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kKelvinatorFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kKelvinatorFanMax, kKelvinatorFanMin,
+                           kKelvinatorFanAuto, kKelvinatorFanAuto,
+                           kKelvinatorBasicFanMax);
   result += addBoolToString(getTurbo(), F("Turbo"));
   result += addBoolToString(getQuiet(), F("Quiet"));
   result += addBoolToString(getXFan(), F("XFan"));

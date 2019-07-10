@@ -20,6 +20,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if SEND_GOODWEATHER
@@ -313,21 +314,9 @@ String IRGoodweatherAc::toString() {
   result += addModeToString(getMode(), kGoodweatherAuto, kGoodweatherCool,
                             kGoodweatherHeat, kGoodweatherDry, kGoodweatherFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kGoodweatherFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kGoodweatherFanHigh:
-      result += F(" (HIGH)");
-      break;
-    case kGoodweatherFanMed:
-      result += F(" (MED)");
-      break;
-    case kGoodweatherFanLow:
-      result += F(" (LOW)");
-      break;
-  }
+  result += addFanToString(getFan(), kGoodweatherFanHigh, kGoodweatherFanLow,
+                           kGoodweatherFanAuto, kGoodweatherFanAuto,
+                           kGoodweatherFanMed);
   result += addLabeledString(getTurbo() ? F("Toggle") : F("-"), F("Turbo"));
   result += addLabeledString(getLight() ? F("Toggle") : F("-"), F("Light"));
   result += addLabeledString(getSleep() ? F("Toggle") : F("-"), F("Sleep"));

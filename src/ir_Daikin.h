@@ -92,6 +92,7 @@ const uint8_t kDaikinFan = 0b110;
 const uint8_t kDaikinMinTemp = 10;  // Celsius
 const uint8_t kDaikinMaxTemp = 32;  // Celsius
 const uint8_t kDaikinFanMin = 1;
+const uint8_t kDaikinFanMed = 3;
 const uint8_t kDaikinFanMax = 5;
 const uint8_t kDaikinFanAuto = 0b1010;
 const uint8_t kDaikinFanQuiet = 0b1011;

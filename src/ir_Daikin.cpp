@@ -33,6 +33,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::addFanToString;
 using irutils::minsToString;
 
 #if SEND_DAIKIN
@@ -511,21 +512,8 @@ String IRDaikinESP::toString(void) {
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addBoolToString(getPowerful(), F("Powerful"));
   result += addBoolToString(getQuiet(), F("Quiet"));
   result += addBoolToString(getSensor(), F("Sensor"));
@@ -1161,21 +1149,8 @@ String IRDaikin2::toString() {
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (Quiet)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (Min)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (Max)");
-      break;
-  }
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addIntToString(getSwingVertical(), F("Swing (V)"));
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
@@ -1608,21 +1583,8 @@ String IRDaikin216::toString() {
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
   result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
   result += addBoolToString(getQuiet(), F("Quiet"));
@@ -1973,21 +1935,8 @@ String IRDaikin160::toString() {
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addIntToString(getSwingVertical(), F("Vent Position (V)"));
   switch (getSwingVertical()) {
     case kDaikin160SwingVHighest: result += F(" (Highest)"); break;

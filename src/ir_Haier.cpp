@@ -34,6 +34,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
@@ -457,15 +458,8 @@ String IRHaierAC::toString(void) {
   result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
                             kHaierAcDry, kHaierAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kHaierAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kHaierAcFanHigh:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kHaierAcFanHigh, kHaierAcFanLow,
+                           kHaierAcFanAuto, kHaierAcFanAuto, kHaierAcFanMed);
   result += addIntToString(getSwing(), F("Swing"));
   result += F(" (");
   switch (getSwing()) {
@@ -850,23 +844,9 @@ String IRHaierACYRW02::toString(void) {
                             kHaierAcYrw02Heat, kHaierAcYrw02Dry,
                             kHaierAcYrw02Fan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kHaierAcYrw02FanAuto:
-      result += F(" (Auto)");
-      break;
-    case kHaierAcYrw02FanHigh:
-      result += F(" (High)");
-      break;
-    case kHaierAcYrw02FanLow:
-      result += F(" (Low)");
-      break;
-    case kHaierAcYrw02FanMed:
-      result += F(" (Med)");
-      break;
-    default:
-      result += F(" (Unknown)");
-  }
+  result += addFanToString(getFan(), kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
+                           kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
+                           kHaierAcYrw02FanMed);
   result += addIntToString(getTurbo(), F("Turbo"));
   result += F(" (");
   switch (getTurbo()) {

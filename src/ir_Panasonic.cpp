@@ -62,6 +62,7 @@ const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -763,21 +764,9 @@ String IRPanasonicAc::toString(void) {
   result += addModeToString(getMode(), kPanasonicAcAuto, kPanasonicAcCool,
                             kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kPanasonicAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kPanasonicAcFanMax:
-      result += F(" (MAX)");
-      break;
-    case kPanasonicAcFanMin:
-      result += F(" (MIN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-      break;
-  }
+  result += addFanToString(getFan(), kPanasonicAcFanMax, kPanasonicAcFanMin,
+                           kPanasonicAcFanAuto, kPanasonicAcFanAuto,
+                           kPanasonicAcFanMed);
   result += addIntToString(getSwingVertical(), F("Swing (Vertical)"));
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:

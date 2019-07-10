@@ -38,6 +38,7 @@ const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -348,21 +349,8 @@ String IRMideaAC::toString(void) {
   result += '/';
   result += uint64ToString(getTemp(false));
   result += 'F';
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kMideaACFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kMideaACFanLow:
-      result += F(" (LOW)");
-      break;
-    case kMideaACFanMed:
-      result += F(" (MED)");
-      break;
-    case kMideaACFanHigh:
-      result += F(" (HI)");
-      break;
-  }
+  result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
+                           kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
   result += addBoolToString(getSleep(), F("Sleep"));
   return result;
 }

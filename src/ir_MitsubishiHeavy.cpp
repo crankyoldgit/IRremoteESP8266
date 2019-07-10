@@ -467,31 +467,33 @@ String IRMitsubishiHeavy152Ac::toString(void) {
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
   result += addIntToString(getFan(), F("Fan"));
+  result += F(" (");
   switch (this->getFan()) {
     case kMitsubishiHeavy152FanAuto:
-      result += F(" (Auto)");
+      result += F("Auto");
       break;
     case kMitsubishiHeavy152FanHigh:
-      result += F(" (High)");
+      result += F("High");
       break;
     case kMitsubishiHeavy152FanLow:
-      result += F(" (Low)");
+      result += F("Low");
       break;
     case kMitsubishiHeavy152FanMed:
-      result += F(" (Med)");
+      result += F("Medium");
       break;
     case kMitsubishiHeavy152FanMax:
-      result += F(" (Max)");
+      result += F("Max");
       break;
     case kMitsubishiHeavy152FanEcono:
-      result += F(" (Econo)");
+      result += F("Econo");
       break;
     case kMitsubishiHeavy152FanTurbo:
-      result += F(" (Turbo)");
+      result += F("Turbo");
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += F("UNKNOWN");
   }
+  result += ')';
   result += addIntToString(getSwingVertical(), F("Swing (V)"));
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy152SwingVAuto:
@@ -913,28 +915,30 @@ String IRMitsubishiHeavy88Ac::toString(void) {
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
   result += addIntToString(getFan(), F("Fan"));
+  result += F(" (");
   switch (this->getFan()) {
     case kMitsubishiHeavy88FanAuto:
-      result += F(" (Auto)");
+      result += F("Auto");
       break;
     case kMitsubishiHeavy88FanHigh:
-      result += F(" (High)");
+      result += F("High");
       break;
     case kMitsubishiHeavy88FanLow:
-      result += F(" (Low)");
+      result += F("Low");
       break;
     case kMitsubishiHeavy88FanMed:
-      result += F(" (Med)");
+      result += F("Medium");
       break;
     case kMitsubishiHeavy88FanEcono:
-      result += F(" (Econo)");
+      result += F("Econo");
       break;
     case kMitsubishiHeavy88FanTurbo:
-      result += F(" (Turbo)");
+      result += F("Turbo");
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += F("UNKNOWN");
   }
+  result += ')';
   result += addIntToString(getSwingVertical(), F("Swing (V)"));
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy88SwingVAuto:

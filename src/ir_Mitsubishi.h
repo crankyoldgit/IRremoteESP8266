@@ -34,6 +34,7 @@ const uint8_t kMitsubishiAcFanAuto = 0;
 const uint8_t kMitsubishiAcFanMax = 5;
 const uint8_t kMitsubishiAcFanRealMax = 4;
 const uint8_t kMitsubishiAcFanSilent = 6;
+const uint8_t kMitsubishiAcFanQuiet = kMitsubishiAcFanSilent;
 const uint8_t kMitsubishiAcMinTemp = 16;  // 16C
 const uint8_t kMitsubishiAcMaxTemp = 31;  // 31C
 const uint8_t kMitsubishiAcVaneAuto = 0;

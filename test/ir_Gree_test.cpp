@@ -495,7 +495,7 @@ TEST(TestGreeClass, HumanReadable) {
   IRGreeAC irgree(0);
 
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (AUTO), Turbo: Off, "
+      "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (Auto), Turbo: Off, "
       "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Manual, Swing Vertical Pos: 0 (Last Pos)",
       irgree.toString());
@@ -511,7 +511,7 @@ TEST(TestGreeClass, HumanReadable) {
   irgree.setWiFi(true);
   irgree.setSwingVertical(true, kGreeSwingAuto);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (MAX), Turbo: On, "
+      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (High), Turbo: On, "
       "IFeel: On, WiFi: On, XFan: On, Light: Off, Sleep: On, "
       "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
       irgree.toString());
@@ -571,7 +571,7 @@ TEST(TestDecodeGree, NormalRealExample) {
   EXPECT_STATE_EQ(gree_code, irsend.capture.state, kGreeBits);
   irgree.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1, Turbo: Off, "
+      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low), Turbo: Off, "
       "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Manual, Swing Vertical Pos: 2",
       irgree.toString());

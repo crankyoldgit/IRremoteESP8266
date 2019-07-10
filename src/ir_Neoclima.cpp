@@ -29,6 +29,7 @@ const uint16_t kNeoclimaZeroSpace = 571;
 const uint32_t kNeoclimaMinGap = kDefaultMessageGap;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -457,21 +458,8 @@ String IRNeoclimaAc::toString(void) {
   result += addModeToString(getMode(), kNeoclimaAuto, kNeoclimaCool,
                             kNeoclimaHeat, kNeoclimaDry, kNeoclimaFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kNeoclimaFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kNeoclimaFanHigh:
-      result += F(" (High)");
-      break;
-    case kNeoclimaFanMed:
-      result += F(" (Med)");
-      break;
-    case kNeoclimaFanLow:
-      result += F(" (Low)");
-      break;
-  }
+  result += addFanToString(getFan(), kNeoclimaFanHigh, kNeoclimaFanLow,
+                           kNeoclimaFanAuto, kNeoclimaFanAuto, kNeoclimaFanMed);
   result += addBoolToString(getSwingV(), F("Swing(V)"));
   result += addBoolToString(getSwingH(), F("Swing(H)"));
   result += addBoolToString(getSleep(), F("Sleep"));

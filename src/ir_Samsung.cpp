@@ -51,6 +51,7 @@ const uint16_t kSamsungAcOneSpace = 1432;
 const uint16_t kSamsungAcZeroSpace = 436;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -677,19 +678,19 @@ String IRSamsungAc::toString(void) {
   switch (getFan()) {
     case kSamsungAcFanAuto:
     case kSamsungAcFanAuto2:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kSamsungAcFanLow:
-      result += F(" (LOW)");
+      result += F(" (Low)");
       break;
     case kSamsungAcFanMed:
-      result += F(" (MED)");
+      result += F(" (Medium)");
       break;
     case kSamsungAcFanHigh:
-      result += F(" (HIGH)");
+      result += F(" (High)");
       break;
     case kSamsungAcFanTurbo:
-      result += F(" (TURBO)");
+      result += F(" (Turbo)");
       break;
     default:
       result += F(" (UNKNOWN)");

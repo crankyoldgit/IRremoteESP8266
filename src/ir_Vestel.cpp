@@ -513,22 +513,22 @@ String IRVestelAc::toString(void) {
   result += addIntToString(getFan(), F("Fan"));
   switch (this->getFan()) {
     case kVestelAcFanAuto:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kVestelAcFanLow:
-      result += F(" (LOW)");
+      result += F(" (Low)");
       break;
     case kVestelAcFanMed:
-      result += F(" (MEDIUM)");
+      result += F(" (Medium)");
       break;
     case kVestelAcFanHigh:
-      result += F(" (HIGH)");
+      result += F(" (High)");
       break;
     case kVestelAcFanAutoCool:
-      result += F(" (AUTO COOL)");
+      result += F(" (Auto Cool)");
       break;
     case kVestelAcFanAutoHot:
-      result += F(" (AUTO HOT)");
+      result += F(" (Auto Hot)");
       break;
     default:
       result += F(" (UNKNOWN)");

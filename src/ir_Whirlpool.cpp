@@ -36,6 +36,7 @@ const uint32_t kWhirlpoolAcMinGap = kDefaultMessageGap;  // Just a guess.
 const uint8_t kWhirlpoolAcSections = 3;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -503,24 +504,9 @@ String IRWhirlpoolAc::toString(void) {
   result += addModeToString(getMode(), kWhirlpoolAcAuto, kWhirlpoolAcCool,
                             kWhirlpoolAcHeat, kWhirlpoolAcDry, kWhirlpoolAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kWhirlpoolAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kWhirlpoolAcFanHigh:
-      result += F(" (HIGH)");
-      break;
-    case kWhirlpoolAcFanMedium:
-      result += F(" (MEDIUM)");
-      break;
-    case kWhirlpoolAcFanLow:
-      result += F(" (LOW)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-      break;
-  }
+  result += addFanToString(getFan(), kWhirlpoolAcFanHigh, kWhirlpoolAcFanLow,
+                           kWhirlpoolAcFanAuto, kWhirlpoolAcFanAuto,
+                           kWhirlpoolAcFanMedium);
   result += addBoolToString(getSwing(), F("Swing"));
   result += addBoolToString(getLight(), F("Light"));
   result += addLabeledString(minsToString(getClock()), F("Clock"));

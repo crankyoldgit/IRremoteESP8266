@@ -31,6 +31,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if SEND_FUJITSU_AC
@@ -548,24 +549,9 @@ String IRFujitsuAC::toString(void) {
                             kFujitsuAcModeHeat, kFujitsuAcModeDry,
                             kFujitsuAcModeFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFanSpeed(), F("Fan"));
-  switch (getFanSpeed()) {
-    case kFujitsuAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kFujitsuAcFanHigh:
-      result += F(" (HIGH)");
-      break;
-    case kFujitsuAcFanMed:
-      result += F(" (MED)");
-      break;
-    case kFujitsuAcFanLow:
-      result += F(" (LOW)");
-      break;
-    case kFujitsuAcFanQuiet:
-      result += F(" (QUIET)");
-      break;
-  }
+  result += addFanToString(getFanSpeed(), kFujitsuAcFanHigh, kFujitsuAcFanLow,
+                           kFujitsuAcFanAuto, kFujitsuAcFanQuiet,
+                           kFujitsuAcFanMed);
   switch (model) {
     // These models have no internal swing state.
     case fujitsu_ac_remote_model_t::ARDB1:

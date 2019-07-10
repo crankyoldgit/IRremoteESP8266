@@ -33,6 +33,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if SEND_GREE
@@ -453,15 +454,8 @@ String IRGreeAC::toString(void) {
   result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
                             kGreeDry, kGreeFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case 0:
-      result += F(" (AUTO)");
-      break;
-    case kGreeFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addFanToString(getFan(), kGreeFanMax, kGreeFanMin, kGreeFanAuto,
+                           kGreeFanAuto, kGreeFanMed);
   result += addBoolToString(getTurbo(), F("Turbo"));
   result += addBoolToString(getIFeel(), F("IFeel"));
   result += addBoolToString(getWiFi(), F("WiFi"));

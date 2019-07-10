@@ -11,6 +11,7 @@
 // Constants
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -356,21 +357,8 @@ String IRTcl112Ac::toString(void) {
   result += uint64ToString(nrHalfDegrees / 2);
   if (nrHalfDegrees & 1) result += F(".5");
   result += 'C';
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kTcl112AcFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kTcl112AcFanLow:
-      result += F(" (Low)");
-      break;
-    case kTcl112AcFanMed:
-      result += F(" (Med)");
-      break;
-    case kTcl112AcFanHigh:
-      result += F(" (High)");
-      break;
-  }
+  result += addFanToString(getFan(), kTcl112AcFanHigh, kTcl112AcFanLow,
+                           kTcl112AcFanAuto, kTcl112AcFanAuto, kTcl112AcFanMed);
   result += addBoolToString(getEcono(), F("Econo"));
   result += addBoolToString(getHealth(), F("Health"));
   result += addBoolToString(getLight(), F("Light"));

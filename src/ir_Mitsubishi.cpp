@@ -60,6 +60,7 @@ const uint16_t kMitsubishiAcRptMark = 440;
 const uint16_t kMitsubishiAcRptSpace = 17100;
 
 using irutils::addBoolToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -707,21 +708,11 @@ String IRMitsubishiAC::toString(void) {
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcAuto);
   result += addTempToString(getTemp());
-  result += F(", FAN: ");
-  switch (this->getFan()) {
-    case MITSUBISHI_AC_FAN_AUTO:
-      result += F("AUTO");
-      break;
-    case MITSUBISHI_AC_FAN_MAX:
-      result += F("MAX");
-      break;
-    case MITSUBISHI_AC_FAN_SILENT:
-      result += F("SILENT");
-      break;
-    default:
-      result += uint64ToString(this->getFan());
-  }
-  result += F(", VANE: ");
+  result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
+                           kMitsubishiAcFanRealMax - 3,
+                           kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
+                           kMitsubishiAcFanRealMax - 2);
+  result += F(", Vane: ");
   switch (this->getVane()) {
     case MITSUBISHI_AC_VANE_AUTO:
       result += F("AUTO");

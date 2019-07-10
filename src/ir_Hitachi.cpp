@@ -30,6 +30,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
@@ -350,21 +351,9 @@ String IRHitachiAc::toString(void) {
   result += addModeToString(getMode(), kHitachiAcAuto, kHitachiAcCool,
                             kHitachiAcHeat, kHitachiAcDry, kHitachiAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (getFan()) {
-    case kHitachiAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kHitachiAcFanLow:
-      result += F(" (LOW)");
-      break;
-    case kHitachiAcFanHigh:
-      result += F(" (HIGH)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-      break;
-  }
+  result += addFanToString(getFan(), kHitachiAcFanHigh, kHitachiAcFanLow,
+                           kHitachiAcFanAuto, kHitachiAcFanAuto,
+                           kHitachiAcFanMed);
   result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
   result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
   return result;

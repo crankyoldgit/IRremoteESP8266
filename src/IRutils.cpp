@@ -792,6 +792,21 @@ namespace irutils {
     return result + ')';
   }
 
+  String addFanToString(const uint8_t speed, const uint8_t high,
+                        const uint8_t low, const uint8_t automatic,
+                        const uint8_t quiet, const uint8_t medium) {
+    String result = addIntToString(speed, F("Fan"));
+    result += F(" (");
+    if (speed == high) result += F("High");
+    else if (speed == low) result += F("Low");
+    else if (speed == automatic) result += F("Auto");
+    else if (speed == quiet) result += F("Quiet");
+    else if (speed == medium) result += F("Medium");
+    else
+     result += F("UNKNOWN");
+    return result + ')';
+  }
+
   // Escape any special HTML (unsafe) characters in a string. e.g. anti-XSS.
   // Args:
   //   unescaped: A string containing text to make HTML safe.

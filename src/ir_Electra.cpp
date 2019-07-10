@@ -27,6 +27,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addFanToString;
 using irutils::addTempToString;
 
 #if SEND_ELECTRA_AC
@@ -279,21 +280,9 @@ String IRElectraAc::toString(void) {
   result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  switch (this->getFan()) {
-    case kElectraAcFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kElectraAcFanHigh:
-      result += F(" (High)");
-      break;
-    case kElectraAcFanMed:
-      result += F(" (Med)");
-      break;
-    case kElectraAcFanLow:
-      result += F(" (Low)");
-      break;
-  }
+  result += addFanToString(getFan(), kElectraAcFanHigh, kElectraAcFanLow,
+                           kElectraAcFanAuto, kElectraAcFanAuto,
+                           kElectraAcFanMed);
   result += addBoolToString(getSwingV(), F("Swing(V)"));
   result += addBoolToString(getSwingH(), F("Swing(H)"));
   return result;
