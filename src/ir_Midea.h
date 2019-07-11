@@ -64,7 +64,8 @@ const uint64_t kMideaACChecksumMask = 0x0000FFFFFFFFFF00;
 
 class IRMideaAC {
  public:
-  explicit IRMideaAC(const uint16_t pin);
+  explicit IRMideaAC(const uint16_t pin, const bool inverted = false,
+                     const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_MIDEA

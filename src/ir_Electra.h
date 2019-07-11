@@ -52,7 +52,8 @@ const uint8_t kElectraAcPowerMask =  0b00100000;
 // Classes
 class IRElectraAc {
  public:
-  explicit IRElectraAc(const uint16_t pin);
+  explicit IRElectraAc(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_ELECTRA_AC

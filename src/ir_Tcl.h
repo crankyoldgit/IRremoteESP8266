@@ -51,7 +51,8 @@ const uint8_t kTcl112AcBitTurbo  = 0b01000000;
 
 class IRTcl112Ac {
  public:
-  explicit IRTcl112Ac(const uint16_t pin);
+  explicit IRTcl112Ac(const uint16_t pin, const bool inverted = false,
+                      const bool use_modulation = true);
 
 #if SEND_TCL112AC
   void send(const uint16_t repeat = kTcl112AcDefaultRepeat);

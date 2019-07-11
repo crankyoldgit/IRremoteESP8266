@@ -86,7 +86,8 @@ const uint8_t kGreeSwingUpAuto = 0b00001011;
 // Classes
 class IRGreeAC {
  public:
-  explicit IRGreeAC(uint16_t pin);
+  explicit IRGreeAC(const uint16_t pin, const bool inverted = false,
+                    const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_GREE

@@ -89,7 +89,8 @@ enum whirlpool_ac_remote_model_t {
 // Classes
 class IRWhirlpoolAc {
  public:
-  explicit IRWhirlpoolAc(const uint16_t pin);
+  explicit IRWhirlpoolAc(const uint16_t pin, const bool inverted = false,
+                         const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_WHIRLPOOL_AC

@@ -81,7 +81,9 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN
 
-IRDaikinESP::IRDaikinESP(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikinESP::IRDaikinESP(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+      : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikinESP::begin(void) { _irsend.begin(); }
 
@@ -697,7 +699,9 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
 //   https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
-IRDaikin2::IRDaikin2(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikin2::IRDaikin2(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikin2::begin() { _irsend.begin(); }
 
@@ -1406,7 +1410,9 @@ void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 //   https://github.com/danny-source/Arduino_DY_IRDaikin
-IRDaikin216::IRDaikin216(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikin216::IRDaikin216(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikin216::begin() { _irsend.begin(); }
 
@@ -1769,7 +1775,9 @@ void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
-IRDaikin160::IRDaikin160(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikin160::IRDaikin160(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikin160::begin() { _irsend.begin(); }
 

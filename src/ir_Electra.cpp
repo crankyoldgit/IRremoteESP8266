@@ -46,7 +46,9 @@ void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
 #endif
 
 
-IRElectraAc::IRElectraAc(const uint16_t pin) : _irsend(pin) {
+IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) {
   this->stateReset();
 }
 

@@ -187,7 +187,8 @@ const uint8_t kHaierAcYrw02ButtonSleep = 0xB;
 
 class IRHaierAC {
  public:
-  explicit IRHaierAC(const uint16_t pin);
+  explicit IRHaierAC(const uint16_t pin, const bool inverted = false,
+                     const bool use_modulation = true);
 
 #if SEND_HAIER_AC
   void send(const uint16_t repeat = kHaierAcDefaultRepeat);
@@ -253,7 +254,8 @@ class IRHaierAC {
 
 class IRHaierACYRW02 {
  public:
-  explicit IRHaierACYRW02(uint16_t pin);
+  explicit IRHaierACYRW02(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
 
 #if SEND_HAIER_AC_YRW02
   void send(const uint16_t repeat = kHaierAcYrw02DefaultRepeat);

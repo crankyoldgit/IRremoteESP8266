@@ -92,7 +92,8 @@ enum panasonic_ac_remote_model_t {
 
 class IRPanasonicAc {
  public:
-  explicit IRPanasonicAc(const uint16_t pin);
+  explicit IRPanasonicAc(const uint16_t pin, const bool inverted = false,
+                         const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_PANASONIC
