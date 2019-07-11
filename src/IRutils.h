@@ -54,6 +54,7 @@ namespace irutils {
                         const uint8_t low, const uint8_t automatic,
                         const uint8_t quiet, const uint8_t medium);
   String htmlEscape(const String unescaped);
+  String msToString(uint32_t const msecs);
   String minsToString(const uint16_t mins);
 }  // namespace irutils
 #endif  // IRUTILS_H_

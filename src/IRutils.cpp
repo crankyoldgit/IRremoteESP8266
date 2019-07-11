@@ -869,6 +869,39 @@ namespace irutils {
     return result;
   }
 
+  String msToString(uint32_t const msecs) {
+    uint32_t totalseconds = msecs / 1000;
+    if (totalseconds == 0) return F("Now");
+
+    // Note: uint32_t can only hold up to 45 days, so uint8_t is safe.
+    uint8_t days = totalseconds / (60 * 60 * 24);
+    uint8_t hours = (totalseconds / (60 * 60)) % 24;
+    uint8_t minutes = (totalseconds / 60) % 60;
+    uint8_t seconds = totalseconds % 60;
+
+    String result = "";
+    if (days) {
+      result += uint64ToString(days) + F(" day");
+      if (days > 1) result += 's';
+    }
+    if (hours) {
+      if (result.length()) result += ' ';
+      result += uint64ToString(hours) + F(" hour");
+      if (hours > 1) result += 's';
+    }
+    if (minutes) {
+      if (result.length()) result += ' ';
+      result += uint64ToString(minutes) + F(" minute");
+      if (minutes > 1) result += 's';
+    }
+    if (seconds) {
+      if (result.length()) result += ' ';
+      result += uint64ToString(seconds) + F(" second");
+      if (seconds > 1) result += 's';
+    }
+    return result;
+  }
+
   String minsToString(const uint16_t mins) {
     String result = "";
     result.reserve(5);  // 23:59 is the typical worst case.
