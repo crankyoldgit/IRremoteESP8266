@@ -197,7 +197,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.3.0"
+#define _MY_VERSION_ "v1.3.1"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
