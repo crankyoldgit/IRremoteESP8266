@@ -2383,7 +2383,7 @@ void receivingMQTT(String const topic_name, String const callback_str) {
           // send received MQTT value by IR signal
           lastSendSucceeded = sendIRCode(
               IrSendTable[channel], ir_type, code,
-              strchr(sequence_item, kCommandDelimiter[0]), nbits, repeat);
+              strchr(sequence_item, kCommandDelimiter[0]) + 1, nbits, repeat);
         }
     }
     free(ircommand);
