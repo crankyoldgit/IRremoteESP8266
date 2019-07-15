@@ -6,6 +6,7 @@
 //   Brand: EKOKAI,  Model: A/C
 //   Brand: RusClimate,  Model: EACS/I-09HAR_X/N3 A/C
 //   Brand: RusClimate,  Model: YAW1F remote
+//   Brand: Green,  Model: YBOFB2 remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -37,7 +38,7 @@ const uint8_t kGreeSleepMask = 0b10000000;
 // Byte 2
 const uint8_t kGreeTurboMask = 0b00010000;
 const uint8_t kGreeLightMask = 0b00100000;
-const uint8_t kGreePower2Mask = 0b01000000;
+const uint8_t kGreePower2Mask = 0b01000000;  // This might not be used. See #814
 const uint8_t kGreeXfanMask = 0b10000000;
 // Byte 4
 const uint8_t kGreeSwingPosMask = 0b00001111;

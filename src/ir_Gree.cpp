@@ -174,12 +174,12 @@ bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
 
 void IRGreeAC::on(void) {
   remote_state[0] |= kGreePower1Mask;
-  remote_state[2] |= kGreePower2Mask;
+  remote_state[2] |= kGreePower2Mask;  // May not be needed. See #814
 }
 
 void IRGreeAC::off(void) {
   remote_state[0] &= ~kGreePower1Mask;
-  remote_state[2] &= ~kGreePower2Mask;
+  remote_state[2] &= ~kGreePower2Mask;  // May not be needed. See #814
 }
 
 void IRGreeAC::setPower(const bool on) {
@@ -190,8 +190,8 @@ void IRGreeAC::setPower(const bool on) {
 }
 
 bool IRGreeAC::getPower(void) {
-  return (remote_state[0] & kGreePower1Mask) &&
-         (remote_state[2] & kGreePower2Mask);
+  //  See #814. Not checking/requiring: (remote_state[2] & kGreePower2Mask)
+  return remote_state[0] & kGreePower1Mask;
 }
 
 // Set the temp. in deg C

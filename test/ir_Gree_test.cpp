@@ -609,3 +609,18 @@ TEST(TestGreeClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
+
+TEST(TestGreeClass, Issue814Power) {
+  IRGreeAC ac(0);
+  ac.begin();
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/814#issuecomment-511263921
+  uint8_t on[8] = {0x59, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0xC0};
+  uint8_t off[8] = {0x51, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0x40};
+
+  ac.on();
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getPower());
+  ac.setRaw(on);
+  EXPECT_TRUE(ac.getPower());
+}
