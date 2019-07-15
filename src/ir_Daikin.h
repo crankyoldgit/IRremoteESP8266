@@ -543,13 +543,12 @@ class IRDaikin160 {
   void stateReset();
   void checksum();
 };
-
 // Class to emulate a Daikin BRC4C153 remote.
 class IRDaikin176 {
  public:
   explicit IRDaikin176(uint16_t pin);
 
-#if SEND_DAIKIN176
+ #if SEND_DAIKIN176
   void send(const uint16_t repeat = kDaikin176DefaultRepeat);
   uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif
@@ -577,9 +576,9 @@ class IRDaikin176 {
   stdAc::state_t toCommon(void);
   String toString(void);
 
-#ifndef UNIT_TEST
+ #ifndef UNIT_TEST
 
- private:
+  private:
   IRsend _irsend;
 #else
   IRsendTest _irsend;
@@ -589,4 +588,5 @@ class IRDaikin176 {
   void stateReset();
   void checksum();
 };// end of IRDaikin176
+
 #endif  // IR_DAIKIN_H_
