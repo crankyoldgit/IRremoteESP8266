@@ -113,9 +113,12 @@ void IRsend::sendGree(const uint64_t data, const uint16_t nbits,
 }
 #endif  // SEND_GREE
 
-IRGreeAC::IRGreeAC(const uint16_t pin, const bool inverted,
-                   const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+IRGreeAC::IRGreeAC(const uint16_t pin, const gree_ac_remote_model_t model,
+                   const bool inverted, const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) {
+  stateReset();
+  setModel(model);
+}
 
 void IRGreeAC::stateReset(void) {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.
@@ -128,6 +131,7 @@ void IRGreeAC::stateReset(void) {
 }
 
 void IRGreeAC::fixup(void) {
+  setPower(getPower());  // Redo the power bits as they differ between models.
   checksum();  // Calculate the checksums
 }
 
@@ -149,6 +153,13 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kGreeStateLength; i++) {
     remote_state[i] = new_code[i];
   }
+  // We can only detect the difference between models when the power is on.
+  if (getPower()) {
+    if (remote_state[2] & kGreePower2Mask)
+      _model = gree_ac_remote_model_t::YAW1F;
+    else
+      _model = gree_ac_remote_model_t::YBOFB2;
+  }
 }
 
 void IRGreeAC::checksum(const uint16_t length) {
@@ -165,28 +176,40 @@ void IRGreeAC::checksum(const uint16_t length) {
 //   A boolean.
 bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
   // Top 4 bits of the last byte in the state is the state's checksum.
-  if (state[length - 1] >> 4 ==
-      IRKelvinatorAC::calcBlockChecksum(state, length))
-    return true;
-  else
-    return false;
+  return (state[length - 1] >> 4 == IRKelvinatorAC::calcBlockChecksum(state,
+                                                                      length));
 }
 
-void IRGreeAC::on(void) {
-  remote_state[0] |= kGreePower1Mask;
-  remote_state[2] |= kGreePower2Mask;  // May not be needed. See #814
+void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
+  switch (model) {
+    case gree_ac_remote_model_t::YAW1F:
+    case gree_ac_remote_model_t::YBOFB2:
+      _model = model; break;
+    default:
+      setModel(gree_ac_remote_model_t::YAW1F);
+  }
 }
 
-void IRGreeAC::off(void) {
-  remote_state[0] &= ~kGreePower1Mask;
-  remote_state[2] &= ~kGreePower2Mask;  // May not be needed. See #814
+gree_ac_remote_model_t IRGreeAC::getModel(void) {
+  return _model;
 }
+
+void IRGreeAC::on(void) { setPower(true); }
+
+void IRGreeAC::off(void) { setPower(false); }
 
 void IRGreeAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  if (on) {
+    remote_state[0] |= kGreePower1Mask;
+    switch (_model) {
+      case gree_ac_remote_model_t::YBOFB2: break;
+      default:
+        remote_state[2] |= kGreePower2Mask;
+    }
+  } else {
+    remote_state[0] &= ~kGreePower1Mask;
+    remote_state[2] &= ~kGreePower2Mask;  // May not be needed. See #814
+  }
 }
 
 bool IRGreeAC::getPower(void) {
@@ -424,7 +447,7 @@ stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
 stdAc::state_t IRGreeAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::GREE;
-  result.model = -1;  // No models used.
+  result.model = this->getModel();
   result.power = this->getPower();
   result.mode = this->toCommonMode(this->getMode());
   result.celsius = true;
@@ -452,7 +475,13 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addIntToString(getModel(), F("Model"), false);
+  switch (getModel()) {
+    case gree_ac_remote_model_t::YAW1F: result += F(" (YAW1F)"); break;
+    case gree_ac_remote_model_t::YBOFB2: result += F(" (YBOFB2)"); break;
+    default: result += F(" (UNKNOWN)");
+  }
+  result += addBoolToString(getPower(), F("Power"));
   result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
                             kGreeDry, kGreeFan);
   result += addTempToString(getTemp());
