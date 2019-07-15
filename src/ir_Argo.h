@@ -110,7 +110,8 @@ const uint8_t kArgoFlapFull = 7;  // 0b111
 
 class IRArgoAC {
  public:
-  explicit IRArgoAC(const uint16_t pin);
+  explicit IRArgoAC(const uint16_t pin, const bool inverted = false,
+                    const bool use_modulation = true);
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);

@@ -87,7 +87,8 @@ const uint8_t kGoodweatherCmdLight    = 0x0B;
 // Classes
 class IRGoodweatherAc {
  public:
-  explicit IRGoodweatherAc(uint16_t pin);
+  explicit IRGoodweatherAc(const uint16_t pin, const bool inverted = false,
+                           const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_GOODWEATHER

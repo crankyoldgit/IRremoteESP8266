@@ -59,7 +59,8 @@ const uint8_t kTrotecMaxTimer = 23;
 
 class IRTrotecESP {
  public:
-  explicit IRTrotecESP(uint16_t pin);
+  explicit IRTrotecESP(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
 #if SEND_TROTEC
   void send(const uint16_t repeat = kTrotecDefaultRepeat);

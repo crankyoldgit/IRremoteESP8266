@@ -57,7 +57,9 @@ void IRsend::sendGoodweather(const uint64_t data, const uint16_t nbits,
 }
 #endif  // SEND_GOODWEATHER
 
-IRGoodweatherAc::IRGoodweatherAc(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRGoodweatherAc::IRGoodweatherAc(const uint16_t pin, const bool inverted,
+                                 const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRGoodweatherAc::stateReset(void) {
 }

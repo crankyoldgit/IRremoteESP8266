@@ -86,7 +86,8 @@ const uint32_t kCoolixDefaultState = 0b101100101011111111001000;  // 0xB2BFC8
 // Classes
 class IRCoolixAC {
  public:
-  explicit IRCoolixAC(uint16_t pin);
+  explicit IRCoolixAC(const uint16_t pin, const bool inverted = false,
+                      const bool use_modulation = true);
 
   void stateReset();
 #if SEND_COOLIX

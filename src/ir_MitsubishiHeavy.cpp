@@ -73,8 +73,10 @@ void IRsend::sendMitsubishiHeavy152(const unsigned char data[],
 #endif  // SEND_MITSUBISHIHEAVY
 
 // Class for decoding and constructing MitsubishiHeavy152 AC messages.
-IRMitsubishiHeavy152Ac::IRMitsubishiHeavy152Ac(
-    const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRMitsubishiHeavy152Ac::IRMitsubishiHeavy152Ac(const uint16_t pin,
+                                               const bool inverted,
+                                               const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRMitsubishiHeavy152Ac::begin(void) { _irsend.begin(); }
 
@@ -560,8 +562,10 @@ String IRMitsubishiHeavy152Ac::toString(void) {
 
 
 // Class for decoding and constructing MitsubishiHeavy88 AC messages.
-IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(
-    const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(const uint16_t pin,
+                                             const bool inverted,
+                                             const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRMitsubishiHeavy88Ac::begin(void) { _irsend.begin(); }
 

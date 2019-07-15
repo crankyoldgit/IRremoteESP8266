@@ -74,7 +74,9 @@ void IRsend::sendHaierACYRW02(const unsigned char data[], const uint16_t nbytes,
 #endif  // SEND_HAIER_AC_YRW02
 
 // Class for emulating a Haier HSU07-HEA03 remote
-IRHaierAC::IRHaierAC(const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRHaierAC::IRHaierAC(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRHaierAC::begin(void) { _irsend.begin(); }
 
@@ -513,7 +515,9 @@ String IRHaierAC::toString(void) {
 // End of IRHaierAC class.
 
 // Class for emulating a Haier YRW02 remote
-IRHaierACYRW02::IRHaierACYRW02(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRHaierACYRW02::IRHaierACYRW02(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRHaierACYRW02::begin(void) { _irsend.begin(); }
 

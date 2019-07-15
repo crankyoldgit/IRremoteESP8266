@@ -103,7 +103,8 @@ const uint64_t kVestelAcTimeStateDefault = 0x201ULL;
 
 class IRVestelAc {
  public:
-  explicit IRVestelAc(const uint16_t pin);
+  explicit IRVestelAc(const uint16_t pin, const bool inverted = false,
+                      const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_VESTEL_AC

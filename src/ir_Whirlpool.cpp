@@ -79,9 +79,9 @@ void IRsend::sendWhirlpoolAC(const unsigned char data[], const uint16_t nbytes,
 // Decoding help from:
 //   @redmusicxd, @josh929800, @raducostea
 
-IRWhirlpoolAc::IRWhirlpoolAc(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRWhirlpoolAc::IRWhirlpoolAc(const uint16_t pin, const bool inverted,
+                             const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRWhirlpoolAc::stateReset(void) {
   for (uint8_t i = 2; i < kWhirlpoolAcStateLength; i++) remote_state[i] = 0x0;

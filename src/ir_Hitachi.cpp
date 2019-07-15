@@ -104,7 +104,9 @@ void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
 // Inspired by:
 // https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
 
-IRHitachiAc::IRHitachiAc(const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRHitachiAc::IRHitachiAc(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRHitachiAc::stateReset(void) {
   remote_state[0] = 0x80;

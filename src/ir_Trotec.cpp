@@ -38,9 +38,9 @@ void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_TROTEC
 
-IRTrotecESP::IRTrotecESP(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRTrotecESP::IRTrotecESP(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRTrotecESP::begin(void) { _irsend.begin(); }
 
