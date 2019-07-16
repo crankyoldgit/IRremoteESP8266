@@ -6,7 +6,9 @@
 //   Brand: EKOKAI,  Model: A/C
 //   Brand: RusClimate,  Model: EACS/I-09HAR_X/N3 A/C
 //   Brand: RusClimate,  Model: YAW1F remote
+//   Brand: Green,  Model: YBOFB remote
 //   Brand: Green,  Model: YBOFB2 remote
+//   Brand: Green,  Model: YAPOF3 remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -25,7 +27,7 @@
 // Constants
 enum gree_ac_remote_model_t {
   YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
-  YBOFB2,     // (2) Green
+  YBOFB,     // (2) Green, YBOFB2, YAPOF3
 };
 
 const uint8_t kGreeAuto = 0;

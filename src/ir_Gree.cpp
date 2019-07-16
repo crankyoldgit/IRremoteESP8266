@@ -158,7 +158,7 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
     if (remote_state[2] & kGreePower2Mask)
       _model = gree_ac_remote_model_t::YAW1F;
     else
-      _model = gree_ac_remote_model_t::YBOFB2;
+      _model = gree_ac_remote_model_t::YBOFB;
   }
 }
 
@@ -183,7 +183,7 @@ bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
 void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
-    case gree_ac_remote_model_t::YBOFB2:
+    case gree_ac_remote_model_t::YBOFB:
       _model = model; break;
     default:
       setModel(gree_ac_remote_model_t::YAW1F);
@@ -202,7 +202,7 @@ void IRGreeAC::setPower(const bool on) {
   if (on) {
     remote_state[0] |= kGreePower1Mask;
     switch (_model) {
-      case gree_ac_remote_model_t::YBOFB2: break;
+      case gree_ac_remote_model_t::YBOFB: break;
       default:
         remote_state[2] |= kGreePower2Mask;
     }
@@ -478,7 +478,7 @@ String IRGreeAC::toString(void) {
   result += addIntToString(getModel(), F("Model"), false);
   switch (getModel()) {
     case gree_ac_remote_model_t::YAW1F: result += F(" (YAW1F)"); break;
-    case gree_ac_remote_model_t::YBOFB2: result += F(" (YBOFB2)"); break;
+    case gree_ac_remote_model_t::YBOFB: result += F(" (YBOFB)"); break;
     default: result += F(" (UNKNOWN)");
   }
   result += addBoolToString(getPower(), F("Power"));

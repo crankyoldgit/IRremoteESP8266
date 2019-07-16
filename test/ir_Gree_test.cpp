@@ -615,31 +615,31 @@ TEST(TestGreeClass, Issue814Power) {
   ac.begin();
 
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/814#issuecomment-511263921
-  uint8_t YBOFB2_on[8] = {0x59, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0xC0};
+  uint8_t YBOFB_on[8] = {0x59, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0xC0};
   uint8_t off[8] = {0x51, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0x40};
 
   ac.on();
   EXPECT_EQ(gree_ac_remote_model_t::YAW1F, ac.getModel());
   ac.setRaw(off);
   EXPECT_FALSE(ac.getPower());
-  ac.setRaw(YBOFB2_on);
+  ac.setRaw(YBOFB_on);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_EQ(gree_ac_remote_model_t::YBOFB2, ac.getModel());
+  EXPECT_EQ(gree_ac_remote_model_t::YBOFB, ac.getModel());
   EXPECT_EQ(
-      "Model: 2 (YBOFB2), Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 1, "
+      "Model: 2 (YBOFB), Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 1, "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
       ac.toString());
   ac.off();
   EXPECT_STATE_EQ(off, ac.getRaw(), kGreeBits);
   ac.on();
-  EXPECT_STATE_EQ(YBOFB2_on, ac.getRaw(), kGreeBits);
+  EXPECT_STATE_EQ(YBOFB_on, ac.getRaw(), kGreeBits);
   uint8_t YAW1F_on[8] = {0x59, 0x07, 0x60, 0x50, 0x01, 0x20, 0x00, 0xC0};
   ac.setModel(gree_ac_remote_model_t::YAW1F);
   EXPECT_STATE_EQ(YAW1F_on, ac.getRaw(), kGreeBits);
   ac.off();
   EXPECT_STATE_EQ(off, ac.getRaw(), kGreeBits);
-  ac.setModel(gree_ac_remote_model_t::YBOFB2);
+  ac.setModel(gree_ac_remote_model_t::YBOFB);
   ac.on();
-  EXPECT_STATE_EQ(YBOFB2_on, ac.getRaw(), kGreeBits);
+  EXPECT_STATE_EQ(YBOFB_on, ac.getRaw(), kGreeBits);
 }

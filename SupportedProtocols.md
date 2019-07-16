@@ -19,10 +19,10 @@
 | [GICable](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_GICable.cpp) | **Unknown** |  |  | - |
 | [GlobalCache](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_GlobalCache.cpp) | **Unknown** |  |  | - |
 | [Goodweather](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Goodweather.cpp) | **[Goodweather](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Goodweather.h)** | ZH/JT-03 remote |  | Yes |
-| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[EKOKAI](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | A/C | YAW1F<BR>YBOFB2 | Yes |
-| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[Green](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | YBOFB2 remote | YAW1F<BR>YBOFB2 | Yes |
-| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[RusClimate](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | EACS/I-09HAR_X/N3 A/C<BR>YAW1F remote | YAW1F<BR>YBOFB2 | Yes |
-| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[Ultimate](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | Heat Pump | YAW1F<BR>YBOFB2 | Yes |
+| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[EKOKAI](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | A/C | YAW1F<BR>YBOFB | Yes |
+| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[Green](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | YAPOF3 remote<BR>YBOFB remote<BR>YBOFB2 remote | YAW1F<BR>YBOFB | Yes |
+| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[RusClimate](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | EACS/I-09HAR_X/N3 A/C<BR>YAW1F remote | YAW1F<BR>YBOFB | Yes |
+| [Gree](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.cpp) | **[Ultimate](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Gree.h)** | Heat Pump | YAW1F<BR>YBOFB | Yes |
 | [Haier](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Haier.cpp) | **[Haier](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Haier.h)** | HSU-09HMC203 A/C<BR>HSU07-HEA03 remote<BR>YR-W02 remote |  | Yes |
 | [Hitachi](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Hitachi.cpp) | **[Hitachi](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Hitachi.h)** | LT0541-HTA remote<BR>RAS-35THA6 remote<BR>Series VI A/C (Circa 2007) |  | Yes |
 | [Inax](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Inax.cpp) | **Lixil** | Inax DT-BA283 Toilet |  | - |
