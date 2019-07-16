@@ -267,9 +267,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
     case DAIKIN160:
       result = F("DAIKIN160");
       break;
-   case DAIKIN176:
+    case DAIKIN176:
       result = F("DAIKIN176");
-      break;      
+      break;
     case DAIKIN2:
       result = F("DAIKIN2");
       break;

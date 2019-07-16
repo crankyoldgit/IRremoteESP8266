@@ -578,7 +578,7 @@ class IRDaikin176 {
 
  #ifndef UNIT_TEST
 
-  private:
+ private:
   IRsend _irsend;
 #else
   IRsendTest _irsend;
@@ -587,6 +587,6 @@ class IRDaikin176 {
   uint8_t remote_state[kDaikin176StateLength];
   void stateReset();
   void checksum();
-};// end of IRDaikin176
+};
 
 #endif  // IR_DAIKIN_H_

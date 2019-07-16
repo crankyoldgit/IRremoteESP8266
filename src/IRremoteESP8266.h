@@ -251,7 +251,8 @@
      DECODE_WHIRLPOOL_AC || DECODE_SAMSUNG_AC || DECODE_ELECTRA_AC || \
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
      DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
-     DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || DECODE_DAIKIN176 || DECODE_NEOCLIMA)
+     DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
+     DECODE_NEOCLIMA || DECODE_DAIKIN176)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -336,8 +337,8 @@ enum decode_type_t {
   GOODWEATHER,
   INAX,
   DAIKIN160,  // 65
-  DAIKIN176,
   NEOCLIMA,
+  DAIKIN176,
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = DAIKIN176,
 };

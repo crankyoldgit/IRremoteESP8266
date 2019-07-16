@@ -639,14 +639,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Daikin160 decode");
   if (decodeDaikin160(results)) return true;
 #endif  // DECODE_DAIKIN160
-#if DECODE_DAIKIN176
-  DPRINTLN("Attempting Daikin176 decode");
-  if (decodeDaikin176(results)) return true;
-#endif  // DECODE_DAIKIN176  
 #if DECODE_NEOCLIMA
   DPRINTLN("Attempting Neoclima decode");
   if (decodeNeoclima(results)) return true;
 #endif  // DECODE_NEOCLIMA
+  #if DECODE_DAIKIN176
+  DPRINTLN("Attempting Daikin176 decode");
+  if (decodeDaikin176(results)) return true;
+#endif  // DECODE_DAIKIN176
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.

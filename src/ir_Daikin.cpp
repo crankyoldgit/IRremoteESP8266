@@ -2166,7 +2166,7 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 // 
 IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
 
- void IRDaikin176::begin() { _irsend.begin(); }
+void IRDaikin176::begin() { _irsend.begin(); }
 
  // Verify the checksum is valid for a given state.
 // Args:
@@ -2196,7 +2196,7 @@ void IRDaikin176::checksum() {
       remote_state + kDaikin176Section1Length, kDaikin176Section2Length - 1);
 }
 
- void IRDaikin176::stateReset() {
+void IRDaikin176::stateReset() {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
   remote_state[1] =  0xDA;
@@ -2214,12 +2214,12 @@ void IRDaikin176::checksum() {
   // remote_state[21] is a checksum byte, it will be set by checksum().
 }
 
- uint8_t *IRDaikin176::getRaw() {
+uint8_t *IRDaikin176::getRaw() {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
- void IRDaikin176::setRaw(const uint8_t new_code[]) {
+void IRDaikin176::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++)
     remote_state[i] = new_code[i];
 }
@@ -2231,30 +2231,30 @@ void IRDaikin176::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN176
 
- void IRDaikin176::on() {
+void IRDaikin176::on() {
   remote_state[kDaikin176BytePower] |= kDaikinBitPower;
 }
 
- void IRDaikin176::off() {
+void IRDaikin176::off() {
   remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
 }
 
- void IRDaikin176::setPower(const bool state) {
+void IRDaikin176::setPower(const bool state) {
   if (state)
     on();
   else
     off();
 }
 
- bool IRDaikin176::getPower() {
+bool IRDaikin176::getPower() {
   return remote_state[kDaikin176BytePower] & kDaikinBitPower;
 }
 
- uint8_t IRDaikin176::getMode() {
+uint8_t IRDaikin176::getMode() {
   return (remote_state[kDaikin176ByteMode] & kDaikin176MaskMode) >> 4;
 }
 
- void IRDaikin176::setMode(const uint8_t mode) {
+void IRDaikin176::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinAuto:
     case kDaikin176Cool:
@@ -2294,7 +2294,7 @@ void IRDaikin176::setTemp(const uint8_t temp) {
   remote_state[kDaikin176ByteTemp] |= degrees;
 }
 
- uint8_t IRDaikin176::getTemp(void) {
+uint8_t IRDaikin176::getTemp(void) {
   return (((remote_state[kDaikin176ByteTemp] & kDaikin176MaskTemp) / 2 ) + 9);
 }
 
@@ -2312,15 +2312,15 @@ void IRDaikin176::setFan(const uint8_t fan) {
   remote_state[kDaikin176ByteFan] |= (fanset << 4);
 }
 
- uint8_t IRDaikin176::getFan() {
+uint8_t IRDaikin176::getFan() {
  // uint8_t fan = (remote_state[kDaikin176ByteFan] & kDaikin176MaskFan) >> 4;
- uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
+  uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
  // if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -=2 ;
   return fan;
 }
 
  // Convert a standard A/C Fan speed into its native fan speed.
- uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
      switch (speed) {
     case stdAc::fanspeed_t::kMin:
       return kDaikinFanMin;
@@ -2337,7 +2337,7 @@ void IRDaikin176::setFan(const uint8_t fan) {
   } 
 }
 
- void IRDaikin176::setSwingHorizontal(const uint8_t position) {
+void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
     case kDaikin176SwingHSwing:
     remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
@@ -2380,7 +2380,7 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
 
    // Not supported.
-  //result.swingv = stdAc::swingv_t::kOff;
+  result.swingv = stdAc::swingv_t::kOff;
   result.quiet = false;
   result.turbo = false;
   result.light = false;
@@ -2470,7 +2470,7 @@ String IRDaikin176::toString() {
 //
 // Ref
 
- bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
+bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
     return false;
@@ -2478,7 +2478,7 @@ String IRDaikin176::toString() {
    // Compliance
   if (strict && nbits != kDaikin176Bits) return false;
 
-   uint16_t offset = kStartOffset;
+  uint16_t offset = kStartOffset;
   const uint8_t ksectionSize[kDaikin176Sections] = {kDaikin176Section1Length,
                                                     kDaikin176Section2Length};
 
