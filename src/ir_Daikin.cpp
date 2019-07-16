@@ -2224,7 +2224,7 @@ void IRDaikin176::setRaw(const uint8_t new_code[]) {
     remote_state[i] = new_code[i];
 }
 
- #if SEND_DAIKIN176
+#if SEND_DAIKIN176
 void IRDaikin176::send(const uint16_t repeat) {
   checksum();
   _irsend.sendDaikin176(remote_state, kDaikin176StateLength, repeat);
@@ -2322,16 +2322,11 @@ uint8_t IRDaikin176::getFan() {
  // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
      switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kDaikinFanMin;
-    case stdAc::fanspeed_t::kLow:
-      return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMin + 2;
-    case stdAc::fanspeed_t::kHigh:
-      return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kDaikinFanMax;
+    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
+    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
     default:
       return kDaikinFanAuto; 
   } 
