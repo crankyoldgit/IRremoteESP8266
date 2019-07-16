@@ -238,11 +238,11 @@
 #define DECODE_DAIKIN160       true
 #define SEND_DAIKIN160         true
 
-#define DECODE_DAIKIN176       true
-#define SEND_DAIKIN176         true
-
 #define DECODE_NEOCLIMA        true
 #define SEND_NEOCLIMA          true
+
+#define DECODE_DAIKIN176       true
+#define SEND_DAIKIN176         true
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
