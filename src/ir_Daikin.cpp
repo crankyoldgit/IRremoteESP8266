@@ -2508,5 +2508,3 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN176
-
-//no newline at end of file
