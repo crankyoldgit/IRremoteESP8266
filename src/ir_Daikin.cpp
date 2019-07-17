@@ -2440,7 +2440,7 @@ String IRDaikin176::toString() {
     result += F(" (Off)");
     break;
   }
-  return result; 
+  return result;
 }
 
 #if DECODE_DAIKIN176
