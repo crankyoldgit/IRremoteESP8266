@@ -543,7 +543,6 @@ class IRDaikin160 {
   void stateReset();
   void checksum();
 };
-
 // Class to emulate a Daikin BRC4C153 remote.
 class IRDaikin176 {
  public:
@@ -588,5 +587,6 @@ class IRDaikin176 {
   uint8_t remote_state[kDaikin176StateLength];
   void stateReset();
   void checksum();
-};// end of IRDaikin176
+};
+
 #endif  // IR_DAIKIN_H_

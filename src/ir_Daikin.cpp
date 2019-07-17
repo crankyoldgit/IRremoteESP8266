@@ -6,7 +6,7 @@ http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 Copyright 2016 sillyfrog
 Copyright 2017 sillyfrog, crankyoldgit
 Copyright 2018-2019 crankyoldgit
-Copyright 2019 pasna (IRDaikin160 class / IRDaikin176 class)
+Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 */
 
 #include "ir_Daikin.h"
@@ -2132,8 +2132,6 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
 // Supported devices:
 // - Daikin BRC4C153 remote.
 //
-// Ref:
-//  
 void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin176Section1Length)
@@ -2163,7 +2161,6 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 //
 // Supported Remotes: Daikin BRC4C153 remote
 //
-// 
 IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRDaikin176::begin() { _irsend.begin(); }
@@ -2271,7 +2268,6 @@ void IRDaikin176::setMode(const uint8_t mode) {
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
-//  return IRDaikinESP::convertMode(mode);
   switch (mode) {
     case stdAc::opmode_t::kCool:
       return kDaikin176Cool;
@@ -2313,28 +2309,21 @@ void IRDaikin176::setFan(const uint8_t fan) {
 }
 
 uint8_t IRDaikin176::getFan() {
- // uint8_t fan = (remote_state[kDaikin176ByteFan] & kDaikin176MaskFan) >> 4;
- uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
- // if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -=2 ;
+  uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
   return fan;
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
- uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
      switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kDaikinFanMin;
-    case stdAc::fanspeed_t::kLow:
-      return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMin + 2;
-    case stdAc::fanspeed_t::kHigh:
-      return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kDaikinFanMax;
+    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
+    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
     default:
-      return kDaikinFanAuto; 
-  } 
+      return kDaikinFanAuto;
+  }
 }
 
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
@@ -2380,7 +2369,7 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
 
   // Not supported.
-  //result.swingv = stdAc::swingv_t::kOff;
+  result.swingv = stdAc::swingv_t::kOff;
   result.quiet = false;
   result.turbo = false;
   result.light = false;
@@ -2451,7 +2440,7 @@ String IRDaikin176::toString() {
     result += F(" (Off)");
     break;
   }
-  return result; 
+  return result;
 }
 
 #if DECODE_DAIKIN176
@@ -2468,7 +2457,6 @@ String IRDaikin176::toString() {
 //
 // Status: BETA / Probably works.
 //
-// Ref
 
 bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
                              const bool strict) {
@@ -2482,7 +2470,7 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   const uint8_t ksectionSize[kDaikin176Sections] = {kDaikin176Section1Length,
                                                     kDaikin176Section2Length};
 
-  // Sections                                              
+  // Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin176Sections; section++) {
     uint16_t used;
@@ -2514,5 +2502,3 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN176
-
-//no newline at end of file
