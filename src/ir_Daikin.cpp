@@ -2328,8 +2328,8 @@ uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
     case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
     case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
     default:
-      return kDaikinFanAuto; 
-  } 
+      return kDaikinFanAuto;
+  }
 }
 
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
@@ -2470,14 +2470,14 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
     return false;
 
-   // Compliance
+  // Compliance
   if (strict && nbits != kDaikin176Bits) return false;
 
   uint16_t offset = kStartOffset;
   const uint8_t ksectionSize[kDaikin176Sections] = {kDaikin176Section1Length,
                                                     kDaikin176Section2Length};
 
-   // Sections                                              
+  // Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin176Sections; section++) {
     uint16_t used;
@@ -2500,7 +2500,7 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
     if (!IRDaikin176::validChecksum(results->state)) return false;
   }
 
-   // Success
+  // Success
   results->decode_type = decode_type_t::DAIKIN176;
   results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
@@ -2510,4 +2510,4 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
 }
 #endif  // DECODE_DAIKIN176
 
- //no newline at end of file
+//no newline at end of file
