@@ -2132,8 +2132,6 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
 // Supported devices:
 // - Daikin BRC4C153 remote.
 //
-// Ref:
-//  
 void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin176Section1Length)
@@ -2445,7 +2443,7 @@ String IRDaikin176::toString() {
   return result; 
 }
 
- #if DECODE_DAIKIN176
+#if DECODE_DAIKIN176
 // Decode the supplied Daikin 176 bit A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -2459,6 +2457,7 @@ String IRDaikin176::toString() {
 //
 // Status: BETA / Probably works.
 //
+
 bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
