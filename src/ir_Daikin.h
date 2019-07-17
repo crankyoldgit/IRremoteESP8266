@@ -548,7 +548,7 @@ class IRDaikin176 {
  public:
   explicit IRDaikin176(uint16_t pin);
 
- #if SEND_DAIKIN176
+#if SEND_DAIKIN176
   void send(const uint16_t repeat = kDaikin176DefaultRepeat);
   uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif
@@ -576,7 +576,7 @@ class IRDaikin176 {
   stdAc::state_t toCommon(void);
   String toString(void);
 
- #ifndef UNIT_TEST
+#ifndef UNIT_TEST
 
  private:
   IRsend _irsend;
