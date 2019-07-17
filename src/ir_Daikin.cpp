@@ -2163,7 +2163,6 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 //
 // Supported Remotes: Daikin BRC4C153 remote
 //
-// 
 IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
 
 void IRDaikin176::begin() { _irsend.begin(); }
@@ -2312,9 +2311,7 @@ void IRDaikin176::setFan(const uint8_t fan) {
 }
 
 uint8_t IRDaikin176::getFan() {
-// uint8_t fan = (remote_state[kDaikin176ByteFan] & kDaikin176MaskFan) >> 4;
   uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
-// if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -=2 ;
   return fan;
 }
 
@@ -2462,8 +2459,6 @@ String IRDaikin176::toString() {
 //
 // Status: BETA / Probably works.
 //
-// Ref
-
 bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
