@@ -6,7 +6,7 @@ http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 Copyright 2016 sillyfrog
 Copyright 2017 sillyfrog, crankyoldgit
 Copyright 2018-2019 crankyoldgit
-Copyright 2019 pasna (IRDaikin160 class)
+Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 */
 
 #include "ir_Daikin.h"
@@ -2129,3 +2129,384 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN160
+#if SEND_DAIKIN176
+// Send a Daikin 176 bit A/C message.
+//
+// Args:
+//   data: An array of kDaikin176StateLength bytes containing the IR command.
+//
+// Status: Alpha/Untested on a real device.
+//
+// Supported devices:
+// - Daikin BRC4C153 remote.
+//
+void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  if (nbytes < kDaikin176Section1Length)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Section #1
+    sendGeneric(kDaikin176HdrMark, kDaikin176HdrSpace, kDaikin176BitMark,
+                kDaikin176OneSpace, kDaikin176BitMark, kDaikin176ZeroSpace,
+                kDaikin176BitMark, kDaikin176Gap, data,
+                kDaikin176Section1Length,
+                kDaikin176Freq, false, 0, kDutyDefault);
+    // Section #2
+    sendGeneric(kDaikin176HdrMark, kDaikin176HdrSpace, kDaikin176BitMark,
+                kDaikin176OneSpace, kDaikin176BitMark, kDaikin176ZeroSpace,
+                kDaikin176BitMark, kDaikin176Gap,
+                data + kDaikin176Section1Length,
+                nbytes - kDaikin176Section1Length,
+                kDaikin176Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN176
+
+// Class for handling Daikin 176 bit / 22 byte A/C messages.
+//
+// Code by crankyoldgit.
+//
+// Supported Remotes: Daikin BRC4C153 remote
+//
+IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
+
+void IRDaikin176::begin() { _irsend.begin(); }
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin176::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin176Section1Length - 1 ||
+      state[kDaikin176Section1Length - 1] != sumBytes(
+          state, kDaikin176Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2 (a.k.a. the rest)
+  if (length <= kDaikin176Section1Length + 1 ||
+      state[length - 1] != sumBytes(state + kDaikin176Section1Length,
+                                    length - kDaikin176Section1Length - 1))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin176::checksum() {
+  remote_state[kDaikin176Section1Length - 1] = sumBytes(
+      remote_state, kDaikin176Section1Length - 1);
+  remote_state[kDaikin176StateLength - 1] = sumBytes(
+      remote_state + kDaikin176Section1Length, kDaikin176Section2Length - 1);
+}
+
+void IRDaikin176::stateReset() {
+  for (uint8_t i = 0; i < kDaikin176StateLength; i++) remote_state[i] = 0x00;
+  remote_state[0] =  0x11;
+  remote_state[1] =  0xDA;
+  remote_state[2] =  0x17;
+  remote_state[3] =  0x18;
+  remote_state[4] =  0x04;
+  // remote_state[6] is a checksum byte, it will be set by checksum().
+  remote_state[7] =  0x11;
+  remote_state[8] =  0xDA;
+  remote_state[9] =  0x17;
+  remote_state[10] = 0x18;
+  remote_state[12] = 0x03;
+  remote_state[14] = 0x20;
+  remote_state[20] = 0x20;
+  // remote_state[21] is a checksum byte, it will be set by checksum().
+}
+
+uint8_t *IRDaikin176::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin176::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin176StateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+#if SEND_DAIKIN176
+void IRDaikin176::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin176(remote_state, kDaikin176StateLength, repeat);
+}
+#endif  // SEND_DAIKIN176
+
+void IRDaikin176::on() {
+  remote_state[kDaikin176BytePower] |= kDaikinBitPower;
+}
+
+void IRDaikin176::off() {
+  remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
+}
+
+void IRDaikin176::setPower(const bool state) {
+  if (state)
+    on();
+  else
+    off();
+}
+
+bool IRDaikin176::getPower() {
+  return remote_state[kDaikin176BytePower] & kDaikinBitPower;
+}
+
+uint8_t IRDaikin176::getMode() {
+  return (remote_state[kDaikin176ByteMode] & kDaikin176MaskMode) >> 4;
+}
+
+void IRDaikin176::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinAuto:
+    case kDaikin176Cool:
+    case kDaikinHeat:
+    case kDaikinFan:
+    case kDaikinDry:
+      remote_state[kDaikin176ByteMode] &= kDaikin176MaskMode;
+      remote_state[kDaikin176ByteMode] |= (mode << 4);
+      break;
+    default:
+      this->setMode(kDaikinAuto);
+  }
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kDaikin176Cool;
+    case stdAc::opmode_t::kHeat:
+      return kDaikinHeat;
+    case stdAc::opmode_t::kDry:
+      return kDaikinDry;
+    case stdAc::opmode_t::kFan:
+      return kDaikinFan;
+    default:
+      return kDaikinAuto;
+  }
+}
+
+// Set the temp in deg C
+void IRDaikin176::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(temp, kDaikinMinTemp);
+  degrees = std::min(degrees, kDaikinMaxTemp) * 2 - 18;
+  remote_state[kDaikin176ByteTemp] &= ~kDaikin176MaskTemp;
+  remote_state[kDaikin176ByteTemp] |= degrees;
+}
+
+uint8_t IRDaikin176::getTemp(void) {
+  return (((remote_state[kDaikin176ByteTemp] & kDaikin176MaskTemp) / 2 ) + 9);
+}
+
+// Set the speed of the fan, 1 for Min or 3 for Max
+void IRDaikin176::setFan(const uint8_t fan) {
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  // Set the fan speed bits, leave *lower* 4 bits alone
+  remote_state[kDaikin176ByteFan] &= ~kDaikin176MaskFan;
+  remote_state[kDaikin176ByteFan] |= (fanset << 4);
+}
+
+uint8_t IRDaikin176::getFan() {
+  uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
+  return fan;
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
+     switch (speed) {
+    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
+    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
+    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
+    default:
+      return kDaikinFanAuto;
+  }
+}
+
+void IRDaikin176::setSwingHorizontal(const uint8_t position) {
+  switch (position) {
+    case kDaikin176SwingHSwing:
+    remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
+    remote_state[kDaikin176ByteSwingH] |= position;
+    break;
+     default: setSwingHorizontal(kDaikin176SwingHAuto);
+  }
+}
+uint8_t IRDaikin176::getSwingHorizontal() {
+  return remote_state[kDaikin176ByteSwingH] & kDaikin176MaskSwingH;
+}
+
+// Convert a standard A/C horizontal swing into its native version.
+uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kOff:
+      return kDaikin176SwingHSwing;
+    default:
+      return kDaikin176SwingHAuto;
+  }
+}
+// Convert a native horizontal swing to it's common equivalent.
+stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin176SwingHSwing: return stdAc::swingh_t::kOff;
+    default: return stdAc::swingh_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin176::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::DAIKIN176;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
+
+  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.quiet = false;
+  result.turbo = false;
+  result.light = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+String IRDaikin176::toString() {
+  String result = "";
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result += F("Power: ");
+  if (this->getPower())
+    result += F("On");
+  else
+    result += F("Off");
+  result += F(", Mode: ");
+  result += uint64ToString(this->getMode());
+  switch (getMode()) {
+    case kDaikinAuto:
+      result += F(" (AUTO)");
+      break;
+    case kDaikinCool + 4:
+      result += F(" (COOL)");
+      break;
+    case kDaikinHeat:
+      result += F(" (HEAT)");
+      break;
+    case kDaikinDry:
+      result += F(" (DRY)");
+      break;
+    case kDaikinFan:
+      result += F(" (FAN)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
+  }
+  result += F(", Temp: ");
+  result += uint64ToString(this->getTemp());
+  result += F("C, Fan: ");
+  result += uint64ToString(this->getFan());
+  switch (this->getFan()) {
+    case kDaikinFanAuto:
+      result += F(" (AUTO)");
+      break;
+    case kDaikinFanQuiet:
+      result += F(" (QUIET)");
+      break;
+    case kDaikinFanMin:
+      result += F(" (MIN)");
+      break;
+    case kDaikinFanMax - 2:
+      result += F(" (MAX)");
+      break;
+  }
+  result += F(", Swing (H): ");
+  result += uint64ToString(getSwingHorizontal());
+  switch (getSwingHorizontal()) {
+    case kDaikin176SwingHAuto:
+    result += F(" (Auto)");
+    break;
+    case kDaikin176SwingHSwing:
+    result += F(" (Off)");
+    break;
+  }
+  return result;
+}
+
+#if DECODE_DAIKIN176
+// Decode the supplied Daikin 176 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin176Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin BRC4C153 remote.
+//
+// Status: BETA / Probably works.
+//
+
+bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
+    return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin176Bits) return false;
+
+  uint16_t offset = kStartOffset;
+  const uint8_t ksectionSize[kDaikin176Sections] = {kDaikin176Section1Length,
+                                                    kDaikin176Section2Length};
+
+  // Sections
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin176Sections; section++) {
+    uint16_t used;
+    // Section Header + Section Data (7 bytes) + Section Footer
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikin176HdrMark, kDaikin176HdrSpace,
+                        kDaikin176BitMark, kDaikin176OneSpace,
+                        kDaikin176BitMark, kDaikin176ZeroSpace,
+                        kDaikin176BitMark, kDaikin176Gap,
+                        section >= kDaikin176Sections - 1,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
+  }
+  // Compliance
+  if (strict) {
+    // Validate the checksum.
+    if (!IRDaikin176::validChecksum(results->state)) return false;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN176;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN176

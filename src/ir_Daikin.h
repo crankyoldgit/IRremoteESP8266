@@ -244,6 +244,31 @@ const uint8_t kDaikin160SwingVHigh =    0x4;
 const uint8_t kDaikin160SwingVHighest = 0x5;
 const uint8_t kDaikin160SwingVAuto =    0xF;
 
+// Another variant of the protocol for the Daikin BRC4C153 remote.
+const uint16_t kDaikin176Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin176HdrMark = 5070;
+const uint16_t kDaikin176HdrSpace = 2140;
+const uint16_t kDaikin176BitMark = 370;
+const uint16_t kDaikin176OneSpace = 1780;
+const uint16_t kDaikin176ZeroSpace = 710;
+const uint16_t kDaikin176Gap = 29410;
+const uint16_t kDaikin176Sections = 2;
+const uint16_t kDaikin176Section1Length = 7;
+const uint16_t kDaikin176Section2Length = kDaikin176StateLength -
+                                          kDaikin176Section1Length;
+const uint8_t kDaikin176Cool = 0b111;
+const uint8_t kDaikin176BytePower = 14;
+const uint8_t kDaikin176ByteMode = 12;
+const uint8_t kDaikin176MaskMode = 0b01110011;
+const uint8_t kDaikin176ByteTemp = 17;
+const uint8_t kDaikin176MaskTemp = 0b01111110;
+const uint8_t kDaikin176ByteFan = 18;
+const uint8_t kDaikin176MaskFan = 0b11110000;
+const uint8_t kDaikin176ByteSwingH = 18;
+const uint8_t kDaikin176MaskSwingH = 0b00001111;
+const uint8_t kDaikin176SwingHAuto =  0x5;
+const uint8_t kDaikin176SwingHSwing = 0x6;
+
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
@@ -519,6 +544,51 @@ class IRDaikin160 {
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin160StateLength];
+  void stateReset();
+  void checksum();
+};
+// Class to emulate a Daikin BRC4C153 remote.
+class IRDaikin176 {
+ public:
+  explicit IRDaikin176(uint16_t pin);
+
+#if SEND_DAIKIN176
+  void send(const uint16_t repeat = kDaikin176DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif
+  void begin();
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin176StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  void setSwingHorizontal(const uint8_t position);
+  uint8_t getSwingHorizontal();
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin176StateLength];
   void stateReset();
   void checksum();
 };

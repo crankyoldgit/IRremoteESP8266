@@ -101,6 +101,12 @@ void daikin160(IRDaikin160 *ac,
                const float degrees, const stdAc::fanspeed_t fan,
                const stdAc::swingv_t swingv);
 #endif  // SEND_DAIKIN160
+#if SEND_DAIKIN176
+void daikin176(IRDaikin176 *ac,
+               const bool on, const stdAc::opmode_t mode,
+               const float degrees, const stdAc::fanspeed_t fan,
+               const stdAc::swingh_t swingh);
+#endif  // SEND_DAIKIN176
 #if SEND_DAIKIN2
   void daikin2(IRDaikin2 *ac,
                const bool on, const stdAc::opmode_t mode,
