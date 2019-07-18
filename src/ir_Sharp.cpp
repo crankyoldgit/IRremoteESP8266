@@ -262,7 +262,9 @@ void IRsend::sendSharpAc(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_SHARP_AC
 
-IRSharpAc::IRSharpAc(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
+IRSharpAc::IRSharpAc(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRSharpAc::begin(void) { _irsend.begin(); }
 

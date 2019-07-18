@@ -92,7 +92,9 @@ enum fujitsu_ac_remote_model_t {
 class IRFujitsuAC {
  public:
   explicit IRFujitsuAC(const uint16_t pin,
-                       const fujitsu_ac_remote_model_t model = ARRAH2E);
+                       const fujitsu_ac_remote_model_t model = ARRAH2E,
+                       const bool inverted = false,
+                       const bool use_modulation = true);
 
   void setModel(const fujitsu_ac_remote_model_t model);
   fujitsu_ac_remote_model_t getModel(void);

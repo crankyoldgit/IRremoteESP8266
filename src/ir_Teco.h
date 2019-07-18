@@ -87,7 +87,8 @@ const uint64_t kTecoReset =      0b01001010000000000000010000000000000;
 // Classes
 class IRTecoAc {
  public:
-  explicit IRTecoAc(const uint16_t pin);
+  explicit IRTecoAc(const uint16_t pin, const bool inverted = false,
+                    const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_TECO

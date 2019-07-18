@@ -284,7 +284,8 @@ const uint8_t kDaikin176SwingHSwing = 0x6;
 
 class IRDaikinESP {
  public:
-  explicit IRDaikinESP(uint16_t pin);
+  explicit IRDaikinESP(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
 #if SEND_DAIKIN
   void send(const uint16_t repeat = kDaikinDefaultRepeat);
@@ -359,7 +360,8 @@ class IRDaikinESP {
 // Class to emulate a Daikin ARC477A1 remote.
 class IRDaikin2 {
  public:
-  explicit IRDaikin2(uint16_t pin);
+  explicit IRDaikin2(const uint16_t pin, const bool inverted = false,
+                     const bool use_modulation = true);
 
 #if SEND_DAIKIN2
   void send(const uint16_t repeat = kDaikin2DefaultRepeat);
@@ -452,7 +454,8 @@ class IRDaikin2 {
 // Class to emulate a Daikin ARC433B69 remote.
 class IRDaikin216 {
  public:
-  explicit IRDaikin216(uint16_t pin);
+  explicit IRDaikin216(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
 #if SEND_DAIKIN216
   void send(const uint16_t repeat = kDaikin216DefaultRepeat);
@@ -502,7 +505,8 @@ class IRDaikin216 {
 // Class to emulate a Daikin ARC423A5 remote.
 class IRDaikin160 {
  public:
-  explicit IRDaikin160(uint16_t pin);
+  explicit IRDaikin160(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
 #if SEND_DAIKIN160
   void send(const uint16_t repeat = kDaikin160DefaultRepeat);

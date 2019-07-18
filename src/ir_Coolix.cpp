@@ -89,7 +89,9 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   RG57K7(B)/BGEF remote control for Beko BINR 070/071 split-type aircon.
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
-IRCoolixAC::IRCoolixAC(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
+                       const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRCoolixAC::stateReset() { setRaw(kCoolixDefaultState); }
 

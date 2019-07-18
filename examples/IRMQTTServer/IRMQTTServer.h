@@ -33,6 +33,15 @@ const uint8_t kNrOfIrTxGpios = 1;
 // For an ESP-01 we suggest you use RX/GPIO3/Pin 7. i.e. kDefaultIrLed = 3
 // Note: A value of -1 means unused.
 const int8_t kDefaultIrLed = 4;  // <=- CHANGE_ME (optional)
+
+// **DANGER** Optional flag to invert the output. (default = false)
+//            `false`: The LED is illuminated when the GPIO is HIGH.
+//            `true`: The LED is illuminated when GPIO is LOW rather than HIGH.
+//            Setting this to something other than the default could
+//            easily destroy your IR LED if you are overdriving it.
+//            Unless you *REALLY* know what you are doing, don't change this.
+const bool kInvertTxOutput = false;
+
 // Default GPIO the IR demodulator is connected to/controlled by. GPIO 14 = D5.
 const int8_t kDefaultIrRx = 14;  // <=- CHANGE_ME (optional)
 
@@ -197,7 +206,7 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.3.0"
+#define _MY_VERSION_ "v1.3.1"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds

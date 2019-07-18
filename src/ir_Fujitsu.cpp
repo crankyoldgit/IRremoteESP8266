@@ -55,8 +55,9 @@ void IRsend::sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
 
 // Initialise the object.
 IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
-                         const fujitsu_ac_remote_model_t model)
-    : _irsend(pin) {
+                         const fujitsu_ac_remote_model_t model,
+                         const bool inverted, const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) {
   this->setModel(model);
   this->stateReset();
 }

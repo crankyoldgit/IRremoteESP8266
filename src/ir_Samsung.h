@@ -62,7 +62,8 @@ const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
 // Classes
 class IRSamsungAc {
  public:
-  explicit IRSamsungAc(const uint16_t pin, bool inverted = false);
+  explicit IRSamsungAc(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_SAMSUNG_AC

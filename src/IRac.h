@@ -37,7 +37,8 @@ const int8_t kGpioUnused = -1;
 // Class
 class IRac {
  public:
-  explicit IRac(uint8_t pin);
+  explicit IRac(const uint16_t pin, const bool inverted = false,
+                const bool use_modulation = true);
   static bool isProtocolSupported(const decode_type_t protocol);
   bool sendAc(const decode_type_t vendor, const int16_t model,
               const bool power, const stdAc::opmode_t mode, const float degrees,
@@ -69,7 +70,9 @@ class IRac {
 
  private:
 #endif
-  uint8_t _pin;
+  uint16_t _pin;
+  bool _inverted;
+  bool _modulation;
 #if SEND_ARGO
   void argo(IRArgoAC *ac,
             const bool on, const stdAc::opmode_t mode, const float degrees,
