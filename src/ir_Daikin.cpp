@@ -2169,7 +2169,9 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 //
 // Supported Remotes: Daikin BRC4C153 remote
 //
-IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikin176::IRDaikin176(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikin176::begin() { _irsend.begin(); }
 

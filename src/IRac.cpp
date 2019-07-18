@@ -1007,7 +1007,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 #if SEND_DAIKIN176
     case DAIKIN176:
     {
-      IRDaikin176 ac(_pin);
+      IRDaikin176 ac(_pin, _inverted, _modulation);
       daikin176(&ac, on, mode, degC, fan, swingh);
       break;
     }
