@@ -583,7 +583,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case DAIKIN160:
       return kDaikin160Bits;
     case DAIKIN176:
-        return kDaikin176Bits;
+      return kDaikin176Bits;
     case DAIKIN2:
       return kDaikin2Bits;
     case DAIKIN216:
@@ -855,9 +855,9 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       break;
 #endif  // SEND_DAIKIN160
 #if SEND_DAIKIN176
-      case DAIKIN176:
-          sendDaikin176(state, nbytes);
-          break;
+    case DAIKIN176:
+      sendDaikin176(state, nbytes);
+      break;
 #endif  // SEND_DAIKIN176
 #if SEND_DAIKIN2
     case DAIKIN2:

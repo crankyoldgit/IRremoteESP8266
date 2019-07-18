@@ -2312,7 +2312,7 @@ void IRDaikin176::setFan(const uint8_t fan) {
   else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
     fanset = kDaikinFanAuto;
   else
-    fanset = 2 + fan;
+    fanset = fan;
   // Set the fan speed bits, leave *lower* 4 bits alone
   remote_state[kDaikin176ByteFan] &= ~kDaikin176MaskFan;
   remote_state[kDaikin176ByteFan] |= (fanset << 4);
@@ -2325,12 +2325,12 @@ uint8_t IRDaikin176::getFan() {
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
-     switch (speed) {
+  switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
-    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
-    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
+    case stdAc::fanspeed_t::kLow:
+    case stdAc::fanspeed_t::kMedium:
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax - 2;
     default:
       return kDaikinFanAuto;
   }
@@ -2339,10 +2339,12 @@ uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
     case kDaikin176SwingHSwing:
-    remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
-    remote_state[kDaikin176ByteSwingH] |= position;
-    break;
-     default: setSwingHorizontal(kDaikin176SwingHAuto);
+    case kDaikin176SwingHAuto:
+      remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
+      remote_state[kDaikin176ByteSwingH] |= position;
+      break;
+    default:
+      setSwingHorizontal(kDaikin176SwingHAuto);
   }
 }
 uint8_t IRDaikin176::getSwingHorizontal() {
@@ -2354,6 +2356,8 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kOff:
       return kDaikin176SwingHSwing;
+    case stdAc::swingh_t::kAuto:
+      return kDaikin176SwingHAuto;
     default:
       return kDaikin176SwingHAuto;
   }
@@ -2362,7 +2366,21 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
     case kDaikin176SwingHSwing: return stdAc::swingh_t::kOff;
-    default: return stdAc::swingh_t::kAuto;
+    case kDaikin176SwingHAuto: return stdAc::swingh_t::kAuto;
+    default:
+      return stdAc::swingh_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDaikinFanMax:
+    case kDaikinFanMax - 1:
+    case kDaikinFanMin + 2: return stdAc::fanspeed_t::kMax;
+    case kDaikinFanMin + 1:
+    case kDaikinFanMin: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -2375,7 +2393,7 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   result.mode = IRDaikinESP::toCommonMode(this->getMode());
   result.celsius = true;
   result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
 
   // Not supported.
