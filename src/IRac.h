@@ -185,8 +185,9 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_KELVINATOR
 #if SEND_MIDEA
   void midea(IRMideaAC *ac,
-             const bool on, const stdAc::opmode_t mode, const float degrees,
-             const stdAc::fanspeed_t fan, const int16_t sleep = -1);
+             const bool on, const stdAc::opmode_t mode, const bool celsius,
+             const float degrees, const stdAc::fanspeed_t fan,
+             const int16_t sleep = -1);
 #endif  // SEND_MIDEA
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,

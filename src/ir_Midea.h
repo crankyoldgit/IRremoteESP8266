@@ -37,12 +37,13 @@ const uint64_t kMideaACPower = 1ULL << 39;
 const uint64_t kMideaACSleep = 1ULL << 38;
 const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
 const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
-const uint8_t kMideaACMinTempC = 16;  // Celsius
+const uint8_t kMideaACMinTempC = 17;  // Celsius
 const uint8_t kMideaACMaxTempC = 30;  // Celsius
-const uint64_t kMideaACStateMask = 0x0000FFFFFFFFFFFF;
-const uint64_t kMideaACTempMask = 0x0000FFFFE0FFFFFF;
-const uint64_t kMideaACFanMask = 0x0000FFC7FFFFFFFF;
-const uint64_t kMideaACModeMask = 0x0000FFF8FFFFFFFF;
+const uint64_t kMideaACStateMask =    0x0000FFFFFFFFFFFF;
+const uint64_t kMideaACCelsiusBit =   0x0000000020000000;
+const uint64_t kMideaACTempMask =     0x0000FFFFE0FFFFFF;
+const uint64_t kMideaACFanMask =      0x0000FFC7FFFFFFFF;
+const uint64_t kMideaACModeMask =     0x0000FFF8FFFFFFFF;
 const uint64_t kMideaACChecksumMask = 0x0000FFFFFFFFFF00;
 
 // Legacy defines. (Deprecated)
@@ -77,6 +78,8 @@ class IRMideaAC {
   void off(void);
   void setPower(const bool on);
   bool getPower(void);
+  bool getUseCelsius(void);
+  void setUseCelsius(const bool celsius);
   void setTemp(const uint8_t temp, const bool useCelsius = false);
   uint8_t getTemp(const bool useCelsius = false);
   void setFan(const uint8_t fan);

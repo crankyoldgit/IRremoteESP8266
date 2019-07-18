@@ -144,35 +144,59 @@ void IRMideaAC::setPower(const bool on) {
 // Return the requested power state of the A/C.
 bool IRMideaAC::getPower(void) { return (remote_state & kMideaACPower); }
 
+// Returns true if we want the A/C unit to work natively in Celsius.
+bool IRMideaAC::getUseCelsius(void) {
+  return !(remote_state & kMideaACCelsiusBit);
+}
+
+// Set the A/C unit to use Celsius natively.
+void IRMideaAC::setUseCelsius(const bool on) {
+  if (on != getUseCelsius()) {  // We need to change.
+    uint8_t native_temp = getTemp(!on);  // Get the old native temp.
+    if (on)
+      remote_state &= ~kMideaACCelsiusBit;  // Clear the bit
+    else
+      remote_state |= kMideaACCelsiusBit;  // Set the bit
+    setTemp(native_temp, !on);  // Reset temp using the old native temp.
+  }
+}
+
 // Set the temperature.
 // Args:
 //   temp:       Temp. in degrees.
 //   useCelsius: Degree type to use. Celsius (true) or Fahrenheit (false)
 void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
-  uint8_t new_temp = temp;
+  uint8_t max_temp = kMideaACMaxTempF;
+  uint8_t min_temp = kMideaACMinTempF;
   if (useCelsius) {
-    new_temp = std::max(kMideaACMinTempC, new_temp);
-    new_temp = std::min(kMideaACMaxTempC, new_temp);
-    // Convert and add 0.5 for rounding.
-    new_temp = celsiusToFahrenheit(new_temp) + 0.5;
+    max_temp = kMideaACMaxTempC;
+    min_temp = kMideaACMinTempC;
   }
-  new_temp = std::max(kMideaACMinTempF, new_temp);
-  new_temp = std::min(kMideaACMaxTempF, new_temp);
-  new_temp -= kMideaACMinTempF;
+  uint8_t new_temp = std::min(max_temp, std::max(min_temp, temp));
+  if (getUseCelsius() && !useCelsius)  // Native is in C, new_temp is in F
+    new_temp = fahrenheitToCelsius(new_temp) - kMideaACMinTempC;
+  else if (!getUseCelsius() && useCelsius)  // Native is in F, new_temp is in C
+    new_temp = celsiusToFahrenheit(new_temp) - kMideaACMinTempF;
+  else  // Native and desired are the same units.
+    new_temp -= min_temp;
+  // Set the actual data.
   remote_state &= kMideaACTempMask;
   remote_state |= ((uint64_t)new_temp << 24);
 }
 
 // Return the set temp.
 // Args:
-//   useCelsius: Flag indicating if the results are in Celsius or Fahrenheit.
+//   celsius: Flag indicating if the results are in Celsius or Fahrenheit.
 // Returns:
 //   A uint8_t containing the temperature.
-uint8_t IRMideaAC::getTemp(const bool useCelsius) {
-  uint8_t temp = ((remote_state >> 24) & 0x1F) + kMideaACMinTempF;
-  if (useCelsius) {
-    temp = fahrenheitToCelsius(temp);
-  }
+uint8_t IRMideaAC::getTemp(const bool celsius) {
+  uint8_t temp = ((remote_state >> 24) & 0x1F);
+  if (getUseCelsius())
+    temp += kMideaACMinTempC;
+  else
+    temp += kMideaACMinTempF;
+  if (celsius && !getUseCelsius()) temp = fahrenheitToCelsius(temp) + 0.5;
+  if (!celsius && getUseCelsius()) temp = celsiusToFahrenheit(temp);
   return temp;
 }
 
@@ -322,7 +346,7 @@ stdAc::state_t IRMideaAC::toCommon(void) {
   result.model = -1;  // No models used.
   result.power = this->getPower();
   result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
+  result.celsius = this->getUseCelsius();
   result.degrees = this->getTemp(result.celsius);
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.sleep = this->getSleep() ? 0 : -1;
@@ -347,6 +371,7 @@ String IRMideaAC::toString(void) {
   result += addBoolToString(getPower(), F("Power"), false);
   result += addModeToString(getMode(), kMideaACAuto, kMideaACCool, kMideaACHeat,
                             kMideaACDry, kMideaACFan);
+  result += IRutils::acBoolToString(getUseCelsius(), F("Celsius"));
   result += addTempToString(getTemp(true));
   result += '/';
   result += uint64ToString(getTemp(false));

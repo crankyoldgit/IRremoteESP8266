@@ -533,11 +533,13 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 
 #if SEND_MIDEA
 void IRac::midea(IRMideaAC *ac,
-                 const bool on, const stdAc::opmode_t mode, const float degrees,
-                 const stdAc::fanspeed_t fan, const int16_t sleep) {
+                 const bool on, const stdAc::opmode_t mode, const bool celsius,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const int16_t sleep) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees, true);  // true means use Celsius.
+  ac->setUseCelsius(celsius);
+  ac->setTemp(degrees, celsius);
   ac->setFan(ac->convertFan(fan));
   // No Vertical swing setting available.
   // No Horizontal swing setting available.
@@ -1109,7 +1111,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       ac.begin();
-      midea(&ac, on, mode, degC, fan, sleep);
+      midea(&ac, on, mode, celsius, degrees, fan, sleep);
       break;
     }
 #endif  // SEND_MIDEA

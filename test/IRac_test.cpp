@@ -472,13 +472,15 @@ TEST(TestIRac, Midea) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (DRY), Temp: 27C/81F, Fan: 2 (Medium), Sleep: On";
+      "Power: On, Mode: 1 (DRY), Celsius: On, Temp: 27C/80F, Fan: 2 (Medium), "
+      "Sleep: On";
 
   ac.begin();
   irac.midea(&ac,
              true,                        // Power
              stdAc::opmode_t::kDry,       // Mode
-             27,                          // Celsius
+             true,                        // Celsius
+             27,                          // Degrees
              stdAc::fanspeed_t::kMedium,  // Fan speed
              8 * 60 + 0);                 // Sleep time
 
