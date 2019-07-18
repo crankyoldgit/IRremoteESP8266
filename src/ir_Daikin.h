@@ -550,7 +550,8 @@ class IRDaikin160 {
 // Class to emulate a Daikin BRC4C153 remote.
 class IRDaikin176 {
  public:
-  explicit IRDaikin176(uint16_t pin);
+  explicit IRDaikin176(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
 #if SEND_DAIKIN176
   void send(const uint16_t repeat = kDaikin176DefaultRepeat);
@@ -574,7 +575,7 @@ class IRDaikin176 {
   uint8_t getFan(void);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   void setSwingHorizontal(const uint8_t position);
-  uint8_t getSwingHorizontal();
+  uint8_t getSwingHorizontal(void);
   static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);
