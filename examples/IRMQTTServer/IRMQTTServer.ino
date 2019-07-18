@@ -757,6 +757,7 @@ void handleRoot(void) {
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin (35 bytes)</option>"
         "<option value='65'>Daikin160 (20 bytes)</option>"
+        "<option value='67'>Daikin176 (22 bytes)</option>"
         "<option value='53'>Daikin2 (39 bytes)</option>"
         "<option value='61'>Daikin216 (27 bytes)</option>"
         "<option value='48'>Electra</option>"
