@@ -577,6 +577,7 @@ class IRDaikin176 {
   void setSwingHorizontal(const uint8_t position);
   uint8_t getSwingHorizontal(void);
   static uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);
   String toString(void);
