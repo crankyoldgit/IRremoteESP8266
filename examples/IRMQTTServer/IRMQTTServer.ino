@@ -2980,7 +2980,7 @@ bool decodeCommonAc(const decode_results *decode) {
   }
   stdAc::state_t state = climate;
   debug("Converting inbound IR A/C message to common A/C");
-  if (!IRAcUtils::decodeToState(decode, &state)) {
+  if (!IRAcUtils::decodeToState(decode, &state, &climate)) {
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
   }

@@ -282,6 +282,7 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
 
 namespace IRAcUtils {
   String resultAcToString(const decode_results * const results);
-  bool decodeToState(const decode_results *decode, stdAc::state_t *result);
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                     const stdAc::state_t *prev = NULL);
 }  // namespace IRAcUtils
 #endif  // IRAC_H_
