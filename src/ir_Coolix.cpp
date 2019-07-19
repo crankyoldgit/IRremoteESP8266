@@ -446,7 +446,6 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
   }
   // Back to "normal" stateful messages.
   result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   return result;
