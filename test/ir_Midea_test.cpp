@@ -446,7 +446,7 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   ac.setRaw(0xA1826FFFFF62);
   EXPECT_EQ(
       "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off", ac.toString());
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.off();
   ac.setTemp(25, true);
   ac.setFan(kMideaACFanHigh);
@@ -454,16 +454,16 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   ac.setSleep(true);
   EXPECT_EQ(
       "Power: Off, Mode: 1 (DRY), Celsius: Off, Temp: 25C/77F, Fan: 3 (High), "
-      "Sleep: On", ac.toString());
+      "Sleep: On, Swing(V) Toggle: Off", ac.toString());
   ac.setUseCelsius(true);
   EXPECT_EQ(
       "Power: Off, Mode: 1 (DRY), Celsius: On, Temp: 25C/77F, Fan: 3 (High), "
-      "Sleep: On", ac.toString());
+      "Sleep: On, Swing(V) Toggle: Off", ac.toString());
 
   ac.setRaw(0xA19867FFFF7E);
   EXPECT_EQ(
       "Power: On, Mode: 0 (COOL), Celsius: Off, Temp: 21C/69F, Fan: 3 (High), "
-      "Sleep: Off", ac.toString());
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
 }
 
 // Tests for decodeMidea().
@@ -677,8 +677,8 @@ TEST(TestMideaACClass, toCommon) {
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
-  // Unsupported.
   ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  // Unsupported.
   ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
@@ -706,13 +706,13 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   EXPECT_EQ(on_cool_low_17c, ac.getRaw());
   EXPECT_EQ(
       "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (LOW), "
-      "Sleep: Off", ac.toString());
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.setRaw(on_cool_low_17c);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
   EXPECT_EQ(
       "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (LOW), "
-      "Sleep: Off", ac.toString());
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.setTemp(17, true);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
@@ -721,5 +721,24 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   ac.setRaw(on_cool_low_30c);
   EXPECT_EQ(
       "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 30C/86F, Fan: 1 (LOW), "
-      "Sleep: Off", ac.toString());
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
+}
+
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/819
+TEST(TestMideaACClass, SwingV) {
+  IRMideaAC ac(0);
+  ac.setSwingVToggle(false);
+  ASSERT_FALSE(ac.getSwingVToggle());
+  ac.setSwingVToggle(true);
+  ASSERT_TRUE(ac.getSwingVToggle());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Sleep: Off, Swing(V) Toggle: On", ac.toString());
+  ac.setSwingVToggle(false);
+  ASSERT_FALSE(ac.getSwingVToggle());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
+  ac.setRaw(kMideaACToggleSwingV);
+  EXPECT_EQ("Swing(V) Toggle: On", ac.toString());
 }

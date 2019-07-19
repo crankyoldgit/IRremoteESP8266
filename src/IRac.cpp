@@ -535,13 +535,13 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 void IRac::midea(IRMideaAC *ac,
                  const bool on, const stdAc::opmode_t mode, const bool celsius,
                  const float degrees, const stdAc::fanspeed_t fan,
-                 const int16_t sleep) {
+                 const stdAc::swingv_t swingv, const int16_t sleep) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setUseCelsius(celsius);
   ac->setTemp(degrees, celsius);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
@@ -915,6 +915,13 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.clean = desired.clean ^ prev->clean;
         result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
+      case decode_type_t::MIDEA:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        break;
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
         break;
@@ -1111,7 +1118,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       ac.begin();
-      midea(&ac, on, mode, celsius, degrees, fan, sleep);
+      midea(&ac, on, mode, celsius, degrees, fan, swingv, sleep);
       break;
     }
 #endif  // SEND_MIDEA
@@ -1849,7 +1856,7 @@ namespace IRAcUtils {
       case decode_type_t::MIDEA: {
         IRMideaAC ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_MIDEA
