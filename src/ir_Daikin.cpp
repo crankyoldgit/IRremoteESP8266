@@ -2309,7 +2309,7 @@ void IRDaikin176::setFan(const uint8_t fan) {
   uint8_t fanset;
   if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
     fanset = fan;
-  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+  else if (fan < kDaikinFanMin || fan > kDaikin176FanMax)
     fanset = kDaikinFanAuto;
   else
     fanset = fan;
@@ -2326,11 +2326,14 @@ uint8_t IRDaikin176::getFan() {
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kMin:
     case stdAc::fanspeed_t::kLow:
+      return kDaikinFanMin;
     case stdAc::fanspeed_t::kMedium:
+      return kDaikinFanMin + 1;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax: return kDaikinFanMax - 2;
+    case stdAc::fanspeed_t::kMax:
+      return kDaikin176FanMax;
     default:
       return kDaikinFanAuto;
   }
@@ -2375,10 +2378,9 @@ stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kDaikinFanMax:
-    case kDaikinFanMax - 1:
-    case kDaikinFanMin + 2: return stdAc::fanspeed_t::kMax;
-    case kDaikinFanMin + 1:
+    case kDaikin176FanMax: return stdAc::fanspeed_t::kMax;
+    case kDaikinFanMin + 1: return stdAc::fanspeed_t::kMedium;
+    case kDaikinFanQuiet:
     case kDaikinFanMin: return stdAc::fanspeed_t::kMin;
     default: return stdAc::fanspeed_t::kAuto;
   }

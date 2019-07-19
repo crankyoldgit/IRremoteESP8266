@@ -264,6 +264,7 @@ const uint8_t kDaikin176ByteTemp = 17;
 const uint8_t kDaikin176MaskTemp = 0b01111110;
 const uint8_t kDaikin176ByteFan = 18;
 const uint8_t kDaikin176MaskFan = 0b11110000;
+const uint8_t kDaikin176FanMax = 3;
 const uint8_t kDaikin176ByteSwingH = 18;
 const uint8_t kDaikin176MaskSwingH = 0b00001111;
 const uint8_t kDaikin176SwingHAuto =  0x5;
