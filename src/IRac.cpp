@@ -1716,9 +1716,11 @@ namespace IRAcUtils {
   // Args:
   //   decode: A PTR to a successful raw IR decode object.
   //   result: A PTR to a state structure to store the result in.
+  //   prev:   A PTR to a state structure which has the prev. state. (optional)
   // Returns:
   //   A boolean indicating success or failure.
-  bool decodeToState(const decode_results *decode, stdAc::state_t *result) {
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                     const stdAc::state_t *prev) {
     if (decode == NULL || result == NULL) return false;  // Safety check.
     switch (decode->decode_type) {
 #if DECODE_ARGO
@@ -1733,7 +1735,7 @@ namespace IRAcUtils {
       case decode_type_t::COOLIX: {
         IRCoolixAC ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_COOLIX

@@ -396,30 +396,58 @@ stdAc::fanspeed_t IRCoolixAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
-stdAc::state_t IRCoolixAC::toCommon(void) {
+// Convert the A/C state to it's common equivalent. Utilise the previous
+// state if supplied.
+stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
-  result.protocol = decode_type_t::COOLIX;
-  result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
-  result.swingh = this->getSwing() ? stdAc::swingh_t::kAuto :
-                                     stdAc::swingh_t::kOff;
-  result.turbo = this->getTurbo();
-  result.sleep = this->getSleep() ? 0 : -1;
-  result.light = this->getLed();
-  result.clean = this->getClean();
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    result.swingv = stdAc::swingv_t::kOff;
+    result.sleep = -1;
+  }
   // Not supported.
+  result.model = -1;  // No models used.
+  result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.econo = false;
   result.filter = false;
   result.beep = false;
   result.clock = -1;
+
+  // Supported.
+  result.protocol = decode_type_t::COOLIX;
+  result.celsius = true;
+  result.power = this->getPower();
+  // Power off state no other state info. Use the previous state if we have it.
+  if (!result.power) return result;
+  // Handle the special single command (Swing/Turbo/Light/Clean/Sleep) toggle
+  // messages. These have no other state info so use the rest of the previous
+  // state if we have it for them.
+  if (this->getSwing()) {
+    result.swingv = result.swingv != stdAc::swingv_t::kOff ?
+        stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;  // Invert swing.
+    return result;
+  } else if (this->getTurbo()) {
+    result.turbo = !result.turbo;
+    return result;
+  } else if (this->getLed()) {
+    result.light = !result.light;
+    return result;
+  } else if (this->getClean()) {
+    result.clean = !result.clean;
+    return result;
+  } else if (this->getSleep()) {
+    result.sleep = result.sleep >= 0 ? -1 : 0;  // Invert sleep.
+    return result;
+  }
+  // Back to "normal" stateful messages.
+  result.mode = this->toCommonMode(this->getMode());
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
   return result;
 }
 
