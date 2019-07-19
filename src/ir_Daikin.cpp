@@ -2343,7 +2343,7 @@ void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
     case kDaikin176SwingHSwing:
     case kDaikin176SwingHAuto:
-      remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
+      remote_state[kDaikin176ByteSwingH] &= ~kDaikin176MaskSwingH;
       remote_state[kDaikin176ByteSwingH] |= position;
       break;
     default:
