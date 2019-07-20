@@ -343,15 +343,20 @@ class IRrecv {
   bool decodeDaikin(decode_results *results, const uint16_t nbits = kDaikinBits,
                     const bool strict = true);
 #endif
+#if DECODE_DAIKIN128
+  bool decodeDaikin128(decode_results *results,
+                       const uint16_t nbits = kDaikin128Bits,
+                       const bool strict = true);
+#endif  // DECODE_DAIKIN128
 #if DECODE_DAIKIN160
   bool decodeDaikin160(decode_results *results,
                        const uint16_t nbits = kDaikin160Bits,
                        const bool strict = true);
 #endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN176
-    bool decodeDaikin176(decode_results *results,
-                         const uint16_t nbits = kDaikin176Bits,
-                         const bool strict = true);
+  bool decodeDaikin176(decode_results *results,
+                       const uint16_t nbits = kDaikin176Bits,
+                       const bool strict = true);
 #endif  // DECODE_DAIKIN176
 #if DECODE_DAIKIN2
   bool decodeDaikin2(decode_results *results, uint16_t nbits = kDaikin2Bits,
