@@ -12,8 +12,10 @@
 //   Brand: Daikin,  Model: ARC423A5 remote
 //   Brand: Daikin,  Model: FTE12HV2S A/C
 //   Brand: Daikin,  Model: BRC4C153 remote
-//   Brand: Daikin,  Model: 17 Series A/C
-//   Brand: Daikin,  Model: BRC52B63 remote
+//   Brand: Daikin,  Model: 17 Series A/C (DAIKIN128)
+//   Brand: Daikin,  Model: FTXB12AXVJU A/C (DAIKIN128)
+//   Brand: Daikin,  Model: FTXB09AXVJU A/C (DAIKIN128)
+//   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
 
 
 #ifndef IR_DAIKIN_H_
