@@ -262,13 +262,14 @@ const uint8_t kDaikin176ByteMode = 12;
 const uint8_t kDaikin176MaskMode = 0b01110011;
 const uint8_t kDaikin176ByteTemp = 17;
 const uint8_t kDaikin176MaskTemp = 0b01111110;
+const uint8_t kDaikin176DryFanTemp = 17;  // Dry/Fan mode is always 17 Celsius.
 const uint8_t kDaikin176ByteFan = 18;
 const uint8_t kDaikin176MaskFan = 0b11110000;
 const uint8_t kDaikin176FanMax = 3;
 const uint8_t kDaikin176ByteSwingH = 18;
 const uint8_t kDaikin176MaskSwingH = 0b00001111;
 const uint8_t kDaikin176SwingHAuto =  0x5;
-const uint8_t kDaikin176SwingHSwing = 0x6;
+const uint8_t kDaikin176SwingHOff = 0x6;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -592,6 +593,7 @@ class IRDaikin176 {
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin176StateLength];
+  uint8_t _saved_temp;
   void stateReset();
   void checksum();
 };

@@ -2219,6 +2219,7 @@ void IRDaikin176::stateReset() {
   remote_state[14] = 0x20;
   remote_state[20] = 0x20;
   // remote_state[21] is a checksum byte, it will be set by checksum().
+  _saved_temp = getTemp();
 }
 
 uint8_t *IRDaikin176::getRaw() {
@@ -2229,6 +2230,7 @@ uint8_t *IRDaikin176::getRaw() {
 void IRDaikin176::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++)
     remote_state[i] = new_code[i];
+  _saved_temp = getTemp();
 }
 
 #if SEND_DAIKIN176
@@ -2263,13 +2265,14 @@ uint8_t IRDaikin176::getMode() {
 
 void IRDaikin176::setMode(const uint8_t mode) {
   switch (mode) {
+    case kDaikinFan:
+    case kDaikinDry:
     case kDaikinAuto:
     case kDaikin176Cool:
     case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry:
-      remote_state[kDaikin176ByteMode] &= kDaikin176MaskMode;
+      remote_state[kDaikin176ByteMode] &= ~kDaikin176MaskMode;
       remote_state[kDaikin176ByteMode] |= (mode << 4);
+      setTemp(_saved_temp);
       break;
     default:
       this->setMode(kDaikinAuto);
@@ -2294,8 +2297,14 @@ uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
 
 // Set the temp in deg C
 void IRDaikin176::setTemp(const uint8_t temp) {
-  uint8_t degrees = std::max(temp, kDaikinMinTemp);
-  degrees = std::min(degrees, kDaikinMaxTemp) * 2 - 18;
+  uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
+  _saved_temp = degrees;
+  switch (getMode()) {
+    case kDaikinDry:
+    case kDaikinFan:
+      degrees = kDaikin176DryFanTemp;
+  }
+  degrees = degrees * 2 - 18;
   remote_state[kDaikin176ByteTemp] &= ~kDaikin176MaskTemp;
   remote_state[kDaikin176ByteTemp] |= degrees;
 }
@@ -2341,7 +2350,7 @@ uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
 
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
-    case kDaikin176SwingHSwing:
+    case kDaikin176SwingHOff:
     case kDaikin176SwingHAuto:
       remote_state[kDaikin176ByteSwingH] &= ~kDaikin176MaskSwingH;
       remote_state[kDaikin176ByteSwingH] |= position;
@@ -2350,6 +2359,7 @@ void IRDaikin176::setSwingHorizontal(const uint8_t position) {
       setSwingHorizontal(kDaikin176SwingHAuto);
   }
 }
+
 uint8_t IRDaikin176::getSwingHorizontal() {
   return remote_state[kDaikin176ByteSwingH] & kDaikin176MaskSwingH;
 }
@@ -2358,7 +2368,7 @@ uint8_t IRDaikin176::getSwingHorizontal() {
 uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kOff:
-      return kDaikin176SwingHSwing;
+      return kDaikin176SwingHOff;
     case stdAc::swingh_t::kAuto:
       return kDaikin176SwingHAuto;
     default:
@@ -2368,7 +2378,7 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
 // Convert a native horizontal swing to it's common equivalent.
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin176SwingHSwing: return stdAc::swingh_t::kOff;
+    case kDaikin176SwingHOff: return stdAc::swingh_t::kOff;
     case kDaikin176SwingHAuto: return stdAc::swingh_t::kAuto;
     default:
       return stdAc::swingh_t::kAuto;
@@ -2466,7 +2476,7 @@ String IRDaikin176::toString() {
     case kDaikin176SwingHAuto:
     result += F(" (Auto)");
     break;
-    case kDaikin176SwingHSwing:
+    case kDaikin176SwingHOff:
     result += F(" (Off)");
     break;
   }

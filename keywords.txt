@@ -1131,7 +1131,7 @@ kDaikin176SwingVHigh	LITERAL1
 kDaikin176SwingVLow	LITERAL1
 kDaikin176SwingVAuto	LITERAL1
 kDaikin176SwingHAuto	LITERAL1
-kDaikin176SwingHSwing	LITERAL1
+kDaikin176SwingHOff	LITERAL1
 kDaikin176FanMax	LITERAL1
 kDaikin216BitMark	LITERAL1
 kDaikin216Bits	LITERAL1
