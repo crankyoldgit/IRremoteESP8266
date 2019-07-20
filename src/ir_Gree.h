@@ -8,7 +8,6 @@
 //   Brand: RusClimate,  Model: YAW1F remote
 //   Brand: Green,  Model: YBOFB remote
 //   Brand: Green,  Model: YBOFB2 remote
-//   Brand: Green,  Model: YAPOF3 remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_

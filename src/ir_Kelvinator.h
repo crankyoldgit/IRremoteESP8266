@@ -13,6 +13,7 @@
 //   Brand: Kelvinator,  Model: KSV70CRC A/C
 //   Brand: Kelvinator,  Model: KSV70HRC A/C
 //   Brand: Kelvinator,  Model: KSV80HRC A/C
+//   Brand: Green,  Model: YAPOF3 remote
 
 #ifndef IR_KELVINATOR_H_
 #define IR_KELVINATOR_H_
