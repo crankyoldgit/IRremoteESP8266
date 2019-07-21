@@ -1191,8 +1191,8 @@ void handleInfo(void) {
 #endif  // ESP32
     "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
-    + IRutils::acBoolToString(kInvertTxOutput,
-                              "Inverting GPIO output", false) + "<br>"
+    + irutils::addBoolToString(kInvertTxOutput,
+                               "Inverting GPIO output", false) + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
