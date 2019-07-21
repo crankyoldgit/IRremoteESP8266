@@ -67,9 +67,9 @@ void IRsend::sendToshibaAC(const unsigned char data[], const uint16_t nbytes,
 // Status:  STABLE / Working.
 //
 // Initialise the object.
-IRToshibaAC::IRToshibaAC(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRToshibaAC::IRToshibaAC(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRToshibaAC::stateReset(void) {

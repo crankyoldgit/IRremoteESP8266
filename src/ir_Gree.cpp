@@ -113,7 +113,9 @@ void IRsend::sendGree(const uint64_t data, const uint16_t nbits,
 }
 #endif  // SEND_GREE
 
-IRGreeAC::IRGreeAC(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRGreeAC::IRGreeAC(const uint16_t pin, const bool inverted,
+                   const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRGreeAC::stateReset(void) {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.

@@ -390,9 +390,9 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
 // Equipment it seems compatible with:
 //  * <Add models (A/C & remotes) you've gotten it working with here>
 // Initialise the object.
-IRMitsubishiAC::IRMitsubishiAC(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRMitsubishiAC::IRMitsubishiAC(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiAC::stateReset(void) {

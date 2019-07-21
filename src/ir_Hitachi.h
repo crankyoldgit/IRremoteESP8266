@@ -38,7 +38,8 @@ const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 // Classes
 class IRHitachiAc {
  public:
-  explicit IRHitachiAc(const uint16_t pin);
+  explicit IRHitachiAc(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_HITACHI_AC

@@ -52,9 +52,9 @@ void IRsend::sendVestelAc(const uint64_t data, const uint16_t nbits,
 // Code to emulate Vestel A/C IR remote control unit.
 
 // Initialise the object.
-IRVestelAc::IRVestelAc(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRVestelAc::IRVestelAc(const uint16_t pin, const bool inverted,
+                       const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRVestelAc::stateReset(void) {

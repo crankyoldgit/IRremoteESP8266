@@ -290,8 +290,9 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_SAMSUNG_AC
 
-IRSamsungAc::IRSamsungAc(const uint16_t pin, bool inverted)
-  : _irsend(pin, inverted) {
+IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) {
   this->stateReset();
 }
 

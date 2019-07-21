@@ -93,7 +93,9 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Warning: Consider this very alpha code.
 
 // Initialise the object.
-IRMideaAC::IRMideaAC(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
+IRMideaAC::IRMideaAC(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 // Reset the state of the remote to a known good state/sequence.
 void IRMideaAC::stateReset(void) {

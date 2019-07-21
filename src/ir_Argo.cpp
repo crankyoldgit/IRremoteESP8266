@@ -47,7 +47,9 @@ void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_ARGO
 
-IRArgoAC::IRArgoAC(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
+IRArgoAC::IRArgoAC(const uint16_t pin, const bool inverted,
+                   const bool use_modulation)
+      : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRArgoAC::begin(void) { _irsend.begin(); }
 

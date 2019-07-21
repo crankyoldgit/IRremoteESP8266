@@ -28,7 +28,9 @@ void IRsend::sendTcl112Ac(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_TCL112AC
 
-IRTcl112Ac::IRTcl112Ac(const uint16_t pin) : _irsend(pin) { stateReset(); }
+IRTcl112Ac::IRTcl112Ac(const uint16_t pin, const bool inverted,
+                       const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRTcl112Ac::begin(void) { this->_irsend.begin(); }
 

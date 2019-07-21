@@ -66,7 +66,9 @@ void IRsend::sendNeoclima(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_NEOCLIMA
 
-IRNeoclimaAc::IRNeoclimaAc(const uint16_t pin) : _irsend(pin) {
+IRNeoclimaAc::IRNeoclimaAc(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) {
   this->stateReset();
 }
 

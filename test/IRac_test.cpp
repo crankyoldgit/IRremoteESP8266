@@ -1163,3 +1163,29 @@ TEST(TestIRac, swinghToString) {
   EXPECT_EQ("auto", IRac::swinghToString(stdAc::swingh_t::kAuto));
   EXPECT_EQ("unknown", IRac::swinghToString((stdAc::swingh_t)500));
 }
+
+// Check that we keep the previous state info if the message is a special
+// state-less command.
+TEST(TestIRac, CoolixDecodeToState) {
+  stdAc::state_t prev;
+  prev.mode = stdAc::opmode_t::kHeat;
+  prev.power = true;
+  prev.celsius = true;
+  prev.degrees = 20;
+  prev.fanspeed = stdAc::fanspeed_t::kLow;
+
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+  irsend.sendCOOLIX(kCoolixOff);  // Special state-less "off" message.
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  stdAc::state_t result;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_EQ(decode_type_t::COOLIX, result.protocol);
+  ASSERT_FALSE(result.power);
+  ASSERT_EQ(stdAc::opmode_t::kHeat, result.mode);
+  ASSERT_TRUE(result.celsius);
+  ASSERT_EQ(20, result.degrees);
+  ASSERT_EQ(stdAc::fanspeed_t::kLow, result.fanspeed);
+}

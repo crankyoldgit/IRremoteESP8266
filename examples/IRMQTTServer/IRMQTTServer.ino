@@ -736,6 +736,7 @@ void handleRoot(void) {
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin (35 bytes)</option>"
         "<option value='65'>Daikin160 (20 bytes)</option>"
+        "<option value='67'>Daikin176 (22 bytes)</option>"
         "<option value='53'>Daikin2 (39 bytes)</option>"
         "<option value='61'>Daikin216 (27 bytes)</option>"
         "<option value='48'>Electra</option>"
@@ -1190,6 +1191,8 @@ void handleInfo(void) {
 #endif  // ESP32
     "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
+    + IRutils::acBoolToString(kInvertTxOutput,
+                              "Inverting GPIO output", false) + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
@@ -1962,7 +1965,7 @@ void setup(void) {
     if (txGpioTable[i] == kGpioUnused) {
       IrSendTable[i] = NULL;
     } else {
-      IrSendTable[i] = new IRsend(txGpioTable[i]);
+      IrSendTable[i] = new IRsend(txGpioTable[i], kInvertTxOutput);
       if (IrSendTable[i] == NULL) break;
       IrSendTable[i]->begin();
       offset = IrSendTable[i]->calibrate();
@@ -1979,7 +1982,7 @@ void setup(void) {
     irrecv->enableIRIn(IR_RX_PULLUP);  // Start the receiver
   }
 #endif  // IR_RX
-  commonAc = new IRac(txGpioTable[0]);
+  commonAc = new IRac(txGpioTable[0], kInvertTxOutput);
 
   // Wait a bit for things to settle.
   delay(500);
@@ -2918,7 +2921,7 @@ bool decodeCommonAc(const decode_results *decode) {
   }
   stdAc::state_t state = climate;
   debug("Converting inbound IR A/C message to common A/C");
-  if (!IRAcUtils::decodeToState(decode, &state)) {
+  if (!IRAcUtils::decodeToState(decode, &state, &climate)) {
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
   }

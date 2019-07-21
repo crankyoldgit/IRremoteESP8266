@@ -61,7 +61,8 @@ const uint8_t kMitsubishiAcStartStopTimer = 7;
 
 class IRMitsubishiAC {
  public:
-  explicit IRMitsubishiAC(const uint16_t pin);
+  explicit IRMitsubishiAC(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
 
   static uint8_t calculateChecksum(const uint8_t* data);
 

@@ -134,7 +134,8 @@ const uint8_t kKelvinatorAutoTemp = 25;  // 25C
 // Classes
 class IRKelvinatorAC {
  public:
-  explicit IRKelvinatorAC(uint16_t pin);
+  explicit IRKelvinatorAC(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_KELVINATOR

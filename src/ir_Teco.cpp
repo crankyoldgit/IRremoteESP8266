@@ -43,7 +43,9 @@ void IRsend::sendTeco(const uint64_t data, const uint16_t nbits,
 #endif  // SEND_TECO
 
 // Class for decoding and constructing Teco AC messages.
-IRTecoAc::IRTecoAc(const uint16_t pin) : _irsend(pin) { this->stateReset(); }
+IRTecoAc::IRTecoAc(const uint16_t pin, const bool inverted,
+                   const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRTecoAc::begin(void) { _irsend.begin(); }
 

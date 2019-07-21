@@ -223,9 +223,9 @@ void IRsend::sendPanasonicAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_PANASONIC_AC
 
-IRPanasonicAc::IRPanasonicAc(const uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRPanasonicAc::IRPanasonicAc(const uint16_t pin, const bool inverted,
+                             const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRPanasonicAc::stateReset(void) {
   for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)

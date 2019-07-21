@@ -125,9 +125,9 @@ void IRsend::sendKelvinator(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_KELVINATOR
 
-IRKelvinatorAC::IRKelvinatorAC(uint16_t pin) : _irsend(pin) {
-  this->stateReset();
-}
+IRKelvinatorAC::IRKelvinatorAC(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRKelvinatorAC::stateReset(void) {
   for (uint8_t i = 0; i < kKelvinatorStateLength; i++) remote_state[i] = 0x0;

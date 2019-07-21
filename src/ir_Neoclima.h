@@ -82,7 +82,8 @@ const uint8_t kNeoclimaHeat =     0b100;
 // Classes
 class IRNeoclimaAc {
  public:
-  explicit IRNeoclimaAc(const uint16_t pin);
+  explicit IRNeoclimaAc(const uint16_t pin, const bool inverted = false,
+                        const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_NEOCLIMA

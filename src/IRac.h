@@ -37,7 +37,8 @@ const int8_t kGpioUnused = -1;
 // Class
 class IRac {
  public:
-  explicit IRac(uint8_t pin);
+  explicit IRac(const uint16_t pin, const bool inverted = false,
+                const bool use_modulation = true);
   static bool isProtocolSupported(const decode_type_t protocol);
   bool sendAc(const decode_type_t vendor, const int16_t model,
               const bool power, const stdAc::opmode_t mode, const float degrees,
@@ -69,7 +70,9 @@ class IRac {
 
  private:
 #endif
-  uint8_t _pin;
+  uint16_t _pin;
+  bool _inverted;
+  bool _modulation;
 #if SEND_ARGO
   void argo(IRArgoAC *ac,
             const bool on, const stdAc::opmode_t mode, const float degrees,
@@ -98,6 +101,12 @@ void daikin160(IRDaikin160 *ac,
                const float degrees, const stdAc::fanspeed_t fan,
                const stdAc::swingv_t swingv);
 #endif  // SEND_DAIKIN160
+#if SEND_DAIKIN176
+void daikin176(IRDaikin176 *ac,
+               const bool on, const stdAc::opmode_t mode,
+               const float degrees, const stdAc::fanspeed_t fan,
+               const stdAc::swingh_t swingh);
+#endif  // SEND_DAIKIN176
 #if SEND_DAIKIN2
   void daikin2(IRDaikin2 *ac,
                const bool on, const stdAc::opmode_t mode,
@@ -273,6 +282,7 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
 
 namespace IRAcUtils {
   String resultAcToString(const decode_results * const results);
-  bool decodeToState(const decode_results *decode, stdAc::state_t *result);
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                     const stdAc::state_t *prev = NULL);
 }  // namespace IRAcUtils
 #endif  // IRAC_H_
