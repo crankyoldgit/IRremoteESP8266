@@ -92,6 +92,7 @@ const uint8_t kDaikinFan = 0b110;
 const uint8_t kDaikinMinTemp = 10;  // Celsius
 const uint8_t kDaikinMaxTemp = 32;  // Celsius
 const uint8_t kDaikinFanMin = 1;
+const uint8_t kDaikinFanMed = 3;
 const uint8_t kDaikinFanMax = 5;
 const uint8_t kDaikinFanAuto = 0b1010;
 const uint8_t kDaikinFanQuiet = 0b1011;
@@ -343,7 +344,6 @@ class IRDaikinESP {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
-  static String renderTime(const uint16_t timemins);
 #ifndef UNIT_TEST
 
  private:
@@ -435,7 +435,6 @@ class IRDaikin2 {
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);
   String toString();
-  static String renderTime(uint16_t timemins);
 #ifndef UNIT_TEST
 
  private:
@@ -488,7 +487,6 @@ class IRDaikin216 {
   bool getPowerful(void);
   stdAc::state_t toCommon(void);
   String toString(void);
-  static String renderTime(const uint16_t timemins);
 #ifndef UNIT_TEST
 
  private:

@@ -36,6 +36,7 @@ const uint8_t kKelvinatorFan = 3;
 const uint8_t kKelvinatorHeat = 4;
 const uint8_t kKelvinatorBasicFanMax = 3;
 const uint8_t kKelvinatorFanAuto = 0;
+const uint8_t kKelvinatorFanMin = 1;
 const uint8_t kKelvinatorFanMax = 5;
 const uint8_t kKelvinatorMinTemp = 16;   // 16C
 const uint8_t kKelvinatorMaxTemp = 30;   // 30C

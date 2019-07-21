@@ -66,6 +66,13 @@ const uint8_t kKelvinatorXfan = 1 << kKelvinatorXfanOffset;
 const uint8_t kKelvinatorTurboOffset = 4;
 const uint8_t kKelvinatorTurbo = 1 << kKelvinatorTurboOffset;
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addFanToString;
+using irutils::addTempToString;
+
 #if SEND_KELVINATOR
 // Send a Kelvinator A/C message.
 //
@@ -416,30 +423,20 @@ stdAc::state_t IRKelvinatorAC::toCommon(void) {
 String IRKelvinatorAC::toString(void) {
   String result = "";
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kKelvinatorAuto, kKelvinatorCool,
-                                    kKelvinatorHeat, kKelvinatorDry,
-                                    kKelvinatorFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kKelvinatorFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kKelvinatorFanMax:
-      result += F(" (MAX)");
-      break;
-  }
-  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getXFan(), F("XFan"));
-  result += IRutils::acBoolToString(getIonFilter(), F("IonFilter"));
-  result += IRutils::acBoolToString(getLight(), F("Light"));
-  result += IRutils::acBoolToString(getSwingHorizontal(),
-                                    F("Swing (Horizontal)"));
-  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kKelvinatorAuto, kKelvinatorCool,
+                            kKelvinatorHeat, kKelvinatorDry, kKelvinatorFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kKelvinatorFanMax, kKelvinatorFanMin,
+                           kKelvinatorFanAuto, kKelvinatorFanAuto,
+                           kKelvinatorBasicFanMax);
+  result += addBoolToString(getTurbo(), F("Turbo"));
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getXFan(), F("XFan"));
+  result += addBoolToString(getIonFilter(), F("IonFilter"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
+  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
   return result;
 }
 

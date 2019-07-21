@@ -61,6 +61,14 @@ const uint16_t kPanasonicAcSectionGap = 10000;
 const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
 //
@@ -588,15 +596,6 @@ bool IRPanasonicAc::isOffTimerEnabled(void) {
   return remote_state[13] & kPanasonicAcOffTimer;
 }
 
-String IRPanasonicAc::timeToString(const uint16_t mins_since_midnight) {
-  String result = "";
-  result.reserve(6);
-  result += uint64ToString(mins_since_midnight / 60) + ':';
-  uint8_t mins = mins_since_midnight % 60;
-  if (mins < 10) result += '0';  // Zero pad the minutes.
-  return result + uint64ToString(mins);
-}
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -761,30 +760,14 @@ String IRPanasonicAc::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getPower(), F("Power"));
-  result += IRutils::acModeToString(getMode(), kPanasonicAcAuto,
-                                    kPanasonicAcCool, kPanasonicAcHeat,
-                                    kPanasonicAcDry, kPanasonicAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kPanasonicAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kPanasonicAcFanMax:
-      result += F(" (MAX)");
-      break;
-    case kPanasonicAcFanMin:
-      result += F(" (MIN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-      break;
-  }
-  result += F(", Swing (Vertical): ");
-  result += uint64ToString(getSwingVertical());
+  result += addBoolToString(getPower(), F("Power"));
+  result += addModeToString(getMode(), kPanasonicAcAuto, kPanasonicAcCool,
+                            kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kPanasonicAcFanMax, kPanasonicAcFanMin,
+                           kPanasonicAcFanAuto, kPanasonicAcFanAuto,
+                           kPanasonicAcFanMed);
+  result += addIntToString(getSwingVertical(), F("Swing (Vertical)"));
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
       result += F(" (AUTO)");
@@ -808,8 +791,7 @@ String IRPanasonicAc::toString(void) {
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += F(", Swing (Horizontal): ");
-      result += uint64ToString(getSwingHorizontal());
+      result += addIntToString(getSwingHorizontal(), F("Swing (Horizontal)"));
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
           result += F(" (AUTO)");
@@ -834,20 +816,15 @@ String IRPanasonicAc::toString(void) {
           break;
       }
   }
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
-  result += F(", Clock: ");
-  result += timeToString(getClock());
-  result += F(", On Timer: ");
-  if (isOnTimerEnabled())
-    result += timeToString(getOnTimer());
-  else
-    result += F("Off");
-  result += F(", Off Timer: ");
-  if (isOffTimerEnabled())
-    result += timeToString(getOffTimer());
-  else
-    result += F("Off");
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addLabeledString(
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : F("Off"),
+      F("On Timer"));
+  result += addLabeledString(
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : F("Off"),
+      F("Off Timer"));
   return result;
 }
 

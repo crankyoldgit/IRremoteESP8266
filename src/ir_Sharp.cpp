@@ -37,6 +37,13 @@ const uint64_t kSharpToggleMask =
 const uint64_t kSharpAddressMask = ((uint64_t)1 << kSharpAddressBits) - 1;
 const uint64_t kSharpCommandMask = ((uint64_t)1 << kSharpCommandBits) - 1;
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
 //
@@ -490,31 +497,12 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 String IRSharpAc::toString(void) {
   String result = "";
   result.reserve(60);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kSharpAcAuto,
-                                    kSharpAcCool, kSharpAcHeat,
-                                    kSharpAcDry, kSharpAcAuto);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kSharpAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kSharpAcFanMin:
-      result += F(" (MIN)");
-      break;
-    case kSharpAcFanMed:
-      result += F(" (MED)");
-      break;
-    case kSharpAcFanHigh:
-      result += F(" (HIGH)");
-      break;
-    case kSharpAcFanMax:
-      result += F(" (MAX)");
-      break;
-  }
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
+                            kSharpAcDry, kSharpAcAuto);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
+                           kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);
   return result;
 }
 

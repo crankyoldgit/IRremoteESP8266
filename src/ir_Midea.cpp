@@ -37,6 +37,13 @@ const uint16_t kMideaMinGapTicks =
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_MIDEA
 // Send a Midea message
 //
@@ -337,31 +344,16 @@ stdAc::state_t IRMideaAC::toCommon(void) {
 String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kMideaACAuto, kMideaACCool,
-                                    kMideaACHeat, kMideaACDry,
-                                    kMideaACFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp(true));
-  result += F("C/");
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kMideaACAuto, kMideaACCool, kMideaACHeat,
+                            kMideaACDry, kMideaACFan);
+  result += addTempToString(getTemp(true));
+  result += '/';
   result += uint64ToString(getTemp(false));
-  result += F("F, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kMideaACFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kMideaACFanLow:
-      result += F(" (LOW)");
-      break;
-    case kMideaACFanMed:
-      result += F(" (MED)");
-      break;
-    case kMideaACFanHigh:
-      result += F(" (HI)");
-      break;
-  }
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += 'F';
+  result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
+                           kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
+  result += addBoolToString(getSleep(), F("Sleep"));
   return result;
 }
 

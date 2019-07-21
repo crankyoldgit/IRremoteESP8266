@@ -352,7 +352,7 @@ TEST(TestDecodeTeco, RealNormalExample) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (DRY), Temp: 21C, Fan: 2 (Med), Sleep: Off, "
+      "Power: On, Mode: 2 (DRY), Temp: 21C, Fan: 2 (Medium), Sleep: Off, "
       "Swing: On",
       ac.toString());
 }

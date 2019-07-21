@@ -22,6 +22,12 @@ const uint16_t kArgoOneSpace = 2200;
 const uint16_t kArgoZeroSpace = 900;
 const uint32_t kArgoGap = kDefaultMessageGap;  // Made up value. Complete guess.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_ARGO
 // Send an Argo A/C message.
 //
@@ -338,9 +344,8 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 String IRArgoAC::toString() {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += F(", Mode: ");
-  result += uint64ToString(getMode());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addIntToString(getMode(), F("Mode"));
   switch (getMode()) {
     case kArgoAuto:
       result += F(" (AUTO)");
@@ -363,8 +368,7 @@ String IRArgoAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Fan: ");
-  result += uint64ToString(getFan());
+  result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kArgoFanAuto:
       result += F(" (AUTO)");
@@ -381,15 +385,12 @@ String IRArgoAC::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += 'C';
-  result += F(", Room Temp: ");
-  result += uint64ToString(getRoomTemp());
-  result += 'C';
-  result += IRutils::acBoolToString(getMax(), F("Max"));
-  result += IRutils::acBoolToString(getiFeel(), F("iFeel"));
-  result += IRutils::acBoolToString(getNight(), F("Night"));
+  result += addTempToString(getTemp());
+  result += F(", Room ");
+  result += addTempToString(getRoomTemp(), true, false);
+  result += addBoolToString(getMax(), F("Max"));
+  result += addBoolToString(getiFeel(), F("iFeel"));
+  result += addBoolToString(getNight(), F("Night"));
   return result;
 }
 

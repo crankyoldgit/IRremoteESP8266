@@ -28,6 +28,13 @@ const uint16_t kNeoclimaOneSpace = 1651;
 const uint16_t kNeoclimaZeroSpace = 571;
 const uint32_t kNeoclimaMinGap = kDefaultMessageGap;
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_NEOCLIMA
 // Send a Neoclima message.
 //
@@ -449,71 +456,24 @@ stdAc::state_t IRNeoclimaAc::toCommon(void) {
 String IRNeoclimaAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  result += this->getPower() ? F("On") : F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (this->getMode()) {
-    case kNeoclimaAuto:
-      result += F(" (AUTO)");
-      break;
-    case kNeoclimaCool:
-      result += F(" (COOL)");
-      break;
-    case kNeoclimaHeat:
-      result += F(" (HEAT)");
-      break;
-    case kNeoclimaDry:
-      result += F(" (DRY)");
-      break;
-    case kNeoclimaFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kNeoclimaFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kNeoclimaFanHigh:
-      result += F(" (High)");
-      break;
-    case kNeoclimaFanMed:
-      result += F(" (Med)");
-      break;
-    case kNeoclimaFanLow:
-      result += F(" (Low)");
-      break;
-  }
-  result += F(", Swing(V): ");
-  result += this->getSwingV() ? F("On") : F("Off");
-  result += F(", Swing(H): ");
-  result += this->getSwingH() ? F("On") : F("Off");
-  result += F(", Sleep: ");
-  result += this->getSleep() ? F("On") : F("Off");
-  result += F(", Turbo: ");
-  result += this->getTurbo() ? F("On") : F("Off");
-  result += F(", Hold: ");
-  result += this->getHold() ? F("On") : F("Off");
-  result += F(", Ion: ");
-  result += this->getIon() ? F("On") : F("Off");
-  result += F(", Eye: ");
-  result += this->getEye() ? F("On") : F("Off");
-  result += F(", Light: ");
-  result += this->getLight() ? F("On") : F("Off");
-  result += F(", Follow: ");
-  result += this->getFollow() ? F("On") : F("Off");
-  result += F(", 8C Heat: ");
-  result += this->get8CHeat() ? F("On") : F("Off");
-  result += F(", Fresh: ");
-  result += this->getFresh() ? F("On") : F("Off");
-  result += F(", Button: ");
-  result += uint64ToString(this->getButton());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kNeoclimaAuto, kNeoclimaCool,
+                            kNeoclimaHeat, kNeoclimaDry, kNeoclimaFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kNeoclimaFanHigh, kNeoclimaFanLow,
+                           kNeoclimaFanAuto, kNeoclimaFanAuto, kNeoclimaFanMed);
+  result += addBoolToString(getSwingV(), F("Swing(V)"));
+  result += addBoolToString(getSwingH(), F("Swing(H)"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getTurbo(), F("Turbo"));
+  result += addBoolToString(getHold(), F("Hold"));
+  result += addBoolToString(getIon(), F("Ion"));
+  result += addBoolToString(getEye(), F("Eye"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addBoolToString(getFollow(), F("Follow"));
+  result += addBoolToString(get8CHeat(), F("8C Heat"));
+  result += addBoolToString(getFresh(), F("Fresh"));
+  result += addIntToString(getButton(), F("Button"));
   result += F(" (");
   switch (this->getButton()) {
     case kNeoclimaButtonPower:    result += F("Power"); break;
@@ -533,9 +493,9 @@ String IRNeoclimaAc::toString(void) {
     case kNeoclimaButton8CHeat:   result += F("8C Heat"); break;
     case kNeoclimaButtonTurbo:    result += F("Turbo"); break;
     default:
-      result += F("UNKNOWN");
+      result += F("Unknown");
   }
-  result += F(")");
+  result += ')';
   return result;
 }
 

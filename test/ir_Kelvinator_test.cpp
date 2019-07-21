@@ -422,7 +422,7 @@ TEST(TestKelvinatorClass, HumanReadable) {
   IRKelvinatorAC irkelv(0);
 
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (AUTO), Turbo: Off, "
+      "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (Auto), Turbo: Off, "
       "Quiet: Off, XFan: Off, IonFilter: Off, Light: Off, "
       "Swing (Horizontal): Off, Swing (Vertical): Off",
       irkelv.toString());
@@ -435,7 +435,7 @@ TEST(TestKelvinatorClass, HumanReadable) {
   irkelv.setLight(true);
   irkelv.setSwingHorizontal(true);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 25C, Fan: 5 (MAX), Turbo: Off, "
+      "Power: On, Mode: 1 (COOL), Temp: 25C, Fan: 5 (High), Turbo: Off, "
       "Quiet: Off, XFan: On, IonFilter: On, Light: On, "
       "Swing (Horizontal): On, Swing (Vertical): Off",
       irkelv.toString());

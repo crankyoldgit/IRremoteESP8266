@@ -237,7 +237,6 @@ class IRHaierAC {
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void);
   String toString(void);
-  static String timeToString(const uint16_t nr_mins);
 #ifndef UNIT_TEST
 
  private:

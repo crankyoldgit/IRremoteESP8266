@@ -48,7 +48,7 @@ TEST(TestTrotecESPClass, MessageConstructon) {
       0x12, 0x34, 0x29, 0x82, 0x00, 0x00, 0x00, 0x00, 0xAB};
   EXPECT_STATE_EQ(expected, ac.getRaw(), kTrotecBits);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan Speed: 2 (Med), Sleep: On",
+      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 2 (Medium), Sleep: On",
       ac.toString());
 }
 
@@ -100,7 +100,7 @@ TEST(TestDecodeTrotec, SyntheticDecode) {
   IRTrotecESP ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan Speed: 2 (Med), Sleep: On",
+      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 2 (Medium), Sleep: On",
       ac.toString());
 }
 
