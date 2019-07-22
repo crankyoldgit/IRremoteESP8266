@@ -626,7 +626,7 @@ TEST(TestGreeClass, Issue814Power) {
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(gree_ac_remote_model_t::YBOFB, ac.getModel());
   EXPECT_EQ(
-      "Model: 2 (YBOFB), Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 1, "
+      "Model: 2 (YBOFB), Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 1 (Low), "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
       ac.toString());
