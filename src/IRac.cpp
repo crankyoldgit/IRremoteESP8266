@@ -1065,7 +1065,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       IRGreeAC ac(_pin, (gree_ac_remote_model_t)model, _inverted, _modulation);
       ac.begin();
       gree(&ac, (gree_ac_remote_model_t)model, on, mode, degC, fan, swingv,
-           light, turbo, clean, sleep);
+           turbo, light, clean, sleep);
       break;
     }
 #endif  // SEND_GREE
