@@ -2526,6 +2526,7 @@ TEST(TestDaikin176Class, ReconstructKnownStates) {
   ac.setRaw(on_cool_25_max_auto_v2);  // DEBUG Remove! Not needed. Added to pass
   EXPECT_STATE_EQ(on_cool_25_max_auto_v2, ac.getRaw(), kDaikin176Bits);
 }
+
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
 // Data from:
 //   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
