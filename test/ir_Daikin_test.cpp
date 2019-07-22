@@ -1514,10 +1514,20 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN));
 
+  ASSERT_EQ("DAIKIN128", typeToString(decode_type_t::DAIKIN128));
+  ASSERT_EQ(decode_type_t::DAIKIN128, strToDecodeType("DAIKIN128"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN128));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
+
   ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
   ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN160));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN160));
+
+  ASSERT_EQ("DAIKIN176", typeToString(decode_type_t::DAIKIN176));
+  ASSERT_EQ(decode_type_t::DAIKIN176, strToDecodeType("DAIKIN176"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN176));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN176));
 
   ASSERT_EQ("DAIKIN2", typeToString(decode_type_t::DAIKIN2));
   ASSERT_EQ(decode_type_t::DAIKIN2, strToDecodeType("DAIKIN2"));
@@ -2287,4 +2297,68 @@ TEST(TestDaikin160Class, HumanReadable) {
       "Power: On, Mode: 0 (AUTO), Temp: 19C, Fan: 1 (Low), "
       "Vent Position (V): 15 (Auto)",
       ac.toString());
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+// Data from:
+//   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
+TEST(TestDecodeDaikin128, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t rawData[265] = {
+      9846, 9794, 9848, 9796, 4638, 2512, 348, 382, 352, 954, 352, 956, 352,
+      382, 352, 956, 352, 384, 352, 382, 352, 386, 352, 382, 352, 954, 352, 384,
+      352, 382, 352, 954, 352, 384, 352, 382, 352, 386, 352, 382, 352, 382, 354,
+      382, 354, 382, 352, 382, 352, 954, 352, 382, 352, 384, 352, 954, 352, 382,
+      352, 382, 352, 954, 352, 954, 354, 382, 352, 382, 352, 386, 352, 954, 354,
+      954, 352, 954, 352, 384, 352, 382, 352, 382, 352, 954, 352, 384, 354, 382,
+      352, 954, 352, 382, 352, 382, 352, 382, 352, 956, 352, 382, 354, 384, 354,
+      382, 354, 954, 352, 954, 352, 382, 352, 382, 352, 954, 352, 382, 352, 384,
+      354, 954, 352, 382, 352, 954, 352, 954, 352, 382, 352, 954, 352, 382, 352,
+      956, 352, 20306, 376, 954, 352, 384, 352, 382, 352, 382, 354, 382, 352,
+      954, 352, 382, 352, 958, 352, 384, 352, 382, 352, 382, 352, 382, 352, 382,
+      354, 382, 352, 382, 352, 386, 352, 382, 352, 382, 354, 382, 352, 384, 352,
+      382, 352, 382, 352, 382, 354, 384, 354, 382, 354, 382, 354, 382, 352, 382,
+      352, 382, 352, 382, 352, 382, 352, 386, 354, 382, 352, 382, 352, 382, 352,
+      382, 352, 382, 352, 382, 354, 382, 352, 384, 352, 382, 354, 382, 354, 382,
+      354, 382, 352, 382, 354, 382, 354, 382, 354, 384, 354, 382, 354, 382, 352,
+      382, 352, 382, 354, 382, 352, 382, 352, 382, 352, 386, 354, 952, 354, 954,
+      352, 382, 352, 954, 354, 382, 352, 382, 354, 382, 354, 382, 4618
+      };  // UNKNOWN DBA1F5E3
+  uint8_t expectedState[kDaikin128StateLength] = {
+      // 8 bytes
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      // 8 bytes
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 265, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN128, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+// Data from:
+//   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
+TEST(TestDecodeDaikin128, SyntheticSelfDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint8_t expectedState[kDaikin128StateLength] = {
+      // 8 bytes
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      // 8 bytes
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin128(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN128, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }

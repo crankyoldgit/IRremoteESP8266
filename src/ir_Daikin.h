@@ -11,6 +11,12 @@
 //   Brand: Daikin,  Model: ARC433B69 remote
 //   Brand: Daikin,  Model: ARC423A5 remote
 //   Brand: Daikin,  Model: FTE12HV2S A/C
+//   Brand: Daikin,  Model: BRC4C153 remote
+//   Brand: Daikin,  Model: 17 Series A/C (DAIKIN128)
+//   Brand: Daikin,  Model: FTXB12AXVJU A/C (DAIKIN128)
+//   Brand: Daikin,  Model: FTXB09AXVJU A/C (DAIKIN128)
+//   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
+
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -269,6 +275,21 @@ const uint8_t kDaikin176ByteSwingH = 18;
 const uint8_t kDaikin176MaskSwingH = 0b00001111;
 const uint8_t kDaikin176SwingHAuto =  0x5;
 const uint8_t kDaikin176SwingHSwing = 0x6;
+
+// Another variant of the protocol for the Daikin BRC52B63 remote.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+const uint16_t kDaikin128Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin128LeaderMark = 9800;
+const uint16_t kDaikin128LeaderSpace = 9800;
+const uint16_t kDaikin128HdrMark = 4600;
+const uint16_t kDaikin128HdrSpace = 2500;
+const uint16_t kDaikin128BitMark = 350;
+const uint16_t kDaikin128OneSpace = 954;
+const uint16_t kDaikin128ZeroSpace = 382;
+const uint16_t kDaikin128Gap = 20300;
+const uint16_t kDaikin128FooterMark = kDaikin128HdrMark;
+const uint16_t kDaikin128Sections = 2;
+const uint16_t kDaikin128SectionLength = 8;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool

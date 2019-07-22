@@ -2019,6 +2019,7 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN160
+
 #if SEND_DAIKIN176
 // Send a Daikin 176 bit A/C message.
 //
@@ -2400,3 +2401,113 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN176
+
+#if SEND_DAIKIN128
+// Send a Daikin 128 bit A/C message.
+//
+// Args:
+//   data: An array of kDaikin128StateLength bytes containing the IR command.
+//
+// Status: Alpha/Untested on a real device.
+//
+// Supported devices:
+// - Daikin BRC52B63 remote.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  if (nbytes < kDaikin128SectionLength)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    enableIROut(kDaikin128Freq);
+    // Leader
+    for (uint8_t i = 0; i < 2; i++) {
+      mark(kDaikin128LeaderMark);
+      space(kDaikin128LeaderSpace);
+    }
+    // Section #1 (Header + Data)
+    sendGeneric(kDaikin128HdrMark, kDaikin128HdrSpace, kDaikin128BitMark,
+                kDaikin128OneSpace, kDaikin128BitMark, kDaikin128ZeroSpace,
+                kDaikin128BitMark, kDaikin128Gap, data,
+                kDaikin128SectionLength,
+                kDaikin128Freq, false, 0, kDutyDefault);
+    // Section #2 (Data + Footer)
+    sendGeneric(0, 0, kDaikin128BitMark,
+                kDaikin128OneSpace, kDaikin128BitMark, kDaikin128ZeroSpace,
+                kDaikin128FooterMark, kDaikin128Gap,
+                data + kDaikin128SectionLength,
+                nbytes - kDaikin128SectionLength,
+                kDaikin128Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN128
+
+#if DECODE_DAIKIN128
+// Decode the supplied Daikin 128 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin128Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin BRC52B63 remote.
+//
+// Status: BETA / Probably works.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader) + kFooter - 1)
+    return false;
+  if (nbits / 8 <= kDaikin128SectionLength) return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin128Bits) return false;
+
+  uint16_t offset = kStartOffset;
+
+  // Leader
+  for (uint8_t i = 0; i < 2; i++) {
+    if (!matchMark(results->rawbuf[offset++], kDaikin128LeaderMark,
+                   kDaikinTolerance, kDaikinMarkExcess)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin128LeaderSpace,
+                    kDaikinTolerance, kDaikinMarkExcess)) return false;
+  }
+  DPRINTLN("DEBUG: Past the leader.");
+  const uint16_t ksectionSize[kDaikin128Sections] = {
+      kDaikin128SectionLength, (uint16_t)(nbits / 8 - kDaikin128SectionLength)};
+  // Data Sections
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin128Sections; section++) {
+    uint16_t used;
+    // Section Header (first section only) + Section Data (8 bytes) +
+    //     Section Footer (Not for first section)
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        section == 0 ? kDaikin128HdrMark : 0,
+                        section == 0 ? kDaikin128HdrSpace : 0,
+                        kDaikin128BitMark, kDaikin128OneSpace,
+                        kDaikin128BitMark, kDaikin128ZeroSpace,
+                        section > 0 ? kDaikin128FooterMark : kDaikin128BitMark,
+                        kDaikin128Gap,
+                        section > 0,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
+    DPRINTLN("DEBUG: Past matchGeneric.");
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
+  }
+  // Compliance
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN128;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN128

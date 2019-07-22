@@ -244,6 +244,9 @@
 #define DECODE_DAIKIN176       true
 #define SEND_DAIKIN176         true
 
+#define DECODE_DAIKIN128       true
+#define SEND_DAIKIN128         true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -252,7 +255,7 @@
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
      DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
      DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
-     DECODE_NEOCLIMA || DECODE_DAIKIN176)
+     DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -339,8 +342,9 @@ enum decode_type_t {
   DAIKIN160,  // 65
   NEOCLIMA,
   DAIKIN176,
+  DAIKIN128,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DAIKIN176,
+  kLastDecodeType = DAIKIN128,
 };
 
 // Message lengths & required repeat values
@@ -367,6 +371,9 @@ const uint16_t kDaikin2DefaultRepeat = kNoRepeat;
 const uint16_t kDaikin160StateLength = 20;
 const uint16_t kDaikin160Bits = kDaikin160StateLength * 8;
 const uint16_t kDaikin160DefaultRepeat = kNoRepeat;
+const uint16_t kDaikin128StateLength = 16;
+const uint16_t kDaikin128Bits = kDaikin128StateLength * 8;
+const uint16_t kDaikin128DefaultRepeat = kNoRepeat;
 const uint16_t kDaikin176StateLength = 22;
 const uint16_t kDaikin176Bits = kDaikin176StateLength * 8;
 const uint16_t kDaikin176DefaultRepeat = kNoRepeat;
