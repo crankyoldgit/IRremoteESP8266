@@ -30,6 +30,14 @@ const uint16_t kHaierAcOneSpace = 1650;
 const uint16_t kHaierAcZeroSpace = 650;
 const uint32_t kHaierAcMinGap = 150000;  // Completely made up value.
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addFanToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 // Send a Haier A/C message. (HSU07-HEA03 remote)
 //
@@ -298,17 +306,6 @@ void IRHaierAC::setSwing(const uint8_t state) {
   }
 }
 
-// Convert a Haier time into a human readable string.
-String IRHaierAC::timeToString(const uint16_t nr_mins) {
-  String result = "";
-  if (nr_mins / 24 < 10) result += '0';  // Zero pad.
-  result += uint64ToString(nr_mins / 60);
-  result += ':';
-  if (nr_mins % 60 < 10) result += '0';  // Zero pad.
-  result += uint64ToString(nr_mins % 60);
-  return result;
-}
-
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -420,8 +417,7 @@ String IRHaierAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   uint8_t cmd = getCommand();
-  result += F("Command: ");
-  result += uint64ToString(cmd);
+  result += addIntToString(cmd, F("Command"), false);
   result += F(" (");
   switch (cmd) {
     case kHaierAcCmdOff:
@@ -461,23 +457,12 @@ String IRHaierAC::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += IRutils::acModeToString(getMode(), kHaierAcAuto,
-                                    kHaierAcCool, kHaierAcHeat,
-                                    kHaierAcDry, kHaierAcFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kHaierAcFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kHaierAcFanHigh:
-      result += F(" (MAX)");
-      break;
-  }
-  result += F(", Swing: ");
-  result += uint64ToString(getSwing());
+  result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
+                            kHaierAcDry, kHaierAcFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kHaierAcFanHigh, kHaierAcFanLow,
+                           kHaierAcFanAuto, kHaierAcFanAuto, kHaierAcFanMed);
+  result += addIntToString(getSwing(), F("Swing"));
   result += F(" (");
   switch (getSwing()) {
     case kHaierAcSwingOff:
@@ -496,20 +481,14 @@ String IRHaierAC::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += IRutils::acBoolToString(getHealth(), F("Health"));
-  result += F(", Current Time: ");
-  result += timeToString(getCurrTime());
-  result += F(", On Timer: ");
-  if (getOnTimer() >= 0)
-    result += timeToString(getOnTimer());
-  else
-    result += F("Off");
-  result += F(", Off Timer: ");
-  if (getOffTimer() >= 0)
-    result += timeToString(getOffTimer());
-  else
-    result += F("Off");
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getHealth(), F("Health"));
+  result += addLabeledString(minsToString(getCurrTime()), F("Current Time"));
+  result += addLabeledString(
+      getOnTimer() >= 0 ? minsToString(getOnTimer()) : F("Off"), F("On Timer"));
+  result += addLabeledString(
+      getOffTimer() >= 0 ? minsToString(getOffTimer()) : F("Off"),
+      F("Off Timer"));
   return result;
 }
 // End of IRHaierAC class.
@@ -829,10 +808,9 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) {
 String IRHaierACYRW02::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), F("Power"), false);
   uint8_t cmd = getButton();
-  result += F(", Button: ");
-  result += uint64ToString(cmd);
+  result += addIntToString(cmd, F("Button"));
   result += F(" (");
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
@@ -866,31 +844,14 @@ String IRHaierACYRW02::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += IRutils::acModeToString(getMode(), kHaierAcYrw02Auto,
-                                    kHaierAcYrw02Cool, kHaierAcYrw02Heat,
-                                    kHaierAcYrw02Dry, kHaierAcYrw02Fan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kHaierAcYrw02FanAuto:
-      result += F(" (Auto)");
-      break;
-    case kHaierAcYrw02FanHigh:
-      result += F(" (High)");
-      break;
-    case kHaierAcYrw02FanLow:
-      result += F(" (Low)");
-      break;
-    case kHaierAcYrw02FanMed:
-      result += F(" (Med)");
-      break;
-    default:
-      result += F(" (Unknown)");
-  }
-  result += F(", Turbo: ");
-  result += uint64ToString(getTurbo());
+  result += addModeToString(getMode(), kHaierAcYrw02Auto, kHaierAcYrw02Cool,
+                            kHaierAcYrw02Heat, kHaierAcYrw02Dry,
+                            kHaierAcYrw02Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
+                           kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
+                           kHaierAcYrw02FanMed);
+  result += addIntToString(getTurbo(), F("Turbo"));
   result += F(" (");
   switch (getTurbo()) {
     case kHaierAcYrw02TurboOff:
@@ -906,8 +867,7 @@ String IRHaierACYRW02::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += F(", Swing: ");
-  result += uint64ToString(getSwing());
+  result += addIntToString(getSwing(), F("Swing"));
   result += F(" (");
   switch (getSwing()) {
     case kHaierAcYrw02SwingOff:
@@ -932,8 +892,8 @@ String IRHaierACYRW02::toString(void) {
       result += F("Unknown");
   }
   result += ')';
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
-  result += IRutils::acBoolToString(getHealth(), F("Health"));
+  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getHealth(), F("Health"));
   return result;
 }
 // End of IRHaierACYRW02 class.

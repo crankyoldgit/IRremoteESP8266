@@ -22,7 +22,7 @@ TEST(TestIRFujitsuACClass, GetRawDefault) {
   EXPECT_STATE_EQ(expected_arrah2e, ac.getRaw(), 16 * 8);
   EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Swing: Vert + Horiz, Command: N/A",
+            "Fan: 1 (High), Swing: Vert + Horiz, Command: N/A",
             ac.toString());
 
   uint8_t expected_ardb1[15] = {
@@ -32,7 +32,7 @@ TEST(TestIRFujitsuACClass, GetRawDefault) {
   EXPECT_STATE_EQ(expected_ardb1, ac.getRaw(), 15 * 8);
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Command: N/A",
+            "Fan: 1 (High), Command: N/A",
             ac.toString());
 }
 
@@ -44,7 +44,7 @@ TEST(TestIRFujitsuACClass, GetRawTurnOff) {
   EXPECT_STATE_EQ(expected_arrah2e, ac.getRaw(), 7 * 8);
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: Off, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Swing: Vert + Horiz, Command: N/A",
+            "Fan: 1 (High), Swing: Vert + Horiz, Command: N/A",
             ac.toString());
 
   ac.setModel(ARDB1);
@@ -52,7 +52,7 @@ TEST(TestIRFujitsuACClass, GetRawTurnOff) {
   EXPECT_STATE_EQ(expected_ardb1, ac.getRaw(), 6 * 8);
   EXPECT_EQ(kFujitsuAcStateLengthShort - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: Off, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Command: N/A",
+            "Fan: 1 (High), Command: N/A",
             ac.toString());
 }
 
@@ -64,7 +64,7 @@ TEST(TestIRFujitsuACClass, GetRawStepHoriz) {
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ(
       "Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-      "Fan: 1 (HIGH), Swing: Vert + Horiz, Command: Step vane horizontally",
+      "Fan: 1 (High), Swing: Vert + Horiz, Command: Step vane horizontally",
       ac.toString());
 }
 
@@ -76,7 +76,7 @@ TEST(TestIRFujitsuACClass, GetRawStepVert) {
   EXPECT_STATE_EQ(expected_arrah2e, ac.getRaw(), 7 * 8);
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Swing: Vert + Horiz, Command: Step vane vertically",
+            "Fan: 1 (High), Swing: Vert + Horiz, Command: Step vane vertically",
             ac.toString());
 
   ac.setModel(ARDB1);
@@ -86,7 +86,7 @@ TEST(TestIRFujitsuACClass, GetRawStepVert) {
   EXPECT_EQ(kFujitsuAcStateLengthShort - 1,
             ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Command: Step vane vertically",
+            "Fan: 1 (High), Command: Step vane vertically",
             ac.toString());
 }
 
@@ -101,7 +101,7 @@ TEST(TestIRFujitsuACClass, GetRawWithSwingHoriz) {
                           0x90, 0x1, 0x24, 0x0, 0x0, 0x0, 0x20, 0xFB};
   EXPECT_STATE_EQ(expected, ac.getRaw(), 16 * 8);
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 25C, "
-            "Fan: 4 (QUIET), Swing: Horiz, Command: N/A",
+            "Fan: 4 (Quiet), Swing: Horiz, Command: N/A",
             ac.toString());
 }
 
@@ -120,7 +120,7 @@ TEST(TestIRFujitsuACClass, GetRawWithFan) {
   EXPECT_STATE_EQ(expected_arrah2e, ac.getRaw(), 16 * 8);
   EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 3 (FAN), Temp: 20C, "
-            "Fan: 2 (MED), Swing: Horiz, Command: N/A", ac.toString());
+            "Fan: 2 (Medium), Swing: Horiz, Command: N/A", ac.toString());
 
   ac.setModel(ARDB1);
   uint8_t expected_ardb1[15] = {
@@ -129,7 +129,7 @@ TEST(TestIRFujitsuACClass, GetRawWithFan) {
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_STATE_EQ(expected_ardb1, ac.getRaw(), ac.getStateLength() * 8);
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 3 (FAN), Temp: 20C, "
-            "Fan: 2 (MED), Command: N/A", ac.toString());
+            "Fan: 2 (Medium), Command: N/A", ac.toString());
 }
 
 TEST(TestIRFujitsuACClass, SetRaw) {
@@ -141,7 +141,7 @@ TEST(TestIRFujitsuACClass, SetRaw) {
   EXPECT_STATE_EQ(expected_default_arrah2e, ac.getRaw(),
                   ac.getStateLength() * 8);
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-            "Fan: 1 (HIGH), Swing: Vert + Horiz, Command: N/A",
+            "Fan: 1 (High), Swing: Vert + Horiz, Command: N/A",
             ac.toString());
   // Now set a new state via setRaw();
   // This state is a real state from an AR-DB1 remote.
@@ -152,7 +152,7 @@ TEST(TestIRFujitsuACClass, SetRaw) {
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_STATE_EQ(new_state1, ac.getRaw(), ac.getStateLength() * 8);
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 19C, "
-            "Fan: 0 (AUTO), Command: N/A", ac.toString());
+            "Fan: 0 (Auto), Command: N/A", ac.toString());
 }
 
 TEST(TestSendFujitsuAC, GenerateMessage) {
@@ -348,7 +348,7 @@ TEST(TestDecodeFujitsuAC, SyntheticLongMessages) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 18C, "
-            "Fan: 4 (QUIET), Swing: Vert, Command: N/A", ac.toString());
+            "Fan: 4 (Quiet), Swing: Vert, Command: N/A", ac.toString());
 
   irsend.reset();
 
@@ -365,7 +365,7 @@ TEST(TestDecodeFujitsuAC, SyntheticLongMessages) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 18C, "
-            "Fan: 4 (QUIET), Command: N/A", ac.toString());
+            "Fan: 4 (Quiet), Command: N/A", ac.toString());
 }
 
 TEST(TestDecodeFujitsuAC, RealShortARDB1OffExample) {
@@ -397,7 +397,7 @@ TEST(TestDecodeFujitsuAC, RealShortARDB1OffExample) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLengthShort - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: Off, Mode: 0 (AUTO), Temp: 16C, "
-            "Fan: 0 (AUTO), Command: N/A", ac.toString());
+            "Fan: 0 (Auto), Command: N/A", ac.toString());
 }
 
 TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
@@ -441,7 +441,7 @@ TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 18C, "
-            "Fan: 4 (QUIET), Command: N/A", ac.toString());
+            "Fan: 4 (Quiet), Command: N/A", ac.toString());
 
   irsend.reset();
   uint16_t rawData2[243] = {
@@ -478,7 +478,7 @@ TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLength - 1, ac.getStateLength());
   EXPECT_EQ("Model: 2 (ARDB1), Power: On, Mode: 1 (COOL), Temp: 19C, "
-            "Fan: 0 (AUTO), Command: N/A", ac.toString());
+            "Fan: 0 (Auto), Command: N/A", ac.toString());
 }
 
 TEST(TestDecodeFujitsuAC, Issue414) {
@@ -520,7 +520,7 @@ TEST(TestDecodeFujitsuAC, Issue414) {
   ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 4 (HEAT), Temp: 24C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: N/A", ac.toString());
+            "Fan: 0 (Auto), Swing: Off, Command: N/A", ac.toString());
 
   // Resend it using the state this time.
   irsend.reset();
@@ -595,7 +595,7 @@ TEST(TestIRFujitsuACClass, toCommon) {
   // Now test it.
   EXPECT_EQ(    // Off mode technically has no temp, mode, fan, etc.
       "Model: 1 (ARRAH2E), Power: Off, Mode: 0 (AUTO), Temp: 16C, "
-      "Fan: 0 (AUTO), Swing: Off, Command: N/A", ac.toString());
+      "Fan: 0 (Auto), Swing: Off, Command: N/A", ac.toString());
   ASSERT_EQ(decode_type_t::FUJITSU_AC, ac.toCommon().protocol);
   ASSERT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
   ASSERT_FALSE(ac.toCommon().power);
@@ -649,7 +649,7 @@ TEST(TestDecodeFujitsuAC, Issue716) {
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARREB1E, ac.getModel());
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 3 (ARREB1E), Power: On, Mode: 0 (AUTO), Temp: 16C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: Powerful, Outside Quiet: Off",
+            "Fan: 0 (Auto), Swing: Off, Command: Powerful, Outside Quiet: Off",
             ac.toString());
 
   // Economy (just from the state)
@@ -663,7 +663,7 @@ TEST(TestDecodeFujitsuAC, Issue716) {
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARREB1E, ac.getModel());
   EXPECT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
   EXPECT_EQ("Model: 3 (ARREB1E), Power: On, Mode: 0 (AUTO), Temp: 16C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: Economy, Outside Quiet: Off",
+            "Fan: 0 (Auto), Swing: Off, Command: Economy, Outside Quiet: Off",
             ac.toString());
 }
 
@@ -694,11 +694,11 @@ TEST(TestIRFujitsuACClass, OutsideQuiet) {
   // the option is set. Otheriwse they appear the same.
   EXPECT_EQ(
       "Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-      "Fan: 0 (AUTO), Swing: Off, Command: N/A", ac.toString());
+      "Fan: 0 (Auto), Swing: Off, Command: N/A", ac.toString());
   ac.setModel(fujitsu_ac_remote_model_t::ARREB1E);
   EXPECT_EQ(
       "Model: 3 (ARREB1E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-      "Fan: 0 (AUTO), Swing: Off, Command: N/A, Outside Quiet: Off",
+      "Fan: 0 (Auto), Swing: Off, Command: N/A, Outside Quiet: Off",
       ac.toString());
 
   // Make sure we can't accidentally inherit the correct model.
@@ -709,7 +709,7 @@ TEST(TestIRFujitsuACClass, OutsideQuiet) {
   EXPECT_TRUE(ac.getOutsideQuiet());
   EXPECT_EQ(
       "Model: 3 (ARREB1E), Power: On, Mode: 1 (COOL), Temp: 24C, "
-      "Fan: 0 (AUTO), Swing: Off, Command: N/A, Outside Quiet: On",
+      "Fan: 0 (Auto), Swing: Off, Command: N/A, Outside Quiet: On",
       ac.toString());
 
   ac.setOutsideQuiet(false);
@@ -756,7 +756,7 @@ TEST(TestIRFujitsuACClass, toggleSwing) {
   EXPECT_EQ(kFujitsuAcSwingBoth, ac.getSwing());
 
   EXPECT_EQ(
-      "Model: 4 (ARJW2), Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 1 (HIGH), "
+      "Model: 4 (ARJW2), Power: On, Mode: 1 (COOL), Temp: 24C, Fan: 1 (High), "
       "Command: Toggle horizontal swing",
       ac.toString());
 
@@ -793,6 +793,6 @@ TEST(TestDecodeFujitsuAC, Issue726) {
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.getModel());
   EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
   EXPECT_EQ("Model: 1 (ARRAH2E), Power: On, Mode: 0 (AUTO), Temp: 24C, "
-            "Fan: 0 (AUTO), Swing: Off, Command: N/A",
+            "Fan: 0 (Auto), Swing: Off, Command: N/A",
             ac.toString());
 }

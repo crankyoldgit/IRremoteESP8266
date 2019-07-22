@@ -18,6 +18,13 @@ const uint16_t kTrotecZeroSpace = 592;
 const uint16_t kTrotecGap = 6184;
 const uint16_t kTrotecGapEnd = 1500;  // made up value
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+
 #if SEND_TROTEC
 
 void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
@@ -229,26 +236,13 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 String IRTrotecESP::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kTrotecAuto,
-                                    kTrotecCool, kTrotecAuto,
-                                    kTrotecDry, kTrotecFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan Speed: ");
-  result += uint64ToString(this->getSpeed());
-  switch (this->getSpeed()) {
-    case kTrotecFanLow:
-      result += F(" (Low)");
-      break;
-    case kTrotecFanMed:
-      result += F(" (Med)");
-      break;
-    case kTrotecFanHigh:
-      result += F(" (High)");
-      break;
-  }
-  result += IRutils::acBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kTrotecAuto, kTrotecCool, kTrotecAuto,
+                            kTrotecDry, kTrotecFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getSpeed(), kTrotecFanHigh, kTrotecFanLow,
+                           kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
+  result += addBoolToString(getSleep(), F("Sleep"));
   return result;
 }
 

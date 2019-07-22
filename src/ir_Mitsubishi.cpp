@@ -59,6 +59,14 @@ const uint16_t kMitsubishiAcZeroSpace = 420;
 const uint16_t kMitsubishiAcRptMark = 440;
 const uint16_t kMitsubishiAcRptSpace = 17100;
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
 #if SEND_MITSUBISHI
 // Send a Mitsubishi message
 //
@@ -691,42 +699,20 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
   return result;
 }
 
-String IRMitsubishiAC::timeToString(const uint64_t time) {
-  String result = "";
-  result.reserve(6);
-  if (time / 6 < 10) result += '0';
-  result += uint64ToString(time / 6);
-  result += ':';
-  if (time * 10 % 60 < 10) result += '0';
-  result += uint64ToString(time * 10 % 60);
-  return result;
-}
-
 // Convert the internal state into a human readable string.
 String IRMitsubishiAC::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kMitsubishiAcAuto,
-                                    kMitsubishiAcCool, kMitsubishiAcHeat,
-                                    kMitsubishiAcDry, kMitsubishiAcAuto);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, FAN: ");
-  switch (this->getFan()) {
-    case MITSUBISHI_AC_FAN_AUTO:
-      result += F("AUTO");
-      break;
-    case MITSUBISHI_AC_FAN_MAX:
-      result += F("MAX");
-      break;
-    case MITSUBISHI_AC_FAN_SILENT:
-      result += F("SILENT");
-      break;
-    default:
-      result += uint64ToString(this->getFan());
-  }
-  result += F(", VANE: ");
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kMitsubishiAcAuto, kMitsubishiAcCool,
+                            kMitsubishiAcHeat, kMitsubishiAcDry,
+                            kMitsubishiAcAuto);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
+                           kMitsubishiAcFanRealMax - 3,
+                           kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
+                           kMitsubishiAcFanRealMax - 2);
+  result += F(", Vane: ");
   switch (this->getVane()) {
     case MITSUBISHI_AC_VANE_AUTO:
       result += F("AUTO");
@@ -737,12 +723,9 @@ String IRMitsubishiAC::toString(void) {
     default:
       result += uint64ToString(this->getVane());
   }
-  result += F(", Time: ");
-  result += this->timeToString(this->getClock());
-  result += F(", On timer: ");
-  result += this->timeToString(this->getStartClock());
-  result += F(", Off timer: ");
-  result += this->timeToString(this->getStopClock());
+  result += addLabeledString(minsToString(getClock() * 10), F("Time"));
+  result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));
+  result += addLabeledString(minsToString(getStopClock() * 10), F("Off timer"));
   result += F(", Timer: ");
   switch (this->getTimer()) {
     case kMitsubishiAcNoTimer:

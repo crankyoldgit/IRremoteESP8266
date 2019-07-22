@@ -28,6 +28,14 @@ Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 //   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 
+using irutils::addBoolToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::addFanToString;
+using irutils::minsToString;
+
 #if SEND_DAIKIN
 // Send a Daikin A/C message.
 //
@@ -498,52 +506,25 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
   return result;
 }
 
-String IRDaikinESP::renderTime(const uint16_t timemins) {
-  String ret;
-  ret = uint64ToString(timemins / 60) + ':';
-  uint8_t mins = timemins % 60;
-  if (mins < 10) ret += '0';
-  ret += uint64ToString(mins);
-  return ret;
-}
-
 // Convert the internal state into a human readable string.
 String IRDaikinESP::toString(void) {
   String result = "";
   result.reserve(230);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kDaikinAuto,
-                                    kDaikinCool, kDaikinHeat,
-                                    kDaikinDry, kDaikinFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getSensor(), F("Sensor"));
-  result += IRutils::acBoolToString(getMold(), F("Mold"));
-  result += IRutils::acBoolToString(getComfort(), F("Comfort"));
-  result += IRutils::acBoolToString(getSwingHorizontal(),
-                                    F("Swing (Horizontal)"));
-  result += IRutils::acBoolToString(getSwingVertical(),
-                                    F("Swing (Vertical)"));
-  result += F(", Current Time: ");
-  result += this->renderTime(this->getCurrentTime());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getSensor(), F("Sensor"));
+  result += addBoolToString(getMold(), F("Mold"));
+  result += addBoolToString(getComfort(), F("Comfort"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
+  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addLabeledString(minsToString(this->getCurrentTime()),
+                             F("Current Time"));
   result += F(", Current Day: ");
   switch (this->getCurrentDay()) {
   case 1:
@@ -563,18 +544,13 @@ String IRDaikinESP::toString(void) {
   default:
     result +=F("(UNKNOWN)"); break;
   }
-  result += F(", On Time: ");
-  if (this->getOnTimerEnabled())
-    result += this->renderTime(this->getOnTime());
-  else
-    result += F("Off");
-  result += F(", Off Time: ");
-  if (this->getOffTimerEnabled())
-    result += this->renderTime(this->getOffTime());
-  else
-    result += F("Off");
-  result += F(", Weekly Timer: ");
-  result += this->getWeeklyTimerEnable() ? F("On") : F("Off");
+  result += addLabeledString(getOnTimerEnabled()
+                             ? minsToString(this->getOnTime()) : F("Off"),
+                             F("On Time"));
+  result += addLabeledString(getOffTimerEnabled()
+                            ? minsToString(this->getOffTime()) : F("Off"),
+                            F("Off Time"));
+  result += addBoolToString(getWeeklyTimerEnable(), F("Weekly Timer"));
   return result;
 }
 
@@ -1173,30 +1149,13 @@ stdAc::state_t IRDaikin2::toCommon(void) {
 String IRDaikin2::toString() {
   String result = "";
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kDaikinAuto,
-                                    kDaikinCool, kDaikinHeat,
-                                    kDaikinDry, kDaikinFan);
-  result += F(", Temp: ");
-  result += uint64ToString(getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (Quiet)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (Min)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (Max)");
-      break;
-  }
-  result += F(", Swing (V): ");
-  result += uint64ToString(getSwingVertical());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addIntToString(getSwingVertical(), F("Swing (V)"));
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
       result += F(" (Highest)");
@@ -1221,8 +1180,7 @@ String IRDaikin2::toString() {
     default:
       result += F(" (Unknown)");
   }
-  result += F(", Swing (H): ");
-  result += uint64ToString(getSwingHorizontal());
+  result += addIntToString(getSwingHorizontal(), F("Swing (H)"));
   switch (getSwingHorizontal()) {
     case kDaikin2SwingHAuto:
       result += F(" (Auto)");
@@ -1231,25 +1189,16 @@ String IRDaikin2::toString() {
       result += F(" (Swing)");
       break;
   }
-  result += F(", Clock: ");
-  result += IRDaikinESP::renderTime(getCurrentTime());
-  result += F(", On Time: ");
-  if (getOnTimerEnabled())
-    result += IRDaikinESP::renderTime(getOnTime());
-  else
-    result += F("Off");
-  result += F(", Off Time: ");
-  if (getOffTimerEnabled())
-    result += IRDaikinESP::renderTime(getOffTime());
-  else
-    result += F("Off");
-  result += F(", Sleep Time: ");
-  if (getSleepTimerEnabled())
-    result += IRDaikinESP::renderTime(getSleepTime());
-  else
-    result += F("Off");
-  result += F(", Beep: ");
-  result += uint64ToString(getBeep());
+  result += addLabeledString(minsToString(getCurrentTime()), F("Clock"));
+  result += addLabeledString(
+      getOnTimerEnabled() ? minsToString(getOnTime()) : F("Off"), F("On Time"));
+  result += addLabeledString(
+      getOffTimerEnabled() ? minsToString(getOffTime()) : F("Off"),
+      F("Off Time"));
+  result += addLabeledString(
+      getSleepTimerEnabled() ? minsToString(getSleepTime()) : F("Off"),
+      F("Sleep Time"));
+  result += addIntToString(getBeep(), F("Beep"));
   switch (getBeep()) {
     case kDaikinBeepLoud:
       result += F(" (Loud)");
@@ -1263,8 +1212,7 @@ String IRDaikin2::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += F(", Light: ");
-  result += uint64ToString(getLight());
+  result += addIntToString(getLight(), F("Light"));
   switch (getLight()) {
     case kDaikinLightBright:
       result += F(" (Bright)");
@@ -1278,19 +1226,17 @@ String IRDaikin2::toString() {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += IRutils::acBoolToString(getMold(), F("Mold"));
-  result += IRutils::acBoolToString(getClean(), F("Clean"));
-  result += F(", Fresh Air: ");
-  if (getFreshAir())
-    result += (getFreshAirHigh() ? "High" : "On");
-  else
-    result += F("Off");
-  result += IRutils::acBoolToString(getEye(), F("Eye"));
-  result += IRutils::acBoolToString(getEyeAuto(), F("Eye Auto"));
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
-  result += IRutils::acBoolToString(getPurify(), F("Purify"));
-  result += IRutils::acBoolToString(getEcono(), F("Econo"));
+  result += addBoolToString(getMold(), F("Mold"));
+  result += addBoolToString(getClean(), F("Clean"));
+  result += addLabeledString(
+      getFreshAir() ? (getFreshAirHigh() ? F("High") : F("On")) : F("Off"),
+      F("Fresh Air"));
+  result += addBoolToString(getEye(), F("Eye"));
+  result += addBoolToString(getEyeAuto(), F("Eye Auto"));
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += addBoolToString(getPurify(), F("Purify"));
+  result += addBoolToString(getEcono(), F("Econo"));
   return result;
 }
 
@@ -1639,33 +1585,16 @@ stdAc::state_t IRDaikin216::toCommon(void) {
 String IRDaikin216::toString() {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kDaikinAuto,
-                                    kDaikinCool, kDaikinHeat,
-                                    kDaikinDry, kDaikinFan);
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
-  result += IRutils::acBoolToString(getSwingHorizontal(),
-                                    F("Swing (Horizontal)"));
-  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (Vertical)"));
-  result += IRutils::acBoolToString(getQuiet(), F("Quiet"));
-  result += IRutils::acBoolToString(getPowerful(), F("Powerful"));
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
+  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += addBoolToString(getPowerful(), F("Powerful"));
   return result;
 }
 
@@ -2010,52 +1939,13 @@ stdAc::state_t IRDaikin160::toCommon(void) {
 String IRDaikin160::toString() {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (this->getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (getMode()) {
-    case kDaikinAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinCool:
-      result += F(" (COOL)");
-      break;
-    case kDaikinHeat:
-      result += F(" (HEAT)");
-      break;
-    case kDaikinDry:
-      result += F(" (DRY)");
-      break;
-    case kDaikinFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax:
-      result += F(" (MAX)");
-      break;
-  }
-  result += F(", Vent Position (V): ");
-  result += uint64ToString(getSwingVertical());
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addIntToString(getSwingVertical(), F("Vent Position (V)"));
   switch (getSwingVertical()) {
     case kDaikin160SwingVHighest: result += F(" (Highest)"); break;
     case kDaikin160SwingVHigh:    result += F(" (High)"); break;
@@ -2129,6 +2019,7 @@ bool IRrecv::decodeDaikin160(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN160
+
 #if SEND_DAIKIN176
 // Send a Daikin 176 bit A/C message.
 //
@@ -2542,3 +2433,113 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN176
+
+#if SEND_DAIKIN128
+// Send a Daikin 128 bit A/C message.
+//
+// Args:
+//   data: An array of kDaikin128StateLength bytes containing the IR command.
+//
+// Status: Alpha/Untested on a real device.
+//
+// Supported devices:
+// - Daikin BRC52B63 remote.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  if (nbytes < kDaikin128SectionLength)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    enableIROut(kDaikin128Freq);
+    // Leader
+    for (uint8_t i = 0; i < 2; i++) {
+      mark(kDaikin128LeaderMark);
+      space(kDaikin128LeaderSpace);
+    }
+    // Section #1 (Header + Data)
+    sendGeneric(kDaikin128HdrMark, kDaikin128HdrSpace, kDaikin128BitMark,
+                kDaikin128OneSpace, kDaikin128BitMark, kDaikin128ZeroSpace,
+                kDaikin128BitMark, kDaikin128Gap, data,
+                kDaikin128SectionLength,
+                kDaikin128Freq, false, 0, kDutyDefault);
+    // Section #2 (Data + Footer)
+    sendGeneric(0, 0, kDaikin128BitMark,
+                kDaikin128OneSpace, kDaikin128BitMark, kDaikin128ZeroSpace,
+                kDaikin128FooterMark, kDaikin128Gap,
+                data + kDaikin128SectionLength,
+                nbytes - kDaikin128SectionLength,
+                kDaikin128Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN128
+
+#if DECODE_DAIKIN128
+// Decode the supplied Daikin 128 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin128Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin BRC52B63 remote.
+//
+// Status: BETA / Probably works.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader) + kFooter - 1)
+    return false;
+  if (nbits / 8 <= kDaikin128SectionLength) return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin128Bits) return false;
+
+  uint16_t offset = kStartOffset;
+
+  // Leader
+  for (uint8_t i = 0; i < 2; i++) {
+    if (!matchMark(results->rawbuf[offset++], kDaikin128LeaderMark,
+                   kDaikinTolerance, kDaikinMarkExcess)) return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin128LeaderSpace,
+                    kDaikinTolerance, kDaikinMarkExcess)) return false;
+  }
+  DPRINTLN("DEBUG: Past the leader.");
+  const uint16_t ksectionSize[kDaikin128Sections] = {
+      kDaikin128SectionLength, (uint16_t)(nbits / 8 - kDaikin128SectionLength)};
+  // Data Sections
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin128Sections; section++) {
+    uint16_t used;
+    // Section Header (first section only) + Section Data (8 bytes) +
+    //     Section Footer (Not for first section)
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        section == 0 ? kDaikin128HdrMark : 0,
+                        section == 0 ? kDaikin128HdrSpace : 0,
+                        kDaikin128BitMark, kDaikin128OneSpace,
+                        kDaikin128BitMark, kDaikin128ZeroSpace,
+                        section > 0 ? kDaikin128FooterMark : kDaikin128BitMark,
+                        kDaikin128Gap,
+                        section > 0,
+                        kDaikinTolerance, kDaikinMarkExcess, false);
+    DPRINTLN("DEBUG: Past matchGeneric.");
+    if (used == 0) return false;
+    offset += used;
+    pos += ksectionSize[section];
+  }
+  // Compliance
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN128;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN128

@@ -404,19 +404,19 @@ TEST(TestStrToDecodeType, strToDecodeType) {
 }
 
 TEST(TestUtils, htmlEscape) {
-  EXPECT_EQ("", IRutils::htmlEscape(""));
-  EXPECT_EQ("No Changes", IRutils::htmlEscape("No Changes"));
+  EXPECT_EQ("", irutils::htmlEscape(""));
+  EXPECT_EQ("No Changes", irutils::htmlEscape("No Changes"));
   EXPECT_EQ("No\tChanges+_%^$@~`\n:\\",
-            IRutils::htmlEscape("No\tChanges+_%^$@~`\n:\\"));
+            irutils::htmlEscape("No\tChanges+_%^$@~`\n:\\"));
   EXPECT_EQ("&quot;With Changes&quot;",
-            IRutils::htmlEscape("\"With Changes\""));
+            irutils::htmlEscape("\"With Changes\""));
   EXPECT_EQ(
       "&apos;&semi;&excl;&dash;&quot;&lt;&gt;&#equals;&amp;&num;&lcub;&rcub;"
-      "&lpar;&rpar;", IRutils::htmlEscape("';!-\"<>=&#{}()"));
-  EXPECT_EQ("&quot;&quot;", IRutils::htmlEscape("\"\""));
+      "&lpar;&rpar;", irutils::htmlEscape("';!-\"<>=&#{}()"));
+  EXPECT_EQ("&quot;&quot;", irutils::htmlEscape("\"\""));
   EXPECT_EQ(
       "&amp;quot&semi;&amp;lt&semi;&amp;apos&semi;&amp;gt&semi;&amp;amp&semi;",
-      IRutils::htmlEscape("&quot;&lt;&apos;&gt;&amp;"));
+      irutils::htmlEscape("&quot;&lt;&apos;&gt;&amp;"));
 }
 
 TEST(TestUtils, TemperatureConversion) {
@@ -502,4 +502,17 @@ TEST(TestUtils, TypeStringConversionRangeTests) {
         "Protocol " << typeToString((decode_type_t)i) <<
         " doesn't decode from a string correctly";
   }
+}
+
+TEST(TestUtils, MinsToString) {
+  EXPECT_EQ("00:00", irutils::minsToString(0));
+  EXPECT_EQ("00:01", irutils::minsToString(1));
+  EXPECT_EQ("00:10", irutils::minsToString(10));
+  EXPECT_EQ("00:59", irutils::minsToString(59));
+
+  EXPECT_EQ("01:00", irutils::minsToString(60));
+  EXPECT_EQ("01:01", irutils::minsToString(61));
+  EXPECT_EQ("01:59", irutils::minsToString(60 + 59));
+  EXPECT_EQ("18:59", irutils::minsToString(18 * 60 + 59));
+  EXPECT_EQ("23:59", irutils::minsToString(23 * 60 + 59));
 }

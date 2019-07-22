@@ -38,12 +38,23 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 decode_type_t strToDecodeType(const char *str);
 float celsiusToFahrenheit(const float deg);
 float fahrenheitToCelsius(const float deg);
-namespace IRutils {
-  String acBoolToString(const bool value, const String text,
+namespace irutils {
+  String addBoolToString(const bool value, const String label,
+                         const bool precomma = true);
+  String addIntToString(const uint16_t value, const String label,
                         const bool precomma = true);
-  String acModeToString(const uint8_t mode, const uint8_t automatic,
-                        const uint8_t cool, const uint8_t heat,
-                        const uint8_t dry, const uint8_t fan);
+  String addLabeledString(const String value, const String label,
+                          const bool precomma = true);
+  String addTempToString(const uint16_t degrees, const bool celsius = true,
+                         const bool precomma = true);
+  String addModeToString(const uint8_t mode, const uint8_t automatic,
+                         const uint8_t cool, const uint8_t heat,
+                         const uint8_t dry, const uint8_t fan);
+  String addFanToString(const uint8_t speed, const uint8_t high,
+                        const uint8_t low, const uint8_t automatic,
+                        const uint8_t quiet, const uint8_t medium);
   String htmlEscape(const String unescaped);
-}  // namespace IRutils
+  String msToString(uint32_t const msecs);
+  String minsToString(const uint16_t mins);
+}  // namespace irutils
 #endif  // IRUTILS_H_

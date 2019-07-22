@@ -345,6 +345,8 @@
 #include <memory>
 #include <string>
 
+using irutils::msToString;
+
 // Globals
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
@@ -587,52 +589,29 @@ bool loadConfigFile(void) {
   return success;
 }
 
-String msToHumanString(uint32_t const msecs) {
-  uint32_t totalseconds = msecs / 1000;
-  if (totalseconds == 0) return "Now";
-
-  // Note: millis() can only count up to 45 days, so uint8_t is safe.
-  uint8_t days = totalseconds / (60 * 60 * 24);
-  uint8_t hours = (totalseconds / (60 * 60)) % 24;
-  uint8_t minutes = (totalseconds / 60) % 60;
-  uint8_t seconds = totalseconds % 60;
-
-  String result = "";
-  if (days) result += String(days) + " day";
-  if (days > 1) result += 's';
-  if (hours) result += ' ' + String(hours) + " hour";
-  if (hours > 1) result += 's';
-  if (minutes) result += ' ' + String(minutes) + " minute";
-  if (minutes > 1) result += 's';
-  if (seconds) result += ' ' + String(seconds) + " second";
-  if (seconds > 1) result += 's';
-  result.trim();
-  return result;
-}
-
 String timeElapsed(uint32_t const msec) {
-  String result = msToHumanString(msec);
+  String result = msToString(msec);
   if (result.equalsIgnoreCase("Now"))
     return result;
   else
-    return result + " ago";
+    return result + F(" ago");
 }
 
 String timeSince(uint32_t const start) {
   if (start == 0)
-    return "Never";
+    return F("Never");
   uint32_t diff = 0;
   uint32_t now = millis();
   if (start < now)
     diff = now - start;
   else
     diff = UINT32_MAX - start + now;
-  return msToHumanString(diff) + " ago";
+  return msToString(diff) + F(" ago");
 }
 
 String gpioToString(const int16_t gpio) {
   if (gpio == kGpioUnused)
-    return "Unused";
+    return F("Unused");
   else
     return String(gpio);
 }
@@ -756,6 +735,7 @@ void handleRoot(void) {
       "<select name='type'>"
         "<option value='27'>Argo</option>"
         "<option value='16'>Daikin (35 bytes)</option>"
+        "<option value='68'>Daikin128 (16 bytes)</option>"
         "<option value='65'>Daikin160 (20 bytes)</option>"
         "<option value='67'>Daikin176 (22 bytes)</option>"
         "<option value='53'>Daikin2 (39 bytes)</option>"
@@ -921,17 +901,19 @@ void handleExamples(void) {
 }
 #endif  // EXAMPLES_ENABLE
 
+String htmlOptionItem(const String value, const String text, bool selected) {
+  String html = F("<option value='");
+  html += value + '\'';
+  if (selected) html += F(" selected='selected'");
+  html += '>' + text + F("</option>");
+  return html;
+}
+
 String htmlSelectBool(const String name, const bool def) {
   String html = "<select name='" + name + "'>";
-  for (uint16_t i = 0; i < 2; i++) {
-    html += F("<option value='");
-    html += IRac::boolToString(i);
-    html += '\'';
-    if (i == def) html += F(" selected='selected'");
-    html += '>';
-    html += IRac::boolToString(i);
-    html += F("</option>");
-  }
+  for (uint16_t i = 0; i < 2; i++)
+    html += htmlOptionItem(IRac::boolToString(i), IRac::boolToString(i),
+                           i == def);
   html += F("</select>");
   return html;
 }
@@ -940,13 +922,8 @@ String htmlSelectProtocol(const String name, const decode_type_t def) {
   String html = "<select name='" + name + "'>";
   for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
     if (IRac::isProtocolSupported((decode_type_t)i)) {
-      html += F("<option value='");
-      html += String(i);
-      html += '\'';
-      if (i == def) html += F(" selected='selected'");
-      html += '>';
-      html += typeToString((decode_type_t)i);
-      html += F("</option>");
+      html += htmlOptionItem(String(i), typeToString((decode_type_t)i),
+                             i == def);
     }
   }
   html += F("</select>");
@@ -957,18 +934,14 @@ String htmlSelectModel(const String name, const int16_t def) {
   String html = "<select name='" + name + "'>";
   for (int16_t i = -1; i <= 6; i++) {
     String num = String(i);
-    html += F("<option value='");
-    html += num;
-    html += '\'';
-    if (i == def) html += F(" selected='selected'");
-    html += '>';
+    String text;
     if (i == -1)
-      html += F("Default");
+      text = F("Default");
     else if (i == 0)
-      html += F("Unknown");
+      text = F("Unknown");
     else
-      html += num;
-    html += F("</option>");
+      text = num;
+    html += htmlOptionItem(num, text, i == def);
   }
   html += F("</select>");
   return html;
@@ -979,15 +952,8 @@ String htmlSelectGpio(const String name, const int16_t def,
   String html = ": <select name='" + name + "'>";
   for (int16_t i = 0; i < length; i++) {
     String num = String(list[i]);
-    html += F("<option value='");
-    html += num;
-    html += '\'';
-    if (list[i] == def) html += F(" selected='selected'");
-    html += '>';
-    if (list[i] == kGpioUnused)
-      html += F("Unused");
-    else
-      html += num;
+    html += htmlOptionItem(num, list[i] == kGpioUnused ? F("Unused") : num,
+                           list[i] == def);
     html += F("</option>");
   }
   html += F("</select>");
@@ -998,13 +964,7 @@ String htmlSelectMode(const String name, const stdAc::opmode_t def) {
   String html = "<select name='" + name + "'>";
   for (int8_t i = -1; i <= 4; i++) {
     String mode = IRac::opmodeToString((stdAc::opmode_t)i);
-    html += F("<option value='");
-    html += mode;
-    html += '\'';
-    if ((stdAc::opmode_t)i == def) html += F(" selected='selected'");
-    html += '>';
-    html += mode;
-    html += F("</option>");
+    html += htmlOptionItem(mode, mode, (stdAc::opmode_t)i == def);
   }
   html += F("</select>");
   return html;
@@ -1014,13 +974,7 @@ String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
   String html = "<select name='" + name + "'>";
   for (int8_t i = 0; i <= 5; i++) {
     String speed = IRac::fanspeedToString((stdAc::fanspeed_t)i);
-    html += F("<option value='");
-    html += speed;
-    html += '\'';
-    if ((stdAc::fanspeed_t)i == def) html += F(" selected='selected'");
-    html += '>';
-    html += speed;
-    html += F("</option>");
+    html += htmlOptionItem(speed, speed, (stdAc::fanspeed_t)i == def);
   }
   html += F("</select>");
   return html;
@@ -1030,13 +984,7 @@ String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
   String html = "<select name='" + name + "'>";
   for (int8_t i = -1; i <= 5; i++) {
     String swing = IRac::swingvToString((stdAc::swingv_t)i);
-    html += F("<option value='");
-    html += swing;
-    html += '\'';
-    if ((stdAc::swingv_t)i == def) html += F(" selected='selected'");
-    html += '>';
-    html += swing;
-    html += F("</option>");
+    html += htmlOptionItem(swing, swing, (stdAc::swingv_t)i == def);
   }
   html += F("</select>");
   return html;
@@ -1046,13 +994,7 @@ String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
   String html = "<select name='" + name + "'>";
   for (int8_t i = -1; i <= 5; i++) {
     String swing = IRac::swinghToString((stdAc::swingh_t)i);
-    html += F("<option value='");
-    html += swing;
-    html += '\'';
-    if ((stdAc::swingh_t)i == def) html += F(" selected='selected'");
-    html += '>';
-    html += swing;
-    html += F("</option>");
+    html += htmlOptionItem(swing, swing, (stdAc::swingh_t)i == def);
   }
   html += F("</select>");
   return html;
@@ -1250,8 +1192,8 @@ void handleInfo(void) {
 #endif  // ESP32
     "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
-    + IRutils::acBoolToString(kInvertTxOutput,
-                              "Inverting GPIO output", false) + "<br>"
+    + irutils::addBoolToString(kInvertTxOutput,
+                               "Inverting GPIO output", false) + "<br>"
     "Total send requests: " + String(sendReqCounter) + "<br>"
     "Last message sent: " + String(lastSendSucceeded ? "Ok" : "FAILED") +
     " <i>(" + timeSince(lastSendTime) + ")</i><br>"
@@ -1301,8 +1243,8 @@ void handleInfo(void) {
     // lastMqttCmd* is unescaped untrusted input.
     // Avoid any possible HTML/XSS when displaying it.
     "Last MQTT command seen: (topic) '" +
-        IRutils::htmlEscape(lastMqttCmdTopic) +
-         "' (payload) '" + IRutils::htmlEscape(lastMqttCmd) + "' <i>(" +
+        irutils::htmlEscape(lastMqttCmdTopic) +
+         "' (payload) '" + irutils::htmlEscape(lastMqttCmd) + "' <i>(" +
          timeSince(lastMqttCmdTime) + ")</i><br>"
     "Total published: " + String(mqttSentCounter) + "<br>"
     "Total received: " + String(mqttRecvCounter) + "<br>"
@@ -1318,8 +1260,8 @@ void handleInfo(void) {
          " <i>(" + timeElapsed(lastClimateIr.elapsed()) + ")</i>") :
         "<i>Never</i>") + "<br>"
 #if MQTT_ENABLE
-    "State listen period: " + msToHumanString(kStatListenPeriodMs) + "<br>"
-    "State broadcast period: " + msToHumanString(kBroadcastPeriodMs) + "<br>"
+    "State listen period: " + msToString(kStatListenPeriodMs) + "<br>"
+    "State broadcast period: " + msToString(kBroadcastPeriodMs) + "<br>"
     "Last state broadcast: " + (hasBroadcastBeenSent ?
         timeElapsed(lastBroadcast.elapsed()) :
         String("<i>Never</i>")) + "<br>"
@@ -2980,7 +2922,7 @@ bool decodeCommonAc(const decode_results *decode) {
   }
   stdAc::state_t state = climate;
   debug("Converting inbound IR A/C message to common A/C");
-  if (!IRAcUtils::decodeToState(decode, &state)) {
+  if (!IRAcUtils::decodeToState(decode, &state, &climate)) {
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
   }

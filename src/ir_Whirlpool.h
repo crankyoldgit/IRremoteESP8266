@@ -160,7 +160,6 @@ class IRWhirlpoolAc {
   void _setTemp(const uint8_t temp, const bool remember = true);
   void _setMode(const uint8_t mode);
   int8_t getTempOffset(void);
-  String timeToString(uint16_t minspastmidnight);
 };
 
 #endif  // IR_WHIRLPOOL_H_

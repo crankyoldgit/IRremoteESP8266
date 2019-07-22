@@ -445,7 +445,7 @@ TEST(TestMideaACClass, HumanReadableOutput) {
 
   midea.setRaw(0xA1826FFFFF62);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (AUTO), Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Power: On, Mode: 2 (AUTO), Temp: 25C/77F, Fan: 0 (Auto), "
       "Sleep: Off",
       midea.toString());
   midea.off();
@@ -453,12 +453,14 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   midea.setFan(kMideaACFanHigh);
   midea.setMode(kMideaACDry);
   midea.setSleep(true);
-  EXPECT_EQ("Power: Off, Mode: 1 (DRY), Temp: 16C/62F, Fan: 3 (HI), Sleep: On",
-            midea.toString());
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (DRY), Temp: 16C/62F, Fan: 3 (High), Sleep: On",
+      midea.toString());
 
   midea.setRaw(0xA19867FFFF7E);
-  EXPECT_EQ("Power: On, Mode: 0 (COOL), Temp: 20C/69F, Fan: 3 (HI), Sleep: Off",
-            midea.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (COOL), Temp: 20C/69F, Fan: 3 (High), Sleep: Off",
+      midea.toString());
 }
 
 // Tests for decodeMidea().

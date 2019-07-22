@@ -10,6 +10,12 @@
 
 // Constants
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addTempToString;
 
 #if SEND_TCL112AC
 void IRsend::sendTcl112Ac(const unsigned char data[], const uint16_t nbytes,
@@ -345,36 +351,22 @@ stdAc::state_t IRTcl112Ac::toCommon(void) {
 String IRTcl112Ac::toString(void) {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += IRutils::acBoolToString(getPower(), F("Power"), false);
-  result += IRutils::acModeToString(getMode(), kTcl112AcAuto,
-                                    kTcl112AcCool, kTcl112AcHeat,
-                                    kTcl112AcDry, kTcl112AcFan);
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kTcl112AcAuto, kTcl112AcCool,
+                            kTcl112AcHeat, kTcl112AcDry, kTcl112AcFan);
   uint16_t nrHalfDegrees = this->getTemp() * 2;
   result += F(", Temp: ");
   result += uint64ToString(nrHalfDegrees / 2);
   if (nrHalfDegrees & 1) result += F(".5");
-  result += F("C, Fan: ");
-  result += uint64ToString(getFan());
-  switch (getFan()) {
-    case kTcl112AcFanAuto:
-      result += F(" (Auto)");
-      break;
-    case kTcl112AcFanLow:
-      result += F(" (Low)");
-      break;
-    case kTcl112AcFanMed:
-      result += F(" (Med)");
-      break;
-    case kTcl112AcFanHigh:
-      result += F(" (High)");
-      break;
-  }
-  result += IRutils::acBoolToString(getEcono(), F("Econo"));
-  result += IRutils::acBoolToString(getHealth(), F("Health"));
-  result += IRutils::acBoolToString(getLight(), F("Light"));
-  result += IRutils::acBoolToString(getTurbo(), F("Turbo"));
-  result += IRutils::acBoolToString(getSwingHorizontal(), F("Swing (H)"));
-  result += IRutils::acBoolToString(getSwingVertical(), F("Swing (V)"));
+  result += 'C';
+  result += addFanToString(getFan(), kTcl112AcFanHigh, kTcl112AcFanLow,
+                           kTcl112AcFanAuto, kTcl112AcFanAuto, kTcl112AcFanMed);
+  result += addBoolToString(getEcono(), F("Econo"));
+  result += addBoolToString(getHealth(), F("Health"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addBoolToString(getTurbo(), F("Turbo"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing (H)"));
+  result += addBoolToString(getSwingVertical(), F("Swing (V)"));
   return result;
 }
 
