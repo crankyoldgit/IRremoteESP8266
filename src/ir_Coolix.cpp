@@ -87,6 +87,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
     mark(kCoolixBitMark);
     space(kCoolixMinGap);  // Pause before repeating
   }
+  space(kDefaultMessageGap);
 }
 #endif
 

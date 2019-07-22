@@ -107,7 +107,7 @@ TEST(TestIRac, Coolix) {
       "m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s560m560s560"
       "m560s1680m560s560m560s560m560s1680m560s560m560s560m560s1680m560s1680"
       // Footer
-      "m560s5040",
+      "m560s105040",
       // End of message #2 (i.e. Repeat '1')
       // Note: the two messages (#1 & #2) are identical.
       ac._irsend.outputStr());
@@ -1188,4 +1188,94 @@ TEST(TestIRac, CoolixDecodeToState) {
   ASSERT_TRUE(result.celsius);
   ASSERT_EQ(20, result.degrees);
   ASSERT_EQ(stdAc::fanspeed_t::kLow, result.fanspeed);
+}
+
+// Check light on/off functionality in Coolix common a/c handling.
+TEST(TestIRac, Issue821) {
+  stdAc::state_t prev;
+  stdAc::state_t next;
+  stdAc::state_t result;
+  // state info from:
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/821#issuecomment-513708970
+  prev.protocol = decode_type_t::COOLIX;
+  prev.model = -1;
+  prev.power = true;
+  prev.mode = stdAc::opmode_t::kAuto;
+  prev.degrees = 24;
+  prev.celsius = true;
+  prev.fanspeed = stdAc::fanspeed_t::kAuto;
+  prev.swingv = stdAc::swingv_t::kOff;
+  prev.swingh = stdAc::swingh_t::kOff;
+  prev.quiet = false;
+  prev.turbo = false;
+  prev.econo = false;
+  prev.light = false;
+  prev.filter = false;
+  prev.clean = false;
+  prev.beep = false;
+
+  next = prev;
+  next.light = true;
+
+  IRac irac(0);
+  IRrecv capture(0);
+  IRCoolixAC ac(0);
+
+  ac.begin();
+  result = irac.handleToggles(next, &prev);
+  ASSERT_TRUE(result.light);
+  irac.sendAc(next, &prev);
+  ASSERT_TRUE(next.light);
+  irac.coolix(&ac,
+              result.power,     // Power
+              result.mode,      // Mode
+              result.degrees,   // Celsius
+              result.fanspeed,  // Fan speed
+              result.swingv,       // Veritcal swing
+              result.swingh,       // Horizontal swing
+              result.turbo,                       // Turbo
+              result.light,                       // Light
+              result.clean,                       // Clean
+              -1);                         // Sleep
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  ASSERT_EQ("Power: On, Led: Toggle",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
+  EXPECT_EQ(
+      "f38000d50m"
+      "4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s5040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s105040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s560m560s560"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s1680"
+      "m560s5040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s560m560s560"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s1680"
+      "m560s105040",
+      ac._irsend.outputStr());
 }

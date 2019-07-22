@@ -911,7 +911,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.turbo = desired.turbo ^ prev->turbo;
         result.light = desired.light ^ prev->light;
         result.clean = desired.clean ^ prev->clean;
-        result.sleep = (desired.sleep ^ prev->sleep) ? 0 : -1;
+        result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
