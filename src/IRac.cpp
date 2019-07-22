@@ -983,7 +983,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRCoolixAC ac(_pin, _inverted, _modulation);
       coolix(&ac, on, mode, degC, fan, swingv, swingh,
-             quiet, turbo, econo, clean);
+             turbo, light, clean, sleep);
       break;
     }
 #endif  // SEND_DAIKIN
