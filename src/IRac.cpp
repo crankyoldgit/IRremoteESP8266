@@ -977,7 +977,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       argo(&ac, on, mode, degC, fan, swingv, turbo, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_ARGO
 #if SEND_COOLIX
     case COOLIX:
     {
@@ -986,7 +986,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
              turbo, light, clean, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_COOLIX
 #if SEND_DAIKIN
     case DAIKIN:
     {
