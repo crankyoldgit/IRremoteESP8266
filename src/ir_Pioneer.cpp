@@ -10,7 +10,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-#include "ir_NEC.h"
+#include "ir_Pioneer.h"
 
 // Ref:
 //  http://adrian-kingston.com/IRFormatPioneer.htm
@@ -30,13 +30,19 @@
 //  http://adrian-kingston.com/IRFormatPioneer.htm
 void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
-  // If nbits is to big, or is odd, abort.
-  if (nbits > sizeof(data) * 8 || nbits % 2 == 1) return;
-
-  // send 1st part of the code
-  sendNEC(data >> (nbits / 2), nbits / 2, 0);
-  // send 2nd part of the code
-  sendNEC(data & (((uint64_t)1 << (nbits / 2)) - 1), nbits / 2, repeat);
+  for (int32_t r=repeat; r>=0; r--) {
+   // don't use NEC repeat but repeat the whole sequence
+   if (nbits > 32) {
+     sendGeneric(kPioneerHdrMark, kPioneerHdrSpace, kPioneerBitMark, kPioneerOneSpace, kPioneerBitMark,
+                 kPioneerZeroSpace, kPioneerBitMark, kPioneerMinGap, kPioneerMinCommandLength,
+                 data >> 32, nbits - 32, 40, true, 0,
+                 33);
+   }
+   sendGeneric(kPioneerHdrMark, kPioneerHdrSpace, kPioneerBitMark, kPioneerOneSpace, kPioneerBitMark,
+               kPioneerZeroSpace, kPioneerBitMark, kPioneerMinGap, kPioneerMinCommandLength,
+               data, nbits > 32 ? 32 : nbits, 40, true, 0,
+               33);
+  }
 }
 
 // Calculate the raw Pioneer data code based on two NEC sub-codes
@@ -89,10 +95,10 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
     uint16_t used;
     used = matchGeneric(results->rawbuf + offset, &data,
                         results->rawlen - offset, nbits / 2,
-                        kNecHdrMark, kNecHdrSpace,
-                        kNecBitMark, kNecOneSpace,
-                        kNecBitMark, kNecZeroSpace,
-                        kNecBitMark, kNecMinGap, true);
+                        kPioneerHdrMark, kPioneerHdrSpace,
+                        kPioneerBitMark, kPioneerOneSpace,
+                        kPioneerBitMark, kPioneerZeroSpace,
+                        kPioneerBitMark, kPioneerMinGap, true);
     if (!used) return false;
     offset += used;
     uint8_t command = data >> 8;
