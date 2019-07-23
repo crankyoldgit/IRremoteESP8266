@@ -505,6 +505,7 @@ TEST(TestIRac, Mitsubishi) {
                   20,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
                   stdAc::swingv_t::kOff,       // Veritcal swing
+                  stdAc::swingh_t::kOff,       // Wade swing
                   false,                       // Silent
                   14 * 60 + 35);               // Clock
   ASSERT_EQ(expected, ac.toString());
