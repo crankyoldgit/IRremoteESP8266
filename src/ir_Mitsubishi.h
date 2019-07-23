@@ -43,6 +43,8 @@ const uint8_t kMitsubishiAcNoTimer = 0;
 const uint8_t kMitsubishiAcStartTimer = 5;
 const uint8_t kMitsubishiAcStopTimer = 3;
 const uint8_t kMitsubishiAcStartStopTimer = 7;
+const uint8_t kMitsubishiAcWideVaneAuto = 8;
+
 
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
@@ -58,6 +60,8 @@ const uint8_t kMitsubishiAcStartStopTimer = 7;
 #define MITSUBISHI_AC_DRY kMitsubishiAcDry
 #define MITSUBISHI_AC_COOL kMitsubishiAcCool
 #define MITSUBISHI_AC_AUTO kMitsubishiAcAuto
+#define MITSUBISHI_AC_WIDE_VANE_AUTO kMitsubishiAcWideVaneAuto
+
 
 class IRMitsubishiAC {
  public:
@@ -83,7 +87,9 @@ class IRMitsubishiAC {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setVane(const uint8_t position);
+  void setWideVane(const uint8_t position);
   uint8_t getVane(void);
+  uint8_t getWideVane(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t* data);
   uint8_t getClock(void);
@@ -97,6 +103,7 @@ class IRMitsubishiAC {
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t position);
+  uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);

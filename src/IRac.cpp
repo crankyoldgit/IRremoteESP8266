@@ -558,13 +558,14 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
                       const bool on, const stdAc::opmode_t mode,
                       const float degrees,
                       const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                      const stdAc::swingh_t swingh,
                       const bool quiet, const int16_t clock) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setVane(ac->convertSwingV(swingv));
-  // No Horizontal swing setting available.
+  ac->setWideVane(ac->convertSwingH(swingh));
   if (quiet) ac->setFan(kMitsubishiAcFanSilent);
   // No Turbo setting available.
   // No Light setting available.

@@ -553,9 +553,22 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
   remote_state[9] |= pos;
 }
 
+// Set the requested wide-vane operation mode of the a/c unit.
+void IRMitsubishiAC::setWideVane(const uint8_t position) {
+  uint8_t pos = std::min(position, (uint8_t)0x1000);  // bounds check
+  pos <<= 4;
+  remote_state[8] &= 0b00110000;  // Clear the previous setting.
+  remote_state[8] |= pos;
+}
+
 // Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getVane(void) {
   return ((remote_state[9] & 0b00111000) >> 3);
+}
+
+// Return the requested wide vane operation mode of the a/c unit.
+uint8_t IRMitsubishiAC::getWideVane(void) {
+  return ((remote_state[8] & 0b11110000) >> 4);
 }
 
 // Return the clock setting of the message. 1=1/6 hour. e.g. 4pm = 48
@@ -630,13 +643,39 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
+      return kMitsubishiAcVaneAutoMove - 2;
     case stdAc::swingv_t::kHigh:
+      return kMitsubishiAcVaneAutoMove - 3;
     case stdAc::swingv_t::kMiddle:
+      return kMitsubishiAcVaneAutoMove - 4;
     case stdAc::swingv_t::kLow:
+      return kMitsubishiAcVaneAutoMove - 5;
     case stdAc::swingv_t::kLowest:
-      return kMitsubishiAcVaneAutoMove;
+      return kMitsubishiAcVaneAutoMove - 6;
+    case stdAc::swingv_t::kAuto:
+       return kMitsubishiAcVaneAutoMove;
     default:
-      return kMitsubishiAcVaneAuto;
+       return kMitsubishiAcVaneAuto;
+  }
+}
+
+// Convert a standard A/C wide wane swing into its native setting.
+uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kLeftMax:
+      return kMitsubishiAcWideVaneAuto - 7;
+    case stdAc::swingh_t::kLeft:
+      return kMitsubishiAcWideVaneAuto - 6;
+    case stdAc::swingh_t::kMiddle:
+      return kMitsubishiAcWideVaneAuto - 5;
+    case stdAc::swingh_t::kRight:
+      return kMitsubishiAcWideVaneAuto - 4;
+    case stdAc::swingh_t::kRightMax:
+      return kMitsubishiAcWideVaneAuto - 3;
+    case stdAc::swingh_t::kAuto:
+      return kMitsubishiAcWideVaneAuto ;
+    default:
+      return kMitsubishiAcWideVaneAuto - 5;
   }
 }
 
@@ -722,6 +761,14 @@ String IRMitsubishiAC::toString(void) {
       break;
     default:
       result += uint64ToString(this->getVane());
+  }
+  result += F(", WIDE VANE: ");
+  switch (this->getWideVane()) {
+    case MITSUBISHI_AC_WIDE_VANE_AUTO:
+      result += F("AUTO");
+      break;
+    default:
+      result += uint64ToString(this->getWideVane());
   }
   result += addLabeledString(minsToString(getClock() * 10), F("Time"));
   result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));
