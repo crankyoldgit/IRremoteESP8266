@@ -705,13 +705,13 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   EXPECT_TRUE(ac.getUseCelsius());
   EXPECT_EQ(on_cool_low_17c, ac.getRaw());
   EXPECT_EQ(
-      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (LOW), "
+      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.setRaw(on_cool_low_17c);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
   EXPECT_EQ(
-      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (LOW), "
+      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 17C/62F, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.setTemp(17, true);
   EXPECT_EQ(17, ac.getTemp(true));
@@ -720,7 +720,7 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
 
   ac.setRaw(on_cool_low_30c);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 30C/86F, Fan: 1 (LOW), "
+      "Power: On, Mode: 0 (COOL), Celsius: On, Temp: 30C/86F, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
 }
 
@@ -732,12 +732,12 @@ TEST(TestMideaACClass, SwingV) {
   ac.setSwingVToggle(true);
   ASSERT_TRUE(ac.getSwingVToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: On", ac.toString());
   ac.setSwingVToggle(false);
   ASSERT_FALSE(ac.getSwingVToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (AUTO), "
+      "Power: On, Mode: 2 (AUTO), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off", ac.toString());
   ac.setRaw(kMideaACToggleSwingV);
   EXPECT_EQ("Swing(V) Toggle: On", ac.toString());
