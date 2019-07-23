@@ -172,14 +172,14 @@ TEST(TestIRac, Daikin176) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 3 (MAX), Swing (H): 5 (Auto)";
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 1 (Low), Swing (H): 5 (Auto)";
 
   ac.begin();
   irac.daikin176(&ac,
                  true,                        // Power
                  stdAc::opmode_t::kCool,      // Mode
                  26,                          // Celsius
-                 stdAc::fanspeed_t::kMax,     // Fan speed
+                 stdAc::fanspeed_t::kLow,     // Fan speed
                  stdAc::swingh_t::kAuto);     // Horizontal swing
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
