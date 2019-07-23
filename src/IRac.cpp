@@ -911,7 +911,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.turbo = desired.turbo ^ prev->turbo;
         result.light = desired.light ^ prev->light;
         result.clean = desired.clean ^ prev->clean;
-        result.sleep = (desired.sleep ^ prev->sleep) ? 0 : -1;
+        result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
@@ -977,16 +977,16 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       argo(&ac, on, mode, degC, fan, swingv, turbo, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_ARGO
 #if SEND_COOLIX
     case COOLIX:
     {
       IRCoolixAC ac(_pin, _inverted, _modulation);
       coolix(&ac, on, mode, degC, fan, swingv, swingh,
-             quiet, turbo, econo, clean);
+             turbo, light, clean, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_COOLIX
 #if SEND_DAIKIN
     case DAIKIN:
     {
