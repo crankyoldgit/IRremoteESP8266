@@ -1,6 +1,7 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017, 2018 David Conran
 // Copyright 2018 Kamil Palczewski
+// Copyright 2019 s-hadinger
 
 // Pioneer remote emulation
 
@@ -10,10 +11,26 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-#include "ir_NEC.h"
 
+// Constants
 // Ref:
-//  http://adrian-kingston.com/IRFormatPioneer.htm
+//  http://www.adrian-kingston.com/IRFormatPioneer.htm
+const uint16_t kPioneerTick = 534;
+const uint16_t kPioneerHdrMarkTicks = 16;
+const uint16_t kPioneerHdrMark = kPioneerHdrMarkTicks * kPioneerTick;
+const uint16_t kPioneerHdrSpaceTicks = 8;
+const uint16_t kPioneerHdrSpace = kPioneerHdrSpaceTicks * kPioneerTick;
+const uint16_t kPioneerBitMarkTicks = 1;
+const uint16_t kPioneerBitMark = kPioneerBitMarkTicks * kPioneerTick;
+const uint16_t kPioneerOneSpaceTicks = 3;
+const uint16_t kPioneerOneSpace = kPioneerOneSpaceTicks * kPioneerTick;
+const uint16_t kPioneerZeroSpaceTicks = 1;
+const uint16_t kPioneerZeroSpace = kPioneerZeroSpaceTicks * kPioneerTick;
+const uint16_t kPioneerMinCommandLengthTicks = 159;
+const uint32_t kPioneerMinCommandLength = kPioneerMinCommandLengthTicks *
+                                          kPioneerTick;
+const uint16_t kPioneerMinGapTicks = 47;
+const uint32_t kPioneerMinGap = kPioneerMinGapTicks * kPioneerTick;
 
 #if SEND_PIONEER
 // Send a raw Pioneer formatted message.
@@ -30,13 +47,25 @@
 //  http://adrian-kingston.com/IRFormatPioneer.htm
 void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
-  // If nbits is to big, or is odd, abort.
-  if (nbits > sizeof(data) * 8 || nbits % 2 == 1) return;
-
-  // send 1st part of the code
-  sendNEC(data >> (nbits / 2), nbits / 2, 0);
-  // send 2nd part of the code
-  sendNEC(data & (((uint64_t)1 << (nbits / 2)) - 1), nbits / 2, repeat);
+  // If nbits is to big, abort.
+  if (nbits > sizeof(data) * 8) return;
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // don't use NEC repeat but repeat the whole sequence
+    if (nbits > 32) {
+      sendGeneric(kPioneerHdrMark, kPioneerHdrSpace,
+                  kPioneerBitMark, kPioneerOneSpace,
+                  kPioneerBitMark, kPioneerZeroSpace,
+                  kPioneerBitMark, kPioneerMinGap,
+                  kPioneerMinCommandLength,
+                  data >> 32, nbits - 32, 40, true, 0, 33);
+    }
+    sendGeneric(kPioneerHdrMark, kPioneerHdrSpace,
+                kPioneerBitMark, kPioneerOneSpace,
+                kPioneerBitMark, kPioneerZeroSpace,
+                kPioneerBitMark, kPioneerMinGap,
+                kPioneerMinCommandLength,
+                data, nbits > 32 ? 32 : nbits, 40, true, 0, 33);
+  }
 }
 
 // Calculate the raw Pioneer data code based on two NEC sub-codes
@@ -89,10 +118,10 @@ bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
     uint16_t used;
     used = matchGeneric(results->rawbuf + offset, &data,
                         results->rawlen - offset, nbits / 2,
-                        kNecHdrMark, kNecHdrSpace,
-                        kNecBitMark, kNecOneSpace,
-                        kNecBitMark, kNecZeroSpace,
-                        kNecBitMark, kNecMinGap, true);
+                        kPioneerHdrMark, kPioneerHdrSpace,
+                        kPioneerBitMark, kPioneerOneSpace,
+                        kPioneerBitMark, kPioneerZeroSpace,
+                        kPioneerBitMark, kPioneerMinGap, true);
     if (!used) return false;
     offset += used;
     uint8_t command = data >> 8;
