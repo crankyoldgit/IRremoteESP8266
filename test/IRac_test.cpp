@@ -334,21 +334,23 @@ TEST(TestIRac, Gree) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 2 (Medium), Turbo: Off, "
-      "IFeel: Off, WiFi: Off, XFan: On, Light: On, Sleep: On, "
-      "Swing Vertical Mode: Manual, Swing Vertical Pos: 3";
+      "Model: 1 (YAW1F), Power: On, Mode: 1 (COOL), Temp: 22C, "
+      "Fan: 2 (Medium), Turbo: Off, IFeel: Off, WiFi: Off, XFan: On, "
+      "Light: On, Sleep: On, Swing Vertical Mode: Manual, "
+      "Swing Vertical Pos: 3";
 
   ac.begin();
   irac.gree(&ac,
-            true,                        // Power
-            stdAc::opmode_t::kCool,      // Mode
-            22,                          // Celsius
-            stdAc::fanspeed_t::kMedium,  // Fan speed
-            stdAc::swingv_t::kHigh,      // Veritcal swing
-            false,                       // Turbo
-            true,                        // Light
-            true,                        // Clean (aka Mold/XFan)
-            8 * 60 + 0);                 // Sleep time
+            gree_ac_remote_model_t::YAW1F,  // Model
+            true,                           // Power
+            stdAc::opmode_t::kCool,         // Mode
+            22,                             // Celsius
+            stdAc::fanspeed_t::kMedium,     // Fan speed
+            stdAc::swingv_t::kHigh,         // Veritcal swing
+            false,                          // Turbo
+            true,                           // Light
+            true,                           // Clean (aka Mold/XFan)
+            8 * 60 + 0);                    // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

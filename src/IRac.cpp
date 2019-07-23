@@ -408,11 +408,12 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 #endif  // SEND_GOODWEATHER
 
 #if SEND_GREE
-void IRac::gree(IRGreeAC *ac,
+void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool turbo, const bool light, const bool clean,
                 const int16_t sleep) {
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1061,9 +1062,10 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 #if SEND_GREE
     case GREE:
     {
-      IRGreeAC ac(_pin, _inverted, _modulation);
+      IRGreeAC ac(_pin, (gree_ac_remote_model_t)model, _inverted, _modulation);
       ac.begin();
-      gree(&ac, on, mode, degC, fan, swingv, light, turbo, clean, sleep);
+      gree(&ac, (gree_ac_remote_model_t)model, on, mode, degC, fan, swingv,
+           turbo, light, clean, sleep);
       break;
     }
 #endif  // SEND_GREE

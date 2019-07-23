@@ -6,6 +6,8 @@
 //   Brand: EKOKAI,  Model: A/C
 //   Brand: RusClimate,  Model: EACS/I-09HAR_X/N3 A/C
 //   Brand: RusClimate,  Model: YAW1F remote
+//   Brand: Green,  Model: YBOFB remote
+//   Brand: Green,  Model: YBOFB2 remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -22,6 +24,11 @@
 #endif
 
 // Constants
+enum gree_ac_remote_model_t {
+  YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
+  YBOFB,     // (2) Green, YBOFB2, YAPOF3
+};
+
 const uint8_t kGreeAuto = 0;
 const uint8_t kGreeCool = 1;
 const uint8_t kGreeDry = 2;
@@ -37,7 +44,7 @@ const uint8_t kGreeSleepMask = 0b10000000;
 // Byte 2
 const uint8_t kGreeTurboMask = 0b00010000;
 const uint8_t kGreeLightMask = 0b00100000;
-const uint8_t kGreePower2Mask = 0b01000000;
+const uint8_t kGreePower2Mask = 0b01000000;  // This might not be used. See #814
 const uint8_t kGreeXfanMask = 0b10000000;
 // Byte 4
 const uint8_t kGreeSwingPosMask = 0b00001111;
@@ -87,8 +94,10 @@ const uint8_t kGreeSwingUpAuto = 0b00001011;
 // Classes
 class IRGreeAC {
  public:
-  explicit IRGreeAC(const uint16_t pin, const bool inverted = false,
-                    const bool use_modulation = true);
+  explicit IRGreeAC(
+      const uint16_t pin,
+      const gree_ac_remote_model_t model = gree_ac_remote_model_t::YAW1F,
+      const bool inverted = false, const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_GREE
@@ -98,6 +107,8 @@ class IRGreeAC {
   void begin(void);
   void on(void);
   void off(void);
+  void setModel(const gree_ac_remote_model_t model);
+  gree_ac_remote_model_t getModel(void);
   void setPower(const bool on);
   bool getPower(void);
   void setTemp(const uint8_t temp);
@@ -142,6 +153,7 @@ class IRGreeAC {
 #endif  // UNIT_TEST
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kGreeStateLength];
+  gree_ac_remote_model_t _model;
   void checksum(const uint16_t length = kGreeStateLength);
   void fixup(void);
 };
