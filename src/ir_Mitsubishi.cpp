@@ -673,7 +673,7 @@ uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
     case stdAc::swingh_t::kRightMax:
       return kMitsubishiAcWideVaneAuto - 3;
     case stdAc::swingh_t::kAuto:
-      return kMitsubishiAcWideVaneAuto ;
+      return kMitsubishiAcWideVaneAuto;
     default:
       return kMitsubishiAcWideVaneAuto - 5;
   }
