@@ -1119,7 +1119,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRMitsubishiAC ac(_pin, _inverted, _modulation);
       ac.begin();
-      mitsubishi(&ac, on, mode, degC, fan, swingv, quiet, clock);
+      mitsubishi(&ac, on, mode, degC, fan, swingv, swingh, quiet, clock);
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
