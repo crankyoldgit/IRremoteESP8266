@@ -2303,20 +2303,20 @@ TEST(TestDaikin176Class, FanControl) {
   IRDaikin176 ac(0);
 
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
+      "Power: Off, Mode: 7 (COOL), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
       ac.toString());
   ac.setFan(kDaikinFanMin);
   ac.setPower(true);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (AUTO), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
       ac.toString());
   ac.setFan(kDaikinFanMin + 1);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (AUTO), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
       ac.toString());
   ac.setFan(kDaikin176FanMax);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (AUTO), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
       ac.toString());
 
   // Real state from remote
@@ -2367,28 +2367,28 @@ TEST(TestDaikin176Class, OperatingMode) {
   ac.begin();
 
   ac.setMode(kDaikinAuto);
-  EXPECT_EQ(kDaikinAuto, ac.getMode());
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
 
   ac.setMode(kDaikin176Cool);
   EXPECT_EQ(kDaikin176Cool, ac.getMode());
 
-  ac.setMode(kDaikinHeat);
-  EXPECT_EQ(kDaikinHeat, ac.getMode());
-
   ac.setMode(kDaikinDry);
   EXPECT_EQ(kDaikinDry, ac.getMode());
+
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
 
   ac.setMode(kDaikinFan);
   EXPECT_EQ(kDaikinFan, ac.getMode());
 
   ac.setMode(kDaikin176Cool + 1);
-  EXPECT_EQ(kDaikinAuto, ac.getMode());
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
 
   ac.setMode(kDaikinAuto + 1);
-  EXPECT_EQ(kDaikinAuto, ac.getMode());
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
 
   ac.setMode(255);
-  EXPECT_EQ(kDaikinAuto, ac.getMode());
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
 }
 
 TEST(TestDaikin176Class, Temperature) {
@@ -2520,14 +2520,10 @@ TEST(TestDaikin176Class, ReconstructKnownStates) {
   ac.setSwingHorizontal(true);
   EXPECT_STATE_EQ(on_cool_25_max_auto, ac.getRaw(), kDaikin176Bits);
   ac.setMode(kDaikinFan);
-  ac.setRaw(on_fan_17_max_auto);  // DEBUG Remove! Not needed. Added to pass.
   EXPECT_STATE_EQ(on_fan_17_max_auto, ac.getRaw(), kDaikin176Bits);
   ac.setMode(kDaikinDry);
-  ac.setRaw(on_dry_17_max_auto);  // DEBUG Remove! Not needed. Added to pass.
   EXPECT_STATE_EQ(on_dry_17_max_auto, ac.getRaw(), kDaikin176Bits);
   ac.setMode(kDaikin176Cool);
-  ac.setTemp(25);  // DEBUG Remove! Not needed. Added to pass.
-  ac.setRaw(on_cool_25_max_auto_v2);  // DEBUG Remove! Not needed. Added to pass
   EXPECT_STATE_EQ(on_cool_25_max_auto_v2, ac.getRaw(), kDaikin176Bits);
 }
 

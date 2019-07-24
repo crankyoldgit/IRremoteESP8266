@@ -2106,7 +2106,7 @@ void IRDaikin176::stateReset() {
   remote_state[8] =  0xDA;
   remote_state[9] =  0x17;
   remote_state[10] = 0x18;
-  remote_state[12] = 0x03;
+  remote_state[12] = 0x73;
   remote_state[14] = 0x20;
   remote_state[18] = 0x16;  // Fan speed and swing
   remote_state[20] = 0x20;
@@ -2132,19 +2132,16 @@ void IRDaikin176::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN176
 
-void IRDaikin176::on() {
-  remote_state[kDaikin176BytePower] |= kDaikinBitPower;
-}
+void IRDaikin176::on() { setPower(true); }
 
-void IRDaikin176::off() {
-  remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
-}
+void IRDaikin176::off() { setPower(false); }
 
 void IRDaikin176::setPower(const bool state) {
+  remote_state[kDaikin176ByteModeButton] = 0;
   if (state)
-    on();
+    remote_state[kDaikin176BytePower] |= kDaikinBitPower;
   else
-    off();
+    remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
 }
 
 bool IRDaikin176::getPower() {
@@ -2156,19 +2153,22 @@ uint8_t IRDaikin176::getMode() {
 }
 
 void IRDaikin176::setMode(const uint8_t mode) {
+  uint8_t altmode = 0;
   switch (mode) {
-    case kDaikinFan:
-    case kDaikinDry:
-    case kDaikinAuto:
-    case kDaikin176Cool:
-    case kDaikinHeat:
-      remote_state[kDaikin176ByteMode] &= ~kDaikin176MaskMode;
-      remote_state[kDaikin176ByteMode] |= (mode << 4);
-      setTemp(_saved_temp);
-      break;
-    default:
-      this->setMode(kDaikinAuto);
+    case kDaikinFan: altmode = 0; break;
+    case kDaikinDry: altmode = 7; break;
+    case kDaikin176Cool: altmode = 2; break;
+    default: this->setMode(kDaikin176Cool); return;
   }
+  // Set the mode.
+  remote_state[kDaikin176ByteMode] &= ~kDaikin176MaskMode;
+  remote_state[kDaikin176ByteMode] |= (mode << 4);
+  // Set the altmode
+  remote_state[kDaikin176BytePower] &= ~kDaikin176MaskMode;
+  remote_state[kDaikin176BytePower] |= (altmode << 4);
+  setTemp(_saved_temp);
+  // Needs to happen after setTemp() as it will clear it.
+  remote_state[kDaikin176ByteModeButton] = kDaikin176ModeButton;
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -2199,6 +2199,7 @@ void IRDaikin176::setTemp(const uint8_t temp) {
   degrees = degrees * 2 - 18;
   remote_state[kDaikin176ByteTemp] &= ~kDaikin176MaskTemp;
   remote_state[kDaikin176ByteTemp] |= degrees;
+  remote_state[kDaikin176ByteModeButton] = 0;
 }
 
 uint8_t IRDaikin176::getTemp(void) {
@@ -2212,6 +2213,7 @@ void IRDaikin176::setFan(const uint8_t fan) {
     case kDaikin176FanMax:
       remote_state[kDaikin176ByteFan] &= ~kDaikin176MaskFan;
       remote_state[kDaikin176ByteFan] |= (fan << 4);
+      remote_state[kDaikin176ByteModeButton] = 0;
       break;
     default:
       setFan(kDaikin176FanMax);

@@ -263,10 +263,12 @@ const uint16_t kDaikin176Sections = 2;
 const uint16_t kDaikin176Section1Length = 7;
 const uint16_t kDaikin176Section2Length = kDaikin176StateLength -
                                           kDaikin176Section1Length;
-const uint8_t kDaikin176Cool = 0b111;
+const uint8_t kDaikin176Cool = 0b111;  // 7
 const uint8_t kDaikin176BytePower = 14;
 const uint8_t kDaikin176ByteMode = 12;
 const uint8_t kDaikin176MaskMode = 0b01110000;
+const uint8_t kDaikin176ByteModeButton = 13;
+const uint8_t kDaikin176ModeButton = 0b00000100;
 const uint8_t kDaikin176ByteTemp = 17;
 const uint8_t kDaikin176MaskTemp = 0b01111110;
 const uint8_t kDaikin176DryFanTemp = 17;  // Dry/Fan mode is always 17 Celsius.
