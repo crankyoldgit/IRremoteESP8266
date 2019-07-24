@@ -2174,16 +2174,23 @@ void IRDaikin176::setMode(const uint8_t mode) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kDaikin176Cool;
-    case stdAc::opmode_t::kHeat:
-      return kDaikinHeat;
     case stdAc::opmode_t::kDry:
       return kDaikinDry;
+    case stdAc::opmode_t::kHeat:  // Heat not supported, but fan is the closest.
     case stdAc::opmode_t::kFan:
       return kDaikinFan;
     default:
-      return kDaikinAuto;
+      return kDaikin176Cool;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinDry: return stdAc::opmode_t::kDry;
+    case kDaikinHeat:  // There is no heat mode, but fan is the closest.
+    case kDaikinFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kCool;
   }
 }
 
@@ -2282,7 +2289,7 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   result.protocol = decode_type_t::DAIKIN176;
   result.model = -1;  // No models used.
   result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.mode = IRDaikin176::toCommonMode(this->getMode());
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
