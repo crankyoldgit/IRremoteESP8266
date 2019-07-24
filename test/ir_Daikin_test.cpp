@@ -2362,3 +2362,55 @@ TEST(TestDecodeDaikin128, SyntheticSelfDecode) {
   ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
+
+TEST(TestDaikin128Class, Checksums) {
+  IRDaikin128 ac(0);
+
+  uint8_t knownGood[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+  uint8_t knownBad[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0x0D,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  EXPECT_EQ(0xA, ac.calcFirstChecksum(knownGood));
+  EXPECT_EQ(0x0B, ac.calcSecondChecksum(knownGood));
+  EXPECT_TRUE(ac.validChecksum(knownGood));
+  ac.setRaw(knownBad);
+  EXPECT_STATE_EQ(knownGood, ac.getRaw(), kDaikin128Bits);
+}
+
+TEST(TestDaikin128Class, PowerToggle) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
+TEST(TestDaikin128Class, SwingVertical) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+}
+
+TEST(TestDaikin128Class, Sleep) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}

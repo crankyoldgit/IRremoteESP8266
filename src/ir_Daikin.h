@@ -290,6 +290,12 @@ const uint16_t kDaikin128Gap = 20300;
 const uint16_t kDaikin128FooterMark = kDaikin128HdrMark;
 const uint16_t kDaikin128Sections = 2;
 const uint16_t kDaikin128SectionLength = 8;
+const uint8_t kDaikin128BytePowerSwingSleep = 7;
+const uint8_t kDaikin128BitSwing =       0b00000001;
+const uint8_t kDaikin128BitSleep =       0b00000010;
+const uint8_t kDaikin128BitPowerToggle = 0b00001000;
+const uint8_t kDaikin128ByteEconoLight = 9;
+const uint8_t kDaikin128BitEcono =       0b00000100;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -610,6 +616,70 @@ class IRDaikin176 {
   uint8_t remote_state[kDaikin176StateLength];
   void stateReset();
   void checksum();
+};
+
+// Class to emulate a Daikin BRC52B63 remote / Daikin 17 series A/C.
+class IRDaikin128 {
+ public:
+  explicit IRDaikin128(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+#if SEND_DAIKIN128
+  void send(const uint16_t repeat = kDaikin128DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_DAIKIN128
+  void begin();
+  void setPowerToggle(const bool toggle);
+  bool getPowerToggle(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  uint8_t getMode(void);
+  void setMode(const uint8_t mode);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical();
+  bool getSleep(void);
+  void setSleep(const bool on);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  void setEcono(const bool on);
+  bool getEcono(void);
+  void enableOnTimer(const uint16_t starttime);
+  void disableOnTimer(void);
+  uint16_t getOnTime(void);
+  bool getOnTimerEnabled(void);
+  void enableSleepTimer(const uint16_t sleeptime);
+  void disableSleepTimer(void);
+  uint16_t getSleepTime(void);
+  bool getSleepTimerEnabled(void);
+  void enableOffTimer(const uint16_t endtime);
+  void disableOffTimer(void);
+  uint16_t getOffTime(void);
+  bool getOffTimerEnabled(void);
+  void setCurrentTime(const uint16_t time);
+  uint16_t getCurrentTime(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[]);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin128StateLength];
+  void stateReset(void);
+  static uint8_t calcFirstChecksum(const uint8_t state[]);
+  static uint8_t calcSecondChecksum(const uint8_t state[]);
+  void checksum(void);
+  void clearOnTimerFlag(void);
+  void clearSleepTimerFlag(void);
 };
 
 #endif  // IR_DAIKIN_H_

@@ -56,5 +56,7 @@ namespace irutils {
   String htmlEscape(const String unescaped);
   String msToString(uint32_t const msecs);
   String minsToString(const uint16_t mins);
+  uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
+                     const uint8_t init = 0);
 }  // namespace irutils
 #endif  // IRUTILS_H_

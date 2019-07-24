@@ -516,3 +516,13 @@ TEST(TestUtils, MinsToString) {
   EXPECT_EQ("18:59", irutils::minsToString(18 * 60 + 59));
   EXPECT_EQ("23:59", irutils::minsToString(23 * 60 + 59));
 }
+
+TEST(TestUtils, sumNibbles) {
+  uint8_t testdata[] = {0x01, 0x23, 0x45};
+  EXPECT_EQ(0, irutils::sumNibbles(testdata, 0));
+  EXPECT_EQ(1, irutils::sumNibbles(testdata, 0, 1));
+  EXPECT_EQ(1, irutils::sumNibbles(testdata, 1));
+  EXPECT_EQ(2, irutils::sumNibbles(testdata, 1, 1));
+  EXPECT_EQ(15, irutils::sumNibbles(testdata, 3));
+  EXPECT_EQ(115, irutils::sumNibbles(testdata, 3, 100));
+}

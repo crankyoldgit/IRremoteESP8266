@@ -35,6 +35,7 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::addFanToString;
 using irutils::minsToString;
+using irutils::sumNibbles;
 
 #if SEND_DAIKIN
 // Send a Daikin A/C message.
@@ -2443,6 +2444,121 @@ void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN128
 
+// Class for handling Daikin 128 bit / 16 byte A/C messages.
+//
+// Code by crankyoldgit.
+// Analysis by Daniel Vena
+//
+// Supported Remotes: Daikin BRC52B63 remote
+//
+IRDaikin128::IRDaikin128(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+void IRDaikin128::begin() { _irsend.begin(); }
+
+uint8_t IRDaikin128::calcFirstChecksum(const uint8_t state[]) {
+  return sumNibbles(state, kDaikin128SectionLength - 1,
+                    state[kDaikin128SectionLength - 1] & 0x0F) & 0x0F;
+}
+
+uint8_t IRDaikin128::calcSecondChecksum(const uint8_t state[]) {
+  return sumNibbles(state + kDaikin128SectionLength,
+                    kDaikin128SectionLength - 1);
+}
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+// Returns:
+//   A boolean.
+bool IRDaikin128::validChecksum(uint8_t state[]) {
+  // Validate the checksum of section #1.
+  if (state[kDaikin128SectionLength - 1] >> 4 != calcFirstChecksum(state))
+    return false;
+  // Validate the checksum of section #2
+  if (state[kDaikin128StateLength - 1] != calcSecondChecksum(state))
+    return false;
+  return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin128::checksum() {
+  remote_state[kDaikin128SectionLength - 1] &= 0x0F;  // Clear upper half.
+  remote_state[kDaikin128SectionLength - 1] |=
+      (calcFirstChecksum(remote_state) << 4);
+  remote_state[kDaikin128StateLength - 1] = calcSecondChecksum(remote_state);
+}
+
+void IRDaikin128::stateReset() {
+  for (uint8_t i = 0; i < kDaikin128StateLength; i++) remote_state[i] = 0x00;
+  remote_state[0] = 0x16;
+  remote_state[7] = 0x04;  // Most significant nibble is a checksum.
+  remote_state[8] = 0xA1;
+  // remote_state[15] is a checksum byte, it will be set by checksum().
+}
+
+uint8_t *IRDaikin128::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin128::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin128StateLength; i++)
+    remote_state[i] = new_code[i];
+}
+
+#if SEND_DAIKIN128
+void IRDaikin128::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin128(remote_state, kDaikin128StateLength, repeat);
+}
+#endif  // SEND_DAIKIN128
+
+void IRDaikin128::setPowerToggle(const bool toggle) {
+  if (toggle)
+    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitPowerToggle;
+  else
+    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitPowerToggle;
+}
+
+bool IRDaikin128::getPowerToggle(void) {
+  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitPowerToggle;
+}
+
+void IRDaikin128::setSwingVertical(const bool toggle) {
+  if (toggle)
+    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSwing;
+  else
+    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSwing;
+}
+
+bool IRDaikin128::getSwingVertical(void) {
+  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSwing;
+}
+
+void IRDaikin128::setSleep(const bool toggle) {
+  if (toggle)
+    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSleep;
+  else
+    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSleep;
+}
+
+bool IRDaikin128::getSleep(void) {
+  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSleep;
+}
+
+void IRDaikin128::setEcono(const bool toggle) {
+  if (toggle)
+    remote_state[kDaikin128ByteEconoLight] |= kDaikin128BitEcono;
+  else
+    remote_state[kDaikin128ByteEconoLight] &= ~kDaikin128BitEcono;
+}
+
+bool IRDaikin128::getEcono(void) {
+  return remote_state[kDaikin128ByteEconoLight] & kDaikin128BitEcono;
+}
+
 #if DECODE_DAIKIN128
 // Decode the supplied Daikin 128 bit A/C message.
 // Args:
@@ -2476,7 +2592,6 @@ bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
     if (!matchSpace(results->rawbuf[offset++], kDaikin128LeaderSpace,
                     kDaikinTolerance, kDaikinMarkExcess)) return false;
   }
-  DPRINTLN("DEBUG: Past the leader.");
   const uint16_t ksectionSize[kDaikin128Sections] = {
       kDaikin128SectionLength, (uint16_t)(nbits / 8 - kDaikin128SectionLength)};
   // Data Sections
@@ -2495,12 +2610,14 @@ bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
                         kDaikin128Gap,
                         section > 0,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    DPRINTLN("DEBUG: Past matchGeneric.");
     if (used == 0) return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
+  if (strict) {
+    if (!IRDaikin128::validChecksum(results->state)) return false;
+  }
 
   // Success
   results->decode_type = decode_type_t::DAIKIN128;
