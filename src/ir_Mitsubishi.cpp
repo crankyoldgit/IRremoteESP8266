@@ -763,7 +763,7 @@ String IRMitsubishiAC::toString(void) {
     default:
       result += uint64ToString(this->getVane());
   }
-  result += F(", WIDE VANE: ");
+  result += F(", Wide Vane: ");
   switch (this->getWideVane()) {
     case MITSUBISHI_AC_WIDE_VANE_AUTO:
       result += F("AUTO");
