@@ -939,4 +939,14 @@ namespace irutils {
       sum += (*ptr >> 4) + (*ptr & 0xF);
     return sum;
   }
+
+  uint8_t bcdToUint8(const uint8_t bcd) {
+    if (bcd > 0x99) return 255;  // Too big.
+    return (bcd >> 4) * 10 + (bcd & 0xF);
+  }
+
+  uint8_t uint8ToBcd(const uint8_t integer) {
+    if (integer > 99) return 255;  // Too big.
+    return ((integer / 10) << 4) + (integer % 10);
+  }
 }  // namespace irutils

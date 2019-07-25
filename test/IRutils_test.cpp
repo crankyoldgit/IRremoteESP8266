@@ -526,3 +526,17 @@ TEST(TestUtils, sumNibbles) {
   EXPECT_EQ(15, irutils::sumNibbles(testdata, 3));
   EXPECT_EQ(115, irutils::sumNibbles(testdata, 3, 100));
 }
+
+TEST(TestUtils, BCD) {
+  EXPECT_EQ(0, irutils::uint8ToBcd(0));
+  EXPECT_EQ(0, irutils::bcdToUint8(0));
+  EXPECT_EQ(1, irutils::uint8ToBcd(1));
+  EXPECT_EQ(10, irutils::bcdToUint8(0x10));
+  EXPECT_EQ(0x10, irutils::uint8ToBcd(10));
+  EXPECT_EQ(11, irutils::bcdToUint8(0x11));
+  EXPECT_EQ(0x11, irutils::uint8ToBcd(11));
+  EXPECT_EQ(99, irutils::bcdToUint8(0x99));
+  EXPECT_EQ(0x99, irutils::uint8ToBcd(99));
+  EXPECT_EQ(255, irutils::bcdToUint8(0x9A));
+  EXPECT_EQ(255, irutils::uint8ToBcd(100));
+}

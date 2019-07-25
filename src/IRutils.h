@@ -58,5 +58,7 @@ namespace irutils {
   String minsToString(const uint16_t mins);
   uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
                      const uint8_t init = 0);
+  uint8_t bcdToUint8(const uint8_t bcd);
+  uint8_t uint8ToBcd(const uint8_t integer);
 }  // namespace irutils
 #endif  // IRUTILS_H_

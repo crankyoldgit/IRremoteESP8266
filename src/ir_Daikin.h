@@ -290,6 +290,23 @@ const uint16_t kDaikin128Gap = 20300;
 const uint16_t kDaikin128FooterMark = kDaikin128HdrMark;
 const uint16_t kDaikin128Sections = 2;
 const uint16_t kDaikin128SectionLength = 8;
+const uint8_t kDaikin128ByteModeFan = 1;
+const uint8_t kDaikin128MaskMode =       0b00001111;
+const uint8_t kDaikin128Dry =            0b00000001;
+const uint8_t kDaikin128Cool =           0b00000010;
+const uint8_t kDaikin128Fan =            0b00000100;
+const uint8_t kDaikin128Heat =           0b00001000;
+const uint8_t kDaikin128Auto =           0b00001010;
+const uint8_t kDaikin128MaskFan =        0b11110000;
+const uint8_t kDaikin128FanAuto =        0b0001;
+const uint8_t kDaikin128FanHigh =        0b0010;
+const uint8_t kDaikin128FanMed =         0b0100;
+const uint8_t kDaikin128FanLow =         0b1000;
+const uint8_t kDaikin128FanPowerful =    0b0011;
+const uint8_t kDaikin128FanQuiet =       0b1001;
+const uint8_t kDaikin128ByteTemp = 6;
+const uint8_t kDaikin128MinTemp = 16;  // C
+const uint8_t kDaikin128MaxTemp = 30;  // C
 const uint8_t kDaikin128BytePowerSwingSleep = 7;
 const uint8_t kDaikin128BitSwing =       0b00000001;
 const uint8_t kDaikin128BitSleep =       0b00000010;
@@ -642,6 +659,8 @@ class IRDaikin128 {
   void setSleep(const bool on);
   bool getQuiet(void);
   void setQuiet(const bool on);
+  bool getPowerful(void);
+  void setPowerful(const bool on);
   void setEcono(const bool on);
   bool getEcono(void);
   void enableOnTimer(const uint16_t starttime);
@@ -663,6 +682,7 @@ class IRDaikin128 {
   static bool validChecksum(uint8_t state[]);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST

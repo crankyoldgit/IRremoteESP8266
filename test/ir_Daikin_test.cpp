@@ -2339,6 +2339,10 @@ TEST(TestDecodeDaikin128, RealExample) {
   ASSERT_EQ(DAIKIN128, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (COOL), Temp: 26C, Fan: 1 (Auto), "
+      "Powerful: Off, Quiet: Off, Swing (Vertical): On, Sleep: Off, Econo: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
@@ -2407,10 +2411,201 @@ TEST(TestDaikin128Class, Sleep) {
   IRDaikin128 ac(0);
   ac.begin();
 
+  // Sleep works in some modes
+  ac.setMode(kDaikin128Cool);
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
   ac.setSleep(false);
   EXPECT_FALSE(ac.getSleep());
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
+  // But not some some modes
+  ac.setMode(kDaikin128Fan);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_FALSE(ac.getSleep());
+}
+
+TEST(TestDaikin128Class, Econo) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Econo works in some modes
+  ac.setMode(kDaikin128Heat);
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_FALSE(ac.getEcono());
+}
+
+TEST(TestDaikin128Class, FanSpeed) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikin128Cool);
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+  ac.setFan(5);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanHigh);
+  EXPECT_EQ(kDaikin128FanHigh, ac.getFan());
+
+  // Beyond Quiet should default to Auto.
+  ac.setFan(kDaikin128FanQuiet + 1);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanMed);
+  EXPECT_EQ(kDaikin128FanMed, ac.getFan());
+
+  ac.setFan(kDaikin128FanLow);
+  EXPECT_EQ(kDaikin128FanLow, ac.getFan());
+
+  ac.setFan(kDaikin128FanPowerful);
+  EXPECT_EQ(kDaikin128FanPowerful, ac.getFan());
+
+  ac.setFan(kDaikin128FanAuto);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanQuiet);
+  EXPECT_EQ(kDaikin128FanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin128Class, OperatingMode) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setMode(0);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Cool);
+  EXPECT_EQ(kDaikin128Cool, ac.getMode());
+  ac.setMode(kDaikin128Auto);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Heat);
+  EXPECT_EQ(kDaikin128Heat, ac.getMode());
+  ac.setMode(kDaikin128Dry);
+  EXPECT_EQ(kDaikin128Dry, ac.getMode());
+  ac.setMode(kDaikin128Fan);
+  EXPECT_EQ(kDaikin128Fan, ac.getMode());
+  ac.setMode(3);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Auto + 1);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+}
+
+TEST(TestDaikin128Class, Quiet) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Quiet works in some modes
+  ac.setMode(kDaikin128Cool);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getQuiet());
+}
+
+TEST(TestDaikin128Class, Powerful) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Powerful works in some modes
+  ac.setMode(kDaikin128Cool);
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getPowerful());
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getPowerful());
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getPowerful());
+}
+
+TEST(TestDaikin128Class, Temperature) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MaxTemp);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp - 1);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MaxTemp + 1);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp + 1);
+  EXPECT_EQ(kDaikin128MinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+// Test human readable output.
+TEST(TestDaikin128Class, HumanReadable) {
+  IRDaikin128 ac(0);
+
+  ac.setPowerToggle(false);
+  ac.setMode(kDaikin128Auto);
+  ac.setTemp(25);
+  ac.setFan(kDaikin128FanAuto);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setSwingVertical(true);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 10 (AUTO), Temp: 25C, Fan: 1 (Auto), "
+      "Powerful: Off, Quiet: Off, Swing (Vertical): On, "
+      "Sleep: Off, Econo: Off",
+      ac.toString());
+  ac.setMode(kDaikin128Cool);
+  ac.setTemp(16);
+  ac.setQuiet(true);
+  ac.setSwingVertical(false);
+  ac.setPowerToggle(true);
+  ac.setSleep(true);
+  ac.setEcono(true);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (COOL), Temp: 16C, Fan: 9 (Quiet), "
+      "Powerful: Off, Quiet: On, Swing (Vertical): Off, "
+      "Sleep: On, Econo: On",
+      ac.toString());
 }
