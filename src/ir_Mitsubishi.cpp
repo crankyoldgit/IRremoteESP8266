@@ -555,9 +555,10 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
 
 // Set the requested wide-vane operation mode of the a/c unit.
 void IRMitsubishiAC::setWideVane(const uint8_t position) {
-  uint8_t pos = std::min(position, (uint8_t)0x1000);  // bounds check
+  uint8_t pos = std::min(position, (uint8_t)0b1000);  // bounds check
+  pos &= 0b1111;
   pos <<= 4;
-  remote_state[8] &= 0b00110000;  // Clear the previous setting.
+  remote_state[8] &= 0b00000111;  // Clear the previous setting.
   remote_state[8] |= pos;
 }
 
@@ -643,15 +644,15 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
-      return kMitsubishiAcVaneAutoMove - 2;
+      return kMitsubishiAcVaneAutoMove - 6;
     case stdAc::swingv_t::kHigh:
-      return kMitsubishiAcVaneAutoMove - 3;
+      return kMitsubishiAcVaneAutoMove - 5;
     case stdAc::swingv_t::kMiddle:
       return kMitsubishiAcVaneAutoMove - 4;
     case stdAc::swingv_t::kLow:
-      return kMitsubishiAcVaneAutoMove - 5;
+      return kMitsubishiAcVaneAutoMove - 3;
     case stdAc::swingv_t::kLowest:
-      return kMitsubishiAcVaneAutoMove - 6;
+      return kMitsubishiAcVaneAutoMove - 2;
     case stdAc::swingv_t::kAuto:
        return kMitsubishiAcVaneAutoMove;
     default:
