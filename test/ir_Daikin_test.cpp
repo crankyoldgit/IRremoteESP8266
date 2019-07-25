@@ -2411,19 +2411,12 @@ TEST(TestDaikin128Class, Sleep) {
   IRDaikin128 ac(0);
   ac.begin();
 
-  // Sleep works in some modes
-  ac.setMode(kDaikin128Cool);
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
   ac.setSleep(false);
   EXPECT_FALSE(ac.getSleep());
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
-  // But not some some modes
-  ac.setMode(kDaikin128Fan);
-  EXPECT_FALSE(ac.getSleep());
-  ac.setSleep(true);
-  EXPECT_FALSE(ac.getSleep());
 }
 
 TEST(TestDaikin128Class, Econo) {

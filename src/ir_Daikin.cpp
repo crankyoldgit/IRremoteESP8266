@@ -2548,8 +2548,7 @@ void IRDaikin128::setMode(const uint8_t mode) {
       return;
   }
   // Force a reset of mode dependant things.
-  setFan(getFan());
-  setSleep(getSleep());
+  setFan(getFan());  // Covers Quiet & Powerful too.
   setEcono(getEcono());
 }
 
@@ -2615,8 +2614,8 @@ void IRDaikin128::setFan(const uint8_t speed) {
   }
 }
 
-void IRDaikin128::setSwingVertical(const bool toggle) {
-  if (toggle)
+void IRDaikin128::setSwingVertical(const bool on) {
+  if (on)
     remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSwing;
   else
     remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSwing;
@@ -2626,10 +2625,8 @@ bool IRDaikin128::getSwingVertical(void) {
   return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSwing;
 }
 
-void IRDaikin128::setSleep(const bool toggle) {
-  uint8_t mode = getMode();
-  if (toggle && (mode == kDaikin128Cool || mode == kDaikin128Heat ||
-                 mode == kDaikin128Auto))
+void IRDaikin128::setSleep(const bool on) {
+  if (on)
     remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSleep;
   else
     remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSleep;
@@ -2639,9 +2636,9 @@ bool IRDaikin128::getSleep(void) {
   return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSleep;
 }
 
-void IRDaikin128::setEcono(const bool toggle) {
+void IRDaikin128::setEcono(const bool on) {
   uint8_t mode = getMode();
-  if (toggle && (mode == kDaikin128Cool || mode == kDaikin128Heat))
+  if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     remote_state[kDaikin128ByteEconoLight] |= kDaikin128BitEcono;
   else
     remote_state[kDaikin128ByteEconoLight] &= ~kDaikin128BitEcono;
@@ -2652,7 +2649,8 @@ bool IRDaikin128::getEcono(void) {
 }
 
 void IRDaikin128::setQuiet(const bool on) {
-  if (on && getMode() != kDaikin128Auto)
+  uint8_t mode = getMode();
+  if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanQuiet);
   else
     setFan(kDaikin128FanAuto);
@@ -2663,7 +2661,8 @@ bool IRDaikin128::getQuiet(void) {
 }
 
 void IRDaikin128::setPowerful(const bool on) {
-  if (on && getMode() != kDaikin128Auto)
+  uint8_t mode = getMode();
+  if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanPowerful);
   else
     setFan(kDaikin128FanAuto);
@@ -2682,7 +2681,8 @@ String IRDaikin128::toString(void) {
                             kDaikin128Heat, kDaikin128Dry, kDaikin128Fan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin128FanHigh, kDaikin128FanLow,
-                           kDaikin128FanAuto, kDaikin128FanQuiet, kDaikin128FanMed);
+                           kDaikin128FanAuto, kDaikin128FanQuiet,
+                           kDaikin128FanMed);
   result += addBoolToString(getPowerful(), F("Powerful"));
   result += addBoolToString(getQuiet(), F("Quiet"));
   result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
