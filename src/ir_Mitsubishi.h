@@ -45,7 +45,6 @@ const uint8_t kMitsubishiAcStopTimer = 3;
 const uint8_t kMitsubishiAcStartStopTimer = 7;
 const uint8_t kMitsubishiAcWideVaneAuto = 8;
 
-
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
 #define MITSUBISHI_AC_VANE_AUTO kMitsubishiAcVaneAuto
@@ -60,7 +59,6 @@ const uint8_t kMitsubishiAcWideVaneAuto = 8;
 #define MITSUBISHI_AC_DRY kMitsubishiAcDry
 #define MITSUBISHI_AC_COOL kMitsubishiAcCool
 #define MITSUBISHI_AC_AUTO kMitsubishiAcAuto
-#define MITSUBISHI_AC_WIDE_VANE_AUTO kMitsubishiAcWideVaneAuto
 
 
 class IRMitsubishiAC {

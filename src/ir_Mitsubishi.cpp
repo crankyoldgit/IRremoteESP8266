@@ -556,7 +556,6 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
 // Set the requested wide-vane operation mode of the a/c unit.
 void IRMitsubishiAC::setWideVane(const uint8_t position) {
   uint8_t pos = std::min(position, kMitsubishiAcWideVaneAuto);  // bounds check
-  pos &= 0b1111;
   pos <<= 4;
   remote_state[8] &= 0b00000111;  // Clear the previous setting.
   remote_state[8] |= pos;
@@ -569,7 +568,7 @@ uint8_t IRMitsubishiAC::getVane(void) {
 
 // Return the requested wide vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getWideVane(void) {
-  return ((remote_state[8] & 0b11110000) >> 4);
+  return (remote_state[8] >> 4);
 }
 
 // Return the clock setting of the message. 1=1/6 hour. e.g. 4pm = 48
