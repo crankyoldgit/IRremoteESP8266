@@ -104,6 +104,7 @@ class IRMitsubishiAC {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST

@@ -713,6 +713,18 @@ stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
   }
 }
 
+// Convert a native horizontal swing to it's common equivalent.
+stdAc::swingh_t IRMitsubishiAC::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case 1: return stdAc::swingh_t::kLeftMax;
+    case 2: return stdAc::swingh_t::kLeft;
+    case 3: return stdAc::swingh_t::kMiddle;
+    case 4: return stdAc::swingh_t::kRight;
+    case 5: return stdAc::swingh_t::kRightMax;
+    default: return stdAc::swingh_t::kAuto;
+  }
+}
+
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRMitsubishiAC::toCommon(void) {
   stdAc::state_t result;
@@ -724,9 +736,9 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingv = this->toCommonSwingV(this->getVane());
+  result.swingh = this->toCommonSwingH(this->getWideVane());
   result.quiet = this->getFan() == kMitsubishiAcFanSilent;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
   result.clean = false;
   result.econo = false;
