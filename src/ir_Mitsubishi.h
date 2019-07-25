@@ -60,7 +60,6 @@ const uint8_t kMitsubishiAcWideVaneAuto = 8;
 #define MITSUBISHI_AC_COOL kMitsubishiAcCool
 #define MITSUBISHI_AC_AUTO kMitsubishiAcAuto
 
-
 class IRMitsubishiAC {
  public:
   explicit IRMitsubishiAC(const uint16_t pin, const bool inverted = false,
