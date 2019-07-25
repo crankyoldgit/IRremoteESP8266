@@ -985,7 +985,7 @@ TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
       "Power: On, Mode: 8 (HEAT), Temp: 22C, Fan: 6 (Quiet), Vane: AUTO, "
-      "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Wide Vane: 3, Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
       irMitsu.toString());
 }
 
