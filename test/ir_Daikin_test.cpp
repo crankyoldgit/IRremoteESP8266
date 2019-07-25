@@ -2662,3 +2662,30 @@ TEST(TestDaikin128Class, Timers) {
   ac.setOffTimerEnabled(false);
   EXPECT_FALSE(ac.getOffTimerEnabled());
 }
+
+TEST(TestDaikin128Class, ReconstructKnownState) {
+  IRDaikin128 ac(0);
+
+  uint8_t expectedState[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+
+  ac.begin();
+  ac.setPowerToggle(true);
+  ac.setMode(kDaikin128Cool);
+  ac.setTemp(26);
+  ac.setFan(kDaikin128FanAuto);
+  ac.setPowerful(false);
+  ac.setQuiet(false);
+  ac.setSwingVertical(true);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setClock(19 * 60 + 20);
+  ac.setOnTimerEnabled(false);
+  ac.setOnTimer(7 * 60 + 30);
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(22 * 60 + 0);
+  ac.setLightToggle(0);
+
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin128Bits);
+}
