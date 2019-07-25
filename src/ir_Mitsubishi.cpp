@@ -557,7 +557,7 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
 void IRMitsubishiAC::setWideVane(const uint8_t position) {
   uint8_t pos = std::min(position, kMitsubishiAcWideVaneAuto);  // bounds check
   pos <<= 4;
-  remote_state[8] &= 0b00000111;  // Clear the previous setting.
+  remote_state[8] &= 0b00001111;  // Clear the previous setting.
   remote_state[8] |= pos;
 }
 
