@@ -555,7 +555,7 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
 
 // Set the requested wide-vane operation mode of the a/c unit.
 void IRMitsubishiAC::setWideVane(const uint8_t position) {
-  uint8_t pos = std::min(position, (uint8_t)0b1000);  // bounds check
+  uint8_t pos = std::min(position, kMitsubishiAcWideVaneAuto);  // bounds check
   pos &= 0b1111;
   pos <<= 4;
   remote_state[8] &= 0b00000111;  // Clear the previous setting.
