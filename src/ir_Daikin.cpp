@@ -2614,6 +2614,30 @@ void IRDaikin128::setFan(const uint8_t speed) {
   }
 }
 
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
+    case stdAc::fanspeed_t::kLow: return kDaikin128FanLow;
+    case stdAc::fanspeed_t::kMedium: return kDaikin128FanMed;
+    case stdAc::fanspeed_t::kHigh: return kDaikin128FanHigh;
+    case stdAc::fanspeed_t::kMax: return kDaikin128FanPowerful;
+    default: return kDaikin128FanAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDaikin128FanPowerful: return stdAc::fanspeed_t::kMax;
+    case kDaikin128FanHigh: return stdAc::fanspeed_t::kHigh;
+    case kDaikin128FanMed: return stdAc::fanspeed_t::kMedium;
+    case kDaikin128FanLow: return stdAc::fanspeed_t::kLow;
+    case kDaikinFanQuiet: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
 void IRDaikin128::setSwingVertical(const bool on) {
   if (on)
     remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSwing;
@@ -2652,7 +2676,7 @@ void IRDaikin128::setQuiet(const bool on) {
   uint8_t mode = getMode();
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanQuiet);
-  else
+  else if (getFan() == kDaikin128FanQuiet)
     setFan(kDaikin128FanAuto);
 }
 
@@ -2664,7 +2688,7 @@ void IRDaikin128::setPowerful(const bool on) {
   uint8_t mode = getMode();
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanPowerful);
-  else
+  else if (getFan() == kDaikin128FanPowerful)
     setFan(kDaikin128FanAuto);
 }
 
@@ -2672,10 +2696,104 @@ bool IRDaikin128::getPowerful(void) {
   return getFan() == kDaikin128FanPowerful;
 }
 
+// Set the clock in mins since midnight
+void IRDaikin128::setClock(const uint16_t mins_since_midnight) {
+  uint16_t mins = mins_since_midnight;
+  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  // Hours.
+  remote_state[kDaikin128ByteClockHours] = uint8ToBcd(mins / 60);
+  // Minutes.
+  remote_state[kDaikin128ByteClockMins] = uint8ToBcd(mins % 60);
+}
+
+uint16_t IRDaikin128::getClock(void) {
+  return bcdToUint8(remote_state[kDaikin128ByteClockHours]) * 60 +
+      bcdToUint8(remote_state[kDaikin128ByteClockMins]);
+}
+
+void IRDaikin128::setOnTimerEnabled(const bool on) {
+  if (on)
+    remote_state[kDaikin128ByteOnTimer] |= kDaikin128BitTimerEnabled;
+  else
+    remote_state[kDaikin128ByteOnTimer] &= ~kDaikin128BitTimerEnabled;
+}
+
+bool IRDaikin128::getOnTimerEnabled(void) {
+  return remote_state[kDaikin128ByteOnTimer] & kDaikin128BitTimerEnabled;
+}
+
+// Timer is rounds down to the nearest half hour.
+// Args:
+//   ptr: A PTR to the byte containing the Timer value to be updated.
+//   mins_since_midnight: The number of minutes the new timer should be set to.
+void IRDaikin128::setTimer(uint8_t *ptr, const uint16_t mins_since_midnight) {
+  uint16_t mins = mins_since_midnight;
+  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  // Clear the time component
+  *ptr &= kDaikin128BitTimerEnabled;
+  uint8_t bcdhours = uint8ToBcd(mins / 60);
+  bool addhalf = (mins % 60) >= 30;
+  *ptr |= ((addhalf << 6) | bcdhours);
+}
+
+// Timer is stored in nr of half hours internally.
+// Args:
+//   ptr: A PTR to the byte containing the Timer value.
+// Returns:
+//   A uint16_t containing the number of minutes since midnight.
+uint16_t IRDaikin128::getTimer(const uint8_t *ptr) {
+  uint8_t bcdhours = *ptr & kDaikin128MaskHours;
+  bool addhalf = *ptr & kDaikin128BitHalfHour;
+  return bcdToUint8(bcdhours) * 60 + (addhalf ? 30 : 0);
+}
+
+void IRDaikin128::setOnTimer(const uint16_t mins_since_midnight) {
+  setTimer(remote_state + kDaikin128ByteOnTimer, mins_since_midnight);
+}
+
+uint16_t IRDaikin128::getOnTimer(void) {
+  return getTimer(remote_state + kDaikin128ByteOnTimer);
+}
+
+void IRDaikin128::setOffTimerEnabled(const bool on) {
+  if (on)
+    remote_state[kDaikin128ByteOffTimer] |= kDaikin128BitTimerEnabled;
+  else
+    remote_state[kDaikin128ByteOffTimer] &= ~kDaikin128BitTimerEnabled;
+}
+
+bool IRDaikin128::getOffTimerEnabled(void) {
+  return remote_state[kDaikin128ByteOffTimer] & kDaikin128BitTimerEnabled;
+}
+
+void IRDaikin128::setOffTimer(const uint16_t mins_since_midnight) {
+  setTimer(remote_state + kDaikin128ByteOffTimer, mins_since_midnight);
+}
+
+uint16_t IRDaikin128::getOffTimer(void) {
+  return getTimer(remote_state + kDaikin128ByteOffTimer);
+}
+
+void IRDaikin128::setLightToggle(const uint8_t unit) {
+  switch (unit) {
+    case kDaikin128BitCeiling:
+    case kDaikin128BitWall:
+    case 0:
+      remote_state[kDaikin128ByteEconoLight] &= ~kDaikin128MaskLight;
+      remote_state[kDaikin128ByteEconoLight] |= unit;
+      break;
+    default: setLightToggle(0);
+  }
+}
+
+uint8_t IRDaikin128::getLightToggle(void) {
+  return remote_state[kDaikin128ByteEconoLight] & kDaikin128MaskLight;
+}
+
 // Convert the internal state into a human readable string.
 String IRDaikin128::toString(void) {
   String result = "";
-  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(240);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPowerToggle(), F("Power Toggle"), false);
   result += addModeToString(getMode(), kDaikin128Auto, kDaikin128Cool,
                             kDaikin128Heat, kDaikin128Dry, kDaikin128Fan);
@@ -2685,9 +2803,50 @@ String IRDaikin128::toString(void) {
                            kDaikin128FanMed);
   result += addBoolToString(getPowerful(), F("Powerful"));
   result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getSwingVertical(), F("Swing (V)"));
   result += addBoolToString(getSleep(), F("Sleep"));
   result += addBoolToString(getEcono(), F("Econo"));
+  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addBoolToString(getOnTimerEnabled(), F("On Timer"));
+  result += addLabeledString(minsToString(getOnTimer()), F("On Time"));
+  result += addBoolToString(getOffTimerEnabled(), F("Off Timer"));
+  result += addLabeledString(minsToString(getOffTimer()), F("Off Time"));
+  result += addIntToString(getLightToggle(), F("Light Toggle"));
+  result += F(" (");
+  switch (getLightToggle()) {
+    case kDaikin128BitCeiling: result += F("Ceiling"); break;
+    case kDaikin128BitWall: result += F("Wall"); break;
+    case 0: result += F("Off"); break;
+    default: result += F("UNKNOWN");
+  }
+  result += ')';
+  return result;
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
+  stdAc::state_t result;
+  if (prev != NULL) result = *prev;
+  result.protocol = decode_type_t::DAIKIN128;
+  result.model = -1;  // No models used.
+  result.power ^= getPowerToggle();
+  result.mode = toCommonMode(getMode());
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
+                                     : stdAc::swingv_t::kOff;
+  result.quiet = getQuiet();
+  result.turbo = getPowerful();
+  result.econo = getEcono();
+  result.light ^= (getLightToggle() != 0);
+  result.sleep = getSleep() ? 0 : -1;
+  result.clock = getClock();
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.clean = false;
+  result.filter = false;
+  result.beep = false;
   return result;
 }
 

@@ -1517,7 +1517,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN128", typeToString(decode_type_t::DAIKIN128));
   ASSERT_EQ(decode_type_t::DAIKIN128, strToDecodeType("DAIKIN128"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN128));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
 
   ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
   ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
@@ -2341,7 +2341,10 @@ TEST(TestDecodeDaikin128, RealExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power Toggle: On, Mode: 2 (COOL), Temp: 26C, Fan: 1 (Auto), "
-      "Powerful: Off, Quiet: Off, Swing (Vertical): On, Sleep: Off, Econo: Off",
+      "Powerful: Off, Quiet: Off, Swing (V): On, Sleep: Off, "
+      "Econo: Off, Clock: 19:20, "
+      "On Timer: Off, On Time: 07:30, Off Timer: Off, Off Time: 22:00, "
+      "Light Toggle: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -2586,8 +2589,10 @@ TEST(TestDaikin128Class, HumanReadable) {
   ac.setSwingVertical(true);
   EXPECT_EQ(
       "Power Toggle: Off, Mode: 10 (AUTO), Temp: 25C, Fan: 1 (Auto), "
-      "Powerful: Off, Quiet: Off, Swing (Vertical): On, "
-      "Sleep: Off, Econo: Off",
+      "Powerful: Off, Quiet: Off, Swing (V): On, "
+      "Sleep: Off, Econo: Off, Clock: 00:00, "
+      "On Timer: Off, On Time: 00:00, Off Timer: Off, Off Time: 00:00, "
+      "Light Toggle: 0 (Off)",
       ac.toString());
   ac.setMode(kDaikin128Cool);
   ac.setTemp(16);
@@ -2596,9 +2601,64 @@ TEST(TestDaikin128Class, HumanReadable) {
   ac.setPowerToggle(true);
   ac.setSleep(true);
   ac.setEcono(true);
+  ac.setClock(18 * 60 + 33);  // 18:33
+  ac.setOnTimer(10 * 60);  // 10am
+  ac.setOnTimerEnabled(true);
+  ac.setOffTimer(21 * 60 + 30);  // 9:30pm
+  ac.setOffTimerEnabled(true);
+  ac.setLightToggle(kDaikin128BitWall);
   EXPECT_EQ(
       "Power Toggle: On, Mode: 2 (COOL), Temp: 16C, Fan: 9 (Quiet), "
-      "Powerful: Off, Quiet: On, Swing (Vertical): Off, "
-      "Sleep: On, Econo: On",
+      "Powerful: Off, Quiet: On, Swing (V): Off, "
+      "Sleep: On, Econo: On, Clock: 18:33, "
+      "On Timer: On, On Time: 10:00, Off Timer: On, Off Time: 21:30, "
+      "Light Toggle: 8 (Wall)",
       ac.toString());
+}
+
+TEST(TestDaikin128Class, Clock) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
+  ac.setClock(23 * 60 + 59 + 1);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(24 * 60 + 99);
+  EXPECT_EQ(0, ac.getClock());
+}
+
+TEST(TestDaikin128Class, Timers) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(true);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimer(13 * 60 + 30);
+  EXPECT_EQ("13:30", irutils::minsToString(ac.getOnTimer()));
+  ac.setOnTimer(13 * 60 + 31);
+  EXPECT_EQ("13:30", irutils::minsToString(ac.getOnTimer()));
+  ac.setOnTimer(13 * 60 + 29);
+  EXPECT_EQ("13:00", irutils::minsToString(ac.getOnTimer()));
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(true);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimer(1 * 60 + 30);
+  EXPECT_EQ("01:30", irutils::minsToString(ac.getOffTimer()));
+  ac.setOffTimer(23 * 60 + 31);
+  EXPECT_EQ("23:30", irutils::minsToString(ac.getOffTimer()));
+  ac.setOffTimer(24 * 60 + 29);
+  EXPECT_EQ("00:00", irutils::minsToString(ac.getOffTimer()));
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
 }

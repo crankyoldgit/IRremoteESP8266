@@ -55,6 +55,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN
     case decode_type_t::DAIKIN:
 #endif
+#if SEND_DAIKIN128
+    case decode_type_t::DAIKIN128:
+#endif
 #if SEND_DAIKIN160
     case decode_type_t::DAIKIN160:
 #endif
@@ -230,6 +233,32 @@ void IRac::daikin(IRDaikinESP *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN
+
+#if SEND_DAIKIN128
+void IRac::daikin128(IRDaikin128 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo, const bool light,
+                  const bool econo, const int16_t sleep, const int16_t clock) {
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  // No Horizontal Swing setting avaliable.
+  ac->setQuiet(quiet);
+  ac->setLightToggle(light ? kDaikin128BitWall : 0);
+  // No Filter setting available.
+  ac->setPowerful(turbo);
+  ac->setEcono(econo);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep > 0);
+  if (clock >= 0) ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_DAIKIN128
 
 #if SEND_DAIKIN160
 void IRac::daikin160(IRDaikin160 *ac,
@@ -914,6 +943,10 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.clean = desired.clean ^ prev->clean;
         result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
+      case decode_type_t::DAIKIN128:
+        result.power = desired.power ^ prev->power;
+        result.light = desired.light ^ prev->light;
+        break;
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
         break;
@@ -997,6 +1030,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN128
+    case DAIKIN128:
+    {
+      IRDaikin128 ac(_pin, _inverted, _modulation);
+      daikin128(&ac, on, mode, degC, fan, swingv, quiet, turbo,
+                light, econo, sleep, clock);
+      break;
+    }
+#endif  // SEND_DAIKIN2
 #if SEND_DAIKIN160
     case DAIKIN160:
     {
@@ -1021,7 +1063,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
               light, econo, filter, clean, beep, sleep, clock);
       break;
     }
-#endif  // SEND_DAIKIN216
+#endif  // SEND_DAIKIN2
 #if SEND_DAIKIN216
     case DAIKIN216:
     {
