@@ -198,6 +198,28 @@ TEST(TestIRac, Daikin160) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Daikin176) {
+  IRDaikin176 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 1 (Low), Swing (H): 5 (Auto)";
+
+  ac.begin();
+  irac.daikin176(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kCool,      // Mode
+                 26,                          // Celsius
+                 stdAc::fanspeed_t::kLow,     // Fan speed
+                 stdAc::swingh_t::kAuto);     // Horizontal swing
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN176, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin176Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Daikin2) {
   IRDaikin2 ac(0);
   IRac irac(0);
@@ -505,14 +527,17 @@ TEST(TestIRac, Midea) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (DRY), Temp: 27C/81F, Fan: 2 (Medium), Sleep: On";
+      "Power: On, Mode: 1 (DRY), Celsius: On, Temp: 27C/80F, Fan: 2 (Medium), "
+      "Sleep: On, Swing(V) Toggle: Off";
 
   ac.begin();
   irac.midea(&ac,
              true,                        // Power
              stdAc::opmode_t::kDry,       // Mode
-             27,                          // Celsius
+             true,                        // Celsius
+             27,                          // Degrees
              stdAc::fanspeed_t::kMedium,  // Fan speed
+             stdAc::swingv_t::kOff,       // Swing (V)
              8 * 60 + 0);                 // Sleep time
 
   ASSERT_EQ(expected, ac.toString());
@@ -529,7 +554,7 @@ TEST(TestIRac, Mitsubishi) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 24 (COOL), Temp: 20C, Fan: 2 (Medium), Vane: AUTO, "
-      "Time: 14:30, On timer: 00:00, Off timer: 00:00, Timer: -";
+      "Wide Vane: 3, Time: 14:30, On timer: 00:00, Off timer: 00:00, Timer: -";
 
   ac.begin();
   irac.mitsubishi(&ac,
@@ -538,6 +563,7 @@ TEST(TestIRac, Mitsubishi) {
                   20,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
                   stdAc::swingv_t::kOff,       // Veritcal swing
+                  stdAc::swingh_t::kOff,       // Horizontal swing
                   false,                       // Silent
                   14 * 60 + 35);               // Clock
   ASSERT_EQ(expected, ac.toString());

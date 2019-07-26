@@ -553,9 +553,22 @@ void IRMitsubishiAC::setVane(const uint8_t position) {
   remote_state[9] |= pos;
 }
 
+// Set the requested wide-vane operation mode of the a/c unit.
+void IRMitsubishiAC::setWideVane(const uint8_t position) {
+  uint8_t pos = std::min(position, kMitsubishiAcWideVaneAuto);  // bounds check
+  pos <<= 4;
+  remote_state[8] &= 0b00001111;  // Clear the previous setting.
+  remote_state[8] |= pos;
+}
+
 // Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishiAC::getVane(void) {
   return ((remote_state[9] & 0b00111000) >> 3);
+}
+
+// Return the requested wide vane operation mode of the a/c unit.
+uint8_t IRMitsubishiAC::getWideVane(void) {
+  return (remote_state[8] >> 4);
 }
 
 // Return the clock setting of the message. 1=1/6 hour. e.g. 4pm = 48
@@ -630,13 +643,39 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
+      return kMitsubishiAcVaneAutoMove - 6;
     case stdAc::swingv_t::kHigh:
+      return kMitsubishiAcVaneAutoMove - 5;
     case stdAc::swingv_t::kMiddle:
+      return kMitsubishiAcVaneAutoMove - 4;
     case stdAc::swingv_t::kLow:
+      return kMitsubishiAcVaneAutoMove - 3;
     case stdAc::swingv_t::kLowest:
-      return kMitsubishiAcVaneAutoMove;
+      return kMitsubishiAcVaneAutoMove - 2;
+    case stdAc::swingv_t::kAuto:
+       return kMitsubishiAcVaneAutoMove;
     default:
-      return kMitsubishiAcVaneAuto;
+       return kMitsubishiAcVaneAuto;
+  }
+}
+
+// Convert a standard A/C wide wane swing into its native setting.
+uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kLeftMax:
+      return kMitsubishiAcWideVaneAuto - 7;
+    case stdAc::swingh_t::kLeft:
+      return kMitsubishiAcWideVaneAuto - 6;
+    case stdAc::swingh_t::kMiddle:
+      return kMitsubishiAcWideVaneAuto - 5;
+    case stdAc::swingh_t::kRight:
+      return kMitsubishiAcWideVaneAuto - 4;
+    case stdAc::swingh_t::kRightMax:
+      return kMitsubishiAcWideVaneAuto - 3;
+    case stdAc::swingh_t::kAuto:
+      return kMitsubishiAcWideVaneAuto;
+    default:
+      return kMitsubishiAcWideVaneAuto - 5;
   }
 }
 
@@ -674,6 +713,18 @@ stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
   }
 }
 
+// Convert a native horizontal swing to it's common equivalent.
+stdAc::swingh_t IRMitsubishiAC::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case 1: return stdAc::swingh_t::kLeftMax;
+    case 2: return stdAc::swingh_t::kLeft;
+    case 3: return stdAc::swingh_t::kMiddle;
+    case 4: return stdAc::swingh_t::kRight;
+    case 5: return stdAc::swingh_t::kRightMax;
+    default: return stdAc::swingh_t::kAuto;
+  }
+}
+
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRMitsubishiAC::toCommon(void) {
   stdAc::state_t result;
@@ -685,9 +736,9 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingv = this->toCommonSwingV(this->getVane());
+  result.swingh = this->toCommonSwingH(this->getWideVane());
   result.quiet = this->getFan() == kMitsubishiAcFanSilent;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
   result.clean = false;
   result.econo = false;
@@ -722,6 +773,14 @@ String IRMitsubishiAC::toString(void) {
       break;
     default:
       result += uint64ToString(this->getVane());
+  }
+  result += F(", Wide Vane: ");
+  switch (this->getWideVane()) {
+    case kMitsubishiAcWideVaneAuto:
+      result += F("AUTO");
+      break;
+    default:
+      result += uint64ToString(this->getWideVane());
   }
   result += addLabeledString(minsToString(getClock() * 10), F("Time"));
   result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));

@@ -2299,6 +2299,234 @@ TEST(TestDaikin160Class, HumanReadable) {
       ac.toString());
 }
 
+TEST(TestDaikin176Class, FanControl) {
+  IRDaikin176 ac(0);
+
+  EXPECT_EQ(
+      "Power: Off, Mode: 7 (COOL), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
+      ac.toString());
+  ac.setFan(kDaikinFanMin);
+  ac.setPower(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 1 (Low), Swing (H): 6 (Off)",
+      ac.toString());
+  ac.setFan(kDaikinFanMin + 1);
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
+      ac.toString());
+  ac.setFan(kDaikin176FanMax);
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 9C, Fan: 3 (High), Swing (H): 6 (Off)",
+      ac.toString());
+
+  // Real state from remote
+  // https://github.com/crankyoldgit/IRremoteESP8266/pull/826#issuecomment-513168270
+  uint8_t state[kDaikin176StateLength] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x73, 0x00, 0x21, 0x00, 0x00, 0x22, 0x35,
+      0x00, 0x20, 0x25};
+  ac.setRaw(state);
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 3 (High), "
+      "Swing (H): 5 (Auto)",
+      ac.toString());
+}
+
+TEST(TestDaikin176Class, convertFan) {
+  EXPECT_EQ(kDaikinFanMin, IRDaikin176::convertFan(stdAc::fanspeed_t::kMin));
+  EXPECT_EQ(kDaikinFanMin, IRDaikin176::convertFan(stdAc::fanspeed_t::kLow));
+  EXPECT_EQ(kDaikin176FanMax,
+            IRDaikin176::convertFan(stdAc::fanspeed_t::kMedium));
+  EXPECT_EQ(kDaikin176FanMax,
+            IRDaikin176::convertFan(stdAc::fanspeed_t::kHigh));
+  EXPECT_EQ(kDaikin176FanMax, IRDaikin176::convertFan(stdAc::fanspeed_t::kMax));
+  EXPECT_EQ(kDaikin176FanMax,
+            IRDaikin176::convertFan(stdAc::fanspeed_t::kAuto));
+}
+
+TEST(TestDaikin176Class, SimulateIRacDaikin176) {
+  IRDaikin176 ac(0);
+
+  ac.setPower(true);
+  ac.setMode(ac.convertMode(stdAc::opmode_t::kCool));
+  ac.setTemp(26);
+  ac.setFan(ac.convertFan(stdAc::fanspeed_t::kMax));
+  ac.setSwingHorizontal(kDaikin176SwingHOff);
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 3 (High), Swing (H): 6 (Off)",
+      ac.toString());
+  ac.setSwingHorizontal(ac.convertSwingH(stdAc::swingh_t::kAuto));
+  EXPECT_EQ(
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 3 (High), "
+      "Swing (H): 5 (Auto)",
+      ac.toString());
+}
+
+TEST(TestDaikin176Class, OperatingMode) {
+  IRDaikin176 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+
+  ac.setMode(kDaikin176Cool);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+
+  ac.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+
+  ac.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikinFan, ac.getMode());
+
+  ac.setMode(kDaikin176Cool + 1);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+
+  ac.setMode(kDaikinAuto + 1);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDaikin176Cool, ac.getMode());
+}
+
+TEST(TestDaikin176Class, Temperature) {
+  IRDaikin176 ac(0);
+  ac.begin();
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp + 1);
+  EXPECT_EQ(kDaikinMinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+
+  // Temp should be locked to kDaikin176DryFanTemp when in Dry or Fan Mode.
+  ac.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikin176DryFanTemp, ac.getTemp());
+  ac.setMode(kDaikin176Cool);
+  EXPECT_EQ(29, ac.getTemp());
+  ac.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+  EXPECT_EQ(kDaikin176DryFanTemp, ac.getTemp());
+  ac.setMode(kDaikin176Cool);
+  EXPECT_EQ(29, ac.getTemp());
+  ac.setMode(kDaikinFan);
+  ac.setTemp(25);
+  EXPECT_EQ(kDaikin176DryFanTemp, ac.getTemp());
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(25, ac.getTemp());
+}
+
+TEST(TestDaikin176Class, Power) {
+  IRDaikin176 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestDaikin176Class, VaneSwing) {
+  IRDaikin176 ac(0);
+  ac.begin();
+
+  ac.setSwingHorizontal(kDaikin176SwingHAuto);
+  EXPECT_EQ(kDaikin176SwingHAuto, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(0);
+  EXPECT_EQ(kDaikin176SwingHAuto, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(kDaikin176SwingHOff);
+  EXPECT_EQ(kDaikin176SwingHOff, ac.getSwingHorizontal());
+
+  ac.setSwingHorizontal(255);
+  EXPECT_EQ(kDaikin176SwingHAuto, ac.getSwingHorizontal());
+
+  EXPECT_EQ(kDaikin176SwingHAuto,
+            IRDaikin176::convertSwingH(stdAc::swingh_t::kAuto));
+  EXPECT_EQ(kDaikin176SwingHOff,
+            IRDaikin176::convertSwingH(stdAc::swingh_t::kOff));
+  EXPECT_EQ(kDaikin176SwingHAuto,
+            IRDaikin176::convertSwingH(stdAc::swingh_t::kLeft));
+}
+
+TEST(TestDaikin176Class, ReconstructKnownStates) {
+  IRDaikin176 ac(0);
+  ac.begin();
+  // Data from:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/pull/826#issuecomment-513531138
+
+  // Power: On, Mode: 7 (COOL), Temp: 25C, Fan: 3 (MAX), Swing (H): 5 (Auto)
+  // 11DA171804001E11DA17180073002100002035002023
+  uint8_t on_cool_25_max_auto[22] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x73, 0x00, 0x21, 0x00, 0x00, 0x20, 0x35,
+      0x00, 0x20, 0x23};
+  // Power: On, Mode: 6 (FAN), Temp: 17C, Fan: 3 (MAX), Swing (H): 5 (Auto)
+  // 11DA171804001E11DA171800630401000010350020E7
+  uint8_t on_fan_17_max_auto[22] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x63, 0x04, 0x01, 0x00, 0x00, 0x10, 0x35,
+      0x00, 0x20, 0xE7};
+  // Power: On, Mode: 2 (DRY), Temp: 17C, Fan: 3 (MAX), Swing (H): 5 (Auto)
+  // 11DA171804001E11DA17180023047100001035002017
+  uint8_t on_dry_17_max_auto[22] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x23, 0x04, 0x71, 0x00, 0x00, 0x10, 0x35,
+      0x00, 0x20, 0x17};
+  // Power: On, Mode: 7 (COOL), Temp: 25C, Fan: 3 (MAX), Swing (H): 5 (Auto)
+  // 11DA171804001E11DA17180073042100002035002027
+  uint8_t on_cool_25_max_auto_v2[22] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x73, 0x04, 0x21, 0x00, 0x00, 0x20, 0x35,
+      0x00, 0x20, 0x27};
+  ac.setMode(kDaikin176Cool);
+  ac.setPower(true);
+  ac.setTemp(25);
+  ac.setFan(kDaikin176FanMax);
+  ac.setSwingHorizontal(true);
+  EXPECT_STATE_EQ(on_cool_25_max_auto, ac.getRaw(), kDaikin176Bits);
+  ac.setMode(kDaikinFan);
+  EXPECT_STATE_EQ(on_fan_17_max_auto, ac.getRaw(), kDaikin176Bits);
+  ac.setMode(kDaikinDry);
+  EXPECT_STATE_EQ(on_dry_17_max_auto, ac.getRaw(), kDaikin176Bits);
+  ac.setMode(kDaikin176Cool);
+  EXPECT_STATE_EQ(on_cool_25_max_auto_v2, ac.getRaw(), kDaikin176Bits);
+}
+
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
 // Data from:
 //   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
