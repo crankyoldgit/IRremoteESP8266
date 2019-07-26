@@ -1517,7 +1517,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN128", typeToString(decode_type_t::DAIKIN128));
   ASSERT_EQ(decode_type_t::DAIKIN128, strToDecodeType("DAIKIN128"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN128));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
 
   ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
   ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
@@ -2567,6 +2567,13 @@ TEST(TestDecodeDaikin128, RealExample) {
   ASSERT_EQ(DAIKIN128, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (COOL), Temp: 26C, Fan: 1 (Auto), "
+      "Powerful: Off, Quiet: Off, Swing (V): On, Sleep: Off, "
+      "Econo: Off, Clock: 19:20, "
+      "On Timer: Off, On Time: 07:30, Off Timer: Off, Off Time: 22:00, "
+      "Light Toggle: 0 (Off)",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
@@ -2589,4 +2596,324 @@ TEST(TestDecodeDaikin128, SyntheticSelfDecode) {
   ASSERT_EQ(DAIKIN128, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin128Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestDaikin128Class, Checksums) {
+  IRDaikin128 ac(0);
+
+  uint8_t knownGood[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+  uint8_t knownBad[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0x0D,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  EXPECT_EQ(0xA, ac.calcFirstChecksum(knownGood));
+  EXPECT_EQ(0x0B, ac.calcSecondChecksum(knownGood));
+  EXPECT_TRUE(ac.validChecksum(knownGood));
+  ac.setRaw(knownBad);
+  EXPECT_STATE_EQ(knownGood, ac.getRaw(), kDaikin128Bits);
+}
+
+TEST(TestDaikin128Class, PowerToggle) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
+TEST(TestDaikin128Class, SwingVertical) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+}
+
+TEST(TestDaikin128Class, Sleep) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestDaikin128Class, Econo) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Econo works in some modes
+  ac.setMode(kDaikin128Heat);
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_FALSE(ac.getEcono());
+}
+
+TEST(TestDaikin128Class, FanSpeed) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikin128Cool);
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+  ac.setFan(5);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanHigh);
+  EXPECT_EQ(kDaikin128FanHigh, ac.getFan());
+
+  // Beyond Quiet should default to Auto.
+  ac.setFan(kDaikin128FanQuiet + 1);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanMed);
+  EXPECT_EQ(kDaikin128FanMed, ac.getFan());
+
+  ac.setFan(kDaikin128FanLow);
+  EXPECT_EQ(kDaikin128FanLow, ac.getFan());
+
+  ac.setFan(kDaikin128FanPowerful);
+  EXPECT_EQ(kDaikin128FanPowerful, ac.getFan());
+
+  ac.setFan(kDaikin128FanAuto);
+  EXPECT_EQ(kDaikin128FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin128FanQuiet);
+  EXPECT_EQ(kDaikin128FanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin128Class, OperatingMode) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setMode(0);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Cool);
+  EXPECT_EQ(kDaikin128Cool, ac.getMode());
+  ac.setMode(kDaikin128Auto);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Heat);
+  EXPECT_EQ(kDaikin128Heat, ac.getMode());
+  ac.setMode(kDaikin128Dry);
+  EXPECT_EQ(kDaikin128Dry, ac.getMode());
+  ac.setMode(kDaikin128Fan);
+  EXPECT_EQ(kDaikin128Fan, ac.getMode());
+  ac.setMode(3);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(kDaikin128Auto + 1);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kDaikin128Auto, ac.getMode());
+}
+
+TEST(TestDaikin128Class, Quiet) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Quiet works in some modes
+  ac.setMode(kDaikin128Cool);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getQuiet());
+}
+
+TEST(TestDaikin128Class, Powerful) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  // Powerful works in some modes
+  ac.setMode(kDaikin128Cool);
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getPowerful());
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  // But not some some modes
+  ac.setMode(kDaikin128Auto);
+  EXPECT_FALSE(ac.getPowerful());
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getPowerful());
+}
+
+TEST(TestDaikin128Class, Temperature) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MaxTemp);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp - 1);
+  EXPECT_EQ(kDaikin128MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MaxTemp + 1);
+  EXPECT_EQ(kDaikin128MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin128MinTemp + 1);
+  EXPECT_EQ(kDaikin128MinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+// Test human readable output.
+TEST(TestDaikin128Class, HumanReadable) {
+  IRDaikin128 ac(0);
+
+  ac.setPowerToggle(false);
+  ac.setMode(kDaikin128Auto);
+  ac.setTemp(25);
+  ac.setFan(kDaikin128FanAuto);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setSwingVertical(true);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 10 (AUTO), Temp: 25C, Fan: 1 (Auto), "
+      "Powerful: Off, Quiet: Off, Swing (V): On, "
+      "Sleep: Off, Econo: Off, Clock: 00:00, "
+      "On Timer: Off, On Time: 00:00, Off Timer: Off, Off Time: 00:00, "
+      "Light Toggle: 0 (Off)",
+      ac.toString());
+  ac.setMode(kDaikin128Cool);
+  ac.setTemp(16);
+  ac.setQuiet(true);
+  ac.setSwingVertical(false);
+  ac.setPowerToggle(true);
+  ac.setSleep(true);
+  ac.setEcono(true);
+  ac.setClock(18 * 60 + 33);  // 18:33
+  ac.setOnTimer(10 * 60);  // 10am
+  ac.setOnTimerEnabled(true);
+  ac.setOffTimer(21 * 60 + 30);  // 9:30pm
+  ac.setOffTimerEnabled(true);
+  ac.setLightToggle(kDaikin128BitWall);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (COOL), Temp: 16C, Fan: 9 (Quiet), "
+      "Powerful: Off, Quiet: On, Swing (V): Off, "
+      "Sleep: On, Econo: On, Clock: 18:33, "
+      "On Timer: On, On Time: 10:00, Off Timer: On, Off Time: 21:30, "
+      "Light Toggle: 8 (Wall)",
+      ac.toString());
+}
+
+TEST(TestDaikin128Class, Clock) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
+  ac.setClock(23 * 60 + 59 + 1);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(24 * 60 + 99);
+  EXPECT_EQ(0, ac.getClock());
+}
+
+TEST(TestDaikin128Class, Timers) {
+  IRDaikin128 ac(0);
+  ac.begin();
+
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(true);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimer(13 * 60 + 30);
+  EXPECT_EQ("13:30", irutils::minsToString(ac.getOnTimer()));
+  ac.setOnTimer(13 * 60 + 31);
+  EXPECT_EQ("13:30", irutils::minsToString(ac.getOnTimer()));
+  ac.setOnTimer(13 * 60 + 29);
+  EXPECT_EQ("13:00", irutils::minsToString(ac.getOnTimer()));
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(true);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimer(1 * 60 + 30);
+  EXPECT_EQ("01:30", irutils::minsToString(ac.getOffTimer()));
+  ac.setOffTimer(23 * 60 + 31);
+  EXPECT_EQ("23:30", irutils::minsToString(ac.getOffTimer()));
+  ac.setOffTimer(24 * 60 + 29);
+  EXPECT_EQ("00:00", irutils::minsToString(ac.getOffTimer()));
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+}
+
+TEST(TestDaikin128Class, ReconstructKnownState) {
+  IRDaikin128 ac(0);
+
+  uint8_t expectedState[kDaikin128StateLength] = {
+      0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+
+  ac.begin();
+  ac.setPowerToggle(true);
+  ac.setMode(kDaikin128Cool);
+  ac.setTemp(26);
+  ac.setFan(kDaikin128FanAuto);
+  ac.setPowerful(false);
+  ac.setQuiet(false);
+  ac.setSwingVertical(true);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setClock(19 * 60 + 20);
+  ac.setOnTimerEnabled(false);
+  ac.setOnTimer(7 * 60 + 30);
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(22 * 60 + 0);
+  ac.setLightToggle(0);
+
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin128Bits);
 }

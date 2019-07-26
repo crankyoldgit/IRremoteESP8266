@@ -144,6 +144,37 @@ TEST(TestIRac, Daikin) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Daikin128) {
+  IRDaikin128 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power Toggle: On, Mode: 8 (HEAT), Temp: 27C, Fan: 9 (Quiet), "
+      "Powerful: Off, Quiet: On, Swing (V): On, Sleep: On, "
+      "Econo: Off, Clock: 21:57, On Timer: Off, On Time: 00:00, "
+      "Off Timer: Off, Off Time: 00:00, Light Toggle: 8 (Wall)";
+
+  ac.begin();
+  irac.daikin128(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kHeat,      // Mode
+                 27,                          // Celsius
+                 stdAc::fanspeed_t::kMin,     // Fan speed
+                 stdAc::swingv_t::kAuto,       // Veritcal swing
+                 true,                        // Quiet
+                 false,                       // Turbo
+                 true,                        // Light
+                 false,                       // Econo
+                 18 * 60,                     // Sleep
+                 21 * 60 + 57);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN128, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin128Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Daikin160) {
   IRDaikin160 ac(0);
   IRac irac(0);

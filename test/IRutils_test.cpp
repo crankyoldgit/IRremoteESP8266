@@ -516,3 +516,27 @@ TEST(TestUtils, MinsToString) {
   EXPECT_EQ("18:59", irutils::minsToString(18 * 60 + 59));
   EXPECT_EQ("23:59", irutils::minsToString(23 * 60 + 59));
 }
+
+TEST(TestUtils, sumNibbles) {
+  uint8_t testdata[] = {0x01, 0x23, 0x45};
+  EXPECT_EQ(0, irutils::sumNibbles(testdata, 0));
+  EXPECT_EQ(1, irutils::sumNibbles(testdata, 0, 1));
+  EXPECT_EQ(1, irutils::sumNibbles(testdata, 1));
+  EXPECT_EQ(2, irutils::sumNibbles(testdata, 1, 1));
+  EXPECT_EQ(15, irutils::sumNibbles(testdata, 3));
+  EXPECT_EQ(115, irutils::sumNibbles(testdata, 3, 100));
+}
+
+TEST(TestUtils, BCD) {
+  EXPECT_EQ(0, irutils::uint8ToBcd(0));
+  EXPECT_EQ(0, irutils::bcdToUint8(0));
+  EXPECT_EQ(1, irutils::uint8ToBcd(1));
+  EXPECT_EQ(10, irutils::bcdToUint8(0x10));
+  EXPECT_EQ(0x10, irutils::uint8ToBcd(10));
+  EXPECT_EQ(11, irutils::bcdToUint8(0x11));
+  EXPECT_EQ(0x11, irutils::uint8ToBcd(11));
+  EXPECT_EQ(99, irutils::bcdToUint8(0x99));
+  EXPECT_EQ(0x99, irutils::uint8ToBcd(99));
+  EXPECT_EQ(255, irutils::bcdToUint8(0x9A));
+  EXPECT_EQ(255, irutils::uint8ToBcd(100));
+}

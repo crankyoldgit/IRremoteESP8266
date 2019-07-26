@@ -923,4 +923,30 @@ namespace irutils {
     result += uint64ToString(mins % 60);
     return result;
   }
+
+  // Sum all the nibbles together in a series of bytes.
+  // Args:
+  //   start: PTR to the start of the bytes.
+  //   length: Nr of bytes to sum the nibbles of.
+  //   init: Starting value of the sum.
+  // Returns:
+  //   A uint8_t sum of all the nibbles inc the init.
+  uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
+                     const uint8_t init) {
+    uint8_t sum = init;
+    const uint8_t *ptr;
+    for (ptr = start; ptr - start < length; ptr++)
+      sum += (*ptr >> 4) + (*ptr & 0xF);
+    return sum;
+  }
+
+  uint8_t bcdToUint8(const uint8_t bcd) {
+    if (bcd > 0x99) return 255;  // Too big.
+    return (bcd >> 4) * 10 + (bcd & 0xF);
+  }
+
+  uint8_t uint8ToBcd(const uint8_t integer) {
+    if (integer > 99) return 255;  // Too big.
+    return ((integer / 10) << 4) + (integer % 10);
+  }
 }  // namespace irutils
