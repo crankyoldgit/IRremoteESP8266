@@ -1,5 +1,33 @@
 # Release Notes
 
+## _v2.6.4 (20190726)_
+
+**[Bug Fixes]**
+- Fix some swing problems with the Mitsubishi HAVC protocol (#831)
+- Fix parameter ordering for Gree in common a/c code. (#815)
+- Fix parameters for Coolix in IRac::sendAc() (#829)
+- IRMQTTServer: Fix sending >64 bit codes. (#811)
+
+**[Features]**
+- Daikin128: Full detailed support & common a/c support. (#832)
+- Midea: Support native temp units of Celsius & SwingV. (#823)
+- Gree: Support `YBOFB` models and bug fix. (#815)
+- Pioneer: Fix sendPioneer with Pioneer specific timings (#830)
+- Daikin128: Initial support for Daikin 17 Series/BRC52B63 (#828)
+- Coolix: Better `toCommon()` support. (#825)
+- Experimental detailed support for Daikin 176 bits (#816)
+- Add setting of output options to A/C classes. (#808)
+- Add invert flag support to Samsung AC (#807)
+
+**[Misc]**
+- Daikin176: making some change on Daikin176 to work with IRMQTTServer (#826)
+- Reduce duplicate code to save (3K+) space. (#813)
+- Daikin176: Experiment Daikin176bits with IRMQTTServer (#824)
+- Update platformio.ini files for PlatformIO v4.0.0 (#812)
+- Change repo URLs to new location. (#806)
+- Move `htmlEscape()` to the IRutils namespace (#801)
+
+
 ## _v2.6.3 (20190704)_
 
 **[Bug Fixes]**
