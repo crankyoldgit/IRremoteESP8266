@@ -2060,7 +2060,9 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 //
 // Supported Remotes: Daikin BRC4C153 remote
 //
-IRDaikin176::IRDaikin176(uint16_t pin) : _irsend(pin) { stateReset(); }
+IRDaikin176::IRDaikin176(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 void IRDaikin176::begin() { _irsend.begin(); }
 
@@ -2104,10 +2106,12 @@ void IRDaikin176::stateReset() {
   remote_state[8] =  0xDA;
   remote_state[9] =  0x17;
   remote_state[10] = 0x18;
-  remote_state[12] = 0x03;
+  remote_state[12] = 0x73;
   remote_state[14] = 0x20;
+  remote_state[18] = 0x16;  // Fan speed and swing
   remote_state[20] = 0x20;
   // remote_state[21] is a checksum byte, it will be set by checksum().
+  _saved_temp = getTemp();
 }
 
 uint8_t *IRDaikin176::getRaw() {
@@ -2118,6 +2122,7 @@ uint8_t *IRDaikin176::getRaw() {
 void IRDaikin176::setRaw(const uint8_t new_code[]) {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++)
     remote_state[i] = new_code[i];
+  _saved_temp = getTemp();
 }
 
 #if SEND_DAIKIN176
@@ -2127,19 +2132,16 @@ void IRDaikin176::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN176
 
-void IRDaikin176::on() {
-  remote_state[kDaikin176BytePower] |= kDaikinBitPower;
-}
+void IRDaikin176::on() { setPower(true); }
 
-void IRDaikin176::off() {
-  remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
-}
+void IRDaikin176::off() { setPower(false); }
 
 void IRDaikin176::setPower(const bool state) {
+  remote_state[kDaikin176ByteModeButton] = 0;
   if (state)
-    on();
+    remote_state[kDaikin176BytePower] |= kDaikinBitPower;
   else
-    off();
+    remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
 }
 
 bool IRDaikin176::getPower() {
@@ -2151,42 +2153,60 @@ uint8_t IRDaikin176::getMode() {
 }
 
 void IRDaikin176::setMode(const uint8_t mode) {
+  uint8_t altmode = 0;
   switch (mode) {
-    case kDaikinAuto:
-    case kDaikin176Cool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry:
-      remote_state[kDaikin176ByteMode] &= kDaikin176MaskMode;
-      remote_state[kDaikin176ByteMode] |= (mode << 4);
-      break;
-    default:
-      this->setMode(kDaikinAuto);
+    case kDaikinFan: altmode = 0; break;
+    case kDaikinDry: altmode = 7; break;
+    case kDaikin176Cool: altmode = 2; break;
+    default: this->setMode(kDaikin176Cool); return;
   }
+  // Set the mode.
+  remote_state[kDaikin176ByteMode] &= ~kDaikin176MaskMode;
+  remote_state[kDaikin176ByteMode] |= (mode << 4);
+  // Set the altmode
+  remote_state[kDaikin176BytePower] &= ~kDaikin176MaskMode;
+  remote_state[kDaikin176BytePower] |= (altmode << 4);
+  setTemp(_saved_temp);
+  // Needs to happen after setTemp() as it will clear it.
+  remote_state[kDaikin176ByteModeButton] = kDaikin176ModeButton;
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kDaikin176Cool;
-    case stdAc::opmode_t::kHeat:
-      return kDaikinHeat;
     case stdAc::opmode_t::kDry:
       return kDaikinDry;
+    case stdAc::opmode_t::kHeat:  // Heat not supported, but fan is the closest.
     case stdAc::opmode_t::kFan:
       return kDaikinFan;
     default:
-      return kDaikinAuto;
+      return kDaikin176Cool;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinDry: return stdAc::opmode_t::kDry;
+    case kDaikinHeat:  // There is no heat mode, but fan is the closest.
+    case kDaikinFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kCool;
   }
 }
 
 // Set the temp in deg C
 void IRDaikin176::setTemp(const uint8_t temp) {
-  uint8_t degrees = std::max(temp, kDaikinMinTemp);
-  degrees = std::min(degrees, kDaikinMaxTemp) * 2 - 18;
+  uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
+  _saved_temp = degrees;
+  switch (getMode()) {
+    case kDaikinDry:
+    case kDaikinFan:
+      degrees = kDaikin176DryFanTemp;
+  }
+  degrees = degrees * 2 - 18;
   remote_state[kDaikin176ByteTemp] &= ~kDaikin176MaskTemp;
   remote_state[kDaikin176ByteTemp] |= degrees;
+  remote_state[kDaikin176ByteModeButton] = 0;
 }
 
 uint8_t IRDaikin176::getTemp(void) {
@@ -2195,45 +2215,43 @@ uint8_t IRDaikin176::getTemp(void) {
 
 // Set the speed of the fan, 1 for Min or 3 for Max
 void IRDaikin176::setFan(const uint8_t fan) {
-  uint8_t fanset;
-  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
-    fanset = fan;
-  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
-    fanset = kDaikinFanAuto;
-  else
-    fanset = 2 + fan;
-  // Set the fan speed bits, leave *lower* 4 bits alone
-  remote_state[kDaikin176ByteFan] &= ~kDaikin176MaskFan;
-  remote_state[kDaikin176ByteFan] |= (fanset << 4);
+  switch (fan) {
+    case kDaikinFanMin:
+    case kDaikin176FanMax:
+      remote_state[kDaikin176ByteFan] &= ~kDaikin176MaskFan;
+      remote_state[kDaikin176ByteFan] |= (fan << 4);
+      remote_state[kDaikin176ByteModeButton] = 0;
+      break;
+    default:
+      setFan(kDaikin176FanMax);
+  }
 }
 
-uint8_t IRDaikin176::getFan() {
-  uint8_t fan = remote_state[kDaikin176ByteFan] >> 4;
-  return fan;
-}
+uint8_t IRDaikin176::getFan() { return remote_state[kDaikin176ByteFan] >> 4; }
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
-     switch (speed) {
-    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
-    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
-    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kDaikinFanMin;
     default:
-      return kDaikinFanAuto;
+      return kDaikin176FanMax;
   }
 }
 
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
-    case kDaikin176SwingHSwing:
-    remote_state[kDaikin176ByteSwingH] &= kDaikin176MaskSwingH;
-    remote_state[kDaikin176ByteSwingH] |= position;
-    break;
-     default: setSwingHorizontal(kDaikin176SwingHAuto);
+    case kDaikin176SwingHOff:
+    case kDaikin176SwingHAuto:
+      remote_state[kDaikin176ByteSwingH] &= ~kDaikin176MaskSwingH;
+      remote_state[kDaikin176ByteSwingH] |= position;
+      break;
+    default:
+      setSwingHorizontal(kDaikin176SwingHAuto);
   }
 }
+
 uint8_t IRDaikin176::getSwingHorizontal() {
   return remote_state[kDaikin176ByteSwingH] & kDaikin176MaskSwingH;
 }
@@ -2242,7 +2260,9 @@ uint8_t IRDaikin176::getSwingHorizontal() {
 uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kOff:
-      return kDaikin176SwingHSwing;
+      return kDaikin176SwingHOff;
+    case stdAc::swingh_t::kAuto:
+      return kDaikin176SwingHAuto;
     default:
       return kDaikin176SwingHAuto;
   }
@@ -2250,9 +2270,17 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
 // Convert a native horizontal swing to it's common equivalent.
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin176SwingHSwing: return stdAc::swingh_t::kOff;
-    default: return stdAc::swingh_t::kAuto;
+    case kDaikin176SwingHOff: return stdAc::swingh_t::kOff;
+    case kDaikin176SwingHAuto: return stdAc::swingh_t::kAuto;
+    default:
+      return stdAc::swingh_t::kAuto;
   }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
+  return (speed == kDaikinFanMin) ? stdAc::fanspeed_t::kMin
+                                  : stdAc::fanspeed_t::kMax;
 }
 
 // Convert the A/C state to it's common equivalent.
@@ -2261,10 +2289,10 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   result.protocol = decode_type_t::DAIKIN176;
   result.model = -1;  // No models used.
   result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.mode = IRDaikin176::toCommonMode(this->getMode());
   result.celsius = true;
   result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
 
   // Not supported.
@@ -2284,60 +2312,24 @@ stdAc::state_t IRDaikin176::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRDaikin176::toString() {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += F("Power: ");
-  if (this->getPower())
-    result += F("On");
-  else
-    result += F("Off");
-  result += F(", Mode: ");
-  result += uint64ToString(this->getMode());
-  switch (getMode()) {
-    case kDaikinAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinCool + 4:
-      result += F(" (COOL)");
-      break;
-    case kDaikinHeat:
-      result += F(" (HEAT)");
-      break;
-    case kDaikinDry:
-      result += F(" (DRY)");
-      break;
-    case kDaikinFan:
-      result += F(" (FAN)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += F(", Temp: ");
-  result += uint64ToString(this->getTemp());
-  result += F("C, Fan: ");
-  result += uint64ToString(this->getFan());
-  switch (this->getFan()) {
-    case kDaikinFanAuto:
-      result += F(" (AUTO)");
-      break;
-    case kDaikinFanQuiet:
-      result += F(" (QUIET)");
-      break;
-    case kDaikinFanMin:
-      result += F(" (MIN)");
-      break;
-    case kDaikinFanMax - 2:
-      result += F(" (MAX)");
-      break;
-  }
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikin176Cool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
+                           kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
   result += F(", Swing (H): ");
   result += uint64ToString(getSwingHorizontal());
   switch (getSwingHorizontal()) {
     case kDaikin176SwingHAuto:
-    result += F(" (Auto)");
-    break;
-    case kDaikin176SwingHSwing:
-    result += F(" (Off)");
-    break;
+      result += F(" (Auto)");
+      break;
+    case kDaikin176SwingHOff:
+      result += F(" (Off)");
+      break;
+    default:
+      result += F(" (UNKNOWN)");
   }
   return result;
 }

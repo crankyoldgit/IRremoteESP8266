@@ -167,6 +167,28 @@ TEST(TestIRac, Daikin160) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Daikin176) {
+  IRDaikin176 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 1 (Low), Swing (H): 5 (Auto)";
+
+  ac.begin();
+  irac.daikin176(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kCool,      // Mode
+                 26,                          // Celsius
+                 stdAc::fanspeed_t::kLow,     // Fan speed
+                 stdAc::swingh_t::kAuto);     // Horizontal swing
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN176, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin176Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Daikin2) {
   IRDaikin2 ac(0);
   IRac irac(0);
