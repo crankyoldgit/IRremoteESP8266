@@ -2412,7 +2412,7 @@ bool IRrecv::decodeDaikin176(decode_results *results, const uint16_t nbits,
 // Args:
 //   data: An array of kDaikin128StateLength bytes containing the IR command.
 //
-// Status: Alpha/Untested on a real device.
+// Status: STABLE / Known Working.
 //
 // Supported devices:
 // - Daikin BRC52B63 remote.
@@ -2451,6 +2451,8 @@ void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
 //
 // Code by crankyoldgit.
 // Analysis by Daniel Vena
+//
+// Status: STABLE / Known Working.
 //
 // Supported Remotes: Daikin BRC52B63 remote
 //
@@ -2862,7 +2864,7 @@ stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
 // Supported devices:
 // - Daikin BRC52B63 remote.
 //
-// Status: BETA / Probably works.
+// Status: STABLE / Known Working.
 //
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
 bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
