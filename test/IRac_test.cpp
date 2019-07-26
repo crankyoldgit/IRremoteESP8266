@@ -498,7 +498,7 @@ TEST(TestIRac, Mitsubishi) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 24 (COOL), Temp: 20C, Fan: 2 (Medium), Vane: AUTO, "
-      "Time: 14:30, On timer: 00:00, Off timer: 00:00, Timer: -";
+      "Wide Vane: 3, Time: 14:30, On timer: 00:00, Off timer: 00:00, Timer: -";
 
   ac.begin();
   irac.mitsubishi(&ac,
@@ -507,6 +507,7 @@ TEST(TestIRac, Mitsubishi) {
                   20,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
                   stdAc::swingv_t::kOff,       // Veritcal swing
+                  stdAc::swingh_t::kOff,       // Horizontal swing
                   false,                       // Silent
                   14 * 60 + 35);               // Clock
   ASSERT_EQ(expected, ac.toString());

@@ -985,7 +985,7 @@ TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
       "Power: On, Mode: 8 (HEAT), Temp: 22C, Fan: 6 (Quiet), Vane: AUTO, "
-      "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Wide Vane: 3, Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
       irMitsu.toString());
 }
 
@@ -1141,6 +1141,7 @@ TEST(TestMitsubishiACClass, toCommon) {
   ac.setTemp(20);
   ac.setFan(kMitsubishiAcFanSilent);
   ac.setVane(kMitsubishiAcVaneAuto);
+  ac.setWideVane(kMitsubishiAcWideVaneAuto);
   // Now test it.
   ASSERT_EQ(decode_type_t::MITSUBISHI_AC, ac.toCommon().protocol);
   ASSERT_EQ(-1, ac.toCommon().model);
@@ -1150,9 +1151,9 @@ TEST(TestMitsubishiACClass, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
   ASSERT_TRUE(ac.toCommon().quiet);
   // Unsupported.
-  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
   ASSERT_FALSE(ac.toCommon().light);
