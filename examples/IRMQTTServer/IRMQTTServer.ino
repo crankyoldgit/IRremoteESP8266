@@ -667,6 +667,7 @@ void handleRoot(void) {
       "Type: "
       "<select name='type'>"
         "<option value='9'>Aiwa RC T501</option>"
+        "<option value='69'>Amcor AC</option>"
         "<option value='37'>Carrier AC</option>"
         "<option value='15'>Coolix</option>"
         "<option value='17'>Denon</option>"

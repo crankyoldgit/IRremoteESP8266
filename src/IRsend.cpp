@@ -500,6 +500,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
   switch (protocol) {
     // Single repeats
     case AIWA_RC_T501:
+    case AMCOR:
     case COOLIX:
     case GICABLE:
     case INAX:
@@ -574,6 +575,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MAGIQUEST:
     case VESTEL_AC:
       return 56;
+    case AMCOR:
     case PIONEER:
       return 64;
     case ARGO:
@@ -652,6 +654,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501:
       sendAiwaRCT501(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_AMCOR
+    case AMCOR:
+      sendAmcor(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_CARRIER_AC

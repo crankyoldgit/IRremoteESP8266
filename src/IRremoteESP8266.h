@@ -247,6 +247,9 @@
 #define DECODE_DAIKIN128       true
 #define SEND_DAIKIN128         true
 
+#define DECODE_AMCOR           true
+#define SEND_AMCOR             true
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -343,8 +346,9 @@ enum decode_type_t {
   NEOCLIMA,
   DAIKIN176,
   DAIKIN128,
+  AMCOR,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DAIKIN128,
+  kLastDecodeType = AMCOR,
 };
 
 // Message lengths & required repeat values
@@ -353,6 +357,8 @@ const uint16_t kSingleRepeat = 1;
 
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
+const uint16_t kAmcorBits = 64;
+const uint16_t kAmcorDefaultRepeat = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoBits = kArgoStateLength * 8;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
