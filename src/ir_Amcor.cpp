@@ -15,12 +15,12 @@
 const uint16_t kAmcorHdrMark = 8200;
 const uint16_t kAmcorHdrSpace = 4200;
 const uint16_t kAmcorOneMark = 1500;
-const uint16_t kAmcorZeroMark = 500;
+const uint16_t kAmcorZeroMark = 600;
 const uint16_t kAmcorOneSpace = kAmcorZeroMark;
 const uint16_t kAmcorZeroSpace = kAmcorOneMark;
 const uint16_t kAmcorFooterMark = 1900;
 const uint16_t kAmcorGap = 34300;
-const uint8_t  kAmcorTolerance = 35;
+const uint8_t  kAmcorTolerance = 40;
 
 #if SEND_AMCOR
 // Send a Amcor HVAC formatted message.
@@ -70,7 +70,7 @@ bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
                       kAmcorHdrMark, kAmcorHdrSpace,
                       kAmcorOneMark, kAmcorOneSpace,
                       kAmcorZeroMark, kAmcorZeroSpace,
-                      kAmcorFooterMark, kAmcorGap, true, kAmcorTolerance);
+                      kAmcorFooterMark, kAmcorGap, true, kAmcorTolerance, 0);
   if (!used) return false;
   offset += used;
 
