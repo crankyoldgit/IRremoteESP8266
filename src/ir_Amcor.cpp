@@ -52,7 +52,7 @@ void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Seems to be working.
 //
 bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
                          bool strict) {
