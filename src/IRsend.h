@@ -465,9 +465,9 @@ class IRsend {
                     const uint16_t repeat = kNeoclimaMinRepeat);
 #endif  // SEND_NEOCLIMA
 #if SEND_AMCOR
-  void sendAmcor(const uint64_t data,
-                    const uint16_t nbits = kAmcorBits,
-                    const uint16_t repeat = kAmcorDefaultRepeat);
+  void sendAmcor(const unsigned char data[],
+                 const uint16_t nbytes = kAmcorStateLength,
+                 const uint16_t repeat = kAmcorDefaultRepeat);
 #endif  // SEND_AMCOR
 
 

@@ -27,18 +27,18 @@ const uint8_t  kAmcorTolerance = 40;
 //
 // Args:
 //   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically kAmcorBits.
+//   nbytes: The byte size of the array being sent. typically kAmcorStateLength.
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: Alpha / Needs testing.
 //
-void IRsend::sendAmcor(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  for (uint16_t r = 0; r <= repeat; r++) {
-    sendGeneric(kAmcorHdrMark, kAmcorHdrSpace, kAmcorOneMark,
-                kAmcorOneSpace, kAmcorZeroMark, kAmcorZeroSpace,
-                kAmcorFooterMark, kAmcorGap, data, nbits, 38, true,
-                0, kDutyDefault);
-  }
+void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
+                       const uint16_t repeat) {
+  // Check if we have enough bytes to send a proper message.
+  if (nbytes < kAmcorStateLength) return;
+  sendGeneric(kAmcorHdrMark, kAmcorHdrSpace, kAmcorOneMark, kAmcorOneSpace,
+             kAmcorZeroMark, kAmcorZeroSpace, kAmcorFooterMark, kAmcorGap,
+             data, nbytes, 38, false, repeat, kDutyDefault);
 }
 #endif
 
@@ -61,24 +61,26 @@ bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
   if (strict && nbits != kAmcorBits)
     return false;  // We expect Amcor to be 64 bits of message.
 
-  uint64_t data = 0;
   uint16_t offset = kStartOffset;
 
   uint16_t used;
-  used = matchGeneric(results->rawbuf + offset, &data,
-                      results->rawlen - offset, nbits,
+  // Header + Data Block (64 bits) + Footer
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, 64,
                       kAmcorHdrMark, kAmcorHdrSpace,
                       kAmcorOneMark, kAmcorOneSpace,
                       kAmcorZeroMark, kAmcorZeroSpace,
-                      kAmcorFooterMark, kAmcorGap, true, kAmcorTolerance, 0);
+                      kAmcorFooterMark, kAmcorGap, true,
+                      kAmcorTolerance, 0, false);
   if (!used) return false;
   offset += used;
 
   // Success
   results->bits = nbits;
-  results->value = data;
   results->decode_type = AMCOR;
-
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
   return true;
 }
 #endif

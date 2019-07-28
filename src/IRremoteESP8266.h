@@ -258,7 +258,7 @@
      DECODE_PANASONIC_AC || DECODE_MWM || DECODE_DAIKIN2 || \
      DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
      DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
-     DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128)
+     DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || DECODE_AMCOR)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -357,7 +357,8 @@ const uint16_t kSingleRepeat = 1;
 
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
-const uint16_t kAmcorBits = 64;
+const uint16_t kAmcorStateLength = 8;
+const uint16_t kAmcorBits = kAmcorStateLength * 8;
 const uint16_t kAmcorDefaultRepeat = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoBits = kArgoStateLength * 8;

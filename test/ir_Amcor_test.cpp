@@ -2,6 +2,7 @@
 
 #include "IRac.h"
 #include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "IRutils.h"
@@ -10,7 +11,7 @@
 TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("AMCOR", typeToString(decode_type_t::AMCOR));
   ASSERT_EQ(decode_type_t::AMCOR, strToDecodeType("AMCOR"));
-  ASSERT_FALSE(hasACState(decode_type_t::AMCOR));
+  ASSERT_TRUE(hasACState(decode_type_t::AMCOR));
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::AMCOR));
 }
 
@@ -20,8 +21,11 @@ TEST(TestSendAmcor, SendDataOnly) {
   IRsendTest irsend(0);
   irsend.begin();
 
+  uint8_t expectedState[kAmcorStateLength] = {
+      0x01, 0x41, 0x36, 0x00, 0x00, 0x30, 0x00, 0x12};
+
   irsend.reset();
-  irsend.sendAmcor(0x80826C00000C0048);
+  irsend.sendAmcor(expectedState);
   EXPECT_EQ(
       "f38000d50"
       "m8200s4200"
@@ -51,14 +55,18 @@ TEST(TestDecodeAmcor, SyntheticSelfDecode) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
 
+  uint8_t expectedState[kAmcorStateLength] = {
+      0x01, 0x41, 0x30, 0x00, 0x00, 0x30, 0x00, 0x0C};
+
   irsend.begin();
   irsend.reset();
-  irsend.sendAmcor(0x80826C00000C0048);
+  irsend.sendAmcor(expectedState);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(AMCOR, irsend.capture.decode_type);
   EXPECT_EQ(kAmcorBits, irsend.capture.bits);
-  EXPECT_EQ(0x80826C00000C0048, irsend.capture.value);
+
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
 
 TEST(TestDecodeAmcor, RealExample) {
@@ -91,13 +99,16 @@ TEST(TestDecodeAmcor, RealExample) {
     1600, 506, 1784, 394, 1512, 1574, 548, 504, 1602, 504, 1768, 1388, 548, 504,
     1602, 504, 1602, 502, 1574, 1792};  // UNKNOWN D510A6EF
 
+  uint8_t expectedState[kAmcorStateLength] = {
+      0x01, 0x41, 0x36, 0x00, 0x00, 0x30, 0x00, 0x12};
+
   irsend.reset();
   irsend.sendRaw(rawData, 263, 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(AMCOR, irsend.capture.decode_type);
   EXPECT_EQ(kAmcorBits, irsend.capture.bits);
-  EXPECT_EQ(0x80826C00000C0048, irsend.capture.value);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
   // Verify the repeat is the same decode.
   irsend.reset();
@@ -106,7 +117,7 @@ TEST(TestDecodeAmcor, RealExample) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(AMCOR, irsend.capture.decode_type);
   EXPECT_EQ(kAmcorBits, irsend.capture.bits);
-  EXPECT_EQ(0x80826C00000C0048, irsend.capture.value);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/834#issuecomment-515700254
   uint16_t rawData2[263] = {8252, 4294, 1518, 508, 544, 1560, 546, 1560, 570,
@@ -129,11 +140,15 @@ TEST(TestDecodeAmcor, RealExample) {
     392, 1526, 574, 1532, 572, 1532, 572, 1716, 418, 1502, 598, 1508, 574, 1532,
     598, 1700, 408, 1504, 1624, 480, 572, 1532, 574, 1716, 1440, 480, 572, 1532,
     572, 1532, 572, 1506, 1814};  // UNKNOWN ADA838FB
+
+    uint8_t expectedState2[kAmcorStateLength] = {
+        0x01, 0x41, 0x18, 0x00, 0x00, 0x30, 0x00, 0x12};
+
     irsend.reset();
     irsend.sendRaw(rawData2, 263, 38000);
     irsend.makeDecodeResult();
     ASSERT_TRUE(irrecv.decode(&irsend.capture));
     EXPECT_EQ(AMCOR, irsend.capture.decode_type);
     EXPECT_EQ(kAmcorBits, irsend.capture.bits);
-    EXPECT_EQ(0x80821800000C0048, irsend.capture.value);
+    EXPECT_STATE_EQ(expectedState2, irsend.capture.state, irsend.capture.bits);
 }
