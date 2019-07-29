@@ -56,6 +56,7 @@ jobs:
       - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiHeavyAc/TurnOnMitsubishiHeavyAc.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/DumbIRRepeater/DumbIRRepeater.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/SmartIRRepeater/SmartIRRepeater.ino 2> /dev/null
+      - arduino --verify --board $BD $PWD/examples/CommonAcControl/CommonAcControl.ino 2> /dev/null
     - script:
       # Check the version numbers match.
       - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
