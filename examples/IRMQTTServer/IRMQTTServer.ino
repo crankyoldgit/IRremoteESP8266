@@ -650,6 +650,26 @@ String htmlMenu(void) {
   return html;
 }
 
+String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
+                                 const bool simple) {
+  String html = "<select name='" + name + "'>";
+  for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
+    if (simple ^ hasACState((decode_type_t)i)) {
+      switch(i) {
+        case decode_type_t::RAW:
+        case decode_type_t::PRONTO:
+        case decode_type_t::GLOBALCACHE:
+          break;
+        default:
+          html += htmlOptionItem(String(i), typeToString((decode_type_t)i),
+                                i == def);
+      }
+    }
+  }
+  html += F("</select>");
+  return html;
+}
+
 // Root web page with example usage etc.
 void handleRoot(void) {
 #if HTML_PASSWORD_ENABLE
@@ -664,66 +684,23 @@ void handleRoot(void) {
   html += F(
     "<h3>Send a simple IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
-      "Type: "
-      "<select name='type'>"
-        "<option value='9'>Aiwa RC T501</option>"
-        "<option value='37'>Carrier AC</option>"
-        "<option value='15'>Coolix</option>"
-        "<option value='17'>Denon</option>"
-        "<option value='13'>Dish</option>"
-        "<option value='43'>GICable</option>"
-        "<option value='63'>Goodweather</option>"
-        "<option value='64'>Inax</option>"
-        "<option value='6'>JVC</option>"
-        "<option value='36'>Lasertag</option>"
-        "<option value='58'>LEGOPF</option>"
-        "<option value='10'>LG</option>"
-        "<option value='51'>LG2</option>"
-        "<option value='47'>Lutron</option>"
-        "<option value='35'>MagiQuest</option>"
-        "<option value='34'>Midea</option>"
-        "<option value='12'>Mitsubishi</option>"
-        "<option value='39'>Mitsubishi2</option>"
-        "<option selected='selected' value='3'>NEC</option>"  // Default
-        "<option value='29'>Nikai</option>"
-        "<option value='5'>Panasonic</option>"
-        "<option value='50'>Pioneer</option>"
-        "<option value='1'>RC-5</option>"
-        "<option value='23'>RC-5X</option>"
-        "<option value='2'>RC-6</option>"
-        "<option value='21'>RC-MM</option>"
-        "<option value='7'>Samsung</option>"
-        "<option value='56'>Samsung36</option>"
-        "<option value='11'>Sanyo</option>"
-        "<option value='22'>Sanyo LC7461</option>"
-        "<option value='14'>Sharp</option>"
-        "<option value='19'>Sherwood</option>"
-        "<option value='4'>Sony</option>"
-        "<option value='54'>Vestel AC</option>"
-        "<option value='55'>Teco AC</option>"
-        "<option value='8'>Whynter</option>"
-      "</select>"
+      "Type: ");
+  html += htmlSelectAcStateProtocol(KEY_TYPE, decode_type_t::NEC, true);
+  html += F(
       " Code: 0x<input type='text' name='code' min='0' value='0' size='16'"
         " maxlength='16'>"
       " Bit size: "
       "<select name='bits'>"
-        "<option selected='selected' value='0'>Default</option>"  // Default
-        // Common bit length options for most protocols.
-        "<option value='12'>12</option>"
-        "<option value='13'>13</option>"
-        "<option value='14'>14</option>"
-        "<option value='15'>15</option>"
-        "<option value='16'>16</option>"
-        "<option value='20'>20</option>"
-        "<option value='21'>21</option>"
-        "<option value='24'>24</option>"
-        "<option value='28'>28</option>"
-        "<option value='32'>32</option>"
-        "<option value='35'>35</option>"
-        "<option value='36'>36</option>"
-        "<option value='48'>48</option>"
-        "<option value='56'>56</option>"
-        "<option value='64'>64</option>"
+        "<option selected='selected' value='0'>Default</option>");  // Default
+  for (uint8_t i = 0; i < sizeof(kCommonBitSizes); i++) {
+    String num = String(kCommonBitSizes[i]);
+    html += F("<option value='");
+    html += num;
+    html += F("'>");
+    html += num;
+    html += F("</option>");
+  }
+  html += F(
       "</select>"
       " Repeats: <input type='number' name='repeats' min='0' max='99' value='0'"
         "size='2' maxlength='2'>"
@@ -732,37 +709,9 @@ void handleRoot(void) {
     "<br><hr>"
     "<h3>Send a complex (Air Conditioner) IR message</h3><p>"
     "<form method='POST' action='/ir' enctype='multipart/form-data'>"
-      "Type: "
-      "<select name='type'>"
-        "<option value='69'>Amcor</option>"
-        "<option value='27'>Argo</option>"
-        "<option value='16'>Daikin (35 bytes)</option>"
-        "<option value='68'>Daikin128 (16 bytes)</option>"
-        "<option value='65'>Daikin160 (20 bytes)</option>"
-        "<option value='67'>Daikin176 (22 bytes)</option>"
-        "<option value='53'>Daikin2 (39 bytes)</option>"
-        "<option value='61'>Daikin216 (27 bytes)</option>"
-        "<option value='48'>Electra</option>"
-        "<option value='33'>Fujitsu</option>"
-        "<option value='24'>Gree</option>"
-        "<option value='38'>Haier (9 bytes)</option>"
-        "<option value='44'>Haier (14 bytes/YR-W02)</option>"
-        "<option value='40'>Hitachi (28 bytes)</option>"
-        "<option value='41'>Hitachi1 (13 bytes)</option>"
-        "<option value='42'>Hitachi2 (53 bytes)</option>"
-        "<option selected='selected' value='18'>Kelvinator</option>"  // Default
-        "<option value='20'>Mitsubishi</option>"
-        "<option value='59'>Mitsubishi Heavy (11 bytes)</option>"
-        "<option value='60'>Mitsubishi Heavy (19 bytes)</option>"
-        "<option value='52'>MWM</option>"
-        "<option value='66'>Neoclima</option>"
-        "<option value='46'>Samsung</option>"
-        "<option value='62'>Sharp</option>"
-        "<option value='57'>TCL112</option>"
-        "<option value='32'>Toshiba</option>"
-        "<option value='28'>Trotec</option>"
-        "<option value='45'>Whirlpool</option>"
-      "</select>"
+      "Type: ");
+  html += htmlSelectAcStateProtocol(KEY_TYPE, decode_type_t::KELVINATOR, false);
+  html += F(
       " State code: 0x"
       "<input type='text' name='code' size='");
   html += String(kStateSizeMax * 2);
@@ -920,7 +869,7 @@ String htmlSelectBool(const String name, const bool def) {
   return html;
 }
 
-String htmlSelectProtocol(const String name, const decode_type_t def) {
+String htmlSelectClimateProtocol(const String name, const decode_type_t def) {
   String html = "<select name='" + name + "'>";
   for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
     if (IRac::isProtocolSupported((decode_type_t)i)) {
@@ -1036,7 +985,7 @@ void handleAirCon(void) {
       "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
       "<table style='width:33%'>"
       "<tr><td>Protocol</td><td>" +
-          htmlSelectProtocol(KEY_PROTOCOL, climate.protocol) + "</td></tr>"
+          htmlSelectClimateProtocol(KEY_PROTOCOL, climate.protocol) + "</td></tr>"
       "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate.model) +
           "</td></tr>"
       "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate.power) +

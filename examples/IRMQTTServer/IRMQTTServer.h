@@ -206,11 +206,14 @@ const uint8_t kPasswordLength = 20;
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.3.3-amcor"
+#define _MY_VERSION_ "v1.3.4-beta"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
 
+// Common bit sizes for the simple protocols.
+const uint8_t kCommonBitSizes[] = {
+    12, 13, 15, 16, 20, 24, 28, 32, 35, 36, 42, 48, 56, 64};
 // Gpio related
 #if defined(ESP8266)
 const int8_t kTxGpios[] = {-1, 0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
@@ -319,7 +322,9 @@ String addJsReloadUrl(const String url, const uint16_t timeout_s,
                       const bool notify);
 void handleExamples(void);
 String htmlSelectBool(const String name, const bool def);
-String htmlSelectProtocol(const String name, const decode_type_t def);
+String htmlSelectClimateProtocol(const String name, const decode_type_t def);
+String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
+                                 const bool simple);
 String htmlSelectModel(const String name, const int16_t def);
 String htmlSelectMode(const String name, const stdAc::opmode_t def);
 String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def);
