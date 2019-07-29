@@ -655,7 +655,7 @@ String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
   String html = "<select name='" + name + "'>";
   for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
     if (simple ^ hasACState((decode_type_t)i)) {
-      switch(i) {
+      switch (i) {
         case decode_type_t::RAW:
         case decode_type_t::PRONTO:
         case decode_type_t::GLOBALCACHE:
@@ -985,7 +985,8 @@ void handleAirCon(void) {
       "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
       "<table style='width:33%'>"
       "<tr><td>Protocol</td><td>" +
-          htmlSelectClimateProtocol(KEY_PROTOCOL, climate.protocol) + "</td></tr>"
+          htmlSelectClimateProtocol(KEY_PROTOCOL, climate.protocol) +
+      "</td></tr>"
       "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate.model) +
           "</td></tr>"
       "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate.power) +
