@@ -71,13 +71,14 @@ namespace stdAc {
   };
 
   enum class swingh_t {
-    kOff =     -1,
-    kAuto =     0,  // a.k.a. On.
-    kLeftMax =  1,
-    kLeft =     2,
-    kMiddle =   3,
-    kRight =    4,
-    kRightMax = 5,
+    kOff =      -1,
+    kAuto =      0,  // a.k.a. On.
+    kLeftMax =   1,
+    kLeft =      2,
+    kMiddle =    3,
+    kRight =     4,
+    kRightMax =  5,
+    kLeftRight = 6,
   };
 
   // Structure to hold a common A/C state.
