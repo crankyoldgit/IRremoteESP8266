@@ -500,6 +500,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
   switch (protocol) {
     // Single repeats
     case AIWA_RC_T501:
+    case AMCOR:
     case COOLIX:
     case GICABLE:
     case INAX:
@@ -574,6 +575,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MAGIQUEST:
     case VESTEL_AC:
       return 56;
+    case AMCOR:
     case PIONEER:
       return 64;
     case ARGO:
@@ -581,11 +583,11 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case DAIKIN:
       return kDaikinBits;
     case DAIKIN128:
-        return kDaikin128Bits;
+      return kDaikin128Bits;
     case DAIKIN160:
       return kDaikin160Bits;
     case DAIKIN176:
-        return kDaikin176Bits;
+      return kDaikin176Bits;
     case DAIKIN2:
       return kDaikin2Bits;
     case DAIKIN216:
@@ -841,6 +843,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 bool IRsend::send(const decode_type_t type, const unsigned char *state,
                   const uint16_t nbytes) {
   switch (type) {
+#if SEND_AMCOR
+    case AMCOR:
+      sendAmcor(state, nbytes);
+      break;
+#endif
 #if SEND_ARGO
     case ARGO:
       sendArgo(state, nbytes);
@@ -863,8 +870,8 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
 #endif  // SEND_DAIKIN160
 #if SEND_DAIKIN176
     case DAIKIN176:
-        sendDaikin176(state, nbytes);
-        break;
+      sendDaikin176(state, nbytes);
+      break;
 #endif  // SEND_DAIKIN176
 #if SEND_DAIKIN2
     case DAIKIN2:

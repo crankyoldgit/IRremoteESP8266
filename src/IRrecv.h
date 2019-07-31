@@ -474,6 +474,11 @@ bool decodeNeoclima(decode_results *results,
                     const uint16_t nbits = kNeoclimaBits,
                     const bool strict = true);
 #endif  // DECODE_NEOCLIMA
+#if DECODE_AMCOR
+bool decodeAmcor(decode_results *results,
+                 const uint16_t nbits = kAmcorBits,
+                 const bool strict = true);
+#endif  // DECODE_AMCOR
 };
 
 #endif  // IRRECV_H_

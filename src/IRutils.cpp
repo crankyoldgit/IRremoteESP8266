@@ -95,6 +95,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::UNUSED;
   else if (!strcasecmp(str, "AIWA_RC_T501"))
     return decode_type_t::AIWA_RC_T501;
+  else if (!strcasecmp(str, "AMCOR"))
+    return decode_type_t::AMCOR;
   else if (!strcasecmp(str, "ARGO"))
     return decode_type_t::ARGO;
   else if (!strcasecmp(str, "CARRIER_AC"))
@@ -253,6 +255,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case AIWA_RC_T501:
       result = F("AIWA_RC_T501");
+      break;
+    case AMCOR:
+      result = F("AMCOR");
       break;
     case ARGO:
       result = F("ARGO");
@@ -467,6 +472,7 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
 // Does the given protocol use a complex state as part of the decode?
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
+    case AMCOR:
     case ARGO:
     case DAIKIN:
     case DAIKIN128:
@@ -922,5 +928,31 @@ namespace irutils {
     if (mins % 60 < 10) result += '0';  // Zero pad the minutes.
     result += uint64ToString(mins % 60);
     return result;
+  }
+
+  // Sum all the nibbles together in a series of bytes.
+  // Args:
+  //   start: PTR to the start of the bytes.
+  //   length: Nr of bytes to sum the nibbles of.
+  //   init: Starting value of the sum.
+  // Returns:
+  //   A uint8_t sum of all the nibbles inc the init.
+  uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
+                     const uint8_t init) {
+    uint8_t sum = init;
+    const uint8_t *ptr;
+    for (ptr = start; ptr - start < length; ptr++)
+      sum += (*ptr >> 4) + (*ptr & 0xF);
+    return sum;
+  }
+
+  uint8_t bcdToUint8(const uint8_t bcd) {
+    if (bcd > 0x99) return 255;  // Too big.
+    return (bcd >> 4) * 10 + (bcd & 0xF);
+  }
+
+  uint8_t uint8ToBcd(const uint8_t integer) {
+    if (integer > 99) return 255;  // Too big.
+    return ((integer / 10) << 4) + (integer % 10);
   }
 }  // namespace irutils

@@ -55,6 +55,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN
     case decode_type_t::DAIKIN:
 #endif
+#if SEND_DAIKIN128
+    case decode_type_t::DAIKIN128:
+#endif
 #if SEND_DAIKIN160
     case decode_type_t::DAIKIN160:
 #endif
@@ -230,6 +233,32 @@ void IRac::daikin(IRDaikinESP *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN
+
+#if SEND_DAIKIN128
+void IRac::daikin128(IRDaikin128 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo, const bool light,
+                  const bool econo, const int16_t sleep, const int16_t clock) {
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  // No Horizontal Swing setting avaliable.
+  ac->setQuiet(quiet);
+  ac->setLightToggle(light ? kDaikin128BitWall : 0);
+  // No Filter setting available.
+  ac->setPowerful(turbo);
+  ac->setEcono(econo);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep > 0);
+  if (clock >= 0) ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_DAIKIN128
 
 #if SEND_DAIKIN160
 void IRac::daikin160(IRDaikin160 *ac,
@@ -408,11 +437,12 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 #endif  // SEND_GOODWEATHER
 
 #if SEND_GREE
-void IRac::gree(IRGreeAC *ac,
+void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool turbo, const bool light, const bool clean,
                 const int16_t sleep) {
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -533,13 +563,15 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 
 #if SEND_MIDEA
 void IRac::midea(IRMideaAC *ac,
-                 const bool on, const stdAc::opmode_t mode, const float degrees,
-                 const stdAc::fanspeed_t fan, const int16_t sleep) {
+                 const bool on, const stdAc::opmode_t mode, const bool celsius,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv, const int16_t sleep) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees, true);  // true means use Celsius.
+  ac->setUseCelsius(celsius);
+  ac->setTemp(degrees, celsius);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
@@ -912,7 +944,18 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.turbo = desired.turbo ^ prev->turbo;
         result.light = desired.light ^ prev->light;
         result.clean = desired.clean ^ prev->clean;
-        result.sleep = (desired.sleep ^ prev->sleep) ? 0 : -1;
+        result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
+        break;
+      case decode_type_t::DAIKIN128:
+        result.power = desired.power ^ prev->power;
+        result.light = desired.light ^ prev->light;
+        break;
+      case decode_type_t::MIDEA:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
@@ -978,16 +1021,16 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       argo(&ac, on, mode, degC, fan, swingv, turbo, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_ARGO
 #if SEND_COOLIX
     case COOLIX:
     {
       IRCoolixAC ac(_pin, _inverted, _modulation);
       coolix(&ac, on, mode, degC, fan, swingv, swingh,
-             quiet, turbo, econo, clean);
+             turbo, light, clean, sleep);
       break;
     }
-#endif  // SEND_DAIKIN
+#endif  // SEND_COOLIX
 #if SEND_DAIKIN
     case DAIKIN:
     {
@@ -997,6 +1040,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN128
+    case DAIKIN128:
+    {
+      IRDaikin128 ac(_pin, _inverted, _modulation);
+      daikin128(&ac, on, mode, degC, fan, swingv, quiet, turbo,
+                light, econo, sleep, clock);
+      break;
+    }
+#endif  // SEND_DAIKIN2
 #if SEND_DAIKIN160
     case DAIKIN160:
     {
@@ -1008,7 +1060,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 #if SEND_DAIKIN176
     case DAIKIN176:
     {
-      IRDaikin176 ac(_pin);
+      IRDaikin176 ac(_pin, _inverted, _modulation);
       daikin176(&ac, on, mode, degC, fan, swingh);
       break;
     }
@@ -1021,7 +1073,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
               light, econo, filter, clean, beep, sleep, clock);
       break;
     }
-#endif  // SEND_DAIKIN216
+#endif  // SEND_DAIKIN2
 #if SEND_DAIKIN216
     case DAIKIN216:
     {
@@ -1062,9 +1114,10 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 #if SEND_GREE
     case GREE:
     {
-      IRGreeAC ac(_pin, _inverted, _modulation);
+      IRGreeAC ac(_pin, (gree_ac_remote_model_t)model, _inverted, _modulation);
       ac.begin();
-      gree(&ac, on, mode, degC, fan, swingv, light, turbo, clean, sleep);
+      gree(&ac, (gree_ac_remote_model_t)model, on, mode, degC, fan, swingv,
+           turbo, light, clean, sleep);
       break;
     }
 #endif  // SEND_GREE
@@ -1110,7 +1163,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       ac.begin();
-      midea(&ac, on, mode, degC, fan, sleep);
+      midea(&ac, on, mode, celsius, degrees, fan, swingv, sleep);
       break;
     }
 #endif  // SEND_MIDEA
@@ -1516,6 +1569,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN128
+      case decode_type_t::DAIKIN128: {
+        IRDaikin128 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN128
 #if DECODE_DAIKIN160
       case decode_type_t::DAIKIN160: {
         IRDaikin160 ac(0);
@@ -1848,7 +1908,7 @@ namespace IRAcUtils {
       case decode_type_t::MIDEA: {
         IRMideaAC ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_MIDEA

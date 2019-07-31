@@ -107,7 +107,7 @@ TEST(TestIRac, Coolix) {
       "m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s560m560s560"
       "m560s1680m560s560m560s560m560s1680m560s560m560s560m560s1680m560s1680"
       // Footer
-      "m560s5040",
+      "m560s105040",
       // End of message #2 (i.e. Repeat '1')
       // Note: the two messages (#1 & #2) are identical.
       ac._irsend.outputStr());
@@ -144,6 +144,37 @@ TEST(TestIRac, Daikin) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Daikin128) {
+  IRDaikin128 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power Toggle: On, Mode: 8 (HEAT), Temp: 27C, Fan: 9 (Quiet), "
+      "Powerful: Off, Quiet: On, Swing (V): On, Sleep: On, "
+      "Econo: Off, Clock: 21:57, On Timer: Off, On Time: 00:00, "
+      "Off Timer: Off, Off Time: 00:00, Light Toggle: 8 (Wall)";
+
+  ac.begin();
+  irac.daikin128(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kHeat,      // Mode
+                 27,                          // Celsius
+                 stdAc::fanspeed_t::kMin,     // Fan speed
+                 stdAc::swingv_t::kAuto,       // Veritcal swing
+                 true,                        // Quiet
+                 false,                       // Turbo
+                 true,                        // Light
+                 false,                       // Econo
+                 18 * 60,                     // Sleep
+                 21 * 60 + 57);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN128, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin128Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Daikin160) {
   IRDaikin160 ac(0);
   IRac irac(0);
@@ -164,6 +195,28 @@ TEST(TestIRac, Daikin160) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(DAIKIN160, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDaikin160Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, Daikin176) {
+  IRDaikin176 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 7 (COOL), Temp: 26C, Fan: 1 (Low), Swing (H): 5 (Auto)";
+
+  ac.begin();
+  irac.daikin176(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kCool,      // Mode
+                 26,                          // Celsius
+                 stdAc::fanspeed_t::kLow,     // Fan speed
+                 stdAc::swingh_t::kAuto);     // Horizontal swing
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN176, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin176Bits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
@@ -334,21 +387,23 @@ TEST(TestIRac, Gree) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (COOL), Temp: 22C, Fan: 2 (Medium), Turbo: Off, "
-      "IFeel: Off, WiFi: Off, XFan: On, Light: On, Sleep: On, "
-      "Swing Vertical Mode: Manual, Swing Vertical Pos: 3";
+      "Model: 1 (YAW1F), Power: On, Mode: 1 (COOL), Temp: 22C, "
+      "Fan: 2 (Medium), Turbo: Off, IFeel: Off, WiFi: Off, XFan: On, "
+      "Light: On, Sleep: On, Swing Vertical Mode: Manual, "
+      "Swing Vertical Pos: 3";
 
   ac.begin();
   irac.gree(&ac,
-            true,                        // Power
-            stdAc::opmode_t::kCool,      // Mode
-            22,                          // Celsius
-            stdAc::fanspeed_t::kMedium,  // Fan speed
-            stdAc::swingv_t::kHigh,      // Veritcal swing
-            false,                       // Turbo
-            true,                        // Light
-            true,                        // Clean (aka Mold/XFan)
-            8 * 60 + 0);                 // Sleep time
+            gree_ac_remote_model_t::YAW1F,  // Model
+            true,                           // Power
+            stdAc::opmode_t::kCool,         // Mode
+            22,                             // Celsius
+            stdAc::fanspeed_t::kMedium,     // Fan speed
+            stdAc::swingv_t::kHigh,         // Veritcal swing
+            false,                          // Turbo
+            true,                           // Light
+            true,                           // Clean (aka Mold/XFan)
+            8 * 60 + 0);                    // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -472,14 +527,17 @@ TEST(TestIRac, Midea) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 1 (DRY), Temp: 27C/81F, Fan: 2 (Medium), Sleep: On";
+      "Power: On, Mode: 1 (DRY), Celsius: On, Temp: 27C/80F, Fan: 2 (Medium), "
+      "Sleep: On, Swing(V) Toggle: Off";
 
   ac.begin();
   irac.midea(&ac,
              true,                        // Power
              stdAc::opmode_t::kDry,       // Mode
-             27,                          // Celsius
+             true,                        // Celsius
+             27,                          // Degrees
              stdAc::fanspeed_t::kMedium,  // Fan speed
+             stdAc::swingv_t::kOff,       // Swing (V)
              8 * 60 + 0);                 // Sleep time
 
   ASSERT_EQ(expected, ac.toString());
@@ -1189,4 +1247,94 @@ TEST(TestIRac, CoolixDecodeToState) {
   ASSERT_TRUE(result.celsius);
   ASSERT_EQ(20, result.degrees);
   ASSERT_EQ(stdAc::fanspeed_t::kLow, result.fanspeed);
+}
+
+// Check light on/off functionality in Coolix common a/c handling.
+TEST(TestIRac, Issue821) {
+  stdAc::state_t prev;
+  stdAc::state_t next;
+  stdAc::state_t result;
+  // state info from:
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/821#issuecomment-513708970
+  prev.protocol = decode_type_t::COOLIX;
+  prev.model = -1;
+  prev.power = true;
+  prev.mode = stdAc::opmode_t::kAuto;
+  prev.degrees = 24;
+  prev.celsius = true;
+  prev.fanspeed = stdAc::fanspeed_t::kAuto;
+  prev.swingv = stdAc::swingv_t::kOff;
+  prev.swingh = stdAc::swingh_t::kOff;
+  prev.quiet = false;
+  prev.turbo = false;
+  prev.econo = false;
+  prev.light = false;
+  prev.filter = false;
+  prev.clean = false;
+  prev.beep = false;
+
+  next = prev;
+  next.light = true;
+
+  IRac irac(0);
+  IRrecv capture(0);
+  IRCoolixAC ac(0);
+
+  ac.begin();
+  result = irac.handleToggles(next, &prev);
+  ASSERT_TRUE(result.light);
+  irac.sendAc(next, &prev);
+  ASSERT_TRUE(next.light);
+  irac.coolix(&ac,
+              result.power,     // Power
+              result.mode,      // Mode
+              result.degrees,   // Celsius
+              result.fanspeed,  // Fan speed
+              result.swingv,       // Veritcal swing
+              result.swingh,       // Horizontal swing
+              result.turbo,                       // Turbo
+              result.light,                       // Light
+              result.clean,                       // Clean
+              -1);                         // Sleep
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  ASSERT_EQ("Power: On, Led: Toggle",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
+  EXPECT_EQ(
+      "f38000d50m"
+      "4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s5040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s560m560s1680m560s560"
+      "m560s1680m560s560m560s1680m560s560m560s560m560s1680m560s560m560s1680"
+      "m560s560m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s560"
+      "m560s105040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s560m560s560"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s1680"
+      "m560s5040"
+      "m4480s4480"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s560m560s560m560s1680m560s560m560s560m560s560"
+      "m560s1680m560s560m560s1680m560s1680m560s560m560s1680m560s1680m560s1680"
+      "m560s105040",
+      ac._irsend.outputStr());
 }

@@ -48,3 +48,6 @@ tools/mode2_decode
 
 #Cygwin builds
 *.exe
+
+# Mac extended attributes
+.DS_Store

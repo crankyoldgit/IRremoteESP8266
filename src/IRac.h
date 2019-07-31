@@ -95,6 +95,15 @@ class IRac {
               const bool quiet, const bool turbo, const bool econo,
               const bool clean);
 #endif  // SEND_DAIKIN
+#if SEND_DAIKIN128
+  void daikin128(IRDaikin128 *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv,
+                 const bool quiet, const bool turbo, const bool light,
+                 const bool econo, const int16_t sleep = -1,
+                 const int16_t clock = -1);
+#endif  // SEND_DAIKIN128
 #if SEND_DAIKIN160
 void daikin160(IRDaikin160 *ac,
                const bool on, const stdAc::opmode_t mode,
@@ -148,7 +157,7 @@ void electra(IRElectraAc *ac,
                    const int16_t sleep = -1);
 #endif  // SEND_GOODWEATHER
 #if SEND_GREE
-  void gree(IRGreeAC *ac,
+  void gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
             const bool on, const stdAc::opmode_t mode, const float degrees,
             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
             const bool turbo, const bool light, const bool clean,
@@ -185,8 +194,9 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_KELVINATOR
 #if SEND_MIDEA
   void midea(IRMideaAC *ac,
-             const bool on, const stdAc::opmode_t mode, const float degrees,
-             const stdAc::fanspeed_t fan, const int16_t sleep = -1);
+             const bool on, const stdAc::opmode_t mode, const bool celsius,
+             const float degrees, const stdAc::fanspeed_t fan,
+             const stdAc::swingv_t swingv, const int16_t sleep = -1);
 #endif  // SEND_MIDEA
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,

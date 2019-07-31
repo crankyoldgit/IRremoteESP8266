@@ -495,8 +495,8 @@ TEST(TestGreeClass, HumanReadable) {
   IRGreeAC irgree(0);
 
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (Auto), Turbo: Off, "
-      "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Model: 1 (YAW1F), Power: Off, Mode: 0 (AUTO), Temp: 25C, Fan: 0 (Auto), "
+      "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Manual, Swing Vertical Pos: 0 (Last Pos)",
       irgree.toString());
   irgree.on();
@@ -511,8 +511,8 @@ TEST(TestGreeClass, HumanReadable) {
   irgree.setWiFi(true);
   irgree.setSwingVertical(true, kGreeSwingAuto);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (High), Turbo: On, "
-      "IFeel: On, WiFi: On, XFan: On, Light: Off, Sleep: On, "
+      "Model: 1 (YAW1F), Power: On, Mode: 1 (COOL), Temp: 16C, Fan: 3 (High), "
+      "Turbo: On, IFeel: On, WiFi: On, XFan: On, Light: Off, Sleep: On, "
       "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
       irgree.toString());
 }
@@ -571,8 +571,8 @@ TEST(TestDecodeGree, NormalRealExample) {
   EXPECT_STATE_EQ(gree_code, irsend.capture.state, kGreeBits);
   irgree.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low), Turbo: Off, "
-      "IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Model: 1 (YAW1F), Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 1 (Low), "
+      "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing Vertical Mode: Manual, Swing Vertical Pos: 2",
       irgree.toString());
 }
@@ -590,7 +590,7 @@ TEST(TestGreeClass, toCommon) {
   ac.setSleep(true);
   // Now test it.
   ASSERT_EQ(decode_type_t::GREE, ac.toCommon().protocol);
-  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(gree_ac_remote_model_t::YAW1F, ac.toCommon().model);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
@@ -608,4 +608,38 @@ TEST(TestGreeClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().filter);
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestGreeClass, Issue814Power) {
+  IRGreeAC ac(0);
+  ac.begin();
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/814#issuecomment-511263921
+  uint8_t YBOFB_on[8] = {0x59, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0xC0};
+  uint8_t off[8] = {0x51, 0x07, 0x20, 0x50, 0x01, 0x20, 0x00, 0x40};
+
+  ac.on();
+  EXPECT_EQ(gree_ac_remote_model_t::YAW1F, ac.getModel());
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getPower());
+  ac.setRaw(YBOFB_on);
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(gree_ac_remote_model_t::YBOFB, ac.getModel());
+  EXPECT_EQ(
+      "Model: 2 (YBOFB), Power: On, Mode: 1 (COOL), Temp: 23C, Fan: 1 (Low), "
+      "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Swing Vertical Mode: Auto, Swing Vertical Pos: 1 (Auto)",
+      ac.toString());
+  ac.off();
+  EXPECT_STATE_EQ(off, ac.getRaw(), kGreeBits);
+  ac.on();
+  EXPECT_STATE_EQ(YBOFB_on, ac.getRaw(), kGreeBits);
+  uint8_t YAW1F_on[8] = {0x59, 0x07, 0x60, 0x50, 0x01, 0x20, 0x00, 0xC0};
+  ac.setModel(gree_ac_remote_model_t::YAW1F);
+  EXPECT_STATE_EQ(YAW1F_on, ac.getRaw(), kGreeBits);
+  ac.off();
+  EXPECT_STATE_EQ(off, ac.getRaw(), kGreeBits);
+  ac.setModel(gree_ac_remote_model_t::YBOFB);
+  ac.on();
+  EXPECT_STATE_EQ(YBOFB_on, ac.getRaw(), kGreeBits);
 }

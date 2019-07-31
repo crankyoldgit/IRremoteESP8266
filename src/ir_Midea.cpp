@@ -101,6 +101,7 @@ IRMideaAC::IRMideaAC(const uint16_t pin, const bool inverted,
 void IRMideaAC::stateReset(void) {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state = 0xA1826FFFFF62;
+  _SwingVToggle = false;
 }
 
 // Configure the pin for output.
@@ -111,6 +112,11 @@ void IRMideaAC::begin(void) { _irsend.begin(); }
 void IRMideaAC::send(const uint16_t repeat) {
   this->checksum();  // Ensure correct checksum before sending.
   _irsend.sendMidea(remote_state, kMideaBits, repeat);
+  // Handle toggling the swing if we need to.
+  if (_SwingVToggle && !isSwingVToggle()) {
+    _irsend.sendMidea(kMideaACToggleSwingV, kMideaBits, repeat);
+  }
+  _SwingVToggle = false;  // The toggle message has been sent, so reset.
 }
 #endif  // SEND_MIDEA
 
@@ -144,35 +150,59 @@ void IRMideaAC::setPower(const bool on) {
 // Return the requested power state of the A/C.
 bool IRMideaAC::getPower(void) { return (remote_state & kMideaACPower); }
 
+// Returns true if we want the A/C unit to work natively in Celsius.
+bool IRMideaAC::getUseCelsius(void) {
+  return !(remote_state & kMideaACCelsiusBit);
+}
+
+// Set the A/C unit to use Celsius natively.
+void IRMideaAC::setUseCelsius(const bool on) {
+  if (on != getUseCelsius()) {  // We need to change.
+    uint8_t native_temp = getTemp(!on);  // Get the old native temp.
+    if (on)
+      remote_state &= ~kMideaACCelsiusBit;  // Clear the bit
+    else
+      remote_state |= kMideaACCelsiusBit;  // Set the bit
+    setTemp(native_temp, !on);  // Reset temp using the old native temp.
+  }
+}
+
 // Set the temperature.
 // Args:
 //   temp:       Temp. in degrees.
 //   useCelsius: Degree type to use. Celsius (true) or Fahrenheit (false)
 void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
-  uint8_t new_temp = temp;
+  uint8_t max_temp = kMideaACMaxTempF;
+  uint8_t min_temp = kMideaACMinTempF;
   if (useCelsius) {
-    new_temp = std::max(kMideaACMinTempC, new_temp);
-    new_temp = std::min(kMideaACMaxTempC, new_temp);
-    // Convert and add 0.5 for rounding.
-    new_temp = celsiusToFahrenheit(new_temp) + 0.5;
+    max_temp = kMideaACMaxTempC;
+    min_temp = kMideaACMinTempC;
   }
-  new_temp = std::max(kMideaACMinTempF, new_temp);
-  new_temp = std::min(kMideaACMaxTempF, new_temp);
-  new_temp -= kMideaACMinTempF;
+  uint8_t new_temp = std::min(max_temp, std::max(min_temp, temp));
+  if (getUseCelsius() && !useCelsius)  // Native is in C, new_temp is in F
+    new_temp = fahrenheitToCelsius(new_temp) - kMideaACMinTempC;
+  else if (!getUseCelsius() && useCelsius)  // Native is in F, new_temp is in C
+    new_temp = celsiusToFahrenheit(new_temp) - kMideaACMinTempF;
+  else  // Native and desired are the same units.
+    new_temp -= min_temp;
+  // Set the actual data.
   remote_state &= kMideaACTempMask;
   remote_state |= ((uint64_t)new_temp << 24);
 }
 
 // Return the set temp.
 // Args:
-//   useCelsius: Flag indicating if the results are in Celsius or Fahrenheit.
+//   celsius: Flag indicating if the results are in Celsius or Fahrenheit.
 // Returns:
 //   A uint8_t containing the temperature.
-uint8_t IRMideaAC::getTemp(const bool useCelsius) {
-  uint8_t temp = ((remote_state >> 24) & 0x1F) + kMideaACMinTempF;
-  if (useCelsius) {
-    temp = fahrenheitToCelsius(temp);
-  }
+uint8_t IRMideaAC::getTemp(const bool celsius) {
+  uint8_t temp = ((remote_state >> 24) & 0x1F);
+  if (getUseCelsius())
+    temp += kMideaACMinTempC;
+  else
+    temp += kMideaACMinTempF;
+  if (celsius && !getUseCelsius()) temp = fahrenheitToCelsius(temp) + 0.5;
+  if (!celsius && getUseCelsius()) temp = celsiusToFahrenheit(temp);
   return temp;
 }
 
@@ -227,6 +257,21 @@ void IRMideaAC::setSleep(const bool on) {
 
 // Return the Sleep state of the A/C.
 bool IRMideaAC::getSleep(void) { return (remote_state & kMideaACSleep); }
+
+// Set the A/C to toggle the vertical swing toggle for the next send.
+void IRMideaAC::setSwingVToggle(const bool on) {
+  _SwingVToggle = on;
+}
+
+// Return if the message/state is just a Swing V toggle message/command.
+bool IRMideaAC::isSwingVToggle(void) {
+  return remote_state == kMideaACToggleSwingV;
+}
+// Return the Swing V toggle state of the A/C.
+bool IRMideaAC::getSwingVToggle(void) {
+  _SwingVToggle |= isSwingVToggle();
+  return _SwingVToggle;
+}
 
 // Calculate the checksum for a given array.
 // Args:
@@ -316,19 +361,16 @@ stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
 }
 
 // Convert the A/C state to it's common equivalent.
-stdAc::state_t IRMideaAC::toCommon(void) {
+stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+  // Fixed/Not supported/Non-zero defaults.
   result.protocol = decode_type_t::MIDEA;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
-  result.degrees = this->getTemp(result.celsius);
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.sleep = this->getSleep() ? 0 : -1;
-  // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
+  result.swingv = stdAc::swingv_t::kOff;
   result.quiet = false;
   result.turbo = false;
   result.clean = false;
@@ -336,24 +378,42 @@ stdAc::state_t IRMideaAC::toCommon(void) {
   result.filter = false;
   result.light = false;
   result.beep = false;
+  result.sleep = -1;
   result.clock = -1;
+  }
+  if (this->isSwingVToggle()) {
+    result.swingv = result.swingv != stdAc::swingv_t::kOff ?
+        stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+    return result;
+  }
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = this->getUseCelsius();
+  result.degrees = this->getTemp(result.celsius);
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.sleep = this->getSleep() ? 0 : -1;
   return result;
 }
 
 // Convert the internal state into a human readable string.
 String IRMideaAC::toString(void) {
   String result = "";
-  result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
-  result += addModeToString(getMode(), kMideaACAuto, kMideaACCool, kMideaACHeat,
-                            kMideaACDry, kMideaACFan);
-  result += addTempToString(getTemp(true));
-  result += '/';
-  result += uint64ToString(getTemp(false));
-  result += 'F';
-  result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
-                           kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
-  result += addBoolToString(getSleep(), F("Sleep"));
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  if (!isSwingVToggle()) {
+    result += addBoolToString(getPower(), F("Power"), false);
+    result += addModeToString(getMode(), kMideaACAuto, kMideaACCool,
+                              kMideaACHeat, kMideaACDry, kMideaACFan);
+    result += addBoolToString(getUseCelsius(), F("Celsius"));
+    result += addTempToString(getTemp(true));
+    result += '/';
+    result += uint64ToString(getTemp(false));
+    result += 'F';
+    result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
+                             kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
+    result += addBoolToString(getSleep(), F("Sleep"));
+  }
+  result += addBoolToString(getSwingVToggle(), F("Swing(V) Toggle"),
+                            !isSwingVToggle());
   return result;
 }
 
