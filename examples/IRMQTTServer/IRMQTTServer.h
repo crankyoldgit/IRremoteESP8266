@@ -156,6 +156,16 @@ const uint16_t kMinUnknownSize = 2 * 10;
 
 // ------------------------ Advanced Usage Only --------------------------------
 
+// Reports the input voltage to the ESP chip. **NOT** the input voltage
+// to the development board (e.g. NodeMCU, D1 Mini etc) which are typically
+// powered by USB (5V) which is then lowered to 3V via a Low Drop Out (LDO)
+// Voltage regulator. Hence, this feature is turned off by default as it
+// make little sense for most users as it really isn't the actual input voltage.
+// E.g. For purposes of monitoring a battery etc.
+// Note: Turning on the feature costs ~250 bytes of prog space.
+#define REPORT_VCC false  // Do we report Vcc via html info page & MQTT?
+
+// Keywords for MQTT topics, html arguments, or config file.
 #define KEY_PROTOCOL "protocol"
 #define KEY_MODEL "model"
 #define KEY_POWER "power"
@@ -175,6 +185,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_CELSIUS "use_celsius"
 #define KEY_JSON "json"
 #define KEY_RESEND "resend"
+#define KEY_VCC "vcc"
 
 // HTML arguments we will parse for IR code information.
 #define KEY_TYPE "type"  // KEY_PROTOCOL is also checked too.
@@ -297,6 +308,9 @@ void sendJsonState(const stdAc::state_t state, const String topic,
                    const bool retain = false, const bool ha_mode = true);
 #endif  // MQTT_CLIMATE_JSON
 #endif  // MQTT_ENABLE
+#if REPORT_VCC
+String vccToString(void);
+#endif  // REPORT_VCC
 bool isSerialGpioUsedByIr(void);
 void debug(const char *str);
 void saveWifiConfigCallback(void);
