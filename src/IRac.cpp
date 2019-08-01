@@ -1413,6 +1413,8 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
            !strcasecmp(str, "MAXRIGHT") || !strcasecmp(str, "MAX RIGHT") ||
            !strcasecmp(str, "FARRIGHT") || !strcasecmp(str, "FAR RIGHT"))
     return stdAc::swingh_t::kRightMax;
+  else if (!strcasecmp(str, "WIDE"))
+    return stdAc::swingh_t::kWide;
   else
     return def;
 }
@@ -1542,6 +1544,8 @@ String IRac::swinghToString(const stdAc::swingh_t swingh) {
       return F("right");
     case stdAc::swingh_t::kRightMax:
       return F("rightmax");
+    case stdAc::swingh_t::kWide:
+      return F("leftright");
     default:
       return F("unknown");
   }

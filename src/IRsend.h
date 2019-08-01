@@ -78,6 +78,7 @@ namespace stdAc {
     kMiddle =   3,
     kRight =    4,
     kRightMax = 5,
+    kWide =     6,
   };
 
   // Structure to hold a common A/C state.
