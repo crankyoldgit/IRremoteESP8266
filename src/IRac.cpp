@@ -1545,7 +1545,7 @@ String IRac::swinghToString(const stdAc::swingh_t swingh) {
     case stdAc::swingh_t::kRightMax:
       return F("rightmax");
     case stdAc::swingh_t::kWide:
-      return F("leftright");
+      return F("wide");
     default:
       return F("unknown");
   }

@@ -49,6 +49,8 @@ namespace stdAc {
     kHeat =  2,
     kDry  =  3,
     kFan  =  4,
+    // Add new entries before this one, and update it to point to the last entry
+    kLastOpmodeEnum = kFan,
   };
 
   enum class fanspeed_t {
@@ -58,6 +60,8 @@ namespace stdAc {
     kMedium = 3,
     kHigh =   4,
     kMax =    5,
+    // Add new entries before this one, and update it to point to the last entry
+    kLastFanspeedEnum = kMax,
   };
 
   enum class swingv_t {
@@ -68,6 +72,8 @@ namespace stdAc {
     kMiddle =  3,
     kLow =     4,
     kLowest =  5,
+    // Add new entries before this one, and update it to point to the last entry
+    kLastSwingvEnum = kLowest,
   };
 
   enum class swingh_t {
@@ -78,7 +84,9 @@ namespace stdAc {
     kMiddle =   3,
     kRight =    4,
     kRightMax = 5,
-    kWide =     6,
+    kWide =     6,  // a.k.a. left & right at the same time.
+    // Add new entries before this one, and update it to point to the last entry
+    kLastSwinghEnum = kWide,
   };
 
   // Structure to hold a common A/C state.

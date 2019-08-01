@@ -913,7 +913,7 @@ String htmlSelectGpio(const String name, const int16_t def,
 
 String htmlSelectMode(const String name, const stdAc::opmode_t def) {
   String html = "<select name='" + name + "'>";
-  for (int8_t i = -1; i <= 4; i++) {
+  for (int8_t i = -1; i <= (int8_t)stdAc::opmode_t::kLastOpmodeEnum; i++) {
     String mode = IRac::opmodeToString((stdAc::opmode_t)i);
     html += htmlOptionItem(mode, mode, (stdAc::opmode_t)i == def);
   }
@@ -923,7 +923,7 @@ String htmlSelectMode(const String name, const stdAc::opmode_t def) {
 
 String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
   String html = "<select name='" + name + "'>";
-  for (int8_t i = 0; i <= 5; i++) {
+  for (int8_t i = 0; i <= (int8_t)stdAc::fanspeed_t::kLastFanspeedEnum; i++) {
     String speed = IRac::fanspeedToString((stdAc::fanspeed_t)i);
     html += htmlOptionItem(speed, speed, (stdAc::fanspeed_t)i == def);
   }
@@ -933,7 +933,7 @@ String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
 
 String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
   String html = "<select name='" + name + "'>";
-  for (int8_t i = -1; i <= 5; i++) {
+  for (int8_t i = -1; i <= (int8_t)stdAc::swingv_t::kLastSwingvEnum; i++) {
     String swing = IRac::swingvToString((stdAc::swingv_t)i);
     html += htmlOptionItem(swing, swing, (stdAc::swingv_t)i == def);
   }
@@ -943,7 +943,7 @@ String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
 
 String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
   String html = "<select name='" + name + "'>";
-  for (int8_t i = -1; i <= 5; i++) {
+  for (int8_t i = -1; i <= (int8_t)stdAc::swingh_t::kLastSwinghEnum; i++) {
     String swing = IRac::swinghToString((stdAc::swingh_t)i);
     html += htmlOptionItem(swing, swing, (stdAc::swingh_t)i == def);
   }
