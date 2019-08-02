@@ -490,16 +490,10 @@ bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
     if (data_result.data != kKelvinatorCmdFooter) return false;
     offset += data_result.used;
 
-    // Interdata gap.
-    if (!matchMark(results->rawbuf[offset++], kKelvinatorBitMark))
-      return false;
-    if (!matchSpace(results->rawbuf[offset++], kKelvinatorGapSpace))
-      return false;
-
-    // Data (Options) (32 bits)
+    // Gap + Data (Options) (32 bits)
     used = matchGeneric(results->rawbuf + offset, results->state + pos,
                         results->rawlen - offset, 32,
-                        0, 0,
+                        kKelvinatorBitMark, kKelvinatorGapSpace,
                         kKelvinatorBitMark, kKelvinatorOneSpace,
                         kKelvinatorBitMark, kKelvinatorZeroSpace,
                         kKelvinatorBitMark, kKelvinatorGapSpace * 2,
