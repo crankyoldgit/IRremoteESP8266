@@ -347,6 +347,10 @@
 
 using irutils::msToString;
 
+#if REPORT_VCC
+  ADC_MODE(ADC_VCC);
+#endif  // REPORT_VCC
+
 // Globals
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
@@ -1121,6 +1125,10 @@ uint32_t maxSketchSpace(void) {
 #endif  // defined(ESP8266)
 }
 
+#if REPORT_VCC
+String vccToString(void) { return String(ESP.getVcc() / 1000.0); }
+#endif  // REPORT_VCC
+
 // Info web page
 void handleInfo(void) {
   String html = htmlHeader(F("IR MQTT server info"));
@@ -1175,6 +1183,11 @@ void handleInfo(void) {
         "Off"
 #endif  // DEBUG
         "<br>"
+#if REPORT_VCC
+    "Vcc: ";
+    html += vccToString();
+    html += "V<br>"
+#endif  // REPORT_VCC
     "</p>"
 #if MQTT_ENABLE
     "<h4>MQTT Information</h4>"
@@ -2167,6 +2180,9 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
     debug("Sending MQTT stat update broadcast.");
     sendClimate(state, state, MqttClimateStat,
                 retain, true, false);
+#if REPORT_VCC
+    sendString(MqttClimateStat + KEY_VCC, vccToString(), false);
+#endif  // REPORT_VCC
 #if MQTT_CLIMATE_JSON
     sendJsonState(state, MqttClimateStat + KEY_JSON);
 #endif  // MQTT_CLIMATE_JSON
