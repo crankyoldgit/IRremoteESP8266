@@ -390,7 +390,7 @@ TEST(TestIRac, Gree) {
       "Model: 1 (YAW1F), Power: On, Mode: 1 (COOL), Temp: 22C, "
       "Fan: 2 (Medium), Turbo: Off, IFeel: Off, WiFi: Off, XFan: On, "
       "Light: On, Sleep: On, Swing Vertical Mode: Manual, "
-      "Swing Vertical Pos: 3";
+      "Swing Vertical Pos: 3, Timer: Off";
 
   ac.begin();
   irac.gree(&ac,

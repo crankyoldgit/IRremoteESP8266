@@ -35,6 +35,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 
 #if SEND_GREE
 // Send a Gree Heat Pump message.
@@ -222,12 +223,13 @@ void IRGreeAC::setTemp(const uint8_t temp) {
   uint8_t new_temp = std::max((uint8_t)kGreeMinTemp, temp);
   new_temp = std::min((uint8_t)kGreeMaxTemp, new_temp);
   if (getMode() == kGreeAuto) new_temp = 25;
-  remote_state[1] = (remote_state[1] & 0xF0U) | (new_temp - kGreeMinTemp);
+  remote_state[1] = (remote_state[1] & ~kGreeTempMask) |
+                    (new_temp - kGreeMinTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRGreeAC::getTemp(void) {
-  return ((remote_state[1] & 0xFU) + kGreeMinTemp);
+  return ((remote_state[1] & kGreeTempMask) + kGreeMinTemp);
 }
 
 // Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
@@ -359,6 +361,44 @@ uint8_t IRGreeAC::getSwingVerticalPosition(void) {
   return remote_state[4] & kGreeSwingPosMask;
 }
 
+void IRGreeAC::setTimerEnabled(const bool on) {
+  if (on)
+    remote_state[1] |= kGreeTimerEnabledBit;
+  else
+    remote_state[1] &= ~kGreeTimerEnabledBit;
+}
+
+bool IRGreeAC::getTimerEnabled(void) {
+  return remote_state[1] & kGreeTimerEnabledBit;
+}
+
+// Returns the number of minutes the timer is set for.
+uint16_t IRGreeAC::getTimer(void) {
+  uint16_t hrs = irutils::bcdToUint8(
+      (remote_state[2] & kGreeTimerHoursMask) |
+      ((remote_state[1] & kGreeTimerTensHrMask) >> 1));
+  return hrs * 60 + ((remote_state[1] & kGreeTimerHalfHrBit) ? 30 : 0);
+}
+
+// Set the A/C's timer to turn off in X many minutes.
+// Stores time internally in 30 min units.
+//   e.g. 5 mins means 0 (& Off), 95 mins is  90 mins (& On). Max is 24 hours.
+//
+// Args:
+//   minutes: The number of minutes the timer should be set for.
+void IRGreeAC::setTimer(const uint16_t minutes) {
+  // Clear the previous settings.
+  remote_state[1] &= ~kGreeTimer1Mask;
+  remote_state[2] &= ~kGreeTimerHoursMask;
+  uint16_t mins = std::min(kGreeTimerMax, minutes);  // Bounds check.
+  setTimerEnabled(mins >= 30);  // Timer is enabled when >= 30 mins.
+  uint8_t hours = mins / 60;
+  uint8_t halfhour = (mins % 60) < 30 ? 0 : 1;
+  // Set the "tens" digit of hours & the half hour.
+  remote_state[1] |= (((hours / 10) << 1) | halfhour) << 4;
+  // Set the "units" digit of hours.
+  remote_state[2] |= (hours % 10);
+}
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
@@ -504,6 +544,11 @@ String IRGreeAC::toString(void) {
       result += F(" (Auto)");
       break;
   }
+  result += F(", Timer: ");
+  if (getTimerEnabled())
+    result += minsToString(getTimer());
+  else
+    result += F("Off");
   return result;
 }
 
