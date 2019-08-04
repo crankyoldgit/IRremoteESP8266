@@ -1220,6 +1220,7 @@ TEST(TestIRac, swinghToString) {
   EXPECT_EQ("off", IRac::swinghToString(stdAc::swingh_t::kOff));
   EXPECT_EQ("left", IRac::swinghToString(stdAc::swingh_t::kLeft));
   EXPECT_EQ("auto", IRac::swinghToString(stdAc::swingh_t::kAuto));
+  EXPECT_EQ("wide", IRac::swinghToString(stdAc::swingh_t::kWide));
   EXPECT_EQ("unknown", IRac::swinghToString((stdAc::swingh_t)500));
 }
 
