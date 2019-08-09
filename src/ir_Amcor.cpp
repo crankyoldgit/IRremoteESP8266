@@ -6,6 +6,7 @@
 //   Brand: Amcor,  Model: TAC-444 remote
 
 #include "ir_Amcor.h"
+#include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
