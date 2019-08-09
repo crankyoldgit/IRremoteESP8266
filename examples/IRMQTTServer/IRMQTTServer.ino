@@ -1265,7 +1265,8 @@ void doRestart(const char* str, const bool serial_only) {
 void handleReset(void) {
 #if HTML_PASSWORD_ENABLE
   if (!server.authenticate(HttpUsername, HttpPassword)) {
-    debug("Basic HTTP authentication failure for " + kUrlWipe);
+    debug(("Basic HTTP authentication failure for " +
+           String(kUrlWipe)).c_str());
     return server.requestAuthentication();
   }
 #endif
@@ -1294,7 +1295,8 @@ void handleReset(void) {
 void handleReboot() {
 #if HTML_PASSWORD_ENABLE
   if (!server.authenticate(HttpUsername, HttpPassword)) {
-    debug("Basic HTTP authentication failure for " + kUrlReboot);
+    debug(("Basic HTTP authentication failure for " +
+           String(kUrlReboot)).c_str());
     return server.requestAuthentication();
   }
 #endif
