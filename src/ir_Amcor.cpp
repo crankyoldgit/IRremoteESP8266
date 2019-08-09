@@ -5,6 +5,7 @@
 //   Brand: Amcor,  Model: TAC-495 remote
 //   Brand: Amcor,  Model: TAC-444 remote
 
+#include "ir_Amcor.h"
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
@@ -21,6 +22,11 @@ const uint16_t kAmcorZeroSpace = kAmcorOneMark;
 const uint16_t kAmcorFooterMark = 1900;
 const uint16_t kAmcorGap = 34300;
 const uint8_t  kAmcorTolerance = 40;
+
+using irutils::addBoolToString;
+using irutils::addModeToString;
+using irutils::addFanToString;
+using irutils::addTempToString;
 
 #if SEND_AMCOR
 // Send a Amcor HVAC formatted message.
@@ -75,6 +81,10 @@ bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
   if (!used) return false;
   offset += used;
 
+  if (strict) {
+    if (!IRAmcorAc::validChecksum(results->state)) return false;
+  }
+
   // Success
   results->bits = nbits;
   results->decode_type = AMCOR;
@@ -84,3 +94,208 @@ bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
   return true;
 }
 #endif
+
+IRAmcorAc::IRAmcorAc(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+      : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+
+void IRAmcorAc::begin(void) { _irsend.begin(); }
+
+#if SEND_AMCOR
+void IRAmcorAc::send(const uint16_t repeat) {
+  this->checksum();  // Create valid checksum before sending
+  _irsend.sendAmcor(remote_state, kAmcorStateLength, repeat);
+}
+#endif  // SEND_AMCOR
+
+uint8_t IRAmcorAc::calcChecksum(const uint8_t state[], const uint16_t length) {
+  return irutils::sumNibbles(state, length - 1);
+}
+
+bool IRAmcorAc::validChecksum(const uint8_t state[], const uint16_t length) {
+  return (state[length - 1] == IRAmcorAc::calcChecksum(state, length));
+}
+
+void IRAmcorAc::checksum(void) {
+  remote_state[kAmcorChecksumByte] = IRAmcorAc::calcChecksum(remote_state,
+                                                             kAmcorStateLength);
+}
+
+void IRAmcorAc::stateReset(void) {
+  for (uint8_t i = 1; i < kAmcorStateLength; i++) remote_state[i] = 0x0;
+  remote_state[0] = 0x01;
+  setFan(kAmcorFanAuto);
+  setMode(kAmcorAuto);
+  setTemp(25);  // 25C
+}
+
+uint8_t* IRAmcorAc::getRaw(void) {
+  this->checksum();  // Ensure correct bit array before returning
+  return remote_state;
+}
+
+void IRAmcorAc::setRaw(const uint8_t state[]) {
+  for (uint8_t i = 0; i < kAmcorStateLength; i++) remote_state[i] = state[i];
+}
+
+void IRAmcorAc::on(void) { setPower(true); }
+
+void IRAmcorAc::off(void) { setPower(false); }
+
+void IRAmcorAc::setPower(const bool on) {
+  remote_state[kAmcorPowerByte] &= ~kAmcorPowerMask;
+  remote_state[kAmcorPowerByte] |= (on ? kAmcorPowerOn : kAmcorPowerOff);
+}
+
+bool IRAmcorAc::getPower(void) {
+  return ((remote_state[kAmcorPowerByte] & kAmcorPowerMask) == kAmcorPowerOn);
+}
+
+// Set the temp in deg C
+void IRAmcorAc::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max(kAmcorMinTemp, degrees);
+  temp = std::min(kAmcorMaxTemp, temp);
+
+  temp <<= 1;
+  remote_state[kAmcorTempByte] &= ~kAmcorTempMask;
+  remote_state[kAmcorTempByte] |= temp;
+}
+
+uint8_t IRAmcorAc::getTemp(void) {
+  return (remote_state[kAmcorTempByte] & kAmcorTempMask) >> 1;
+}
+
+// Set the speed of the fan
+void IRAmcorAc::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kAmcorFanAuto:
+    case kAmcorFanMin:
+    case kAmcorFanMed:
+    case kAmcorFanMax:
+      remote_state[kAmcorModeFanByte] &= ~kAmcorFanMask;
+      remote_state[kAmcorModeFanByte] |= speed << 4;
+      break;
+    default:
+      setFan(kAmcorFanAuto);
+  }
+}
+
+uint8_t IRAmcorAc::getFan(void) {
+  return (remote_state[kAmcorModeFanByte] & kAmcorFanMask) >> 4;
+}
+
+uint8_t IRAmcorAc::getMode(void) {
+  return remote_state[kAmcorModeFanByte] & kAmcorModeMask;
+}
+
+void IRAmcorAc::setMode(const uint8_t mode) {
+  remote_state[kAmcorSpecialByte] &= ~kAmcorVentMask;  // Clear the vent setting
+  switch (mode) {
+    case kAmcorFan:
+      remote_state[kAmcorSpecialByte] |= kAmcorVentMask;  // Set the vent option
+      // FALL-THRU
+    case kAmcorCool:
+    case kAmcorHeat:
+    case kAmcorDry:
+    case kAmcorAuto:
+      // Mask out bits
+      remote_state[kAmcorModeFanByte] &= ~kAmcorModeMask;
+      // Set the mode at bit positions
+      remote_state[kAmcorModeFanByte] |= mode;
+      return;
+    default:
+      this->setMode(kAmcorAuto);
+  }
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRAmcorAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kAmcorCool;
+    case stdAc::opmode_t::kHeat:
+      return kAmcorHeat;
+    case stdAc::opmode_t::kDry:
+      return kAmcorDry;
+    case stdAc::opmode_t::kFan:
+      return kAmcorFan;
+    default:
+      return kAmcorAuto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRAmcorAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kAmcorFanMin;
+    case stdAc::fanspeed_t::kMedium:
+      return kAmcorFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kAmcorFanMax;
+    default:
+      return kAmcorFanAuto;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRAmcorAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kAmcorCool: return stdAc::opmode_t::kCool;
+    case kAmcorHeat: return stdAc::opmode_t::kHeat;
+    case kAmcorDry: return stdAc::opmode_t::kDry;
+    case kAmcorFan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRAmcorAc::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kAmcorFanMax: return stdAc::fanspeed_t::kMax;
+    case kAmcorFanMed: return stdAc::fanspeed_t::kMedium;
+    case kAmcorFanMin: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRAmcorAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::AMCOR;
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  // Not supported.
+  result.model = -1;
+  result.turbo = false;
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.light = false;
+  result.filter = false;
+  result.econo = false;
+  result.quiet = false;
+  result.clean = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+String IRAmcorAc::toString() {
+  String result = "";
+  result.reserve(70);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kAmcorAuto, kAmcorCool,
+                            kAmcorHeat, kAmcorDry, kAmcorFan);
+  result += addFanToString(getFan(), kAmcorFanMax, kAmcorFanMin,
+                           kAmcorFanAuto, kAmcorFanAuto,
+                           kAmcorFanMed);
+  result += addTempToString(getTemp());
+  return result;
+}

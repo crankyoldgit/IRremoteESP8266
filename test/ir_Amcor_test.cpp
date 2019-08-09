@@ -1,6 +1,7 @@
-// Copyright 2018 David Conran
+// Copyright 2019 David Conran
 
 #include "IRac.h"
+#include "ir_Amcor.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -12,9 +13,8 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("AMCOR", typeToString(decode_type_t::AMCOR));
   ASSERT_EQ(decode_type_t::AMCOR, strToDecodeType("AMCOR"));
   ASSERT_TRUE(hasACState(decode_type_t::AMCOR));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::AMCOR));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::AMCOR));
 }
-
 
 // Test sending typical data only.
 TEST(TestSendAmcor, SendDataOnly) {
@@ -54,6 +54,7 @@ TEST(TestSendAmcor, SendDataOnly) {
 TEST(TestDecodeAmcor, SyntheticSelfDecode) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
+  IRAmcorAc ac(0);
 
   uint8_t expectedState[kAmcorStateLength] = {
       0x01, 0x41, 0x30, 0x00, 0x00, 0x30, 0x00, 0x0C};
@@ -65,8 +66,11 @@ TEST(TestDecodeAmcor, SyntheticSelfDecode) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(AMCOR, irsend.capture.decode_type);
   EXPECT_EQ(kAmcorBits, irsend.capture.bits);
-
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Fan: 4 (Auto), Temp: 24C",
+      ac.toString());
 }
 
 TEST(TestDecodeAmcor, RealExample) {
@@ -151,4 +155,153 @@ TEST(TestDecodeAmcor, RealExample) {
     EXPECT_EQ(AMCOR, irsend.capture.decode_type);
     EXPECT_EQ(kAmcorBits, irsend.capture.bits);
     EXPECT_STATE_EQ(expectedState2, irsend.capture.state, irsend.capture.bits);
+}
+
+// Tests for IRAmcorAc class.
+
+TEST(TestAmcorAcClass, Power) {
+  IRAmcorAc ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestAmcorAcClass, Temperature) {
+  IRAmcorAc ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+
+  ac.setTemp(kAmcorMinTemp);
+  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+
+  ac.setTemp(kAmcorMaxTemp);
+  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+
+  ac.setTemp(kAmcorMinTemp - 1);
+  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+
+  ac.setTemp(kAmcorMaxTemp + 1);
+  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestAmcorAcClass, OperatingMode) {
+  IRAmcorAc ac(0);
+  ac.begin();
+
+  ac.setMode(kAmcorAuto);
+  EXPECT_EQ(kAmcorAuto, ac.getMode());
+
+  ac.setMode(kAmcorCool);
+  EXPECT_EQ(kAmcorCool, ac.getMode());
+
+  ac.setMode(kAmcorHeat);
+  EXPECT_EQ(kAmcorHeat, ac.getMode());
+
+  ac.setMode(kAmcorDry);
+  EXPECT_EQ(kAmcorDry, ac.getMode());
+
+  ac.setMode(kAmcorFan);
+  EXPECT_EQ(kAmcorFan, ac.getMode());
+
+  ac.setMode(kAmcorAuto + 1);
+  EXPECT_EQ(kAmcorAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kAmcorAuto, ac.getMode());
+}
+
+TEST(TestAmcorAcClass, FanSpeed) {
+  IRAmcorAc ac(0);
+  ac.begin();
+
+  ac.setFan(0);
+  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+
+  ac.setFan(kAmcorFanMax);
+  EXPECT_EQ(kAmcorFanMax, ac.getFan());
+
+  ac.setFan(kAmcorFanMax + 1);
+  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+
+  ac.setFan(kAmcorFanMax - 1);
+  EXPECT_EQ(kAmcorFanMax - 1, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
+}
+
+TEST(TestAmcorAcClass, Checksums) {
+  uint8_t state[kAmcorStateLength] = {
+      0x01, 0x41, 0x30, 0x00, 0x00, 0x30, 0x00, 0x0C};
+
+  ASSERT_EQ(0x0C, IRAmcorAc::calcChecksum(state));
+  EXPECT_TRUE(IRAmcorAc::validChecksum(state));
+  // Change the array so the checksum is invalid.
+  state[0] ^= 0xFF;
+  EXPECT_FALSE(IRAmcorAc::validChecksum(state));
+  // Restore the previous change, and change another byte.
+  state[0] ^= 0xFF;
+  state[4] ^= 0xFF;
+  EXPECT_FALSE(IRAmcorAc::validChecksum(state));
+  state[4] ^= 0xFF;
+  EXPECT_TRUE(IRAmcorAc::validChecksum(state));
+
+  // Additional known good states.
+  uint8_t knownGood1[kAmcorStateLength] = {
+      0x01, 0x11, 0x3E, 0x00, 0x00, 0x30, 0x00, 0x17};
+  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood1));
+  ASSERT_EQ(0x17, IRAmcorAc::calcChecksum(knownGood1));
+  uint8_t knownGood2[kAmcorStateLength] = {
+      0x01, 0x22, 0x26, 0x00, 0x00, 0x30, 0x00, 0x10};
+  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood2));
+  ASSERT_EQ(0x10, IRAmcorAc::calcChecksum(knownGood2));
+  uint8_t knownGood3[kAmcorStateLength] = {
+      0x01, 0x41, 0x24, 0x00, 0x00, 0xC0, 0x00, 0x18};
+  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood3));
+  ASSERT_EQ(0x18, IRAmcorAc::calcChecksum(knownGood3));
+
+  // For a recalculation.
+  uint8_t knownBad[kAmcorStateLength] = {
+      // Same as knownGood3 except for the checksum.
+      0x01, 0x41, 0x24, 0x00, 0x00, 0xC0, 0x00, 0x00};
+  EXPECT_FALSE(IRAmcorAc::validChecksum(knownBad));
+  IRAmcorAc ac(0);
+  ac.setRaw(knownBad);
+  EXPECT_STATE_EQ(knownGood3, ac.getRaw(), kAmcorBits);
 }
