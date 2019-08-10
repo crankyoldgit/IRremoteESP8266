@@ -166,6 +166,29 @@ uint8_t IRAmcorAc::getTemp(void) {
   return (remote_state[kAmcorTempByte] & kAmcorTempMask) >> 1;
 }
 
+// Maximum Cooling or Hearing
+void IRAmcorAc::setMax(const bool on) {
+  if (on) {
+    switch (getMode()) {
+      case kAmcorCool:
+        setTemp(kAmcorMinTemp);
+        break;
+      case kAmcorHeat:
+        setTemp(kAmcorMaxTemp);
+        break;
+      default:  // Not allowed in all other operating modes.
+        return;
+    }
+    remote_state[kAmcorSpecialByte] |= kAmcorMaxMask;
+  } else {
+    remote_state[kAmcorSpecialByte] &= ~kAmcorMaxMask;
+  }
+}
+
+bool IRAmcorAc::getMax(void) {
+  return ((remote_state[kAmcorSpecialByte] & kAmcorMaxMask) == kAmcorMaxMask);
+}
+
 // Set the speed of the fan
 void IRAmcorAc::setFan(const uint8_t speed) {
   switch (speed) {
@@ -298,5 +321,6 @@ String IRAmcorAc::toString() {
                            kAmcorFanAuto, kAmcorFanAuto,
                            kAmcorFanMed);
   result += addTempToString(getTemp());
+  result += addBoolToString(getMax(), F("Max"));
   return result;
 }

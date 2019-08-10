@@ -39,7 +39,7 @@ TEST(TestIRac, Amcor) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 5 (AUTO), Fan: 3 (High), Temp: 19C";
+      "Power: On, Mode: 5 (AUTO), Fan: 3 (High), Temp: 19C, Max: Off";
 
   ac.begin();
   irac.amcor(&ac,

@@ -60,8 +60,8 @@ const uint8_t kAmcorPowerOff =  0b11000000;  // 0xC0
 
 // state[6]
 const uint8_t kAmcorSpecialByte = 6;
-// "Lo" Mode
-const uint8_t kAmcorLoMask =    0b00000011;  // 0x03
+// Max Mode (aka "Lo" in Cool and "Hi" in Heat)
+const uint8_t kAmcorMaxMask =    0b00000011;  // 0x03
 // "Vent" Mode
 const uint8_t kAmcorVentMask =  0b11000000;  // 0xC0
 
@@ -91,6 +91,8 @@ class IRAmcorAc {
   void off();
   void setTemp(const uint8_t temp);
   uint8_t getTemp();
+  void setMax(const bool on);
+  bool getMax(void);
   void setFan(const uint8_t speed);
   uint8_t getFan();
   void setMode(const uint8_t mode);
