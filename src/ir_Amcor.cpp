@@ -37,7 +37,7 @@ using irutils::addTempToString;
 //   nbytes: The byte size of the array being sent. typically kAmcorStateLength.
 //   repeat: The number of times the message is to be repeated.
 //
-// Status: Alpha / Needs testing.
+// Status: STABLE / Reported as working.
 //
 void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
                        const uint16_t repeat) {
@@ -59,7 +59,7 @@ void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Seems to be working.
+// Status: STABLE / Reported as working.
 //
 bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
                          bool strict) {
