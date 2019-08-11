@@ -5,6 +5,9 @@
 #ifndef EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 #define EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 
+#if defined(ESP8266)
+#include <ESP8266WiFi.h>
+#endif  // ESP8266
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
