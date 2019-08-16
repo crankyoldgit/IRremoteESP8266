@@ -1454,11 +1454,20 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 
 // Assumes str is the model or an integer >= 1.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
+  // Gree
+  if (!strcasecmp(str, "YAW1F")) {
+    return gree_ac_remote_model_t::YAW1F;
+  } else if (!strcasecmp(str, "YBOFB")) {
+    return gree_ac_remote_model_t::YBOFB;
   // Fujitsu A/C models
-  if (!strcasecmp(str, "ARRAH2E")) {
+  } else if (!strcasecmp(str, "ARRAH2E")) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
   } else if (!strcasecmp(str, "ARDB1")) {
     return fujitsu_ac_remote_model_t::ARDB1;
+  } else if (!strcasecmp(str, "ARREB1E")) {
+    return fujitsu_ac_remote_model_t::ARREB1E;
+  } else if (!strcasecmp(str, "ARJW2")) {
+    return fujitsu_ac_remote_model_t::ARJW2;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
