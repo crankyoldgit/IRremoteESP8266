@@ -104,7 +104,6 @@ class IRFujitsuAC {
   uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_FUJITSU_AC
   void begin(void);
-  void off(void);
   void stepHoriz(void);
   void toggleSwingHoriz(const bool update = true);
   void stepVert(void);
@@ -123,6 +122,9 @@ class IRFujitsuAC {
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength(void);
   static bool validChecksum(uint8_t* state, const uint16_t length);
+  void setPower(const bool on);
+  void off(void);
+  void on(void);
   bool getPower(void);
   void setOutsideQuiet(const bool on);
 

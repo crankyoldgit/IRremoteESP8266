@@ -267,9 +267,6 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
   return true;
 }
 
-// Set the requested power state of the A/C to off.
-void IRFujitsuAC::off(void) { this->setCmd(kFujitsuAcCmdTurnOff); }
-
 void IRFujitsuAC::stepHoriz(void) { this->setCmd(kFujitsuAcCmdStepHoriz); }
 
 void IRFujitsuAC::toggleSwingHoriz(const bool update) {
@@ -335,6 +332,17 @@ uint8_t IRFujitsuAC::getCmd(const bool raw) {
   if (raw) return remote_state[5];
   return _cmd;
 }
+
+// Set the requested power state of the A/C.
+void IRFujitsuAC::setPower(const bool on) {
+  this->setCmd(on ? kFujitsuAcCmdTurnOn : kFujitsuAcCmdTurnOff);
+}
+
+// Set the requested power state of the A/C to off.
+void IRFujitsuAC::off(void) { this->setPower(false); }
+
+// Set the requested power state of the A/C to on.
+void IRFujitsuAC::on(void) { this->setPower(true); }
 
 bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 
