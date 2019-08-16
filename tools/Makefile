@@ -228,5 +228,5 @@ ir_Goodweather.o : $(USER_DIR)/ir_Goodweather.cpp $(USER_DIR)/ir_Goodweather.h $
 ir_Neoclima.o : $(USER_DIR)/ir_Neoclima.cpp $(USER_DIR)/ir_Neoclima.h $(COMMON_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Neoclima.cpp
 
-ir_Amcor.o : $(USER_DIR)/ir_Amcor.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Amcor.cpp
+ir_Amcor.o : $(USER_DIR)/ir_Amcor.cpp $(USER_DIR)/ir_Amcor.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Amcor.cpp

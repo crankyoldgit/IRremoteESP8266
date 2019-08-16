@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran
 
 #include <string>
+#include "ir_Amcor.h"
 #include "ir_Argo.h"
 #include "ir_Daikin.h"
 #include "ir_Electra.h"
@@ -32,6 +33,27 @@
 #include "gtest/gtest.h"
 
 // Tests for IRac class.
+
+TEST(TestIRac, Amcor) {
+  IRAmcorAc ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 5 (AUTO), Fan: 3 (High), Temp: 19C, Max: Off";
+
+  ac.begin();
+  irac.amcor(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kAuto,      // Mode
+             19,                          // Celsius
+             stdAc::fanspeed_t::kHigh);   // Fan speed
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(AMCOR, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kAmcorBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
 
 TEST(TestIRac, Argo) {
   IRArgoAC ac(0);

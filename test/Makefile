@@ -88,7 +88,8 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
   ir_Amcor.o
 
 # All the IR Protocol header files.
-PROTOCOLS_H = $(USER_DIR)/ir_Argo.h \
+PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
+		$(USER_DIR)/ir_Argo.h \
 		$(USER_DIR)/ir_Gree.h \
 		$(USER_DIR)/ir_Magiquest.h \
 		$(USER_DIR)/ir_Coolix.h \
@@ -609,7 +610,7 @@ ir_Neoclima_test.o : ir_Neoclima_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 ir_Neoclima_test : $(COMMON_OBJ) ir_Neoclima_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-ir_Amcor.o : $(USER_DIR)/ir_Amcor.cpp $(COMMON_DEPS)
+ir_Amcor.o : $(USER_DIR)/ir_Amcor.h $(USER_DIR)/ir_Amcor.cpp $(COMMON_DEPS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Amcor.cpp
 
 ir_Amcor_test.o : ir_Amcor_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
