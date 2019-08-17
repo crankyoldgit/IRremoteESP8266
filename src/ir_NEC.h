@@ -9,6 +9,10 @@
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
+// Supports:
+//   Brand: Yamaha,  Model: RAV561 remote
+//   Brand: Yamaha,  Model: RXV585B A/V Receiver
+
 // Constants
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php
