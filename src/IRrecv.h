@@ -32,8 +32,9 @@ const uint8_t kIdleState = 2;
 const uint8_t kMarkState = 3;
 const uint8_t kSpaceState = 4;
 const uint8_t kStopState = 5;
-const uint8_t kTolerance = 25;  // default percent tolerance in measurements.
-const uint16_t kRawTick = 2;    // Capture tick to uSec factor.
+const uint8_t kTolerance = 25;   // default percent tolerance in measurements.
+const uint8_t kUseDefTol = 255;  // Indicate to use the class default tolerance.
+const uint16_t kRawTick = 2;     // Capture tick to uSec factor.
 #define RAWTICK kRawTick  // Deprecated. For legacy user code support only.
 // How long (ms) before we give up wait for more data?
 // Don't exceed kMaxTimeoutMs without a good reason.
@@ -122,6 +123,8 @@ class IRrecv {
                   const bool save_buffer = false);                // Constructor
 #endif  // ESP32
   ~IRrecv(void);                                                  // Destructor
+  void setTolerance(const uint8_t percent = kTolerance);
+  uint8_t getTolerance(void);
   bool decode(decode_results *results, irparams_t *save = NULL);
   void enableIRIn(const bool pullup = false);
   void disableIRIn(void);
@@ -130,32 +133,40 @@ class IRrecv {
 #if DECODE_HASH
   void setUnknownThreshold(const uint16_t length);
 #endif
-  static bool match(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
-  static bool matchMark(uint32_t measured, uint32_t desired,
-                        uint8_t tolerance = kTolerance,
-                        int16_t excess = kMarkExcess);
-  static bool matchSpace(uint32_t measured, uint32_t desired,
-                         uint8_t tolerance = kTolerance,
-                         int16_t excess = kMarkExcess);
+  bool match(const uint32_t measured, const uint32_t desired,
+             const uint8_t tolerance = kUseDefTol,
+             const uint16_t delta = 0);
+  bool matchMark(const uint32_t measured, const uint32_t desired,
+                 const uint8_t tolerance = kUseDefTol,
+                 const int16_t excess = kMarkExcess);
+  bool matchSpace(const uint32_t measured, const uint32_t desired,
+                  const uint8_t tolerance = kUseDefTol,
+                  const int16_t excess = kMarkExcess);
 #ifndef UNIT_TEST
 
  private:
 #endif
   irparams_t *irparams_save;
+  uint8_t _tolerance;
+#if defined(ESP32)
   uint8_t _timer_num;
+#endif  // defined(ESP32)
 #if DECODE_HASH
   uint16_t _unknown_threshold;
 #endif
   // These are called by decode
+  uint8_t _validTolerance(const uint8_t percentage);
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);
-  int16_t compare(uint16_t oldval, uint16_t newval);
-  static uint32_t ticksLow(uint32_t usecs, uint8_t tolerance = kTolerance,
-                           uint16_t delta = 0);
-  static uint32_t ticksHigh(uint32_t usecs, uint8_t tolerance = kTolerance,
-                            uint16_t delta = 0);
-  bool matchAtLeast(uint32_t measured, uint32_t desired,
-                    uint8_t tolerance = kTolerance, uint16_t delta = 0);
+  uint16_t compare(const uint16_t oldval, const uint16_t newval);
+  uint32_t ticksLow(const uint32_t usecs,
+                    const uint8_t tolerance = kUseDefTol,
+                    const uint16_t delta = 0);
+  uint32_t ticksHigh(const uint32_t usecs,
+                     const uint8_t tolerance = kUseDefTol,
+                     const uint16_t delta = 0);
+  bool matchAtLeast(const uint32_t measured, const uint32_t desired,
+                    const uint8_t tolerance = kUseDefTol,
+                    const uint16_t delta = 0);
   uint16_t _matchGeneric(volatile uint16_t *data_ptr,
                          uint64_t *result_bits_ptr,
                          uint8_t *result_ptr,
@@ -171,20 +182,20 @@ class IRrecv {
                          const uint16_t footermark,
                          const uint32_t footerspace,
                          const bool atleast = false,
-                         const uint8_t tolerance = kTolerance,
+                         const uint8_t tolerance = kUseDefTol,
                          const int16_t excess = kMarkExcess,
                          const bool MSBfirst = true);
   match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
-                           const uint8_t tolerance = kTolerance,
+                           const uint8_t tolerance = kUseDefTol,
                            const int16_t excess = kMarkExcess,
                            const bool MSBfirst = true);
   uint16_t matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                       const uint16_t remaining, const uint16_t nbytes,
                       const uint16_t onemark, const uint32_t onespace,
                       const uint16_t zeromark, const uint32_t zerospace,
-                      const uint8_t tolerance = kTolerance,
+                      const uint8_t tolerance = kUseDefTol,
                       const int16_t excess = kMarkExcess,
                       const bool MSBfirst = true);
   uint16_t matchGeneric(volatile uint16_t *data_ptr,
@@ -195,7 +206,7 @@ class IRrecv {
                         const uint16_t zeromark, const uint32_t zerospace,
                         const uint16_t footermark, const uint32_t footerspace,
                         const bool atleast = false,
-                        const uint8_t tolerance = kTolerance,
+                        const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
   uint16_t matchGeneric(volatile uint16_t *data_ptr, uint8_t *result_ptr,
@@ -206,7 +217,7 @@ class IRrecv {
                         const uint16_t footermark,
                         const uint32_t footerspace,
                         const bool atleast = false,
-                        const uint8_t tolerance = kTolerance,
+                        const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
   bool decodeHash(decode_results *results);
@@ -249,7 +260,7 @@ class IRrecv {
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
-                     uint16_t bitTime, uint8_t tolerance = kTolerance,
+                     uint16_t bitTime, uint8_t tolerance = kUseDefTol,
                      int16_t excess = kMarkExcess, uint16_t delta = 0,
                      uint8_t maxwidth = 3);
 #endif

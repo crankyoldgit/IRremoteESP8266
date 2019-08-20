@@ -528,7 +528,7 @@ bool IRrecv::decodeNeoclima(decode_results *results, const uint16_t nbits,
                       kNeoclimaBitMark, kNeoclimaOneSpace,
                       kNeoclimaBitMark, kNeoclimaZeroSpace,
                       kNeoclimaBitMark, kNeoclimaHdrSpace, false,
-                      kTolerance, 0, false);
+                      _tolerance, 0, false);
   if (!used) return false;
   offset += used;
   // Extra footer.

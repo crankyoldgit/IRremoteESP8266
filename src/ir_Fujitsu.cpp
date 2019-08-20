@@ -649,7 +649,7 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t nbits,
   match_result_t data_result =
       matchData(&(results->rawbuf[offset]), kFujitsuAcMinBits - 8,
                 kFujitsuAcBitMark, kFujitsuAcOneSpace, kFujitsuAcBitMark,
-                kFujitsuAcZeroSpace, kTolerance, kMarkExcess, false);
+                kFujitsuAcZeroSpace, _tolerance, kMarkExcess, false);
   if (data_result.success == false) return false;      // Fail
   if (data_result.data != 0x1010006314) return false;  // Signature failed.
   dataBitsSoFar += kFujitsuAcMinBits - 8;
@@ -666,7 +666,7 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t nbits,
        i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(
         &(results->rawbuf[offset]), 8, kFujitsuAcBitMark, kFujitsuAcOneSpace,
-        kFujitsuAcBitMark, kFujitsuAcZeroSpace, kTolerance, kMarkExcess, false);
+        kFujitsuAcBitMark, kFujitsuAcZeroSpace, _tolerance, kMarkExcess, false);
     if (data_result.success == false) break;  // Fail
     results->state[i] = data_result.data;
   }

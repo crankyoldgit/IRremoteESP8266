@@ -422,7 +422,7 @@ bool IRrecv::decodeArgo(decode_results *results, const uint16_t nbits,
                     kArgoBitMark, kArgoOneSpace,
                     kArgoBitMark, kArgoZeroSpace,
                     0, 0,  // Footer (None, allegedly. This seems very wrong.)
-                    true, kTolerance, 0, false)) return false;
+                    true, _tolerance, 0, false)) return false;
 
   // Compliance
   // Verify we got a valid checksum.

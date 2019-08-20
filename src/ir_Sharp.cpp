@@ -538,7 +538,7 @@ bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
                       kSharpAcBitMark, kSharpAcOneSpace,
                       kSharpAcBitMark, kSharpAcZeroSpace,
                       kSharpAcBitMark, kSharpAcGap, true,
-                      kTolerance, kMarkExcess, false);
+                      _tolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
   // Compliance

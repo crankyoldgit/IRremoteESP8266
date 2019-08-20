@@ -1275,9 +1275,9 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
 
   // Leader
   if (!matchMark(results->rawbuf[offset++], kDaikin2LeaderMark,
-                 kDaikin2Tolerance)) return false;
+                 _tolerance + kDaikin2Tolerance)) return false;
   if (!matchSpace(results->rawbuf[offset++], kDaikin2LeaderSpace,
-                  kDaikin2Tolerance)) return false;
+                  _tolerance + kDaikin2Tolerance)) return false;
 
   // Sections
   uint16_t pos = 0;
@@ -1291,7 +1291,8 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t nbits,
                         kDaikin2BitMark, kDaikin2ZeroSpace,
                         kDaikin2BitMark, kDaikin2Gap,
                         section >= kDaikin2Sections - 1,
-                        kDaikin2Tolerance, kDaikinMarkExcess, false);
+                        _tolerance + kDaikin2Tolerance, kDaikinMarkExcess,
+                        false);
     if (used == 0) return false;
     offset += used;
     pos += ksectionSize[section];

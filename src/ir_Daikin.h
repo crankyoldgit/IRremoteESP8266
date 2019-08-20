@@ -176,7 +176,7 @@ const uint16_t kDaikin2ZeroSpace = 420;
 const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
-const uint8_t kDaikin2Tolerance = kTolerance + 5;
+const uint8_t kDaikin2Tolerance = 5;  // Extra percentage tolerance
 
 const uint8_t kDaikin2BitSleepTimer = 0b00100000;
 const uint8_t kDaikin2BitPurify = 0b00010000;

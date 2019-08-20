@@ -742,7 +742,7 @@ bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
                         kSamsungAcBitMark, kSamsungAcZeroSpace,
                         kSamsungAcBitMark, kSamsungAcSectionGap,
                         pos + kSamsungACSectionLength >= nbits / 8,
-                        kTolerance, 0, false);
+                        _tolerance, 0, false);
     if (used == 0) return false;
     offset += used;
   }

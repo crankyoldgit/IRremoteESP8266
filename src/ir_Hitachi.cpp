@@ -382,7 +382,7 @@ String IRHitachiAc::toString(void) {
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
                              const bool strict) {
-  const uint8_t kTolerance = 30;
+  const uint8_t k_tolerance = _tolerance + 5;
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
     return false;  // Can't possibly be a valid HitachiAC message.
   if (strict) {
@@ -412,7 +412,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
                     kHitachiAcBitMark, kHitachiAcOneSpace,
                     kHitachiAcBitMark, kHitachiAcZeroSpace,
                     kHitachiAcBitMark, kHitachiAcMinGap, true,
-                    kTolerance)) return false;
+                    k_tolerance)) return false;
 
   // Compliance
   if (strict) {

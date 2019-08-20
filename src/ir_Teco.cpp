@@ -264,7 +264,7 @@ bool IRrecv::decodeTeco(decode_results* results,
                     kTecoBitMark, kTecoOneSpace,
                     kTecoBitMark, kTecoZeroSpace,
                     kTecoBitMark, kTecoGap, true,
-                    kTolerance, kMarkExcess, false)) return false;
+                    _tolerance, kMarkExcess, false)) return false;
 
   // Success
   results->decode_type = TECO;

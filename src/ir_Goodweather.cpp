@@ -419,7 +419,7 @@ bool IRrecv::decodeGoodweather(decode_results* results,
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             kGoodweatherBitMark, kGoodweatherOneSpace,
                             kGoodweatherBitMark, kGoodweatherZeroSpace,
-                            kTolerance, kMarkExcess, false);
+                            _tolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     DPRINTLN("DEBUG: Normal byte read okay.");
     offset += data_result.used;
@@ -428,7 +428,7 @@ bool IRrecv::decodeGoodweather(decode_results* results,
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             kGoodweatherBitMark, kGoodweatherOneSpace,
                             kGoodweatherBitMark, kGoodweatherZeroSpace,
-                            kTolerance, kMarkExcess, false);
+                            _tolerance, kMarkExcess, false);
     if (data_result.success == false) return false;
     DPRINTLN("DEBUG: Inverted byte read okay.");
     offset += data_result.used;

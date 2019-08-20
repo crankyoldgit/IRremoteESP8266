@@ -302,7 +302,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
       data_result =
           matchData(&(results->rawbuf[offset]), 8, kMitsubishiAcBitMark,
                     kMitsubishiAcOneSpace, kMitsubishiAcBitMark,
-                    kMitsubishiAcZeroSpace, kTolerance, kMarkExcess, false);
+                    kMitsubishiAcZeroSpace, _tolerance, kMarkExcess, false);
       if (data_result.success == false) {
         failure = true;
         DPRINT("Byte decode failed at #");
@@ -365,7 +365,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
         data_result =
             matchData(&(results->rawbuf[offset]), 8, kMitsubishiAcBitMark,
                       kMitsubishiAcOneSpace, kMitsubishiAcBitMark,
-                      kMitsubishiAcZeroSpace, kTolerance, kMarkExcess, false);
+                      kMitsubishiAcZeroSpace, _tolerance, kMarkExcess, false);
         if (data_result.success == false ||
             data_result.data != results->state[i]) {
           DPRINTLN("Repeat payload error.");

@@ -274,7 +274,7 @@ bool IRrecv::decodeTrotec(decode_results *results, const uint16_t nbits,
                       kTrotecBitMark, kTrotecOneSpace,
                       kTrotecBitMark, kTrotecZeroSpace,
                       kTrotecBitMark, kTrotecGap, true,
-                      kTolerance, 0, false);
+                      _tolerance, 0, false);
   if (used == 0) return false;
   offset += used;
 

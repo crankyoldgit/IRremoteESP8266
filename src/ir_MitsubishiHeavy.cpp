@@ -1045,7 +1045,7 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
                       kMitsubishiHeavyBitMark, kMitsubishiHeavyOneSpace,
                       kMitsubishiHeavyBitMark, kMitsubishiHeavyZeroSpace,
                       kMitsubishiHeavyBitMark, kMitsubishiHeavyGap, true,
-                      kTolerance, 0, false);
+                      _tolerance, 0, false);
   if (used == 0) return false;
   offset += used;
   // Compliance
