@@ -425,6 +425,7 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
     // No Beep setting available.
     // No Sleep setting available.
     // No Clock setting available.
+    ac->on();  // Ref: Issue #860
   } else {
     // Off is special case/message. We don't need to send other messages.
     ac->off();
