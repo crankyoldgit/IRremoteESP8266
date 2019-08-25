@@ -64,19 +64,18 @@ uint64_t IRTecoAc::getRaw(void) { return remote_state; }
 
 void IRTecoAc::setRaw(const uint64_t new_code) { remote_state = new_code; }
 
-void IRTecoAc::on(void) { remote_state |= kTecoPower; }
+void IRTecoAc::on(void) { setPower(true); }
 
-void IRTecoAc::off(void) { remote_state &= ~kTecoPower; }
+void IRTecoAc::off(void) { setPower(false); }
 
 void IRTecoAc::setPower(const bool on) {
   if (on)
-    this->on();
+    remote_state |= kTecoPower;
   else
-    this->off();
+    remote_state &= ~kTecoPower;
 }
 
-bool IRTecoAc::getPower(void) {
-  return (remote_state & kTecoPower) == kTecoPower; }
+bool IRTecoAc::getPower(void) { return remote_state & kTecoPower; }
 
 void IRTecoAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
@@ -146,6 +145,33 @@ void IRTecoAc::setSleep(const bool on) {
 
 bool IRTecoAc::getSleep(void) { return remote_state & kTecoSleep; }
 
+bool IRTecoAc::getLight(void) { return remote_state & kTecoLight; }
+
+void IRTecoAc::setLight(const bool on) {
+  if (on)
+    remote_state |= kTecoLight;
+  else
+    remote_state &= ~kTecoLight;
+}
+
+bool IRTecoAc::getHumid(void) { return remote_state & kTecoHumid; }
+
+void IRTecoAc::setHumid(const bool on) {
+  if (on)
+    remote_state |= kTecoHumid;
+  else
+    remote_state &= ~kTecoHumid;
+}
+
+bool IRTecoAc::getSave(void) { return remote_state & kTecoSave; }
+
+void IRTecoAc::setSave(const bool on) {
+  if (on)
+    remote_state |= kTecoSave;
+  else
+    remote_state &= ~kTecoSave;
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -212,10 +238,10 @@ stdAc::state_t IRTecoAc::toCommon(void) {
   result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
                                      stdAc::swingv_t::kOff;
   result.sleep = this->getSleep() ? 0 : -1;
+  result.light = this->getLight();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
-  result.light = false;
   result.filter = false;
   result.econo = false;
   result.quiet = false;
@@ -228,7 +254,7 @@ stdAc::state_t IRTecoAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRTecoAc::toString(void) {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
   result += addModeToString(getMode(), kTecoAuto, kTecoCool, kTecoHeat,
                             kTecoDry, kTecoFan);
@@ -237,6 +263,10 @@ String IRTecoAc::toString(void) {
                            kTecoFanAuto, kTecoFanAuto, kTecoFanMed);
   result += addBoolToString(getSleep(), F("Sleep"));
   result += addBoolToString(getSwing(), F("Swing"));
+  result += addBoolToString(getLight(), F("Light"));
+  result += addBoolToString(getHumid(), F("Humid"));
+  result += addBoolToString(getSave(), F("Save"));
+
   return result;
 }
 

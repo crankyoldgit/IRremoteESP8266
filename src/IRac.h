@@ -266,7 +266,7 @@ void electra(IRElectraAc *ac,
   void teco(IRTecoAc *ac,
             const bool on, const stdAc::opmode_t mode, const float degrees,
             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-            const int16_t sleep = -1);
+            const bool light, const int16_t sleep = -1);
 #endif  // SEND_TECO
 #if SEND_TOSHIBA_AC
   void toshiba(IRToshibaAC *ac,

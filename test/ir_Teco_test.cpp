@@ -198,26 +198,63 @@ TEST(TestTecoACClass, Sleep) {
   EXPECT_TRUE(ac.getSleep());
 }
 
+TEST(TestTecoACClass, Light) {
+  IRTecoAc ac(0);
+  ac.begin();
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_EQ(false, ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+}
+
+TEST(TestTecoACClass, Humid) {
+  IRTecoAc ac(0);
+  ac.begin();
+
+  ac.setHumid(true);
+  EXPECT_TRUE(ac.getHumid());
+  ac.setHumid(false);
+  EXPECT_EQ(false, ac.getHumid());
+  ac.setHumid(true);
+  EXPECT_TRUE(ac.getHumid());
+}
+
+TEST(TestTecoACClass, Save) {
+  IRTecoAc ac(0);
+  ac.begin();
+
+  ac.setSave(true);
+  EXPECT_TRUE(ac.getSave());
+  ac.setSave(false);
+  EXPECT_EQ(false, ac.getSave());
+  ac.setSave(true);
+  EXPECT_TRUE(ac.getSave());
+}
+
 TEST(TestTecoACClass, MessageConstuction) {
   IRTecoAc ac(0);
 
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (Auto), Sleep: Off, "
-      "Swing: Off",
+      "Swing: Off, Light: Off, Humid: Off, Save: Off",
       ac.toString());
   ac.setPower(true);
   ac.setMode(kTecoCool);
   ac.setTemp(21);
   ac.setFan(kTecoFanHigh);
   ac.setSwing(false);
+  ac.setLight(false);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 3 (High), Sleep: Off, "
-      "Swing: Off",
+      "Swing: Off, Light: Off, Humid: Off, Save: Off",
       ac.toString());
   ac.setSwing(true);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 3 (High), Sleep: Off, "
-      "Swing: On",
+      "Swing: On, Light: Off, Humid: Off, Save: Off",
       ac.toString());
   ac.setSwing(false);
   ac.setFan(kTecoFanLow);
@@ -225,17 +262,20 @@ TEST(TestTecoACClass, MessageConstuction) {
   ac.setMode(kTecoHeat);
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 21C, Fan: 1 (Low), Sleep: On, "
-      "Swing: Off",
+      "Swing: Off, Light: Off, Humid: Off, Save: Off",
       ac.toString());
   ac.setSleep(false);
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 21C, Fan: 1 (Low), Sleep: Off, "
-      "Swing: Off",
+      "Swing: Off, Light: Off, Humid: Off, Save: Off",
       ac.toString());
   ac.setTemp(25);
+  ac.setLight(true);
+  ac.setSave(true);
+  ac.setHumid(true);
   EXPECT_EQ(
       "Power: On, Mode: 4 (HEAT), Temp: 25C, Fan: 1 (Low), Sleep: Off, "
-      "Swing: Off",
+      "Swing: Off, Light: On, Humid: On, Save: On",
       ac.toString());
 }
 
@@ -253,7 +293,7 @@ TEST(TestTecoACClass, ReconstructKnownMessage) {
   EXPECT_EQ(expected, ac.getRaw());
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
-      "Swing: On",
+      "Swing: On, Light: Off, Humid: Off, Save: Off",
       ac.toString());
 }
 
@@ -295,7 +335,7 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (AUTO), Temp: 16C, Fan: 0 (Auto), Sleep: Off, "
-      "Swing: Off",
+      "Swing: Off, Light: Off, Humid: Off, Save: Off",
       ac.toString());
 }
 
@@ -328,7 +368,7 @@ TEST(TestDecodeTeco, RealNormalExample) {
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 1 (COOL), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
-      "Swing: On",
+      "Swing: On, Light: Off, Humid: Off, Save: Off",
       ac.toString());
 
   uint16_t rawData2[73] = {
@@ -353,7 +393,7 @@ TEST(TestDecodeTeco, RealNormalExample) {
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 2 (DRY), Temp: 21C, Fan: 2 (Medium), Sleep: Off, "
-      "Swing: On",
+      "Swing: On, Light: Off, Humid: Off, Save: Off",
       ac.toString());
 }
 
