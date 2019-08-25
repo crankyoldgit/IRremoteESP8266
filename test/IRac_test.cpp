@@ -844,7 +844,7 @@ TEST(TestIRac, Teco) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 0 (AUTO), Temp: 21C, Fan: 2 (Medium), Sleep: On, "
-      "Swing: On";
+      "Swing: On, Light: On, Humid: Off, Save: Off";
 
   ac.begin();
   irac.teco(&ac,
@@ -853,6 +853,7 @@ TEST(TestIRac, Teco) {
             21,                          // Celsius
             stdAc::fanspeed_t::kMedium,  // Fan speed
             stdAc::swingv_t::kAuto,      // Veritcal swing
+            true,                        // Light
             8 * 60 + 30);                // Sleep
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();

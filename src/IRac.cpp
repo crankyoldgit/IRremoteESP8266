@@ -827,7 +827,7 @@ void IRac::tcl112(IRTcl112Ac *ac,
 void IRac::teco(IRTecoAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-                const int16_t sleep) {
+                const bool light, const int16_t sleep) {
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -836,7 +836,7 @@ void IRac::teco(IRTecoAc *ac,
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
-  // No Light setting available.
+  ac->setLight(light);
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
@@ -1281,7 +1281,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRTecoAc ac(_pin, _inverted, _modulation);
       ac.begin();
-      teco(&ac, on, mode, degC, fan, swingv, sleep);
+      teco(&ac, on, mode, degC, fan, swingv, light, sleep);
       break;
     }
 #endif  // SEND_TECO
