@@ -13,8 +13,8 @@
 #endif
 
 // Supports:
-//   Brand: Alaska,  Model: Unknown A/C
-//   Brand: Alaska,  Model: Unknown remote
+//   Brand: Alaska,  Model: SAC9010QC A/C
+//   Brand: Alaska,  Model: SAC9010QC remote
 
 // Constants. Using LSB to be able to send only 35bits.
 const uint8_t kTecoAuto = 0;  // 0b000

@@ -208,6 +208,9 @@ TEST(TestTecoACClass, Light) {
   EXPECT_EQ(false, ac.getLight());
   ac.setLight(true);
   EXPECT_TRUE(ac.getLight());
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/870#issue-484797174
+  ac.setRaw(0x250200A09);
+  EXPECT_TRUE(ac.getLight());
 }
 
 TEST(TestTecoACClass, Humid) {
@@ -220,6 +223,9 @@ TEST(TestTecoACClass, Humid) {
   EXPECT_EQ(false, ac.getHumid());
   ac.setHumid(true);
   EXPECT_TRUE(ac.getHumid());
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/870#issuecomment-524536810
+  ac.setRaw(0x250100A09);
+  EXPECT_TRUE(ac.getHumid());
 }
 
 TEST(TestTecoACClass, Save) {
@@ -231,6 +237,9 @@ TEST(TestTecoACClass, Save) {
   ac.setSave(false);
   EXPECT_EQ(false, ac.getSave());
   ac.setSave(true);
+  EXPECT_TRUE(ac.getSave());
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/870#issuecomment-524536810
+  ac.setRaw(0x250800A09);
   EXPECT_TRUE(ac.getSave());
 }
 
