@@ -16,7 +16,7 @@
 //   Brand: Daikin,  Model: FTXB12AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: FTXB09AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
-
+//   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -32,7 +32,7 @@
 #endif
 
 /*
-        Daikin AC map
+        Daikin AC map (i.e. DAIKIN, not the other variants)
         byte 6=
           b4:Comfort
         byte 7= checksum of the first part (and last byte before a 29ms pause)
@@ -328,6 +328,17 @@ const uint8_t kDaikin128BitWall =         0b00001000;
 const uint8_t kDaikin128BitCeiling =      0b00000001;
 const uint8_t kDaikin128MaskLight = kDaikin128BitWall | kDaikin128BitCeiling;
 
+// Another variant of the protocol for the Daikin ARC480A5 remote.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+const uint16_t kDaikin152Freq = 38000;  // Modulation Frequency in Hz.
+const uint8_t  kDaikin152LeaderBits = 5;
+const uint16_t kDaikin152HdrMark = 3492;
+const uint16_t kDaikin152HdrSpace = 1718;
+const uint16_t kDaikin152BitMark = 433;
+const uint16_t kDaikin152OneSpace = 1529;
+const uint16_t kDaikin152ZeroSpace = kDaikin152BitMark;
+const uint16_t kDaikin152Gap = 25182;
+
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
@@ -603,6 +614,7 @@ class IRDaikin160 {
   void stateReset();
   void checksum();
 };
+
 // Class to emulate a Daikin BRC4C153 remote.
 class IRDaikin176 {
  public:
@@ -721,4 +733,31 @@ class IRDaikin128 {
   void clearSleepTimerFlag(void);
 };
 
+// Class to emulate a Daikin ARC480A5 remote.
+class IRDaikin152 {
+ public:
+  explicit IRDaikin152(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+#if SEND_DAIKIN152
+  void send(const uint16_t repeat = kDaikin152DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif
+  void begin();
+  uint8_t* getRaw();
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin152StateLength);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // # of bytes per command
+  uint8_t remote_state[kDaikin152StateLength];
+  void stateReset();
+  void checksum();
+};
 #endif  // IR_DAIKIN_H_

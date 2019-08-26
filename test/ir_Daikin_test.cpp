@@ -1519,6 +1519,11 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN128));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN128));
 
+  ASSERT_EQ("DAIKIN152", typeToString(decode_type_t::DAIKIN152));
+  ASSERT_EQ(decode_type_t::DAIKIN152, strToDecodeType("DAIKIN152"));
+  ASSERT_TRUE(hasACState(decode_type_t::DAIKIN152));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN152));
+
   ASSERT_EQ("DAIKIN160", typeToString(decode_type_t::DAIKIN160));
   ASSERT_EQ(decode_type_t::DAIKIN160, strToDecodeType("DAIKIN160"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN160));
@@ -2916,4 +2921,66 @@ TEST(TestDaikin128Class, ReconstructKnownState) {
   ac.setLightToggle(0);
 
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin128Bits);
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+// Data from:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/873#issue-485088080
+TEST(TestDecodeDaikin152, RealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t rawData[319] = {
+      450, 420, 448, 446, 422, 444, 422, 446, 422, 446, 422, 25182, 3492, 1718,
+      450, 1288, 448, 422, 446, 448, 420, 446, 422, 1290, 448, 422, 446, 446,
+      422, 446, 424, 420, 448, 1290, 448, 446, 422, 1288, 448, 1288, 450, 420,
+      448, 1288, 448, 1288, 450, 1288, 448, 1288, 448, 1290, 448, 446, 422, 446,
+      422, 1288, 450, 446, 422, 420, 446, 446, 422, 422, 446, 446, 422, 420,
+      448, 422, 446, 446, 422, 446, 422, 446, 422, 420, 446, 446, 422, 446, 422,
+      422, 446, 446, 422, 422, 446, 446, 422, 446, 422, 446, 422, 446, 422, 446,
+      424, 444, 424, 446, 420, 446, 422, 446, 422, 424, 444, 444, 422, 424, 444,
+      1288, 450, 444, 422, 1288, 450, 1288, 450, 444, 422, 422, 446, 446, 422,
+      446, 422, 446, 422, 446, 422, 422, 446, 420, 448, 444, 422, 446, 422, 446,
+      422, 420, 448, 446, 422, 446, 422, 446, 422, 422, 446, 1286, 450, 422,
+      448, 446, 422, 446, 422, 422, 446, 420, 446, 422, 446, 446, 422, 422, 446,
+      446, 422, 422, 446, 446, 424, 444, 422, 420, 448, 446, 422, 420, 446, 446,
+      422, 446, 422, 420, 448, 444, 422, 422, 448, 444, 424, 420, 446, 446, 422,
+      446, 422, 422, 446, 444, 422, 446, 422, 444, 422, 446, 422, 420, 448, 446,
+      422, 420, 448, 446, 422, 446, 422, 446, 422, 446, 422, 446, 422, 444, 422,
+      1288, 450, 420, 448, 446, 420, 446, 422, 446, 422, 446, 424, 420, 448,
+      444, 422, 422, 446, 446, 424, 420, 448, 1312, 424, 420, 448, 1288, 448,
+      446, 422, 446, 424, 420, 446, 1288, 450, 1288, 450, 444, 422, 446, 422,
+      422, 448, 444, 422, 420, 448, 446, 422, 1288, 448, 446, 422, 446, 422,
+      444, 424, 444, 422, 446, 422, 446, 422, 420, 448, 446, 422, 420, 446,
+      1290, 448, 1288, 448, 420, 446, 1288, 448, 420, 446, 1288, 450, 444, 424,
+      1286, 450};  // UNKNOWN 2B9504D3
+  uint8_t expectedState[kDaikin152StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x34, 0x00, 0x40, 0x00,
+      0x00, 0x00, 0x00, 0x20, 0x00, 0xC5, 0x40, 0x00, 0xAB};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 319, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN152, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin152Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+TEST(TestDecodeDaikin152, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint8_t expectedState[kDaikin152StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x34, 0x00, 0x40, 0x00,
+      0x00, 0x00, 0x00, 0x20, 0x00, 0xC5, 0x40, 0x00, 0xAB};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin152(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(DAIKIN152, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin152Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 }
