@@ -1,5 +1,30 @@
 # Release Notes
 
+## _v2.6.5 (20190828)_
+
+**[Bug Fixes]**
+- IRMQTTServer: Remove duplicate MQTT_CLIMATE from HA discovery (#869)
+- Fujitsu: Ensure `on()` is called in common a/c framework. (#862)
+- Update `strToModel()` (#861)
+- IRMQTTServer: Add missing header file. (#858)
+- IRMQTTServer: Fix a compile error when HTML_PASSWORD_ENABLE is enabled. (#856)
+
+**[Features]**
+- IRrecv: Allow tolerance percentage to be set at run-time. (#865)
+- Basic support for Daikin152 A/C protocol. (#874)
+- Teco: Add light, humid, & save support. (#871)
+- Detailed support for Amcor A/C protocol. (#836, #854)
+- IRMQTTServer: Add ability to report Vcc at the ESP chip. (#845)
+- Gree: Add timer support. (#849)
+- IRac/Mitsubishi A/C: Support wide `swingh_t` mode (#844)
+- IRMQTTServer: Generate protocol and bit size html selects (#838)
+
+**[Misc]**
+- New example code to show how to use the `IRac` class to control A/Cs (#839)
+- Improve/fix `swingh_t::kWide` support (#846)
+- Kelvinator: Optimise code a little to save space. (#843)
+
+
 ## _v2.6.4 (20190726)_
 
 **[Bug Fixes]**
