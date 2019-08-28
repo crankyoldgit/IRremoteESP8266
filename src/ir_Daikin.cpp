@@ -2957,7 +2957,7 @@ void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
 // Supported devices:
 // - Daikin ARC480A5 remote.
 //
-// Status: Beta / Probably working.
+// Status: STABLE / Known working.
 //
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
 bool IRrecv::decodeDaikin152(decode_results *results, const uint16_t nbits,
