@@ -933,7 +933,7 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
                     kHaierAcBitMark, kHaierAcOneSpace,
                     kHaierAcBitMark, kHaierAcZeroSpace,
                     kHaierAcBitMark, kHaierAcMinGap, true,
-                    kTolerance, kMarkExcess)) return false;
+                    _tolerance, kMarkExcess)) return false;
 
   // Compliance
   if (strict) {

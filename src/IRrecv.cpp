@@ -182,6 +182,7 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 #if DECODE_HASH
   _unknown_threshold = kUnknownThreshold;
 #endif  // DECODE_HASH
+  _tolerance = kTolerance;
 }
 
 // Class destructor
@@ -296,6 +297,15 @@ void IRrecv::setUnknownThreshold(const uint16_t length) {
   _unknown_threshold = length;
 }
 #endif  // DECODE_HASH
+
+
+// Set the base tolerance percentage for matching incoming IR messages.
+void IRrecv::setTolerance(const uint8_t percent) {
+  _tolerance = std::min(percent, (uint8_t)100);
+}
+
+// Get the base tolerance percentage for matching incoming IR messages.
+uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 
 // Decodes the received IR message.
 // If the interrupt state is saved, we will immediately resume waiting
@@ -673,6 +683,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   return false;
 }
 
+// Convert the tolerance percentage into something valid.
+uint8_t IRrecv::_validTolerance(const uint8_t percentage) {
+    return (percentage > 100) ? _tolerance : percentage;
+}
+
 // Calculate the lower bound of the nr. of ticks.
 //
 // Args:
@@ -681,10 +696,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
 //   delta:  A non-scaling amount to reduce usecs by.
 // Returns:
 //   Nr. of ticks.
-uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
+uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
+                          const uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
   return ((uint32_t)std::max(
-      (int32_t)(usecs * (1.0 - tolerance / 100.0) - delta), 0));
+      (int32_t)(usecs * (1.0 - _validTolerance(tolerance) / 100.0) - delta),
+      0));
 }
 
 // Calculate the upper bound of the nr. of ticks.
@@ -695,8 +712,10 @@ uint32_t IRrecv::ticksLow(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
 //   delta:  A non-scaling amount to increase usecs by.
 // Returns:
 //   Nr. of ticks.
-uint32_t IRrecv::ticksHigh(uint32_t usecs, uint8_t tolerance, uint16_t delta) {
-  return ((uint32_t)(usecs * (1.0 + tolerance / 100.0)) + 1 + delta);
+uint32_t IRrecv::ticksHigh(const uint32_t usecs, const uint8_t tolerance,
+                           const uint16_t delta) {
+  return ((uint32_t)(usecs * (1.0 + _validTolerance(tolerance) / 100.0)) + 1 +
+          delta);
 }
 
 // Check if we match a pulse(measured) with the desired within
@@ -844,7 +863,7 @@ bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
 // Compare two tick values, returning 0 if newval is shorter,
 // 1 if newval is equal, and 2 if newval is longer
 // Use a tolerance of 20%
-int16_t IRrecv::compare(uint16_t oldval, uint16_t newval) {
+uint16_t IRrecv::compare(const uint16_t oldval, const uint16_t newval) {
   if (newval < oldval * 0.8)
     return 0;
   else if (oldval < newval * 0.8)
@@ -867,7 +886,7 @@ bool IRrecv::decodeHash(decode_results *results) {
   // however it is left this way for compatibility with previously captured
   // values.
   for (uint16_t i = 1; i < results->rawlen - 2; i++) {
-    int16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
+    uint16_t value = compare(results->rawbuf[i], results->rawbuf[i + 2]);
     // Add value into the hash
     hash = (hash * kFnvPrime32) ^ value;
   }
@@ -891,7 +910,7 @@ bool IRrecv::decodeHash(decode_results *results) {
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
 //   excess:  Nr. of useconds. (Def: kMarkExcess)
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
@@ -936,7 +955,7 @@ match_result_t IRrecv::matchData(
 //   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
 //   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
 //   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
 //   excess:  Nr. of useconds. (Def: kMarkExcess)
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
@@ -983,7 +1002,7 @@ uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
 //   footermark:   Nr. of uSeconds for the expected footer mark signal.
 //   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
 //   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
 //   excess:  Nr. of useconds. (Def: kMarkExcess)
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
@@ -1082,7 +1101,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
 //   footermark:   Nr. of uSeconds for the expected footer mark signal.
 //   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
 //   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
 //   excess:  Nr. of useconds. (Def: kMarkExcess)
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:
@@ -1129,7 +1148,7 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 //   footermark:   Nr. of uSeconds for the expected footer mark signal.
 //   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
 //   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kTolerance)
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
 //   excess:  Nr. of useconds. (Def: kMarkExcess)
 //   MSBfirst: Bit order to save the data in. (Def: true)
 // Returns:

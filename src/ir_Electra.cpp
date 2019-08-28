@@ -317,7 +317,7 @@ bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
                     kElectraAcBitMark, kElectraAcOneSpace,
                     kElectraAcBitMark, kElectraAcZeroSpace,
                     kElectraAcBitMark, kElectraAcMessageGap, true,
-                    kTolerance, 0, false)) return false;
+                    _tolerance, 0, false)) return false;
 
   // Compliance
   if (strict) {

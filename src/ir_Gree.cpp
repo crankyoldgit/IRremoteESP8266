@@ -583,7 +583,7 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
                       kGreeBitMark, kGreeOneSpace,
                       kGreeBitMark, kGreeZeroSpace,
                       0, 0, false,
-                      kTolerance, kMarkExcess, false);
+                      _tolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
 
@@ -591,7 +591,7 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
   match_result_t data_result;
   data_result = matchData(&(results->rawbuf[offset]), kGreeBlockFooterBits,
                           kGreeBitMark, kGreeOneSpace, kGreeBitMark,
-                          kGreeZeroSpace, kTolerance, kMarkExcess, false);
+                          kGreeZeroSpace, _tolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
   if (data_result.data != kGreeBlockFooter) return false;
   offset += data_result.used;
@@ -603,7 +603,7 @@ bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
                     kGreeBitMark, kGreeOneSpace,
                     kGreeBitMark, kGreeZeroSpace,
                     kGreeBitMark, kGreeMsgSpace, true,
-                    kTolerance, kMarkExcess, false)) return false;
+                    _tolerance, kMarkExcess, false)) return false;
 
   // Compliance
   if (strict) {

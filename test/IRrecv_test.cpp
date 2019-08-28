@@ -1207,3 +1207,40 @@ TEST(TestMatchGeneric, UsingBytes) {
       true);  // MSB first.
   ASSERT_EQ(0, entries_used);
 }
+
+TEST(TestIRrecv, Tolerance) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  uint16_t equal_encoded_raw[11] = {500,  1500, 1500, 500, 499, 1499,
+                                    1501, 501,  1499, 490, 500};
+  match_result_t result;
+
+  ASSERT_EQ(kTolerance, irrecv.getTolerance());
+  irrecv.setTolerance();
+  ASSERT_EQ(kTolerance, irrecv.getTolerance());
+  irrecv.setTolerance(kTolerance + 1);
+  ASSERT_EQ(kTolerance + 1, irrecv.getTolerance());
+  irrecv.setTolerance(kTolerance - 1);
+  ASSERT_EQ(kTolerance - 1, irrecv.getTolerance());
+
+  irrecv.setTolerance();
+  ASSERT_EQ(kTolerance, irrecv.getTolerance());
+
+  irsend.reset();
+  irsend.sendRaw(equal_encoded_raw, 11, 38000);
+  irsend.makeDecodeResult();
+  result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1500, 500, 500, 1500);
+  ASSERT_TRUE(result.success);
+  EXPECT_EQ(0b01011, result.data);
+  EXPECT_EQ(10, result.used);
+
+  irrecv.setTolerance(0);
+  ASSERT_EQ(0, irrecv.getTolerance());
+  irsend.reset();
+  irsend.sendRaw(equal_encoded_raw, 11, 38000);
+  irsend.makeDecodeResult();
+  result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1500, 500, 500, 1500);
+  ASSERT_FALSE(result.success);
+}

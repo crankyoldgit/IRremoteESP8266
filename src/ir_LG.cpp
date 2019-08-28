@@ -237,7 +237,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
   match_result_t data_result =
       matchData(&(results->rawbuf[offset]), nbits, bitmarkticks * m_tick,
                 kLgOneSpaceTicks * s_tick, bitmarkticks * m_tick,
-                kLgZeroSpaceTicks * s_tick, kTolerance, 0);
+                kLgZeroSpaceTicks * s_tick, _tolerance, 0);
   if (data_result.success == false) return false;
   data = data_result.data;
   offset += data_result.used;

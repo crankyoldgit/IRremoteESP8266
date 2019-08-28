@@ -141,11 +141,9 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t nbits, bool strict) {
     data <<= 2;
     // Use non-default tolerance & excess for matching some of the spaces as the
     // defaults are too generous and causes mis-matches in some cases.
-    if (match(results->rawbuf[offset], kRcmmBitSpace0Ticks * s_tick,
-              kTolerance))
+    if (match(results->rawbuf[offset], kRcmmBitSpace0Ticks * s_tick))
       data += 0;
-    else if (match(results->rawbuf[offset], kRcmmBitSpace1Ticks * s_tick,
-                   kTolerance))
+    else if (match(results->rawbuf[offset], kRcmmBitSpace1Ticks * s_tick))
       data += 1;
     else if (match(results->rawbuf[offset], kRcmmBitSpace2Ticks * s_tick,
                    kRcmmTolerance))

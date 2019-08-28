@@ -362,7 +362,7 @@ bool IRrecv::decodeToshibaAC(decode_results* results, const uint16_t nbits,
                     kToshibaAcBitMark, kToshibaAcOneSpace,
                     kToshibaAcBitMark, kToshibaAcZeroSpace,
                     kToshibaAcBitMark, kToshibaAcMinGap, true,
-                    kTolerance, kMarkExcess)) return false;
+                    _tolerance, kMarkExcess)) return false;
   // Compliance
   if (strict) {
     // Check that the checksum of the message is correct.

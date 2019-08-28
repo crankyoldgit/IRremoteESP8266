@@ -607,7 +607,7 @@ bool IRrecv::decodeWhirlpoolAC(decode_results *results, const uint16_t nbits,
                         kWhirlpoolAcBitMark, kWhirlpoolAcZeroSpace,
                         kWhirlpoolAcBitMark, kWhirlpoolAcGap,
                         section >= kWhirlpoolAcSections - 1,
-                        kTolerance, kMarkExcess, false);
+                        _tolerance, kMarkExcess, false);
     if (used == 0) return false;
     offset += used;
     pos += sectionSize[section];

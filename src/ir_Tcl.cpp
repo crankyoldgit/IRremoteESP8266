@@ -396,7 +396,7 @@ bool IRrecv::decodeTcl112Ac(decode_results *results, const uint16_t nbits,
                     kTcl112AcBitMark, kTcl112AcOneSpace,
                     kTcl112AcBitMark, kTcl112AcZeroSpace,
                     kTcl112AcBitMark, kTcl112AcGap, true,
-                    kTcl112AcTolerance, 0, false)) return false;
+                    _tolerance + kTcl112AcTolerance, 0, false)) return false;
   // Compliance
   // Verify we got a valid checksum.
   if (strict && !IRTcl112Ac::validChecksum(results->state)) return false;
