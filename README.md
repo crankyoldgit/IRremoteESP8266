@@ -10,7 +10,7 @@ This library enables you to **send _and_ receive** infra-red signals on an [ESP8
 [ESP32](https://github.com/espressif/arduino-esp32) using the [Arduino framework](https://www.arduino.cc/) using common 940nm IR LEDs and common IR receiver modules. e.g. TSOP{17,22,24,36,38,44,48}* demodulators etc.
 
 ## v2.6.5 Now Available
-Version 2.6.4 of the library is now [available](https://github.com/crankyoldgit/IRremoteESP8266/releases/latest). You can view the [Release Notes](ReleaseNotes.md) for all the significant changes.
+Version 2.6.5 of the library is now [available](https://github.com/crankyoldgit/IRremoteESP8266/releases/latest). You can view the [Release Notes](ReleaseNotes.md) for all the significant changes.
 
 #### Upgrading from pre-v2.0
 Usage of the library has been slightly changed in v2.0. You will need to change your usage to work with v2.0 and beyond. You can read more about the changes required on our [Upgrade to v2.0](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
