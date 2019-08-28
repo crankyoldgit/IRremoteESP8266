@@ -2980,7 +2980,7 @@ bool IRrecv::decodeDaikin152(decode_results *results, const uint16_t nbits,
                       kDaikin152BitMark, kDaikin152OneSpace,
                       kDaikin152BitMark, kDaikin152ZeroSpace,
                       kDaikin152BitMark, kDaikin152Gap,  // Footer gap
-                      false, kTolerance, kMarkExcess, false);
+                      false, _tolerance, kMarkExcess, false);
   if (used == 0 || leader != 0) return false;
   offset += used;
 
@@ -2991,7 +2991,7 @@ bool IRrecv::decodeDaikin152(decode_results *results, const uint16_t nbits,
                       kDaikin152BitMark, kDaikin152OneSpace,
                       kDaikin152BitMark, kDaikin152ZeroSpace,
                       kDaikin152BitMark, kDaikin152Gap,
-                      true, kTolerance, kMarkExcess, false);
+                      true, _tolerance, kMarkExcess, false);
   if (used == 0) return false;
 
   // Compliance
