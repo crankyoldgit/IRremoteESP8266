@@ -2913,3 +2913,156 @@ bool IRrecv::decodeDaikin128(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_DAIKIN128
+
+#if SEND_DAIKIN152
+// Send a Daikin 152 bit A/C message.
+//
+// Args:
+//   data: An array of kDaikin152StateLength bytes containing the IR command.
+//
+// Supported devices:
+// - Daikin ARC480A5 remote.
+//
+// Status: Beta / Probably working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Leader
+    sendGeneric(0, 0, kDaikin152BitMark, kDaikin152OneSpace,
+                kDaikin152BitMark, kDaikin152ZeroSpace,
+                kDaikin152BitMark, kDaikin152Gap,
+                (uint64_t)0, kDaikin152LeaderBits,
+                kDaikin152Freq, false, 0, kDutyDefault);
+    // Header + Data + Footer
+    sendGeneric(kDaikin152HdrMark, kDaikin152HdrSpace, kDaikin152BitMark,
+                kDaikin152OneSpace, kDaikin152BitMark, kDaikin152ZeroSpace,
+                kDaikin152BitMark, kDaikin152Gap, data,
+                nbytes, kDaikin152Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN152
+
+#if DECODE_DAIKIN152
+// Decode the supplied Daikin 152 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin152Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin ARC480A5 remote.
+//
+// Status: Beta / Probably working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+bool IRrecv::decodeDaikin152(decode_results *results, const uint16_t nbits,
+                             const bool strict) {
+  if (results->rawlen < 2 * (5 + nbits + kFooter) + kHeader - 1)
+    return false;
+  if (nbits / 8 < kDaikin152StateLength) return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin152Bits) return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t used;
+
+  // Leader
+  uint64_t leader = 0;
+  used = matchGeneric(results->rawbuf + offset, &leader,
+                      results->rawlen - offset, kDaikin152LeaderBits,
+                      0, 0,  // No Header
+                      kDaikin152BitMark, kDaikin152OneSpace,
+                      kDaikin152BitMark, kDaikin152ZeroSpace,
+                      kDaikin152BitMark, kDaikin152Gap,  // Footer gap
+                      false, kTolerance, kMarkExcess, false);
+  if (used == 0 || leader != 0) return false;
+  offset += used;
+
+  // Header + Data + Footer
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kDaikin152HdrMark, kDaikin152HdrSpace,
+                      kDaikin152BitMark, kDaikin152OneSpace,
+                      kDaikin152BitMark, kDaikin152ZeroSpace,
+                      kDaikin152BitMark, kDaikin152Gap,
+                      true, kTolerance, kMarkExcess, false);
+  if (used == 0) return false;
+
+  // Compliance
+  if (strict) {
+    if (!IRDaikin152::validChecksum(results->state)) return false;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN152;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN152
+
+// Class for handling Daikin 152 bit / 19 byte A/C messages.
+//
+// Code by crankyoldgit.
+//
+// Supported Remotes: Daikin ARC480A5 remote
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+IRDaikin152::IRDaikin152(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+void IRDaikin152::begin() { _irsend.begin(); }
+
+#if SEND_DAIKIN152
+void IRDaikin152::send(const uint16_t repeat) {
+  checksum();
+  _irsend.sendDaikin152(remote_state, kDaikin152StateLength, repeat);
+}
+#endif  // SEND_DAIKIN152
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin152::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of the given state.
+  if (length <= 1 || state[length - 1] != sumBytes(state, length - 1))
+    return false;
+  else
+    return true;
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin152::checksum() {
+  remote_state[kDaikin152StateLength - 1] = sumBytes(
+      remote_state, kDaikin152StateLength - 1);
+}
+
+void IRDaikin152::stateReset() {
+  for (uint8_t i = 3; i < kDaikin152StateLength; i++) remote_state[i] = 0x00;
+  remote_state[0] =  0x11;
+  remote_state[1] =  0xDA;
+  remote_state[2] =  0x27;
+  // remote_state[19] is a checksum byte, it will be set by checksum().
+}
+
+uint8_t *IRDaikin152::getRaw() {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin152::setRaw(const uint8_t new_code[]) {
+  for (uint8_t i = 0; i < kDaikin152StateLength; i++)
+    remote_state[i] = new_code[i];
+}

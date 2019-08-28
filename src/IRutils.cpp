@@ -107,6 +107,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::DAIKIN;
   else if (!strcasecmp(str, "DAIKIN128"))
     return decode_type_t::DAIKIN128;
+  else if (!strcasecmp(str, "DAIKIN152"))
+    return decode_type_t::DAIKIN152;
   else if (!strcasecmp(str, "DAIKIN160"))
     return decode_type_t::DAIKIN160;
   else if (!strcasecmp(str, "DAIKIN176"))
@@ -273,6 +275,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case DAIKIN128:
       result = F("DAIKIN128");
+      break;
+    case DAIKIN152:
+      result = F("DAIKIN152");
       break;
     case DAIKIN160:
       result = F("DAIKIN160");
@@ -476,6 +481,7 @@ bool hasACState(const decode_type_t protocol) {
     case ARGO:
     case DAIKIN:
     case DAIKIN128:
+    case DAIKIN152:
     case DAIKIN160:
     case DAIKIN176:
     case DAIKIN2:
