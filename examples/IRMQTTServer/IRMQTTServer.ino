@@ -434,8 +434,10 @@ String MqttClientId;
 bool lockMqttBroadcast = true;
 TimerMs lastBroadcast = TimerMs();  // When we last sent a broadcast.
 bool hasBroadcastBeenSent = false;
+#if MQTT_DISCOVERY_ENABLE
 TimerMs lastDiscovery = TimerMs();  // When we last sent a Discovery.
 bool hasDiscoveryBeenSent = false;
+#endif  // MQTT_DISCOVERY_ENABLE
 TimerMs statListenTime = TimerMs();  // How long we've been listening for.
 #endif  // MQTT_ENABLE
 
@@ -1230,12 +1232,14 @@ void handleInfo(void) {
     "Last state broadcast: " + (hasBroadcastBeenSent ?
         timeElapsed(lastBroadcast.elapsed()) :
         String("<i>Never</i>")) + "<br>"
+#if MQTT_DISCOVERY_ENABLE
     "Last discovery sent: " + (lockMqttBroadcast ?
         String("<b>Locked</b>") :
         (hasDiscoveryBeenSent ?
             timeElapsed(lastDiscovery.elapsed()) :
             String("<i>Never</i>"))) +
         "<br>"
+#endif  // MQTT_DISCOVERY_ENABLE
     "Command topics: " + MqttClimateCmnd + kClimateTopics +
     "State topics: " + MqttClimateStat + kClimateTopics +
 #endif  // MQTT_ENABLE
@@ -2356,7 +2360,7 @@ void sendMQTTDiscovery(const char *topic) {
       "\"swing_mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_SWINGV "\","
       "\"swing_modes\":["
         "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\"]"
-      "}").c_str())) {
+      "}").c_str(), true)) {
     mqttLog("MQTT climate discovery successful sent.");
     hasDiscoveryBeenSent = true;
     lastDiscovery.reset();
