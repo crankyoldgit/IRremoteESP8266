@@ -14,6 +14,7 @@
 - [Brett T. Warden](https://github.com/bwarden/)
 - [Fabien Valthier](https://github.com/hcoohb)
 - [Ajay Pala](https://github.com/ajaypala/)
+- [Motea Marius](https://github.com/mariusmotea)
 
 All contributors can be found on the [contributors site](https://github.com/crankyoldgit/IRremoteESP8266/graphs/contributors).
 

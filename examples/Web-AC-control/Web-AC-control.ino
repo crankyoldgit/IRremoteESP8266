@@ -1,3 +1,11 @@
+/* Copyright 2019 Motea Marius
+
+  This example code will create a webserver that will provide basic control to AC units using the web application
+  build with javascript/css. User config zone need to be updated if a different class than Collix need to be used.
+  Javasctipt file may also require minor changes as in current version it will not allow to set fan speed if Auto mode
+  is selected (required for Coolix).
+
+*/
 #include <FS.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
