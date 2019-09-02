@@ -19,20 +19,20 @@
 
 //// ###### User configuration space for AC library classes ##########
 
-#include <ir_Coolix.h> // replace library based on your AC unit model, check https://github.com/markszabo/IRremoteESP8266
+#include <ir_Coolix.h> // replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
 
-#define auto_mode kCoolixAuto
-#define cool_mode kCoolixCool
-#define dry_mode kCoolixDry
-#define heat_mode kCoolixHeat
-#define fan_mode kCoolixFan
+#define AUTO_MODE kCoolixAuto
+#define COOL_MODE kCoolixCool
+#define DRY_MODE kCoolixDry
+#define HEAT_MODE kCoolixHeat
+#define FAN_MODE kCoolixFan
 
-#define fan_auto kCoolixFanAuto
-#define fan_min kCoolixFanMin
-#define fan_med kCoolixFanMed
-#define fan_hi kCoolixFanMax
+#define FAN_AUTO kCoolixFanAuto
+#define FAN_MIN kCoolixFanMin
+#define FAN_MED kCoolixFanMed
+#define FAN_HI kCoolixFanMax
 
-const uint16_t kIrLed = D2;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use for IR blaster.
 IRCoolixAC ac(kIrLed);  // Library initialization, change it according to the imported library file.
 
 /// ##### End user configuration ######
@@ -184,28 +184,28 @@ void setup() {
         ac.on();
         ac.setTemp(acState.temperature);
         if (acState.operation == 0) {
-          ac.setMode(auto_mode);
-          ac.setFan(fan_auto);
+          ac.setMode(AUTO_MODE);
+          ac.setFan(FAN_AUTO);
           acState.fan = 0;
         } else if (acState.operation == 1) {
-          ac.setMode(cool_mode);
+          ac.setMode(COOL_MODE);
         } else if (acState.operation == 2) {
-          ac.setMode(dry_mode);
+          ac.setMode(DRY_MODE);
         } else if (acState.operation == 3) {
-          ac.setMode(heat_mode);
+          ac.setMode(HEAT_MODE);
         } else if (acState.operation == 4) {
-          ac.setMode(fan_mode);
+          ac.setMode(FAN_MODE);
         }
 
         if (acState.operation != 0) {
           if (acState.fan == 0) {
-            ac.setFan(fan_auto);
+            ac.setFan(FAN_AUTO);
           } else if (acState.fan == 1) {
-            ac.setFan(fan_min);
+            ac.setFan(FAN_MIN);
           } else if (acState.fan == 2) {
-            ac.setFan(fan_med);
+            ac.setFan(FAN_MED);
           } else if (acState.fan == 3) {
-            ac.setFan(fan_hi);
+            ac.setFan(FAN_HI);
           }
         }
       } else {

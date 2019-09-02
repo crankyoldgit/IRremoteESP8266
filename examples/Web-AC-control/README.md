@@ -7,13 +7,13 @@ This is just a web interface for the IRremoteESP8266 library.
 
 ## Instructions:
 
- - Connect IR led to one GPIO pin (recommended pin is D2)
+ - Connect IR led to one GPIO pin (recommended pin is GPIO4)
 
  - Edit esp8266-AC-control.ino header marked as "User space". You will need to import the library dedicated for your AC model. Every library has its own commands for AC mode and fan speed that will need to be replace according to commands available in .h file of the library.
 
  - Flash the firmware in ESP board using 1M or 2M of SPIFFS storage.
 
- - Connect the board to yout wifi network (look for "AC Remote Control" SSID and follow WiFi Manager wizard)
+ - Connect the board to your wifi network (look for "AC Remote Control" SSID and follow WiFi Manager wizard)
 
  - Upload web application files in SPIFFS storage using build in web form located at /file-upload path.
  
@@ -35,7 +35,7 @@ Ex:
 
 ## DEBUG:
 
-Use mobile phone camera to see if the led is sending any IR signals when buttons are pressed. This will show if the circuit was properlly made and the selected GPIO pin is the correct one.
+Use mobile phone camera to see if the led is sending any IR signals when buttons are pressed. This will show if the circuit was properly made and the selected GPIO pin is the correct one.
 
 
 ## Credits:
