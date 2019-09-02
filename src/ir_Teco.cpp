@@ -172,6 +172,36 @@ void IRTecoAc::setSave(const bool on) {
     remote_state &= ~kTecoSave;
 }
 
+bool IRTecoAc::getTimerEnabled(void) { return remote_state & kTecoTimerOn; }
+
+uint16_t IRTecoAc::getTimer(void) {
+  uint16_t mins = 0;
+  if (getTimerEnabled()) {
+    mins = ((remote_state & kTecoTimerTenHr) >> 13) * 60 * 10 +
+           ((remote_state & kTecoTimerUniHr) >> 16) * 60;
+    if (remote_state & kTecoTimerHalfH) mins += 30;
+  }
+  return mins;
+}
+
+// Set the timer for when the A/C unit will switch power state.
+// Args:
+//   nr_mins: Number of minutes before power state change.
+//            `0` will clear the timer. Max is 24 hrs.
+//            Time is stored internaly in increments of 30 mins.
+void IRTecoAc::setTimer(const uint16_t nr_mins) {
+  uint16_t mins = std::min(nr_mins, (uint16_t)(24 * 60));  // Limit to 24 hrs.
+  bool half_hour = (mins % 60) >= 30;
+  uint8_t hours = mins / 60;
+  remote_state &= ~kTecoTimerMask;  // Clear previous data
+  if (mins) {
+    remote_state |= kTecoTimerOn;  // Enable the timer.
+    if (half_hour) remote_state |= kTecoTimerHalfH;
+    remote_state |= ((hours % 10) << 16);  // Set the unit hours.
+    remote_state |= ((hours / 10) << 13);  // Set the tens of hours.
+  }
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -266,7 +296,11 @@ String IRTecoAc::toString(void) {
   result += addBoolToString(getLight(), F("Light"));
   result += addBoolToString(getHumid(), F("Humid"));
   result += addBoolToString(getSave(), F("Save"));
-
+  if (getTimerEnabled())
+    result += addLabeledString(irutils::minsToString(getTimer()),
+                               F("Timer"));
+  else
+    result += addBoolToString(false, F("Timer"));
   return result;
 }
 

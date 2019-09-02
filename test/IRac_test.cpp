@@ -844,7 +844,7 @@ TEST(TestIRac, Teco) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 0 (AUTO), Temp: 21C, Fan: 2 (Medium), Sleep: On, "
-      "Swing: On, Light: On, Humid: Off, Save: Off";
+      "Swing: On, Light: On, Humid: Off, Save: Off, Timer: Off";
 
   ac.begin();
   irac.teco(&ac,
