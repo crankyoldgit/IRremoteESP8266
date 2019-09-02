@@ -426,12 +426,16 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 void IRSamsungAc::on(void) {
+  if (getPower())
+    return;
   remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
   remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
   _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
 void IRSamsungAc::off(void) {
+  if (!getPower())
+    return;
   remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
   remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
   _sendpower = true;  // Flag that we need to send the special power message(s).
