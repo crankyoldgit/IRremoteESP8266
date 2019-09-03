@@ -39,6 +39,8 @@ const uint64_t kTecoTimerHalfH = 0b00000000000000000000001000000000000;
 const uint64_t kTecoTimerTenHr = 0b00000000000000000000110000000000000;
 const uint64_t kTecoTimerOn =    0b00000000000000000001000000000000000;
 const uint64_t kTecoTimerUniHr = 0b00000000000000011110000000000000000;
+const uint64_t kTecoTimerMask =  kTecoTimerUniHr | kTecoTimerOn |
+                                 kTecoTimerTenHr | kTecoTimerHalfH;
 const uint64_t kTecoHumid =      0b00000000000000100000000000000000000;
 const uint64_t kTecoLight =      0b00000000000001000000000000000000000;
 const uint64_t kTecoSave =       0b00000000000100000000000000000000000;
@@ -136,8 +138,8 @@ class IRTecoAc {
   void setSave(const bool on);
   bool getSave(void);
 
-  // void setTimer(uint8_t time);  // To check unit
-  // uint8_t getTimer(uint8_t);
+  uint16_t getTimer(void);
+  void setTimer(const uint16_t mins);
 
   uint64_t getRaw(void);
   void setRaw(const uint64_t new_code);
@@ -157,6 +159,7 @@ class IRTecoAc {
 #endif
   // The state of the IR remote in IR code form.
   uint64_t remote_state;
+  bool getTimerEnabled(void);
 };
 
 #endif  // IR_TECO_H_
