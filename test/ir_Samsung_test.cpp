@@ -1212,6 +1212,7 @@ TEST(TestDecodeSamsung36, SyntheticExample) {
 TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   IRSamsungAc ac(0);
   ac.begin();
+  ac.stateReset(false);  // Disable the initial forced sending of a power mesg.
 
   std::string freqduty = "f38000d50";
 
@@ -1275,23 +1276,46 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   ac.send();
   EXPECT_EQ(text, ac.toString());
   EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
-  ac._irsend.reset();
+  // Ensure the power state is changed by changing it and sending it.
+  ac.off();
+  ac.send();
+  ac._irsend.reset();  // Clear the capture buffer.
   // Now trigger a special power message by using a power method.
   ac.on();
   ac.send();  // This should result in two messages. 1 x extended + 1 x normal.
   EXPECT_EQ(text, ac.toString());
   EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
-  ac._irsend.reset();
+  ac._irsend.reset();  // Clear the capture buffer.
   // Subsequent sending should be just the "settings" message.
   ac.send();
   EXPECT_EQ(text, ac.toString());
   EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
-  ac._irsend.reset();
-  // Now trigger a special power message by using a power method (again).
-  ac.setPower(true);
-  ac.send();  // This should result in two messages. 1 x extended + 1 x normal.
+  ac._irsend.reset();  // Clear the capture buffer.
+  ac.setPower(true);  // Note: The power state hasn't changed from previous.
+  ac.send();  // This should result in a normal setting message.
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+
+  ac._irsend.reset();  // Clear the capture buffer.
+  ac.setPower(false);
+  ac.setPower(true);  // Note: The power state hasn't changed from the last sent
+  ac.send();  // This should result in a normal setting message.
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+
+  ac.stateReset();  // Normal `stateReset` defaults to send the power message
+                    // on first send.
+  ac._irsend.reset();  // Clear the capture buffer.
+  ac.setTemp(23);
+  ac.setMode(kSamsungAcCool);
+  ac.setFan(kSamsungAcFanMed);
+  ac.send();
   EXPECT_EQ(text, ac.toString());
   EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
+  ac._irsend.reset();  // Clear the capture buffer.
+  ac.send();  // Subsequent send() should just be a settings message.
+  EXPECT_EQ(text, ac.toString());
+  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
 }
 
 TEST(TestIRSamsungAcClass, toCommon) {

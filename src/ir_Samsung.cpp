@@ -296,7 +296,11 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
   this->stateReset();
 }
 
-void IRSamsungAc::stateReset(void) {
+// Reset the internal state of the emulation.
+// Args:
+//   forcepower: A flag indicating if force sending a special power message
+//              with the first `send()` call. Default: true
+void IRSamsungAc::stateReset(const bool forcepower) {
   for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = 0x02;
@@ -309,7 +313,8 @@ void IRSamsungAc::stateReset(void) {
   remote_state[10] = 0x71;
   remote_state[12] = 0x15;
   remote_state[13] = 0xF0;
-  _sendpower = false;
+  _forcepower = forcepower;
+  _lastsentpowerstate = this->getPower();
 }
 
 void IRSamsungAc::begin(void) { _irsend.begin(); }
@@ -354,12 +359,13 @@ void IRSamsungAc::checksum(uint16_t length) {
 // i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) this->checksum();
-  if (_sendpower) {  // Do we need to send a the special power on/off message?
-    _sendpower = false;  // It will now been sent.
+  // Do we need to send a the special power on/off message?
+  if (this->getPower() != _lastsentpowerstate || _forcepower) {
+    _forcepower = false;  // It will now been sent, so clear the flag if set.
     if (this->getPower()) {
-      this->sendOn();
+      this->sendOn(repeat);
     } else {
-      this->sendOff();
+      this->sendOff(repeat);
       return;  // No point sending anything else if we are turning the unit off.
     }
   }
@@ -395,6 +401,7 @@ void IRSamsungAc::sendOn(const uint16_t repeat) {
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
       0x01, 0xE2, 0xFE, 0x71, 0x80, 0x11, 0xF0};
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
+  _lastsentpowerstate = true;  // On
 }
 
 // Send the special extended "Off" message as the library can't seem to
@@ -406,6 +413,7 @@ void IRSamsungAc::sendOff(const uint16_t repeat) {
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
       0x01, 0x02, 0xFF, 0x71, 0x80, 0x11, 0xC0};
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
+  _lastsentpowerstate = false;  // Off
 }
 #endif  // SEND_SAMSUNG_AC
 
@@ -428,13 +436,11 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 void IRSamsungAc::on(void) {
   remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
   remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
-  _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
 void IRSamsungAc::off(void) {
   remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
   remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
-  _sendpower = true;  // Flag that we need to send the special power message(s).
 }
 
 void IRSamsungAc::setPower(const bool on) {
