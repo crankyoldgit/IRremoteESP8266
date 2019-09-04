@@ -247,7 +247,7 @@ void electra(IRElectraAc *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                const bool quiet, const bool turbo, const bool clean,
-               const bool beep, const bool dopower = true);
+               const bool beep, const bool forcepower = true);
 #endif  // SEND_SAMSUNG_AC
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac,

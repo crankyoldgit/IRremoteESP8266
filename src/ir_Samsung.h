@@ -65,7 +65,7 @@ class IRSamsungAc {
   explicit IRSamsungAc(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
 
-  void stateReset(void);
+  void stateReset(const bool forcepower = true);
 #if SEND_SAMSUNG_AC
   void send(const uint16_t repeat = kSamsungAcDefaultRepeat,
             const bool calcchecksum = true);
@@ -118,7 +118,8 @@ class IRSamsungAc {
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kSamsungAcExtendedStateLength];
-  bool _sendpower;  // Hack to know when we need to send a special power mesg.
+  bool _forcepower;  // Hack to know when we need to send a special power mesg.
+  bool _lastsentpowerstate;
   void checksum(const uint16_t length = kSamsungAcStateLength);
 };
 

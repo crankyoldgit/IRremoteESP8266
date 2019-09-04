@@ -749,9 +749,9 @@ void IRac::samsung(IRSamsungAc *ac,
                    const float degrees,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const bool quiet, const bool turbo, const bool clean,
-                   const bool beep, const bool dopower) {
-  // dopower is for unit testing only. It should only ever be false in tests.
-  if (dopower) ac->setPower(on);
+                   const bool beep, const bool forcepower) {
+  ac->stateReset(forcepower);
+  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
