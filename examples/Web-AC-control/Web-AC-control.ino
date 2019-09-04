@@ -252,7 +252,7 @@ void setup() {
 
   server.on("/", []() {
     server.sendHeader("Location", String("ui.html"), true);
-    server.send (302, "text/plain", "");
+    server.send(302, "text/plain", "");
   });
 
   server.on("/state", HTTP_GET, []() {
