@@ -68,9 +68,9 @@ bool handleFileRead(String path) {
   // Get the MIME type
   String pathWithGz = path + ".gz";
   if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    //  If the file exists, either as a compressed archive, or normal
-    if (SPIFFS.exists(pathWithGz))// If there's a compressed version available
-      path += ".gz";// Use the compressed verion
+    // If the file exists, either as a compressed archive, or normal
+    if (SPIFFS.exists(pathWithGz))  // If there's a compressed version available
+      path += ".gz";  // Use the compressed verion
     File file = SPIFFS.open(path, "r");
     //  Open the file
     size_t sent = server.streamFile(file, contentType);
@@ -95,7 +95,7 @@ String getContentType(String filename) {
   return "text/plain";
 }
 
-void handleFileUpload() { // upload a new file to the SPIFFS
+void handleFileUpload() {  // upload a new file to the SPIFFS
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
