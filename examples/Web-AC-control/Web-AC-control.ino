@@ -19,7 +19,7 @@
 
 //// ###### User configuration space for AC library classes ##########
 
-#include <ir_Coolix.h> // replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
+#include <ir_Coolix.h>  //  replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
 
 #define AUTO_MODE kCoolixAuto
 #define COOL_MODE kCoolixCool
@@ -59,21 +59,22 @@ ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdateServer;
 
 
-bool handleFileRead(String path) { // send the right file to the client (if it exists)
-  // Serial.println("handleFileRead: " + path);
+bool handleFileRead(String path) {
+  //  send the right file to the client (if it exists)
+  //  Serial.println("handleFileRead: " + path);
   if (path.endsWith("/")) path += "index.html";
   // If a folder is requested, send the index file
   String contentType = getContentType(path);
   // Get the MIME type
   String pathWithGz = path + ".gz";
   if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    // If the file exists, either as a compressed archive, or normal
+    //  If the file exists, either as a compressed archive, or normal
     if (SPIFFS.exists(pathWithGz))// If there's a compressed version available
       path += ".gz";// Use the compressed verion
     File file = SPIFFS.open(path, "r");
-    // Open the file
+    //  Open the file
     size_t sent = server.streamFile(file, contentType);
-    // Send it to the client
+    //  Send it to the client
     file.close();
     // Close the file again
     // Serial.println(String("\tSent file: ") + path);
@@ -113,7 +114,7 @@ void handleFileUpload() { // upload a new file to the SPIFFS
       fsUploadFile.close();
       // Close the file again
       // Serial.print("handleFileUpload Size: ");
-      //Serial.println(upload.totalSize);
+      // Serial.println(upload.totalSize);
       server.sendHeader("Location", "/success.html");
       // Redirect the client to the success page
       server.send(303);
@@ -237,8 +238,7 @@ void setup() {
     // Send status 200 (OK) to tell the client we are ready to receive
     server.send(200);
   },
-  handleFileUpload  // Receive and save the file
-           );
+  handleFileUpload);  // Receive and save the file
 
   server.on("/file-upload", HTTP_GET, []() {
     // if the client requests the upload page
@@ -252,7 +252,7 @@ void setup() {
 
   server.on("/", []() {
     server.sendHeader("Location", String("ui.html"), true);
-    server.send ( 302, "text/plain", "");
+    server.send (302, "text/plain", "");
   });
 
   server.on("/state", HTTP_GET, []() {
