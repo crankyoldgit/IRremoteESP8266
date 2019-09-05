@@ -65,7 +65,7 @@ class IRSamsungAc {
   explicit IRSamsungAc(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
 
-  void stateReset(const bool forcepower = true);
+  void stateReset(const bool forcepower = true, const bool initialPower = true);
 #if SEND_SAMSUNG_AC
   void send(const uint16_t repeat = kSamsungAcDefaultRepeat,
             const bool calcchecksum = true);
