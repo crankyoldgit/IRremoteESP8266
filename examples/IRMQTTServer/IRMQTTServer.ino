@@ -31,7 +31,7 @@
  *
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
- *     - ArduinoJson (https://arduinojson.org/) (Version >= 5.0 and < 6.0)
+ *     - ArduinoJson (https://arduinojson.org/) (Version >= 6.0)
  *     - PubSubClient (https://pubsubclient.knolleary.net/)
  *     - WiFiManager (https://github.com/tzapu/WiFiManager)
  *                   (ESP8266: Version >= 0.14, ESP32: 'development' branch.)
@@ -504,8 +504,7 @@ bool mountSpiffs(void) {
 bool saveConfig(void) {
   debug("Saving the config.");
   bool success = false;
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
+  DynamicJsonDocument json(kJsonConfigMaxSize);
 #if MQTT_ENABLE
   json[kMqttServerKey] = MqttServer;
   json[kMqttPortKey] = MqttPort;
@@ -530,7 +529,7 @@ bool saveConfig(void) {
       debug("Failed to open config file for writing.");
     } else {
       debug("Writing out the config file.");
-      json.printTo(configFile);
+      serializeJson(json, configFile);
       configFile.close();
       debug("Finished writing config file.");
       success = true;
@@ -555,9 +554,8 @@ bool loadConfigFile(void) {
         std::unique_ptr<char[]> buf(new char[size]);
 
         configFile.readBytes(buf.get(), size);
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        if (json.success()) {
+        DynamicJsonDocument json(kJsonConfigMaxSize);
+        if (!deserializeJson(json, buf.get(), kJsonConfigMaxSize)) {
           debug("Json config file parsed ok.");
 #if MQTT_ENABLE
           strncpy(MqttServer, json[kMqttServerKey] | "", kHostnameLength);
@@ -2645,8 +2643,7 @@ bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #if MQTT_CLIMATE_JSON
 void sendJsonState(const stdAc::state_t state, const String topic,
                    const bool retain, const bool ha_mode) {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
+  DynamicJsonDocument json(kJsonAcStateMaxSize);
   json[KEY_PROTOCOL] = typeToString(state.protocol);
   json[KEY_MODEL] = state.model;
   json[KEY_POWER] = IRac::boolToString(state.power);
@@ -2672,14 +2669,13 @@ void sendJsonState(const stdAc::state_t state, const String topic,
 
   String payload = "";
   payload.reserve(200);
-  json.printTo(payload);
+  serializeJson(json, payload);
   sendString(topic, payload, retain);
 }
 
 stdAc::state_t jsonToState(const stdAc::state_t current, const String str) {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& json = jsonBuffer.parseObject(str);
-  if (!json.success()) {
+  DynamicJsonDocument json(kJsonAcStateMaxSize);
+  if (deserializeJson(json, str, kJsonAcStateMaxSize)) {
     debug("json MQTT message did not parse. Skipping!");
     return current;
   }

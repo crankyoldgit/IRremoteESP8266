@@ -209,6 +209,11 @@ const uint8_t kPortLength = 5;  // Largest value of uint16_t is "65535".
 const uint8_t kUsernameLength = 15;
 const uint8_t kPasswordLength = 20;
 
+// -------------------------- Json Settings ------------------------------------
+
+const uint16_t kJsonConfigMaxSize = 512;    // Bytes
+const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
+
 // -------------------------- Debug Settings -----------------------------------
 // Debug output is disabled if any of the IR pins are on the TX (D1) pin.
 // See `isSerialGpioUsedByIr()`.
