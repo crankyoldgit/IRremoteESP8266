@@ -43,6 +43,7 @@ jobs:
       - arduino --verify --board $BD $PWD/examples/TurnOnFujitsuAC/TurnOnFujitsuAC.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/TurnOnKelvinatorAC/TurnOnKelvinatorAC.ino 2> /dev/null
       - arduino --verify --board $BD $PWD/examples/TurnOnMitsubishiAC/TurnOnMitsubishiAC.ino 2> /dev/null
+      - arduino --verify --board $BD $PWD/examples/Web-AC-control/Web-AC-control.ino 2> /dev/null
     - script:
       # Check that everything compiles. (Part 2)
       - arduino --verify --board $BD $PWD/examples/IRsendProntoDemo/IRsendProntoDemo.ino 2> /dev/null
