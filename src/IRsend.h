@@ -275,6 +275,11 @@ class IRsend {
   void sendMitsubishi(uint64_t data, uint16_t nbits = kMitsubishiBits,
                       uint16_t repeat = kMitsubishiMinRepeat);
 #endif
+#if SEND_MITSUBISHI136
+  void sendMitsubishi136(const unsigned char data[],
+                         const uint16_t nbytes = kMitsubishi136StateLength,
+                         const uint16_t repeat = kMitsubishi136MinRepeat);
+#endif
 #if SEND_MITSUBISHI2
   void sendMitsubishi2(uint64_t data, uint16_t nbits = kMitsubishiBits,
                        uint16_t repeat = kMitsubishiMinRepeat);

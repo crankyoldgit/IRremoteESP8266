@@ -254,6 +254,11 @@ class IRrecv {
                           uint16_t nbits = kMitsubishiACBits,
                           bool strict = false);
 #endif
+#if DECODE_MITSUBISHI136
+  bool decodeMitsubishi136(decode_results *results,
+                           const uint16_t nbits = kMitsubishi136Bits,
+                           const bool strict = true);
+#endif
 #if DECODE_MITSUBISHIHEAVY
   bool decodeMitsubishiHeavy(decode_results *results, const uint16_t nbits,
                              const bool strict = true);
