@@ -859,7 +859,7 @@ void IRsend::sendMitsubishi136(const unsigned char data[],
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Beta / Probably works.
+// Status: STABLE / Reported as working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/888

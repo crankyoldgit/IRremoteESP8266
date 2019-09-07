@@ -1,7 +1,8 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2019 David Conran
 // Copyright 2018 denxhun
 
 #include "ir_Mitsubishi.h"
+#include "IRac.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
@@ -1227,4 +1228,23 @@ TEST(TestDecodeMitsubishi136, SyntheticExample) {
   ASSERT_EQ(MITSUBISHI136, irsend.capture.decode_type);
   EXPECT_EQ(kMitsubishi136Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi136Bits);
+}
+
+// General housekeeping
+TEST(TestMitsubishi, Housekeeping) {
+  ASSERT_EQ("MITSUBISHI", typeToString(decode_type_t::MITSUBISHI));
+  ASSERT_FALSE(hasACState(decode_type_t::MITSUBISHI));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI));
+
+  ASSERT_EQ("MITSUBISHI2", typeToString(decode_type_t::MITSUBISHI2));
+  ASSERT_FALSE(hasACState(decode_type_t::MITSUBISHI2));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI2));
+
+  ASSERT_EQ("MITSUBISHI_AC", typeToString(decode_type_t::MITSUBISHI_AC));
+  ASSERT_TRUE(hasACState(decode_type_t::MITSUBISHI_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI_AC));
+
+  ASSERT_EQ("MITSUBISHI136", typeToString(decode_type_t::MITSUBISHI136));
+  ASSERT_TRUE(hasACState(decode_type_t::MITSUBISHI136));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI136));
 }
