@@ -1,5 +1,5 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017-2018 David Conran
+// Copyright 2017-2019 David Conran
 // Copyright 2018 Denes Varga
 
 // Mitsubishi
@@ -58,6 +58,17 @@ const uint16_t kMitsubishiAcOneSpace = 1300;
 const uint16_t kMitsubishiAcZeroSpace = 420;
 const uint16_t kMitsubishiAcRptMark = 440;
 const uint16_t kMitsubishiAcRptSpace = 17100;
+
+// Mitsubishi 136 bit A/C
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+
+const uint16_t kMitsubishi136HdrMark = 3324;
+const uint16_t kMitsubishi136HdrSpace = 1474;
+const uint16_t kMitsubishi136BitMark = 467;
+const uint16_t kMitsubishi136OneSpace = 1137;
+const uint16_t kMitsubishi136ZeroSpace = 351;
+const uint32_t kMitsubishi136Gap = kDefaultMessageGap;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -809,3 +820,73 @@ String IRMitsubishiAC::toString(void) {
   }
   return result;
 }
+
+
+#if SEND_MITSUBISHI136
+// Send a Mitsubishi136 A/C message.
+//
+// Args:
+//   data: An array of bytes containing the IR command.
+//   nbytes: Nr. of bytes of data in the array. (>=kMitsubishi136StateLength)
+//   repeat: Nr. of times the message is to be repeated.
+//          (Default = kMitsubishi136MinRepeat).
+//
+// Status: ALPHA / Probably working. Needs to be tested against a real device.
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+void IRsend::sendMitsubishi136(const unsigned char data[],
+                               const uint16_t nbytes,
+                               const uint16_t repeat) {
+  if (nbytes < kMitsubishi136StateLength)
+    return;  // Not enough bytes to send a proper message.
+
+  sendGeneric(kMitsubishi136HdrMark, kMitsubishi136HdrSpace,
+              kMitsubishi136BitMark, kMitsubishi136OneSpace,
+              kMitsubishi136BitMark, kMitsubishi136ZeroSpace,
+              kMitsubishi136BitMark, kMitsubishi136Gap,
+              data, nbytes, 38, false, repeat, 50);
+}
+#endif  // SEND_MITSUBISHI136
+
+#if DECODE_MITSUBISHI136
+// Decode the supplied Mitsubishi136 message.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   Nr. of data bits to expect.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: Beta / Probably works.
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+bool IRrecv::decodeMitsubishi136(decode_results *results, const uint16_t nbits,
+                                 const bool strict) {
+  // Too short to match?
+  if (results->rawlen < (2 * nbits) + kHeader + kFooter - 1) return false;
+  if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
+  if (strict) {  // Do checks to see if it matches the spec.
+    if (nbits != kMitsubishi136Bits) return false;
+  }
+  uint16_t used = matchGeneric(results->rawbuf + kStartOffset, results->state,
+                               results->rawlen - kStartOffset, nbits,
+                               kMitsubishi136HdrMark, kMitsubishi136HdrSpace,
+                               kMitsubishi136BitMark, kMitsubishi136OneSpace,
+                               kMitsubishi136BitMark, kMitsubishi136ZeroSpace,
+                               kMitsubishi136BitMark, kMitsubishi136Gap,
+                               true, _tolerance, 0, false);
+  if (!used) return false;
+  if (strict) {
+    // Header validation: Codes start with 0x23CB26
+    if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
+        results->state[2] != 0x26) return false;
+    // TODO(someone): Add checksum validation if/when supported.
+  }
+  results->decode_type = MITSUBISHI136;
+  results->bits = nbits;
+  return true;
+}
+#endif  // DECODE_MITSUBISHI136

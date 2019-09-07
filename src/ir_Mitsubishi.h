@@ -1,11 +1,13 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017 David Conran
+// Copyright 2017-2019 David Conran
 
 // Mitsubishi
 
 // Supports:
 //   Brand: Mitsubishi,  Model: TV
 //   Brand: Mitsubishi,  Model: HC3000 Projector
+//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
+//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
 
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
