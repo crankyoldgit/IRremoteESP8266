@@ -311,7 +311,7 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
                  const stdAc::state_t state, const bool retain,
                  const bool force);
 #if MQTT_CLIMATE_JSON
-stdAc::state_t jsonToState(const stdAc::state_t current, const String str);
+stdAc::state_t jsonToState(const stdAc::state_t current, const char *str);
 void sendJsonState(const stdAc::state_t state, const String topic,
                    const bool retain = false, const bool ha_mode = true);
 #endif  // MQTT_CLIMATE_JSON
