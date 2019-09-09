@@ -2675,7 +2675,7 @@ void sendJsonState(const stdAc::state_t state, const String topic,
 
 stdAc::state_t jsonToState(const stdAc::state_t current, const String str) {
   DynamicJsonDocument json(kJsonAcStateMaxSize);
-  if (deserializeJson(json, str, kJsonAcStateMaxSize)) {
+  if (deserializeJson(json, str.c_str(), kJsonAcStateMaxSize)) {
     debug("json MQTT message did not parse. Skipping!");
     return current;
   }
