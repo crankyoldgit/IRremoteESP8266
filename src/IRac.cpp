@@ -388,7 +388,8 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                   const bool quiet, const bool turbo, const bool econo) {
+                   const bool quiet, const bool turbo, const bool econo,
+                   const bool filter, const bool clean) {
   ac->setModel(model);
   if (on) {
     // Do all special messages (except "Off") first,
@@ -420,8 +421,8 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
     ac->setSwing(swing);
     if (quiet) ac->setFanSpeed(kFujitsuAcFanQuiet);
     // No Light setting available.
-    // No Filter setting available.
-    // No Clean setting available.
+    ac->setFilter(filter);
+    ac->setClean(clean);
     // No Beep setting available.
     // No Sleep setting available.
     // No Clock setting available.
@@ -1132,7 +1133,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
                      _modulation);
       ac.begin();
       fujitsu(&ac, (fujitsu_ac_remote_model_t)model, on, mode, degC, fan,
-              swingv, swingh, quiet, turbo, econo);
+              swingv, swingh, quiet, turbo, econo, filter, clean);
       break;
     }
 #endif  // SEND_FUJITSU_AC

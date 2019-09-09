@@ -9,6 +9,10 @@
 //   Brand: Fujitsu,  Model: AR-REB1E remote
 //   Brand: Fujitsu,  Model: ASYG7LMCA A/C
 //   Brand: Fujitsu,  Model: AR-RAE1E remote
+//   Brand: Fujitsu,  Model: AGTV14LAC A/C
+//   Brand: Fujitsu,  Model: AR-RAC1E remote
+//   Brand: Fujitsu,  Model: ASTB09LBC A/C
+//   Brand: Fujitsu,  Model: AR-RY4 remote
 //   Brand: Fujitsu General,  Model: AR-JW2 remote
 
 #ifndef IR_FUJITSU_H_
@@ -83,10 +87,11 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
 enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAE1E (Default)
+  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
   ARDB1,        // (2) AR-DB1
   ARREB1E,      // (3) AR-REB1E
   ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
+  ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
 };
 
 class IRFujitsuAC {
@@ -126,6 +131,10 @@ class IRFujitsuAC {
   void off(void);
   void on(void);
   bool getPower(void);
+  void setClean(const bool on);
+  bool getClean(const bool raw = false);
+  void setFilter(const bool on);
+  bool getFilter(const bool raw = false);
   void setOutsideQuiet(const bool on);
 
   bool getOutsideQuiet(const bool raw = false);
@@ -153,6 +162,8 @@ class IRFujitsuAC {
   uint8_t _state_length;
   uint8_t _state_length_short;
   bool _outsideQuiet;
+  bool _clean;
+  bool _filter;
   void buildState(void);
   void buildFromState(const uint16_t length);
 };
