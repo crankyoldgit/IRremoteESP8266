@@ -225,7 +225,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.0-alpha"
+#define _MY_VERSION_ "v1.4.1-alpha"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -393,6 +393,6 @@ bool cmpClimate(const stdAc::state_t a, const stdAc::state_t b);
 bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
                  const String topic_prefix, const bool retain,
                  const bool forceMQTT, const bool forceIR,
-                 const bool enableIR = true);
+                 const bool enableIR = true, IRac *commonAc = NULL);
 bool decodeCommonAc(const decode_results *decode);
 #endif  // EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_

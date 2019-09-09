@@ -75,7 +75,8 @@
  *
  * or
  *
- * Send a MQTT message to the topic 'ir_server/send' (or 'ir_server/send_0' etc)
+ * Send a MQTT message to the topic 'ir_server/send'
+ * (or 'ir_server/send_1' etc if you have enabled more than 1 TX GPIO)
  * using the following format (Order is important):
  *   protocol_num,hexcode
  *     e.g. 7,E0E09966
@@ -177,10 +178,13 @@
  *
  * ### via MQTT:
  * The code listen for commands (via wildcard) on the MQTT topics at the
- * `ir_server/ac/cmnd/+` level, such as:
+ * `ir_server/ac/cmnd/+` level (or ir_server/ac_1/cmnd/+` if multiple TX GPIOs)
+ * such as:
  * i.e. protocol, model, power, mode, temp, fanspeed, swingv, swingh, quiet,
  *      turbo, light, beep, econo, sleep, filter, clean, use_celsius
- * e.g. ir_server/ac/cmnd/power, ir_server/ac/cmnd/temp, etc.
+ * e.g. ir_server/ac/cmnd/power, ir_server/ac/cmnd/temp,
+ *      ir_server/ac_0/cmnd/mode, ir_server/ac_2/cmnd/fanspeed, etc.
+
  * It will process them, and if successful and it caused a change, it will
  * acknowledge this via the relevant state topic for that command.
  * e.g. If the aircon/climate changes from power off to power on, it will
@@ -262,6 +266,20 @@
  *     temp_step: 1
  *     retain: false
  *
+ * #### Home Assistant MQTT Discovery
+ *   There is an option for this: 'Send MQTT Discovery' under the 'Admin' menu.
+ *   It will produce a single MQTT Cliamte Discovery message for Home Assistant
+ *   provided you have everything configured correctly here and in HA.
+ *   This message has MQTT RETAIN set on it, so it only ever needs to be sent
+ *   once or if the config details change etc.
+ *
+ *   If you no longer want it, manually remove it from your MQTT broker.
+ *   e.g.
+ *     `mosquitto_pub -t homeassistant/climate/ir_server/config -n -r -d`
+ *
+ *   NOTE: If you have multiple TX GPIOs configured, it *ONLY* works for the
+ *   first TX GPIO climate. You will need to manually configure the others.
+ *
  * ### via HTTP:
  *   Use the "http://<your_esp8266's_ip_address>/aircon/set" URL and pass on
  *   the arguments as needed to control your device. See the `KEY_*` #defines
@@ -270,6 +288,9 @@
  *        turbo, light, beep, econo, sleep, filter, clean, use_celsius
  *   Example:
  *     http://<your_esp8266's_ip_address>/aircon/set?protocol=PANASONIC_AC&model=LKE&power=on&mode=auto&fanspeed=min&temp=23
+ *
+ *   NOTE: You can only control the ac climate of the first GPIO via HTML/HTTP.
+ *         If you want to control multiple climates, you need to do it via MQTT.
  *
  * ## Debugging & Logging
  * If DEBUG is turned on, there is additional information printed on the Serial
@@ -388,9 +409,10 @@ uint32_t irRecvCounter = 0;
 #endif  // IR_RX
 
 // Climate stuff
-stdAc::state_t climate;
-stdAc::state_t climate_prev;
-IRac *commonAc = NULL;
+stdAc::state_t climate[kNrOfIrTxGpios];
+stdAc::state_t climate_prev[kNrOfIrTxGpios];
+IRac *commonAcTable[kNrOfIrTxGpios];
+String channel_re = "(";  // Will be built later.
 
 TimerMs lastClimateIr = TimerMs();  // When we last sent the IR Climate mesg.
 uint32_t irClimateCounter = 0;  // How many have we sent?
@@ -989,42 +1011,43 @@ void handleAirCon(void) {
       "<form method='POST' action='/aircon/set' enctype='multipart/form-data'>"
       "<table style='width:33%'>"
       "<tr><td>Protocol</td><td>" +
-          htmlSelectClimateProtocol(KEY_PROTOCOL, climate.protocol) +
+          htmlSelectClimateProtocol(KEY_PROTOCOL, climate[0].protocol) +
       "</td></tr>"
-      "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate.model) +
+      "<tr><td>Model</td><td>" + htmlSelectModel(KEY_MODEL, climate[0].model) +
           "</td></tr>"
-      "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate.power) +
+      "<tr><td>Power</td><td>" + htmlSelectBool(KEY_POWER, climate[0].power) +
           "</td></tr>"
-      "<tr><td>Mode</td><td>" + htmlSelectMode(KEY_MODE, climate.mode) +
+      "<tr><td>Mode</td><td>" + htmlSelectMode(KEY_MODE, climate[0].mode) +
           "</td></tr>"
       "<tr><td>Temp</td><td>"
           "<input type='number' name='" KEY_TEMP "' min='16' max='90' "
-          "step='0.5' value='" + String(climate.degrees, 1) + "'>"
+          "step='0.5' value='" + String(climate[0].degrees, 1) + "'>"
           "<select name='" KEY_CELSIUS "'>"
               "<option value='on'" +
-              (climate.celsius ? " selected='selected'" : "") + ">C</option>"
+              (climate[0].celsius ? " selected='selected'" : "") + ">C</option>"
               "<option value='off'" +
-              (!climate.celsius ? " selected='selected'" : "") + ">F</option>"
+              (!climate[0].celsius ? " selected='selected'" : "") +
+              ">F</option>"
           "</select></td></tr>"
       "<tr><td>Fan Speed</td><td>" +
-          htmlSelectFanspeed(KEY_FANSPEED, climate.fanspeed) + "</td></tr>"
+          htmlSelectFanspeed(KEY_FANSPEED, climate[0].fanspeed) + "</td></tr>"
       "<tr><td>Swing (V)</td><td>" +
-          htmlSelectSwingv(KEY_SWINGV, climate.swingv) + "</td></tr>"
+          htmlSelectSwingv(KEY_SWINGV, climate[0].swingv) + "</td></tr>"
       "<tr><td>Swing (H)</td><td>" +
-          htmlSelectSwingh(KEY_SWINGH, climate.swingh) + "</td></tr>"
-      "<tr><td>Quiet</td><td>" + htmlSelectBool(KEY_QUIET, climate.quiet) +
+          htmlSelectSwingh(KEY_SWINGH, climate[0].swingh) + "</td></tr>"
+      "<tr><td>Quiet</td><td>" + htmlSelectBool(KEY_QUIET, climate[0].quiet) +
           "</td></tr>"
-      "<tr><td>Turbo</td><td>" + htmlSelectBool(KEY_TURBO, climate.turbo) +
+      "<tr><td>Turbo</td><td>" + htmlSelectBool(KEY_TURBO, climate[0].turbo) +
           "</td></tr>"
-      "<tr><td>Econo</td><td>" + htmlSelectBool(KEY_ECONO, climate.econo) +
+      "<tr><td>Econo</td><td>" + htmlSelectBool(KEY_ECONO, climate[0].econo) +
           "</td></tr>"
-      "<tr><td>Light</td><td>" + htmlSelectBool(KEY_LIGHT, climate.light) +
+      "<tr><td>Light</td><td>" + htmlSelectBool(KEY_LIGHT, climate[0].light) +
           "</td></tr>"
-      "<tr><td>Filter</td><td>" + htmlSelectBool(KEY_FILTER, climate.filter) +
+      "<tr><td>Filter</td><td>" +
+          htmlSelectBool(KEY_FILTER, climate[0].filter) + "</td></tr>"
+      "<tr><td>Clean</td><td>" + htmlSelectBool(KEY_CLEAN, climate[0].clean) +
           "</td></tr>"
-      "<tr><td>Clean</td><td>" + htmlSelectBool(KEY_CLEAN, climate.clean) +
-          "</td></tr>"
-      "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate.beep) +
+      "<tr><td>Beep</td><td>" + htmlSelectBool(KEY_BEEP, climate[0].beep) +
           "</td></tr>"
       "<tr><td>Force resend</td><td>" + htmlSelectBool(KEY_RESEND, false) +
           "</td></tr>"
@@ -1043,7 +1066,7 @@ void handleAirConSet(void) {
     return server.requestAuthentication();
   }
 #endif
-  stdAc::state_t result = climate;
+  stdAc::state_t result = climate[0];
   debug("New common a/c received via HTTP");
   bool force_resend = false;
   for (uint16_t i = 0; i < server.args(); i++) {
@@ -1054,13 +1077,15 @@ void handleAirConSet(void) {
   }
 
 #if MQTT_ENABLE
-  sendClimate(climate, result, MqttClimateStat, true, false, force_resend);
+  sendClimate(climate[0], result, MqttClimateStat, true, false, force_resend,
+              true, commonAcTable[0]);
 #else  // MQTT_ENABLE
-  sendClimate(climate, result, "", false, false, force_resend);
+  sendClimate(climate[0], result, "", false, false, force_resend, true,
+              commonAcTable[0]);
 #endif  // MQTT_ENABLE
   lastClimateSource = F("HTTP");
   // Update the old climate state with the new one.
-  climate = result;
+  climate[0] = result;
   // Redirect back to the aircon page.
   String html = htmlHeader(F("Aircon updated!"));
   html += addJsReloadUrl(kUrlAircon, kQuickDisplayTime, false);
@@ -1238,8 +1263,10 @@ void handleInfo(void) {
             String("<i>Never</i>"))) +
         "<br>"
 #endif  // MQTT_DISCOVERY_ENABLE
-    "Command topics: " + MqttClimateCmnd + kClimateTopics +
-    "State topics: " + MqttClimateStat + kClimateTopics +
+    "Command topics: " + MqttClimate + channel_re + '/' + MQTT_CLIMATE_CMND +
+        '/' + kClimateTopics +
+    "State topics: " + MqttClimate + channel_re + '/' + MQTT_CLIMATE_STAT +
+        '/' + kClimateTopics +
 #endif  // MQTT_ENABLE
     "</p>"
     // Page footer
@@ -1887,25 +1914,27 @@ void init_vars(void) {
 
 void setup(void) {
   // Set the default climate settings.
-  climate.protocol = decode_type_t::UNKNOWN;
-  climate.model = -1;  // Unknown.
-  climate.power = false;
-  climate.mode = stdAc::opmode_t::kAuto;
-  climate.celsius = true;
-  climate.degrees = 25;  // 25C
-  climate.fanspeed = stdAc::fanspeed_t::kAuto;
-  climate.swingv = stdAc::swingv_t::kAuto;
-  climate.swingh = stdAc::swingh_t::kAuto;
-  climate.quiet = false;
-  climate.turbo = false;
-  climate.econo = false;
-  climate.light = false;
-  climate.filter = false;
-  climate.clean = false;
-  climate.beep = false;
-  climate.sleep = -1;  // Off
-  climate.clock = -1;  // Don't set.
-  climate_prev = climate;
+  for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
+    climate[i].protocol = decode_type_t::UNKNOWN;
+    climate[i].model = -1;  // Unknown.
+    climate[i].power = false;
+    climate[i].mode = stdAc::opmode_t::kAuto;
+    climate[i].celsius = true;
+    climate[i].degrees = 25;  // 25C
+    climate[i].fanspeed = stdAc::fanspeed_t::kAuto;
+    climate[i].swingv = stdAc::swingv_t::kAuto;
+    climate[i].swingh = stdAc::swingh_t::kAuto;
+    climate[i].quiet = false;
+    climate[i].turbo = false;
+    climate[i].econo = false;
+    climate[i].light = false;
+    climate[i].filter = false;
+    climate[i].clean = false;
+    climate[i].beep = false;
+    climate[i].sleep = -1;  // Off
+    climate[i].clock = -1;  // Don't set.
+    climate_prev[i] = climate[i];
+  }
   lastClimateSource = F("None");
 
 #if DEBUG
@@ -1930,16 +1959,27 @@ void setup(void) {
   if (isSerialGpioUsedByIr()) Serial.end();
 #endif  // DEBUG
 
+  channel_re.reserve(kNrOfIrTxGpios * 3);
   // Initialise all the IR transmitters.
   for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
     if (txGpioTable[i] == kGpioUnused) {
       IrSendTable[i] = NULL;
+      commonAcTable[i] = NULL;
     } else {
       IrSendTable[i] = new IRsend(txGpioTable[i], kInvertTxOutput);
       if (IrSendTable[i] == NULL) break;
       IrSendTable[i]->begin();
       offset = IrSendTable[i]->calibrate();
+      commonAcTable[i] = new IRac(txGpioTable[i], kInvertTxOutput);
+      if (commonAcTable[i] == NULL) break;
+      if (i > 0) channel_re += '_' + String(i) + '|';
     }
+  }
+  if (channel_re.length() == 1) {
+    channel_re = "";
+  } else {
+    channel_re[channel_re.length() - 1] = '\0';
+    channel_re += F(")?");
   }
 #if IR_RX
   if (rx_gpio != kGpioUnused)
@@ -1952,8 +1992,6 @@ void setup(void) {
     irrecv->enableIRIn(IR_RX_PULLUP);  // Start the receiver
   }
 #endif  // IR_RX
-  commonAc = new IRac(txGpioTable[0], kInvertTxOutput);
-
   // Wait a bit for things to settle.
   delay(500);
 
@@ -2127,12 +2165,19 @@ bool reconnect(void) {
       mqttSentCounter++;
 
       // Subscribing to topic(s)
-      subscribing(MqttSend);
+      subscribing(MqttSend);  // General base topic.
+      // Per channel topics
+      String cmnd_topic = MqttClimateCmnd + '+';  // Base climate command topics
       for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
-        subscribing(MqttSend + '_' + String(static_cast<int>(i)));
+        // General
+        if (IrSendTable[i] != NULL)
+          subscribing(MqttSend + '_' + String(static_cast<int>(i)));
+        // Climate
+        if (commonAcTable[i] != NULL)
+          subscribing(cmnd_topic);
+        cmnd_topic = MqttClimate + '_' + String(static_cast<int>(i + 1)) + '/' +
+            MQTT_CLIMATE_CMND + '/' + '+';
       }
-      // Climate command topics.
-      subscribing(MqttClimateCmnd + '+');
     } else {
       debug(("failed, rc=" + String(mqtt_client.state()) +
             " Try again in a bit.").c_str());
@@ -2178,18 +2223,23 @@ void handleSendMqttDiscovery(void) {
 #endif  // MQTT_DISCOVERY_ENABLE
 
 void doBroadcast(TimerMs *timer, const uint32_t interval,
-                 const stdAc::state_t state, const bool retain,
+                 const stdAc::state_t states[], const bool retain,
                  const bool force) {
   if (force || (!lockMqttBroadcast && timer->elapsed() > interval)) {
     debug("Sending MQTT stat update broadcast.");
-    sendClimate(state, state, MqttClimateStat,
-                retain, true, false);
+    String stat_topic = MqttClimateStat;
+    for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
+      sendClimate(states[i], states[i], stat_topic,
+                  retain, true, false, true, commonAcTable[i]);
 #if REPORT_VCC
-    sendString(MqttClimateStat + KEY_VCC, vccToString(), false);
+      sendString(stat_topic + KEY_VCC, vccToString(), false);
 #endif  // REPORT_VCC
 #if MQTT_CLIMATE_JSON
-    sendJsonState(state, MqttClimateStat + KEY_JSON);
+      sendJsonState(states[i], stat_topic + KEY_JSON);
 #endif  // MQTT_CLIMATE_JSON
+      stat_topic = MqttClimate + "_" + String(i + 1) + '/' +
+          MQTT_CLIMATE_STAT + '/';
+    }
     timer->reset();  // It's been sent, so reset the timer.
     hasBroadcastBeenSent = true;
   }
@@ -2211,37 +2261,54 @@ void receivingMQTT(String const topic_name, String const callback_str) {
   lastMqttCmdTime = millis();
   mqttRecvCounter++;
 
+  // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
+  // Or is for a specific ac/climate channel. e.g. "*/ac_[1-9]"
+  debug(("Checking for channel number in " + topic_name).c_str());
+  for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
+    if (topic_name.endsWith("_" + String(i)) ||
+        (i > 0 && topic_name.startsWith(MqttClimate + "_" + String(i)))) {
+      channel = i;
+      break;
+    }
+  }
+  debug(("Channel = " + String(channel)).c_str());
+  // Is it a climate topic?
   if (topic_name.startsWith(MqttClimate)) {
-    if (topic_name.startsWith(MqttClimateCmnd)) {
+    String alt_cmnd_topic = MqttClimate + "_" + String(channel) + '/' +
+        MQTT_CLIMATE_CMND + '/';
+    // Also accept climate commands on the '*_0' channel.
+    String cmnd_topic = topic_name.startsWith(alt_cmnd_topic) ? alt_cmnd_topic
+                                                              : MqttClimateCmnd;
+    String stat_topic = "";
+
+    if (channel)  // Never use the '*_0' state channel.
+      stat_topic = MqttClimate + "_" + String(channel) + '/' +
+          MQTT_CLIMATE_STAT + '/';
+    else
+      stat_topic = MqttClimateStat;
+
+    if (topic_name.startsWith(cmnd_topic)) {
       debug("It's a climate command topic");
       stdAc::state_t updated = updateClimate(
-          climate, topic_name, MqttClimateCmnd, callback_str);
+          climate[channel], topic_name, cmnd_topic, callback_str);
       // Handle the special command for forcing a resend of the state via IR.
       bool force_resend = false;
-      if (topic_name.equals(MqttClimateCmnd + KEY_RESEND) &&
+      if (topic_name.equals(cmnd_topic + KEY_RESEND) &&
           callback_str.equalsIgnoreCase(KEY_RESEND)) {
         force_resend = true;
         mqttLog("Climate resend requested.");
       }
-      if (sendClimate(climate, updated, MqttClimateStat,
-                      true, false, force_resend) && !force_resend)
+      if (sendClimate(climate[channel], updated, stat_topic,
+                      true, false, force_resend, true,
+                      commonAcTable[channel]) && !force_resend)
         lastClimateSource = F("MQTT");
-      climate = updated;
-    } else if (topic_name.startsWith(MqttClimateStat)) {
+      climate[channel] = updated;
+    } else if (topic_name.startsWith(stat_topic)) {
       debug("It's a climate state topic. Update internal state and DON'T send");
-      climate = updateClimate(
-          climate, topic_name, MqttClimateStat, callback_str);
+      climate[channel] = updateClimate(
+          climate[channel], topic_name, stat_topic, callback_str);
     }
     return;  // We are done for now.
-  }
-  // Check if a specific channel was requested by looking for a "*_[0-9]" suffix
-  for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
-    debug(("Checking if " + topic_name + " ends with _" + String(i)).c_str());
-    if (topic_name.endsWith("_" + String(i))) {
-      channel = i;
-      debug("It does!");
-      break;
-    }
   }
 
   debug(("Using transmit channel " + String(static_cast<int>(channel)) +
@@ -2404,8 +2471,14 @@ void loop(void) {
           // Attempt to fetch back any Climate state stored in MQTT retained
           // messages on the MQTT broker.
           mqttLog("Started listening for previous state.");
-          climate_prev = climate;  // Make a copy so we can compare afterwards.
-          subscribing(MqttClimateStat + '+');
+          String stat_topic = MqttClimateStat;
+          for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
+            // Make a copy so we can compare afterwards.
+            climate_prev[i] = climate[i];
+            subscribing(stat_topic + '+');
+            stat_topic = MqttClimate + "_" + String(i + 1) + '/' +
+                MQTT_CLIMATE_STAT + '/';
+          }
           statListenTime.reset();
         }
       }
@@ -2415,13 +2488,20 @@ void loop(void) {
     lastConnectedTime = now;
     mqtt_client.loop();
     if (lockMqttBroadcast && statListenTime.elapsed() > kStatListenPeriodMs) {
-      unsubscribing(MqttClimateStat + '+');
+      String stat_topic = MqttClimateStat;
+      for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
+        unsubscribing(stat_topic + '+');
+        // Did something change?
+        if (IRac::cmpStates(climate[i], climate_prev[i])) {
+          mqttLog("The state was recovered from MQTT broker. Updating.");
+          sendClimate(climate_prev[i], climate[i], stat_topic,
+                      true, false, false, MQTT_CLIMATE_IR_SEND_ON_RESTART,
+                      commonAcTable[i]);
+          lastClimateSource = F("MQTT (via retain)");
+          stat_topic = MqttClimate + "_" + String(i + 1) + '/' +
+              MQTT_CLIMATE_STAT + '/';
+      }
       mqttLog("Finished listening for previous state.");
-      if (IRac::cmpStates(climate, climate_prev)) {  // Something changed.
-        mqttLog("The state was recovered from MQTT broker. Updating.");
-        sendClimate(climate_prev, climate, MqttClimateStat,
-                    true, false, false, MQTT_CLIMATE_IR_SEND_ON_RESTART);
-        lastClimateSource = F("MQTT (via retain)");
       }
       lockMqttBroadcast = false;  // Release the lock so we can broadcast again.
     }
@@ -2778,7 +2858,7 @@ stdAc::state_t updateClimate(stdAc::state_t current, const String str,
 bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
                  const String topic_prefix, const bool retain,
                  const bool forceMQTT, const bool forceIR,
-                 const bool enableIR) {
+                 const bool enableIR, IRac *commonAc) {
   bool diff = false;
   bool success = true;
 
@@ -2869,7 +2949,8 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
     // Turn IR capture off if we need to.
     if (irrecv != NULL) irrecv->disableIRIn();  // Stop the IR receiver
 #endif  // IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
-    lastClimateSucceeded = commonAc->sendAc(next, &prev);
+    lastClimateSucceeded = (commonAc == NULL ? commonAc->sendAc(next, &prev)
+                                             : false);
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
     // Turn IR capture back on if we need to.
     if (irrecv != NULL) irrecv->enableIRIn();  // Restart the receiver
@@ -2895,35 +2976,36 @@ bool decodeCommonAc(const decode_results *decode) {
     debug("Inbound IR messages isn't a supported common A/C protocol");
     return false;
   }
-  stdAc::state_t state = climate;
+  stdAc::state_t state = climate[0];
   debug("Converting inbound IR A/C message to common A/C");
-  if (!IRAcUtils::decodeToState(decode, &state, &climate)) {
+  if (!IRAcUtils::decodeToState(decode, &state, &(climate[0]))) {
       debug("Failed to convert to common A/C.");  // This shouldn't happen!
       return false;
   }
 #if IGNORE_DECODED_AC_PROTOCOL
-  if (climate.protocol != decode_type_t::UNKNOWN) {
+  if (climate[0].protocol != decode_type_t::UNKNOWN) {
     // Use the previous protcol/model if set.
-    state.protocol = climate.protocol;
-    state.model = climate.model;
+    state.protocol = climate[0].protocol;
+    state.model = climate[0].model;
   }
 #endif  // IGNORE_DECODED_AC_PROTOCOL
 // Continue to use the previously prefered temperature units.
 // i.e. Keep using Celsius or Fahrenheit.
-if (climate.celsius != state.celsius) {
+if (climate[0].celsius != state.celsius) {
   // We've got a mismatch, so we need to convert.
-  state.degrees = climate.celsius ? fahrenheitToCelsius(state.degrees)
-                                  : celsiusToFahrenheit(state.degrees);
-  state.celsius = climate.celsius;
+  state.degrees = climate[0].celsius ? fahrenheitToCelsius(state.degrees)
+                                     : celsiusToFahrenheit(state.degrees);
+  state.celsius = climate[0].celsius;
 }
 #if MQTT_ENABLE
-  sendClimate(climate, state, MqttClimateStat, true, false,
-              REPLAY_DECODED_AC_MESSAGE, REPLAY_DECODED_AC_MESSAGE);
+  sendClimate(climate[0], state, MqttClimateStat, true, false,
+              REPLAY_DECODED_AC_MESSAGE, REPLAY_DECODED_AC_MESSAGE,
+              commonAcTable[0]);
 #else  // MQTT_ENABLE
-  sendClimate(climate, state, "", false, false, REPLAY_DECODED_AC_MESSAGE,
-              REPLAY_DECODED_AC_MESSAGE);
+  sendClimate(climate[0], state, "", false, false, REPLAY_DECODED_AC_MESSAGE,
+              REPLAY_DECODED_AC_MESSAGE, commonAcTable[0]);
 #endif  // MQTT_ENABLE
-  climate = state;  // Copy over the new climate state.
+  climate[0] = state;  // Copy over the new climate state.
   return true;
 }
 #endif  // USE_DECODED_AC_SETTINGS && IR_RX
