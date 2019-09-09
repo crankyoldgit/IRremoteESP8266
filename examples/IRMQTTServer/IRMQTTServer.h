@@ -68,7 +68,7 @@ const IPAddress kSubnetMask = IPAddress(255, 255, 255, 0);
 #endif  // USE_STATIC_IP
 
 // See: https://github.com/tzapu/WiFiManager#filter-networks for these settings.
-#define HIDE_DUPLIATE_NETWORKS false  // Should WifiManager hide duplicate SSIDs
+#define HIDE_DUPLICATE_NETWORKS false  // Make WifiManager hide duplicate SSIDs
 // #define MIN_SIGNAL_STRENGTH 20  // Minimum WiFi signal stength (percentage)
                                    // before we will connect.
                                    // The unset default is 8%.

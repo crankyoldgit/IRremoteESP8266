@@ -1168,7 +1168,7 @@ void handleInfo(void) {
     " <i>(" + timeSince(lastIrReceivedTime) + ")</i><br>"
 #endif  // IR_RX
     "Duplicate Wifi networks: " +
-        String(HIDE_DUPLIATE_NETWORKS ? "Hide" : "Show") + "<br>"
+        String(HIDE_DUPLICATE_NETWORKS ? "Hide" : "Show") + "<br>"
     "Min Wifi signal required: "
 #ifdef MIN_SIGNAL_STRENGTH
         + String(static_cast<int>(MIN_SIGNAL_STRENGTH)) +
@@ -1833,7 +1833,7 @@ void setup_wifi(void) {
 #if MIN_SIGNAL_STRENGTH
   wifiManager.setMinimumSignalQuality(MIN_SIGNAL_STRENGTH);
 #endif  // MIN_SIGNAL_STRENGTH
-  wifiManager.setRemoveDuplicateAPs(HIDE_DUPLIATE_NETWORKS);
+  wifiManager.setRemoveDuplicateAPs(HIDE_DUPLICATE_NETWORKS);
 
   if (!wifiManager.autoConnect())
     // Reboot. A.k.a. "Have you tried turning it Off and On again?"
