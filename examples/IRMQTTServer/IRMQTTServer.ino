@@ -2673,46 +2673,58 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   sendString(topic, payload, retain);
 }
 
-stdAc::state_t jsonToState(const stdAc::state_t current, const String str) {
+bool validJsonStr(DynamicJsonDocument doc, const char* key) {
+  return doc.containsKey(key) && doc[key].is<char*>();
+}
+
+bool validJsonInt(DynamicJsonDocument doc, const char* key) {
+  return doc.containsKey(key) && doc[key].is<signed int>();
+}
+
+stdAc::state_t jsonToState(const stdAc::state_t current, const char *str) {
   DynamicJsonDocument json(kJsonAcStateMaxSize);
-  if (deserializeJson(json, str.c_str(), kJsonAcStateMaxSize)) {
+  if (deserializeJson(json, str, kJsonAcStateMaxSize)) {
     debug("json MQTT message did not parse. Skipping!");
     return current;
   }
   stdAc::state_t result = current;
-  if (json.containsKey(KEY_PROTOCOL))
+  if (validJsonStr(json, KEY_PROTOCOL))
     result.protocol = strToDecodeType(json[KEY_PROTOCOL]);
-  if (json.containsKey(KEY_MODEL))
-    result.model = IRac::strToModel(json[KEY_MODEL]);
-  if (json.containsKey(KEY_MODE))
+  else if (validJsonInt(json, KEY_PROTOCOL))
+    result.protocol = (decode_type_t)json[KEY_PROTOCOL].as<signed int>();
+  if (validJsonStr(json, KEY_MODEL))
+    result.model = IRac::strToModel(json[KEY_MODEL].as<char*>());
+  else if (validJsonInt(json, KEY_MODEL))
+    result.model = json[KEY_MODEL];
+  if (validJsonStr(json, KEY_MODE))
     result.mode = IRac::strToOpmode(json[KEY_MODE]);
-  if (json.containsKey(KEY_FANSPEED))
+  if (validJsonStr(json, KEY_FANSPEED))
     result.fanspeed = IRac::strToFanspeed(json[KEY_FANSPEED]);
-  if (json.containsKey(KEY_SWINGV))
+  if (validJsonStr(json, KEY_SWINGV))
     result.swingv = IRac::strToSwingV(json[KEY_SWINGV]);
-  if (json.containsKey(KEY_SWINGH))
+  if (validJsonStr(json, KEY_SWINGH))
     result.swingh = IRac::strToSwingH(json[KEY_SWINGH]);
   if (json.containsKey(KEY_TEMP))
     result.degrees = json[KEY_TEMP];
-  if (json.containsKey(KEY_SLEEP))
+  if (validJsonInt(json, KEY_SLEEP))
     result.sleep = json[KEY_SLEEP];
-  if (json.containsKey(KEY_POWER))
+  if (validJsonStr(json, KEY_POWER))
     result.power = IRac::strToBool(json[KEY_POWER]);
-  if (json.containsKey(KEY_QUIET))
+  if (validJsonStr(json, KEY_QUIET))
     result.quiet = IRac::strToBool(json[KEY_QUIET]);
-  if (json.containsKey(KEY_TURBO))
+  if (validJsonStr(json, KEY_TURBO))
     result.turbo = IRac::strToBool(json[KEY_TURBO]);
-  if (json.containsKey(KEY_ECONO))
+  if (validJsonStr(json, KEY_ECONO))
     result.econo = IRac::strToBool(json[KEY_ECONO]);
-  if (json.containsKey(KEY_LIGHT))
+  if (validJsonStr(json, KEY_LIGHT))
     result.light = IRac::strToBool(json[KEY_LIGHT]);
-  if (json.containsKey(KEY_CLEAN))
+  if (validJsonStr(json, KEY_CLEAN))
     result.clean = IRac::strToBool(json[KEY_CLEAN]);
-  if (json.containsKey(KEY_FILTER))
+  if (validJsonStr(json, KEY_FILTER))
     result.filter = IRac::strToBool(json[KEY_FILTER]);
-  if (json.containsKey(KEY_BEEP))
+  if (validJsonStr(json, KEY_BEEP))
     result.beep = IRac::strToBool(json[KEY_BEEP]);
-  if (json.containsKey(KEY_CELSIUS))
+  if (validJsonStr(json, KEY_CELSIUS))
     result.celsius = IRac::strToBool(json[KEY_CELSIUS]);
   return result;
 }
