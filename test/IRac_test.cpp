@@ -337,8 +337,10 @@ TEST(TestIRac, Fujitsu) {
       "Fan: 2 (Medium), Command: N/A";
   std::string arrah2e_expected =
       "Model: 1 (ARRAH2E), Power: On, Mode: 1 (COOL), Temp: 19C, "
-      "Fan: 2 (Medium), Swing: Off, Command: N/A";
-
+      "Fan: 2 (Medium), Clean: Off, Filter: Off, Swing: Off, Command: N/A";
+  std::string arry4_expected =
+          "Model: 5 (ARRY4), Power: On, Mode: 1 (COOL), Temp: 19C, "
+          "Fan: 2 (Medium), Clean: On, Filter: On, Swing: Off, Command: N/A";
   ac.begin();
   irac.fujitsu(&ac,
                ARDB1,                       // Model
@@ -350,7 +352,9 @@ TEST(TestIRac, Fujitsu) {
                stdAc::swingh_t::kOff,       // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo (Powerful)
-               false);                      // Econo
+               false,                       // Econo
+               true,                        // Filter
+               true);                       // Clean
   ASSERT_EQ(ardb1_expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -369,13 +373,35 @@ TEST(TestIRac, Fujitsu) {
                stdAc::swingh_t::kOff,       // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo (Powerful)
-               false);                      // Econo
+               false,                       // Econo
+               true,                        // Filter
+               true);                       // Clean
   ASSERT_EQ(arrah2e_expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(arrah2e_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ac._irsend.reset();
+  irac.fujitsu(&ac,
+               fujitsu_ac_remote_model_t::ARRY4,  // Model
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               19,                          // Celsius
+               stdAc::fanspeed_t::kMedium,  // Fan speed
+               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingh_t::kOff,       // Horizontal swing
+               false,                       // Quiet
+               false,                       // Turbo (Powerful)
+               false,                       // Econo
+               true,                        // Filter
+               true);                       // Clean
+  ASSERT_EQ(arry4_expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(arry4_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Goodweather) {

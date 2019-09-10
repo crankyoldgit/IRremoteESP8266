@@ -388,7 +388,8 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                   const bool quiet, const bool turbo, const bool econo) {
+                   const bool quiet, const bool turbo, const bool econo,
+                   const bool filter, const bool clean) {
   ac->setModel(model);
   if (on) {
     // Do all special messages (except "Off") first,
@@ -420,8 +421,8 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
     ac->setSwing(swing);
     if (quiet) ac->setFanSpeed(kFujitsuAcFanQuiet);
     // No Light setting available.
-    // No Filter setting available.
-    // No Clean setting available.
+    ac->setFilter(filter);
+    ac->setClean(clean);
     // No Beep setting available.
     // No Sleep setting available.
     // No Clock setting available.
@@ -1132,7 +1133,7 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
                      _modulation);
       ac.begin();
       fujitsu(&ac, (fujitsu_ac_remote_model_t)model, on, mode, degC, fan,
-              swingv, swingh, quiet, turbo, econo);
+              swingv, swingh, quiet, turbo, econo, filter, clean);
       break;
     }
 #endif  // SEND_FUJITSU_AC
@@ -1453,7 +1454,7 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
     return def;
 }
 
-// Assumes str is the model or an integer >= 1.
+// Assumes str is the model code or an integer >= 1.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
   if (!strcasecmp(str, "YAW1F")) {
@@ -1469,6 +1470,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return fujitsu_ac_remote_model_t::ARREB1E;
   } else if (!strcasecmp(str, "ARJW2")) {
     return fujitsu_ac_remote_model_t::ARJW2;
+  } else if (!strcasecmp(str, "ARRY4")) {
+    return fujitsu_ac_remote_model_t::ARRY4;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;

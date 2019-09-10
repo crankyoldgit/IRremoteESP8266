@@ -72,13 +72,14 @@ IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
 void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
   _model = model;
   switch (model) {
-    case ARDB1:
-    case ARJW2:
+    case fujitsu_ac_remote_model_t::ARDB1:
+    case fujitsu_ac_remote_model_t::ARJW2:
       _state_length = kFujitsuAcStateLength - 1;
       _state_length_short = kFujitsuAcStateLengthShort - 1;
       break;
-    case ARRAH2E:
-    case ARREB1E:
+    case fujitsu_ac_remote_model_t::ARRY4:
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARREB1E:
     default:
       _state_length = kFujitsuAcStateLength;
       _state_length_short = kFujitsuAcStateLengthShort;
@@ -94,6 +95,8 @@ void IRFujitsuAC::stateReset(void) {
   _mode = kFujitsuAcModeCool;
   _swingMode = kFujitsuAcSwingBoth;
   _cmd = kFujitsuAcCmdTurnOn;
+  _filter = false;
+  _clean = false;
   this->buildState();
 }
 
@@ -127,12 +130,13 @@ void IRFujitsuAC::buildState(void) {
       break;
     default:
       switch (_model) {
-        case ARRAH2E:
-        case ARREB1E:
+        case fujitsu_ac_remote_model_t::ARRY4:
+        case fujitsu_ac_remote_model_t::ARRAH2E:
+        case fujitsu_ac_remote_model_t::ARREB1E:
           remote_state[5] = 0xFE;
           break;
-        case ARDB1:
-        case ARJW2:
+        case fujitsu_ac_remote_model_t::ARDB1:
+        case fujitsu_ac_remote_model_t::ARJW2:
           remote_state[5] = 0xFC;
           break;
       }
@@ -151,19 +155,27 @@ void IRFujitsuAC::buildState(void) {
     remote_state[11] = 0;  // timerOff values
     remote_state[12] = 0;  // timerOff/On values
     remote_state[13] = 0;  // timerOn values
-    remote_state[14] = 0;
+    switch (_model) {
+      case fujitsu_ac_remote_model_t::ARRY4:
+        remote_state[14] = _filter << 3;
+        remote_state[9] |= (_clean << 3);
+        break;
+      default:
+        remote_state[14] = 0;
+    }
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
     switch (_model) {
-      case ARDB1:
-      case ARJW2:
+      case fujitsu_ac_remote_model_t::ARDB1:
+      case fujitsu_ac_remote_model_t::ARJW2:
         checksum = sumBytes(remote_state, _state_length - 1);
         checksum_complement = 0x9B;
         break;
-      case ARREB1E:
+      case fujitsu_ac_remote_model_t::ARREB1E:
         remote_state[14] |= (_outsideQuiet << 7);
         // FALL THRU
-      case ARRAH2E:
+      case fujitsu_ac_remote_model_t::ARRAH2E:
+      case fujitsu_ac_remote_model_t::ARRY4:
         remote_state[14] |= 0x20;
         remote_state[10] |= _swingMode << 4;
         // FALL THRU
@@ -175,8 +187,9 @@ void IRFujitsuAC::buildState(void) {
     remote_state[_state_length - 1] = checksum_complement - checksum;
   } else {  // short codes
     switch (_model) {
-      case ARRAH2E:
-      case ARREB1E:
+      case fujitsu_ac_remote_model_t::ARRY4:
+      case fujitsu_ac_remote_model_t::ARRAH2E:
+      case fujitsu_ac_remote_model_t::ARREB1E:
         // The last byte is the inverse of penultimate byte
         remote_state[_state_length_short - 1] =
             ~remote_state[_state_length_short - 2];
@@ -192,8 +205,12 @@ void IRFujitsuAC::buildState(void) {
 
 uint8_t IRFujitsuAC::getStateLength(void) {
   this->buildState();  // Force an update of the internal state.
-  if (((_model == ARRAH2E || _model == ARREB1E) && remote_state[5] != 0xFE) ||
-      ((_model == ARDB1 || _model == ARJW2) && remote_state[5] != 0xFC))
+  if (((_model == fujitsu_ac_remote_model_t::ARRAH2E ||
+        _model == fujitsu_ac_remote_model_t::ARREB1E ||
+        _model == fujitsu_ac_remote_model_t::ARRY4) &&
+       remote_state[5] != 0xFE) ||
+      ((_model == fujitsu_ac_remote_model_t::ARDB1 ||
+        _model == fujitsu_ac_remote_model_t::ARJW2) && remote_state[5] != 0xFC))
     return _state_length_short;
   else
     return _state_length;
@@ -209,9 +226,10 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (length) {
     case kFujitsuAcStateLength - 1:
     case kFujitsuAcStateLengthShort - 1:
-      this->setModel(ARDB1);
+      this->setModel(fujitsu_ac_remote_model_t::ARDB1);
       // ARJW2 has horizontal swing.
-      if (this->getSwing(true) > kFujitsuAcSwingVert) this->setModel(ARJW2);
+      if (this->getSwing(true) > kFujitsuAcSwingVert)
+        this->setModel(fujitsu_ac_remote_model_t::ARJW2);
       break;
     default:
       switch (this->getCmd(true)) {
@@ -226,11 +244,11 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (remote_state[6]) {
     case 8:
       if (this->getModel() != fujitsu_ac_remote_model_t::ARJW2)
-        this->setModel(ARDB1);
+        this->setModel(fujitsu_ac_remote_model_t::ARDB1);
       break;
     case 9:
       if (this->getModel() != fujitsu_ac_remote_model_t::ARREB1E)
-        this->setModel(ARRAH2E);
+        this->setModel(fujitsu_ac_remote_model_t::ARRAH2E);
       break;
   }
   setTemp((remote_state[8] >> 4) + kFujitsuAcMinTemp);
@@ -238,9 +256,16 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
     setCmd(kFujitsuAcCmdTurnOn);
   else
     setCmd(kFujitsuAcCmdStayOn);
-  setMode(remote_state[9] & 0b111);
+  setMode(remote_state[9] & 0b00000111);
   setFanSpeed(remote_state[10] & 0b111);
   setSwing(remote_state[10] >> 4);
+  setClean(getClean(true));
+  setFilter(getFilter(true));
+  // Currently the only way we know how to tell ARRAH2E & ARRY4 apart is if
+  // either the raw Filter or Clean setting is on.
+  if (getModel() == fujitsu_ac_remote_model_t::ARRAH2E && (getFilter(true) ||
+                                                           getClean(true)))
+      setModel(fujitsu_ac_remote_model_t::ARRY4);
   switch (remote_state[5]) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdStepHoriz:
@@ -299,8 +324,9 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
     case kFujitsuAcCmdToggleSwingHoriz:
       switch (_model) {
         // Only these remotes have step horizontal.
-        case ARRAH2E:
-        case ARJW2:
+        case fujitsu_ac_remote_model_t::ARRY4:
+        case fujitsu_ac_remote_model_t::ARRAH2E:
+        case fujitsu_ac_remote_model_t::ARJW2:
           _cmd = cmd;
           break;
         default:
@@ -400,14 +426,15 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
   _swingMode = swingMode;
   switch (_model) {
     // No Horizontal support.
-    case ARDB1:
-    case ARREB1E:
+    case fujitsu_ac_remote_model_t::ARDB1:
+    case fujitsu_ac_remote_model_t::ARREB1E:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingVert) _swingMode = kFujitsuAcSwingVert;
       break;
     // Has Horizontal support.
-    case ARRAH2E:
-    case ARJW2:
+    case fujitsu_ac_remote_model_t::ARRY4:
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARJW2:
     default:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingBoth) _swingMode = kFujitsuAcSwingBoth;
@@ -425,18 +452,54 @@ uint8_t IRFujitsuAC::getSwing(const bool raw) {
   return _swingMode;
 }
 
+void IRFujitsuAC::setClean(const bool on) {
+  _clean = on;
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+}
+
+bool IRFujitsuAC::getClean(const bool raw) {
+  if (raw) {
+    return remote_state[9] & 0b00001000;
+  } else {
+    switch (getModel()) {
+      case fujitsu_ac_remote_model_t::ARRY4:
+        return _clean;
+      default:
+        return false;
+    }
+  }
+}
+
+void IRFujitsuAC::setFilter(const bool on) {
+  _filter = on;
+  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+}
+
+bool IRFujitsuAC::getFilter(const bool raw) {
+  if (raw) {
+    return remote_state[14] & 0b00001000;
+  } else {
+    switch (getModel()) {
+      case fujitsu_ac_remote_model_t::ARRY4:
+        return _filter;
+      default:
+        return false;
+    }
+  }
+}
+
 bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   uint8_t sum = 0;
   uint8_t sum_complement = 0;
   uint8_t checksum = state[length - 1];
   switch (length) {
-    case kFujitsuAcStateLengthShort:  // ARRAH2E & ARREB1E
+    case kFujitsuAcStateLengthShort:  // ARRAH2E, ARREB1E, & ARRY4
       return state[length - 1] == (uint8_t)~state[length - 2];
     case kFujitsuAcStateLength - 1:  // ARDB1 & ARJW2
       sum = sumBytes(state, length - 1);
       sum_complement = 0x9B;
       break;
-    case kFujitsuAcStateLength:  // ARRAH2E & ARREB1E
+    case kFujitsuAcStateLength:  // ARRAH2E, ARRY4, & ARREB1E
       sum = sumBytes(state + kFujitsuAcStateLengthShort,
                      length - 1 - kFujitsuAcStateLengthShort);
       break;
@@ -515,6 +578,9 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
   switch (result.model) {
     case fujitsu_ac_remote_model_t::ARREB1E:
     case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARRY4:
+      result.clean = _clean;
+      result.filter = _filter;
       result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto :
                                                       stdAc::swingv_t::kOff;
       result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto :
@@ -551,6 +617,7 @@ String IRFujitsuAC::toString(void) {
     case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
     case fujitsu_ac_remote_model_t::ARREB1E: result += F(" (ARREB1E)"); break;
     case fujitsu_ac_remote_model_t::ARJW2: result += F(" (ARJW2)"); break;
+    case fujitsu_ac_remote_model_t::ARRY4: result += F(" (ARRY4)"); break;
     default: result += F(" (UNKNOWN)");
   }
   result += addBoolToString(getPower(), F("Power"));
@@ -562,11 +629,13 @@ String IRFujitsuAC::toString(void) {
                            kFujitsuAcFanAuto, kFujitsuAcFanQuiet,
                            kFujitsuAcFanMed);
   switch (model) {
-    // These models have no internal swing state.
+    // These models have no internal swing, clean. or filter state.
     case fujitsu_ac_remote_model_t::ARDB1:
     case fujitsu_ac_remote_model_t::ARJW2:
       break;
     default:  // Assume everything else does.
+      result += addBoolToString(getClean(), F("Clean"));
+      result += addBoolToString(getFilter(), F("Filter"));
       result += F(", Swing: ");
       switch (this->getSwing()) {
         case kFujitsuAcSwingOff:
