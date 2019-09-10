@@ -1454,7 +1454,7 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
     return def;
 }
 
-// Assumes str is the model or an integer >= 1.
+// Assumes str is the model code or an integer >= 1.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
   if (!strcasecmp(str, "YAW1F")) {
@@ -1470,6 +1470,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return fujitsu_ac_remote_model_t::ARREB1E;
   } else if (!strcasecmp(str, "ARJW2")) {
     return fujitsu_ac_remote_model_t::ARJW2;
+  } else if (!strcasecmp(str, "ARRY4")) {
+    return fujitsu_ac_remote_model_t::ARRY4;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
