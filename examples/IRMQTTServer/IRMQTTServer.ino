@@ -2944,13 +2944,17 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
   }
   // Only send an IR message if we need to.
   if (enableIR && ((diff && !forceMQTT) || forceIR)) {
+    sendReqCounter++;
+    if (commonAc == NULL) {  // No climate object is available.
+      debug("Can't send climate state as common A/C object doesn't exist!");
+      return false;
+    }
     debug("Sending common A/C state via IR.");
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
     // Turn IR capture off if we need to.
     if (irrecv != NULL) irrecv->disableIRIn();  // Stop the IR receiver
 #endif  // IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
-    lastClimateSucceeded = (commonAc == NULL ? commonAc->sendAc(next, &prev)
-                                             : false);
+    lastClimateSucceeded = commonAc->sendAc(next, &prev);
 #if IR_RX && DISABLE_CAPTURE_WHILE_TRANSMITTING
     // Turn IR capture back on if we need to.
     if (irrecv != NULL) irrecv->enableIRIn();  // Restart the receiver
@@ -2959,7 +2963,6 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
     success &= lastClimateSucceeded;
     lastClimateIr.reset();
     irClimateCounter++;
-    sendReqCounter++;
   }
   return success;
 }
