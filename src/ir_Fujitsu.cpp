@@ -323,8 +323,7 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
     case kFujitsuAcCmdStepHoriz:
     case kFujitsuAcCmdToggleSwingHoriz:
       switch (_model) {
-        // Only these remotes have step horizontal.
-        case fujitsu_ac_remote_model_t::ARRY4:
+        // Only these remotes have horizontal.
         case fujitsu_ac_remote_model_t::ARRAH2E:
         case fujitsu_ac_remote_model_t::ARJW2:
           _cmd = cmd;
@@ -428,11 +427,11 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
     // No Horizontal support.
     case fujitsu_ac_remote_model_t::ARDB1:
     case fujitsu_ac_remote_model_t::ARREB1E:
+    case fujitsu_ac_remote_model_t::ARRY4:
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingVert) _swingMode = kFujitsuAcSwingVert;
       break;
     // Has Horizontal support.
-    case fujitsu_ac_remote_model_t::ARRY4:
     case fujitsu_ac_remote_model_t::ARRAH2E:
     case fujitsu_ac_remote_model_t::ARJW2:
     default:
