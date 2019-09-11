@@ -2166,17 +2166,16 @@ bool reconnect(void) {
 
       // Subscribing to topic(s)
       subscribing(MqttSend);  // General base topic.
+      subscribing(MqttClimateCmnd + '+');  // Base climate command topics
       // Per channel topics
-      String cmnd_topic = MqttClimateCmnd + '+';  // Base climate command topics
       for (uint8_t i = 0; i < kNrOfIrTxGpios; i++) {
         // General
         if (IrSendTable[i] != NULL)
           subscribing(MqttSend + '_' + String(static_cast<int>(i)));
         // Climate
         if (commonAcTable[i] != NULL)
-          subscribing(cmnd_topic);
-        cmnd_topic = MqttClimate + '_' + String(static_cast<int>(i + 1)) + '/' +
-            MQTT_CLIMATE_CMND + '/' + '+';
+          subscribing(MqttClimate + '_' + String(static_cast<int>(i)) + '/' +
+              MQTT_CLIMATE_CMND + '/' + '+');
       }
     } else {
       debug(("failed, rc=" + String(mqtt_client.state()) +
