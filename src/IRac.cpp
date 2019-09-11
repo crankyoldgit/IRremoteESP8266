@@ -173,6 +173,7 @@ void IRac::argo(IRArgoAC *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool turbo, const int16_t sleep) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -197,6 +198,7 @@ void IRac::coolix(IRCoolixAC *ac,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool turbo, const bool light, const bool clean,
                   const int16_t sleep) {
+  ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -243,6 +245,7 @@ void IRac::daikin(IRDaikinESP *ac,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool quiet, const bool turbo, const bool econo,
                   const bool clean) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -269,6 +272,7 @@ void IRac::daikin128(IRDaikin128 *ac,
                   const stdAc::swingv_t swingv,
                   const bool quiet, const bool turbo, const bool light,
                   const bool econo, const int16_t sleep, const int16_t clock) {
+  ac->begin();
   ac->setPowerToggle(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -293,6 +297,7 @@ void IRac::daikin160(IRDaikin160 *ac,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -307,6 +312,7 @@ void IRac::daikin176(IRDaikin176 *ac,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingh_t swingh) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -324,6 +330,7 @@ void IRac::daikin2(IRDaikin2 *ac,
                    const bool quiet, const bool turbo, const bool light,
                    const bool econo, const bool filter, const bool clean,
                    const bool beep, const int16_t sleep, const int16_t clock) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -349,6 +356,7 @@ void IRac::daikin216(IRDaikin216 *ac,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                      const bool quiet, const bool turbo) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -367,6 +375,7 @@ void IRac::electra(IRElectraAc *ac,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv,
                    const stdAc::swingh_t swingh) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -393,6 +402,7 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                    const bool quiet, const bool turbo, const bool econo,
                    const bool filter, const bool clean) {
+  ac->begin();
   ac->setModel(model);
   if (on) {
     // Do all special messages (except "Off") first,
@@ -446,6 +456,7 @@ void IRac::goodweather(IRGoodweatherAc *ac,
                        const stdAc::swingv_t swingv,
                        const bool turbo, const bool light,
                        const int16_t sleep) {
+  ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -472,6 +483,7 @@ void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool turbo, const bool light, const bool clean,
                 const int16_t sleep) {
+  ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -498,6 +510,7 @@ void IRac::haier(IRHaierAC *ac,
                  const bool on, const stdAc::opmode_t mode, const float degrees,
                  const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                  const bool filter, const int16_t sleep, const int16_t clock) {
+  ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -525,6 +538,7 @@ void IRac::haierYrwo2(IRHaierACYRW02 *ac,
                       const float degrees, const stdAc::fanspeed_t fan,
                       const stdAc::swingv_t swingv, const bool turbo,
                       const bool filter, const int16_t sleep) {
+  ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -547,6 +561,7 @@ void IRac::hitachi(IRHitachiAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -573,6 +588,7 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
                       const stdAc::swingh_t swingh,
                       const bool quiet, const bool turbo, const bool light,
                       const bool filter, const bool clean) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -596,6 +612,7 @@ void IRac::midea(IRMideaAC *ac,
                  const bool on, const stdAc::opmode_t mode, const bool celsius,
                  const float degrees, const stdAc::fanspeed_t fan,
                  const stdAc::swingv_t swingv, const int16_t sleep) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setUseCelsius(celsius);
@@ -622,6 +639,7 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
                       const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                       const stdAc::swingh_t swingh,
                       const bool quiet, const int16_t clock) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -645,6 +663,7 @@ void IRac::mitsubishi136(IRMitsubishi136 *ac,
                          const bool on, const stdAc::opmode_t mode,
                          const float degrees, const stdAc::fanspeed_t fan,
                          const stdAc::swingv_t swingv, const bool quiet) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -672,6 +691,7 @@ void IRac::mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
                              const stdAc::swingh_t swingh,
                              const bool turbo, const bool econo,
                              const bool clean) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -699,6 +719,7 @@ void IRac::mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
                               const bool quiet, const bool turbo,
                               const bool econo, const bool filter,
                               const bool clean, const int16_t sleep) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -725,6 +746,7 @@ void IRac::neoclima(IRNeoclimaAc *ac,
                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                     const bool turbo, const bool light, const bool filter,
                     const int16_t sleep) {
+  ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -750,6 +772,7 @@ void IRac::panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                      const bool quiet, const bool turbo, const int16_t clock) {
+  ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -777,6 +800,7 @@ void IRac::samsung(IRSamsungAc *ac,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const bool quiet, const bool turbo, const bool clean,
                    const bool beep, const bool forcepower) {
+  ac->begin();
   ac->stateReset(forcepower);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -803,6 +827,7 @@ void IRac::samsung(IRSamsungAc *ac,
 void IRac::sharp(IRSharpAc *ac,
                  const bool on, const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -831,6 +856,7 @@ void IRac::tcl112(IRTcl112Ac *ac,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool turbo, const bool light, const bool econo,
                   const bool filter) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -855,6 +881,7 @@ void IRac::teco(IRTecoAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                 const bool light, const int16_t sleep) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -877,6 +904,7 @@ void IRac::teco(IRTecoAc *ac,
 void IRac::toshiba(IRToshibaAC *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -900,6 +928,7 @@ void IRac::trotec(IRTrotecESP *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const int16_t sleep) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -925,6 +954,7 @@ void IRac::vestel(IRVestelAc *ac,
                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                   const bool turbo, const bool filter, const int16_t sleep,
                   const int16_t clock, const bool sendNormal) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -953,6 +983,7 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
                      const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                      const bool turbo, const bool light,
                      const int16_t sleep, const int16_t clock) {
+  ac->begin();
   ac->setModel(model);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1147,7 +1178,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case ELECTRA_AC:
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       electra(&ac, on, mode, degC, fan, swingv, swingh);
       break;
     }
@@ -1157,7 +1187,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     {
       IRFujitsuAC ac(_pin, (fujitsu_ac_remote_model_t)model, _inverted,
                      _modulation);
-      ac.begin();
       fujitsu(&ac, (fujitsu_ac_remote_model_t)model, on, mode, degC, fan,
               swingv, swingh, quiet, turbo, econo, filter, clean);
       break;
@@ -1167,7 +1196,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case GOODWEATHER:
     {
       IRGoodweatherAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       goodweather(&ac, on, mode, degC, fan, swingv, turbo, light, sleep);
       break;
     }
@@ -1176,7 +1204,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case GREE:
     {
       IRGreeAC ac(_pin, (gree_ac_remote_model_t)model, _inverted, _modulation);
-      ac.begin();
       gree(&ac, (gree_ac_remote_model_t)model, on, mode, degC, fan, swingv,
            turbo, light, clean, sleep);
       break;
@@ -1186,7 +1213,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case HAIER_AC:
     {
       IRHaierAC ac(_pin, _inverted, _modulation);
-      ac.begin();
       haier(&ac, on, mode, degC, fan, swingv, filter, sleep, clock);
       break;
     }
@@ -1195,7 +1221,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case HAIER_AC_YRW02:
     {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
-      ac.begin();
       haierYrwo2(&ac, on, mode, degC, fan, swingv, turbo, filter, sleep);
       break;
     }
@@ -1204,7 +1229,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case HITACHI_AC:
     {
       IRHitachiAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       hitachi(&ac, on, mode, degC, fan, swingv, swingh);
       break;
     }
@@ -1213,7 +1237,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case KELVINATOR:
     {
       IRKelvinatorAC ac(_pin, _inverted, _modulation);
-      ac.begin();
       kelvinator(&ac, on, mode, degC, fan, swingv, swingh, quiet, turbo,
                  light, filter, clean);
       break;
@@ -1223,7 +1246,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case MIDEA:
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
-      ac.begin();
       midea(&ac, on, mode, celsius, degrees, fan, swingv, sleep);
       break;
     }
@@ -1232,7 +1254,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case MITSUBISHI_AC:
     {
       IRMitsubishiAC ac(_pin, _inverted, _modulation);
-      ac.begin();
       mitsubishi(&ac, on, mode, degC, fan, swingv, swingh, quiet, clock);
       break;
     }
@@ -1241,7 +1262,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case MITSUBISHI136:
     {
       IRMitsubishi136 ac(_pin, _inverted, _modulation);
-      ac.begin();
       mitsubishi136(&ac, on, mode, degC, fan, swingv, quiet);
       break;
     }
@@ -1250,7 +1270,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case MITSUBISHI_HEAVY_88:
     {
       IRMitsubishiHeavy88Ac ac(_pin, _inverted, _modulation);
-      ac.begin();
       mitsubishiHeavy88(&ac, on, mode, degC, fan, swingv, swingh,
                         turbo, econo, clean);
       break;
@@ -1258,7 +1277,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case MITSUBISHI_HEAVY_152:
     {
       IRMitsubishiHeavy152Ac ac(_pin, _inverted, _modulation);
-      ac.begin();
       mitsubishiHeavy152(&ac, on, mode, degC, fan, swingv, swingh,
                          quiet, turbo, econo, filter, clean, sleep);
       break;
@@ -1268,7 +1286,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case NEOCLIMA:
     {
       IRNeoclimaAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       neoclima(&ac, on, mode, degC, fan, swingv, swingh, turbo, light, filter,
                sleep);
       break;
@@ -1278,7 +1295,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case PANASONIC_AC:
     {
       IRPanasonicAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       panasonic(&ac, (panasonic_ac_remote_model_t)model, on, mode, degC, fan,
                 swingv, swingh, quiet, turbo, clock);
       break;
@@ -1288,7 +1304,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case SAMSUNG_AC:
     {
       IRSamsungAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       samsung(&ac, on, mode, degC, fan, swingv, quiet, turbo, clean, beep);
       break;
     }
@@ -1297,7 +1312,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case SHARP_AC:
     {
       IRSharpAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       sharp(&ac, on, mode, degC, fan);
       break;
     }
@@ -1306,7 +1320,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case TCL112AC:
     {
       IRTcl112Ac ac(_pin, _inverted, _modulation);
-      ac.begin();
       tcl112(&ac, on, mode, degC, fan, swingv, swingh, turbo, light, econo,
              filter);
       break;
@@ -1316,7 +1329,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case TECO:
     {
       IRTecoAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       teco(&ac, on, mode, degC, fan, swingv, light, sleep);
       break;
     }
@@ -1325,7 +1337,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case TOSHIBA_AC:
     {
       IRToshibaAC ac(_pin, _inverted, _modulation);
-      ac.begin();
       toshiba(&ac, on, mode, degC, fan);
       break;
     }
@@ -1334,7 +1345,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case TROTEC:
     {
       IRTrotecESP ac(_pin, _inverted, _modulation);
-      ac.begin();
       trotec(&ac, on, mode, degC, fan, sleep);
       break;
     }
@@ -1343,7 +1353,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case VESTEL_AC:
     {
       IRVestelAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       vestel(&ac, on, mode, degC, fan, swingv, turbo, filter, sleep, clock);
       break;
     }
@@ -1352,7 +1361,6 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
     case WHIRLPOOL_AC:
     {
       IRWhirlpoolAc ac(_pin, _inverted, _modulation);
-      ac.begin();
       whirlpool(&ac, (whirlpool_ac_remote_model_t)model, on, mode, degC, fan,
                 swingv, turbo, light, sleep, clock);
       break;
