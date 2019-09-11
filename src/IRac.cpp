@@ -151,6 +151,7 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 void IRac::amcor(IRAmcorAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan) {
+  ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
