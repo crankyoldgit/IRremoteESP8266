@@ -7,11 +7,20 @@
 
 */
 #include <FS.h>
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266WebServer.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <ESPmDNS.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <SPIFFS.h>
+#include <Update.h>
+#endif  // ESP32
+#include <WiFiUdp.h>
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <IRremoteESP8266.h>
@@ -40,7 +49,6 @@ IRCoolixAC ac(kIrLed);
 /// ##### End user configuration ######
 
 
-
 struct state {
   uint8_t temperature = 22, fan = 0, operation = 0;
   bool powerStatus;
@@ -55,9 +63,13 @@ state acState;
 // settings
 char deviceName[] = "AC Remote Control";
 
+#if defined(ESP8266)
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdateServer;
-
+#endif  // ESP8266
+#if defined(ESP32)
+WebServer server(80);
+#endif  // ESP32
 
 bool handleFileRead(String path) {
   //  send the right file to the client (if it exists)
@@ -73,7 +85,7 @@ bool handleFileRead(String path) {
       path += ".gz";  // Use the compressed verion
     File file = SPIFFS.open(path, "r");
     //  Open the file
-    size_t sent = server.streamFile(file, contentType);
+    server.streamFile(file, contentType);
     //  Send it to the client
     file.close();
     // Close the file again
@@ -160,12 +172,14 @@ void setup() {
 
   if (!wifiManager.autoConnect(deviceName)) {
     delay(3000);
-    ESP.reset();
+    ESP.restart();
     delay(5000);
   }
 
 
+#if defined(ESP8266)
   httpUpdateServer.setup(&server);
+#endif  // ESP8266
 
 
 
@@ -270,7 +284,7 @@ void setup() {
   server.on("/reset", []() {
     server.send(200, "text/html", "reset");
     delay(100);
-    ESP.reset();
+    ESP.restart();
   });
 
   server.serveStatic("/", SPIFFS, "/", "max-age=86400");
