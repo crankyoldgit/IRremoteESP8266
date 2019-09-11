@@ -2936,7 +2936,7 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
   if (diff && !forceMQTT) {
     debug("Difference in common A/C state detected.");
 #if MQTT_CLIMATE_JSON
-    sendJsonState(next, MqttClimateStat + KEY_JSON);
+    sendJsonState(next, topic_prefix + KEY_JSON);
 #endif  // MQTT_CLIMATE_JSON
   } else {
     debug("NO difference in common A/C state detected.");
