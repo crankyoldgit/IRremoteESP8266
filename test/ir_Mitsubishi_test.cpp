@@ -1206,6 +1206,10 @@ TEST(TestDecodeMitsubishi136, DecodeRealExample) {
       0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0x41, 0x37, 0x04,
       0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi136Bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 3 (High), "
+      "Swing(V): 3 (Highest), Quiet: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 // Self decode a synthetic example.
@@ -1246,5 +1250,183 @@ TEST(TestMitsubishi, Housekeeping) {
 
   ASSERT_EQ("MITSUBISHI136", typeToString(decode_type_t::MITSUBISHI136));
   ASSERT_TRUE(hasACState(decode_type_t::MITSUBISHI136));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI136));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::MITSUBISHI136));
+}
+
+// Tests for IRMitsubishi136 class.
+
+TEST(TestMitsubishi136Class, Power) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestMitsubishi136Class, Temperature) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kMitsubishi136MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kMitsubishi136MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi136MinTemp);
+  EXPECT_EQ(kMitsubishi136MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi136MaxTemp);
+  EXPECT_EQ(kMitsubishi136MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi136MinTemp - 1);
+  EXPECT_EQ(kMitsubishi136MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi136MaxTemp + 1);
+  EXPECT_EQ(kMitsubishi136MaxTemp, ac.getTemp());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestMitsubishi136Class, OperatingMode) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.setMode(kMitsubishi136Auto);
+  EXPECT_EQ(kMitsubishi136Auto, ac.getMode());
+
+  ac.setMode(kMitsubishi136Fan);
+  EXPECT_EQ(kMitsubishi136Fan, ac.getMode());
+
+  ac.setMode(kMitsubishi136Cool);
+  EXPECT_EQ(kMitsubishi136Cool, ac.getMode());
+
+  ac.setMode(kMitsubishi136Heat);
+  EXPECT_EQ(kMitsubishi136Heat, ac.getMode());
+
+  ac.setMode(kMitsubishi136Dry);
+  EXPECT_EQ(kMitsubishi136Dry, ac.getMode());
+
+  ac.setMode(kMitsubishi136Dry + 1);
+  EXPECT_EQ(kMitsubishi136Auto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kMitsubishi136Auto, ac.getMode());
+}
+
+TEST(TestMitsubishi136Class, FanSpeed) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.setFan(kMitsubishi136FanMax);
+  EXPECT_EQ(kMitsubishi136FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi136FanMin);
+  EXPECT_EQ(kMitsubishi136FanMin, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kMitsubishi136FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi136FanMed);
+  EXPECT_EQ(kMitsubishi136FanMed, ac.getFan());
+
+  ac.setFan(kMitsubishi136FanLow);
+  EXPECT_EQ(kMitsubishi136FanLow, ac.getFan());
+
+  ac.setFan(kMitsubishi136FanQuiet);
+  EXPECT_EQ(kMitsubishi136FanQuiet, ac.getFan());
+}
+
+TEST(TestMitsubishi136Class, Quiet) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+}
+
+TEST(TestMitsubishi136Class, SwingV) {
+  IRMitsubishi136 ac(0);
+  ac.begin();
+
+  ac.setSwingV(kMitsubishi136SwingVAuto);
+  EXPECT_EQ(kMitsubishi136SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVAuto + 1);
+  EXPECT_EQ(kMitsubishi136SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVLowest);
+  EXPECT_EQ(kMitsubishi136SwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVLow);
+  EXPECT_EQ(kMitsubishi136SwingVLow, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVHighest);
+  EXPECT_EQ(kMitsubishi136SwingVHighest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVHigh);
+  EXPECT_EQ(kMitsubishi136SwingVHigh, ac.getSwingV());
+}
+
+TEST(TestMitsubishi136Class, toCommon) {
+  IRMitsubishi136 ac(0);
+  ac.setPower(true);
+  ac.setMode(kMitsubishi136Dry);
+  ac.setTemp(22);
+  ac.setFan(kMitsubishi136FanQuiet);
+  ac.setSwingV(kMitsubishi136SwingVAuto);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::MITSUBISHI136, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(22, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kDry, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_TRUE(ac.toCommon().quiet);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestMitsubishi136Class, toCommonMode) {
+  ASSERT_EQ(stdAc::opmode_t::kCool,
+            IRMitsubishi136::toCommonMode(kMitsubishi136Cool));
+  ASSERT_EQ(kMitsubishi136Cool,
+            IRMitsubishi136::convertMode(stdAc::opmode_t::kCool));
+  ASSERT_EQ(stdAc::opmode_t::kDry,
+            IRMitsubishi136::toCommonMode(kMitsubishi136Dry));
+  ASSERT_EQ(kMitsubishi136Dry,
+            IRMitsubishi136::convertMode(stdAc::opmode_t::kDry));
 }

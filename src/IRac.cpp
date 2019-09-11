@@ -104,6 +104,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_MITSUBISHI_AC
     case decode_type_t::MITSUBISHI_AC:
 #endif
+#if SEND_MITSUBISHI136
+    case decode_type_t::MITSUBISHI136:
+#endif
 #if SEND_MITSUBISHIHEAVY
     case decode_type_t::MITSUBISHI_HEAVY_88:
     case decode_type_t::MITSUBISHI_HEAVY_152:
@@ -636,6 +639,29 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->send();
 }
 #endif  // SEND_MITSUBISHI_AC
+
+#if SEND_MITSUBISHI136
+void IRac::mitsubishi136(IRMitsubishi136 *ac,
+                         const bool on, const stdAc::opmode_t mode,
+                         const float degrees, const stdAc::fanspeed_t fan,
+                         const stdAc::swingv_t swingv, const bool quiet) {
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv));
+  // No Horizontal Swing setting available.
+  ac->setQuiet(quiet);
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_MITSUBISHI136
 
 #if SEND_MITSUBISHIHEAVY
 void IRac::mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
@@ -1211,6 +1237,15 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_MITSUBISHI136
+    case MITSUBISHI136:
+    {
+      IRMitsubishi136 ac(_pin, _inverted, _modulation);
+      ac.begin();
+      mitsubishi136(&ac, on, mode, degC, fan, swingv, quiet);
+      break;
+    }
+#endif  // SEND_MITSUBISHI136
 #if SEND_MITSUBISHIHEAVY
     case MITSUBISHI_HEAVY_88:
     {
@@ -1689,6 +1724,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHI136
+      case decode_type_t::MITSUBISHI136: {
+        IRMitsubishi136 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_MITSUBISHI136
 #if DECODE_MITSUBISHIHEAVY
       case decode_type_t::MITSUBISHI_HEAVY_88: {
         IRMitsubishiHeavy88Ac ac(0);
@@ -1985,6 +2027,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHI136
+      case decode_type_t::MITSUBISHI136: {
+        IRMitsubishi136 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHI136
 #if DECODE_MITSUBISHIHEAVY
       case decode_type_t::MITSUBISHI_HEAVY_88: {
         IRMitsubishiHeavy88Ac ac(kGpioUnused);

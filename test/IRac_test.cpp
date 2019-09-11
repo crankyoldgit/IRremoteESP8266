@@ -622,6 +622,30 @@ TEST(TestIRac, Mitsubishi) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Mitsubishi136) {
+  IRMitsubishi136 ac(0);
+  IRac irac(0);
+  IRrecv capture(0);
+  char expected[] =
+      "Power: On, Mode: 5 (DRY), Temp: 22C, Fan: 3 (High), "
+      "Swing(V): 3 (Highest), Quiet: Off";
+
+  ac.begin();
+  irac.mitsubishi136(&ac,
+                     true,                        // Power
+                     stdAc::opmode_t::kDry,       // Mode
+                     22,                          // Celsius
+                     stdAc::fanspeed_t::kMax,     // Fan speed
+                     stdAc::swingv_t::kHighest,   // Veritcal swing
+                     false);                      // Quiet
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MITSUBISHI136, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishi136Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, MitsubishiHeavy88) {
   IRMitsubishiHeavy88Ac ac(0);
   IRac irac(0);

@@ -821,7 +821,6 @@ String IRMitsubishiAC::toString(void) {
   return result;
 }
 
-
 #if SEND_MITSUBISHI136
 // Send a Mitsubishi136 A/C message.
 //
@@ -883,10 +882,306 @@ bool IRrecv::decodeMitsubishi136(decode_results *results, const uint16_t nbits,
     // Header validation: Codes start with 0x23CB26
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
-    // TODO(someone): Add checksum validation if/when supported.
+    if (!IRMitsubishi136::validChecksum(results->state, nbits / 8))
+      return false;
   }
   results->decode_type = MITSUBISHI136;
   results->bits = nbits;
   return true;
 }
 #endif  // DECODE_MITSUBISHI136
+
+// Code to emulate Mitsubishi 136bit A/C IR remote control unit.
+//
+// Equipment it seems compatible with:
+//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
+//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
+
+// Initialise the object.
+IRMitsubishi136::IRMitsubishi136(const uint16_t pin, const bool inverted,
+                                 const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+
+// Reset the state of the remote to a known good state/sequence.
+void IRMitsubishi136::stateReset(void) {
+  // The state of the IR remote in IR code form.
+  // Known good state obtained from:
+  //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=312397579&range=A10
+  remote_state[0] = 0x23;
+  remote_state[1] = 0xCB;
+  remote_state[2] = 0x26;
+  remote_state[3] = 0x21;
+  remote_state[4] = 0x00;
+  remote_state[5] = 0x40;
+  remote_state[6] = 0xC2;
+  remote_state[7] = 0xC7;
+  remote_state[8] = 0x04;
+  remote_state[9] = 0x00;
+  remote_state[10] = 0x00;
+  checksum();  // Calculate the checksum which covers the rest of the state.
+}
+
+// Calculate the checksum for the current internal state of the remote.
+void IRMitsubishi136::checksum(void) {
+  for (uint8_t i = 0; i < 6; i++)
+    remote_state[kMitsubishi136PowerByte + 6 + i] =
+        ~remote_state[kMitsubishi136PowerByte + i];
+}
+
+bool IRMitsubishi136::validChecksum(const uint8_t *data, const uint16_t len) {
+  if (len < kMitsubishi136StateLength) return false;
+  const uint16_t half = (len - kMitsubishi136PowerByte) / 2;
+  for (uint8_t i = 0; i < half; i++)
+    if (data[kMitsubishi136PowerByte + i] !=
+        (uint8_t)~data[kMitsubishi136PowerByte + half + i]) return false;
+  return true;
+}
+
+// Configure the pin for output.
+void IRMitsubishi136::begin(void) { _irsend.begin(); }
+
+#if SEND_MITSUBISHI136
+// Send the current desired state to the IR LED.
+void IRMitsubishi136::send(const uint16_t repeat) {
+  checksum();  // Ensure correct checksum before sending.
+  _irsend.sendMitsubishi136(remote_state, kMitsubishi136StateLength, repeat);
+}
+#endif  // SEND_MITSUBISHI136
+
+// Return a pointer to the internal state date of the remote.
+uint8_t *IRMitsubishi136::getRaw(void) {
+  checksum();
+  return remote_state;
+}
+
+void IRMitsubishi136::setRaw(const uint8_t *data) {
+  for (uint8_t i = 0; i < (kMitsubishi136StateLength - 1); i++) {
+    remote_state[i] = data[i];
+  }
+  checksum();
+}
+
+// Set the requested power state of the A/C to off.
+void IRMitsubishi136::on(void) { setPower(true); }
+
+// Set the requested power state of the A/C to off.
+void IRMitsubishi136::off(void) { setPower(false); }
+
+// Set the requested power state of the A/C.
+void IRMitsubishi136::setPower(bool on) {
+  if (on)
+    remote_state[kMitsubishi136PowerByte] |= kMitsubishi136PowerBit;
+  else
+    remote_state[kMitsubishi136PowerByte] &= ~kMitsubishi136PowerBit;
+}
+
+// Return the requested power state of the A/C.
+bool IRMitsubishi136::getPower(void) {
+  return remote_state[kMitsubishi136PowerByte] & kMitsubishi136PowerBit;
+}
+
+// Set the temp. in deg C
+void IRMitsubishi136::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max((uint8_t)kMitsubishi136MinTemp, degrees);
+  temp = std::min((uint8_t)kMitsubishi136MaxTemp, temp);
+  remote_state[kMitsubishi136TempByte] &= ~kMitsubishi136TempMask;
+  remote_state[kMitsubishi136TempByte] |= ((temp - kMitsubishiAcMinTemp) << 4);
+}
+
+// Return the set temp. in deg C
+uint8_t IRMitsubishi136::getTemp(void) {
+  return (remote_state[kMitsubishi136TempByte] >> 4) + kMitsubishiAcMinTemp;
+}
+
+void IRMitsubishi136::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kMitsubishi136FanMin:
+    case kMitsubishi136FanLow:
+    case kMitsubishi136FanMed:
+    case kMitsubishi136FanMax:
+      remote_state[kMitsubishi136FanByte] &= ~kMitsubishi136FanMask;
+      remote_state[kMitsubishi136FanByte] |= (speed << 1);
+      break;
+    default:
+      setFan(kMitsubishi136FanMax);
+  }
+}
+
+// Return the requested state of the unit's fan.
+uint8_t IRMitsubishi136::getFan(void) {
+  return (remote_state[kMitsubishi136FanByte] & kMitsubishi136FanMask) >> 1;
+}
+
+// Return the requested climate operation mode of the a/c unit.
+uint8_t IRMitsubishi136::getMode(void) {
+  return remote_state[kMitsubishi136ModeByte] & kMitsubishi136ModeMask;
+}
+
+// Set the requested climate operation mode of the a/c unit.
+void IRMitsubishi136::setMode(const uint8_t mode) {
+  // If we get an unexpected mode, default to AUTO.
+  switch (mode) {
+    case kMitsubishi136Fan:
+    case kMitsubishi136Cool:
+    case kMitsubishi136Heat:
+    case kMitsubishi136Auto:
+    case kMitsubishi136Dry:
+      remote_state[kMitsubishi136ModeByte] &= ~kMitsubishi136ModeMask;
+      remote_state[kMitsubishi136ModeByte] |= mode;
+      break;
+    default:
+      setMode(kMitsubishi136Auto);
+  }
+}
+
+// Set the requested vane operation mode of the a/c unit.
+void IRMitsubishi136::setSwingV(const uint8_t position) {
+  // If we get an unexpected mode, default to auto.
+  switch (position) {
+    case kMitsubishi136SwingVLowest:
+    case kMitsubishi136SwingVLow:
+    case kMitsubishi136SwingVHigh:
+    case kMitsubishi136SwingVHighest:
+    case kMitsubishi136SwingVAuto:
+      remote_state[kMitsubishi136SwingVByte] &= ~kMitsubishi136SwingVMask;
+      remote_state[kMitsubishi136SwingVByte] |= position << 4;
+      break;
+    default:
+      setMode(kMitsubishi136SwingVAuto);
+  }
+}
+
+// Return the requested vane operation mode of the a/c unit.
+uint8_t IRMitsubishi136::getSwingV(void) {
+  return (remote_state[kMitsubishi136SwingVByte] &
+          kMitsubishi136SwingVMask) >> 4;
+}
+
+// Emulate a quiet setting. There is no true quiet setting on this a/c
+void IRMitsubishi136::setQuiet(bool on) {
+  if (on)
+    setFan(kMitsubishi136FanQuiet);
+  else if (getQuiet()) setFan(kMitsubishi136FanLow);
+}
+
+// Return the requested power state of the A/C.
+bool IRMitsubishi136::getQuiet(void) {
+  return getFan() == kMitsubishi136FanQuiet;
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRMitsubishi136::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kMitsubishi136Cool;
+    case stdAc::opmode_t::kHeat: return kMitsubishi136Heat;
+    case stdAc::opmode_t::kDry: return kMitsubishi136Dry;
+    case stdAc::opmode_t::kFan: return kMitsubishi136Fan;
+    default: return kMitsubishi136Auto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRMitsubishi136::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin: return kMitsubishi136FanMin;
+    case stdAc::fanspeed_t::kLow: return kMitsubishi136FanLow;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax: return kMitsubishi136FanMax;
+    default: return kMitsubishi136FanMed;
+  }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRMitsubishi136::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest: return kMitsubishi136SwingVHighest;
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle: return kMitsubishi136SwingVHigh;
+    case stdAc::swingv_t::kLow: return kMitsubishi136SwingVLow;
+    case stdAc::swingv_t::kLowest: return kMitsubishi136SwingVLowest;
+    default: return kMitsubishi136SwingVAuto;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRMitsubishi136::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kMitsubishi136Cool: return stdAc::opmode_t::kCool;
+    case kMitsubishi136Heat: return stdAc::opmode_t::kHeat;
+    case kMitsubishi136Dry: return stdAc::opmode_t::kDry;
+    case kMitsubishi136Fan: return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRMitsubishi136::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kMitsubishi136FanMax: return stdAc::fanspeed_t::kMax;
+    case kMitsubishi136FanMed: return stdAc::fanspeed_t::kMedium;
+    case kMitsubishi136FanLow: return stdAc::fanspeed_t::kLow;
+    case kMitsubishi136FanMin: return stdAc::fanspeed_t::kMin;
+    default: return stdAc::fanspeed_t::kMedium;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRMitsubishi136::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kMitsubishi136SwingVHighest: return stdAc::swingv_t::kHighest;
+    case kMitsubishi136SwingVHigh: return stdAc::swingv_t::kHigh;
+    case kMitsubishi136SwingVLow: return stdAc::swingv_t::kLow;
+    case kMitsubishi136SwingVLowest: return stdAc::swingv_t::kLowest;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRMitsubishi136::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::MITSUBISHI136;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->toCommonSwingV(this->getSwingV());
+  result.quiet = this->getQuiet();
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+String IRMitsubishi136::toString(void) {
+  String result = "";
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), F("Power"), false);
+  result += addModeToString(getMode(), kMitsubishi136Auto, kMitsubishi136Cool,
+                            kMitsubishi136Heat, kMitsubishi136Dry,
+                            kMitsubishi136Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kMitsubishi136FanMax,
+                           kMitsubishi136FanLow,  kMitsubishi136FanMax,
+                           kMitsubishi136FanQuiet, kMitsubishi136FanMed);
+  result += addIntToString(getSwingV(), F("Swing(V)"));
+  switch (getSwingV()) {
+    case kMitsubishi136SwingVHighest: result += F(" (Highest)"); break;
+    case kMitsubishi136SwingVHigh: result += F(" (High)"); break;
+    case kMitsubishi136SwingVLow: result += F(" (Low)"); break;
+    case kMitsubishi136SwingVLowest: result += F(" (Lowest)"); break;
+    case kMitsubishi136SwingVAuto: result += F(" (Auto)"); break;
+    default: result += F(" (Unknown)");
+  }
+  result += addBoolToString(getQuiet(), F("Quiet"));
+  return result;
+}
