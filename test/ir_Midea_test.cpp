@@ -742,3 +742,34 @@ TEST(TestMideaACClass, SwingV) {
   ac.setRaw(kMideaACToggleSwingV);
   EXPECT_EQ("Swing(V) Toggle: On", ac.toString());
 }
+
+// Test abusing the protocol for sending 6 arbitary bytes.
+// See https://github.com/crankyoldgit/IRremoteESP8266/issues/887
+TEST(TestDecodeMidea, Issue887) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+  irsend.reset();
+
+  uint64_t hwaddr = 0x1234567890AB;  // 48bits doen't conform to Midea checksum
+
+  irsend.sendMidea(hwaddr);
+  irsend.makeDecodeResult();
+
+  // Test normal operation, it shouldn't match.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_NE(MIDEA, irsend.capture.decode_type);
+  irsend.reset();
+  irsend.sendMidea(hwaddr);
+  irsend.makeDecodeResult();
+  EXPECT_FALSE(irrecv.decodeMidea(&irsend.capture));
+
+  // Now test it with Midea's strict processing turned off!
+  irsend.reset();
+  irsend.sendMidea(hwaddr);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, false));
+  EXPECT_EQ(MIDEA, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
+  EXPECT_EQ(hwaddr, irsend.capture.value);
+}
