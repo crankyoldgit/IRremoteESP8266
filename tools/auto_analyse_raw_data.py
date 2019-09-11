@@ -347,7 +347,10 @@ def generate_irsend_code(defines, normal, bits_str, name="",
   """Output the estimated C++ code to reproduce the IR message."""
   output.write("\nGenerating a VERY rough code outline:\n\n"
                "// WARNING: This probably isn't directly usable."
-               " It's a guide only.\n")
+               " It's a guide only.\n"
+               "// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/"
+               "Adding-support-for-a-new-IR-protocol\n"
+               "// for details of how to include this in the library.\n")
   for line in defines:
     output.write("%s\n" % line)
 

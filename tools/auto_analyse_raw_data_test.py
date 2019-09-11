@@ -264,6 +264,9 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         'Generating a VERY rough code outline:\n'
         '\n'
         "// WARNING: This probably isn't directly usable. It's a guide only.\n"
+        '// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/'
+        'Adding-support-for-a-new-IR-protocol\n'
+        '// for details of how to include this in the library.\n'
         'const uint16_t kFOOHdrMark = 7930;\n'
         'const uint16_t kFOOBitMark = 496;\n'
         'const uint16_t kFOOHdrSpace = 3965;\n'
@@ -387,6 +390,9 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         'Generating a VERY rough code outline:\n'
         '\n'
         "// WARNING: This probably isn't directly usable. It's a guide only.\n"
+        '// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/'
+        'Adding-support-for-a-new-IR-protocol\n'
+        '// for details of how to include this in the library.\n'
         'const uint16_t kFOOHdrMark = 3485;\n'
         'const uint16_t kFOOBitMark = 864;\n'
         'const uint16_t kFOOHdrSpace = 3512;\n'
