@@ -450,7 +450,7 @@ uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
     case stdAc::fanspeed_t::kLow:
       return kDaikinFanMin;
     case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMin + 1;
+      return kDaikinFanMed;
     case stdAc::fanspeed_t::kHigh:
       return kDaikinFanMax - 1;
     case stdAc::fanspeed_t::kMax:
@@ -476,6 +476,7 @@ stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikinFanMax: return stdAc::fanspeed_t::kMax;
     case kDaikinFanMax - 1: return stdAc::fanspeed_t::kHigh;
+    case kDaikinFanMed:
     case kDaikinFanMin + 1: return stdAc::fanspeed_t::kMedium;
     case kDaikinFanMin: return stdAc::fanspeed_t::kLow;
     case kDaikinFanQuiet: return stdAc::fanspeed_t::kMin;
@@ -1137,12 +1138,12 @@ stdAc::state_t IRDaikin2::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingVertical());
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
   result.quiet = this->getQuiet();
-  result.light = this->getLight();
+  result.light = this->getLight() != 3;  // 3 is Off, everything else is On.
   result.turbo = this->getPowerful();
   result.clean = this->getMold();
   result.econo = this->getEcono();
   result.filter = this->getPurify();
-  result.beep = this->getBeep();
+  result.beep = this->getBeep() != 3;  // 3 is Off, everything else is On.
   result.sleep = this->getSleepTimerEnabled() ? this->getSleepTime() : -1;
   // Not supported.
   result.clock = -1;
