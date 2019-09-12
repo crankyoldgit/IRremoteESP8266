@@ -103,6 +103,30 @@ class RawIRMessage():
       code.append("    mark(k%sBitMark);" % name)
     return code
 
+  def add_data_decode_code(self, bin_str, name="", footer=True):
+    """Add the common "data" sequence code to decode the bulk of a message."""
+    # pylint: disable=no-self-use
+    code = []
+    code.extend([
+        "",
+        "  // Data",
+        "  // e.g. data_result.data = 0x%X, nbits = %d" % (int(bin_str, 2),
+                                                           len(bin_str)),
+        "  data_result = matchData(&(results->rawbuf[offset]), nbits,",
+        "                          k%sBitMark, k%sOneSpace," % (name, name),
+        "                          k%sBitMark, k%sZeroSpace);" % (name, name),
+        "                          _tolerance, kMarkExcess, true);",
+        "  offset += data_result.used;",
+        "  if (data_result.success == false) return false;  // Fail",
+        "  data = data_result.data;"])
+    if footer:
+      code.extend([
+          "",
+          "  // Footer",
+          "  if (!matchMark(results->rawbuf[offset++], k%sBitMark))" % name,
+          "    return false;"])
+    return code
+
   def _calc_values(self):
     """Calculate the values which describe the standard timings
        for the protocol."""
@@ -230,7 +254,9 @@ def parse_and_report(rawdata_str, margin, gen_code=False, name="",
                      output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
   defines = []
-  function_code = []
+  code = {}
+  code["send"] = []
+  code["recv"] = []
 
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
@@ -246,12 +272,12 @@ def parse_and_report(rawdata_str, margin, gen_code=False, name="",
     output.write("Sorry, it looks like it is Mark encoded. "
                  "I can't do that yet. Exiting.\n")
     sys.exit(1)
-  total_bits = decode_data(message, defines, function_code, name, output)
+  total_bits = decode_data(message, defines, code, name, output)
   if gen_code:
-    generate_irsend_code(defines, function_code, total_bits, name, output)
+    generate_code(defines, code, total_bits, name, output)
 
 
-def decode_data(message, defines, function_code, name="", output=sys.stdout):
+def decode_data(message, defines, code, name="", output=sys.stdout):
   """Decode the data sequence with the given values in mind."""
   # pylint: disable=too-many-branches,too-many-statements
 
@@ -263,13 +289,31 @@ def decode_data(message, defines, function_code, name="", output=sys.stdout):
   count = 1
   total_bits = ""
   binary_value = add_bit("", "reset")
+  if name:
+    def_name = name
+  else:
+    def_name = "TBD"
 
-  function_code.extend([
+  code["send"].extend([
+      "#if SEND_%s" % def_name.upper(),
       "// Function should be safe up to 64 bits.",
       "void IRsend::send%s(const uint64_t data, const uint16_t"
-      " nbits, const uint16_t repeat) {" % name,
+      " nbits, const uint16_t repeat) {" % def_name,
       "  enableIROut(38);  // A guess. Most common frequency.",
       "  for (uint16_t r = 0; r <= repeat; r++) {"
+  ])
+
+  code["recv"].extend([
+      "#if DECODE_%s" % def_name.upper(),
+      "// Function should be safe up to 64 bits.",
+      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
+      " const bool strict) {" % def_name,
+      "  if (strict && nbits != k%sBits)" % name,
+      "    return false;",
+      "",
+      "  uint16_t offset = kStartOffset;",
+      "  uint64_t data = 0;",
+      "  match_result_t data_result;"
   ])
 
   for usec in message.timings:
@@ -278,22 +322,34 @@ def decode_data(message, defines, function_code, name="", output=sys.stdout):
       state = "HM"
       if binary_value:
         message.display_binary(binary_value)
-        function_code.extend(message.add_data_code(binary_value, name, False))
+        code["send"].extend(message.add_data_code(binary_value, name, False))
+        code["recv"].extend(message.add_data_decode_code(binary_value, name,
+                                                         False))
         total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
       output.write("k%sHdrMark+" % name)
-      function_code.extend(["    // Header", "    mark(k%sHdrMark);" % name])
+      code["send"].extend(["    // Header", "    mark(k%sHdrMark);" % name])
+      code["recv"].extend([
+          "",
+          "  // Header",
+          "  if (!matchMark(results->rawbuf[offset++], k%sHdrMark))" % name,
+          "    return false;"])
+
     elif message.is_hdr_space(usec) and not message.is_one_space(usec):
       if state != "HM":
         if binary_value:
           message.display_binary(binary_value)
           total_bits = total_bits + binary_value
-          function_code.extend(message.add_data_code(binary_value, name))
+          code["send"].extend(message.add_data_code(binary_value, name))
+          code["recv"].extend(message.add_data_decode_code(binary_value, name))
         binary_value = add_bit(binary_value, "reset")
         output.write("UNEXPECTED->")
       state = "HS"
       output.write("k%sHdrSpace+" % name)
-      function_code.append("    space(k%sHdrSpace);" % name)
+      code["send"].append("    space(k%sHdrSpace);" % name)
+      code["recv"].extend([
+          "  if (!matchSpace(results->rawbuf[offset++], k%sHdrSpace))" % name,
+          "    return false;"])
     elif message.is_bit_mark(usec) and count % 2:
       if state not in ("HS", "BS"):
         output.write("k%sBitMark(UNEXPECTED)" % name)
@@ -315,10 +371,18 @@ def decode_data(message, defines, function_code, name="", output=sys.stdout):
       output.write("GAP(%d)" % usec)
       if binary_value:
         message.display_binary(binary_value)
-        function_code.extend(message.add_data_code(binary_value, name))
+        code["send"].extend(message.add_data_code(binary_value, name))
+        code["recv"].extend(message.add_data_decode_code(binary_value, name))
       else:
-        function_code.extend(["    // Gap", "    mark(k%sBitMark);" % name])
-      function_code.append("    space(k%sSpaceGap);" % name)
+        code["send"].extend(["    // Gap", "    mark(k%sBitMark);" % name])
+        code["recv"].extend([
+            "  // Gap",
+            "  if (!matchMark(results->rawbuf[offset++], k%sBitMark))" % name,
+            "    return false;"])
+      code["send"].append("    space(k%sSpaceGap);" % name)
+      code["recv"].extend([
+          "  if (!matchSpace(results->rawbuf[offset++], k%sSpaceGap))" % name,
+          "    return false;"])
       total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
     else:
@@ -327,11 +391,25 @@ def decode_data(message, defines, function_code, name="", output=sys.stdout):
     count = count + 1
   if binary_value:
     message.display_binary(binary_value)
-    function_code.extend(message.add_data_code(binary_value, name))
-  function_code.extend([
+    code["send"].extend(message.add_data_code(binary_value, name))
+    code["recv"].extend(message.add_data_decode_code(binary_value, name))
+  code["send"].extend([
       "    space(kDefaultMessageGap);  // A 100% made up guess of the gap"
-      " between messages.", "  }", "}"
-  ])
+      " between messages.",
+      "  }",
+      "}",
+      "#endif  // SEND_%s" % def_name.upper()])
+  code["recv"].extend([
+      "",
+      "  // Success",
+      "  results->decode_type = decode_type_t::%s;" % def_name.upper(),
+      "  results->bits = nbits;",
+      "  results->value = data;",
+      "  results->command = 0;",
+      "  results->address = 0;",
+      "  return true;",
+      "}",
+      "#endif  // DECODE_%s" % def_name.upper()])
 
   total_bits = total_bits + binary_value
   output.write("\nTotal Nr. of suspected bits: %d\n" % len(total_bits))
@@ -342,28 +420,38 @@ def decode_data(message, defines, function_code, name="", output=sys.stdout):
   return total_bits
 
 
-def generate_irsend_code(defines, normal, bits_str, name="",
-                         output=sys.stdout):
-  """Output the estimated C++ code to reproduce the IR message."""
+def generate_code(defines, code, bits_str, name="", output=sys.stdout):
+  """Output the estimated C++ code to reproduce & decode the IR message."""
+  if name:
+    def_name = name
+  else:
+    def_name = "TBD"
   output.write("\nGenerating a VERY rough code outline:\n\n"
+               "// Copyright 2019 David Conran (crankyoldgit)\n"
+               "// Support for %s protocol\n\n"
+               '#include "IRrecv.h"\n'
+               '#include "IRsend.h"\n'
+               '#include "IRutils.h"\n\n'
                "// WARNING: This probably isn't directly usable."
-               " It's a guide only.\n"
+               " It's a guide only.\n\n"
                "// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/"
                "Adding-support-for-a-new-IR-protocol\n"
-               "// for details of how to include this in the library.\n")
+               "// for details of how to include this in the library."
+               "\n" % def_name)
   for line in defines:
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
     output.write("// DANGER: More than 64 bits detected. A uint64_t for "
                  "'data' won't work!\n")
-  # Display the "normal" version's code incase there are some
+  # Display the "normal" version's send code incase there are some
   # oddities in it.
-  for line in normal:
+  for line in code["send"]:
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
-    output.write("\n\n// Alternative >64 bit Function\n"
+    output.write("\n\n#if SEND_%s\n"
+                 "// Alternative >64 bit Function\n"
                  "void IRsend::send%s(uint8_t data[], uint16_t nbytes,"
                  " uint16_t repeat) {\n"
                  "  // nbytes should typically be k%sStateLength\n"
@@ -382,10 +470,22 @@ def generate_irsend_code(defines, normal, bits_str, name="",
                  " frequency.\n"
                  "                true, 0, 50);\n"
                  "  }\n"
-                 "}\n" % (name, name, name,
-                          ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
-                                      for i in range(0, len(bits_str), 8)),
-                          name, name, name, name, name, name, name))
+                 "}\n"
+                 "#endif  // SEND_%s\n" % (
+                     def_name.upper(), def_name, name, name,
+                     ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
+                                 for i in range(0, len(bits_str), 8)),
+                     name, name, name, name, name, name, name,
+                     def_name.upper()))
+
+  output.write("\n")
+  if len(bits_str) > 64:  # Will it fit in a uint64_t?
+    output.write("// DANGER: More than 64 bits detected. A uint64_t for "
+                 "'data' won't work!\n")
+  # Display the "normal" version's decode code incase there are some
+  # oddities in it.
+  for line in code["recv"]:
+    output.write("%s\n" % line)
 
 
 def main():
