@@ -413,9 +413,11 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
 
   total_bits = total_bits + binary_value
   output.write("\nTotal Nr. of suspected bits: %d\n" % len(total_bits))
-  defines.append("const uint16_t k%sBits = %d;" % (name, len(total_bits)))
+  defines.append("const uint16_t k%sBits = %d;"
+                 "  // Move to IRremoteESP8266.h" % (name, len(total_bits)))
   if len(total_bits) > 64:
-    defines.append("const uint16_t k%sStateLength = %d;" %
+    defines.append("const uint16_t k%sStateLength = %d;"
+                   "  // Move to IRremoteESP8266.h" %
                    (name, len(total_bits) / 8))
   return total_bits
 
