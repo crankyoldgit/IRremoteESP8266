@@ -248,7 +248,7 @@ TEST(TestIRac, Daikin2) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 1 (Low), "
-      "Swing (V): 14 (Auto), Swing (H): 0, Clock: 00:00, On Time: Off, "
+      "Swing (V): 14 (Auto), Swing (H): 170, Clock: 00:00, On Time: Off, "
       "Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), Light: 1 (Bright), "
       "Mold: On, Clean: On, Fresh Air: Off, Eye: Off, Eye Auto: Off, "
       "Quiet: Off, Powerful: Off, Purify: On, Econo: Off";
@@ -260,7 +260,7 @@ TEST(TestIRac, Daikin2) {
                19,                          // Celsius
                stdAc::fanspeed_t::kLow,     // Fan speed
                stdAc::swingv_t::kOff,       // Veritcal swing
-               stdAc::swingh_t::kOff,       // Horizontal swing
+               stdAc::swingh_t::kMiddle,    // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo
                true,                        // Light

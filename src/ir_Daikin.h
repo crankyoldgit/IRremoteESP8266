@@ -194,8 +194,17 @@ const uint8_t kDaikin2SwingVLow = 0x6;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
 const uint8_t kDaikin2SwingVCirculate = 0xD;
 const uint8_t kDaikin2SwingVAuto = 0xE;
-const uint8_t kDaikin2SwingHAuto = 0xBE;
-const uint8_t kDaikin2SwingHSwing = 0xBF;
+// Ref:
+//   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
+const uint8_t kDaikin2SwingHWide =     0xA3;
+const uint8_t kDaikin2SwingHLeftMax =  0xA8;
+const uint8_t kDaikin2SwingHLeft =     0xA9;
+const uint8_t kDaikin2SwingHMiddle =   0xAA;
+const uint8_t kDaikin2SwingHRight =    0xAB;
+const uint8_t kDaikin2SwingHRightMax = 0xAC;
+const uint8_t kDaikin2SwingHAuto =     0xBE;
+const uint8_t kDaikin2SwingHSwing =    0xBF;
+
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
 // Another variant of the protocol for the Daikin ARC433B69 remote.
@@ -499,7 +508,8 @@ class IRDaikin2 {
                             const uint16_t length = kDaikin2StateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);

@@ -2003,7 +2003,7 @@ TEST(TestDaikin2Class, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
-  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_EQ(6 * 60, ac.toCommon().sleep);
   // Unsupported.
   ASSERT_EQ(-1, ac.toCommon().clock);

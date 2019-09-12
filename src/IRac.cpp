@@ -337,7 +337,7 @@ void IRac::daikin2(IRDaikin2 *ac,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVertical(ac->convertSwingV(swingv));
-  ac->setSwingHorizontal((int8_t)swingh >= 0);
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
   ac->setLight(light ? 1 : 3);  // On/High is 1, Off is 3.
   ac->setPowerful(turbo);

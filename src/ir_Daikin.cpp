@@ -1116,11 +1116,30 @@ stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   }
 }
 
+// Convert a standard A/C horizontal swing into its native version.
+uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kAuto: return kDaikin2SwingHSwing;
+    case stdAc::swingh_t::kLeftMax: return kDaikin2SwingHLeftMax;
+    case stdAc::swingh_t::kLeft: return kDaikin2SwingHLeft;
+    case stdAc::swingh_t::kMiddle: return kDaikin2SwingHMiddle;
+    case stdAc::swingh_t::kRight: return kDaikin2SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kDaikin2SwingHRightMax;
+    case stdAc::swingh_t::kWide: return kDaikin2SwingHWide;
+    default: return kDaikin2SwingHAuto;
+  }
+}
+
 // Convert a native horizontal swing to it's common equivalent.
 stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin2SwingHSwing:
-    case kDaikin2SwingHAuto: return stdAc::swingh_t::kAuto;
+    case kDaikin2SwingHSwing: return stdAc::swingh_t::kAuto;
+    case kDaikin2SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
+    case kDaikin2SwingHLeft: return stdAc::swingh_t::kLeft;
+    case kDaikin2SwingHMiddle: return stdAc::swingh_t::kMiddle;
+    case kDaikin2SwingHRight: return stdAc::swingh_t::kRight;
+    case kDaikin2SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kDaikin2SwingHWide: return stdAc::swingh_t::kWide;
     default: return stdAc::swingh_t::kOff;
   }
 }
