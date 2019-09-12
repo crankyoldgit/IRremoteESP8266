@@ -99,7 +99,7 @@ class RawIRMessage():
                                                          nbits))
     code.append("    sendData(k%sBitMark, k%sOneSpace, k%sBitMark, "
                 "k%sZeroSpace, data, %d, true);" %
-                    (name, name, name, name, nbits))
+                (name, name, name, name, nbits))
     if footer:
       code.append("    // Footer")
       code.append("    mark(k%sBitMark);" % name)
