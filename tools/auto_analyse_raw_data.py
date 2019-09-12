@@ -115,7 +115,6 @@ class RawIRMessage():
         "  data_result = matchData(&(results->rawbuf[offset]), nbits,",
         "                          k%sBitMark, k%sOneSpace," % (name, name),
         "                          k%sBitMark, k%sZeroSpace);" % (name, name),
-        "                          _tolerance, kMarkExcess, true);",
         "  offset += data_result.used;",
         "  if (data_result.success == false) return false;  // Fail",
         "  data = data_result.data;"])
