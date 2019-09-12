@@ -93,11 +93,13 @@ class RawIRMessage():
     """Add the common "data" sequence of code to send the bulk of a message."""
     # pylint: disable=no-self-use
     code = []
+    nbits = len(bin_str)
     code.append("    // Data")
     code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
-                                                         len(bin_str)))
+                                                         nbits))
     code.append("    sendData(k%sBitMark, k%sOneSpace, k%sBitMark, "
-                "k%sZeroSpace, data, nbits, true);" % (name, name, name, name))
+                "k%sZeroSpace, data, %d, true);" %
+                    (name, name, name, name, nbits))
     if footer:
       code.append("    // Footer")
       code.append("    mark(k%sBitMark);" % name)
@@ -107,17 +109,19 @@ class RawIRMessage():
     """Add the common "data" sequence code to decode the bulk of a message."""
     # pylint: disable=no-self-use
     code = []
+    nbits = len(bin_str)
     code.extend([
         "",
         "  // Data",
         "  // e.g. data_result.data = 0x%X, nbits = %d" % (int(bin_str, 2),
-                                                           len(bin_str)),
-        "  data_result = matchData(&(results->rawbuf[offset]), nbits,",
+                                                           nbits),
+        "  data_result = matchData(&(results->rawbuf[offset]), %s," % nbits,
         "                          k%sBitMark, k%sOneSpace," % (name, name),
         "                          k%sBitMark, k%sZeroSpace);" % (name, name),
         "  offset += data_result.used;",
         "  if (data_result.success == false) return false;  // Fail",
-        "  data = data_result.data;"])
+        "  data <<= %s;  // Make room for the new bits of data." % nbits,
+        "  data |= data_result.data;"])
     if footer:
       code.extend([
           "",
@@ -375,6 +379,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       else:
         code["send"].extend(["    // Gap", "    mark(k%sBitMark);" % name])
         code["recv"].extend([
+            "",
             "  // Gap",
             "  if (!matchMark(results->rawbuf[offset++], k%sBitMark))" % name,
             "    return false;"])
