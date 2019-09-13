@@ -2497,9 +2497,9 @@ void loop(void) {
                       true, false, false, MQTT_CLIMATE_IR_SEND_ON_RESTART,
                       commonAcTable[i]);
           lastClimateSource = F("MQTT (via retain)");
-          stat_topic = MqttClimate + "_" + String(i + 1) + '/' +
-              MQTT_CLIMATE_STAT + '/';
-      }
+        }
+        stat_topic = MqttClimate + "_" + String(i + 1) + '/' +
+            MQTT_CLIMATE_STAT + '/';
       mqttLog("Finished listening for previous state.");
       }
       lockMqttBroadcast = false;  // Release the lock so we can broadcast again.
