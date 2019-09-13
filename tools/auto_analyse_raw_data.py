@@ -27,7 +27,8 @@ class RawIRMessage():
     self.space_buckets = {}
     self.output = output
     self.verbose = verbose
-    if len(timings) <= 3:
+    self.rawlen = len(timings)
+    if self.rawlen <= 3:
       raise ValueError("Too few message timings supplied.")
     self.timings = timings
     self._generate_timing_candidates()
@@ -305,12 +306,13 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  enableIROut(38);  // A guess. Most common frequency.",
       "  for (uint16_t r = 0; r <= repeat; r++) {"
   ])
-
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
       "// Function should be safe up to 64 bits.",
       "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
       " const bool strict) {" % def_name,
+      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
+      "    return false;  // Too short a message to match.",
       "  if (strict && nbits != k%sBits)" % name,
       "    return false;",
       "",
@@ -423,6 +425,8 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
     defines.append("const uint16_t k%sStateLength = %d;"
                    "  // Move to IRremoteESP8266.h" %
                    (name, len(total_bits) / 8))
+  defines.append("const uint16_t k%sOverhead = %d;" %
+                 (name, message.rawlen - 2 * len(total_bits)))
   return total_bits
 
 
