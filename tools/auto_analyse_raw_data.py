@@ -27,6 +27,7 @@ class RawIRMessage():
     self.space_buckets = {}
     self.output = output
     self.verbose = verbose
+    self.section_count = 1
     self.rawlen = len(timings)
     if self.rawlen <= 3:
       raise ValueError("Too few message timings supplied.")
@@ -95,12 +96,13 @@ class RawIRMessage():
     # pylint: disable=no-self-use
     code = []
     nbits = len(bin_str)
-    code.append("    // Data")
+    code.append("    // Data Section #%d" % self.section_count)
     code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
                                                          nbits))
     code.append("    sendData(k%sBitMark, k%sOneSpace, k%sBitMark, "
-                "k%sZeroSpace, data, %d, true);" %
+                "k%sZeroSpace, send_data, %d, true);" %
                 (name, name, name, name, nbits))
+    code.append("    send_data >>= %d;" % nbits)
     if footer:
       code.append("    // Footer")
       code.append("    mark(k%sBitMark);" % name)
@@ -113,7 +115,7 @@ class RawIRMessage():
     nbits = len(bin_str)
     code.extend([
         "",
-        "  // Data",
+        "  // Data Section #%d" % self.section_count,
         "  // e.g. data_result.data = 0x%X, nbits = %d" % (int(bin_str, 2),
                                                            nbits),
         "  data_result = matchData(&(results->rawbuf[offset]), %s," % nbits,
@@ -304,7 +306,8 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "void IRsend::send%s(const uint64_t data, const uint16_t"
       " nbits, const uint16_t repeat) {" % def_name,
       "  enableIROut(38);  // A guess. Most common frequency.",
-      "  for (uint16_t r = 0; r <= repeat; r++) {"
+      "  for (uint16_t r = 0; r <= repeat; r++) {",
+      "    uint64_t send_data = data;"
   ])
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
@@ -330,6 +333,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
         code["send"].extend(message.add_data_code(binary_value, name, False))
         code["recv"].extend(message.add_data_decode_code(binary_value, name,
                                                          False))
+        message.section_count = message.section_count + 1
         total_bits = total_bits + binary_value
       binary_value = add_bit(binary_value, "reset")
       output.write("k%sHdrMark+" % name)
@@ -347,6 +351,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
           total_bits = total_bits + binary_value
           code["send"].extend(message.add_data_code(binary_value, name))
           code["recv"].extend(message.add_data_decode_code(binary_value, name))
+          message.section_count = message.section_count + 1
         binary_value = add_bit(binary_value, "reset")
         output.write("UNEXPECTED->")
       state = "HS"
@@ -378,6 +383,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
         message.display_binary(binary_value)
         code["send"].extend(message.add_data_code(binary_value, name))
         code["recv"].extend(message.add_data_decode_code(binary_value, name))
+        message.section_count = message.section_count + 1
       else:
         code["send"].extend(["    // Gap", "    mark(k%sBitMark);" % name])
         code["recv"].extend([
@@ -399,6 +405,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
     message.display_binary(binary_value)
     code["send"].extend(message.add_data_code(binary_value, name))
     code["recv"].extend(message.add_data_decode_code(binary_value, name))
+    message.section_count = message.section_count + 1
   code["send"].extend([
       "    space(kDefaultMessageGap);  // A 100% made up guess of the gap"
       " between messages.",
