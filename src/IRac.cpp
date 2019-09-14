@@ -1046,11 +1046,11 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
-// Create a new state base on next & previous states but handle
+// Create a new state base on desired & previous states but handle
 // any state changes for options that need to be toggled.
 // Args:
-//   next: The state_t structure describing the desired a/c state.
-//   prev: Ptr to the previous state_t structure.
+//   desired: The state_t structure describing the desired a/c state.
+//   prev:    Ptr to the previous state_t structure.
 //
 // Returns:
 //   A stdAc::state_t with the needed settings.
