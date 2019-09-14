@@ -69,9 +69,9 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (Auto), Temp: 25C, "
       "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
-      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (Temp)",
       ac.toString());
 }
 
@@ -93,9 +93,9 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 2 (COOL), Temp: 26C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 2 (Cool), Temp: 26C, "
       "Fan: 0 (Auto), Swing: On, Light: On, Clock: 19:18, On Timer: Off, "
-      "Off Timer: Off, Sleep: Off, Super: Off, Command: 7 (SWING)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 7 (Swing)",
       ac.toString());
 }
 
@@ -148,9 +148,9 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (Dry), Temp: 25C, "
       "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
-      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
+      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (On Timer)",
       ac.toString());
 }
 
@@ -206,9 +206,9 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   IRWhirlpoolAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (AUTO), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 1 (Auto), Temp: 25C, "
       "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
-      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (TEMP)",
+      "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (Temp)",
       ac.toString());
 }
 
@@ -556,9 +556,9 @@ TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
   ac.enableOnTimer(true);
 
   EXPECT_EQ(
-      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (DRY), Temp: 25C, "
+      "Model: 1 (DG11J13A), Power toggle: Off, Mode: 3 (Dry), Temp: 25C, "
       "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 07:35, On Timer: 07:40, "
-      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (ONTIMER)",
+      "Off Timer: 08:05, Sleep: Off, Super: Off, Command: 5 (On Timer)",
       ac.toString());
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);
 }

@@ -737,8 +737,8 @@ TEST(TestIRPanasonicAcClass, QuietAndPowerful) {
 TEST(TestIRPanasonicAcClass, HumanReadable) {
   IRPanasonicAc pana(0);
   EXPECT_EQ(
-      "Model: 4 (JKE), Power: Off, Mode: 0 (AUTO), Temp: 0C, "
-      "Fan: 253 (UNKNOWN), Swing (Vertical): 0 (UNKNOWN), Quiet: Off, "
+      "Model: 4 (JKE), Power: Off, Mode: 0 (Auto), Temp: 0C, "
+      "Fan: 253 (UNKNOWN), Swing(V): 0 (UNKNOWN), Quiet: Off, "
       "Powerful: Off, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
   pana.setPower(true);
@@ -748,24 +748,24 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
   pana.setSwingVertical(kPanasonicAcSwingVAuto);
   pana.setPowerful(true);
   EXPECT_EQ(
-      "Model: 4 (JKE), Power: On, Mode: 4 (HEAT), Temp: 30C, "
-      "Fan: 4 (High), Swing (Vertical): 15 (AUTO), Quiet: Off, "
+      "Model: 4 (JKE), Power: On, Mode: 4 (Heat), Temp: 30C, "
+      "Fan: 4 (High), Swing(V): 15 (Auto), Quiet: Off, "
       "Powerful: On, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
   pana.setQuiet(true);
   pana.setModel(kPanasonicLke);
   EXPECT_EQ(
-      "Model: 1 (LKE), Power: Off, Mode: 4 (HEAT), Temp: 30C, "
-      "Fan: 4 (High), Swing (Vertical): 15 (AUTO), "
-      "Swing (Horizontal): 6 (Middle), Quiet: On, Powerful: Off, "
+      "Model: 1 (LKE), Power: Off, Mode: 4 (Heat), Temp: 30C, "
+      "Fan: 4 (High), Swing(V): 15 (Auto), "
+      "Swing(H): 6 (Middle), Quiet: On, Powerful: Off, "
       "Clock: 00:00, On Timer: 00:00, Off Timer: Off",
       pana.toString());
   pana.setModel(kPanasonicDke);
   pana.setSwingHorizontal(kPanasonicAcSwingHRight);
   EXPECT_EQ(
-      "Model: 3 (DKE), Power: Off, Mode: 4 (HEAT), Temp: 30C, "
-      "Fan: 4 (High), Swing (Vertical): 15 (AUTO), "
-      "Swing (Horizontal): 11 (Right), Quiet: On, Powerful: Off, "
+      "Model: 3 (DKE), Power: Off, Mode: 4 (Heat), Temp: 30C, "
+      "Fan: 4 (High), Swing(V): 15 (Auto), "
+      "Swing(H): 11 (Right), Quiet: On, Powerful: Off, "
       "Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
@@ -856,8 +856,8 @@ TEST(TestDecodePanasonicAC, SyntheticExample) {
   IRPanasonicAc pana(0);
   pana.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 4 (JKE), Power: Off, Mode: 3 (COOL), Temp: 25C, "
-      "Fan: 7 (Auto), Swing (Vertical): 15 (AUTO), Quiet: Off, "
+      "Model: 4 (JKE), Power: Off, Mode: 3 (Cool), Temp: 25C, "
+      "Fan: 7 (Auto), Swing(V): 15 (Auto), Quiet: Off, "
       "Powerful: Off, Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
@@ -935,9 +935,9 @@ TEST(TestDecodePanasonicAC, Issue540) {
   pana.setRaw(irsend.capture.state);
   // TODO(crankyoldgit): Try to figure out what model this should be.
   EXPECT_EQ(
-      "Model: 0 (UNKNOWN), Power: On, Mode: 3 (COOL), Temp: 26C, "
-      "Fan: 7 (Auto), Swing (Vertical): 15 (AUTO), "
-      "Swing (Horizontal): 13 (AUTO), Quiet: Off, Powerful: Off, "
+      "Model: 0 (UNKNOWN), Power: On, Mode: 3 (Cool), Temp: 26C, "
+      "Fan: 7 (Auto), Swing(V): 15 (Auto), "
+      "Swing(H): 13 (Auto), Quiet: Off, Powerful: Off, "
       "Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
@@ -1115,8 +1115,8 @@ TEST(TestDecodePanasonicAC, CkpModelSpecifics) {
   IRPanasonicAc pana(0);
   pana.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Model: 5 (CKP), Power: Off, Mode: 4 (HEAT), Temp: 23C, "
-      "Fan: 7 (Auto), Swing (Vertical): 15 (AUTO), Quiet: Off, "
+      "Model: 5 (CKP), Power: Off, Mode: 4 (Heat), Temp: 23C, "
+      "Fan: 7 (Auto), Swing(V): 15 (Auto), Quiet: Off, "
       "Powerful: On, Clock: 00:00, On Timer: 00:00, Off Timer: 00:00",
       pana.toString());
 

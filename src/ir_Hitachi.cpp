@@ -356,8 +356,8 @@ String IRHitachiAc::toString(void) {
   result += addFanToString(getFan(), kHitachiAcFanHigh, kHitachiAcFanLow,
                            kHitachiAcFanAuto, kHitachiAcFanAuto,
                            kHitachiAcFanMed);
-  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
   return result;
 }
 

@@ -308,7 +308,7 @@ stdAc::state_t IRGoodweatherAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRGoodweatherAc::toString() {
+String IRGoodweatherAc::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);

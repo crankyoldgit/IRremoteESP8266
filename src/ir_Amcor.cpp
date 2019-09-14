@@ -311,7 +311,7 @@ stdAc::state_t IRAmcorAc::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRAmcorAc::toString() {
+String IRAmcorAc::toString(void) {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);

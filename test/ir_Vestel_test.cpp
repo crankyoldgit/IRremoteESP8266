@@ -321,7 +321,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   IRVestelAc ac(0);
 
   EXPECT_EQ(
-      "Power: On, Mode: 0 (AUTO), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
   ac.setMode(kVestelAcCool);
@@ -329,7 +329,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setFan(kVestelAcFanHigh);
   EXPECT_FALSE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 11 (High), Sleep: Off, "
+      "Power: On, Mode: 1 (Cool), Temp: 21C, Fan: 11 (High), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
   ac.setSwing(true);
@@ -337,7 +337,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setTurbo(true);
   EXPECT_FALSE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 21C, Fan: 11 (High), Sleep: Off, "
+      "Power: On, Mode: 1 (Cool), Temp: 21C, Fan: 11 (High), Sleep: Off, "
       "Turbo: On, Ion: On, Swing: On",
       ac.toString());
 
@@ -345,7 +345,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setSleep(true);
   ac.setMode(kVestelAcHeat);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (HEAT), Temp: 21C, Fan: 11 (High), Sleep: On, "
+      "Power: On, Mode: 4 (Heat), Temp: 21C, Fan: 11 (High), Sleep: On, "
       "Turbo: Off, Ion: On, Swing: On",
       ac.toString());
   EXPECT_FALSE(ac.isTimeCommand());
@@ -353,7 +353,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setTemp(25);
   ac.setPower(false);
   EXPECT_EQ(
-      "Power: Off, Mode: 4 (HEAT), Temp: 25C, Fan: 11 (High), Sleep: On, "
+      "Power: Off, Mode: 4 (Heat), Temp: 25C, Fan: 11 (High), Sleep: On, "
       "Turbo: Off, Ion: On, Swing: On",
       ac.toString());
   EXPECT_FALSE(ac.isTimeCommand());
@@ -389,7 +389,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.on();
   EXPECT_FALSE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Power: On, Mode: 4 (HEAT), Temp: 25C, Fan: 11 (High), Sleep: On, "
+      "Power: On, Mode: 4 (Heat), Temp: 25C, Fan: 11 (High), Sleep: On, "
       "Turbo: Off, Ion: On, Swing: On",
       ac.toString());
 }
@@ -431,7 +431,7 @@ TEST(TestDecodeVestelAc, NormalDecodeWithStrict) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (AUTO), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
 }
@@ -467,7 +467,7 @@ TEST(TestDecodeVestelAc, RealNormalExample) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (HEAT), Temp: 16C, Fan: 1 (Auto), Sleep: Off, "
+      "Power: On, Mode: 4 (Heat), Temp: 16C, Fan: 1 (Auto), Sleep: Off, "
       "Turbo: Off, Ion: On, Swing: Off",
       ac.toString());
 }

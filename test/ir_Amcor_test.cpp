@@ -69,7 +69,7 @@ TEST(TestDecodeAmcor, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Fan: 4 (Auto), Temp: 24C, Max: Off",
+      "Power: On, Mode: 1 (Cool), Fan: 4 (Auto), Temp: 24C, Max: Off",
       ac.toString());
 }
 
@@ -343,9 +343,9 @@ TEST(TestAmcorAcClass, Max) {
   uint8_t hi[kAmcorStateLength] = {
       0x01, 0x12, 0x40, 0x00, 0x00, 0x30, 0x03, 0x0E};
   ac.setRaw(lo);
-  EXPECT_EQ("Power: On, Mode: 1 (COOL), Fan: 4 (Auto), Temp: 12C, Max: On",
+  EXPECT_EQ("Power: On, Mode: 1 (Cool), Fan: 4 (Auto), Temp: 12C, Max: On",
             ac.toString());
   ac.setRaw(hi);
-  EXPECT_EQ("Power: On, Mode: 2 (HEAT), Fan: 1 (Low), Temp: 32C, Max: On",
+  EXPECT_EQ("Power: On, Mode: 2 (Heat), Fan: 1 (Low), Temp: 32C, Max: On",
             ac.toString());
 }

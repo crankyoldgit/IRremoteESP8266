@@ -300,8 +300,8 @@ TEST(TestIRHitachiAcClass, HumanReadable) {
   ac.setFan(kHitachiAcFanHigh);
   ac.setSwingVertical(true);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (High), "
-      "Swing (Vertical): On, Swing (Horizontal): Off",
+      "Power: On, Mode: 3 (Heat), Temp: 32C, Fan: 5 (High), "
+      "Swing(V): On, Swing(H): Off",
       ac.toString());
   ac.setMode(kHitachiAcCool);
   ac.setTemp(kHitachiAcMinTemp);
@@ -309,8 +309,8 @@ TEST(TestIRHitachiAcClass, HumanReadable) {
   ac.setSwingVertical(false);
   ac.setSwingHorizontal(true);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 2 (Low), "
-      "Swing (Vertical): Off, Swing (Horizontal): On",
+      "Power: On, Mode: 4 (Cool), Temp: 16C, Fan: 2 (Low), "
+      "Swing(V): Off, Swing(H): On",
       ac.toString());
 }
 
@@ -428,8 +428,8 @@ TEST(TestDecodeHitachiAC, NormalRealExample1) {
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (COOL), Temp: 16C, Fan: 1 (Auto), "
-      "Swing (Vertical): Off, Swing (Horizontal): Off",
+      "Power: On, Mode: 4 (Cool), Temp: 16C, Fan: 1 (Auto), "
+      "Swing(V): Off, Swing(H): Off",
       ac.toString());
 }
 
@@ -496,8 +496,8 @@ TEST(TestDecodeHitachiAC, NormalRealExample2) {
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (HEAT), Temp: 32C, Fan: 5 (High), "
-      "Swing (Vertical): Off, Swing (Horizontal): Off",
+      "Power: On, Mode: 3 (Heat), Temp: 32C, Fan: 5 (High), "
+      "Swing(V): Off, Swing(H): Off",
       ac.toString());
 }
 

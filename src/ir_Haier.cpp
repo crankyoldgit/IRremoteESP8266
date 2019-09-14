@@ -454,7 +454,7 @@ String IRHaierAC::toString(void) {
       result += F("Swing");
       break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
@@ -475,10 +475,10 @@ String IRHaierAC::toString(void) {
       result += F("Down");
       break;
     case kHaierAcSwingChg:
-      result += F("Chg");
+      result += F("Change");
       break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   result += addBoolToString(getSleep(), F("Sleep"));
@@ -841,7 +841,7 @@ String IRHaierACYRW02::toString(void) {
       result += F("Turbo");
       break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcYrw02Auto, kHaierAcYrw02Cool,
@@ -864,7 +864,7 @@ String IRHaierACYRW02::toString(void) {
       result += F("High");
       break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   result += addIntToString(getSwing(), F("Swing"));
@@ -889,7 +889,7 @@ String IRHaierACYRW02::toString(void) {
       result += F("Middle");
       break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   result += addBoolToString(getSleep(), F("Sleep"));

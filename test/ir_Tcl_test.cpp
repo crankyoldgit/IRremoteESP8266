@@ -65,8 +65,8 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
   IRTcl112Ac ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 }
 
@@ -107,23 +107,23 @@ TEST(TestTcl112AcClass, Temperature) {
   IRTcl112Ac ac(0);
   ac.setRaw(temp16C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
   ac.setRaw(temp16point5C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 16.5C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 16.5C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
   ac.setRaw(temp19point5C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 19.5C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 19.5C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 
   ac.setTemp(kTcl112AcTempMin);
@@ -203,8 +203,8 @@ TEST(TestTcl112AcClass, OperatingMode) {
       0x07, 0x00, 0x00, 0x00, 0x00, 0x80, 0x48};
   ac.setRaw(automode);
   EXPECT_EQ(
-      "Power: On, Mode: 8 (AUTO), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 8 (Auto), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 }
 
@@ -232,8 +232,8 @@ TEST(TestTcl112AcClass, Power) {
       0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(on);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 
   const uint8_t off[kTcl112AcStateLength] = {
@@ -241,8 +241,8 @@ TEST(TestTcl112AcClass, Power) {
       0x07, 0x40, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(off);
   EXPECT_EQ(
-      "Power: Off, Mode: 3 (COOL), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: Off, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 }
 
@@ -257,13 +257,13 @@ TEST(TestTcl112AcClass, Checksum) {
   EXPECT_EQ(0xCB, ac.calcChecksum(temp16C));
   ac.setRaw(temp16C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 31C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
   EXPECT_EQ(0xBC, ac.calcChecksum(temp31C));
 
@@ -456,7 +456,7 @@ TEST(TestDecodeTcl112Ac, Issue744) {
   IRTcl112Ac ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (COOL), Temp: 23C, Fan: 0 (Auto), Econo: Off, "
-      "Health: Off, Light: On, Turbo: Off, Swing (H): Off, Swing (V): Off",
+      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 0 (Auto), Econo: Off, "
+      "Health: Off, Light: On, Turbo: Off, Swing(H): Off, Swing(V): Off",
       ac.toString());
 }

@@ -985,8 +985,9 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeededButError) {
 TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
-      "Power: On, Mode: 8 (HEAT), Temp: 22C, Fan: 6 (Quiet), Vane: AUTO, "
-      "Wide Vane: 3, Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Power: On, Mode: 8 (Heat), Temp: 22C, Fan: 6 (Quiet), "
+      "Swing(V): 0 (Auto), Swing(H): 3, "
+      "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
       irMitsu.toString());
 }
 
@@ -1207,7 +1208,7 @@ TEST(TestDecodeMitsubishi136, DecodeRealExample) {
       0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi136Bits);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 20C, Fan: 3 (High), "
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 3 (High), "
       "Swing(V): 3 (Highest), Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -1494,8 +1495,8 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
   IRMitsubishiAC ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 24 (COOL), Temp: 24C, Fan: 0 (Auto), "
-      "Vane: AUTO, Wide Vane: 3, "
+      "Power: Off, Mode: 24 (Cool), Temp: 24C, Fan: 0 (Auto), "
+      "Swing(V): 0 (Auto), Swing(H): 3, "
       "Time: 00:00, On timer: 00:00, Off timer: 00:00, Timer: -",
       ac.toString());
 }

@@ -493,7 +493,7 @@ String IRNeoclimaAc::toString(void) {
     case kNeoclimaButton8CHeat:   result += F("8C Heat"); break;
     case kNeoclimaButtonTurbo:    result += F("Turbo"); break;
     default:
-      result += F("Unknown");
+      result += F("UNKNOWN");
   }
   result += ')';
   return result;

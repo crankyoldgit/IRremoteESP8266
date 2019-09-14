@@ -763,10 +763,10 @@ String IRPanasonicAc::toString(void) {
   result += addFanToString(getFan(), kPanasonicAcFanMax, kPanasonicAcFanMin,
                            kPanasonicAcFanAuto, kPanasonicAcFanAuto,
                            kPanasonicAcFanMed);
-  result += addIntToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addIntToString(getSwingVertical(), F("Swing(V)"));
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kPanasonicAcSwingVHighest:
       result += F(" (Full Up)");
@@ -787,10 +787,10 @@ String IRPanasonicAc::toString(void) {
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += addIntToString(getSwingHorizontal(), F("Swing (Horizontal)"));
+      result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
-          result += F(" (AUTO)");
+          result += F(" (Auto)");
           break;
         case kPanasonicAcSwingHFullLeft:
           result += F(" (Full Left)");

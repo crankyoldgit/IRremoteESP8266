@@ -784,24 +784,15 @@ String IRMitsubishiAC::toString(void) {
                            kMitsubishiAcFanRealMax - 3,
                            kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
                            kMitsubishiAcFanRealMax - 2);
-  result += F(", Vane: ");
+  result += addIntToString(this->getVane(), F("Swing(V)"));
   switch (this->getVane()) {
-    case MITSUBISHI_AC_VANE_AUTO:
-      result += F("AUTO");
-      break;
-    case MITSUBISHI_AC_VANE_AUTO_MOVE:
-      result += F("AUTO MOVE");
-      break;
-    default:
-      result += uint64ToString(this->getVane());
+    case kMitsubishiAcVaneAuto: result += F(" (Auto)"); break;
+    case kMitsubishiAcVaneAutoMove: result += F(" (Auto Move)"); break;
   }
-  result += F(", Wide Vane: ");
+  result += addIntToString(this->getWideVane(), F("Swing(H)"));
   switch (this->getWideVane()) {
     case kMitsubishiAcWideVaneAuto:
-      result += F("AUTO");
-      break;
-    default:
-      result += uint64ToString(this->getWideVane());
+      result += F(" (Auto)");
   }
   result += addLabeledString(minsToString(getClock() * 10), F("Time"));
   result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));
@@ -1190,7 +1181,7 @@ String IRMitsubishi136::toString(void) {
     case kMitsubishi136SwingVLow: result += F(" (Low)"); break;
     case kMitsubishi136SwingVLowest: result += F(" (Lowest)"); break;
     case kMitsubishi136SwingVAuto: result += F(" (Auto)"); break;
-    default: result += F(" (Unknown)");
+    default: result += F(" (UNKNOWN)");
   }
   result += addBoolToString(getQuiet(), F("Quiet"));
   return result;

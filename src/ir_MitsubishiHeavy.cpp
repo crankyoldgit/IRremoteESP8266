@@ -496,7 +496,7 @@ String IRMitsubishiHeavy152Ac::toString(void) {
       result += F("UNKNOWN");
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), F("Swing (V)"));
+  result += addIntToString(getSwingVertical(), F("Swing(V)"));
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy152SwingVAuto:
       result += F(" (Auto)");
@@ -522,7 +522,7 @@ String IRMitsubishiHeavy152Ac::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing (H)"));
+  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy152SwingHAuto:
       result += F(" (Auto)");
@@ -943,7 +943,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
       result += F("UNKNOWN");
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), F("Swing (V)"));
+  result += addIntToString(getSwingVertical(), F("Swing(V)"));
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy88SwingVAuto:
       result += F(" (Auto)");
@@ -969,7 +969,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
     default:
       result += F(" (UNKNOWN)");
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing (H)"));
+  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy88SwingHAuto:
       result += F(" (Auto)");
