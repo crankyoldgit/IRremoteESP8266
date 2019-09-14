@@ -841,15 +841,10 @@ void IRac::samsung(IRSamsungAc *ac,
                    const float degrees,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const bool quiet, const bool turbo, const bool clean,
-<<<<<<< HEAD
-                   const bool beep, const bool forcepower) {
-  ac->begin();
-  ac->stateReset(forcepower);
-=======
                    const bool beep, const bool prevpower,
                    const bool forcepower) {
+  ac->begin();
   ac->stateReset(forcepower, prevpower);
->>>>>>> Improve Common A/C api
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1246,13 +1241,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case ELECTRA_AC:
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      electra(&ac, on, mode, degC, fan, swingv, swingh);
-=======
-      ac.begin();
       electra(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
               send.swingh);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_ELECTRA_AC
@@ -1261,15 +1251,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRFujitsuAC ac(_pin, (fujitsu_ac_remote_model_t)send.model, _inverted,
                      _modulation);
-<<<<<<< HEAD
-      fujitsu(&ac, (fujitsu_ac_remote_model_t)model, on, mode, degC, fan,
-              swingv, swingh, quiet, turbo, econo, filter, clean);
-=======
-      ac.begin();
       fujitsu(&ac, (fujitsu_ac_remote_model_t)send.model, on, send.mode, degC,
               send.fanspeed, send.swingv, send.swingh, send.quiet, send.turbo,
-              send.econo);
->>>>>>> Improve Common A/C api
+              send.econo, send.filter, send.clean);
       break;
     }
 #endif  // SEND_FUJITSU_AC
@@ -1277,31 +1261,19 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case GOODWEATHER:
     {
       IRGoodweatherAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      goodweather(&ac, on, mode, degC, fan, swingv, turbo, light, sleep);
-=======
-      ac.begin();
       goodweather(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                   send.turbo, send.light, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_GOODWEATHER
 #if SEND_GREE
     case GREE:
     {
-<<<<<<< HEAD
-      IRGreeAC ac(_pin, (gree_ac_remote_model_t)model, _inverted, _modulation);
-      gree(&ac, (gree_ac_remote_model_t)model, on, mode, degC, fan, swingv,
-           turbo, light, clean, sleep);
-=======
       IRGreeAC ac(_pin, (gree_ac_remote_model_t)send.model, _inverted,
                   _modulation);
-      ac.begin();
       gree(&ac, (gree_ac_remote_model_t)send.model, on, send.mode, degC,
            send.fanspeed, send.swingv, send.turbo, send.light, send.clean,
            send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_GREE
@@ -1309,13 +1281,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC:
     {
       IRHaierAC ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      haier(&ac, on, mode, degC, fan, swingv, filter, sleep, clock);
-=======
-      ac.begin();
       haier(&ac, on, send.mode, degC, send.fanspeed, send.swingv, send.filter,
             send.sleep, send.clock);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_HAIER_AC
@@ -1323,13 +1290,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC_YRW02:
     {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      haierYrwo2(&ac, on, mode, degC, fan, swingv, turbo, filter, sleep);
-=======
-      ac.begin();
       haierYrwo2(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                  send.turbo, send.filter, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02
@@ -1337,13 +1299,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HITACHI_AC:
     {
       IRHitachiAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      hitachi(&ac, on, mode, degC, fan, swingv, swingh);
-=======
-      ac.begin();
       hitachi(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
               send.swingh);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_HITACHI_AC
@@ -1351,15 +1308,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case KELVINATOR:
     {
       IRKelvinatorAC ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      kelvinator(&ac, on, mode, degC, fan, swingv, swingh, quiet, turbo,
-                 light, filter, clean);
-=======
-      ac.begin();
       kelvinator(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                  send.swingh, send.quiet, send.turbo, send.light, send.filter,
                  send.clean);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_KELVINATOR
@@ -1367,13 +1318,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case MIDEA:
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      midea(&ac, on, mode, celsius, degrees, fan, swingv, sleep);
-=======
-      ac.begin();
       midea(&ac, on, send.mode, send.celsius, send.degrees, send.fanspeed,
             send.swingv, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_MIDEA
@@ -1381,13 +1327,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case MITSUBISHI_AC:
     {
       IRMitsubishiAC ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      mitsubishi(&ac, on, mode, degC, fan, swingv, swingh, quiet, clock);
-=======
-      ac.begin();
       mitsubishi(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                  send.swingh, send.quiet, send.clock);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
@@ -1395,7 +1336,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case MITSUBISHI136:
     {
       IRMitsubishi136 ac(_pin, _inverted, _modulation);
-      mitsubishi136(&ac, on, mode, degC, fan, swingv, quiet);
+      mitsubishi136(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
+                    send.quiet);
       break;
     }
 #endif  // SEND_MITSUBISHI136
@@ -1403,28 +1345,16 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case MITSUBISHI_HEAVY_88:
     {
       IRMitsubishiHeavy88Ac ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      mitsubishiHeavy88(&ac, on, mode, degC, fan, swingv, swingh,
-                        turbo, econo, clean);
-=======
-      ac.begin();
       mitsubishiHeavy88(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                         send.swingh, send.turbo, send.econo, send.clean);
->>>>>>> Improve Common A/C api
       break;
     }
     case MITSUBISHI_HEAVY_152:
     {
       IRMitsubishiHeavy152Ac ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      mitsubishiHeavy152(&ac, on, mode, degC, fan, swingv, swingh,
-                         quiet, turbo, econo, filter, clean, sleep);
-=======
-      ac.begin();
       mitsubishiHeavy152(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                          send.swingh, send.quiet, send.turbo, send.econo,
                          send.filter, send.clean, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_MITSUBISHIHEAVY
@@ -1432,14 +1362,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case NEOCLIMA:
     {
       IRNeoclimaAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      neoclima(&ac, on, mode, degC, fan, swingv, swingh, turbo, light, filter,
-               sleep);
-=======
-      ac.begin();
       neoclima(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
                send.swingh, send.turbo, send.light, send.filter, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_NEOCLIMA
@@ -1447,15 +1371,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case PANASONIC_AC:
     {
       IRPanasonicAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      panasonic(&ac, (panasonic_ac_remote_model_t)model, on, mode, degC, fan,
-                swingv, swingh, quiet, turbo, clock);
-=======
-      ac.begin();
       panasonic(&ac, (panasonic_ac_remote_model_t)send.model, on, send.mode,
                 degC, send.fanspeed, send.swingv, send.swingh, send.quiet,
                 send.turbo, send.clock);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_PANASONIC_AC
@@ -1463,13 +1381,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SAMSUNG_AC:
     {
       IRSamsungAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      samsung(&ac, on, mode, degC, fan, swingv, quiet, turbo, clean, beep);
-=======
-      ac.begin();
       samsung(&ac, on, send.mode, degC, send.fanspeed, send.swingv, send.quiet,
               send.turbo, send.clean, send.beep, prev->power);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_SAMSUNG_AC
@@ -1477,12 +1390,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SHARP_AC:
     {
       IRSharpAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      sharp(&ac, on, mode, degC, fan);
-=======
-      ac.begin();
       sharp(&ac, on, send.mode, degC, send.fanspeed);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_SHARP_AC
@@ -1490,14 +1398,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TCL112AC:
     {
       IRTcl112Ac ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      tcl112(&ac, on, mode, degC, fan, swingv, swingh, turbo, light, econo,
-             filter);
-=======
-      ac.begin();
       tcl112(&ac, on, send.mode, degC, send.fanspeed, send.swingv, send.swingh,
              send.turbo, send.light, send.econo, send.filter);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_TCL112AC
@@ -1505,13 +1407,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TECO:
     {
       IRTecoAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      teco(&ac, on, mode, degC, fan, swingv, light, sleep);
-=======
-      ac.begin();
       teco(&ac, on, send.mode, degC, send.fanspeed, send.swingv, send.light,
            send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_TECO
@@ -1519,12 +1416,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TOSHIBA_AC:
     {
       IRToshibaAC ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      toshiba(&ac, on, mode, degC, fan);
-=======
-      ac.begin();
       toshiba(&ac, on, send.mode, degC, send.fanspeed);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_TOSHIBA_AC
@@ -1532,12 +1424,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TROTEC:
     {
       IRTrotecESP ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      trotec(&ac, on, mode, degC, fan, sleep);
-=======
-      ac.begin();
       trotec(&ac, on, send.mode, degC, send.fanspeed, send.sleep);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_TROTEC
@@ -1545,13 +1432,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case VESTEL_AC:
     {
       IRVestelAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      vestel(&ac, on, mode, degC, fan, swingv, turbo, filter, sleep, clock);
-=======
-      ac.begin();
       vestel(&ac, on, send.mode, degC, send.fanspeed, send.swingv, send.turbo,
              send.filter, send.sleep, send.clock);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_VESTEL_AC
@@ -1559,15 +1441,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case WHIRLPOOL_AC:
     {
       IRWhirlpoolAc ac(_pin, _inverted, _modulation);
-<<<<<<< HEAD
-      whirlpool(&ac, (whirlpool_ac_remote_model_t)model, on, mode, degC, fan,
-                swingv, turbo, light, sleep, clock);
-=======
-      ac.begin();
       whirlpool(&ac, (whirlpool_ac_remote_model_t)send.model, on, send.mode,
                 degC, send.fanspeed, send.swingv, send.turbo, send.light,
                 send.sleep, send.clock);
->>>>>>> Improve Common A/C api
       break;
     }
 #endif  // SEND_WHIRLPOOL_AC
