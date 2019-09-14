@@ -42,8 +42,8 @@ IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   _pin = pin;
   _inverted = inverted;
   _modulation = use_modulation;
-  initState(&desired);
-  _prev = desired;
+  initState(&next);
+  _prev = next;
 }
 
 void IRac::initState(stdAc::state_t *state,
@@ -1046,11 +1046,11 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
-// Create a new state base on desired & previous states but handle
+// Create a new state base on next & previous states but handle
 // any state changes for options that need to be toggled.
 // Args:
-//   desired: The state_t structure describing the desired a/c state.
-//   prev:    Ptr to the previous state_t structure.
+//   next: The state_t structure describing the desired a/c state.
+//   prev: Ptr to the previous state_t structure.
 //
 // Returns:
 //   A stdAc::state_t with the needed settings.
@@ -1458,8 +1458,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 // Returns:
 //   boolean: True, if accepted/converted/attempted. False, if unsupported.
 bool IRac::sendAc(void) {
-  bool success = this->sendAc(desired, &_prev);
-  _prev = desired;
+  bool success = this->sendAc(next, &_prev);
+  _prev = next;
   return success;
 }
 

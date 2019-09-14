@@ -80,7 +80,7 @@ class IRac {
   static String fanspeedToString(const stdAc::fanspeed_t speed);
   static String swingvToString(const stdAc::swingv_t swingv);
   static String swinghToString(const stdAc::swingh_t swingh);
-  stdAc::state_t desired;
+  stdAc::state_t next;
 #ifndef UNIT_TEST
 
  private:
