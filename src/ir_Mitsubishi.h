@@ -6,6 +6,8 @@
 // Supports:
 //   Brand: Mitsubishi,  Model: TV
 //   Brand: Mitsubishi,  Model: HC3000 Projector
+//   Brand: Mitsubishi,  Model: MS-GK24VA A/C
+//   Brand: Mitsubishi,  Model: KM14A 0179213 remote
 //   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
 //   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
 
