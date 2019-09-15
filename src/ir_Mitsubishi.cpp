@@ -58,6 +58,7 @@ const uint16_t kMitsubishiAcOneSpace = 1300;
 const uint16_t kMitsubishiAcZeroSpace = 420;
 const uint16_t kMitsubishiAcRptMark = 440;
 const uint16_t kMitsubishiAcRptSpace = 17100;
+const uint8_t  kMitsubishiAcExtraTolerance = 5;
 
 // Mitsubishi 136 bit A/C
 // Ref:
@@ -299,13 +300,16 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     while (!headerFound &&
            offset < (results->rawlen - (kMitsubishiACBits * 2 + 2))) {
       headerFound =
-          matchMark(results->rawbuf[offset++], kMitsubishiAcHdrMark) &&
-          matchSpace(results->rawbuf[offset++], kMitsubishiAcHdrSpace);
+          matchMark(results->rawbuf[offset], kMitsubishiAcHdrMark) &&
+          matchSpace(results->rawbuf[offset + 1], kMitsubishiAcHdrSpace);
+      offset += 2;
     }
     if (!headerFound) {
       DPRINTLN("Header mark not found.");
-      failure = true;
+      return false;
     }
+    DPRINT("Header mark found at #");
+    DPRINTLN(offset - 2);
     // Decode byte-by-byte:
     match_result_t data_result;
     for (uint8_t i = 0; i < kMitsubishiACStateLength && !failure; i++) {
@@ -313,7 +317,8 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
       data_result =
           matchData(&(results->rawbuf[offset]), 8, kMitsubishiAcBitMark,
                     kMitsubishiAcOneSpace, kMitsubishiAcBitMark,
-                    kMitsubishiAcZeroSpace, _tolerance, kMarkExcess, false);
+                    kMitsubishiAcZeroSpace,
+                    _tolerance + kMitsubishiAcExtraTolerance, 0, false);
       if (data_result.success == false) {
         failure = true;
         DPRINT("Byte decode failed at #");
@@ -347,8 +352,9 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
       while (!repeatMarkFound &&
              offset < (results->rawlen - (kMitsubishiACBits * 2 + 4))) {
         repeatMarkFound =
-            matchMark(results->rawbuf[offset++], kMitsubishiAcRptMark) &&
-            matchSpace(results->rawbuf[offset++], kMitsubishiAcRptSpace);
+            matchMark(results->rawbuf[offset], kMitsubishiAcRptMark) &&
+            matchSpace(results->rawbuf[offset + 1], kMitsubishiAcRptSpace);
+            offset += 2;
       }
       if (!repeatMarkFound) {
         DPRINTLN("First attempt failure and repeat mark not found.");
@@ -376,7 +382,8 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
         data_result =
             matchData(&(results->rawbuf[offset]), 8, kMitsubishiAcBitMark,
                       kMitsubishiAcOneSpace, kMitsubishiAcBitMark,
-                      kMitsubishiAcZeroSpace, _tolerance, kMarkExcess, false);
+                      kMitsubishiAcZeroSpace,
+                      _tolerance + kMitsubishiAcExtraTolerance, 0, false);
         if (data_result.success == false ||
             data_result.data != results->state[i]) {
           DPRINTLN("Repeat payload error.");
@@ -388,7 +395,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
   } while (failure && rep <= kMitsubishiACMinRepeat);
   results->decode_type = MITSUBISHI_AC;
   results->bits = kMitsubishiACStateLength * 8;
-  return true;
+  return !failure;
 }
 #endif  // DECODE_MITSUBISHI_AC
 
