@@ -1348,11 +1348,13 @@ TEST(TestDaikin2Class, Swing) {
   ASSERT_EQ(kDaikin2SwingVBreeze, ac.getSwingVertical());
   ac.setSwingVertical(kDaikin2SwingVCirculate);
   ASSERT_EQ(kDaikin2SwingVCirculate, ac.getSwingVertical());
+  ac.setSwingVertical(kDaikin2SwingVSwing);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.getSwingVertical());
   ac.setSwingVertical(kDaikin2SwingVAuto);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
   ac.setSwingVertical(0);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
-  ac.setSwingVertical(7);
+  ac.setSwingVertical(20);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
   ac.setSwingVertical(255);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
@@ -3026,4 +3028,14 @@ TEST(TestDaikin2ClassNew, Issue908) {
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
   // Either 3 or 4 is fine as they both map to stdAc::swingv_t::kMiddle.
   ASSERT_EQ(4, ac.convertSwingV(stdAc::swingv_t::kMiddle));
+  // Native "swing" should convert to common's "auto".
+  ac.setSwingVertical(kDaikin2SwingVSwing);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.convertSwingV(stdAc::swingv_t::kAuto));
+  // Native "auto" should convert to common's "off".
+  ac.setSwingVertical(kDaikin2SwingVAuto);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.convertSwingV(stdAc::swingv_t::kOff));
 }

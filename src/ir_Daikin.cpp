@@ -843,6 +843,7 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
     case 4:
     case 5:
     case kDaikin2SwingVLow:
+    case kDaikin2SwingVSwing:
     case kDaikin2SwingVBreeze:
     case kDaikin2SwingVCirculate:
     case kDaikin2SwingVAuto:
