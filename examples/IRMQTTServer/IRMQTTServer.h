@@ -31,7 +31,7 @@
 #define BAUD_RATE 115200  // Serial port Baud rate.
 
 // Change if you need multiple independent send gpios & topics. (MQTT only)
-const uint8_t kNrOfIrTxGpios = 5;
+const uint8_t kNrOfIrTxGpios = 1;
 // Default GPIO the IR LED is connected to/controlled by. GPIO 4 = D2.
 // For an ESP-01 we suggest you use RX/GPIO3/Pin 7. i.e. kDefaultIrLed = 3
 // Note: A value of -1 means unused.
@@ -99,7 +99,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE_CMND "cmnd"  // Sub-topic for the climate command topics.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
-#define MQTT_CLIMATE_JSON true
+#define MQTT_CLIMATE_JSON false
 // Do we send an IR message when we reboot and recover the existing A/C state?
 // If set to `false` you may miss requested state changes while the ESP was
 // down. If set to `true`, it will resend the previous desired state sent to the
@@ -111,7 +111,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 // #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
 // Enable(true)/Disable(false) the option to send a MQTT Discovery message for
 // the AirCon/Climate system to Home Assistant. `false` saves ~1.5k.
-#define MQTT_DISCOVERY_ENABLE false
+#define MQTT_DISCOVERY_ENABLE true
 #endif  // MQTT_ENABLE
 
 // ------------------------ IR Capture Settings --------------------------------
@@ -219,7 +219,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // See `isSerialGpioUsedByIr()`.
 // Note: Debug costs ~6k of program space.
 #ifndef DEBUG
-#define DEBUG true  // Change to 'true' for serial debug output.
+#define DEBUG false  // Change to 'true' for serial debug output.
 #endif  // DEBUG
 
 // ----------------- End of User Configuration Section -------------------------
