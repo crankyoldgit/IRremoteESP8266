@@ -445,18 +445,12 @@ uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kDaikinFanQuiet;
-    case stdAc::fanspeed_t::kLow:
-      return kDaikinFanMin;
-    case stdAc::fanspeed_t::kMedium:
-      return kDaikinFanMed;
-    case stdAc::fanspeed_t::kHigh:
-      return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kDaikinFanMax;
-    default:
-      return kDaikinFanAuto;
+    case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
+    case stdAc::fanspeed_t::kLow: return kDaikinFanMin;
+    case stdAc::fanspeed_t::kMedium: return kDaikinFanMed;
+    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
+    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
+    default: return kDaikinFanAuto;
   }
 }
 
@@ -856,6 +850,33 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
 
 uint8_t IRDaikin2::getSwingVertical() { return remote_state[18] & 0x0F; }
 
+// Convert a standard A/C vertical swing into its native version.
+uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return (uint8_t)position + kDaikin2SwingVHigh;
+    default:
+      return kDaikin2SwingVAuto;
+  }
+}
+
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
+    case kDaikin2SwingVHigh + 1: return stdAc::swingv_t::kHigh;
+    case kDaikin2SwingVHigh + 2:
+    case kDaikin2SwingVHigh + 3: return stdAc::swingv_t::kMiddle;
+    case kDaikin2SwingVLow - 1: return stdAc::swingv_t::kLow;
+    case kDaikin2SwingVLow: return stdAc::swingv_t::kLowest;
+    default: return stdAc::swingv_t::kAuto;
+  }
+}
+
 void IRDaikin2::setSwingHorizontal(const uint8_t position) {
   remote_state[17] = position;
 }
@@ -1087,33 +1108,6 @@ uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
-}
-
-// Convert a standard A/C vertical swing into its native version.
-uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
-  switch (position) {
-    case stdAc::swingv_t::kHighest:
-    case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle:
-    case stdAc::swingv_t::kLow:
-    case stdAc::swingv_t::kLowest:
-      return (uint8_t)position + kDaikin2SwingVHigh;
-    default:
-      return kDaikin2SwingVAuto;
-  }
-}
-
-// Convert a native vertical swing to it's common equivalent.
-stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
-  switch (setting) {
-    case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
-    case kDaikin2SwingVHigh + 1: return stdAc::swingv_t::kHigh;
-    case kDaikin2SwingVHigh + 2:
-    case kDaikin2SwingVHigh + 3: return stdAc::swingv_t::kMiddle;
-    case kDaikin2SwingVLow - 1: return stdAc::swingv_t::kLow;
-    case kDaikin2SwingVLow: return stdAc::swingv_t::kLowest;
-    default: return stdAc::swingv_t::kAuto;
-  }
 }
 
 // Convert a standard A/C horizontal swing into its native version.

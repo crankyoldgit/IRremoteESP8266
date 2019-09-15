@@ -191,9 +191,9 @@ const uint8_t kDaikin2LightMask =       0b00110000;  // Byte[7]
 const uint8_t kDaikin2BeepMask =        0b11000000;  // Byte[7]
 const uint8_t kDaikin2SwingVHigh = 0x1;
 const uint8_t kDaikin2SwingVLow = 0x6;
+const uint8_t kDaikin2SwingVAuto = 0x8;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
 const uint8_t kDaikin2SwingVCirculate = 0xD;
-const uint8_t kDaikin2SwingVAuto = 0xE;
 // Ref:
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
 const uint8_t kDaikin2SwingHWide =     0xA3;
