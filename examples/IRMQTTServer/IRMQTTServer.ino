@@ -1113,9 +1113,12 @@ void handleAdmin(void) {
       kUrlSendDiscovery, F("Send MQTT Discovery"),
       F("Send a Climate MQTT discovery message to Home Assistant.<br><br>"));
 #endif  // MQTT_DISCOVERY_ENABLE
+#if MQTT_CLEAR_ENABLE
   html += htmlButton(
-      kUrlClearMqtt, F("Clear Climates"),
-      F("Clear all saved climates for this device & reboot.<br>"));
+      kUrlClearMqtt, F("Clear data saved to MQTT"),
+      F("Clear all saved climate & discovery messages for this device & "
+        "reboot.<br><br>"));
+#endif  // MQTT_CLEAR_ENABLE
 #endif  // MQTT_ENABLE
   html += htmlButton(
       kUrlReboot, F("Reboot"),
@@ -1293,7 +1296,7 @@ void doRestart(const char* str, const bool serial_only) {
   delay(5000);  // Enough time to ensure we don't return.
 }
 
-#if MQTT_ENABLE
+#if MQTT_ENABLE && MQTT_CLEAR_ENABLE
 // Clear any MQTT message that we might have set retain on.
 bool clearMqttSavedStates(const String topic_base) {
   String channelStr = "";
@@ -1344,7 +1347,7 @@ void handleClearMqtt(void) {
   clearMqttSavedStates(MqttClimate);
   doRestart("Rebooting...");
 }
-#endif  // MQTT_ENABLE
+#endif  // MQTT_ENABLE && MQTT_CLEAR_ENABLE
 
 // Reset web page
 void handleReset(void) {
@@ -1363,8 +1366,10 @@ void handleReset(void) {
     htmlEnd());
   // Do the reset.
 #if MQTT_ENABLE
+#if MQTT_CLEAR_ENABLE
   mqttLog("Clearing all saved climate settings from MQTT.");
   clearMqttSavedStates(MqttClimate);
+#endif  // MQTT_CLEAR_ENABLE
   mqttLog("Wiping all saved config settings.");
 #endif  // MQTT_ENABLE
   if (mountSpiffs()) {
@@ -2090,8 +2095,10 @@ void setup(void) {
   // Parse and update the new gpios.
   server.on(kUrlGpioSet, handleGpioSetting);
 #if MQTT_ENABLE
+#if MQTT_CLEAR_ENABLE
   // Clear settings saved to MQTT as retained messages.
   server.on(kUrlClearMqtt, handleClearMqtt);
+#endif  // MQTT_CLEAR_ENABLE
 #if MQTT_DISCOVERY_ENABLE
   // MQTT Discovery url
   server.on(kUrlSendDiscovery, handleSendMqttDiscovery);
