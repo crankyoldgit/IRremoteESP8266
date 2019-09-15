@@ -938,9 +938,12 @@ void IRMitsubishi136::checksum(void) {
 bool IRMitsubishi136::validChecksum(const uint8_t *data, const uint16_t len) {
   if (len < kMitsubishi136StateLength) return false;
   const uint16_t half = (len - kMitsubishi136PowerByte) / 2;
-  for (uint8_t i = 0; i < half; i++)
-    if (data[kMitsubishi136PowerByte + i] !=
-        (uint8_t)~data[kMitsubishi136PowerByte + half + i]) return false;
+  for (uint8_t i = 0; i < half; i++) {
+    // This variable is needed to avoid the warning: (known compiler issue)
+    // warning: comparison of promoted ~unsigned with unsigned [-Wsign-compare]
+    const uint8_t inverted = ~data[kMitsubishi136PowerByte + half + i];
+    if (data[kMitsubishi136PowerByte + i] != inverted) return false;
+  }
   return true;
 }
 

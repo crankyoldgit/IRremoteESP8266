@@ -225,7 +225,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.0-alpha"
+#define _MY_VERSION_ "v1.4.1-alpha"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -275,7 +275,9 @@ const char* kUrlWipe = "/reset";
 
 #if MQTT_ENABLE
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
-const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
+// How long should we listen to recover for previous states?
+// Default is 5 seconds per IR TX GPIOs (channels) used.
+const uint32_t kStatListenPeriodMs = 5 * 1000 * kNrOfIrTxGpios;  // mSeconds
 const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
 const char* kSequenceDelimiter = ";";
 const char kPauseChar = 'P';
@@ -393,6 +395,6 @@ bool cmpClimate(const stdAc::state_t a, const stdAc::state_t b);
 bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
                  const String topic_prefix, const bool retain,
                  const bool forceMQTT, const bool forceIR,
-                 const bool enableIR = true);
+                 const bool enableIR = true, IRac *commonAc = NULL);
 bool decodeCommonAc(const decode_results *decode);
 #endif  // EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
