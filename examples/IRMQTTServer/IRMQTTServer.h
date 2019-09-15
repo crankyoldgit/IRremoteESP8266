@@ -109,9 +109,15 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 
 #define QOS 1  // MQTT broker should queue up any unreceived messages for us
 // #define QOS 0  // MQTT broker WON'T queue up messages for us. Fire & Forget.
+
 // Enable(true)/Disable(false) the option to send a MQTT Discovery message for
-// the AirCon/Climate system to Home Assistant. `false` saves ~1.5k.
+// the AirCon/Climate system to Home Assistant. Note: `false` saves ~1.5k.
 #define MQTT_DISCOVERY_ENABLE true
+// Enable(true)/Disable(false) the option to clear any settings stored in MQTT
+// for this device's current config. e.g. Climate states using MQTT retain.
+// In theory, you shouldn't need this as you can always clean up by hand, hence
+// it is disabled by default. Note: `false` saves ~1.2k.
+#define MQTT_CLEAR_ENABLE false
 #endif  // MQTT_ENABLE
 
 // ------------------------ IR Capture Settings --------------------------------
@@ -225,7 +231,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.1-alpha"
+#define _MY_VERSION_ "v1.4.2-alpha"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -272,6 +278,7 @@ const char* kUrlGpioSet = "/gpio/set";
 const char* kUrlInfo = "/info";
 const char* kUrlReboot = "/quitquitquit";
 const char* kUrlWipe = "/reset";
+const char* kUrlClearMqtt = "/clear_retained";
 
 #if MQTT_ENABLE
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
@@ -297,6 +304,12 @@ const char* kClimateTopics =
     "|" KEY_JSON
 #endif  // MQTT_CLIMATE_JSON
     ")<br>";
+const char* kMqttTopics[] = {
+    KEY_PROTOCOL, KEY_MODEL, KEY_POWER, KEY_MODE, KEY_TEMP, KEY_FANSPEED,
+    KEY_SWINGV, KEY_SWINGH, KEY_QUIET, KEY_TURBO, KEY_LIGHT, KEY_BEEP,
+    KEY_ECONO, KEY_SLEEP, KEY_FILTER, KEY_CLEAN, KEY_CELSIUS, KEY_RESEND,
+    KEY_JSON};  // KEY_JSON needs to be the last one.
+
 
 void mqttCallback(char* topic, byte* payload, unsigned int length);
 String listOfCommandTopics(void);
