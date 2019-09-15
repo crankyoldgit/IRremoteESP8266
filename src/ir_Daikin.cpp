@@ -820,14 +820,17 @@ void IRDaikin2::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  remote_state[28] &= 0x0F;
-  remote_state[28] |= (fanset << 4);
+  remote_state[kDaikin2FanByte] &= 0x0F;
+  remote_state[kDaikin2FanByte] |= (fanset << 4);
 }
 
 uint8_t IRDaikin2::getFan() {
-  uint8_t fan = remote_state[28] >> 4;
-  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
-  return fan;
+  const uint8_t fan = remote_state[kDaikin2FanByte] >> 4;
+  switch (fan) {
+    case kDaikinFanAuto:
+    case kDaikinFanQuiet: return fan;
+    default: return fan - 2;
+  }
 }
 
 uint8_t IRDaikin2::getTemp() { return remote_state[26] / 2; }
@@ -859,8 +862,8 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kLow:
     case stdAc::swingv_t::kLowest:
       return (uint8_t)position + kDaikin2SwingVHigh;
-    default:
-      return kDaikin2SwingVAuto;
+    case stdAc::swingv_t::kAuto: return kDaikin2SwingVSwing;
+    default: return kDaikin2SwingVAuto;
   }
 }
 
@@ -873,6 +876,7 @@ stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
     case kDaikin2SwingVHigh + 3: return stdAc::swingv_t::kMiddle;
     case kDaikin2SwingVLow - 1: return stdAc::swingv_t::kLow;
     case kDaikin2SwingVLow: return stdAc::swingv_t::kLowest;
+    case kDaikin2SwingVAuto: return stdAc::swingv_t::kOff;
     default: return stdAc::swingv_t::kAuto;
   }
 }
@@ -1194,6 +1198,9 @@ String IRDaikin2::toString() {
       break;
     case kDaikin2SwingVAuto:
       result += F(" (Auto)");
+      break;
+    case kDaikin2SwingVSwing:
+      result += F(" (Swing)");
       break;
     default:
       result += F(" (Unknown)");

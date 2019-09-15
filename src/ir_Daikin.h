@@ -100,8 +100,8 @@ const uint8_t kDaikinMaxTemp = 32;  // Celsius
 const uint8_t kDaikinFanMin = 1;
 const uint8_t kDaikinFanMed = 3;
 const uint8_t kDaikinFanMax = 5;
-const uint8_t kDaikinFanAuto = 0b1010;
-const uint8_t kDaikinFanQuiet = 0b1011;
+const uint8_t kDaikinFanAuto = 0b1010;  // 10 / 0xA
+const uint8_t kDaikinFanQuiet = 0b1011;  // 11 / 0xB
 const uint16_t kDaikinHeaderLength = 5;
 const uint8_t kDaikinSections = 3;
 const uint8_t kDaikinSection1Length = 8;
@@ -177,7 +177,6 @@ const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
 const uint8_t kDaikin2Tolerance = 5;  // Extra percentage tolerance
-
 const uint8_t kDaikin2BitSleepTimer =   0b00100000;
 const uint8_t kDaikin2BitPurify =       0b00010000;
 const uint8_t kDaikin2BitEye =          0b00000010;
@@ -191,9 +190,12 @@ const uint8_t kDaikin2LightMask =       0b00110000;  // Byte[7]
 const uint8_t kDaikin2BeepMask =        0b11000000;  // Byte[7]
 const uint8_t kDaikin2SwingVHigh = 0x1;
 const uint8_t kDaikin2SwingVLow = 0x6;
+const uint8_t kDaikin2SwingVSwing = 0x7;
 const uint8_t kDaikin2SwingVAuto = 0x8;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
 const uint8_t kDaikin2SwingVCirculate = 0xD;
+const uint8_t kDaikin2FanByte = 28;
+
 // Ref:
 //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
 const uint8_t kDaikin2SwingHWide =     0xA3;
