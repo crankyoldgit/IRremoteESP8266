@@ -275,7 +275,9 @@ const char* kUrlWipe = "/reset";
 
 #if MQTT_ENABLE
 const uint32_t kBroadcastPeriodMs = MQTTbroadcastInterval * 1000;  // mSeconds.
-const uint32_t kStatListenPeriodMs = 5 * 1000;  // mSeconds
+// How long should we listen to recover for previous states?
+// Default is 5 seconds per IR TX GPIOs (channels) used.
+const uint32_t kStatListenPeriodMs = 5 * 1000 * kNrOfIrTxGpios;  // mSeconds
 const int32_t kMaxPauseMs = 10000;  // 10 Seconds.
 const char* kSequenceDelimiter = ";";
 const char kPauseChar = 'P';
