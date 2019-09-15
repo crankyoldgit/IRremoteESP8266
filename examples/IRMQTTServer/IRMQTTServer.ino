@@ -1113,6 +1113,9 @@ void handleAdmin(void) {
       kUrlSendDiscovery, F("Send MQTT Discovery"),
       F("Send a Climate MQTT discovery message to Home Assistant.<br><br>"));
 #endif  // MQTT_DISCOVERY_ENABLE
+  html += htmlButton(
+      kUrlClearMqtt, F("Clear Climates"),
+      F("Clear all saved climates for this device & reboot.<br>"));
 #endif  // MQTT_ENABLE
   html += htmlButton(
       kUrlReboot, F("Reboot"),
@@ -1290,6 +1293,59 @@ void doRestart(const char* str, const bool serial_only) {
   delay(5000);  // Enough time to ensure we don't return.
 }
 
+#if MQTT_ENABLE
+// Clear any MQTT message that we might have set retain on.
+bool clearMqttSavedStates(const String topic_base) {
+  String channelStr = "";
+  bool success = true;
+  // Clear the Last Will & Testament.
+  success &= mqtt_client.publish(MqttLwt.c_str(), "", true);
+#if MQTT_DISCOVERY_ENABLE
+  // Clear the HA climate discovery message.
+  success &= mqtt_client.publish(MqttDiscovery.c_str(), "", true);
+#endif  // MQTT_DISCOVERY_ENABLE
+  for (size_t channel = 0;
+       channel <= kNrOfIrTxGpios;
+       channelStr = '_' + String(channel++)) {
+    for (size_t i = 0; i < sizeof(kMqttTopics) / sizeof(char*); i++) {
+      // Sending a retained "" message to the topic should clear previous values
+      // in theory.
+      String topic = topic_base + channelStr + '/' + F(MQTT_CLIMATE_STAT) +
+          '/' + String(kMqttTopics[i]);
+      success &= mqtt_client.publish(topic.c_str(), "", true);
+    }
+    channelStr = '_' + String(channel);
+  }
+  String logmesg = "Removing all possible settings saved in MQTT for '" +
+      topic_base + "' ";
+  logmesg += success ? F("succeeded") : F("failed");
+  mqttLog(logmesg.c_str());
+  return success;
+}
+
+// Clear settings from MQTT web page
+void handleClearMqtt(void) {
+#if HTML_PASSWORD_ENABLE
+  if (!server.authenticate(HttpUsername, HttpPassword)) {
+    debug(("Basic HTTP authentication failure for " +
+           String(kUrlClearMqtt)).c_str());
+    return server.requestAuthentication();
+  }
+#endif
+  server.send(200, "text/html",
+    htmlHeader(F("Clearing saved info from MQTT"),
+               F("Removing all saved settings for this device from "
+                 "MQTT.")) +
+    "<p>Device restarting. Try connecting in a few seconds.</p>" +
+    addJsReloadUrl(kUrlRoot, 10, true) +
+    htmlEnd());
+  // Do the clearing.
+  mqttLog("Clearing all saved settings from MQTT.");
+  clearMqttSavedStates(MqttClimate);
+  doRestart("Rebooting...");
+}
+#endif  // MQTT_ENABLE
+
 // Reset web page
 void handleReset(void) {
 #if HTML_PASSWORD_ENABLE
@@ -1307,6 +1363,8 @@ void handleReset(void) {
     htmlEnd());
   // Do the reset.
 #if MQTT_ENABLE
+  mqttLog("Clearing all saved climate settings from MQTT.");
+  clearMqttSavedStates(MqttClimate);
   mqttLog("Wiping all saved config settings.");
 #endif  // MQTT_ENABLE
   if (mountSpiffs()) {
@@ -1978,7 +2036,7 @@ void setup(void) {
   if (channel_re.length() == 1) {
     channel_re = "";
   } else {
-    channel_re[channel_re.length() - 1] = '\0';
+    channel_re.remove(channel_re.length() - 1, 1);  // Remove the last char.
     channel_re += F(")?");
   }
 #if IR_RX
@@ -2032,6 +2090,8 @@ void setup(void) {
   // Parse and update the new gpios.
   server.on(kUrlGpioSet, handleGpioSetting);
 #if MQTT_ENABLE
+  // Clear settings saved to MQTT as retained messages.
+  server.on(kUrlClearMqtt, handleClearMqtt);
 #if MQTT_DISCOVERY_ENABLE
   // MQTT Discovery url
   server.on(kUrlSendDiscovery, handleSendMqttDiscovery);
