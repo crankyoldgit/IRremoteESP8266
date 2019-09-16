@@ -584,9 +584,13 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   for line in code["recv"]:
     output.write("%s\n" % line)
   # Display the > 64bit version's decode code
-  output.write("\n// Note: This should be 64+ bit safe.\n")
-  for line in code["recv64+"]:
-    output.write("%s\n" % line)
+  if len(bits_str) > 64:  # Is it too big for a uint64_t?
+    output.write("\n// Note: This should be 64+ bit safe.\n")
+    if len(bits_str) % 8:
+      output.write("\n// WARNING: Data is not a multiple of bytes. "
+                   "This won't work!\n")
+    for line in code["recv64+"]:
+      output.write("%s\n" % line)
 
 
 def main():
