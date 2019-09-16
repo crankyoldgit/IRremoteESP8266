@@ -100,6 +100,11 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
 #define MQTT_CLIMATE_JSON false
+// Use Home Assistant-style operation modes.
+// i.e. Change the climate mode to "off" when turning the power "off".
+// See: https://www.home-assistant.io/components/climate.mqtt/#modes
+// Change to false, if your home automation system doesn't like this.
+#define MQTT_CLIMATE_HA_MODE true
 // Do we send an IR message when we reboot and recover the existing A/C state?
 // If set to `false` you may miss requested state changes while the ESP was
 // down. If set to `true`, it will resend the previous desired state sent to the
@@ -328,7 +333,8 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
 #if MQTT_CLIMATE_JSON
 stdAc::state_t jsonToState(const stdAc::state_t current, const char *str);
 void sendJsonState(const stdAc::state_t state, const String topic,
-                   const bool retain = false, const bool ha_mode = true);
+                   const bool retain = false,
+                   const bool ha_mode = MQTT_CLIMATE_HA_MODE);
 #endif  // MQTT_CLIMATE_JSON
 #endif  // MQTT_ENABLE
 #if REPORT_VCC
