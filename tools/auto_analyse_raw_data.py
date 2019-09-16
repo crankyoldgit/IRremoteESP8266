@@ -133,6 +133,38 @@ class RawIRMessage():
           "    return false;"])
     return code
 
+  def add_data_byte_code(self, bin_str, name="", ambles=None):
+    """Add the code to send the data from an array."""
+    # pylint: disable=no-self-use
+    code = []
+    nbits = len(bin_str)
+    nbytes = nbits / 8
+    if ambles is None:
+      ambles = {}
+    firstmark = ambles.get("firstmark", 0)
+    firstspace = ambles.get("firstspace", 0)
+    lastmark = ambles.get("lastmark", "k%sBitMark" % name)
+    lastspace = ambles.get("lastspace", "kDefaultMessageGap")
+    code.append(
+        "    // Data Section #%d" % self.section_count)
+    if nbits % 8:
+      code.append("    // DANGER: Nr. of bits is not a multiple of 8. "
+                  "This section won't work!")
+    code.extend([
+        "    // e.g.",
+        "    //   bits = %d; bytes = %d;" % (nbits, nbytes),
+        "    //   *(data + pos) = {0x%s};" % (
+            ", 0x".join("%02X" % int(bin_str[i:i + 8], 2)
+                        for i in range(0, len(bin_str), 8))),
+        "    sendGeneric(%s, %s," % (firstmark, firstspace),
+        "                k%sBitMark, k%sOneSpace," % (name, name),
+        "                k%sBitMark, k%sZeroSpace," % (name, name),
+        "                %s, %s," % (lastmark, lastspace),
+        "                data + pos, %d,  // Bytes" % nbytes,
+        "                k%sFreq);" % name,
+        "    pos += %d;  // Adjust by how many bytes of data we sent" % nbytes])
+    return code
+
   def add_data_byte_decode_code(self, bin_str, name="", ambles=None):
     """Add the common byte-wise "data" sequence decode code."""
     # pylint: disable=no-self-use
@@ -148,7 +180,6 @@ class RawIRMessage():
     firstspace = ambles.get("firstspace", 0)
     lastmark = ambles.get("lastmark", "k%sBitMark" % name)
     lastspace = ambles.get("lastspace", "kDefaultMessageGap")
-    ambles.clear()
 
     code.extend([
         "",
@@ -166,8 +197,7 @@ class RawIRMessage():
         "                      %s, %s, true);" % (lastmark, lastspace),
         "  if (used == 0) return false;  // We failed to find any data.",
         "  offset += used;  // Adjust for how much of the message we read.",
-        "  pos += %d;  // Adjust by how many bytes of data we read" %
-        (nbits / 8)])
+        "  pos += %d;  // Adjust by how many bytes of data we read" % nbytes])
     return code
 
   def _calc_values(self):
@@ -301,6 +331,7 @@ def parse_and_report(rawdata_str, margin, gen_code=False, name="",
   defines = []
   code = {}
   code["send"] = []
+  code["send64+"] = []
   code["recv"] = []
   code["recv64+"] = []
 
@@ -349,6 +380,19 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  enableIROut(k%sFreq);" % name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint64_t send_data = data;"])
+  code["send64+"].extend([
+      "// Args:",
+      "//   data: An array of bytes containing the IR command.",
+      "//         It is assumed to be in MSB order for this code.\n"
+      "//   nbytes: Nr. of bytes of data in the array."
+      " (>=k%sStateLength)" % name,
+      "//   repeat: Nr. of times the message is to be repeated.",
+      "//",
+      "// Status: ALPHA / Untested.",
+      "void IRsend::send%s(const uint8_t data[], const uint16_t nbytes,"
+      " const uint16_t repeat) {" % def_name,
+      "  for (uint16_t r = 0; r < repeat; r++) {",
+      "    uint16_t pos = 0;"])
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
       "// Function should be safe up to 64 bits.",
@@ -404,9 +448,12 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       if binary64_value:
         code_info["lastspace"] = "k%sHdrSpace" % name
         message.section_count = message.section_count - 1
+        code["send64+"].extend(message.add_data_byte_code(binary64_value, name,
+                                                          code_info))
         code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
                                                                  name,
                                                                  code_info))
+        code_info.clear()
         binary64_value = binary_value
         message.section_count = message.section_count + 1
       if state != "HM":
@@ -447,9 +494,12 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       output.write("GAP(%d)" % usec)
       code_info["lastspace"] = "k%sSpaceGap" % name
       if binary64_value:
+        code["send64+"].extend(message.add_data_byte_code(binary64_value, name,
+                                                          code_info))
         code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
                                                                  name,
                                                                  code_info))
+        code_info.clear()
       if binary_value:
         message.display_binary(binary_value)
         code["send"].extend(message.add_data_code(binary_value, name))
@@ -473,8 +523,11 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       state = "UNK"
     count = count + 1
   if binary64_value:
+    code["send64+"].extend(message.add_data_byte_code(binary64_value, name,
+                                                      code_info))
     code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
                                                              name, code_info))
+    code_info.clear()
   if binary_value:
     message.display_binary(binary_value)
     code["send"].extend(message.add_data_code(binary_value, name))
@@ -483,6 +536,10 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
   code["send"].extend([
       "    space(kDefaultMessageGap);  // A 100% made up guess of the gap"
       " between messages.",
+      "  }",
+      "}",
+      "#endif  // SEND_%s" % def_name.upper()])
+  code["send64+"].extend([
       "  }",
       "}",
       "#endif  // SEND_%s" % def_name.upper()])
@@ -549,32 +606,17 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
-    output.write("\n\n#if SEND_%s\n"
-                 "// Alternative >64 bit Function\n"
-                 "void IRsend::send%s(uint8_t data[], uint16_t nbytes,"
-                 " uint16_t repeat) {\n"
-                 "  // nbytes should typically be k%sStateLength\n"
-                 "  // data should typically be:\n"
-                 "  //   uint8_t data[k%sStateLength] = {0x%s};\n"
-                 "  // data[] is assumed to be in MSB order for this code.\n"
-                 "  for (uint16_t r = 0; r <= repeat; r++) {\n"
-                 "    sendGeneric(k%sHdrMark, k%sHdrSpace,\n"
-                 "                k%sBitMark, k%sOneSpace,\n"
-                 "                k%sBitMark, k%sZeroSpace,\n"
-                 "                k%sBitMark,\n"
-                 "                kDefaultMessageGap, // 100%% made-up guess at"
-                 " the message gap.\n"
-                 "                data, nbytes,\n"
-                 "                k%sFreq, true, 0, 50);\n"
-                 "  }\n"
-                 "}\n"
-                 "#endif  // SEND_%s\n" % (
-                     def_name.upper(), def_name, name, name,
-                     ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
-                                 for i in range(0, len(bits_str), 8)),
-                     name, name, name, name, name, name, name, name,
-                     def_name.upper()))
-
+    code["send64+"] = [
+        "",
+        "#if SEND_%s" % def_name.upper(),
+        "// Alternative >64bit function to send %s messages" % def_name.upper(),
+        "// Where data is:",
+        "//   uint8_t data[k%sStateLength] = {0x%s};" % (
+            name, ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
+                              for i in range(0, len(bits_str), 8))),
+        "//"] + code["send64+"]
+    for line in code["send64+"]:
+      output.write("%s\n" % line)
   output.write("\n")
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
     output.write("// DANGER: More than 64 bits detected. A uint64_t for "
