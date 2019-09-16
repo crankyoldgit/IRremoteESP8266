@@ -133,6 +133,43 @@ class RawIRMessage():
           "    return false;"])
     return code
 
+  def add_data_byte_decode_code(self, bin_str, name="", ambles=None):
+    """Add the common byte-wise "data" sequence decode code."""
+    # pylint: disable=no-self-use
+    code = []
+    nbits = len(bin_str)
+    nbytes = nbits / 8
+    if nbits % 8:
+      code.append("  // WARNING: Nr. of bits is not a multiple of 8. "
+                  "This section won't work!")
+    if ambles is None:
+      ambles = {}
+    firstmark = ambles.get("firstmark", 0)
+    firstspace = ambles.get("firstspace", 0)
+    lastmark = ambles.get("lastmark", "k%sBitMark" % name)
+    lastspace = ambles.get("lastspace", "kDefaultMessageGap")
+    ambles.clear()
+
+    code.extend([
+        "",
+        "  // Data Section #%d" % self.section_count,
+        "  // e.g.",
+        "  //   bits = %d; bytes = %d;" % (nbits, nbytes),
+        "  //   *(results->state + pos) = {0x%s};" % (
+            ", 0x".join("%02X" % int(bin_str[i:i + 8], 2)
+                        for i in range(0, len(bin_str), 8))),
+        "  used = matchGeneric(results->rawbuf + offset, results->state + pos,",
+        "                      results->rawlen - offset, %d," % nbits,
+        "                      %s, %s," % (firstmark, firstspace),
+        "                      k%sBitMark, k%sOneSpace," % (name, name),
+        "                      k%sBitMark, k%sZeroSpace," % (name, name),
+        "                      %s, %s, true);" % (lastmark, lastspace),
+        "  if (used == 0) return false;  // We failed to find any data.",
+        "  offset += used;  // Adjust for how much of the message we read.",
+        "  pos += %d;  // Adjust by how many bytes of data we read" %
+        (nbits / 8)])
+    return code
+
   def _calc_values(self):
     """Calculate the values which describe the standard timings
        for the protocol."""
@@ -254,6 +291,8 @@ def dump_constants(message, defines, name="", output=sys.stdout):
       count = count + 1
       output.write("k%sSpaceGap%d = %d\n" % (name, count, gap))
       defines.append("const uint16_t k%sSpaceGap%d = %d;" % (name, count, gap))
+  defines.append("const uint16_t k%sFreq = 38000;  "
+                 "// Hz. (Guessing the most common frequency.)" % name)
 
 
 def parse_and_report(rawdata_str, margin, gen_code=False, name="",
@@ -263,6 +302,7 @@ def parse_and_report(rawdata_str, margin, gen_code=False, name="",
   code = {}
   code["send"] = []
   code["recv"] = []
+  code["recv64+"] = []
 
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
@@ -292,9 +332,10 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
 
   output.write("\nDecoding protocol based on analysis so far:\n\n")
   state = ""
+  code_info = {}
   count = 1
   total_bits = ""
-  binary_value = add_bit("", "reset")
+  binary_value = binary64_value = add_bit("", "reset")
   if name:
     def_name = name
   else:
@@ -305,10 +346,9 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "// Function should be safe up to 64 bits.",
       "void IRsend::send%s(const uint64_t data, const uint16_t"
       " nbits, const uint16_t repeat) {" % def_name,
-      "  enableIROut(38);  // A guess. Most common frequency.",
+      "  enableIROut(k%sFreq);" % name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
-      "    uint64_t send_data = data;"
-  ])
+      "    uint64_t send_data = data;"])
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
       "// Function should be safe up to 64 bits.",
@@ -321,10 +361,23 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "",
       "  uint16_t offset = kStartOffset;",
       "  uint64_t data = 0;",
-      "  match_result_t data_result;"
-  ])
+      "  match_result_t data_result;"])
+  code["recv64+"].extend([
+      "#if DECODE_%s" % def_name.upper(),
+      "// Function should be safe over 64 bits.",
+      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
+      " const bool strict) {" % def_name,
+      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
+      "    return false;  // Too short a message to match.",
+      "  if (strict && nbits != k%sBits)" % name,
+      "    return false;",
+      "",
+      "  uint16_t offset = kStartOffset;",
+      "  uint16_t pos = 0;",
+      "  uint16_t used = 0;"])
 
   for usec in message.timings:
+    # Handle header marks.
     if (message.is_hdr_mark(usec) and count % 2 and
         not message.is_bit_mark(usec)):
       state = "HM"
@@ -334,7 +387,9 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
         code["recv"].extend(message.add_data_decode_code(binary_value, name,
                                                          False))
         message.section_count = message.section_count + 1
+        code_info["lastmark"] = "k%sHdrMark" % name
         total_bits = total_bits + binary_value
+      code_info["firstmark"] = "k%sHdrMark" % name
       binary_value = add_bit(binary_value, "reset")
       output.write("k%sHdrMark+" % name)
       code["send"].extend(["    // Header", "    mark(k%sHdrMark);" % name])
@@ -344,15 +399,25 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
           "  if (!matchMark(results->rawbuf[offset++], k%sHdrMark))" % name,
           "    return false;"])
 
+    # Handle header spaces.
     elif message.is_hdr_space(usec) and not message.is_one_space(usec):
+      if binary64_value:
+        code_info["lastspace"] = "k%sHdrSpace" % name
+        message.section_count = message.section_count - 1
+        code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
+                                                                 name,
+                                                                 code_info))
+        binary64_value = binary_value
+        message.section_count = message.section_count + 1
       if state != "HM":
-        if binary_value:
+        if binary_value:  # If we we are in a header and we have data, add it.
           message.display_binary(binary_value)
           total_bits = total_bits + binary_value
           code["send"].extend(message.add_data_code(binary_value, name))
           code["recv"].extend(message.add_data_decode_code(binary_value, name))
+          code_info["lastspace"] = "k%sHdrSpace" % name
           message.section_count = message.section_count + 1
-        binary_value = add_bit(binary_value, "reset")
+        binary_value = binary64_value = add_bit(binary_value, "reset")
         output.write("UNEXPECTED->")
       state = "HS"
       output.write("k%sHdrSpace+" % name)
@@ -360,6 +425,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       code["recv"].extend([
           "  if (!matchSpace(results->rawbuf[offset++], k%sHdrSpace))" % name,
           "    return false;"])
+      code_info["firstspace"] = "k%sHdrSpace" % name
     elif message.is_bit_mark(usec) and count % 2:
       if state not in ("HS", "BS"):
         output.write("k%sBitMark(UNEXPECTED)" % name)
@@ -368,17 +434,22 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       if state != "BM":
         output.write("k%sZeroSpace(UNEXPECTED)" % name)
       state = "BS"
-      binary_value = add_bit(binary_value, 0, output)
+      binary_value = binary64_value = add_bit(binary_value, 0, output)
     elif message.is_one_space(usec):
       if state != "BM":
         output.write("k%sOneSpace(UNEXPECTED)" % name)
       state = "BS"
-      binary_value = add_bit(binary_value, 1, output)
+      binary_value = binary64_value = add_bit(binary_value, 1, output)
     elif message.is_gap(usec):
       if state != "BM":
         output.write("UNEXPECTED->")
       state = "GS"
       output.write("GAP(%d)" % usec)
+      code_info["lastspace"] = "k%sSpaceGap" % name
+      if binary64_value:
+        code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
+                                                                 name,
+                                                                 code_info))
       if binary_value:
         message.display_binary(binary_value)
         code["send"].extend(message.add_data_code(binary_value, name))
@@ -396,11 +467,14 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
           "  if (!matchSpace(results->rawbuf[offset++], k%sSpaceGap))" % name,
           "    return false;"])
       total_bits = total_bits + binary_value
-      binary_value = add_bit(binary_value, "reset")
+      binary_value = binary64_value = add_bit(binary_value, "reset")
     else:
       output.write("UNKNOWN(%d)" % usec)
       state = "UNK"
     count = count + 1
+  if binary64_value:
+    code["recv64+"].extend(message.add_data_byte_decode_code(binary64_value,
+                                                             name, code_info))
   if binary_value:
     message.display_binary(binary_value)
     code["send"].extend(message.add_data_code(binary_value, name))
@@ -420,6 +494,14 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  results->value = data;",
       "  results->command = 0;",
       "  results->address = 0;",
+      "  return true;",
+      "}",
+      "#endif  // DECODE_%s" % def_name.upper()])
+  code["recv64+"].extend([
+      "",
+      "  // Success",
+      "  results->decode_type = decode_type_t::%s;" % def_name.upper(),
+      "  results->bits = nbits;",
       "  return true;",
       "}",
       "#endif  // DECODE_%s" % def_name.upper()])
@@ -483,16 +565,14 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                  "                kDefaultMessageGap, // 100%% made-up guess at"
                  " the message gap.\n"
                  "                data, nbytes,\n"
-                 "                38000, // Complete guess of the modulation"
-                 " frequency.\n"
-                 "                true, 0, 50);\n"
+                 "                k%sFreq, true, 0, 50);\n"
                  "  }\n"
                  "}\n"
                  "#endif  // SEND_%s\n" % (
                      def_name.upper(), def_name, name, name,
                      ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
                                  for i in range(0, len(bits_str), 8)),
-                     name, name, name, name, name, name, name,
+                     name, name, name, name, name, name, name, name,
                      def_name.upper()))
 
   output.write("\n")
@@ -502,6 +582,10 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   # Display the "normal" version's decode code incase there are some
   # oddities in it.
   for line in code["recv"]:
+    output.write("%s\n" % line)
+  # Display the > 64bit version's decode code
+  output.write("\n// Note: This should be 64+ bit safe.\n")
+  for line in code["recv64+"]:
     output.write("%s\n" % line)
 
 
