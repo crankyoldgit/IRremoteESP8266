@@ -1348,11 +1348,13 @@ TEST(TestDaikin2Class, Swing) {
   ASSERT_EQ(kDaikin2SwingVBreeze, ac.getSwingVertical());
   ac.setSwingVertical(kDaikin2SwingVCirculate);
   ASSERT_EQ(kDaikin2SwingVCirculate, ac.getSwingVertical());
+  ac.setSwingVertical(kDaikin2SwingVSwing);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.getSwingVertical());
   ac.setSwingVertical(kDaikin2SwingVAuto);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
   ac.setSwingVertical(0);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
-  ac.setSwingVertical(7);
+  ac.setSwingVertical(20);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
   ac.setSwingVertical(255);
   ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
@@ -2003,7 +2005,7 @@ TEST(TestDaikin2Class, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
-  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_EQ(6 * 60, ac.toCommon().sleep);
   // Unsupported.
   ASSERT_EQ(-1, ac.toCommon().clock);
@@ -2983,4 +2985,57 @@ TEST(TestDecodeDaikin152, SyntheticExample) {
   ASSERT_EQ(DAIKIN152, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin152Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestDaikin2ClassNew, Issue908) {
+  IRDaikin2 ac(0);
+  // https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=I8
+  uint8_t fanMedium[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x4A, 0x42, 0xB0, 0x28, 0x0C, 0x80, 0x04,
+      0xB0, 0x16, 0x24, 0x00, 0x00, 0xAA, 0xC3, 0x5E, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x09, 0x3C, 0x00, 0x50, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0xBE};
+  ac.setRaw(fanMedium);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (AUTO), Temp: 30C, Fan: 3 (Medium), "
+      "Swing (V): 3, Swing (H): 170, Clock: 09:46, "
+      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+  ASSERT_EQ(kDaikinFanMed, ac.getFan());
+  ASSERT_EQ(stdAc::fanspeed_t::kMedium, ac.toCommon().fanspeed);
+  ASSERT_EQ(kDaikinFanMed, ac.convertFan(stdAc::fanspeed_t::kMedium));
+
+  // https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=I17
+  uint8_t swingvMiddle[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x55, 0x42, 0xB0, 0x28, 0x0C, 0x80, 0x04,
+      0xB0, 0x16, 0x24, 0x00, 0x00, 0xAA, 0xC3, 0x69, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x09, 0x3C, 0x00, 0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0x1E};
+  ac.setRaw(swingvMiddle);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (AUTO), Temp: 30C, Fan: 11 (Quiet), "
+      "Swing (V): 3, Swing (H): 170, Clock: 09:57, On Time: Off, "
+      "Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), Light: 3 (Off), "
+      "Mold: On, Clean: On, Fresh Air: Off, Eye: Off, Eye Auto: Off, "
+      "Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+  ASSERT_EQ(3, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
+  ac.setSwingVertical(4);
+  ASSERT_EQ(4, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
+  // Either 3 or 4 is fine as they both map to stdAc::swingv_t::kMiddle.
+  ASSERT_EQ(4, ac.convertSwingV(stdAc::swingv_t::kMiddle));
+  // Native "swing" should convert to common's "auto".
+  ac.setSwingVertical(kDaikin2SwingVSwing);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(kDaikin2SwingVSwing, ac.convertSwingV(stdAc::swingv_t::kAuto));
+  // Native "auto" should convert to common's "off".
+  ac.setSwingVertical(kDaikin2SwingVAuto);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.getSwingVertical());
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  ASSERT_EQ(kDaikin2SwingVAuto, ac.convertSwingV(stdAc::swingv_t::kOff));
 }

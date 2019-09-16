@@ -248,9 +248,9 @@ TEST(TestIRac, Daikin2) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 3 (COOL), Temp: 19C, Fan: 1 (Low), "
-      "Swing (V): 14 (Auto), Swing (H): 0, Clock: 00:00, On Time: Off, "
-      "Off Time: Off, Sleep Time: Off, Beep: 1 (Quiet), Light: 1 (Bright), "
-      "Mold: On, Clean: Off, Fresh Air: Off, Eye: Off, Eye Auto: Off, "
+      "Swing (V): 14 (Auto), Swing (H): 170, Clock: 00:00, On Time: Off, "
+      "Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), Light: 1 (Bright), "
+      "Mold: On, Clean: On, Fresh Air: Off, Eye: Off, Eye Auto: Off, "
       "Quiet: Off, Powerful: Off, Purify: On, Econo: Off";
 
   ac.begin();
@@ -260,13 +260,14 @@ TEST(TestIRac, Daikin2) {
                19,                          // Celsius
                stdAc::fanspeed_t::kLow,     // Fan speed
                stdAc::swingv_t::kOff,       // Veritcal swing
-               stdAc::swingh_t::kOff,       // Horizontal swing
+               stdAc::swingh_t::kMiddle,    // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo
                true,                        // Light
                false,                       // Econo
-               true,                        // Filter
+               true,                        // Filter (aka Purify)
                true,                        // Clean (aka Mold)
+               true,                        // Beep (Loud)
                -1,                          // Sleep time
                -1);                         // Current time
   ASSERT_EQ(expected, ac.toString());

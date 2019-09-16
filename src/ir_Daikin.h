@@ -100,8 +100,8 @@ const uint8_t kDaikinMaxTemp = 32;  // Celsius
 const uint8_t kDaikinFanMin = 1;
 const uint8_t kDaikinFanMed = 3;
 const uint8_t kDaikinFanMax = 5;
-const uint8_t kDaikinFanAuto = 0b1010;
-const uint8_t kDaikinFanQuiet = 0b1011;
+const uint8_t kDaikinFanAuto = 0b1010;  // 10 / 0xA
+const uint8_t kDaikinFanQuiet = 0b1011;  // 11 / 0xB
 const uint16_t kDaikinHeaderLength = 5;
 const uint8_t kDaikinSections = 3;
 const uint8_t kDaikinSection1Length = 8;
@@ -177,25 +177,36 @@ const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
 const uint8_t kDaikin2Tolerance = 5;  // Extra percentage tolerance
-
-const uint8_t kDaikin2BitSleepTimer = 0b00100000;
-const uint8_t kDaikin2BitPurify = 0b00010000;
-const uint8_t kDaikin2BitEye = 0b00000010;
-const uint8_t kDaikin2BitEyeAuto = 0b10000000;
-const uint8_t kDaikin2BitMold = 0b00001000;
-const uint8_t kDaikin2BitClean = 0b00100000;
-const uint8_t kDaikin2BitFreshAir = 0b00000001;
+const uint8_t kDaikin2BitSleepTimer =   0b00100000;
+const uint8_t kDaikin2BitPurify =       0b00010000;
+const uint8_t kDaikin2BitEye =          0b00000010;
+const uint8_t kDaikin2BitEyeAuto =      0b10000000;
+const uint8_t kDaikin2BitMold =         0b00001000;
+const uint8_t kDaikin2BitClean =        0b00100000;  // Byte[8]
+const uint8_t kDaikin2BitFreshAir =     0b00000001;
 const uint8_t kDaikin2BitFreshAirHigh = 0b10000000;
-const uint8_t kDaikin2BitPower = 0b10000000;
-const uint8_t kDaikin2LightMask = 0b00110000;
-const uint8_t kDaikin2BeepMask = 0b11000000;
+const uint8_t kDaikin2BitPower =        0b10000000;
+const uint8_t kDaikin2LightMask =       0b00110000;  // Byte[7]
+const uint8_t kDaikin2BeepMask =        0b11000000;  // Byte[7]
 const uint8_t kDaikin2SwingVHigh = 0x1;
 const uint8_t kDaikin2SwingVLow = 0x6;
+const uint8_t kDaikin2SwingVSwing = 0xF;
+const uint8_t kDaikin2SwingVAuto = 0xE;
 const uint8_t kDaikin2SwingVBreeze = 0xC;
 const uint8_t kDaikin2SwingVCirculate = 0xD;
-const uint8_t kDaikin2SwingVAuto = 0xE;
-const uint8_t kDaikin2SwingHAuto = 0xBE;
-const uint8_t kDaikin2SwingHSwing = 0xBF;
+const uint8_t kDaikin2FanByte = 28;
+
+// Ref:
+//   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
+const uint8_t kDaikin2SwingHWide =     0xA3;
+const uint8_t kDaikin2SwingHLeftMax =  0xA8;
+const uint8_t kDaikin2SwingHLeft =     0xA9;
+const uint8_t kDaikin2SwingHMiddle =   0xAA;
+const uint8_t kDaikin2SwingHRight =    0xAB;
+const uint8_t kDaikin2SwingHRightMax = 0xAC;
+const uint8_t kDaikin2SwingHAuto =     0xBE;
+const uint8_t kDaikin2SwingHSwing =    0xBF;
+
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
 // Another variant of the protocol for the Daikin ARC433B69 remote.
@@ -499,7 +510,8 @@ class IRDaikin2 {
                             const uint16_t length = kDaikin2StateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
   stdAc::state_t toCommon(void);

@@ -337,14 +337,15 @@ void IRac::daikin2(IRDaikin2 *ac,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVertical(ac->convertSwingV(swingv));
-  ac->setSwingHorizontal((int8_t)swingh >= 0);
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
-  ac->setLight(light);
+  ac->setLight(light ? 1 : 3);  // On/High is 1, Off is 3.
   ac->setPowerful(turbo);
   ac->setEcono(econo);
   ac->setPurify(filter);
   ac->setMold(clean);
-  ac->setBeep(beep);
+  ac->setClean(true);  // Hardwire auto clean to be on per request (@sheppy99)
+  ac->setBeep(beep ? 2 : 3);  // On/Loud is 2, Off is 3.
   if (sleep > 0) ac->enableSleepTimer(sleep);
   if (clock >= 0) ac->setCurrentTime(clock);
   ac->send();
