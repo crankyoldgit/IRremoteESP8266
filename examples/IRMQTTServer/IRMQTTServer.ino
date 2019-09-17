@@ -2937,6 +2937,8 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
     diff = true;
     success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
+#if MQTT_CLIMATE_HA_MODE
+  // Home Assistant want's these two bound together.
   if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
@@ -2945,6 +2947,18 @@ bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
                                       : F("off")),
                           retain);
   }
+#else  // MQTT_CLIMATE_HA_MODE
+  // In non-Home Assistant mode, power and mode are not bound together.
+  if (prev.power != next.power || forceMQTT) {
+    diff = true;
+    success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
+  }
+  if (prev.mode != next.mode || forceMQTT) {
+    diff = true;
+    success &= sendString(topic_prefix + KEY_MODE,
+                          IRac::opmodeToString(next.mode), retain);
+  }
+#endif  // MQTT_CLIMATE_HA_MODE
   if (prev.degrees != next.degrees || forceMQTT) {
     diff = true;
     success &= sendFloat(topic_prefix + KEY_TEMP, next.degrees, retain);
