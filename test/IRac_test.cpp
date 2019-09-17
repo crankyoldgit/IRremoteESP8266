@@ -766,7 +766,7 @@ TEST(TestIRac, Panasonic) {
 
   char expected_dke[] =
       "Model: 3 (DKE), Power: On, Mode: 3 (COOL), Temp: 18C, Fan: 4 (High), "
-      "Swing (Vertical): 1 (Full Up), Swing (Horizontal): 6 (Middle), "
+      "Swing (Vertical): 2, Swing (Horizontal): 6 (Middle), "
       "Quiet: Off, Powerful: On, Clock: 19:17, On Timer: Off, Off Timer: Off";
   ac._irsend.reset();
   irac.panasonic(&ac,

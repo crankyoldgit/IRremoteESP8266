@@ -665,19 +665,19 @@ TEST(TestIRPanasonicAcClass, SetAndGetSwings) {
   pana.setSwingVertical(kPanasonicAcSwingVAuto);
   EXPECT_EQ(kPanasonicAcSwingVAuto, pana.getSwingVertical());
 
-  pana.setSwingVertical(kPanasonicAcSwingVUp);
-  EXPECT_EQ(kPanasonicAcSwingVUp, pana.getSwingVertical());
-  pana.setSwingVertical(kPanasonicAcSwingVUp - 1);
-  EXPECT_EQ(kPanasonicAcSwingVUp, pana.getSwingVertical());
-  pana.setSwingVertical(kPanasonicAcSwingVUp + 1);
-  EXPECT_EQ(kPanasonicAcSwingVUp + 1, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVHighest);
+  EXPECT_EQ(kPanasonicAcSwingVHighest, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVHighest - 1);
+  EXPECT_EQ(kPanasonicAcSwingVHighest, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVHighest + 1);
+  EXPECT_EQ(kPanasonicAcSwingVHighest + 1, pana.getSwingVertical());
 
-  pana.setSwingVertical(kPanasonicAcSwingVDown);
-  EXPECT_EQ(kPanasonicAcSwingVDown, pana.getSwingVertical());
-  pana.setSwingVertical(kPanasonicAcSwingVDown + 1);
-  EXPECT_EQ(kPanasonicAcSwingVDown, pana.getSwingVertical());
-  pana.setSwingVertical(kPanasonicAcSwingVDown - 1);
-  EXPECT_EQ(kPanasonicAcSwingVDown - 1, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVLowest);
+  EXPECT_EQ(kPanasonicAcSwingVLowest, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVLowest + 1);
+  EXPECT_EQ(kPanasonicAcSwingVLowest, pana.getSwingVertical());
+  pana.setSwingVertical(kPanasonicAcSwingVLowest - 1);
+  EXPECT_EQ(kPanasonicAcSwingVLowest - 1, pana.getSwingVertical());
 
   pana.setSwingVertical(kPanasonicAcSwingVAuto);
   EXPECT_EQ(kPanasonicAcSwingVAuto, pana.getSwingVertical());
@@ -1164,4 +1164,17 @@ TEST(TestIRPanasonicAcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/921#issuecomment-532267240
+  ac.setSwingVertical(kPanasonicAcSwingVLow);
+  ASSERT_EQ(stdAc::swingv_t::kLow, ac.toCommon().swingv);
+  // Real data.
+  uint8_t swingVMiddle[27] = {
+      0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02, 0x20, 0xE0, 0x04,
+      0x00, 0x39, 0x32, 0x80, 0x73, 0x00, 0x00, 0x0E, 0xE0, 0x00, 0x00, 0x89,
+      0x00, 0x00, 0xDB};
+  ac.setRaw(swingVMiddle);
+  ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
+  ASSERT_EQ(kPanasonicAcSwingVMiddle,
+            IRPanasonicAc::convertSwingV(stdAc::swingv_t::kMiddle));
 }
