@@ -2197,8 +2197,8 @@ kPanasonicAcSwingHLeft	LITERAL1
 kPanasonicAcSwingHMiddle	LITERAL1
 kPanasonicAcSwingHRight	LITERAL1
 kPanasonicAcSwingVAuto	LITERAL1
-kPanasonicAcSwingVDown	LITERAL1
-kPanasonicAcSwingVUp	LITERAL1
+kPanasonicAcSwingVLowest	LITERAL1
+kPanasonicAcSwingVHighest	LITERAL1
 kPanasonicAcTimeMax	LITERAL1
 kPanasonicAcTimeSpecial	LITERAL1
 kPanasonicAcTolerance	LITERAL1
