@@ -26,11 +26,12 @@
 // Constants
 
 // Timing
-const uint16_t kGoodweatherBitMark = 640;
+const uint16_t kGoodweatherBitMark = 580;
 const uint16_t kGoodweatherOneSpace = 580;
-const uint16_t kGoodweatherZeroSpace = 1600;
-const uint16_t kGoodweatherHdrMark = 6800;
-const uint16_t kGoodweatherHdrSpace = 6800;
+const uint16_t kGoodweatherZeroSpace = 1860;
+const uint16_t kGoodweatherHdrMark = 6820;
+const uint16_t kGoodweatherHdrSpace = 6820;
+const uint8_t  kGoodweatherExtraTolerance = 12;  // +12% extra
 
 // Masks
 const uint8_t kGoodweatherBitLight = 8;
@@ -45,12 +46,16 @@ const uint8_t kGoodweatherBitPower = kGoodweatherBitSleep + 1;  // 25
 const uint64_t kGoodweatherPowerMask = 0x1ULL << kGoodweatherBitPower;
 const uint8_t kGoodweatherBitSwing = kGoodweatherBitPower + 1;  // 26
 const uint64_t kGoodweatherSwingMask = 0x3ULL << kGoodweatherBitSwing;
-const uint8_t kGoodweatherBitFan = kGoodweatherBitSwing + 3;  // 29
+const uint8_t kGoodweatherBitAirFlow = kGoodweatherBitSwing + 2;  // 28
+const uint64_t kGoodweatherAirFlowMask = 0x1ULL << kGoodweatherBitAirFlow;
+const uint8_t kGoodweatherBitFan = kGoodweatherBitAirFlow + 1;  // 29
 const uint64_t kGoodweatherFanMask = 0x3ULL << kGoodweatherBitFan;
 const uint8_t kGoodweatherBitTemp = kGoodweatherBitFan + 3;  // 32
 const uint64_t kGoodweatherTempMask = 0xFULL << kGoodweatherBitTemp;
 const uint8_t kGoodweatherBitMode = kGoodweatherBitTemp + 5;  // 37
 const uint64_t kGoodweatherModeMask = 0x7ULL << kGoodweatherBitMode;
+const uint8_t kGoodweatherBitEOF = kGoodweatherBitMode + 3;  // 40
+const uint64_t kGoodweatherEOFMask = 0xFFULL << kGoodweatherBitEOF;
 
 // Modes
 const uint8_t kGoodweatherAuto = 0b000;
@@ -58,6 +63,7 @@ const uint8_t kGoodweatherCool = 0b001;
 const uint8_t kGoodweatherDry =  0b010;
 const uint8_t kGoodweatherFan =  0b011;
 const uint8_t kGoodweatherHeat = 0b100;
+// Swing
 const uint8_t kGoodweatherSwingFast = 0b00;
 const uint8_t kGoodweatherSwingSlow = 0b01;
 const uint8_t kGoodweatherSwingOff =  0b10;
@@ -82,6 +88,8 @@ const uint8_t kGoodweatherCmdHold     = 0x08;
 const uint8_t kGoodweatherCmdSleep    = 0x09;
 const uint8_t kGoodweatherCmdTurbo    = 0x0A;
 const uint8_t kGoodweatherCmdLight    = 0x0B;
+// PAD EOF
+const uint64_t kGoodweatherStateInit  = 0xD50000000000;
 
 
 // Classes
