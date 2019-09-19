@@ -64,6 +64,7 @@ class IRac {
               const bool beep, const int16_t sleep = -1,
               const int16_t clock = -1);
   static bool cmpStates(const stdAc::state_t a, const stdAc::state_t b);
+  bool cmpState(const stdAc::state_t a);
   static bool strToBool(const char *str, const bool def = false);
   static int16_t strToModel(const char *str, const int16_t def = -1);
   static stdAc::opmode_t strToOpmode(
@@ -80,6 +81,10 @@ class IRac {
   static String fanspeedToString(const stdAc::fanspeed_t speed);
   static String swingvToString(const stdAc::swingv_t swingv);
   static String swinghToString(const stdAc::swingh_t swingh);
+  stdAc::state_t getState(void);
+  stdAc::state_t getStatePrev(void);
+  bool hasStateChanged(void);
+  uint16_t getGpio(void);
   stdAc::state_t next;
 #ifndef UNIT_TEST
 
