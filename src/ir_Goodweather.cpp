@@ -68,8 +68,7 @@ IRGoodweatherAc::IRGoodweatherAc(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-void IRGoodweatherAc::stateReset(void) {
-}
+void IRGoodweatherAc::stateReset(void) { remote = kGoodweatherStateInit; }
 
 void IRGoodweatherAc::begin(void) { _irsend.begin(); }
 
@@ -419,7 +418,8 @@ bool IRrecv::decodeGoodweather(decode_results* results,
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             kGoodweatherBitMark, kGoodweatherOneSpace,
                             kGoodweatherBitMark, kGoodweatherZeroSpace,
-                            _tolerance, kMarkExcess, false);
+                            _tolerance + kGoodweatherExtraTolerance,
+                            kMarkExcess, false);
     if (data_result.success == false) return false;
     DPRINTLN("DEBUG: Normal byte read okay.");
     offset += data_result.used;
@@ -428,7 +428,8 @@ bool IRrecv::decodeGoodweather(decode_results* results,
     data_result = matchData(&(results->rawbuf[offset]), 8,
                             kGoodweatherBitMark, kGoodweatherOneSpace,
                             kGoodweatherBitMark, kGoodweatherZeroSpace,
-                            _tolerance, kMarkExcess, false);
+                            _tolerance + kGoodweatherExtraTolerance,
+                            kMarkExcess, false);
     if (data_result.success == false) return false;
     DPRINTLN("DEBUG: Inverted byte read okay.");
     offset += data_result.used;
@@ -442,10 +443,12 @@ bool IRrecv::decodeGoodweather(decode_results* results,
   }
 
   // Footer.
-  if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark)) return false;
+  if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark,
+                 _tolerance + kGoodweatherExtraTolerance)) return false;
   if (!matchSpace(results->rawbuf[offset++], kGoodweatherHdrSpace))
     return false;
-  if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark)) return false;
+  if (!matchMark(results->rawbuf[offset++], kGoodweatherBitMark,
+                 _tolerance + kGoodweatherExtraTolerance)) return false;
   if (offset <= results->rawlen &&
       !matchAtLeast(results->rawbuf[offset], kGoodweatherHdrSpace))
     return false;
