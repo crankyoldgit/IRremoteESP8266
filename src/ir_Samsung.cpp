@@ -300,7 +300,7 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
 // Args:
 //   forcepower: A flag indicating if force sending a special power message
 //              with the first `send()` call. Default: true
-void IRSamsungAc::stateReset(const bool forcepower) {
+void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
   for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
     remote_state[i] = 0x0;
   remote_state[0] = 0x02;
@@ -314,7 +314,8 @@ void IRSamsungAc::stateReset(const bool forcepower) {
   remote_state[12] = 0x15;
   remote_state[13] = 0xF0;
   _forcepower = forcepower;
-  _lastsentpowerstate = this->getPower();
+  _lastsentpowerstate = initialPower;
+  setPower(initialPower);
 }
 
 void IRSamsungAc::begin(void) { _irsend.begin(); }

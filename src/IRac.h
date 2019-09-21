@@ -41,6 +41,20 @@ class IRac {
   explicit IRac(const uint16_t pin, const bool inverted = false,
                 const bool use_modulation = true);
   static bool isProtocolSupported(const decode_type_t protocol);
+  static void initState(stdAc::state_t *state,
+                        const decode_type_t vendor, const int16_t model,
+                        const bool power, const stdAc::opmode_t mode,
+                        const float degrees, const bool celsius,
+                        const stdAc::fanspeed_t fan,
+                        const stdAc::swingv_t swingv,
+                        const stdAc::swingh_t swingh,
+                        const bool quiet, const bool turbo, const bool econo,
+                        const bool light, const bool filter, const bool clean,
+                        const bool beep, const int16_t sleep,
+                        const int16_t clock);
+  static void initState(stdAc::state_t *state);
+  bool sendAc(void);
+  bool sendAc(const stdAc::state_t desired, const stdAc::state_t *prev = NULL);
   bool sendAc(const decode_type_t vendor, const int16_t model,
               const bool power, const stdAc::opmode_t mode, const float degrees,
               const bool celsius, const stdAc::fanspeed_t fan,
@@ -49,7 +63,6 @@ class IRac {
               const bool light, const bool filter, const bool clean,
               const bool beep, const int16_t sleep = -1,
               const int16_t clock = -1);
-  bool sendAc(const stdAc::state_t desired, const stdAc::state_t *prev = NULL);
   static bool cmpStates(const stdAc::state_t a, const stdAc::state_t b);
   static bool strToBool(const char *str, const bool def = false);
   static int16_t strToModel(const char *str, const int16_t def = -1);
@@ -67,6 +80,10 @@ class IRac {
   static String fanspeedToString(const stdAc::fanspeed_t speed);
   static String swingvToString(const stdAc::swingv_t swingv);
   static String swinghToString(const stdAc::swingh_t swingh);
+  stdAc::state_t getState(void);
+  stdAc::state_t getStatePrev(void);
+  bool hasStateChanged(void);
+  stdAc::state_t next;  // The state we want the device to be in after we send.
 #ifndef UNIT_TEST
 
  private:
@@ -74,6 +91,7 @@ class IRac {
   uint16_t _pin;
   bool _inverted;
   bool _modulation;
+  stdAc::state_t _prev;  // The state we expect the device to currently be in.
 #if SEND_AMCOR
   void amcor(IRAmcorAc *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,
@@ -254,7 +272,8 @@ void electra(IRElectraAc *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                const bool quiet, const bool turbo, const bool clean,
-               const bool beep, const bool forcepower = true);
+               const bool beep, const bool prevpower = true,
+               const bool forcepower = true);
 #endif  // SEND_SAMSUNG_AC
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac,

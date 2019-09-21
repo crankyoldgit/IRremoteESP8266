@@ -807,6 +807,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Turbo
                true,                        // Clean
                true,                        // Beep
+               true,                        // Previous power state
                false);                      // with dopower Off
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
@@ -826,6 +827,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Turbo
                true,                        // Clean
                true,                        // Beep
+               true,                        // Previous power state
                true);                       // with dopower On
   ASSERT_EQ(expected, ac.toString());  // Class should be in the desired mode.
   ac._irsend.makeDecodeResult();
