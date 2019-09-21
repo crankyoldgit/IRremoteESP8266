@@ -64,7 +64,6 @@ class IRac {
               const bool beep, const int16_t sleep = -1,
               const int16_t clock = -1);
   static bool cmpStates(const stdAc::state_t a, const stdAc::state_t b);
-  bool cmpState(const stdAc::state_t a);
   static bool strToBool(const char *str, const bool def = false);
   static int16_t strToModel(const char *str, const int16_t def = -1);
   static stdAc::opmode_t strToOpmode(
@@ -84,8 +83,7 @@ class IRac {
   stdAc::state_t getState(void);
   stdAc::state_t getStatePrev(void);
   bool hasStateChanged(void);
-  uint16_t getGpio(void);
-  stdAc::state_t next;
+  stdAc::state_t next;  // The state we want the device to be in after we send.
 #ifndef UNIT_TEST
 
  private:
@@ -93,7 +91,7 @@ class IRac {
   uint16_t _pin;
   bool _inverted;
   bool _modulation;
-  stdAc::state_t _prev;
+  stdAc::state_t _prev;  // The state we expect the device to currently be in.
 #if SEND_AMCOR
   void amcor(IRAmcorAc *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,

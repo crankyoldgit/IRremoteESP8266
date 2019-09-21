@@ -46,8 +46,6 @@ IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   _prev = next;
 }
 
-uint16_t IRac::getGpio(void) { return _pin; }
-
 void IRac::initState(stdAc::state_t *state,
                      const decode_type_t vendor, const int16_t model,
                      const bool power, const stdAc::opmode_t mode,
@@ -87,6 +85,7 @@ void IRac::initState(stdAc::state_t *state) {
 }
 
 stdAc::state_t IRac::getState(void) { return next; }
+
 stdAc::state_t IRac::getStatePrev(void) { return _prev; }
 
 // Is the given protocol supported by the IRac class?
@@ -1479,11 +1478,6 @@ bool IRac::cmpStates(const stdAc::state_t a, const stdAc::state_t b) {
       a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
       a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep;
 }
-
-// Compare a AirCon state with the current internal state..
-// Returns: True if they differ, False if they don't.
-// Note: Excludes clock.
-bool IRac::cmpState(const stdAc::state_t a) { return cmpStates(a, next); }
 
 bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
 
