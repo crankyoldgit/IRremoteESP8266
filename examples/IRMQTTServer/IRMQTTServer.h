@@ -236,7 +236,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.2-beta"
+#define _MY_VERSION_ "v1.4.3-beta"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -328,7 +328,7 @@ void receivingMQTT(String const topic_name, String const callback_str);
 void callback(char* topic, byte* payload, unsigned int length);
 void sendMQTTDiscovery(const char *topic);
 void doBroadcast(TimerMs *timer, const uint32_t interval,
-                 const stdAc::state_t state, const bool retain,
+                 IRac *climates[], const bool retain,
                  const bool force);
 #if MQTT_CLIMATE_JSON
 stdAc::state_t jsonToState(const stdAc::state_t current, const char *str);
@@ -408,12 +408,11 @@ bool sendInt(const String topic, const int32_t num, const bool retain);
 bool sendBool(const String topic, const bool on, const bool retain);
 bool sendString(const String topic, const String str, const bool retain);
 bool sendFloat(const String topic, const float_t temp, const bool retain);
-stdAc::state_t updateClimate(stdAc::state_t current, const String str,
-                              const String prefix, const String payload);
+void updateClimate(stdAc::state_t *current, const String str,
+                   const String prefix, const String payload);
 bool cmpClimate(const stdAc::state_t a, const stdAc::state_t b);
-bool sendClimate(const stdAc::state_t prev, const stdAc::state_t next,
-                 const String topic_prefix, const bool retain,
+bool sendClimate(const String topic_prefix, const bool retain,
                  const bool forceMQTT, const bool forceIR,
-                 const bool enableIR = true, IRac *commonAc = NULL);
+                 const bool enableIR = true, IRac *ac = NULL);
 bool decodeCommonAc(const decode_results *decode);
 #endif  // EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
