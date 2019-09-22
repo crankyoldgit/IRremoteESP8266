@@ -206,6 +206,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_CODE "code"
 #define KEY_BITS "bits"
 #define KEY_REPEAT "repeats"
+#define KEY_CHANNEL "channel"  // Which IR TX channel to send on.
 
 // GPIO html/config keys
 #define KEY_TX_GPIO "tx"
@@ -236,7 +237,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.3-beta"
+#define _MY_VERSION_ "v1.4.4-alpha"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
@@ -353,6 +354,7 @@ String gpioToString(const int16_t gpio);
 uint8_t getDefaultIrSendIdx(void);
 IRsend* getDefaultIrSendPtr(void);
 int8_t getDefaultTxGpio(void);
+String genStatTopic(const uint16_t channel = 0);
 String listOfTxGpios(void);
 bool hasUnsafeHTMLChars(String input);
 String htmlHeader(const String title, const String h1_text = "");
