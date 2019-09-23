@@ -2345,7 +2345,7 @@ void doBroadcast(TimerMs *timer, const uint32_t interval,
       sendString(stat_topic + KEY_VCC, vccToString(), false);
 #endif  // REPORT_VCC
 #if MQTT_CLIMATE_JSON
-      sendJsonState(states[i], stat_topic + KEY_JSON);
+      sendJsonState(climate[i]->next, stat_topic + KEY_JSON);
 #endif  // MQTT_CLIMATE_JSON
     }
     timer->reset();  // It's been sent, so reset the timer.
