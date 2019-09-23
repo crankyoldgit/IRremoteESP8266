@@ -1128,7 +1128,7 @@ void handleAirConSet(void) {
     }
   }
   // Change the HTML channel for the climate if it is within the correct range.
-  if (channel >= 0 && channel < kNrOfIrTxGpios) chan = channel;
+  if (channel < kNrOfIrTxGpios) chan = channel;
 
   IRac *ac_ptr = climate[chan];
   String html = htmlHeader(F("Aircon updated!"));
