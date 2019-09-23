@@ -65,5 +65,12 @@ namespace irutils {
                      const uint8_t init = 0);
   uint8_t bcdToUint8(const uint8_t bcd);
   uint8_t uint8ToBcd(const uint8_t integer);
+  bool getBit(const uint64_t data, const uint8_t position,
+              const uint8_t size = 64);
+  bool getBit(const uint8_t data, const uint8_t position);
+  uint64_t setBit(const uint64_t data, const uint8_t position,
+                  const bool on = true, const uint8_t size = 64);
+  uint8_t setBit(const uint8_t data, const uint8_t position,
+                 const bool on = true);
 }  // namespace irutils
 #endif  // IRUTILS_H_

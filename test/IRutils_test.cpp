@@ -540,3 +540,45 @@ TEST(TestUtils, BCD) {
   EXPECT_EQ(255, irutils::bcdToUint8(0x9A));
   EXPECT_EQ(255, irutils::uint8ToBcd(100));
 }
+
+TEST(TestUtils, getBit) {
+  // uint8_t method.
+  EXPECT_FALSE(irutils::getBit((uint8_t)0, 0));
+  EXPECT_TRUE(irutils::getBit((uint8_t)1, 0));
+  EXPECT_FALSE(irutils::getBit((uint8_t)0b01, 1));
+  EXPECT_TRUE(irutils::getBit((uint8_t)0b10, 1));
+  EXPECT_FALSE(irutils::getBit((uint8_t)0b01111111, 7));
+  EXPECT_TRUE(irutils::getBit((uint8_t)0b10000000, 7));
+  // uint64_t method.
+  EXPECT_FALSE(irutils::getBit((uint64_t)0, 0));
+  EXPECT_TRUE(irutils::getBit((uint64_t)1, 0));
+  EXPECT_FALSE(irutils::getBit((uint64_t)0b01, 1));
+  EXPECT_TRUE(irutils::getBit((uint64_t)0b10, 1));
+  EXPECT_FALSE(irutils::getBit((uint64_t)0b01111111, 7));
+  EXPECT_TRUE(irutils::getBit((uint64_t)0b10000000, 7));
+}
+
+TEST(TestUtils, setBit) {
+  // uint8_t method.
+  EXPECT_EQ(0, irutils::setBit((uint8_t)0, 0, false));
+  EXPECT_EQ(0, irutils::setBit((uint8_t)1, 0, false));
+  EXPECT_EQ(1, irutils::setBit((uint8_t)0, 0, true));
+  EXPECT_EQ(1, irutils::setBit((uint8_t)1, 0, true));
+  EXPECT_EQ(0b101, irutils::setBit((uint8_t)0b101, 1, false));
+  EXPECT_EQ(0b100, irutils::setBit((uint8_t)0b110, 1, false));
+  EXPECT_EQ(0b111, irutils::setBit((uint8_t)0b101, 1, true));
+  EXPECT_EQ(0b110, irutils::setBit((uint8_t)0b110, 1, true));
+  EXPECT_EQ(0b11111111, irutils::setBit((uint8_t)0b01111111, 7, true));
+  EXPECT_EQ(0, irutils::setBit((uint8_t)0b10000000, 7, false));
+  // uint64_t method.
+  EXPECT_EQ(0, irutils::setBit((uint64_t)0, 0, false));
+  EXPECT_EQ(0, irutils::setBit((uint64_t)1, 0, false));
+  EXPECT_EQ(1, irutils::setBit((uint64_t)0, 0, true));
+  EXPECT_EQ(1, irutils::setBit((uint64_t)1, 0, true));
+  EXPECT_EQ(0b101, irutils::setBit((uint64_t)0b101, 1, false));
+  EXPECT_EQ(0b100, irutils::setBit((uint64_t)0b110, 1, false));
+  EXPECT_EQ(0b111, irutils::setBit((uint64_t)0b101, 1, true));
+  EXPECT_EQ(0b110, irutils::setBit((uint64_t)0b110, 1, true));
+  EXPECT_EQ(0b11111111, irutils::setBit((uint64_t)0b01111111, 7, true));
+  EXPECT_EQ(0, irutils::setBit((uint64_t)0b10000000, 7, false));
+}

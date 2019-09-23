@@ -1033,4 +1033,54 @@ namespace irutils {
     if (integer > 99) return 255;  // Too big.
     return ((integer / 10) << 4) + (integer % 10);
   }
+
+  // Return the value of `position`th bit of `data`.
+  // Args:
+  //   data: Value to be examined.
+  //   position: Nr. of the nth bit to be examined. `0` is the LSB.
+  //   size: Nr. of bits in data.
+  bool getBit(const uint64_t data, const uint8_t position, const uint8_t size) {
+    if (position >= size) return false;  // Outside of range.
+    return data & (1ULL << position);
+  }
+
+  // Return the value of `position`th bit of `data`.
+  // Args:
+  //   data: Value to be examined.
+  //   position: Nr. of the nth bit to be examined. `0` is the LSB.
+  bool getBit(const uint8_t data, const uint8_t position) {
+    if (position >= 8) return false;  // Outside of range.
+    return data & (1 << position);
+  }
+
+  // Return the value of `data` with the `position`th bit changed to `on`
+  // Args:
+  //   data: Value to be changed.
+  //   position: Nr. of the bit to be changed. `0` is the LSB.
+  //   on: Value to set the position'th bit to.
+  //   size: Nr. of bits in data.
+  uint64_t setBit(const uint64_t data, const uint8_t position, const bool on,
+                  const uint8_t size) {
+    if (position >= size) return data;  // Outside of range.
+    uint64_t mask = 1ULL << position;
+    if (on)
+      return data | mask;
+    else
+      return data & ~mask;
+  }
+
+  // Return the value of `data` with the `position`th bit changed to `on`
+  // Args:
+  //   data: Value to be changed.
+  //   position: Nr. of the bit to be changed. `0` is the LSB.
+  //   on: Value to set the position'th bit to.
+  //   size: Nr. of bits in data.
+  uint8_t setBit(const uint8_t data, const uint8_t position, const bool on) {
+    if (position >= 8) return data;  // Outside of range.
+    uint64_t mask = 1 << position;
+    if (on)
+      return data | mask;
+    else
+      return data & ~mask;
+  }
 }  // namespace irutils
