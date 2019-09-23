@@ -53,7 +53,7 @@ TEST(TestArgoACClass, MessageConstructon) {
       0xAC, 0xF5, 0x00, 0x24, 0x02, 0x00, 0x00, 0x00, 0x00, 0xAC, 0xD6, 0x01};
   EXPECT_STATE_EQ(expected, ac.getRaw(), kArgoBits);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (COOL), Fan: 0 (AUTO), Temp: 20C, Room Temp: 21C, "
+      "Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, Room Temp: 21C, "
       "Max: On, iFeel: On, Night: On",
       ac.toString());
 }

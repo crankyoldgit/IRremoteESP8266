@@ -521,40 +521,40 @@ String IRWhirlpoolAc::toString(void) {
   result += addIntToString(getCommand(), F("Command"));
   switch (this->getCommand()) {
     case kWhirlpoolAcCommandLight:
-      result += F(" (LIGHT)");
+      result += F(" (Light)");
       break;
     case kWhirlpoolAcCommandPower:
-      result += F(" (POWER)");
+      result += F(" (Power)");
       break;
     case kWhirlpoolAcCommandTemp:
-      result += F(" (TEMP)");
+      result += F(" (Temp)");
       break;
     case kWhirlpoolAcCommandSleep:
-      result += F(" (SLEEP)");
+      result += F(" (Sleep)");
       break;
     case kWhirlpoolAcCommandSuper:
-      result += F(" (SUPER)");
+      result += F(" (Super)");
       break;
     case kWhirlpoolAcCommandOnTimer:
-      result += F(" (ONTIMER)");
+      result += F(" (On Timer)");
       break;
     case kWhirlpoolAcCommandMode:
-      result += F(" (MODE)");
+      result += F(" (Mode)");
       break;
     case kWhirlpoolAcCommandSwing:
-      result += F(" (SWING)");
+      result += F(" (Swing)");
       break;
     case kWhirlpoolAcCommandIFeel:
-      result += F(" (IFEEL)");
+      result += F(" (IFeel)");
       break;
     case kWhirlpoolAcCommandFanSpeed:
-      result += F(" (FANSPEED)");
+      result += F(" (Fan Speed)");
       break;
     case kWhirlpoolAcCommand6thSense:
-      result += F(" (6THSENSE)");
+      result += F(" (6th Sense)");
       break;
     case kWhirlpoolAcCommandOffTimer:
-      result += F(" (OFFTIMER)");
+      result += F(" (Off Timer)");
       break;
     default:
       result += F(" (UNKNOWN)");

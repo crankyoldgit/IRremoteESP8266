@@ -812,11 +812,11 @@ namespace irutils {
                          const uint8_t dry, const uint8_t fan) {
     String result = addIntToString(mode, F("Mode"));
     result += F(" (");
-    if (mode == automatic) result += F("AUTO");
-    else if (mode == cool) result += F("COOL");
-    else if (mode == heat) result += F("HEAT");
-    else if (mode == dry) result += F("DRY");
-    else if (mode == fan) result += F("FAN");
+    if (mode == automatic) result += F("Auto");
+    else if (mode == cool) result += F("Cool");
+    else if (mode == heat) result += F("Heat");
+    else if (mode == dry) result += F("Dry");
+    else if (mode == fan) result += F("Fan");
     else
       result += F("UNKNOWN");
     return result + ')';

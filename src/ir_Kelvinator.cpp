@@ -435,8 +435,8 @@ String IRKelvinatorAC::toString(void) {
   result += addBoolToString(getXFan(), F("XFan"));
   result += addBoolToString(getIonFilter(), F("IonFilter"));
   result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
-  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
   return result;
 }
 

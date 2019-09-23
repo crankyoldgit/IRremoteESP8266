@@ -459,7 +459,7 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
 }
 
 // Convert the internal state into a human readable string.
-String IRCoolixAC::toString() {
+String IRCoolixAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
@@ -491,25 +491,25 @@ String IRCoolixAC::toString() {
   result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kCoolixFanAuto:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kCoolixFanAuto0:
-      result += F(" (AUTO0)");
+      result += F(" (Auto0)");
       break;
     case kCoolixFanMax:
-      result += F(" (MAX)");
+      result += F(" (Max)");
       break;
     case kCoolixFanMin:
-      result += F(" (MIN)");
+      result += F(" (Min)");
       break;
     case kCoolixFanMed:
-      result += F(" (MED)");
+      result += F(" (Med)");
       break;
     case kCoolixFanZoneFollow:
-      result += F(" (ZONEFOLLOW)");
+      result += F(" (Zone Follow)");
       break;
     case kCoolixFanFixed:
-      result += F(" (FIXED)");
+      result += F(" (Fixed)");
       break;
     default:
       result += F(" (UNKNOWN)");

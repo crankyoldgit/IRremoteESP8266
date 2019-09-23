@@ -352,16 +352,16 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
                                                    0x00, 0xC1, 0x00, 0xC0};
 
   toshiba.setRaw(initial_state);
-  EXPECT_EQ("Power: On, Mode: 0 (AUTO), Temp: 17C, Fan: 0 (Auto)",
+  EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto)",
             toshiba.toString());
   toshiba.setRaw(modified_state);
-  EXPECT_EQ("Power: On, Mode: 1 (COOL), Temp: 17C, Fan: 5 (High)",
+  EXPECT_EQ("Power: On, Mode: 1 (Cool), Temp: 17C, Fan: 5 (High)",
             toshiba.toString());
   toshiba.off();
   toshiba.setTemp(25);
   toshiba.setFan(3);
   toshiba.setMode(kToshibaAcDry);
-  EXPECT_EQ("Power: Off, Mode: 2 (DRY), Temp: 25C, Fan: 3 (Medium)",
+  EXPECT_EQ("Power: Off, Mode: 2 (Dry), Temp: 25C, Fan: 3 (Medium)",
             toshiba.toString());
 }
 

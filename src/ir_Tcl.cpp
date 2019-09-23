@@ -355,8 +355,7 @@ String IRTcl112Ac::toString(void) {
   result += addModeToString(getMode(), kTcl112AcAuto, kTcl112AcCool,
                             kTcl112AcHeat, kTcl112AcDry, kTcl112AcFan);
   uint16_t nrHalfDegrees = this->getTemp() * 2;
-  result += F(", Temp: ");
-  result += uint64ToString(nrHalfDegrees / 2);
+  result += addIntToString(nrHalfDegrees / 2, F("Temp"));
   if (nrHalfDegrees & 1) result += F(".5");
   result += 'C';
   result += addFanToString(getFan(), kTcl112AcFanHigh, kTcl112AcFanLow,
@@ -365,8 +364,8 @@ String IRTcl112Ac::toString(void) {
   result += addBoolToString(getHealth(), F("Health"));
   result += addBoolToString(getLight(), F("Light"));
   result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing (H)"));
-  result += addBoolToString(getSwingVertical(), F("Swing (V)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
   return result;
 }
 

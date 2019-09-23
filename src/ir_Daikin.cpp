@@ -520,26 +520,26 @@ String IRDaikinESP::toString(void) {
   result += addBoolToString(getSensor(), F("Sensor"));
   result += addBoolToString(getMold(), F("Mold"));
   result += addBoolToString(getComfort(), F("Comfort"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
-  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
   result += addLabeledString(minsToString(this->getCurrentTime()),
                              F("Current Time"));
   result += F(", Current Day: ");
   switch (this->getCurrentDay()) {
   case 1:
-    result +=F("SUN"); break;
+    result +=F("Sun"); break;
   case 2:
-    result +=F("MON"); break;
+    result +=F("Mon"); break;
   case 3:
-    result +=F("TUE"); break;
+    result +=F("Tue"); break;
   case 4:
-    result +=F("WED"); break;
+    result +=F("Wed"); break;
   case 5:
-    result +=F("THU"); break;
+    result +=F("Thu"); break;
   case 6:
-    result +=F("FRI"); break;
+    result +=F("Fri"); break;
   case 7:
-    result +=F("SAT"); break;
+    result +=F("Sat"); break;
   default:
     result +=F("(UNKNOWN)"); break;
   }
@@ -1169,7 +1169,7 @@ stdAc::state_t IRDaikin2::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRDaikin2::toString() {
+String IRDaikin2::toString(void) {
   String result = "";
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
@@ -1178,7 +1178,7 @@ String IRDaikin2::toString() {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), F("Swing (V)"));
+  result += addIntToString(getSwingVertical(), F("Swing(V)"));
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
       result += F(" (Highest)");
@@ -1206,7 +1206,7 @@ String IRDaikin2::toString() {
     default:
       result += F(" (Unknown)");
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing (H)"));
+  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
   switch (getSwingHorizontal()) {
     case kDaikin2SwingHAuto:
       result += F(" (Auto)");
@@ -1609,7 +1609,7 @@ stdAc::state_t IRDaikin216::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRDaikin216::toString() {
+String IRDaikin216::toString(void) {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
@@ -1618,8 +1618,8 @@ String IRDaikin216::toString() {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getSwingHorizontal(), F("Swing (Horizontal)"));
-  result += addBoolToString(getSwingVertical(), F("Swing (Vertical)"));
+  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
   result += addBoolToString(getQuiet(), F("Quiet"));
   result += addBoolToString(getPowerful(), F("Powerful"));
   return result;
@@ -1963,7 +1963,7 @@ stdAc::state_t IRDaikin160::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRDaikin160::toString() {
+String IRDaikin160::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
@@ -1972,7 +1972,7 @@ String IRDaikin160::toString() {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), F("Vent Position (V)"));
+  result += addIntToString(getSwingVertical(), F("Swing(V)"));
   switch (getSwingVertical()) {
     case kDaikin160SwingVHighest: result += F(" (Highest)"); break;
     case kDaikin160SwingVHigh:    result += F(" (High)"); break;
@@ -1981,7 +1981,7 @@ String IRDaikin160::toString() {
     case kDaikin160SwingVLowest:  result += F(" (Lowest)"); break;
     case kDaikin160SwingVAuto:    result += F(" (Auto)"); break;
     default:
-      result += F(" (Unknown)");
+      result += F(" (UNKNOWN)");
   }
   return result;
 }
@@ -2337,7 +2337,7 @@ stdAc::state_t IRDaikin176::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRDaikin176::toString() {
+String IRDaikin176::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
@@ -2346,8 +2346,7 @@ String IRDaikin176::toString() {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
-  result += F(", Swing (H): ");
-  result += uint64ToString(getSwingHorizontal());
+  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
   switch (getSwingHorizontal()) {
     case kDaikin176SwingHAuto:
       result += F(" (Auto)");
@@ -2820,7 +2819,7 @@ String IRDaikin128::toString(void) {
                            kDaikin128FanMed);
   result += addBoolToString(getPowerful(), F("Powerful"));
   result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getSwingVertical(), F("Swing (V)"));
+  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
   result += addBoolToString(getSleep(), F("Sleep"));
   result += addBoolToString(getEcono(), F("Econo"));
   result += addLabeledString(minsToString(getClock()), F("Clock"));

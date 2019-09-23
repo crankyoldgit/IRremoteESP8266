@@ -79,7 +79,7 @@ TEST(TestDecodeNeoclima, RealExample) {
   IRNeoclimaAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (COOL), Temp: 26C, Fan: 3 (Low), "
+      "Power: On, Mode: 1 (Cool), Temp: 26C, Fan: 3 (Low), "
       "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Hold: Off, "
       "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
       "Button: 0 (Power)",

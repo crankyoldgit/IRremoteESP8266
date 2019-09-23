@@ -341,29 +341,29 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 }
 
 // Convert the internal state into a human readable string.
-String IRArgoAC::toString() {
+String IRArgoAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
   result += addIntToString(getMode(), F("Mode"));
   switch (getMode()) {
     case kArgoAuto:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kArgoCool:
-      result += F(" (COOL)");
+      result += F(" (Cool)");
       break;
     case kArgoHeat:
-      result += F(" (HEAT)");
+      result += F(" (Heat)");
       break;
     case kArgoDry:
-      result += F(" (DRY)");
+      result += F(" (Dry)");
       break;
     case kArgoHeatAuto:
-      result += F(" (HEATAUTO)");
+      result += F(" (Heat Auto)");
       break;
     case kArgoOff:
-      result += F(" (OFF)");
+      result += F(" (Off)");
       break;
     default:
       result += F(" (UNKNOWN)");
@@ -371,16 +371,16 @@ String IRArgoAC::toString() {
   result += addIntToString(getFan(), F("Fan"));
   switch (getFan()) {
     case kArgoFanAuto:
-      result += F(" (AUTO)");
+      result += F(" (Auto)");
       break;
     case kArgoFan3:
-      result += F(" (MAX)");
+      result += F(" (Max)");
       break;
     case kArgoFan1:
-      result += F(" (MIN)");
+      result += F(" (Min)");
       break;
     case kArgoFan2:
-      result += F(" (MED)");
+      result += F(" (Med)");
       break;
     default:
       result += F(" (UNKNOWN)");
