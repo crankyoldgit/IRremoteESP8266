@@ -51,7 +51,7 @@
 #endif  // UNIT_TEST
 
 // Library Version
-#define _IRREMOTEESP8266_VERSION_ "2.6.5"
+#define _IRREMOTEESP8266_VERSION_ "2.6.6"
 // Supported IR protocols
 // Each protocol you include costs memory and, during decode, costs time
 // Disable (set to false) all the protocols you do not need/want!
