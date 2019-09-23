@@ -491,6 +491,8 @@ bool isSerialGpioUsedByIr(void) {
 }
 
 // Debug messages get sent to the serial port.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void debug(const char *str) {
 #if DEBUG
   if (isSerialGpioUsedByIr()) return;  // Abort.
@@ -498,6 +500,7 @@ void debug(const char *str) {
   Serial.printf("%07u.%03u: %s\n", now / 1000, now % 1000, str);
 #endif  // DEBUG
 }
+#pragma GCC diagnostic pop
 
 // callback notifying us of the need to save the wifi config
 void saveWifiConfigCallback(void) {
