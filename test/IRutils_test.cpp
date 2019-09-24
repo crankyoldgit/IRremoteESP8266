@@ -581,4 +581,15 @@ TEST(TestUtils, setBit) {
   EXPECT_EQ(0b110, irutils::setBit((uint64_t)0b110, 1, true));
   EXPECT_EQ(0b11111111, irutils::setBit((uint64_t)0b01111111, 7, true));
   EXPECT_EQ(0, irutils::setBit((uint64_t)0b10000000, 7, false));
+  // Pointer method.
+  uint8_t data = 0;
+  irutils::setBit(&data, 0, false);
+  EXPECT_EQ(0, data);
+  data = 1;
+  irutils::setBit(&data, 0, false);
+  ASSERT_EQ(0, data);
+  irutils::setBit(&data, 0, true);
+  ASSERT_EQ(1, data);
+  irutils::setBit(&data, 0, true);
+  ASSERT_EQ(1, data);
 }

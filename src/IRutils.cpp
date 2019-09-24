@@ -1074,13 +1074,27 @@ namespace irutils {
   //   data: Value to be changed.
   //   position: Nr. of the bit to be changed. `0` is the LSB.
   //   on: Value to set the position'th bit to.
-  //   size: Nr. of bits in data.
   uint8_t setBit(const uint8_t data, const uint8_t position, const bool on) {
     if (position >= 8) return data;  // Outside of range.
-    uint64_t mask = 1 << position;
+    uint8_t mask = 1 << position;
     if (on)
       return data | mask;
     else
       return data & ~mask;
+  }
+
+  // Change the value at the location `data_ptr` with the `position`th bit
+  //  changed to `on`
+  // Args:
+  //   data: Ptr to the data to be changed.
+  //   position: Nr. of the bit to be changed. `0` is the LSB.
+  //   on: Value to set the position'th bit to.
+  void setBit(uint8_t * const data, const uint8_t position, const bool on) {
+    if (position >= 8) return;  // Outside of range.
+    uint8_t mask = 1 << position;
+    if (on)
+      *data |= mask;
+    else
+      *data &= ~mask;
   }
 }  // namespace irutils

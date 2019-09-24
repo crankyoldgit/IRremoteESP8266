@@ -72,5 +72,7 @@ namespace irutils {
                   const bool on = true, const uint8_t size = 64);
   uint8_t setBit(const uint8_t data, const uint8_t position,
                  const bool on = true);
+  void setBit(uint8_t * const data, const uint8_t position,
+              const bool on = true);
 }  // namespace irutils
 #endif  // IRUTILS_H_
