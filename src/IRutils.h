@@ -68,11 +68,19 @@ namespace irutils {
   bool getBit(const uint64_t data, const uint8_t position,
               const uint8_t size = 64);
   bool getBit(const uint8_t data, const uint8_t position);
+#define GETBIT8(a, b) (a & ((uint8_t)1 << b))
+#define GETBIT16(a, b) (a & ((uint16_t)1 << b))
+#define GETBIT32(a, b) (a & ((uint32_t)1 << b))
+#define GETBIT64(a, b) (a & ((uint64_t)1 << b))
   uint64_t setBit(const uint64_t data, const uint8_t position,
                   const bool on = true, const uint8_t size = 64);
   uint8_t setBit(const uint8_t data, const uint8_t position,
                  const bool on = true);
   void setBit(uint8_t * const data, const uint8_t position,
+              const bool on = true);
+  void setBit(uint32_t * const data, const uint8_t position,
+              const bool on = true);
+  void setBit(uint64_t * const data, const uint8_t position,
               const bool on = true);
 }  // namespace irutils
 #endif  // IRUTILS_H_
