@@ -1090,7 +1090,6 @@ namespace irutils {
   //   position: Nr. of the bit to be changed. `0` is the LSB.
   //   on: Value to set the position'th bit to.
   void setBit(uint8_t * const data, const uint8_t position, const bool on) {
-    if (position >= 8) return;  // Outside of range.
     uint8_t mask = 1 << position;
     if (on)
       *data |= mask;
@@ -1105,7 +1104,6 @@ namespace irutils {
   //   position: Nr. of the bit to be changed. `0` is the LSB.
   //   on: Value to set the position'th bit to.
   void setBit(uint32_t * const data, const uint8_t position, const bool on) {
-    if (position >= 32) return;  // Outside of range.
     uint32_t mask = (uint32_t)1 << position;
     if (on)
       *data |= mask;
@@ -1120,11 +1118,48 @@ namespace irutils {
   //   position: Nr. of the bit to be changed. `0` is the LSB.
   //   on: Value to set the position'th bit to.
   void setBit(uint64_t * const data, const uint8_t position, const bool on) {
-    if (position >= 64) return;  // Outside of range.
     uint64_t mask = (uint64_t)1 << position;
     if (on)
       *data |= mask;
     else
       *data &= ~mask;
+  }
+
+  // Change the uint8_t pointed to by `dst` starting at the `offset`th bit
+  //   and for `nbits` bits, with the contents of `data`.
+  // Args:
+  //   dst: Ptr to the uint8_t to be changed.
+  //   offset: Nr. of bits from the Least Significant Bit to be ignored.
+  //   nbits: Nr of bits of `data` to be placed into the destination uint8_t.
+  //   data: Value to be placed into the byte.
+  void setBits(uint8_t * const dst, const uint8_t offset, const uint8_t nbits,
+               const uint8_t data) {
+    if (offset >= 8 || !nbits) return;  // Short circuit as nothing will change.
+    // Calculate the mask for the supplied value.
+    uint8_t mask = UINT8_MAX >> (8 - ((nbits > 8) ? 8 : nbits));
+    // Calculate the mask & clear the space for the data.
+    // Clear the destination bits.
+    *dst &= ~(uint8_t)(mask << offset);
+    // Merge in the data.
+    *dst |= ((data & mask) << offset);
+  }
+
+  // Change the uint64_t pointed to by `dst` starting at the `offset`th bit
+  //   and for `nbits` bits, with the contents of `data`.
+  // Args:
+  //   dst: Ptr to the uint64_t to be changed.
+  //   offset: Nr. of bits from the Least Significant Bit to be ignored.
+  //   nbits: Nr of bits of `data` to be placed into the destination uint64_t.
+  //   data: Value to be placed into the byte.
+  void setBits(uint64_t * const dst, const uint8_t offset, const uint8_t nbits,
+               const uint64_t data) {
+    if (offset >= 64 || !nbits) return;  // Short circuit as nothing will change.
+    // Calculate the mask for the supplied value.
+    uint64_t mask = UINT64_MAX >> (64 - ((nbits > 64) ? 64 : nbits));
+    // Calculate the mask & clear the space for the data.
+    // Clear the destination bits.
+    *dst &= ~(mask << offset);
+    // Merge in the data.
+    *dst |= ((data & mask) << offset);
   }
 }  // namespace irutils

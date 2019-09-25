@@ -606,3 +606,116 @@ TEST(TestUtils, setBit) {
   irutils::setBit(&data64, 38, true);
   ASSERT_EQ(1ULL << 38, data64);
 }
+
+TEST(TestUtils, setBits8Bit) {
+  uint8_t data = 0b00000001;
+  // Trivial/corner cases.
+  irutils::setBits(&data, 0, 0, 0);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 0, 0, 17);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 22, 0, 22);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 8, 23, 3);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 8, 0, 3);
+  EXPECT_EQ(1, data);
+  // Single bit.
+  irutils::setBits(&data, 0, 1, 0);
+  EXPECT_EQ(0, data);
+  irutils::setBits(&data, 0, 1, 1);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 1, 1, 0);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 1, 1, 1);
+  EXPECT_EQ(0b11, data);
+  irutils::setBits(&data, 1, 1, 0);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 2, 1, 1);
+  EXPECT_EQ(0b101, data);
+  irutils::setBits(&data, 7, 1, 1);
+  EXPECT_EQ(0b10000101, data);
+  // Larger value than bits desired to be set.
+  irutils::setBits(&data, 5, 1, 255);
+  EXPECT_EQ(0b10100101, data);
+  // Set multiple bits
+  data = 0;
+  irutils::setBits(&data, 0, 8, 255);
+  EXPECT_EQ(0b11111111, data);
+  irutils::setBits(&data, 0, 8, 0);
+  EXPECT_EQ(0, data);
+  irutils::setBits(&data, 0, 4, 0xF);
+  EXPECT_EQ(0xF, data);
+  irutils::setBits(&data, 4, 4, 0xF);
+  EXPECT_EQ(0xFF, data);
+  irutils::setBits(&data, 4, 4, 0x3);
+  EXPECT_EQ(0x3F, data);
+  irutils::setBits(&data, 3, 4, 0x3);
+  EXPECT_EQ(0x1F, data);
+  irutils::setBits(&data, 1, 4, 0x3);
+  EXPECT_EQ(0b00000111, data);
+  irutils::setBits(&data, 1, 4, 0b1001);
+  EXPECT_EQ(0b00010011, data);
+  // Partial overrun.
+  irutils::setBits(&data, 6, 4, 0b1001);
+  EXPECT_EQ(0b01010011, data);
+  irutils::setBits(&data, 7, 4, 0b1001);
+  EXPECT_EQ(0b11010011, data);
+}
+
+TEST(TestUtils, setBits64Bit) {
+  uint64_t data = 1;
+  // Trivial/corner cases.
+  irutils::setBits(&data, 0, 0, 0);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 0, 0, 17);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 100, 0, 22);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 64, 23, 3);
+  EXPECT_EQ(1, data);
+  irutils::setBits(&data, 64, 0, 3);
+  EXPECT_EQ(1, data);
+  // Single bit.
+  irutils::setBits(&data, 0, 1, 0);
+  EXPECT_EQ(0, data);
+  irutils::setBits(&data, 0, 1, 1);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 1, 1, 0);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 1, 1, 1);
+  EXPECT_EQ(0b11, data);
+  irutils::setBits(&data, 1, 1, 0);
+  EXPECT_EQ(0b1, data);
+  irutils::setBits(&data, 2, 1, 1);
+  EXPECT_EQ(0b101, data);
+  irutils::setBits(&data, 7, 1, 1);
+  EXPECT_EQ(0b10000101, data);
+  // Larger value than bits desired to be set.
+  irutils::setBits(&data, 5, 1, 255);
+  EXPECT_EQ(0b10100101, data);
+  // Set multiple bits
+  data = 0;
+  irutils::setBits(&data, 0, 8, 255);
+  EXPECT_EQ(0b11111111, data);
+  irutils::setBits(&data, 0, 8, 0);
+  EXPECT_EQ(0, data);
+  irutils::setBits(&data, 0, 4, 0xF);
+  EXPECT_EQ(0xF, data);
+  irutils::setBits(&data, 4, 4, 0xF);
+  EXPECT_EQ(0xFF, data);
+  irutils::setBits(&data, 4, 4, 0x3);
+  EXPECT_EQ(0x3F, data);
+  irutils::setBits(&data, 3, 4, 0x3);
+  EXPECT_EQ(0x1F, data);
+  irutils::setBits(&data, 1, 4, 0x3);
+  EXPECT_EQ(0b00000111, data);
+  irutils::setBits(&data, 1, 4, 0b1001);
+  EXPECT_EQ(0b00010011, data);
+  // Partial overrun.
+  irutils::setBits(&data, 62, 4, 0b1001);
+  EXPECT_EQ(0x4000000000000013, data);
+  // General
+  irutils::setBits(&data, 32, 4, 0b1001);
+  EXPECT_EQ(0x4000000900000013, data);
+}
