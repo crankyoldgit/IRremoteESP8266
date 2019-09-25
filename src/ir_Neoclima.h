@@ -28,15 +28,22 @@
 
 // Constants
 // state[1]
-const uint8_t kNeoclima8CHeatMask = 0b00000010;
-const uint8_t kNeoclimaIonMask =    0b00000100;
+const uint8_t kNeoclima8CHeatOffset = 1;
+const uint8_t kNeoclima8CHeatMask = 1 << kNeoclima8CHeatOffset;  // 0b00000010
+const uint8_t kNeoclimaIonOffset = 2;
+const uint8_t kNeoclimaIonMask = 1 << kNeoclimaIonOffset;  // 0b00000100
 // state[3]
-const uint8_t kNeoclimaLightMask =  0b00000001;
-const uint8_t kNeoclimaHoldMask =   0b00000100;
-const uint8_t kNeoclimaTurboMask =  0b00001000;
-const uint8_t kNeoclimaEyeMask =    0b01000000;
+const uint8_t kNeoclimaLightOffset = 0;
+const uint8_t kNeoclimaLightMask = 1 << kNeoclimaLightOffset;  // 0b00000001
+const uint8_t kNeoclimaHoldOffset = 2;
+const uint8_t kNeoclimaHoldMask = 1 << kNeoclimaHoldOffset;  // 0b00000100
+const uint8_t kNeoclimaTurboOffset = 3;
+const uint8_t kNeoclimaTurboMask = 1 << kNeoclimaTurboOffset;  // 0b00001000
+const uint8_t kNeoclimaEyeOffset = 6;
+const uint8_t kNeoclimaEyeMask = 1 << kNeoclimaEyeOffset;  // 0b01000000
 // state[5]
-const uint8_t kNeoclimaFreshMask =  0b10000000;
+const uint8_t kNeoclimaFreshOffset = 7;
+const uint8_t kNeoclimaFreshMask = 1 << kNeoclimaFreshOffset;  // 0b10000000
 const uint8_t kNeoclimaButtonMask = 0b00011111;
 const uint8_t kNeoclimaButtonPower =    0x00;
 const uint8_t kNeoclimaButtonMode =     0x01;
@@ -55,12 +62,15 @@ const uint8_t kNeoclimaButtonIon =      0x14;
 const uint8_t kNeoclimaButtonFresh =    0x15;
 const uint8_t kNeoclimaButton8CHeat =   0x1D;
 // state[7]
-const uint8_t kNeoclimaSleepMask =  0b00000001;
-const uint8_t kNeoclimaPowerMask =  0b00000010;
+const uint8_t kNeoclimaSleepOffset = 0;
+const uint8_t kNeoclimaSleepMask = 1 << kNeoclimaSleepOffset;  // 0b00000001
+const uint8_t kNeoclimaPowerOffset = 1;
+const uint8_t kNeoclimaPowerMask = 1 << kNeoclimaPowerOffset;  // 0b00000010
 const uint8_t kNeoclimaSwingVMask = 0b00001100;
 const uint8_t kNeoclimaSwingVOn =   0b00000100;
 const uint8_t kNeoclimaSwingVOff =  0b00001000;
-const uint8_t kNeoclimaSwingHMask = 0b00010000;
+const uint8_t kNeoclimaSwingHOffset = 4;
+const uint8_t kNeoclimaSwingHMask = 1 << kNeoclimaSwingHOffset;  // 0b00010000
 const uint8_t kNeoclimaFanMask =    0b01100000;
 const uint8_t kNeoclimaFanAuto =     0b00;
 const uint8_t kNeoclimaFanHigh =     0b01;

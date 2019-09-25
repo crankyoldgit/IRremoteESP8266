@@ -38,6 +38,7 @@ using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 // Send a Haier A/C message. (HSU07-HEA03 remote)
@@ -220,18 +221,14 @@ uint8_t IRHaierAC::getTemp(void) {
 
 void IRHaierAC::setHealth(const bool on) {
   setCommand(kHaierAcCmdHealth);
-  remote_state[4] &= 0b11011111;
-  remote_state[4] |= (on << 5);
+  setBit(&remote_state[4], 5, on);
 }
 
 bool IRHaierAC::getHealth(void) { return remote_state[4] & (1 << 5); }
 
 void IRHaierAC::setSleep(const bool on) {
   setCommand(kHaierAcCmdSleep);
-  if (on)
-    remote_state[7] |= kHaierAcSleepBit;
-  else
-    remote_state[7] &= ~kHaierAcSleepBit;
+  setBit(&remote_state[7], kHaierAcSleepBitOffset, on);
 }
 
 bool IRHaierAC::getSleep(void) { return remote_state[7] & kHaierAcSleepBit; }
@@ -270,13 +267,13 @@ void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
 
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  remote_state[3] |= 0b10000000;
+  setBit(&remote_state[3], 7);
   setTime(remote_state + 6, nr_mins);
 }
 
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  remote_state[3] |= 0b01000000;
+  setBit(&remote_state[3], 6);
   setTime(remote_state + 4, nr_mins);
 }
 
@@ -576,7 +573,7 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
     default:  // If unexpected, default to auto mode.
       new_mode = kHaierAcYrw02Auto;
   }
-  remote_state[7] &= 0b0001111;
+  remote_state[7] &= 0b00001111;
   remote_state[7] |= (new_mode << 4);
 }
 
@@ -606,8 +603,7 @@ uint8_t IRHaierACYRW02::getTemp(void) {
 
 void IRHaierACYRW02::setHealth(const bool on) {
   setButton(kHaierAcYrw02ButtonHealth);
-  remote_state[3] &= 0b11111101;
-  remote_state[3] |= (on << 1);
+  setBit(&remote_state[3], 1, on);
 }
 
 bool IRHaierACYRW02::getHealth(void) { return remote_state[3] & 0b00000010; }
@@ -618,10 +614,7 @@ bool IRHaierACYRW02::getPower(void) {
 
 void IRHaierACYRW02::setPower(const bool on) {
   setButton(kHaierAcYrw02ButtonPower);
-  if (on)
-    remote_state[4] |= kHaierAcYrw02Power;
-  else
-    remote_state[4] &= ~kHaierAcYrw02Power;
+  setBit(&remote_state[4], kHaierAcYrw02PowerOffset, on);
 }
 
 void IRHaierACYRW02::on(void) { setPower(true); }
@@ -634,10 +627,7 @@ bool IRHaierACYRW02::getSleep(void) {
 
 void IRHaierACYRW02::setSleep(const bool on) {
   setButton(kHaierAcYrw02ButtonSleep);
-  if (on)
-    remote_state[8] |= kHaierAcYrw02Sleep;
-  else
-    remote_state[8] &= ~kHaierAcYrw02Sleep;
+  setBit(&remote_state[8], kHaierAcYrw02SleepOffset, on);
 }
 
 uint8_t IRHaierACYRW02::getTurbo(void) { return remote_state[6] >> 6; }

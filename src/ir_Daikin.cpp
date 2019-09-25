@@ -38,6 +38,7 @@ using irutils::addTempToString;
 using irutils::addFanToString;
 using irutils::bcdToUint8;
 using irutils::minsToString;
+using irutils::setBit;
 using irutils::sumNibbles;
 using irutils::uint8ToBcd;
 
@@ -186,19 +187,16 @@ void IRDaikinESP::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote[i + offset] = new_code[i];
 }
 
-void IRDaikinESP::on(void) { remote[kDaikinBytePower] |= kDaikinBitPower; }
+void IRDaikinESP::on(void) { setPower(true); }
 
-void IRDaikinESP::off(void) { remote[kDaikinBytePower] &= ~kDaikinBitPower; }
+void IRDaikinESP::off(void) { setPower(false); }
 
 void IRDaikinESP::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote[kDaikinBytePower], kDaikinBitPowerOffset, on);
 }
 
 bool IRDaikinESP::getPower(void) {
-  return remote[kDaikinBytePower] & kDaikinBitPower;
+  return GETBIT8(remote[kDaikinBytePower], kDaikinBitPowerOffset);
 }
 
 // Set the temp in deg C
@@ -270,84 +268,65 @@ bool IRDaikinESP::getSwingHorizontal(void) {
 }
 
 void IRDaikinESP::setQuiet(const bool on) {
-  if (on) {
-    remote[kDaikinByteSilent] |= kDaikinBitSilent;
-    // Powerful & Quiet mode being on are mutually exclusive.
-    this->setPowerful(false);
-  } else {
-    remote[kDaikinByteSilent] &= ~kDaikinBitSilent;
-  }
+  setBit(&remote[kDaikinByteSilent], kDaikinBitSilentOffset, on);
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) this->setPowerful(false);
 }
 
 bool IRDaikinESP::getQuiet(void) {
-  return remote[kDaikinByteSilent] & kDaikinBitSilent;
+  return GETBIT8(remote[kDaikinByteSilent], kDaikinBitSilentOffset);
 }
 
 void IRDaikinESP::setPowerful(const bool on) {
+  setBit(&remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset, on);
   if (on) {
-    remote[kDaikinBytePowerful] |= kDaikinBitPowerful;
     // Powerful, Quiet, & Econo mode being on are mutually exclusive.
     this->setQuiet(false);
     this->setEcono(false);
-  } else {
-    remote[kDaikinBytePowerful] &= ~kDaikinBitPowerful;
   }
 }
 
 bool IRDaikinESP::getPowerful(void) {
-  return remote[kDaikinBytePowerful] & kDaikinBitPowerful;
+  return GETBIT8(remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset);
 }
 
 void IRDaikinESP::setSensor(const bool on) {
-  if (on)
-    remote[kDaikinByteSensor] |= kDaikinBitSensor;
-  else
-    remote[kDaikinByteSensor] &= ~kDaikinBitSensor;
+  setBit(&remote[kDaikinByteSensor], kDaikinBitSensorOffset, on);
 }
 
 bool IRDaikinESP::getSensor(void) {
-  return remote[kDaikinByteSensor] & kDaikinBitSensor;
+  return GETBIT8(remote[kDaikinByteSensor], kDaikinBitSensorOffset);
 }
 
 void IRDaikinESP::setEcono(const bool on) {
-  if (on) {
-    remote[kDaikinByteEcono] |= kDaikinBitEcono;
-    // Powerful & Econo mode being on are mutually exclusive.
-    this->setPowerful(false);
-  } else {
-    remote[kDaikinByteEcono] &= ~kDaikinBitEcono;
-  }
+  setBit(&remote[kDaikinByteEcono], kDaikinBitEconoOffset, on);
+  // Powerful & Econo mode being on are mutually exclusive.
+  if (on) this->setPowerful(false);
 }
 
 bool IRDaikinESP::getEcono(void) {
-  return remote[kDaikinByteEcono] & kDaikinBitEcono;
+  return GETBIT8(remote[kDaikinByteEcono], kDaikinBitEconoOffset);
 }
 
 void IRDaikinESP::setMold(const bool on) {
-  if (on)
-    remote[kDaikinByteMold] |= kDaikinBitMold;
-  else
-    remote[kDaikinByteMold] &= ~kDaikinBitMold;
+  setBit(&remote[kDaikinByteMold], kDaikinBitMoldOffset, on);
 }
 
 bool IRDaikinESP::getMold(void) {
-  return remote[kDaikinByteMold] & kDaikinBitMold;
+  return GETBIT8(remote[kDaikinByteMold], kDaikinBitMoldOffset);
 }
 
 void IRDaikinESP::setComfort(const bool on) {
-  if (on)
-    remote[kDaikinByteComfort] |= kDaikinBitComfort;
-  else
-    remote[kDaikinByteComfort] &= ~kDaikinBitComfort;
+  setBit(&remote[kDaikinByteComfort], kDaikinBitComfortOffset, on);
 }
 
 bool IRDaikinESP::getComfort(void) {
-  return remote[kDaikinByteComfort] & kDaikinBitComfort;
+  return GETBIT8(remote[kDaikinByteComfort], kDaikinBitComfortOffset);
 }
 
 // starttime: Number of minutes after midnight.
 void IRDaikinESP::enableOnTimer(const uint16_t starttime) {
-  remote[kDaikinByteOnTimer] |= kDaikinBitOnTimer;
+  setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
   remote[kDaikinByteOnTimerMinsLow] = starttime;
   // only keep 4 bits
   remote[kDaikinByteOnTimerMinsHigh] &= 0xF0;
@@ -356,7 +335,7 @@ void IRDaikinESP::enableOnTimer(const uint16_t starttime) {
 
 void IRDaikinESP::disableOnTimer(void) {
   this->enableOnTimer(kDaikinUnusedTime);
-  remote[kDaikinByteOnTimer] &= ~kDaikinBitOnTimer;
+  setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset, false);
 }
 
 uint16_t IRDaikinESP::getOnTime(void) {
@@ -365,12 +344,12 @@ uint16_t IRDaikinESP::getOnTime(void) {
 }
 
 bool IRDaikinESP::getOnTimerEnabled(void) {
-  return remote[kDaikinByteOnTimer] & kDaikinBitOnTimer;
+  return GETBIT8(remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
 }
 
 // endtime: Number of minutes after midnight.
 void IRDaikinESP::enableOffTimer(const uint16_t endtime) {
-  remote[kDaikinByteOffTimer] |= kDaikinBitOffTimer;
+  setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
   remote[kDaikinByteOffTimerMinsHigh] = endtime >> 4;
   remote[kDaikinByteOffTimerMinsLow] &= 0x0F;
   remote[kDaikinByteOffTimerMinsLow] |= ((endtime & 0x0F) << 4);
@@ -378,7 +357,7 @@ void IRDaikinESP::enableOffTimer(const uint16_t endtime) {
 
 void IRDaikinESP::disableOffTimer(void) {
   this->enableOffTimer(kDaikinUnusedTime);
-  remote[kDaikinByteOffTimer] &= ~kDaikinBitOffTimer;
+  setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset, false);
 }
 
 uint16_t IRDaikinESP::getOffTime(void) {
@@ -387,7 +366,7 @@ uint16_t IRDaikinESP::getOffTime(void) {
 }
 
 bool IRDaikinESP::getOffTimerEnabled(void) {
-  return remote[kDaikinByteOffTimer] & kDaikinBitOffTimer;
+  return GETBIT8(remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
 }
 
 void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
@@ -418,14 +397,12 @@ uint8_t IRDaikinESP::getCurrentDay(void) {
 }
 
 void IRDaikinESP::setWeeklyTimerEnable(const bool on) {
-  if (on)
-    remote[kDaikinByteWeeklyTimer] &= ~kDaikinBitWeeklyTimer;  // Clear the bit.
-  else
-    remote[kDaikinByteWeeklyTimer] |= kDaikinBitWeeklyTimer;  // Set the bit.
+  // Bit is cleared for `on`.
+  setBit(&remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset, !on);
 }
 
 bool IRDaikinESP::getWeeklyTimerEnable(void) {
-  return !(remote[kDaikinByteWeeklyTimer] & kDaikinBitWeeklyTimer);
+  return !GETBIT8(remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset);
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -545,7 +522,7 @@ String IRDaikinESP::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Reported as working.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -752,16 +729,14 @@ void IRDaikin2::off() {
   remote_state[6] |= kDaikin2BitPower;
 }
 
-void IRDaikin2::setPower(const bool state) {
-  if (state)
-    on();
-  else
-    off();
+void IRDaikin2::setPower(const bool on) {
+  setBit(&remote_state[25], kDaikinBitPowerOffset, on);
+  setBit(&remote_state[6], kDaikin2BitPowerOffset, !on);
 }
 
 bool IRDaikin2::getPower() {
-  return (remote_state[25] & kDaikinBitPower) &&
-         !(remote_state[6] & kDaikin2BitPower);
+  return GETBIT8(remote_state[25], kDaikinBitPowerOffset) &&
+         !GETBIT8(remote_state[6], kDaikin2BitPowerOffset);
 }
 
 uint8_t IRDaikin2::getMode() { return remote_state[25] >> 4; }
@@ -888,7 +863,7 @@ uint16_t IRDaikin2::getCurrentTime() {
 // Note: Timer location is shared with sleep timer.
 void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   clearSleepTimerFlag();
-  remote_state[25] |= kDaikinBitOnTimer;  // Set the On Timer flag.
+  setBit(&remote_state[25], kDaikinBitOnTimerOffset);  // Set the On Timer flag.
   remote_state[30] = (uint8_t)(starttime & 0xFF);
   // only keep 4 bits
   remote_state[31] &= 0xF0;
@@ -896,7 +871,7 @@ void IRDaikin2::enableOnTimer(const uint16_t starttime) {
 }
 
 void IRDaikin2::clearOnTimerFlag() {
-  remote_state[25] &= ~kDaikinBitOnTimer;
+  setBit(&remote_state[25], kDaikinBitOnTimerOffset, false);
 }
 
 void IRDaikin2::disableOnTimer() {
@@ -910,12 +885,13 @@ uint16_t IRDaikin2::getOnTime() {
 }
 
 bool IRDaikin2::getOnTimerEnabled() {
-  return remote_state[25] & kDaikinBitOnTimer;
+  return GETBIT8(remote_state[25], kDaikinBitOnTimerOffset);
 }
 
 // endtime: Number of minutes after midnight.
 void IRDaikin2::enableOffTimer(const uint16_t endtime) {
-  remote_state[25] |= kDaikinBitOffTimer;  // Set the Off Timer flag.
+  // Set the Off Timer flag.
+  setBit(&remote_state[25], kDaikinBitOffTimerOffset);
   remote_state[32] = (uint8_t)((endtime >> 4) & 0xFF);
   remote_state[31] &= 0x0F;
   remote_state[31] |= (uint8_t)((endtime & 0xF) << 4);
@@ -923,7 +899,8 @@ void IRDaikin2::enableOffTimer(const uint16_t endtime) {
 
 void IRDaikin2::disableOffTimer() {
   enableOffTimer(kDaikinUnusedTime);
-  remote_state[25] &= ~kDaikinBitOffTimer;  // Clear the Off Timer flag.
+  // Clear the Off Timer flag.
+  setBit(&remote_state[25], kDaikinBitOffTimerOffset, false);
 }
 
 uint16_t IRDaikin2::getOffTime() {
@@ -931,7 +908,7 @@ uint16_t IRDaikin2::getOffTime() {
 }
 
 bool IRDaikin2::getOffTimerEnabled() {
-  return remote_state[25] & kDaikinBitOffTimer;
+  return GETBIT8(remote_state[25], kDaikinBitOffTimerOffset);
 }
 
 uint8_t IRDaikin2::getBeep() {
@@ -953,82 +930,61 @@ void IRDaikin2::setLight(const uint8_t light) {
 }
 
 void IRDaikin2::setMold(const bool on) {
-  if (on)
-    remote_state[8] |= kDaikin2BitMold;
-  else
-    remote_state[8] &= ~kDaikin2BitMold;
+  setBit(&remote_state[8], kDaikin2BitMoldOffset, on);
 }
 
 bool IRDaikin2::getMold() {
-  return remote_state[8] & kDaikin2BitMold;
+  return GETBIT8(remote_state[8], kDaikin2BitMoldOffset);
 }
 
 // Auto clean setting.
 void IRDaikin2::setClean(const bool on) {
-  if (on)
-    remote_state[8] |= kDaikin2BitClean;
-  else
-    remote_state[8] &= ~kDaikin2BitClean;
+  setBit(&remote_state[8], kDaikin2BitCleanOffset, on);
 }
 
 bool IRDaikin2::getClean() {
-  return remote_state[8] & kDaikin2BitClean;
+  return GETBIT8(remote_state[8], kDaikin2BitCleanOffset);
 }
 
 // Fresh Air settings.
 void IRDaikin2::setFreshAir(const bool on) {
-  if (on)
-    remote_state[8] |= kDaikin2BitFreshAir;
-  else
-    remote_state[8] &= ~kDaikin2BitFreshAir;
+  setBit(&remote_state[8], kDaikin2BitFreshAirOffset, on);
 }
 
 bool IRDaikin2::getFreshAir() {
-  return remote_state[8] & kDaikin2BitFreshAir;
+  return GETBIT8(remote_state[8], kDaikin2BitFreshAirOffset);
 }
 
 void IRDaikin2::setFreshAirHigh(const bool on) {
-  if (on)
-    remote_state[8] |= kDaikin2BitFreshAirHigh;
-  else
-    remote_state[8] &= ~kDaikin2BitFreshAirHigh;
+  setBit(&remote_state[8], kDaikin2BitFreshAirHighOffset, on);
 }
 
 bool IRDaikin2::getFreshAirHigh() {
-  return remote_state[8] & kDaikin2BitFreshAirHigh;
+  return GETBIT8(remote_state[8], kDaikin2BitFreshAirHighOffset);
 }
 
 void IRDaikin2::setEyeAuto(bool on) {
-  if (on)
-    remote_state[13] |= kDaikin2BitEyeAuto;
-  else
-    remote_state[13] &= ~kDaikin2BitEyeAuto;
+  setBit(&remote_state[13], kDaikin2BitEyeAutoOffset, on);
 }
 
 bool IRDaikin2::getEyeAuto() {
-  return remote_state[13] & kDaikin2BitEyeAuto;
+  return GETBIT8(remote_state[13], kDaikin2BitEyeAutoOffset);
 }
 
 void IRDaikin2::setEye(bool on) {
-  if (on)
-    remote_state[36] |= kDaikin2BitEye;
-  else
-    remote_state[36] &= ~kDaikin2BitEye;
+  setBit(&remote_state[36], kDaikin2BitEyeOffset, on);
 }
 
 bool IRDaikin2::getEye() {
-  return remote_state[36] & kDaikin2BitEye;
+  return GETBIT8(remote_state[36], kDaikin2BitEyeOffset);
 }
 
 void IRDaikin2::setEcono(bool on) {
-  if (on)
-    remote_state[36] |= kDaikinBitEcono;
-  else
-    remote_state[36] &= ~kDaikinBitEcono;
+  setBit(&remote_state[36], kDaikinBitEconoOffset, on);
 }
 
 bool IRDaikin2::getEcono() {
-  return remote_state[36] & kDaikinBitEcono;
+  return GETBIT8(remote_state[36], kDaikinBitEconoOffset);
 }
 
 // sleeptime: Number of minutes.
@@ -1036,11 +992,12 @@ bool IRDaikin2::getEcono() {
 void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
   enableOnTimer(sleeptime);
   clearOnTimerFlag();
-  remote_state[36] |= kDaikin2BitSleepTimer;  // Set the Sleep Timer flag.
+  // Set the Sleep Timer flag.
+  setBit(&remote_state[36], kDaikin2BitSleepTimerOffset);
 }
 
 void IRDaikin2::clearSleepTimerFlag() {
-  remote_state[36] &= ~kDaikin2BitSleepTimer;
+  setBit(&remote_state[36], kDaikin2BitSleepTimerOffset, false);
 }
 
 void IRDaikin2::disableSleepTimer() {
@@ -1052,41 +1009,36 @@ uint16_t IRDaikin2::getSleepTime() {
 }
 
 bool IRDaikin2::getSleepTimerEnabled() {
-  return remote_state[36] & kDaikin2BitSleepTimer;
+  return GETBIT8(remote_state[36],  kDaikin2BitSleepTimerOffset);
 }
 
 void IRDaikin2::setQuiet(const bool on) {
-  if (on) {
-    remote_state[33] |= kDaikinBitSilent;
-    // Powerful & Quiet mode being on are mutually exclusive.
-    setPowerful(false);
-  } else {
-    remote_state[33] &= ~kDaikinBitSilent;
-  }
+  setBit(&remote_state[33], kDaikinBitSilentOffset, on);
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) setPowerful(false);
 }
 
-bool IRDaikin2::getQuiet() { return remote_state[33] & kDaikinBitSilent; }
+bool IRDaikin2::getQuiet() {
+  return GETBIT8(remote_state[33], kDaikinBitSilentOffset);
+}
 
 void IRDaikin2::setPowerful(const bool on) {
-  if (on) {
-    remote_state[33] |= kDaikinBitPowerful;
-    // Powerful & Quiet mode being on are mutually exclusive.
-    setQuiet(false);
-  } else {
-    remote_state[33] &= ~kDaikinBitPowerful;
-  }
+  setBit(&remote_state[33], kDaikinBitPowerfulOffset, on);
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) setQuiet(false);
 }
 
-bool IRDaikin2::getPowerful() { return remote_state[33] & kDaikinBitPowerful; }
+bool IRDaikin2::getPowerful() {
+  return GETBIT8(remote_state[33], kDaikinBitPowerfulOffset);
+}
 
 void IRDaikin2::setPurify(const bool on) {
-  if (on)
-    remote_state[36] |= kDaikin2BitPurify;
-  else
-    remote_state[36] &= ~kDaikin2BitPurify;
+  setBit(&remote_state[36], kDaikin2BitPurifyOffset, on);
 }
 
-bool IRDaikin2::getPurify() { return remote_state[36] & kDaikin2BitPurify; }
+bool IRDaikin2::getPurify() {
+  return GETBIT8(remote_state[36],  kDaikin2BitPurifyOffset);
+}
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
@@ -1441,23 +1393,16 @@ void IRDaikin216::setRaw(const uint8_t new_code[]) {
 }
 
 
-void IRDaikin216::on() {
-  remote_state[kDaikin216BytePower] |= kDaikinBitPower;
-}
+void IRDaikin216::on() { setPower(true); }
 
-void IRDaikin216::off() {
-  remote_state[kDaikin216BytePower] &= ~kDaikinBitPower;
-}
+void IRDaikin216::off() { setPower(false); }
 
-void IRDaikin216::setPower(const bool state) {
-  if (state)
-    on();
-  else
-    off();
+void IRDaikin216::setPower(const bool on) {
+  setBit(&remote_state[kDaikin216BytePower], kDaikinBitPowerOffset, on);
 }
 
 bool IRDaikin216::getPower() {
-  return remote_state[kDaikin216BytePower] & kDaikinBitPower;
+  return GETBIT8(remote_state[kDaikin216BytePower], kDaikinBitPowerOffset);
 }
 
 uint8_t IRDaikin216::getMode() {
@@ -1560,17 +1505,14 @@ bool IRDaikin216::getQuiet(void) {
 }
 
 void IRDaikin216::setPowerful(const bool on) {
-  if (on) {
-    remote_state[kDaikin216BytePowerful] |= kDaikinBitPowerful;
-    // Powerful & Quiet mode being on are mutually exclusive.
-    this->setQuiet(false);
-  } else {
-    remote_state[kDaikin216BytePowerful] &= ~kDaikinBitPowerful;
-  }
+  setBit(&remote_state[kDaikin216BytePowerful], kDaikinBitPowerfulOffset, on);
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) this->setQuiet(false);
 }
 
 bool IRDaikin216::getPowerful() {
-  return remote_state[kDaikin216BytePowerful] & kDaikinBitPowerful;
+  return GETBIT8(remote_state[kDaikin216BytePowerful],
+                 kDaikinBitPowerfulOffset);
 }
 
 // Convert the A/C state to it's common equivalent.
@@ -1794,23 +1736,16 @@ void IRDaikin160::send(const uint16_t repeat) {
 }
 #endif  // SEND_DAIKIN160
 
-void IRDaikin160::on() {
-  remote_state[kDaikin160BytePower] |= kDaikinBitPower;
-}
+void IRDaikin160::on() { setPower(true); }
 
-void IRDaikin160::off() {
-  remote_state[kDaikin160BytePower] &= ~kDaikinBitPower;
-}
+void IRDaikin160::off() { setPower(false); }
 
-void IRDaikin160::setPower(const bool state) {
-  if (state)
-    on();
-  else
-    off();
+void IRDaikin160::setPower(const bool on) {
+  setBit(&remote_state[kDaikin160BytePower], kDaikinBitPowerOffset, on);
 }
 
 bool IRDaikin160::getPower() {
-  return remote_state[kDaikin160BytePower] & kDaikinBitPower;
+  return GETBIT8(remote_state[kDaikin160BytePower], kDaikinBitPowerOffset);
 }
 
 uint8_t IRDaikin160::getMode() {
@@ -2156,16 +2091,13 @@ void IRDaikin176::on() { setPower(true); }
 
 void IRDaikin176::off() { setPower(false); }
 
-void IRDaikin176::setPower(const bool state) {
+void IRDaikin176::setPower(const bool on) {
   remote_state[kDaikin176ByteModeButton] = 0;
-  if (state)
-    remote_state[kDaikin176BytePower] |= kDaikinBitPower;
-  else
-    remote_state[kDaikin176BytePower] &= ~kDaikinBitPower;
+  setBit(&remote_state[kDaikin176BytePower], kDaikinBitPowerOffset, on);
 }
 
 bool IRDaikin176::getPower() {
-  return remote_state[kDaikin176BytePower] & kDaikinBitPower;
+  return GETBIT8(remote_state[kDaikin176BytePower], kDaikinBitPowerOffset);
 }
 
 uint8_t IRDaikin176::getMode() {
@@ -2530,14 +2462,13 @@ void IRDaikin128::send(const uint16_t repeat) {
 #endif  // SEND_DAIKIN128
 
 void IRDaikin128::setPowerToggle(const bool toggle) {
-  if (toggle)
-    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitPowerToggle;
-  else
-    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitPowerToggle;
+  setBit(&remote_state[kDaikin128BytePowerSwingSleep],
+         kDaikin128BitPowerToggleOffset, toggle);
 }
 
 bool IRDaikin128::getPowerToggle(void) {
-  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitPowerToggle;
+  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
+                 kDaikin128BitPowerToggleOffset);
 }
 
 uint8_t IRDaikin128::getMode() {
@@ -2650,37 +2581,34 @@ stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
 }
 
 void IRDaikin128::setSwingVertical(const bool on) {
-  if (on)
-    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSwing;
-  else
-    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSwing;
+  setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSwingOffset,
+         on);
 }
 
 bool IRDaikin128::getSwingVertical(void) {
-  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSwing;
+  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
+                 kDaikin128BitSwingOffset);
 }
 
 void IRDaikin128::setSleep(const bool on) {
-  if (on)
-    remote_state[kDaikin128BytePowerSwingSleep] |= kDaikin128BitSleep;
-  else
-    remote_state[kDaikin128BytePowerSwingSleep] &= ~kDaikin128BitSleep;
+  setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSleepOffset,
+         on);
 }
 
 bool IRDaikin128::getSleep(void) {
-  return remote_state[kDaikin128BytePowerSwingSleep] & kDaikin128BitSleep;
+  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
+                 kDaikin128BitSleepOffset);
 }
 
 void IRDaikin128::setEcono(const bool on) {
   uint8_t mode = getMode();
-  if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
-    remote_state[kDaikin128ByteEconoLight] |= kDaikin128BitEcono;
-  else
-    remote_state[kDaikin128ByteEconoLight] &= ~kDaikin128BitEcono;
+  setBit(&remote_state[kDaikin128ByteEconoLight], kDaikin128BitEconoOffset,
+         on && (mode == kDaikin128Cool || mode == kDaikin128Heat));
 }
 
 bool IRDaikin128::getEcono(void) {
-  return remote_state[kDaikin128ByteEconoLight] & kDaikin128BitEcono;
+  return GETBIT8(remote_state[kDaikin128ByteEconoLight],
+                 kDaikin128BitEconoOffset);
 }
 
 void IRDaikin128::setQuiet(const bool on) {
@@ -2723,14 +2651,13 @@ uint16_t IRDaikin128::getClock(void) {
 }
 
 void IRDaikin128::setOnTimerEnabled(const bool on) {
-  if (on)
-    remote_state[kDaikin128ByteOnTimer] |= kDaikin128BitTimerEnabled;
-  else
-    remote_state[kDaikin128ByteOnTimer] &= ~kDaikin128BitTimerEnabled;
+  setBit(&remote_state[kDaikin128ByteOnTimer], kDaikin128BitTimerEnabledOffset,
+         on);
 }
 
 bool IRDaikin128::getOnTimerEnabled(void) {
-  return remote_state[kDaikin128ByteOnTimer] & kDaikin128BitTimerEnabled;
+  return GETBIT8(remote_state[kDaikin128ByteOnTimer],
+                 kDaikin128BitTimerEnabledOffset);
 }
 
 // Timer is rounds down to the nearest half hour.
@@ -2767,14 +2694,13 @@ uint16_t IRDaikin128::getOnTimer(void) {
 }
 
 void IRDaikin128::setOffTimerEnabled(const bool on) {
-  if (on)
-    remote_state[kDaikin128ByteOffTimer] |= kDaikin128BitTimerEnabled;
-  else
-    remote_state[kDaikin128ByteOffTimer] &= ~kDaikin128BitTimerEnabled;
+  setBit(&remote_state[kDaikin128ByteOffTimer], kDaikin128BitTimerEnabledOffset,
+         on);
 }
 
 bool IRDaikin128::getOffTimerEnabled(void) {
-  return remote_state[kDaikin128ByteOffTimer] & kDaikin128BitTimerEnabled;
+  return GETBIT8(remote_state[kDaikin128ByteOffTimer],
+                 kDaikin128BitTimerEnabledOffset);
 }
 
 void IRDaikin128::setOffTimer(const uint16_t mins_since_midnight) {

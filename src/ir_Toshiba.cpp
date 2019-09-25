@@ -38,6 +38,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_TOSHIBA_AC
 // Send a Toshiba A/C message.
@@ -150,30 +151,24 @@ void IRToshibaAC::checksum(const uint16_t length) {
                                                                 length);
 }
 
-// Set the requested power state of the A/C to off.
-void IRToshibaAC::on(void) {
-  // state = ON;
-  remote_state[6] &= ~kToshibaAcPower;
-  setMode(mode_state);
-}
+// Set the requested power state of the A/C to on.
+void IRToshibaAC::on(void) { setPower(true); }
 
 // Set the requested power state of the A/C to off.
-void IRToshibaAC::off(void) {
-  // state = OFF;
-  remote_state[6] |= (kToshibaAcPower | 0b00000011);
-}
+void IRToshibaAC::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRToshibaAC::setPower(const bool on) {
+  setBit(&remote_state[6], kToshibaAcPowerOffset, !on);  // Cleared when on.
   if (on)
-    this->on();
+    setMode(mode_state);
   else
-    this->off();
+    remote_state[6] |= kToshibaAcHeat;
 }
 
 // Return the requested power state of the A/C.
 bool IRToshibaAC::getPower(void) {
-  return ((remote_state[6] & kToshibaAcPower) == 0);
+  return !GETBIT8(remote_state[6], kToshibaAcPowerOffset);
 }
 
 // Set the temp. in deg C

@@ -67,10 +67,10 @@ const uint8_t kArgoTempOffset = 4;
 const uint8_t kArgoMaxRoomTemp = ((1 << 5) - 1) + kArgoTempOffset;  // 35C
 
 // byte[9]
-const uint8_t kArgoPowerBit = 0b00100000;
-const uint8_t kArgoMaxBit =   0b00001000;
-const uint8_t kArgoNightBit = 0b00000100;
-const uint8_t kArgoIFeelBit = 0b10000000;
+const uint8_t kArgoNightBitOffset = 2;
+const uint8_t kArgoMaxBitOffset = 3;
+const uint8_t kArgoPowerBitOffset = 5;
+const uint8_t kArgoIFeelBitOffset = 7;
 
 const uint8_t kArgoMinTemp = 10;  // Celsius offset +4
 const uint8_t kArgoMaxTemp = 32;  // Celsius

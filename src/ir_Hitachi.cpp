@@ -33,6 +33,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
@@ -169,13 +170,12 @@ void IRHitachiAc::send(const uint16_t repeat) {
 }
 #endif  // SEND_HITACHI_AC
 
-bool IRHitachiAc::getPower(void) { return (remote_state[17] & 0x01); }
+bool IRHitachiAc::getPower(void) {
+  return GETBIT8(remote_state[17], kHitachiAcPowerOffset);
+}
 
 void IRHitachiAc::setPower(const bool on) {
-  if (on)
-    remote_state[17] |= 0x01;
-  else
-    remote_state[17] &= 0xFE;
+  setBit(&remote_state[17], kHitachiAcPowerOffset, on);
 }
 
 void IRHitachiAc::on(void) { setPower(true); }
@@ -245,24 +245,21 @@ void IRHitachiAc::setFan(const uint8_t speed) {
   remote_state[13] = reverseBits(newspeed, 8);
 }
 
-bool IRHitachiAc::getSwingVertical(void) { return remote_state[14] & 0x80; }
+bool IRHitachiAc::getSwingVertical(void) {
+  return GETBIT8(remote_state[14], kHitachiAcSwingOffset);
+}
 
 void IRHitachiAc::setSwingVertical(const bool on) {
-  if (on)
-    remote_state[14] |= 0x80;
-  else
-    remote_state[14] &= 0x7F;
+  setBit(&remote_state[14], kHitachiAcSwingOffset, on);
 }
 
-bool IRHitachiAc::getSwingHorizontal(void) { return remote_state[15] & 0x80; }
+bool IRHitachiAc::getSwingHorizontal(void) {
+  return GETBIT8(remote_state[15], kHitachiAcSwingOffset);
+}
 
 void IRHitachiAc::setSwingHorizontal(const bool on) {
-  if (on)
-    remote_state[15] |= 0x80;
-  else
-    remote_state[15] &= 0x7F;
+  setBit(&remote_state[15], kHitachiAcSwingOffset, on);
 }
-
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {

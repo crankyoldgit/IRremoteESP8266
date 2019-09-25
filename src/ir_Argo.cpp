@@ -28,6 +28,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_ARGO
 // Send an Argo A/C message.
@@ -109,35 +110,21 @@ void IRArgoAC::setRaw(const uint8_t state[]) {
   for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = state[i];
 }
 
-void IRArgoAC::on(void) {
-  // Bit 5 of byte 9 is on/off
-  // in MSB first
-  argo[9]|= kArgoPowerBit;  // Set ON/OFF bit to 1
-}
+void IRArgoAC::on(void) { setPower(true); }
 
-void IRArgoAC::off(void) {
-  // in MSB first
-  // bit 5 of byte 9 to off
-  argo[9] &= ~kArgoPowerBit;  // Set on/off bit to 0
-}
+void IRArgoAC::off(void) { setPower(false); }
 
 void IRArgoAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&argo[9], kArgoPowerBitOffset, on);
 }
 
-bool IRArgoAC::getPower(void) { return argo[9] & kArgoPowerBit; }
+bool IRArgoAC::getPower(void) { return GETBIT8(argo[9], kArgoPowerBitOffset); }
 
 void IRArgoAC::setMax(const bool on) {
-  if (on)
-    argo[9] |= kArgoMaxBit;
-  else
-    argo[9] &= ~kArgoMaxBit;
+  setBit(&argo[9], kArgoMaxBitOffset, on);
 }
 
-bool IRArgoAC::getMax(void) { return argo[9] & kArgoMaxBit; }
+bool IRArgoAC::getMax(void) { return GETBIT8(argo[9], kArgoMaxBitOffset); }
 
 // Set the temp in deg C
 // Sending 0 equals +4
@@ -204,24 +191,16 @@ void IRArgoAC::setMode(const uint8_t mode) {
 }
 
 void IRArgoAC::setNight(const bool on) {
-  if (on)
-    // Set bit at night position: bit 2
-    argo[9] |= kArgoNightBit;
-  else
-    argo[9] &= ~kArgoNightBit;
+  setBit(&argo[9], kArgoNightBitOffset, on);
 }
 
-bool IRArgoAC::getNight(void) { return argo[9] & kArgoNightBit; }
+bool IRArgoAC::getNight(void) { return GETBIT8(argo[9], kArgoNightBitOffset); }
 
 void IRArgoAC::setiFeel(const bool on) {
-  if (on)
-    // Set bit at iFeel position: bit 7
-    argo[9] |= kArgoIFeelBit;
-  else
-    argo[9] &= ~kArgoIFeelBit;
+  setBit(&argo[9], kArgoIFeelBitOffset, on);
 }
 
-bool IRArgoAC::getiFeel(void) { return argo[9] & kArgoIFeelBit; }
+bool IRArgoAC::getiFeel(void) { return GETBIT8(argo[9], kArgoIFeelBitOffset); }
 
 void IRArgoAC::setTime(void) {
   // TODO(kaschmo): use function call from checksum to set time first

@@ -44,6 +44,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_MIDEA
 // Send a Midea message
@@ -132,38 +133,32 @@ void IRMideaAC::setRaw(const uint64_t newState) {
   remote_state = newState & kMideaACStateMask;
 }
 
-// Set the requested power state of the A/C to off.
-void IRMideaAC::on(void) { remote_state |= kMideaACPower; }
+// Set the requested power state of the A/C to on.
+void IRMideaAC::on(void) { setPower(true); }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::off(void) {
-  remote_state &= (kMideaACStateMask ^ kMideaACPower);
-}
+void IRMideaAC::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMideaAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state, kMideaACPowerOffset, on);
 }
 
 // Return the requested power state of the A/C.
-bool IRMideaAC::getPower(void) { return (remote_state & kMideaACPower); }
+bool IRMideaAC::getPower(void) {
+  return GETBIT64(remote_state, kMideaACPowerOffset);
+}
 
 // Returns true if we want the A/C unit to work natively in Celsius.
 bool IRMideaAC::getUseCelsius(void) {
-  return !(remote_state & kMideaACCelsiusBit);
+  return !GETBIT64(remote_state, kMideaACCelsiusOffset);
 }
 
 // Set the A/C unit to use Celsius natively.
 void IRMideaAC::setUseCelsius(const bool on) {
   if (on != getUseCelsius()) {  // We need to change.
     uint8_t native_temp = getTemp(!on);  // Get the old native temp.
-    if (on)
-      remote_state &= ~kMideaACCelsiusBit;  // Clear the bit
-    else
-      remote_state |= kMideaACCelsiusBit;  // Set the bit
+    setBit(&remote_state, kMideaACCelsiusOffset, !on);  // Cleared is on.
     setTemp(native_temp, !on);  // Reset temp using the old native temp.
   }
 }
@@ -250,14 +245,13 @@ void IRMideaAC::setMode(const uint8_t mode) {
 
 // Set the Sleep state of the A/C.
 void IRMideaAC::setSleep(const bool on) {
-  if (on)
-    remote_state |= kMideaACSleep;
-  else
-    remote_state &= (kMideaACStateMask ^ kMideaACSleep);
+  setBit(&remote_state, kMideaACSleepOffset, on);
 }
 
 // Return the Sleep state of the A/C.
-bool IRMideaAC::getSleep(void) { return (remote_state & kMideaACSleep); }
+bool IRMideaAC::getSleep(void) {
+  return GETBIT64(remote_state, kMideaACSleepOffset);
+}
 
 // Set the A/C to toggle the vertical swing toggle for the next send.
 void IRMideaAC::setSwingVToggle(const bool on) {
@@ -268,6 +262,7 @@ void IRMideaAC::setSwingVToggle(const bool on) {
 bool IRMideaAC::isSwingVToggle(void) {
   return remote_state == kMideaACToggleSwingV;
 }
+
 // Return the Swing V toggle state of the A/C.
 bool IRMideaAC::getSwingVToggle(void) {
   _SwingVToggle |= isSwingVToggle();

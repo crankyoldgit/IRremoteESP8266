@@ -45,7 +45,8 @@ const uint16_t kKelvinatorGapSpace = kKelvinatorGapSpaceTicks * kKelvinatorTick;
 const uint8_t kKelvinatorCmdFooter = 2;
 const uint8_t kKelvinatorCmdFooterBits = 3;
 
-const uint8_t kKelvinatorPower = 8;
+const uint8_t kKelvinatorPowerOffset = 3;
+const uint8_t kKelvinatorPower = 1 << kKelvinatorPowerOffset;
 const uint8_t kKelvinatorModeMask = 0xF8;
 const uint8_t kKelvinatorFanOffset = 4;
 const uint8_t kKelvinatorBasicFanMask = 0xFF ^ (3U << kKelvinatorFanOffset);
@@ -53,8 +54,10 @@ const uint8_t kKelvinatorFanMask = 0xFF ^ (7U << kKelvinatorFanOffset);
 const uint8_t kKelvinatorChecksumStart = 10;
 const uint8_t kKelvinatorVentSwingOffset = 6;
 const uint8_t kKelvinatorVentSwing = 1 << kKelvinatorVentSwingOffset;
-const uint8_t kKelvinatorVentSwingV = 1;
-const uint8_t kKelvinatorVentSwingH = 1 << 4;
+const uint8_t kKelvinatorVentSwingVOffset = 0;
+const uint8_t kKelvinatorVentSwingV = 1 << kKelvinatorVentSwingVOffset;
+const uint8_t kKelvinatorVentSwingHOffset = 4;
+const uint8_t kKelvinatorVentSwingH = 1 << kKelvinatorVentSwingHOffset;
 const uint8_t kKelvinatorSleep1And3 = 1 << 7;
 const uint8_t kKelvinatorQuietOffset = 7;
 const uint8_t kKelvinatorQuiet = 1 << kKelvinatorQuietOffset;
@@ -73,6 +76,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_KELVINATOR
 // Send a Kelvinator A/C message.
@@ -200,25 +204,17 @@ bool IRKelvinatorAC::validChecksum(const uint8_t state[],
   return true;
 }
 
-void IRKelvinatorAC::on(void) {
-  remote_state[0] |= kKelvinatorPower;
-  remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
-}
+void IRKelvinatorAC::on(void) { setPower(true); }
 
-void IRKelvinatorAC::off(void) {
-  remote_state[0] &= ~kKelvinatorPower;
-  remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
-}
+void IRKelvinatorAC::off(void) {setPower(false); }
 
 void IRKelvinatorAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[0], kKelvinatorPowerOffset, on);
+  remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getPower(void) {
-  return remote_state[0] & kKelvinatorPower;
+  return GETBIT8(remote_state[0], kKelvinatorPowerOffset);
 }
 
 // Set the temp. in deg C
@@ -281,84 +277,71 @@ void IRKelvinatorAC::setMode(const uint8_t mode) {
 }
 
 void IRKelvinatorAC::setSwingVertical(const bool on) {
-  if (on) {
-    remote_state[0] |= kKelvinatorVentSwing;
-    remote_state[4] |= kKelvinatorVentSwingV;
-  } else {
-    remote_state[4] &= ~kKelvinatorVentSwingV;
-    if (!this->getSwingHorizontal()) remote_state[0] &= ~kKelvinatorVentSwing;
-  }
+  setBit(&remote_state[4], kKelvinatorVentSwingVOffset, on);
+  setBit(&remote_state[0], kKelvinatorVentSwingOffset,
+         on || getSwingHorizontal());
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getSwingVertical(void) {
-  return remote_state[4] & kKelvinatorVentSwingV;
+  return GETBIT8(remote_state[4], kKelvinatorVentSwingVOffset);
 }
 
 void IRKelvinatorAC::setSwingHorizontal(const bool on) {
-  if (on) {
-    remote_state[0] |= kKelvinatorVentSwing;
-    remote_state[4] |= kKelvinatorVentSwingH;
-  } else {
-    remote_state[4] &= ~kKelvinatorVentSwingH;
-    if (!this->getSwingVertical()) remote_state[0] &= ~kKelvinatorVentSwing;
-  }
+  setBit(&remote_state[4], kKelvinatorVentSwingHOffset, on);
+  setBit(&remote_state[0], kKelvinatorVentSwingOffset,
+         on || getSwingVertical());
   remote_state[8] = remote_state[0];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getSwingHorizontal(void) {
-  return remote_state[4] & kKelvinatorVentSwingH;
+  return GETBIT8(remote_state[4], kKelvinatorVentSwingHOffset);
 }
 
 void IRKelvinatorAC::setQuiet(const bool on) {
-  remote_state[12] &= ~kKelvinatorQuiet;
-  remote_state[12] |= (on << kKelvinatorQuietOffset);
+  setBit(&remote_state[12], kKelvinatorQuietOffset, on);
 }
 
 bool IRKelvinatorAC::getQuiet(void) {
-  return remote_state[12] & kKelvinatorQuiet;
+  return GETBIT8(remote_state[12], kKelvinatorQuietOffset);
 }
 
 void IRKelvinatorAC::setIonFilter(const bool on) {
-  remote_state[2] &= ~kKelvinatorIonFilter;
-  remote_state[2] |= (on << kKelvinatorIonFilterOffset);
+  setBit(&remote_state[2], kKelvinatorIonFilterOffset, on);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getIonFilter(void) {
-  return remote_state[2] & kKelvinatorIonFilter;
+  return GETBIT8(remote_state[2], kKelvinatorIonFilterOffset);
 }
 
 void IRKelvinatorAC::setLight(const bool on) {
-  remote_state[2] &= ~kKelvinatorLight;
-  remote_state[2] |= (on << kKelvinatorLightOffset);
+  setBit(&remote_state[2], kKelvinatorLightOffset, on);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getLight(void) {
-  return remote_state[2] & kKelvinatorLight;
+  return GETBIT8(remote_state[2], kKelvinatorLightOffset);
 }
 
 // Note: XFan mode is only valid in Cool or Dry mode.
 void IRKelvinatorAC::setXFan(const bool on) {
-  remote_state[2] &= ~kKelvinatorXfan;
-  remote_state[2] |= (on << kKelvinatorXfanOffset);
+  setBit(&remote_state[2], kKelvinatorXfanOffset, on);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getXFan(void) {
-  return remote_state[2] & kKelvinatorXfan;
+  return GETBIT8(remote_state[2], kKelvinatorXfanOffset);
 }
 
 // Note: Turbo mode is turned off if the fan speed is changed.
 void IRKelvinatorAC::setTurbo(const bool on) {
-  remote_state[2] &= ~kKelvinatorTurbo;
-  remote_state[2] |= (on << kKelvinatorTurboOffset);
+  setBit(&remote_state[2], kKelvinatorTurboOffset, on);
   remote_state[10] = remote_state[2];  // Duplicate to the 2nd command chunk.
 }
 
 bool IRKelvinatorAC::getTurbo(void) {
-  return remote_state[2] & kKelvinatorTurbo;
+  return GETBIT8(remote_state[2], kKelvinatorTurboOffset);
 }
 
 // Convert a standard A/C mode into its native mode.

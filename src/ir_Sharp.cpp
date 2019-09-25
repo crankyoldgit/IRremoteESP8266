@@ -44,6 +44,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
@@ -329,19 +330,16 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote[i] = new_code[i];
 }
 
-void IRSharpAc::on(void) { remote[kSharpAcBytePower] |= kSharpAcBitPower; }
+void IRSharpAc::on(void) { setPower(true); }
 
-void IRSharpAc::off(void) { remote[kSharpAcBytePower] &= ~kSharpAcBitPower; }
+void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
 }
 
 bool IRSharpAc::getPower(void) {
-  return remote[kSharpAcBytePower] & kSharpAcBitPower;
+  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPowerOffset);
 }
 
 // Set the temp in deg C
@@ -355,7 +353,7 @@ void IRSharpAc::setTemp(const uint8_t temp) {
       return;
     default:
       remote[kSharpAcByteTemp] = 0xC0;
-      remote[kSharpAcByteManual] |= kSharpAcBitTempManual;
+      setBit(&remote[kSharpAcByteManual], kSharpAcBitTempManualOffset);
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
@@ -372,12 +370,10 @@ uint8_t IRSharpAc::getMode(void) {
 }
 
 void IRSharpAc::setMode(const uint8_t mode) {
-  const uint8_t special = 0x20;  // Non-auto modes have this bit set.
-  remote[kSharpAcBytePower] |= special;
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitModeNonAutoOffset,
+         mode != kSharpAcAuto);
   switch (mode) {
     case kSharpAcAuto:
-      remote[kSharpAcBytePower] &= ~special;  // Auto has this bit cleared.
-      // FALLTHRU
     case kSharpAcDry:
       this->setTemp(0);  // Dry/Auto have no temp setting.
       // FALLTHRU
@@ -394,16 +390,14 @@ void IRSharpAc::setMode(const uint8_t mode) {
 
 // Set the speed of the fan
 void IRSharpAc::setFan(const uint8_t speed) {
-  remote[kSharpAcByteManual] |= kSharpAcBitFanManual;  // Manual fan mode.
   switch (speed) {
     case kSharpAcFanAuto:
-      // Clear the manual fan bit.
-      remote[kSharpAcByteManual] &= ~kSharpAcBitFanManual;
-      // FALLTHRU
     case kSharpAcFanMin:
     case kSharpAcFanMed:
     case kSharpAcFanHigh:
     case kSharpAcFanMax:
+      setBit(&remote[kSharpAcByteManual], kSharpAcBitFanManualOffset,
+             speed != kSharpAcFanAuto);
       remote[kSharpAcByteFan] &= ~kSharpAcMaskFan;
       remote[kSharpAcByteFan] |= (speed << 4);
       break;

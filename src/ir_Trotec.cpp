@@ -25,6 +25,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_TROTEC
 
@@ -95,13 +96,12 @@ void IRTrotecESP::setRaw(const uint8_t state[]) {
 }
 
 void IRTrotecESP::setPower(const bool on) {
-  if (on)
-    remote_state[2] |= kTrotecPowerBit;
-  else
-    remote_state[2] &= ~kTrotecPowerBit;
+  setBit(&remote_state[2], kTrotecPowerBitOffset, on);
 }
 
-bool IRTrotecESP::getPower(void) { return remote_state[2] & kTrotecPowerBit; }
+bool IRTrotecESP::getPower(void) {
+  return GETBIT8(remote_state[2], kTrotecPowerBitOffset);
+}
 
 void IRTrotecESP::setSpeed(const uint8_t fan) {
   uint8_t speed = std::min(fan, kTrotecFanHigh);
@@ -119,7 +119,7 @@ void IRTrotecESP::setMode(const uint8_t mode) {
     case kTrotecDry:
     case kTrotecFan:
       remote_state[2] = (remote_state[2] & 0b11111100) | mode;
-      return;
+      break;
     default:
       this->setMode(kTrotecAuto);
   }
@@ -138,19 +138,15 @@ uint8_t IRTrotecESP::getTemp(void) {
 }
 
 void IRTrotecESP::setSleep(const bool on) {
-  if (on)
-    remote_state[3] |= kTrotecSleepBit;
-  else
-    remote_state[3] &= ~kTrotecSleepBit;
+  setBit(&remote_state[3], kTrotecSleepBitOffset, on);
 }
 
-bool IRTrotecESP::getSleep(void) { return remote_state[3] & kTrotecSleepBit; }
+bool IRTrotecESP::getSleep(void) {
+  return GETBIT8(remote_state[3], kTrotecSleepBitOffset);
+}
 
 void IRTrotecESP::setTimer(const uint8_t timer) {
-  if (timer)
-    remote_state[5] |= kTrotecTimerBit;
-  else
-    remote_state[5] &= ~kTrotecTimerBit;
+  setBit(&remote_state[5], kTrotecTimerBitOffset, timer);
   remote_state[6] = (timer > kTrotecMaxTimer) ? kTrotecMaxTimer : timer;
 }
 

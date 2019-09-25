@@ -57,6 +57,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_SAMSUNG
 // Send a Samsung formatted message.
@@ -286,7 +287,7 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
                   38000, false, 0, 50);                    // Send in LSBF order
     }
     // Complete made up guess at inter-message gap.
-    space(100000 - kSamsungAcSectionGap);
+    space(kDefaultMessageGap - kSamsungAcSectionGap);
   }
 }
 #endif  // SEND_SAMSUNG_AC
@@ -435,26 +436,21 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   }
 }
 
-void IRSamsungAc::on(void) {
-  remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
-  remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
-}
+void IRSamsungAc::on(void) { setPower(true); }
 
-void IRSamsungAc::off(void) {
-  remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
-  remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
-}
+void IRSamsungAc::off(void) { setPower(false); }
 
 void IRSamsungAc::setPower(const bool on) {
+  setBit(&remote_state[1], kSamsungAcPower1Offset, !on);  // Cleared when on.
   if (on)
-    this->on();
+    remote_state[6] |= kSamsungAcPowerMask6;
   else
-    this->off();
+    remote_state[6] &= ~kSamsungAcPowerMask6;
 }
 
 bool IRSamsungAc::getPower(void) {
   return (remote_state[6] & kSamsungAcPowerMask6) &&
-         !(remote_state[1] & kSamsungAcPowerMask1);
+         !GETBIT8(remote_state[1], kSamsungAcPower1Offset);
 }
 
 // Set the temp. in deg C
@@ -509,7 +505,7 @@ void IRSamsungAc::setFan(const uint8_t speed) {
 }
 
 uint8_t IRSamsungAc::getFan(void) {
-  return ((remote_state[12] & kSamsungAcFanMask) >> 1);
+  return (remote_state[12] & kSamsungAcFanMask) >> 1;
 }
 
 bool IRSamsungAc::getSwing(void) {
@@ -529,46 +525,35 @@ void IRSamsungAc::setSwing(const bool on) {
 }
 
 bool IRSamsungAc::getBeep(void) {
-  return remote_state[13] & kSamsungAcBeepMask;
+  return GETBIT8(remote_state[13], kSamsungAcBeepOffset);
 }
 
 void IRSamsungAc::setBeep(const bool on) {
-  if (on)
-    remote_state[13] |= kSamsungAcBeepMask;
-  else
-    remote_state[13] &= ~kSamsungAcBeepMask;
+  setBit(&remote_state[13], kSamsungAcBeepOffset, on);
 }
 
 bool IRSamsungAc::getClean(void) {
-  return (remote_state[10] & kSamsungAcCleanMask10) &&
-         (remote_state[11] & kSamsungAcCleanMask11);
+  return GETBIT8(remote_state[10], kSamsungAcClean10Offset) &&
+         GETBIT8(remote_state[11], kSamsungAcClean11Offset);
 }
 
 void IRSamsungAc::setClean(const bool on) {
-  if (on) {
-    remote_state[10] |= kSamsungAcCleanMask10;
-    remote_state[11] |= kSamsungAcCleanMask11;
-  } else {
-    remote_state[10] &= ~kSamsungAcCleanMask10;
-    remote_state[11] &= ~kSamsungAcCleanMask11;
-  }
+  setBit(&remote_state[10], kSamsungAcClean10Offset, on);
+  setBit(&remote_state[11], kSamsungAcClean11Offset, on);
 }
 
 bool IRSamsungAc::getQuiet(void) {
-  return !(remote_state[1] & kSamsungAcQuietMask1) &&
-         (remote_state[5] & kSamsungAcQuietMask5);
+  return !GETBIT8(remote_state[1], kSamsungAcQuiet1Offset) &&
+         GETBIT8(remote_state[5], kSamsungAcQuiet5Offset);
 }
 
 void IRSamsungAc::setQuiet(const bool on) {
+  setBit(&remote_state[1], kSamsungAcQuiet1Offset, !on);  // Cleared when on.
+  setBit(&remote_state[5], kSamsungAcQuiet5Offset, on);
   if (on) {
-    remote_state[1] &= ~kSamsungAcQuietMask1;  // Bit needs to be cleared.
-    remote_state[5] |= kSamsungAcQuietMask5;  // Bit needs to be set.
     // Quiet mode seems to set fan speed to auto.
     this->setFan(kSamsungAcFanAuto);
     this->setPowerful(false);  // Quiet 'on' is mutually exclusive to Powerful.
-  } else {
-    remote_state[1] |= kSamsungAcQuietMask1;  // Bit needs to be set.
-    remote_state[5] &= ~kSamsungAcQuietMask5;  // Bit needs to be cleared.
   }
 }
 

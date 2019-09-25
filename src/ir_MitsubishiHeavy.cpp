@@ -40,6 +40,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_MITSUBISHIHEAVY
 // Send a MitsubishiHeavy 88 bit A/C message.
@@ -112,19 +113,12 @@ void IRMitsubishiHeavy152Ac::setRaw(const uint8_t *data) {
     remote_state[i] = data[i];
 }
 
-void IRMitsubishiHeavy152Ac::on(void) {
-  remote_state[5] |= kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy152Ac::on(void) { setPower(true); }
 
-void IRMitsubishiHeavy152Ac::off(void) {
-  remote_state[5] &= ~kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy152Ac::off(void) { setPower(false); }
 
 void IRMitsubishiHeavy152Ac::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[5], kMitsubishiHeavyPowerOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getPower(void) {
@@ -206,14 +200,11 @@ uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
 }
 
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
-  if (on)
-    remote_state[15] |= kMitsubishiHeavyNightBit;
-  else
-    remote_state[15] &= ~kMitsubishiHeavyNightBit;
+  setBit(&remote_state[15], kMitsubishiHeavyNightOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getNight(void) {
-  return remote_state[15] & kMitsubishiHeavyNightBit;
+  return GETBIT8(remote_state[15], kMitsubishiHeavyNightOffset);
 }
 
 void IRMitsubishiHeavy152Ac::set3D(const bool on) {
@@ -228,37 +219,28 @@ bool IRMitsubishiHeavy152Ac::get3D(void) {
 }
 
 void IRMitsubishiHeavy152Ac::setSilent(const bool on) {
-  if (on)
-    remote_state[15] |= kMitsubishiHeavySilentBit;
-  else
-    remote_state[15] &= ~kMitsubishiHeavySilentBit;
+  setBit(&remote_state[15], kMitsubishiHeavySilentOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getSilent(void) {
-  return remote_state[15] & kMitsubishiHeavySilentBit;
+  return GETBIT8(remote_state[15], kMitsubishiHeavySilentOffset);
 }
 
 void IRMitsubishiHeavy152Ac::setFilter(const bool on) {
-  if (on)
-    remote_state[5] |= kMitsubishiHeavyFilterBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavyFilterBit;
+  setBit(&remote_state[5], kMitsubishiHeavyFilterOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getFilter(void) {
-  return remote_state[5] & kMitsubishiHeavyFilterBit;
+  return GETBIT8(remote_state[5], kMitsubishiHeavyFilterOffset);
 }
 
 void IRMitsubishiHeavy152Ac::setClean(const bool on) {
   this->setFilter(on);
-  if (on)
-    remote_state[5] |= kMitsubishiHeavyCleanBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavyCleanBit;
+  setBit(&remote_state[5], kMitsubishiHeavyCleanOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getClean(void) {
-  return remote_state[5] & kMitsubishiHeavyCleanBit && this->getFilter();
+  return GETBIT8(remote_state[5], kMitsubishiHeavyCleanOffset) && getFilter();
 }
 
 void IRMitsubishiHeavy152Ac::setTurbo(const bool on) {
@@ -602,23 +584,16 @@ void IRMitsubishiHeavy88Ac::setRaw(const uint8_t *data) {
     remote_state[i] = data[i];
 }
 
-void IRMitsubishiHeavy88Ac::on(void) {
-  remote_state[9] |= kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy88Ac::on(void) { setPower(true); }
 
-void IRMitsubishiHeavy88Ac::off(void) {
-  remote_state[9] &= ~kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy88Ac::off(void) { setPower(false); }
 
 void IRMitsubishiHeavy88Ac::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[9], kMitsubishiHeavyPowerOffset, on);
 }
 
 bool IRMitsubishiHeavy88Ac::getPower(void) {
-  return remote_state[9] & kMitsubishiHeavyPowerBit;
+  return GETBIT8(remote_state[9], kMitsubishiHeavyPowerOffset);
 }
 
 void IRMitsubishiHeavy88Ac::setTemp(const uint8_t temp) {
@@ -756,14 +731,11 @@ bool IRMitsubishiHeavy88Ac::get3D(void) {
 }
 
 void IRMitsubishiHeavy88Ac::setClean(const bool on) {
-  if (on)
-    remote_state[5] |= kMitsubishiHeavy88CleanBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavy88CleanBit;
+  setBit(&remote_state[5], kMitsubishiHeavy88CleanOffset, on);
 }
 
 bool IRMitsubishiHeavy88Ac::getClean(void) {
-  return remote_state[5] & kMitsubishiHeavy88CleanBit;
+  return GETBIT8(remote_state[5], kMitsubishiHeavy88CleanOffset);
 }
 
 // Verify the given state has a ZJ-S signature.

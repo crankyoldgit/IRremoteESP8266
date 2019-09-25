@@ -70,6 +70,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if (SEND_PANASONIC || SEND_DENON)
 // Send a Panasonic formatted message.
@@ -349,22 +350,19 @@ void IRPanasonicAc::setRaw(const uint8_t state[]) {
 // For all other models, setPower(true) should set the internal state to
 // turn it on, and setPower(false) should turn it off.
 void IRPanasonicAc::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[13], kPanasonicAcPowerOffset, on);
 }
 
 // Return the A/C power state of the remote.
 // Except for CKP models, where it returns if the power state will be toggled
 // on the A/C unit when the next message is sent.
 bool IRPanasonicAc::getPower(void) {
-  return (remote_state[13] & kPanasonicAcPower) == kPanasonicAcPower;
+  return GETBIT8(remote_state[13], kPanasonicAcPowerOffset);
 }
 
-void IRPanasonicAc::on(void) { remote_state[13] |= kPanasonicAcPower; }
+void IRPanasonicAc::on(void) { setPower(true); }
 
-void IRPanasonicAc::off(void) { remote_state[13] &= ~kPanasonicAcPower; }
+void IRPanasonicAc::off(void) { setPower(false); }
 
 uint8_t IRPanasonicAc::getMode(void) { return remote_state[13] >> 4; }
 
@@ -463,58 +461,49 @@ bool IRPanasonicAc::getQuiet(void) {
   switch (this->getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
-      return remote_state[21] & kPanasonicAcQuietCkp;
+      return GETBIT8(remote_state[21], kPanasonicAcQuietCkpOffset);
     default:
-      return remote_state[21] & kPanasonicAcQuiet;
+      return GETBIT8(remote_state[21], kPanasonicAcQuietOffset);
   }
 }
 
 void IRPanasonicAc::setQuiet(const bool on) {
-  uint8_t quiet;
+  uint8_t offset;
   switch (this->getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
-      quiet = kPanasonicAcQuietCkp;
+      offset = kPanasonicAcQuietCkpOffset;
       break;
     default:
-      quiet = kPanasonicAcQuiet;
+      offset = kPanasonicAcQuietOffset;
   }
-
-  if (on) {
-    this->setPowerful(false);  // Powerful is mutually exclusive.
-    remote_state[21] |= quiet;
-  } else {
-    remote_state[21] &= ~quiet;
-  }
+  if (on) this->setPowerful(false);  // Powerful is mutually exclusive.
+  setBit(&remote_state[21], offset, on);
 }
 
 bool IRPanasonicAc::getPowerful(void) {
   switch (this->getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
-      return remote_state[21] & kPanasonicAcPowerfulCkp;
+      return GETBIT8(remote_state[21], kPanasonicAcPowerfulCkpOffset);
     default:
-      return remote_state[21] & kPanasonicAcPowerful;
+      return GETBIT8(remote_state[21], kPanasonicAcPowerfulOffset);
   }
 }
 
 void IRPanasonicAc::setPowerful(const bool on) {
-  uint8_t powerful;
+  uint8_t offset;
   switch (this->getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
-      powerful = kPanasonicAcPowerfulCkp;
+      offset = kPanasonicAcPowerfulCkpOffset;
       break;
     default:
-      powerful = kPanasonicAcPowerful;
+      offset = kPanasonicAcPowerfulOffset;
   }
 
-  if (on) {
-    this->setQuiet(false);  // Quiet is mutually exclusive.
-    remote_state[21] |= powerful;
-  } else {
-    remote_state[21] &= ~powerful;
-  }
+  if (on) this->setQuiet(false);  // Quiet is mutually exclusive.
+  setBit(&remote_state[21], offset, on);
 }
 
 uint16_t IRPanasonicAc::encodeTime(const uint8_t hours, const uint8_t mins) {
@@ -549,11 +538,7 @@ void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
   corrected -= corrected % 10;
   if (mins_since_midnight == kPanasonicAcTimeSpecial)
     corrected = kPanasonicAcTimeSpecial;
-
-  if (enable)
-    remote_state[13] |= kPanasonicAcOnTimer;  // Set the Ontimer flag.
-  else
-    remote_state[13] &= ~kPanasonicAcOnTimer;  // Clear the Ontimer flag.
+  setBit(&remote_state[13], kPanasonicAcOnTimerOffset, enable);
   // Store the time.
   remote_state[18] = corrected & 0xFF;
   remote_state[19] &= 0b11111000;
@@ -563,7 +548,7 @@ void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
 void IRPanasonicAc::cancelOnTimer(void) { this->setOnTimer(0, false); }
 
 bool IRPanasonicAc::isOnTimerEnabled(void) {
-  return remote_state[13] & kPanasonicAcOnTimer;
+  return GETBIT8(remote_state[13], kPanasonicAcOnTimerOffset);
 }
 
 uint16_t IRPanasonicAc::getOffTimer(void) {
@@ -580,11 +565,7 @@ void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
   corrected -= corrected % 10;
   if (mins_since_midnight == kPanasonicAcTimeSpecial)
     corrected = kPanasonicAcTimeSpecial;
-
-  if (enable)
-    remote_state[13] |= kPanasonicAcOffTimer;  // Set the OffTimer flag.
-  else
-    remote_state[13] &= ~kPanasonicAcOffTimer;  // Clear the OffTimer flag.
+  setBit(&remote_state[13], kPanasonicAcOffTimerOffset, enable);
   // Store the time.
   remote_state[19] &= 0b00001111;
   remote_state[19] |= (corrected & 0b00001111) << 4;
@@ -595,7 +576,7 @@ void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
 void IRPanasonicAc::cancelOffTimer(void) { this->setOffTimer(0, false); }
 
 bool IRPanasonicAc::isOffTimerEnabled(void) {
-  return remote_state[13] & kPanasonicAcOffTimer;
+  return GETBIT8(remote_state[13], kPanasonicAcOffTimerOffset);
 }
 
 // Convert a standard A/C mode into its native mode.

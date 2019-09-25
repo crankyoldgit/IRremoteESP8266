@@ -32,15 +32,18 @@ const uint8_t kMitsubishiHeavySigLength = 5;
 const uint8_t kMitsubishiHeavyZmsSig[kMitsubishiHeavySigLength] = {
     0xAD, 0x51, 0x3C, 0xE5, 0x1A};
 // Byte[5]
-const uint8_t kMitsubishiHeavyFilterBit =     0b01000000;
-const uint8_t kMitsubishiHeavyCleanBit =      0b00100000;
-const uint8_t kMitsubishiHeavyPowerBit =      0b00001000;  // Byte 9 on ZJS
 const uint8_t kMitsubishiHeavyModeMask =      0b00000111;  // Byte 9 on ZJS
 const uint8_t kMitsubishiHeavyAuto = 0;         // 0b000
 const uint8_t kMitsubishiHeavyCool = 1;         // 0b001
 const uint8_t kMitsubishiHeavyDry =  2;         // 0b010
 const uint8_t kMitsubishiHeavyFan =  3;         // 0b011
 const uint8_t kMitsubishiHeavyHeat = 4;         // 0b100
+const uint8_t kMitsubishiHeavyPowerOffset = 3;  // Byte 9 on ZJS
+const uint8_t kMitsubishiHeavyPowerBit = 1 << kMitsubishiHeavyPowerOffset;
+const uint8_t kMitsubishiHeavyCleanOffset = 5;
+const uint8_t kMitsubishiHeavyCleanBit = 1 << kMitsubishiHeavyCleanOffset;
+const uint8_t kMitsubishiHeavyFilterOffset = 6;
+const uint8_t kMitsubishiHeavyFilterBit = 1 << kMitsubishiHeavyFilterOffset;
 // Byte[7]
 const uint8_t kMitsubishiHeavyTempMask =      0b00001111;
 const uint8_t kMitsubishiHeavyMinTemp = 17;   // 17C
@@ -76,15 +79,18 @@ const uint8_t kMitsubishiHeavy152SwingHRightLeft = 6;  // 0b0110
 const uint8_t kMitsubishiHeavy152SwingHLeftRight = 7;  // 0b0111
 const uint8_t kMitsubishiHeavy152SwingHOff =       8;  // 0b1000
 // Byte[15]
-const uint8_t kMitsubishiHeavyNightBit =   0b01000000;
-const uint8_t kMitsubishiHeavySilentBit =  0b10000000;
+const uint8_t kMitsubishiHeavyNightOffset = 6;
+const uint8_t kMitsubishiHeavyNightBit = 1 << kMitsubishiHeavyNightOffset;
+const uint8_t kMitsubishiHeavySilentOffset = 7;
+const uint8_t kMitsubishiHeavySilentBit = 1 << kMitsubishiHeavySilentOffset;
 
 
 // ZJS (88 bit)
 const uint8_t kMitsubishiHeavyZjsSig[kMitsubishiHeavySigLength] = {
     0xAD, 0x51, 0x3C, 0xD9, 0x26};
 // Byte [5]
-const uint8_t kMitsubishiHeavy88CleanBit =                  0b00100000;
+const uint8_t kMitsubishiHeavy88CleanOffset = 5;
+const uint8_t kMitsubishiHeavy88CleanBit = 1 << kMitsubishiHeavy88CleanOffset;
 const uint8_t kMitsubishiHeavy88SwingHMask =                0b11001100;
 const uint8_t kMitsubishiHeavy88SwingHAuto =      0x80;  // 0b10000000
 const uint8_t kMitsubishiHeavy88SwingHLeftMax =   0x04;  // 0b00000100

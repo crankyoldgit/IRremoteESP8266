@@ -28,6 +28,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if SEND_VESTEL_AC
 // Send a Vestel message
@@ -214,15 +215,12 @@ void IRVestelAc::setAuto(const int8_t autoLevel) {
 }
 
 void IRVestelAc::setTimerActive(const bool on) {
-  if (on)  // activation
-    remote_time_state |= ((uint64_t)1 << kVestelAcTimerFlagOffset);
-  else  // deactivate
-    remote_time_state &= ~((uint64_t)1 << kVestelAcTimerFlagOffset);
+  setBit(&remote_time_state, kVestelAcTimerFlagOffset, on);
   use_time_state = true;
 }
 
 bool IRVestelAc::isTimerActive(void) {
-  return (remote_time_state >> kVestelAcTimerFlagOffset) & 1;
+  return GETBIT64(remote_time_state, kVestelAcTimerFlagOffset);
 }
 
 // Set Timer option of AC.
@@ -260,15 +258,12 @@ uint16_t IRVestelAc::getTime(void) {
 }
 
 void IRVestelAc::setOnTimerActive(const bool on) {
-  if (on)  // activation
-    remote_time_state |= ((uint64_t)1 << kVestelAcOnTimerFlagOffset);
-  else  // deactivate
-    remote_time_state &= ~((uint64_t)1 << kVestelAcOnTimerFlagOffset);
+  setBit(&remote_time_state, kVestelAcOnTimerFlagOffset, on);
   use_time_state = true;
 }
 
 bool IRVestelAc::isOnTimerActive(void) {
-  return (remote_time_state >> kVestelAcOnTimerFlagOffset) & 1;
+  return GETBIT64(remote_time_state, kVestelAcOnTimerFlagOffset);
 }
 
 // Set AC's wake up time. Takes time in minute.
@@ -287,15 +282,12 @@ uint16_t IRVestelAc::getOnTimer(void) {
 }
 
 void IRVestelAc::setOffTimerActive(const bool on) {
-  if (on)  // activation
-    remote_time_state |= ((uint64_t)1 << kVestelAcOffTimerFlagOffset);
-  else  // deactivate
-    remote_time_state &= ~((uint64_t)1 << kVestelAcOffTimerFlagOffset);
+  setBit(&remote_time_state, kVestelAcOffTimerFlagOffset, on);
   use_time_state = true;
 }
 
 bool IRVestelAc::isOffTimerActive(void) {
-  return (remote_time_state >> kVestelAcOffTimerFlagOffset) & 1;
+  return GETBIT64(remote_time_state, kVestelAcOffTimerFlagOffset);
 }
 
 // Set AC's turn off time. Takes time in minute.
@@ -342,15 +334,13 @@ bool IRVestelAc::getTurbo(void) {
 
 // Set the Ion state of the A/C.
 void IRVestelAc::setIon(const bool on) {
-  remote_state &= ~((uint64_t)0x1 << kVestelAcIonOffset);
-
-  remote_state |= (uint64_t)(on ? 1 : 0) << kVestelAcIonOffset;
+  setBit(&remote_state, kVestelAcIonOffset, on);
   use_time_state = false;
 }
 
 // Return the Ion state of the A/C.
 bool IRVestelAc::getIon(void) {
-  return (remote_state >> kVestelAcIonOffset) & 1;
+  return GETBIT64(remote_state, kVestelAcIonOffset);
 }
 
 // Set the Swing Roaming state of the A/C.

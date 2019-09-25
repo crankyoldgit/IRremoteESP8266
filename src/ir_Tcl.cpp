@@ -17,6 +17,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_TCL112AC
 void IRsend::sendTcl112Ac(const unsigned char data[], const uint16_t nbytes,
@@ -107,15 +108,12 @@ void IRTcl112Ac::off(void) { this->setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRTcl112Ac::setPower(const bool on) {
-  if (on)
-    remote_state[5] |= kTcl112AcPowerMask;
-  else
-    remote_state[5] &= ~kTcl112AcPowerMask;
+  setBit(&remote_state[5], kTcl112AcPowerOffset, on);
 }
 
 // Return the requested power state of the A/C.
 bool IRTcl112Ac::getPower(void) {
-  return remote_state[5] & kTcl112AcPowerMask;
+  return GETBIT8(remote_state[5], kTcl112AcPowerOffset);
 }
 
 // Get the requested climate operation mode of the a/c unit.
@@ -152,17 +150,15 @@ void IRTcl112Ac::setTemp(const float celsius) {
   safecelsius = std::min(safecelsius, kTcl112AcTempMax);
   // Convert to integer nr. of half degrees.
   uint8_t nrHalfDegrees = safecelsius * 2;
-  if (nrHalfDegrees & 1)  // Do we have a half degree celsius?
-    remote_state[12] |= kTcl112AcHalfDegree;  // Add 0.5 degrees
-  else
-    remote_state[12] &= ~kTcl112AcHalfDegree;  // Clear the half degree.
+  // Do we have a half degree celsius?
+  setBit(&remote_state[12], kTcl112AcHalfDegreeOffset, nrHalfDegrees & 1);
   remote_state[7] &= 0xF0;  // Clear temp bits.
   remote_state[7] |= ((uint8_t)kTcl112AcTempMax - nrHalfDegrees / 2);
 }
 
 float IRTcl112Ac::getTemp(void) {
   float result = kTcl112AcTempMax - (remote_state[7] & 0xF);
-  if (remote_state[12] & kTcl112AcHalfDegree) result += 0.5;
+  if (GETBIT8(remote_state[12], kTcl112AcHalfDegreeOffset)) result += 0.5;
   return result;
 }
 
@@ -189,54 +185,42 @@ uint8_t IRTcl112Ac::getFan(void) {
 
 // Control economy mode.
 void IRTcl112Ac::setEcono(const bool on) {
-  if (on)
-    remote_state[5] |= kTcl112AcBitEcono;
-  else
-    remote_state[5] &= ~kTcl112AcBitEcono;
+  setBit(&remote_state[5], kTcl112AcBitEconoOffset, on);
 }
 
 // Return the economy state of the A/C.
 bool IRTcl112Ac::getEcono(void) {
-  return remote_state[5] & kTcl112AcBitEcono;
+  return GETBIT8(remote_state[5],  kTcl112AcBitEconoOffset);
 }
 
 // Control Health mode.
 void IRTcl112Ac::setHealth(const bool on) {
-  if (on)
-    remote_state[6] |= kTcl112AcBitHealth;
-  else
-    remote_state[6] &= ~kTcl112AcBitHealth;
+  setBit(&remote_state[6], kTcl112AcBitHealthOffset, on);
 }
 
 // Return the Health mode state of the A/C.
 bool IRTcl112Ac::getHealth(void) {
-  return remote_state[6] & kTcl112AcBitHealth;
+  return GETBIT8(remote_state[6], kTcl112AcBitHealthOffset);
 }
 
 // Control Light/Display mode.
 void IRTcl112Ac::setLight(const bool on) {
-  if (on)
-    remote_state[5] &= ~kTcl112AcBitLight;
-  else
-    remote_state[5] |= kTcl112AcBitLight;
+  setBit(&remote_state[5], kTcl112AcBitLightOffset, !on);  // Cleared when on.
 }
 
 // Return the Light/Display mode state of the A/C.
 bool IRTcl112Ac::getLight(void) {
-  return !(remote_state[5] & kTcl112AcBitLight);
+  return !GETBIT8(remote_state[5],  kTcl112AcBitLightOffset);
 }
 
 // Control Horizontal Swing.
 void IRTcl112Ac::setSwingHorizontal(const bool on) {
-  if (on)
-    remote_state[12] |= kTcl112AcBitSwingH;
-  else
-    remote_state[12] &= ~kTcl112AcBitSwingH;
+  setBit(&remote_state[12], kTcl112AcBitSwingHOffset, on);
 }
 
 // Return the Horizontal Swing state of the A/C.
 bool IRTcl112Ac::getSwingHorizontal(void) {
-  return remote_state[12] & kTcl112AcBitSwingH;
+  return GETBIT8(remote_state[12], kTcl112AcBitSwingHOffset);
 }
 
 // Control Vertical Swing.
@@ -254,18 +238,16 @@ bool IRTcl112Ac::getSwingVertical(void) {
 
 // Control the Turbo setting.
 void IRTcl112Ac::setTurbo(const bool on) {
+  setBit(&remote_state[6], kTcl112AcBitTurboOffset, on);
   if (on) {
-    remote_state[6] |= kTcl112AcBitTurbo;
     this->setFan(kTcl112AcFanHigh);
     this->setSwingVertical(true);
-  } else {
-    remote_state[6] &= ~kTcl112AcBitTurbo;
   }
 }
 
 // Return the Turbo setting state of the A/C.
 bool IRTcl112Ac::getTurbo(void) {
-  return remote_state[6] & kTcl112AcBitTurbo;
+  return GETBIT8(remote_state[6], kTcl112AcBitTurboOffset);
 }
 
 // Convert a standard A/C mode into its native mode.

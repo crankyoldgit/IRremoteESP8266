@@ -36,17 +36,24 @@ const uint8_t kTcl112AcFanLow  = 0b00000010;
 const uint8_t kTcl112AcFanMed  = 0b00000011;
 const uint8_t kTcl112AcFanHigh = 0b00000101;
 
-const uint8_t kTcl112AcHalfDegree = 0b00100000;
+const uint8_t kTcl112AcHalfDegreeOffset = 5;
+const uint8_t kTcl112AcHalfDegree = 1 << kTcl112AcHalfDegreeOffset;  // 0b100000
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
 
-const uint8_t kTcl112AcPowerMask = 0b00000100;
-const uint8_t kTcl112AcBitEcono  = 0b10000000;
-const uint8_t kTcl112AcBitLight  = 0b01000000;
-const uint8_t kTcl112AcBitHealth = 0b00010000;
-const uint8_t kTcl112AcBitSwingH = 0b00001000;
+const uint8_t kTcl112AcPowerOffset = 2;
+const uint8_t kTcl112AcPowerMask = 1 << kTcl112AcPowerOffset;      // 0b00000100
+const uint8_t kTcl112AcBitEconoOffset = 7;
+const uint8_t kTcl112AcBitEcono =  1 << kTcl112AcBitEconoOffset;   // 0b10000000
+const uint8_t kTcl112AcBitLightOffset = 6;
+const uint8_t kTcl112AcBitLight =  1 << kTcl112AcBitLightOffset;   // 0b01000000
+const uint8_t kTcl112AcBitHealthOffset = 4;
+const uint8_t kTcl112AcBitHealth = 1 << kTcl112AcBitHealthOffset;  // 0b00010000
+const uint8_t kTcl112AcBitSwingHOffset = 3;
+const uint8_t kTcl112AcBitSwingH = 1 << kTcl112AcBitSwingHOffset;  // 0b00001000
 const uint8_t kTcl112AcBitSwingV = 0b00111000;
-const uint8_t kTcl112AcBitTurbo  = 0b01000000;
+const uint8_t kTcl112AcBitTurboOffset = 6;
+const uint8_t kTcl112AcBitTurbo =  1 << kTcl112AcBitTurboOffset;   // 0b01000000
 
 
 class IRTcl112Ac {

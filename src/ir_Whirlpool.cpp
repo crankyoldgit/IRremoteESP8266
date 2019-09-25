@@ -44,6 +44,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if SEND_WHIRLPOOL_AC
 // Send a Whirlpool A/C message.
@@ -253,30 +254,24 @@ uint8_t IRWhirlpoolAc::getFan(void) {
 }
 
 void IRWhirlpoolAc::setSwing(const bool on) {
-  if (on) {
-    remote_state[kWhirlpoolAcFanPos] |= kWhirlpoolAcSwing1Mask;
-    remote_state[kWhirlpoolAcOffTimerPos] |= kWhirlpoolAcSwing2Mask;
-  } else {
-    remote_state[kWhirlpoolAcFanPos] &= ~kWhirlpoolAcSwing1Mask;
-    remote_state[kWhirlpoolAcOffTimerPos] &= ~kWhirlpoolAcSwing2Mask;
-  }
+  setBit(&remote_state[kWhirlpoolAcFanPos], kWhirlpoolAcSwing1Offset, on);
+  setBit(&remote_state[kWhirlpoolAcOffTimerPos], kWhirlpoolAcSwing2Offset, on);
   setCommand(kWhirlpoolAcCommandSwing);
 }
 
 bool IRWhirlpoolAc::getSwing(void) {
-  return (remote_state[kWhirlpoolAcFanPos] & kWhirlpoolAcSwing1Mask) &&
-         (remote_state[kWhirlpoolAcOffTimerPos] & kWhirlpoolAcSwing2Mask);
+  return GETBIT8(remote_state[kWhirlpoolAcFanPos], kWhirlpoolAcSwing1Offset) &&
+         GETBIT8(remote_state[kWhirlpoolAcOffTimerPos],
+                 kWhirlpoolAcSwing2Offset);
 }
 
 void IRWhirlpoolAc::setLight(const bool on) {
-  if (on)
-    remote_state[kWhirlpoolAcClockPos] &= ~kWhirlpoolAcLightMask;
-  else
-    remote_state[kWhirlpoolAcClockPos] |= kWhirlpoolAcLightMask;
+  // Cleared when on.
+  setBit(&remote_state[kWhirlpoolAcClockPos], kWhirlpoolAcLightOffset, !on);
 }
 
 bool IRWhirlpoolAc::getLight(void) {
-  return !(remote_state[kWhirlpoolAcClockPos] & kWhirlpoolAcLightMask);
+  return !GETBIT8(remote_state[kWhirlpoolAcClockPos], kWhirlpoolAcLightOffset);
 }
 
 void IRWhirlpoolAc::setTime(const uint16_t pos,
@@ -295,14 +290,11 @@ uint16_t IRWhirlpoolAc::getTime(const uint16_t pos) {
 }
 
 bool IRWhirlpoolAc::isTimerEnabled(const uint16_t pos) {
-  return remote_state[pos - 1] & kWhirlpoolAcTimerEnableMask;
+  return GETBIT8(remote_state[pos - 1], kWhirlpoolAcTimerEnableOffset);
 }
 
 void IRWhirlpoolAc::enableTimer(const uint16_t pos, const bool on) {
-  if (on)
-    remote_state[pos - 1] |= kWhirlpoolAcTimerEnableMask;
-  else
-    remote_state[pos - 1] &= ~kWhirlpoolAcTimerEnableMask;
+  setBit(&remote_state[pos - 1], kWhirlpoolAcTimerEnableOffset, on);
 }
 
 void IRWhirlpoolAc::setClock(const uint16_t minspastmidnight) {
@@ -348,16 +340,15 @@ void IRWhirlpoolAc::enableOnTimer(const bool on) {
 }
 
 void IRWhirlpoolAc::setPowerToggle(const bool on) {
-  if (on)
-    remote_state[kWhirlpoolAcPowerTogglePos] |= kWhirlpoolAcPowerToggleMask;
-  else
-    remote_state[kWhirlpoolAcPowerTogglePos] &= ~kWhirlpoolAcPowerToggleMask;
+  setBit(&remote_state[kWhirlpoolAcPowerTogglePos],
+         kWhirlpoolAcPowerToggleOffset, on);
   this->setSuper(false);  // Changing power cancels Super/Jet mode.
   this->setCommand(kWhirlpoolAcCommandPower);
 }
 
 bool IRWhirlpoolAc::getPowerToggle(void) {
-  return remote_state[kWhirlpoolAcPowerTogglePos] & kWhirlpoolAcPowerToggleMask;
+  return GETBIT8(remote_state[kWhirlpoolAcPowerTogglePos],
+                 kWhirlpoolAcPowerToggleOffset);
 }
 
 uint8_t IRWhirlpoolAc::getCommand(void) {
@@ -365,17 +356,14 @@ uint8_t IRWhirlpoolAc::getCommand(void) {
 }
 
 void IRWhirlpoolAc::setSleep(const bool on) {
-  if (on) {
-    remote_state[kWhirlpoolAcSleepPos] |= kWhirlpoolAcSleepMask;
-    this->setFan(kWhirlpoolAcFanLow);
-  } else {
-    remote_state[kWhirlpoolAcSleepPos] &= ~kWhirlpoolAcSleepMask;
-  }
+  setBit(&remote_state[kWhirlpoolAcSleepPos],
+         kWhirlpoolAcSleepOffset, on);
+  if (on) this->setFan(kWhirlpoolAcFanLow);
   this->setCommand(kWhirlpoolAcCommandSleep);
 }
 
 bool IRWhirlpoolAc::getSleep(void) {
-  return remote_state[kWhirlpoolAcSleepPos] & kWhirlpoolAcSleepMask;
+  return GETBIT8(remote_state[kWhirlpoolAcSleepPos], kWhirlpoolAcSleepOffset);
 }
 
 // AKA Jet/Turbo mode.

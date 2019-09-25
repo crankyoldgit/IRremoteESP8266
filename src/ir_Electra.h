@@ -46,7 +46,7 @@ const uint8_t kElectraAcDry =      0b010;
 const uint8_t kElectraAcHeat =     0b100;
 const uint8_t kElectraAcFan =      0b110;
 // state[9]
-const uint8_t kElectraAcPowerMask =  0b00100000;
+const uint8_t kElectraAcPowerOffset = 5;
 
 
 // Classes

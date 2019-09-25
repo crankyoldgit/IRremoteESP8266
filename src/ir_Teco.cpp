@@ -27,6 +27,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_TECO
 // Send a Teco A/C message.
@@ -70,13 +71,12 @@ void IRTecoAc::on(void) { setPower(true); }
 void IRTecoAc::off(void) { setPower(false); }
 
 void IRTecoAc::setPower(const bool on) {
-  if (on)
-    remote_state |= kTecoPower;
-  else
-    remote_state &= ~kTecoPower;
+  setBit(&remote_state, kTecoPowerOffset, on);
 }
 
-bool IRTecoAc::getPower(void) { return remote_state & kTecoPower; }
+bool IRTecoAc::getPower(void) {
+  return GETBIT64(remote_state, kTecoPowerOffset);
+}
 
 void IRTecoAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
@@ -129,51 +129,48 @@ void IRTecoAc::setMode(const uint8_t mode) {
 uint8_t IRTecoAc::getMode(void) { return remote_state & kTecoModeMask; }
 
 void IRTecoAc::setSwing(const bool on) {
-  if (on)
-    remote_state |= kTecoSwing;
-  else
-    remote_state &= ~kTecoSwing;
+  setBit(&remote_state, kTecoSwingOffset, on);
 }
 
-bool IRTecoAc::getSwing(void) { return remote_state & kTecoSwing; }
+bool IRTecoAc::getSwing(void) {
+  return GETBIT64(remote_state, kTecoSwingOffset);
+}
 
 void IRTecoAc::setSleep(const bool on) {
-  if (on)
-    remote_state |= kTecoSleep;
-  else
-    remote_state &= ~kTecoSleep;
+  setBit(&remote_state, kTecoSleepOffset, on);
 }
 
-bool IRTecoAc::getSleep(void) { return remote_state & kTecoSleep; }
-
-bool IRTecoAc::getLight(void) { return remote_state & kTecoLight; }
+bool IRTecoAc::getSleep(void) {
+  return GETBIT64(remote_state, kTecoSleepOffset);
+}
 
 void IRTecoAc::setLight(const bool on) {
-  if (on)
-    remote_state |= kTecoLight;
-  else
-    remote_state &= ~kTecoLight;
+  setBit(&remote_state, kTecoLightOffset, on);
 }
 
-bool IRTecoAc::getHumid(void) { return remote_state & kTecoHumid; }
+bool IRTecoAc::getLight(void) {
+  return GETBIT64(remote_state,  kTecoLightOffset);
+}
 
 void IRTecoAc::setHumid(const bool on) {
-  if (on)
-    remote_state |= kTecoHumid;
-  else
-    remote_state &= ~kTecoHumid;
+  setBit(&remote_state, kTecoHumidOffset, on);
 }
 
-bool IRTecoAc::getSave(void) { return remote_state & kTecoSave; }
+bool IRTecoAc::getHumid(void) {
+  return GETBIT64(remote_state, kTecoHumidOffset);
+}
 
 void IRTecoAc::setSave(const bool on) {
-  if (on)
-    remote_state |= kTecoSave;
-  else
-    remote_state &= ~kTecoSave;
+  setBit(&remote_state, kTecoSaveOffset, on);
 }
 
-bool IRTecoAc::getTimerEnabled(void) { return remote_state & kTecoTimerOn; }
+bool IRTecoAc::getSave(void) {
+  return GETBIT64(remote_state, kTecoSaveOffset);
+}
+
+bool IRTecoAc::getTimerEnabled(void) {
+  return GETBIT64(remote_state, kTecoTimerOnOffset);
+}
 
 uint16_t IRTecoAc::getTimer(void) {
   uint16_t mins = 0;
@@ -196,7 +193,7 @@ void IRTecoAc::setTimer(const uint16_t nr_mins) {
   uint8_t hours = mins / 60;
   remote_state &= ~kTecoTimerMask;  // Clear previous data
   if (mins) {
-    remote_state |= kTecoTimerOn;  // Enable the timer.
+    setBit(&remote_state, kTecoTimerOnOffset);
     if (half_hour) remote_state |= kTecoTimerHalfH;
     remote_state |= ((hours % 10) << 16);  // Set the unit hours.
     remote_state |= ((hours / 10) << 13);  // Set the tens of hours.

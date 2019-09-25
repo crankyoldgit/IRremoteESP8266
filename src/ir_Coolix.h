@@ -35,6 +35,7 @@ const uint8_t kCoolixAuto = 0b010;
 const uint8_t kCoolixHeat = 0b011;
 const uint8_t kCoolixFan = 0b100;                                 // Synthetic.
 const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
+const uint8_t kCoolixZoneFollowMaskOffset = 19;
 const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000;  // 0x80000
 // Fan Control
 const uint8_t kCoolixFanMin = 0b100;
@@ -139,7 +140,7 @@ class IRCoolixAC {
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
   void setSensorTempRaw(const uint8_t code);
-  void setZoneFollow(const bool state);
+  void setZoneFollow(const bool on);
   bool isSpecialState(void);
   void updateSavedState(void);
   void recoverSavedState(void);

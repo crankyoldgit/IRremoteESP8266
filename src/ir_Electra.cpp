@@ -30,6 +30,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_ELECTRA_AC
 // Send a Electra message
@@ -110,14 +111,11 @@ void IRElectraAc::on(void) { this->setPower(true); }
 void IRElectraAc::off(void) { this->setPower(false); }
 
 void IRElectraAc::setPower(const bool on) {
-  if (on)
-    remote_state[9] |= kElectraAcPowerMask;
-  else
-    remote_state[9] &= ~kElectraAcPowerMask;
+  setBit(&remote_state[9], kElectraAcPowerOffset, on);
 }
 
 bool IRElectraAc::getPower(void) {
-  return remote_state[9] & kElectraAcPowerMask;
+  return GETBIT8(remote_state[9], kElectraAcPowerOffset);
 }
 
 void IRElectraAc::setMode(const uint8_t mode) {

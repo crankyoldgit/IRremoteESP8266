@@ -26,7 +26,8 @@ const uint8_t kTrotecCool = 1;
 const uint8_t kTrotecDry = 2;
 const uint8_t kTrotecFan = 3;
 
-const uint8_t kTrotecPowerBit = 0b00001000;
+const uint8_t kTrotecPowerBitOffset = 3;
+const uint8_t kTrotecPowerBit = 1 << kTrotecPowerBitOffset;  // 0b00001000
 
 const uint8_t kTrotecFanLow = 1;
 const uint8_t kTrotecFanMed = 2;
@@ -36,11 +37,12 @@ const uint8_t kTrotecFanHigh = 3;
 const uint8_t kTrotecMinTemp = 18;
 const uint8_t kTrotecDefTemp = 25;
 const uint8_t kTrotecMaxTemp = 32;
-
-const uint8_t kTrotecSleepBit = 0b10000000;
+const uint8_t kTrotecSleepBitOffset = 7;
+const uint8_t kTrotecSleepBit = 1 << kTrotecSleepBitOffset;  // 0b10000000
 
 // Byte 5
-const uint8_t kTrotecTimerBit = 0b01000000;
+const uint8_t kTrotecTimerBitOffset = 6;
+const uint8_t kTrotecTimerBit = 1 << kTrotecTimerBitOffset;  // 0b01000000
 
 // Byte 6
 const uint8_t kTrotecMaxTimer = 23;

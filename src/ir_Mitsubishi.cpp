@@ -79,6 +79,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if SEND_MITSUBISHI
 // Send a Mitsubishi message
@@ -342,8 +343,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
       // DATA part:
 
       // FOOTER checksum:
-      if (IRMitsubishiAC::calculateChecksum(results->state) !=
-          results->state[kMitsubishiACStateLength - 1]) {
+      if (!IRMitsubishiAC::validChecksum(results->state)) {
         DPRINTLN("Checksum error.");
         failure = true;
       }
@@ -465,40 +465,31 @@ void IRMitsubishiAC::setRaw(const uint8_t *data) {
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishiAC::checksum(void) {
-  remote_state[17] = this->calculateChecksum(remote_state);
+  remote_state[kMitsubishiACStateLength - 1] = calculateChecksum(remote_state);
+}
+
+bool IRMitsubishiAC::validChecksum(const uint8_t *data) {
+  return calculateChecksum(data) == data[kMitsubishiACStateLength - 1];
 }
 
 uint8_t IRMitsubishiAC::calculateChecksum(const uint8_t *data) {
-  uint8_t sum = 0;
-  // Checksum is simple addition of all previous bytes stored
-  // as an 8 bit value.
-  for (uint8_t i = 0; i < 17; i++) sum += data[i];
-  return sum & 0xFFU;
+  return sumBytes(data, kMitsubishiACStateLength - 1);
 }
 
-// Set the requested power state of the A/C to off.
-void IRMitsubishiAC::on(void) {
-  // state = ON;
-  remote_state[5] |= kMitsubishiAcPower;
-}
+// Set the requested power state of the A/C to on.
+void IRMitsubishiAC::on(void) { setPower(true); }
 
 // Set the requested power state of the A/C to off.
-void IRMitsubishiAC::off(void) {
-  // state = OFF;
-  remote_state[5] &= ~kMitsubishiAcPower;
-}
+void IRMitsubishiAC::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishiAC::setPower(bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[5], kMitsubishiAcPowerOffset, on);
 }
 
 // Return the requested power state of the A/C.
 bool IRMitsubishiAC::getPower(void) {
-  return ((remote_state[5] & kMitsubishiAcPower) != 0);
+  return GETBIT8(remote_state[5], kMitsubishiAcPowerOffset);
 }
 
 // Set the temp. in deg C
@@ -538,7 +529,7 @@ uint8_t IRMitsubishiAC::getFan(void) {
 }
 
 // Return the requested climate operation mode of the a/c unit.
-uint8_t IRMitsubishiAC::getMode(void) { return (remote_state[6]); }
+uint8_t IRMitsubishiAC::getMode(void) { return remote_state[6]; }
 
 // Set the requested climate operation mode of the a/c unit.
 void IRMitsubishiAC::setMode(const uint8_t mode) {
@@ -962,7 +953,7 @@ uint8_t *IRMitsubishi136::getRaw(void) {
 }
 
 void IRMitsubishi136::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < (kMitsubishi136StateLength - 1); i++) {
+  for (uint8_t i = 0; i < kMitsubishi136StateLength - 1; i++) {
     remote_state[i] = data[i];
   }
   checksum();
@@ -976,15 +967,13 @@ void IRMitsubishi136::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi136::setPower(bool on) {
-  if (on)
-    remote_state[kMitsubishi136PowerByte] |= kMitsubishi136PowerBit;
-  else
-    remote_state[kMitsubishi136PowerByte] &= ~kMitsubishi136PowerBit;
+  setBit(&remote_state[kMitsubishi136PowerByte], kMitsubishi136PowerOffset, on);
 }
 
 // Return the requested power state of the A/C.
 bool IRMitsubishi136::getPower(void) {
-  return remote_state[kMitsubishi136PowerByte] & kMitsubishi136PowerBit;
+  return GETBIT8(remote_state[kMitsubishi136PowerByte],
+                 kMitsubishi136PowerOffset);
 }
 
 // Set the temp. in deg C

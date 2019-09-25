@@ -549,6 +549,13 @@ TEST(TestUtils, getBit) {
   EXPECT_TRUE(irutils::getBit((uint8_t)0b10, 1));
   EXPECT_FALSE(irutils::getBit((uint8_t)0b01111111, 7));
   EXPECT_TRUE(irutils::getBit((uint8_t)0b10000000, 7));
+  // 8-bit macro method
+  EXPECT_FALSE(GETBIT8((uint8_t)0, 0));
+  EXPECT_TRUE(GETBIT8((uint8_t)1, 0));
+  EXPECT_FALSE(GETBIT8((uint8_t)0b01, 1));
+  EXPECT_TRUE(GETBIT8((uint8_t)0b10, 1));
+  EXPECT_FALSE(GETBIT8((uint8_t)0b01111111, 7));
+  EXPECT_TRUE(GETBIT8((uint8_t)0b10000000, 7));
   // uint64_t method.
   EXPECT_FALSE(irutils::getBit((uint64_t)0, 0));
   EXPECT_TRUE(irutils::getBit((uint64_t)1, 0));
@@ -581,7 +588,7 @@ TEST(TestUtils, setBit) {
   EXPECT_EQ(0b110, irutils::setBit((uint64_t)0b110, 1, true));
   EXPECT_EQ(0b11111111, irutils::setBit((uint64_t)0b01111111, 7, true));
   EXPECT_EQ(0, irutils::setBit((uint64_t)0b10000000, 7, false));
-  // Pointer method.
+  // uint8_t Pointer method.
   uint8_t data = 0;
   irutils::setBit(&data, 0, false);
   EXPECT_EQ(0, data);
@@ -592,4 +599,10 @@ TEST(TestUtils, setBit) {
   ASSERT_EQ(1, data);
   irutils::setBit(&data, 0, true);
   ASSERT_EQ(1, data);
+  // uint64_t Pointer method.
+  uint64_t data64 = 0;
+  irutils::setBit(&data64, 38, true);
+  ASSERT_EQ(1ULL << 38, data64);
+  irutils::setBit(&data64, 38, true);
+  ASSERT_EQ(1ULL << 38, data64);
 }

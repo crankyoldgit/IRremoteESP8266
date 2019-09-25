@@ -35,6 +35,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_NEOCLIMA
 // Send a Neoclima message.
@@ -157,14 +158,11 @@ void IRNeoclimaAc::off(void) { this->setPower(false); }
 
 void IRNeoclimaAc::setPower(const bool on) {
   this->setButton(kNeoclimaButtonPower);
-  if (on)
-    remote_state[7] |= kNeoclimaPowerMask;
-  else
-    remote_state[7] &= ~kNeoclimaPowerMask;
+  setBit(&remote_state[7], kNeoclimaPowerOffset, on);
 }
 
 bool IRNeoclimaAc::getPower(void) {
-  return remote_state[7] & kNeoclimaPowerMask;
+  return GETBIT8(remote_state[7], kNeoclimaPowerOffset);
 }
 
 void IRNeoclimaAc::setMode(const uint8_t mode) {
@@ -290,14 +288,11 @@ stdAc::fanspeed_t IRNeoclimaAc::toCommonFanSpeed(const uint8_t speed) {
 
 void IRNeoclimaAc::setSleep(const bool on) {
   this->setButton(kNeoclimaButtonSleep);
-  if (on)
-    remote_state[7] |= kNeoclimaSleepMask;
-  else
-    remote_state[7] &= ~kNeoclimaSleepMask;
+  setBit(&remote_state[7], kNeoclimaSleepOffset, on);
 }
 
 bool IRNeoclimaAc::getSleep(void) {
-  return remote_state[7] & kNeoclimaSleepMask;
+  return GETBIT8(remote_state[7],  kNeoclimaSleepOffset);
 }
 
 // A.k.a. Swing
@@ -314,74 +309,56 @@ bool IRNeoclimaAc::getSwingV(void) {
 // A.k.a. Air Flow
 void IRNeoclimaAc::setSwingH(const bool on) {
   this->setButton(kNeoclimaButtonAirFlow);
-  if (on)
-    remote_state[7] &= ~kNeoclimaSwingHMask;
-  else
-    remote_state[7] |= kNeoclimaSwingHMask;
+  setBit(&remote_state[7], kNeoclimaSwingHOffset, !on);  // Cleared when `on`
 }
 
 bool IRNeoclimaAc::getSwingH(void) {
-  return !(remote_state[7] & kNeoclimaSwingHMask);
+  return !GETBIT8(remote_state[7], kNeoclimaSwingHOffset);
 }
 
 void IRNeoclimaAc::setTurbo(const bool on) {
   this->setButton(kNeoclimaButtonTurbo);
-  if (on)
-    remote_state[3] |= kNeoclimaTurboMask;
-  else
-    remote_state[3] &= ~kNeoclimaTurboMask;
+  setBit(&remote_state[3], kNeoclimaTurboOffset, on);
 }
 
 bool IRNeoclimaAc::getTurbo(void) {
-  return remote_state[3] & kNeoclimaTurboMask;
+  return GETBIT8(remote_state[3], kNeoclimaTurboOffset);
 }
 
 void IRNeoclimaAc::setFresh(const bool on) {
   this->setButton(kNeoclimaButtonFresh);
-  if (on)
-    remote_state[5] |= kNeoclimaFreshMask;
-  else
-    remote_state[5] &= ~kNeoclimaFreshMask;
+  setBit(&remote_state[5], kNeoclimaFreshOffset, on);
 }
 
 bool IRNeoclimaAc::getFresh(void) {
-  return remote_state[5] & kNeoclimaFreshMask;
+  return GETBIT8(remote_state[5], kNeoclimaFreshOffset);
 }
 
 void IRNeoclimaAc::setHold(const bool on) {
   this->setButton(kNeoclimaButtonHold);
-  if (on)
-    remote_state[3] |= kNeoclimaHoldMask;
-  else
-    remote_state[3] &= ~kNeoclimaHoldMask;
+  setBit(&remote_state[3], kNeoclimaHoldOffset, on);
 }
 
 bool IRNeoclimaAc::getHold(void) {
-  return remote_state[3] & kNeoclimaHoldMask;
+  return GETBIT8(remote_state[3], kNeoclimaHoldOffset);
 }
 
 void IRNeoclimaAc::setIon(const bool on) {
   this->setButton(kNeoclimaButtonIon);
-  if (on)
-    remote_state[1] |= kNeoclimaIonMask;
-  else
-    remote_state[1] &= ~kNeoclimaIonMask;
+  setBit(&remote_state[1], kNeoclimaIonOffset, on);
 }
 
 bool IRNeoclimaAc::getIon(void) {
-  return remote_state[1] & kNeoclimaIonMask;
+  return GETBIT8(remote_state[1], kNeoclimaIonOffset);
 }
 
 void IRNeoclimaAc::setLight(const bool on) {
   this->setButton(kNeoclimaButtonLight);
-  if (on)
-    remote_state[3] |= kNeoclimaLightMask;
-  else
-    remote_state[3] &= ~kNeoclimaLightMask;
+  setBit(&remote_state[3], kNeoclimaLightOffset, on);
 }
 
 bool IRNeoclimaAc::getLight(void) {
-  return remote_state[3] & kNeoclimaLightMask;
+  return GETBIT8(remote_state[3], kNeoclimaLightOffset);
 }
 
 // This feature maintains the room temperature steadily at 8°C and prevents the
@@ -389,26 +366,20 @@ bool IRNeoclimaAc::getLight(void) {
 // nobody is at home over a longer period during severe winter.
 void IRNeoclimaAc::set8CHeat(const bool on) {
   this->setButton(kNeoclimaButton8CHeat);
-  if (on)
-    remote_state[1] |= kNeoclima8CHeatMask;
-  else
-    remote_state[1] &= ~kNeoclima8CHeatMask;
+  setBit(&remote_state[1], kNeoclima8CHeatOffset, on);
 }
 
 bool IRNeoclimaAc::get8CHeat(void) {
-  return remote_state[1] & kNeoclima8CHeatMask;
+  return GETBIT8(remote_state[1], kNeoclima8CHeatOffset);
 }
 
 void IRNeoclimaAc::setEye(const bool on) {
   this->setButton(kNeoclimaButtonEye);
-  if (on)
-    remote_state[3] |= kNeoclimaEyeMask;
-  else
-    remote_state[3] &= ~kNeoclimaEyeMask;
+  setBit(&remote_state[3], kNeoclimaEyeOffset, on);
 }
 
 bool IRNeoclimaAc::getEye(void) {
-  return remote_state[3] & kNeoclimaEyeMask;
+  return GETBIT8(remote_state[3], kNeoclimaEyeOffset);
 }
 
 /* DISABLED

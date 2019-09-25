@@ -38,6 +38,7 @@ using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
 
 #if SEND_GREE
 // Send a Gree Heat Pump message.
@@ -202,22 +203,15 @@ void IRGreeAC::on(void) { setPower(true); }
 void IRGreeAC::off(void) { setPower(false); }
 
 void IRGreeAC::setPower(const bool on) {
-  if (on) {
-    remote_state[0] |= kGreePower1Mask;
-    switch (_model) {
-      case gree_ac_remote_model_t::YBOFB: break;
-      default:
-        remote_state[2] |= kGreePower2Mask;
-    }
-  } else {
-    remote_state[0] &= ~kGreePower1Mask;
-    remote_state[2] &= ~kGreePower2Mask;  // May not be needed. See #814
-  }
+  setBit(&remote_state[0], kGreePower1Offset, on);
+  // May not be needed. See #814
+  setBit(&remote_state[2], kGreePower2Offset,
+         on && _model != gree_ac_remote_model_t::YBOFB);
 }
 
 bool IRGreeAC::getPower(void) {
   //  See #814. Not checking/requiring: (remote_state[2] & kGreePower2Mask)
-  return remote_state[0] & kGreePower1Mask;
+  return GETBIT8(remote_state[0], kGreePower1Offset);
 }
 
 // Set the temp. in deg C
@@ -272,62 +266,55 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
 uint8_t IRGreeAC::getMode(void) { return (remote_state[0] & kGreeModeMask); }
 
 void IRGreeAC::setLight(const bool on) {
-  if (on)
-    remote_state[2] |= kGreeLightMask;
-  else
-    remote_state[2] &= ~kGreeLightMask;
+  setBit(&remote_state[2], kGreeLightOffset, on);
 }
 
-bool IRGreeAC::getLight(void) { return remote_state[2] & kGreeLightMask; }
+bool IRGreeAC::getLight(void) {
+  return GETBIT8(remote_state[2], kGreeLightOffset);
+}
 
 void IRGreeAC::setIFeel(const bool on) {
-  if (on)
-    remote_state[5] |= kGreeIFeelMask;
-  else
-    remote_state[5] &= ~kGreeIFeelMask;
+  setBit(&remote_state[5], kGreeIFeelOffset, on);
 }
 
-bool IRGreeAC::getIFeel(void) { return remote_state[5] & kGreeIFeelMask; }
+bool IRGreeAC::getIFeel(void) {
+  return GETBIT8(remote_state[5], kGreeIFeelOffset);
+}
 
 void IRGreeAC::setWiFi(const bool on) {
-  if (on)
-    remote_state[5] |= kGreeWiFiMask;
-  else
-    remote_state[5] &= ~kGreeWiFiMask;
+  setBit(&remote_state[5], kGreeWiFiOffset, on);
 }
 
-bool IRGreeAC::getWiFi(void) { return remote_state[5] & kGreeWiFiMask; }
+bool IRGreeAC::getWiFi(void) {
+  return GETBIT8(remote_state[5], kGreeWiFiOffset);
+}
 
 void IRGreeAC::setXFan(const bool on) {
-  if (on)
-    remote_state[2] |= kGreeXfanMask;
-  else
-    remote_state[2] &= ~kGreeXfanMask;
+  setBit(&remote_state[2], kGreeXfanOffset, on);
 }
 
-bool IRGreeAC::getXFan(void) { return remote_state[2] & kGreeXfanMask; }
+bool IRGreeAC::getXFan(void) {
+  return GETBIT8(remote_state[2], kGreeXfanOffset);
+}
 
 void IRGreeAC::setSleep(const bool on) {
-  if (on)
-    remote_state[0] |= kGreeSleepMask;
-  else
-    remote_state[0] &= ~kGreeSleepMask;
+  setBit(&remote_state[0], kGreeSleepOffset, on);
 }
 
-bool IRGreeAC::getSleep(void) { return remote_state[0] & kGreeSleepMask; }
+bool IRGreeAC::getSleep(void) {
+  return GETBIT8(remote_state[0], kGreeSleepOffset);
+}
 
 void IRGreeAC::setTurbo(const bool on) {
-  if (on)
-    remote_state[2] |= kGreeTurboMask;
-  else
-    remote_state[2] &= ~kGreeTurboMask;
+  setBit(&remote_state[2], kGreeTurboOffset, on);
 }
 
-bool IRGreeAC::getTurbo(void) { return remote_state[2] & kGreeTurboMask; }
+bool IRGreeAC::getTurbo(void) {
+  return GETBIT8(remote_state[2], kGreeTurboOffset);
+}
 
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
-  remote_state[0] &= ~kGreeSwingAutoMask;
-  remote_state[0] |= (automatic << 6);
+  setBit(&remote_state[0], kGreeSwingAutoOffset, automatic);
   uint8_t new_position = position;
   if (!automatic) {
     switch (position) {
@@ -356,7 +343,7 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
 }
 
 bool IRGreeAC::getSwingVerticalAuto(void) {
-  return remote_state[0] & kGreeSwingAutoMask;
+  return GETBIT8(remote_state[0], kGreeSwingAutoOffset);
 }
 
 uint8_t IRGreeAC::getSwingVerticalPosition(void) {
@@ -364,14 +351,11 @@ uint8_t IRGreeAC::getSwingVerticalPosition(void) {
 }
 
 void IRGreeAC::setTimerEnabled(const bool on) {
-  if (on)
-    remote_state[1] |= kGreeTimerEnabledBit;
-  else
-    remote_state[1] &= ~kGreeTimerEnabledBit;
+  setBit(&remote_state[1], kGreeTimerEnabledOffset, on);
 }
 
 bool IRGreeAC::getTimerEnabled(void) {
-  return remote_state[1] & kGreeTimerEnabledBit;
+  return GETBIT8(remote_state[1],  kGreeTimerEnabledOffset);
 }
 
 // Returns the number of minutes the timer is set for.

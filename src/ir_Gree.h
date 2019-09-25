@@ -33,19 +33,23 @@ const uint8_t kGreeHeat = 4;
 
 // Byte 0
 const uint8_t kGreeModeMask =        0b00000111;
-const uint8_t kGreePower1Mask =      0b00001000;
+const uint8_t kGreePower1Offset = 3;
+const uint8_t kGreePower1Mask = 1 << kGreePower1Offset;  // 0b00001000
 const uint8_t kGreeFanMask =         0b00110000;
 const uint8_t kGreeFanAuto = 0;
 const uint8_t kGreeFanMin = 1;
 const uint8_t kGreeFanMed = 2;
 const uint8_t kGreeFanMax = 3;
-const uint8_t kGreeSwingAutoMask =   0b01000000;
-const uint8_t kGreeSleepMask =       0b10000000;
+const uint8_t kGreeSwingAutoOffset = 6;
+const uint8_t kGreeSwingAutoMask = 1 << kGreeSwingAutoOffset;  // 0b01000000
+const uint8_t kGreeSleepOffset = 7;
+const uint8_t kGreeSleepMask = 1 << kGreeSleepOffset;  // 0b10000000
 // Byte 1
 const uint8_t kGreeTempMask =        0b00001111;
 const uint8_t kGreeMinTemp = 16;  // Celsius
 const uint8_t kGreeMaxTemp = 30;  // Celsius
-const uint8_t kGreeTimerEnabledBit = 0b10000000;
+const uint8_t kGreeTimerEnabledOffset = 7;
+const uint8_t kGreeTimerEnabledBit = 1 << kGreeTimerEnabledOffset;
 const uint8_t kGreeTimerHalfHrBit =  0b00010000;
 const uint8_t kGreeTimerTensHrMask = 0b01100000;
 const uint8_t kGreeTimer1Mask = kGreeTimerTensHrMask | kGreeTimerHalfHrBit;
@@ -53,16 +57,22 @@ const uint16_t kGreeTimerMax = 24 * 60;
 
 // Byte 2
 const uint8_t kGreeTimerHoursMask =  0b00001111;
-const uint8_t kGreeTurboMask =       0b00010000;
-const uint8_t kGreeLightMask =       0b00100000;
+const uint8_t kGreeTurboOffset = 4;
+const uint8_t kGreeTurboMask = 1 << kGreeTurboOffset;  // 0b00010000
+const uint8_t kGreeLightOffset = 5;
+const uint8_t kGreeLightMask =  1 << kGreeLightOffset;  // 0b00100000
 // This might not be used. See #814
-const uint8_t kGreePower2Mask =      0b01000000;
-const uint8_t kGreeXfanMask =        0b10000000;
+const uint8_t kGreePower2Offset = 6;
+const uint8_t kGreePower2Mask = 1 << kGreePower2Offset;  // 0b01000000
+const uint8_t kGreeXfanOffset = 7;
+const uint8_t kGreeXfanMask = 1 << kGreeXfanOffset;  // 0b10000000
 // Byte 4
 const uint8_t kGreeSwingPosMask =    0b00001111;
 // byte 5
-const uint8_t kGreeIFeelMask =       0b00000100;
-const uint8_t kGreeWiFiMask =        0b01000000;
+const uint8_t kGreeIFeelOffset = 2;
+const uint8_t kGreeIFeelMask = 1 << kGreeIFeelOffset;  // 0b00000100
+const uint8_t kGreeWiFiOffset = 6;
+const uint8_t kGreeWiFiMask = 1 << kGreeWiFiOffset;  // 0b01000000
 
 const uint8_t kGreeSwingLastPos =    0b00000000;
 const uint8_t kGreeSwingAuto =       0b00000001;

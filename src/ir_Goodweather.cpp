@@ -23,6 +23,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if SEND_GOODWEATHER
 // Send a Goodweather message.
@@ -89,13 +90,12 @@ void IRGoodweatherAc::off(void) { this->setPower(false); }
 
 void IRGoodweatherAc::setPower(const bool on) {
   this->setCommand(kGoodweatherCmdPower);
-  if (on)
-    remote |= kGoodweatherPowerMask;
-  else
-    remote &= ~kGoodweatherPowerMask;
+  setBit(&remote, kGoodweatherBitPower, on);
 }
 
-bool IRGoodweatherAc::getPower(void) { return remote & kGoodweatherPowerMask; }
+bool IRGoodweatherAc::getPower(void) {
+  return GETBIT64(remote, kGoodweatherBitPower);
+}
 
 // Set the temp. in deg C
 void IRGoodweatherAc::setTemp(const uint8_t temp) {
@@ -156,33 +156,30 @@ uint8_t IRGoodweatherAc::getMode() {
 
 void IRGoodweatherAc::setLight(const bool toggle) {
   this->setCommand(kGoodweatherCmdLight);
-  if (toggle)
-    remote |= kGoodweatherLightMask;
-  else
-    remote &= ~kGoodweatherLightMask;
+  setBit(&remote, kGoodweatherBitLight, toggle);
 }
 
-bool IRGoodweatherAc::getLight() { return remote & kGoodweatherLightMask; }
+bool IRGoodweatherAc::getLight() {
+  return GETBIT64(remote, kGoodweatherBitLight);
+}
 
 void IRGoodweatherAc::setSleep(const bool toggle) {
   this->setCommand(kGoodweatherCmdSleep);
-  if (toggle)
-    remote |= kGoodweatherSleepMask;
-  else
-    remote &= ~kGoodweatherSleepMask;
+  setBit(&remote, kGoodweatherBitSleep, toggle);
 }
 
-bool IRGoodweatherAc::getSleep() { return remote & kGoodweatherSleepMask; }
+bool IRGoodweatherAc::getSleep() {
+  return GETBIT64(remote, kGoodweatherBitSleep);
+}
 
 void IRGoodweatherAc::setTurbo(const bool toggle) {
   this->setCommand(kGoodweatherCmdTurbo);
-  if (toggle)
-    remote |= kGoodweatherTurboMask;
-  else
-    remote &= ~kGoodweatherTurboMask;
+  setBit(&remote, kGoodweatherBitTurbo, toggle);
 }
 
-bool IRGoodweatherAc::getTurbo() { return remote & kGoodweatherTurboMask; }
+bool IRGoodweatherAc::getTurbo() {
+  return GETBIT64(remote, kGoodweatherBitTurbo);
+}
 
 void IRGoodweatherAc::setSwing(const uint8_t speed) {
   switch (speed) {

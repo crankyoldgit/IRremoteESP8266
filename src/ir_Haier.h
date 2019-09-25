@@ -68,6 +68,7 @@ const uint8_t kHaierAcFanHigh = 3;
 const uint16_t kHaierAcMaxTime = (23 * 60) + 59;
 
 // Byte 7
+const uint8_t kHaierAcSleepBitOffset = 6;
 const uint8_t kHaierAcSleepBit = 0b01000000;
 
 // Legacy Haier AC defines.
@@ -118,6 +119,7 @@ const uint8_t kHaierAcYrw02SwingAuto = 0xC;  // Airflow
 // Bit 7 - Health mode
 
 // Byte 4
+const uint8_t kHaierAcYrw02PowerOffset = 6;
 const uint8_t kHaierAcYrw02Power = 0b01000000;
 
 // Byte 5
@@ -142,6 +144,7 @@ const uint8_t kHaierAcYrw02Heat = 0x8;
 const uint8_t kHaierAcYrw02Fan = 0xC;
 
 // Byte 8
+const uint8_t kHaierAcYrw02SleepOffset = 7;
 const uint8_t kHaierAcYrw02Sleep = 0b10000000;
 
 // Byte 12

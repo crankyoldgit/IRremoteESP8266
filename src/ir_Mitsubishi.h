@@ -33,7 +33,8 @@ const uint8_t kMitsubishiAcAuto = 0x20;
 const uint8_t kMitsubishiAcCool = 0x18;
 const uint8_t kMitsubishiAcDry = 0x10;
 const uint8_t kMitsubishiAcHeat = 0x08;
-const uint8_t kMitsubishiAcPower = 0x20;
+const uint8_t kMitsubishiAcPowerOffset = 5;
+const uint8_t kMitsubishiAcPower = 1 << kMitsubishiAcPowerOffset;  // 0x20
 const uint8_t kMitsubishiAcFanAuto = 0;
 const uint8_t kMitsubishiAcFanMax = 5;
 const uint8_t kMitsubishiAcFanRealMax = 4;
@@ -50,7 +51,8 @@ const uint8_t kMitsubishiAcStartStopTimer = 7;
 const uint8_t kMitsubishiAcWideVaneAuto = 8;
 
 const uint8_t kMitsubishi136PowerByte = 5;
-const uint8_t kMitsubishi136PowerBit =   0b01000000;
+const uint8_t kMitsubishi136PowerOffset = 6;
+const uint8_t kMitsubishi136PowerBit = 1 << kMitsubishi136PowerOffset;
 const uint8_t kMitsubishi136TempByte = 6;
 const uint8_t kMitsubishi136TempMask =   0b11110000;
 const uint8_t kMitsubishi136MinTemp = 17;  // 17C
@@ -96,10 +98,8 @@ class IRMitsubishiAC {
  public:
   explicit IRMitsubishiAC(const uint16_t pin, const bool inverted = false,
                           const bool use_modulation = true);
-
-  static uint8_t calculateChecksum(const uint8_t* data);
-
   void stateReset(void);
+  static bool validChecksum(const uint8_t* data);
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
   uint8_t calibrate(void) { return _irsend.calibrate(); }
@@ -148,6 +148,7 @@ class IRMitsubishiAC {
 #endif
   uint8_t remote_state[kMitsubishiACStateLength];
   void checksum(void);
+  static uint8_t calculateChecksum(const uint8_t* data);
 };
 
 class IRMitsubishi136 {
