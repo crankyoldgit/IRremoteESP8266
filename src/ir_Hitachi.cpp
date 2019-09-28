@@ -139,9 +139,9 @@ void IRHitachiAc::begin(void) { _irsend.begin(); }
 
 uint8_t IRHitachiAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
-  int8_t sum = 62;
+  uint8_t sum = 62;
   for (uint16_t i = 0; i < length - 1; i++) sum -= reverseBits(state[i], 8);
-  return reverseBits((uint8_t)sum, 8);
+  return reverseBits(sum, 8);
 }
 
 void IRHitachiAc::checksum(const uint16_t length) {
@@ -187,17 +187,13 @@ uint8_t IRHitachiAc::getMode(void) { return reverseBits(remote_state[10], 8); }
 void IRHitachiAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
   switch (mode) {
-    case kHitachiAcFan:
-      // Fan mode sets a special temp.
-      setTemp(64);
-      break;
+    // Fan mode sets a special temp.
+    case kHitachiAcFan: setTemp(64); break;
     case kHitachiAcAuto:
     case kHitachiAcHeat:
     case kHitachiAcCool:
-    case kHitachiAcDry:
-      break;
-    default:
-      newmode = kHitachiAcAuto;
+    case kHitachiAcDry: break;
+    default: newmode = kHitachiAcAuto;
   }
   remote_state[10] = reverseBits(newmode, 8);
   if (mode != kHitachiAcFan) setTemp(_previoustemp);
@@ -264,16 +260,11 @@ void IRHitachiAc::setSwingHorizontal(const bool on) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kHitachiAcCool;
-    case stdAc::opmode_t::kHeat:
-      return kHitachiAcHeat;
-    case stdAc::opmode_t::kDry:
-      return kHitachiAcDry;
-    case stdAc::opmode_t::kFan:
-      return kHitachiAcFan;
-    default:
-      return kHitachiAcAuto;
+    case stdAc::opmode_t::kCool: return kHitachiAcCool;
+    case stdAc::opmode_t::kHeat: return kHitachiAcHeat;
+    case stdAc::opmode_t::kDry:  return kHitachiAcDry;
+    case stdAc::opmode_t::kFan:  return kHitachiAcFan;
+    default:                     return kHitachiAcAuto;
   }
 }
 
@@ -281,16 +272,11 @@ uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kHitachiAcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kHitachiAcFanLow + 1;
-    case stdAc::fanspeed_t::kHigh:
-      return kHitachiAcFanHigh - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kHitachiAcFanHigh;
-    default:
-      return kHitachiAcFanAuto;
+    case stdAc::fanspeed_t::kLow:    return kHitachiAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kHitachiAcFanLow + 1;
+    case stdAc::fanspeed_t::kHigh:   return kHitachiAcFanHigh - 1;
+    case stdAc::fanspeed_t::kMax:    return kHitachiAcFanHigh;
+    default:                         return kHitachiAcFanAuto;
   }
 }
 
@@ -299,20 +285,20 @@ stdAc::opmode_t IRHitachiAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAcCool: return stdAc::opmode_t::kCool;
     case kHitachiAcHeat: return stdAc::opmode_t::kHeat;
-    case kHitachiAcDry: return stdAc::opmode_t::kDry;
-    case kHitachiAcFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kHitachiAcDry:  return stdAc::opmode_t::kDry;
+    case kHitachiAcFan:  return stdAc::opmode_t::kFan;
+    default:             return stdAc::opmode_t::kAuto;
   }
 }
 
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kHitachiAcFanHigh: return stdAc::fanspeed_t::kMax;
+    case kHitachiAcFanHigh:     return stdAc::fanspeed_t::kMax;
     case kHitachiAcFanHigh - 1: return stdAc::fanspeed_t::kHigh;
-    case kHitachiAcFanLow + 1: return stdAc::fanspeed_t::kMedium;
-    case kHitachiAcFanLow: return stdAc::fanspeed_t::kLow;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kHitachiAcFanLow + 1:  return stdAc::fanspeed_t::kMedium;
+    case kHitachiAcFanLow:      return stdAc::fanspeed_t::kLow;
+    default:                    return stdAc::fanspeed_t::kAuto;
   }
 }
 

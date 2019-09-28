@@ -41,30 +41,46 @@
 
 // byte[2]
 const uint8_t kArgoHeatBit =      0b00100000;
-const uint8_t kArgoModeMask =     0b00111000;
-const uint8_t kArgoTempLowMask =  0b11000000;
-const uint8_t kArgoCool =           0b000;  // 0b000 (LSB) 0
-const uint8_t kArgoDry =            0b001;  // 0b100 (LSB) 1
-const uint8_t kArgoAuto =           0b010;  // 0b010 (LSB) 2
-const uint8_t kArgoOff =            0b011;  // 0b110 (LSB) 3
-const uint8_t kArgoHeat =           0b100;  // 0b001 (LSB) 4
-const uint8_t kArgoHeatAuto =       0b101;  // 0b101 (LSB) 5
+//            kArgoTempLowMask =  0b11000000;
+const uint8_t kArgoTempLowOffset = 5;
+const uint8_t kArgoTempLowSize = 2;
+
+// Mode                           0b00111000
+const uint8_t kArgoModeOffset = 3;
+const uint8_t kArgoModeSize = 3;
+const uint8_t kArgoCool =           0b000;
+const uint8_t kArgoDry =            0b001;
+const uint8_t kArgoAuto =           0b010;
+const uint8_t kArgoOff =            0b011;
+const uint8_t kArgoHeat =           0b100;
+const uint8_t kArgoHeatAuto =       0b101;
 // ?no idea what mode that is
-const uint8_t kArgoHeatBlink = 0b110;  // 0b011 (LSB) 6
+const uint8_t kArgoHeatBlink =      0b110;
 
 // byte[3]
-const uint8_t kArgoTempHighMask =    0b00000111;
-const uint8_t kArgoFanMask =         0b00011000;
-const uint8_t kArgoRoomTempLowMask = 0b11100000;
-const uint8_t kArgoFanAuto = 0;  // 0b00
-const uint8_t kArgoFan3 = 3;  // 0b11
-const uint8_t kArgoFan2 = 2;  // 0b01
-const uint8_t kArgoFan1 = 1;  // 0b10
+//            kArgoTempHighMask =    0b00000111;
+const uint8_t kArgoTempHighOffset = 0;
+const uint8_t kArgoTempHighSize = 3;
+// Fan                               0b00011000
+const uint8_t kArgoFanOffset = 3;
+const uint8_t kArgoFanSize = 2;
+const uint8_t kArgoFanAuto = 0;      // 0b00
+const uint8_t kArgoFan1 = 1;         // 0b01
+const uint8_t kArgoFan2 = 2;         // 0b10
+const uint8_t kArgoFan3 = 3;         // 0b11
+//            kArgoRoomTempLowMask = 0b11100000;
+const uint8_t kArgoRoomTempLowOffset = 5;
+const uint8_t kArgoRoomTempLowSize = 3;
 
 // byte[4]
-const uint8_t kArgoRoomTempHighMask = 0b00000011;
-const uint8_t kArgoTempOffset = 4;
-const uint8_t kArgoMaxRoomTemp = ((1 << 5) - 1) + kArgoTempOffset;  // 35C
+//            kArgoRoomTempHighMask = 0b00000011;
+const uint8_t kArgoRoomTempHighOffset = 0;
+const uint8_t kArgoRoomTempHighSize = 2;
+
+const uint8_t kArgoTempDelta = 4;
+const uint8_t kArgoMaxRoomTemp =
+    ((1 << (kArgoRoomTempHighSize + kArgoRoomTempLowSize)) - 1) +
+    kArgoTempDelta;  // 35C
 
 // byte[9]
 const uint8_t kArgoNightBitOffset = 2;
@@ -72,17 +88,17 @@ const uint8_t kArgoMaxBitOffset = 3;
 const uint8_t kArgoPowerBitOffset = 5;
 const uint8_t kArgoIFeelBitOffset = 7;
 
-const uint8_t kArgoMinTemp = 10;  // Celsius offset +4
+const uint8_t kArgoMinTemp = 10;  // Celsius delta +4
 const uint8_t kArgoMaxTemp = 32;  // Celsius
 
-const uint8_t kArgoFlapAuto = 0;  // 0b000
-const uint8_t kArgoFlap1 = 1;  // 0b100
-const uint8_t kArgoFlap2 = 2;  // 0b010
-const uint8_t kArgoFlap3 = 3;  // 0b110
-const uint8_t kArgoFlap4 = 4;  // 0b001
-const uint8_t kArgoFlap5 = 5;  // 0b101
-const uint8_t kArgoFlap6 = 6;  // 0b011
-const uint8_t kArgoFlapFull = 7;  // 0b111
+const uint8_t kArgoFlapAuto = 0;
+const uint8_t kArgoFlap1 = 1;
+const uint8_t kArgoFlap2 = 2;
+const uint8_t kArgoFlap3 = 3;
+const uint8_t kArgoFlap4 = 4;
+const uint8_t kArgoFlap5 = 5;
+const uint8_t kArgoFlap6 = 6;
+const uint8_t kArgoFlapFull = 7;
 
 // Legacy defines. (Deperecated)
 #define ARGO_COOL_ON              kArgoCoolOn

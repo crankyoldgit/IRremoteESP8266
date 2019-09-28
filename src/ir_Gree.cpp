@@ -39,6 +39,7 @@ using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_GREE
 // Send a Gree Heat Pump message.
@@ -159,7 +160,7 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
   }
   // We can only detect the difference between models when the power is on.
   if (getPower()) {
-    if (remote_state[2] & kGreePower2Mask)
+    if (GETBIT8(remote_state[2], kGreePower2Offset))
       _model = gree_ac_remote_model_t::YAW1F;
     else
       _model = gree_ac_remote_model_t::YBOFB;
@@ -168,8 +169,8 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
 
 void IRGreeAC::checksum(const uint16_t length) {
   // Gree uses the same checksum alg. as Kelvinator's block checksum.
-  uint8_t sum = IRKelvinatorAC::calcBlockChecksum(remote_state, length);
-  remote_state[length - 1] = (sum << 4) | (remote_state[length - 1] & 0xFU);
+  setBits(&remote_state[length - 1], kHighNibble, kNibbleSize,
+          IRKelvinatorAC::calcBlockChecksum(remote_state, length));
 }
 
 // Verify the checksum is valid for a given state.
@@ -180,23 +181,19 @@ void IRGreeAC::checksum(const uint16_t length) {
 //   A boolean.
 bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
   // Top 4 bits of the last byte in the state is the state's checksum.
-  return (state[length - 1] >> 4 == IRKelvinatorAC::calcBlockChecksum(state,
-                                                                      length));
+  return GETBITS8(state[length - 1], kHighNibble, kNibbleSize) ==
+      IRKelvinatorAC::calcBlockChecksum(state, length);
 }
 
 void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
-    case gree_ac_remote_model_t::YBOFB:
-      _model = model; break;
-    default:
-      setModel(gree_ac_remote_model_t::YAW1F);
+    case gree_ac_remote_model_t::YBOFB: _model = model; break;
+    default: setModel(gree_ac_remote_model_t::YAW1F);
   }
 }
 
-gree_ac_remote_model_t IRGreeAC::getModel(void) {
-  return _model;
-}
+gree_ac_remote_model_t IRGreeAC::getModel(void) { return _model; }
 
 void IRGreeAC::on(void) { setPower(true); }
 
@@ -219,51 +216,45 @@ void IRGreeAC::setTemp(const uint8_t temp) {
   uint8_t new_temp = std::max((uint8_t)kGreeMinTemp, temp);
   new_temp = std::min((uint8_t)kGreeMaxTemp, new_temp);
   if (getMode() == kGreeAuto) new_temp = 25;
-  remote_state[1] = (remote_state[1] & ~kGreeTempMask) |
-                    (new_temp - kGreeMinTemp);
+  setBits(&remote_state[1], kLowNibble, kGreeTempSize, new_temp - kGreeMinTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRGreeAC::getTemp(void) {
-  return ((remote_state[1] & kGreeTempMask) + kGreeMinTemp);
+  return GETBITS8(remote_state[1], kLowNibble, kGreeTempSize) + kGreeMinTemp;
 }
 
 // Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
 void IRGreeAC::setFan(const uint8_t speed) {
   uint8_t fan = std::min((uint8_t)kGreeFanMax, speed);  // Bounds check
-
   if (getMode() == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
   // Set the basic fan values.
-  remote_state[0] &= ~kGreeFanMask;
-  remote_state[0] |= (fan << 4);
+  setBits(&remote_state[0], kGreeFanOffset, kGreeFanSize, fan);
 }
 
-uint8_t IRGreeAC::getFan(void) { return (remote_state[0] & kGreeFanMask) >> 4; }
+uint8_t IRGreeAC::getFan(void) {
+  return GETBITS8(remote_state[0], kGreeFanOffset, kGreeFanSize);
+}
 
 void IRGreeAC::setMode(const uint8_t new_mode) {
   uint8_t mode = new_mode;
   switch (mode) {
-    case kGreeAuto:
-      // AUTO is locked to 25C
-      setTemp(25);
-      break;
-    case kGreeDry:
-      // DRY always sets the fan to 1.
-      setFan(1);
-      break;
+    // AUTO is locked to 25C
+    case kGreeAuto: setTemp(25); break;
+    // DRY always sets the fan to 1.
+    case kGreeDry: setFan(1); break;
     case kGreeCool:
     case kGreeFan:
-    case kGreeHeat:
-      break;
-    default:
-      // If we get an unexpected mode, default to AUTO.
-      mode = kGreeAuto;
+    case kGreeHeat: break;
+    // If we get an unexpected mode, default to AUTO.
+    default: mode = kGreeAuto;
   }
-  remote_state[0] &= ~kGreeModeMask;
-  remote_state[0] |= mode;
+  setBits(&remote_state[0], kLowNibble, kModeBitsSize, mode);
 }
 
-uint8_t IRGreeAC::getMode(void) { return (remote_state[0] & kGreeModeMask); }
+uint8_t IRGreeAC::getMode(void) {
+  return GETBITS8(remote_state[0], kLowNibble, kModeBitsSize);
+}
 
 void IRGreeAC::setLight(const bool on) {
   setBit(&remote_state[2], kGreeLightOffset, on);
@@ -338,8 +329,7 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
         new_position = kGreeSwingAuto;
     }
   }
-  remote_state[4] &= ~kGreeSwingPosMask;
-  remote_state[4] |= new_position;
+  setBits(&remote_state[4], kLowNibble, kGreeSwingSize, new_position);
 }
 
 bool IRGreeAC::getSwingVerticalAuto(void) {
@@ -347,7 +337,7 @@ bool IRGreeAC::getSwingVerticalAuto(void) {
 }
 
 uint8_t IRGreeAC::getSwingVerticalPosition(void) {
-  return remote_state[4] & kGreeSwingPosMask;
+  return GETBITS8(remote_state[4], kLowNibble, kGreeSwingSize);
 }
 
 void IRGreeAC::setTimerEnabled(const bool on) {
@@ -355,15 +345,16 @@ void IRGreeAC::setTimerEnabled(const bool on) {
 }
 
 bool IRGreeAC::getTimerEnabled(void) {
-  return GETBIT8(remote_state[1],  kGreeTimerEnabledOffset);
+  return GETBIT8(remote_state[1], kGreeTimerEnabledOffset);
 }
 
 // Returns the number of minutes the timer is set for.
 uint16_t IRGreeAC::getTimer(void) {
   uint16_t hrs = irutils::bcdToUint8(
-      (remote_state[2] & kGreeTimerHoursMask) |
-      ((remote_state[1] & kGreeTimerTensHrMask) >> 1));
-  return hrs * 60 + ((remote_state[1] & kGreeTimerHalfHrBit) ? 30 : 0);
+      (GETBITS8(remote_state[1], kGreeTimerTensHrOffset,
+                kGreeTimerTensHrSize) << kNibbleSize) |
+      GETBITS8(remote_state[2], kGreeTimerHoursOffset, kGreeTimerHoursSize));
+  return hrs * 60 + (GETBIT8(remote_state[1], kGreeTimerHalfHrOffset) ? 30 : 0);
 }
 
 // Set the A/C's timer to turn off in X many minutes.
@@ -373,66 +364,51 @@ uint16_t IRGreeAC::getTimer(void) {
 // Args:
 //   minutes: The number of minutes the timer should be set for.
 void IRGreeAC::setTimer(const uint16_t minutes) {
-  // Clear the previous settings.
-  remote_state[1] &= ~kGreeTimer1Mask;
-  remote_state[2] &= ~kGreeTimerHoursMask;
   uint16_t mins = std::min(kGreeTimerMax, minutes);  // Bounds check.
   setTimerEnabled(mins >= 30);  // Timer is enabled when >= 30 mins.
   uint8_t hours = mins / 60;
-  uint8_t halfhour = (mins % 60) < 30 ? 0 : 1;
-  // Set the "tens" digit of hours & the half hour.
-  remote_state[1] |= (((hours / 10) << 1) | halfhour) << 4;
+  // Set the half hour bit.
+  setBit(&remote_state[1], kGreeTimerHalfHrOffset, !((mins % 60) < 30));
+  // Set the "tens" digit of hours.
+  setBits(&remote_state[1], kGreeTimerTensHrOffset, kGreeTimerTensHrSize,
+          hours / 10);
   // Set the "units" digit of hours.
-  remote_state[2] |= (hours % 10);
+  setBits(&remote_state[2], kGreeTimerHoursOffset, kGreeTimerHoursSize,
+          hours % 10);
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kGreeCool;
-    case stdAc::opmode_t::kHeat:
-      return kGreeHeat;
-    case stdAc::opmode_t::kDry:
-      return kGreeDry;
-    case stdAc::opmode_t::kFan:
-      return kGreeFan;
-    default:
-      return kGreeAuto;
+    case stdAc::opmode_t::kCool: return kGreeCool;
+    case stdAc::opmode_t::kHeat: return kGreeHeat;
+    case stdAc::opmode_t::kDry:  return kGreeDry;
+    case stdAc::opmode_t::kFan:  return kGreeFan;
+    default:                     return kGreeAuto;
   }
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kGreeFanMin;
+    case stdAc::fanspeed_t::kMin:    return kGreeFanMin;
     case stdAc::fanspeed_t::kLow:
-    case stdAc::fanspeed_t::kMedium:
-      return kGreeFanMax - 1;
+    case stdAc::fanspeed_t::kMedium: return kGreeFanMax - 1;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kGreeFanMax;
-    default:
-      return kGreeFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kGreeFanMax;
+    default:                         return kGreeFanAuto;
   }
 }
 
 // Convert a standard A/C Vertical Swing into its native version.
 uint8_t IRGreeAC::convertSwingV(const stdAc::swingv_t swingv) {
   switch (swingv) {
-    case stdAc::swingv_t::kHighest:
-      return kGreeSwingUp;
-    case stdAc::swingv_t::kHigh:
-      return kGreeSwingMiddleUp;
-    case stdAc::swingv_t::kMiddle:
-      return kGreeSwingMiddle;
-    case stdAc::swingv_t::kLow:
-      return kGreeSwingMiddleDown;
-    case stdAc::swingv_t::kLowest:
-      return kGreeSwingDown;
-    default:
-      return kGreeSwingAuto;
+    case stdAc::swingv_t::kHighest: return kGreeSwingUp;
+    case stdAc::swingv_t::kHigh:    return kGreeSwingMiddleUp;
+    case stdAc::swingv_t::kMiddle:  return kGreeSwingMiddle;
+    case stdAc::swingv_t::kLow:     return kGreeSwingMiddleDown;
+    case stdAc::swingv_t::kLowest:  return kGreeSwingDown;
+    default:                        return kGreeSwingAuto;
   }
 }
 

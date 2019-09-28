@@ -16,41 +16,36 @@
 //   Brand: Alaska,  Model: SAC9010QC A/C
 //   Brand: Alaska,  Model: SAC9010QC remote
 
-// Constants. Using LSB to be able to send only 35bits.
-const uint8_t kTecoAuto = 0;  // 0b000
-const uint8_t kTecoCool = 1;  // 0b001
-const uint8_t kTecoDry = 2;  // 0b010
-const uint8_t kTecoFan = 3;  // 0b110
-const uint8_t kTecoHeat = 4;  // 0b001
+// Constants.
+const uint8_t kTecoAuto = 0;
+const uint8_t kTecoCool = 1;
+const uint8_t kTecoDry = 2;
+const uint8_t kTecoFan = 3;
+const uint8_t kTecoHeat = 4;
 const uint8_t kTecoFanAuto = 0;  // 0b00
+const uint8_t kTecoFanLow = 1;   // 0b01
+const uint8_t kTecoFanMed = 2;   // 0b10
 const uint8_t kTecoFanHigh = 3;  // 0b11
-const uint8_t kTecoFanMed = 2;  // 0b10
-const uint8_t kTecoFanLow = 1;  // 0b01
 const uint8_t kTecoMinTemp = 16;   // 16C
 const uint8_t kTecoMaxTemp = 30;   // 30C
 
-const uint64_t kTecoModeMask =   0b00000000000000000000000000000000111;
+const uint8_t kTecoModeOffset = 0;
 const uint8_t kTecoPowerOffset = 3;
-const uint64_t kTecoPower =      0b00000000000000000000000000000001000;
-const uint64_t kTecoFanMask =    0b00000000000000000000000000000110000;
+const uint8_t kTecoFanOffset = 4;
+const uint8_t kTecoFanSize = 2;  // Nr. of bits
 const uint8_t kTecoSwingOffset = 6;
-const uint64_t kTecoSwing =      0b00000000000000000000000000001000000;
 const uint8_t kTecoSleepOffset = 7;
-const uint64_t kTecoSleep =      0b00000000000000000000000000010000000;
-const uint64_t kTecoTempMask =   0b00000000000000000000000111100000000;
-const uint64_t kTecoTimerHalfH = 0b00000000000000000000001000000000000;
-const uint64_t kTecoTimerTenHr = 0b00000000000000000000110000000000000;
+const uint8_t kTecoTempOffset = 8;
+const uint8_t kTecoTempSize = 4;  // Nr. of bits
+const uint8_t kTecoTimerHalfHourOffset = 12;
+const uint8_t kTecoTimerTensHoursOffset = 13;
+const uint8_t kTecoTimerTensHoursSize = 2;  // Nr. of bits
 const uint8_t kTecoTimerOnOffset = 15;
-const uint64_t kTecoTimerOn =    0b00000000000000000001000000000000000;
-const uint64_t kTecoTimerUniHr = 0b00000000000000011110000000000000000;
-const uint64_t kTecoTimerMask =  kTecoTimerUniHr | kTecoTimerOn |
-                                 kTecoTimerTenHr | kTecoTimerHalfH;
-const uint64_t kTecoHumidOffset = 20;
-const uint64_t kTecoHumid =      0b00000000000000100000000000000000000;
-const uint64_t kTecoLightOffset = 21;
-const uint64_t kTecoLight =      0b00000000000001000000000000000000000;
-const uint64_t kTecoSaveOffset = 23;
-const uint64_t kTecoSave =       0b00000000000100000000000000000000000;
+const uint8_t kTecoTimerUnitHoursOffset = 16;
+const uint8_t kTecoTimerUnitHoursSize = 4;  // Nr. of bits
+const uint8_t kTecoHumidOffset = 20;
+const uint8_t kTecoLightOffset = 21;
+const uint8_t kTecoSaveOffset = 23;
 const uint64_t kTecoReset =      0b01001010000000000000010000000000000;
 /*
   (header mark and space)

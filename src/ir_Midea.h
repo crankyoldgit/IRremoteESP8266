@@ -26,30 +26,27 @@
 //   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Constants
+const uint8_t kMideaACTempOffset = 24;
+const uint8_t kMideaACTempSize = 5;  // Bits
+const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
+const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
+const uint8_t kMideaACMinTempC = 17;  // Celsius
+const uint8_t kMideaACMaxTempC = 30;  // Celsius
+const uint8_t kMideaACCelsiusOffset = 29;
+const uint8_t kMideaACModeOffset = 32;
 const uint8_t kMideaACCool = 0;     // 0b000
 const uint8_t kMideaACDry = 1;      // 0b001
 const uint8_t kMideaACAuto = 2;     // 0b010
 const uint8_t kMideaACHeat = 3;     // 0b011
 const uint8_t kMideaACFan = 4;      // 0b100
-const uint8_t kMideaACFanAuto = 0;  // 0b000
-const uint8_t kMideaACFanLow = 1;   // 0b001
-const uint8_t kMideaACFanMed = 2;   // 0b010
-const uint8_t kMideaACFanHigh = 3;  // 0b011
+const uint8_t kMideaACFanOffset = 35;
+const uint8_t kMideaACFanSize = 2;  // Bits
+const uint8_t kMideaACFanAuto = 0;  // 0b00
+const uint8_t kMideaACFanLow = 1;   // 0b01
+const uint8_t kMideaACFanMed = 2;   // 0b10
+const uint8_t kMideaACFanHigh = 3;  // 0b11
 const uint8_t kMideaACSleepOffset = 38;
-const uint64_t kMideaACSleep = 1ULL << kMideaACSleepOffset;
 const uint8_t kMideaACPowerOffset = 39;
-const uint64_t kMideaACPower = 1ULL << kMideaACPowerOffset;
-const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
-const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
-const uint8_t kMideaACMinTempC = 17;  // Celsius
-const uint8_t kMideaACMaxTempC = 30;  // Celsius
-const uint64_t kMideaACStateMask =    0x0000FFFFFFFFFFFF;
-const uint8_t kMideaACCelsiusOffset = 29;
-const uint64_t kMideaACCelsiusBit = 1 << kMideaACCelsiusOffset;
-const uint64_t kMideaACTempMask =     0x0000FFFFE0FFFFFF;
-const uint64_t kMideaACFanMask =      0x0000FFC7FFFFFFFF;
-const uint64_t kMideaACModeMask =     0x0000FFF8FFFFFFFF;
-const uint64_t kMideaACChecksumMask = 0x0000FFFFFFFFFF00;
 const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
 
 // Legacy defines. (Deprecated)

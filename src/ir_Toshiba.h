@@ -25,16 +25,21 @@
 #endif
 
 // Constants
+const uint8_t kToshibaAcModeOffset = 0;
+const uint8_t kToshibaAcModeSize = 2;  // Nr. of bits
 const uint8_t kToshibaAcAuto = 0;
 const uint8_t kToshibaAcCool = 1;
 const uint8_t kToshibaAcDry = 2;
 const uint8_t kToshibaAcHeat = 3;
 const uint8_t kToshibaAcPowerOffset = 2;
-const uint8_t kToshibaAcPower = 1 << kToshibaAcPowerOffset;  // 0b00000100
-const uint8_t kToshibaAcFanAuto = 0;
-const uint8_t kToshibaAcFanMin = 1;
-const uint8_t kToshibaAcFanMed = 3;
-const uint8_t kToshibaAcFanMax = 5;
+const uint8_t kToshibaAcFanOffset = 5;
+const uint8_t kToshibaAcFanSize = 3;  // Nr. of bits
+const uint8_t kToshibaAcFanAuto = 0b000;
+const uint8_t kToshibaAcFanMin =  0b001;
+const uint8_t kToshibaAcFanMed =  0b011;
+const uint8_t kToshibaAcFanMax =  0b101;
+const uint8_t kToshibaAcTempOffset = 4;
+const uint8_t kToshibaAcTempSize = 4;  // Nr. of bits
 const uint8_t kToshibaAcMinTemp = 17;  // 17C
 const uint8_t kToshibaAcMaxTemp = 30;  // 30C
 

@@ -35,36 +35,44 @@ const uint8_t kAmcorFanMin =   0b001;
 const uint8_t kAmcorFanMed =   0b010;
 const uint8_t kAmcorFanMax =   0b011;
 const uint8_t kAmcorFanAuto =  0b100;
-const uint8_t kAmcorFanMask = 0b01110000;
+const uint8_t kAmcorFanOffset = 4;
+const uint8_t kAmcorFanSize = 3;
 // Modes
 const uint8_t kAmcorCool =          0b001;
 const uint8_t kAmcorHeat =          0b010;
 const uint8_t kAmcorFan =           0b011;  // Aka "Vent"
 const uint8_t kAmcorDry =           0b100;
 const uint8_t kAmcorAuto =          0b101;
-const uint8_t kAmcorModeMask = 0b00000111;
+const uint8_t kAmcorModeOffset = 0;
+const uint8_t kAmcorModeSize = 3;
 
 // state[2]
 const uint8_t kAmcorTempByte = 2;
 // Temperature
 const uint8_t kAmcorMinTemp = 12;  // Celsius
 const uint8_t kAmcorMaxTemp = 32;  // Celsius
-const uint8_t kAmcorTempMask = 0b01111110;
+const uint8_t kAmcorTempOffset = 1;
+const uint8_t kAmcorTempSize = 6;  // Bits
 
 // state[5]
 // Power
 const uint8_t kAmcorPowerByte = 5;
-const uint8_t kAmcorPowerMask = 0b11110000;
-const uint8_t kAmcorPowerOn =   0b00110000;  // 0x30
-const uint8_t kAmcorPowerOff =  0b11000000;  // 0xC0
+const uint8_t kAmcorPowerOffset = 4;
+const uint8_t kAmcorPowerSize = 4;
+const uint8_t kAmcorPowerOn =   0b0011;  // 0x3
+const uint8_t kAmcorPowerOff =  0b1100;  // 0xC
 
 // state[6]
 const uint8_t kAmcorSpecialByte = 6;
 // Max Mode (aka "Lo" in Cool and "Hi" in Heat)
-const uint8_t kAmcorMaxMask =    0b00000011;  // 0x03
-// "Vent" Mode
-const uint8_t kAmcorVentMask =  0b11000000;  // 0xC0
+const uint8_t kAmcorMax = 0b11;
+const uint8_t kAmcorMaxOffset = 0;
+const uint8_t kAmcorMaxSize = 2;
 
+// "Vent" Mode
+const uint8_t kAmcorVentOn =  0b11;
+const uint8_t kAmcorVentOffset = 6;
+const uint8_t kAmcorVentSize = 2;
 // state[7]
 // Checksum byte.
 const uint8_t kAmcorChecksumByte = kAmcorStateLength - 1;

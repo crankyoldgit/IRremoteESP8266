@@ -36,6 +36,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_NEOCLIMA
 // Send a Neoclima message.
@@ -140,8 +141,8 @@ void IRNeoclimaAc::setButton(const uint8_t button) {
     case kNeoclimaButtonFresh:
     case kNeoclimaButton8CHeat:
     case kNeoclimaButtonTurbo:
-      remote_state[5] &= ~kNeoclimaButtonMask;
-      remote_state[5] |= button;
+      setBits(&remote_state[5], kNeoclimaButtonOffset, kNeoclimaButtonSize,
+              button);
       break;
     default:
       this->setButton(kNeoclimaButtonPower);
@@ -149,7 +150,7 @@ void IRNeoclimaAc::setButton(const uint8_t button) {
 }
 
 uint8_t IRNeoclimaAc::getButton(void) {
-  return remote_state[5] & kNeoclimaButtonMask;
+  return GETBITS8(remote_state[5], kNeoclimaButtonOffset, kNeoclimaButtonSize);
 }
 
 void IRNeoclimaAc::on(void) { this->setPower(true); }
@@ -175,8 +176,7 @@ void IRNeoclimaAc::setMode(const uint8_t mode) {
     case kNeoclimaCool:
     case kNeoclimaFan:
     case kNeoclimaHeat:
-      remote_state[9] &= ~kNeoclimaModeMask;
-      remote_state[9] |= (mode << 5);
+      setBits(&remote_state[9], kNeoclimaModeOffset, kModeBitsSize, mode);
       this->setButton(kNeoclimaButtonMode);
       break;
     default:
@@ -186,22 +186,17 @@ void IRNeoclimaAc::setMode(const uint8_t mode) {
 }
 
 uint8_t IRNeoclimaAc::getMode(void) {
-  return (remote_state[9] & kNeoclimaModeMask) >> 5;
+  return GETBITS8(remote_state[9], kNeoclimaModeOffset, kModeBitsSize);
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRNeoclimaAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kNeoclimaCool;
-    case stdAc::opmode_t::kHeat:
-      return kNeoclimaHeat;
-    case stdAc::opmode_t::kDry:
-      return kNeoclimaDry;
-    case stdAc::opmode_t::kFan:
-      return kNeoclimaFan;
-    default:
-      return kNeoclimaAuto;
+    case stdAc::opmode_t::kCool: return kNeoclimaCool;
+    case stdAc::opmode_t::kHeat: return kNeoclimaHeat;
+    case stdAc::opmode_t::kDry:  return kNeoclimaDry;
+    case stdAc::opmode_t::kFan:  return kNeoclimaFan;
+    default:                     return kNeoclimaAuto;
   }
 }
 
@@ -210,9 +205,9 @@ stdAc::opmode_t IRNeoclimaAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kNeoclimaCool: return stdAc::opmode_t::kCool;
     case kNeoclimaHeat: return stdAc::opmode_t::kHeat;
-    case kNeoclimaDry: return stdAc::opmode_t::kDry;
-    case kNeoclimaFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kNeoclimaDry:  return stdAc::opmode_t::kDry;
+    case kNeoclimaFan:  return stdAc::opmode_t::kFan;
+    default:            return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -225,13 +220,14 @@ void IRNeoclimaAc::setTemp(const uint8_t temp) {
     this->setButton(kNeoclimaButtonTempDown);
   else if (newtemp > oldtemp)
     this->setButton(kNeoclimaButtonTempUp);
-  remote_state[9] = (remote_state[9] & ~kNeoclimaTempMask) |
-    (newtemp - kNeoclimaMinTemp);
+  setBits(&remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize,
+          newtemp - kNeoclimaMinTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRNeoclimaAc::getTemp(void) {
-  return (remote_state[9] & kNeoclimaTempMask) + kNeoclimaMinTemp;
+  return GETBITS8(remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize) +
+      kNeoclimaMinTemp;
 }
 
 // Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
@@ -246,8 +242,7 @@ void IRNeoclimaAc::setFan(const uint8_t speed) {
       }
       // FALL-THRU
     case kNeoclimaFanLow:
-      remote_state[7] &= ~kNeoclimaFanMask;
-      remote_state[7] |= (speed << 5);
+      setBits(&remote_state[7], kNeoclimaFanOffest, kNeoclimaFanSize, speed);
       this->setButton(kNeoclimaButtonFanSpeed);
       break;
     default:
@@ -257,22 +252,18 @@ void IRNeoclimaAc::setFan(const uint8_t speed) {
 }
 
 uint8_t IRNeoclimaAc::getFan(void) {
-  return (remote_state[7] & kNeoclimaFanMask) >> 5;
+  return GETBITS8(remote_state[7], kNeoclimaFanOffest, kNeoclimaFanSize);
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRNeoclimaAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kNeoclimaFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kNeoclimaFanMed;
+    case stdAc::fanspeed_t::kLow:    return kNeoclimaFanLow;
+    case stdAc::fanspeed_t::kMedium: return kNeoclimaFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kNeoclimaFanHigh;
-    default:
-      return kNeoclimaFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kNeoclimaFanHigh;
+    default:                         return kNeoclimaFanAuto;
   }
 }
 
@@ -280,9 +271,9 @@ uint8_t IRNeoclimaAc::convertFan(const stdAc::fanspeed_t speed) {
 stdAc::fanspeed_t IRNeoclimaAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kNeoclimaFanHigh: return stdAc::fanspeed_t::kMax;
-    case kNeoclimaFanMed: return stdAc::fanspeed_t::kMedium;
-    case kNeoclimaFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kNeoclimaFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kNeoclimaFanLow:  return stdAc::fanspeed_t::kMin;
+    default:               return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -298,12 +289,13 @@ bool IRNeoclimaAc::getSleep(void) {
 // A.k.a. Swing
 void IRNeoclimaAc::setSwingV(const bool on) {
   this->setButton(kNeoclimaButtonSwing);
-  remote_state[7] &= ~kNeoclimaSwingVMask;
-  remote_state[7] |= on ? kNeoclimaSwingVOn : kNeoclimaSwingVOff;
+  setBits(&remote_state[7], kNeoclimaSwingVOffset, kNeoclimaSwingVSize,
+          on ? kNeoclimaSwingVOn : kNeoclimaSwingVOff);
 }
 
 bool IRNeoclimaAc::getSwingV(void) {
-  return (remote_state[7] & kNeoclimaSwingVMask) == kNeoclimaSwingVOn;
+  return GETBITS8(remote_state[7], kNeoclimaSwingVOffset,
+                  kNeoclimaSwingVSize) == kNeoclimaSwingVOn;
 }
 
 // A.k.a. Air Flow

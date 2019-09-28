@@ -18,6 +18,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_TCL112AC
 void IRsend::sendTcl112Ac(const unsigned char data[], const uint16_t nbytes,
@@ -136,8 +137,7 @@ void IRTcl112Ac::setMode(const uint8_t mode) {
     case kTcl112AcCool:
     case kTcl112AcHeat:
     case kTcl112AcDry:
-      remote_state[6] &= 0xF0;
-      remote_state[6] |= mode;
+      setBits(&remote_state[6], kLowNibble, kTcl112AcModeSize, mode);
       break;
     default:
       setMode(kTcl112AcAuto);
@@ -152,12 +152,13 @@ void IRTcl112Ac::setTemp(const float celsius) {
   uint8_t nrHalfDegrees = safecelsius * 2;
   // Do we have a half degree celsius?
   setBit(&remote_state[12], kTcl112AcHalfDegreeOffset, nrHalfDegrees & 1);
-  remote_state[7] &= 0xF0;  // Clear temp bits.
-  remote_state[7] |= ((uint8_t)kTcl112AcTempMax - nrHalfDegrees / 2);
+  setBits(&remote_state[7], kLowNibble, kNibbleSize,
+          (uint8_t)kTcl112AcTempMax - nrHalfDegrees / 2);
 }
 
 float IRTcl112Ac::getTemp(void) {
-  float result = kTcl112AcTempMax - (remote_state[7] & 0xF);
+  float result = kTcl112AcTempMax - GETBITS8(remote_state[7], kLowNibble,
+                                             kNibbleSize);
   if (GETBIT8(remote_state[12], kTcl112AcHalfDegreeOffset)) result += 0.5;
   return result;
 }
@@ -170,8 +171,7 @@ void IRTcl112Ac::setFan(const uint8_t speed) {
     case kTcl112AcFanLow:
     case kTcl112AcFanMed:
     case kTcl112AcFanHigh:
-      remote_state[8] &= ~kTcl112AcFanMask;
-      remote_state[8] |= speed;
+      setBits(&remote_state[8], kLowNibble, kTcl112AcFanSize, speed);
       break;
     default:
       this->setFan(kTcl112AcFanAuto);
@@ -180,7 +180,7 @@ void IRTcl112Ac::setFan(const uint8_t speed) {
 
 // Return the currect fan speed.
 uint8_t IRTcl112Ac::getFan(void) {
-  return remote_state[8] & kTcl112AcFanMask;
+  return GETBITS8(remote_state[8], kLowNibble, kTcl112AcFanSize);
 }
 
 // Control economy mode.
@@ -225,15 +225,13 @@ bool IRTcl112Ac::getSwingHorizontal(void) {
 
 // Control Vertical Swing.
 void IRTcl112Ac::setSwingVertical(const bool on) {
-  if (on)
-    remote_state[8] |= kTcl112AcBitSwingV;
-  else
-    remote_state[8] &= ~kTcl112AcBitSwingV;
+  setBits(&remote_state[8], kTcl112AcSwingVOffset, kTcl112AcSwingVSize,
+          on ? kTcl112AcSwingVOn : kTcl112AcSwingVOff);
 }
 
 // Return the Vertical Swing state of the A/C.
 bool IRTcl112Ac::getSwingVertical(void) {
-  return remote_state[8] & kTcl112AcBitSwingV;
+  return GETBITS8(remote_state[8], kTcl112AcSwingVOffset, kTcl112AcSwingVSize);
 }
 
 // Control the Turbo setting.
@@ -253,16 +251,11 @@ bool IRTcl112Ac::getTurbo(void) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRTcl112Ac::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kTcl112AcCool;
-    case stdAc::opmode_t::kHeat:
-      return kTcl112AcHeat;
-    case stdAc::opmode_t::kDry:
-      return kTcl112AcDry;
-    case stdAc::opmode_t::kFan:
-      return kTcl112AcFan;
-    default:
-      return kTcl112AcAuto;
+    case stdAc::opmode_t::kCool: return kTcl112AcCool;
+    case stdAc::opmode_t::kHeat: return kTcl112AcHeat;
+    case stdAc::opmode_t::kDry:  return kTcl112AcDry;
+    case stdAc::opmode_t::kFan:  return kTcl112AcFan;
+    default:                     return kTcl112AcAuto;
   }
 }
 
@@ -270,15 +263,11 @@ uint8_t IRTcl112Ac::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRTcl112Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kTcl112AcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kTcl112AcFanMed;
+    case stdAc::fanspeed_t::kLow:    return kTcl112AcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kTcl112AcFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kTcl112AcFanHigh;
-    default:
-      return kTcl112AcFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kTcl112AcFanHigh;
+    default:                         return kTcl112AcFanAuto;
   }
 }
 
@@ -287,9 +276,9 @@ stdAc::opmode_t IRTcl112Ac::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTcl112AcCool: return stdAc::opmode_t::kCool;
     case kTcl112AcHeat: return stdAc::opmode_t::kHeat;
-    case kTcl112AcDry: return stdAc::opmode_t::kDry;
-    case kTcl112AcFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kTcl112AcDry:  return stdAc::opmode_t::kDry;
+    case kTcl112AcFan:  return stdAc::opmode_t::kFan;
+    default:            return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -297,9 +286,9 @@ stdAc::opmode_t IRTcl112Ac::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRTcl112Ac::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kTcl112AcFanHigh: return stdAc::fanspeed_t::kMax;
-    case kTcl112AcFanMed: return stdAc::fanspeed_t::kMedium;
-    case kTcl112AcFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kTcl112AcFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kTcl112AcFanLow:  return stdAc::fanspeed_t::kMin;
+    default:               return stdAc::fanspeed_t::kAuto;
   }
 }
 
