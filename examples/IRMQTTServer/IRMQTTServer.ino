@@ -651,13 +651,6 @@ int8_t getDefaultTxGpio(void) {
   return kGpioUnused;
 }
 
-String genStatTopic(const uint16_t channel) {
-  if (channel)  // Never use the '*_0' state channel.
-    return MqttClimate + "_" + String(channel) + '/' + MQTT_CLIMATE_STAT + '/';
-  else
-    return MqttClimate + '/' + MQTT_CLIMATE_STAT + '/';
-}
-
 // Return a string containing the comma separated list of sending gpios.
 String listOfTxGpios(void) {
   bool found = false;
@@ -2225,6 +2218,13 @@ void setup(void) {
 }
 
 #if MQTT_ENABLE
+String genStatTopic(const uint16_t channel) {
+  if (channel)  // Never use the '*_0' state channel.
+    return MqttClimate + "_" + String(channel) + '/' + MQTT_CLIMATE_STAT + '/';
+  else
+    return MqttClimate + '/' + MQTT_CLIMATE_STAT + '/';
+}
+
 // MQTT subscribing to topic
 void subscribing(const String topic_name) {
   // subscription to topic for receiving data with QoS.
