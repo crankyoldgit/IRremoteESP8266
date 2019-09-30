@@ -11,6 +11,7 @@ Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
 #include "ir_Daikin.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -105,8 +106,7 @@ void IRDaikinESP::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN
 void IRDaikinESP::send(const uint16_t repeat) {
-  this->checksum();
-  _irsend.sendDaikin(remote, kDaikinStateLength, repeat);
+  _irsend.sendDaikin(getRaw(), kDaikinStateLength, repeat);
 }
 #endif  // SEND_DAIKIN
 
@@ -638,8 +638,7 @@ void IRDaikin2::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN2
 void IRDaikin2::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin2(remote_state, kDaikin2StateLength, repeat);
+  _irsend.sendDaikin2(getRaw(), kDaikin2StateLength, repeat);
 }
 #endif  // SEND_DAIKIN2
 
@@ -711,8 +710,7 @@ uint8_t *IRDaikin2::getRaw(void) {
 }
 
 void IRDaikin2::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin2StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin2StateLength);
 }
 
 void IRDaikin2::on(void) { setPower(true); }
@@ -1320,8 +1318,7 @@ void IRDaikin216::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN216
 void IRDaikin216::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin216(remote_state, kDaikin216StateLength, repeat);
+  _irsend.sendDaikin216(getRaw(), kDaikin216StateLength, repeat);
 }
 #endif  // SEND_DAIKIN216
 
@@ -1373,8 +1370,7 @@ uint8_t *IRDaikin216::getRaw(void) {
 }
 
 void IRDaikin216::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin216StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin216StateLength);
 }
 
 
@@ -1710,14 +1706,12 @@ uint8_t *IRDaikin160::getRaw(void) {
 }
 
 void IRDaikin160::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin160StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin160StateLength);
 }
 
 #if SEND_DAIKIN160
 void IRDaikin160::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin160(remote_state, kDaikin160StateLength, repeat);
+  _irsend.sendDaikin160(getRaw(), kDaikin160StateLength, repeat);
 }
 #endif  // SEND_DAIKIN160
 
@@ -2060,15 +2054,13 @@ uint8_t *IRDaikin176::getRaw(void) {
 }
 
 void IRDaikin176::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin176StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin176StateLength);
   _saved_temp = getTemp();
 }
 
 #if SEND_DAIKIN176
 void IRDaikin176::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin176(remote_state, kDaikin176StateLength, repeat);
+  _irsend.sendDaikin176(getRaw(), kDaikin176StateLength, repeat);
 }
 #endif  // SEND_DAIKIN176
 
@@ -2427,14 +2419,12 @@ uint8_t *IRDaikin128::getRaw(void) {
 }
 
 void IRDaikin128::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin128StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin128StateLength);
 }
 
 #if SEND_DAIKIN128
 void IRDaikin128::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin128(remote_state, kDaikin128StateLength, repeat);
+  _irsend.sendDaikin128(getRaw(), kDaikin128StateLength, repeat);
 }
 #endif  // SEND_DAIKIN128
 
@@ -2941,8 +2931,7 @@ void IRDaikin152::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN152
 void IRDaikin152::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendDaikin152(remote_state, kDaikin152StateLength, repeat);
+  _irsend.sendDaikin152(getRaw(), kDaikin152StateLength, repeat);
 }
 #endif  // SEND_DAIKIN152
 
@@ -2980,6 +2969,5 @@ uint8_t *IRDaikin152::getRaw(void) {
 }
 
 void IRDaikin152::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kDaikin152StateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, kDaikin152StateLength);
 }

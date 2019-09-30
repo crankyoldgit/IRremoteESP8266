@@ -5,6 +5,7 @@
 
 #include "ir_Panasonic.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -232,8 +233,7 @@ IRPanasonicAc::IRPanasonicAc(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRPanasonicAc::stateReset(void) {
-  for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)
-    remote_state[i] = kPanasonicKnownGoodState[i];
+  memcpy(remote_state, kPanasonicKnownGoodState, kPanasonicAcStateLength);
   _temp = 25;  // An initial saved desired temp. Completely made up.
   _swingh = kPanasonicAcSwingHMiddle;  // A similar made up value for H Swing.
 }
@@ -262,8 +262,7 @@ void IRPanasonicAc::fixChecksum(const uint16_t length) {
 
 #if SEND_PANASONIC_AC
 void IRPanasonicAc::send(const uint16_t repeat) {
-  this->fixChecksum();
-  _irsend.sendPanasonicAC(remote_state, kPanasonicAcStateLength, repeat);
+  _irsend.sendPanasonicAC(getRaw(), kPanasonicAcStateLength, repeat);
 }
 #endif  // SEND_PANASONIC_AC
 
@@ -336,8 +335,7 @@ uint8_t *IRPanasonicAc::getRaw(void) {
 }
 
 void IRPanasonicAc::setRaw(const uint8_t state[]) {
-  for (uint8_t i = 0; i < kPanasonicAcStateLength; i++)
-    remote_state[i] = state[i];
+  memcpy(remote_state, state, kPanasonicAcStateLength);
 }
 
 // Control the power state of the A/C unit.

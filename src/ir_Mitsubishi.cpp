@@ -6,6 +6,7 @@
 
 #include "ir_Mitsubishi.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -419,25 +420,10 @@ void IRMitsubishiAC::stateReset(void) {
   // The state of the IR remote in IR code form.
   // Known good state obtained from:
   //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L108
-  // Note: Can't use the following because it requires -std=c++11
-  // uint8_t known_good_state[kMitsubishiACStateLength] = {
-  //    0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
-  //    0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
-  remote_state[0] = 0x23;
-  remote_state[1] = 0xCB;
-  remote_state[2] = 0x26;
-  remote_state[3] = 0x01;
-  remote_state[4] = 0x00;
-  remote_state[5] = 0x20;
-  remote_state[6] = 0x08;
-  remote_state[7] = 0x06;
-  remote_state[8] = 0x30;
-  remote_state[9] = 0x45;
-  remote_state[10] = 0x67;
-  for (uint8_t i = 11; i < kMitsubishiACStateLength - 1; i++)
-    remote_state[i] = 0;
-  remote_state[kMitsubishiACStateLength - 1] = 0x1F;
-  this->checksum();  // Calculate the checksum
+  static const uint8_t kReset[kMitsubishiACStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x06, 0x30, 0x45, 0x67, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x1F};
+  memcpy(remote_state, kReset, kMitsubishiACStateLength);
 }
 
 // Configure the pin for output.
@@ -446,8 +432,7 @@ void IRMitsubishiAC::begin(void) { _irsend.begin(); }
 #if SEND_MITSUBISHI_AC
 // Send the current desired state to the IR LED.
 void IRMitsubishiAC::send(const uint16_t repeat) {
-  this->checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMitsubishiAC(remote_state, kMitsubishiACStateLength, repeat);
+  _irsend.sendMitsubishiAC(getRaw(), kMitsubishiACStateLength, repeat);
 }
 #endif  // SEND_MITSUBISHI_AC
 
@@ -458,9 +443,7 @@ uint8_t *IRMitsubishiAC::getRaw(void) {
 }
 
 void IRMitsubishiAC::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < (kMitsubishiACStateLength - 1); i++) {
-    remote_state[i] = data[i];
-  }
+  memcpy(remote_state, data, kMitsubishiACStateLength);
 }
 
 // Calculate the checksum for the current internal state of the remote.
@@ -870,18 +853,9 @@ void IRMitsubishi136::stateReset(void) {
   // The state of the IR remote in IR code form.
   // Known good state obtained from:
   //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=312397579&range=A10
-  remote_state[0] = 0x23;
-  remote_state[1] = 0xCB;
-  remote_state[2] = 0x26;
-  remote_state[3] = 0x21;
-  remote_state[4] = 0x00;
-  remote_state[5] = 0x40;
-  remote_state[6] = 0xC2;
-  remote_state[7] = 0xC7;
-  remote_state[8] = 0x04;
-  remote_state[9] = 0x00;
-  remote_state[10] = 0x00;
-  checksum();  // Calculate the checksum which covers the rest of the state.
+  static const uint8_t kReset[kMitsubishi136StateLength] = {
+      0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0xC2, 0xC7, 0x04};
+  memcpy(remote_state, kReset, kMitsubishi136StateLength);
 }
 
 // Calculate the checksum for the current internal state of the remote.
@@ -909,8 +883,7 @@ void IRMitsubishi136::begin(void) { _irsend.begin(); }
 #if SEND_MITSUBISHI136
 // Send the current desired state to the IR LED.
 void IRMitsubishi136::send(const uint16_t repeat) {
-  checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMitsubishi136(remote_state, kMitsubishi136StateLength, repeat);
+  _irsend.sendMitsubishi136(getRaw(), kMitsubishi136StateLength, repeat);
 }
 #endif  // SEND_MITSUBISHI136
 
@@ -921,9 +894,7 @@ uint8_t *IRMitsubishi136::getRaw(void) {
 }
 
 void IRMitsubishi136::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < kMitsubishi136StateLength - 1; i++) {
-    remote_state[i] = data[i];
-  }
+  memcpy(remote_state, data, kMitsubishi136StateLength);
 }
 
 // Set the requested power state of the A/C to off.

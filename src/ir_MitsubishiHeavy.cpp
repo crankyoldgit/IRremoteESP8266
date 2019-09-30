@@ -15,6 +15,7 @@
 
 #include "ir_MitsubishiHeavy.h"
 #include <algorithm>
+#include <cstring>
 #include "IRremoteESP8266.h"
 #include "IRtext.h"
 #include "IRutils.h"
@@ -97,10 +98,9 @@ void IRMitsubishiHeavy152Ac::send(const uint16_t repeat) {
 #endif  // SEND_MITSUBISHIHEAVY
 
 void IRMitsubishiHeavy152Ac::stateReset(void) {
-  uint8_t i = 0;
-  for (; i < kMitsubishiHeavySigLength; i++)
-    remote_state[i] = kMitsubishiHeavyZmsSig[i];
-  for (; i < kMitsubishiHeavy152StateLength - 3; i += 2) remote_state[i] = 0;
+  memcpy(remote_state, kMitsubishiHeavyZmsSig, kMitsubishiHeavySigLength);
+  for (uint8_t i = kMitsubishiHeavySigLength;
+       i < kMitsubishiHeavy152StateLength - 3; i += 2) remote_state[i] = 0;
   remote_state[17] = 0x80;
 }
 
@@ -110,8 +110,7 @@ uint8_t *IRMitsubishiHeavy152Ac::getRaw(void) {
 }
 
 void IRMitsubishiHeavy152Ac::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < kMitsubishiHeavy152StateLength; i++)
-    remote_state[i] = data[i];
+  memcpy(remote_state, data, kMitsubishiHeavy152StateLength);
 }
 
 void IRMitsubishiHeavy152Ac::on(void) { setPower(true); }
@@ -541,10 +540,9 @@ void IRMitsubishiHeavy88Ac::send(const uint16_t repeat) {
 #endif  // SEND_MITSUBISHIHEAVY
 
 void IRMitsubishiHeavy88Ac::stateReset(void) {
-  uint8_t i = 0;
-  for (; i < kMitsubishiHeavySigLength; i++)
-    remote_state[i] = kMitsubishiHeavyZjsSig[i];
-  for (; i < kMitsubishiHeavy88StateLength; i++) remote_state[i] = 0;
+  memcpy(remote_state, kMitsubishiHeavyZjsSig, kMitsubishiHeavySigLength);
+  for (uint8_t i = kMitsubishiHeavySigLength; i < kMitsubishiHeavy88StateLength;
+       i++) remote_state[i] = 0;
 }
 
 uint8_t *IRMitsubishiHeavy88Ac::getRaw(void) {
@@ -553,8 +551,7 @@ uint8_t *IRMitsubishiHeavy88Ac::getRaw(void) {
 }
 
 void IRMitsubishiHeavy88Ac::setRaw(const uint8_t *data) {
-  for (uint8_t i = 0; i < kMitsubishiHeavy88StateLength; i++)
-    remote_state[i] = data[i];
+  memcpy(remote_state, data, kMitsubishiHeavy88StateLength);
 }
 
 void IRMitsubishiHeavy88Ac::on(void) { setPower(true); }

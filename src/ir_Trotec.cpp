@@ -3,6 +3,7 @@
 
 #include "ir_Trotec.h"
 #include <algorithm>
+#include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
@@ -93,7 +94,7 @@ uint8_t* IRTrotecESP::getRaw(void) {
 }
 
 void IRTrotecESP::setRaw(const uint8_t state[]) {
-  for (uint16_t i = 0; i < kTrotecStateLength; i++) remote_state[i] = state[i];
+  memcpy(remote_state, state, kTrotecStateLength);
 }
 
 void IRTrotecESP::setPower(const bool on) {

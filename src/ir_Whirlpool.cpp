@@ -16,6 +16,7 @@
 
 #include "ir_Whirlpool.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -147,8 +148,7 @@ uint8_t *IRWhirlpoolAc::getRaw(const bool calcchecksum) {
 }
 
 void IRWhirlpoolAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kWhirlpoolAcStateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, std::min(length, kWhirlpoolAcStateLength));
 }
 
 whirlpool_ac_remote_model_t IRWhirlpoolAc::getModel(void) {

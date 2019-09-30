@@ -7,6 +7,7 @@ Copyright 2019 crankyoldgit
 
 #include "ir_Argo.h"
 #include <algorithm>
+#include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif  // UNIT_TEST
@@ -58,8 +59,7 @@ void IRArgoAC::begin(void) { _irsend.begin(); }
 
 #if SEND_ARGO
 void IRArgoAC::send(const uint16_t repeat) {
-  this->checksum();  // Create valid checksum before sending
-  _irsend.sendArgo(argo, kArgoStateLength, repeat);
+  _irsend.sendArgo(getRaw(), kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
 
@@ -108,7 +108,7 @@ uint8_t* IRArgoAC::getRaw(void) {
 }
 
 void IRArgoAC::setRaw(const uint8_t state[]) {
-  for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = state[i];
+  memcpy(argo, state, kArgoStateLength);
 }
 
 void IRArgoAC::on(void) { setPower(true); }

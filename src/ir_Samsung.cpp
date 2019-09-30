@@ -5,6 +5,7 @@
 
 #include "ir_Samsung.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -304,18 +305,10 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
 //   forcepower: A flag indicating if force sending a special power message
 //              with the first `send()` call. Default: true
 void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
-  for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
-    remote_state[i] = 0x0;
-  remote_state[0] = 0x02;
-  remote_state[1] = 0x92;
-  remote_state[2] = 0x0F;
-  remote_state[6] = 0xF0;
-  remote_state[7] = 0x01;
-  remote_state[8] = 0x02;
-  remote_state[9] = 0xAE;
-  remote_state[10] = 0x71;
-  remote_state[12] = 0x15;
-  remote_state[13] = 0xF0;
+  static const uint8_t kReset[kSamsungAcExtendedStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0x02, 0xAE, 0x71, 0x00,
+      0x15, 0xF0};
+  memcpy(remote_state, kReset, kSamsungAcExtendedStateLength);
   _forcepower = forcepower;
   _lastsentpowerstate = initialPower;
   setPower(initialPower);
@@ -427,9 +420,8 @@ uint8_t *IRSamsungAc::getRaw(void) {
 }
 
 void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kSamsungAcExtendedStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, std::min(length,
+                                          kSamsungAcExtendedStateLength));
   // Shrink the extended state into a normal state.
   if (length > kSamsungAcStateLength) {
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
