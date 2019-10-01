@@ -25,7 +25,7 @@ The most likely externally used `#define`s have been _aliased_ for limited
 backward compatibility for projects using the old style. Going forward, only the
 new `kConstantName` style will be supported for new protocol additions.
 
-In the unlikely case it does break your code, then you may have been referencing
+In the unlikely case, it does break your code, then you may have been referencing
 something you likely should not have. You should be able to quickly determine
 the new name from the old. e.g. `CONSTANT_NAME` to `kConstantName`.
 Use common sense or examining the library's code if this does affect code.
@@ -55,12 +55,12 @@ Some common answers to common questions and problems are on our [F.A.Q. wiki pag
 1. Restart your Arduino IDE.
 1. Check out the examples.
 
-##### Using Git to install library ( Linux )
+##### Using Git to install the library ( Linux )
 ```
 cd ~/Arduino/libraries
 git clone https://github.com/crankyoldgit/IRremoteESP8266.git
 ```
-###### To Update to the latest version of the library
+###### To update to the latest version of the library
 ```
 cd ~/Arduino/libraries/IRremoteESP8266 && git pull
 ```
