@@ -483,7 +483,7 @@ TEST(TestCoolixACClass, HumanReadable) {
 
   // Initial starting point.
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Fan: 5 (Auto), Temp: 25C, "
+      "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, "
       "Zone Follow: Off, Sensor Temp: Ignored",
       ircoolix.toString());
 
@@ -572,10 +572,10 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   ac.begin();
   // Default
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Fan: 5 (Auto), Temp: 25C, Zone Follow: Off, "
+      "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, Zone Follow: Off, "
       "Sensor Temp: Ignored",
       ac.toString());
-  EXPECT_EQ(0xB2BFC8, ac.getRaw());
+  EXPECT_EQ(0xB21FC8, ac.getRaw());
   // Change of settings.
   ac.setPower(true);
   ac.setTemp(24);
