@@ -20,6 +20,7 @@ Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -29,6 +30,7 @@ Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 
 using irutils::addBoolToString;
+using irutils::addDayToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
@@ -509,47 +511,28 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
 String IRDaikinESP::toString(void) {
   String result = "";
   result.reserve(230);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getPowerful(), F("Powerful"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getSensor(), F("Sensor"));
-  result += addBoolToString(getMold(), F("Mold"));
-  result += addBoolToString(getComfort(), F("Comfort"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
-  result += addLabeledString(minsToString(this->getCurrentTime()),
-                             F("Current Time"));
-  result += F(", Current Day: ");
-  switch (this->getCurrentDay()) {
-  case 1:
-    result +=F("Sun"); break;
-  case 2:
-    result +=F("Mon"); break;
-  case 3:
-    result +=F("Tue"); break;
-  case 4:
-    result +=F("Wed"); break;
-  case 5:
-    result +=F("Thu"); break;
-  case 6:
-    result +=F("Fri"); break;
-  case 7:
-    result +=F("Sat"); break;
-  default:
-    result +=F("(UNKNOWN)"); break;
-  }
+  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getSensor(), kSensorStr);
+  result += addBoolToString(getMold(), kMoldStr);
+  result += addBoolToString(getComfort(), kComfortStr);
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addLabeledString(minsToString(this->getCurrentTime()), kClockStr);
+  result += addDayToString(getCurrentDay(), -1);
   result += addLabeledString(getOnTimerEnabled()
-                             ? minsToString(this->getOnTime()) : F("Off"),
-                             F("On Time"));
+                             ? minsToString(this->getOnTime()) : kOffStr,
+                             kOnTimerStr);
   result += addLabeledString(getOffTimerEnabled()
-                            ? minsToString(this->getOffTime()) : F("Off"),
-                            F("Off Time"));
-  result += addBoolToString(getWeeklyTimerEnable(), F("Weekly Timer"));
+                             ? minsToString(this->getOffTime()) : kOffStr,
+                             kOffTimerStr);
+  result += addBoolToString(getWeeklyTimerEnable(), kWeeklyTimerStr);
   return result;
 }
 
@@ -1172,97 +1155,106 @@ stdAc::state_t IRDaikin2::toCommon(void) {
 String IRDaikin2::toString(void) {
   String result = "";
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), F("Swing(V)"));
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (getSwingVertical()) {
     case kDaikin2SwingVHigh:
-      result += F(" (Highest)");
+      result += kHighestStr;
       break;
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+    case 2: result += kHighStr; break;
+    case 3: result += kUpperStr + kMiddleStr; break;
+    case 4: result += kLowerStr + kMiddleStr; break;
+    case 5: result += kLowStr; break;
       break;
     case kDaikin2SwingVLow:
-      result += F(" (Lowest)");
+      result += kLowestStr;
       break;
     case kDaikin2SwingVBreeze:
-      result += F(" (Breeze)");
+      result += kBreezeStr;
       break;
     case kDaikin2SwingVCirculate:
-      result += F(" (Circulate)");
+      result += kCirculateStr;
       break;
     case kDaikin2SwingVAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kDaikin2SwingVSwing:
-      result += F(" (Swing)");
+      result += kSwingStr;
       break;
     default:
-      result += F(" (Unknown)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
+  result += ')';
+  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += kSpaceLBraceStr;
   switch (getSwingHorizontal()) {
     case kDaikin2SwingHAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kDaikin2SwingHSwing:
-      result += F(" (Swing)");
+      result += kSwingStr;
       break;
+    default: result += kUnknownStr;
   }
-  result += addLabeledString(minsToString(getCurrentTime()), F("Clock"));
+  result += ')';
+  result += addLabeledString(minsToString(getCurrentTime()), kClockStr);
   result += addLabeledString(
-      getOnTimerEnabled() ? minsToString(getOnTime()) : F("Off"), F("On Time"));
+      getOnTimerEnabled() ? minsToString(getOnTime()) : kOffStr, kOnTimerStr);
   result += addLabeledString(
-      getOffTimerEnabled() ? minsToString(getOffTime()) : F("Off"),
-      F("Off Time"));
+      getOffTimerEnabled() ? minsToString(getOffTime()) : kOffStr,
+      kOffTimerStr);
   result += addLabeledString(
-      getSleepTimerEnabled() ? minsToString(getSleepTime()) : F("Off"),
-      F("Sleep Time"));
-  result += addIntToString(getBeep(), F("Beep"));
+      getSleepTimerEnabled() ? minsToString(getSleepTime()) : kOffStr,
+      kSleepStr + ' ' + kTimerStr);
+  result += addIntToString(getBeep(), kBeepStr);
+  result += kSpaceLBraceStr;
   switch (getBeep()) {
     case kDaikinBeepLoud:
-      result += F(" (Loud)");
+      result += kLoudStr;
       break;
     case kDaikinBeepQuiet:
-      result += F(" (Quiet)");
+      result += kQuietStr;
       break;
     case kDaikinBeepOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getLight(), F("Light"));
+  result += ')';
+  result += addIntToString(getLight(), kLightStr);
+  result += kSpaceLBraceStr;
   switch (getLight()) {
     case kDaikinLightBright:
-      result += F(" (Bright)");
+      result += kHighStr;
       break;
     case kDaikinLightDim:
-      result += F(" (Dim)");
+      result += kLowStr;
       break;
     case kDaikinLightOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addBoolToString(getMold(), F("Mold"));
-  result += addBoolToString(getClean(), F("Clean"));
+  result += ')';
+  result += addBoolToString(getMold(), kMoldStr);
+  result += addBoolToString(getClean(), kCleanStr);
   result += addLabeledString(
-      getFreshAir() ? (getFreshAirHigh() ? F("High") : F("On")) : F("Off"),
-      F("Fresh Air"));
-  result += addBoolToString(getEye(), F("Eye"));
-  result += addBoolToString(getEyeAuto(), F("Eye Auto"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getPowerful(), F("Powerful"));
-  result += addBoolToString(getPurify(), F("Purify"));
-  result += addBoolToString(getEcono(), F("Econo"));
+      getFreshAir() ? (getFreshAirHigh() ? kHighStr : kOnStr) : kOffStr,
+      kFreshStr);
+  result += addBoolToString(getEye(), kEyeStr);
+  result += addBoolToString(getEyeAuto(), kEyeStr + ' ' + kAutoStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getPurify(), kPurifyStr);
+  result += addBoolToString(getEcono(), kEconoStr);
   return result;
 }
 
@@ -1612,16 +1604,16 @@ stdAc::state_t IRDaikin216::toCommon(void) {
 String IRDaikin216::toString(void) {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
   return result;
 }
 
@@ -1966,23 +1958,24 @@ stdAc::state_t IRDaikin160::toCommon(void) {
 String IRDaikin160::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), F("Swing(V)"));
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (getSwingVertical()) {
-    case kDaikin160SwingVHighest: result += F(" (Highest)"); break;
-    case kDaikin160SwingVHigh:    result += F(" (High)"); break;
-    case kDaikin160SwingVMiddle:  result += F(" (Middle)"); break;
-    case kDaikin160SwingVLow:     result += F(" (Low)"); break;
-    case kDaikin160SwingVLowest:  result += F(" (Lowest)"); break;
-    case kDaikin160SwingVAuto:    result += F(" (Auto)"); break;
-    default:
-      result += F(" (UNKNOWN)");
+    case kDaikin160SwingVHighest: result += kHighestStr; break;
+    case kDaikin160SwingVHigh:    result += kHighStr; break;
+    case kDaikin160SwingVMiddle:  result += kMiddleStr; break;
+    case kDaikin160SwingVLow:     result += kLowStr; break;
+    case kDaikin160SwingVLowest:  result += kLowestStr; break;
+    case kDaikin160SwingVAuto:    result += kAutoStr; break;
+    default:                      result += kUnknownStr;
   }
+  result += ')';
   return result;
 }
 
@@ -2340,23 +2333,25 @@ stdAc::state_t IRDaikin176::toCommon(void) {
 String IRDaikin176::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kDaikinAuto, kDaikin176Cool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
-  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += kSpaceLBraceStr;
   switch (getSwingHorizontal()) {
     case kDaikin176SwingHAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kDaikin176SwingHOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
+  result += ')';
   return result;
 }
 
@@ -2810,30 +2805,31 @@ uint8_t IRDaikin128::getLightToggle(void) {
 String IRDaikin128::toString(void) {
   String result = "";
   result.reserve(240);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPowerToggle(), F("Power Toggle"), false);
+  result += addBoolToString(getPowerToggle(), kPowerStr + ' ' + kToggleStr,
+                            false);
   result += addModeToString(getMode(), kDaikin128Auto, kDaikin128Cool,
                             kDaikin128Heat, kDaikin128Dry, kDaikin128Fan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin128FanHigh, kDaikin128FanLow,
                            kDaikin128FanAuto, kDaikin128FanQuiet,
                            kDaikin128FanMed);
-  result += addBoolToString(getPowerful(), F("Powerful"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getEcono(), F("Econo"));
-  result += addLabeledString(minsToString(getClock()), F("Clock"));
-  result += addBoolToString(getOnTimerEnabled(), F("On Timer"));
-  result += addLabeledString(minsToString(getOnTimer()), F("On Time"));
-  result += addBoolToString(getOffTimerEnabled(), F("Off Timer"));
-  result += addLabeledString(minsToString(getOffTimer()), F("Off Time"));
-  result += addIntToString(getLightToggle(), F("Light Toggle"));
-  result += F(" (");
+  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
+  result += addBoolToString(getOnTimerEnabled(), kOnTimerStr);
+  result += addLabeledString(minsToString(getOnTimer()), kOnTimerStr);
+  result += addBoolToString(getOffTimerEnabled(), kOffTimerStr);
+  result += addLabeledString(minsToString(getOffTimer()), kOffTimerStr);
+  result += addIntToString(getLightToggle(), kLightStr + ' ' + kToggleStr);
+  result += kSpaceLBraceStr;
   switch (getLightToggle()) {
-    case kDaikin128BitCeiling: result += F("Ceiling"); break;
-    case kDaikin128BitWall: result += F("Wall"); break;
-    case 0: result += F("Off"); break;
-    default: result += F("UNKNOWN");
+    case kDaikin128BitCeiling: result += kCeilingStr; break;
+    case kDaikin128BitWall: result += kWallStr; break;
+    case 0: result += kOffStr; break;
+    default: result += kUnknownStr;
   }
   result += ')';
   return result;

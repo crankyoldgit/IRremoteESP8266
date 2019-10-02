@@ -24,10 +24,6 @@
 #endif
 
 // Constants
-enum gree_ac_remote_model_t {
-  YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
-  YBOFB,     // (2) Green, YBOFB2, YAPOF3
-};
 
 const uint8_t kGreeAuto = 0;
 const uint8_t kGreeCool = 1;

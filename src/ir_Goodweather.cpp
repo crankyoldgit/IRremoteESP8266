@@ -14,6 +14,7 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 using irutils::addBoolToString;
@@ -311,71 +312,75 @@ stdAc::state_t IRGoodweatherAc::toCommon(void) {
 String IRGoodweatherAc::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kGoodweatherAuto, kGoodweatherCool,
                             kGoodweatherHeat, kGoodweatherDry, kGoodweatherFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kGoodweatherFanHigh, kGoodweatherFanLow,
                            kGoodweatherFanAuto, kGoodweatherFanAuto,
                            kGoodweatherFanMed);
-  result += addLabeledString(getTurbo() ? F("Toggle") : F("-"), F("Turbo"));
-  result += addLabeledString(getLight() ? F("Toggle") : F("-"), F("Light"));
-  result += addLabeledString(getSleep() ? F("Toggle") : F("-"), F("Sleep"));
-  result += addIntToString(getSwing(), F("Swing"));
+  result += addLabeledString(getTurbo() ? kToggleStr : F("-"), kTurboStr);
+  result += addLabeledString(getLight() ? kToggleStr : F("-"), kLightStr);
+  result += addLabeledString(getSleep() ? kToggleStr : F("-"), kSleepStr);
+  result += addIntToString(getSwing(), kSwingStr);
+  result += kSpaceLBraceStr;
   switch (this->getSwing()) {
     case kGoodweatherSwingFast:
-      result += F(" (Fast)");
+      result += kFastStr;
       break;
     case kGoodweatherSwingSlow:
-      result += F(" (Slow)");
+      result += kSlowStr;
       break;
     case kGoodweatherSwingOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getCommand(), F("Command"));
+  result += ')';
+  result += addIntToString(getCommand(), kCommandStr);
+  result += kSpaceLBraceStr;
   switch (this->getCommand()) {
     case kGoodweatherCmdPower:
-      result += F(" (Power)");
+      result += kPowerStr;
       break;
     case kGoodweatherCmdMode:
-      result += F(" (Mode)");
+      result += kModeStr;
       break;
     case kGoodweatherCmdUpTemp:
-      result += F(" (Temp Up)");
+      result += kTempUpStr;
       break;
     case kGoodweatherCmdDownTemp:
-      result += F(" (Temp Down)");
+      result += kTempDownStr;
       break;
     case kGoodweatherCmdSwing:
-      result += F(" (Swing)");
+      result += kSwingStr;
       break;
     case kGoodweatherCmdFan:
-      result += F(" (Fan)");
+      result += kFanStr;
       break;
     case kGoodweatherCmdTimer:
-      result += F(" (Timer)");
+      result += kTimerStr;
       break;
     case kGoodweatherCmdAirFlow:
-      result += F(" (Air Flow)");
+      result += kAirFlowStr;
       break;
     case kGoodweatherCmdHold:
-      result += F(" (Hold)");
+      result += kHoldStr;
       break;
     case kGoodweatherCmdSleep:
-      result += F(" (Sleep)");
+      result += kSleepStr;
       break;
     case kGoodweatherCmdTurbo:
-      result += F(" (Turbo)");
+      result += kTurboStr;
       break;
     case kGoodweatherCmdLight:
-      result += F(" (Light)");
+      result += kLightStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
+  result += ')';
   return result;
 }
 

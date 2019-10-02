@@ -6,6 +6,7 @@
 #include <string>
 #endif
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -351,21 +352,21 @@ stdAc::state_t IRTcl112Ac::toCommon(void) {
 String IRTcl112Ac::toString(void) {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTcl112AcAuto, kTcl112AcCool,
                             kTcl112AcHeat, kTcl112AcDry, kTcl112AcFan);
   uint16_t nrHalfDegrees = this->getTemp() * 2;
-  result += addIntToString(nrHalfDegrees / 2, F("Temp"));
+  result += addIntToString(nrHalfDegrees / 2, kTempStr);
   if (nrHalfDegrees & 1) result += F(".5");
   result += 'C';
   result += addFanToString(getFan(), kTcl112AcFanHigh, kTcl112AcFanLow,
                            kTcl112AcFanAuto, kTcl112AcFanAuto, kTcl112AcFanMed);
-  result += addBoolToString(getEcono(), F("Econo"));
-  result += addBoolToString(getHealth(), F("Health"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(getHealth(), kHealthStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
   return result;
 }
 

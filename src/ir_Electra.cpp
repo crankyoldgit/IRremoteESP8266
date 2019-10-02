@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Electra A/C added by crankyoldgit
@@ -278,15 +279,15 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 String IRElectraAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kElectraAcFanHigh, kElectraAcFanLow,
                            kElectraAcFanAuto, kElectraAcFanAuto,
                            kElectraAcFanMed);
-  result += addBoolToString(getSwingV(), F("Swing(V)"));
-  result += addBoolToString(getSwingH(), F("Swing(H)"));
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(getSwingH(), kSwingHStr);
   return result;
 }
 

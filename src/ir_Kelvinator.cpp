@@ -22,6 +22,7 @@
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -423,20 +424,20 @@ stdAc::state_t IRKelvinatorAC::toCommon(void) {
 String IRKelvinatorAC::toString(void) {
   String result = "";
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kKelvinatorAuto, kKelvinatorCool,
                             kKelvinatorHeat, kKelvinatorDry, kKelvinatorFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kKelvinatorFanMax, kKelvinatorFanMin,
                            kKelvinatorFanAuto, kKelvinatorFanAuto,
                            kKelvinatorBasicFanMax);
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getXFan(), F("XFan"));
-  result += addBoolToString(getIonFilter(), F("IonFilter"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getXFan(), kXFanStr);
+  result += addBoolToString(getIonFilter(), kIonStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
   return result;
 }
 

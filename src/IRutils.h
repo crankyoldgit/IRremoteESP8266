@@ -43,6 +43,9 @@ namespace irutils {
                          const bool precomma = true);
   String addIntToString(const uint16_t value, const String label,
                         const bool precomma = true);
+  String modelToStr(const decode_type_t protocol, const int16_t model);
+  String addModelToString(const decode_type_t protocol, const int16_t model,
+                          const bool precomma = true);
   String addLabeledString(const String value, const String label,
                           const bool precomma = true);
   String addTempToString(const uint16_t degrees, const bool celsius = true,
@@ -53,6 +56,8 @@ namespace irutils {
   String addFanToString(const uint8_t speed, const uint8_t high,
                         const uint8_t low, const uint8_t automatic,
                         const uint8_t quiet, const uint8_t medium);
+  String addDayToString(const uint8_t day_of_week, const int8_t offset = 0,
+                        const bool precomma = true);
   String htmlEscape(const String unescaped);
   String msToString(uint32_t const msecs);
   String minsToString(const uint16_t mins);

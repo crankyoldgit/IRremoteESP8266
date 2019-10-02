@@ -8,6 +8,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Coolix A/C / heatpump added by (send) bakrus & (decode) crankyoldgit
@@ -462,66 +463,66 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
 String IRCoolixAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   if (!getPower()) return result;  // If it's off, there is no other info.
   // Special modes.
   if (getSwing()) {
-    result += F(", Swing: Toggle");
+    result += kCommaSpaceStr + kSwingStr + kColonSpaceStr + kToggleStr;
     return result;
   }
   if (getSleep()) {
-    result += F(", Sleep: Toggle");
+    result += kCommaSpaceStr + kSleepStr + kColonSpaceStr + kToggleStr;
     return result;
   }
   if (getTurbo()) {
-    result += F(", Turbo: Toggle");
+    result += kCommaSpaceStr + kTurboStr + kColonSpaceStr + kToggleStr;
     return result;
   }
   if (getLed()) {
-    result += F(", Led: Toggle");
+    result += kCommaSpaceStr + kLightStr + kColonSpaceStr + kToggleStr;
     return result;
   }
   if (getClean()) {
-    result += F(", Clean: Toggle");
+    result += kCommaSpaceStr + kCleanStr + kColonSpaceStr + kToggleStr;
     return result;
   }
-  result += addModeToString(getMode(), kCoolixAuto,
-                                    kCoolixCool, kCoolixHeat,
-                                    kCoolixDry, kCoolixFan);
-  result += addIntToString(getFan(), F("Fan"));
+  result += addModeToString(getMode(), kCoolixAuto, kCoolixCool, kCoolixHeat,
+                            kCoolixDry, kCoolixFan);
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (getFan()) {
     case kCoolixFanAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kCoolixFanAuto0:
-      result += F(" (Auto0)");
+      result += kAutoStr + '0';
       break;
     case kCoolixFanMax:
-      result += F(" (Max)");
+      result += kMaxStr;
       break;
     case kCoolixFanMin:
-      result += F(" (Min)");
+      result += kMinStr;
       break;
     case kCoolixFanMed:
-      result += F(" (Med)");
+      result += kMedStr;
       break;
     case kCoolixFanZoneFollow:
-      result += F(" (Zone Follow)");
+      result += kZoneFollowStr;
       break;
     case kCoolixFanFixed:
-      result += F(" (Fixed)");
+      result += kFixedStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
+  result += ')';
   // Fan mode doesn't have a temperature.
   if (getMode() != kCoolixFan) result += addTempToString(getTemp());
-  result += addBoolToString(getZoneFollow(), F("Zone Follow"));
-  result += F(", Sensor Temp: ");
-  if (getSensorTemp() > kCoolixSensorTempMax)
-    result += F("Ignored");
-  else
-    result += uint64ToString(getSensorTemp()) + F("C");
+  result += addBoolToString(getZoneFollow(), kZoneFollowStr);
+  result += addLabeledString(
+      (getSensorTemp() > kCoolixSensorTempMax)
+          ? kOffStr : uint64ToString(getSensorTemp()) + F("C"),
+      kSensorStr + ' ' + kTempStr);
   return result;
 }
 

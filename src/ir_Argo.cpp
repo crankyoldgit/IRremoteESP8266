@@ -11,6 +11,7 @@ Copyright 2019 crankyoldgit
 #include <Arduino.h>
 #endif  // UNIT_TEST
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -344,53 +345,57 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 String IRArgoAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
-  result += addIntToString(getMode(), F("Mode"));
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addIntToString(getMode(), kModeStr);
+  result += kSpaceLBraceStr;
   switch (getMode()) {
     case kArgoAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kArgoCool:
-      result += F(" (Cool)");
+      result += kCoolStr;
       break;
     case kArgoHeat:
-      result += F(" (Heat)");
+      result += kHeatStr;
       break;
     case kArgoDry:
-      result += F(" (Dry)");
+      result += kDryStr;
       break;
     case kArgoHeatAuto:
-      result += F(" (Heat Auto)");
+      result += kHeatStr + ' ' + kAutoStr;
       break;
     case kArgoOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getFan(), F("Fan"));
+  result += ')';
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (getFan()) {
     case kArgoFanAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kArgoFan3:
-      result += F(" (Max)");
+      result += kMaxStr;
       break;
     case kArgoFan1:
-      result += F(" (Min)");
+      result += kMinStr;
       break;
     case kArgoFan2:
-      result += F(" (Med)");
+      result += kMedStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
+  result += ')';
   result += addTempToString(getTemp());
-  result += F(", Room ");
+  result += kCommaSpaceStr + kRoomStr + ' ';
   result += addTempToString(getRoomTemp(), true, false);
-  result += addBoolToString(getMax(), F("Max"));
-  result += addBoolToString(getiFeel(), F("iFeel"));
-  result += addBoolToString(getNight(), F("Night"));
+  result += addBoolToString(getMax(), kMaxStr);
+  result += addBoolToString(getiFeel(), kIFeelStr);
+  result += addBoolToString(getNight(), kNightStr);
   return result;
 }
 

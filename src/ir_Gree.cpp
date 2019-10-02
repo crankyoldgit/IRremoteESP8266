@@ -15,6 +15,7 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #include "ir_Kelvinator.h"
 
@@ -33,6 +34,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
@@ -515,40 +517,35 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += addIntToString(getModel(), F("Model"), false);
-  switch (getModel()) {
-    case gree_ac_remote_model_t::YAW1F: result += F(" (YAW1F)"); break;
-    case gree_ac_remote_model_t::YBOFB: result += F(" (YBOFB)"); break;
-    default: result += F(" (UNKNOWN)");
-  }
-  result += addBoolToString(getPower(), F("Power"));
+  result += addModelToString(decode_type_t::GREE, getModel(), false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
                             kGreeDry, kGreeFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kGreeFanMax, kGreeFanMin, kGreeFanAuto,
                            kGreeFanAuto, kGreeFanMed);
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getIFeel(), F("IFeel"));
-  result += addBoolToString(getWiFi(), F("WiFi"));
-  result += addBoolToString(getXFan(), F("XFan"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addLabeledString(getSwingVerticalAuto() ? F("Auto") : F("Manual"),
-                             F("Swing Vertical Mode"));
-  result += addIntToString(getSwingVerticalPosition(), F("Swing Vertical Pos"));
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getIFeel(), kIFeelStr);
+  result += addBoolToString(getWiFi(), kWifiStr);
+  result += addBoolToString(getXFan(), kXFanStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addLabeledString(getSwingVerticalAuto() ? kAutoStr : kManualStr,
+                             kSwingVStr + ' ' + kModeStr);
+  result += addIntToString(getSwingVerticalPosition(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (getSwingVerticalPosition()) {
     case kGreeSwingLastPos:
-      result += F(" (Last Pos)");
+      result += kLastStr;
       break;
     case kGreeSwingAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
+    default: result += kUnknownStr;
   }
-  result += F(", Timer: ");
-  if (getTimerEnabled())
-    result += minsToString(getTimer());
-  else
-    result += F("Off");
+  result += ')';
+  result += addLabeledString(
+      getTimerEnabled() ? minsToString(getTimer()) : kOffStr, kTimerStr);
   return result;
 }
 

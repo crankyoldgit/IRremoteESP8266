@@ -13,6 +13,7 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -349,15 +350,15 @@ stdAc::state_t IRHitachiAc::toCommon(void) {
 String IRHitachiAc::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kHitachiAcAuto, kHitachiAcCool,
                             kHitachiAcHeat, kHitachiAcDry, kHitachiAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHitachiAcFanHigh, kHitachiAcFanLow,
                            kHitachiAcFanAuto, kHitachiAcFanAuto,
                            kHitachiAcFanMed);
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
   return result;
 }
 

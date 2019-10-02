@@ -1265,7 +1265,7 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
       "m586s1432m586s436m586s436m586s1432m586s1432m586s436m586s436m586s436"
       "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
       "m586s100000";
-  std::string text = "Power: On, Mode: 1 (Cool), Temp: 23C, Fan: 4 (Medium), "
+  std::string text = "Power: On, Mode: 1 (Cool), Temp: 23C, Fan: 4 (Med), "
                      "Swing: On, Beep: Off, Clean: Off, Quiet: Off, "
                      "Powerful: Off";
   // Don't do a setPower()/on()/off() as that will trigger the special message.

@@ -14,6 +14,7 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
@@ -1483,19 +1484,25 @@ bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
 
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                 const stdAc::opmode_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()))
     return stdAc::opmode_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::opmode_t::kOff;
-  else if (!strcasecmp(str, "COOL") || !strcasecmp(str, "COOLING"))
+  else if (!strcasecmp(str, kCoolStr.c_str()) ||
+           !strcasecmp(str, "COOLING"))
     return stdAc::opmode_t::kCool;
-  else if (!strcasecmp(str, "HEAT") || !strcasecmp(str, "HEATING"))
+  else if (!strcasecmp(str, kHeatStr.c_str()) ||
+           !strcasecmp(str, "HEATING"))
     return stdAc::opmode_t::kHeat;
-  else if (!strcasecmp(str, "DRY") || !strcasecmp(str, "DRYING") ||
+  else if (!strcasecmp(str, kDryStr.c_str()) ||
+           !strcasecmp(str, "DRYING") ||
            !strcasecmp(str, "DEHUMIDIFY"))
     return stdAc::opmode_t::kDry;
-  else if (!strcasecmp(str, "FAN") || !strcasecmp(str, "FANONLY") ||
-           !strcasecmp(str, "FAN_ONLY"))
+  else if (!strcasecmp(str, kFanStr.c_str()) ||
+           !strcasecmp(str, "FANONLY") ||
+           !strcasecmp(str, kFanOnlyStr.c_str()))
     return stdAc::opmode_t::kFan;
   else
     return def;
@@ -1503,20 +1510,26 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()))
     return stdAc::fanspeed_t::kAuto;
-  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
-           !strcasecmp(str, "LOWEST"))
+  else if (!strcasecmp(str, kMinStr.c_str()) ||
+           !strcasecmp(str, kMinimumStr.c_str()) ||
+           !strcasecmp(str, kLowestStr.c_str()))
     return stdAc::fanspeed_t::kMin;
-  else if (!strcasecmp(str, "LOW"))
+  else if (!strcasecmp(str, kLowStr.c_str()) ||
+           !strcasecmp(str, kLoStr.c_str()))
     return stdAc::fanspeed_t::kLow;
-  else if (!strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "MID"))
+  else if (!strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kMidStr.c_str()))
     return stdAc::fanspeed_t::kMedium;
-  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
+  else if (!strcasecmp(str, kHighStr.c_str()) ||
+           !strcasecmp(str, kHiStr.c_str()))
     return stdAc::fanspeed_t::kHigh;
-  else if (!strcasecmp(str, "MAX") || !strcasecmp(str, "MAXIMUM") ||
-           !strcasecmp(str, "HIGHEST"))
+  else if (!strcasecmp(str, kMaxStr.c_str()) ||
+           !strcasecmp(str, kMaximumStr.c_str()) ||
+           !strcasecmp(str, kHighestStr.c_str()))
     return stdAc::fanspeed_t::kMax;
   else
     return def;
@@ -1524,26 +1537,36 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
-      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()) ||
+      !strcasecmp(str, kOnStr.c_str()) ||
+      !strcasecmp(str, kSwingStr.c_str()))
     return stdAc::swingv_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::swingv_t::kOff;
-  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
-           !strcasecmp(str, "LOWEST") || !strcasecmp(str, "BOTTOM") ||
-           !strcasecmp(str, "DOWN"))
+  else if (!strcasecmp(str, kMinStr.c_str()) ||
+           !strcasecmp(str, kMinimumStr.c_str()) ||
+           !strcasecmp(str, kLowestStr.c_str()) ||
+           !strcasecmp(str, kBottomStr.c_str()) ||
+           !strcasecmp(str, kDownStr.c_str()))
     return stdAc::swingv_t::kLowest;
-  else if (!strcasecmp(str, "LOW"))
+  else if (!strcasecmp(str, kLowStr.c_str()))
     return stdAc::swingv_t::kLow;
-  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
-           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
+  else if (!strcasecmp(str, kMidStr.c_str()) ||
+           !strcasecmp(str, kMiddleStr.c_str()) ||
+           !strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kCentreStr.c_str()))
     return stdAc::swingv_t::kMiddle;
-  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
+  else if (!strcasecmp(str, kHighStr.c_str()) ||
+           !strcasecmp(str, kHiStr.c_str()))
     return stdAc::swingv_t::kHigh;
-  else if (!strcasecmp(str, "HIGHEST") || !strcasecmp(str, "MAX") ||
-           !strcasecmp(str, "MAXIMUM") || !strcasecmp(str, "TOP") ||
-           !strcasecmp(str, "UP"))
+  else if (!strcasecmp(str, kHighestStr.c_str()) ||
+           !strcasecmp(str, kMaxStr.c_str()) ||
+           !strcasecmp(str, kMaximumStr.c_str()) ||
+           !strcasecmp(str, kTopStr.c_str()) ||
+           !strcasecmp(str, kUpStr.c_str()))
     return stdAc::swingv_t::kHighest;
   else
     return def;
@@ -1551,28 +1574,34 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
-      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()) ||
+      !strcasecmp(str, kOnStr.c_str()) || !strcasecmp(str, kSwingStr.c_str()))
     return stdAc::swingh_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::swingh_t::kOff;
-  else if (!strcasecmp(str, "LEFTMAX") || !strcasecmp(str, "LEFT MAX") ||
-           !strcasecmp(str, "MAXLEFT") || !strcasecmp(str, "MAX LEFT") ||
-           !strcasecmp(str, "FARLEFT") || !strcasecmp(str, "FAR LEFT"))
+  else if (!strcasecmp(str, kLeftMaxStr.c_str()) ||
+           !strcasecmp(str, D_STR_LEFT " " D_STR_MAX) ||
+           !strcasecmp(str, D_STR_MAX D_STR_LEFT) ||
+           !strcasecmp(str, kMaxLeftStr.c_str()))
     return stdAc::swingh_t::kLeftMax;
-  else if (!strcasecmp(str, "LEFT"))
+  else if (!strcasecmp(str, kLeftStr.c_str()))
     return stdAc::swingh_t::kLeft;
-  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
-           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
+  else if (!strcasecmp(str, kMidStr.c_str()) ||
+           !strcasecmp(str, kMiddleStr.c_str()) ||
+           !strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kCentreStr.c_str()))
     return stdAc::swingh_t::kMiddle;
-  else if (!strcasecmp(str, "RIGHT"))
+  else if (!strcasecmp(str, kRightStr.c_str()))
     return stdAc::swingh_t::kRight;
-  else if (!strcasecmp(str, "RIGHTMAX") || !strcasecmp(str, "RIGHT MAX") ||
-           !strcasecmp(str, "MAXRIGHT") || !strcasecmp(str, "MAX RIGHT") ||
-           !strcasecmp(str, "FARRIGHT") || !strcasecmp(str, "FAR RIGHT"))
+  else if (!strcasecmp(str, kRightMaxStr.c_str()) ||
+           !strcasecmp(str, D_STR_MAX " " D_STR_RIGHT) ||
+           !strcasecmp(str, D_STR_MAX D_STR_RIGHT) ||
+           !strcasecmp(str, kMaxRightStr.c_str()))
     return stdAc::swingh_t::kRightMax;
-  else if (!strcasecmp(str, "WIDE"))
+  else if (!strcasecmp(str, kWideStr.c_str()))
     return stdAc::swingh_t::kWide;
   else
     return def;
@@ -1625,99 +1654,103 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 }
 
 bool IRac::strToBool(const char *str, const bool def) {
-  if (!strcasecmp(str, "ON") || !strcasecmp(str, "1") ||
-      !strcasecmp(str, "YES") || !strcasecmp(str, "TRUE"))
+  if (!strcasecmp(str, kOnStr.c_str()) ||
+      !strcasecmp(str, "1") ||
+      !strcasecmp(str, kYesStr.c_str()) ||
+      !strcasecmp(str, kTrueStr.c_str()))
     return true;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "0") ||
-           !strcasecmp(str, "NO") || !strcasecmp(str, "FALSE"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, "0") ||
+           !strcasecmp(str, kNoStr.c_str()) ||
+           !strcasecmp(str, kFalseStr.c_str()))
     return false;
   else
     return def;
 }
 
 String IRac::boolToString(const bool value) {
-  return value ? F("on") : F("off");
+  return value ? kOnStr : kOffStr;
 }
 
 String IRac::opmodeToString(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::opmode_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::opmode_t::kCool:
-      return F("cool");
+      return kCoolStr;
     case stdAc::opmode_t::kHeat:
-      return F("heat");
+      return kHeatStr;
     case stdAc::opmode_t::kDry:
-      return F("dry");
+      return kDryStr;
     case stdAc::opmode_t::kFan:
-      return F("fan_only");
+      return kFanOnlyStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::fanspeed_t::kMax:
-      return F("max");
+      return kMaxStr;
     case stdAc::fanspeed_t::kHigh:
-      return F("high");
+      return kHighStr;
     case stdAc::fanspeed_t::kMedium:
-      return F("medium");
+      return kMediumStr;
     case stdAc::fanspeed_t::kLow:
-      return F("low");
+      return kLowStr;
     case stdAc::fanspeed_t::kMin:
-      return F("min");
+      return kMinStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::swingv_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::swingv_t::kHighest:
-      return F("highest");
+      return kHighestStr;
     case stdAc::swingv_t::kHigh:
-      return F("high");
+      return kHighStr;
     case stdAc::swingv_t::kMiddle:
-      return F("middle");
+      return kMiddleStr;
     case stdAc::swingv_t::kLow:
-      return F("low");
+      return kLowStr;
     case stdAc::swingv_t::kLowest:
-      return F("lowest");
+      return kLowestStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::swinghToString(const stdAc::swingh_t swingh) {
   switch (swingh) {
     case stdAc::swingh_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::swingh_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::swingh_t::kLeftMax:
-      return F("leftmax");
+      return kLeftMaxStr;
     case stdAc::swingh_t::kLeft:
-      return F("left");
+      return kLeftStr;
     case stdAc::swingh_t::kMiddle:
-      return F("middle");
+      return kMiddleStr;
     case stdAc::swingh_t::kRight:
-      return F("right");
+      return kRightStr;
     case stdAc::swingh_t::kRightMax:
-      return F("rightmax");
+      return kRightMaxStr;
     case stdAc::swingh_t::kWide:
-      return F("wide");
+      return kWideStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 

@@ -6,6 +6,7 @@ Node MCU/ESP8266 Sketch to emulate Teco
 #include "ir_Teco.h"
 #include <algorithm>
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #ifndef ARDUINO
 #include <string>
@@ -285,22 +286,22 @@ stdAc::state_t IRTecoAc::toCommon(void) {
 String IRTecoAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTecoAuto, kTecoCool, kTecoHeat,
                             kTecoDry, kTecoFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kTecoFanHigh, kTecoFanLow,
                            kTecoFanAuto, kTecoFanAuto, kTecoFanMed);
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getSwing(), F("Swing"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getHumid(), F("Humid"));
-  result += addBoolToString(getSave(), F("Save"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getHumid(), kHumidStr);
+  result += addBoolToString(getSave(), kSaveStr);
   if (getTimerEnabled())
     result += addLabeledString(irutils::minsToString(getTimer()),
-                               F("Timer"));
+                               kTimerStr);
   else
-    result += addBoolToString(false, F("Timer"));
+    result += addBoolToString(false, kTimerStr);
   return result;
 }
 

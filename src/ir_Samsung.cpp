@@ -10,6 +10,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
@@ -677,38 +678,40 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 String IRSamsungAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
                             kSamsungAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (getFan()) {
     case kSamsungAcFanAuto:
     case kSamsungAcFanAuto2:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kSamsungAcFanLow:
-      result += F(" (Low)");
+      result += kLowStr;
       break;
     case kSamsungAcFanMed:
-      result += F(" (Medium)");
+      result += kMedStr;
       break;
     case kSamsungAcFanHigh:
-      result += F(" (High)");
+      result += kHighStr;
       break;
     case kSamsungAcFanTurbo:
-      result += F(" (Turbo)");
+      result += kTurboStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
       break;
   }
-  result += addBoolToString(getSwing(), F("Swing"));
-  result += addBoolToString(getBeep(), F("Beep"));
-  result += addBoolToString(getClean(), F("Clean"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += ')';
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getBeep(), kBeepStr);
+  result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
   return result;
 }
 

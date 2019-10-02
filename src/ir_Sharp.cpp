@@ -10,6 +10,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Equipment it seems compatible with:
@@ -497,7 +498,7 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 String IRSharpAc::toString(void) {
   String result = "";
   result.reserve(60);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());

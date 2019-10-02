@@ -17,6 +17,7 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -456,44 +457,44 @@ stdAc::state_t IRNeoclimaAc::toCommon(void) {
 String IRNeoclimaAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kNeoclimaAuto, kNeoclimaCool,
                             kNeoclimaHeat, kNeoclimaDry, kNeoclimaFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kNeoclimaFanHigh, kNeoclimaFanLow,
                            kNeoclimaFanAuto, kNeoclimaFanAuto, kNeoclimaFanMed);
-  result += addBoolToString(getSwingV(), F("Swing(V)"));
-  result += addBoolToString(getSwingH(), F("Swing(H)"));
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getHold(), F("Hold"));
-  result += addBoolToString(getIon(), F("Ion"));
-  result += addBoolToString(getEye(), F("Eye"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getFollow(), F("Follow"));
-  result += addBoolToString(get8CHeat(), F("8C Heat"));
-  result += addBoolToString(getFresh(), F("Fresh"));
-  result += addIntToString(getButton(), F("Button"));
-  result += F(" (");
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(getSwingH(), kSwingHStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getHold(), kHoldStr);
+  result += addBoolToString(getIon(), kIonStr);
+  result += addBoolToString(getEye(), kEyeStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getFollow(), kFollowStr);
+  result += addBoolToString(get8CHeat(), k8CHeatStr);
+  result += addBoolToString(getFresh(), kFreshStr);
+  result += addIntToString(getButton(), kButtonStr);
+  result += kSpaceLBraceStr;
   switch (this->getButton()) {
-    case kNeoclimaButtonPower:    result += F("Power"); break;
-    case kNeoclimaButtonMode:     result += F("Mode"); break;
-    case kNeoclimaButtonTempUp:   result += F("Temp Up"); break;
-    case kNeoclimaButtonTempDown: result += F("Temp Down"); break;
-    case kNeoclimaButtonSwing:    result += F("Swing"); break;
-    case kNeoclimaButtonFanSpeed: result += F("Speed"); break;
-    case kNeoclimaButtonAirFlow:  result += F("Air Flow"); break;
-    case kNeoclimaButtonHold:     result += F("Hold"); break;
-    case kNeoclimaButtonSleep:    result += F("Sleep"); break;
-    case kNeoclimaButtonLight:    result += F("Light"); break;
-    case kNeoclimaButtonEye:      result += F("Eye"); break;
-    case kNeoclimaButtonFollow:   result += F("Follow"); break;
-    case kNeoclimaButtonIon:      result += F("Ion"); break;
-    case kNeoclimaButtonFresh:    result += F("Fresh"); break;
-    case kNeoclimaButton8CHeat:   result += F("8C Heat"); break;
-    case kNeoclimaButtonTurbo:    result += F("Turbo"); break;
+    case kNeoclimaButtonPower:    result += kPowerStr; break;
+    case kNeoclimaButtonMode:     result += kModeStr; break;
+    case kNeoclimaButtonTempUp:   result += kTempUpStr; break;
+    case kNeoclimaButtonTempDown: result += kTempDownStr; break;
+    case kNeoclimaButtonSwing:    result += kSwingStr; break;
+    case kNeoclimaButtonFanSpeed: result += kFanStr; break;
+    case kNeoclimaButtonAirFlow:  result += kAirFlowStr; break;
+    case kNeoclimaButtonHold:     result += kHoldStr; break;
+    case kNeoclimaButtonSleep:    result += kSleepStr; break;
+    case kNeoclimaButtonLight:    result += kLightStr; break;
+    case kNeoclimaButtonEye:      result += kEyeStr; break;
+    case kNeoclimaButtonFollow:   result += kFollowStr; break;
+    case kNeoclimaButtonIon:      result += kIonStr; break;
+    case kNeoclimaButtonFresh:    result += kFreshStr; break;
+    case kNeoclimaButton8CHeat:   result += k8CHeatStr; break;
+    case kNeoclimaButtonTurbo:    result += kTurboStr; break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
   return result;

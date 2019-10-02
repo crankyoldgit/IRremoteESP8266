@@ -694,8 +694,8 @@ TEST(TestDaikinClass, HumanReadable) {
       "Power: On, Mode: 4 (Heat), Temp: 15C, Fan: 11 (Quiet), "
       "Powerful: Off, Quiet: Off, Sensor: Off, Mold: Off, "
       "Comfort: Off, Swing(H): Off, Swing(V): Off, "
-      "Current Time: 00:00, Current Day: (UNKNOWN), On Time: Off, "
-      "Off Time: Off, Weekly Timer: On",
+      "Clock: 00:00, Day: 0 (UNKNOWN), On Timer: Off, "
+      "Off Timer: Off, Weekly Timer: On",
       ac.toString());
   ac.setMode(kDaikinAuto);
   ac.setTemp(25);
@@ -716,7 +716,7 @@ TEST(TestDaikinClass, HumanReadable) {
       "Power: Off, Mode: 0 (Auto), Temp: 25C, Fan: 10 (Auto), "
       "Powerful: Off, Quiet: On, Sensor: On, Mold: On, Comfort: On, "
       "Swing(H): On, Swing(V): On, "
-      "Current Time: 09:15, Current Day: Wed, On Time: 08:00, Off Time: 17:30, "
+      "Clock: 09:15, Day: 4 (Wed), On Timer: 08:00, Off Timer: 17:30, "
       "Weekly Timer: Off",
       ac.toString());
 }
@@ -869,8 +869,8 @@ TEST(TestDecodeDaikin, RealExample) {
       "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
+      "Clock: 22:18, Day: 0 (UNKNOWN), "
+      "On Timer: 21:30, Off Timer: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -902,8 +902,8 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
       "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
+      "Clock: 22:18, Day: 0 (UNKNOWN), "
+      "On Timer: 21:30, Off Timer: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -931,8 +931,8 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
       "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mold: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
-      "Current Time: 22:18, Current Day: (UNKNOWN), "
-      "On Time: 21:30, Off Time: 06:10, Weekly Timer: On", ac.toString());
+      "Clock: 22:18, Day: 0 (UNKNOWN), "
+      "On Timer: 21:30, Off Timer: 06:10, Weekly Timer: On", ac.toString());
 }
 
 // Test decoding a message captured from a real IR remote.
@@ -1033,9 +1033,9 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (Auto), Temp: 19C, Fan: 10 (Auto), "
-      "Swing(V): 5, Swing(H): 190 (Auto), "
-      "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
-      "Beep: 1 (Quiet), Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, "
+      "Swing(V): 5 (Low), Swing(H): 190 (Auto), "
+      "Clock: 14:50, On Timer: Off, Off Timer: Off, Sleep Timer: Off, "
+      "Beep: 1 (Quiet), Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, "
       "Eye: Off, Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: Off, "
       "Econo: Off",
       ac.toString());
@@ -1446,8 +1446,8 @@ TEST(TestDaikin2Class, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 21C, Fan: 5 (High), "
       "Swing(V): 14 (Auto), Swing(H): 191 (Swing), Clock: 12:34, "
-      "On Time: Off, Off Time: 20:00, Sleep Time: 04:00, Beep: 2 (Loud), "
-      "Light: 2 (Dim), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
+      "On Timer: Off, Off Timer: 20:00, Sleep Timer: 04:00, Beep: 2 (Loud), "
+      "Light: 2 (Low), Mold: On, Clean: Off, Fresh: On, Eye: On, "
       "Eye Auto: On, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
       ac.toString());
   ac.setQuiet(true);
@@ -1461,8 +1461,8 @@ TEST(TestDaikin2Class, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Temp: 32C, Fan: 1 (Low), "
       "Swing(V): 14 (Auto), Swing(H): 191 (Swing), Clock: 23:45, "
-      "On Time: 09:11, Off Time: 20:00, Sleep Time: Off, Beep: 1 (Quiet), "
-      "Light: 1 (Bright), Mold: On, Clean: Off, Fresh Air: On, Eye: On, "
+      "On Timer: 09:11, Off Timer: 20:00, Sleep Timer: Off, Beep: 1 (Quiet), "
+      "Light: 1 (High), Mold: On, Clean: Off, Fresh: On, Eye: On, "
       "Eye Auto: On, Quiet: On, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }
@@ -1501,9 +1501,9 @@ TEST(TestDaikin2Class, KnownConstruction) {
   ac.setEcono(false);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (Auto), Temp: 19C, Fan: 10 (Auto), "
-      "Swing(V): 5, Swing(H): 190 (Auto), "
-      "Clock: 14:50, On Time: Off, Off Time: Off, Sleep Time: Off, "
-      "Beep: 1 (Quiet), Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, "
+      "Swing(V): 5 (Low), Swing(H): 190 (Auto), "
+      "Clock: 14:50, On Timer: Off, Off Timer: Off, Sleep Timer: Off, "
+      "Beep: 1 (Quiet), Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, "
       "Eye: Off, Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: Off, "
       "Econo: Off",
       ac.toString());
@@ -1564,8 +1564,8 @@ TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
   EXPECT_EQ(
       "Power: On, Mode: 0 (Auto), Temp: 19C, Fan: 10 (Auto), "
       "Swing(V): 14 (Auto), Swing(H): 190 (Auto), Clock: 09:20, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: On, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: On, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }
@@ -1589,8 +1589,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 10 (Auto), "
       "Swing(V): 14 (Auto), Swing(H): 190 (Auto), Clock: 13:46, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
       ac.toString());
   ac.setRaw(PowerfulOff);
@@ -1598,8 +1598,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 10 (Auto), "
       "Swing(V): 14 (Auto), Swing(H): 190 (Auto), Clock: 13:46, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 
@@ -1618,8 +1618,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 10 (Auto), "
       "Swing(V): 14 (Auto), Swing(H): 190 (Auto), Clock: 13:47, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: On",
       ac.toString());
   ac.setRaw(EconoOff);
@@ -1627,8 +1627,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 10 (Auto), "
       "Swing(V): 14 (Auto), Swing(H): 190 (Auto), Clock: 13:47, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 3 (Off), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
 }
@@ -2578,7 +2578,7 @@ TEST(TestDecodeDaikin128, RealExample) {
       "Power Toggle: On, Mode: 2 (Cool), Temp: 26C, Fan: 1 (Auto), "
       "Powerful: Off, Quiet: Off, Swing(V): On, Sleep: Off, "
       "Econo: Off, Clock: 19:20, "
-      "On Timer: Off, On Time: 07:30, Off Timer: Off, Off Time: 22:00, "
+      "On Timer: Off, On Timer: 07:30, Off Timer: Off, Off Timer: 22:00, "
       "Light Toggle: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -2826,7 +2826,7 @@ TEST(TestDaikin128Class, HumanReadable) {
       "Power Toggle: Off, Mode: 10 (Auto), Temp: 25C, Fan: 1 (Auto), "
       "Powerful: Off, Quiet: Off, Swing(V): On, "
       "Sleep: Off, Econo: Off, Clock: 00:00, "
-      "On Timer: Off, On Time: 00:00, Off Timer: Off, Off Time: 00:00, "
+      "On Timer: Off, On Timer: 00:00, Off Timer: Off, Off Timer: 00:00, "
       "Light Toggle: 0 (Off)",
       ac.toString());
   ac.setMode(kDaikin128Cool);
@@ -2846,7 +2846,7 @@ TEST(TestDaikin128Class, HumanReadable) {
       "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 9 (Quiet), "
       "Powerful: Off, Quiet: On, Swing(V): Off, "
       "Sleep: On, Econo: On, Clock: 18:33, "
-      "On Timer: On, On Time: 10:00, Off Timer: On, Off Time: 21:30, "
+      "On Timer: On, On Timer: 10:00, Off Timer: On, Off Timer: 21:30, "
       "Light Toggle: 8 (Wall)",
       ac.toString());
 }
@@ -2998,9 +2998,9 @@ TEST(TestDaikin2ClassNew, Issue908) {
   ac.setRaw(fanMedium);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Auto), Temp: 30C, Fan: 3 (Medium), "
-      "Swing(V): 3, Swing(H): 170, Clock: 09:46, "
-      "On Time: Off, Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), "
-      "Light: 3 (Off), Mold: On, Clean: On, Fresh Air: Off, Eye: Off, "
+      "Swing(V): 3 (UpperMiddle), Swing(H): 170 (UNKNOWN), Clock: 09:46, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
   ASSERT_EQ(kDaikinFanMed, ac.getFan());
@@ -3016,10 +3016,10 @@ TEST(TestDaikin2ClassNew, Issue908) {
   ac.setRaw(swingvMiddle);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Auto), Temp: 30C, Fan: 11 (Quiet), "
-      "Swing(V): 3, Swing(H): 170, Clock: 09:57, On Time: Off, "
-      "Off Time: Off, Sleep Time: Off, Beep: 2 (Loud), Light: 3 (Off), "
-      "Mold: On, Clean: On, Fresh Air: Off, Eye: Off, Eye Auto: Off, "
-      "Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Swing(V): 3 (UpperMiddle), Swing(H): 170 (UNKNOWN), Clock: 09:57, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
+      "Light: 3 (Off), Mold: On, Clean: On, Fresh: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
   ASSERT_EQ(3, ac.getSwingVertical());
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);

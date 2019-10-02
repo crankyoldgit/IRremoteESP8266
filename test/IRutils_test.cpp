@@ -308,8 +308,8 @@ TEST(TestResultToHumanReadableBasic, SimpleCodes) {
   ASSERT_EQ(NEC, irsend.capture.decode_type);
   ASSERT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Encoding  : NEC\n"
-      "Code      : 8F704FB (32 bits)\n",
+      "Protocol  : NEC\n"
+      "Code      : 0x8F704FB (32 Bits)\n",
       resultToHumanReadableBasic(&irsend.capture));
 }
 
@@ -328,8 +328,8 @@ TEST(TestResultToHumanReadableBasic, ComplexCodes) {
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Encoding  : TOSHIBA_AC\n"
-      "Code      : F20D03FC0100000001 (72 bits)\n",
+      "Protocol  : TOSHIBA_AC\n"
+      "Code      : 0xF20D03FC0100000001 (72 Bits)\n",
       resultToHumanReadableBasic(&irsend.capture));
 }
 

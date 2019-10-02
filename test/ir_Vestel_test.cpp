@@ -321,7 +321,7 @@ TEST(TestVestelAcClass, MessageConstuction) {
   IRVestelAc ac(0);
 
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Heat), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
   ac.setMode(kVestelAcCool);
@@ -363,28 +363,28 @@ TEST(TestVestelAcClass, MessageConstuction) {
   ac.setTime(23 * 60 + 59);
   EXPECT_TRUE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
+      "Clock: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setTimer(8 * 60 + 0);
   EXPECT_TRUE(ac.isTimeCommand());
   EXPECT_EQ(
-      "Time: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
+      "Clock: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setOnTimer(7 * 60 + 40);
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: 07:40, Off Timer: Off",
+      "Clock: 23:59, Timer: Off, On Timer: 07:40, Off Timer: Off",
       ac.toString());
   ac.setOffTimer(17 * 60 + 10);
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: 07:40, Off Timer: 17:10",
+      "Clock: 23:59, Timer: Off, On Timer: 07:40, Off Timer: 17:10",
       ac.toString());
   ac.setTimer(8 * 60 + 0);
   EXPECT_EQ(
-      "Time: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
+      "Clock: 23:59, Timer: 08:00, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setTimer(0);
   EXPECT_EQ(
-      "Time: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
+      "Clock: 23:59, Timer: Off, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.on();
   EXPECT_FALSE(ac.isTimeCommand());
@@ -431,7 +431,7 @@ TEST(TestDecodeVestelAc, NormalDecodeWithStrict) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Hot), Sleep: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 25C, Fan: 13 (Auto Heat), Sleep: Off, "
       "Turbo: Off, Ion: Off, Swing: Off",
       ac.toString());
 }
@@ -502,7 +502,7 @@ TEST(TestDecodeVestelAc, RealTimerExample) {
   ac.begin();
   ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
-      "Time: 05:45, Timer: Off, On Timer: 14:00, Off Timer: 23:00",
+      "Clock: 05:45, Timer: Off, On Timer: 14:00, Off Timer: 23:00",
       ac.toString());
 }
 
