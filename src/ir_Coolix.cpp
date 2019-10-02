@@ -153,7 +153,6 @@ uint32_t IRCoolixAC::getNormalState(void) {
 }
 
 void IRCoolixAC::setTempRaw(const uint8_t code) {
-  recoverSavedState();
   remote_state &= ~kCoolixTempMask;  // Clear the old temp.
   remote_state |= (code << 4);
 }
@@ -166,6 +165,8 @@ void IRCoolixAC::setTemp(const uint8_t desired) {
   // Range check.
   uint8_t temp = std::min(desired, kCoolixTempMax);
   temp = std::max(temp, kCoolixTempMin);
+
+  recoverSavedState();
   setTempRaw(kCoolixTempMap[temp - kCoolixTempMin]);
 }
 
@@ -178,7 +179,6 @@ uint8_t IRCoolixAC::getTemp() {
 }
 
 void IRCoolixAC::setSensorTempRaw(const uint8_t code) {
-  recoverSavedState();
   remote_state &= ~kCoolixSensorTempMask;  // Clear previous sensor temp.
   remote_state |= ((code & 0xF) << 8);
 }
@@ -187,6 +187,7 @@ void IRCoolixAC::setSensorTemp(const uint8_t desired) {
   uint8_t temp = desired;
   temp = std::min(temp, kCoolixSensorTempMax);
   temp = std::max(temp, kCoolixSensorTempMin);
+  recoverSavedState();
   setSensorTempRaw(temp - kCoolixSensorTempMin);
   setZoneFollow(true);  // Setting a Sensor temp means you want to Zone Follow.
 }
@@ -315,7 +316,7 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   remote_state &= ~kCoolixModeMask;
   remote_state |= (actualmode << 2);
   // Force the temp into a known-good state.
-  setTemp(getTemp());
+  setTempRaw(getTempRaw());
   if (mode == kCoolixFan) setTempRaw(kCoolixFanTempCode);
 }
 
