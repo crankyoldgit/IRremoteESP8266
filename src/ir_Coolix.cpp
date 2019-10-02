@@ -295,15 +295,11 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   switch (actualmode) {
     case kCoolixAuto:
     case kCoolixDry:
-      if (this->getFan() == kCoolixFanAuto)
-        //  No kCoolixFanAuto in Dry/Auto mode.
         this->setFan(kCoolixFanAuto0, false);
       break;
     case kCoolixCool:
     case kCoolixHeat:
     case kCoolixFan:
-      if (this->getFan() == kCoolixFanAuto0)
-        // kCoolixFanAuto0 only in Dry/Auto mode.
         this->setFan(kCoolixFanAuto, false);
       break;
     default:  // Anything else, go with Auto mode.
@@ -312,7 +308,6 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   }
   // Fan mode is a special case of Dry.
   if (mode == kCoolixFan) actualmode = kCoolixDry;
-  recoverSavedState();
   remote_state &= ~kCoolixModeMask;
   remote_state |= (actualmode << 2);
   // Force the temp into a known-good state.
