@@ -98,9 +98,10 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
                        const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+    : _irsend(pin, inverted, use_modulation),
+      coolixState(IRCoolixAC::sOff) { cmdReset(); }
 
-void IRCoolixAC::stateReset() { setRaw(kCoolixDefaultState); }
+void IRCoolixAC::cmdReset() { setRaw(kCoolixDefaultState); }
 
 void IRCoolixAC::begin() { _irsend.begin(); }
 
@@ -110,6 +111,10 @@ void IRCoolixAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_COOLIX
 
+void IRCoolixAC::send(uint64_t data, uint16_t nbits, const uint16_t repeat) {
+  _irsend.sendCOOLIX(data, nbits, repeat);
+}
+
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
 void IRCoolixAC::setRaw(const uint32_t new_code) {
@@ -118,8 +123,8 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
 }
 
 // Return true if the current state is a special state.
-bool IRCoolixAC::isSpecialState(void) {
-  switch (remote_state) {
+bool IRCoolixAC::isSpecialState(const uint32_t data) {
+  switch (data) {
     case kCoolixClean:
     case kCoolixLed:
     case kCoolixOff:
@@ -133,19 +138,16 @@ bool IRCoolixAC::isSpecialState(void) {
 }
 
 void IRCoolixAC::updateSavedState(void) {
-  if (!isSpecialState()) saved_state = remote_state;
+  saved_state = remote_state;
 }
 
 void IRCoolixAC::recoverSavedState(void) {
   // If the current state is a special one, last known normal one.
-  if (isSpecialState()) remote_state = saved_state;
-  // If the saved_state was also a special state, reset as we expect a normal
-  // state out of all this.
-  if (isSpecialState()) stateReset();
+  remote_state = saved_state;
 }
 
 uint32_t IRCoolixAC::getNormalState(void) {
-  return isSpecialState() ? saved_state : remote_state;
+  return remote_state;
 }
 
 void IRCoolixAC::setTempRaw(const uint8_t code) {
@@ -194,16 +196,28 @@ uint8_t IRCoolixAC::getSensorTemp() {
 
 bool IRCoolixAC::getPower() {
   // There is only an off state. Everything else is "on".
-  return remote_state != kCoolixOff;
+  return coolixState == IRCoolixAC::sOn;
 }
 
 void IRCoolixAC::setPower(const bool power) {
-  if (power) {
-    // There really is no distinct "on" setting, just ensure it a normal state.
-    recoverSavedState();
-  } else {
-    updateSavedState();
-    remote_state = kCoolixOff;
+  switch(coolixState){
+    // power on
+    case IRCoolixAC::sOff:
+      if(power){
+        recoverSavedState();
+        coolixState = IRCoolixAC::sOn;
+      }
+    break;
+    // power off
+    case IRCoolixAC::sOn:
+      if(!power){
+        updateSavedState();
+        send(kCoolixOff,kCoolixBits);
+        coolixState = IRCoolixAC::sOff;
+      }
+    break;
+    default:
+    break;
   }
 }
 
@@ -220,14 +234,14 @@ bool IRCoolixAC::getSwing() { return remote_state == kCoolixSwing; }
 void IRCoolixAC::setSwing() {
   // Assumes that repeated sending "swing" toggles the action on the device.
   updateSavedState();
-  remote_state = kCoolixSwing;
+  send(kCoolixSwing,kCoolixBits);
 }
 
 bool IRCoolixAC::getSleep() { return remote_state == kCoolixSleep; }
 
 void IRCoolixAC::setSleep() {
   updateSavedState();
-  remote_state = kCoolixSleep;
+  send(kCoolixSleep,kCoolixBits);
 }
 
 bool IRCoolixAC::getTurbo() { return remote_state == kCoolixTurbo; }
@@ -235,7 +249,7 @@ bool IRCoolixAC::getTurbo() { return remote_state == kCoolixTurbo; }
 void IRCoolixAC::setTurbo() {
   // Assumes that repeated sending "turbo" toggles the action on the device.
   updateSavedState();
-  remote_state = kCoolixTurbo;
+  send(kCoolixTurbo,kCoolixBits);
 }
 
 bool IRCoolixAC::getLed() { return remote_state == kCoolixLed; }
@@ -243,14 +257,14 @@ bool IRCoolixAC::getLed() { return remote_state == kCoolixLed; }
 void IRCoolixAC::setLed() {
   // Assumes that repeated sending "Led" toggles the action on the device.
   updateSavedState();
-  remote_state = kCoolixLed;
+  send(kCoolixLed,kCoolixBits);
 }
 
 bool IRCoolixAC::getClean() { return remote_state == kCoolixClean; }
 
 void IRCoolixAC::setClean() {
   updateSavedState();
-  remote_state = kCoolixClean;
+  send(kCoolixClean,kCoolixBits);
 }
 
 bool IRCoolixAC::getZoneFollow() {
