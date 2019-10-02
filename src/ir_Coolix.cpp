@@ -133,7 +133,7 @@ bool IRCoolixAC::isSpecialState(const uint32_t data) {
     case kCoolixSwing:
     case kCoolixSleep:
     case kCoolixTurbo:
-    case kCoolixFan:
+    case kCoolixCmdFan:
       return true;
     default:
       return false;
