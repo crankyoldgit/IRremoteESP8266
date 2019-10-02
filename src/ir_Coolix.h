@@ -81,7 +81,7 @@ const uint32_t kCoolixTurbo = 0b101101011111010110100010;  // 0xB5F5A2
 const uint32_t kCoolixLed = 0b101101011111010110100101;    // 0xB5F5A5
 const uint32_t kCoolixClean = 0b101101011111010110101010;  // 0xB5F5AA
 // On, 25C, Mode: Auto, Fan: Auto, Zone Follow: Off, Sensor Temp: Ignore.
-const uint32_t kCoolixDefaultState = 0b101100101011111111001000;  // 0xB2BFC8
+const uint32_t kCoolixDefaultState = 0b101100100001111111001000; // 0xB21FC8
 
 // Classes
 class IRCoolixAC {
