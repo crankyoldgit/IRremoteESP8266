@@ -312,7 +312,8 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   // Fan mode is a special case of Dry.
   if (mode == kCoolixFan) actualmode = kCoolixDry;
   recoverSavedState();
-  remote_state = (remote_state & ~kCoolixModeMask) | (actualmode << 2);
+  remote_state &= ~kCoolixModeMask;
+  remote_state |= (actualmode << 2);
   // Force the temp into a known-good state.
   setTemp(getTemp());
   if (mode == kCoolixFan) setTempRaw(kCoolixFanTempCode);
