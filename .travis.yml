@@ -12,7 +12,6 @@ install:
   - sudo apt-get install pylint3
   - sudo pip install platformio
   - pio update
-  - pio lib -g install ArduinoJson@^5.0.0 PubSubClient WifiManager
 script: echo Running checks
 notifications:
   email:
