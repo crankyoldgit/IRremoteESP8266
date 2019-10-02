@@ -165,17 +165,22 @@ void IRCoolixAC::setTemp(const uint8_t desired) {
   // Range check.
   uint8_t temp = std::min(desired, kCoolixTempMax);
   temp = std::max(temp, kCoolixTempMin);
-
   recoverSavedState();
   setTempRaw(kCoolixTempMap[temp - kCoolixTempMin]);
 }
 
 uint8_t IRCoolixAC::getTemp() {
   uint8_t code = getTempRaw();
-  uint8_t i;
-  for (i = 0; i < kCoolixTempRange; i++)
-    if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
-  return kCoolixUnknown;  // Not a temp we expected.
+  uint8_t i, temp;
+  for (i = 0; i < kCoolixTempRange; i++){
+    if (kCoolixTempMap[i] == code){
+      temp = kCoolixTempMin + i;
+    }
+  }
+  // Range check.
+  temp = std::min(temp, kCoolixTempMax);
+  temp = std::max(temp, kCoolixTempMin);
+  return temp;
 }
 
 void IRCoolixAC::setSensorTempRaw(const uint8_t code) {
