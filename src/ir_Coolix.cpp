@@ -332,7 +332,6 @@ uint8_t IRCoolixAC::getFan() {
 }
 
 void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
-  recoverSavedState();
   uint8_t newspeed = speed;
   switch (speed) {
     case kCoolixFanAuto:  // Dry & Auto mode can't have this speed.
