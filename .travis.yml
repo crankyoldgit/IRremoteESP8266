@@ -21,7 +21,7 @@ jobs:
   include:
     - script:
       # Check that everything compiles.
-      - find examples/ -mindepth 1 -maxdepth 1 -type d | xargs -n 1 pio run --project-dir
+      - find . -name platformio.ini -type f | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
     - script:
       # Check the version numbers match.
       - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
@@ -37,3 +37,5 @@ jobs:
       # Build and run the unit tests.
       - (cd test; make run)
       - (cd tools; make run_tests)
+      # Check that every example directory has a platformio.ini file.
+      - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
