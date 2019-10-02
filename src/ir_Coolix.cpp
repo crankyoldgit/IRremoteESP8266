@@ -118,8 +118,10 @@ void IRCoolixAC::send(uint64_t data, uint16_t nbits, const uint16_t repeat) {
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
 void IRCoolixAC::setRaw(const uint32_t new_code) {
-  remote_state = new_code;
-  saved_state = new_code;
+  if(!isSpecialState(new_code)){
+    remote_state = new_code;
+    saved_state = new_code;
+  }
 }
 
 // Return true if the current state is a special state.
