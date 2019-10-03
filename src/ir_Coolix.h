@@ -141,10 +141,6 @@ class IRCoolixAC {
   enum State {sOff=0, sOn=1};
   // internal state
   State   coolixState;
-  uint8_t fanSpeed;
-  uint8_t temperature;
-  uint8_t sensorTemperature;
-  uint8_t mode;
   bool    turboFlag;
   bool    ledFlag;
   bool    cleanFlag;
@@ -153,8 +149,6 @@ class IRCoolixAC {
   bool    swingFlag;
   bool    swingHFlag;
   bool    swingVFlag;
-  // state to be sent over IR
-  uint32_t remote;
 
   uint32_t remote_state;  // The state of the IR remote in IR code form.
   uint32_t saved_state;   // Copy of the state if we required a special mode.

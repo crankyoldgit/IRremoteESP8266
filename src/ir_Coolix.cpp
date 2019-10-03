@@ -219,7 +219,7 @@ uint8_t IRCoolixAC::getTemp() {
   uint8_t i;
   for (i = 0; i < kCoolixTempRange; i++)
     if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
-  return kCoolixUnknown;  // Not a temp we expected.
+  return kCoolixTempMax;  // Not a temp we expected.
 }
 
 void IRCoolixAC::setSensorTempRaw(const uint8_t code) {
@@ -250,6 +250,8 @@ void IRCoolixAC::setPower(const bool power) {
       // power on
       case IRCoolixAC::sOff:
         if(power){
+          // at this point remote_state must be ready
+          // to be transmitted
           coolixState = IRCoolixAC::sOn;
         }
       break;
