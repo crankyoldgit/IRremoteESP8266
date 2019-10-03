@@ -163,8 +163,9 @@ bool IRCoolixAC::handleSpecialState(const uint32_t data) {
       setTurbo();
       break;
     default:
-      break;
+      return false;
   }
+  return true;
 }
 
 void IRCoolixAC::setTempRaw(const uint8_t code) {
@@ -187,8 +188,8 @@ uint8_t IRCoolixAC::fromCodeToTemp(const uint8_t code) {
 void IRCoolixAC::setTemp(const uint8_t desired) {
   // Range check.
   acTemperature = std::min(desired, kCoolixTempMax);
-  acTemperature = std::max(temp, kCoolixTempMin);
-  setTempRaw(kCoolixTempMap[temp - kCoolixTempMin]);
+  acTemperature = std::max(acTemperature, kCoolixTempMin);
+  setTempRaw(kCoolixTempMap[acTemperature - kCoolixTempMin]);
 }
 
 uint8_t IRCoolixAC::getTemp() {
@@ -343,7 +344,7 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   // Fan mode is a special case of Dry.
   if (mode == kCoolixFan){
     actualmode = kCoolixDry;
-    setTempRaw(kCoolixFanTempCode)
+    setTempRaw(kCoolixFanTempCode);
   }
   // set
   remote &= ~kCoolixModeMask;
