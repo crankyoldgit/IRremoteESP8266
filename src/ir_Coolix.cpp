@@ -260,63 +260,63 @@ void IRCoolixAC::off(void) {
 
 bool IRCoolixAC::getSwing() { return swingCounter>0; }
 
-void IRCoolixAC::setSwing(const bool send) {
+void IRCoolixAC::setSwing(const bool sendflag) {
   if(++swingCounter==0){
     swingCounter=1;
   }
-  if(send)
+  if(sendflag)
     send(kCoolixSwing,kCoolixBits);
 }
 
 bool IRCoolixAC::getSwingH() { return swingHCounter>0; }
 
-void IRCoolixAC::setSwingH(const bool send) {
+void IRCoolixAC::setSwingH(const bool sendflag) {
   if(++swingHCounter==0){
     swingHCounter=1;
   }
-  if(send)
+  if(sendflag)
     send(kCoolixSwingH,kCoolixBits);
 }
 
 bool IRCoolixAC::getSwingV() { return swingVCounter>0; }
 
-void IRCoolixAC::setSwingV(const bool send) {
+void IRCoolixAC::setSwingV(const bool sendflag) {
   if(++swingVCounter==0){
     swingVCounter=1;
   }
-  if(send)
+  if(sendflag)
     send(kCoolixSwingV,kCoolixBits);
 }
 
 bool IRCoolixAC::getSleep() { return sleepFlag; }
 
-void IRCoolixAC::setSleep(const bool send) {
+void IRCoolixAC::setSleep(const bool sendflag) {
   sleepFlag = !sleepFlag;
-  if(send)
+  if(sendflag)
     send(kCoolixSleep,kCoolixBits);
 }
 
 bool IRCoolixAC::getTurbo() { return turboFlag; }
 
-void IRCoolixAC::setTurbo(const bool send) {
+void IRCoolixAC::setTurbo(const bool sendflag) {
   turboFlag = !turboFlag;
-  if(send)
+  if(sendflag)
     send(kCoolixTurbo,kCoolixBits);
 }
 
 bool IRCoolixAC::getLed() { return ledFlag; }
 
-void IRCoolixAC::setLed(const bool send) {
+void IRCoolixAC::setLed(const bool sendflag) {
   ledFlag = !ledFlag;
-  if(send)
+  if(sendflag)
     send(kCoolixLed,kCoolixBits);
 }
 
 bool IRCoolixAC::getClean() { return cleanFlag; }
 
-void IRCoolixAC::setClean(const bool send) {
+void IRCoolixAC::setClean(const bool sendflag) {
   cleanFlag = !cleanFlag;
-  if(send)
+  if(sendflag)
     send(kCoolixClean,kCoolixBits);
 }
 
