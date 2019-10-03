@@ -1289,25 +1289,33 @@ void IRMitsubishi112::stateReset(void) {
   remote_state[0] = 0x23;
   remote_state[1] = 0xCB;
   remote_state[2] = 0x26;
-  remote_state[3] = 0x21;
+  remote_state[3] = 0x01;
   remote_state[4] = 0x00;
-  remote_state[5] = 0x40;
-  remote_state[6] = 0xC2;
-  remote_state[7] = 0xC7;
-  remote_state[8] = 0x04;
+  remote_state[5] = 0x24;
+  remote_state[6] = 0x03;
+  remote_state[7] = 0x09;
+  remote_state[8] = 0x00;
   remote_state[9] = 0x00;
   remote_state[10] = 0x00;
+  remote_state[11] = 0x00;
+  remote_state[12] = 0x30;
+  remote_state[13] = 0x75;
+
   checksum();  // Calculate the checksum which covers the rest of the state.
 }
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  for (uint8_t i = 0; i < 6; i++)
+  //FIXME
+
+  /*for (uint8_t i = 0; i < 6; i++)
     remote_state[kMitsubishi112PowerByte + 6 + i] =
-        ~remote_state[kMitsubishi112PowerByte + i];
+        ~remote_state[kMitsubishi112PowerByte + i];*/
 }
 
 bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
+  //FIXME
+
   if (len < kMitsubishi112StateLength) return false;
   const uint16_t half = (len - kMitsubishi112PowerByte) / 2;
   for (uint8_t i = 0; i < half; i++) {
@@ -1351,8 +1359,9 @@ void IRMitsubishi112::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi112::setPower(bool on) {
+  //FIXME
   if (on)
-    remote_state[kMitsubishi112PowerByte] |= kMitsubishi112PowerBit;
+    remote_state[kMitsubishi112PowerByte] &= kMitsubishi112PowerBit;
   else
     remote_state[kMitsubishi112PowerByte] &= ~kMitsubishi112PowerBit;
 }
@@ -1366,13 +1375,12 @@ bool IRMitsubishi112::getPower(void) {
 void IRMitsubishi112::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kMitsubishi112MinTemp, degrees);
   temp = std::min((uint8_t)kMitsubishi112MaxTemp, temp);
-  remote_state[kMitsubishi112TempByte] &= ~kMitsubishi112TempMask;
-  remote_state[kMitsubishi112TempByte] |= ((temp - kMitsubishiAcMinTemp) << 4);
+  remote_state[kMitsubishi112TempByte] = kMitsubishiAcMaxTemp - temp;
+
 }
 
 // Return the set temp. in deg C
 uint8_t IRMitsubishi112::getTemp(void) {
-
   return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte] ) ;
 }
 
@@ -1383,8 +1391,7 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
     case kMitsubishi112FanMed:
     case kMitsubishi112FanMax:
       //FIXME
-      //remote_state[kMitsubishi112FanByte] &kMitsubishi112FanMask;
-      //remote_state[kMitsubishi112FanByte] |= (speed << 1);
+      remote_state[kMitsubishi112FanByte] &= ~kMitsubishi112FanMask;
       break;
     default:
       setFan(kMitsubishi112FanMax);
@@ -1409,8 +1416,9 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
     case kMitsubishi112Heat:
     case kMitsubishi112Auto:
     case kMitsubishi112Dry:
+
+    //FIXME
       remote_state[kMitsubishi112ModeByte] &= ~kMitsubishi112ModeMask;
-      remote_state[kMitsubishi112ModeByte] |= mode;
       break;
     default:
       setMode(kMitsubishi112Auto);
@@ -1420,6 +1428,7 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
 // Set the requested vane operation mode of the a/c unit.
 void IRMitsubishi112::setSwingV(const uint8_t position) {
   // If we get an unexpected mode, default to auto.
+  //FIXME
   switch (position) {
     case kMitsubishi112SwingVLowest:
     case kMitsubishi112SwingVLow:
