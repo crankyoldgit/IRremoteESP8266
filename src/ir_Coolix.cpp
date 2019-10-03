@@ -138,9 +138,6 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
       // must be a command changing Temp|Mode|Fan
       // it is safe to just copy to remote var
       remote = new_code;
-      if(coolixState==IRCoolixAC::sOff){
-        coolixState = IRCoolixAC::sOn;
-      }
       setMode((new_code & kCoolixModeMask)>>2);
       setFan((new_code & kCoolixFanMask)>>13);
       setTemp(fromCodeToTemp(getTempRaw()));
