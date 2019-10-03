@@ -89,19 +89,30 @@ const uint8_t kMitsubishi112Cool =            0b011;
 const uint8_t kMitsubishi112Heat =            0b001;
 const uint8_t kMitsubishi112Auto =            0b111;
 const uint8_t kMitsubishi112Dry =             0b010;
-const uint8_t kMitsubishi112SwingVByte = 9;
+const uint8_t kMitsubishi112SwingVByte = 13;
 const uint8_t kMitsubishi112SwingVMask = 0b11110000;
 const uint8_t kMitsubishi112SwingVLowest =   0b0000;
 const uint8_t kMitsubishi112SwingVLow =      0b0001;
 const uint8_t kMitsubishi112SwingVHigh =     0b0010;
 const uint8_t kMitsubishi112SwingVHighest =  0b0111;
 const uint8_t kMitsubishi112SwingVAuto =     0b1100;
+const uint8_t kMitsubishi112SwingHByte = 13;
+const uint8_t kMitsubishi112SwingHMask =   0b11000000;
+/*const uint8_t kMitsubishi112SwingHLowest =   0b000100;
+const uint8_t kMitsubishi112SwingHLow =      0b001000;
+const uint8_t kMitsubishi112SwingHHigh =     0b001100;
+const uint8_t kMitsubishi112SwingHHighest =  0b010000;
+const uint8_t kMitsubishi112SwingHHighest2 = 0b010100;
+const uint8_t kMitsubishi112SwingHAuto3 =    0b110000;
+const uint8_t kMitsubishi112SwingHAuto =    0b100000;
+const uint8_t kMitsubishi112SwingHAuto2 =    0b110000;*/
+
 const uint8_t kMitsubishi112FanByte = 8;
-const uint8_t kMitsubishi112FanMask =    0b00001111;
-const uint8_t kMitsubishi112FanMin =          0b1010;
-const uint8_t kMitsubishi112FanLow =          0b1011;
-const uint8_t kMitsubishi112FanMed =          0b1101;
-const uint8_t kMitsubishi112FanMax =          0b1000;
+const uint8_t kMitsubishi112FanMask =    0b1111;
+const uint8_t kMitsubishi112FanMin =          0b0010;
+const uint8_t kMitsubishi112FanLow =          0b0011;
+const uint8_t kMitsubishi112FanMed =          0b0101;
+const uint8_t kMitsubishi112FanMax =          0b0000;
 const uint8_t kMitsubishi112FanQuiet = kMitsubishi112FanMin;
 
 // Legacy defines (Deprecated)
@@ -253,6 +264,8 @@ class IRMitsubishi112 {
   uint8_t getMode(void);
   void setSwingV(const uint8_t position);
   uint8_t getSwingV(void);
+  void setSwingH(const uint8_t position);
+  uint8_t getSwingH(void);
   void setQuiet(const bool on);
   bool getQuiet(void);
   uint8_t* getRaw(void);
@@ -260,9 +273,11 @@ class IRMitsubishi112 {
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST

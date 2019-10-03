@@ -1393,6 +1393,7 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
 
 // Return the requested state of the unit's fan.
 uint8_t IRMitsubishi112::getFan(void) {
+  Serial.printf("%02x %02x\n", remote_state[kMitsubishi112FanByte] , kMitsubishi112FanMask);
   return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanMask);
 }
 
@@ -1440,6 +1441,29 @@ uint8_t IRMitsubishi112::getSwingV(void) {
           kMitsubishi112SwingVMask) >> 4;
 }
 
+// Set the requested vane operation mode of the a/c unit.
+void IRMitsubishi112::setSwingH(const uint8_t position) {
+  // If we get an unexpected mode, default to auto.
+/*  switch (position) {
+    case kMitsubishi112SwingHLowest:
+    case kMitsubishi112SwingHLow:
+    case kMitsubishi112SwingHHigh:
+    case kMitsubishi112SwingHHighest:
+    case kMitsubishi112SwingHAuto:
+      remote_state[kMitsubishi112SwingHByte] &= ~kMitsubishi112SwingHMask;
+      remote_state[kMitsubishi112SwingHByte] |= position << 4;
+      break;
+    default:
+      setMode(kMitsubishi112SwingHAuto);
+  }*/
+}
+
+// Return the requested vane operation mode of the a/c unit.
+uint8_t IRMitsubishi112::getSwingH(void) {
+  return (remote_state[kMitsubishi112SwingHByte] &
+          kMitsubishi112SwingHMask) >> 4;
+}
+
 // Emulate a quiet setting. There is no true quiet setting on this a/c
 void IRMitsubishi112::setQuiet(bool on) {
   if (on)
@@ -1467,6 +1491,7 @@ uint8_t IRMitsubishi112::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kMitsubishi112FanMin;
     case stdAc::fanspeed_t::kLow: return kMitsubishi112FanLow;
+    case stdAc::fanspeed_t::kMedium: return kMitsubishi112FanMed;
     case stdAc::fanspeed_t::kHigh:
     case stdAc::fanspeed_t::kMax: return kMitsubishi112FanMax;
     default: return kMitsubishi112FanMed;
@@ -1483,6 +1508,18 @@ uint8_t IRMitsubishi112::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kLowest: return kMitsubishi112SwingVLowest;
     default: return kMitsubishi112SwingVAuto;
   }
+}
+
+// Convert a standard A/C vertical swing into its native setting.
+uint8_t IRMitsubishi112::convertSwingH(const stdAc::swingh_t position) {
+  /*switch (position) {
+    case stdAc::swingh_t::kHighest: return kMitsubishi112SwingHHighest;
+    case stdAc::swingh_t::kHigh:
+    case stdAc::swingh_t::kMiddle: return kMitsubishi112SwingHHigh;
+    case stdAc::swingh_t::kLow: return kMitsubishi112SwingHLow;
+    case stdAc::swingh_t::kLowest: return kMitsubishi112SwingHLowest;
+    default: return kMitsubishi112SwingHAuto;
+  }*/
 }
 
 // Convert a native mode to it's common equivalent.
@@ -1517,6 +1554,16 @@ stdAc::swingv_t IRMitsubishi112::toCommonSwingV(const uint8_t pos) {
   }
 }
 
+// Convert a native vertical swing to it's common equivalent.
+stdAc::swingh_t IRMitsubishi112::toCommonSwingH(const uint8_t pos) {
+  /*switch (pos) {
+    case kMitsubishi112SwingHHighest: return stdAc::swingh_t::kHighest;
+    case kMitsubishi112SwingHHigh: return stdAc::swingh_t::kHigh;
+    case kMitsubishi112SwingHLow: return stdAc::swingh_t::kLow;
+    case kMitsubishi112SwingHLowest: return stdAc::swingh_t::kLowest;
+    default: return stdAc::swingh_t::kAuto;
+  }*/
+}
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRMitsubishi112::toCommon(void) {
   stdAc::state_t result;
@@ -1530,7 +1577,7 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
   //FIXME
-  result.swingh = stdAc::swingh_t::kOff;
+  result.swingh = this->toCommonSwingH(this->getSwingH());;
   result.econo = false;
   result.clock = -1;
   // Not supported.
