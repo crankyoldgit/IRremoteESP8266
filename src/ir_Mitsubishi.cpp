@@ -1359,7 +1359,6 @@ void IRMitsubishi112::setPower(bool on) {
 
 // Return the requested power state of the A/C.
 bool IRMitsubishi112::getPower(void) {
-  Serial.printf("%02X %02X, %02x\n", remote_state[kMitsubishi112PowerByte], kMitsubishi112PowerBit, remote_state[kMitsubishi112PowerByte] & kMitsubishi112PowerBit);
   return remote_state[kMitsubishi112PowerByte] & kMitsubishi112PowerBit;
 }
 
@@ -1373,7 +1372,8 @@ void IRMitsubishi112::setTemp(const uint8_t degrees) {
 
 // Return the set temp. in deg C
 uint8_t IRMitsubishi112::getTemp(void) {
-  return (remote_state[kMitsubishi112TempByte] >> 4) + kMitsubishiAcMinTemp;
+
+  return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte] ) ;
 }
 
 void IRMitsubishi112::setFan(const uint8_t speed) {
@@ -1382,8 +1382,9 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
     case kMitsubishi112FanLow:
     case kMitsubishi112FanMed:
     case kMitsubishi112FanMax:
-      remote_state[kMitsubishi112FanByte] &= ~kMitsubishi112FanMask;
-      remote_state[kMitsubishi112FanByte] |= (speed << 1);
+      //FIXME
+      //remote_state[kMitsubishi112FanByte] &kMitsubishi112FanMask;
+      //remote_state[kMitsubishi112FanByte] |= (speed << 1);
       break;
     default:
       setFan(kMitsubishi112FanMax);
@@ -1392,7 +1393,7 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
 
 // Return the requested state of the unit's fan.
 uint8_t IRMitsubishi112::getFan(void) {
-  return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanMask) >> 1;
+  return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanMask);
 }
 
 // Return the requested climate operation mode of the a/c unit.
@@ -1404,7 +1405,6 @@ uint8_t IRMitsubishi112::getMode(void) {
 void IRMitsubishi112::setMode(const uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case kMitsubishi112Fan:
     case kMitsubishi112Cool:
     case kMitsubishi112Heat:
     case kMitsubishi112Auto:
@@ -1458,7 +1458,6 @@ uint8_t IRMitsubishi112::convertMode(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kCool: return kMitsubishi112Cool;
     case stdAc::opmode_t::kHeat: return kMitsubishi112Heat;
     case stdAc::opmode_t::kDry: return kMitsubishi112Dry;
-    case stdAc::opmode_t::kFan: return kMitsubishi112Fan;
     default: return kMitsubishi112Auto;
   }
 }
@@ -1492,7 +1491,6 @@ stdAc::opmode_t IRMitsubishi112::toCommonMode(const uint8_t mode) {
     case kMitsubishi112Cool: return stdAc::opmode_t::kCool;
     case kMitsubishi112Heat: return stdAc::opmode_t::kHeat;
     case kMitsubishi112Dry: return stdAc::opmode_t::kDry;
-    case kMitsubishi112Fan: return stdAc::opmode_t::kFan;
     default: return stdAc::opmode_t::kAuto;
   }
 }
@@ -1531,16 +1529,19 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
-  // Not supported.
+  //FIXME
   result.swingh = stdAc::swingh_t::kOff;
+  result.econo = false;
+  result.clock = -1;
+  // Not supported.
+
   result.turbo = false;
   result.clean = false;
-  result.econo = false;
   result.filter = false;
   result.light = false;
   result.beep = false;
   result.sleep = -1;
-  result.clock = -1;
+
   return result;
 }
 
@@ -1550,8 +1551,7 @@ String IRMitsubishi112::toString(void) {
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), F("Power"), false);
   result += addModeToString(getMode(), kMitsubishi112Auto, kMitsubishi112Cool,
-                            kMitsubishi112Heat, kMitsubishi112Dry,
-                            kMitsubishi112Fan);
+                            kMitsubishi112Heat, kMitsubishi112Dry, -1);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kMitsubishi112FanMax,
                            kMitsubishi112FanLow,  kMitsubishi112FanMax,
