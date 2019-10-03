@@ -77,6 +77,34 @@ const uint8_t kMitsubishi136FanMed =          0b10;
 const uint8_t kMitsubishi136FanMax =          0b11;
 const uint8_t kMitsubishi136FanQuiet = kMitsubishi136FanMin;
 
+const uint8_t kMitsubishi112PowerByte = 5;
+const uint8_t kMitsubishi112PowerBit =   0b00000100;
+const uint8_t kMitsubishi112TempByte = 8;
+const uint8_t kMitsubishi112TempMask =   0b11110000;
+const uint8_t kMitsubishi112MinTemp = 16;  // 17C
+const uint8_t kMitsubishi112MaxTemp = 31;  // 30C
+const uint8_t kMitsubishi112ModeByte = kMitsubishi112TempByte;
+const uint8_t kMitsubishi112ModeMask =   0b00000111;
+const uint8_t kMitsubishi112Fan =             0b000;
+const uint8_t kMitsubishi112Cool =            0b001;
+const uint8_t kMitsubishi112Heat =            0b010;
+const uint8_t kMitsubishi112Auto =            0b011;
+const uint8_t kMitsubishi112Dry =             0b101;
+const uint8_t kMitsubishi112SwingVByte = 7;
+const uint8_t kMitsubishi112SwingVMask = 0b11110000;
+const uint8_t kMitsubishi112SwingVLowest =   0b0000;
+const uint8_t kMitsubishi112SwingVLow =      0b0001;
+const uint8_t kMitsubishi112SwingVHigh =     0b0010;
+const uint8_t kMitsubishi112SwingVHighest =  0b0011;
+const uint8_t kMitsubishi112SwingVAuto =     0b1100;
+const uint8_t kMitsubishi112FanByte = kMitsubishi112SwingVByte;
+const uint8_t kMitsubishi112FanMask =    0b00000110;
+const uint8_t kMitsubishi112FanMin =          0b00;
+const uint8_t kMitsubishi112FanLow =          0b01;
+const uint8_t kMitsubishi112FanMed =          0b10;
+const uint8_t kMitsubishi112FanMax =          0b11;
+const uint8_t kMitsubishi112FanQuiet = kMitsubishi112FanMin;
+
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
 #define MITSUBISHI_AC_VANE_AUTO kMitsubishiAcVaneAuto
@@ -196,6 +224,56 @@ class IRMitsubishi136 {
   IRsendTest _irsend;
 #endif
   uint8_t remote_state[kMitsubishi136StateLength];
+  void checksum(void);
+};
+
+
+class IRMitsubishi112 {
+ public:
+  explicit IRMitsubishi112(const uint16_t pin, const bool inverted = false,
+                           const bool use_modulation = true);
+
+
+  void stateReset(void);
+#if SEND_MITSUBISHI112
+  void send(const uint16_t repeat = kMitsubishi112MinRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_MITSUBISHI112
+  void begin(void);
+  static bool validChecksum(const uint8_t* data,
+                            const uint16_t len = kMitsubishi112StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingV(const uint8_t position);
+  uint8_t getSwingV(void);
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t* data);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint8_t remote_state[kMitsubishi112StateLength];
   void checksum(void);
 };
 
