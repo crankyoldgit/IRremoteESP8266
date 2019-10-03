@@ -140,7 +140,7 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
       remote = new_code;
       setMode((new_code & kCoolixModeMask)>>2);
       setFan((new_code & kCoolixFanMask)>>13);
-      setTemp(getTempRaw());
+      setTemp(fromCodeToTemp(getTempRaw()));
     }
   }
 }
