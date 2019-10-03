@@ -35,7 +35,7 @@ const uint8_t kCoolixDry = 0b001;
 const uint8_t kCoolixAuto = 0b010;
 const uint8_t kCoolixHeat = 0b011;
 const uint8_t kCoolixFan = 0b100;                                 // Synthetic.
-const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
+const uint32_t kCoolixModeMask       = 0b000000000000000000001100;  // 0xC
 const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000;  // 0x80000
 // Fan Control
 const uint8_t kCoolixFanMin = 0b100;
@@ -114,6 +114,10 @@ class IRCoolixAC {
   uint8_t getMode();
   void setSwing();
   bool getSwing();
+  void setSwingH();
+  bool getSwingH();
+  void setSwingV();
+  bool getSwingV();
   void setSleep();
   bool getSleep();
   void setTurbo();
@@ -125,7 +129,6 @@ class IRCoolixAC {
   bool getZoneFollow();
   uint32_t getRaw();
   void setRaw(const uint32_t new_code);
-  bool isSpecialState(const uint32_t data);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -142,17 +145,27 @@ class IRCoolixAC {
   enum State {sOff=0, sOn=1};
   State coolixState;
 
-  uint32_t remote_state;  // The state of the IR remote in IR code form.
-  uint32_t saved_state;   // Copy of the state if we required a special mode.
+  uint8_t fanSpeed;
+  uint8_t acTemperature;
+  uint8_t acMode;
+  bool    turboFlag;
+  bool    ledFlag;
+  bool    cleanFlag;
+  bool    sleepFlag;
+  bool    zoneFollowFlag;
+  uint8_t swingCounter;
+  uint8_t swingHCounter;
+  uint8_t swingVCounter;
+
+  uint32_t remote;
 
   void send(uint64_t data, uint16_t nbits, const uint16_t repeat = kCoolixDefaultRepeat);
+  bool handleSpecialState(const uint32_t data);
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
   void setSensorTempRaw(const uint8_t code);
   void setZoneFollow(const bool state);
-  void updateSavedState(void);
-  void recoverSavedState(void);
-  uint32_t getNormalState(void);
+  uint8_t fromCodeToTemp(const uint8_t code);
 };
 
 #endif  // IR_COOLIX_H_
