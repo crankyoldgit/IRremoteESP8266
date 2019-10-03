@@ -486,7 +486,7 @@ TEST(TestCoolixACClass, HumanReadable) {
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, "
       "Zone Follow: Off, Sensor Temp: Ignored",
       ircoolix.toString());
-
+  ircoolix.setPower(true);
   ircoolix.setSensorTemp(24);
   ircoolix.setTemp(22);
   ircoolix.setMode(kCoolixCool);
@@ -503,7 +503,7 @@ TEST(TestCoolixACClass, HumanReadable) {
 
 TEST(TestCoolixACClass, KnownExamples) {
   IRCoolixAC ircoolix(0);
-
+  ircoolix.setPower(true);
   ircoolix.setRaw(0b101100101011111111100100);
   EXPECT_EQ(
       "Power: On, Mode: 4 (Fan), Fan: 5 (Auto), Zone Follow: Off, "
@@ -518,7 +518,7 @@ TEST(TestCoolixACClass, KnownExamples) {
 
 TEST(TestCoolixACClass, Issue579FanAuto0) {
   IRCoolixAC ircoolix(0);
-
+  ircoolix.setPower(true);
   ircoolix.setRaw(0xB21F28);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 20C, "
@@ -570,6 +570,7 @@ TEST(TestCoolixACClass, RealCaptureExample) {
 TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   IRCoolixAC ac(0);
   ac.begin();
+  ac.setPower(true);
   // Default
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, Zone Follow: Off, "
@@ -577,7 +578,6 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
       ac.toString());
   EXPECT_EQ(0xB21FC8, ac.getRaw());
   // Change of settings.
-  ac.setPower(true);
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
   ac.setFan(kCoolixFanAuto);
@@ -606,7 +606,6 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   // Now test if we setRaw() a special state first.
   ac.setRaw(kCoolixSwing);
   // Repeat change of settings.
-  ac.setPower(true);
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
   ac.setFan(kCoolixFanAuto);
@@ -619,6 +618,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
 
 TEST(TestCoolixACClass, toCommon) {
   IRCoolixAC ac(0);
+  ac.begin();
   ac.setPower(true);
   ac.setMode(kCoolixCool);
   ac.setTemp(20);
@@ -666,6 +666,7 @@ TEST(TestCoolixACClass, Issue722) {
 
   // ON Auto Temp 18C
   uint32_t on_auto_18c_fan_auto0 = 0xB21F18;
+  ac.on();
   ac.setTemp(18);
   EXPECT_EQ(on_auto_18c_fan_auto0, ac.getRaw());
 

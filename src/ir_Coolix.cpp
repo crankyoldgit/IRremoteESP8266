@@ -103,12 +103,12 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
 
 void IRCoolixAC::stateReset() {
   setRaw(kCoolixDefaultState);
+  clearSensorTemp();
   coolixState = IRCoolixAC::sOff;
   turboFlag = false;
   ledFlag = false;
   cleanFlag = false;
   sleepFlag = false;
-  zoneFollowFlag = false;
   swingFlag = false;
   swingHFlag = false;
   swingVFlag = false;
@@ -128,12 +128,11 @@ void IRCoolixAC::send(const uint16_t repeat) {
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
 void IRCoolixAC::setRaw(const uint32_t new_code) {
-  if(!handleSpecialState(new_code)){
+  if (!handleSpecialState(new_code)){
     // it isn`t special so might afect Temp|mode|Fan
-    if( new_code == kCoolixCmdFan ){
+    if (new_code == kCoolixCmdFan){
       setMode(kCoolixFan);
-    }
-    else {
+    } else {
       // must be a command changing Temp|Mode|Fan
       // it is safe to just copy to remote var
       remote_state = new_code;
@@ -246,10 +245,10 @@ bool IRCoolixAC::getPower() {
 }
 
 void IRCoolixAC::setPower(const bool power) {
-  switch(coolixState){
+  switch (coolixState) {
       // power on
       case IRCoolixAC::sOff:
-        if(power){
+        if (power) {
           // at this point remote_state must be ready
           // to be transmitted
           coolixState = IRCoolixAC::sOn;
@@ -257,7 +256,7 @@ void IRCoolixAC::setPower(const bool power) {
       break;
       // power off
       case IRCoolixAC::sOn:
-        if(!power){
+        if (!power) {
           updateSavedState();
           remote_state = kCoolixOff;
           coolixState = IRCoolixAC::sOff;
@@ -344,15 +343,11 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   switch (actualmode) {
     case kCoolixAuto:
     case kCoolixDry:
-      if (this->getFan() == kCoolixFanAuto)
-        //  No kCoolixFanAuto in Dry/Auto mode.
         this->setFan(kCoolixFanAuto0, false);
       break;
     case kCoolixCool:
     case kCoolixHeat:
     case kCoolixFan:
-      if (this->getFan() == kCoolixFanAuto0)
-        // kCoolixFanAuto0 only in Dry/Auto mode.
         this->setFan(kCoolixFanAuto, false);
       break;
     default:  // Anything else, go with Auto mode.
@@ -386,17 +381,18 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
           case kCoolixAuto:
           case kCoolixDry:
             newspeed = kCoolixFanAuto0;
+          break;
         }
       }
       break;
     case kCoolixFanAuto0:  // Only Dry & Auto mode can have this speed.
       if (modecheck) {
         switch (this->getMode()) {
-          case kCoolixAuto:
-          case kCoolixDry:
-            break;
-          default:
+          case kCoolixCool:
+          case kCoolixHeat:
+          case kCoolixFan:
             newspeed = kCoolixFanAuto;
+            break;
         }
       }
       break;
@@ -408,6 +404,7 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
       break;
     default:  // Unknown speed requested.
       newspeed = kCoolixFanAuto;
+      break;
   }
   remote_state &= ~kCoolixFanMask;
   remote_state |= ((newspeed << 13) & kCoolixFanMask);
