@@ -93,7 +93,7 @@ class IRCoolixAC {
   explicit IRCoolixAC(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
 
-  void cmdReset();
+  void stateReset();
 #if SEND_COOLIX
   void send(const uint16_t repeat = kCoolixDefaultRepeat);
   uint8_t calibrate(void) { return _irsend.calibrate(); }

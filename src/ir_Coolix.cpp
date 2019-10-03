@@ -111,9 +111,9 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
       zoneFollowFlag(false),
       swingCounter(0),
       swingHCounter(0),
-      swingVCounter(0) { cmdReset(); }
+      swingVCounter(0) { stateReset(); }
 
-void IRCoolixAC::cmdReset() { setRaw(kCoolixDefaultState); }
+void IRCoolixAC::stateReset() { setRaw(kCoolixDefaultState); }
 
 void IRCoolixAC::begin() { _irsend.begin(); }
 
