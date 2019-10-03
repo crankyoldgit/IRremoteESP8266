@@ -352,7 +352,9 @@ TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
 }
 
 // Tests for the IRCoolixAC class.
-
+// This test isn't relevant anymore since there is
+// no transient states
+/*
 TEST(TestCoolixACClass, SetAndGetRaw) {
   IRCoolixAC ircoolix(0);
 
@@ -360,7 +362,7 @@ TEST(TestCoolixACClass, SetAndGetRaw) {
   EXPECT_EQ(kCoolixOff, ircoolix.getRaw());
   ircoolix.setRaw(kCoolixDefaultState);
   EXPECT_EQ(kCoolixDefaultState, ircoolix.getRaw());
-}
+}*/
 
 TEST(TestCoolixACClass, SetAndGetTemp) {
   IRCoolixAC ircoolix(0);
@@ -480,13 +482,14 @@ TEST(TestCoolixACClass, SpecialModesAndReset) {
 
 TEST(TestCoolixACClass, HumanReadable) {
   IRCoolixAC ircoolix(0);
+  ircoolix.begin();
+  ircoolix.setPower(true);
 
   // Initial starting point.
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, "
       "Zone Follow: Off, Sensor Temp: Ignored",
       ircoolix.toString());
-  ircoolix.setPower(true);
   ircoolix.setSensorTemp(24);
   ircoolix.setTemp(22);
   ircoolix.setMode(kCoolixCool);
@@ -503,6 +506,7 @@ TEST(TestCoolixACClass, HumanReadable) {
 
 TEST(TestCoolixACClass, KnownExamples) {
   IRCoolixAC ircoolix(0);
+  ircoolix.begin();
   ircoolix.setPower(true);
   ircoolix.setRaw(0b101100101011111111100100);
   EXPECT_EQ(
@@ -518,6 +522,7 @@ TEST(TestCoolixACClass, KnownExamples) {
 
 TEST(TestCoolixACClass, Issue579FanAuto0) {
   IRCoolixAC ircoolix(0);
+  ircoolix.begin();
   ircoolix.setPower(true);
   ircoolix.setRaw(0xB21F28);
   EXPECT_EQ(
