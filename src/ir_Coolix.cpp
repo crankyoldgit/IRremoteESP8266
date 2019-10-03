@@ -99,7 +99,18 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
 IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
                        const bool use_modulation)
     : _irsend(pin, inverted, use_modulation),
-      coolixState(IRCoolixAC::sOff) { cmdReset(); }
+      coolixState(IRCoolixAC::sOff),
+      fanSpeed(kCoolixFanAuto),
+      acTemperature(22),
+      acMode(kCoolixCool),
+      turboFlag(false),
+      ledFlag(false),
+      cleanFlag(false),
+      sleepFlag(false),
+      zoneFollowFlag(false),
+      swingCounter(0),
+      swingHCounter(0),
+      swingVCounter(0) { cmdReset(); }
 
 void IRCoolixAC::cmdReset() { setRaw(kCoolixDefaultState); }
 
