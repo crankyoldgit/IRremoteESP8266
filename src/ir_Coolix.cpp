@@ -107,7 +107,7 @@ void IRCoolixAC::begin() { _irsend.begin(); }
 
 #if SEND_COOLIX
 void IRCoolixAC::send(const uint16_t repeat) {
-  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat);
+  _irsend.sendCOOLIX(remote, kCoolixBits, repeat);
 }
 #endif  // SEND_COOLIX
 
@@ -273,14 +273,14 @@ void IRCoolixAC::setSwingV() {
   send(kCoolixSwingV,kCoolixBits);
 }
 
-bool IRCoolixAC::getSleep() { return sleepToggle; }
+bool IRCoolixAC::getSleep() { return sleepFlag; }
 
 void IRCoolixAC::setSleep() {
   sleepFlag = !sleepFlag;
   send(kCoolixSleep,kCoolixBits);
 }
 
-bool IRCoolixAC::getTurbo() { return turboToggle; }
+bool IRCoolixAC::getTurbo() { return turboFlag; }
 
 void IRCoolixAC::setTurbo() {
   turboFlag = !turboFlag;
@@ -302,7 +302,7 @@ void IRCoolixAC::setClean() {
 }
 
 bool IRCoolixAC::getZoneFollow() {
-  return getNormalState() & kCoolixZoneFollowMask;
+  return remote & kCoolixZoneFollowMask;
 }
 
 // Internal use only.
