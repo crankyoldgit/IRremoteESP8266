@@ -101,7 +101,8 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation),
       coolixState(IRCoolixAC::sOff),
       fanSpeed(kCoolixFanAuto),
-      acTemperature(22),
+      acTemperature(kCoolixTempMin),
+      acSensorTemperature(kCoolixSensorTempMin),
       acMode(kCoolixCool),
       turboFlag(false),
       ledFlag(false),
@@ -140,7 +141,14 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
       remote = new_code;
       setMode((new_code & kCoolixModeMask)>>2);
       setFan((new_code & kCoolixFanMask)>>13);
-      setTemp(fromCodeToTemp(getTempRaw()));
+      setTemp(fromCodeToTemperature(getTempRaw()));
+      // if it is bigger than max, kCoolixSensorTempIgnoreCode was set
+      if( getSensorTempRaw() > kCoolixSensorTempMax ){
+        clearSensorTemp();
+      }
+      else{
+        setSensorTemp(getSensorTempRaw());
+      }
     }
   }
 }
@@ -190,7 +198,7 @@ uint8_t IRCoolixAC::getTempRaw() {
   return (remote & kCoolixTempMask) >> 4;
 }
 
-uint8_t IRCoolixAC::fromCodeToTemp(const uint8_t code) {
+uint8_t IRCoolixAC::fromCodeToTemperature(const uint8_t code) {
   uint8_t i;
   for (i = 0; i < kCoolixTempRange; i++){
     if (kCoolixTempMap[i] == code) break;
@@ -214,17 +222,24 @@ void IRCoolixAC::setSensorTempRaw(const uint8_t code) {
   remote |= ((code & 0xF) << 8);
 }
 
+// return temperature between kCoolixSensorTempMin and kCoolixSensorTempMax
+// there is a special case when raw is kCoolixSensorTempIgnoreCode
+// and the temperature is going to be out of limite > kCoolixSensorTempMax
+uint8_t IRCoolixAC::getSensorTempRaw(){
+  return ((remote & kCoolixSensorTempMask) >> 8) + kCoolixSensorTempMin;
+}
+
 void IRCoolixAC::setSensorTemp(const uint8_t desired) {
   uint8_t temp = desired;
   temp = std::min(temp, kCoolixSensorTempMax);
   temp = std::max(temp, kCoolixSensorTempMin);
+  acSensorTemperature = temp;
   setSensorTempRaw(temp - kCoolixSensorTempMin);
   setZoneFollow(true);  // Setting a Sensor temp means you want to Zone Follow.
 }
 
 uint8_t IRCoolixAC::getSensorTemp() {
-  return ((remote & kCoolixSensorTempMask) >> 8) +
-         kCoolixSensorTempMin;
+  return acSensorTemperature;
 }
 
 bool IRCoolixAC::getPower() {
@@ -323,7 +338,7 @@ void IRCoolixAC::setClean(const bool sendflag) {
 }
 
 bool IRCoolixAC::getZoneFollow() {
-  return remote & kCoolixZoneFollowMask;
+  return zoneFollowFlag;
 }
 
 // Internal use only.
@@ -333,6 +348,8 @@ void IRCoolixAC::setZoneFollow(bool state) {
   } else {
     remote &= ~kCoolixZoneFollowMask;
   }
+  // update flag
+  zoneFollowFlag = state;
 }
 
 void IRCoolixAC::clearSensorTemp() {

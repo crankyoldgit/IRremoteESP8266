@@ -143,10 +143,11 @@ class IRCoolixAC {
   IRsendTest _irsend;
 #endif
   enum State {sOff=0, sOn=1};
+  // internal state
   State coolixState;
-
   uint8_t fanSpeed;
   uint8_t acTemperature;
+  uint8_t acSensorTemperature;
   uint8_t acMode;
   bool    turboFlag;
   bool    ledFlag;
@@ -156,16 +157,20 @@ class IRCoolixAC {
   uint8_t swingCounter;
   uint8_t swingHCounter;
   uint8_t swingVCounter;
-
+  // state to be sent over IR
   uint32_t remote;
 
   void send(uint64_t data, uint16_t nbits, const uint16_t repeat = kCoolixDefaultRepeat);
+
   bool handleSpecialState(const uint32_t data);
+
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
+  uint8_t fromCodeToTemperature(const uint8_t code);
+
   void setSensorTempRaw(const uint8_t code);
+  uint8_t getSensorTempRaw();
   void setZoneFollow(const bool state);
-  uint8_t fromCodeToTemp(const uint8_t code);
 };
 
 #endif  // IR_COOLIX_H_
