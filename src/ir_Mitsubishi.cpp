@@ -1393,7 +1393,6 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
 
 // Return the requested state of the unit's fan.
 uint8_t IRMitsubishi112::getFan(void) {
-  Serial.printf("%02x %02x\n", remote_state[kMitsubishi112FanByte] , kMitsubishi112FanMask);
   return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanMask);
 }
 
