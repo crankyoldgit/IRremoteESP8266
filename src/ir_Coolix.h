@@ -22,6 +22,7 @@
 //   Brand: Midea, Model: RG52D/BGE Remote
 //   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
+//   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 // Kudos:
@@ -74,12 +75,15 @@ const uint32_t kCoolixSensorTempMask = 0b000000000000111100000000;  // 0xF00
 // Fixed states/messages.
 const uint8_t kCoolixPrefix = 0b1011;  // 0xB
 const uint8_t kCoolixUnknown = 0xFF;
-const uint32_t kCoolixOff = 0b101100100111101111100000;    // 0xB27BE0
-const uint32_t kCoolixSwing = 0b101100100110101111100000;  // 0xB26BE0
-const uint32_t kCoolixSleep = 0b101100101110000000000011;  // 0xB2E003
-const uint32_t kCoolixTurbo = 0b101101011111010110100010;  // 0xB5F5A2
-const uint32_t kCoolixLed = 0b101101011111010110100101;    // 0xB5F5A5
-const uint32_t kCoolixClean = 0b101101011111010110101010;  // 0xB5F5AA
+const uint32_t kCoolixOff    = 0b101100100111101111100000; // 0xB27BE0
+const uint32_t kCoolixSwing  = 0b101100100110101111100000; // 0xB26BE0
+const uint32_t kCoolixSwingH = 0b101100101111010110100010; // 0xB5F5A2
+const uint32_t kCoolixSwingV = 0b101100100000111111100000; // 0xB20FE0
+const uint32_t kCoolixSleep  = 0b101100101110000000000011; // 0xB2E003
+const uint32_t kCoolixTurbo  = 0b101101011111010110100010; // 0xB5F5A2
+const uint32_t kCoolixLed    = 0b101101011111010110100101; // 0xB5F5A5
+const uint32_t kCoolixClean  = 0b101101011111010110101010; // 0xB5F5AA
+const uint32_t kCoolixCmdFan = 0b101100101011111111100100; // 0xB2BFE4
 // On, 25C, Mode: Auto, Fan: Auto, Zone Follow: Off, Sensor Temp: Ignore.
 const uint32_t kCoolixDefaultState = 0b101100100001111111001000;  // 0xB21FC8
 
@@ -134,6 +138,24 @@ class IRCoolixAC {
 #else
   IRsendTest _irsend;
 #endif
+  enum State {sOff=0, sOn=1};
+  // internal state
+  State   coolixState;
+  uint8_t fanSpeed;
+  uint8_t temperature;
+  uint8_t sensorTemperature;
+  uint8_t mode;
+  bool    turboFlag;
+  bool    ledFlag;
+  bool    cleanFlag;
+  bool    sleepFlag;
+  bool    zoneFollowFlag;
+  bool    swingFlag;
+  bool    swingHFlag;
+  bool    swingVFlag;
+  // state to be sent over IR
+  uint32_t remote;
+
   uint32_t remote_state;  // The state of the IR remote in IR code form.
   uint32_t saved_state;   // Copy of the state if we required a special mode.
   void setTempRaw(const uint8_t code);
@@ -141,6 +163,7 @@ class IRCoolixAC {
   void setSensorTempRaw(const uint8_t code);
   void setZoneFollow(const bool state);
   bool isSpecialState(void);
+  bool handleSpecialState(const uint32_t data);
   void updateSavedState(void);
   void recoverSavedState(void);
   uint32_t getNormalState(void);
