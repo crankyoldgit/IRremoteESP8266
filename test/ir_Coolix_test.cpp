@@ -595,7 +595,6 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
       ac.toString());
   EXPECT_EQ(kCoolixOff, ac.getRaw());
   // Repeat change of settings.
-  ac.send();
   ac.setPower(true);
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
@@ -606,9 +605,6 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
       ac.toString());
   EXPECT_EQ(0xB2BF40, ac.getRaw());
 
-  // Now test if we setRaw() a special state first.
-  ac.setRaw(kCoolixSwing);
-  ac.send();
   // Repeat change of settings.
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
@@ -670,7 +666,6 @@ TEST(TestCoolixACClass, Issue722) {
 
   // ON Auto Temp 18C
   uint32_t on_auto_18c_fan_auto0 = 0xB21F18;
-  ac.send();
   ac.on();
   ac.setTemp(18);
   EXPECT_EQ(on_auto_18c_fan_auto0, ac.getRaw());

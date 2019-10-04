@@ -251,6 +251,7 @@ void IRCoolixAC::setPower(const bool power) {
         if (power) {
           // at this point remote_state must be ready
           // to be transmitted
+          recoverSavedState();
           coolixState = IRCoolixAC::sOn;
         }
       break;
