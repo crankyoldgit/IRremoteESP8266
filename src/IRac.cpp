@@ -1907,6 +1907,7 @@ namespace IRAcUtils {
 #if DECODE_COOLIX
       case decode_type_t::COOLIX: {
         IRCoolixAC ac(0);
+        ac.on();
         ac.setRaw(result->value);  // Coolix uses value instead of state.
         return ac.toString();
       }
