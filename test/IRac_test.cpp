@@ -1359,6 +1359,7 @@ TEST(TestIRac, Issue821) {
   IRCoolixAC ac(0);
 
   ac.begin();
+  ac.on();
   result = irac.handleToggles(next, &prev);
   ASSERT_TRUE(result.light);
   irac.sendAc(next, &prev);
