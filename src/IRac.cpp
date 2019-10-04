@@ -246,7 +246,10 @@ void IRac::coolix(IRCoolixAC *ac,
   ac->begin();
   ac->setPower(on);
   if (!on) {
+      // after turn off AC no more commands should
+      // be accepted
       ac->send();
+      return;
   }
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
