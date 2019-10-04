@@ -1509,8 +1509,8 @@ uint8_t IRMitsubishi112::convertFan(const stdAc::fanspeed_t speed) {
 uint8_t IRMitsubishi112::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kMitsubishi112SwingVHighest;
-    case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle: return kMitsubishi112SwingVHigh;
+    case stdAc::swingv_t::kHigh: return kMitsubishi112SwingVHigh;
+    case stdAc::swingv_t::kMiddle: return kMitsubishi112SwingVMiddle;
     case stdAc::swingv_t::kLow: return kMitsubishi112SwingVLow;
     case stdAc::swingv_t::kLowest: return kMitsubishi112SwingVLowest;
     default: return kMitsubishi112SwingVAuto;
@@ -1555,6 +1555,7 @@ stdAc::swingv_t IRMitsubishi112::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kMitsubishi112SwingVHighest: return stdAc::swingv_t::kHighest;
     case kMitsubishi112SwingVHigh: return stdAc::swingv_t::kHigh;
+    case kMitsubishi112SwingVMiddle: return stdAc::swingv_t::kMiddle;
     case kMitsubishi112SwingVLow: return stdAc::swingv_t::kLow;
     case kMitsubishi112SwingVLowest: return stdAc::swingv_t::kLowest;
     default: return stdAc::swingv_t::kAuto;
@@ -1614,6 +1615,7 @@ String IRMitsubishi112::toString(void) {
   switch (getSwingV()) {
     case kMitsubishi112SwingVHighest: result += F(" (Highest)"); break;
     case kMitsubishi112SwingVHigh: result += F(" (High)"); break;
+    case kMitsubishi112SwingVMiddle: result += F(" (Middle)"); break;
     case kMitsubishi112SwingVLow: result += F(" (Low)"); break;
     case kMitsubishi112SwingVLowest: result += F(" (Lowest)"); break;
     case kMitsubishi112SwingVAuto: result += F(" (Auto)"); break;
