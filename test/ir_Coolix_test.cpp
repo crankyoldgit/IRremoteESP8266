@@ -593,6 +593,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   EXPECT_EQ(0xB2BF40, ac.getRaw());
   // Turn the unit off.
   ac.setPower(false);
+  ac.send();
   EXPECT_EQ(
       "Power: Off",
       ac.toString());
@@ -667,6 +668,7 @@ TEST(TestCoolixACClass, Issue722) {
   // Off
   uint32_t off = 0xB27BE0;
   ac.off();
+  ac.send();
   EXPECT_EQ(off, ac.getRaw());
 
   // ON Auto Temp 18C
