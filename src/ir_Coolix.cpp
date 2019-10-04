@@ -128,9 +128,9 @@ void IRCoolixAC::send(const uint16_t repeat) {
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
 void IRCoolixAC::setRaw(const uint32_t new_code) {
-  if (!handleSpecialState(new_code)){
+  if (!handleSpecialState(new_code)) {
     // it isn`t special so might afect Temp|mode|Fan
-    if (new_code == kCoolixCmdFan){
+    if (new_code == kCoolixCmdFan) {
       setMode(kCoolixFan);
     } else {
       // must be a command changing Temp|Mode|Fan
