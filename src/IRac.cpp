@@ -244,6 +244,10 @@ void IRac::coolix(IRCoolixAC *ac,
                   const bool turbo, const bool light, const bool clean,
                   const int16_t sleep) {
   ac->begin();
+  ac->setPower(on);
+  if (!on) {
+      ac->send();
+  }
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -277,8 +281,6 @@ void IRac::coolix(IRCoolixAC *ac,
     ac->setClean();
     ac->send();
   }
-  // Power gets done last, as off has a special command.
-  ac->setPower(on);
   ac->send();
 }
 #endif  // SEND_COOLIX
