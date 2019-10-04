@@ -1307,10 +1307,9 @@ void IRMitsubishi112::stateReset(void) {
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
   //FIXME
-
-  /*for (uint8_t i = 0; i < 6; i++)
-    remote_state[kMitsubishi112PowerByte + 6 + i] =
-        ~remote_state[kMitsubishi112PowerByte + i];*/
+  Serial.printf("Before %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
+  remote_state[kMitsubishi112PowerByte + 6 + i] = ~remote_state[kMitsubishi112PowerByte + i];
+  Serial.printf("After %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
 }
 
 bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {

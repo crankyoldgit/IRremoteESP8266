@@ -243,8 +243,7 @@ void electra(IRElectraAc *ac,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv,
                      const stdAc::swingh_t swingh,
-                     const bool econo,
-                     const bool quiet);
+                     const bool econo, const bool quiet);
 #endif  // SEND_MITSUBISHI112
 #if SEND_MITSUBISHIHEAVY
   void mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
