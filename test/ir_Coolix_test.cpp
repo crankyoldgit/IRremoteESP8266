@@ -352,17 +352,14 @@ TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
 }
 
 // Tests for the IRCoolixAC class.
-// This test isn't relevant anymore since there is
-// no transient states
-/*
 TEST(TestCoolixACClass, SetAndGetRaw) {
   IRCoolixAC ircoolix(0);
 
-  ircoolix.setRaw(kCoolixOff);
-  EXPECT_EQ(kCoolixOff, ircoolix.getRaw());
+  ircoolix.setRaw(0xB21F28);
+  EXPECT_EQ(0xB21F28, ircoolix.getRaw());
   ircoolix.setRaw(kCoolixDefaultState);
   EXPECT_EQ(kCoolixDefaultState, ircoolix.getRaw());
-}*/
+}
 
 TEST(TestCoolixACClass, SetAndGetTemp) {
   IRCoolixAC ircoolix(0);
@@ -593,12 +590,12 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   EXPECT_EQ(0xB2BF40, ac.getRaw());
   // Turn the unit off.
   ac.setPower(false);
-  ac.send();
   EXPECT_EQ(
       "Power: Off",
       ac.toString());
   EXPECT_EQ(kCoolixOff, ac.getRaw());
   // Repeat change of settings.
+  ac.send();
   ac.setPower(true);
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
@@ -611,6 +608,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
 
   // Now test if we setRaw() a special state first.
   ac.setRaw(kCoolixSwing);
+  ac.send();
   // Repeat change of settings.
   ac.setTemp(24);
   ac.setMode(kCoolixCool);
@@ -668,11 +666,11 @@ TEST(TestCoolixACClass, Issue722) {
   // Off
   uint32_t off = 0xB27BE0;
   ac.off();
-  ac.send();
   EXPECT_EQ(off, ac.getRaw());
 
   // ON Auto Temp 18C
   uint32_t on_auto_18c_fan_auto0 = 0xB21F18;
+  ac.send();
   ac.on();
   ac.setTemp(18);
   EXPECT_EQ(on_auto_18c_fan_auto0, ac.getRaw());
