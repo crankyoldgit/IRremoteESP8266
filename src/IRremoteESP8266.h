@@ -590,7 +590,7 @@ const uint8_t  kVestelAcBits = 56;
 #define WHYNTER_BITS                  kWhynterBits
 
 // Turn on Debugging information by uncommenting the following line.
-//#define DEBUG 1
+// #define DEBUG 1
 
 #ifdef DEBUG
 #ifdef UNIT_TEST
