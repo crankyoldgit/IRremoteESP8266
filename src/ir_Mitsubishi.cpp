@@ -1293,8 +1293,8 @@ void IRMitsubishi112::stateReset(void) {
   remote_state[4] = 0x00;
   remote_state[5] = 0x24;
   remote_state[6] = 0x03;
-  remote_state[7] = 0x09;
-  remote_state[8] = 0x00;
+  remote_state[7] = 0x0B;
+  remote_state[8] = 0x10;
   remote_state[9] = 0x00;
   remote_state[10] = 0x00;
   remote_state[11] = 0x00;
@@ -1359,11 +1359,11 @@ void IRMitsubishi112::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi112::setPower(bool on) {
-  //FIXME
+  //FIXME - Hardcoded values rather than anything else at the moment.
   if (on)
-    remote_state[kMitsubishi112PowerByte] &= kMitsubishi112PowerBit;
+    remote_state[kMitsubishi112PowerByte] = 0x24;
   else
-    remote_state[kMitsubishi112PowerByte] &= ~kMitsubishi112PowerBit;
+    remote_state[kMitsubishi112PowerByte] = 0x20;
 }
 
 // Return the requested power state of the A/C.
@@ -1390,8 +1390,8 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
     case kMitsubishi112FanLow:
     case kMitsubishi112FanMed:
     case kMitsubishi112FanMax:
-      //FIXME
-      remote_state[kMitsubishi112FanByte] &= ~kMitsubishi112FanMask;
+      remote_state[kMitsubishi112FanByte] &= kMitsubishi112FanMask;
+      remote_state[kMitsubishi112FanByte] |= speed;
       break;
     default:
       setFan(kMitsubishi112FanMax);
@@ -1400,7 +1400,7 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
 
 // Return the requested state of the unit's fan.
 uint8_t IRMitsubishi112::getFan(void) {
-  return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanMask);
+  return (remote_state[kMitsubishi112FanByte] & kMitsubishi112FanGetMask);
 }
 
 // Return the requested climate operation mode of the a/c unit.
@@ -1416,9 +1416,8 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
     case kMitsubishi112Heat:
     case kMitsubishi112Auto:
     case kMitsubishi112Dry:
-
-    //FIXME
       remote_state[kMitsubishi112ModeByte] &= ~kMitsubishi112ModeMask;
+      remote_state[kMitsubishi112ModeByte] |= mode;
       break;
     default:
       setMode(kMitsubishi112Auto);
@@ -1432,11 +1431,12 @@ void IRMitsubishi112::setSwingV(const uint8_t position) {
   switch (position) {
     case kMitsubishi112SwingVLowest:
     case kMitsubishi112SwingVLow:
+    case kMitsubishi112SwingVMiddle:
     case kMitsubishi112SwingVHigh:
     case kMitsubishi112SwingVHighest:
     case kMitsubishi112SwingVAuto:
       remote_state[kMitsubishi112SwingVByte] &= ~kMitsubishi112SwingVMask;
-      remote_state[kMitsubishi112SwingVByte] |= position << 4;
+      remote_state[kMitsubishi112SwingVByte] |= position;
       break;
     default:
       setMode(kMitsubishi112SwingVAuto);
@@ -1445,8 +1445,7 @@ void IRMitsubishi112::setSwingV(const uint8_t position) {
 
 // Return the requested vane operation mode of the a/c unit.
 uint8_t IRMitsubishi112::getSwingV(void) {
-  return (remote_state[kMitsubishi112SwingVByte] &
-          kMitsubishi112SwingVMask) >> 4;
+  return remote_state[kMitsubishi112SwingVByte] & kMitsubishi112SwingVMask;
 }
 
 // Set the requested vane operation mode of the a/c unit.
