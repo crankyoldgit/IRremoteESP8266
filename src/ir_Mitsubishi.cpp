@@ -1471,13 +1471,14 @@ bool IRMitsubishi112::getQuiet(void) {
   return getFan() == kMitsubishi112FanQuiet;
 }
 
-// Emulate a quiet setting. There is no true quiet setting on this a/c
 void IRMitsubishi112::setEcono(bool on) {
-  // FIXME
-  ac.econo = on;
+  // FIXME - Need to implement the bitset but haven't as yet.
+  bool econo;
+  econo = on;
+
+  return;
 }
 
-// Return the requested power state of the A/C.
 bool IRMitsubishi112::getEcono(void) {
   // FIXME - haven't implemented as yet.
   return false;
