@@ -1262,7 +1262,7 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
         //FIXME - Haven't worked out the checksum as yet
-    //if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
+    // if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
     //  return false;
   }
   results->decode_type = MITSUBISHI112;
@@ -1285,7 +1285,6 @@ IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
 void IRMitsubishi112::stateReset(void) {
   // The state of the IR remote in IR code form.
   // Known good state obtained from:
-  //   FIXME
   remote_state[0] = 0x23;
   remote_state[1] = 0xCB;
   remote_state[2] = 0x26;
@@ -1306,23 +1305,11 @@ void IRMitsubishi112::stateReset(void) {
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  //FIXME
-  Serial.printf("Before %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
-  remote_state[kMitsubishi112PowerByte + 6 + i] = ~remote_state[kMitsubishi112PowerByte + i];
-  Serial.printf("After %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
+  // FIXME
 }
 
 bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
-  //FIXME
-
-  if (len < kMitsubishi112StateLength) return false;
-  const uint16_t half = (len - kMitsubishi112PowerByte) / 2;
-  for (uint8_t i = 0; i < half; i++) {
-    // This variable is needed to avoid the warning: (known compiler issue)
-    // warning: comparison of promoted ~unsigned with unsigned [-Wsign-compare]
-    const uint8_t inverted = ~data[kMitsubishi112PowerByte + half + i];
-    if (data[kMitsubishi112PowerByte + i] != inverted) return false;
-  }
+  // FIXME
   return true;
 }
 
@@ -1358,7 +1345,7 @@ void IRMitsubishi112::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi112::setPower(bool on) {
-  //FIXME - Hardcoded values rather than anything else at the moment.
+  // FIXME - Hardcoded values rather than anything else at the moment.
   if (on)
     remote_state[kMitsubishi112PowerByte] = 0x24;
   else
@@ -1426,7 +1413,6 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
 // Set the requested vane operation mode of the a/c unit.
 void IRMitsubishi112::setSwingV(const uint8_t position) {
   // If we get an unexpected mode, default to auto.
-  //FIXME
   switch (position) {
     case kMitsubishi112SwingVLowest:
     case kMitsubishi112SwingVLow:
