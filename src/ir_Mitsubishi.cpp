@@ -1240,10 +1240,9 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 // Status: STABLE / Reported as working.
 //
 // Ref:
-//   FIXME
+// FIXME
 bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
                                  const bool strict) {
-  // Too short to match?
   if (results->rawlen < ((2 * nbits) + kHeader + kFooter - 1)) return false;
   if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
   if (strict) {  // Do checks to see if it matches the spec.
@@ -1362,12 +1361,11 @@ void IRMitsubishi112::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kMitsubishi112MinTemp, degrees);
   temp = std::min((uint8_t)kMitsubishi112MaxTemp, temp);
   remote_state[kMitsubishi112TempByte] = kMitsubishiAcMaxTemp - temp;
-
 }
 
 // Return the set temp. in deg C
 uint8_t IRMitsubishi112::getTemp(void) {
-  return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte] ) ;
+  return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte]);
 }
 
 void IRMitsubishi112::setFan(const uint8_t speed) {
@@ -1593,9 +1591,9 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
   result.swingh = this->toCommonSwingH(this->getSwingH());;
-  result.econo = false; //Need to figure this part from stdAc
-  //result.econo = this->toCommonEcono(this->getEcono());
-  //FIXME
+  result.econo = false; // Need to figure this part from stdAc
+  // result.econo = this->toCommonEcono(this->getEcono());
+  // FIXME
   result.clock = -1;
   result.sleep = -1;
   // Not supported.
