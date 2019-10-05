@@ -1240,10 +1240,9 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 // Status: STABLE / Reported as working.
 //
 // Ref:
-//   FIXME
+// FIXME
 bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
                                  const bool strict) {
-  // Too short to match?
   if (results->rawlen < ((2 * nbits) + kHeader + kFooter - 1)) return false;
   if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
   if (strict) {  // Do checks to see if it matches the spec.
@@ -1261,8 +1260,8 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
     // Header validation: Codes start with 0x23CB26
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
-        //FIXME - Haven't worked out the checksum as yet
-    //if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
+        // FIXME - Haven't worked out the checksum as yet
+    // if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
     //  return false;
   }
   results->decode_type = MITSUBISHI112;
@@ -1285,7 +1284,6 @@ IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
 void IRMitsubishi112::stateReset(void) {
   // The state of the IR remote in IR code form.
   // Known good state obtained from:
-  //   FIXME
   remote_state[0] = 0x23;
   remote_state[1] = 0xCB;
   remote_state[2] = 0x26;
@@ -1306,23 +1304,11 @@ void IRMitsubishi112::stateReset(void) {
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  //FIXME
-  Serial.printf("Before %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
-  remote_state[kMitsubishi112PowerByte + 6 + i] = ~remote_state[kMitsubishi112PowerByte + i];
-  Serial.printf("After %02x %02x %02x\n", remote_state[kMitsubishi112PowerByte + 6 + i], ~remote_state[kMitsubishi112PowerByte + i], i);
+  // FIXME
 }
 
 bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
-  //FIXME
-
-  if (len < kMitsubishi112StateLength) return false;
-  const uint16_t half = (len - kMitsubishi112PowerByte) / 2;
-  for (uint8_t i = 0; i < half; i++) {
-    // This variable is needed to avoid the warning: (known compiler issue)
-    // warning: comparison of promoted ~unsigned with unsigned [-Wsign-compare]
-    const uint8_t inverted = ~data[kMitsubishi112PowerByte + half + i];
-    if (data[kMitsubishi112PowerByte + i] != inverted) return false;
-  }
+  // FIXME
   return true;
 }
 
@@ -1358,7 +1344,7 @@ void IRMitsubishi112::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi112::setPower(bool on) {
-  //FIXME - Hardcoded values rather than anything else at the moment.
+  // FIXME - Hardcoded values rather than anything else at the moment.
   if (on)
     remote_state[kMitsubishi112PowerByte] = 0x24;
   else
@@ -1375,12 +1361,11 @@ void IRMitsubishi112::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kMitsubishi112MinTemp, degrees);
   temp = std::min((uint8_t)kMitsubishi112MaxTemp, temp);
   remote_state[kMitsubishi112TempByte] = kMitsubishiAcMaxTemp - temp;
-
 }
 
 // Return the set temp. in deg C
 uint8_t IRMitsubishi112::getTemp(void) {
-  return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte] ) ;
+  return (kMitsubishiAcMaxTemp -remote_state[kMitsubishi112TempByte]);
 }
 
 void IRMitsubishi112::setFan(const uint8_t speed) {
@@ -1426,7 +1411,6 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
 // Set the requested vane operation mode of the a/c unit.
 void IRMitsubishi112::setSwingV(const uint8_t position) {
   // If we get an unexpected mode, default to auto.
-  //FIXME
   switch (position) {
     case kMitsubishi112SwingVLowest:
     case kMitsubishi112SwingVLow:
@@ -1483,6 +1467,22 @@ void IRMitsubishi112::setQuiet(bool on) {
 // Return the requested power state of the A/C.
 bool IRMitsubishi112::getQuiet(void) {
   return getFan() == kMitsubishi112FanQuiet;
+}
+
+void IRMitsubishi112::setEcono(bool on) {
+  // FIXME - Need to implement the bitset but haven't as yet.
+  bool econo;
+  econo = on;
+  switch(econo){
+    default:
+      break;
+  }
+  return;
+}
+
+bool IRMitsubishi112::getEcono(void) {
+  // FIXME - haven't implemented as yet.
+  return false;
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -1594,9 +1594,10 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
   result.swingh = this->toCommonSwingH(this->getSwingH());;
-  result.econo = false; //Need to figure this part from stdAc
-  //result.econo = this->toCommonEcono(this->getEcono());
-  //FIXME
+  result.econo = false;  // Need to figure this part from stdAc
+
+  // result.econo = this->toCommonEcono(this->getEcono());
+  // FIXME
   result.clock = -1;
   result.sleep = -1;
   // Not supported.
