@@ -1500,3 +1500,253 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
       "Time: 00:00, On timer: 00:00, Off timer: 00:00, Timer: -",
       ac.toString());
 }
+
+
+// Tests for IRMitsubishi112 class.
+
+TEST(TestMitsubishi112Class, Power) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestMitsubishi112Class, Temperature) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MinTemp);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MaxTemp);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MinTemp - 1);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MaxTemp + 1);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestMitsubishi112Class, OperatingMode) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setMode(kMitsubishi112Auto);
+  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
+
+  ac.setMode(kMitsubishi112Fan);
+  EXPECT_EQ(kMitsubishi112Fan, ac.getMode());
+
+  ac.setMode(kMitsubishi112Cool);
+  EXPECT_EQ(kMitsubishi112Cool, ac.getMode());
+
+  ac.setMode(kMitsubishi112Heat);
+  EXPECT_EQ(kMitsubishi112Heat, ac.getMode());
+
+  ac.setMode(kMitsubishi112Dry);
+  EXPECT_EQ(kMitsubishi112Dry, ac.getMode());
+
+  ac.setMode(kMitsubishi112Dry + 1);
+  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
+}
+
+TEST(TestMitsubishi112Class, FanSpeed) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setFan(kMitsubishi112FanMax);
+  EXPECT_EQ(kMitsubishi112FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanMin);
+  EXPECT_EQ(kMitsubishi112FanMin, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kMitsubishi112FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanMed);
+  EXPECT_EQ(kMitsubishi112FanMed, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanLow);
+  EXPECT_EQ(kMitsubishi112FanLow, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanQuiet);
+  EXPECT_EQ(kMitsubishi112FanQuiet, ac.getFan());
+}
+
+TEST(TestMitsubishi112Class, Quiet) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+}
+
+TEST(TestMitsubishi112Class, SwingV) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setSwingV(kMitsubishi112SwingVAuto);
+  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVAuto + 1);
+  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVLowest);
+  EXPECT_EQ(kMitsubishi112SwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVLow);
+  EXPECT_EQ(kMitsubishi112SwingVLow, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVHighest);
+  EXPECT_EQ(kMitsubishi112SwingVHighest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVHigh);
+  EXPECT_EQ(kMitsubishi112SwingVHigh, ac.getSwingV());
+}
+
+TEST(TestMitsubishi112Class, toCommon) {
+  IRMitsubishi112 ac(0);
+  ac.setPower(true);
+  ac.setMode(kMitsubishi112Dry);
+  ac.setTemp(22);
+  ac.setFan(kMitsubishi112FanQuiet);
+  ac.setSwingV(kMitsubishi112SwingVAuto);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::MITSUBISHI112, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(22, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kDry, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_TRUE(ac.toCommon().quiet);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestMitsubishi112Class, toCommonMode) {
+  ASSERT_EQ(stdAc::opmode_t::kCool,
+            IRMitsubishi112::toCommonMode(kMitsubishi112Cool));
+  ASSERT_EQ(kMitsubishi112Cool,
+            IRMitsubishi112::convertMode(stdAc::opmode_t::kCool));
+  ASSERT_EQ(stdAc::opmode_t::kDry,
+            IRMitsubishi112::toCommonMode(kMitsubishi112Dry));
+  ASSERT_EQ(kMitsubishi112Dry,
+            IRMitsubishi112::convertMode(stdAc::opmode_t::kDry));
+}
+
+
+
+// Decode a 'real' example.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+TEST(TestDecodeMitsubishi112, DecodeRealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // Mitsubishi Electric Ducted A/C - ON, 20C, Cooling, MaxFan.
+  uint16_t rawData[275] = {
+      3324, 1474, 520, 1110, 492, 1110, 524, 314, 498, 318, 466, 336, 474, 1124,
+      514, 322, 464, 338, 472, 1124, 516, 1112, 482, 342, 480, 1118, 488, 338,
+      466, 344, 480, 1124, 480, 1124, 510, 328, 484, 1114, 480, 1132, 510, 330,
+      456, 344, 464, 1134, 506, 334, 452, 346, 462, 1136, 504, 336, 450, 348,
+      460, 350, 472, 338, 474, 1124, 472, 352, 472, 340, 474, 342, 446, 354,
+      454, 354, 468, 344, 470, 344, 442, 356, 450, 358, 466, 346, 466, 348, 440,
+      360, 448, 360, 462, 350, 464, 352, 438, 360, 434, 1162, 490, 350, 438,
+      1148, 486, 350, 464, 352, 436, 362, 432, 376, 462, 352, 462, 1138, 448,
+      376, 460, 1142, 462, 1150, 484, 1140, 462, 360, 446, 1152, 492, 1132, 460,
+      362, 466, 348, 466, 348, 438, 360, 446, 1152, 492, 348, 436, 360, 434,
+      374, 462, 350, 464, 350, 436, 362, 434, 376, 460, 352, 462, 352, 434, 364,
+      432, 378, 458, 354, 460, 356, 434, 364, 430, 380, 456, 356, 458, 356, 432,
+      366, 428, 382, 454, 358, 456, 358, 430, 1158, 476, 1146, 458, 1156, 478,
+      1150, 454, 1154, 480, 1142, 460, 362, 434, 1164, 488, 352, 436, 1148, 488,
+      1140, 462, 1144, 490, 1136, 466, 1142, 492, 346, 466, 1132, 462, 360, 466,
+      348, 466, 350, 438, 1152, 482, 348, 464, 350, 438, 1144, 490, 1142, 462,
+      1148, 486, 1138, 466, 354, 450, 1146, 496, 1132, 460, 1150, 494, 1130,
+      464, 1146, 498, 1130, 464, 1144, 498, 1130, 462, 1144, 500, 1126, 468,
+      1142, 502, 1122, 470, 1142, 502, 1130, 464, 1140, 504, 1124, 468, 1140,
+      504, 1122, 472, 1142, 502, 1122, 472, 1138, 506};  // UNKNOWN 66B4490E
+
+  irsend.sendRaw(rawData, 275, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
+  EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
+  uint8_t expected[kMitsubishi112StateLength] = {
+      0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0x41, 0x37, 0x04,
+      0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 3 (High), "
+      "Swing(V): 3 (Highest), Quiet: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+// Self decode a synthetic example.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+TEST(TestDecodeMitsubishi112, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  // Mitsubishi Electric Ducted A/C - ON, 20C, Cooling, MaxFan.
+  uint8_t expected[kMitsubishi112StateLength] = {
+      0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0x41, 0x37, 0x04,
+      0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
+
+  irsend.sendMitsubishi112(expected);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
+  EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
+}
