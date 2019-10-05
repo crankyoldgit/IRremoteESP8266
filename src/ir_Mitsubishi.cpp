@@ -1260,7 +1260,7 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
     // Header validation: Codes start with 0x23CB26
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
-        //FIXME - Haven't worked out the checksum as yet
+        // FIXME - Haven't worked out the checksum as yet
     // if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
     //  return false;
   }
@@ -1473,7 +1473,10 @@ void IRMitsubishi112::setEcono(bool on) {
   // FIXME - Need to implement the bitset but haven't as yet.
   bool econo;
   econo = on;
-
+  switch(econo){
+    default:
+      break;
+  }
   return;
 }
 
@@ -1591,7 +1594,8 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
   result.swingh = this->toCommonSwingH(this->getSwingH());;
-  result.econo = false; // Need to figure this part from stdAc
+  result.econo = false;  // Need to figure this part from stdAc
+
   // result.econo = this->toCommonEcono(this->getEcono());
   // FIXME
   result.clock = -1;
