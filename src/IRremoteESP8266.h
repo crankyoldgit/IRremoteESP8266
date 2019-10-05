@@ -133,6 +133,9 @@
 #define DECODE_MITSUBISHI136   true
 #define SEND_MITSUBISHI136     true
 
+#define DECODE_MITSUBISHI112   true
+#define SEND_MITSUBISHI112     true
+
 #define DECODE_FUJITSU_AC      true
 #define SEND_FUJITSU_AC        true
 
@@ -265,7 +268,8 @@
      DECODE_VESTEL_AC || DECODE_TCL112AC || DECODE_MITSUBISHIHEAVY || \
      DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
-     DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136)
+     DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
+     DECODE_MITSUBISHI112)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -356,8 +360,9 @@ enum decode_type_t {
   AMCOR,
   DAIKIN152,  // 70
   MITSUBISHI136,
+  MITSUBISHI112,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MITSUBISHI136,
+  kLastDecodeType = MITSUBISHI112,
 };
 
 // Message lengths & required repeat values
@@ -458,6 +463,9 @@ const uint16_t kMitsubishiACMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishi136StateLength = 17;
 const uint16_t kMitsubishi136Bits = kMitsubishi136StateLength * 8;
 const uint16_t kMitsubishi136MinRepeat = kNoRepeat;
+const uint16_t kMitsubishi112StateLength = 14;
+const uint16_t kMitsubishi112Bits = kMitsubishi112StateLength * 8;
+const uint16_t kMitsubishi112MinRepeat = kNoRepeat;
 const uint16_t kMitsubishiHeavy88StateLength = 11;
 const uint16_t kMitsubishiHeavy88Bits = kMitsubishiHeavy88StateLength * 8;
 const uint16_t kMitsubishiHeavy88MinRepeat = kNoRepeat;

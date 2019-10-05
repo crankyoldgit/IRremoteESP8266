@@ -673,6 +673,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Mitsubishi136 decode");
   if (decodeMitsubishi136(results)) return true;
 #endif  // DECODE_MITSUBISHI136
+#if DECODE_MITSUBISHI112
+  DPRINTLN("Attempting Mitsubishi112 decode");
+  if (decodeMitsubishi112(results)) return true;
+#endif  // DECODE_MITSUBISHI112
   // Typically new protocols are added above this line.
 #if DECODE_HASH
   // decodeHash returns a hash on any input.

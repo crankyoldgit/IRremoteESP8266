@@ -171,6 +171,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::MITSUBISHI_AC;
   else if (!strcasecmp(str, "MITSUBISHI136"))
     return decode_type_t::MITSUBISHI136;
+  else if (!strcasecmp(str, "MITSUBISHI112"))
+    return decode_type_t::MITSUBISHI112;
   else if (!strcasecmp(str, "MITSUBISHI_HEAVY_88"))
     return decode_type_t::MITSUBISHI_HEAVY_88;
   else if (!strcasecmp(str, "MITSUBISHI_HEAVY_152"))
@@ -374,6 +376,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
     case MITSUBISHI136:
       result = F("MITSUBISHI136");
       break;
+    case MITSUBISHI112:
+      result = F("MITSUBISHI112");
+      break;
     case MITSUBISHI_HEAVY_88:
       result = F("MITSUBISHI_HEAVY_88");
       break;
@@ -501,6 +506,7 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC2:
     case KELVINATOR:
     case MITSUBISHI136:
+    case MITSUBISHI112:
     case MITSUBISHI_AC:
     case MITSUBISHI_HEAVY_88:
     case MITSUBISHI_HEAVY_152:

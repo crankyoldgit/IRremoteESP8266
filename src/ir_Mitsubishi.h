@@ -77,6 +77,47 @@ const uint8_t kMitsubishi136FanMed =          0b10;
 const uint8_t kMitsubishi136FanMax =          0b11;
 const uint8_t kMitsubishi136FanQuiet = kMitsubishi136FanMin;
 
+const uint8_t kMitsubishi112PowerByte = 5;
+const uint8_t kMitsubishi112PowerBit =   0b00000100;
+const uint8_t kMitsubishi112TempByte = 7;
+const uint8_t kMitsubishi112TempMask =   0b00001111;
+const uint8_t kMitsubishi112MinTemp = 16;  // 16C
+const uint8_t kMitsubishi112MaxTemp = 31;  // 31C
+const uint8_t kMitsubishi112ModeByte = 6;
+const uint8_t kMitsubishi112ModeMask =   0b00000111;
+const uint8_t kMitsubishi112Cool =            0b011;
+const uint8_t kMitsubishi112Heat =            0b001;
+const uint8_t kMitsubishi112Auto =            0b111;
+const uint8_t kMitsubishi112Dry =             0b010;
+const uint8_t kMitsubishi112SwingVByte = 8;
+const uint8_t kMitsubishi112SwingVMask =     0b111000;
+const uint8_t kMitsubishi112SwingVLowest =   0b101000;
+const uint8_t kMitsubishi112SwingVLow =      0b100000;
+const uint8_t kMitsubishi112SwingVMiddle =   0b011000;
+const uint8_t kMitsubishi112SwingVHigh =     0b010000;
+const uint8_t kMitsubishi112SwingVHighest =  0b001000;
+const uint8_t kMitsubishi112SwingVAuto =     0b111000;
+
+const uint8_t kMitsubishi112SwingHByte = 12;
+const uint8_t kMitsubishi112SwingHMask =       0b111100;
+const uint8_t kMitsubishi112SwingHLeftMax =    0b000100;
+const uint8_t kMitsubishi112SwingHLeftInner =  0b001000;
+const uint8_t kMitsubishi112SwingHMiddle =     0b001100;
+const uint8_t kMitsubishi112SwingHRightInner = 0b010000;
+const uint8_t kMitsubishi112SwingHRightMax =   0b010100;
+const uint8_t kMitsubishi112SwingHWide =       0b100000;
+const uint8_t kMitsubishi112SwingHAuto =       0b110000;
+
+
+const uint8_t kMitsubishi112FanByte = 8;
+const uint8_t kMitsubishi112FanMask =    0b11111000;
+const uint8_t kMitsubishi112FanGetMask =    0b111;
+const uint8_t kMitsubishi112FanMin =          0b010;
+const uint8_t kMitsubishi112FanLow =          0b011;
+const uint8_t kMitsubishi112FanMed =          0b101;
+const uint8_t kMitsubishi112FanMax =          0b000;
+const uint8_t kMitsubishi112FanQuiet = kMitsubishi112FanMin;
+
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
 #define MITSUBISHI_AC_VANE_AUTO kMitsubishiAcVaneAuto
@@ -196,6 +237,60 @@ class IRMitsubishi136 {
   IRsendTest _irsend;
 #endif
   uint8_t remote_state[kMitsubishi136StateLength];
+  void checksum(void);
+};
+
+
+class IRMitsubishi112 {
+ public:
+  explicit IRMitsubishi112(const uint16_t pin, const bool inverted = false,
+                           const bool use_modulation = true);
+
+
+  void stateReset(void);
+#if SEND_MITSUBISHI112
+  void send(const uint16_t repeat = kMitsubishi112MinRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_MITSUBISHI112
+  void begin(void);
+  static bool validChecksum(const uint8_t* data,
+                            const uint16_t len = kMitsubishi112StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t degrees);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingV(const uint8_t position);
+  uint8_t getSwingV(void);
+  void setSwingH(const uint8_t position);
+  uint8_t getSwingH(void);
+  void setQuiet(const bool on);
+  bool getQuiet(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t* data);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint8_t remote_state[kMitsubishi112StateLength];
   void checksum(void);
 };
 
