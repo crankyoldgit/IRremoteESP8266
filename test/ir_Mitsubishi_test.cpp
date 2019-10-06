@@ -1702,7 +1702,7 @@ TEST(TestDecodeMitsubishi112, DecodeRealExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 2 (Quiet), "
-      "Swing(V): 56 (Auto), Swing(H): 48 (Auto), Quiet: On"
+      "Swing(V): 56 (Auto), Swing(H): 48 (Auto), Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 

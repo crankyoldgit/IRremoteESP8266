@@ -746,7 +746,7 @@ void IRac::mitsubishi112(IRMitsubishi112 *ac,
   ac->setSwingV(ac->convertSwingV(swingv));
   ac->setSwingH(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
-  ac->setEcono(econo);
+  // ac->setEcono(econo);
   // FIXME - Econo
   // $No Turbo setting available.
   // No Light setting available.

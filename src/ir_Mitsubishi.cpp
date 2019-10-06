@@ -1487,15 +1487,6 @@ bool IRMitsubishi112::getQuiet(void) {
   return getFan() == kMitsubishi112FanQuiet;
 }
 
-void IRMitsubishi112::setEcono(bool on) {
-  // FIXME - Need to implement the bitset but haven't as yet.
-  return;
-}
-
-bool IRMitsubishi112::getEcono(void) {
-  // FIXME - haven't implemented as yet.
-  return false;
-}
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRMitsubishi112::convertMode(const stdAc::opmode_t mode) {
