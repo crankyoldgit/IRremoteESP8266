@@ -1260,9 +1260,8 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
     // Header validation: Codes start with 0x23CB26
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
-        // FIXME - Haven't worked out the checksum as yet
-    // if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
-    //  return false;
+    if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
+      return false;
   }
   results->decode_type = MITSUBISHI112;
   results->bits = nbits;
@@ -1304,11 +1303,24 @@ void IRMitsubishi112::stateReset(void) {
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  // FIXME
+  uint8_t checksum = 0;
+  for (uint8_t i = 0; i < 13; i++) {
+      checksum = checksum + remote_state[i];
+  }
+  remote_state[13] = checksum;
 }
 
 bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
-  // FIXME
+  uint8_t checksum = 0;
+
+  if (len < kMitsubishi112StateLength) return false;
+
+  for (uint8_t i = 0; i < kMitsubishi112StateLength-1; i++) {
+    checksum += data[i];
+  }
+
+  if (data[kMitsubishi112StateLength-1] != checksum) return false;
+
   return true;
 }
 
@@ -1469,21 +1481,6 @@ bool IRMitsubishi112::getQuiet(void) {
   return getFan() == kMitsubishi112FanQuiet;
 }
 
-void IRMitsubishi112::setEcono(bool on) {
-  // FIXME - Need to implement the bitset but haven't as yet.
-  bool econo;
-  econo = on;
-  switch(econo){
-    default:
-      break;
-  }
-  return;
-}
-
-bool IRMitsubishi112::getEcono(void) {
-  // FIXME - haven't implemented as yet.
-  return false;
-}
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRMitsubishi112::convertMode(const stdAc::opmode_t mode) {

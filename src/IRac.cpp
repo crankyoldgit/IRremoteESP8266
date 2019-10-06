@@ -737,7 +737,7 @@ void IRac::mitsubishi112(IRMitsubishi112 *ac,
                          const float degrees, const stdAc::fanspeed_t fan,
                          const stdAc::swingv_t swingv,
                          const stdAc::swingh_t swingh,
-                         const bool econo, const bool quiet) {
+                         const bool quiet) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -746,7 +746,7 @@ void IRac::mitsubishi112(IRMitsubishi112 *ac,
   ac->setSwingV(ac->convertSwingV(swingv));
   ac->setSwingH(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
-  ac->setEcono(econo);
+  // ac->setEcono(econo);
   // FIXME - Econo
   // $No Turbo setting available.
   // No Light setting available.
@@ -1381,7 +1381,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRMitsubishi112 ac(_pin, _inverted, _modulation);
       mitsubishi112(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
-                    send.swingh, send.econo, send.quiet);
+                    send.swingh, send.quiet);
       break;
     }
 #endif  // SEND_MITSUBISHI112

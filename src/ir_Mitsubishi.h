@@ -271,8 +271,6 @@ class IRMitsubishi112 {
   uint8_t getSwingH(void);
   void setQuiet(const bool on);
   bool getQuiet(void);
-  void setEcono(const bool on);
-  bool getEcono(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t* data);
   static uint8_t convertMode(const stdAc::opmode_t mode);
