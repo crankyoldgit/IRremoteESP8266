@@ -1563,9 +1563,6 @@ TEST(TestMitsubishi112Class, OperatingMode) {
   ac.setMode(kMitsubishi112Auto);
   EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
 
-  ac.setMode(kMitsubishi112Fan);
-  EXPECT_EQ(kMitsubishi112Fan, ac.getMode());
-
   ac.setMode(kMitsubishi112Cool);
   EXPECT_EQ(kMitsubishi112Cool, ac.getMode());
 
@@ -1575,11 +1572,6 @@ TEST(TestMitsubishi112Class, OperatingMode) {
   ac.setMode(kMitsubishi112Dry);
   EXPECT_EQ(kMitsubishi112Dry, ac.getMode());
 
-  ac.setMode(kMitsubishi112Dry + 1);
-  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
-
-  ac.setMode(255);
-  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
 }
 
 TEST(TestMitsubishi112Class, FanSpeed) {
@@ -1605,17 +1597,6 @@ TEST(TestMitsubishi112Class, FanSpeed) {
   EXPECT_EQ(kMitsubishi112FanQuiet, ac.getFan());
 }
 
-TEST(TestMitsubishi112Class, Quiet) {
-  IRMitsubishi112 ac(0);
-  ac.begin();
-
-  ac.setQuiet(true);
-  EXPECT_TRUE(ac.getQuiet());
-  ac.setQuiet(false);
-  EXPECT_FALSE(ac.getQuiet());
-  ac.setQuiet(true);
-  EXPECT_TRUE(ac.getQuiet());
-}
 
 TEST(TestMitsubishi112Class, SwingV) {
   IRMitsubishi112 ac(0);
@@ -1720,8 +1701,8 @@ TEST(TestDecodeMitsubishi112, DecodeRealExample) {
   ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
   EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
   uint8_t expected[kMitsubishi112StateLength] = {
-      0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0x41, 0x37, 0x04,
-      0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x03, 0x12,
+      0x00, 0x00, 0x00, 0x04, 0x60};
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 3 (High), "
@@ -1739,8 +1720,8 @@ TEST(TestDecodeMitsubishi112, SyntheticExample) {
   irsend.reset();
   // Mitsubishi Electric Ducted A/C - ON, 20C, Cooling, MaxFan.
   uint8_t expected[kMitsubishi112StateLength] = {
-      0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0x41, 0x37, 0x04,
-      0x00, 0x00, 0xBF, 0xBE, 0xC8, 0xFB, 0xFF, 0xFF};
+    0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x03, 0x12,
+    0x00, 0x00, 0x00, 0x04, 0x60};
 
   irsend.sendMitsubishi112(expected);
   irsend.makeDecodeResult();
