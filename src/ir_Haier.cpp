@@ -9,6 +9,7 @@
 #include <Arduino.h>
 #endif
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Supported devices:
@@ -417,44 +418,44 @@ String IRHaierAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   uint8_t cmd = getCommand();
-  result += addIntToString(cmd, F("Command"), false);
-  result += F(" (");
+  result += addIntToString(cmd, kCommandStr, false);
+  result += kSpaceLBraceStr;
   switch (cmd) {
     case kHaierAcCmdOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcCmdOn:
-      result += F("On");
+      result += kOnStr;
       break;
     case kHaierAcCmdMode:
-      result += F("Mode");
+      result += kModeStr;
       break;
     case kHaierAcCmdFan:
-      result += F("Fan");
+      result += kFanStr;
       break;
     case kHaierAcCmdTempUp:
-      result += F("Temp Up");
+      result += kTempUpStr;
       break;
     case kHaierAcCmdTempDown:
-      result += F("Temp Down");
+      result += kTempDownStr;
       break;
     case kHaierAcCmdSleep:
-      result += F("Sleep");
+      result += kSleepStr;
       break;
     case kHaierAcCmdTimerSet:
-      result += F("Timer Set");
+      result += kTimerStr + ' ' + kSetStr;
       break;
     case kHaierAcCmdTimerCancel:
-      result += F("Timer Cancel");
+      result += kTimerStr + ' ' + kCancelStr;
       break;
     case kHaierAcCmdHealth:
-      result += F("Health");
+      result += kHealthStr;
       break;
     case kHaierAcCmdSwing:
-      result += F("Swing");
+      result += kSwingStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
@@ -462,33 +463,33 @@ String IRHaierAC::toString(void) {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHaierAcFanHigh, kHaierAcFanLow,
                            kHaierAcFanAuto, kHaierAcFanAuto, kHaierAcFanMed);
-  result += addIntToString(getSwing(), F("Swing"));
-  result += F(" (");
+  result += addIntToString(getSwing(), kSwingStr);
+  result += kSpaceLBraceStr;
   switch (getSwing()) {
     case kHaierAcSwingOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcSwingUp:
-      result += F("Up");
+      result += kUpStr;
       break;
     case kHaierAcSwingDown:
-      result += F("Down");
+      result += kDownStr;
       break;
     case kHaierAcSwingChg:
-      result += F("Change");
+      result += kChangeStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getHealth(), F("Health"));
-  result += addLabeledString(minsToString(getCurrTime()), F("Current Time"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getHealth(), kHealthStr);
+  result += addLabeledString(minsToString(getCurrTime()), kClockStr);
   result += addLabeledString(
-      getOnTimer() >= 0 ? minsToString(getOnTimer()) : F("Off"), F("On Timer"));
+      getOnTimer() >= 0 ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
   result += addLabeledString(
-      getOffTimer() >= 0 ? minsToString(getOffTimer()) : F("Off"),
-      F("Off Timer"));
+      getOffTimer() >= 0 ? minsToString(getOffTimer()) : kOffStr,
+      kOffTimerStr);
   return result;
 }
 // End of IRHaierAC class.
@@ -808,40 +809,40 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) {
 String IRHaierACYRW02::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   uint8_t cmd = getButton();
-  result += addIntToString(cmd, F("Button"));
-  result += F(" (");
+  result += addIntToString(cmd, kButtonStr);
+  result += kSpaceLBraceStr;
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
-      result += F("Power");
+      result += kPowerStr;
       break;
     case kHaierAcYrw02ButtonMode:
-      result += F("Mode");
+      result += kModeStr;
       break;
     case kHaierAcYrw02ButtonFan:
-      result += F("Fan");
+      result += kFanStr;
       break;
     case kHaierAcYrw02ButtonTempUp:
-      result += F("Temp Up");
+      result += kTempUpStr;
       break;
     case kHaierAcYrw02ButtonTempDown:
-      result += F("Temp Down");
+      result += kTempDownStr;
       break;
     case kHaierAcYrw02ButtonSleep:
-      result += F("Sleep");
+      result += kSleepStr;
       break;
     case kHaierAcYrw02ButtonHealth:
-      result += "Health";
+      result += kHealthStr;
       break;
     case kHaierAcYrw02ButtonSwing:
-      result += F("Swing");
+      result += kSwingStr;
       break;
     case kHaierAcYrw02ButtonTurbo:
-      result += F("Turbo");
+      result += kTurboStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcYrw02Auto, kHaierAcYrw02Cool,
@@ -851,49 +852,49 @@ String IRHaierACYRW02::toString(void) {
   result += addFanToString(getFan(), kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
                            kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
                            kHaierAcYrw02FanMed);
-  result += addIntToString(getTurbo(), F("Turbo"));
-  result += F(" (");
+  result += addIntToString(getTurbo(), kTurboStr);
+  result += kSpaceLBraceStr;
   switch (getTurbo()) {
     case kHaierAcYrw02TurboOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcYrw02TurboLow:
-      result += F("Low");
+      result += kLowStr;
       break;
     case kHaierAcYrw02TurboHigh:
-      result += F("High");
+      result += kHighStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwing(), F("Swing"));
-  result += F(" (");
+  result += addIntToString(getSwing(), kSwingStr);
+  result += kSpaceLBraceStr;
   switch (getSwing()) {
     case kHaierAcYrw02SwingOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcYrw02SwingAuto:
-      result += F("Auto");
+      result += kAutoStr;
       break;
     case kHaierAcYrw02SwingBottom:
-      result += F("Bottom");
+      result += kLowestStr;
       break;
     case kHaierAcYrw02SwingDown:
-      result += F("Down");
+      result += kLowStr;
       break;
     case kHaierAcYrw02SwingTop:
-      result += F("Top");
+      result += kHighestStr;
       break;
     case kHaierAcYrw02SwingMiddle:
-      result += F("Middle");
+      result += kMiddleStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getHealth(), F("Health"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getHealth(), kHealthStr);
   return result;
 }
 // End of IRHaierACYRW02 class.

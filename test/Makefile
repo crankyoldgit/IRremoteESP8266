@@ -21,7 +21,7 @@ INCLUDES = -I$(USER_DIR) -I.
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -DUNIT_TEST
+CPPFLAGS += -isystem $(GTEST_DIR)/include -DUNIT_TEST -D_IR_LOCALE_=en_AU
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
@@ -117,11 +117,12 @@ PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
 		$(USER_DIR)/ir_Trotec.h
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRac.o ir_GlobalCache.o \
-             $(PROTOCOLS) gtest_main.a
+             IRtext.o $(PROTOCOLS) gtest_main.a
 # Common dependencies
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
               $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h \
-							$(USER_DIR)/IRac.h $(PROTOCOLS_H)
+							$(USER_DIR)/IRac.h $(USER_DIR)/i18n.h $(USER_DIR)/IRtext.h \
+							$(PROTOCOLS_H)
 
 # Common test dependencies
 COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h
@@ -148,8 +149,11 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRutils.cpp
+IRtext.o : $(USER_DIR)/IRtext.cpp $(USER_DIR)/IRtext.h $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/i18n.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/IRtext.cpp
+
+IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/i18n.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/IRutils.cpp
 
 IRutils_test.o : IRutils_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c IRutils_test.cpp

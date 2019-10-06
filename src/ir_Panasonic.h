@@ -84,15 +84,6 @@ const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
     0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
     0x00, 0x0E, 0xE0, 0x00, 0x00, 0x81, 0x00, 0x00, 0x00};
 
-enum panasonic_ac_remote_model_t {
-  kPanasonicUnknown = 0,
-  kPanasonicLke = 1,
-  kPanasonicNke = 2,
-  kPanasonicDke = 3,
-  kPanasonicJke = 4,
-  kPanasonicCkp = 5,
-  kPanasonicRkr = 6,
-};
 
 class IRPanasonicAc {
  public:

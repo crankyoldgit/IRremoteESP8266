@@ -11,6 +11,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
@@ -775,7 +776,7 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
 String IRMitsubishiAC::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcAuto);
@@ -784,37 +785,42 @@ String IRMitsubishiAC::toString(void) {
                            kMitsubishiAcFanRealMax - 3,
                            kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
                            kMitsubishiAcFanRealMax - 2);
-  result += addIntToString(this->getVane(), F("Swing(V)"));
+  result += addIntToString(this->getVane(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (this->getVane()) {
-    case kMitsubishiAcVaneAuto: result += F(" (Auto)"); break;
-    case kMitsubishiAcVaneAutoMove: result += F(" (Auto Move)"); break;
+    case kMitsubishiAcVaneAuto:     result += kAutoStr; break;
+    case kMitsubishiAcVaneAutoMove: result += kAutoStr + ' ' + kMoveStr; break;
+    default:                        result += kUnknownStr;
   }
-  result += addIntToString(this->getWideVane(), F("Swing(H)"));
+  result += ')';
+  result += addIntToString(this->getWideVane(), kSwingHStr);
+  result += kSpaceLBraceStr;
   switch (this->getWideVane()) {
-    case kMitsubishiAcWideVaneAuto:
-      result += F(" (Auto)");
+    case kMitsubishiAcWideVaneAuto: result += kAutoStr; break;
+    default:                        result += kUnknownStr;
   }
-  result += addLabeledString(minsToString(getClock() * 10), F("Time"));
-  result += addLabeledString(minsToString(getStartClock() * 10), F("On timer"));
-  result += addLabeledString(minsToString(getStopClock() * 10), F("Off timer"));
-  result += F(", Timer: ");
+  result += ')';
+  result += addLabeledString(minsToString(getClock() * 10), kClockStr);
+  result += addLabeledString(minsToString(getStartClock() * 10), kOnTimerStr);
+  result += addLabeledString(minsToString(getStopClock() * 10), kOffTimerStr);
+  result += kCommaSpaceStr + kTimerStr + kColonSpaceStr;
   switch (this->getTimer()) {
     case kMitsubishiAcNoTimer:
       result += '-';
       break;
     case kMitsubishiAcStartTimer:
-      result += F("Start");
+      result += kStartStr;
       break;
     case kMitsubishiAcStopTimer:
-      result += F("Stop");
+      result += kStopStr;
       break;
     case kMitsubishiAcStartStopTimer:
-      result += F("Start+Stop");
+      result += kStartStr + '+' + kStopStr;
       break;
     default:
       result += F("? (");
       result += this->getTimer();
-      result += F(")\n");
+      result += ')';
   }
   return result;
 }
@@ -1166,7 +1172,7 @@ stdAc::state_t IRMitsubishi136::toCommon(void) {
 String IRMitsubishi136::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kMitsubishi136Auto, kMitsubishi136Cool,
                             kMitsubishi136Heat, kMitsubishi136Dry,
                             kMitsubishi136Fan);
@@ -1174,15 +1180,17 @@ String IRMitsubishi136::toString(void) {
   result += addFanToString(getFan(), kMitsubishi136FanMax,
                            kMitsubishi136FanLow,  kMitsubishi136FanMax,
                            kMitsubishi136FanQuiet, kMitsubishi136FanMed);
-  result += addIntToString(getSwingV(), F("Swing(V)"));
+  result += addIntToString(getSwingV(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (getSwingV()) {
-    case kMitsubishi136SwingVHighest: result += F(" (Highest)"); break;
-    case kMitsubishi136SwingVHigh: result += F(" (High)"); break;
-    case kMitsubishi136SwingVLow: result += F(" (Low)"); break;
-    case kMitsubishi136SwingVLowest: result += F(" (Lowest)"); break;
-    case kMitsubishi136SwingVAuto: result += F(" (Auto)"); break;
-    default: result += F(" (UNKNOWN)");
+    case kMitsubishi136SwingVHighest: result += kHighestStr; break;
+    case kMitsubishi136SwingVHigh: result += kHighStr; break;
+    case kMitsubishi136SwingVLow: result += kLowStr; break;
+    case kMitsubishi136SwingVLowest: result += kLowestStr; break;
+    case kMitsubishi136SwingVAuto: result += kAutoStr; break;
+    default: result += kUnknownStr;
   }
-  result += addBoolToString(getQuiet(), F("Quiet"));
+  result += ')';
+  result += addBoolToString(getQuiet(), kQuietStr);
   return result;
 }

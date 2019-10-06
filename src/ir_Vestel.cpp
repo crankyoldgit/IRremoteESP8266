@@ -11,6 +11,7 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #include "ir_Haier.h"
 
@@ -492,51 +493,53 @@ String IRVestelAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (this->isTimeCommand()) {
-    result += addLabeledString(minsToString(getTime()), F("Time"), false);
+    result += addLabeledString(minsToString(getTime()), kClockStr, false);
     result += addLabeledString(
-        isTimerActive() ? minsToString(getTimer()) : F("Off"),
-        F("Timer"));
+        isTimerActive() ? minsToString(getTimer()) : kOffStr,
+        kTimerStr);
     result += addLabeledString(
         (isOnTimerActive() && !isTimerActive()) ?
-          minsToString(this->getOnTimer()) : F("Off"),
-        F("On Timer"));
+          minsToString(this->getOnTimer()) : kOffStr,
+        kOnTimerStr);
     result += addLabeledString(
-        isOffTimerActive() ? minsToString(getOffTimer()) : F("Off"),
-        F("Off Timer"));
+        isOffTimerActive() ? minsToString(getOffTimer()) : kOffStr,
+        kOffTimerStr);
     return result;
   }
   // Not a time command, it's a normal command.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kVestelAcAuto, kVestelAcCool,
                             kVestelAcHeat,   kVestelAcDry, kVestelAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (this->getFan()) {
     case kVestelAcFanAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kVestelAcFanLow:
-      result += F(" (Low)");
+      result += kLowStr;
       break;
     case kVestelAcFanMed:
-      result += F(" (Medium)");
+      result += kMedStr;
       break;
     case kVestelAcFanHigh:
-      result += F(" (High)");
+      result += kHighStr;
       break;
     case kVestelAcFanAutoCool:
-      result += F(" (Auto Cool)");
+      result += kAutoStr + ' ' + kCoolStr;
       break;
     case kVestelAcFanAutoHot:
-      result += F(" (Auto Hot)");
+      result += kAutoStr + ' ' + kHeatStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getIon(), F("Ion"));
-  result += addBoolToString(getSwing(), F("Swing"));
+  result += ')';
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getIon(), kIonStr);
+  result += addBoolToString(getSwing(), kSwingStr);
   return result;
 }
 

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -314,13 +315,13 @@ stdAc::state_t IRAmcorAc::toCommon(void) {
 String IRAmcorAc::toString(void) {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kAmcorAuto, kAmcorCool,
                             kAmcorHeat, kAmcorDry, kAmcorFan);
   result += addFanToString(getFan(), kAmcorFanMax, kAmcorFanMin,
                            kAmcorFanAuto, kAmcorFanAuto,
                            kAmcorFanMed);
   result += addTempToString(getTemp());
-  result += addBoolToString(getMax(), F("Max"));
+  result += addBoolToString(getMax(), kMaxStr);
   return result;
 }

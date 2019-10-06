@@ -14,6 +14,8 @@
 #endif
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
+#include "IRsend.h"
+#include "IRtext.h"
 
 // Reverse the order of the requested least significant nr. of bits.
 // Args:
@@ -89,7 +91,7 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 // Returns:
 //  A decode_type_t enum.
 decode_type_t strToDecodeType(const char * const str) {
-  if (!strcasecmp(str, "UNKNOWN"))
+  if (!strcasecmp(str, kUnknownStr.c_str()))
     return decode_type_t::UNKNOWN;
   else if (!strcasecmp(str, "UNUSED"))
     return decode_type_t::UNUSED;
@@ -472,10 +474,10 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case UNKNOWN:
     default:
-      result = F("UNKNOWN");
+      result = kUnknownStr;
       break;
   }
-  if (isRepeat) result += F(" (Repeat)");
+  if (isRepeat) result += kSpaceLBraceStr + kRepeatStr + ')';
   return result;
 }
 
@@ -561,7 +563,7 @@ String resultToSourceCode(const decode_results * const results) {
     }
     output += uint64ToString(usecs, 10);
     if (i < results->rawlen - 1)
-      output += F(", ");            // ',' not needed on the last one
+      output += kCommaSpaceStr;            // ',' not needed on the last one
     if (i % 2 == 0) output += ' ';  // Extra if it was even.
   }
 
@@ -588,7 +590,7 @@ String resultToSourceCode(const decode_results * const results) {
         output += F("0x");
         if (results->state[i] < 0x10) output += '0';
         output += uint64ToString(results->state[i], 16);
-        if (i < nbytes - 1) output += F(", ");
+        if (i < nbytes - 1) output += kCommaSpaceStr;
       }
       output += F("};\n");
 #endif  // DECODE_AC
@@ -636,7 +638,7 @@ String resultToTimingInfo(const decode_results * const results) {
     while (value.length() < 6) value = ' ' + value;
     output += value;
     if (i < results->rawlen - 1)
-      output += F(", ");  // ',' not needed for last one
+      output += kCommaSpaceStr;  // ',' not needed for last one
     if (!(i % 8)) output += '\n';  // Newline every 8 entries.
   }
   output += '\n';
@@ -646,9 +648,9 @@ String resultToTimingInfo(const decode_results * const results) {
 // Convert the decode_results structure's value/state to simple hexadecimal.
 //
 String resultToHexidecimal(const decode_results * const result) {
-  String output = "";
+  String output = F("0x");
   // Reserve some space for the string to reduce heap fragmentation.
-  output.reserve(2 * kStateSizeMax);  // Should cover worst cases.
+  output.reserve(2 * kStateSizeMax + 2);  // Should cover worst cases.
   if (hasACState(result->decode_type)) {
 #if DECODE_AC
     for (uint16_t i = 0; result->bits > i * 8; i++) {
@@ -669,16 +671,16 @@ String resultToHumanReadableBasic(const decode_results * const results) {
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
   // Show Encoding standard
-  output += F("Encoding  : ");
+  output += kProtocolStr + F("  : ");
   output += typeToString(results->decode_type, results->repeat);
   output += '\n';
 
   // Show Code & length
-  output += F("Code      : ");
+  output += kCodeStr + F("      : ");
   output += resultToHexidecimal(results);
-  output += F(" (");
+  output += kSpaceLBraceStr;
   output += uint64ToString(results->bits);
-  output += F(" bits)\n");
+  output += ' ' + kBitsStr + F(")\n");
   return output;
 }
 
@@ -784,15 +786,15 @@ namespace irutils {
   String addLabeledString(const String value, const String label,
                           const bool precomma) {
     String result = "";
-    if (precomma) result += F(", ");
+    if (precomma) result += kCommaSpaceStr;
     result += label;
-    result += F(": ");
+    result += kColonSpaceStr;
     return result + value;
   }
 
   String addBoolToString(const bool value, const String label,
                          const bool precomma) {
-    return addLabeledString((value ? F("On") : F("Off")), label, precomma);
+    return addLabeledString((value ? kOnStr : kOffStr), label, precomma);
   }
 
   String addIntToString(const uint16_t value, const String label,
@@ -800,9 +802,58 @@ namespace irutils {
     return addLabeledString(uint64ToString(value), label, precomma);
   }
 
+  String modelToStr(const decode_type_t protocol, const int16_t model) {
+    switch (protocol) {
+      case decode_type_t::GREE:
+        switch (model) {
+          case gree_ac_remote_model_t::YAW1F: return F("YAW1F");
+          case gree_ac_remote_model_t::YBOFB: return F("YBOFB");
+          default: return kUnknownStr;
+        }
+        break;
+      case decode_type_t::FUJITSU_AC:
+        switch (model) {
+          case fujitsu_ac_remote_model_t::ARRAH2E: return F("ARRAH2E");
+          case fujitsu_ac_remote_model_t::ARDB1: return F("ARDB1");
+          case fujitsu_ac_remote_model_t::ARREB1E: return F("ARREB1E");
+          case fujitsu_ac_remote_model_t::ARJW2: return F("ARJW2");
+          case fujitsu_ac_remote_model_t::ARRY4: return F("ARRY4");
+          default: return kUnknownStr;
+        }
+        break;
+      case decode_type_t::PANASONIC_AC:
+        switch (model) {
+          case panasonic_ac_remote_model_t::kPanasonicLke: return F("LKE");
+          case panasonic_ac_remote_model_t::kPanasonicNke: return F("NKE");
+          case panasonic_ac_remote_model_t::kPanasonicDke: return F("DKE");
+          case panasonic_ac_remote_model_t::kPanasonicJke: return F("JKE");
+          case panasonic_ac_remote_model_t::kPanasonicCkp: return F("CKP");
+          case panasonic_ac_remote_model_t::kPanasonicRkr: return F("RKR");
+          default: return kUnknownStr;
+        }
+        break;
+      case decode_type_t::WHIRLPOOL_AC:
+        switch (model) {
+          case whirlpool_ac_remote_model_t::DG11J13A: return F("DG11J13A");
+          case whirlpool_ac_remote_model_t::DG11J191: return F("DG11J191");
+          default: return kUnknownStr;
+        }
+        break;
+      default: return kUnknownStr;
+    }
+  }
+
+  String addModelToString(const decode_type_t protocol, const int16_t model,
+                          const bool precomma) {
+    String result = addIntToString(model, kModelStr, precomma);
+    result += kSpaceLBraceStr;
+    result += modelToStr(protocol, model);
+    return result + ')';
+  }
+
   String addTempToString(const uint16_t degrees, const bool celsius,
                          const bool precomma) {
-    String result = addIntToString(degrees, F("Temp"), precomma);
+    String result = addIntToString(degrees, kTempStr, precomma);
     result += celsius ? 'C' : 'F';
     return result;
   }
@@ -810,30 +861,47 @@ namespace irutils {
   String addModeToString(const uint8_t mode, const uint8_t automatic,
                          const uint8_t cool, const uint8_t heat,
                          const uint8_t dry, const uint8_t fan) {
-    String result = addIntToString(mode, F("Mode"));
-    result += F(" (");
-    if (mode == automatic) result += F("Auto");
-    else if (mode == cool) result += F("Cool");
-    else if (mode == heat) result += F("Heat");
-    else if (mode == dry) result += F("Dry");
-    else if (mode == fan) result += F("Fan");
+    String result = addIntToString(mode, kModeStr);
+    result += kSpaceLBraceStr;
+    if (mode == automatic) result += kAutoStr;
+    else if (mode == cool) result += kCoolStr;
+    else if (mode == heat) result += kHeatStr;
+    else if (mode == dry) result += kDryStr;
+    else if (mode == fan) result += kFanStr;
     else
-      result += F("UNKNOWN");
+      result += kUnknownStr;
+    return result + ')';
+  }
+
+  String addDayToString(const uint8_t day_of_week, const int8_t offset,
+                        const bool precomma) {
+    String result = addIntToString(day_of_week, kDayStr, precomma);
+    result += kSpaceLBraceStr;
+    if ((uint8_t)(day_of_week + offset) < 7)
+#if UNIT_TEST
+      result += kThreeLetterDayOfWeekStr.substr(
+          (day_of_week + offset) * 3, 3);
+#else  // UNIT_TEST
+      result += kThreeLetterDayOfWeekStr.substring(
+          (day_of_week + offset) * 3, (day_of_week + offset) * 3 + 3);
+#endif  // UNIT_TEST
+    else
+      result += kUnknownStr;
     return result + ')';
   }
 
   String addFanToString(const uint8_t speed, const uint8_t high,
                         const uint8_t low, const uint8_t automatic,
                         const uint8_t quiet, const uint8_t medium) {
-    String result = addIntToString(speed, F("Fan"));
-    result += F(" (");
-    if (speed == high) result += F("High");
-    else if (speed == low) result += F("Low");
-    else if (speed == automatic) result += F("Auto");
-    else if (speed == quiet) result += F("Quiet");
-    else if (speed == medium) result += F("Medium");
+    String result = addIntToString(speed, kFanStr);
+    result += kSpaceLBraceStr;
+    if (speed == high) result += kHighStr;
+    else if (speed == low) result += kLowStr;
+    else if (speed == automatic) result += kAutoStr;
+    else if (speed == quiet) result += kQuietStr;
+    else if (speed == medium) result += kMediumStr;
     else
-     result += F("UNKNOWN");
+     result += kUnknownStr;
     return result + ')';
   }
 
@@ -901,7 +969,7 @@ namespace irutils {
 
   String msToString(uint32_t const msecs) {
     uint32_t totalseconds = msecs / 1000;
-    if (totalseconds == 0) return F("Now");
+    if (totalseconds == 0) return kNowStr;
 
     // Note: uint32_t can only hold up to 45 days, so uint8_t is safe.
     uint8_t days = totalseconds / (60 * 60 * 24);
@@ -910,24 +978,22 @@ namespace irutils {
     uint8_t seconds = totalseconds % 60;
 
     String result = "";
-    if (days) {
-      result += uint64ToString(days) + F(" day");
-      if (days > 1) result += 's';
-    }
+    if (days)
+      result += uint64ToString(days) + ' ' + ((days > 1) ? kDaysStr : kDayStr);
     if (hours) {
       if (result.length()) result += ' ';
-      result += uint64ToString(hours) + F(" hour");
-      if (hours > 1) result += 's';
+      result += uint64ToString(hours) + ' ' + ((hours > 1) ? kHoursStr
+                                                           : kHourStr);
     }
     if (minutes) {
       if (result.length()) result += ' ';
-      result += uint64ToString(minutes) + F(" minute");
-      if (minutes > 1) result += 's';
+      result += uint64ToString(minutes) + ' ' + ((minutes > 1) ? kMinutesStr
+                                                               : kMinuteStr);
     }
     if (seconds) {
       if (result.length()) result += ' ';
-      result += uint64ToString(seconds) + F(" second");
-      if (seconds > 1) result += 's';
+      result += uint64ToString(seconds) + ' ' + ((seconds > 1) ? kSecondsStr
+                                                               : kSecondStr);
     }
     return result;
   }
@@ -936,7 +1002,7 @@ namespace irutils {
     String result = "";
     result.reserve(5);  // 23:59 is the typical worst case.
     if (mins / 60 < 10) result += '0';  // Zero pad the hours
-    result += uint64ToString(mins / 60) + ':';
+    result += uint64ToString(mins / 60) + kTimeSep;
     if (mins % 60 < 10) result += '0';  // Zero pad the minutes.
     result += uint64ToString(mins % 60);
     return result;

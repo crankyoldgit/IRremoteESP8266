@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #endif
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -236,13 +237,13 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 String IRTrotecESP::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTrotecAuto, kTrotecCool, kTrotecAuto,
                             kTrotecDry, kTrotecFan);
   result += addTempToString(getTemp());
   result += addFanToString(getSpeed(), kTrotecFanHigh, kTrotecFanLow,
                            kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
-  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getSleep(), kSleepStr);
   return result;
 }
 

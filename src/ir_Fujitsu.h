@@ -88,13 +88,6 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_HORIZ kFujitsuAcSwingHoriz
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
-enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
-  ARDB1,        // (2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work)
-  ARREB1E,      // (3) AR-REB1E
-  ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
-  ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
-};
 
 class IRFujitsuAC {
  public:

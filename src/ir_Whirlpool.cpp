@@ -22,6 +22,7 @@
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -40,6 +41,7 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
@@ -488,78 +490,69 @@ stdAc::state_t IRWhirlpoolAc::toCommon(void) {
 String IRWhirlpoolAc::toString(void) {
   String result = "";
   result.reserve(200);  // Reserve some heap for the string to reduce fragging.
-  result += F("Model: ");
-  result += uint64ToString(this->getModel());
-  switch (this->getModel()) {
-    case DG11J191:
-      result += F(" (DG11J191)");
-      break;
-    case DG11J13A:
-      result += F(" (DG11J13A)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += addBoolToString(getPowerToggle(), F("Power toggle"));
+  result += addModelToString(decode_type_t::WHIRLPOOL_AC, getModel(), false);
+  result += addBoolToString(getPowerToggle(), kPowerStr + ' ' + kToggleStr);
   result += addModeToString(getMode(), kWhirlpoolAcAuto, kWhirlpoolAcCool,
                             kWhirlpoolAcHeat, kWhirlpoolAcDry, kWhirlpoolAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kWhirlpoolAcFanHigh, kWhirlpoolAcFanLow,
                            kWhirlpoolAcFanAuto, kWhirlpoolAcFanAuto,
                            kWhirlpoolAcFanMedium);
-  result += addBoolToString(getSwing(), F("Swing"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(
-      isOnTimerEnabled() ? minsToString(getOnTimer()) : F("Off"),
-      F("On Timer"));
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : kOffStr,
+      kOnTimerStr);
   result += addLabeledString(
-      isOffTimerEnabled() ? minsToString(getOffTimer()) : F("Off"),
-      F("Off Timer"));
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getSuper(), F("Super"));
-  result += addIntToString(getCommand(), F("Command"));
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : kOffStr,
+      kOffTimerStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getSuper(), kSuperStr);
+  result += addIntToString(getCommand(), kCommandStr);
+  result += kSpaceLBraceStr;
   switch (this->getCommand()) {
     case kWhirlpoolAcCommandLight:
-      result += F(" (Light)");
+      result += kLightStr;
       break;
     case kWhirlpoolAcCommandPower:
-      result += F(" (Power)");
+      result += kPowerStr;
       break;
     case kWhirlpoolAcCommandTemp:
-      result += F(" (Temp)");
+      result += kTempStr;
       break;
     case kWhirlpoolAcCommandSleep:
-      result += F(" (Sleep)");
+      result += kSleepStr;
       break;
     case kWhirlpoolAcCommandSuper:
-      result += F(" (Super)");
+      result += kSuperStr;
       break;
     case kWhirlpoolAcCommandOnTimer:
-      result += F(" (On Timer)");
+      result += kOnTimerStr;
       break;
     case kWhirlpoolAcCommandMode:
-      result += F(" (Mode)");
+      result += kModeStr;
       break;
     case kWhirlpoolAcCommandSwing:
-      result += F(" (Swing)");
+      result += kSwingStr;
       break;
     case kWhirlpoolAcCommandIFeel:
-      result += F(" (IFeel)");
+      result += kIFeelStr;
       break;
     case kWhirlpoolAcCommandFanSpeed:
-      result += F(" (Fan Speed)");
+      result += kFanStr;
       break;
     case kWhirlpoolAcCommand6thSense:
-      result += F(" (6th Sense)");
+      result += k6thSenseStr;
       break;
     case kWhirlpoolAcCommandOffTimer:
-      result += F(" (Off Timer)");
+      result += kOffTimerStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
       break;
   }
+  result += ')';
   return result;
 }
 

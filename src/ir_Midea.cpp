@@ -8,6 +8,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
@@ -400,19 +401,19 @@ String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   if (!isSwingVToggle()) {
-    result += addBoolToString(getPower(), F("Power"), false);
+    result += addBoolToString(getPower(), kPowerStr, false);
     result += addModeToString(getMode(), kMideaACAuto, kMideaACCool,
                               kMideaACHeat, kMideaACDry, kMideaACFan);
-    result += addBoolToString(getUseCelsius(), F("Celsius"));
+    result += addBoolToString(getUseCelsius(), kCelsiusStr);
     result += addTempToString(getTemp(true));
     result += '/';
     result += uint64ToString(getTemp(false));
     result += 'F';
     result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
-    result += addBoolToString(getSleep(), F("Sleep"));
+    result += addBoolToString(getSleep(), kSleepStr);
   }
-  result += addBoolToString(getSwingVToggle(), F("Swing(V) Toggle"),
+  result += addBoolToString(getSwingVToggle(), kSwingVStr + ' ' + kToggleStr,
                             !isSwingVToggle());
   return result;
 }

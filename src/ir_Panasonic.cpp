@@ -10,6 +10,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Panasonic protocol originally added by Kristian Lauszus from:
@@ -66,6 +67,7 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
@@ -732,95 +734,80 @@ stdAc::state_t IRPanasonicAc::toCommon(void) {
 String IRPanasonicAc::toString(void) {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
-  result += F("Model: ");
-  result += uint64ToString(getModel());
-  switch (getModel()) {
-    case kPanasonicDke:
-      result += F(" (DKE)");
-      break;
-    case kPanasonicJke:
-      result += F(" (JKE)");
-      break;
-    case kPanasonicNke:
-      result += F(" (NKE)");
-      break;
-    case kPanasonicLke:
-      result += F(" (LKE)");
-      break;
-    case kPanasonicCkp:
-      result += F(" (CKP)");
-      break;
-    case kPanasonicRkr:
-      result += F(" (RKR)");
-      break;
-    default:
-      result += F(" (UNKNOWN)");
-  }
-  result += addBoolToString(getPower(), F("Power"));
+  result += addModelToString(decode_type_t::PANASONIC_AC, getModel(), false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kPanasonicAcAuto, kPanasonicAcCool,
                             kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kPanasonicAcFanMax, kPanasonicAcFanMin,
                            kPanasonicAcFanAuto, kPanasonicAcFanAuto,
                            kPanasonicAcFanMed);
-  result += addIntToString(getSwingVertical(), F("Swing(V)"));
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (getSwingVertical()) {
     case kPanasonicAcSwingVAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kPanasonicAcSwingVHighest:
-      result += F(" (Full Up)");
+      result += kHighestStr;
+      break;
+    case kPanasonicAcSwingVHigh:
+      result += kHighStr;
+      break;
+    case kPanasonicAcSwingVMiddle:
+      result += kMiddleStr;
+      break;
+    case kPanasonicAcSwingVLow:
+      result += kLowStr;
       break;
     case kPanasonicAcSwingVLowest:
-      result += F(" (Full Down)");
-      break;
-    case 2:
-    case 3:
-    case 4:
+      result += kLowestStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
       break;
   }
+  result += ')';
   switch (getModel()) {
     case kPanasonicJke:
     case kPanasonicCkp:
       break;  // No Horizontal Swing support.
     default:
-      result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
+      result += addIntToString(getSwingHorizontal(), kSwingHStr);
+      result += kSpaceLBraceStr;
       switch (getSwingHorizontal()) {
         case kPanasonicAcSwingHAuto:
-          result += F(" (Auto)");
+          result += kAutoStr;
           break;
         case kPanasonicAcSwingHFullLeft:
-          result += F(" (Full Left)");
+          result += kMaxLeftStr;
           break;
         case kPanasonicAcSwingHLeft:
-          result += F(" (Left)");
+          result += kLeftStr;
           break;
         case kPanasonicAcSwingHMiddle:
-          result += F(" (Middle)");
+          result += kMiddleStr;
           break;
         case kPanasonicAcSwingHFullRight:
-          result += F(" (Full Right)");
+          result += kMaxRightStr;
           break;
         case kPanasonicAcSwingHRight:
-          result += F(" (Right)");
+          result += kRightStr;
           break;
         default:
-          result += F(" (UNKNOWN)");
-          break;
+          result += kUnknownStr;
       }
+      result += ')';
   }
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getPowerful(), F("Powerful"));
-  result += addLabeledString(minsToString(getClock()), F("Clock"));
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(
-      isOnTimerEnabled() ? minsToString(getOnTimer()) : F("Off"),
-      F("On Timer"));
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : kOffStr,
+      kOnTimerStr);
   result += addLabeledString(
-      isOffTimerEnabled() ? minsToString(getOffTimer()) : F("Off"),
-      F("Off Timer"));
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : kOffStr,
+      kOffTimerStr);
   return result;
 }
 

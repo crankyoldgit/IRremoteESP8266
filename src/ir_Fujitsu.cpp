@@ -6,6 +6,7 @@
 #include <string>
 #endif
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Fujitsu A/C support added by Jonny Graham & David Conran
@@ -31,6 +32,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 
@@ -610,16 +612,8 @@ String IRFujitsuAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   fujitsu_ac_remote_model_t model = this->getModel();
-  result += addIntToString(model, F("Model"), false);
-  switch (model) {
-    case fujitsu_ac_remote_model_t::ARRAH2E: result += F(" (ARRAH2E)"); break;
-    case fujitsu_ac_remote_model_t::ARDB1: result += F(" (ARDB1)"); break;
-    case fujitsu_ac_remote_model_t::ARREB1E: result += F(" (ARREB1E)"); break;
-    case fujitsu_ac_remote_model_t::ARJW2: result += F(" (ARJW2)"); break;
-    case fujitsu_ac_remote_model_t::ARRY4: result += F(" (ARRY4)"); break;
-    default: result += F(" (UNKNOWN)");
-  }
-  result += addBoolToString(getPower(), F("Power"));
+  result += addModelToString(decode_type_t::FUJITSU_AC, model, false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kFujitsuAcModeAuto, kFujitsuAcModeCool,
                             kFujitsuAcModeHeat, kFujitsuAcModeDry,
                             kFujitsuAcModeFan);
@@ -633,51 +627,53 @@ String IRFujitsuAC::toString(void) {
     case fujitsu_ac_remote_model_t::ARJW2:
       break;
     default:  // Assume everything else does.
-      result += addBoolToString(getClean(), F("Clean"));
-      result += addBoolToString(getFilter(), F("Filter"));
-      result += F(", Swing: ");
+      result += addBoolToString(getClean(), kCleanStr);
+      result += addBoolToString(getFilter(), kFilterStr);
+      result += addIntToString(this->getSwing(), kSwingStr);
+      result += kSpaceLBraceStr;
       switch (this->getSwing()) {
         case kFujitsuAcSwingOff:
-          result += F("Off");
+          result += kOffStr;
           break;
         case kFujitsuAcSwingVert:
-          result += F("Vert");
+          result += kSwingVStr;
           break;
         case kFujitsuAcSwingHoriz:
-          result += F("Horiz");
+          result += kSwingHStr;
           break;
         case kFujitsuAcSwingBoth:
-          result += F("Vert + Horiz");
+          result += kSwingVStr + '+' + kSwingHStr;
           break;
         default:
-          result += F("UNKNOWN");
+          result += kUnknownStr;
       }
+      result += ')';
   }
-  result += F(", Command: ");
+  result += kCommaSpaceStr + kCommandStr + kColonSpaceStr;
   switch (this->getCmd()) {
     case kFujitsuAcCmdStepHoriz:
-      result += F("Step vane horizontally");
+      result += kStepStr + ' ' + kSwingHStr;
       break;
     case kFujitsuAcCmdStepVert:
-      result += F("Step vane vertically");
+      result += kStepStr + ' ' + kSwingVStr;
       break;
     case kFujitsuAcCmdToggleSwingHoriz:
-      result += F("Toggle horizontal swing");
+      result += kToggleStr + ' ' + kSwingHStr;
       break;
     case kFujitsuAcCmdToggleSwingVert:
-      result += F("Toggle vertically swing");
+      result += kToggleStr + ' ' + kSwingVStr;
       break;
     case kFujitsuAcCmdEcono:
-      result += F("Economy");
+      result += kEconoStr;
       break;
     case kFujitsuAcCmdPowerful:
-      result += F("Powerful");
+      result += kPowerfulStr;
       break;
     default:
-      result += F("N/A");
+      result += kNAStr;
   }
   if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E)
-    result += addBoolToString(getOutsideQuiet(), F("Outside Quiet"));
+    result += addBoolToString(getOutsideQuiet(), kOutsideStr + ' ' + kQuietStr);
   return result;
 }
 

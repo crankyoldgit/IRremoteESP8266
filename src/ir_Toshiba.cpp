@@ -10,6 +10,7 @@
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 //
@@ -323,7 +324,7 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
                             kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
   result += addTempToString(getTemp());

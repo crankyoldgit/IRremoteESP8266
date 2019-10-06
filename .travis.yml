@@ -31,7 +31,7 @@ jobs:
       - (cd tools; make all)
       # Check for lint issues.
       - shopt -s nullglob
-      - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
+      - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,src/locale,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
       - pylint3 -d F0001 {src,test,tools}/*.py
       - shopt -u nullglob
       # Build and run the unit tests.

@@ -81,11 +81,6 @@ const uint8_t kWhirlpoolAcCommandOffTimer = 0x1D;
 const uint8_t kWhirlpoolAcAltTempMask = 0b00001000;
 const uint8_t kWhirlpoolAcAltTempPos = 18;
 
-enum whirlpool_ac_remote_model_t {
-  DG11J13A = 1,  // DG11J1-04 too
-  DG11J191,
-};
-
 // Classes
 class IRWhirlpoolAc {
  public:

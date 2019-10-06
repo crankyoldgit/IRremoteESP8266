@@ -16,6 +16,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include <algorithm>
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #ifndef ARDUINO
 #include <string>
@@ -463,104 +464,108 @@ stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
 String IRMitsubishiHeavy152Ac::toString(void) {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kMitsubishiHeavyAuto,
                             kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  result += F(" (");
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (this->getFan()) {
     case kMitsubishiHeavy152FanAuto:
-      result += F("Auto");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy152FanHigh:
-      result += F("High");
+      result += kHighStr;
       break;
     case kMitsubishiHeavy152FanLow:
-      result += F("Low");
+      result += kLowStr;
       break;
     case kMitsubishiHeavy152FanMed:
-      result += F("Medium");
+      result += kMedStr;
       break;
     case kMitsubishiHeavy152FanMax:
-      result += F("Max");
+      result += kMaxStr;
       break;
     case kMitsubishiHeavy152FanEcono:
-      result += F("Econo");
+      result += kEconoStr;
       break;
     case kMitsubishiHeavy152FanTurbo:
-      result += F("Turbo");
+      result += kTurboStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), F("Swing(V)"));
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy152SwingVAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy152SwingVHighest:
-      result += F(" (Highest)");
+      result += kHighestStr;
       break;
     case kMitsubishiHeavy152SwingVHigh:
-      result += F(" (High)");
+      result += kHighStr;
       break;
     case kMitsubishiHeavy152SwingVMiddle:
-      result += F(" (Middle)");
+      result += kMiddleStr;
       break;
     case kMitsubishiHeavy152SwingVLow:
-      result += F(" (Low)");
+      result += kLowStr;
       break;
     case kMitsubishiHeavy152SwingVLowest:
-      result += F(" (Lowest)");
+      result += kLowestStr;
       break;
     case kMitsubishiHeavy152SwingVOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
+  result += ')';
+  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += kSpaceLBraceStr;
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy152SwingHAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy152SwingHLeftMax:
-      result += F(" (Max Left)");
+      result += kMaxLeftStr;
       break;
     case kMitsubishiHeavy152SwingHLeft:
-      result += F(" (Left)");
+      result += kLeftStr;
       break;
     case kMitsubishiHeavy152SwingHMiddle:
-      result += F(" (Middle)");
+      result += kMiddleStr;
       break;
     case kMitsubishiHeavy152SwingHRight:
-      result += F(" (Right)");
+      result += kRightStr;
       break;
     case kMitsubishiHeavy152SwingHRightMax:
-      result += F(" (Max Right)");
+      result += kMaxRightStr;
       break;
     case kMitsubishiHeavy152SwingHLeftRight:
-      result += F(" (Left Right)");
+      result += kLeftStr + ' ' + kRightStr;
       break;
     case kMitsubishiHeavy152SwingHRightLeft:
-      result += F(" (Right Left)");
+      result += kRightStr + ' ' + kLeftStr;
       break;
     case kMitsubishiHeavy152SwingHOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addBoolToString(getSilent(), F("Silent"));
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getEcono(), F("Econo"));
-  result += addBoolToString(getNight(), F("Night"));
-  result += addBoolToString(getFilter(), F("Filter"));
-  result += addBoolToString(get3D(), F("3D"));
-  result += addBoolToString(getClean(), F("Clean"));
+  result += ')';
+  result += addBoolToString(getSilent(), kSilentStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(getNight(), kNightStr);
+  result += addBoolToString(getFilter(), kFilterStr);
+  result += addBoolToString(get3D(), k3DStr);
+  result += addBoolToString(getClean(), kCleanStr);
   return result;
 }
 
@@ -913,101 +918,105 @@ stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
 String IRMitsubishiHeavy88Ac::toString(void) {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kMitsubishiHeavyAuto,
                             kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
-  result += F(" (");
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (this->getFan()) {
     case kMitsubishiHeavy88FanAuto:
-      result += F("Auto");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy88FanHigh:
-      result += F("High");
+      result += kHighStr;
       break;
     case kMitsubishiHeavy88FanLow:
-      result += F("Low");
+      result += kLowStr;
       break;
     case kMitsubishiHeavy88FanMed:
-      result += F("Medium");
+      result += kMedStr;
       break;
     case kMitsubishiHeavy88FanEcono:
-      result += F("Econo");
+      result += kEconoStr;
       break;
     case kMitsubishiHeavy88FanTurbo:
-      result += F("Turbo");
+      result += kTurboStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), F("Swing(V)"));
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
   switch (this->getSwingVertical()) {
     case kMitsubishiHeavy88SwingVAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy88SwingVHighest:
-      result += F(" (Highest)");
+      result += kHighestStr;
       break;
     case kMitsubishiHeavy88SwingVHigh:
-      result += F(" (High)");
+      result += kHighStr;
       break;
     case kMitsubishiHeavy88SwingVMiddle:
-      result += F(" (Middle)");
+      result += kMiddleStr;
       break;
     case kMitsubishiHeavy88SwingVLow:
-      result += F(" (Low)");
+      result += kLowStr;
       break;
     case kMitsubishiHeavy88SwingVLowest:
-      result += F(" (Lowest)");
+      result += kLowestStr;
       break;
     case kMitsubishiHeavy88SwingVOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addIntToString(getSwingHorizontal(), F("Swing(H)"));
+  result += ')';
+  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += kSpaceLBraceStr;
   switch (this->getSwingHorizontal()) {
     case kMitsubishiHeavy88SwingHAuto:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kMitsubishiHeavy88SwingHLeftMax:
-      result += F(" (Max Left)");
+      result += kMaxLeftStr;
       break;
     case kMitsubishiHeavy88SwingHLeft:
-      result += F(" (Left)");
+      result += kLeftStr;
       break;
     case kMitsubishiHeavy88SwingHMiddle:
-      result += F(" (Middle)");
+      result += kMiddleStr;
       break;
     case kMitsubishiHeavy88SwingHRight:
-      result += F(" (Right)");
+      result += kRightStr;
       break;
     case kMitsubishiHeavy88SwingHRightMax:
-      result += F(" (Max Right)");
+      result += kMaxRightStr;
       break;
     case kMitsubishiHeavy88SwingHLeftRight:
-      result += F(" (Left Right)");
+      result += kLeftStr + ' ' + kRightStr;
       break;
     case kMitsubishiHeavy88SwingHRightLeft:
-      result += F(" (Right Left)");
+      result += kRightStr + ' ' + kLeftStr;
       break;
     case kMitsubishiHeavy88SwingH3D:
-      result += F(" (3D)");
+      result += k3DStr;
       break;
     case kMitsubishiHeavy88SwingHOff:
-      result += F(" (Off)");
+      result += kOffStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
   }
-  result += addBoolToString(getTurbo(), F("Turbo"));
-  result += addBoolToString(getEcono(), F("Econo"));
-  result += addBoolToString(get3D(), F("3D"));
-  result += addBoolToString(getClean(), F("Clean"));
+  result += ')';
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(get3D(), k3DStr);
+  result += addBoolToString(getClean(), kCleanStr);
   return result;
 }
 

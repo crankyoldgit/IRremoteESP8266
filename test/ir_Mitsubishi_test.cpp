@@ -986,8 +986,8 @@ TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
       "Power: On, Mode: 8 (Heat), Temp: 22C, Fan: 6 (Quiet), "
-      "Swing(V): 0 (Auto), Swing(H): 3, "
-      "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       irMitsu.toString());
 }
 
@@ -1496,7 +1496,7 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 24 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Swing(V): 0 (Auto), Swing(H): 3, "
-      "Time: 00:00, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Clock: 00:00, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       ac.toString());
 }
