@@ -1305,7 +1305,7 @@ void IRMitsubishi112::stateReset(void) {
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
   uint16_t checksum;
-  for (uint8_t i = 0; i < 13; i++){
+  for (uint8_t i = 0; i < 13; i++) {
       checksum = checksum + remote_state[i];
   }
   checksum = checksum % 0xff;
@@ -1319,7 +1319,7 @@ bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
 
   if (len < kMitsubishi112StateLength) return false;
 
-  for (uint8_t i = 0; i < kMitsubishi112StateLength-1; i++){
+  for (uint8_t i = 0; i < kMitsubishi112StateLength-1; i++) {
     checksum += data[i];
   }
 
@@ -1488,7 +1488,7 @@ bool IRMitsubishi112::getQuiet(void) {
 }
 
 void IRMitsubishi112::setEcono(bool on) {
-  // FIXME - Need to implement the bitset but haven't as yet.
+  // FIXME - Need to implement the bitset but haven't as yet. 
   return;
 }
 

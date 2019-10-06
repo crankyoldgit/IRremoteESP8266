@@ -1571,7 +1571,6 @@ TEST(TestMitsubishi112Class, OperatingMode) {
 
   ac.setMode(kMitsubishi112Dry);
   EXPECT_EQ(kMitsubishi112Dry, ac.getMode());
-
 }
 
 TEST(TestMitsubishi112Class, FanSpeed) {
