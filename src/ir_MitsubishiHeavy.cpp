@@ -40,6 +40,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_MITSUBISHIHEAVY
 // Send a MitsubishiHeavy 88 bit A/C message.
@@ -112,36 +114,29 @@ void IRMitsubishiHeavy152Ac::setRaw(const uint8_t *data) {
     remote_state[i] = data[i];
 }
 
-void IRMitsubishiHeavy152Ac::on(void) {
-  remote_state[5] |= kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy152Ac::on(void) { setPower(true); }
 
-void IRMitsubishiHeavy152Ac::off(void) {
-  remote_state[5] &= ~kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy152Ac::off(void) { setPower(false); }
 
 void IRMitsubishiHeavy152Ac::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[5], kMitsubishiHeavyPowerOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getPower(void) {
-  return remote_state[5] & kMitsubishiHeavyPowerBit;
+  return GETBIT8(remote_state[5], kMitsubishiHeavyPowerOffset);
 }
 
 void IRMitsubishiHeavy152Ac::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kMitsubishiHeavyMaxTemp);
   newtemp = std::max(newtemp, kMitsubishiHeavyMinTemp);
-
-  remote_state[7] &= ~kMitsubishiHeavyTempMask;
-  remote_state[7] |= newtemp - kMitsubishiHeavyMinTemp;
+  setBits(&remote_state[7], kLowNibble, kNibbleSize,
+          newtemp - kMitsubishiHeavyMinTemp);
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getTemp(void) {
-  return (remote_state[7] & kMitsubishiHeavyTempMask) + kMitsubishiHeavyMinTemp;
+  return GETBITS8(remote_state[7], kLowNibble, kNibbleSize) +
+      kMitsubishiHeavyMinTemp;
 }
 
 // Set the speed of the fan
@@ -153,17 +148,14 @@ void IRMitsubishiHeavy152Ac::setFan(const uint8_t speed) {
     case kMitsubishiHeavy152FanHigh:
     case kMitsubishiHeavy152FanMax:
     case kMitsubishiHeavy152FanEcono:
-    case kMitsubishiHeavy152FanTurbo:
-      break;
-    default:
-      newspeed = kMitsubishiHeavy152FanAuto;
+    case kMitsubishiHeavy152FanTurbo: break;
+    default: newspeed = kMitsubishiHeavy152FanAuto;
   }
-  remote_state[9] &= ~kMitsubishiHeavyFanMask;
-  remote_state[9] |= newspeed;
+  setBits(&remote_state[9], kLowNibble, kNibbleSize, newspeed);
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getFan(void) {
-  return remote_state[9] & kMitsubishiHeavyFanMask;
+  return GETBITS8(remote_state[9], kLowNibble, kNibbleSize);
 }
 
 void IRMitsubishiHeavy152Ac::setMode(const uint8_t mode) {
@@ -177,43 +169,39 @@ void IRMitsubishiHeavy152Ac::setMode(const uint8_t mode) {
     default:
       newmode = kMitsubishiHeavyAuto;
   }
-  remote_state[5] &= ~kMitsubishiHeavyModeMask;
-  remote_state[5] |= newmode;
+  setBits(&remote_state[5], kMitsubishiHeavyModeOffset, kModeBitsSize, newmode);
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getMode(void) {
-  return remote_state[5] & kMitsubishiHeavyModeMask;
+  return GETBITS8(remote_state[5], kMitsubishiHeavyModeOffset, kModeBitsSize);
 }
 
 void IRMitsubishiHeavy152Ac::setSwingVertical(const uint8_t pos) {
-  uint8_t newpos = std::min(pos, kMitsubishiHeavy152SwingVOff);
-  remote_state[11] &= ~kMitsubishiHeavy152SwingVMask;
-  remote_state[11] |= (newpos << 5);
+  setBits(&remote_state[11], kMitsubishiHeavy152SwingVOffset,
+          kMitsubishiHeavy152SwingVSize,
+          std::min(pos, kMitsubishiHeavy152SwingVOff));
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getSwingVertical(void) {
-  return remote_state[11] >> 5;
+  return GETBITS8(remote_state[11], kMitsubishiHeavy152SwingVOffset,
+                  kMitsubishiHeavy152SwingVSize);
 }
 
 void IRMitsubishiHeavy152Ac::setSwingHorizontal(const uint8_t pos) {
-  uint8_t newpos = std::min(pos, kMitsubishiHeavy152SwingHOff);
-  remote_state[13] &= ~kMitsubishiHeavy152SwingHMask;
-  remote_state[13] |= (newpos & kMitsubishiHeavy152SwingHMask);
+  setBits(&remote_state[13], kLowNibble, kNibbleSize,
+          std::min(pos, kMitsubishiHeavy152SwingHOff));
 }
 
 uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
-  return remote_state[13] & kMitsubishiHeavy152SwingHMask;
+  return GETBITS8(remote_state[13], kLowNibble, kNibbleSize);
 }
 
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
-  if (on)
-    remote_state[15] |= kMitsubishiHeavyNightBit;
-  else
-    remote_state[15] &= ~kMitsubishiHeavyNightBit;
+  setBit(&remote_state[15], kMitsubishiHeavyNightOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getNight(void) {
-  return remote_state[15] & kMitsubishiHeavyNightBit;
+  return GETBIT8(remote_state[15], kMitsubishiHeavyNightOffset);
 }
 
 void IRMitsubishiHeavy152Ac::set3D(const bool on) {
@@ -228,37 +216,28 @@ bool IRMitsubishiHeavy152Ac::get3D(void) {
 }
 
 void IRMitsubishiHeavy152Ac::setSilent(const bool on) {
-  if (on)
-    remote_state[15] |= kMitsubishiHeavySilentBit;
-  else
-    remote_state[15] &= ~kMitsubishiHeavySilentBit;
+  setBit(&remote_state[15], kMitsubishiHeavySilentOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getSilent(void) {
-  return remote_state[15] & kMitsubishiHeavySilentBit;
+  return GETBIT8(remote_state[15], kMitsubishiHeavySilentOffset);
 }
 
 void IRMitsubishiHeavy152Ac::setFilter(const bool on) {
-  if (on)
-    remote_state[5] |= kMitsubishiHeavyFilterBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavyFilterBit;
+  setBit(&remote_state[5], kMitsubishiHeavyFilterOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getFilter(void) {
-  return remote_state[5] & kMitsubishiHeavyFilterBit;
+  return GETBIT8(remote_state[5], kMitsubishiHeavyFilterOffset);
 }
 
 void IRMitsubishiHeavy152Ac::setClean(const bool on) {
   this->setFilter(on);
-  if (on)
-    remote_state[5] |= kMitsubishiHeavyCleanBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavyCleanBit;
+  setBit(&remote_state[5], kMitsubishiHeavyCleanOffset, on);
 }
 
 bool IRMitsubishiHeavy152Ac::getClean(void) {
-  return remote_state[5] & kMitsubishiHeavyCleanBit && this->getFilter();
+  return GETBIT8(remote_state[5], kMitsubishiHeavyCleanOffset) && getFilter();
 }
 
 void IRMitsubishiHeavy152Ac::setTurbo(const bool on) {
@@ -315,74 +294,50 @@ bool IRMitsubishiHeavy152Ac::validChecksum(const uint8_t *state,
 // Convert a standard A/C mode into its native mode.
 uint8_t IRMitsubishiHeavy152Ac::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kMitsubishiHeavyCool;
-    case stdAc::opmode_t::kHeat:
-      return kMitsubishiHeavyHeat;
-    case stdAc::opmode_t::kDry:
-      return kMitsubishiHeavyDry;
-    case stdAc::opmode_t::kFan:
-      return kMitsubishiHeavyFan;
-    default:
-      return kMitsubishiHeavyAuto;
+    case stdAc::opmode_t::kCool: return kMitsubishiHeavyCool;
+    case stdAc::opmode_t::kHeat: return kMitsubishiHeavyHeat;
+    case stdAc::opmode_t::kDry:  return kMitsubishiHeavyDry;
+    case stdAc::opmode_t::kFan:  return kMitsubishiHeavyFan;
+    default:                     return kMitsubishiHeavyAuto;
   }
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRMitsubishiHeavy152Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kMitsubishiHeavy152FanEcono;  // Assumes Econo is slower than Low.
-    case stdAc::fanspeed_t::kLow:
-      return kMitsubishiHeavy152FanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kMitsubishiHeavy152FanMed;
-    case stdAc::fanspeed_t::kHigh:
-      return kMitsubishiHeavy152FanHigh;
-    case stdAc::fanspeed_t::kMax:
-      return kMitsubishiHeavy152FanMax;
-    default:
-      return kMitsubishiHeavy152FanAuto;
+    // Assumes Econo is slower than Low.
+    case stdAc::fanspeed_t::kMin:    return kMitsubishiHeavy152FanEcono;
+    case stdAc::fanspeed_t::kLow:    return kMitsubishiHeavy152FanLow;
+    case stdAc::fanspeed_t::kMedium: return kMitsubishiHeavy152FanMed;
+    case stdAc::fanspeed_t::kHigh:   return kMitsubishiHeavy152FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kMitsubishiHeavy152FanMax;
+    default:                         return kMitsubishiHeavy152FanAuto;
   }
 }
 
 // Convert a standard A/C vertical swing into its native setting.
 uint8_t IRMitsubishiHeavy152Ac::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kAuto:
-      return kMitsubishiHeavy152SwingVAuto;
-    case stdAc::swingv_t::kHighest:
-      return kMitsubishiHeavy152SwingVHighest;
-    case stdAc::swingv_t::kHigh:
-      return kMitsubishiHeavy152SwingVHigh;
-    case stdAc::swingv_t::kMiddle:
-      return kMitsubishiHeavy152SwingVMiddle;
-    case stdAc::swingv_t::kLow:
-      return kMitsubishiHeavy152SwingVLow;
-    case stdAc::swingv_t::kLowest:
-      return kMitsubishiHeavy152SwingVLowest;
-    default:
-      return kMitsubishiHeavy152SwingVOff;
+    case stdAc::swingv_t::kAuto:    return kMitsubishiHeavy152SwingVAuto;
+    case stdAc::swingv_t::kHighest: return kMitsubishiHeavy152SwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kMitsubishiHeavy152SwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kMitsubishiHeavy152SwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kMitsubishiHeavy152SwingVLow;
+    case stdAc::swingv_t::kLowest:  return kMitsubishiHeavy152SwingVLowest;
+    default:                        return kMitsubishiHeavy152SwingVOff;
   }
 }
 
 // Convert a standard A/C horizontal swing into its native setting.
 uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kAuto:
-      return kMitsubishiHeavy152SwingHAuto;
-    case stdAc::swingh_t::kLeftMax:
-      return kMitsubishiHeavy152SwingHLeftMax;
-    case stdAc::swingh_t::kLeft:
-      return kMitsubishiHeavy152SwingHLeft;
-    case stdAc::swingh_t::kMiddle:
-      return kMitsubishiHeavy152SwingHMiddle;
-    case stdAc::swingh_t::kRight:
-    return kMitsubishiHeavy152SwingHRight;
-    case stdAc::swingh_t::kRightMax:
-      return kMitsubishiHeavy152SwingHRightMax;
-    default:
-      return kMitsubishiHeavy152SwingHOff;
+    case stdAc::swingh_t::kAuto:     return kMitsubishiHeavy152SwingHAuto;
+    case stdAc::swingh_t::kLeftMax:  return kMitsubishiHeavy152SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kMitsubishiHeavy152SwingHLeft;
+    case stdAc::swingh_t::kMiddle:   return kMitsubishiHeavy152SwingHMiddle;
+    case stdAc::swingh_t::kRight:    return kMitsubishiHeavy152SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kMitsubishiHeavy152SwingHRightMax;
+    default:                         return kMitsubishiHeavy152SwingHOff;
   }
 }
 
@@ -391,34 +346,34 @@ stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishiHeavyCool: return stdAc::opmode_t::kCool;
     case kMitsubishiHeavyHeat: return stdAc::opmode_t::kHeat;
-    case kMitsubishiHeavyDry: return stdAc::opmode_t::kDry;
-    case kMitsubishiHeavyFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kMitsubishiHeavyDry:  return stdAc::opmode_t::kDry;
+    case kMitsubishiHeavyFan:  return stdAc::opmode_t::kFan;
+    default:                   return stdAc::opmode_t::kAuto;
   }
 }
 
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRMitsubishiHeavy152Ac::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
-    case kMitsubishiHeavy152FanMax: return stdAc::fanspeed_t::kMax;
-    case kMitsubishiHeavy152FanHigh: return stdAc::fanspeed_t::kHigh;
-    case kMitsubishiHeavy152FanMed: return stdAc::fanspeed_t::kMedium;
-    case kMitsubishiHeavy152FanLow: return stdAc::fanspeed_t::kLow;
+    case kMitsubishiHeavy152FanMax:   return stdAc::fanspeed_t::kMax;
+    case kMitsubishiHeavy152FanHigh:  return stdAc::fanspeed_t::kHigh;
+    case kMitsubishiHeavy152FanMed:   return stdAc::fanspeed_t::kMedium;
+    case kMitsubishiHeavy152FanLow:   return stdAc::fanspeed_t::kLow;
     case kMitsubishiHeavy152FanEcono: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    default:                          return stdAc::fanspeed_t::kAuto;
   }
 }
 
 // Convert a native vertical swing to it's common equivalent.
 stdAc::swingh_t IRMitsubishiHeavy152Ac::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
-    case kMitsubishiHeavy152SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
-    case kMitsubishiHeavy152SwingHLeft: return stdAc::swingh_t::kLeft;
-    case kMitsubishiHeavy152SwingHMiddle: return stdAc::swingh_t::kMiddle;
-    case kMitsubishiHeavy152SwingHRight: return stdAc::swingh_t::kRight;
+    case kMitsubishiHeavy152SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kMitsubishiHeavy152SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kMitsubishiHeavy152SwingHMiddle:   return stdAc::swingh_t::kMiddle;
+    case kMitsubishiHeavy152SwingHRight:    return stdAc::swingh_t::kRight;
     case kMitsubishiHeavy152SwingHRightMax: return stdAc::swingh_t::kRightMax;
-    case kMitsubishiHeavy152SwingHOff: return stdAc::swingh_t::kOff;
-    default: return stdAc::swingh_t::kAuto;
+    case kMitsubishiHeavy152SwingHOff:      return stdAc::swingh_t::kOff;
+    default:                                return stdAc::swingh_t::kAuto;
   }
 }
 
@@ -426,12 +381,12 @@ stdAc::swingh_t IRMitsubishiHeavy152Ac::toCommonSwingH(const uint8_t pos) {
 stdAc::swingv_t IRMitsubishiHeavy152Ac::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kMitsubishiHeavy152SwingVHighest: return stdAc::swingv_t::kHighest;
-    case kMitsubishiHeavy152SwingVHigh: return stdAc::swingv_t::kHigh;
-    case kMitsubishiHeavy152SwingVMiddle: return stdAc::swingv_t::kMiddle;
-    case kMitsubishiHeavy152SwingVLow: return stdAc::swingv_t::kLow;
-    case kMitsubishiHeavy152SwingVLowest: return stdAc::swingv_t::kLowest;
-    case kMitsubishiHeavy152SwingVOff: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
+    case kMitsubishiHeavy152SwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kMitsubishiHeavy152SwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kMitsubishiHeavy152SwingVLow:     return stdAc::swingv_t::kLow;
+    case kMitsubishiHeavy152SwingVLowest:  return stdAc::swingv_t::kLowest;
+    case kMitsubishiHeavy152SwingVOff:     return stdAc::swingv_t::kOff;
+    default:                               return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -602,36 +557,29 @@ void IRMitsubishiHeavy88Ac::setRaw(const uint8_t *data) {
     remote_state[i] = data[i];
 }
 
-void IRMitsubishiHeavy88Ac::on(void) {
-  remote_state[9] |= kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy88Ac::on(void) { setPower(true); }
 
-void IRMitsubishiHeavy88Ac::off(void) {
-  remote_state[9] &= ~kMitsubishiHeavyPowerBit;
-}
+void IRMitsubishiHeavy88Ac::off(void) { setPower(false); }
 
 void IRMitsubishiHeavy88Ac::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[9], kMitsubishiHeavyPowerOffset, on);
 }
 
 bool IRMitsubishiHeavy88Ac::getPower(void) {
-  return remote_state[9] & kMitsubishiHeavyPowerBit;
+  return GETBIT8(remote_state[9], kMitsubishiHeavyPowerOffset);
 }
 
 void IRMitsubishiHeavy88Ac::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kMitsubishiHeavyMaxTemp);
   newtemp = std::max(newtemp, kMitsubishiHeavyMinTemp);
-
-  remote_state[9] &= kMitsubishiHeavyTempMask;
-  remote_state[9] |= ((newtemp - kMitsubishiHeavyMinTemp) << 4);
+  setBits(&remote_state[9], kHighNibble, kNibbleSize,
+          newtemp - kMitsubishiHeavyMinTemp);
 }
 
 uint8_t IRMitsubishiHeavy88Ac::getTemp(void) {
-  return (remote_state[9] >> 4) + kMitsubishiHeavyMinTemp;
+  return GETBITS8(remote_state[9], kHighNibble, kNibbleSize) +
+      kMitsubishiHeavyMinTemp;
 }
 
 // Set the speed of the fan
@@ -642,17 +590,16 @@ void IRMitsubishiHeavy88Ac::setFan(const uint8_t speed) {
     case kMitsubishiHeavy88FanMed:
     case kMitsubishiHeavy88FanHigh:
     case kMitsubishiHeavy88FanTurbo:
-    case kMitsubishiHeavy88FanEcono:
-      break;
-    default:
-      newspeed = kMitsubishiHeavy88FanAuto;
+    case kMitsubishiHeavy88FanEcono: break;
+    default: newspeed = kMitsubishiHeavy88FanAuto;
   }
-  remote_state[7] &= ~kMitsubishiHeavy88FanMask;
-  remote_state[7] |= (newspeed << 5);
+  setBits(&remote_state[7], kMitsubishiHeavy88FanOffset,
+          kMitsubishiHeavy88FanSize, newspeed);
 }
 
 uint8_t IRMitsubishiHeavy88Ac::getFan(void) {
-  return remote_state[7] >> 5;
+  return GETBITS8(remote_state[7], kMitsubishiHeavy88FanOffset,
+                  kMitsubishiHeavy88FanSize);
 }
 
 void IRMitsubishiHeavy88Ac::setMode(const uint8_t mode) {
@@ -666,12 +613,11 @@ void IRMitsubishiHeavy88Ac::setMode(const uint8_t mode) {
     default:
       newmode = kMitsubishiHeavyAuto;
   }
-  remote_state[9] &= ~kMitsubishiHeavyModeMask;
-  remote_state[9] |= newmode;
+  setBits(&remote_state[9], kMitsubishiHeavyModeOffset, kModeBitsSize, newmode);
 }
 
 uint8_t IRMitsubishiHeavy88Ac::getMode(void) {
-  return remote_state[9] & kMitsubishiHeavyModeMask;
+  return GETBITS8(remote_state[9], kMitsubishiHeavyModeOffset, kModeBitsSize);
 }
 
 void IRMitsubishiHeavy88Ac::setSwingVertical(const uint8_t pos) {
@@ -682,21 +628,22 @@ void IRMitsubishiHeavy88Ac::setSwingVertical(const uint8_t pos) {
     case kMitsubishiHeavy88SwingVHigh:
     case kMitsubishiHeavy88SwingVMiddle:
     case kMitsubishiHeavy88SwingVLow:
-    case kMitsubishiHeavy88SwingVLowest:
-      newpos = pos;
-      break;
-    default:
-      newpos = kMitsubishiHeavy88SwingVOff;
+    case kMitsubishiHeavy88SwingVLowest: newpos = pos; break;
+    default: newpos = kMitsubishiHeavy88SwingVOff;
   }
-  remote_state[5] &= ~kMitsubishiHeavy88SwingVMaskByte5;
-  remote_state[5] |= (newpos & kMitsubishiHeavy88SwingVMaskByte5);
-  remote_state[7] &= ~kMitsubishiHeavy88SwingVMaskByte7;
-  remote_state[7] |= (newpos & kMitsubishiHeavy88SwingVMaskByte7);
+  setBit(&remote_state[5], kMitsubishiHeavy88SwingVByte5Offset,
+         newpos & 1);
+  setBits(&remote_state[7], kMitsubishiHeavy88SwingVByte7Offset,
+          kMitsubishiHeavy88SwingVByte7Size,
+          newpos >> kMitsubishiHeavy88SwingVByte5Size);
 }
 
 uint8_t IRMitsubishiHeavy88Ac::getSwingVertical(void) {
-  return (remote_state[5] & kMitsubishiHeavy88SwingVMaskByte5) |
-         (remote_state[7] & kMitsubishiHeavy88SwingVMaskByte7);
+  return GETBITS8(remote_state[5], kMitsubishiHeavy88SwingVByte5Offset,
+                  kMitsubishiHeavy88SwingVByte5Size) |
+         (GETBITS8(remote_state[7], kMitsubishiHeavy88SwingVByte7Offset,
+                   kMitsubishiHeavy88SwingVByte7Size) <<
+          kMitsubishiHeavy88SwingVByte5Size);
 }
 
 void IRMitsubishiHeavy88Ac::setSwingHorizontal(const uint8_t pos) {
@@ -710,18 +657,22 @@ void IRMitsubishiHeavy88Ac::setSwingHorizontal(const uint8_t pos) {
     case kMitsubishiHeavy88SwingHRightMax:
     case kMitsubishiHeavy88SwingHLeftRight:
     case kMitsubishiHeavy88SwingHRightLeft:
-    case kMitsubishiHeavy88SwingH3D:
-      newpos = pos;
-      break;
-    default:
-      newpos = kMitsubishiHeavy88SwingHOff;
+    case kMitsubishiHeavy88SwingH3D: newpos = pos; break;
+    default:                         newpos = kMitsubishiHeavy88SwingHOff;
   }
-  remote_state[5] &= ~kMitsubishiHeavy88SwingHMask;
-  remote_state[5] |= newpos;
+  setBits(&remote_state[5], kMitsubishiHeavy88SwingHOffset1,
+                  kMitsubishiHeavy88SwingHSize, newpos);
+  setBits(&remote_state[5], kMitsubishiHeavy88SwingHOffset2,
+                  kMitsubishiHeavy88SwingHSize,
+                  newpos >> kMitsubishiHeavy88SwingHSize);
 }
 
 uint8_t IRMitsubishiHeavy88Ac::getSwingHorizontal(void) {
-  return remote_state[5] & kMitsubishiHeavy88SwingHMask;
+  return GETBITS8(remote_state[5], kMitsubishiHeavy88SwingHOffset1,
+                  kMitsubishiHeavy88SwingHSize) |
+         (GETBITS8(remote_state[5], kMitsubishiHeavy88SwingHOffset2,
+                   kMitsubishiHeavy88SwingHSize) <<
+          kMitsubishiHeavy88SwingHSize);
 }
 
 void IRMitsubishiHeavy88Ac::setTurbo(const bool on) {
@@ -756,14 +707,11 @@ bool IRMitsubishiHeavy88Ac::get3D(void) {
 }
 
 void IRMitsubishiHeavy88Ac::setClean(const bool on) {
-  if (on)
-    remote_state[5] |= kMitsubishiHeavy88CleanBit;
-  else
-    remote_state[5] &= ~kMitsubishiHeavy88CleanBit;
+  setBit(&remote_state[5], kMitsubishiHeavy88CleanOffset, on);
 }
 
 bool IRMitsubishiHeavy88Ac::getClean(void) {
-  return remote_state[5] & kMitsubishiHeavy88CleanBit;
+  return GETBIT8(remote_state[5], kMitsubishiHeavy88CleanOffset);
 }
 
 // Verify the given state has a ZJ-S signature.
@@ -796,58 +744,39 @@ uint8_t IRMitsubishiHeavy88Ac::convertMode(const stdAc::opmode_t mode) {
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRMitsubishiHeavy88Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kMitsubishiHeavy88FanEcono;  // Assumes Econo is slower than Low.
-    case stdAc::fanspeed_t::kLow:
-      return kMitsubishiHeavy88FanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kMitsubishiHeavy88FanMed;
-    case stdAc::fanspeed_t::kHigh:
-      return kMitsubishiHeavy88FanHigh;
-    case stdAc::fanspeed_t::kMax:
-      return kMitsubishiHeavy88FanTurbo;
-    default:
-      return kMitsubishiHeavy88FanAuto;
+    // Assumes Econo is slower than Low.
+    case stdAc::fanspeed_t::kMin:    return kMitsubishiHeavy88FanEcono;
+    case stdAc::fanspeed_t::kLow:    return kMitsubishiHeavy88FanLow;
+    case stdAc::fanspeed_t::kMedium: return kMitsubishiHeavy88FanMed;
+    case stdAc::fanspeed_t::kHigh:   return kMitsubishiHeavy88FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kMitsubishiHeavy88FanTurbo;
+    default:                         return kMitsubishiHeavy88FanAuto;
   }
 }
 
 // Convert a standard A/C vertical swing into its native setting.
 uint8_t IRMitsubishiHeavy88Ac::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kAuto:
-      return kMitsubishiHeavy88SwingVAuto;
-    case stdAc::swingv_t::kHighest:
-      return kMitsubishiHeavy88SwingVHighest;
-    case stdAc::swingv_t::kHigh:
-      return kMitsubishiHeavy88SwingVHigh;
-    case stdAc::swingv_t::kMiddle:
-      return kMitsubishiHeavy88SwingVMiddle;
-    case stdAc::swingv_t::kLow:
-      return kMitsubishiHeavy88SwingVLow;
-    case stdAc::swingv_t::kLowest:
-      return kMitsubishiHeavy88SwingVLowest;
-    default:
-      return kMitsubishiHeavy88SwingVOff;
+    case stdAc::swingv_t::kAuto:    return kMitsubishiHeavy88SwingVAuto;
+    case stdAc::swingv_t::kHighest: return kMitsubishiHeavy88SwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kMitsubishiHeavy88SwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kMitsubishiHeavy88SwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kMitsubishiHeavy88SwingVLow;
+    case stdAc::swingv_t::kLowest:  return kMitsubishiHeavy88SwingVLowest;
+    default:                        return kMitsubishiHeavy88SwingVOff;
   }
 }
 
 // Convert a standard A/C horizontal swing into its native setting.
 uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kAuto:
-      return kMitsubishiHeavy88SwingHAuto;
-    case stdAc::swingh_t::kLeftMax:
-      return kMitsubishiHeavy88SwingHLeftMax;
-    case stdAc::swingh_t::kLeft:
-      return kMitsubishiHeavy88SwingHLeft;
-    case stdAc::swingh_t::kMiddle:
-      return kMitsubishiHeavy88SwingHMiddle;
-    case stdAc::swingh_t::kRight:
-    return kMitsubishiHeavy88SwingHRight;
-    case stdAc::swingh_t::kRightMax:
-      return kMitsubishiHeavy88SwingHRightMax;
-    default:
-      return kMitsubishiHeavy88SwingHOff;
+    case stdAc::swingh_t::kAuto:     return kMitsubishiHeavy88SwingHAuto;
+    case stdAc::swingh_t::kLeftMax:  return kMitsubishiHeavy88SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kMitsubishiHeavy88SwingHLeft;
+    case stdAc::swingh_t::kMiddle:   return kMitsubishiHeavy88SwingHMiddle;
+    case stdAc::swingh_t::kRight:    return kMitsubishiHeavy88SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kMitsubishiHeavy88SwingHRightMax;
+    default:                         return kMitsubishiHeavy88SwingHOff;
   }
 }
 
@@ -855,24 +784,24 @@ uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
 stdAc::fanspeed_t IRMitsubishiHeavy88Ac::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMitsubishiHeavy88FanTurbo: return stdAc::fanspeed_t::kMax;
-    case kMitsubishiHeavy88FanHigh: return stdAc::fanspeed_t::kHigh;
-    case kMitsubishiHeavy88FanMed: return stdAc::fanspeed_t::kMedium;
-    case kMitsubishiHeavy88FanLow: return stdAc::fanspeed_t::kLow;
+    case kMitsubishiHeavy88FanHigh:  return stdAc::fanspeed_t::kHigh;
+    case kMitsubishiHeavy88FanMed:   return stdAc::fanspeed_t::kMedium;
+    case kMitsubishiHeavy88FanLow:   return stdAc::fanspeed_t::kLow;
     case kMitsubishiHeavy88FanEcono: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    default:                         return stdAc::fanspeed_t::kAuto;
   }
 }
 
 // Convert a native vertical swing to it's common equivalent.
 stdAc::swingh_t IRMitsubishiHeavy88Ac::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
-    case kMitsubishiHeavy88SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
-    case kMitsubishiHeavy88SwingHLeft: return stdAc::swingh_t::kLeft;
-    case kMitsubishiHeavy88SwingHMiddle: return stdAc::swingh_t::kMiddle;
-    case kMitsubishiHeavy88SwingHRight: return stdAc::swingh_t::kRight;
+    case kMitsubishiHeavy88SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kMitsubishiHeavy88SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kMitsubishiHeavy88SwingHMiddle:   return stdAc::swingh_t::kMiddle;
+    case kMitsubishiHeavy88SwingHRight:    return stdAc::swingh_t::kRight;
     case kMitsubishiHeavy88SwingHRightMax: return stdAc::swingh_t::kRightMax;
-    case kMitsubishiHeavy88SwingHOff: return stdAc::swingh_t::kOff;
-    default: return stdAc::swingh_t::kAuto;
+    case kMitsubishiHeavy88SwingHOff:      return stdAc::swingh_t::kOff;
+    default:                               return stdAc::swingh_t::kAuto;
   }
 }
 
@@ -880,12 +809,12 @@ stdAc::swingh_t IRMitsubishiHeavy88Ac::toCommonSwingH(const uint8_t pos) {
 stdAc::swingv_t IRMitsubishiHeavy88Ac::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kMitsubishiHeavy88SwingVHighest: return stdAc::swingv_t::kHighest;
-    case kMitsubishiHeavy88SwingVHigh: return stdAc::swingv_t::kHigh;
-    case kMitsubishiHeavy88SwingVMiddle: return stdAc::swingv_t::kMiddle;
-    case kMitsubishiHeavy88SwingVLow: return stdAc::swingv_t::kLow;
-    case kMitsubishiHeavy88SwingVLowest: return stdAc::swingv_t::kLowest;
-    case kMitsubishiHeavy88SwingVOff: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
+    case kMitsubishiHeavy88SwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kMitsubishiHeavy88SwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kMitsubishiHeavy88SwingVLow:     return stdAc::swingv_t::kLow;
+    case kMitsubishiHeavy88SwingVLowest:  return stdAc::swingv_t::kLowest;
+    case kMitsubishiHeavy88SwingVOff:     return stdAc::swingv_t::kOff;
+    default:                              return stdAc::swingv_t::kAuto;
   }
 }
 

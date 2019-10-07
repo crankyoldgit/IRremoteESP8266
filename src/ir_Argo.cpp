@@ -28,6 +28,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_ARGO
 // Send an Argo A/C message.
@@ -109,70 +111,51 @@ void IRArgoAC::setRaw(const uint8_t state[]) {
   for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = state[i];
 }
 
-void IRArgoAC::on(void) {
-  // Bit 5 of byte 9 is on/off
-  // in MSB first
-  argo[9]|= kArgoPowerBit;  // Set ON/OFF bit to 1
-}
+void IRArgoAC::on(void) { setPower(true); }
 
-void IRArgoAC::off(void) {
-  // in MSB first
-  // bit 5 of byte 9 to off
-  argo[9] &= ~kArgoPowerBit;  // Set on/off bit to 0
-}
+void IRArgoAC::off(void) { setPower(false); }
 
 void IRArgoAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&argo[9], kArgoPowerBitOffset, on);
 }
 
-bool IRArgoAC::getPower(void) { return argo[9] & kArgoPowerBit; }
+bool IRArgoAC::getPower(void) { return GETBIT8(argo[9], kArgoPowerBitOffset); }
 
 void IRArgoAC::setMax(const bool on) {
-  if (on)
-    argo[9] |= kArgoMaxBit;
-  else
-    argo[9] &= ~kArgoMaxBit;
+  setBit(&argo[9], kArgoMaxBitOffset, on);
 }
 
-bool IRArgoAC::getMax(void) { return argo[9] & kArgoMaxBit; }
+bool IRArgoAC::getMax(void) { return GETBIT8(argo[9], kArgoMaxBitOffset); }
 
 // Set the temp in deg C
 // Sending 0 equals +4
 void IRArgoAC::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kArgoMinTemp, degrees);
-  temp = std::min(kArgoMaxTemp, temp);
-
-  // offset 4 degrees. "If I want 12 degrees, I need to send 8"
-  temp -= kArgoTempOffset;
+  // delta 4 degrees. "If I want 12 degrees, I need to send 8"
+  temp = std::min(kArgoMaxTemp, temp) - kArgoTempDelta;
   // Settemp = Bit 6,7 of byte 2, and bit 0-2 of byte 3
   // mask out bits
   // argo[13] & 0x00000100;  // mask out ON/OFF Bit
-  argo[2] &= ~kArgoTempLowMask;
-  argo[3] &= ~kArgoTempHighMask;
-
-  // append to bit 6,7
-  argo[2] += temp << 6;
-  // remove lowest to bits and append in 0-2
-  argo[3] += ((temp >> 2) & kArgoTempHighMask);
+  setBits(&argo[2], kArgoTempLowOffset, kArgoTempLowSize, temp);
+  setBits(&argo[3], kArgoTempHighOffset, kArgoTempHighSize,
+          temp >> kArgoTempLowSize);
 }
 
 uint8_t IRArgoAC::getTemp(void) {
-  return (((argo[3] & kArgoTempHighMask) << 2 ) | (argo[2] >> 6)) +
-      kArgoTempOffset;
+  return ((GETBITS8(argo[3], kArgoTempHighOffset,
+                    kArgoTempHighSize) << kArgoTempLowSize) |
+           GETBITS8(argo[2], kArgoTempLowOffset, kArgoTempLowSize)) +
+      kArgoTempDelta;
 }
 
 // Set the speed of the fan
 void IRArgoAC::setFan(const uint8_t fan) {
-  // Mask out bits
-  argo[3] &= ~kArgoFanMask;
-  // Set fan mode at bit positions
-  argo[3] |= (std::min(fan, kArgoFan3) << 3);
+  setBits(&argo[3], kArgoFanOffset, kArgoFanSize, std::min(fan, kArgoFan3));
 }
 
-uint8_t IRArgoAC::getFan(void) { return (argo[3] & kArgoFanMask) >> 3; }
+uint8_t IRArgoAC::getFan(void) {
+  return GETBITS8(argo[3], kArgoFanOffset, kArgoFanSize);
+}
 
 void IRArgoAC::setFlap(const uint8_t flap) {
   flap_mode = flap;
@@ -182,7 +165,7 @@ void IRArgoAC::setFlap(const uint8_t flap) {
 uint8_t IRArgoAC::getFlap(void) { return flap_mode; }
 
 uint8_t IRArgoAC::getMode(void) {
-  return (argo[2] & kArgoModeMask) >> 3;
+  return GETBITS8(argo[2], kArgoModeOffset, kArgoModeSize);
 }
 
 void IRArgoAC::setMode(const uint8_t mode) {
@@ -193,10 +176,7 @@ void IRArgoAC::setMode(const uint8_t mode) {
     case kArgoOff:
     case kArgoHeat:
     case kArgoHeatAuto:
-      // Mask out bits
-      argo[2] &= ~kArgoModeMask;
-      // Set the mode at bit positions
-      argo[2] |= ((mode << 3) & kArgoModeMask);
+      setBits(&argo[2], kArgoModeOffset, kArgoModeSize, mode);
       return;
     default:
       this->setMode(kArgoAuto);
@@ -204,24 +184,16 @@ void IRArgoAC::setMode(const uint8_t mode) {
 }
 
 void IRArgoAC::setNight(const bool on) {
-  if (on)
-    // Set bit at night position: bit 2
-    argo[9] |= kArgoNightBit;
-  else
-    argo[9] &= ~kArgoNightBit;
+  setBit(&argo[9], kArgoNightBitOffset, on);
 }
 
-bool IRArgoAC::getNight(void) { return argo[9] & kArgoNightBit; }
+bool IRArgoAC::getNight(void) { return GETBIT8(argo[9], kArgoNightBitOffset); }
 
 void IRArgoAC::setiFeel(const bool on) {
-  if (on)
-    // Set bit at iFeel position: bit 7
-    argo[9] |= kArgoIFeelBit;
-  else
-    argo[9] &= ~kArgoIFeelBit;
+  setBit(&argo[9], kArgoIFeelBitOffset, on);
 }
 
-bool IRArgoAC::getiFeel(void) { return argo[9] & kArgoIFeelBit; }
+bool IRArgoAC::getiFeel(void) { return GETBIT8(argo[9], kArgoIFeelBitOffset); }
 
 void IRArgoAC::setTime(void) {
   // TODO(kaschmo): use function call from checksum to set time first
@@ -229,19 +201,17 @@ void IRArgoAC::setTime(void) {
 
 void IRArgoAC::setRoomTemp(const uint8_t degrees) {
   uint8_t temp = std::min(degrees, kArgoMaxRoomTemp);
-  temp = std::max(temp, kArgoTempOffset);
-  temp -= kArgoTempOffset;;
-  // Mask out bits
-  argo[3] &= ~kArgoRoomTempLowMask;
-  argo[4] &= ~kArgoRoomTempHighMask;
-
-  argo[3] += temp << 5;  // Append to bit 5,6,7
-  argo[4] += temp >> 3;  // Remove lowest 3 bits and append in 0,1
+  temp = std::max(temp, kArgoTempDelta) - kArgoTempDelta;
+  setBits(&argo[3], kArgoRoomTempLowOffset, kArgoRoomTempLowSize, temp);
+  setBits(&argo[4], kArgoRoomTempHighOffset, kArgoRoomTempHighSize,
+          temp >> kArgoRoomTempLowSize);
 }
 
 uint8_t IRArgoAC::getRoomTemp(void) {
-  return ((argo[4] & kArgoRoomTempHighMask) << 3 | (argo[3] >> 5)) +
-      kArgoTempOffset;
+  return ((GETBITS8(argo[4], kArgoRoomTempHighOffset,
+                   kArgoRoomTempHighSize) << kArgoRoomTempLowSize) |
+           GETBITS8(argo[3], kArgoRoomTempLowOffset, kArgoRoomTempLowSize)) +
+      kArgoTempDelta;
 }
 
 // Convert a standard A/C mode into its native mode.

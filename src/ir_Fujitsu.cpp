@@ -35,6 +35,8 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_FUJITSU_AC
 // Send a Fujitsu A/C message.
@@ -174,12 +176,13 @@ void IRFujitsuAC::buildState(void) {
         checksum_complement = 0x9B;
         break;
       case fujitsu_ac_remote_model_t::ARREB1E:
-        remote_state[14] |= (_outsideQuiet << 7);
+        setBit(&remote_state[14], kFujitsuAcOutsideQuietOffset, _outsideQuiet);
         // FALL THRU
       case fujitsu_ac_remote_model_t::ARRAH2E:
       case fujitsu_ac_remote_model_t::ARRY4:
-        remote_state[14] |= 0x20;
-        remote_state[10] |= _swingMode << 4;
+        setBit(&remote_state[14], 5);  // |= 0b00100000
+        setBits(&remote_state[10], kHighNibble, kFujitsuAcSwingSize,
+                _swingMode);
         // FALL THRU
       default:
         checksum = sumBytes(remote_state + _state_length_short,
@@ -254,13 +257,13 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       break;
   }
   setTemp((remote_state[8] >> 4) + kFujitsuAcMinTemp);
-  if (remote_state[8] & 0x1)
+  if (GETBIT8(remote_state[8], 0))
     setCmd(kFujitsuAcCmdTurnOn);
   else
     setCmd(kFujitsuAcCmdStayOn);
-  setMode(remote_state[9] & 0b00000111);
-  setFanSpeed(remote_state[10] & 0b111);
-  setSwing(remote_state[10] >> 4);
+  setMode(GETBITS8(remote_state[9], kLowNibble, kModeBitsSize));
+  setFanSpeed(GETBITS8(remote_state[10], kLowNibble, kFujitsuAcFanSize));
+  setSwing(GETBITS8(remote_state[10], kHighNibble, kFujitsuAcSwingSize));
   setClean(getClean(true));
   setFilter(getFilter(true));
   // Currently the only way we know how to tell ARRAH2E & ARRY4 apart is if
@@ -385,7 +388,7 @@ void IRFujitsuAC::setOutsideQuiet(const bool on) {
 //   A boolean for if it is set or not.
 bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
   if (_state_length == kFujitsuAcStateLength && raw) {
-    _outsideQuiet = remote_state[14] & 0b10000000;
+    _outsideQuiet = GETBIT8(remote_state[14], kFujitsuAcOutsideQuietOffset);
     // Only ARREB1E seems to have this mode.
     if (_outsideQuiet) this->setModel(fujitsu_ac_remote_model_t::ARREB1E);
   }
@@ -449,7 +452,8 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
 // Returns:
 //   A uint8_t containing the contents of the swing state.
 uint8_t IRFujitsuAC::getSwing(const bool raw) {
-  if (raw) _swingMode = remote_state[10] >> 4;
+  if (raw) _swingMode = GETBITS8(remote_state[10], kHighNibble,
+                                 kFujitsuAcSwingSize);
   return _swingMode;
 }
 
@@ -460,13 +464,11 @@ void IRFujitsuAC::setClean(const bool on) {
 
 bool IRFujitsuAC::getClean(const bool raw) {
   if (raw) {
-    return remote_state[9] & 0b00001000;
+    return GETBIT8(remote_state[9], kFujitsuAcCleanOffset);
   } else {
     switch (getModel()) {
-      case fujitsu_ac_remote_model_t::ARRY4:
-        return _clean;
-      default:
-        return false;
+      case fujitsu_ac_remote_model_t::ARRY4: return _clean;
+      default: return false;
     }
   }
 }
@@ -478,13 +480,11 @@ void IRFujitsuAC::setFilter(const bool on) {
 
 bool IRFujitsuAC::getFilter(const bool raw) {
   if (raw) {
-    return remote_state[14] & 0b00001000;
+    return GETBIT8(remote_state[14], kFujitsuAcFilterOffset);
   } else {
     switch (getModel()) {
-      case fujitsu_ac_remote_model_t::ARRY4:
-        return _filter;
-      default:
-        return false;
+      case fujitsu_ac_remote_model_t::ARRY4: return _filter;
+      default: return false;
     }
   }
 }
@@ -513,33 +513,23 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRFujitsuAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kFujitsuAcModeCool;
-    case stdAc::opmode_t::kHeat:
-      return kFujitsuAcModeHeat;
-    case stdAc::opmode_t::kDry:
-      return kFujitsuAcModeDry;
-    case stdAc::opmode_t::kFan:
-      return kFujitsuAcModeFan;
-    default:
-      return kFujitsuAcModeAuto;
+    case stdAc::opmode_t::kCool: return kFujitsuAcModeCool;
+    case stdAc::opmode_t::kHeat: return kFujitsuAcModeHeat;
+    case stdAc::opmode_t::kDry:  return kFujitsuAcModeDry;
+    case stdAc::opmode_t::kFan:  return kFujitsuAcModeFan;
+    default:                     return kFujitsuAcModeAuto;
   }
 }
 
 // Convert a standard A/C Fan speed into its native fan speed.
 uint8_t IRFujitsuAC::convertFan(stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-      return kFujitsuAcFanQuiet;
-    case stdAc::fanspeed_t::kLow:
-      return kFujitsuAcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kFujitsuAcFanMed;
+    case stdAc::fanspeed_t::kMin:    return kFujitsuAcFanQuiet;
+    case stdAc::fanspeed_t::kLow:    return kFujitsuAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kFujitsuAcFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kFujitsuAcFanHigh;
-    default:
-      return kFujitsuAcFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kFujitsuAcFanHigh;
+    default:                         return kFujitsuAcFanAuto;
   }
 }
 
@@ -548,20 +538,20 @@ stdAc::opmode_t IRFujitsuAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kFujitsuAcModeCool: return stdAc::opmode_t::kCool;
     case kFujitsuAcModeHeat: return stdAc::opmode_t::kHeat;
-    case kFujitsuAcModeDry: return stdAc::opmode_t::kDry;
-    case kFujitsuAcModeFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kFujitsuAcModeDry:  return stdAc::opmode_t::kDry;
+    case kFujitsuAcModeFan:  return stdAc::opmode_t::kFan;
+    default:                 return stdAc::opmode_t::kAuto;
   }
 }
 
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kFujitsuAcFanHigh: return stdAc::fanspeed_t::kMax;
-    case kFujitsuAcFanMed: return stdAc::fanspeed_t::kMedium;
-    case kFujitsuAcFanLow: return stdAc::fanspeed_t::kLow;
+    case kFujitsuAcFanHigh:  return stdAc::fanspeed_t::kMax;
+    case kFujitsuAcFanMed:   return stdAc::fanspeed_t::kMedium;
+    case kFujitsuAcFanLow:   return stdAc::fanspeed_t::kLow;
     case kFujitsuAcFanQuiet: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    default:                 return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -706,10 +696,8 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t nbits,
       case kFujitsuAcBits:
       case kFujitsuAcBits - 8:
       case kFujitsuAcMinBits:
-      case kFujitsuAcMinBits + 8:
-        break;
-      default:
-        return false;  // Must be called with the correct nr. of bits.
+      case kFujitsuAcMinBits + 8: break;
+      default: return false;  // Must be called with the correct nr. of bits.
     }
   }
 

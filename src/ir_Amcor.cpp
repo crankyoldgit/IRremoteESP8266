@@ -29,6 +29,7 @@ using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBits;
 
 #if SEND_AMCOR
 // Send a Amcor HVAC formatted message.
@@ -145,49 +146,45 @@ void IRAmcorAc::on(void) { setPower(true); }
 void IRAmcorAc::off(void) { setPower(false); }
 
 void IRAmcorAc::setPower(const bool on) {
-  remote_state[kAmcorPowerByte] &= ~kAmcorPowerMask;
-  remote_state[kAmcorPowerByte] |= (on ? kAmcorPowerOn : kAmcorPowerOff);
+  setBits(&remote_state[kAmcorPowerByte], kAmcorPowerOffset, kAmcorPowerSize,
+          on ? kAmcorPowerOn : kAmcorPowerOff);
 }
 
 bool IRAmcorAc::getPower(void) {
-  return ((remote_state[kAmcorPowerByte] & kAmcorPowerMask) == kAmcorPowerOn);
+  return GETBITS8(remote_state[kAmcorPowerByte], kAmcorPowerOffset,
+                  kAmcorPowerSize) == kAmcorPowerOn;
 }
 
 // Set the temp in deg C
 void IRAmcorAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kAmcorMinTemp, degrees);
   temp = std::min(kAmcorMaxTemp, temp);
-
-  temp <<= 1;
-  remote_state[kAmcorTempByte] &= ~kAmcorTempMask;
-  remote_state[kAmcorTempByte] |= temp;
+  setBits(&remote_state[kAmcorTempByte], kAmcorTempOffset, kAmcorTempSize,
+          temp);
 }
 
 uint8_t IRAmcorAc::getTemp(void) {
-  return (remote_state[kAmcorTempByte] & kAmcorTempMask) >> 1;
+  return GETBITS8(remote_state[kAmcorTempByte], kAmcorTempOffset,
+                  kAmcorTempSize);
 }
 
 // Maximum Cooling or Hearing
 void IRAmcorAc::setMax(const bool on) {
   if (on) {
     switch (getMode()) {
-      case kAmcorCool:
-        setTemp(kAmcorMinTemp);
-        break;
-      case kAmcorHeat:
-        setTemp(kAmcorMaxTemp);
-        break;
-      default:  // Not allowed in all other operating modes.
-        return;
+      case kAmcorCool: setTemp(kAmcorMinTemp); break;
+      case kAmcorHeat: setTemp(kAmcorMaxTemp); break;
+      // Not allowed in all other operating modes.
+      default: return;
     }
-    remote_state[kAmcorSpecialByte] |= kAmcorMaxMask;
-  } else {
-    remote_state[kAmcorSpecialByte] &= ~kAmcorMaxMask;
   }
+  setBits(&remote_state[kAmcorSpecialByte], kAmcorMaxOffset, kAmcorMaxSize,
+          on ? kAmcorMax : 0);
 }
 
 bool IRAmcorAc::getMax(void) {
-  return ((remote_state[kAmcorSpecialByte] & kAmcorMaxMask) == kAmcorMaxMask);
+  return GETBITS8(remote_state[kAmcorSpecialByte], kAmcorMaxOffset,
+                  kAmcorMaxSize) == kAmcorMax;
 }
 
 // Set the speed of the fan
@@ -197,8 +194,8 @@ void IRAmcorAc::setFan(const uint8_t speed) {
     case kAmcorFanMin:
     case kAmcorFanMed:
     case kAmcorFanMax:
-      remote_state[kAmcorModeFanByte] &= ~kAmcorFanMask;
-      remote_state[kAmcorModeFanByte] |= speed << 4;
+      setBits(&remote_state[kAmcorModeFanByte], kAmcorFanOffset, kAmcorFanSize,
+              speed);
       break;
     default:
       setFan(kAmcorFanAuto);
@@ -206,27 +203,26 @@ void IRAmcorAc::setFan(const uint8_t speed) {
 }
 
 uint8_t IRAmcorAc::getFan(void) {
-  return (remote_state[kAmcorModeFanByte] & kAmcorFanMask) >> 4;
+  return GETBITS8(remote_state[kAmcorModeFanByte], kAmcorFanOffset,
+                  kAmcorFanSize);
 }
 
 uint8_t IRAmcorAc::getMode(void) {
-  return remote_state[kAmcorModeFanByte] & kAmcorModeMask;
+  return GETBITS8(remote_state[kAmcorModeFanByte], kAmcorModeOffset,
+                  kAmcorModeSize);
 }
 
 void IRAmcorAc::setMode(const uint8_t mode) {
-  remote_state[kAmcorSpecialByte] &= ~kAmcorVentMask;  // Clear the vent setting
   switch (mode) {
     case kAmcorFan:
-      remote_state[kAmcorSpecialByte] |= kAmcorVentMask;  // Set the vent option
-      // FALL-THRU
     case kAmcorCool:
     case kAmcorHeat:
     case kAmcorDry:
     case kAmcorAuto:
-      // Mask out bits
-      remote_state[kAmcorModeFanByte] &= ~kAmcorModeMask;
-      // Set the mode at bit positions
-      remote_state[kAmcorModeFanByte] |= mode;
+      setBits(&remote_state[kAmcorSpecialByte], kAmcorVentOffset,
+              kAmcorVentSize, (mode == kAmcorFan) ? kAmcorVentOn : 0);
+      setBits(&remote_state[kAmcorModeFanByte], kAmcorModeOffset,
+              kAmcorModeSize, mode);
       return;
     default:
       this->setMode(kAmcorAuto);

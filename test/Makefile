@@ -95,6 +95,7 @@ PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
 		$(USER_DIR)/ir_Coolix.h \
 		$(USER_DIR)/ir_Electra.h \
 		$(USER_DIR)/ir_Haier.h \
+		$(USER_DIR)/ir_Hitachi.h \
 		$(USER_DIR)/ir_Midea.h \
 		$(USER_DIR)/ir_Toshiba.h \
 		$(USER_DIR)/ir_Daikin.h \
@@ -470,7 +471,7 @@ ir_Haier_test.o : ir_Haier_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 ir_Haier_test : $(COMMON_OBJ) ir_Haier_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-ir_Hitachi.o : $(USER_DIR)/ir_Hitachi.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
+ir_Hitachi.o : $(USER_DIR)/ir_Hitachi.cpp $(USER_DIR)/ir_Hitachi.h $(COMMON_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Hitachi.cpp
 
 ir_Hitachi_test.o : ir_Hitachi_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)

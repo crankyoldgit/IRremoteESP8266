@@ -34,9 +34,15 @@ const uint8_t kCoolixDry = 0b001;
 const uint8_t kCoolixAuto = 0b010;
 const uint8_t kCoolixHeat = 0b011;
 const uint8_t kCoolixFan = 0b100;                                 // Synthetic.
-const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
-const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000;  // 0x80000
+// const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
+const uint8_t kCoolixModeOffset = 2;
+const uint8_t kCoolixModeSize = 2;
+// const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000  0x80000
+const uint8_t kCoolixZoneFollowMaskOffset = 19;
 // Fan Control
+// const uint32_t kCoolixFanMask = 0b000000001110000000000000;  // 0x00E000
+const uint8_t kCoolixFanOffset = 13;
+const uint8_t kCoolixFanSize = 3;
 const uint8_t kCoolixFanMin = 0b100;
 const uint8_t kCoolixFanMed = 0b010;
 const uint8_t kCoolixFanMax = 0b001;
@@ -44,13 +50,14 @@ const uint8_t kCoolixFanAuto = 0b101;
 const uint8_t kCoolixFanAuto0 = 0b000;
 const uint8_t kCoolixFanZoneFollow = 0b110;
 const uint8_t kCoolixFanFixed = 0b111;
-const uint32_t kCoolixFanMask = 0b000000001110000000000000;  // 0x00E000
 // Temperature
 const uint8_t kCoolixTempMin = 17;  // Celsius
 const uint8_t kCoolixTempMax = 30;  // Celsius
 const uint8_t kCoolixTempRange = kCoolixTempMax - kCoolixTempMin + 1;
 const uint8_t kCoolixFanTempCode = 0b1110;  // Part of Fan Mode.
-const uint32_t kCoolixTempMask = 0b11110000;
+// const uint32_t kCoolixTempMask = 0b11110000;
+const uint8_t kCoolixTempOffset = 4;
+const uint8_t kCoolixTempSize = 4;
 const uint8_t kCoolixTempMap[kCoolixTempRange] = {
     0b0000,  // 17C
     0b0001,  // 18c
@@ -70,7 +77,9 @@ const uint8_t kCoolixTempMap[kCoolixTempRange] = {
 const uint8_t kCoolixSensorTempMin = 16;  // Celsius
 const uint8_t kCoolixSensorTempMax = 30;  // Celsius
 const uint8_t kCoolixSensorTempIgnoreCode = 0b1111;
-const uint32_t kCoolixSensorTempMask = 0b000000000000111100000000;  // 0xF00
+// kCoolixSensorTempMask = 0b000000000000111100000000;  // 0xF00
+const uint8_t kCoolixSensorTempOffset = 8;
+const uint8_t kCoolixSensorTempSize = 4;
 // Fixed states/messages.
 const uint8_t kCoolixPrefix = 0b1011;  // 0xB
 const uint8_t kCoolixUnknown = 0xFF;
@@ -139,7 +148,7 @@ class IRCoolixAC {
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
   void setSensorTempRaw(const uint8_t code);
-  void setZoneFollow(const bool state);
+  void setZoneFollow(const bool on);
   bool isSpecialState(void);
   void updateSavedState(void);
   void recoverSavedState(void);

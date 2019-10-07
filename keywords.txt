@@ -1486,7 +1486,7 @@ kElectraAcMessageGap	LITERAL1
 kElectraAcMinRepeat	LITERAL1
 kElectraAcMinTemp	LITERAL1
 kElectraAcModeMask	LITERAL1
-kElectraAcOffsetTemp	LITERAL1
+kElectraAcTempDelta	LITERAL1
 kElectraAcOneSpace	LITERAL1
 kElectraAcPowerMask	LITERAL1
 kElectraAcStateLength	LITERAL1

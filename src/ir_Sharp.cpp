@@ -44,6 +44,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if (SEND_SHARP || SEND_DENON)
 // Send a (raw) Sharp message
@@ -116,10 +118,10 @@ uint32_t IRsend::encodeSharp(const uint16_t address, const uint16_t command,
                              const uint16_t expansion, const uint16_t check,
                              const bool MSBfirst) {
   // Mask any unexpected bits.
-  uint16_t tempaddress = address & ((1 << kSharpAddressBits) - 1);
-  uint16_t tempcommand = command & ((1 << kSharpCommandBits) - 1);
-  uint16_t tempexpansion = expansion & 1;
-  uint16_t tempcheck = check & 1;
+  uint16_t tempaddress = GETBITS16(address, 0, kSharpAddressBits);
+  uint16_t tempcommand = GETBITS16(command, 0, kSharpCommandBits);
+  uint16_t tempexpansion = GETBITS16(expansion, 0, 1);
+  uint16_t tempcheck = GETBITS16(check, 0, 1);
 
   if (!MSBfirst) {  // Correct bit order if needed.
     tempaddress = reverseBits(tempaddress, kSharpAddressBits);
@@ -291,9 +293,9 @@ void IRSharpAc::send(const uint16_t repeat) {
 //   The 4 bit checksum.
 uint8_t IRSharpAc::calcChecksum(uint8_t state[], const uint16_t length) {
   uint8_t xorsum = xorBytes(state, length - 1);
-  xorsum ^= (state[length - 1] & 0xF);
-  xorsum ^= xorsum >> 4;
-  return xorsum & 0xF;
+  xorsum ^= GETBITS8(state[length - 1], kLowNibble, kNibbleSize);
+  xorsum ^= GETBITS8(xorsum, kHighNibble, kNibbleSize);
+  return GETBITS8(xorsum, kLowNibble, kNibbleSize);
 }
 
 // Verify the checksums are valid for a given state.
@@ -303,13 +305,14 @@ uint8_t IRSharpAc::calcChecksum(uint8_t state[], const uint16_t length) {
 // Returns:
 //   A boolean.
 bool IRSharpAc::validChecksum(uint8_t state[], const uint16_t length) {
-  return (state[length - 1] >> 4) == IRSharpAc::calcChecksum(state, length);
+  return GETBITS8(state[length - 1], kHighNibble, kNibbleSize) ==
+      IRSharpAc::calcChecksum(state, length);
 }
 
 // Calculate and set the checksum values for the internal state.
 void IRSharpAc::checksum(void) {
-  remote[kSharpAcStateLength - 1] &= 0x0F;
-  remote[kSharpAcStateLength - 1] |= this->calcChecksum(remote) << 4;
+  setBits(&remote[kSharpAcStateLength - 1], kHighNibble, kNibbleSize,
+          this->calcChecksum(remote));
 }
 
 void IRSharpAc::stateReset(void) {
@@ -329,19 +332,16 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote[i] = new_code[i];
 }
 
-void IRSharpAc::on(void) { remote[kSharpAcBytePower] |= kSharpAcBitPower; }
+void IRSharpAc::on(void) { setPower(true); }
 
-void IRSharpAc::off(void) { remote[kSharpAcBytePower] &= ~kSharpAcBitPower; }
+void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
 }
 
 bool IRSharpAc::getPower(void) {
-  return remote[kSharpAcBytePower] & kSharpAcBitPower;
+  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPowerOffset);
 }
 
 // Set the temp in deg C
@@ -355,37 +355,34 @@ void IRSharpAc::setTemp(const uint8_t temp) {
       return;
     default:
       remote[kSharpAcByteTemp] = 0xC0;
-      remote[kSharpAcByteManual] |= kSharpAcBitTempManual;
+      setBit(&remote[kSharpAcByteManual], kSharpAcBitTempManualOffset);
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
-  remote[kSharpAcByteTemp] &= ~kSharpAcMaskTemp;
-  remote[kSharpAcByteTemp] |= (degrees - kSharpAcMinTemp);
+  setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
+          degrees - kSharpAcMinTemp);
 }
 
 uint8_t IRSharpAc::getTemp(void) {
-  return (remote[kSharpAcByteTemp] & kSharpAcMaskTemp) + kSharpAcMinTemp;
+  return GETBITS8(remote[kSharpAcByteTemp], kLowNibble, kNibbleSize) +
+      kSharpAcMinTemp;
 }
 
 uint8_t IRSharpAc::getMode(void) {
-  return remote[kSharpAcByteMode] & kSharpAcMaskMode;
+  return GETBITS8(remote[kSharpAcByteMode], kLowNibble, kSharpAcModeSize);
 }
 
 void IRSharpAc::setMode(const uint8_t mode) {
-  const uint8_t special = 0x20;  // Non-auto modes have this bit set.
-  remote[kSharpAcBytePower] |= special;
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitModeNonAutoOffset,
+         mode != kSharpAcAuto);
   switch (mode) {
     case kSharpAcAuto:
-      remote[kSharpAcBytePower] &= ~special;  // Auto has this bit cleared.
-      // FALLTHRU
     case kSharpAcDry:
       this->setTemp(0);  // Dry/Auto have no temp setting.
       // FALLTHRU
     case kSharpAcCool:
     case kSharpAcHeat:
-      remote[kSharpAcByteMode] &= ~kSharpAcMaskMode;
-      remote[kSharpAcByteMode] |= mode;
-
+      setBits(&remote[kSharpAcByteMode], kLowNibble, kSharpAcModeSize, mode);
       break;
     default:
       this->setMode(kSharpAcAuto);
@@ -394,18 +391,16 @@ void IRSharpAc::setMode(const uint8_t mode) {
 
 // Set the speed of the fan
 void IRSharpAc::setFan(const uint8_t speed) {
-  remote[kSharpAcByteManual] |= kSharpAcBitFanManual;  // Manual fan mode.
   switch (speed) {
     case kSharpAcFanAuto:
-      // Clear the manual fan bit.
-      remote[kSharpAcByteManual] &= ~kSharpAcBitFanManual;
-      // FALLTHRU
     case kSharpAcFanMin:
     case kSharpAcFanMed:
     case kSharpAcFanHigh:
     case kSharpAcFanMax:
-      remote[kSharpAcByteFan] &= ~kSharpAcMaskFan;
-      remote[kSharpAcByteFan] |= (speed << 4);
+      setBit(&remote[kSharpAcByteManual], kSharpAcBitFanManualOffset,
+             speed != kSharpAcFanAuto);
+      setBits(&remote[kSharpAcByteFan], kSharpAcFanOffset, kSharpAcFanSize,
+              speed);
       break;
     default:
       this->setFan(kSharpAcFanAuto);
@@ -413,21 +408,17 @@ void IRSharpAc::setFan(const uint8_t speed) {
 }
 
 uint8_t IRSharpAc::getFan(void) {
-  return (remote[kSharpAcByteFan] & kSharpAcMaskFan) >> 4;
+  return GETBITS8(remote[kSharpAcByteFan], kSharpAcFanOffset, kSharpAcFanSize);
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kSharpAcCool;
-    case stdAc::opmode_t::kHeat:
-      return kSharpAcHeat;
-    case stdAc::opmode_t::kDry:
-      return kSharpAcDry;
+    case stdAc::opmode_t::kCool: return kSharpAcCool;
+    case stdAc::opmode_t::kHeat: return kSharpAcHeat;
+    case stdAc::opmode_t::kDry:  return kSharpAcDry;
     // No Fan mode.
-    default:
-      return kSharpAcAuto;
+    default:                     return kSharpAcAuto;
   }
 }
 
@@ -435,16 +426,11 @@ uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRSharpAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kSharpAcFanMin;
-    case stdAc::fanspeed_t::kMedium:
-      return kSharpAcFanMed;
-    case stdAc::fanspeed_t::kHigh:
-      return kSharpAcFanHigh;
-    case stdAc::fanspeed_t::kMax:
-      return kSharpAcFanMax;
-    default:
-      return kSharpAcFanAuto;
+    case stdAc::fanspeed_t::kLow:    return kSharpAcFanMin;
+    case stdAc::fanspeed_t::kMedium: return kSharpAcFanMed;
+    case stdAc::fanspeed_t::kHigh:   return kSharpAcFanHigh;
+    case stdAc::fanspeed_t::kMax:    return kSharpAcFanMax;
+    default:                         return kSharpAcFanAuto;
   }
 }
 
@@ -453,19 +439,19 @@ stdAc::opmode_t IRSharpAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kSharpAcCool: return stdAc::opmode_t::kCool;
     case kSharpAcHeat: return stdAc::opmode_t::kHeat;
-    case kSharpAcDry: return stdAc::opmode_t::kDry;
-    default: return stdAc::opmode_t::kAuto;
+    case kSharpAcDry:  return stdAc::opmode_t::kDry;
+    default:           return stdAc::opmode_t::kAuto;
   }
 }
 
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRSharpAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kSharpAcFanMax: return stdAc::fanspeed_t::kMax;
+    case kSharpAcFanMax:  return stdAc::fanspeed_t::kMax;
     case kSharpAcFanHigh: return stdAc::fanspeed_t::kHigh;
-    case kSharpAcFanMed: return stdAc::fanspeed_t::kMedium;
-    case kSharpAcFanMin: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kSharpAcFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kSharpAcFanMin:  return stdAc::fanspeed_t::kMin;
+    default:              return stdAc::fanspeed_t::kAuto;
   }
 }
 

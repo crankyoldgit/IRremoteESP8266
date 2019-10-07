@@ -29,18 +29,26 @@
 // Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
 
 // Constants
-const uint8_t kMitsubishiAcAuto = 0x20;
-const uint8_t kMitsubishiAcCool = 0x18;
-const uint8_t kMitsubishiAcDry = 0x10;
-const uint8_t kMitsubishiAcHeat = 0x08;
-const uint8_t kMitsubishiAcPower = 0x20;
+const uint8_t kMitsubishiAcModeOffset = 3;
+const uint8_t kMitsubishiAcAuto = 0b100;
+const uint8_t kMitsubishiAcCool = 0b011;
+const uint8_t kMitsubishiAcDry =  0b010;
+const uint8_t kMitsubishiAcHeat = 0b001;
+const uint8_t kMitsubishiAcPowerOffset = 5;
+const uint8_t kMitsubishiAcPower = 1 << kMitsubishiAcPowerOffset;  // 0x20
+const uint8_t kMitsubishiAcFanOffset = 0;
+const uint8_t kMitsubishiAcFanSize = 3;  // Mask 0b111
 const uint8_t kMitsubishiAcFanAuto = 0;
+const uint8_t kMitsubishiAcFanAutoOffset = 7;
 const uint8_t kMitsubishiAcFanMax = 5;
 const uint8_t kMitsubishiAcFanRealMax = 4;
 const uint8_t kMitsubishiAcFanSilent = 6;
 const uint8_t kMitsubishiAcFanQuiet = kMitsubishiAcFanSilent;
 const uint8_t kMitsubishiAcMinTemp = 16;  // 16C
 const uint8_t kMitsubishiAcMaxTemp = 31;  // 31C
+const uint8_t kMitsubishiAcVaneBitOffset = 6;
+const uint8_t kMitsubishiAcVaneOffset = 3;
+const uint8_t kMitsubishiAcVaneSize = 3;
 const uint8_t kMitsubishiAcVaneAuto = 0;
 const uint8_t kMitsubishiAcVaneAutoMove = 7;
 const uint8_t kMitsubishiAcNoTimer = 0;
@@ -50,27 +58,28 @@ const uint8_t kMitsubishiAcStartStopTimer = 7;
 const uint8_t kMitsubishiAcWideVaneAuto = 8;
 
 const uint8_t kMitsubishi136PowerByte = 5;
-const uint8_t kMitsubishi136PowerBit =   0b01000000;
+const uint8_t kMitsubishi136PowerOffset = 6;
+const uint8_t kMitsubishi136PowerBit = 1 << kMitsubishi136PowerOffset;
 const uint8_t kMitsubishi136TempByte = 6;
-const uint8_t kMitsubishi136TempMask =   0b11110000;
 const uint8_t kMitsubishi136MinTemp = 17;  // 17C
 const uint8_t kMitsubishi136MaxTemp = 30;  // 30C
 const uint8_t kMitsubishi136ModeByte = kMitsubishi136TempByte;
-const uint8_t kMitsubishi136ModeMask =   0b00000111;
+const uint8_t kMitsubishi136ModeOffset = 0;
 const uint8_t kMitsubishi136Fan =             0b000;
 const uint8_t kMitsubishi136Cool =            0b001;
 const uint8_t kMitsubishi136Heat =            0b010;
 const uint8_t kMitsubishi136Auto =            0b011;
 const uint8_t kMitsubishi136Dry =             0b101;
 const uint8_t kMitsubishi136SwingVByte = 7;
-const uint8_t kMitsubishi136SwingVMask = 0b11110000;
 const uint8_t kMitsubishi136SwingVLowest =   0b0000;
 const uint8_t kMitsubishi136SwingVLow =      0b0001;
 const uint8_t kMitsubishi136SwingVHigh =     0b0010;
 const uint8_t kMitsubishi136SwingVHighest =  0b0011;
 const uint8_t kMitsubishi136SwingVAuto =     0b1100;
 const uint8_t kMitsubishi136FanByte = kMitsubishi136SwingVByte;
-const uint8_t kMitsubishi136FanMask =    0b00000110;
+//                          FanMask =    0b00000110;
+const uint8_t kMitsubishi136FanOffset = 1;
+const uint8_t kMitsubishi136FanSize = 2;  // Bits
 const uint8_t kMitsubishi136FanMin =          0b00;
 const uint8_t kMitsubishi136FanLow =          0b01;
 const uint8_t kMitsubishi136FanMed =          0b10;
@@ -96,10 +105,8 @@ class IRMitsubishiAC {
  public:
   explicit IRMitsubishiAC(const uint16_t pin, const bool inverted = false,
                           const bool use_modulation = true);
-
-  static uint8_t calculateChecksum(const uint8_t* data);
-
   void stateReset(void);
+  static bool validChecksum(const uint8_t* data);
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
   uint8_t calibrate(void) { return _irsend.calibrate(); }
@@ -148,6 +155,7 @@ class IRMitsubishiAC {
 #endif
   uint8_t remote_state[kMitsubishiACStateLength];
   void checksum(void);
+  static uint8_t calculateChecksum(const uint8_t* data);
 };
 
 class IRMitsubishi136 {

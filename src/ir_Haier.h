@@ -34,26 +34,37 @@ const uint8_t kHaierAcPrefix = 0b10100101;
 const uint8_t kHaierAcMinTemp = 16;
 const uint8_t kHaierAcDefTemp = 25;
 const uint8_t kHaierAcMaxTemp = 30;
-const uint8_t kHaierAcCmdOff = 0b00000000;
-const uint8_t kHaierAcCmdOn = 0b00000001;
-const uint8_t kHaierAcCmdMode = 0b00000010;
-const uint8_t kHaierAcCmdFan = 0b00000011;
-const uint8_t kHaierAcCmdTempUp = 0b00000110;
-const uint8_t kHaierAcCmdTempDown = 0b00000111;
-const uint8_t kHaierAcCmdSleep = 0b00001000;
-const uint8_t kHaierAcCmdTimerSet = 0b00001001;
-const uint8_t kHaierAcCmdTimerCancel = 0b00001010;
-const uint8_t kHaierAcCmdHealth = 0b00001100;
-const uint8_t kHaierAcCmdSwing = 0b00001101;
+const uint8_t kHaierAcCmdOff =         0b0000;
+const uint8_t kHaierAcCmdOn =          0b0001;
+const uint8_t kHaierAcCmdMode =        0b0010;
+const uint8_t kHaierAcCmdFan =         0b0011;
+const uint8_t kHaierAcCmdTempUp =      0b0110;
+const uint8_t kHaierAcCmdTempDown =    0b0111;
+const uint8_t kHaierAcCmdSleep =       0b1000;
+const uint8_t kHaierAcCmdTimerSet =    0b1001;
+const uint8_t kHaierAcCmdTimerCancel = 0b1010;
+const uint8_t kHaierAcCmdHealth =      0b1100;
+const uint8_t kHaierAcCmdSwing =       0b1101;
 
-// Byte 2
-const uint8_t kHaierAcSwingOff = 0b00000000;
-const uint8_t kHaierAcSwingUp = 0b00000001;
-const uint8_t kHaierAcSwingDown = 0b00000010;
-const uint8_t kHaierAcSwingChg = 0b00000011;
+// Byte 2 (Clock Hours)
 
-// Byte 6
-const uint8_t kHaierAcModeMask = 0b11100000;
+// Byte 3 (Timer Flags & Clock Minutes)
+const uint8_t kHaierAcOffTimerOffset = 6;
+const uint8_t kHaierAcOnTimerOffset =  7;
+
+// Byte 4 (Health & Off Time Hours)
+const uint8_t kHaierAcHealthBitOffset =  5;
+
+// Byte 5 (Swing & Off Time Mins)
+const uint8_t kHaierAcSwingOffset = 6;
+const uint8_t kHaierAcSwingSize = 2;  // Bits
+const uint8_t kHaierAcSwingOff =  0b00;
+const uint8_t kHaierAcSwingUp =   0b01;
+const uint8_t kHaierAcSwingDown = 0b10;
+const uint8_t kHaierAcSwingChg =  0b11;
+
+// Byte 6 (Mode & On Time Hours)
+const uint8_t kHaierAcModeOffset = 5;
 const uint8_t kHaierAcAuto = 0;
 const uint8_t kHaierAcCool = 1;
 const uint8_t kHaierAcDry = 2;
@@ -65,9 +76,17 @@ const uint8_t kHaierAcFanLow = 1;
 const uint8_t kHaierAcFanMed = 2;
 const uint8_t kHaierAcFanHigh = 3;
 
+// Byte 7 (On Time Minutes)
+
+// Time
+const uint8_t kHaierAcTimeOffset = 0;  // Bits
+const uint8_t kHaierAcHoursSize = 5;  // Bits
+const uint8_t kHaierAcMinsSize = 6;  // Bits
+
 const uint16_t kHaierAcMaxTime = (23 * 60) + 59;
 
 // Byte 7
+const uint8_t kHaierAcSleepBitOffset = 6;
 const uint8_t kHaierAcSleepBit = 0b01000000;
 
 // Legacy Haier AC defines.
@@ -104,9 +123,9 @@ const uint8_t kHaierAcSleepBit = 0b01000000;
 const uint8_t kHaierAcYrw02Prefix = 0xA6;
 
 // Byte 1
-// Bits 0-3
+// High Nibble - Temperature
 // 0x0 = 16DegC, ... 0xE = 30DegC
-// Bits 4-7 - Swing
+// Low Nibble - Swing
 const uint8_t kHaierAcYrw02SwingOff = 0x0;
 const uint8_t kHaierAcYrw02SwingTop = 0x1;
 const uint8_t kHaierAcYrw02SwingMiddle = 0x2;  // Not available in heat mode.
@@ -115,33 +134,39 @@ const uint8_t kHaierAcYrw02SwingDown = 0xA;
 const uint8_t kHaierAcYrw02SwingAuto = 0xC;  // Airflow
 
 // Byte 3
-// Bit 7 - Health mode
+const uint8_t kHaierAcYrw02HealthOffset = 1;
 
 // Byte 4
+const uint8_t kHaierAcYrw02PowerOffset = 6;
 const uint8_t kHaierAcYrw02Power = 0b01000000;
 
 // Byte 5
 // Bits 0-3
-const uint8_t kHaierAcYrw02FanHigh = 0x2;
-const uint8_t kHaierAcYrw02FanMed = 0x4;
-const uint8_t kHaierAcYrw02FanLow = 0x6;
-const uint8_t kHaierAcYrw02FanAuto = 0xA;
+const uint8_t kHaierAcYrw02FanOffset = 5;
+const uint8_t kHaierAcYrw02FanSize = 3;
+const uint8_t kHaierAcYrw02FanHigh = 0b001;
+const uint8_t kHaierAcYrw02FanMed =  0b010;
+const uint8_t kHaierAcYrw02FanLow =  0b011;
+const uint8_t kHaierAcYrw02FanAuto = 0b101;
 
 // Byte 6
-// Bits 0-1
+const uint8_t kHaierAcYrw02TurboOffset = 6;
+const uint8_t kHaierAcYrw02TurboSize = 2;
 const uint8_t kHaierAcYrw02TurboOff = 0x0;
 const uint8_t kHaierAcYrw02TurboHigh = 0x1;
 const uint8_t kHaierAcYrw02TurboLow = 0x2;
 
 // Byte 7
-// Bits 0-3
-const uint8_t kHaierAcYrw02Auto = 0x0;
-const uint8_t kHaierAcYrw02Cool = 0x2;
-const uint8_t kHaierAcYrw02Dry = 0x4;
-const uint8_t kHaierAcYrw02Heat = 0x8;
-const uint8_t kHaierAcYrw02Fan = 0xC;
+//                      Mode mask 0b11100000
+const uint8_t kHaierAcYrw02ModeOffset = 5;
+const uint8_t kHaierAcYrw02Auto = 0b000;  // 0
+const uint8_t kHaierAcYrw02Cool = 0b001;  // 1
+const uint8_t kHaierAcYrw02Dry =  0b010;  // 2
+const uint8_t kHaierAcYrw02Heat = 0b100;  // 4
+const uint8_t kHaierAcYrw02Fan =  0b110;  // 5
 
 // Byte 8
+const uint8_t kHaierAcYrw02SleepOffset = 7;
 const uint8_t kHaierAcYrw02Sleep = 0b10000000;
 
 // Byte 12

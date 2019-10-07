@@ -56,14 +56,20 @@ const uint8_t kFujitsuAcFanHigh = 0x01;
 const uint8_t kFujitsuAcFanMed = 0x02;
 const uint8_t kFujitsuAcFanLow = 0x03;
 const uint8_t kFujitsuAcFanQuiet = 0x04;
+const uint8_t kFujitsuAcFanSize = 3;  // Bits
 
 const uint8_t kFujitsuAcMinTemp = 16;  // 16C
 const uint8_t kFujitsuAcMaxTemp = 30;  // 30C
 
+const uint8_t kFujitsuAcSwingSize = 2;
 const uint8_t kFujitsuAcSwingOff = 0x00;
 const uint8_t kFujitsuAcSwingVert = 0x01;
 const uint8_t kFujitsuAcSwingHoriz = 0x02;
 const uint8_t kFujitsuAcSwingBoth = 0x03;
+
+const uint8_t kFujitsuAcOutsideQuietOffset = 7;
+const uint8_t kFujitsuAcCleanOffset = 3;
+const uint8_t kFujitsuAcFilterOffset = 3;
 
 // Legacy defines.
 #define FUJITSU_AC_MODE_AUTO kFujitsuAcModeAuto

@@ -34,6 +34,8 @@ const uint8_t kHitachiAcFanHigh = 5;
 const uint8_t kHitachiAcMinTemp = 16;   // 16C
 const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
+const uint8_t kHitachiAcPowerOffset = 0;
+const uint8_t kHitachiAcSwingOffset = 7;
 
 // Classes
 class IRHitachiAc {

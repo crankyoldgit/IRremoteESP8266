@@ -30,23 +30,28 @@ const uint8_t kTcl112AcDry =  2;
 const uint8_t kTcl112AcCool = 3;
 const uint8_t kTcl112AcFan =  7;
 const uint8_t kTcl112AcAuto = 8;
-const uint8_t kTcl112AcFanMask = 0b00000111;
-const uint8_t kTcl112AcFanAuto = 0b00000000;
-const uint8_t kTcl112AcFanLow  = 0b00000010;
-const uint8_t kTcl112AcFanMed  = 0b00000011;
-const uint8_t kTcl112AcFanHigh = 0b00000101;
+const uint8_t kTcl112AcModeSize = 4;  // Nr. of Bits
 
-const uint8_t kTcl112AcHalfDegree = 0b00100000;
+const uint8_t kTcl112AcFanSize = 3;  // Nr. of Bits. Mask = 0b00000111
+const uint8_t kTcl112AcFanAuto = 0b000;
+const uint8_t kTcl112AcFanLow  = 0b010;
+const uint8_t kTcl112AcFanMed  = 0b011;
+const uint8_t kTcl112AcFanHigh = 0b101;
+
+const uint8_t kTcl112AcHalfDegreeOffset = 5;
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
 
-const uint8_t kTcl112AcPowerMask = 0b00000100;
-const uint8_t kTcl112AcBitEcono  = 0b10000000;
-const uint8_t kTcl112AcBitLight  = 0b01000000;
-const uint8_t kTcl112AcBitHealth = 0b00010000;
-const uint8_t kTcl112AcBitSwingH = 0b00001000;
-const uint8_t kTcl112AcBitSwingV = 0b00111000;
-const uint8_t kTcl112AcBitTurbo  = 0b01000000;
+const uint8_t kTcl112AcPowerOffset = 2;
+const uint8_t kTcl112AcBitEconoOffset = 7;
+const uint8_t kTcl112AcBitLightOffset = 6;
+const uint8_t kTcl112AcBitHealthOffset = 4;
+const uint8_t kTcl112AcBitSwingHOffset = 3;
+const uint8_t kTcl112AcSwingVOffset = 3;  // Mask 0b00111000
+const uint8_t kTcl112AcSwingVSize = 3;  // Nr. of bits.
+const uint8_t kTcl112AcSwingVOn =    0b111;
+const uint8_t kTcl112AcSwingVOff =   0b000;
+const uint8_t kTcl112AcBitTurboOffset = 6;
 
 
 class IRTcl112Ac {

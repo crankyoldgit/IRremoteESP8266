@@ -572,10 +572,10 @@ TEST(TestMitsubishiHeavy88AcClass, VerticalSwing) {
   ac.setSwingVertical(kMitsubishiHeavy88SwingVOff);
   EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
 
-  ac.setSwingVertical(kMitsubishiHeavy88SwingVHighest + 1);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVLowest + 1);
   EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
 
-  ac.setSwingVertical(kMitsubishiHeavy88SwingVOff + 1);
+  ac.setSwingVertical(kMitsubishiHeavy88SwingVHigh + 1);
   EXPECT_EQ(kMitsubishiHeavy88SwingVOff, ac.getSwingVertical());
 
   // Out of bounds.
@@ -592,19 +592,19 @@ TEST(TestMitsubishiHeavy88AcClass, HorizontalSwing) {
   ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftMax);
   EXPECT_EQ(kMitsubishiHeavy88SwingHLeftMax, ac.getSwingHorizontal());
 
-  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftMax + 1);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax + 1);
   EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
 
   ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax);
   EXPECT_EQ(kMitsubishiHeavy88SwingHRightMax, ac.getSwingHorizontal());
 
-  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax - 1);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHRightMax + 1);
   EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
 
   ac.setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
   EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
 
-  ac.setSwingHorizontal(kMitsubishiHeavy88SwingHOff + 1);
+  ac.setSwingHorizontal(kMitsubishiHeavy88SwingH3D + 1);
   EXPECT_EQ(kMitsubishiHeavy88SwingHOff, ac.getSwingHorizontal());
 
   // Out of bounds.
@@ -649,7 +649,7 @@ TEST(TestMitsubishiHeavy88AcClass, HumanReadable) {
   ac.setSwingVertical(kMitsubishiHeavy88SwingVAuto);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 17C, Fan: 4 (High), "
-      "Swing(V): 16 (Auto), Swing(H): 200 (3D), "
+      "Swing(V): 4 (Auto), Swing(H): 14 (3D), "
       "Turbo: Off, Econo: Off, 3D: On, Clean: Off",
       ac.toString());
 
@@ -663,7 +663,7 @@ TEST(TestMitsubishiHeavy88AcClass, HumanReadable) {
 
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Temp: 31C, Fan: 6 (Turbo), "
-      "Swing(V): 26 (Lowest), Swing(H): 4 (Max Left), Turbo: On, Econo: Off, "
+      "Swing(V): 7 (Lowest), Swing(H): 1 (Max Left), Turbo: On, Econo: Off, "
       "3D: Off, Clean: Off",
       ac.toString());
 
@@ -674,7 +674,7 @@ TEST(TestMitsubishiHeavy88AcClass, HumanReadable) {
 
   EXPECT_EQ(
       "Power: On, Mode: 0 (Auto), Temp: 31C, Fan: 7 (Econo), "
-      "Swing(V): 0 (Off), Swing(H): 4 (Max Left), Turbo: Off, Econo: On, "
+      "Swing(V): 0 (Off), Swing(H): 1 (Max Left), Turbo: Off, Econo: On, "
       "3D: Off, Clean: On",
       ac.toString());
 
@@ -685,7 +685,7 @@ TEST(TestMitsubishiHeavy88AcClass, HumanReadable) {
   ac.setSwingHorizontal(kMitsubishiHeavy88SwingHLeftRight);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (Off), Swing(H): 72 (Left Right), Turbo: Off, Econo: Off, "
+      "Swing(V): 0 (Off), Swing(H): 6 (Left Right), Turbo: Off, Econo: Off, "
       "3D: Off, Clean: Off",
       ac.toString());
 }
@@ -845,7 +845,7 @@ TEST(TestDecodeMitsubishiHeavy, ZjsSyntheticExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (Off), Swing(H): 72 (Left Right), Turbo: Off, Econo: Off, "
+      "Swing(V): 0 (Off), Swing(H): 6 (Left Right), Turbo: Off, Econo: Off, "
       "3D: Off, Clean: Off",
       ac.toString());
 }

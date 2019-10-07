@@ -647,15 +647,17 @@ TEST(TestIRPanasonicAcClass, SetAndGetFan) {
   pana.setFan(kPanasonicAcFanMin);
   EXPECT_EQ(kPanasonicAcFanMin, pana.getFan());
   pana.setFan(kPanasonicAcFanMin - 1);
-  EXPECT_EQ(kPanasonicAcFanMin, pana.getFan());
+  EXPECT_EQ(kPanasonicAcFanAuto, pana.getFan());
+  pana.setFan(kPanasonicAcFanMed);
+  EXPECT_EQ(kPanasonicAcFanMed, pana.getFan());
   pana.setFan(kPanasonicAcFanMin + 1);
-  EXPECT_EQ(kPanasonicAcFanMin + 1, pana.getFan());
+  EXPECT_EQ(kPanasonicAcFanAuto, pana.getFan());
   pana.setFan(kPanasonicAcFanMax);
   EXPECT_EQ(kPanasonicAcFanMax, pana.getFan());
   pana.setFan(kPanasonicAcFanMax + 1);
-  EXPECT_EQ(kPanasonicAcFanMax, pana.getFan());
+  EXPECT_EQ(kPanasonicAcFanAuto, pana.getFan());
   pana.setFan(kPanasonicAcFanMax - 1);
-  EXPECT_EQ(kPanasonicAcFanMax - 1, pana.getFan());
+  EXPECT_EQ(kPanasonicAcFanAuto, pana.getFan());
 }
 
 TEST(TestIRPanasonicAcClass, SetAndGetSwings) {

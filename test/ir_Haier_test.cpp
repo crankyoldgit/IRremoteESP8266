@@ -131,6 +131,8 @@ TEST(TestHaierACClass, Command) {
   EXPECT_EQ(kHaierAcCmdSwing, haier.getCommand());
   haier.setCommand(kHaierAcCmdOn);
   EXPECT_EQ(kHaierAcCmdOn, haier.getCommand());
+  haier.setCommand(kHaierAcCmdOff);
+  EXPECT_EQ(kHaierAcCmdOff, haier.getCommand());
 
   // Test unexpected values.
   haier.setCommand(0b00001110);
@@ -671,15 +673,15 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
 
   EXPECT_EQ(
       "Power: On, Button: 5 (Power), Mode: 0 (Auto), Temp: 25C,"
-      " Fan: 10 (Auto), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+      " Fan: 5 (Auto), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
       " Health: On",
       haier.toString());
   haier.setMode(kHaierAcYrw02Cool);
   haier.setTemp(21);
   haier.setFan(kHaierAcYrw02FanHigh);
   EXPECT_EQ(
-      "Power: On, Button: 4 (Fan), Mode: 2 (Cool), Temp: 21C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+      "Power: On, Button: 4 (Fan), Mode: 1 (Cool), Temp: 21C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
       " Health: On",
       haier.toString());
 
@@ -688,8 +690,8 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
   haier.setSleep(true);
   haier.setTurbo(kHaierAcYrw02TurboHigh);
   EXPECT_EQ(
-      "Power: On, Button: 8 (Turbo), Mode: 2 (Cool), Temp: 21C,"
-      " Fan: 2 (High), Turbo: 1 (High), Swing: 2 (Middle),"
+      "Power: On, Button: 8 (Turbo), Mode: 1 (Cool), Temp: 21C,"
+      " Fan: 1 (High), Turbo: 1 (High), Swing: 2 (Middle),"
       " Sleep: On, Health: Off",
       haier.toString());
 }
@@ -703,8 +705,8 @@ TEST(TestHaierACYRW02Class, RealStates) {
   IRHaierACYRW02 haier(0);
   haier.setRaw(expectedState1);
   EXPECT_EQ(
-      "Power: On, Button: 7 (Health), Mode: 8 (Heat), Temp: 30C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 1 (Highest), Sleep: Off,"
+      "Power: On, Button: 7 (Health), Mode: 4 (Heat), Temp: 30C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 1 (Highest), Sleep: Off,"
       " Health: Off",
       haier.toString());
 
@@ -713,8 +715,8 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x80, 0x00, 0x00, 0x00, 0x00, 0x05, 0x75};
   haier.setRaw(expectedState2);
   EXPECT_EQ(
-      "Power: Off, Button: 5 (Power), Mode: 8 (Heat), Temp: 30C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
+      "Power: Off, Button: 5 (Power), Mode: 4 (Heat), Temp: 30C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
       " Health: Off",
       haier.toString());
 
@@ -723,8 +725,8 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x2B};
   haier.setRaw(expectedState3);
   EXPECT_EQ(
-      "Power: On, Button: 1 (Temp Down), Mode: 2 (Cool), Temp: 16C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
+      "Power: On, Button: 1 (Temp Down), Mode: 1 (Cool), Temp: 16C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
       " Health: On",
       haier.toString());
 
@@ -734,8 +736,8 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x80, 0x00, 0x00, 0x00, 0x0B, 0xD7};
   haier.setRaw(expectedState4);
   EXPECT_EQ(
-      "Power: On, Button: 11 (Sleep), Mode: 2 (Cool), Temp: 25C,"
-      " Fan: 10 (Auto), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
+      "Power: On, Button: 11 (Sleep), Mode: 1 (Cool), Temp: 25C,"
+      " Fan: 5 (Auto), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
       " Health: On",
       haier.toString());
 
@@ -745,8 +747,8 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x80, 0x00, 0x00, 0x00, 0x04, 0x85};
   haier.setRaw(expectedState5);
   EXPECT_EQ(
-      "Power: On, Button: 4 (Fan), Mode: 2 (Cool), Temp: 25C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
+      "Power: On, Button: 4 (Fan), Mode: 1 (Cool), Temp: 25C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
       " Health: On",
       haier.toString());
 }
@@ -972,8 +974,8 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
   IRHaierACYRW02 haier(0);
   haier.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Button: 5 (Power), Mode: 2 (Cool), Temp: 17C,"
-      " Fan: 2 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 17C,"
+      " Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
       " Health: On",
       haier.toString());
 }

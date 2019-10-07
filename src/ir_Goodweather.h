@@ -35,25 +35,19 @@ const uint8_t  kGoodweatherExtraTolerance = 12;  // +12% extra
 
 // Masks
 const uint8_t kGoodweatherBitLight = 8;
-const uint64_t kGoodweatherLightMask = 0x1ULL << kGoodweatherBitLight;
 const uint8_t kGoodweatherBitTurbo = kGoodweatherBitLight + 3;  // 11
-const uint64_t kGoodweatherTurboMask = 0x1ULL << kGoodweatherBitTurbo;
 const uint8_t kGoodweatherBitCommand = kGoodweatherBitTurbo + 5;  // 16
-const uint64_t kGoodweatherCommandMask = 0xFULL << kGoodweatherBitCommand;
+const uint8_t kGoodweatherCommandSize = 4;  // Bits
 const uint8_t kGoodweatherBitSleep = kGoodweatherBitCommand + 8;  // 24
-const uint64_t kGoodweatherSleepMask = 0x1ULL << kGoodweatherBitSleep;
 const uint8_t kGoodweatherBitPower = kGoodweatherBitSleep + 1;  // 25
-const uint64_t kGoodweatherPowerMask = 0x1ULL << kGoodweatherBitPower;
 const uint8_t kGoodweatherBitSwing = kGoodweatherBitPower + 1;  // 26
-const uint64_t kGoodweatherSwingMask = 0x3ULL << kGoodweatherBitSwing;
+const uint8_t kGoodweatherSwingSize = 2;  // Bits
 const uint8_t kGoodweatherBitAirFlow = kGoodweatherBitSwing + 2;  // 28
-const uint64_t kGoodweatherAirFlowMask = 0x1ULL << kGoodweatherBitAirFlow;
 const uint8_t kGoodweatherBitFan = kGoodweatherBitAirFlow + 1;  // 29
-const uint64_t kGoodweatherFanMask = 0x3ULL << kGoodweatherBitFan;
+const uint8_t kGoodweatherFanSize = 2;  // Bits
 const uint8_t kGoodweatherBitTemp = kGoodweatherBitFan + 3;  // 32
-const uint64_t kGoodweatherTempMask = 0xFULL << kGoodweatherBitTemp;
+const uint8_t kGoodweatherTempSize = 4;  // Bits
 const uint8_t kGoodweatherBitMode = kGoodweatherBitTemp + 5;  // 37
-const uint64_t kGoodweatherModeMask = 0x7ULL << kGoodweatherBitMode;
 const uint8_t kGoodweatherBitEOF = kGoodweatherBitMode + 3;  // 40
 const uint64_t kGoodweatherEOFMask = 0xFFULL << kGoodweatherBitEOF;
 

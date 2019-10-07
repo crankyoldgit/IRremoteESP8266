@@ -44,6 +44,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_MIDEA
 // Send a Midea message
@@ -124,46 +126,38 @@ void IRMideaAC::send(const uint16_t repeat) {
 // Return a pointer to the internal state date of the remote.
 uint64_t IRMideaAC::getRaw(void) {
   this->checksum();
-  return remote_state & kMideaACStateMask;
+  return GETBITS64(remote_state, 0, kMideaBits);
 }
 
 // Override the internal state with the new state.
-void IRMideaAC::setRaw(const uint64_t newState) {
-  remote_state = newState & kMideaACStateMask;
-}
+void IRMideaAC::setRaw(const uint64_t newState) { remote_state = newState; }
+
+// Set the requested power state of the A/C to on.
+void IRMideaAC::on(void) { setPower(true); }
 
 // Set the requested power state of the A/C to off.
-void IRMideaAC::on(void) { remote_state |= kMideaACPower; }
-
-// Set the requested power state of the A/C to off.
-void IRMideaAC::off(void) {
-  remote_state &= (kMideaACStateMask ^ kMideaACPower);
-}
+void IRMideaAC::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMideaAC::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state, kMideaACPowerOffset, on);
 }
 
 // Return the requested power state of the A/C.
-bool IRMideaAC::getPower(void) { return (remote_state & kMideaACPower); }
+bool IRMideaAC::getPower(void) {
+  return GETBIT64(remote_state, kMideaACPowerOffset);
+}
 
 // Returns true if we want the A/C unit to work natively in Celsius.
 bool IRMideaAC::getUseCelsius(void) {
-  return !(remote_state & kMideaACCelsiusBit);
+  return !GETBIT64(remote_state, kMideaACCelsiusOffset);
 }
 
 // Set the A/C unit to use Celsius natively.
 void IRMideaAC::setUseCelsius(const bool on) {
   if (on != getUseCelsius()) {  // We need to change.
     uint8_t native_temp = getTemp(!on);  // Get the old native temp.
-    if (on)
-      remote_state &= ~kMideaACCelsiusBit;  // Clear the bit
-    else
-      remote_state |= kMideaACCelsiusBit;  // Set the bit
+    setBit(&remote_state, kMideaACCelsiusOffset, !on);  // Cleared is on.
     setTemp(native_temp, !on);  // Reset temp using the old native temp.
   }
 }
@@ -187,8 +181,7 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
   else  // Native and desired are the same units.
     new_temp -= min_temp;
   // Set the actual data.
-  remote_state &= kMideaACTempMask;
-  remote_state |= ((uint64_t)new_temp << 24);
+  setBits(&remote_state, kMideaACTempOffset, kMideaACTempSize, new_temp);
 }
 
 // Return the set temp.
@@ -197,7 +190,7 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
 // Returns:
 //   A uint8_t containing the temperature.
 uint8_t IRMideaAC::getTemp(const bool celsius) {
-  uint8_t temp = ((remote_state >> 24) & 0x1F);
+  uint8_t temp = GETBITS64(remote_state, kMideaACTempOffset, kMideaACTempSize);
   if (getUseCelsius())
     temp += kMideaACMinTempC;
   else
@@ -210,27 +203,21 @@ uint8_t IRMideaAC::getTemp(const bool celsius) {
 // Set the speed of the fan,
 // 1-3 set the speed, 0 or anything else set it to auto.
 void IRMideaAC::setFan(const uint8_t fan) {
-  uint64_t new_fan;
-  switch (fan) {
-    case kMideaACFanLow:
-    case kMideaACFanMed:
-    case kMideaACFanHigh:
-      new_fan = fan;
-      break;
-    default:
-      new_fan = kMideaACFanAuto;
-  }
-  remote_state &= kMideaACFanMask;
-  remote_state |= (new_fan << 35);
+  setBits(&remote_state, kMideaACFanOffset, kMideaACFanSize,
+          (fan > kMideaACFanHigh) ? kMideaACFanAuto : fan);
 }
 
 // Return the requested state of the unit's fan.
-uint8_t IRMideaAC::getFan(void) { return (remote_state >> 35) & 0b111; }
+uint8_t IRMideaAC::getFan(void) {
+  return GETBITS64(remote_state, kMideaACFanOffset, kMideaACFanSize);
+}
 
 // Get the requested climate operation mode of the a/c unit.
 // Returns:
 //   A uint8_t containing the A/C mode.
-uint8_t IRMideaAC::getMode(void) { return ((remote_state >> 32) & 0b111); }
+uint8_t IRMideaAC::getMode(void) {
+  return GETBITS64(remote_state, kMideaACModeOffset, kModeBitsSize);
+}
 
 // Set the requested climate operation mode of the a/c unit.
 void IRMideaAC::setMode(const uint8_t mode) {
@@ -240,9 +227,8 @@ void IRMideaAC::setMode(const uint8_t mode) {
     case kMideaACHeat:
     case kMideaACDry:
     case kMideaACFan:
-      remote_state &= kMideaACModeMask;
-      remote_state |= ((uint64_t)mode << 32);
-      return;
+      setBits(&remote_state, kMideaACModeOffset, kModeBitsSize, mode);
+      break;
     default:
       this->setMode(kMideaACAuto);
   }
@@ -250,24 +236,22 @@ void IRMideaAC::setMode(const uint8_t mode) {
 
 // Set the Sleep state of the A/C.
 void IRMideaAC::setSleep(const bool on) {
-  if (on)
-    remote_state |= kMideaACSleep;
-  else
-    remote_state &= (kMideaACStateMask ^ kMideaACSleep);
+  setBit(&remote_state, kMideaACSleepOffset, on);
 }
 
 // Return the Sleep state of the A/C.
-bool IRMideaAC::getSleep(void) { return (remote_state & kMideaACSleep); }
+bool IRMideaAC::getSleep(void) {
+  return GETBIT64(remote_state, kMideaACSleepOffset);
+}
 
 // Set the A/C to toggle the vertical swing toggle for the next send.
-void IRMideaAC::setSwingVToggle(const bool on) {
-  _SwingVToggle = on;
-}
+void IRMideaAC::setSwingVToggle(const bool on) { _SwingVToggle = on; }
 
 // Return if the message/state is just a Swing V toggle message/command.
 bool IRMideaAC::isSwingVToggle(void) {
   return remote_state == kMideaACToggleSwingV;
 }
+
 // Return the Swing V toggle state of the A/C.
 bool IRMideaAC::getSwingVToggle(void) {
   _SwingVToggle |= isSwingVToggle();
@@ -297,30 +281,24 @@ uint8_t IRMideaAC::calcChecksum(const uint64_t state) {
 // Returns:
 //   A boolean.
 bool IRMideaAC::validChecksum(const uint64_t state) {
-  return ((state & 0xFF) == calcChecksum(state));
+  return GETBITS64(state, 0, 8) == calcChecksum(state);
 }
 
 // Calculate & set the checksum for the current internal state of the remote.
 void IRMideaAC::checksum(void) {
   // Stored the checksum value in the last byte.
-  remote_state &= kMideaACChecksumMask;
-  remote_state |= calcChecksum(remote_state);
+  setBits(&remote_state, 0, 8, calcChecksum(remote_state));
 }
 
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kMideaACCool;
-    case stdAc::opmode_t::kHeat:
-      return kMideaACHeat;
-    case stdAc::opmode_t::kDry:
-      return kMideaACDry;
-    case stdAc::opmode_t::kFan:
-      return kMideaACFan;
-    default:
-      return kMideaACAuto;
+    case stdAc::opmode_t::kCool: return kMideaACCool;
+    case stdAc::opmode_t::kHeat: return kMideaACHeat;
+    case stdAc::opmode_t::kDry:  return kMideaACDry;
+    case stdAc::opmode_t::kFan:  return kMideaACFan;
+    default:                     return kMideaACAuto;
   }
 }
 
@@ -328,15 +306,11 @@ uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kMideaACFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kMideaACFanMed;
+    case stdAc::fanspeed_t::kLow:    return kMideaACFanLow;
+    case stdAc::fanspeed_t::kMedium: return kMideaACFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kMideaACFanHigh;
-    default:
-      return kMideaACFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kMideaACFanHigh;
+    default:                         return kMideaACFanAuto;
   }
 }
 
@@ -345,9 +319,9 @@ stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMideaACCool: return stdAc::opmode_t::kCool;
     case kMideaACHeat: return stdAc::opmode_t::kHeat;
-    case kMideaACDry: return stdAc::opmode_t::kDry;
-    case kMideaACFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kMideaACDry:  return stdAc::opmode_t::kDry;
+    case kMideaACFan:  return stdAc::opmode_t::kFan;
+    default:           return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -355,9 +329,9 @@ stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMideaACFanHigh: return stdAc::fanspeed_t::kMax;
-    case kMideaACFanMed: return stdAc::fanspeed_t::kMedium;
-    case kMideaACFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kMideaACFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kMideaACFanLow:  return stdAc::fanspeed_t::kMin;
+    default:              return stdAc::fanspeed_t::kAuto;
   }
 }
 

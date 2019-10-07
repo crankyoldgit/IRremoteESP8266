@@ -494,8 +494,8 @@ TEST(TestIRac, HaierYrwo2) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Button: 5 (Power), Mode: 2 (Cool), Temp: 23C, "
-      "Fan: 4 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
+      "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
       "Health: On";
 
   ac.begin();
@@ -603,7 +603,7 @@ TEST(TestIRac, Mitsubishi) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 24 (Cool), Temp: 20C, Fan: 2 (Medium), "
+      "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 2 (Medium), "
       "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
       "Clock: 14:30, On Timer: 00:00, Off Timer: 00:00, Timer: -";
 
@@ -655,7 +655,7 @@ TEST(TestIRac, MitsubishiHeavy88) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 1 (Cool), Temp: 21C, Fan: 3 (Med), "
-      "Swing(V): 16 (Auto), Swing(H): 0 (Off), Turbo: Off, Econo: Off, "
+      "Swing(V): 4 (Auto), Swing(H): 0 (Off), Turbo: Off, Econo: Off, "
       "3D: Off, Clean: On";
 
   ac.begin();
