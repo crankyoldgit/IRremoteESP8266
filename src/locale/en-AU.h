@@ -3,6 +3,6 @@
 // This file will override the default values located in `defaults.h`.
 #ifndef LOCALE_EN_AU_H_
 #define LOCALE_EN_AU_H_
-// Nothing should really need to be set here, as en_AU is the default
+// Nothing should really need to be set here, as en-AU is the default
 // locale/language.
 #endif  // LOCALE_EN_AU_H__

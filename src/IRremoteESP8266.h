@@ -55,7 +55,7 @@
 
 // Set the language & locale for the library. See the `locale` dir for options.
 #ifndef _IR_LOCALE_
-#define _IR_LOCALE_ en_AU
+#define _IR_LOCALE_ en-AU
 #endif  // _IR_LOCALE_
 
 // Supported IR protocols

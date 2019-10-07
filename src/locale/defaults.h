@@ -2,10 +2,14 @@
 // The default text to use throughout the library.
 // The library will use this text if no locale (_IR_LOCALE_) is set or if
 // the locale doesn't define particular values.
-// If they are defined, this file should NOT over ride them.
+// If they are defined, this file should NOT override them.
+//
 // This file should contain a #define for every translateable/locale dependant
-// string used by the library.
-
+// string used by the library. Language specific files don't have to include
+// everything.
+//
+// NOTE: ASCII/UTF-8 characters only. Unicode is NOT supported.
+//
 // The defaults are English (AU) / en-AU. Australia (AU) is pretty much the same
 // as English (UK) for this libraries use case.
 #ifndef LOCALE_DEFAULTS_H_
