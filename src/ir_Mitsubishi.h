@@ -1,5 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017-2019 David Conran
+// Copyright 2019 kuchel77
 
 // Mitsubishi
 
@@ -10,6 +11,8 @@
 //   Brand: Mitsubishi,  Model: KM14A 0179213 remote
 //   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
 //   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
+//   Brand: Mitsubishi Electric,  Model: MSH-A24WV / MUH-A24WV A/C
+//   Brand: Mitsubishi Electric,  Model: KPOA remote
 
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
@@ -77,46 +80,50 @@ const uint8_t kMitsubishi136FanMed =          0b10;
 const uint8_t kMitsubishi136FanMax =          0b11;
 const uint8_t kMitsubishi136FanQuiet = kMitsubishi136FanMin;
 
+// Mitsubishi112
+
+// remote_state[5]
 const uint8_t kMitsubishi112PowerByte = 5;
-const uint8_t kMitsubishi112PowerBit =   0b00000100;
+const uint8_t kMitsubishi112PowerBit =         0b00000100;
+// remote_state[6]
+const uint8_t kMitsubishi112ModeByte = 6;
+const uint8_t kMitsubishi112ModeMask =         0b00000111;
+const uint8_t kMitsubishi112Cool =                  0b011;
+const uint8_t kMitsubishi112Heat =                  0b001;
+const uint8_t kMitsubishi112Auto =                  0b111;
+const uint8_t kMitsubishi112Dry =                   0b010;
+// remote_state[7]
 const uint8_t kMitsubishi112TempByte = 7;
-const uint8_t kMitsubishi112TempMask =   0b00001111;
+const uint8_t kMitsubishi112TempMask =         0b00001111;
 const uint8_t kMitsubishi112MinTemp = 16;  // 16C
 const uint8_t kMitsubishi112MaxTemp = 31;  // 31C
-const uint8_t kMitsubishi112ModeByte = 6;
-const uint8_t kMitsubishi112ModeMask =   0b00000111;
-const uint8_t kMitsubishi112Cool =            0b011;
-const uint8_t kMitsubishi112Heat =            0b001;
-const uint8_t kMitsubishi112Auto =            0b111;
-const uint8_t kMitsubishi112Dry =             0b010;
-const uint8_t kMitsubishi112SwingVByte = 8;
-const uint8_t kMitsubishi112SwingVMask =     0b111000;
-const uint8_t kMitsubishi112SwingVLowest =   0b101000;
-const uint8_t kMitsubishi112SwingVLow =      0b100000;
-const uint8_t kMitsubishi112SwingVMiddle =   0b011000;
-const uint8_t kMitsubishi112SwingVHigh =     0b010000;
-const uint8_t kMitsubishi112SwingVHighest =  0b001000;
-const uint8_t kMitsubishi112SwingVAuto =     0b111000;
-
-const uint8_t kMitsubishi112SwingHByte = 12;
-const uint8_t kMitsubishi112SwingHMask =       0b111100;
-const uint8_t kMitsubishi112SwingHLeftMax =    0b000100;
-const uint8_t kMitsubishi112SwingHLeftInner =  0b001000;
-const uint8_t kMitsubishi112SwingHMiddle =     0b001100;
-const uint8_t kMitsubishi112SwingHRightInner = 0b010000;
-const uint8_t kMitsubishi112SwingHRightMax =   0b010100;
-const uint8_t kMitsubishi112SwingHWide =       0b100000;
-const uint8_t kMitsubishi112SwingHAuto =       0b110000;
-
-
+// remote_state[8]
 const uint8_t kMitsubishi112FanByte = 8;
-const uint8_t kMitsubishi112FanMask =    0b11111000;
-const uint8_t kMitsubishi112FanGetMask =    0b111;
-const uint8_t kMitsubishi112FanMin =          0b010;
-const uint8_t kMitsubishi112FanLow =          0b011;
-const uint8_t kMitsubishi112FanMed =          0b101;
-const uint8_t kMitsubishi112FanMax =          0b000;
+const uint8_t kMitsubishi112FanMask =          0b11111000;
+const uint8_t kMitsubishi112FanGetMask =            0b111;
+const uint8_t kMitsubishi112FanMin =                0b010;
+const uint8_t kMitsubishi112FanLow =                0b011;
+const uint8_t kMitsubishi112FanMed =                0b101;
+const uint8_t kMitsubishi112FanMax =                0b000;
 const uint8_t kMitsubishi112FanQuiet = kMitsubishi112FanMin;
+const uint8_t kMitsubishi112SwingVByte = kMitsubishi112FanByte;
+const uint8_t kMitsubishi112SwingVMask =       0b00111000;
+const uint8_t kMitsubishi112SwingVLowest =     0b00101000;
+const uint8_t kMitsubishi112SwingVLow =        0b00100000;
+const uint8_t kMitsubishi112SwingVMiddle =     0b00011000;
+const uint8_t kMitsubishi112SwingVHigh =       0b00010000;
+const uint8_t kMitsubishi112SwingVHighest =    0b00001000;
+const uint8_t kMitsubishi112SwingVAuto =       0b00111000;
+// remote_state[12]
+const uint8_t kMitsubishi112SwingHByte = 12;
+const uint8_t kMitsubishi112SwingHMask =       0b00111100;
+const uint8_t kMitsubishi112SwingHLeftMax =    0b00000100;
+const uint8_t kMitsubishi112SwingHLeftInner =  0b00001000;
+const uint8_t kMitsubishi112SwingHMiddle =     0b00001100;
+const uint8_t kMitsubishi112SwingHRightInner = 0b00010000;
+const uint8_t kMitsubishi112SwingHRightMax =   0b00010100;
+const uint8_t kMitsubishi112SwingHWide =       0b00100000;
+const uint8_t kMitsubishi112SwingHAuto =       0b00110000;
 
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
@@ -253,8 +260,6 @@ class IRMitsubishi112 {
   uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI112
   void begin(void);
-  static bool validChecksum(const uint8_t* data,
-                            const uint16_t len = kMitsubishi112StateLength);
   void on(void);
   void off(void);
   void setPower(const bool on);

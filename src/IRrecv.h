@@ -482,11 +482,6 @@ class IRrecv {
                       const uint16_t nbits = kVestelAcBits,
                       const bool strict = true);
 #endif
-#if DECODE_TCL112AC
-  bool decodeTcl112Ac(decode_results *results,
-                      const uint16_t nbits = kTcl112AcBits,
-                      const bool strict = true);
-#endif
 #if DECODE_TECO
   bool decodeTeco(decode_results *results, const uint16_t nbits = kTecoBits,
                   const bool strict = false);

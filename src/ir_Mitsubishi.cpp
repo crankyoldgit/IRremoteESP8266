@@ -1,5 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017-2019 David Conran
+// Copyright 2019 kuchel77
 // Copyright 2018 Denes Varga
 
 // Mitsubishi
@@ -12,6 +13,7 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
+#include "ir_Tcl.h"
 
 // Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
 // Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
@@ -81,6 +83,8 @@ const uint16_t kMitsubishi112BitMark = 450;
 const uint16_t kMitsubishi112OneSpace = 1250;
 const uint16_t kMitsubishi112ZeroSpace = 385;
 const uint32_t kMitsubishi112Gap = kDefaultMessageGap;
+// Total tolerance percentage to use for matching the header mark.
+const uint8_t  kMitsubishi112HdrMarkTolerance = 5;
 
 
 using irutils::addBoolToString;
@@ -1209,7 +1213,7 @@ String IRMitsubishi136::toString(void) {
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = kMitsubishi112MinRepeat).
 //
-// Status: ALPHA / Probably working. Needs to be tested against a real device.
+// Status: Stable / Reported as working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
@@ -1227,8 +1231,8 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 }
 #endif  // SEND_MITSUBISHI112
 
-#if DECODE_MITSUBISHI112
-// Decode the supplied Mitsubishi112 message.
+#if DECODE_MITSUBISHI112 || DECODE_TCL112AC
+// Decode the supplied Mitsubishi112 / Tcl112Ac message.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -1239,40 +1243,89 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 //
 // Status: STABLE / Reported as working.
 //
+// Note: Mitsubishi112 & Tcl112Ac are basically the same protocol.
+//       The only significant difference I can see is Mitsubishi112 has a
+//       slightly longer header mark. We will use that to determine which
+//       varient it should be. The other differences require full decoding and
+//       only only with certain settings.
+//       There are some other timing differences too, but the tolerances will
+//       overlap.
 // Ref:
-// FIXME
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/619
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/947
 bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
                                  const bool strict) {
   if (results->rawlen < ((2 * nbits) + kHeader + kFooter - 1)) return false;
   if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
   if (strict) {  // Do checks to see if it matches the spec.
-    if (nbits != kMitsubishi112Bits) return false;
+    if (nbits != kMitsubishi112Bits && nbits != kTcl112AcBits) return false;
   }
-  uint16_t used = matchGeneric(results->rawbuf + kStartOffset, results->state,
-                               results->rawlen - kStartOffset, nbits,
-                               kMitsubishi112HdrMark, kMitsubishi112HdrSpace,
-                               kMitsubishi112BitMark, kMitsubishi112OneSpace,
-                               kMitsubishi112BitMark, kMitsubishi112ZeroSpace,
-                               kMitsubishi112BitMark, kMitsubishi112Gap,
-                               true, _tolerance, 0, false);
+  uint16_t offset = kStartOffset;
+  decode_type_t typeguess = decode_type_t::UNKNOWN;
+  uint16_t hdrspace;
+  uint16_t bitmark;
+  uint16_t onespace;
+  uint16_t zerospace;
+  uint32_t gap;
+  uint8_t tolerance = _tolerance;
+
+  // Header
+#if DECODE_MITSUBISHI112
+  if (matchMark(results->rawbuf[offset], kMitsubishi112HdrMark,
+                kMitsubishi112HdrMarkTolerance, 0)) {
+    typeguess = decode_type_t::MITSUBISHI112;
+    hdrspace = kMitsubishi112HdrSpace;
+    bitmark = kMitsubishi112BitMark;
+    onespace = kMitsubishi112OneSpace;
+    zerospace = kMitsubishi112ZeroSpace;
+    gap = kMitsubishi112Gap;
+  }
+#endif  // DECODE_MITSUBISHI112
+#if DECODE_TCL112AC
+  if (typeguess == decode_type_t::UNKNOWN &&  // We didn't match Mitsubishi112
+      matchMark(results->rawbuf[offset], kTcl112AcHdrMark,
+                kTcl112AcHdrMarkTolerance, 0)) {
+    typeguess = decode_type_t::TCL112AC;
+    hdrspace = kTcl112AcHdrSpace;
+    bitmark = kTcl112AcBitMark;
+    onespace = kTcl112AcOneSpace;
+    zerospace = kTcl112AcZeroSpace;
+    gap = kTcl112AcGap;
+    tolerance += kTcl112AcTolerance;
+  }
+#endif  // DECODE_TCL112AC
+  if (typeguess == decode_type_t::UNKNOWN) return false;  // No header matched.
+  offset++;
+
+  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
+                               results->rawlen - offset, nbits,
+                               0,  // Skip the header as we matched it earlier.
+                               hdrspace, bitmark, onespace, bitmark, zerospace,
+                               bitmark, gap,
+                               true, tolerance, 0, false);
   if (!used) return false;
   if (strict) {
     // Header validation: Codes start with 0x23CB26
     if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
         results->state[2] != 0x26) return false;
-    if (!IRMitsubishi112::validChecksum(results->state, nbits / 8))
-      return false;
+    // TCL112 and MITSUBISHI112 share the exact same checksum.
+    if (!IRTcl112Ac::validChecksum(results->state, nbits / 8)) return false;
   }
-  results->decode_type = MITSUBISHI112;
+  // Success
+  results->decode_type = typeguess;
   results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
   return true;
 }
-#endif  // DECODE_MITSUBISHI112
+#endif  // DECODE_MITSUBISHI112 || DECODE_TCL112AC
+
 // Code to emulate Mitsubishi 112bit A/C IR remote control unit.
 //
 // Equipment it seems compatible with:
-//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
-//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
+//   Brand: Mitsubishi Electric,  Model: MSH-A24WV / MUH-A24WV A/C
+//   Brand: Mitsubishi Electric,  Model: KPOA remote
 
 // Initialise the object.
 IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
@@ -1282,7 +1335,6 @@ IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
 // Reset the state of the remote to a known good state/sequence.
 void IRMitsubishi112::stateReset(void) {
   // The state of the IR remote in IR code form.
-  // Known good state obtained from:
   remote_state[0] = 0x23;
   remote_state[1] = 0xCB;
   remote_state[2] = 0x26;
@@ -1296,32 +1348,12 @@ void IRMitsubishi112::stateReset(void) {
   remote_state[10] = 0x00;
   remote_state[11] = 0x00;
   remote_state[12] = 0x30;
-  remote_state[13] = 0x75;
-
-  checksum();  // Calculate the checksum which covers the rest of the state.
 }
 
 // Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  uint8_t checksum = 0;
-  for (uint8_t i = 0; i < 13; i++) {
-      checksum = checksum + remote_state[i];
-  }
-  remote_state[13] = checksum;
-}
-
-bool IRMitsubishi112::validChecksum(const uint8_t *data, const uint16_t len) {
-  uint8_t checksum = 0;
-
-  if (len < kMitsubishi112StateLength) return false;
-
-  for (uint8_t i = 0; i < kMitsubishi112StateLength-1; i++) {
-    checksum += data[i];
-  }
-
-  if (data[kMitsubishi112StateLength-1] != checksum) return false;
-
-  return true;
+  remote_state[kMitsubishi112StateLength - 1] = IRTcl112Ac::calcChecksum(
+      remote_state, kMitsubishi112StateLength);
 }
 
 // Configure the pin for output.
@@ -1345,7 +1377,6 @@ void IRMitsubishi112::setRaw(const uint8_t *data) {
   for (uint8_t i = 0; i < (kMitsubishi112StateLength - 1); i++) {
     remote_state[i] = data[i];
   }
-  checksum();
 }
 
 // Set the requested power state of the A/C to off.
@@ -1356,11 +1387,10 @@ void IRMitsubishi112::off(void) { setPower(false); }
 
 // Set the requested power state of the A/C.
 void IRMitsubishi112::setPower(bool on) {
-  // FIXME - Hardcoded values rather than anything else at the moment.
   if (on)
-    remote_state[kMitsubishi112PowerByte] = 0x24;
+    remote_state[kMitsubishi112PowerByte] |= kMitsubishi112PowerBit;
   else
-    remote_state[kMitsubishi112PowerByte] = 0x20;
+    remote_state[kMitsubishi112PowerByte] &= ~kMitsubishi112PowerBit;
 }
 
 // Return the requested power state of the A/C.
