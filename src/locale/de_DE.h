@@ -93,4 +93,34 @@
 #define D_STR_TOP "Oben"
 #define D_STR_BOTTOM "Unten"
 
+#define D_STR_DAY "Tag"
+#define D_STR_DAYS D_STR_DAY "e"
+#define D_STR_HOUR "Stunde"
+#define D_STR_HOURS D_STR_HOUR "n"
+#define D_STR_MINUTES D_STR_MINUTE "n"
+#define D_STR_SECOND "Sekunde"
+#define D_STR_SECONDS D_STR_SECOND "n"
+#define D_STR_NOW "Jetzt"
+// These don't translate well to German as typically only 2 letter
+// abbreviations are used. Hence, this is an approximation.
+#define D_STR_THREELETTERDAYS "SonMonDieMitDonFreSam"
+
+#define D_STR_YES "Ja"
+#define D_STR_NO "Nein"
+#define D_STR_TRUE "Wahr"
+#define D_STR_FALSE "Falsch"
+
+#define D_STR_REPEAT "Wiederholen"
+
+// IRrecvDumpV2
+#define D_STR_TIMESTAMP "Zeitstempel"
+#define D_STR_LIBRARY "Bibliothek"
+#define D_STR_MESGDESC "Nachr. Beschr."
+#define D_STR_IRRECVDUMP_STARTUP \
+    "IRrecvDumpV2 läuft und wartet auf IR Eingabe auf Pin %d"
+#define D_WARN_BUFFERFULL \
+    "WARNUNG: IR Code ist zu gross für Buffer (>= %d). " \
+    "Dem Resultat sollte nicht vertraut werden bevor das behoben ist. " \
+    "Bearbeite & vergrössere `kCaptureBufferSize`."
+
 #endif  // LOCALE_DE_DE_H_
