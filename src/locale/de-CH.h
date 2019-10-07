@@ -5,7 +5,7 @@
 #define LOCALE_DE_CH_H_
 
 // Import German / Germany as default overrides.
-#include "locale/de_DE.h"
+#include "locale/de-DE.h"
 
 // As we have loaded another language, we need to #undef anything we need
 // to update/change.

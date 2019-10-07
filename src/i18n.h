@@ -7,7 +7,7 @@
 
 // Load the appropriate locale header file.
 #ifndef _IR_LOCALE_
-#define _IR_LOCALE_ en_AU
+#define _IR_LOCALE_ en-AU
 #endif  // _IR_LOCALE_
 
 #define ENQUOTE_(x) #x

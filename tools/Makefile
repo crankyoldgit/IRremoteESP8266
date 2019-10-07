@@ -18,7 +18,7 @@ INCLUDES = -I$(USER_DIR) -I$(TEST_DIR)
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -DUNIT_TEST -D_IR_LOCALE_=en_AU
+CPPFLAGS += -DUNIT_TEST -D_IR_LOCALE_=en-AU
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
