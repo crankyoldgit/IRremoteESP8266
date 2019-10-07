@@ -63,4 +63,34 @@
 #define D_STR_6THSENSE "6ter Sinn"
 #define D_STR_FIXED "Fixiert"
 
+#define D_STR_AUTOMATIC "Automatisch"
+#define D_STR_MANUAL "Manuell"
+#define D_STR_COOL "Kühlen"
+#define D_STR_HEAT "Heizen"
+#define D_STR_FAN "Lüfter"
+#define D_STR_FANONLY "nur_lüfter"
+#define D_STR_DRY "Trocken"
+
+#define D_STR_MED "Mit"
+#define D_STR_MEDIUM "Mittel"
+
+#define D_STR_HIGHEST "Höchste"
+#define D_STR_HIGH "Hoch"
+#define D_STR_HI "H"
+#define D_STR_MID "M"
+#define D_STR_MIDDLE "Mittel"
+#define D_STR_LOW "Tief"
+#define D_STR_LO "T"
+#define D_STR_LOWEST "Tiefste"
+#define D_STR_RIGHT "Rechts"
+#define D_STR_MAXRIGHT D_STR_MAX " " D_STR_RIGHT
+#define D_STR_RIGHTMAX_NOSPACE D_STR_RIGHT D_STR_MAX
+#define D_STR_LEFT "Links"
+#define D_STR_MAXLEFT D_STR_MAX " " D_STR_LEFT
+#define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX
+#define D_STR_WIDE "Breit"
+#define D_STR_CENTRE "Mitte"
+#define D_STR_TOP "Oben"
+#define D_STR_BOTTOM "Unten"
+
 #endif  // LOCALE_DE_DE_H_
