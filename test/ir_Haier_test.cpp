@@ -705,7 +705,7 @@ TEST(TestHaierACYRW02Class, RealStates) {
   IRHaierACYRW02 haier(0);
   haier.setRaw(expectedState1);
   EXPECT_EQ(
-      "Power: On, Button: 7 (Health), Mode: 8 (Heat), Temp: 30C,"
+      "Power: On, Button: 7 (Health), Mode: 4 (Heat), Temp: 30C,"
       " Fan: 1 (High), Turbo: 0 (Off), Swing: 1 (Highest), Sleep: Off,"
       " Health: Off",
       haier.toString());
