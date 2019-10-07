@@ -1478,9 +1478,9 @@ void IRMitsubishi112::setSwingH(const uint8_t position) {
   // If we get an unexpected mode, default to auto.
   switch (position) {
     case kMitsubishi112SwingHLeftMax:
-    case kMitsubishi112SwingHLeftInner:
+    case kMitsubishi112SwingHLeft:
     case kMitsubishi112SwingHMiddle:
-    case kMitsubishi112SwingHRightInner:
+    case kMitsubishi112SwingHRight:
     case kMitsubishi112SwingHRightMax:
     case kMitsubishi112SwingHWide:
     case kMitsubishi112SwingHAuto:
@@ -1550,9 +1550,9 @@ uint8_t IRMitsubishi112::convertSwingV(const stdAc::swingv_t position) {
 uint8_t IRMitsubishi112::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax: return kMitsubishi112SwingHLeftMax;
-    case stdAc::swingh_t::kLeft: return kMitsubishi112SwingHLeftInner;
+    case stdAc::swingh_t::kLeft: return kMitsubishi112SwingHLeft;
     case stdAc::swingh_t::kMiddle: return kMitsubishi112SwingHMiddle;
-    case stdAc::swingh_t::kRight: return kMitsubishi112SwingHRightInner;
+    case stdAc::swingh_t::kRight: return kMitsubishi112SwingHRight;
     case stdAc::swingh_t::kRightMax: return kMitsubishi112SwingHRightMax;
     case stdAc::swingh_t::kWide: return kMitsubishi112SwingHWide;
     case stdAc::swingh_t::kAuto: return kMitsubishi112SwingHAuto;
@@ -1597,9 +1597,9 @@ stdAc::swingv_t IRMitsubishi112::toCommonSwingV(const uint8_t pos) {
 stdAc::swingh_t IRMitsubishi112::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
     case kMitsubishi112SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
-    case kMitsubishi112SwingHLeftInner: return stdAc::swingh_t::kLeft;
+    case kMitsubishi112SwingHLeft: return stdAc::swingh_t::kLeft;
     case kMitsubishi112SwingHMiddle: return stdAc::swingh_t::kMiddle;
-    case kMitsubishi112SwingHRightInner: return stdAc::swingh_t::kRight;
+    case kMitsubishi112SwingHRight: return stdAc::swingh_t::kRight;
     case kMitsubishi112SwingHRightMax: return stdAc::swingh_t::kRightMax;
     case kMitsubishi112SwingHWide: return stdAc::swingh_t::kWide;
     case kMitsubishi112SwingHAuto: return stdAc::swingh_t::kAuto;
@@ -1663,9 +1663,9 @@ String IRMitsubishi112::toString(void) {
   result += addIntToString(getSwingH(), F("Swing(H)"));
   switch (getSwingH()) {
     case kMitsubishi112SwingHLeftMax: result += F(" (Left Max)"); break;
-    case kMitsubishi112SwingHLeftInner: result += F(" (Left Inner)"); break;
+    case kMitsubishi112SwingHLeft: result += F(" (Left)"); break;
     case kMitsubishi112SwingHMiddle: result += F(" (Middle)"); break;
-    case kMitsubishi112SwingHRightInner: result += F(" (Right Inner)"); break;
+    case kMitsubishi112SwingHRight: result += F(" (Right)"); break;
     case kMitsubishi112SwingHRightMax: result += F(" (Right Max)"); break;
     case kMitsubishi112SwingHWide: result += F(" (Wide)"); break;
     case kMitsubishi112SwingHAuto: result += F(" (Auto)"); break;
