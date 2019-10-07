@@ -332,9 +332,6 @@
 #ifndef D_STR_LEFTMAX_NOSPACE
 #define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX
 #endif  // D_STR_LEFTMAX_NOSPACE
-#ifndef D_STR_LOWEST
-#define D_STR_LOWEST "Lowest"
-#endif  // D_STR_LOWEST
 #ifndef D_STR_WIDE
 #define D_STR_WIDE "Wide"
 #endif  // D_STR_WIDE
