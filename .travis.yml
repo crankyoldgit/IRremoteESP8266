@@ -19,17 +19,17 @@ notifications:
     on_failure: change
 jobs:
   include:
-    - stage: "Compile the trivial examples"
+    - name: "Compile the trivial examples"
       script:
       # Check that everything compiles but some heavy tasks e.g. IRMQTTServer & IRrecvDumpV2
       # i.e. We are splitting the work load in to parallel tasks.
       - find . -regextype egrep -name platformio.ini -type f \! -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
-    - stage: "Compile the complex examples"
+    - name: "Compile the complex examples"
       script:
       # Check that everything else compiles.
       # i.e. We are splitting the work load in to parallel tasks.
       - find . -regextype egrep -name platformio.ini -type f -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
-    - stage: "Unit tests & Linter checks"
+    - name: "Unit tests & Linter checks"
       script:
       # Run all the Tests & check the code linters have no issues.
       # i.e. We are splitting the work load in to parallel tasks.
