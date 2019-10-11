@@ -1714,7 +1714,7 @@ TEST(TestDecodeMitsubishi112, SyntheticExample) {
   irsend.begin();
 
   irsend.reset();
-  // Mitsubishi Electric Ducted A/C - ON, 20C, Cooling, MaxFan.
+  // Mitsubishi Electric 112 Split System A/C - ON, 20C, Cooling, MaxFan.
   uint8_t expected[kMitsubishi112StateLength] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x08, 0x3A,
       0x00, 0x00, 0x00, 0x30, 0xAE};
@@ -1723,7 +1723,7 @@ TEST(TestDecodeMitsubishi112, SyntheticExample) {
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  // ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
+  ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
   EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
 }

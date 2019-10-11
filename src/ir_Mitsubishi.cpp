@@ -1268,11 +1268,12 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_MITSUBISHI112
+
 // Code to emulate Mitsubishi 112bit A/C IR remote control unit.
 //
 // Equipment it seems compatible with:
-//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
-//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
+//   Brand: Mitsubishi Electric,  Model:  Split System A/C
+//   Brand: Mitsubishi Electric,  Model: KPOA UR65CV1125 remote
 
 // Initialise the object.
 IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
