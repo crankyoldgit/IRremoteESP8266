@@ -9,7 +9,7 @@ To keep the space used by the library to a minimum, all methods require the chan
 There is _no_ runtime option to change locales.
 
 ### Change `_IR_LOCALE_` in the `src/IRremoteESP8266.h` file.
-In the [IRremoteESP8266.h](IRremoteESP8266.h#L57-L59) file, find and locate the lines that look like:
+In the [IRremoteESP8266.h](../IRremoteESP8266.h#L57-L59) file, find and locate the lines that look like:
 ```
 #ifndef _IR_LOCALE_
 #define _IR_LOCALE_ en-AU
@@ -27,7 +27,7 @@ the `de_DE.h` file.
 If you examine the `platformio.ini` file located in the same directory as the example code you may find pre-setup compile environments
 for the different supported locales.
 Choose the appropriate one for you language by asking PlatformIO to build or upload using that environment.
-e.g. See `IRrecvDumpV2`'s [platformio.ini](../examples/IRrecvDumpV2/platformio.ini)
+e.g. See `IRrecvDumpV2`'s [platformio.ini](../../examples/IRrecvDumpV2/platformio.ini)
 
 ### Use a custom `build_flags`. _(PlatformIO only)_
 Edit the `platformio.ini` file in the directory containing your example/source code.
@@ -47,24 +47,24 @@ Only [ASCII](https://en.wikipedia.org/wiki/ASCII#8-bit_codes)/[UTF-8](https://en
 i.e. If Arduino's `Serial.print()` can handle it, it will probably work.
 
 ### Copy/create a new locale file in this directory.
-Copy [en-AU.h](locale/en-AU.h) or which every is a closer fit for your language to `xx-YY.h` where `xx` is the [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes) for the language.
+Copy [en-AU.h](en-AU.h) or which every is a closer fit for your language to `xx-YY.h` where `xx` is the [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes) for the language.
 e.g. `en` is English. `de` is German etc. and `YY` is the ISO country code. e.g. `AU` is Australia.
 Modify the comments and all `LOCALE_EN_AU_H_`s in the file to `LOCALE_XX_YY_H_` for your locale.
 
 
 ### Override any `#define` values that reside in `defaults.h`
-Go through the [defaults.h](locale/defaults.h) file, and find any `#define` lines that define a macro starting with `D_` that has text
+Go through the [defaults.h](defaults.h) file, and find any `#define` lines that define a macro starting with `D_` that has text
 that needs to change for your locale.
 Copy or create a corresponding `#define D_STR_HELLOWORLD "Hello World"` in your `xx-YY.h` file, and translate the text appropriately
 e.g. `#define D_STR_HELLOWORLD "Bonjour le monde"` (French)
 
-Any values you `#define` in `xx-YY.h` will override the corresponding value in the [defaults.h](locale/defaults.h) file.
+Any values you `#define` in `xx-YY.h` will override the corresponding value in the [defaults.h](defaults.h) file.
 
 ### Supporting a dialect/regional varient of another _existing_ language/locale.
 Similar to the previous step, if you only need to modify a small subset of the strings used in another locale file, then include the
 other locale file and then make sure to `#undef` any strings that need to be (re-)changed.
-See the [Swiss-German](locale/de-CH.h) for an example of how to do this. i.e. It `#include "locale/de-DE.h"`s the German locale, and
-redefines any strings that are not standard [German](locale/de-DE.h).
+See the [Swiss-German](de-CH.h) for an example of how to do this. i.e. It `#include "locale/de-DE.h"`s the German locale, and
+redefines any strings that are not standard [German](de-DE.h).
 
 ## Adding new text strings to the library.
 If you need to add an entirely new string to the library to support some feature etc. e.g. _"Widget"_.
@@ -78,7 +78,7 @@ String kWidgetStr = D_STR_WIDGET;
 The `kWidgetStr` variable will house the sole copy of the string for the entire library. This limits any duplication.
 The `D_STR_WIDGET` macro will be what is targeted by the different language / locales files.
 
-3. Edit [locale/defaults.h](locale/defaults.h), and add the appropriate stanza for your new string. e.g.
+3. Edit [locale/defaults.h](defaults.h), and add the appropriate stanza for your new string. e.g.
 ```
 #ifndef D_STR_WIDGET
 #define D_STR_WIDGET "Turbo"
@@ -86,12 +86,12 @@ The `D_STR_WIDGET` macro will be what is targeted by the different language / lo
 ```
 
 
-4. _(Manual)_ Update [IRtext.h](IRtext.h), and add the appropriate line for your new constant. e.g.
+4. _(Manual)_ Update [IRtext.h](../IRtext.h), and add the appropriate line for your new constant. e.g.
 ```
 extern const String kWidgetStr;
 ```
 For any file that `#include <IRtext.h>`s this file, it will tell it that the string is stored elsewhere,
 and to look for it elsewhere at the object linking stage of the build. This is what makes the string be referenced from a central location.
 
-4. _(Automatic)_ Run `tools/generate_irtext_h.sh` to update [IRtext.h](IRtext.h).
-In the [src/locale](locale) directory. Run the `../../tools/generate_irtext_h.sh` command. It will update the file for you automatically.
+4. _(Automatic)_ Run `tools/generate_irtext_h.sh` to update [IRtext.h](../IRtext.h).
+In the [src/locale](../locale) directory. Run the `../../tools/generate_irtext_h.sh` command. It will update the file for you automatically.
