@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include "IRac.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "IRutils.h"
-#include "IRac.h"
 
 const uint16_t kMaxGcCodeLength = 10000;
 
@@ -26,14 +26,14 @@ void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
 
 void usage_error(char *name) {
   std::cerr << "Usage: " << name << " [-gc] <global_code>" << std::endl
-            << "Usage: " << name << " -prontohex [-raw] <prontohex_code>" << std::endl
-            << "Usage: " << name << " -raw <freq> <raw_code>"
-            << std::endl;
+            << "Usage: " << name << " -prontohex [-raw] <prontohex_code>"
+            << std::endl
+            << "Usage: " << name << " -raw <freq> <raw_code>" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
   int argv_offset = 1;
-  uint16_t frequency = 38; // Keeping default Frequency
+  uint16_t frequency = 38;  // Keeping default Frequency
   bool dumpgc = false;
   bool prontohex = false;
   bool dumpraw = false;
@@ -57,12 +57,11 @@ int main(int argc, char *argv[]) {
     argv_offset++;
   }
   // Parse Frequency in case of raw codes
-  if(dumpraw){
-    // Frequency 
+  if (dumpraw) {
+    // Frequency
     str_to_uint16(argv[argv_offset], &frequency, 10);
     argv_offset++;
   }
-
 
   if (argc - argv_offset != 1) {
     usage_error(argv[0]);
@@ -95,10 +94,10 @@ int main(int argc, char *argv[]) {
 
   if (prontohex) {
     irsend.sendPronto(gc_test, index);
-  } else if(dumpgc){
+  } else if (dumpgc) {
     irsend.sendGC(gc_test, index);
-  } else if(dumpraw){
-    irsend.sendRaw(gc_test,index, frequency );
+  } else if (dumpraw) {
+    irsend.sendRaw(gc_test, index, frequency);
   }
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
@@ -114,9 +113,7 @@ int main(int argc, char *argv[]) {
     std::cout << std::endl;
     String description = IRAcUtils::resultAcToString(&irsend.capture);
     if (description.length()) {
-      std::cout << "Msg Description: "
-                << description.c_str()
-                << std::endl;
+      std::cout << "Msg Description: " << description.c_str() << std::endl;
     }
   } else {
     std::cout << "Code value     0x" << std::hex << irsend.capture.value
@@ -127,7 +124,8 @@ int main(int argc, char *argv[]) {
               << std::endl;
   }
 
-  if (dumpraw || dumpgc || irsend.capture.decode_type == UNKNOWN) irsend.dumpRawResult();
+  if (dumpraw || dumpgc || irsend.capture.decode_type == UNKNOWN)
+    irsend.dumpRawResult();
 
   return 0;
 }
