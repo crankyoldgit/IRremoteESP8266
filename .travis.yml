@@ -39,7 +39,3 @@ jobs:
       - (cd tools; make run_tests)
       # Check that every example directory has a platformio.ini file.
       - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
-
-notifications:
-  slack:
-    secure: JZivIkgyuJtuGHUrnC4Z+m8CiDoSI5EI+994kwicP+901rarsQuQwRRzulQ4f9K+SbK+MlzFIHW5kxOO1I3jqenlEP6zFcixyXOOuz5W2wOkASwliyaIYuFkhy3DHtatkD4KEh6RH/cuMEH0wQ2deTAmEg4OgkfdxJWzvKicvFlKMZWU1zcZJmuboXQScxOiRblbuxz1jbqfw6RqzD9CYuUkKSSELaX1G9O07LpzS9o2rJWSoTXnuuWhfOrNFYDmpc2YOSZCSjRNNkZhHcAIqmTw30ThRTrJb8wXHLI5W/hnx3h/6bDS9V/I8UqHryXIMI+NHFBLrwIokhsegIXf6UNEq7CJxoV0y6QeoneHx9FAZCK4X1n9B7MDwKPRT02exgZ0BJwyHhYALr99TLUtm/Lf+sEM9surH2zNZhgon9bkXvchPDvexViFUNhuoXgXb9HDZWMj0VPG9EoA3oT1hjFJCQBt5RAXjLChYADwHaBsxM07ez/c087JVRsu5D2zO4f1ERxlXy+O7Hn2rfvu6VyGFqZ9kgzSGZ7q+GGWBU9MfF6lYVv3/B3QUTwwnV0q8ORhC0FL7zJ7ipDqLik85mgwKuSoltP2g440sub+4oTto6tq98U00ebLOPJucnaCKS/sUudFSJGW5NaK4wXJildx1WbxObYWF/8JMk5giFs=
