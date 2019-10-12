@@ -1,0 +1,41 @@
+language: c
+env:
+  - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"
+cache:
+  directories:
+    - "~/.platformio"
+before_install:
+  - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
+install:
+  - sudo apt-get install jq
+  - sudo apt-get purge python-enum34
+  - sudo apt-get install pylint3
+  - sudo pip install platformio
+  - pio update
+script: echo Running checks
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+jobs:
+  include:
+    - script:
+      # Check that everything compiles.
+      - find . -name platformio.ini -type f | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
+    - script:
+      # Check the version numbers match.
+      - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
+      - test ${LIB_VERSION} == "$(jq -r .version library.json)"
+      - grep -q "^version=${LIB_VERSION}$" library.properties
+      # Check the tools programs compile.
+      - (cd tools; make all)
+      # Check for lint issues.
+      - shopt -s nullglob
+      - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
+      - pylint3 -d F0001 {src,test,tools}/*.py
+      - shopt -u nullglob
+      # Build and run the unit tests.
+      - (cd test; make run)
+      - (cd tools; make run_tests)
+      # Check that every example directory has a platformio.ini file.
+      - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})

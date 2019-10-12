@@ -1628,6 +1628,7 @@ TEST(TestMitsubishi112Class, toCommon) {
   ac.setTemp(22);
   ac.setFan(kMitsubishi112FanQuiet);
   ac.setSwingV(kMitsubishi112SwingVAuto);
+  ac.setSwingH(kMitsubishi112SwingHAuto);
   // Now test it.
   ASSERT_EQ(decode_type_t::MITSUBISHI112, ac.toCommon().protocol);
   ASSERT_EQ(-1, ac.toCommon().model);
@@ -1637,9 +1638,9 @@ TEST(TestMitsubishi112Class, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kDry, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
   ASSERT_TRUE(ac.toCommon().quiet);
   // Unsupported.
-  // ASSERT_FALSE(ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
   ASSERT_FALSE(ac.toCommon().light);
