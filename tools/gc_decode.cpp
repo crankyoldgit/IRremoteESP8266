@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   int argv_offset = 1;
   bool dumpraw = false;
   enum decode_type_t input_type = GLOBALCACHE;
-  uint16_t raw_freq = 38;
+  const uint16_t raw_freq = 38;
   // Check the invocation/calling usage.
   if (argc < 2 || argc > 4) {
     usage_error(argv[0]);
