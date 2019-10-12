@@ -1216,7 +1216,7 @@ String IRMitsubishi136::toString(void) {
 // Status: Stable / Reported as working.
 //
 // Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/947
 void IRsend::sendMitsubishi112(const unsigned char data[],
                                const uint16_t nbytes,
                                const uint16_t repeat) {
@@ -1621,14 +1621,10 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
   result.swingv = this->toCommonSwingV(this->getSwingV());
   result.quiet = this->getQuiet();
   result.swingh = this->toCommonSwingH(this->getSwingH());;
+  // Not supported.
   result.econo = false;  // Need to figure this part from stdAc
-
-  // result.econo = this->toCommonEcono(this->getEcono());
-  // FIXME
   result.clock = -1;
   result.sleep = -1;
-  // Not supported.
-
   result.turbo = false;
   result.clean = false;
   result.filter = false;

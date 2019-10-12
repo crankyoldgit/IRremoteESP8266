@@ -1638,8 +1638,8 @@ TEST(TestMitsubishi112Class, toCommon) {
   ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
   ASSERT_TRUE(ac.toCommon().quiet);
+  ASSERT_TRUE(ac.toCommon().swingh);
   // Unsupported.
-  // ASSERT_FALSE(ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
   ASSERT_FALSE(ac.toCommon().light);
