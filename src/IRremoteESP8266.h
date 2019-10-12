@@ -36,6 +36,7 @@
  * Carrier & Haier AC code by crankyoldgit
  * Vestel AC code by Erdem U. Altınyurt
  * Teco AC code by Fabien Valthier (hcoohb)
+ * Mitsubishi 112 AC Code by kuchel77
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/

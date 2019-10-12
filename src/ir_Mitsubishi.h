@@ -1,6 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017-2019 David Conran
-// Copyright 2019 kuchel77
+// Copyright 2019 Mark Kuchel
 
 // Mitsubishi
 
