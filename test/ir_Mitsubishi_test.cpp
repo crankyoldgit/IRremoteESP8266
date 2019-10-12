@@ -1638,7 +1638,7 @@ TEST(TestMitsubishi112Class, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kDry, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
-  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
   ASSERT_TRUE(ac.toCommon().quiet);
   // Unsupported.
   ASSERT_FALSE(ac.toCommon().turbo);
