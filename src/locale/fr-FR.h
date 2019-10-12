@@ -6,9 +6,6 @@
 
 #define D_STR_UNKNOWN "INCONNU"
 #define D_STR_PROTOCOL "Protocole"
-#define D_STR_ON "On"
-#define D_STR_OFF "Off"
-#define D_STR_MODE "Mode"
 #define D_STR_TOGGLE "Bascule"
 #define D_STR_SLEEP "Pause"
 #define D_STR_LIGHT "Lumière"
@@ -40,17 +37,15 @@
 #define D_STR_DOWN "En bas"
 #define D_STR_TEMPDOWN D_STR_TEMP " " D_STR_DOWN
 #define D_STR_CHANGE "Changement"
-#define D_STR_MOVE "Move"
 #define D_STR_SET "Mettre"
 #define D_STR_CANCEL "Annuler"
-#define D_STR_COMFORT "Cpnfort"
+#define D_STR_COMFORT "Confort"
 #define D_STR_WEEKLY "Chaque semaine"
 #define D_STR_WEEKLYTIMER D_STR_WEEKLY " " D_STR_TIMER
 #define D_STR_FAST "Rapide"
 #define D_STR_SLOW "Lent"
 #define D_STR_AIRFLOW "Ebauche"
 #define D_STR_STEP "Etape"
-#define D_STR_NA "N/A"
 #define D_STR_OUTSIDE "Plein air"
 #define D_STR_LOUD "Fort"
 #define D_STR_UPPER "Au dessus"
@@ -90,7 +85,7 @@
 #define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX
 #define D_STR_WIDE "Large"
 #define D_STR_CENTRE "Centre"
-  #define D_STR_TOP "au-dessus"
+ #define D_STR_TOP "au-dessus"
 #define D_STR_BOTTOM "en-dessous"
 
 #define D_STR_DAY "Jour"
