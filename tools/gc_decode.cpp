@@ -1,4 +1,4 @@
-// Quick and dirty tool to decode GlobalCache (GC) codes
+// Quick and dirty tool to decode Raw Codes, GlobalCache (GC) codes
 // and ProntoHex codes
 // Copyright 2017 Jorge Cisneros
 
@@ -25,41 +25,35 @@ void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
 }
 
 void usage_error(char *name) {
-  std::cerr << "Usage: " << name << " [-gc] <global_code>" << std::endl
-            << "Usage: " << name << " -prontohex [-raw] <prontohex_code>"
+  std::cerr << "Usage: " << name << " [-gc] [-rawdump] <global_code>"
             << std::endl
-            << "Usage: " << name << " -raw <freq> <raw_code>" << std::endl;
+            << "Usage: " << name << " -prontohex [-rawdump] <prontohex_code>"
+            << std::endl
+            << "Usage: " << name << " -raw [-rawdump] <raw_code>" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
   int argv_offset = 1;
-  uint16_t frequency = 38;  // Keeping default Frequency
-  bool dumpgc = false;
-  bool prontohex = false;
   bool dumpraw = false;
-
+  enum decode_type_t input_type = GLOBALCACHE;
+  uint16_t raw_freq = 38;
   // Check the invocation/calling usage.
   if (argc < 2 || argc > 4) {
     usage_error(argv[0]);
     return 1;
   }
-  if (strncmp("-prontohex", argv[argv_offset], 10) == 0) {
-    prontohex = true;
+  if (strncmp("-gc", argv[argv_offset], 3) == 0) {
+    argv_offset++;
+  } else if (strncmp("-prontohex", argv[argv_offset], 10) == 0) {
+    input_type = PRONTO;
+    argv_offset++;
+  } else if (strncmp("-raw", argv[argv_offset], 4) == 0) {
+    input_type = RAW;
     argv_offset++;
   }
 
-  if (strncmp("-gc", argv[argv_offset], 3) == 0) {
-    dumpgc = true;
-    argv_offset++;
-  }
-  if (strncmp("-raw", argv[argv_offset], 4) == 0) {
+  if (strncmp("-rawdump", argv[argv_offset], 7) == 0) {
     dumpraw = true;
-    argv_offset++;
-  }
-  // Parse Frequency in case of raw codes
-  if (dumpraw) {
-    // Frequency
-    str_to_uint16(argv[argv_offset], &frequency, 10);
     argv_offset++;
   }
 
@@ -74,8 +68,7 @@ int main(int argc, char *argv[]) {
   char *saveptr1;
   char *sep = const_cast<char *>(",");
   int codebase = 10;
-
-  if (prontohex) {
+  if (input_type == PRONTO) {
     sep = const_cast<char *>(" ");
     codebase = 16;
   }
@@ -92,12 +85,18 @@ int main(int argc, char *argv[]) {
   irsend.begin();
   irsend.reset();
 
-  if (prontohex) {
-    irsend.sendPronto(gc_test, index);
-  } else if (dumpgc) {
-    irsend.sendGC(gc_test, index);
-  } else if (dumpraw) {
-    irsend.sendRaw(gc_test, index, frequency);
+  switch (input_type) {
+    case GLOBALCACHE:
+      irsend.sendGC(gc_test, index);
+      break;
+    case PRONTO:
+      irsend.sendPronto(gc_test, index);
+      break;
+    case RAW:
+      irsend.sendRaw(gc_test, index, raw_freq);
+      break;
+    default:
+      break;
   }
   irsend.makeDecodeResult();
   irrecv.decode(&irsend.capture);
@@ -124,8 +123,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
   }
 
-  if (dumpraw || dumpgc || irsend.capture.decode_type == UNKNOWN)
-    irsend.dumpRawResult();
+  if (dumpraw || irsend.capture.decode_type == UNKNOWN) irsend.dumpRawResult();
 
   return 0;
 }
