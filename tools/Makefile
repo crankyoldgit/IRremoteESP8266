@@ -54,7 +54,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 						ir_Trotec.o ir_Neoclima.o ir_Amcor.o
 
 # Common object files
-COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRtext.o $(PROTOCOLS)
+COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRtext.o $(PROTOCOLS) IRac.o
 
 # Common dependencies
 COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
@@ -233,3 +233,6 @@ ir_Neoclima.o : $(USER_DIR)/ir_Neoclima.cpp $(USER_DIR)/ir_Neoclima.h $(COMMON_D
 
 ir_Amcor.o : $(USER_DIR)/ir_Amcor.cpp $(USER_DIR)/ir_Amcor.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Amcor.cpp
+
+IRac.o : $(USER_DIR)/IRac.cpp $(USER_DIR)/IRac.h $(COMMON_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES)  -c $(USER_DIR)/IRac.cpp
