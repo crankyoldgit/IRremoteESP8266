@@ -150,7 +150,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-IRtext.o : $(USER_DIR)/IRtext.cpp $(USER_DIR)/IRtext.h $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/i18n.h
+IRtext.o : $(USER_DIR)/IRtext.cpp $(USER_DIR)/IRtext.h $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/i18n.h $(USER_DIR)/locale/*.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/IRtext.cpp
 
 IRutils.o : $(USER_DIR)/IRutils.cpp $(USER_DIR)/IRutils.h $(USER_DIR)/IRremoteESP8266.h $(USER_DIR)/i18n.h

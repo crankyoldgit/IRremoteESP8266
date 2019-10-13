@@ -69,9 +69,9 @@
 #ifndef D_STR_BEEP
 #define D_STR_BEEP "Beep"
 #endif  // D_STR_BEEP
-#ifndef D_STR_MOLD
-#define D_STR_MOLD "Mold"
-#endif  // D_STR_MOLD
+#ifndef D_STR_MOULD
+#define D_STR_MOULD "Mould"
+#endif  // D_STR_MOULD
 #ifndef D_STR_CLEAN
 #define D_STR_CLEAN "Clean"
 #endif  // D_STR_CLEAN

@@ -16,7 +16,7 @@
 #define D_STR_QUIET "Ruhig"
 #define D_STR_ECONO "Eco"
 #define D_STR_BEEP "Piep"
-#define D_STR_MOLD "Schimmel"
+#define D_STR_MOULD "Schimmel"
 #define D_STR_CLEAN "Reinigen"
 #define D_STR_PURIFY "Frischen"
 #define D_STR_TIMER "Timer"

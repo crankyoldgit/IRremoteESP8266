@@ -13,7 +13,7 @@
 #define D_STR_QUIET "Silence"
 #define D_STR_ECONO "Economie"
 #define D_STR_BEEP "Bip"
-#define D_STR_MOLD "Moule"
+#define D_STR_MOULD "Moule"
 #define D_STR_CLEAN "Nettoyer"
 #define D_STR_PURIFY "Purifier"
 #define D_STR_ON "On"

@@ -87,7 +87,7 @@ extern const String kMinutesStr;
 extern const String kMinuteStr;
 extern const String kModelStr;
 extern const String kModeStr;
-extern const String kMoldStr;
+extern const String kMouldStr;
 extern const String kMoveStr;
 extern const String kNAStr;
 extern const String kNightStr;

@@ -8,5 +8,6 @@
 
 // Overrides to the default.
 #define D_STR_CENTRE "Center"
+#define D_STR_MOULD "Mold"
 
 #endif  // LOCALE_EN_US_H__
