@@ -5,6 +5,7 @@
 // * YR-W02/HSU-09HMC203 by non7top.
 
 #include "ir_Haier.h"
+#include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
@@ -93,8 +94,7 @@ void IRHaierAC::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC
 void IRHaierAC::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHaierAC(remote_state, kHaierACStateLength, repeat);
+  _irsend.sendHaierAC(getRaw(), kHaierACStateLength, repeat);
 }
 #endif  // SEND_HAIER_AC
 
@@ -126,9 +126,7 @@ uint8_t* IRHaierAC::getRaw(void) {
 }
 
 void IRHaierAC::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kHaierACStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, kHaierACStateLength);
 }
 
 void IRHaierAC::setCommand(const uint8_t command) {
@@ -476,8 +474,7 @@ void IRHaierACYRW02::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC_YRW02
 void IRHaierACYRW02::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHaierACYRW02(remote_state, kHaierACYRW02StateLength, repeat);
+  _irsend.sendHaierACYRW02(getRaw(), kHaierACYRW02StateLength, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
 
@@ -511,9 +508,7 @@ uint8_t* IRHaierACYRW02::getRaw(void) {
 }
 
 void IRHaierACYRW02::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kHaierACYRW02StateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, kHaierACYRW02StateLength);
 }
 
 void IRHaierACYRW02::setButton(uint8_t button) {

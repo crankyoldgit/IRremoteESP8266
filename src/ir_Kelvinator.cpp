@@ -16,6 +16,7 @@
 
 #include "ir_Kelvinator.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -153,9 +154,7 @@ uint8_t *IRKelvinatorAC::getRaw(void) {
 }
 
 void IRKelvinatorAC::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kKelvinatorStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, kKelvinatorStateLength);
 }
 
 uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,

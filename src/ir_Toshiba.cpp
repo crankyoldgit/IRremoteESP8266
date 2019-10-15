@@ -5,6 +5,7 @@
 
 #include "ir_Toshiba.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -79,17 +80,10 @@ void IRToshibaAC::stateReset(void) {
   // The state of the IR remote in IR code form.
   // Known good state obtained from:
   //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L103
-  // Note: Can't use the following because it requires -std=c++11
-  // uint8_t remote_state[kToshibaACStateLength] = {
-  //    0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, 0x00 };
-  remote_state[0] = 0xF2;
-  remote_state[1] = 0x0D;
-  remote_state[2] = 0x03;
-  remote_state[3] = 0xFC;
-  remote_state[4] = 0x01;
-  for (uint8_t i = 5; i < kToshibaACStateLength; i++) remote_state[i] = 0;
+  static const uint8_t kReset[kToshibaACStateLength] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01};
+  memcpy(remote_state, kReset, kToshibaACStateLength);
   mode_state = getMode(true);
-  this->checksum();  // Calculate the checksum
 }
 
 // Configure the pin for output.
@@ -98,8 +92,7 @@ void IRToshibaAC::begin(void) { _irsend.begin(); }
 #if SEND_TOSHIBA_AC
 // Send the current desired state to the IR LED.
 void IRToshibaAC::send(const uint16_t repeat) {
-  this->checksum();  // Ensure correct checksum before sending.
-  _irsend.sendToshibaAC(remote_state, kToshibaACStateLength, repeat);
+  _irsend.sendToshibaAC(getRaw(), kToshibaACStateLength, repeat);
 }
 #endif  // SEND_TOSHIBA_AC
 
@@ -111,9 +104,7 @@ uint8_t* IRToshibaAC::getRaw(void) {
 
 // Override the internal state with the new state.
 void IRToshibaAC::setRaw(const uint8_t newState[]) {
-  for (uint8_t i = 0; i < kToshibaACStateLength; i++) {
-    remote_state[i] = newState[i];
-  }
+  memcpy(remote_state, newState, kToshibaACStateLength);
   mode_state = this->getMode(true);
 }
 

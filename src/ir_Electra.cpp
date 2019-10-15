@@ -2,6 +2,7 @@
 
 #include "ir_Electra.h"
 #include <algorithm>
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtext.h"
@@ -63,8 +64,7 @@ IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
 }
 
 void IRElectraAc::stateReset(void) {
-  for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++)
-    remote_state[i] = 0;
+  for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
   remote_state[0] = 0xC3;
   remote_state[11] = 0x08;
   // [12] is the checksum.
@@ -103,8 +103,7 @@ uint8_t *IRElectraAc::getRaw(void) {
 }
 
 void IRElectraAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kElectraAcStateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, std::min(length, kElectraAcStateLength));
 }
 
 void IRElectraAc::on(void) { this->setPower(true); }

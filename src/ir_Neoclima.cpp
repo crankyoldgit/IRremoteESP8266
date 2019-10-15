@@ -15,6 +15,7 @@
 
 #include "ir_Neoclima.h"
 #include <algorithm>
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtext.h"
@@ -76,13 +77,9 @@ IRNeoclimaAc::IRNeoclimaAc(const uint16_t pin, const bool inverted,
 }
 
 void IRNeoclimaAc::stateReset(void) {
-  for (uint8_t i = 0; i < kNeoclimaStateLength; i++)
-    remote_state[i] = 0x0;
-  remote_state[7] = 0x6A;
-  remote_state[8] = 0x00;
-  remote_state[9] = 0x2A;
-  remote_state[10] = 0xA5;
-  // [11] is the checksum.
+  static const uint8_t kReset[kNeoclimaStateLength] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x6A, 0x00, 0x2A, 0xA5};
+  setRaw(kReset);
 }
 
 void IRNeoclimaAc::begin(void) { _irsend.begin(); }
@@ -107,8 +104,7 @@ void IRNeoclimaAc::checksum(uint16_t length) {
 
 #if SEND_NEOCLIMA
 void IRNeoclimaAc::send(const uint16_t repeat) {
-  this->checksum();
-  _irsend.sendNeoclima(remote_state, kNeoclimaStateLength, repeat);
+  _irsend.sendNeoclima(getRaw(), kNeoclimaStateLength, repeat);
 }
 #endif  // SEND_NEOCLIMA
 
@@ -118,8 +114,7 @@ uint8_t *IRNeoclimaAc::getRaw(void) {
 }
 
 void IRNeoclimaAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kNeoclimaStateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, std::min(length, kNeoclimaStateLength));
 }
 
 

@@ -2,6 +2,7 @@
 
 #include "ir_Tcl.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -39,8 +40,7 @@ void IRTcl112Ac::begin(void) { this->_irsend.begin(); }
 
 #if SEND_TCL112AC
 void IRTcl112Ac::send(const uint16_t repeat) {
-  this->checksum();
-  this->_irsend.sendTcl112Ac(remote_state, kTcl112AcStateLength, repeat);
+  this->_irsend.sendTcl112Ac(getRaw(), kTcl112AcStateLength, repeat);
 }
 #endif  // SEND_TCL112AC
 
@@ -50,8 +50,7 @@ void IRTcl112Ac::send(const uint16_t repeat) {
 //   length: The size of the array.
 // Returns:
 //   The 8 bit checksum value.
-uint8_t IRTcl112Ac::calcChecksum(uint8_t state[],
-                                 const uint16_t length) {
+uint8_t IRTcl112Ac::calcChecksum(uint8_t state[], const uint16_t length) {
   if (length)
     return sumBytes(state, length - 1);
   else
@@ -76,18 +75,11 @@ bool IRTcl112Ac::validChecksum(uint8_t state[], const uint16_t length) {
 }
 
 void IRTcl112Ac::stateReset(void) {
-  for (uint8_t i = 0; i < kTcl112AcStateLength; i++)
-    remote_state[i] = 0x0;
   // A known good state. (On, Cool, 24C)
-  remote_state[0] =  0x23;
-  remote_state[1] =  0xCB;
-  remote_state[2] =  0x26;
-  remote_state[3] =  0x01;
-  remote_state[5] =  0x24;
-  remote_state[6] =  0x03;
-  remote_state[7] =  0x07;
-  remote_state[8] =  0x40;
-  remote_state[13] = 0x03;
+  static const uint8_t reset[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x07, 0x40, 0x00, 0x00, 0x00,
+      0x00, 0x03};
+  memcpy(remote_state, reset, kTcl112AcStateLength);
 }
 
 uint8_t* IRTcl112Ac::getRaw(void) {
@@ -96,9 +88,7 @@ uint8_t* IRTcl112Ac::getRaw(void) {
 }
 
 void IRTcl112Ac::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kTcl112AcStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, std::min(length, kTcl112AcStateLength));
 }
 
 // Set the requested power state of the A/C to on.

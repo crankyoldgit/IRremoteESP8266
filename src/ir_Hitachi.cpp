@@ -7,6 +7,7 @@
 
 #include "ir_Hitachi.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -159,14 +160,12 @@ uint8_t *IRHitachiAc::getRaw(void) {
 }
 
 void IRHitachiAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kHitachiAcStateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, std::min(length, kHitachiAcStateLength));
 }
 
 #if SEND_HITACHI_AC
 void IRHitachiAc::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHitachiAC(remote_state, kHitachiAcStateLength, repeat);
+  _irsend.sendHitachiAC(getRaw(), kHitachiAcStateLength, repeat);
 }
 #endif  // SEND_HITACHI_AC
 

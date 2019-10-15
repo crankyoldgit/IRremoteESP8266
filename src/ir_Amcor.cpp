@@ -7,6 +7,7 @@
 
 #include "ir_Amcor.h"
 #include <algorithm>
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtext.h"
@@ -106,8 +107,7 @@ void IRAmcorAc::begin(void) { _irsend.begin(); }
 
 #if SEND_AMCOR
 void IRAmcorAc::send(const uint16_t repeat) {
-  this->checksum();  // Create valid checksum before sending
-  _irsend.sendAmcor(remote_state, kAmcorStateLength, repeat);
+  _irsend.sendAmcor(getRaw(), kAmcorStateLength, repeat);
 }
 #endif  // SEND_AMCOR
 
@@ -138,7 +138,7 @@ uint8_t* IRAmcorAc::getRaw(void) {
 }
 
 void IRAmcorAc::setRaw(const uint8_t state[]) {
-  for (uint8_t i = 0; i < kAmcorStateLength; i++) remote_state[i] = state[i];
+  memcpy(remote_state, state, kAmcorStateLength);
 }
 
 void IRAmcorAc::on(void) { setPower(true); }

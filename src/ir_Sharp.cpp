@@ -5,6 +5,7 @@
 
 #include "ir_Sharp.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
@@ -280,8 +281,7 @@ void IRSharpAc::begin(void) { _irsend.begin(); }
 
 #if SEND_SHARP_AC
 void IRSharpAc::send(const uint16_t repeat) {
-  this->checksum();
-  _irsend.sendSharpAc(remote, kSharpAcStateLength, repeat);
+  _irsend.sendSharpAc(getRaw(), kSharpAcStateLength, repeat);
 }
 #endif  // SEND_SHARP_AC
 
@@ -319,7 +319,7 @@ void IRSharpAc::stateReset(void) {
   static const uint8_t reset[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x01, 0x00, 0x00, 0x08, 0x80, 0x00, 0xE0,
       0x01};
-  for (uint8_t i = 0; i < kSharpAcStateLength; i++) remote[i] = reset[i];
+  memcpy(remote, reset, kSharpAcStateLength);
 }
 
 uint8_t *IRSharpAc::getRaw(void) {
@@ -328,8 +328,7 @@ uint8_t *IRSharpAc::getRaw(void) {
 }
 
 void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kSharpAcStateLength; i++)
-    remote[i] = new_code[i];
+  memcpy(remote, new_code, std::min(length, kSharpAcStateLength));
 }
 
 void IRSharpAc::on(void) { setPower(true); }
