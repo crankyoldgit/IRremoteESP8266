@@ -78,8 +78,8 @@ IRNeoclimaAc::IRNeoclimaAc(const uint16_t pin, const bool inverted,
 
 void IRNeoclimaAc::stateReset(void) {
   static const uint8_t kReset[kNeoclimaStateLength] = {
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x6A, 0x00, 0x2A, 0xA5, 0x00};
-  memcpy(remote_state, kReset, kNeoclimaStateLength);
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x6A, 0x00, 0x2A, 0xA5};
+  setRaw(kReset);
 }
 
 void IRNeoclimaAc::begin(void) { _irsend.begin(); }
