@@ -20,7 +20,7 @@
 #define D_STR_SWINGH D_STR_SWING"(H)"
 #define D_STR_SWINGV D_STR_SWING"(V)"
 #define D_STR_BEEP "Bip"
-#define D_STR_MOLD "Molde"
+#define D_STR_MOULD "Molde"
 #define D_STR_CLEAN "Limpiar"
 #define D_STR_PURIFY "Purificar"
 #define D_STR_TIMER "Temporizador"

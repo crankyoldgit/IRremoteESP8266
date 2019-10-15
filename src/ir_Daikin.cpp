@@ -493,7 +493,7 @@ String IRDaikinESP::toString(void) {
   result += addBoolToString(getPowerful(), kPowerfulStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getSensor(), kSensorStr);
-  result += addBoolToString(getMold(), kMoldStr);
+  result += addBoolToString(getMold(), kMouldStr);
   result += addBoolToString(getComfort(), kComfortStr);
   result += addBoolToString(getSwingHorizontal(), kSwingHStr);
   result += addBoolToString(getSwingVertical(), kSwingVStr);
@@ -1181,7 +1181,7 @@ String IRDaikin2::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getMold(), kMoldStr);
+  result += addBoolToString(getMold(), kMouldStr);
   result += addBoolToString(getClean(), kCleanStr);
   result += addLabeledString(
       getFreshAir() ? (getFreshAirHigh() ? kHighStr : kOnStr) : kOffStr,

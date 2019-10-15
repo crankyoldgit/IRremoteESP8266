@@ -61,17 +61,17 @@
 #define D_STR_SWING "Swing"
 #endif  // D_STR_SWING
 #ifndef D_STR_SWINGH
-#define D_STR_SWINGH D_STR_SWING"(H)"
+#define D_STR_SWINGH D_STR_SWING"(H)"  // Set `D_STR_SWING` first!
 #endif  // D_STR_SWINGH
 #ifndef D_STR_SWINGV
-#define D_STR_SWINGV D_STR_SWING"(V)"
+#define D_STR_SWINGV D_STR_SWING"(V)"  // Set `D_STR_SWING` first!
 #endif  // D_STR_SWINGV
 #ifndef D_STR_BEEP
 #define D_STR_BEEP "Beep"
 #endif  // D_STR_BEEP
-#ifndef D_STR_MOLD
-#define D_STR_MOLD "Mold"
-#endif  // D_STR_MOLD
+#ifndef D_STR_MOULD
+#define D_STR_MOULD "Mould"
+#endif  // D_STR_MOULD
 #ifndef D_STR_CLEAN
 #define D_STR_CLEAN "Clean"
 #endif  // D_STR_CLEAN
@@ -82,10 +82,10 @@
 #define D_STR_TIMER "Timer"
 #endif  // D_STR_TIMER
 #ifndef D_STR_ONTIMER
-#define D_STR_ONTIMER D_STR_ON " " D_STR_TIMER
+#define D_STR_ONTIMER D_STR_ON " " D_STR_TIMER  // Set `D_STR_ON` first!
 #endif  // D_STR_ONTIMER
 #ifndef D_STR_OFFTIMER
-#define D_STR_OFFTIMER D_STR_OFF " " D_STR_TIMER
+#define D_STR_OFFTIMER D_STR_OFF " " D_STR_TIMER  // Set `D_STR_OFF` first!
 #endif  // D_STR_OFFTIMER
 #ifndef D_STR_CLOCK
 #define D_STR_CLOCK "Clock"
@@ -130,7 +130,7 @@
 #define D_STR_HOLD "Hold"
 #endif  // D_STR_HOLD
 #ifndef D_STR_8C_HEAT
-#define D_STR_8C_HEAT "8C " D_STR_HEAT
+#define D_STR_8C_HEAT "8C " D_STR_HEAT  // Set `D_STR_HEAT` first!
 #endif  // D_STR_8C_HEAT
 #ifndef D_STR_BUTTON
 #define D_STR_BUTTON "Button"
@@ -154,13 +154,13 @@
 #define D_STR_UP "Up"
 #endif  // D_STR_UP
 #ifndef D_STR_TEMPUP
-#define D_STR_TEMPUP D_STR_TEMP " " D_STR_UP
+#define D_STR_TEMPUP D_STR_TEMP " " D_STR_UP  // Set `D_STR_TEMP` first!
 #endif  // D_STR_TEMPUP
 #ifndef D_STR_DOWN
 #define D_STR_DOWN "Down"
 #endif  // D_STR_DOWN
 #ifndef D_STR_TEMPDOWN
-#define D_STR_TEMPDOWN D_STR_TEMP " " D_STR_DOWN
+#define D_STR_TEMPDOWN D_STR_TEMP " " D_STR_DOWN  // Set `D_STR_TEMP` first!
 #endif  // D_STR_TEMPDOWN
 #ifndef D_STR_CHANGE
 #define D_STR_CHANGE "Change"
@@ -190,7 +190,7 @@
 #define D_STR_WEEKLY "Weekly"
 #endif  // D_STR_WEEKLY
 #ifndef D_STR_WEEKLYTIMER
-#define D_STR_WEEKLYTIMER D_STR_WEEKLY " " D_STR_TIMER
+#define D_STR_WEEKLYTIMER D_STR_WEEKLY " " D_STR_TIMER  // Needs `D_STR_WEEKLY`!
 #endif  // D_STR_WEEKLYTIMER
 #ifndef D_STR_WIFI
 #define D_STR_WIFI "WiFi"
@@ -322,19 +322,19 @@
 #define D_STR_RIGHT "Right"
 #endif  // D_STR_RIGHT
 #ifndef D_STR_MAXRIGHT
-#define D_STR_MAXRIGHT D_STR_MAX " " D_STR_RIGHT
+#define D_STR_MAXRIGHT D_STR_MAX " " D_STR_RIGHT  // Set `D_STR_MAX` first!
 #endif  // D_STR_MAXRIGHT
 #ifndef D_STR_RIGHTMAX_NOSPACE
-#define D_STR_RIGHTMAX_NOSPACE D_STR_RIGHT D_STR_MAX
+#define D_STR_RIGHTMAX_NOSPACE D_STR_RIGHT D_STR_MAX  // Set `D_STR_MAX` first!
 #endif  // D_STR_RIGHTMAX_NOSPACE
 #ifndef D_STR_LEFT
 #define D_STR_LEFT "Left"
 #endif  // D_STR_LEFT
 #ifndef D_STR_MAXLEFT
-#define D_STR_MAXLEFT D_STR_MAX " " D_STR_LEFT
+#define D_STR_MAXLEFT D_STR_MAX " " D_STR_LEFT  // Set `D_STR_MAX` first!
 #endif  // D_STR_MAXLEFT
 #ifndef D_STR_LEFTMAX_NOSPACE
-#define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX
+#define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX  // Set `D_STR_MAX` first!
 #endif  // D_STR_LEFTMAX_NOSPACE
 #ifndef D_STR_WIDE
 #define D_STR_WIDE "Wide"
