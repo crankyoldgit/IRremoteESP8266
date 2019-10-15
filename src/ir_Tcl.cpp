@@ -332,41 +332,7 @@ String IRTcl112Ac::toString(void) {
 }
 
 #if DECODE_TCL112AC
-// Decode the supplied TCL112AC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   The number of data bits to expect. Typically kTcl112AcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Appears to mostly work.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/619
-bool IRrecv::decodeTcl112Ac(decode_results *results, const uint16_t nbits,
-                            const bool strict) {
-  if (strict && nbits != kTcl112AcBits) return false;
-
-  uint16_t offset = kStartOffset;
-  // Match Header + Data + Footer
-  if (!matchGeneric(results->rawbuf + offset, results->state,
-                    results->rawlen - offset, nbits,
-                    kTcl112AcHdrMark, kTcl112AcHdrSpace,
-                    kTcl112AcBitMark, kTcl112AcOneSpace,
-                    kTcl112AcBitMark, kTcl112AcZeroSpace,
-                    kTcl112AcBitMark, kTcl112AcGap, true,
-                    _tolerance + kTcl112AcTolerance, 0, false)) return false;
-  // Compliance
-  // Verify we got a valid checksum.
-  if (strict && !IRTcl112Ac::validChecksum(results->state)) return false;
-  // Success
-  results->decode_type = TCL112AC;
-  results->bits = nbits;
-  // No need to record the state as we stored it as we decoded it.
-  // As we use result->state, we don't record value, address, or command as it
-  // is a union data type.
-  return true;
-}
+// NOTE: There is no `decodedecodeTcl112Ac()`.
+//       It's the same as `decodeMitsubishi112()`. A shared routine is used.
+//       You can find it in: ir_Mitsubishi.cpp
 #endif  // DECODE_TCL112AC
