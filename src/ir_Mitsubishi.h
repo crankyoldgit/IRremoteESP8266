@@ -93,46 +93,48 @@ const uint8_t kMitsubishi136FanQuiet = kMitsubishi136FanMin;
 
 // remote_state[5]
 const uint8_t kMitsubishi112PowerByte = 5;
-const uint8_t kMitsubishi112PowerBit =         0b00000100;
+const uint8_t kMitsubishi112PowerOffset = 2;  // 0b00000100
 // remote_state[6]
 const uint8_t kMitsubishi112ModeByte = 6;
-const uint8_t kMitsubishi112ModeMask =         0b00000111;
-const uint8_t kMitsubishi112Cool =                  0b011;
-const uint8_t kMitsubishi112Heat =                  0b001;
-const uint8_t kMitsubishi112Auto =                  0b111;
-const uint8_t kMitsubishi112Dry =                   0b010;
+const uint8_t kMitsubishi112ModeOffset = 0;  // Mask 0b00000111
+const uint8_t kMitsubishi112Cool =                        0b011;
+const uint8_t kMitsubishi112Heat =                        0b001;
+const uint8_t kMitsubishi112Auto =                        0b111;
+const uint8_t kMitsubishi112Dry =                         0b010;
 // remote_state[7]
 const uint8_t kMitsubishi112TempByte = 7;
-const uint8_t kMitsubishi112TempMask =         0b00001111;
+const uint8_t kMitsubishi112TempSize = 4;  // Mask 0b00001111
 const uint8_t kMitsubishi112MinTemp = 16;  // 16C
 const uint8_t kMitsubishi112MaxTemp = 31;  // 31C
 // remote_state[8]
 const uint8_t kMitsubishi112FanByte = 8;
-const uint8_t kMitsubishi112FanMask =          0b11111000;
-const uint8_t kMitsubishi112FanGetMask =            0b111;
-const uint8_t kMitsubishi112FanMin =                0b010;
-const uint8_t kMitsubishi112FanLow =                0b011;
-const uint8_t kMitsubishi112FanMed =                0b101;
-const uint8_t kMitsubishi112FanMax =                0b000;
+const uint8_t kMitsubishi112FanOffset = 0;  // Mask 0b00000111;
+const uint8_t kMitsubishi112FanSize = 3;
+const uint8_t kMitsubishi112FanMin =                     0b010;
+const uint8_t kMitsubishi112FanLow =                     0b011;
+const uint8_t kMitsubishi112FanMed =                     0b101;
+const uint8_t kMitsubishi112FanMax =                     0b000;
 const uint8_t kMitsubishi112FanQuiet = kMitsubishi112FanMin;
 const uint8_t kMitsubishi112SwingVByte = kMitsubishi112FanByte;
-const uint8_t kMitsubishi112SwingVMask =       0b00111000;
-const uint8_t kMitsubishi112SwingVLowest =     0b00101000;
-const uint8_t kMitsubishi112SwingVLow =        0b00100000;
-const uint8_t kMitsubishi112SwingVMiddle =     0b00011000;
-const uint8_t kMitsubishi112SwingVHigh =       0b00010000;
-const uint8_t kMitsubishi112SwingVHighest =    0b00001000;
-const uint8_t kMitsubishi112SwingVAuto =       0b00111000;
+const uint8_t kMitsubishi112SwingVOffset = 3;  // Mask 0b00111000
+const uint8_t kMitsubishi112SwingVSize = 3;    // Mask 0b00111000
+const uint8_t kMitsubishi112SwingVLowest =               0b101;
+const uint8_t kMitsubishi112SwingVLow =                  0b100;
+const uint8_t kMitsubishi112SwingVMiddle =               0b011;
+const uint8_t kMitsubishi112SwingVHigh =                 0b010;
+const uint8_t kMitsubishi112SwingVHighest =              0b001;
+const uint8_t kMitsubishi112SwingVAuto =                 0b111;
 // remote_state[12]
 const uint8_t kMitsubishi112SwingHByte = 12;
-const uint8_t kMitsubishi112SwingHMask =       0b00111100;
-const uint8_t kMitsubishi112SwingHLeftMax =    0b00000100;
-const uint8_t kMitsubishi112SwingHLeft =       0b00001000;
-const uint8_t kMitsubishi112SwingHMiddle =     0b00001100;
-const uint8_t kMitsubishi112SwingHRight =      0b00010000;
-const uint8_t kMitsubishi112SwingHRightMax =   0b00010100;
-const uint8_t kMitsubishi112SwingHWide =       0b00100000;
-const uint8_t kMitsubishi112SwingHAuto =       0b00110000;
+const uint8_t kMitsubishi112SwingHSize = 4;
+const uint8_t kMitsubishi112SwingHOffset = 2;  // Mask 0b00111100
+const uint8_t kMitsubishi112SwingHLeftMax =              0b0001;
+const uint8_t kMitsubishi112SwingHLeft =                 0b0010;
+const uint8_t kMitsubishi112SwingHMiddle =               0b0011;
+const uint8_t kMitsubishi112SwingHRight =                0b0100;
+const uint8_t kMitsubishi112SwingHRightMax =             0b0101;
+const uint8_t kMitsubishi112SwingHWide =                 0b1000;
+const uint8_t kMitsubishi112SwingHAuto =                 0b1100;
 
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
