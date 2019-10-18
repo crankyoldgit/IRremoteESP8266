@@ -107,6 +107,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN128
     case decode_type_t::DAIKIN128:
 #endif
+#if SEND_DAIKIN152
+    case decode_type_t::DAIKIN152:
+#endif
 #if SEND_DAIKIN160
     case decode_type_t::DAIKIN160:
 #endif
@@ -340,6 +343,32 @@ void IRac::daikin128(IRDaikin128 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN128
+
+#if SEND_DAIKIN152
+void IRac::daikin152(IRDaikin152 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo, const bool econo) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV((int8_t)swingv >= 0);
+  // No Horizontal Swing setting avaliable.
+  ac->setQuiet(quiet);
+  // No Light setting available.
+  // No Filter setting available.
+  ac->setPowerful(turbo);
+  ac->setEcono(econo);
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_DAIKIN152
 
 #if SEND_DAIKIN160
 void IRac::daikin160(IRDaikin160 *ac,
@@ -1238,6 +1267,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN2
+#if SEND_DAIKIN152
+    case DAIKIN152:
+    {
+      IRDaikin152 ac(_pin, _inverted, _modulation);
+      daikin152(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
+                send.quiet, send.turbo, send.econo);
+      break;
+    }
+#endif  // SEND_DAIKIN152
 #if SEND_DAIKIN160
     case DAIKIN160:
     {
@@ -1830,6 +1868,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN128
+#if DECODE_DAIKIN152
+      case decode_type_t::DAIKIN152: {
+        IRDaikin152 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN152
 #if DECODE_DAIKIN160
       case decode_type_t::DAIKIN160: {
         IRDaikin160 ac(0);

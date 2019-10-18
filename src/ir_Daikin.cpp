@@ -2923,6 +2923,8 @@ bool IRrecv::decodeDaikin152(decode_results *results, const uint16_t nbits,
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
 IRDaikin152::IRDaikin152(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -2960,6 +2962,7 @@ void IRDaikin152::stateReset(void) {
   remote_state[0] =  0x11;
   remote_state[1] =  0xDA;
   remote_state[2] =  0x27;
+  remote_state[15] = 0xC5;
   // remote_state[19] is a checksum byte, it will be set by checksum().
 }
 
@@ -2970,4 +2973,202 @@ uint8_t *IRDaikin152::getRaw(void) {
 
 void IRDaikin152::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin152StateLength);
+}
+
+void IRDaikin152::on(void) { setPower(true); }
+
+void IRDaikin152::off(void) { setPower(false); }
+
+void IRDaikin152::setPower(const bool on) {
+  setBit(&remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset, on);
+}
+
+bool IRDaikin152::getPower(void) {
+  return GETBIT8(remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset);
+}
+
+uint8_t IRDaikin152::getMode(void) {
+  return GETBITS8(remote_state[kDaikin152ModeByte], kDaikinModeOffset,
+                  kDaikinModeSize);
+}
+
+void IRDaikin152::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikinFan:
+      setTemp(kDaikin152FanTemp);  // Handle special temp for fan mode.
+      break;
+    case kDaikinDry:
+      setTemp(kDaikin152DryTemp);  // Handle special temp for dry mode.
+      break;
+    case kDaikinAuto:
+    case kDaikinCool:
+    case kDaikinHeat:
+      break;
+    default:
+      this->setMode(kDaikinAuto);
+      return;
+  }
+  setBits(&remote_state[kDaikin152ModeByte], kDaikinModeOffset,
+          kDaikinModeSize, mode);
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikin152::convertMode(const stdAc::opmode_t mode) {
+  return IRDaikinESP::convertMode(mode);
+}
+
+// Set the temp in deg C
+void IRDaikin152::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(
+      temp, (getMode() == kDaikinHeat) ? kDaikinMinTemp : kDaikin2MinCoolTemp);
+  degrees = std::min(degrees, kDaikinMaxTemp);
+  if (temp == kDaikin152FanTemp) degrees = temp;  // Handle fan only temp.
+  setBits(&remote_state[kDaikin152TempByte], kDaikinTempOffset,
+          kDaikin152TempSize, degrees);
+}
+
+uint8_t IRDaikin152::getTemp(void) {
+  return GETBITS8(remote_state[kDaikin152TempByte], kDaikinTempOffset,
+                  kDaikin152TempSize);
+}
+
+// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+void IRDaikin152::setFan(const uint8_t fan) {
+  // Set the fan speed bits, leave low 4 bits alone
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  setBits(&remote_state[kDaikin152FanByte], kHighNibble, kNibbleSize, fanset);
+}
+
+uint8_t IRDaikin152::getFan(void) {
+  const uint8_t fan = GETBITS8(remote_state[kDaikin152FanByte], kHighNibble,
+                               kNibbleSize);
+  switch (fan) {
+    case kDaikinFanAuto:
+    case kDaikinFanQuiet: return fan;
+    default: return fan - 2;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin152::convertFan(const stdAc::fanspeed_t speed) {
+  return IRDaikinESP::convertFan(speed);
+}
+
+void IRDaikin152::setSwingV(const bool on) {
+  setBits(&remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
+          kDaikinSwingSize, on ? kDaikinSwingOn : kDaikinSwingOff);
+}
+
+bool IRDaikin152::getSwingV(void) {
+  return GETBITS8(remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
+                  kDaikinSwingSize);
+}
+
+void IRDaikin152::setQuiet(const bool on) {
+  setBit(&remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset, on);
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) this->setPowerful(false);
+}
+
+bool IRDaikin152::getQuiet(void) {
+  return GETBIT8(remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset);
+}
+
+void IRDaikin152::setPowerful(const bool on) {
+  setBit(&remote_state[kDaikin152PowerfulByte], kDaikinBitPowerfulOffset, on);
+  if (on) {
+    // Powerful, Quiet, Comfortm & Econo mode being on are mutually exclusive.
+    this->setQuiet(false);
+    this->setComfort(false);
+    this->setEcono(false);
+  }
+}
+
+bool IRDaikin152::getPowerful(void) {
+  return GETBIT8(remote_state[kDaikin152PowerfulByte],
+                 kDaikinBitPowerfulOffset);
+}
+
+void IRDaikin152::setEcono(const bool on) {
+  setBit(&remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset, on);
+  // Powerful & Econo mode being on are mutually exclusive.
+  if (on) this->setPowerful(false);
+}
+
+bool IRDaikin152::getEcono(void) {
+  return GETBIT8(remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset);
+}
+
+void IRDaikin152::setSensor(const bool on) {
+  setBit(&remote_state[kDaikin152SensorByte], kDaikin152SensorOffset, on);
+}
+
+bool IRDaikin152::getSensor(void) {
+  return GETBIT8(remote_state[kDaikin152SensorByte], kDaikin152SensorOffset);
+}
+
+void IRDaikin152::setComfort(const bool on) {
+  setBit(&remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset, on);
+  if (on) {
+    // Comfort mode is incompatible with Powerful mode.
+    setPowerful(false);
+    // It also sets the fan to auto and turns off swingv.
+    setFan(kDaikinFanAuto);
+    setSwingV(false);
+  }
+}
+
+bool IRDaikin152::getComfort(void) {
+  return GETBIT8(remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset);
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin152::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::DAIKIN152;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwingV() ? stdAc::swingv_t::kAuto
+                                    : stdAc::swingv_t::kOff;
+  result.quiet = this->getQuiet();
+  result.turbo = this->getPowerful();
+  result.econo = this->getEcono();
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.clean = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+String IRDaikin152::toString(void) {
+  String result = "";
+  result.reserve(180);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(getSensor(), kSensorStr);
+  result += addBoolToString(getComfort(), kComfortStr);
+  return result;
 }
