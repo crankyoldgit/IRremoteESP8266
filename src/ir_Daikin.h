@@ -130,6 +130,8 @@ const uint8_t kDaikinByteChecksum2 = 15;
 const uint8_t kDaikinBytePower = 21;
 const uint8_t kDaikinBitPowerOffset = 0;
 const uint8_t kDaikinBitPower = 1 << kDaikinBitPowerOffset;
+const uint8_t kDaikinTempOffset = 1;
+const uint8_t kDaikinTempSize = 6;
 const uint8_t kDaikinByteTemp = 22;
 const uint8_t kDaikinByteFan = 24;
 const uint8_t kDaikinByteSwingH = 25;
@@ -406,6 +408,28 @@ const uint16_t kDaikin152BitMark = 433;
 const uint16_t kDaikin152OneSpace = 1529;
 const uint16_t kDaikin152ZeroSpace = kDaikin152BitMark;
 const uint16_t kDaikin152Gap = 25182;
+
+// Byte[5]
+const uint8_t kDaikin152ModeByte = 5;                        // Mask 0b01110000
+const uint8_t kDaikin152PowerByte = kDaikin152ModeByte;      // Mask 0b00000001
+// Byte[6]
+const uint8_t kDaikin152TempByte = 6;                        // Mask 0b11111110
+const uint8_t kDaikin152TempSize = 7;
+const uint8_t kDaikin152DryTemp = kDaikin2MinCoolTemp;  // Celsius
+const uint8_t kDaikin152FanTemp = 0x60;  // 96 Celsius
+// Byte[8]
+const uint8_t kDaikin152FanByte = 8;
+const uint8_t kDaikin152SwingVByte = kDaikin152FanByte;
+// Byte[13]
+const uint8_t kDaikin152QuietByte = 13;                      // Mask 0b00100000
+const uint8_t kDaikin152PowerfulByte = kDaikin152QuietByte;  // Mask 0b00000001
+// Byte[16]
+const uint8_t kDaikin152EconoByte = 16;                      // Mask 0b00000100
+const uint8_t kDaikin152ComfortByte = kDaikin152EconoByte;   // Mask 0b00000010
+const uint8_t kDaikin152ComfortOffset = 1;                   // Mask 0b00000010
+const uint8_t kDaikin152SensorByte = kDaikin152EconoByte;    // Mask 0b00001000
+const uint8_t kDaikin152SensorOffset = 3;                    // Mask 0b00001000
+
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -817,6 +841,34 @@ class IRDaikin152 {
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin152StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingV(const bool on);
+  bool getSwingV(void);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  bool getPowerful(void);
+  void setPowerful(const bool on);
+  void setSensor(const bool on);
+  bool getSensor(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
+  void setComfort(const bool on);
+  bool getComfort(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
+  String toString(void);
 #ifndef UNIT_TEST
 
  private:
