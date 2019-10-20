@@ -161,7 +161,8 @@ class RawIRMessage():
         "                k%sBitMark, k%sZeroSpace," % (name, name),
         "                %s, %s," % (lastmark, lastspace),
         "                data + pos, %d,  // Bytes" % nbytes,
-        "                k%sFreq);" % name,
+        "                k%sFreq," % name,
+        "                true, 0, 50);",
         "    pos += %d;  // Adjust by how many bytes of data we sent" % nbytes])
     return code
 
