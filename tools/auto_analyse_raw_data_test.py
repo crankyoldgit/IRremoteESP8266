@@ -567,7 +567,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '// Status: ALPHA / Untested.\n'
         'void IRsend::sendFOO(const uint8_t data[], const uint16_t nbytes,'
         ' const uint16_t repeat) {\n'
-        '  for (uint16_t r = 0; r < repeat; r++) {\n'
+        '  for (uint16_t r = 0; r <= repeat; r++) {\n'
         '    uint16_t pos = 0;\n'
         '    // Data Section #1\n'
         '    // e.g.\n'
