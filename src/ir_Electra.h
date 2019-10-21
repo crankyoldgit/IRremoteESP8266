@@ -25,28 +25,39 @@
 
 // Constants
 // state[1]
-const uint8_t kElectraAcTempMask =   0b11111000;
+//                             Temp  0b11111000
+const uint8_t kElectraAcTempOffset = 3;
+const uint8_t kElectraAcTempSize = 5;   // Bits
 const uint8_t kElectraAcMinTemp = 16;   // 16C
 const uint8_t kElectraAcMaxTemp = 32;   // 32C
-const uint8_t kElectraAcOffsetTemp = 8;
-const uint8_t kElectraAcSwingVMask = 0b00000111;
+const uint8_t kElectraAcTempDelta = 8;
+const uint8_t kElectraAcSwingSize = 3;  // Bits
+const uint8_t kElectraAcSwingOn =  0b000;
+const uint8_t kElectraAcSwingOff = 0b111;
+//                      SwingVMask = 0b00000111;
+const uint8_t kElectraAcSwingVOffset = 0;
 // state[2]
-const uint8_t kElectraAcSwingHMask = 0b11100000;
+//                      SwingHMask = 0b11100000;
+const uint8_t kElectraAcSwingHOffset = 5;
 // state[4]
-const uint8_t kElectraAcFanMask =    0b11100000;
+//                      FanMask =    0b11100000;
+const uint8_t kElectraAcFanOffset = 5;
+const uint8_t kElectraAcFanSize = 3;  // Bits
+
 const uint8_t kElectraAcFanAuto =    0b101;
 const uint8_t kElectraAcFanLow =     0b011;
 const uint8_t kElectraAcFanMed =     0b010;
 const uint8_t kElectraAcFanHigh =    0b001;
 // state[6]
-const uint8_t kElectraAcModeMask = 0b11100000;
+//                            Mode 0b11100000
+const uint8_t kElectraAcModeOffset = 5;
 const uint8_t kElectraAcAuto =     0b000;
 const uint8_t kElectraAcCool =     0b001;
 const uint8_t kElectraAcDry =      0b010;
 const uint8_t kElectraAcHeat =     0b100;
 const uint8_t kElectraAcFan =      0b110;
 // state[9]
-const uint8_t kElectraAcPowerMask =  0b00100000;
+const uint8_t kElectraAcPowerOffset = 5;
 
 
 // Classes

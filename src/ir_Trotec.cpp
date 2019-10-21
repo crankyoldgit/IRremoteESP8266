@@ -3,10 +3,12 @@
 
 #include "ir_Trotec.h"
 #include <algorithm>
+#include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -24,6 +26,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_TROTEC
 
@@ -31,6 +35,7 @@ void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
                         const uint16_t repeat) {
   if (nbytes < kTrotecStateLength) return;
 
+  enableIROut(36);
   for (uint16_t r = 0; r <= repeat; r++) {
     sendGeneric(kTrotecHdrMark, kTrotecHdrSpace, kTrotecBitMark,
                 kTrotecOneSpace, kTrotecBitMark, kTrotecZeroSpace,
@@ -38,7 +43,6 @@ void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
                 0,  // Repeats handled elsewhere
                 50);
     // More footer
-    enableIROut(36);
     mark(kTrotecBitMark);
     space(kTrotecGapEnd);
   }
@@ -90,66 +94,57 @@ uint8_t* IRTrotecESP::getRaw(void) {
 }
 
 void IRTrotecESP::setRaw(const uint8_t state[]) {
-  for (uint16_t i = 0; i < kTrotecStateLength; i++) remote_state[i] = state[i];
+  memcpy(remote_state, state, kTrotecStateLength);
 }
 
 void IRTrotecESP::setPower(const bool on) {
-  if (on)
-    remote_state[2] |= kTrotecPowerBit;
-  else
-    remote_state[2] &= ~kTrotecPowerBit;
+  setBit(&remote_state[2], kTrotecPowerBitOffset, on);
 }
 
-bool IRTrotecESP::getPower(void) { return remote_state[2] & kTrotecPowerBit; }
+bool IRTrotecESP::getPower(void) {
+  return GETBIT8(remote_state[2], kTrotecPowerBitOffset);
+}
 
 void IRTrotecESP::setSpeed(const uint8_t fan) {
   uint8_t speed = std::min(fan, kTrotecFanHigh);
-  remote_state[2] = (remote_state[2] & 0b11001111) | (speed << 4);
+  setBits(&remote_state[2], kTrotecFanOffset, kTrotecFanSize, speed);
 }
 
 uint8_t IRTrotecESP::getSpeed(void) {
-  return (remote_state[2] & 0b00110000) >> 4;
+  return GETBITS8(remote_state[2], kTrotecFanOffset, kTrotecFanSize);
 }
 
 void IRTrotecESP::setMode(const uint8_t mode) {
-  switch (mode) {
-    case kTrotecAuto:
-    case kTrotecCool:
-    case kTrotecDry:
-    case kTrotecFan:
-      remote_state[2] = (remote_state[2] & 0b11111100) | mode;
-      return;
-    default:
-      this->setMode(kTrotecAuto);
-  }
+  setBits(&remote_state[2], kTrotecModeOffset, kTrotecModeSize,
+          (mode > kTrotecFan) ? kTrotecAuto : mode);
 }
 
-uint8_t IRTrotecESP::getMode(void) { return remote_state[2] & 0b00000011; }
+uint8_t IRTrotecESP::getMode(void) {
+  return GETBITS8(remote_state[2], kTrotecModeOffset, kTrotecModeSize);
+}
 
 void IRTrotecESP::setTemp(const uint8_t celsius) {
   uint8_t temp = std::max(celsius, kTrotecMinTemp);
   temp = std::min(temp, kTrotecMaxTemp);
-  remote_state[3] = (remote_state[3] & 0x80) | (temp - kTrotecMinTemp);
+  setBits(&remote_state[3], kTrotecTempOffset, kTrotecTempSize,
+          temp - kTrotecMinTemp);
 }
 
 uint8_t IRTrotecESP::getTemp(void) {
-  return (remote_state[3] & 0b01111111) + kTrotecMinTemp;
+  return GETBITS8(remote_state[3], kTrotecTempOffset, kTrotecTempSize) +
+      kTrotecMinTemp;
 }
 
 void IRTrotecESP::setSleep(const bool on) {
-  if (on)
-    remote_state[3] |= kTrotecSleepBit;
-  else
-    remote_state[3] &= ~kTrotecSleepBit;
+  setBit(&remote_state[3], kTrotecSleepBitOffset, on);
 }
 
-bool IRTrotecESP::getSleep(void) { return remote_state[3] & kTrotecSleepBit; }
+bool IRTrotecESP::getSleep(void) {
+  return GETBIT8(remote_state[3], kTrotecSleepBitOffset);
+}
 
 void IRTrotecESP::setTimer(const uint8_t timer) {
-  if (timer)
-    remote_state[5] |= kTrotecTimerBit;
-  else
-    remote_state[5] &= ~kTrotecTimerBit;
+  setBit(&remote_state[5], kTrotecTimerBitOffset, timer);
   remote_state[6] = (timer > kTrotecMaxTimer) ? kTrotecMaxTimer : timer;
 }
 
@@ -158,15 +153,11 @@ uint8_t IRTrotecESP::getTimer(void) { return remote_state[6]; }
 // Convert a standard A/C mode into its native mode.
 uint8_t IRTrotecESP::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kTrotecCool;
-    case stdAc::opmode_t::kDry:
-      return kTrotecDry;
-    case stdAc::opmode_t::kFan:
-      return kTrotecFan;
+    case stdAc::opmode_t::kCool: return kTrotecCool;
+    case stdAc::opmode_t::kDry:  return kTrotecDry;
+    case stdAc::opmode_t::kFan:  return kTrotecFan;
     // Note: No Heat mode.
-    default:
-      return kTrotecAuto;
+    default:                     return kTrotecAuto;
   }
 }
 
@@ -174,15 +165,11 @@ uint8_t IRTrotecESP::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRTrotecESP::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kTrotecFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kTrotecFanMed;
+    case stdAc::fanspeed_t::kLow:    return kTrotecFanLow;
+    case stdAc::fanspeed_t::kMedium: return kTrotecFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kTrotecFanHigh;
-    default:
-      return kTrotecFanMed;
+    case stdAc::fanspeed_t::kMax:    return kTrotecFanHigh;
+    default:                         return kTrotecFanMed;
   }
 }
 
@@ -191,9 +178,9 @@ uint8_t IRTrotecESP::convertFan(const stdAc::fanspeed_t speed) {
 stdAc::opmode_t IRTrotecESP::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTrotecCool: return stdAc::opmode_t::kCool;
-    case kTrotecDry: return stdAc::opmode_t::kDry;
-    case kTrotecFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kTrotecDry:  return stdAc::opmode_t::kDry;
+    case kTrotecFan:  return stdAc::opmode_t::kFan;
+    default:          return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -201,9 +188,9 @@ stdAc::opmode_t IRTrotecESP::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRTrotecESP::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kTrotecFanHigh: return stdAc::fanspeed_t::kMax;
-    case kTrotecFanMed: return stdAc::fanspeed_t::kMedium;
-    case kTrotecFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kTrotecFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kTrotecFanLow:  return stdAc::fanspeed_t::kMin;
+    default:             return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -236,13 +223,13 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 String IRTrotecESP::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTrotecAuto, kTrotecCool, kTrotecAuto,
                             kTrotecDry, kTrotecFan);
   result += addTempToString(getTemp());
   result += addFanToString(getSpeed(), kTrotecFanHigh, kTrotecFanLow,
                            kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
-  result += addBoolToString(getSleep(), F("Sleep"));
+  result += addBoolToString(getSleep(), kSleepStr);
   return result;
 }
 

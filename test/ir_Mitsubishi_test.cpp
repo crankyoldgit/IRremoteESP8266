@@ -1,4 +1,5 @@
 // Copyright 2017-2019 David Conran
+// Copyright 2019 kuchel77
 // Copyright 2018 denxhun
 
 #include "ir_Mitsubishi.h"
@@ -985,9 +986,9 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeededButError) {
 TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC irMitsu(0);
   EXPECT_EQ(
-      "Power: On, Mode: 8 (Heat), Temp: 22C, Fan: 6 (Quiet), "
-      "Swing(V): 0 (Auto), Swing(H): 3, "
-      "Time: 17:10, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Power: On, Mode: 1 (Heat), Temp: 22C, Fan: 6 (Quiet), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       irMitsu.toString());
 }
 
@@ -1495,8 +1496,232 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
   IRMitsubishiAC ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: Off, Mode: 24 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Swing(V): 0 (Auto), Swing(H): 3, "
-      "Time: 00:00, On timer: 00:00, Off timer: 00:00, Timer: -",
+      "Power: Off, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Clock: 00:00, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       ac.toString());
+}
+
+
+// Tests for IRMitsubishi112 class.
+
+TEST(TestMitsubishi112Class, Power) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestMitsubishi112Class, Temperature) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MinTemp);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MaxTemp);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MinTemp - 1);
+  EXPECT_EQ(kMitsubishi112MinTemp, ac.getTemp());
+
+  ac.setTemp(kMitsubishi112MaxTemp + 1);
+  EXPECT_EQ(kMitsubishi112MaxTemp, ac.getTemp());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestMitsubishi112Class, OperatingMode) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setMode(kMitsubishi112Auto);
+  EXPECT_EQ(kMitsubishi112Auto, ac.getMode());
+
+  ac.setMode(kMitsubishi112Cool);
+  EXPECT_EQ(kMitsubishi112Cool, ac.getMode());
+
+  ac.setMode(kMitsubishi112Heat);
+  EXPECT_EQ(kMitsubishi112Heat, ac.getMode());
+
+  ac.setMode(kMitsubishi112Dry);
+  EXPECT_EQ(kMitsubishi112Dry, ac.getMode());
+}
+
+TEST(TestMitsubishi112Class, FanSpeed) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setFan(kMitsubishi112FanMax);
+  EXPECT_EQ(kMitsubishi112FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanMin);
+  EXPECT_EQ(kMitsubishi112FanMin, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kMitsubishi112FanMax, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanMed);
+  EXPECT_EQ(kMitsubishi112FanMed, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanLow);
+  EXPECT_EQ(kMitsubishi112FanLow, ac.getFan());
+
+  ac.setFan(kMitsubishi112FanQuiet);
+  EXPECT_EQ(kMitsubishi112FanQuiet, ac.getFan());
+}
+
+
+TEST(TestMitsubishi112Class, SwingV) {
+  IRMitsubishi112 ac(0);
+  ac.begin();
+
+  ac.setSwingV(kMitsubishi112SwingVAuto);
+  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVAuto + 1);
+  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVLowest);
+  EXPECT_EQ(kMitsubishi112SwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVLow);
+  EXPECT_EQ(kMitsubishi112SwingVLow, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVHighest);
+  EXPECT_EQ(kMitsubishi112SwingVHighest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVHigh);
+  EXPECT_EQ(kMitsubishi112SwingVHigh, ac.getSwingV());
+}
+
+TEST(TestMitsubishi112Class, toCommon) {
+  IRMitsubishi112 ac(0);
+  ac.setPower(true);
+  ac.setMode(kMitsubishi112Dry);
+  ac.setTemp(22);
+  ac.setFan(kMitsubishi112FanQuiet);
+  ac.setSwingV(kMitsubishi112SwingVAuto);
+  ac.setSwingH(kMitsubishi112SwingHAuto);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::MITSUBISHI112, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(22, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kDry, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_TRUE(ac.toCommon().quiet);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestMitsubishi112Class, toCommonMode) {
+  ASSERT_EQ(stdAc::opmode_t::kCool,
+            IRMitsubishi112::toCommonMode(kMitsubishi112Cool));
+  ASSERT_EQ(kMitsubishi112Cool,
+            IRMitsubishi112::convertMode(stdAc::opmode_t::kCool));
+  ASSERT_EQ(stdAc::opmode_t::kDry,
+            IRMitsubishi112::toCommonMode(kMitsubishi112Dry));
+  ASSERT_EQ(kMitsubishi112Dry,
+            IRMitsubishi112::convertMode(stdAc::opmode_t::kDry));
+}
+
+
+
+// Decode a 'real' example.
+TEST(TestDecodeMitsubishi112, DecodeRealExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint16_t rawData[227] = {3468, 1694, 464, 1248, 464, 1248, 466, 376, 468,
+      422, 470, 380, 488, 1246, 464, 382, 462, 422, 470, 1248, 466, 1246,
+      442, 420, 472, 1246, 466, 380, 488, 382, 486, 1248, 442, 1272, 440,
+      422, 472, 1246, 464, 1248, 466, 378, 490, 382, 464, 1270, 466, 380,
+      464, 420, 448, 1270, 440, 422, 472, 380, 488, 380, 490, 378, 490,
+      376, 466, 424, 468, 386, 486, 380, 488, 382, 462, 422, 448, 422,
+      448, 422, 472, 378, 464, 422, 472, 380, 488, 380, 490, 380, 486,
+      1248, 466, 380, 488, 380, 490, 1246, 440, 424, 468, 382, 488, 1246,
+      466, 1246, 466, 380, 490, 380, 464, 422, 472, 380, 464, 422, 472,
+      380, 464, 424, 472, 376, 466, 422, 448, 1270, 444, 420, 448, 420,
+      470, 384, 486, 380, 490, 380, 486, 1248, 442, 422, 474, 1244, 464,
+      1246, 466, 1246, 466, 384, 462, 422, 472, 378, 490, 382, 486, 384,
+      462, 422, 470, 382, 488, 380, 464, 420, 448, 420, 448, 422, 470,
+      380, 466, 420, 472, 378, 490, 380, 490, 378, 490, 378, 466, 422,
+      446, 422, 446, 422, 446, 422, 472, 378, 488, 380, 490, 380, 466,
+      420, 472, 380, 490, 380, 486, 384, 462, 422, 472, 378, 466, 1270,
+      466, 1246, 442, 422, 470, 380, 488, 384, 486, 1246, 466, 1246, 442,
+      1270, 440, 420, 472, 1248, 466, 384, 462, 1270, 440};  // MITSUBISHI112
+
+  irsend.sendRaw(rawData, 227, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
+  EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
+  uint8_t expected[kMitsubishi112StateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x08, 0x3A, 0x00,
+      0x00, 0x00, 0x30, 0xAE};
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 2 (Quiet), "
+      "Swing(V): 56 (Auto), Swing(H): 48 (Auto), Quiet: On",
+      IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+// Self decode a synthetic example.
+TEST(TestDecodeMitsubishi112, SyntheticExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  uint8_t expected[kMitsubishi112StateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03, 0x08, 0x3A,
+      0x00, 0x00, 0x00, 0x30, 0xAE};
+
+  irsend.sendMitsubishi112(expected);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
+  EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
 }

@@ -14,6 +14,7 @@
 #endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
@@ -106,6 +107,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN128
     case decode_type_t::DAIKIN128:
 #endif
+#if SEND_DAIKIN152
+    case decode_type_t::DAIKIN152:
+#endif
 #if SEND_DAIKIN160
     case decode_type_t::DAIKIN160:
 #endif
@@ -147,6 +151,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_MITSUBISHI_AC
     case decode_type_t::MITSUBISHI_AC:
+#endif
+#if SEND_MITSUBISHI112
+    case decode_type_t::MITSUBISHI112:
 #endif
 #if SEND_MITSUBISHI136
     case decode_type_t::MITSUBISHI136:
@@ -341,6 +348,32 @@ void IRac::daikin128(IRDaikin128 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN128
+
+#if SEND_DAIKIN152
+void IRac::daikin152(IRDaikin152 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo, const bool econo) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV((int8_t)swingv >= 0);
+  // No Horizontal Swing setting avaliable.
+  ac->setQuiet(quiet);
+  // No Light setting available.
+  // No Filter setting available.
+  ac->setPowerful(turbo);
+  ac->setEcono(econo);
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_DAIKIN152
 
 #if SEND_DAIKIN160
 void IRac::daikin160(IRDaikin160 *ac,
@@ -708,6 +741,34 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->send();
 }
 #endif  // SEND_MITSUBISHI_AC
+
+#if SEND_MITSUBISHI112
+void IRac::mitsubishi112(IRMitsubishi112 *ac,
+                         const bool on, const stdAc::opmode_t mode,
+                         const float degrees, const stdAc::fanspeed_t fan,
+                         const stdAc::swingv_t swingv,
+                         const stdAc::swingh_t swingh,
+                         const bool quiet) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv));
+  ac->setSwingH(ac->convertSwingH(swingh));
+  ac->setQuiet(quiet);
+  // ac->setEcono(econo);
+  // FIXME - Econo
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_MITSUBISHI112
 
 #if SEND_MITSUBISHI136
 void IRac::mitsubishi136(IRMitsubishi136 *ac,
@@ -1211,6 +1272,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN2
+#if SEND_DAIKIN152
+    case DAIKIN152:
+    {
+      IRDaikin152 ac(_pin, _inverted, _modulation);
+      daikin152(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
+                send.quiet, send.turbo, send.econo);
+      break;
+    }
+#endif  // SEND_DAIKIN152
 #if SEND_DAIKIN160
     case DAIKIN160:
     {
@@ -1341,6 +1411,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_MITSUBISHI112
+    case MITSUBISHI112:
+    {
+      IRMitsubishi112 ac(_pin, _inverted, _modulation);
+      mitsubishi112(&ac, on, send.mode, degC, send.fanspeed, send.swingv,
+                    send.swingh, send.quiet);
+      break;
+    }
+#endif  // SEND_MITSUBISHI112
 #if SEND_MITSUBISHI136
     case MITSUBISHI136:
     {
@@ -1488,19 +1567,25 @@ bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
 
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                 const stdAc::opmode_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()))
     return stdAc::opmode_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::opmode_t::kOff;
-  else if (!strcasecmp(str, "COOL") || !strcasecmp(str, "COOLING"))
+  else if (!strcasecmp(str, kCoolStr.c_str()) ||
+           !strcasecmp(str, "COOLING"))
     return stdAc::opmode_t::kCool;
-  else if (!strcasecmp(str, "HEAT") || !strcasecmp(str, "HEATING"))
+  else if (!strcasecmp(str, kHeatStr.c_str()) ||
+           !strcasecmp(str, "HEATING"))
     return stdAc::opmode_t::kHeat;
-  else if (!strcasecmp(str, "DRY") || !strcasecmp(str, "DRYING") ||
+  else if (!strcasecmp(str, kDryStr.c_str()) ||
+           !strcasecmp(str, "DRYING") ||
            !strcasecmp(str, "DEHUMIDIFY"))
     return stdAc::opmode_t::kDry;
-  else if (!strcasecmp(str, "FAN") || !strcasecmp(str, "FANONLY") ||
-           !strcasecmp(str, "FAN_ONLY"))
+  else if (!strcasecmp(str, kFanStr.c_str()) ||
+           !strcasecmp(str, "FANONLY") ||
+           !strcasecmp(str, kFanOnlyStr.c_str()))
     return stdAc::opmode_t::kFan;
   else
     return def;
@@ -1508,20 +1593,26 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()))
     return stdAc::fanspeed_t::kAuto;
-  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
-           !strcasecmp(str, "LOWEST"))
+  else if (!strcasecmp(str, kMinStr.c_str()) ||
+           !strcasecmp(str, kMinimumStr.c_str()) ||
+           !strcasecmp(str, kLowestStr.c_str()))
     return stdAc::fanspeed_t::kMin;
-  else if (!strcasecmp(str, "LOW"))
+  else if (!strcasecmp(str, kLowStr.c_str()) ||
+           !strcasecmp(str, kLoStr.c_str()))
     return stdAc::fanspeed_t::kLow;
-  else if (!strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "MID"))
+  else if (!strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kMidStr.c_str()))
     return stdAc::fanspeed_t::kMedium;
-  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
+  else if (!strcasecmp(str, kHighStr.c_str()) ||
+           !strcasecmp(str, kHiStr.c_str()))
     return stdAc::fanspeed_t::kHigh;
-  else if (!strcasecmp(str, "MAX") || !strcasecmp(str, "MAXIMUM") ||
-           !strcasecmp(str, "HIGHEST"))
+  else if (!strcasecmp(str, kMaxStr.c_str()) ||
+           !strcasecmp(str, kMaximumStr.c_str()) ||
+           !strcasecmp(str, kHighestStr.c_str()))
     return stdAc::fanspeed_t::kMax;
   else
     return def;
@@ -1529,26 +1620,36 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
-      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()) ||
+      !strcasecmp(str, kOnStr.c_str()) ||
+      !strcasecmp(str, kSwingStr.c_str()))
     return stdAc::swingv_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::swingv_t::kOff;
-  else if (!strcasecmp(str, "MIN") || !strcasecmp(str, "MINIMUM") ||
-           !strcasecmp(str, "LOWEST") || !strcasecmp(str, "BOTTOM") ||
-           !strcasecmp(str, "DOWN"))
+  else if (!strcasecmp(str, kMinStr.c_str()) ||
+           !strcasecmp(str, kMinimumStr.c_str()) ||
+           !strcasecmp(str, kLowestStr.c_str()) ||
+           !strcasecmp(str, kBottomStr.c_str()) ||
+           !strcasecmp(str, kDownStr.c_str()))
     return stdAc::swingv_t::kLowest;
-  else if (!strcasecmp(str, "LOW"))
+  else if (!strcasecmp(str, kLowStr.c_str()))
     return stdAc::swingv_t::kLow;
-  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
-           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
+  else if (!strcasecmp(str, kMidStr.c_str()) ||
+           !strcasecmp(str, kMiddleStr.c_str()) ||
+           !strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kCentreStr.c_str()))
     return stdAc::swingv_t::kMiddle;
-  else if (!strcasecmp(str, "HIGH") || !strcasecmp(str, "HI"))
+  else if (!strcasecmp(str, kHighStr.c_str()) ||
+           !strcasecmp(str, kHiStr.c_str()))
     return stdAc::swingv_t::kHigh;
-  else if (!strcasecmp(str, "HIGHEST") || !strcasecmp(str, "MAX") ||
-           !strcasecmp(str, "MAXIMUM") || !strcasecmp(str, "TOP") ||
-           !strcasecmp(str, "UP"))
+  else if (!strcasecmp(str, kHighestStr.c_str()) ||
+           !strcasecmp(str, kMaxStr.c_str()) ||
+           !strcasecmp(str, kMaximumStr.c_str()) ||
+           !strcasecmp(str, kTopStr.c_str()) ||
+           !strcasecmp(str, kUpStr.c_str()))
     return stdAc::swingv_t::kHighest;
   else
     return def;
@@ -1556,28 +1657,34 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
-  if (!strcasecmp(str, "AUTO") || !strcasecmp(str, "AUTOMATIC") ||
-      !strcasecmp(str, "ON") || !strcasecmp(str, "SWING"))
+  if (!strcasecmp(str, kAutoStr.c_str()) ||
+      !strcasecmp(str, kAutomaticStr.c_str()) ||
+      !strcasecmp(str, kOnStr.c_str()) || !strcasecmp(str, kSwingStr.c_str()))
     return stdAc::swingh_t::kAuto;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "STOP"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, kStopStr.c_str()))
     return stdAc::swingh_t::kOff;
-  else if (!strcasecmp(str, "LEFTMAX") || !strcasecmp(str, "LEFT MAX") ||
-           !strcasecmp(str, "MAXLEFT") || !strcasecmp(str, "MAX LEFT") ||
-           !strcasecmp(str, "FARLEFT") || !strcasecmp(str, "FAR LEFT"))
+  else if (!strcasecmp(str, kLeftMaxStr.c_str()) ||
+           !strcasecmp(str, D_STR_LEFT " " D_STR_MAX) ||
+           !strcasecmp(str, D_STR_MAX D_STR_LEFT) ||
+           !strcasecmp(str, kMaxLeftStr.c_str()))
     return stdAc::swingh_t::kLeftMax;
-  else if (!strcasecmp(str, "LEFT"))
+  else if (!strcasecmp(str, kLeftStr.c_str()))
     return stdAc::swingh_t::kLeft;
-  else if (!strcasecmp(str, "MID") || !strcasecmp(str, "MIDDLE") ||
-           !strcasecmp(str, "MED") || !strcasecmp(str, "MEDIUM") ||
-           !strcasecmp(str, "CENTRE") || !strcasecmp(str, "CENTER"))
+  else if (!strcasecmp(str, kMidStr.c_str()) ||
+           !strcasecmp(str, kMiddleStr.c_str()) ||
+           !strcasecmp(str, kMedStr.c_str()) ||
+           !strcasecmp(str, kMediumStr.c_str()) ||
+           !strcasecmp(str, kCentreStr.c_str()))
     return stdAc::swingh_t::kMiddle;
-  else if (!strcasecmp(str, "RIGHT"))
+  else if (!strcasecmp(str, kRightStr.c_str()))
     return stdAc::swingh_t::kRight;
-  else if (!strcasecmp(str, "RIGHTMAX") || !strcasecmp(str, "RIGHT MAX") ||
-           !strcasecmp(str, "MAXRIGHT") || !strcasecmp(str, "MAX RIGHT") ||
-           !strcasecmp(str, "FARRIGHT") || !strcasecmp(str, "FAR RIGHT"))
+  else if (!strcasecmp(str, kRightMaxStr.c_str()) ||
+           !strcasecmp(str, D_STR_MAX " " D_STR_RIGHT) ||
+           !strcasecmp(str, D_STR_MAX D_STR_RIGHT) ||
+           !strcasecmp(str, kMaxRightStr.c_str()))
     return stdAc::swingh_t::kRightMax;
-  else if (!strcasecmp(str, "WIDE"))
+  else if (!strcasecmp(str, kWideStr.c_str()))
     return stdAc::swingh_t::kWide;
   else
     return def;
@@ -1630,99 +1737,103 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 }
 
 bool IRac::strToBool(const char *str, const bool def) {
-  if (!strcasecmp(str, "ON") || !strcasecmp(str, "1") ||
-      !strcasecmp(str, "YES") || !strcasecmp(str, "TRUE"))
+  if (!strcasecmp(str, kOnStr.c_str()) ||
+      !strcasecmp(str, "1") ||
+      !strcasecmp(str, kYesStr.c_str()) ||
+      !strcasecmp(str, kTrueStr.c_str()))
     return true;
-  else if (!strcasecmp(str, "OFF") || !strcasecmp(str, "0") ||
-           !strcasecmp(str, "NO") || !strcasecmp(str, "FALSE"))
+  else if (!strcasecmp(str, kOffStr.c_str()) ||
+           !strcasecmp(str, "0") ||
+           !strcasecmp(str, kNoStr.c_str()) ||
+           !strcasecmp(str, kFalseStr.c_str()))
     return false;
   else
     return def;
 }
 
 String IRac::boolToString(const bool value) {
-  return value ? F("on") : F("off");
+  return value ? kOnStr : kOffStr;
 }
 
 String IRac::opmodeToString(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::opmode_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::opmode_t::kCool:
-      return F("cool");
+      return kCoolStr;
     case stdAc::opmode_t::kHeat:
-      return F("heat");
+      return kHeatStr;
     case stdAc::opmode_t::kDry:
-      return F("dry");
+      return kDryStr;
     case stdAc::opmode_t::kFan:
-      return F("fan_only");
+      return kFanOnlyStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::fanspeed_t::kMax:
-      return F("max");
+      return kMaxStr;
     case stdAc::fanspeed_t::kHigh:
-      return F("high");
+      return kHighStr;
     case stdAc::fanspeed_t::kMedium:
-      return F("medium");
+      return kMediumStr;
     case stdAc::fanspeed_t::kLow:
-      return F("low");
+      return kLowStr;
     case stdAc::fanspeed_t::kMin:
-      return F("min");
+      return kMinStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::swingv_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::swingv_t::kHighest:
-      return F("highest");
+      return kHighestStr;
     case stdAc::swingv_t::kHigh:
-      return F("high");
+      return kHighStr;
     case stdAc::swingv_t::kMiddle:
-      return F("middle");
+      return kMiddleStr;
     case stdAc::swingv_t::kLow:
-      return F("low");
+      return kLowStr;
     case stdAc::swingv_t::kLowest:
-      return F("lowest");
+      return kLowestStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
 String IRac::swinghToString(const stdAc::swingh_t swingh) {
   switch (swingh) {
     case stdAc::swingh_t::kOff:
-      return F("off");
+      return kOffStr;
     case stdAc::swingh_t::kAuto:
-      return F("auto");
+      return kAutoStr;
     case stdAc::swingh_t::kLeftMax:
-      return F("leftmax");
+      return kLeftMaxStr;
     case stdAc::swingh_t::kLeft:
-      return F("left");
+      return kLeftStr;
     case stdAc::swingh_t::kMiddle:
-      return F("middle");
+      return kMiddleStr;
     case stdAc::swingh_t::kRight:
-      return F("right");
+      return kRightStr;
     case stdAc::swingh_t::kRightMax:
-      return F("rightmax");
+      return kRightMaxStr;
     case stdAc::swingh_t::kWide:
-      return F("wide");
+      return kWideStr;
     default:
-      return F("unknown");
+      return kUnknownStr;
   }
 }
 
@@ -1762,6 +1873,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN128
+#if DECODE_DAIKIN152
+      case decode_type_t::DAIKIN152: {
+        IRDaikin152 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN152
 #if DECODE_DAIKIN160
       case decode_type_t::DAIKIN160: {
         IRDaikin160 ac(0);
@@ -1818,6 +1936,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHI112
+      case decode_type_t::MITSUBISHI112: {
+        IRMitsubishi112 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_MITSUBISHI112
 #if DECODE_MITSUBISHI136
       case decode_type_t::MITSUBISHI136: {
         IRMitsubishi136 ac(0);
@@ -2122,6 +2247,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHI112
+      case decode_type_t::MITSUBISHI112: {
+        IRMitsubishi112 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHI112
 #if DECODE_MITSUBISHI136
       case decode_type_t::MITSUBISHI136: {
         IRMitsubishi136 ac(kGpioUnused);

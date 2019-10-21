@@ -6,6 +6,7 @@ Node MCU/ESP8266 Sketch to emulate Teco
 #include "ir_Teco.h"
 #include <algorithm>
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #ifndef ARDUINO
 #include <string>
@@ -26,6 +27,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_TECO
 // Send a Teco A/C message.
@@ -69,26 +72,23 @@ void IRTecoAc::on(void) { setPower(true); }
 void IRTecoAc::off(void) { setPower(false); }
 
 void IRTecoAc::setPower(const bool on) {
-  if (on)
-    remote_state |= kTecoPower;
-  else
-    remote_state &= ~kTecoPower;
+  setBit(&remote_state, kTecoPowerOffset, on);
 }
 
-bool IRTecoAc::getPower(void) { return remote_state & kTecoPower; }
+bool IRTecoAc::getPower(void) {
+  return GETBIT64(remote_state, kTecoPowerOffset);
+}
 
 void IRTecoAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kTecoMaxTemp);
   newtemp = std::max(newtemp, kTecoMinTemp);
-  newtemp -= kTecoMinTemp;  // 16=0b000
-
-  remote_state &= ~kTecoTempMask;  // reinit temp
-  remote_state |= (newtemp << 8);
+  setBits(&remote_state, kTecoTempOffset, kTecoTempSize,
+          newtemp - kTecoMinTemp);
 }
 
 uint8_t IRTecoAc::getTemp(void) {
-  return ((remote_state & kTecoTempMask) >> 8) + kTecoMinTemp;
+  return GETBITS64(remote_state, kTecoTempOffset, kTecoTempSize) + kTecoMinTemp;
 }
 
 // Set the speed of the fan
@@ -98,16 +98,15 @@ void IRTecoAc::setFan(const uint8_t speed) {
     case kTecoFanAuto:
     case kTecoFanHigh:
     case kTecoFanMed:
-    case kTecoFanLow:
-      break;
-    default:
-      newspeed = kTecoFanAuto;
+    case kTecoFanLow: break;
+    default: newspeed = kTecoFanAuto;
   }
-  remote_state &= ~kTecoFanMask;  // reinit fan
-  remote_state |= (newspeed << 4);
+  setBits(&remote_state, kTecoFanOffset, kTecoFanSize, newspeed);
 }
 
-uint8_t IRTecoAc::getFan(void) { return (remote_state & kTecoFanMask) >> 4; }
+uint8_t IRTecoAc::getFan(void) {
+  return GETBITS64(remote_state, kTecoFanOffset, kTecoFanSize);
+}
 
 void IRTecoAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
@@ -116,70 +115,68 @@ void IRTecoAc::setMode(const uint8_t mode) {
     case kTecoCool:
     case kTecoDry:
     case kTecoFan:
-    case kTecoHeat:
-      break;
-    default:
-      newmode = kTecoAuto;
+    case kTecoHeat: break;
+    default: newmode = kTecoAuto;
   }
-  remote_state &= ~kTecoModeMask;  // reinit mode
-  remote_state |= newmode;
+  setBits(&remote_state, kTecoModeOffset, kModeBitsSize, newmode);
 }
 
-uint8_t IRTecoAc::getMode(void) { return remote_state & kTecoModeMask; }
+uint8_t IRTecoAc::getMode(void) {
+  return GETBITS64(remote_state, kTecoModeOffset, kModeBitsSize);
+}
 
 void IRTecoAc::setSwing(const bool on) {
-  if (on)
-    remote_state |= kTecoSwing;
-  else
-    remote_state &= ~kTecoSwing;
+  setBit(&remote_state, kTecoSwingOffset, on);
 }
 
-bool IRTecoAc::getSwing(void) { return remote_state & kTecoSwing; }
+bool IRTecoAc::getSwing(void) {
+  return GETBIT64(remote_state, kTecoSwingOffset);
+}
 
 void IRTecoAc::setSleep(const bool on) {
-  if (on)
-    remote_state |= kTecoSleep;
-  else
-    remote_state &= ~kTecoSleep;
+  setBit(&remote_state, kTecoSleepOffset, on);
 }
 
-bool IRTecoAc::getSleep(void) { return remote_state & kTecoSleep; }
-
-bool IRTecoAc::getLight(void) { return remote_state & kTecoLight; }
+bool IRTecoAc::getSleep(void) {
+  return GETBIT64(remote_state, kTecoSleepOffset);
+}
 
 void IRTecoAc::setLight(const bool on) {
-  if (on)
-    remote_state |= kTecoLight;
-  else
-    remote_state &= ~kTecoLight;
+  setBit(&remote_state, kTecoLightOffset, on);
 }
 
-bool IRTecoAc::getHumid(void) { return remote_state & kTecoHumid; }
+bool IRTecoAc::getLight(void) {
+  return GETBIT64(remote_state,  kTecoLightOffset);
+}
 
 void IRTecoAc::setHumid(const bool on) {
-  if (on)
-    remote_state |= kTecoHumid;
-  else
-    remote_state &= ~kTecoHumid;
+  setBit(&remote_state, kTecoHumidOffset, on);
 }
 
-bool IRTecoAc::getSave(void) { return remote_state & kTecoSave; }
+bool IRTecoAc::getHumid(void) {
+  return GETBIT64(remote_state, kTecoHumidOffset);
+}
 
 void IRTecoAc::setSave(const bool on) {
-  if (on)
-    remote_state |= kTecoSave;
-  else
-    remote_state &= ~kTecoSave;
+  setBit(&remote_state, kTecoSaveOffset, on);
 }
 
-bool IRTecoAc::getTimerEnabled(void) { return remote_state & kTecoTimerOn; }
+bool IRTecoAc::getSave(void) {
+  return GETBIT64(remote_state, kTecoSaveOffset);
+}
+
+bool IRTecoAc::getTimerEnabled(void) {
+  return GETBIT64(remote_state, kTecoTimerOnOffset);
+}
 
 uint16_t IRTecoAc::getTimer(void) {
   uint16_t mins = 0;
   if (getTimerEnabled()) {
-    mins = ((remote_state & kTecoTimerTenHr) >> 13) * 60 * 10 +
-           ((remote_state & kTecoTimerUniHr) >> 16) * 60;
-    if (remote_state & kTecoTimerHalfH) mins += 30;
+    mins = GETBITS64(remote_state, kTecoTimerTensHoursOffset,
+                     kTecoTimerTensHoursSize) * 60 * 10 +
+        GETBITS64(remote_state, kTecoTimerUnitHoursOffset,
+                  kTecoTimerUnitHoursSize) * 60;
+    if (GETBIT64(remote_state, kTecoTimerHalfHourOffset)) mins += 30;
   }
   return mins;
 }
@@ -191,30 +188,26 @@ uint16_t IRTecoAc::getTimer(void) {
 //            Time is stored internaly in increments of 30 mins.
 void IRTecoAc::setTimer(const uint16_t nr_mins) {
   uint16_t mins = std::min(nr_mins, (uint16_t)(24 * 60));  // Limit to 24 hrs.
-  bool half_hour = (mins % 60) >= 30;
   uint8_t hours = mins / 60;
-  remote_state &= ~kTecoTimerMask;  // Clear previous data
-  if (mins) {
-    remote_state |= kTecoTimerOn;  // Enable the timer.
-    if (half_hour) remote_state |= kTecoTimerHalfH;
-    remote_state |= ((hours % 10) << 16);  // Set the unit hours.
-    remote_state |= ((hours / 10) << 13);  // Set the tens of hours.
-  }
+  setBit(&remote_state, kTecoTimerOnOffset, mins);  // Set the timer flag.
+  // Set the half hour bit.
+  setBit(&remote_state, kTecoTimerHalfHourOffset, (mins % 60) >= 30);
+  // Set the unit hours.
+  setBits(&remote_state, kTecoTimerUnitHoursOffset, kTecoTimerUnitHoursSize,
+          hours % 10);
+  // Set the tens of hours.
+  setBits(&remote_state, kTecoTimerTensHoursOffset, kTecoTimerTensHoursSize,
+          hours / 10);
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kTecoCool;
-    case stdAc::opmode_t::kHeat:
-      return kTecoHeat;
-    case stdAc::opmode_t::kDry:
-      return kTecoDry;
-    case stdAc::opmode_t::kFan:
-      return kTecoFan;
-    default:
-      return kTecoAuto;
+    case stdAc::opmode_t::kCool: return kTecoCool;
+    case stdAc::opmode_t::kHeat: return kTecoHeat;
+    case stdAc::opmode_t::kDry:  return kTecoDry;
+    case stdAc::opmode_t::kFan:  return kTecoFan;
+    default:                     return kTecoAuto;
   }
 }
 
@@ -222,15 +215,11 @@ uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRTecoAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kTecoFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kTecoFanMed;
+    case stdAc::fanspeed_t::kLow:    return kTecoFanLow;
+    case stdAc::fanspeed_t::kMedium: return kTecoFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kTecoFanHigh;
-    default:
-      return kTecoFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kTecoFanHigh;
+    default:                         return kTecoFanAuto;
   }
 }
 
@@ -239,9 +228,9 @@ stdAc::opmode_t IRTecoAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTecoCool: return stdAc::opmode_t::kCool;
     case kTecoHeat: return stdAc::opmode_t::kHeat;
-    case kTecoDry: return stdAc::opmode_t::kDry;
-    case kTecoFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kTecoDry:  return stdAc::opmode_t::kDry;
+    case kTecoFan:  return stdAc::opmode_t::kFan;
+    default:        return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -249,9 +238,9 @@ stdAc::opmode_t IRTecoAc::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRTecoAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kTecoFanHigh: return stdAc::fanspeed_t::kMax;
-    case kTecoFanMed: return stdAc::fanspeed_t::kMedium;
-    case kTecoFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kTecoFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kTecoFanLow:  return stdAc::fanspeed_t::kMin;
+    default:           return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -285,22 +274,22 @@ stdAc::state_t IRTecoAc::toCommon(void) {
 String IRTecoAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTecoAuto, kTecoCool, kTecoHeat,
                             kTecoDry, kTecoFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kTecoFanHigh, kTecoFanLow,
                            kTecoFanAuto, kTecoFanAuto, kTecoFanMed);
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getSwing(), F("Swing"));
-  result += addBoolToString(getLight(), F("Light"));
-  result += addBoolToString(getHumid(), F("Humid"));
-  result += addBoolToString(getSave(), F("Save"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getHumid(), kHumidStr);
+  result += addBoolToString(getSave(), kSaveStr);
   if (getTimerEnabled())
     result += addLabeledString(irutils::minsToString(getTimer()),
-                               F("Timer"));
+                               kTimerStr);
   else
-    result += addBoolToString(false, F("Timer"));
+    result += addBoolToString(false, kTimerStr);
   return result;
 }
 

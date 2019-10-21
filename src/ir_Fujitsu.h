@@ -56,14 +56,20 @@ const uint8_t kFujitsuAcFanHigh = 0x01;
 const uint8_t kFujitsuAcFanMed = 0x02;
 const uint8_t kFujitsuAcFanLow = 0x03;
 const uint8_t kFujitsuAcFanQuiet = 0x04;
+const uint8_t kFujitsuAcFanSize = 3;  // Bits
 
 const uint8_t kFujitsuAcMinTemp = 16;  // 16C
 const uint8_t kFujitsuAcMaxTemp = 30;  // 30C
 
+const uint8_t kFujitsuAcSwingSize = 2;
 const uint8_t kFujitsuAcSwingOff = 0x00;
 const uint8_t kFujitsuAcSwingVert = 0x01;
 const uint8_t kFujitsuAcSwingHoriz = 0x02;
 const uint8_t kFujitsuAcSwingBoth = 0x03;
+
+const uint8_t kFujitsuAcOutsideQuietOffset = 7;
+const uint8_t kFujitsuAcCleanOffset = 3;
+const uint8_t kFujitsuAcFilterOffset = 3;
 
 // Legacy defines.
 #define FUJITSU_AC_MODE_AUTO kFujitsuAcModeAuto
@@ -88,13 +94,6 @@ const uint8_t kFujitsuAcSwingBoth = 0x03;
 #define FUJITSU_AC_SWING_HORIZ kFujitsuAcSwingHoriz
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
-enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
-  ARDB1,        // (2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work)
-  ARREB1E,      // (3) AR-REB1E
-  ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
-  ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
-};
 
 class IRFujitsuAC {
  public:

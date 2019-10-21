@@ -5,10 +5,12 @@
 // * YR-W02/HSU-09HMC203 by non7top.
 
 #include "ir_Haier.h"
+#include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
 #include "IRremoteESP8266.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Supported devices:
@@ -37,6 +39,8 @@ using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 // Send a Haier A/C message. (HSU07-HEA03 remote)
@@ -90,8 +94,7 @@ void IRHaierAC::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC
 void IRHaierAC::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHaierAC(remote_state, kHaierACStateLength, repeat);
+  _irsend.sendHaierAC(getRaw(), kHaierACStateLength, repeat);
 }
 #endif  // SEND_HAIER_AC
 
@@ -123,14 +126,11 @@ uint8_t* IRHaierAC::getRaw(void) {
 }
 
 void IRHaierAC::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kHaierACStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, kHaierACStateLength);
 }
 
-void IRHaierAC::setCommand(const uint8_t state) {
-  remote_state[1] &= 0b11110000;
-  switch (state) {
+void IRHaierAC::setCommand(const uint8_t command) {
+  switch (command) {
     case kHaierAcCmdOff:
     case kHaierAcCmdOn:
     case kHaierAcCmdMode:
@@ -142,61 +142,51 @@ void IRHaierAC::setCommand(const uint8_t state) {
     case kHaierAcCmdTimerCancel:
     case kHaierAcCmdHealth:
     case kHaierAcCmdSwing:
-      remote_state[1] |= (state & 0b00001111);
+      setBits(&remote_state[1], kLowNibble, kNibbleSize, command);
   }
 }
 
-uint8_t IRHaierAC::getCommand(void) { return remote_state[1] & (0b00001111); }
+uint8_t IRHaierAC::getCommand(void) {
+  return GETBITS8(remote_state[1], kLowNibble, kNibbleSize);
+}
 
 void IRHaierAC::setFan(const uint8_t speed) {
   uint8_t new_speed = kHaierAcFanAuto;
   switch (speed) {
-    case kHaierAcFanLow:
-      new_speed = 3;
-      break;
-    case kHaierAcFanMed:
-      new_speed = 1;
-      break;
-    case kHaierAcFanHigh:
-      new_speed = 2;
-      break;
-    default:
-      new_speed = kHaierAcFanAuto;  // Default to auto for anything else.
+    case kHaierAcFanLow:  new_speed = 3; break;
+    case kHaierAcFanMed:  new_speed = 1; break;
+    case kHaierAcFanHigh: new_speed = 2; break;
+    // Default to auto for anything else.
+    default:              new_speed = kHaierAcFanAuto;
   }
 
   if (speed != getFan()) setCommand(kHaierAcCmdFan);
-  remote_state[5] &= 0b11111100;
-  remote_state[5] |= new_speed;
+  setBits(&remote_state[5], kLowNibble, kHaierAcSwingSize, new_speed);
 }
 
 uint8_t IRHaierAC::getFan(void) {
-  switch (remote_state[5] & 0b00000011) {
-    case 1:
-      return kHaierAcFanMed;
-    case 2:
-      return kHaierAcFanHigh;
-    case 3:
-      return kHaierAcFanLow;
-    default:
-      return kHaierAcFanAuto;
+  switch (GETBITS8(remote_state[5], kLowNibble, kHaierAcSwingSize)) {
+    case 1:  return kHaierAcFanMed;
+    case 2:  return kHaierAcFanHigh;
+    case 3:  return kHaierAcFanLow;
+    default: return kHaierAcFanAuto;
   }
 }
 
 void IRHaierAC::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
   setCommand(kHaierAcCmdMode);
-  if (mode > kHaierAcFan)  // If out of range, default to auto mode.
-    new_mode = kHaierAcAuto;
-  remote_state[6] &= ~kHaierAcModeMask;
-  remote_state[6] |= (new_mode << 5);
+  // If out of range, default to auto mode.
+  if (mode > kHaierAcFan) new_mode = kHaierAcAuto;
+  setBits(&remote_state[6], kHaierAcModeOffset, kModeBitsSize, new_mode);
 }
 
 uint8_t IRHaierAC::getMode(void) {
-  return (remote_state[6] & kHaierAcModeMask) >> 5;
+  return GETBITS8(remote_state[6], kHaierAcModeOffset, kModeBitsSize);
 }
 
-void IRHaierAC::setTemp(const uint8_t celsius) {
-  uint8_t temp = celsius;
+void IRHaierAC::setTemp(const uint8_t degrees) {
+  uint8_t temp = degrees;
   if (temp < kHaierAcMinTemp)
     temp = kHaierAcMinTemp;
   else if (temp > kHaierAcMaxTemp)
@@ -208,46 +198,47 @@ void IRHaierAC::setTemp(const uint8_t celsius) {
     setCommand(kHaierAcCmdTempDown);
   else
     setCommand(kHaierAcCmdTempUp);
-
-  remote_state[1] &= 0b00001111;  // Clear the previous temp.
-  remote_state[1] |= ((temp - kHaierAcMinTemp) << 4);
+  setBits(&remote_state[1], kHighNibble, kNibbleSize, temp - kHaierAcMinTemp);
 }
 
 uint8_t IRHaierAC::getTemp(void) {
-  return ((remote_state[1] & 0b11110000) >> 4) + kHaierAcMinTemp;
+  return GETBITS8(remote_state[1], kHighNibble, kNibbleSize) + kHaierAcMinTemp;
 }
 
 void IRHaierAC::setHealth(const bool on) {
   setCommand(kHaierAcCmdHealth);
-  remote_state[4] &= 0b11011111;
-  remote_state[4] |= (on << 5);
+  setBit(&remote_state[4], kHaierAcHealthBitOffset, on);
 }
 
-bool IRHaierAC::getHealth(void) { return remote_state[4] & (1 << 5); }
+bool IRHaierAC::getHealth(void) {
+  return GETBIT8(remote_state[4], kHaierAcHealthBitOffset);
+}
 
 void IRHaierAC::setSleep(const bool on) {
   setCommand(kHaierAcCmdSleep);
-  if (on)
-    remote_state[7] |= kHaierAcSleepBit;
-  else
-    remote_state[7] &= ~kHaierAcSleepBit;
+  setBit(&remote_state[7], kHaierAcSleepBitOffset, on);
 }
 
-bool IRHaierAC::getSleep(void) { return remote_state[7] & kHaierAcSleepBit; }
+bool IRHaierAC::getSleep(void) {
+  return GETBIT8(remote_state[7], kHaierAcSleepBitOffset);
+}
 
 uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
-  return (ptr[0] & 0b00011111) * 60 + (ptr[1] & 0b00111111);
+  return GETBITS8(ptr[0], kHaierAcTimeOffset, kHaierAcHoursSize) * 60 +
+         GETBITS8(ptr[1], kHaierAcTimeOffset, kHaierAcMinsSize);
 }
 
 int16_t IRHaierAC::getOnTimer(void) {
-  if (remote_state[3] & 0b10000000)  // Check if the timer is turned on.
+  // Check if the timer is turned on.
+  if (GETBIT8(remote_state[3], kHaierAcOnTimerOffset))
     return getTime(remote_state + 6);
   else
     return -1;
 }
 
 int16_t IRHaierAC::getOffTimer(void) {
-  if (remote_state[3] & 0b01000000)  // Check if the timer is turned on.
+  // Check if the timer is turned on.
+  if (GETBIT8(remote_state[3], kHaierAcOffTimerOffset))
     return getTime(remote_state + 4);
   else
     return -1;
@@ -258,30 +249,25 @@ uint16_t IRHaierAC::getCurrTime(void) { return getTime(remote_state + 2); }
 void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   uint16_t mins = nr_mins;
   if (nr_mins > kHaierAcMaxTime) mins = kHaierAcMaxTime;
-
-  // Hours
-  ptr[0] &= 0b11100000;
-  ptr[0] |= (mins / 60);
-  // Minutes
-  ptr[1] &= 0b11000000;
-  ptr[1] |= (mins % 60);
+  setBits(ptr, kHaierAcTimeOffset, kHaierAcHoursSize, mins / 60);  // Hours
+  setBits(ptr + 1, kHaierAcTimeOffset, kHaierAcMinsSize, mins % 60);  // Minutes
 }
 
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  remote_state[3] |= 0b10000000;
+  setBit(&remote_state[3], kHaierAcOnTimerOffset);
   setTime(remote_state + 6, nr_mins);
 }
 
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  remote_state[3] |= 0b01000000;
+  setBit(&remote_state[3], kHaierAcOffTimerOffset);
   setTime(remote_state + 4, nr_mins);
 }
 
 void IRHaierAC::cancelTimers(void) {
   setCommand(kHaierAcCmdTimerCancel);
-  remote_state[3] &= 0b00111111;
+  setBits(&remote_state[3], kHaierAcOffTimerOffset, 2, 0);
 }
 
 void IRHaierAC::setCurrTime(const uint16_t nr_mins) {
@@ -289,19 +275,18 @@ void IRHaierAC::setCurrTime(const uint16_t nr_mins) {
 }
 
 uint8_t IRHaierAC::getSwing(void) {
-  return (remote_state[2] & 0b11000000) >> 6;
+  return GETBITS8(remote_state[2], kHaierAcSwingOffset, kHaierAcSwingSize);
 }
 
-void IRHaierAC::setSwing(const uint8_t state) {
-  if (state == getSwing()) return;  // Nothing to do.
-  setCommand(kHaierAcCmdSwing);
-  switch (state) {
+void IRHaierAC::setSwing(const uint8_t cmd) {
+  if (cmd == getSwing()) return;  // Nothing to do.
+  switch (cmd) {
     case kHaierAcSwingOff:
     case kHaierAcSwingUp:
     case kHaierAcSwingDown:
     case kHaierAcSwingChg:
-      remote_state[2] &= 0b00111111;
-      remote_state[2] |= (state << 6);
+      setCommand(kHaierAcCmdSwing);
+      setBits(&remote_state[2], kHaierAcSwingOffset, kHaierAcSwingSize, cmd);
       break;
   }
 }
@@ -309,16 +294,11 @@ void IRHaierAC::setSwing(const uint8_t state) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kHaierAcCool;
-    case stdAc::opmode_t::kHeat:
-      return kHaierAcHeat;
-    case stdAc::opmode_t::kDry:
-      return kHaierAcDry;
-    case stdAc::opmode_t::kFan:
-      return kHaierAcFan;
-    default:
-      return kHaierAcAuto;
+    case stdAc::opmode_t::kCool: return kHaierAcCool;
+    case stdAc::opmode_t::kHeat: return kHaierAcHeat;
+    case stdAc::opmode_t::kDry:  return kHaierAcDry;
+    case stdAc::opmode_t::kFan:  return kHaierAcFan;
+    default:                     return kHaierAcAuto;
   }
 }
 
@@ -326,15 +306,11 @@ uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRHaierAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kHaierAcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kHaierAcFanMed;
+    case stdAc::fanspeed_t::kLow:    return kHaierAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kHaierAcFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kHaierAcFanHigh;
-    default:
-      return kHaierAcFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kHaierAcFanHigh;
+    default:                         return kHaierAcFanAuto;
   }
 }
 
@@ -343,15 +319,11 @@ uint8_t IRHaierAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
     case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle:
-      return kHaierAcSwingUp;
+    case stdAc::swingv_t::kMiddle:  return kHaierAcSwingUp;
     case stdAc::swingv_t::kLow:
-    case stdAc::swingv_t::kLowest:
-      return kHaierAcSwingDown;
-    case stdAc::swingv_t::kOff:
-      return kHaierAcSwingOff;
-    default:
-      return kHaierAcSwingChg;
+    case stdAc::swingv_t::kLowest:  return kHaierAcSwingDown;
+    case stdAc::swingv_t::kOff:     return kHaierAcSwingOff;
+    default:                        return kHaierAcSwingChg;
   }
 }
 
@@ -360,9 +332,9 @@ stdAc::opmode_t IRHaierAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHaierAcCool: return stdAc::opmode_t::kCool;
     case kHaierAcHeat: return stdAc::opmode_t::kHeat;
-    case kHaierAcDry: return stdAc::opmode_t::kDry;
-    case kHaierAcFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kHaierAcDry:  return stdAc::opmode_t::kDry;
+    case kHaierAcFan:  return stdAc::opmode_t::kFan;
+    default:           return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -370,19 +342,19 @@ stdAc::opmode_t IRHaierAC::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRHaierAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHaierAcFanHigh: return stdAc::fanspeed_t::kMax;
-    case kHaierAcFanMed: return stdAc::fanspeed_t::kMedium;
-    case kHaierAcFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kHaierAcFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kHaierAcFanLow:  return stdAc::fanspeed_t::kMin;
+    default:              return stdAc::fanspeed_t::kAuto;
   }
 }
 
 // Convert a native vertical swing to it's common equivalent.
 stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
-    case kHaierAcSwingUp: return stdAc::swingv_t::kHighest;
+    case kHaierAcSwingUp:   return stdAc::swingv_t::kHighest;
     case kHaierAcSwingDown: return stdAc::swingv_t::kLowest;
-    case kHaierAcSwingOff: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
+    case kHaierAcSwingOff:  return stdAc::swingv_t::kOff;
+    default:                return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -417,44 +389,44 @@ String IRHaierAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
   uint8_t cmd = getCommand();
-  result += addIntToString(cmd, F("Command"), false);
-  result += F(" (");
+  result += addIntToString(cmd, kCommandStr, false);
+  result += kSpaceLBraceStr;
   switch (cmd) {
     case kHaierAcCmdOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcCmdOn:
-      result += F("On");
+      result += kOnStr;
       break;
     case kHaierAcCmdMode:
-      result += F("Mode");
+      result += kModeStr;
       break;
     case kHaierAcCmdFan:
-      result += F("Fan");
+      result += kFanStr;
       break;
     case kHaierAcCmdTempUp:
-      result += F("Temp Up");
+      result += kTempUpStr;
       break;
     case kHaierAcCmdTempDown:
-      result += F("Temp Down");
+      result += kTempDownStr;
       break;
     case kHaierAcCmdSleep:
-      result += F("Sleep");
+      result += kSleepStr;
       break;
     case kHaierAcCmdTimerSet:
-      result += F("Timer Set");
+      result += kTimerStr + ' ' + kSetStr;
       break;
     case kHaierAcCmdTimerCancel:
-      result += F("Timer Cancel");
+      result += kTimerStr + ' ' + kCancelStr;
       break;
     case kHaierAcCmdHealth:
-      result += F("Health");
+      result += kHealthStr;
       break;
     case kHaierAcCmdSwing:
-      result += F("Swing");
+      result += kSwingStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
@@ -462,33 +434,33 @@ String IRHaierAC::toString(void) {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHaierAcFanHigh, kHaierAcFanLow,
                            kHaierAcFanAuto, kHaierAcFanAuto, kHaierAcFanMed);
-  result += addIntToString(getSwing(), F("Swing"));
-  result += F(" (");
+  result += addIntToString(getSwing(), kSwingStr);
+  result += kSpaceLBraceStr;
   switch (getSwing()) {
     case kHaierAcSwingOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcSwingUp:
-      result += F("Up");
+      result += kUpStr;
       break;
     case kHaierAcSwingDown:
-      result += F("Down");
+      result += kDownStr;
       break;
     case kHaierAcSwingChg:
-      result += F("Change");
+      result += kChangeStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getHealth(), F("Health"));
-  result += addLabeledString(minsToString(getCurrTime()), F("Current Time"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getHealth(), kHealthStr);
+  result += addLabeledString(minsToString(getCurrTime()), kClockStr);
   result += addLabeledString(
-      getOnTimer() >= 0 ? minsToString(getOnTimer()) : F("Off"), F("On Timer"));
+      getOnTimer() >= 0 ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
   result += addLabeledString(
-      getOffTimer() >= 0 ? minsToString(getOffTimer()) : F("Off"),
-      F("Off Timer"));
+      getOffTimer() >= 0 ? minsToString(getOffTimer()) : kOffStr,
+      kOffTimerStr);
   return result;
 }
 // End of IRHaierAC class.
@@ -502,8 +474,7 @@ void IRHaierACYRW02::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC_YRW02
 void IRHaierACYRW02::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHaierACYRW02(remote_state, kHaierACYRW02StateLength, repeat);
+  _irsend.sendHaierACYRW02(getRaw(), kHaierACYRW02StateLength, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
 
@@ -537,9 +508,7 @@ uint8_t* IRHaierACYRW02::getRaw(void) {
 }
 
 void IRHaierACYRW02::setRaw(const uint8_t new_code[]) {
-  for (uint8_t i = 0; i < kHaierACYRW02StateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, kHaierACYRW02StateLength);
 }
 
 void IRHaierACYRW02::setButton(uint8_t button) {
@@ -553,13 +522,12 @@ void IRHaierACYRW02::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonHealth:
     case kHaierAcYrw02ButtonTurbo:
     case kHaierAcYrw02ButtonSleep:
-      remote_state[12] &= 0b11110000;
-      remote_state[12] |= (button & 0b00001111);
+      setBits(&remote_state[12], kLowNibble, kNibbleSize, button);
   }
 }
 
 uint8_t IRHaierACYRW02::getButton(void) {
-  return remote_state[12] & 0b00001111;
+  return GETBITS8(remote_state[12], kLowNibble, kNibbleSize);
 }
 
 void IRHaierACYRW02::setMode(uint8_t mode) {
@@ -570,16 +538,15 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
     case kHaierAcYrw02Cool:
     case kHaierAcYrw02Dry:
     case kHaierAcYrw02Heat:
-    case kHaierAcYrw02Fan:
-      break;
-    default:  // If unexpected, default to auto mode.
-      new_mode = kHaierAcYrw02Auto;
+    case kHaierAcYrw02Fan: break;
+    default: new_mode = kHaierAcYrw02Auto;  // Unexpected, default to auto mode.
   }
-  remote_state[7] &= 0b0001111;
-  remote_state[7] |= (new_mode << 4);
+  setBits(&remote_state[7], kHaierAcYrw02ModeOffset, kModeBitsSize, new_mode);
 }
 
-uint8_t IRHaierACYRW02::getMode(void) { return remote_state[7] >> 4; }
+uint8_t IRHaierACYRW02::getMode(void) {
+  return GETBITS8(remote_state[7], kHaierAcYrw02ModeOffset, kModeBitsSize);
+}
 
 void IRHaierACYRW02::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
@@ -594,33 +561,29 @@ void IRHaierACYRW02::setTemp(const uint8_t celsius) {
     setButton(kHaierAcYrw02ButtonTempDown);
   else
     setButton(kHaierAcYrw02ButtonTempUp);
-
-  remote_state[1] &= 0b00001111;  // Clear the previous temp.
-  remote_state[1] |= ((temp - kHaierAcMinTemp) << 4);
+  setBits(&remote_state[1], kHighNibble, kNibbleSize, temp - kHaierAcMinTemp);
 }
 
 uint8_t IRHaierACYRW02::getTemp(void) {
-  return ((remote_state[1] & 0b11110000) >> 4) + kHaierAcMinTemp;
+  return GETBITS8(remote_state[1], kHighNibble, kNibbleSize) + kHaierAcMinTemp;
 }
 
 void IRHaierACYRW02::setHealth(const bool on) {
   setButton(kHaierAcYrw02ButtonHealth);
-  remote_state[3] &= 0b11111101;
-  remote_state[3] |= (on << 1);
+  setBit(&remote_state[3], kHaierAcYrw02HealthOffset, on);
 }
 
-bool IRHaierACYRW02::getHealth(void) { return remote_state[3] & 0b00000010; }
+bool IRHaierACYRW02::getHealth(void) {
+  return GETBIT8(remote_state[3], kHaierAcYrw02HealthOffset);
+}
 
 bool IRHaierACYRW02::getPower(void) {
-  return remote_state[4] & kHaierAcYrw02Power;
+  return GETBIT8(remote_state[4], kHaierAcYrw02PowerOffset);
 }
 
 void IRHaierACYRW02::setPower(const bool on) {
   setButton(kHaierAcYrw02ButtonPower);
-  if (on)
-    remote_state[4] |= kHaierAcYrw02Power;
-  else
-    remote_state[4] &= ~kHaierAcYrw02Power;
+  setBit(&remote_state[4], kHaierAcYrw02PowerOffset, on);
 }
 
 void IRHaierACYRW02::on(void) { setPower(true); }
@@ -628,31 +591,34 @@ void IRHaierACYRW02::on(void) { setPower(true); }
 void IRHaierACYRW02::off(void) { setPower(false); }
 
 bool IRHaierACYRW02::getSleep(void) {
-  return remote_state[8] & kHaierAcYrw02Sleep;
+  return GETBIT8(remote_state[8], kHaierAcYrw02SleepOffset);
 }
 
 void IRHaierACYRW02::setSleep(const bool on) {
   setButton(kHaierAcYrw02ButtonSleep);
-  if (on)
-    remote_state[8] |= kHaierAcYrw02Sleep;
-  else
-    remote_state[8] &= ~kHaierAcYrw02Sleep;
+  setBit(&remote_state[8], kHaierAcYrw02SleepOffset, on);
 }
 
-uint8_t IRHaierACYRW02::getTurbo(void) { return remote_state[6] >> 6; }
+uint8_t IRHaierACYRW02::getTurbo(void) {
+  return GETBITS8(remote_state[6], kHaierAcYrw02TurboOffset,
+                  kHaierAcYrw02TurboSize);
+}
 
 void IRHaierACYRW02::setTurbo(uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02TurboOff:
     case kHaierAcYrw02TurboLow:
     case kHaierAcYrw02TurboHigh:
-      remote_state[6] &= 0b00111111;
-      remote_state[6] |= (speed << 6);
+      setBits(&remote_state[6], kHaierAcYrw02TurboOffset,
+              kHaierAcYrw02TurboSize, speed);
       setButton(kHaierAcYrw02ButtonTurbo);
   }
 }
 
-uint8_t IRHaierACYRW02::getFan(void) { return remote_state[5] >> 4; }
+uint8_t IRHaierACYRW02::getFan(void) {
+  return GETBITS8(remote_state[5], kHaierAcYrw02FanOffset,
+                  kHaierAcYrw02FanSize);
+}
 
 void IRHaierACYRW02::setFan(uint8_t speed) {
   switch (speed) {
@@ -660,54 +626,44 @@ void IRHaierACYRW02::setFan(uint8_t speed) {
     case kHaierAcYrw02FanMed:
     case kHaierAcYrw02FanHigh:
     case kHaierAcYrw02FanAuto:
-      remote_state[5] &= 0b00001111;
-      remote_state[5] |= (speed << 4);
+      setBits(&remote_state[5], kHaierAcYrw02FanOffset, kHaierAcYrw02FanSize,
+              speed);
       setButton(kHaierAcYrw02ButtonFan);
   }
 }
 
-uint8_t IRHaierACYRW02::getSwing(void) { return remote_state[1] & 0b00001111; }
+uint8_t IRHaierACYRW02::getSwing(void) {
+  return GETBITS8(remote_state[1], kLowNibble, kNibbleSize);
+}
 
-void IRHaierACYRW02::setSwing(uint8_t state) {
-  uint8_t newstate = state;
-  switch (state) {
+void IRHaierACYRW02::setSwing(uint8_t pos) {
+  uint8_t newpos = pos;
+  switch (pos) {
     case kHaierAcYrw02SwingOff:
     case kHaierAcYrw02SwingAuto:
     case kHaierAcYrw02SwingTop:
     case kHaierAcYrw02SwingMiddle:
     case kHaierAcYrw02SwingBottom:
-    case kHaierAcYrw02SwingDown:
-      setButton(kHaierAcYrw02ButtonSwing);
-      break;
-    default:
-      return;  // Unexpected value so don't do anything.
+    case kHaierAcYrw02SwingDown: setButton(kHaierAcYrw02ButtonSwing); break;
+    default: return;  // Unexpected value so don't do anything.
   }
-
   // Heat mode has no MIDDLE setting, use BOTTOM instead.
-  if (state == kHaierAcYrw02SwingMiddle && getMode() == kHaierAcYrw02Heat)
-    newstate = kHaierAcYrw02SwingBottom;
-
+  if (pos == kHaierAcYrw02SwingMiddle && getMode() == kHaierAcYrw02Heat)
+    newpos = kHaierAcYrw02SwingBottom;
   // BOTTOM is only allowed if we are in Heat mode, otherwise MIDDLE.
-  if (state == kHaierAcYrw02SwingBottom && getMode() != kHaierAcYrw02Heat)
-    newstate = kHaierAcYrw02SwingMiddle;
-
-  remote_state[1] &= 0b11110000;
-  remote_state[1] |= newstate;
+  if (pos == kHaierAcYrw02SwingBottom && getMode() != kHaierAcYrw02Heat)
+    newpos = kHaierAcYrw02SwingMiddle;
+  setBits(&remote_state[1], kLowNibble, kNibbleSize, newpos);
 }
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kHaierAcYrw02Cool;
-    case stdAc::opmode_t::kHeat:
-      return kHaierAcYrw02Heat;
-    case stdAc::opmode_t::kDry:
-      return kHaierAcYrw02Dry;
-    case stdAc::opmode_t::kFan:
-      return kHaierAcYrw02Fan;
-    default:
-      return kHaierAcYrw02Auto;
+    case stdAc::opmode_t::kCool: return kHaierAcYrw02Cool;
+    case stdAc::opmode_t::kHeat: return kHaierAcYrw02Heat;
+    case stdAc::opmode_t::kDry:  return kHaierAcYrw02Dry;
+    case stdAc::opmode_t::kFan:  return kHaierAcYrw02Fan;
+    default:                     return kHaierAcYrw02Auto;
   }
 }
 
@@ -715,15 +671,11 @@ uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kHaierAcYrw02FanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kHaierAcYrw02FanMed;
+    case stdAc::fanspeed_t::kLow:    return kHaierAcYrw02FanLow;
+    case stdAc::fanspeed_t::kMedium: return kHaierAcYrw02FanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:
-      return kHaierAcYrw02FanHigh;
-    default:
-      return kHaierAcYrw02FanAuto;
+    case stdAc::fanspeed_t::kMax:    return kHaierAcYrw02FanHigh;
+    default:                         return kHaierAcYrw02FanAuto;
   }
 }
 
@@ -731,18 +683,12 @@ uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
 uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
-    case stdAc::swingv_t::kHigh:
-      return kHaierAcYrw02SwingTop;
-    case stdAc::swingv_t::kMiddle:
-      return kHaierAcYrw02SwingMiddle;
-    case stdAc::swingv_t::kLow:
-      return kHaierAcYrw02SwingDown;
-    case stdAc::swingv_t::kLowest:
-      return kHaierAcYrw02SwingBottom;
-    case stdAc::swingv_t::kOff:
-      return kHaierAcYrw02SwingOff;
-    default:
-      return kHaierAcYrw02SwingAuto;
+    case stdAc::swingv_t::kHigh:   return kHaierAcYrw02SwingTop;
+    case stdAc::swingv_t::kMiddle: return kHaierAcYrw02SwingMiddle;
+    case stdAc::swingv_t::kLow:    return kHaierAcYrw02SwingDown;
+    case stdAc::swingv_t::kLowest: return kHaierAcYrw02SwingBottom;
+    case stdAc::swingv_t::kOff:    return kHaierAcYrw02SwingOff;
+    default:                       return kHaierAcYrw02SwingAuto;
   }
 }
 
@@ -751,9 +697,9 @@ stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHaierAcYrw02Cool: return stdAc::opmode_t::kCool;
     case kHaierAcYrw02Heat: return stdAc::opmode_t::kHeat;
-    case kHaierAcYrw02Dry: return stdAc::opmode_t::kDry;
-    case kHaierAcYrw02Fan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kHaierAcYrw02Dry:  return stdAc::opmode_t::kDry;
+    case kHaierAcYrw02Fan:  return stdAc::opmode_t::kFan;
+    default:                return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -761,21 +707,21 @@ stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRHaierACYRW02::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02FanHigh: return stdAc::fanspeed_t::kMax;
-    case kHaierAcYrw02FanMed: return stdAc::fanspeed_t::kMedium;
-    case kHaierAcYrw02FanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kHaierAcYrw02FanMed:  return stdAc::fanspeed_t::kMedium;
+    case kHaierAcYrw02FanLow:  return stdAc::fanspeed_t::kMin;
+    default:                   return stdAc::fanspeed_t::kAuto;
   }
 }
 
 // Convert a native vertical swing to it's common equivalent.
 stdAc::swingv_t IRHaierACYRW02::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
-    case kHaierAcYrw02SwingTop: return stdAc::swingv_t::kHighest;
+    case kHaierAcYrw02SwingTop:    return stdAc::swingv_t::kHighest;
     case kHaierAcYrw02SwingMiddle: return stdAc::swingv_t::kMiddle;
-    case kHaierAcYrw02SwingDown: return stdAc::swingv_t::kLow;
+    case kHaierAcYrw02SwingDown:   return stdAc::swingv_t::kLow;
     case kHaierAcYrw02SwingBottom: return stdAc::swingv_t::kLowest;
-    case kHaierAcYrw02SwingOff: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
+    case kHaierAcYrw02SwingOff:    return stdAc::swingv_t::kOff;
+    default:                       return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -808,40 +754,40 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) {
 String IRHaierACYRW02::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   uint8_t cmd = getButton();
-  result += addIntToString(cmd, F("Button"));
-  result += F(" (");
+  result += addIntToString(cmd, kButtonStr);
+  result += kSpaceLBraceStr;
   switch (cmd) {
     case kHaierAcYrw02ButtonPower:
-      result += F("Power");
+      result += kPowerStr;
       break;
     case kHaierAcYrw02ButtonMode:
-      result += F("Mode");
+      result += kModeStr;
       break;
     case kHaierAcYrw02ButtonFan:
-      result += F("Fan");
+      result += kFanStr;
       break;
     case kHaierAcYrw02ButtonTempUp:
-      result += F("Temp Up");
+      result += kTempUpStr;
       break;
     case kHaierAcYrw02ButtonTempDown:
-      result += F("Temp Down");
+      result += kTempDownStr;
       break;
     case kHaierAcYrw02ButtonSleep:
-      result += F("Sleep");
+      result += kSleepStr;
       break;
     case kHaierAcYrw02ButtonHealth:
-      result += "Health";
+      result += kHealthStr;
       break;
     case kHaierAcYrw02ButtonSwing:
-      result += F("Swing");
+      result += kSwingStr;
       break;
     case kHaierAcYrw02ButtonTurbo:
-      result += F("Turbo");
+      result += kTurboStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
   result += addModeToString(getMode(), kHaierAcYrw02Auto, kHaierAcYrw02Cool,
@@ -851,49 +797,49 @@ String IRHaierACYRW02::toString(void) {
   result += addFanToString(getFan(), kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
                            kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
                            kHaierAcYrw02FanMed);
-  result += addIntToString(getTurbo(), F("Turbo"));
-  result += F(" (");
+  result += addIntToString(getTurbo(), kTurboStr);
+  result += kSpaceLBraceStr;
   switch (getTurbo()) {
     case kHaierAcYrw02TurboOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcYrw02TurboLow:
-      result += F("Low");
+      result += kLowStr;
       break;
     case kHaierAcYrw02TurboHigh:
-      result += F("High");
+      result += kHighStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwing(), F("Swing"));
-  result += F(" (");
+  result += addIntToString(getSwing(), kSwingStr);
+  result += kSpaceLBraceStr;
   switch (getSwing()) {
     case kHaierAcYrw02SwingOff:
-      result += F("Off");
+      result += kOffStr;
       break;
     case kHaierAcYrw02SwingAuto:
-      result += F("Auto");
+      result += kAutoStr;
       break;
     case kHaierAcYrw02SwingBottom:
-      result += F("Bottom");
+      result += kLowestStr;
       break;
     case kHaierAcYrw02SwingDown:
-      result += F("Down");
+      result += kLowStr;
       break;
     case kHaierAcYrw02SwingTop:
-      result += F("Top");
+      result += kHighestStr;
       break;
     case kHaierAcYrw02SwingMiddle:
-      result += F("Middle");
+      result += kMiddleStr;
       break;
     default:
-      result += F("UNKNOWN");
+      result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), F("Sleep"));
-  result += addBoolToString(getHealth(), F("Health"));
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getHealth(), kHealthStr);
   return result;
 }
 // End of IRHaierACYRW02 class.

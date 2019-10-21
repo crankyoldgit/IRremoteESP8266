@@ -128,6 +128,13 @@ class IRac {
                  const bool econo, const int16_t sleep = -1,
                  const int16_t clock = -1);
 #endif  // SEND_DAIKIN128
+#if SEND_DAIKIN152
+  void daikin152(IRDaikin152 *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv,
+                 const bool quiet, const bool turbo, const bool econo);
+#endif  // SEND_DAIKIN152
 #if SEND_DAIKIN160
 void daikin160(IRDaikin160 *ac,
                const bool on, const stdAc::opmode_t mode,
@@ -231,6 +238,14 @@ void electra(IRElectraAc *ac,
                   const stdAc::swingh_t swingh,
                   const bool quiet, const int16_t clock = -1);
 #endif  // SEND_MITSUBISHI_AC
+#if SEND_MITSUBISHI112
+  void mitsubishi112(IRMitsubishi112 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv,
+                     const stdAc::swingh_t swingh,
+                     const bool quiet);
+#endif  // SEND_MITSUBISHI112
 #if SEND_MITSUBISHI136
   void mitsubishi136(IRMitsubishi136 *ac,
                      const bool on, const stdAc::opmode_t mode,

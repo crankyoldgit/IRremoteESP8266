@@ -24,10 +24,6 @@
 #endif
 
 // Constants
-enum gree_ac_remote_model_t {
-  YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
-  YBOFB,     // (2) Green, YBOFB2, YAPOF3
-};
 
 const uint8_t kGreeAuto = 0;
 const uint8_t kGreeCool = 1;
@@ -36,48 +32,48 @@ const uint8_t kGreeFan = 3;
 const uint8_t kGreeHeat = 4;
 
 // Byte 0
-const uint8_t kGreeModeMask =        0b00000111;
-const uint8_t kGreePower1Mask =      0b00001000;
-const uint8_t kGreeFanMask =         0b00110000;
+const uint8_t kGreePower1Offset = 3;
+const uint8_t kGreeFanOffset = 4;
+const uint8_t kGreeFanSize = 2;  // Bits
 const uint8_t kGreeFanAuto = 0;
 const uint8_t kGreeFanMin = 1;
 const uint8_t kGreeFanMed = 2;
 const uint8_t kGreeFanMax = 3;
-const uint8_t kGreeSwingAutoMask =   0b01000000;
-const uint8_t kGreeSleepMask =       0b10000000;
+const uint8_t kGreeSwingAutoOffset = 6;
+const uint8_t kGreeSleepOffset = 7;
 // Byte 1
-const uint8_t kGreeTempMask =        0b00001111;
+const uint8_t kGreeTempSize = 4;
 const uint8_t kGreeMinTemp = 16;  // Celsius
 const uint8_t kGreeMaxTemp = 30;  // Celsius
-const uint8_t kGreeTimerEnabledBit = 0b10000000;
-const uint8_t kGreeTimerHalfHrBit =  0b00010000;
-const uint8_t kGreeTimerTensHrMask = 0b01100000;
-const uint8_t kGreeTimer1Mask = kGreeTimerTensHrMask | kGreeTimerHalfHrBit;
+const uint8_t kGreeTimerHalfHrOffset = 4;
+const uint8_t kGreeTimerTensHrOffset = 5;
+const uint8_t kGreeTimerTensHrSize = 2;  // Bits
 const uint16_t kGreeTimerMax = 24 * 60;
+const uint8_t kGreeTimerEnabledOffset = 7;
 
 // Byte 2
-const uint8_t kGreeTimerHoursMask =  0b00001111;
-const uint8_t kGreeTurboMask =       0b00010000;
-const uint8_t kGreeLightMask =       0b00100000;
+const uint8_t kGreeTimerHoursOffset = 0;
+const uint8_t kGreeTimerHoursSize = 4;  // Bits
+const uint8_t kGreeTurboOffset = 4;
+const uint8_t kGreeLightOffset = 5;
 // This might not be used. See #814
-const uint8_t kGreePower2Mask =      0b01000000;
-const uint8_t kGreeXfanMask =        0b10000000;
+const uint8_t kGreePower2Offset = 6;
+const uint8_t kGreeXfanOffset = 7;
 // Byte 4
-const uint8_t kGreeSwingPosMask =    0b00001111;
+const uint8_t kGreeSwingSize = 4;  // Bits
+const uint8_t kGreeSwingLastPos =    0b0000;
+const uint8_t kGreeSwingAuto =       0b0001;
+const uint8_t kGreeSwingUp =         0b0010;
+const uint8_t kGreeSwingMiddleUp =   0b0011;
+const uint8_t kGreeSwingMiddle =     0b0100;
+const uint8_t kGreeSwingMiddleDown = 0b0101;
+const uint8_t kGreeSwingDown =       0b0110;
+const uint8_t kGreeSwingDownAuto =   0b0111;
+const uint8_t kGreeSwingMiddleAuto = 0b1001;
+const uint8_t kGreeSwingUpAuto =     0b1011;
 // byte 5
-const uint8_t kGreeIFeelMask =       0b00000100;
-const uint8_t kGreeWiFiMask =        0b01000000;
-
-const uint8_t kGreeSwingLastPos =    0b00000000;
-const uint8_t kGreeSwingAuto =       0b00000001;
-const uint8_t kGreeSwingUp =         0b00000010;
-const uint8_t kGreeSwingMiddleUp =   0b00000011;
-const uint8_t kGreeSwingMiddle =     0b00000100;
-const uint8_t kGreeSwingMiddleDown = 0b00000101;
-const uint8_t kGreeSwingDown =       0b00000110;
-const uint8_t kGreeSwingDownAuto =   0b00000111;
-const uint8_t kGreeSwingMiddleAuto = 0b00001001;
-const uint8_t kGreeSwingUpAuto =     0b00001011;
+const uint8_t kGreeIFeelOffset = 2;
+const uint8_t kGreeWiFiOffset = 6;
 
 // Legacy defines.
 #define GREE_AUTO kGreeAuto

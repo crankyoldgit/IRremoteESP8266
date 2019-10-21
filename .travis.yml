@@ -19,10 +19,20 @@ notifications:
     on_failure: change
 jobs:
   include:
-    - script:
-      # Check that everything compiles.
-      - find . -name platformio.ini -type f | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
-    - script:
+    - name: "Compile the trivial examples"
+      script:
+      # Check that everything compiles but some heavy tasks e.g. IRMQTTServer & IRrecvDumpV2
+      # i.e. We are splitting the work load in to parallel tasks.
+      - find . -regextype egrep -name platformio.ini -type f \! -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
+    - name: "Compile the complex examples"
+      script:
+      # Check that everything else compiles.
+      # i.e. We are splitting the work load in to parallel tasks.
+      - find . -regextype egrep -name platformio.ini -type f -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
+    - name: "Unit tests & Linter checks"
+      script:
+      # Run all the Tests & check the code linters have no issues.
+      # i.e. We are splitting the work load in to parallel tasks.
       # Check the version numbers match.
       - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
       - test ${LIB_VERSION} == "$(jq -r .version library.json)"
@@ -31,7 +41,7 @@ jobs:
       - (cd tools; make all)
       # Check for lint issues.
       - shopt -s nullglob
-      - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
+      - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,src/locale,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
       - pylint3 -d F0001 {src,test,tools}/*.py
       - shopt -u nullglob
       # Build and run the unit tests.

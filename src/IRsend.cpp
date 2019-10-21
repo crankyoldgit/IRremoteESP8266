@@ -614,6 +614,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kMitsubishiACBits;
     case MITSUBISHI136:
       return kMitsubishi136Bits;
+    case MITSUBISHI112:
+      return kMitsubishi112Bits;
     case MITSUBISHI_HEAVY_152:
       return kMitsubishiHeavy152Bits;
     case MITSUBISHI_HEAVY_88:
@@ -947,6 +949,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendMitsubishi136(state, nbytes);
       break;
 #endif  // SEND_MITSUBISHI136
+#if SEND_MITSUBISHI112
+    case MITSUBISHI112:
+      sendMitsubishi112(state, nbytes);
+      break;
+#endif  // SEND_MITSUBISHI112
 #if SEND_MITSUBISHIHEAVY
     case MITSUBISHI_HEAVY_88:
       sendMitsubishiHeavy88(state, nbytes);

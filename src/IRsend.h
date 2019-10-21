@@ -112,6 +112,36 @@ namespace stdAc {
   } state_t;
 };  // namespace stdAc
 
+
+enum fujitsu_ac_remote_model_t {
+  ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
+  ARDB1,        // (2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work)
+  ARREB1E,      // (3) AR-REB1E
+  ARJW2,        // (4) AR-JW2  (Same as ARDB1 but with horiz control)
+  ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
+};
+
+enum gree_ac_remote_model_t {
+  YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
+  YBOFB,     // (2) Green, YBOFB2, YAPOF3
+};
+
+enum panasonic_ac_remote_model_t {
+  kPanasonicUnknown = 0,
+  kPanasonicLke = 1,
+  kPanasonicNke = 2,
+  kPanasonicDke = 3,
+  kPanasonicJke = 4,
+  kPanasonicCkp = 5,
+  kPanasonicRkr = 6,
+};
+
+enum whirlpool_ac_remote_model_t {
+  DG11J13A = 1,  // DG11J1-04 too
+  DG11J191,
+};
+
+
 // Classes
 class IRsend {
  public:
@@ -279,6 +309,11 @@ class IRsend {
   void sendMitsubishi136(const unsigned char data[],
                          const uint16_t nbytes = kMitsubishi136StateLength,
                          const uint16_t repeat = kMitsubishi136MinRepeat);
+#endif
+#if SEND_MITSUBISHI112
+  void sendMitsubishi112(const unsigned char data[],
+                         const uint16_t nbytes = kMitsubishi112StateLength,
+                         const uint16_t repeat = kMitsubishi112MinRepeat);
 #endif
 #if SEND_MITSUBISHI2
   void sendMitsubishi2(uint64_t data, uint16_t nbits = kMitsubishiBits,

@@ -5,11 +5,13 @@
 
 #include "ir_Samsung.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
@@ -56,6 +58,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::setBit;
+using irutils::setBits;
 
 #if SEND_SAMSUNG
 // Send a Samsung formatted message.
@@ -285,7 +289,7 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
                   38000, false, 0, 50);                    // Send in LSBF order
     }
     // Complete made up guess at inter-message gap.
-    space(100000 - kSamsungAcSectionGap);
+    space(kDefaultMessageGap - kSamsungAcSectionGap);
   }
 }
 #endif  // SEND_SAMSUNG_AC
@@ -301,18 +305,10 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
 //   forcepower: A flag indicating if force sending a special power message
 //              with the first `send()` call. Default: true
 void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
-  for (uint8_t i = 0; i < kSamsungAcExtendedStateLength; i++)
-    remote_state[i] = 0x0;
-  remote_state[0] = 0x02;
-  remote_state[1] = 0x92;
-  remote_state[2] = 0x0F;
-  remote_state[6] = 0xF0;
-  remote_state[7] = 0x01;
-  remote_state[8] = 0x02;
-  remote_state[9] = 0xAE;
-  remote_state[10] = 0x71;
-  remote_state[12] = 0x15;
-  remote_state[13] = 0xF0;
+  static const uint8_t kReset[kSamsungAcExtendedStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0x02, 0xAE, 0x71, 0x00,
+      0x15, 0xF0};
+  memcpy(remote_state, kReset, kSamsungAcExtendedStateLength);
   _forcepower = forcepower;
   _lastsentpowerstate = initialPower;
   setPower(initialPower);
@@ -329,10 +325,10 @@ uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
   //   https://github.com/adafruit/Raw-IR-decoder-for-Arduino/pull/3/files
   // Count most of the '1' bits after the checksum location.
   sum += countBits(state[length - 7], 8);
-  sum -= countBits(state[length - 6] & 0xF, 8);
-  sum += countBits(state[length - 5] & 0b11111110, 8);
+  sum -= countBits(GETBITS8(state[length - 6], kLowNibble, kNibbleSize), 8);
+  sum += countBits(GETBITS8(state[length - 5], 1, 7), 8);
   sum += countBits(state + length - 4, 3);
-  return (28 - sum) & 0xF;
+  return GETBITS8(28 - sum, kLowNibble, kNibbleSize);
 }
 
 bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
@@ -340,19 +336,19 @@ bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
     return true;  // No checksum to compare with. Assume okay.
   uint8_t offset = 0;
   if (length >= kSamsungAcExtendedStateLength) offset = 7;
-  return ((state[length - 6] >> 4) == IRSamsungAc::calcChecksum(state, length)
-          && (state[length - (13 + offset)] >> 4) == IRSamsungAc::calcChecksum(
-                 state, length - (7 + offset)));
+  return (GETBITS8(state[length - 6], kHighNibble, kNibbleSize) ==
+          IRSamsungAc::calcChecksum(state, length)) &&
+         (GETBITS8(state[length - (13 + offset)], kHighNibble, kNibbleSize) ==
+          IRSamsungAc::calcChecksum(state, length - (7 + offset)));
 }
 
 // Update the checksum for the internal state.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 13) return;
-  remote_state[length - 6] &= 0x0F;
-  remote_state[length - 6] |= (this->calcChecksum(remote_state, length) << 4);
-  remote_state[length - 13] &= 0x0F;
-  remote_state[length - 13] |= (this->calcChecksum(remote_state,
-                                                   length - 7) << 4);
+  setBits(&remote_state[length - 6], kHighNibble, kNibbleSize,
+          this->calcChecksum(remote_state, length));
+  setBits(&remote_state[length - 13], kHighNibble, kNibbleSize,
+          this->calcChecksum(remote_state, length - 7));
 }
 
 #if SEND_SAMSUNG_AC
@@ -424,9 +420,8 @@ uint8_t *IRSamsungAc::getRaw(void) {
 }
 
 void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kSamsungAcExtendedStateLength; i++) {
-    remote_state[i] = new_code[i];
-  }
+  memcpy(remote_state, new_code, std::min(length,
+                                          kSamsungAcExtendedStateLength));
   // Shrink the extended state into a normal state.
   if (length > kSamsungAcStateLength) {
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
@@ -434,46 +429,41 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   }
 }
 
-void IRSamsungAc::on(void) {
-  remote_state[1] &= ~kSamsungAcPowerMask1;  // Bit needs to be cleared.
-  remote_state[6] |= kSamsungAcPowerMask6;  // Bit needs to be set.
-}
+void IRSamsungAc::on(void) { setPower(true); }
 
-void IRSamsungAc::off(void) {
-  remote_state[1] |= kSamsungAcPowerMask1;  // Bit needs to be set.
-  remote_state[6] &= ~kSamsungAcPowerMask6;  // Bit needs to be cleared.
-}
+void IRSamsungAc::off(void) { setPower(false); }
 
 void IRSamsungAc::setPower(const bool on) {
-  if (on)
-    this->on();
-  else
-    this->off();
+  setBit(&remote_state[1], kSamsungAcPower1Offset, !on);  // Cleared when on.
+  setBits(&remote_state[6], kSamsungAcPower6Offset, kSamsungAcPower6Size,
+          on ? 0b11 : 0b00);
 }
 
 bool IRSamsungAc::getPower(void) {
-  return (remote_state[6] & kSamsungAcPowerMask6) &&
-         !(remote_state[1] & kSamsungAcPowerMask1);
+  return (GETBITS8(remote_state[6], kSamsungAcPower6Offset,
+                   kSamsungAcPower6Size) == 0b11) &&
+      !GETBIT8(remote_state[1], kSamsungAcPower1Offset);
 }
 
 // Set the temp. in deg C
 void IRSamsungAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = std::max(kSamsungAcMinTemp, temp);
   newtemp = std::min(kSamsungAcMaxTemp, newtemp);
-  remote_state[11] = (remote_state[11] & ~kSamsungAcTempMask) |
-                     ((newtemp - kSamsungAcMinTemp) << 4);
+  setBits(&remote_state[11], kHighNibble, kNibbleSize,
+          newtemp - kSamsungAcMinTemp);
 }
 
 // Return the set temp. in deg C
 uint8_t IRSamsungAc::getTemp(void) {
-  return ((remote_state[11] & kSamsungAcTempMask) >> 4) + kSamsungAcMinTemp;
+  return GETBITS8(remote_state[11], kHighNibble, kNibbleSize) +
+      kSamsungAcMinTemp;
 }
 
 void IRSamsungAc::setMode(const uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   uint8_t newmode = mode;
   if (newmode > kSamsungAcHeat) newmode = kSamsungAcAuto;
-  remote_state[12] = (remote_state[12] & ~kSamsungAcModeMask) | (newmode << 4);
+  setBits(&remote_state[12], kSamsungAcModeOffset, kModeBitsSize, newmode);
 
   // Auto mode has a special fan setting valid only in auto mode.
   if (newmode == kSamsungAcAuto) {
@@ -486,7 +476,7 @@ void IRSamsungAc::setMode(const uint8_t mode) {
 }
 
 uint8_t IRSamsungAc::getMode(void) {
-  return (remote_state[12] & kSamsungAcModeMask) >> 4;
+  return GETBITS8(remote_state[12], kSamsungAcModeOffset, kModeBitsSize);
 }
 
 void IRSamsungAc::setFan(const uint8_t speed) {
@@ -504,89 +494,77 @@ void IRSamsungAc::setFan(const uint8_t speed) {
     default:
       return;
   }
-  remote_state[12] = (remote_state[12] & ~kSamsungAcFanMask) | (speed << 1);
+  setBits(&remote_state[12], kSamsungAcFanOffest, kSamsungAcFanSize, speed);
 }
 
 uint8_t IRSamsungAc::getFan(void) {
-  return ((remote_state[12] & kSamsungAcFanMask) >> 1);
+  return GETBITS8(remote_state[12], kSamsungAcFanOffest, kSamsungAcFanSize);
 }
 
 bool IRSamsungAc::getSwing(void) {
   // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
   // e.g. 0xAE or 0XAF for swing move.
-  return ((remote_state[9] & kSamsungAcSwingMask) >> 4) == kSamsungAcSwingMove;
+  return GETBITS8(remote_state[9], kSamsungAcSwingOffset,
+                  kSamsungAcSwingSize) == kSamsungAcSwingMove;
 }
 
 void IRSamsungAc::setSwing(const bool on) {
   // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
   // e.g. 0xAE or 0XAF for swing move.
-  remote_state[9] &= ~kSamsungAcSwingMask;  // Clear the previous swing state.
-  if (on)
-    remote_state[9] |= (kSamsungAcSwingMove << 4);
-  else
-    remote_state[9] |= (kSamsungAcSwingStop << 4);
+  setBits(&remote_state[9], kSamsungAcSwingOffset, kSamsungAcSwingSize,
+          on ? kSamsungAcSwingMove : kSamsungAcSwingStop);
 }
 
 bool IRSamsungAc::getBeep(void) {
-  return remote_state[13] & kSamsungAcBeepMask;
+  return GETBIT8(remote_state[13], kSamsungAcBeepOffset);
 }
 
 void IRSamsungAc::setBeep(const bool on) {
-  if (on)
-    remote_state[13] |= kSamsungAcBeepMask;
-  else
-    remote_state[13] &= ~kSamsungAcBeepMask;
+  setBit(&remote_state[13], kSamsungAcBeepOffset, on);
 }
 
 bool IRSamsungAc::getClean(void) {
-  return (remote_state[10] & kSamsungAcCleanMask10) &&
-         (remote_state[11] & kSamsungAcCleanMask11);
+  return GETBIT8(remote_state[10], kSamsungAcClean10Offset) &&
+         GETBIT8(remote_state[11], kSamsungAcClean11Offset);
 }
 
 void IRSamsungAc::setClean(const bool on) {
-  if (on) {
-    remote_state[10] |= kSamsungAcCleanMask10;
-    remote_state[11] |= kSamsungAcCleanMask11;
-  } else {
-    remote_state[10] &= ~kSamsungAcCleanMask10;
-    remote_state[11] &= ~kSamsungAcCleanMask11;
-  }
+  setBit(&remote_state[10], kSamsungAcClean10Offset, on);
+  setBit(&remote_state[11], kSamsungAcClean11Offset, on);
 }
 
 bool IRSamsungAc::getQuiet(void) {
-  return !(remote_state[1] & kSamsungAcQuietMask1) &&
-         (remote_state[5] & kSamsungAcQuietMask5);
+  return !GETBIT8(remote_state[1], kSamsungAcQuiet1Offset) &&
+         GETBIT8(remote_state[5], kSamsungAcQuiet5Offset);
 }
 
 void IRSamsungAc::setQuiet(const bool on) {
+  setBit(&remote_state[1], kSamsungAcQuiet1Offset, !on);  // Cleared when on.
+  setBit(&remote_state[5], kSamsungAcQuiet5Offset, on);
   if (on) {
-    remote_state[1] &= ~kSamsungAcQuietMask1;  // Bit needs to be cleared.
-    remote_state[5] |= kSamsungAcQuietMask5;  // Bit needs to be set.
     // Quiet mode seems to set fan speed to auto.
     this->setFan(kSamsungAcFanAuto);
     this->setPowerful(false);  // Quiet 'on' is mutually exclusive to Powerful.
-  } else {
-    remote_state[1] |= kSamsungAcQuietMask1;  // Bit needs to be set.
-    remote_state[5] &= ~kSamsungAcQuietMask5;  // Bit needs to be cleared.
   }
 }
 
 bool IRSamsungAc::getPowerful(void) {
   return !(remote_state[8] & kSamsungAcPowerfulMask8) &&
-         (remote_state[10] & kSamsungAcPowerfulMask10) &&
-         this->getFan() == kSamsungAcFanTurbo;
+         GETBITS8(remote_state[10], kSamsungAcPowerful10Offset,
+                  kSamsungAcPowerful10Offset) &&
+         (this->getFan() == kSamsungAcFanTurbo);
 }
 
 void IRSamsungAc::setPowerful(const bool on) {
+  setBits(&remote_state[10], kSamsungAcPowerful10Offset,
+          kSamsungAcPowerful10Offset, on ? 0b11: 0b00);
   if (on) {
     remote_state[8] &= ~kSamsungAcPowerfulMask8;  // Bit needs to be cleared.
-    remote_state[10] |= kSamsungAcPowerfulMask10;  // Bit needs to be set.
     // Powerful mode sets fan speed to Turbo.
     this->setFan(kSamsungAcFanTurbo);
     this->setQuiet(false);  // Powerful 'on' is mutually exclusive to Quiet.
   } else {
     remote_state[8] |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
-    remote_state[10] &= ~kSamsungAcPowerfulMask10;  // Bit needs to be cleared.
     // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
     if (this->getFan() == kSamsungAcFanTurbo) this->setFan(kSamsungAcFanAuto);
   }
@@ -595,16 +573,11 @@ void IRSamsungAc::setPowerful(const bool on) {
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kSamsungAcCool;
-    case stdAc::opmode_t::kHeat:
-      return kSamsungAcHeat;
-    case stdAc::opmode_t::kDry:
-      return kSamsungAcDry;
-    case stdAc::opmode_t::kFan:
-      return kSamsungAcFan;
-    default:
-      return kSamsungAcAuto;
+    case stdAc::opmode_t::kCool: return kSamsungAcCool;
+    case stdAc::opmode_t::kHeat: return kSamsungAcHeat;
+    case stdAc::opmode_t::kDry:  return kSamsungAcDry;
+    case stdAc::opmode_t::kFan:  return kSamsungAcFan;
+    default:                     return kSamsungAcAuto;
   }
 }
 
@@ -612,16 +585,11 @@ uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kSamsungAcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kSamsungAcFanMed;
-    case stdAc::fanspeed_t::kHigh:
-      return kSamsungAcFanHigh;
-    case stdAc::fanspeed_t::kMax:
-      return kSamsungAcFanTurbo;
-    default:
-      return kSamsungAcFanAuto;
+    case stdAc::fanspeed_t::kLow:    return kSamsungAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kSamsungAcFanMed;
+    case stdAc::fanspeed_t::kHigh:   return kSamsungAcFanHigh;
+    case stdAc::fanspeed_t::kMax:    return kSamsungAcFanTurbo;
+    default:                         return kSamsungAcFanAuto;
   }
 }
 
@@ -630,9 +598,9 @@ stdAc::opmode_t IRSamsungAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kSamsungAcCool: return stdAc::opmode_t::kCool;
     case kSamsungAcHeat: return stdAc::opmode_t::kHeat;
-    case kSamsungAcDry: return stdAc::opmode_t::kDry;
-    case kSamsungAcFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kSamsungAcDry:  return stdAc::opmode_t::kDry;
+    case kSamsungAcFan:  return stdAc::opmode_t::kFan;
+    default:             return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -640,10 +608,10 @@ stdAc::opmode_t IRSamsungAc::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kSamsungAcFanTurbo: return stdAc::fanspeed_t::kMax;
-    case kSamsungAcFanHigh: return stdAc::fanspeed_t::kHigh;
-    case kSamsungAcFanMed: return stdAc::fanspeed_t::kMedium;
-    case kSamsungAcFanLow: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kSamsungAcFanHigh:  return stdAc::fanspeed_t::kHigh;
+    case kSamsungAcFanMed:   return stdAc::fanspeed_t::kMedium;
+    case kSamsungAcFanLow:   return stdAc::fanspeed_t::kMin;
+    default:                 return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -677,38 +645,40 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 String IRSamsungAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
                             kSamsungAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), F("Fan"));
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
   switch (getFan()) {
     case kSamsungAcFanAuto:
     case kSamsungAcFanAuto2:
-      result += F(" (Auto)");
+      result += kAutoStr;
       break;
     case kSamsungAcFanLow:
-      result += F(" (Low)");
+      result += kLowStr;
       break;
     case kSamsungAcFanMed:
-      result += F(" (Medium)");
+      result += kMedStr;
       break;
     case kSamsungAcFanHigh:
-      result += F(" (High)");
+      result += kHighStr;
       break;
     case kSamsungAcFanTurbo:
-      result += F(" (Turbo)");
+      result += kTurboStr;
       break;
     default:
-      result += F(" (UNKNOWN)");
+      result += kUnknownStr;
       break;
   }
-  result += addBoolToString(getSwing(), F("Swing"));
-  result += addBoolToString(getBeep(), F("Beep"));
-  result += addBoolToString(getClean(), F("Clean"));
-  result += addBoolToString(getQuiet(), F("Quiet"));
-  result += addBoolToString(getPowerful(), F("Powerful"));
+  result += ')';
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getBeep(), kBeepStr);
+  result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getPowerful(), kPowerfulStr);
   return result;
 }
 

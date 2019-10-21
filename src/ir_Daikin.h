@@ -91,10 +91,12 @@
 
 // Constants
 const uint8_t kDaikinAuto = 0b000;
-const uint8_t kDaikinDry = 0b010;
+const uint8_t kDaikinDry =  0b010;
 const uint8_t kDaikinCool = 0b011;
 const uint8_t kDaikinHeat = 0b100;
-const uint8_t kDaikinFan = 0b110;
+const uint8_t kDaikinFan =  0b110;
+const uint8_t kDaikinModeOffset = 4;
+const uint8_t kDaikinModeSize = 3;
 const uint8_t kDaikinMinTemp = 10;  // Celsius
 const uint8_t kDaikinMaxTemp = 32;  // Celsius
 const uint8_t kDaikinFanMin = 1;
@@ -102,6 +104,12 @@ const uint8_t kDaikinFanMed = 3;
 const uint8_t kDaikinFanMax = 5;
 const uint8_t kDaikinFanAuto = 0b1010;  // 10 / 0xA
 const uint8_t kDaikinFanQuiet = 0b1011;  // 11 / 0xB
+const uint8_t kDaikinFanOffset = 4;
+const uint8_t kDaikinFanSize = 4;
+const uint8_t kDaikinSwingOffset = 0;
+const uint8_t kDaikinSwingSize = 4;
+const uint8_t kDaikinSwingOn =  0b1111;
+const uint8_t kDaikinSwingOff = 0b0000;
 const uint16_t kDaikinHeaderLength = 5;
 const uint8_t kDaikinSections = 3;
 const uint8_t kDaikinSection1Length = 8;
@@ -110,37 +118,55 @@ const uint8_t kDaikinSection3Length =
     kDaikinStateLength - kDaikinSection1Length - kDaikinSection2Length;
 const uint8_t kDaikinByteComfort = 6;
 const uint8_t kDaikinByteChecksum1 = 7;
-const uint8_t kDaikinBitComfort = 0b00010000;
+const uint8_t kDaikinBitComfortOffset = 4;
+const uint8_t kDaikinBitComfort = 1 << kDaikinBitComfortOffset;
 const uint8_t kDaikinByteClockMinsLow = 13;
 const uint8_t kDaikinByteClockMinsHigh = 14;
+const uint8_t kDaikinClockMinsHighOffset = 0;
+const uint8_t kDaikinClockMinsHighSize = 3;
+const uint8_t kDaikinDoWOffset = 3;
+const uint8_t kDaikinDoWSize = 3;
 const uint8_t kDaikinByteChecksum2 = 15;
 const uint8_t kDaikinBytePower = 21;
-const uint8_t kDaikinBitPower = 0b00000001;
+const uint8_t kDaikinBitPowerOffset = 0;
+const uint8_t kDaikinBitPower = 1 << kDaikinBitPowerOffset;
+const uint8_t kDaikinTempOffset = 1;
+const uint8_t kDaikinTempSize = 6;
 const uint8_t kDaikinByteTemp = 22;
 const uint8_t kDaikinByteFan = 24;
 const uint8_t kDaikinByteSwingH = 25;
 const uint8_t kDaikinByteOnTimerMinsLow = 26;
 const uint8_t kDaikinByteOnTimerMinsHigh = 27;
+const uint8_t kDaikinOnTimerMinsHighOffset = 0;
+const uint8_t kDaikinOnTimerMinsHighSize = 4;
 const uint8_t kDaikinByteOffTimerMinsLow = kDaikinByteOnTimerMinsHigh;
 const uint8_t kDaikinByteOffTimerMinsHigh = 28;
 const uint8_t kDaikinBytePowerful = 29;
-const uint8_t kDaikinBitPowerful = 0b00000001;
+const uint8_t kDaikinBitPowerfulOffset = 0;
+const uint8_t kDaikinBitPowerful = 1 << kDaikinBitPowerfulOffset;
 const uint8_t kDaikinByteSilent = kDaikinBytePowerful;
-const uint8_t kDaikinBitSilent = 0b00100000;
+const uint8_t kDaikinBitSilentOffset = 5;
+const uint8_t kDaikinBitSilent = 1 << kDaikinBitSilentOffset;
 const uint8_t kDaikinByteSensor = 32;
-const uint8_t kDaikinBitSensor = 0b00000010;
+const uint8_t kDaikinBitSensorOffset = 1;
+const uint8_t kDaikinBitSensor = 1 << kDaikinBitSensorOffset;
 const uint8_t kDaikinByteEcono = kDaikinByteSensor;
-const uint8_t kDaikinBitEcono = 0b00000100;
+const uint8_t kDaikinBitEconoOffset = 2;
+const uint8_t kDaikinBitEcono = 1 << kDaikinBitEconoOffset;
 const uint8_t kDaikinByteEye = kDaikinByteSensor;
 const uint8_t kDaikinBitEye = 0b10000000;
 const uint8_t kDaikinByteWeeklyTimer = kDaikinByteSensor;
-const uint8_t kDaikinBitWeeklyTimer = 0b10000000;
+const uint8_t kDaikinBitWeeklyTimerOffset = 7;
+const uint8_t kDaikinBitWeeklyTimer = 1 << kDaikinBitWeeklyTimerOffset;
 const uint8_t kDaikinByteMold = 33;
-const uint8_t kDaikinBitMold = 0b00000010;
+const uint8_t kDaikinBitMoldOffset = 1;
+const uint8_t kDaikinBitMold = 1 << kDaikinBitMoldOffset;
 const uint8_t kDaikinByteOffTimer = kDaikinBytePower;
-const uint8_t kDaikinBitOffTimer = 0b00000100;
+const uint8_t kDaikinBitOffTimerOffset = 2;
+const uint8_t kDaikinBitOffTimer = 1 << kDaikinBitOffTimerOffset;
 const uint8_t kDaikinByteOnTimer = kDaikinByteOffTimer;
-const uint8_t kDaikinBitOnTimer = 0b00000010;
+const uint8_t kDaikinBitOnTimerOffset = 1;
+const uint8_t kDaikinBitOnTimer = 1 << kDaikinBitOnTimerOffset;
 const uint8_t kDaikinByteChecksum3 = kDaikinStateLength - 1;
 const uint16_t kDaikinUnusedTime = 0x600;
 const uint8_t kDaikinBeepQuiet = 1;
@@ -177,17 +203,30 @@ const uint16_t kDaikin2Sections = 2;
 const uint16_t kDaikin2Section1Length = 20;
 const uint16_t kDaikin2Section2Length = 19;
 const uint8_t kDaikin2Tolerance = 5;  // Extra percentage tolerance
-const uint8_t kDaikin2BitSleepTimer =   0b00100000;
-const uint8_t kDaikin2BitPurify =       0b00010000;
-const uint8_t kDaikin2BitEye =          0b00000010;
-const uint8_t kDaikin2BitEyeAuto =      0b10000000;
-const uint8_t kDaikin2BitMold =         0b00001000;
-const uint8_t kDaikin2BitClean =        0b00100000;  // Byte[8]
-const uint8_t kDaikin2BitFreshAir =     0b00000001;
-const uint8_t kDaikin2BitFreshAirHigh = 0b10000000;
-const uint8_t kDaikin2BitPower =        0b10000000;
-const uint8_t kDaikin2LightMask =       0b00110000;  // Byte[7]
-const uint8_t kDaikin2BeepMask =        0b11000000;  // Byte[7]
+const uint8_t kDaikin2BitSleepTimerOffset = 5;
+const uint8_t kDaikin2BitSleepTimer = 1 << kDaikin2BitSleepTimerOffset;
+const uint8_t kDaikin2BitPurifyOffset = 4;
+const uint8_t kDaikin2BitPurify = 1 << kDaikin2BitPurifyOffset;  // 0b00010000
+const uint8_t kDaikin2BitEyeOffset = 1;
+const uint8_t kDaikin2BitEye = 1 << kDaikin2BitEyeOffset;  // 0b00000010
+const uint8_t kDaikin2BitEyeAutoOffset = 7;
+const uint8_t kDaikin2BitEyeAuto = 1 << kDaikin2BitEyeAutoOffset;  // 0b10000000
+const uint8_t kDaikin2BitMoldOffset = 3;
+const uint8_t kDaikin2BitMold = 1 << kDaikin2BitMoldOffset;    // 0b00001000
+const uint8_t kDaikin2BitCleanOffset = 5;  // Byte[8]
+const uint8_t kDaikin2BitClean = 1 << kDaikin2BitCleanOffset;  // 0b00100000
+const uint8_t kDaikin2BitFreshAirOffset = 0;
+const uint8_t kDaikin2BitFreshAir = 1 << kDaikin2BitFreshAirOffset;
+const uint8_t kDaikin2BitFreshAirHighOffset = 7;
+const uint8_t kDaikin2BitFreshAirHigh = 1 << kDaikin2BitFreshAirHighOffset;
+const uint8_t kDaikin2BitPowerOffset = 7;
+const uint8_t kDaikin2BitPower = 1 << kDaikin2BitPowerOffset;  // 0b10000000
+// const uint8_t kDaikin2LightMask =    0b00110000;  // Byte[7]
+const uint8_t kDaikin2LightOffset = 4;  // Byte[7]
+const uint8_t kDaikin2LightSize = 2;
+// const uint8_t kDaikin2BeepMask =     0b11000000;  // Byte[7]
+const uint8_t kDaikin2BeepOffset = 6;  // Byte[7]
+const uint8_t kDaikin2BeepSize = 2;
 const uint8_t kDaikin2SwingVHigh = 0x1;
 const uint8_t kDaikin2SwingVLow = 0x6;
 const uint8_t kDaikin2SwingVSwing = 0xF;
@@ -223,15 +262,20 @@ const uint16_t kDaikin216Section2Length = kDaikin216StateLength -
                                           kDaikin216Section1Length;
 const uint8_t kDaikin216BytePower = 13;
 const uint8_t kDaikin216ByteMode = kDaikin216BytePower;
-const uint8_t kDaikin216MaskMode = 0b01110000;
+// const uint8_t kDaikin216MaskMode = 0b01110000;
 const uint8_t kDaikin216ByteTemp = 14;
-const uint8_t kDaikin216MaskTemp = 0b01111110;
+// const uint8_t kDaikin216MaskTemp = 0b01111110;
+const uint8_t kDaikin216TempOffset = 1;
+const uint8_t kDaikin216TempSize = 6;
+
 const uint8_t kDaikin216ByteFan = 16;
 const uint8_t kDaikin216MaskFan = 0b11110000;
 const uint8_t kDaikin216ByteSwingV = 16;
-const uint8_t kDaikin216MaskSwingV = 0b00001111;
+// const uint8_t kDaikin216MaskSwingV = 0b00001111;
+const uint8_t kDaikin216SwingSize = 4;
+const uint8_t kDaikin216SwingOn = 0b1111;
+const uint8_t kDaikin216SwingOff = 0b0000;
 const uint8_t kDaikin216ByteSwingH = 17;
-const uint8_t kDaikin216MaskSwingH = kDaikin216MaskSwingV;
 const uint8_t kDaikin216BytePowerful = 21;
 
 // Another variant of the protocol for the Daikin ARC423A5 remote.
@@ -248,9 +292,11 @@ const uint16_t kDaikin160Section2Length = kDaikin160StateLength -
                                           kDaikin160Section1Length;
 const uint8_t kDaikin160BytePower = 12;
 const uint8_t kDaikin160ByteMode = kDaikin160BytePower;
-const uint8_t kDaikin160MaskMode = 0b01110000;
+// const uint8_t kDaikin160MaskMode = 0b01110000;
 const uint8_t kDaikin160ByteTemp = 16;
-const uint8_t kDaikin160MaskTemp = 0b01111110;
+// const uint8_t kDaikin160MaskTemp = 0b01111110;
+const uint8_t kDaikin160TempOffset = 1;
+const uint8_t kDaikin160TempSize = 6;
 const uint8_t kDaikin160ByteFan = 17;
 const uint8_t kDaikin160MaskFan = 0b00001111;
 const uint8_t kDaikin160ByteSwingV = 13;
@@ -281,13 +327,15 @@ const uint8_t kDaikin176MaskMode = 0b01110000;
 const uint8_t kDaikin176ByteModeButton = 13;
 const uint8_t kDaikin176ModeButton = 0b00000100;
 const uint8_t kDaikin176ByteTemp = 17;
-const uint8_t kDaikin176MaskTemp = 0b01111110;
+// const uint8_t kDaikin176MaskTemp = 0b01111110;
+const uint8_t kDaikin176TempOffset = 1;
+const uint8_t kDaikin176TempSize = 6;
 const uint8_t kDaikin176DryFanTemp = 17;  // Dry/Fan mode is always 17 Celsius.
 const uint8_t kDaikin176ByteFan = 18;
 const uint8_t kDaikin176MaskFan = 0b11110000;
 const uint8_t kDaikin176FanMax = 3;
 const uint8_t kDaikin176ByteSwingH = 18;
-const uint8_t kDaikin176MaskSwingH = 0b00001111;
+// const uint8_t kDaikin176MaskSwingH = 0b00001111;
 const uint8_t kDaikin176SwingHAuto =  0x5;
 const uint8_t kDaikin176SwingHOff = 0x6;
 
@@ -306,7 +354,8 @@ const uint16_t kDaikin128FooterMark = kDaikin128HdrMark;
 const uint16_t kDaikin128Sections = 2;
 const uint16_t kDaikin128SectionLength = 8;
 const uint8_t kDaikin128ByteModeFan = 1;
-const uint8_t kDaikin128MaskMode =        0b00001111;
+// const uint8_t kDaikin128MaskMode =     0b00001111;
+const uint8_t kDaikin128ModeSize = 4;
 const uint8_t kDaikin128Dry =             0b00000001;
 const uint8_t kDaikin128Cool =            0b00000010;
 const uint8_t kDaikin128Fan =             0b00000100;
@@ -323,18 +372,28 @@ const uint8_t kDaikin128ByteClockMins = 2;
 const uint8_t kDaikin128ByteClockHours = 3;
 const uint8_t kDaikin128ByteOnTimer = 4;
 const uint8_t kDaikin128ByteOffTimer = 5;
-const uint8_t kDaikin128BitTimerEnabled = 0b10000000;
-const uint8_t kDaikin128BitHalfHour =     0b01000000;
-const uint8_t kDaikin128MaskHours =       0b00111111;
+const uint8_t kDaikin128BitTimerEnabledOffset = 7;
+const uint8_t kDaikin128BitTimerEnabled = 1 << kDaikin128BitTimerEnabledOffset;
+const uint8_t kDaikin128TimerOffset = 0;
+const uint8_t kDaikin128TimerSize = 7;
+const uint8_t kDaikin128HalfHourOffset = 6;
+const uint8_t kDaikin128BitHalfHour = 1 << kDaikin128HalfHourOffset;
+// const uint8_t kDaikin128MaskHours =       0b00111111;
+const uint8_t kDaikin128HoursOffset = 0;
+const uint8_t kDaikin128HoursSize = 6;
 const uint8_t kDaikin128ByteTemp = 6;
 const uint8_t kDaikin128MinTemp = 16;  // C
 const uint8_t kDaikin128MaxTemp = 30;  // C
 const uint8_t kDaikin128BytePowerSwingSleep = 7;
-const uint8_t kDaikin128BitSwing =        0b00000001;
-const uint8_t kDaikin128BitSleep =        0b00000010;
-const uint8_t kDaikin128BitPowerToggle =  0b00001000;
+const uint8_t kDaikin128BitSwingOffset = 0;
+const uint8_t kDaikin128BitSwing = 1 << kDaikin128BitSwingOffset;  // 0b00000001
+const uint8_t kDaikin128BitSleepOffset = 1;
+const uint8_t kDaikin128BitSleep = 1 << kDaikin128BitSleepOffset;  // 0b00000010
+const uint8_t kDaikin128BitPowerToggleOffset = 3;
+const uint8_t kDaikin128BitPowerToggle = 1 << kDaikin128BitPowerToggleOffset;
 const uint8_t kDaikin128ByteEconoLight = 9;
-const uint8_t kDaikin128BitEcono =        0b00000100;
+const uint8_t kDaikin128BitEconoOffset = 2;
+const uint8_t kDaikin128BitEcono = 1 << kDaikin128BitEconoOffset;  // 0b00000100
 const uint8_t kDaikin128BitWall =         0b00001000;
 const uint8_t kDaikin128BitCeiling =      0b00000001;
 const uint8_t kDaikin128MaskLight = kDaikin128BitWall | kDaikin128BitCeiling;
@@ -349,6 +408,28 @@ const uint16_t kDaikin152BitMark = 433;
 const uint16_t kDaikin152OneSpace = 1529;
 const uint16_t kDaikin152ZeroSpace = kDaikin152BitMark;
 const uint16_t kDaikin152Gap = 25182;
+
+// Byte[5]
+const uint8_t kDaikin152ModeByte = 5;                        // Mask 0b01110000
+const uint8_t kDaikin152PowerByte = kDaikin152ModeByte;      // Mask 0b00000001
+// Byte[6]
+const uint8_t kDaikin152TempByte = 6;                        // Mask 0b11111110
+const uint8_t kDaikin152TempSize = 7;
+const uint8_t kDaikin152DryTemp = kDaikin2MinCoolTemp;  // Celsius
+const uint8_t kDaikin152FanTemp = 0x60;  // 96 Celsius
+// Byte[8]
+const uint8_t kDaikin152FanByte = 8;
+const uint8_t kDaikin152SwingVByte = kDaikin152FanByte;
+// Byte[13]
+const uint8_t kDaikin152QuietByte = 13;                      // Mask 0b00100000
+const uint8_t kDaikin152PowerfulByte = kDaikin152QuietByte;  // Mask 0b00000001
+// Byte[16]
+const uint8_t kDaikin152EconoByte = 16;                      // Mask 0b00000100
+const uint8_t kDaikin152ComfortByte = kDaikin152EconoByte;   // Mask 0b00000010
+const uint8_t kDaikin152ComfortOffset = 1;                   // Mask 0b00000010
+const uint8_t kDaikin152SensorByte = kDaikin152EconoByte;    // Mask 0b00001000
+const uint8_t kDaikin152SensorOffset = 3;                    // Mask 0b00001000
+
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -760,6 +841,34 @@ class IRDaikin152 {
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin152StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingV(const bool on);
+  bool getSwingV(void);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  bool getPowerful(void);
+  void setPowerful(const bool on);
+  void setSensor(const bool on);
+  bool getSensor(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
+  void setComfort(const bool on);
+  bool getComfort(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
+  String toString(void);
 #ifndef UNIT_TEST
 
  private:

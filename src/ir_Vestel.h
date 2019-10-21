@@ -61,8 +61,6 @@ const uint8_t kVestelAcMinTempH = 16;
 const uint8_t kVestelAcMinTempC = 18;
 const uint8_t kVestelAcMaxTemp = 30;
 
-const uint64_t kVestelAcCRCMask = 0xFFFFFFFFFFF00000;
-
 const uint8_t kVestelAcAuto = 0;
 const uint8_t kVestelAcCool = 1;
 const uint8_t kVestelAcDry = 2;
@@ -83,21 +81,30 @@ const uint8_t kVestelAcIon = 4;
 const uint8_t kVestelAcSwing = 0xA;
 
 const uint8_t kVestelAcChecksumOffset = 12;
+const uint8_t kVestelAcChecksumSize = 8;  // Nr. of bits
 const uint8_t kVestelAcSwingOffset = 20;
 const uint8_t kVestelAcTurboSleepOffset = 24;
 const uint8_t kVestelAcTempOffset = 36;
 const uint8_t kVestelAcFanOffset = 40;
+const uint8_t kVestelAcFanSize = 4;  // Nr. of bits
 const uint8_t kVestelAcModeOffset = 44;
 const uint8_t kVestelAcIonOffset = 50;
 const uint8_t kVestelAcPowerOffset = 52;
+const uint8_t kVestelAcPowerSize = 2;  // Nr. of bits
 const uint8_t kVestelAcOffTimeOffset = 20;
 const uint8_t kVestelAcOnTimeOffset = 28;
+const uint8_t kVestelAcTimerHourSize = 5;  // Nr. of bits
+const uint8_t kVestelAcTimerMinsSize = 3;  // Nr. of bits
+const uint8_t kVestelAcTimerSize = kVestelAcTimerHourSize +
+    kVestelAcTimerMinsSize;  // Nr. of bits
 const uint8_t kVestelAcHourOffset = 36;  // 5 bits
+const uint8_t kVestelAcHourSize = 5;  // Nr. of bits
 const uint8_t kVestelAcOnTimerFlagOffset = kVestelAcHourOffset + 5;
 const uint8_t kVestelAcOffTimerFlagOffset = kVestelAcHourOffset + 6;
 const uint8_t kVestelAcTimerFlagOffset = kVestelAcHourOffset + 7;
 const uint8_t kVestelAcMinuteOffset = 44;
-
+const uint8_t kVestelAcMinuteSize = 8;  // Nr. of bits
+// Default states
 const uint64_t kVestelAcStateDefault = 0x0F00D9001FEF201ULL;
 const uint64_t kVestelAcTimeStateDefault = 0x201ULL;
 
@@ -168,6 +175,8 @@ class IRVestelAc {
   uint64_t remote_time_state;
   bool use_time_state;
   void checksum(void);
+  void _setTimer(const uint16_t minutes, const uint8_t offset);
+  uint16_t _getTimer(const uint8_t offset);
 };
 
 #endif  // IR_VESTEL_H_

@@ -485,7 +485,7 @@ TEST(TestCoolixACClass, HumanReadable) {
   // Initial starting point.
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, "
-      "Zone Follow: Off, Sensor Temp: Ignored",
+      "Zone Follow: Off, Sensor Temp: Off",
       ircoolix.toString());
   ircoolix.setSensorTemp(24);
   ircoolix.setTemp(22);
@@ -508,12 +508,12 @@ TEST(TestCoolixACClass, KnownExamples) {
   ircoolix.setRaw(0b101100101011111111100100);
   EXPECT_EQ(
       "Power: On, Mode: 4 (Fan), Fan: 5 (Auto), Zone Follow: Off, "
-      "Sensor Temp: Ignored",
+      "Sensor Temp: Off",
       ircoolix.toString());
   ircoolix.setRaw(0b101100101001111100000000);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 4 (Min), Temp: 17C, "
-      "Zone Follow: Off, Sensor Temp: Ignored",
+      "Zone Follow: Off, Sensor Temp: Off",
       ircoolix.toString());
 }
 
@@ -524,7 +524,7 @@ TEST(TestCoolixACClass, Issue579FanAuto0) {
   ircoolix.setRaw(0xB21F28);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 20C, "
-      "Zone Follow: Off, Sensor Temp: Ignored",
+      "Zone Follow: Off, Sensor Temp: Off",
       ircoolix.toString());
 }
 
@@ -576,7 +576,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   // Default
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Fan: 0 (Auto0), Temp: 25C, Zone Follow: Off, "
-      "Sensor Temp: Ignored",
+      "Sensor Temp: Off",
       ac.toString());
   EXPECT_EQ(0xB21FC8, ac.getRaw());
   // Change of settings.
@@ -585,7 +585,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   ac.setFan(kCoolixFanAuto);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 5 (Auto), Temp: 24C, Zone Follow: Off, "
-      "Sensor Temp: Ignored",
+      "Sensor Temp: Off",
       ac.toString());
   EXPECT_EQ(0xB2BF40, ac.getRaw());
   // Turn the unit off.
@@ -601,7 +601,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   ac.setFan(kCoolixFanAuto);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 5 (Auto), Temp: 24C, Zone Follow: Off, "
-      "Sensor Temp: Ignored",
+      "Sensor Temp: Off",
       ac.toString());
   EXPECT_EQ(0xB2BF40, ac.getRaw());
 
@@ -611,7 +611,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
   ac.setFan(kCoolixFanAuto);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 5 (Auto), Temp: 24C, Zone Follow: Off, "
-      "Sensor Temp: Ignored",
+      "Sensor Temp: Off",
       ac.toString());
   EXPECT_EQ(0xB2BF40, ac.getRaw());
 }

@@ -7,12 +7,14 @@
 
 #include "ir_Hitachi.h"
 #include <algorithm>
+#include <cstring>
 #ifndef ARDUINO
 #include <string>
 #endif
 #include "IRrecv.h"
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 // Constants
@@ -32,6 +34,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::setBit;
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
@@ -137,9 +140,9 @@ void IRHitachiAc::begin(void) { _irsend.begin(); }
 
 uint8_t IRHitachiAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
-  int8_t sum = 62;
+  uint8_t sum = 62;
   for (uint16_t i = 0; i < length - 1; i++) sum -= reverseBits(state[i], 8);
-  return reverseBits((uint8_t)sum, 8);
+  return reverseBits(sum, 8);
 }
 
 void IRHitachiAc::checksum(const uint16_t length) {
@@ -157,24 +160,21 @@ uint8_t *IRHitachiAc::getRaw(void) {
 }
 
 void IRHitachiAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  for (uint8_t i = 0; i < length && i < kHitachiAcStateLength; i++)
-    remote_state[i] = new_code[i];
+  memcpy(remote_state, new_code, std::min(length, kHitachiAcStateLength));
 }
 
 #if SEND_HITACHI_AC
 void IRHitachiAc::send(const uint16_t repeat) {
-  checksum();
-  _irsend.sendHitachiAC(remote_state, kHitachiAcStateLength, repeat);
+  _irsend.sendHitachiAC(getRaw(), kHitachiAcStateLength, repeat);
 }
 #endif  // SEND_HITACHI_AC
 
-bool IRHitachiAc::getPower(void) { return (remote_state[17] & 0x01); }
+bool IRHitachiAc::getPower(void) {
+  return GETBIT8(remote_state[17], kHitachiAcPowerOffset);
+}
 
 void IRHitachiAc::setPower(const bool on) {
-  if (on)
-    remote_state[17] |= 0x01;
-  else
-    remote_state[17] &= 0xFE;
+  setBit(&remote_state[17], kHitachiAcPowerOffset, on);
 }
 
 void IRHitachiAc::on(void) { setPower(true); }
@@ -186,17 +186,13 @@ uint8_t IRHitachiAc::getMode(void) { return reverseBits(remote_state[10], 8); }
 void IRHitachiAc::setMode(const uint8_t mode) {
   uint8_t newmode = mode;
   switch (mode) {
-    case kHitachiAcFan:
-      // Fan mode sets a special temp.
-      setTemp(64);
-      break;
+    // Fan mode sets a special temp.
+    case kHitachiAcFan: setTemp(64); break;
     case kHitachiAcAuto:
     case kHitachiAcHeat:
     case kHitachiAcCool:
-    case kHitachiAcDry:
-      break;
-    default:
-      newmode = kHitachiAcAuto;
+    case kHitachiAcDry: break;
+    default: newmode = kHitachiAcAuto;
   }
   remote_state[10] = reverseBits(newmode, 8);
   if (mode != kHitachiAcFan) setTemp(_previoustemp);
@@ -244,38 +240,30 @@ void IRHitachiAc::setFan(const uint8_t speed) {
   remote_state[13] = reverseBits(newspeed, 8);
 }
 
-bool IRHitachiAc::getSwingVertical(void) { return remote_state[14] & 0x80; }
+bool IRHitachiAc::getSwingVertical(void) {
+  return GETBIT8(remote_state[14], kHitachiAcSwingOffset);
+}
 
 void IRHitachiAc::setSwingVertical(const bool on) {
-  if (on)
-    remote_state[14] |= 0x80;
-  else
-    remote_state[14] &= 0x7F;
+  setBit(&remote_state[14], kHitachiAcSwingOffset, on);
 }
 
-bool IRHitachiAc::getSwingHorizontal(void) { return remote_state[15] & 0x80; }
+bool IRHitachiAc::getSwingHorizontal(void) {
+  return GETBIT8(remote_state[15], kHitachiAcSwingOffset);
+}
 
 void IRHitachiAc::setSwingHorizontal(const bool on) {
-  if (on)
-    remote_state[15] |= 0x80;
-  else
-    remote_state[15] &= 0x7F;
+  setBit(&remote_state[15], kHitachiAcSwingOffset, on);
 }
-
 
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool:
-      return kHitachiAcCool;
-    case stdAc::opmode_t::kHeat:
-      return kHitachiAcHeat;
-    case stdAc::opmode_t::kDry:
-      return kHitachiAcDry;
-    case stdAc::opmode_t::kFan:
-      return kHitachiAcFan;
-    default:
-      return kHitachiAcAuto;
+    case stdAc::opmode_t::kCool: return kHitachiAcCool;
+    case stdAc::opmode_t::kHeat: return kHitachiAcHeat;
+    case stdAc::opmode_t::kDry:  return kHitachiAcDry;
+    case stdAc::opmode_t::kFan:  return kHitachiAcFan;
+    default:                     return kHitachiAcAuto;
   }
 }
 
@@ -283,16 +271,11 @@ uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:
-      return kHitachiAcFanLow;
-    case stdAc::fanspeed_t::kMedium:
-      return kHitachiAcFanLow + 1;
-    case stdAc::fanspeed_t::kHigh:
-      return kHitachiAcFanHigh - 1;
-    case stdAc::fanspeed_t::kMax:
-      return kHitachiAcFanHigh;
-    default:
-      return kHitachiAcFanAuto;
+    case stdAc::fanspeed_t::kLow:    return kHitachiAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kHitachiAcFanLow + 1;
+    case stdAc::fanspeed_t::kHigh:   return kHitachiAcFanHigh - 1;
+    case stdAc::fanspeed_t::kMax:    return kHitachiAcFanHigh;
+    default:                         return kHitachiAcFanAuto;
   }
 }
 
@@ -301,20 +284,20 @@ stdAc::opmode_t IRHitachiAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAcCool: return stdAc::opmode_t::kCool;
     case kHitachiAcHeat: return stdAc::opmode_t::kHeat;
-    case kHitachiAcDry: return stdAc::opmode_t::kDry;
-    case kHitachiAcFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kHitachiAcDry:  return stdAc::opmode_t::kDry;
+    case kHitachiAcFan:  return stdAc::opmode_t::kFan;
+    default:             return stdAc::opmode_t::kAuto;
   }
 }
 
 // Convert a native fan speed to it's common equivalent.
 stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kHitachiAcFanHigh: return stdAc::fanspeed_t::kMax;
+    case kHitachiAcFanHigh:     return stdAc::fanspeed_t::kMax;
     case kHitachiAcFanHigh - 1: return stdAc::fanspeed_t::kHigh;
-    case kHitachiAcFanLow + 1: return stdAc::fanspeed_t::kMedium;
-    case kHitachiAcFanLow: return stdAc::fanspeed_t::kLow;
-    default: return stdAc::fanspeed_t::kAuto;
+    case kHitachiAcFanLow + 1:  return stdAc::fanspeed_t::kMedium;
+    case kHitachiAcFanLow:      return stdAc::fanspeed_t::kLow;
+    default:                    return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -349,15 +332,15 @@ stdAc::state_t IRHitachiAc::toCommon(void) {
 String IRHitachiAc::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), F("Power"), false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kHitachiAcAuto, kHitachiAcCool,
                             kHitachiAcHeat, kHitachiAcDry, kHitachiAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHitachiAcFanHigh, kHitachiAcFanLow,
                            kHitachiAcFanAuto, kHitachiAcFanAuto,
                            kHitachiAcFanMed);
-  result += addBoolToString(getSwingVertical(), F("Swing(V)"));
-  result += addBoolToString(getSwingHorizontal(), F("Swing(H)"));
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
   return result;
 }
 
