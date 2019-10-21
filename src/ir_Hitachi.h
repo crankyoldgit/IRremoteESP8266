@@ -1,11 +1,13 @@
 // Hitachi A/C
 //
-// Copyright 2018 David Conran
+// Copyright 2018-2019 David Conran
 
 // Supports:
 //   Brand: Hitachi,  Model: RAS-35THA6 remote
 //   Brand: Hitachi,  Model: LT0541-HTA remote
 //   Brand: Hitachi,  Model: Series VI A/C (Circa 2007)
+//   Brand: Hitachi,  Model: RAR-8P2 remote
+//   Brand: Hitachi,  Model: RAS-AJ25H A/C
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
@@ -22,6 +24,7 @@
 #endif
 
 // Constants
+const uint16_t kHitachiAcFreq = 38000;  // Hz.
 const uint8_t kHitachiAcAuto = 2;
 const uint8_t kHitachiAcHeat = 3;
 const uint8_t kHitachiAcCool = 4;

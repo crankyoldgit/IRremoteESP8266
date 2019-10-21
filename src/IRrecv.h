@@ -446,6 +446,11 @@ class IRrecv {
                         const uint16_t nbits = kHitachiAc1Bits,
                         const bool strict = true);
 #endif
+#if DECODE_HITACHI_AC424
+  bool decodeHitachiAc424(decode_results *results,
+                          const uint16_t nbits = kHitachiAc424Bits,
+                          const bool strict = true);
+#endif  // DECODE_HITACHI_AC424
 #if DECODE_GICABLE
   bool decodeGICable(decode_results *results, uint16_t nbits = kGicableBits,
                      bool strict = true);

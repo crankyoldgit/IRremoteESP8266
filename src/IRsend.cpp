@@ -608,6 +608,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc1Bits;
     case HITACHI_AC2:
       return kHitachiAc2Bits;
+    case HITACHI_AC424:
+      return kHitachiAc424Bits;
     case KELVINATOR:
       return kKelvinatorBits;
     case MITSUBISHI_AC:
@@ -934,6 +936,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendHitachiAC2(state, nbytes);
       break;
 #endif  // SEND_HITACHI_AC2
+#if SEND_HITACHI_AC424
+    case HITACHI_AC424:
+      sendHitachiAc424(state, nbytes);
+      break;
+#endif  // SEND_HITACHI_AC424
 #if SEND_KELVINATOR
     case KELVINATOR:
       sendKelvinator(state, nbytes);
