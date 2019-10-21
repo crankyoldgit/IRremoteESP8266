@@ -203,7 +203,7 @@ void IRCoolixAC::setTempRaw(const uint8_t code) {
 }
 
 uint8_t IRCoolixAC::getTempRaw() {
-  return GETBITS32(getNormalState(), kCoolixTempOffset, kCoolixTempSize);
+  return GETBITS32(remote_state, kCoolixTempOffset, kCoolixTempSize);
 }
 
 void IRCoolixAC::setTemp(const uint8_t desired) {
@@ -233,7 +233,7 @@ void IRCoolixAC::setSensorTemp(const uint8_t desired) {
 }
 
 uint8_t IRCoolixAC::getSensorTemp() {
-  return GETBITS32(getNormalState(), kCoolixSensorTempOffset,
+  return GETBITS32(remote_state, kCoolixSensorTempOffset,
                    kCoolixSensorTempSize) + kCoolixSensorTempMin;
 }
 
