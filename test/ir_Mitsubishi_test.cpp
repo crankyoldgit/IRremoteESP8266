@@ -1502,7 +1502,6 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
       ac.toString());
 }
 
-
 // Tests for IRMitsubishi112 class.
 
 TEST(TestMitsubishi112Class, Power) {
@@ -1662,8 +1661,6 @@ TEST(TestMitsubishi112Class, toCommonMode) {
             IRMitsubishi112::convertMode(stdAc::opmode_t::kDry));
 }
 
-
-
 // Decode a 'real' example.
 TEST(TestDecodeMitsubishi112, DecodeRealExample) {
   IRsendTest irsend(0);
@@ -1702,7 +1699,7 @@ TEST(TestDecodeMitsubishi112, DecodeRealExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 2 (Quiet), "
-      "Swing(V): 56 (Auto), Swing(H): 48 (Auto), Quiet: On",
+      "Swing(V): 7 (Auto), Swing(H): 12 (Auto), Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
