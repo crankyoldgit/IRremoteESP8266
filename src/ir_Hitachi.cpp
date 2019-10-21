@@ -445,7 +445,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
 //   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc424StateLength)
 //   repeat: Nr. of times the message is to be repeated.
 //
-// Status: Beta / Untested against a real device.
+// Status: STABLE / Reported as working. Bit ordering not yet confirmed though.
 void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
                               const uint16_t repeat) {
   enableIROut(kHitachiAcFreq);
@@ -477,7 +477,7 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Probably works. Bit ordering not yet confirmed.
+// Status: STABLE / Reported as working. Bit ordering not yet confirmed though.
 //
 // Supported devices:
 //  Hitachi Shirokumakun / AC Model: RAS-AJ25H / AC Remote Model: RAR-8P2
