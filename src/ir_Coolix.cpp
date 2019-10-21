@@ -107,7 +107,7 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
 void IRCoolixAC::stateReset() {
   setRaw(kCoolixDefaultState);
   clearSensorTemp();
-  coolixState = IRCoolixAC::sOff;
+  powerFlag = false;
   turboFlag = false;
   ledFlag = false;
   cleanFlag = false;
@@ -157,7 +157,7 @@ bool IRCoolixAC::isSpecialState(void) {
 }
 
 // Special state means commands that are not
-// afecting Temperature/Mode/Fan
+// affecting Temperature/Mode/Fan
 bool IRCoolixAC::handleSpecialState(const uint32_t data) {
   switch (data) {
     case kCoolixClean:
@@ -167,7 +167,7 @@ bool IRCoolixAC::handleSpecialState(const uint32_t data) {
       ledFlag = !ledFlag;
       break;
     case kCoolixOff:
-      coolixState = IRCoolixAC::sOff;
+      powerFlag = false;
       break;
     case kCoolixSwing:
       swingFlag = !swingFlag;
@@ -239,31 +239,23 @@ uint8_t IRCoolixAC::getSensorTemp() {
 
 bool IRCoolixAC::getPower() {
   // There is only an off state. Everything else is "on".
-  return coolixState == IRCoolixAC::sOn;
+  return powerFlag;
 }
 
-void IRCoolixAC::setPower(const bool power) {
-  switch (coolixState) {
-      // power on
-      case IRCoolixAC::sOff:
-        if (power) {
-          // at this point remote_state must be ready
-          // to be transmitted
-          recoverSavedState();
-          coolixState = IRCoolixAC::sOn;
-        }
-      break;
-      // power off
-      case IRCoolixAC::sOn:
-        if (!power) {
-          updateSavedState();
-          remote_state = kCoolixOff;
-          coolixState = IRCoolixAC::sOff;
-        }
-      break;
-      default:
-      break;
+void IRCoolixAC::setPower(const bool on) {
+  if (powerFlag) {
+    if (!on) {
+      updateSavedState();
+      remote_state = kCoolixOff;
     }
+  } else {
+    if (on) {
+      // at this point remote_state must be ready
+      // to be transmitted
+      recoverSavedState();
+    }
+  }
+  powerFlag = on;
 }
 
 void IRCoolixAC::on(void) { this->setPower(true); }
@@ -333,12 +325,12 @@ void IRCoolixAC::setMode(const uint8_t mode) {
   switch (actualmode) {
     case kCoolixAuto:
     case kCoolixDry:
-        setFan(kCoolixFanAuto0, false);
+      setFan(kCoolixFanAuto0, false);
       break;
     case kCoolixCool:
     case kCoolixHeat:
     case kCoolixFan:
-        setFan(kCoolixFanAuto, false);
+      setFan(kCoolixFanAuto, false);
       break;
     default:  // Anything else, go with Auto mode.
       setMode(kCoolixAuto);

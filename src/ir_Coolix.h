@@ -147,9 +147,8 @@ class IRCoolixAC {
 #else
   IRsendTest _irsend;
 #endif
-  enum State {sOff = 0, sOn = 1};
   // internal state
-  State   coolixState;
+  bool    powerFlag;
   bool    turboFlag;
   bool    ledFlag;
   bool    cleanFlag;
