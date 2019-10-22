@@ -251,6 +251,13 @@ void IRac::coolix(IRCoolixAC *ac,
                   const bool turbo, const bool light, const bool clean,
                   const int16_t sleep) {
   ac->begin();
+  ac->setPower(on);
+  if (!on) {
+      // after turn off AC no more commands should
+      // be accepted
+      ac->send();
+      return;
+  }
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -284,8 +291,6 @@ void IRac::coolix(IRCoolixAC *ac,
     ac->setClean();
     ac->send();
   }
-  // Power gets done last, as off has a special command.
-  ac->setPower(on);
   ac->send();
 }
 #endif  // SEND_COOLIX
@@ -2030,6 +2035,7 @@ namespace IRAcUtils {
 #if DECODE_COOLIX
       case decode_type_t::COOLIX: {
         IRCoolixAC ac(0);
+        ac.on();
         ac.setRaw(result->value);  // Coolix uses value instead of state.
         return ac.toString();
       }
