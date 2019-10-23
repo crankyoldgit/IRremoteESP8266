@@ -4,6 +4,7 @@ from io import StringIO
 import unittest
 import auto_analyse_raw_data as analyse
 
+# pylint: disable=too-many-lines
 
 class TestRawIRMessage(unittest.TestCase):
   """Unit tests for the RawIRMessage class."""
@@ -19,36 +20,43 @@ class TestRawIRMessage(unittest.TestCase):
     message.display_binary("10101010")
     message.display_binary("0000000000000000")
     message.display_binary("00010010001101000101011001111000")
-    self.assertEqual(output.getvalue(), '\n'
-                     '  Bits: 8\n'
-                     '  Hex:  0xAA (MSB first)\n'
-                     '        0x55 (LSB first)\n'
-                     '  Dec:  170 (MSB first)\n'
-                     '        85 (LSB first)\n'
-                     '  Bin:  0b10101010 (MSB first)\n'
-                     '        0b01010101 (LSB first)\n'
-                     '\n'
-                     '  Bits: 16\n'
-                     '  Hex:  0x0000 (MSB first)\n'
-                     '        0x0000 (LSB first)\n'
-                     '  Dec:  0 (MSB first)\n'
-                     '        0 (LSB first)\n'
-                     '  Bin:  0b0000000000000000 (MSB first)\n'
-                     '        0b0000000000000000 (LSB first)\n'
-                     '\n'
-                     '  Bits: 32\n'
-                     '  Hex:  0x12345678 (MSB first)\n'
-                     '        0x1E6A2C48 (LSB first)\n'
-                     '  Dec:  305419896 (MSB first)\n'
-                     '        510274632 (LSB first)\n'
-                     '  Bin:  0b00010010001101000101011001111000 (MSB first)\n'
-                     '        0b00011110011010100010110001001000 (LSB first)\n')
+    self.assertEqual(
+        output.getvalue(), '\n'
+        '  Bits: 8\n'
+        '  Hex:  0xAA (MSB first)\n'
+        '        0x55 (LSB first)\n'
+        '  Dec:  170 (MSB first)\n'
+        '        85 (LSB first)\n'
+        '  Bin:  0b10101010 (MSB first)\n'
+        '        0b01010101 (LSB first)\n'
+        '\n'
+        '  Bits: 16\n'
+        '  Hex:  0x0000 (MSB first)\n'
+        '        0x0000 (LSB first)\n'
+        '  Dec:  0 (MSB first)\n'
+        '        0 (LSB first)\n'
+        '  Bin:  0b0000000000000000 (MSB first)\n'
+        '        0b0000000000000000 (LSB first)\n'
+        '\n'
+        '  Bits: 32\n'
+        '  Hex:  0x12345678 (MSB first)\n'
+        '        0x1E6A2C48 (LSB first)\n'
+        '  Dec:  305419896 (MSB first)\n'
+        '        510274632 (LSB first)\n'
+        '  Bin:  0b00010010001101000101011001111000 (MSB first)\n'
+        '        0b00011110011010100010110001001000 (LSB first)\n')
 
 
 class TestAutoAnalyseRawData(unittest.TestCase):
   """Unit tests for the functions in AutoAnalyseRawData."""
 
   # pylint: disable=too-many-public-methods
+
+  def test_avg_list(self):
+    """Tests for the avg_list method."""
+
+    self.assertEqual(0, analyse.avg_list([]))
+    self.assertEqual(23, analyse.avg_list([10, 20, 40]))
 
   def test_dump_constants_simple(self):
     """Simple tests for the dump_constants() function."""
@@ -70,12 +78,13 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         'const uint16_t kBARFreq = 38000;  // Hz. (Guessing the most common '
         'frequency.)'
     ])
-    self.assertEqual(output.getvalue(), 'Guessing key value:\n'
-                     'kBARHdrMark   = 7930\n'
-                     'kBARHdrSpace  = 3965\n'
-                     'kBARBitMark   = 496\n'
-                     'kBAROneSpace  = 1485\n'
-                     'kBARZeroSpace = 520\n')
+    self.assertEqual(
+        output.getvalue(), 'Guessing key value:\n'
+        'kBARHdrMark   = 7930\n'
+        'kBARHdrSpace  = 3965\n'
+        'kBARBitMark   = 496\n'
+        'kBAROneSpace  = 1485\n'
+        'kBARZeroSpace = 520\n')
 
   def test_dump_constants_aircon(self):
     """More complex tests for the dump_constants() function."""
@@ -106,13 +115,14 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         'const uint16_t kTESTFreq = 38000;  // Hz. (Guessing the most common '
         'frequency.)'
     ])
-    self.assertEqual(output.getvalue(), 'Guessing key value:\n'
-                     'kTESTHdrMark   = 9008\n'
-                     'kTESTHdrSpace  = 4496\n'
-                     'kTESTBitMark   = 650\n'
-                     'kTESTOneSpace  = 1657\n'
-                     'kTESTZeroSpace = 554\n'
-                     'kTESTSpaceGap = 19990\n')
+    self.assertEqual(
+        output.getvalue(), 'Guessing key value:\n'
+        'kTESTHdrMark   = 9008\n'
+        'kTESTHdrSpace  = 4496\n'
+        'kTESTBitMark   = 650\n'
+        'kTESTOneSpace  = 1657\n'
+        'kTESTZeroSpace = 554\n'
+        'kTESTSpaceGap = 19990\n')
 
   def test_convert_rawdata(self):
     """Tests for the convert_rawdata() function."""
@@ -120,8 +130,8 @@ class TestAutoAnalyseRawData(unittest.TestCase):
     self.assertEqual(analyse.convert_rawdata("0"), [0])
     with self.assertRaises(ValueError) as context:
       analyse.convert_rawdata("")
-    self.assertEqual(str(context.exception),
-                     "Raw Data contains a non-numeric value of ''.")
+    self.assertEqual(
+        str(context.exception), "Raw Data contains a non-numeric value of ''.")
 
     # Single parenthesis
     self.assertEqual(analyse.convert_rawdata("foo {10"), [10])
@@ -141,14 +151,16 @@ class TestAutoAnalyseRawData(unittest.TestCase):
     # Bad parentheses
     with self.assertRaises(ValueError) as context:
       analyse.convert_rawdata("}10{")
-    self.assertEqual(str(context.exception),
-                     "Raw Data not parsible due to parentheses placement.")
+    self.assertEqual(
+        str(context.exception),
+        "Raw Data not parsible due to parentheses placement.")
 
     # Non base-10 values
     with self.assertRaises(ValueError) as context:
       analyse.convert_rawdata("10, 20, foo, bar, 30")
-    self.assertEqual(str(context.exception),
-                     "Raw Data contains a non-numeric value of 'foo'.")
+    self.assertEqual(
+        str(context.exception),
+        "Raw Data contains a non-numeric value of 'foo'.")
 
     # A messy usual "good" case.
     input_str = """uint16_t rawbuf[6] = {
@@ -228,8 +240,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
             494, 520, 494, 1482, 494};"""
     analyse.parse_and_report(input_str, 200, True, "FOO", output)
     self.assertEqual(
-        output.getvalue(),
-        'Found 37 timing entries.\n'
+        output.getvalue(), 'Found 37 timing entries.\n'
         'Potential Mark Candidates:\n'
         '[7930, 520]\n'
         'Potential Space Candidates:\n'
@@ -379,6 +390,350 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '}\n'
         '#endif  // DECODE_FOO\n')
 
+  def test_reduce_list(self):
+    """Tests for the reduce_list method."""
+
+    ignore = StringIO()
+    message = analyse.RawIRMessage(200, [
+        7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494,
+        520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494,
+        520, 520, 520, 494, 520, 494, 520, 494, 1482, 494
+    ], ignore)
+    test_space_data = [4496, 1660, 530, 558, 1636, 1660, 556]
+    result_list, result_dict = message.reduce_list(test_space_data)
+    self.assertEqual([4496, 1660, 558], result_list)
+    self.assertEqual({
+        558: [558, 556, 530],
+        1660: [1660, 1660, 1636],
+        4496: [4496]
+    }, result_dict)
+
+  def test_leader_marks(self):
+    """Tests for leader-type marks in parse_and_report() function."""
+
+    # Ref Issue #973
+    output = StringIO()
+    input_str = """
+        uint16_t rawData[853] = {
+        29784, 49290, 3416, 1604, 464, 1210, 468, 372, 460, 374, 462, 374,
+        466, 368, 464, 372, 462, 374, 464, 374, 464, 368, 464, 370, 464, 370,
+        466, 370, 464, 1208, 464, 374, 462, 372, 466, 374, 464, 370, 462, 372,
+        464, 370, 466, 370, 464, 372, 462, 374, 462, 374, 462, 378, 460, 370,
+        460, 374, 464, 372, 462, 372, 464, 374, 466, 368, 464, 1210, 464, 374,
+        466, 1202, 464, 1206, 464, 1210, 466, 1206, 468, 1204, 464, 1210, 466,
+        370, 462, 1214, 460, 1208, 464, 1206, 464, 1208, 466, 1208, 464, 1206,
+        466, 1208, 464, 1206, 466, 1212, 464, 370, 464, 370, 462, 374, 462,
+        374, 462, 374, 462, 374, 462, 372, 464, 376, 460, 372, 462, 374, 466,
+        1204, 464, 1210, 464, 372, 460, 374, 462, 1208, 464, 1212, 464, 1202,
+        468, 1204, 464, 374, 460, 374, 466, 1208, 462, 1210, 462, 374, 462,
+        376, 464, 368, 466, 1204, 462, 374, 466, 372, 464, 1206, 462, 376,
+        460, 376, 464, 1210, 462, 1208, 462, 372, 466, 1206, 464, 1208, 466,
+        372, 462, 1210, 462, 1210, 466, 374, 468, 1202, 464, 1206, 466, 374,
+        462, 372, 464, 1208, 464, 374, 464, 372, 464, 376, 462, 370, 466, 368,
+        464, 1208, 462, 1210, 460, 374, 464, 1208, 466, 1206, 464, 1214, 464,
+        368, 462, 374, 462, 1212, 460, 1210, 466, 1206, 466, 370, 462, 1210,
+        464, 416, 424, 1202, 466, 1220, 448, 376, 464, 372, 462, 372, 462,
+        1212, 462, 374, 460, 1214, 468, 364, 468, 370, 462, 372, 462, 376,
+        458, 374, 464, 372, 462, 376, 464, 376, 462, 1204, 464, 1210, 462,
+        1210, 464, 1208, 466, 1208, 464, 1206, 462, 1210, 464, 1212, 464, 368,
+        462, 372, 464, 372, 464, 372, 464, 372, 466, 370, 466, 370, 464, 376,
+        464, 1202, 464, 1212, 464, 1204, 464, 1210, 462, 1208, 464, 1212, 462,
+        1210, 464, 1212, 460, 372, 462, 374, 462, 374, 466, 370, 462, 374, 462,
+        372, 464, 372, 462, 376, 462, 1206, 464, 1206, 466, 1210, 462, 1208,
+        464, 1210, 466, 1204, 464, 1210, 462, 1214, 462, 368, 462, 374, 466,
+        370, 462, 376, 466, 368, 466, 370, 462, 414, 424, 374, 464, 1206, 464,
+        1206, 464, 1206, 468, 1206, 466, 1206, 466, 1210, 462, 1206, 464, 1214,
+        468, 364, 466, 372, 466, 370, 462, 372, 462, 374, 464, 372, 462, 374,
+        460, 376, 466, 1204, 464, 1208, 462, 1210, 464, 1206, 464, 1210, 464,
+        1208, 464, 1208, 466, 1210, 462, 1206, 466, 1206, 466, 372, 462, 374,
+        466, 1206, 466, 370, 464, 1206, 466, 376, 464, 368, 462, 372, 466,
+        1206, 464, 1206, 464, 374, 466, 1204, 464, 374, 466, 1206, 466, 1204,
+        468, 368, 466, 370, 466, 370, 462, 1212, 462, 1210, 462, 1210, 462,
+        1214, 464, 368, 464, 1206, 466, 1206, 466, 1206, 464, 374, 464, 370,
+        466, 370, 462, 378, 466, 366, 464, 372, 466, 368, 466, 370, 464, 370,
+        462, 372, 462, 374, 464, 374, 464, 1202, 466, 1206, 462, 1208, 466,
+        1208, 466, 1208, 464, 1210, 462, 1206, 464, 1212, 464, 368, 464, 372,
+        464, 370, 468, 368, 462, 376, 462, 372, 466, 370, 464, 376, 462, 1206,
+        464, 1210, 462, 1212, 462, 1208, 464, 1208, 462, 1212, 466, 1246, 424,
+        1212, 464, 368, 464, 372, 466, 370, 464, 372, 462, 374, 464, 372, 464,
+        370, 462, 1212, 466, 1206, 462, 1206, 464, 1210, 466, 1206, 462, 1208,
+        464, 1250, 422, 1208, 468, 372, 464, 1204, 466, 1206, 466, 370, 462,
+        374, 462, 376, 460, 374, 466, 370, 462, 376, 464, 368, 462, 376, 462,
+        1210, 462, 1208, 464, 1206, 466, 1206, 464, 1208, 468, 1212, 460, 1206,
+        464, 372, 464, 372, 466, 370, 462, 374, 466, 370, 466, 370, 466, 374,
+        464, 368, 462, 1210, 462, 1210, 464, 1210, 462, 1208, 462, 1212, 464,
+        1206, 466, 1208, 466, 366, 464, 374, 460, 374, 462, 1208, 466, 372,
+        462, 374, 462, 374, 464, 1212, 468, 1202, 464, 1208, 466, 1204, 464,
+        376, 460, 1208, 468, 1208, 462, 1208, 464, 378, 460, 372, 460, 372,
+        462, 376, 464, 372, 462, 374, 460, 374, 464, 370, 462, 378, 464, 1202,
+        468, 1204, 468, 1204, 466, 1208, 466, 1208, 464, 1210, 460, 1212, 462,
+        1212, 464, 366, 466, 370, 464, 372, 466, 370, 464, 372, 462, 414, 424,
+        372, 466, 372, 460, 1206, 466, 1206, 466, 1206, 466, 1208, 466, 1206,
+        464, 1208, 466, 1208, 462, 1212, 468, 1202, 466, 1204, 470, 1204, 468,
+        1204, 466, 1206, 466, 1206, 464, 1210, 462, 1212, 468, 366, 464, 372,
+        462, 374, 460, 374, 460, 374, 466, 410, 424, 372, 460, 378, 466, 1200,
+        464, 1212, 462, 1210, 464, 1210, 466, 1206, 462, 1208, 464, 1210, 464,
+        1210, 464, 366, 462, 376, 462, 374, 460, 376, 462, 372, 466, 374, 460,
+        372, 462, 378, 462, 1202, 468, 1206, 464, 1208, 466, 1208, 462, 1208,
+        464, 1208, 468, 1204, 464, 1212, 466, 368, 462, 374, 466, 372, 464,
+        370, 462, 374, 464, 370, 462, 376, 464, 374, 462, 1206, 464, 1208, 462,
+        1210, 466, 1208, 460, 1210, 468, 1206, 462, 1210, 464, 1212, 466, 366,
+        464, 374, 462, 372, 466, 370, 462, 374, 464, 372, 464, 370, 464, 374,
+        462};"""
+    analyse.parse_and_report(input_str, 200, True, "Hitachi", output)
+    self.assertEqual(
+        output.getvalue(), 'Found 853 timing entries.\n'
+        'Potential Mark Candidates:\n'
+        '[29784, 3416, 470]\n'
+        'Potential Space Candidates:\n'
+        '[49290, 1604, 1250, 416]\n'
+        'DANGER: Unusual number of mark timings!\n'
+        'Guessing encoding type:\n'
+        'Looks like it uses space encoding. Yay!\n'
+        '\n'
+        'Guessing key value:\n'
+        'kHitachiHdrMark   = 3416\n'
+        'kHitachiHdrSpace  = 1604\n'
+        'kHitachiBitMark   = 463\n'
+        'kHitachiOneSpace  = 1208\n'
+        'kHitachiZeroSpace = 372\n'
+        'kHitachiLdrMark   = 29784\n'
+        'kHitachiSpaceGap = 49290\n'
+        '\n'
+        'Decoding protocol based on analysis so far:\n'
+        '\n'
+        'kHitachiLdrMark+UNEXPECTED->GAP(49290)kHitachiHdrMark+'
+        'kHitachiHdrSpace+100000000000100000000000000000101111110111111111'
+        '0000000000110011110011000100100110110110110010000011011100111010110001'
+        '010000000011111111000000001111111100000000111111110000000011111111'
+        '0000000011111111110010100011010110001111011100000000000011111111'
+        '0000000011111111000000011111111011000000001111111000000001111111'
+        '0001000111101110000000001111111100000000111111111111111100000000'
+        '111111110000000011111111000000001111111100000000\n'
+        '  Bits: 424\n'
+        '  Hex:  0x80080002FDFF0033CC49B6C8373AC500FF00FF00FF00FF00FFCA358F7000'
+        'FF00FF01FEC03F807F11EE00FF00FFFF00FF00FF00FF00 (MSB first)\n'
+        '        0x00FF00FF00FF00FFFF00FF007788FE01FC037F80FF00FF000EF1AC53FF00'
+        'FF00FF00FF00FF00A35CEC136D9233CC00FFBF40001001 (LSB first)\n'
+        '  Dec:  21666770463250971033249250747302630158357464218891161163035832'
+        '525825434564377831675503794869126268735511944198247894513495375616'
+        ' (MSB first)\n'
+        '        16857184424372658669179408622645041920057617761062334415219526'
+        '0950249734545225589859643087812860908833344117446370839379316737'
+        ' (LSB first)\n'
+        '  Bin:  0b100000000000100000000000000000101111110111111111000000000011'
+        '00111100110001001001101101101100100000110111001110101100010100000000'
+        '1111111100000000111111110000000011111111000000001111111100000000'
+        '1111111111001010001101011000111101110000000000001111111100000000'
+        '1111111100000001111111101100000000111111100000000111111100010001'
+        '1110111000000000111111110000000011111111111111110000000011111111'
+        '0000000011111111000000001111111100000000 (MSB first)\n'
+        '        0b000000001111111100000000111111110000000011111111000000001111'
+        '11111111111100000000111111110000000001110111100010001111111000000001'
+        '1111110000000011011111111000000011111111000000001111111100000000'
+        '0000111011110001101011000101001111111111000000001111111100000000'
+        '1111111100000000111111110000000011111111000000001010001101011100'
+        '1110110000010011011011011001001000110011110011000000000011111111'
+        '1011111101000000000000000001000000000001 (LSB first)\n'
+        '\n'
+        'Total Nr. of suspected bits: 424\n'
+        '\n'
+        'Generating a VERY rough code outline:\n'
+        '\n'
+        '// Copyright 2019 David Conran (crankyoldgit)\n'
+        '// Support for Hitachi protocol\n'
+        '\n'
+        '#include "IRrecv.h"\n'
+        '#include "IRsend.h"\n'
+        '#include "IRutils.h"\n'
+        '\n'
+        "// WARNING: This probably isn't directly usable. It's a guide only.\n"
+        '\n'
+        '// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/'
+        'Adding-support-for-a-new-IR-protocol\n'
+        '// for details of how to include this in the library.\n'
+        'const uint16_t kHitachiHdrMark = 3416;\n'
+        'const uint16_t kHitachiBitMark = 463;\n'
+        'const uint16_t kHitachiHdrSpace = 1604;\n'
+        'const uint16_t kHitachiOneSpace = 1208;\n'
+        'const uint16_t kHitachiZeroSpace = 372;\n'
+        'const uint16_t kHitachiLdrMark = 29784;\n'
+        'const uint16_t kHitachiSpaceGap = 49290;\n'
+        'const uint16_t kHitachiFreq = 38000;  // Hz. (Guessing the most'
+        ' common frequency.)\n'
+        'const uint16_t kHitachiBits = 424;  // Move to IRremoteESP8266.h\n'
+        'const uint16_t kHitachiStateLength = 53;  // Move to IRremoteESP8266.h'
+        '\n'
+        'const uint16_t kHitachiOverhead = 5;\n'
+        "// DANGER: More than 64 bits detected. A uint64_t for 'data' won't"
+        ' work!\n'
+        '#if SEND_HITACHI\n'
+        '// Function should be safe up to 64 bits.\n'
+        'void IRsend::sendHitachi(const uint64_t data, const uint16_t nbits,'
+        ' const uint16_t repeat) {\n'
+        '  enableIROut(kHitachiFreq);\n'
+        '  for (uint16_t r = 0; r <= repeat; r++) {\n'
+        '    uint64_t send_data = data;\n'
+        '    // Leader\n'
+        '    mark(kHitachiLdrMark);\n'
+        '    // Gap\n'
+        '    space(kHitachiSpaceGap);\n'
+        '    // Header\n'
+        '    mark(kHitachiHdrMark);\n'
+        '    space(kHitachiHdrSpace);\n'
+        '    // Data Section #1\n'
+        '    // e.g. data = 0x80080002FDFF0033CC49B6C8373AC500FF00FF00FF00FF00'
+        'FFCA358F7000FF00FF01FEC03F807F11EE00FF00FFFF00FF00FF00FF00,'
+        ' nbits = 424\n'
+        '    sendData(kHitachiBitMark, kHitachiOneSpace, kHitachiBitMark,'
+        ' kHitachiZeroSpace, send_data, 424, true);\n'
+        '    send_data >>= 424;\n'
+        '    // Footer\n'
+        '    mark(kHitachiBitMark);\n'
+        '    space(kDefaultMessageGap);  // A 100% made up guess of the gap'
+        ' between messages.\n'
+        '  }\n'
+        '}\n'
+        '#endif  // SEND_HITACHI\n'
+        '\n'
+        '#if SEND_HITACHI\n'
+        '// Alternative >64bit function to send HITACHI messages\n'
+        '// Where data is:\n'
+        '//   uint8_t data[kHitachiStateLength] = {0x80, 0x08, 0x00, 0x02,'
+        ' 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x49, 0xB6, 0xC8, 0x37, 0x3A, 0xC5,'
+        ' 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0xCA,'
+        ' 0x35, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0, 0x3F,'
+        ' 0x80, 0x7F, 0x11, 0xEE, 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0xFF,'
+        ' 0x00, 0xFF, 0x00, 0xFF, 0x00};\n'
+        '//\n'
+        '// Args:\n'
+        '//   data: An array of bytes containing the IR command.\n'
+        '//         It is assumed to be in MSB order for this code.\n'
+        '//   nbytes: Nr. of bytes of data in the array.'
+        ' (>=kHitachiStateLength)\n'
+        '//   repeat: Nr. of times the message is to be repeated.\n'
+        '//\n'
+        '// Status: ALPHA / Untested.\n'
+        'void IRsend::sendHitachi(const uint8_t data[], const uint16_t nbytes,'
+        ' const uint16_t repeat) {\n'
+        '  for (uint16_t r = 0; r <= repeat; r++) {\n'
+        '    uint16_t pos = 0;\n'
+        '    // Data Section #1\n'
+        '    // e.g.\n'
+        '    //   bits = 424; bytes = 53;\n'
+        '    //   *(data + pos) = {0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00,'
+        ' 0x33, 0xCC, 0x49, 0xB6, 0xC8, 0x37, 0x3A, 0xC5, 0x00, 0xFF, 0x00,'
+        ' 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0xCA, 0x35, 0x8F, 0x70,'
+        ' 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0, 0x3F, 0x80, 0x7F, 0x11,'
+        ' 0xEE, 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,'
+        ' 0xFF, 0x00};\n'
+        '    sendGeneric(kHitachiHdrMark, kHitachiHdrSpace,\n'
+        '                kHitachiBitMark, kHitachiOneSpace,\n'
+        '                kHitachiBitMark, kHitachiZeroSpace,\n'
+        '                kHitachiBitMark, kHitachiSpaceGap,\n'
+        '                data + pos, 53,  // Bytes\n'
+        '                kHitachiFreq, true, kNoRepeat, kDutyDefault);\n'
+        '    pos += 53;  // Adjust by how many bytes of data we sent\n'
+        '  }\n'
+        '}\n'
+        '#endif  // SEND_HITACHI\n'
+        '\n'
+        "// DANGER: More than 64 bits detected. A uint64_t for 'data' won't"
+        ' work!\n'
+        '#if DECODE_HITACHI\n'
+        '// Function should be safe up to 64 bits.\n'
+        'bool IRrecv::decodeHitachi(decode_results *results,'
+        ' const uint16_t nbits, const bool strict) {\n'
+        '  if (results->rawlen < 2 * nbits + kHitachiOverhead)\n'
+        '    return false;  // Too short a message to match.\n'
+        '  if (strict && nbits != kHitachiBits)\n'
+        '    return false;\n'
+        '\n'
+        '  uint16_t offset = kStartOffset;\n'
+        '  uint64_t data = 0;\n'
+        '  match_result_t data_result;\n'
+        '\n'
+        '  // Leader\n'
+        '  if (!matchMark(results->rawbuf[offset++], kHitachiLdrMark))\n'
+        '    return false;\n'
+        '\n'
+        '  // Gap\n'
+        '  if (!matchSpace(results->rawbuf[offset++], kHitachiSpaceGap))\n'
+        '    return false;\n'
+        '\n'
+        '  // Header\n'
+        '  if (!matchMark(results->rawbuf[offset++], kHitachiHdrMark))\n'
+        '    return false;\n'
+        '  if (!matchSpace(results->rawbuf[offset++], kHitachiHdrSpace))\n'
+        '    return false;\n'
+        '\n'
+        '  // Data Section #1\n'
+        '  // e.g. data_result.data = 0x80080002FDFF0033CC49B6C8373AC500FF00FF'
+        '00FF00FF00FFCA358F7000FF00FF01FEC03F807F11EE00FF00FFFF00FF00FF00FF00,'
+        ' nbits = 424\n'
+        '  data_result = matchData(&(results->rawbuf[offset]), 424,\n'
+        '                          kHitachiBitMark, kHitachiOneSpace,\n'
+        '                          kHitachiBitMark, kHitachiZeroSpace);\n'
+        '  offset += data_result.used;\n'
+        '  if (data_result.success == false) return false;  // Fail\n'
+        '  data <<= 424;  // Make room for the new bits of data.\n'
+        '  data |= data_result.data;\n'
+        '\n'
+        '  // Footer\n'
+        '  if (!matchMark(results->rawbuf[offset++], kHitachiBitMark))\n'
+        '    return false;\n'
+        '\n'
+        '  // Success\n'
+        '  results->decode_type = decode_type_t::HITACHI;\n'
+        '  results->bits = nbits;\n'
+        '  results->value = data;\n'
+        '  results->command = 0;\n'
+        '  results->address = 0;\n'
+        '  return true;\n'
+        '}\n'
+        '#endif  // DECODE_HITACHI\n'
+        '\n'
+        '// Note: This should be 64+ bit safe.\n'
+        '#if DECODE_HITACHI\n'
+        '// Function should be safe over 64 bits.\n'
+        'bool IRrecv::decodeHitachi(decode_results *results,'
+        ' const uint16_t nbits, const bool strict) {\n'
+        '  if (results->rawlen < 2 * nbits + kHitachiOverhead)\n'
+        '    return false;  // Too short a message to match.\n'
+        '  if (strict && nbits != kHitachiBits)\n'
+        '    return false;\n'
+        '\n'
+        '  uint16_t offset = kStartOffset;\n'
+        '  uint16_t pos = 0;\n'
+        '  uint16_t used = 0;\n'
+        '\n'
+        '  // Data Section #1\n'
+        '  // e.g.\n'
+        '  //   bits = 424; bytes = 53;\n'
+        '  //   *(results->state + pos) = {0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF,'
+        ' 0x00, 0x33, 0xCC, 0x49, 0xB6, 0xC8, 0x37, 0x3A, 0xC5, 0x00, 0xFF,'
+        ' 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0xCA, 0x35, 0x8F,'
+        ' 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0, 0x3F, 0x80, 0x7F,'
+        ' 0x11, 0xEE, 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0xFF, 0x00, 0xFF,'
+        ' 0x00, 0xFF, 0x00};\n'
+        '  used = matchGeneric(results->rawbuf + offset,'
+        ' results->state + pos,\n'
+        '                      results->rawlen - offset, 424,\n'
+        '                      kHitachiHdrMark, kHitachiHdrSpace,\n'
+        '                      kHitachiBitMark, kHitachiOneSpace,\n'
+        '                      kHitachiBitMark, kHitachiZeroSpace,\n'
+        '                      kHitachiBitMark, kHitachiSpaceGap, true);\n'
+        '  if (used == 0) return false;  // We failed to find any data.\n'
+        '  offset += used;  // Adjust for how much of the message we read.\n'
+        '  pos += 53;  // Adjust by how many bytes of data we read\n'
+        '\n'
+        '  // Success\n'
+        '  results->decode_type = decode_type_t::HITACHI;\n'
+        '  results->bits = nbits;\n'
+        '  return true;\n'
+        '}\n'
+        '#endif  // DECODE_HITACHI\n')
+
   def test_unusual_gaps(self):
     """Tests for unusual Space Gaps in parse_and_report() function."""
 
@@ -412,8 +767,7 @@ class TestAutoAnalyseRawData(unittest.TestCase):
             864, 2620, 864, 864, 864, 864, 3485, 3512, 864, 13996};"""
     analyse.parse_and_report(input_str, 200, True, "FOO", output)
     self.assertEqual(
-        output.getvalue(),
-        'Found 272 timing entries.\n'
+        output.getvalue(), 'Found 272 timing entries.\n'
         'Potential Mark Candidates:\n'
         '[3485, 864]\n'
         'Potential Space Candidates:\n'
@@ -810,30 +1164,6 @@ class TestAutoAnalyseRawData(unittest.TestCase):
         '  return true;\n'
         '}\n'
         '#endif  // DECODE_FOO\n')
-
-  def test_reduce_list(self):
-    """Tests for the reduce_list method."""
-
-    ignore = StringIO()
-    message = analyse.RawIRMessage(200, [
-        7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494,
-        520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, 494,
-        520, 520, 520, 494, 520, 494, 520, 494, 1482, 494
-    ], ignore)
-    test_space_data = [4496, 1660, 530, 558, 1636, 1660, 556]
-    result_list, result_dict = message.reduce_list(test_space_data)
-    self.assertEqual([4496, 1660, 558], result_list)
-    self.assertEqual({
-        558: [558, 556, 530],
-        1660: [1660, 1660, 1636],
-        4496: [4496]
-    }, result_dict)
-
-  def test_avg_list(self):
-    """Tests for the avg_list method."""
-
-    self.assertEqual(0, analyse.avg_list([]))
-    self.assertEqual(23, analyse.avg_list([10, 20, 40]))
 
 
 if __name__ == '__main__':
