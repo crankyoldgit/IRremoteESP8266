@@ -438,14 +438,15 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
 //
 // Note: This protocol is almost exactly the same as HitachiAC2 except this
 //       variant has a leader section as well, and subtle timing differences.
+//       It is also in LSBF order (per byte), rather than MSBF order.
 //
 // Args:
 //   data: An array of bytes containing the IR command.
-//         It is assumed to be in MSB order for this code.
+//         It is assumed to be in LSBF order for this code.
 //   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc424StateLength)
 //   repeat: Nr. of times the message is to be repeated.
 //
-// Status: STABLE / Reported as working. Bit ordering not yet confirmed though.
+// Status: STABLE / Reported as working.
 void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
                               const uint16_t repeat) {
   enableIROut(kHitachiAcFreq);
@@ -459,7 +460,7 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
                 kHitachiAc424BitMark, kHitachiAc424ZeroSpace,
                 kHitachiAc424BitMark, kHitachiAcMinGap,
                 data, nbytes,  // Bytes
-                kHitachiAcFreq, true, kNoRepeat, kDutyDefault);
+                kHitachiAcFreq, false, kNoRepeat, kDutyDefault);
   }
 }
 #endif  // SEND_HITACHI_AC424
@@ -469,6 +470,7 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 //
 // Note: This protocol is almost exactly the same as HitachiAC2 except this
 //       variant has a leader section as well, and subtle timing differences.
+//       It is also in LSBF order (per byte), rather than MSBF order.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -477,7 +479,7 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: STABLE / Reported as working. Bit ordering not yet confirmed though.
+// Status: STABLE / Reported as working.
 //
 // Supported devices:
 //  Hitachi Shirokumakun / AC Model: RAS-AJ25H / AC Remote Model: RAR-8P2
@@ -509,7 +511,7 @@ bool IRrecv::decodeHitachiAc424(decode_results *results, const uint16_t nbits,
                       kHitachiAc424BitMark, kHitachiAc424OneSpace,
                       kHitachiAc424BitMark, kHitachiAc424ZeroSpace,
                       kHitachiAc424BitMark, kHitachiAcMinGap, true,
-                      kUseDefTol, 0);
+                      kUseDefTol, 0, false);
   if (used == 0) return false;  // We failed to find any data.
 
   // Success
