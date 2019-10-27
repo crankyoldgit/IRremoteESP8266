@@ -560,11 +560,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   DPRINTLN("Attempting Haier AC YR-W02 decode");
   if (decodeHaierACYRW02(results)) return true;
 #endif
+#if DECODE_HITACHI_AC424
+  // HitachiAc424 should be checked before HitachiAC & HitachiAC2
+  DPRINTLN("Attempting Hitachi AC 424 decode");
+  if (decodeHitachiAc424(results, kHitachiAc424Bits)) return true;
+#endif  // DECODE_HITACHI_AC2
 #if DECODE_HITACHI_AC2
   // HitachiAC2 should be checked before HitachiAC
   DPRINTLN("Attempting Hitachi AC2 decode");
   if (decodeHitachiAC(results, kHitachiAc2Bits)) return true;
-#endif
+#endif  // DECODE_HITACHI_AC2
 #if DECODE_HITACHI_AC
   DPRINTLN("Attempting Hitachi AC decode");
   if (decodeHitachiAC(results, kHitachiAcBits)) return true;

@@ -1,4 +1,4 @@
-// Copyright 2018 David Conran
+// Copyright 2018-2019 David Conran
 //
 // Code to emulate Hitachi protocol compatible devices.
 // Should be compatible with:
@@ -27,6 +27,15 @@ const uint16_t kHitachiAcBitMark = 400;
 const uint16_t kHitachiAcOneSpace = 1250;
 const uint16_t kHitachiAcZeroSpace = 500;
 const uint32_t kHitachiAcMinGap = kDefaultMessageGap;  // Just a guess.
+// Support for HitachiAc424 protocol
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/973
+const uint16_t kHitachiAc424LdrMark = 29784;   // Leader
+const uint16_t kHitachiAc424LdrSpace = 49290;  // Leader
+const uint16_t kHitachiAc424HdrMark = 3416;    // Header
+const uint16_t kHitachiAc424HdrSpace = 1604;   // Header
+const uint16_t kHitachiAc424BitMark = 463;
+const uint16_t kHitachiAc424OneSpace = 1208;
+const uint16_t kHitachiAc424ZeroSpace = 372;
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -81,8 +90,8 @@ void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
     return;  // Not enough bytes to send a proper message.
   sendGeneric(kHitachiAc1HdrMark, kHitachiAc1HdrSpace, kHitachiAcBitMark,
               kHitachiAcOneSpace, kHitachiAcBitMark, kHitachiAcZeroSpace,
-              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, true,
-              repeat, 50);
+              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, kHitachiAcFreq,
+              true, repeat, kDutyDefault);
 }
 #endif  // SEND_HITACHI_AC1
 
@@ -423,3 +432,91 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
+
+#if SEND_HITACHI_AC424
+// Send HITACHI_AC424 messages
+//
+// Note: This protocol is almost exactly the same as HitachiAC2 except this
+//       variant has a leader section as well, and subtle timing differences.
+//       It is also in LSBF order (per byte), rather than MSBF order.
+//
+// Args:
+//   data: An array of bytes containing the IR command.
+//         It is assumed to be in LSBF order for this code.
+//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc424StateLength)
+//   repeat: Nr. of times the message is to be repeated.
+//
+// Status: STABLE / Reported as working.
+void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
+                              const uint16_t repeat) {
+  enableIROut(kHitachiAcFreq);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Leader
+    mark(kHitachiAc424LdrMark);
+    space(kHitachiAc424LdrSpace);
+    // Header + Data + Footer
+    sendGeneric(kHitachiAc424HdrMark, kHitachiAc424HdrSpace,
+                kHitachiAc424BitMark, kHitachiAc424OneSpace,
+                kHitachiAc424BitMark, kHitachiAc424ZeroSpace,
+                kHitachiAc424BitMark, kHitachiAcMinGap,
+                data, nbytes,  // Bytes
+                kHitachiAcFreq, false, kNoRepeat, kDutyDefault);
+  }
+}
+#endif  // SEND_HITACHI_AC424
+
+#if DECODE_HITACHI_AC424
+// Decode the supplied Hitachi 424 bit A/C message.
+//
+// Note: This protocol is almost exactly the same as HitachiAC2 except this
+//       variant has a leader section as well, and subtle timing differences.
+//       It is also in LSBF order (per byte), rather than MSBF order.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   nbits:   The number of data bits to expect. Typically kHitachiAc424Bits.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: STABLE / Reported as working.
+//
+// Supported devices:
+//  Hitachi Shirokumakun / AC Model: RAS-AJ25H / AC Remote Model: RAR-8P2
+//  Manual (Japanese):
+//    https://kadenfan.hitachi.co.jp/support/raj/item/docs/ras_aj22h_a_tori.pdf
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/973
+bool IRrecv::decodeHitachiAc424(decode_results *results, const uint16_t nbits,
+                                const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kHeader + kFooter - 1)
+    return false;  // Too short a message to match.
+  if (strict && nbits != kHitachiAc424Bits)
+    return false;
+
+  uint16_t offset = kStartOffset;
+  uint16_t used;
+
+  // Leader
+  if (!matchMark(results->rawbuf[offset++], kHitachiAc424LdrMark))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], kHitachiAc424LdrSpace))
+    return false;
+
+  // Header + Data + Footer
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, nbits,
+                      kHitachiAc424HdrMark, kHitachiAc424HdrSpace,
+                      kHitachiAc424BitMark, kHitachiAc424OneSpace,
+                      kHitachiAc424BitMark, kHitachiAc424ZeroSpace,
+                      kHitachiAc424BitMark, kHitachiAcMinGap, true,
+                      kUseDefTol, 0, false);
+  if (used == 0) return false;  // We failed to find any data.
+
+  // Success
+  results->decode_type = decode_type_t::HITACHI_AC424;
+  results->bits = nbits;
+  return true;
+}
+#endif  // DECODE_HITACHI_AC424
