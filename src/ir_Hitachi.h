@@ -39,6 +39,8 @@ const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
+const uint8_t  kHitachiAc424BytePower = 27;
+const uint8_t  kHitachiAc424PowerOffset = 4;
 
 // Classes
 class IRHitachiAc {
@@ -89,6 +91,37 @@ class IRHitachiAc {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAcStateLength];
   void checksum(const uint16_t length = kHitachiAcStateLength);
+  uint8_t _previoustemp;
+};
+
+class IRHitachiAc424 {
+ public:
+  explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+  void stateReset(void);
+#if SEND_HITACHI_AC424
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_HITACHI_AC424
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc424StateLength);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // The state of the IR remote in IR code form.
+  uint8_t remote_state[kHitachiAc424StateLength];
+  void setInvertedState(void);
   uint8_t _previoustemp;
 };
 

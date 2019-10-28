@@ -520,3 +520,70 @@ bool IRrecv::decodeHitachiAc424(decode_results *results, const uint16_t nbits,
   return true;
 }
 #endif  // DECODE_HITACHI_AC424
+
+// Class for handling the remote control on a Hitachi_AC424 53 byte A/C message
+IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+// Reset to auto fan, cooling, 23° Celcius
+void IRHitachiAc424::stateReset(void) {
+  for (uint8_t i = 15; i < kHitachiAc424StateLength; i++)
+    remote_state[i] = 0x00;
+
+  remote_state[0]  = 0x01;
+  remote_state[1]  = 0x10;
+  // The following bytes will also have a calculated bit inverted pair
+  remote_state[3]  = 0x40;
+  remote_state[5]  = 0xFF;
+  remote_state[7]  = 0xCC;
+  remote_state[9]  = 0x92;
+  remote_state[11] = 0x13;  // Button Action
+  remote_state[13] = 0x5C;  // 23C
+  remote_state[25] = 0x53;  // Fan speed, mode
+  remote_state[27] = 0xF1;  // Power
+  remote_state[33] = 0x80;
+  remote_state[35] = 0x03;
+  remote_state[37] = 0x01;
+  remote_state[39] = 0x88;
+  remote_state[45] = 0xFF;
+  remote_state[47] = 0xFF;
+  remote_state[49] = 0xFF;
+  remote_state[51] = 0xFF;
+  // setInvertedState();
+}
+
+void IRHitachiAc424::setInvertedState(void) {
+  for (uint8_t i = 3; i < kHitachiAc424StateLength; i+=2)
+    remote_state[i+1] = ~remote_state[i];
+}
+
+void IRHitachiAc424::begin(void) { _irsend.begin(); }
+
+uint8_t *IRHitachiAc424::getRaw(void) {
+  setInvertedState();
+  return remote_state;
+}
+
+void IRHitachiAc424::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(remote_state, new_code, std::min(length, kHitachiAc424StateLength));
+}
+
+#if SEND_HITACHI_AC424
+void IRHitachiAc424::send(const uint16_t repeat) {
+  _irsend.sendHitachiAc424(getRaw(), kHitachiAc424StateLength, repeat);
+}
+#endif  // SEND_HITACHI_AC424
+
+bool IRHitachiAc424::getPower(void) {
+  return GETBIT8(remote_state[kHitachiAc424BytePower],
+    kHitachiAc424PowerOffset);
+}
+
+void IRHitachiAc424::setPower(const bool on) {
+  setBit(&remote_state[kHitachiAc424BytePower], kHitachiAc424PowerOffset, on);
+}
+
+void IRHitachiAc424::on(void) { setPower(true); }
+
+void IRHitachiAc424::off(void) { setPower(false); }
