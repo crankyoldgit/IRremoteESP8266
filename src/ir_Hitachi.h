@@ -53,8 +53,6 @@ const uint8_t kHitachiAc424FanHigh = 4;
 const uint8_t kHitachiAc424FanAuto = 5;
 const uint8_t kHitachiAc424FanMax = 6;
 const uint8_t kHitachiAc424FanMaxDry = 2;
-const uint8_t kHitachiAc424ByteFanAndMode = 25;
-const uint8_t kHitachiAc424BytePower = 27;
 const uint8_t kHitachiAc424PowerOffset = 4;
 
 // Classes

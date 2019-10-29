@@ -577,12 +577,12 @@ void IRHitachiAc424::send(const uint16_t repeat) {
 #endif  // SEND_HITACHI_AC424
 
 bool IRHitachiAc424::getPower(void) {
-  return GETBIT8(remote_state[kHitachiAc424BytePower],
+  return GETBIT8(remote_state[27],
     kHitachiAc424PowerOffset);
 }
 
 void IRHitachiAc424::setPower(const bool on) {
-  setBit(&remote_state[kHitachiAc424BytePower], kHitachiAc424PowerOffset, on);
+  setBit(&remote_state[27], kHitachiAc424PowerOffset, on);
 }
 
 void IRHitachiAc424::on(void) { setPower(true); }
