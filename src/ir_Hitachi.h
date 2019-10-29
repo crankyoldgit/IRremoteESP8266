@@ -126,6 +126,8 @@ class IRHitachiAc424 {
   bool getPower(void);
   void setTemp(const uint8_t temp, bool setPrevious = true);
   uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   uint8_t* getRaw(void);

@@ -619,3 +619,34 @@ void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious = true) {
   temp = std::max(temp, kHitachiAc424MinTemp);
   remote_state[13] = temp << 2;
 }
+
+uint8_t IRHitachiAc424::getFan(void) {
+  return GETBITS8(remote_state[25], kHighNibble, kNibbleSize);
+}
+
+void IRHitachiAc424::setFan(const uint8_t speed) {
+  uint8_t newSpeed = std::max(speed, kHitachiAc424FanMin);
+  uint8_t fanMax = kHitachiAc424FanMax;
+
+  // Only 2 x low speeds in Dry mode or Auto
+  if (getMode() == kHitachiAcDry && speed == kHitachiAc424FanAuto) {
+    fanMax = kHitachiAc424FanAuto;
+  } else if (getMode() == kHitachiAcDry) {
+    fanMax = kHitachiAc424FanMaxDry;
+  } else if (getMode() == kHitachiAcFan && speed == kHitachiAc424FanAuto) {
+    // Fan Mode does not have auto. Set to safe low
+    newSpeed = kHitachiAc424FanMin;
+  }
+
+  newSpeed = std::min(newSpeed, fanMax);
+  setBits(&remote_state[25], kHighNibble, kNibbleSize, newSpeed);
+  remote_state[9] = 0x92;
+  remote_state[29] = 0x00;
+
+  // When fan is at min/max, additional bytes seem to be set
+  if (newSpeed == kHitachiAc424FanMin) remote_state[9] = 0x98;
+  if (newSpeed == kHitachiAc424FanMax) {
+    remote_state[9] = 0xA9;
+    remote_state[29] = 0x30;
+  }
+}
