@@ -133,6 +133,8 @@ class IRHitachiAc424 {
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc424StateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
 #ifndef UNIT_TEST
 
  private:
@@ -142,7 +144,7 @@ class IRHitachiAc424 {
 #endif
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAc424StateLength];
-  void setInvertedState(void);
+  void setInvertedStates(void);
   uint8_t _previoustemp;
 };
 

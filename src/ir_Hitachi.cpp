@@ -650,3 +650,26 @@ void IRHitachiAc424::setFan(const uint8_t speed) {
     remote_state[29] = 0x30;
   }
 }
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRHitachiAc424::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kHitachiAc424Cool;
+    case stdAc::opmode_t::kHeat: return kHitachiAc424Heat;
+    case stdAc::opmode_t::kDry:  return kHitachiAc424Dry;
+    case stdAc::opmode_t::kFan:  return kHitachiAc424Fan;
+    default:                     return kHitachiAc424Cool;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHitachiAc424::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:    return kHitachiAc424FanMin;
+    case stdAc::fanspeed_t::kLow:    return kHitachiAc424FanLow;
+    case stdAc::fanspeed_t::kMedium: return kHitachiAc424FanMedium;
+    case stdAc::fanspeed_t::kHigh:   return kHitachiAc424FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kHitachiAc424FanMax;
+    default:                         return kHitachiAc424FanAuto;
+  }
+}
