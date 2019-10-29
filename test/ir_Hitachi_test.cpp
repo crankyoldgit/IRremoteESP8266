@@ -1022,3 +1022,50 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(ac.getRaw()[9], 0x92);
   EXPECT_EQ(ac.getRaw()[29], 0x00);
 }
+
+TEST(TestIRHitachiAc424Class, HumanReadable) {
+  IRHitachiAc424 ac(0);
+
+  ac.setMode(kHitachiAc424Heat);
+  ac.setTemp(kHitachiAc424MaxTemp);
+  ac.on();
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(
+      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High)",
+      ac.toString());
+  ac.setMode(kHitachiAc424Cool);
+  ac.setTemp(kHitachiAc424MinTemp);
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Quiet)",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAcClass424, toCommon) {
+  IRHitachiAc424 ac(0);
+  ac.setPower(true);
+  ac.setMode(kHitachiAc424Cool);
+  ac.setTemp(20);
+  ac.setFan(kHitachiAc424FanMax);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::HITACHI_AC424, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  // Todo:
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
