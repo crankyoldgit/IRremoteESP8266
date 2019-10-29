@@ -39,8 +39,23 @@ const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
-const uint8_t  kHitachiAc424BytePower = 27;
-const uint8_t  kHitachiAc424PowerOffset = 4;
+// HitachiAc424
+const uint8_t kHitachiAc424Fan = 1;
+const uint8_t kHitachiAc424Cool = 3;
+const uint8_t kHitachiAc424Dry = 5;
+const uint8_t kHitachiAc424Heat = 6;
+const uint8_t kHitachiAc424MinTemp = 16;   // 16C
+const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
+const uint8_t kHitachiAc424FanMin = 1;
+const uint8_t kHitachiAc424FanLow = 2;
+const uint8_t kHitachiAc424FanMedium = 3;
+const uint8_t kHitachiAc424FanHigh = 4;
+const uint8_t kHitachiAc424FanAuto = 5;
+const uint8_t kHitachiAc424FanMax = 6;
+const uint8_t kHitachiAc424FanMaxDry = 2;
+const uint8_t kHitachiAc424ByteFanAndMode = 25;
+const uint8_t kHitachiAc424BytePower = 27;
+const uint8_t kHitachiAc424PowerOffset = 4;
 
 // Classes
 class IRHitachiAc {
