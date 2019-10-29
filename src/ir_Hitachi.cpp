@@ -673,3 +673,26 @@ uint8_t IRHitachiAc424::convertFan(const stdAc::fanspeed_t speed) {
     default:                         return kHitachiAc424FanAuto;
   }
 }
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRHitachiAc424::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAc424Cool: return stdAc::opmode_t::kCool;
+    case kHitachiAc424Heat: return stdAc::opmode_t::kHeat;
+    case kHitachiAc424Dry:  return stdAc::opmode_t::kDry;
+    case kHitachiAc424Fan:  return stdAc::opmode_t::kFan;
+    default:                return stdAc::opmode_t::kCool;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRHitachiAc424::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kHitachiAc424FanMax:    return stdAc::fanspeed_t::kMax;
+    case kHitachiAc424FanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kHitachiAc424FanMedium: return stdAc::fanspeed_t::kMedium;
+    case kHitachiAc424FanLow:    return stdAc::fanspeed_t::kLow;
+    case kHitachiAc424FanMin:    return stdAc::fanspeed_t::kMin;
+    default:                     return stdAc::fanspeed_t::kAuto;
+  }
+}

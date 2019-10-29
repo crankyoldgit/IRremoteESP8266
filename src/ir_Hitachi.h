@@ -135,6 +135,8 @@ class IRHitachiAc424 {
               const uint16_t length = kHitachiAc424StateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
 #ifndef UNIT_TEST
 
  private:
