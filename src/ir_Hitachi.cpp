@@ -44,6 +44,7 @@ using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::setBit;
+using irutils::setBits;
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
 // Send a Hitachi A/C message.
@@ -587,3 +588,34 @@ void IRHitachiAc424::setPower(const bool on) {
 void IRHitachiAc424::on(void) { setPower(true); }
 
 void IRHitachiAc424::off(void) { setPower(false); }
+
+uint8_t IRHitachiAc424::getMode(void) {
+  return GETBITS8(remote_state[25], kLowNibble, kNibbleSize);
+}
+
+void IRHitachiAc424::setMode(const uint8_t mode) {
+  uint8_t newMode = mode;
+  switch (mode) {
+    // Fan mode sets a special temp.
+    case kHitachiAc424Fan: setTemp(27, false); break;
+    case kHitachiAc424Heat:
+    case kHitachiAc424Cool:
+    case kHitachiAc424Dry: break;
+    default: newMode = kHitachiAc424Cool;
+  }
+  setBits(&remote_state[25], kLowNibble, kNibbleSize, newMode);
+  if (newMode != kHitachiAc424Fan) setTemp(_previoustemp);
+  setFan(getFan());  // Reset the fan speed after the mode change.
+}
+
+uint8_t IRHitachiAc424::getTemp(void) {
+  return remote_state[13] >> 2;
+}
+
+void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious = true) {
+  uint8_t temp;
+  if (setPrevious) _previoustemp = celsius;
+  temp = std::min(celsius, kHitachiAc424MaxTemp);
+  temp = std::max(temp, kHitachiAc424MinTemp);
+  remote_state[13] = temp << 2;
+}

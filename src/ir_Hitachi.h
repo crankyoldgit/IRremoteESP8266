@@ -109,6 +109,10 @@ class IRHitachiAc424 {
   void off(void);
   void setPower(const bool on);
   bool getPower(void);
+  void setTemp(const uint8_t temp, bool setPrevious = true);
+  uint8_t getTemp(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc424StateLength);
