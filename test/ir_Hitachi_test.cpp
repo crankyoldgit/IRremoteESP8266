@@ -1009,4 +1009,16 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
   ac.setFan(kHitachiAc424FanAuto);
   EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+
+  // Check additional bytes set by min & max fan
+  ac.setMode(kHitachiAc424Cool);
+  ac.setFan(kHitachiAc424FanMax);
+  EXPECT_EQ(ac.getRaw()[9], 0xA9);
+  EXPECT_EQ(ac.getRaw()[29], 0x30);
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(ac.getRaw()[9], 0x98);
+  EXPECT_EQ(ac.getRaw()[29], 0x00);
+  ac.setFan(kHitachiAc424FanLow);
+  EXPECT_EQ(ac.getRaw()[9], 0x92);
+  EXPECT_EQ(ac.getRaw()[29], 0x00);
 }
