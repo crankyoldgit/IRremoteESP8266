@@ -724,3 +724,19 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
   result.clock = -1;
   return result;
 }
+
+// Convert the internal state into a human readable string.
+String IRHitachiAc424::toString(void) {
+  String result = "";
+  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(getMode(), 0, kHitachiAc424Cool,
+                            kHitachiAc424Heat, kHitachiAc424Dry,
+                            kHitachiAc424Fan);
+  result += addTempToString(getTemp());
+  // Todo: Does not handle max fan, overload method?
+  result += addFanToString(getFan(), kHitachiAc424FanHigh, kHitachiAc424FanLow,
+                           kHitachiAc424FanAuto, kHitachiAc424FanMin,
+                           kHitachiAc424FanMedium);
+  return result;
+}
