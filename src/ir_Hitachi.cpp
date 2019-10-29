@@ -528,7 +528,7 @@ IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
 
 // Reset to auto fan, cooling, 23° Celcius
 void IRHitachiAc424::stateReset(void) {
-  for (uint8_t i = 15; i < kHitachiAc424StateLength; i++)
+  for (uint8_t i = 0; i < kHitachiAc424StateLength; i++)
     remote_state[i] = 0x00;
 
   remote_state[0]  = 0x01;
