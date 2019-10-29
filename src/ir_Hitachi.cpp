@@ -696,3 +696,31 @@ stdAc::fanspeed_t IRHitachiAc424::toCommonFanSpeed(const uint8_t speed) {
     default:                     return stdAc::fanspeed_t::kAuto;
   }
 }
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRHitachiAc424::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::HITACHI_AC424;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+
+  //  todo:
+  result.swingv = stdAc::swingv_t::kOff;
+
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
