@@ -932,3 +932,81 @@ TEST(TestDecodeHitachiAc424, SyntheticExample) {
   ASSERT_EQ(kHitachiAc424Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
 }
+
+// Tests for IRHitachiAc424 class.
+TEST(TestIRHitachiAc424Class, SetAndGetPower) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetTemp) {
+  IRHitachiAc424 ac(0);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kHitachiAc424MinTemp);
+  EXPECT_EQ(kHitachiAc424MinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MinTemp - 1);
+  EXPECT_EQ(kHitachiAc424MinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MaxTemp);
+  EXPECT_EQ(kHitachiAc424MaxTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MaxTemp + 1);
+  EXPECT_EQ(kHitachiAc424MaxTemp, ac.getTemp());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetMode) {
+  IRHitachiAc424 ac(0);
+  ac.setMode(kHitachiAc424Cool);
+  ac.setFan(kHitachiAc424FanAuto);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAc424Cool, ac.getMode());
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+  ac.setMode(kHitachiAc424Fan);
+  EXPECT_EQ(kHitachiAc424Fan, ac.getMode());
+  EXPECT_EQ(27, ac.getTemp());
+  EXPECT_NE(kHitachiAc424FanAuto, ac.getFan());
+  ac.setMode(kHitachiAc424Heat);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAc424Heat, ac.getMode());
+  ac.setMode(kHitachiAc424Dry);
+  EXPECT_EQ(kHitachiAc424Dry, ac.getMode());
+  EXPECT_NE(kHitachiAc424FanAuto, ac.getFan());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetFan) {
+  IRHitachiAc424 ac(0);
+  ac.setMode(kHitachiAc424Cool);  // All fan options are available in this mode.
+  ac.setFan(kHitachiAc424FanAuto);
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc424FanLow);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(kHitachiAc424FanHigh, ac.getFan());
+  ac.setFan(kHitachiAc424FanMax + 1);
+  EXPECT_EQ(kHitachiAc424FanMax, ac.getFan());
+  ac.setFan(kHitachiAc424FanMin - 1);
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+
+  ac.setFan(kHitachiAc424FanAuto)
+  ac.setMode(kHitachiAc424Fan);  // No auto-fan in Fan mode.
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+  ac.setFan(kHitachiAc424FanMax);
+  EXPECT_EQ(kHitachiAc424FanMax, ac.getFan());
+
+  // Only min, low and auto fan settings in Dry mode.
+  ac.setMode(kHitachiAc424Dry);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+  ac.setFan(kHitachiAc424FanAuto);
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+}
