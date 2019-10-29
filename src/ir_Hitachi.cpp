@@ -550,10 +550,10 @@ void IRHitachiAc424::stateReset(void) {
   remote_state[47] = 0xFF;
   remote_state[49] = 0xFF;
   remote_state[51] = 0xFF;
-  // setInvertedState();
+  setInvertedStates();
 }
 
-void IRHitachiAc424::setInvertedState(void) {
+void IRHitachiAc424::setInvertedStates(void) {
   for (uint8_t i = 3; i < kHitachiAc424StateLength; i+=2)
     remote_state[i+1] = ~remote_state[i];
 }
@@ -561,7 +561,7 @@ void IRHitachiAc424::setInvertedState(void) {
 void IRHitachiAc424::begin(void) { _irsend.begin(); }
 
 uint8_t *IRHitachiAc424::getRaw(void) {
-  setInvertedState();
+  setInvertedStates();
   return remote_state;
 }
 
