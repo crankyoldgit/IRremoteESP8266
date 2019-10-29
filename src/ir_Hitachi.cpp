@@ -612,7 +612,7 @@ uint8_t IRHitachiAc424::getTemp(void) {
   return remote_state[13] >> 2;
 }
 
-void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious = true) {
+void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious) {
   uint8_t temp;
   if (setPrevious) _previoustemp = celsius;
   temp = std::min(celsius, kHitachiAc424MaxTemp);
