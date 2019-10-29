@@ -534,15 +534,10 @@ void IRHitachiAc424::stateReset(void) {
 
   remote_state[0]  = 0x01;
   remote_state[1]  = 0x10;
-  // The following bytes will also have a calculated bit inverted pair
   remote_state[3]  = 0x40;
   remote_state[5]  = 0xFF;
   remote_state[7]  = 0xCC;
-  remote_state[9]  = 0x92;
   remote_state[11] = 0x13;  // Button Action
-  remote_state[13] = 0x5C;  // 23C
-  remote_state[25] = 0x53;  // Fan speed, mode
-  remote_state[27] = 0xF1;  // Power
   remote_state[33] = 0x80;
   remote_state[35] = 0x03;
   remote_state[37] = 0x01;
@@ -551,6 +546,11 @@ void IRHitachiAc424::stateReset(void) {
   remote_state[47] = 0xFF;
   remote_state[49] = 0xFF;
   remote_state[51] = 0xFF;
+
+  setTemp(23);
+  setPower(true);
+  setMode(kHitachiAc424Cool);
+  setFan(kHitachiAc424FanAuto);
   setInvertedStates();
 }
 
