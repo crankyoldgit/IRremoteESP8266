@@ -629,11 +629,11 @@ void IRHitachiAc424::setFan(const uint8_t speed) {
   uint8_t fanMax = kHitachiAc424FanMax;
 
   // Only 2 x low speeds in Dry mode or Auto
-  if (getMode() == kHitachiAcDry && speed == kHitachiAc424FanAuto) {
+  if (getMode() == kHitachiAc424Dry && speed == kHitachiAc424FanAuto) {
     fanMax = kHitachiAc424FanAuto;
-  } else if (getMode() == kHitachiAcDry) {
+  } else if (getMode() == kHitachiAc424Dry) {
     fanMax = kHitachiAc424FanMaxDry;
-  } else if (getMode() == kHitachiAcFan && speed == kHitachiAc424FanAuto) {
+  } else if (getMode() == kHitachiAc424Fan && speed == kHitachiAc424FanAuto) {
     // Fan Mode does not have auto. Set to safe low
     newSpeed = kHitachiAc424FanMin;
   }

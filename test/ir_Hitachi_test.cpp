@@ -994,7 +994,7 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   ac.setFan(kHitachiAc424FanMin - 1);
   EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
 
-  ac.setFan(kHitachiAc424FanAuto)
+  ac.setFan(kHitachiAc424FanAuto);
   ac.setMode(kHitachiAc424Fan);  // No auto-fan in Fan mode.
   EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
   ac.setFan(kHitachiAc424FanMax);
