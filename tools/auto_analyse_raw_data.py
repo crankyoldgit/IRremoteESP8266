@@ -14,6 +14,7 @@ class RawIRMessage():
   # pylint: disable=too-many-instance-attributes
 
   def __init__(self, margin, timings, output=sys.stdout, verbose=True):
+    self.ldr_mark = None
     self.hdr_mark = None
     self.hdr_space = None
     self.bit_mark = None
@@ -208,14 +209,18 @@ class RawIRMessage():
                         "%s\n"
                         "Potential Space Candidates:\n"
                         "%s\n" % (str(self.marks), str(self.spaces)))
-    # Largest mark is likely the kHdrMark
-    self.hdr_mark = self.marks[0]
     # The bit mark is likely to be the smallest mark.
     self.bit_mark = self.marks[-1]
+    if len(self.marks) > 2:  # Possible leader mark?
+      self.ldr_mark = self.marks[0]
+      self.hdr_mark = self.marks[1]
+    else:
+      # Largest mark is likely the kHdrMark
+      self.hdr_mark = self.marks[0]
 
     if self.is_space_encoded() and len(self.spaces) >= 3:
       if self.verbose and len(self.marks) > 2:
-        self.output.write("DANGER: Unexpected and unused mark timings!")
+        self.output.write("DANGER: Unusual number of mark timings!")
       # We should have 3 space candidates at least.
       # They should be: zero_space (smallest), one_space, & hdr_space (largest)
       spaces = list(self.spaces)
@@ -228,6 +233,12 @@ class RawIRMessage():
   def is_space_encoded(self):
     """Make an educated guess if the message is space encoded."""
     return len(self.spaces) > len(self.marks)
+
+  def is_ldr_mark(self, usec):
+    """Is usec the leader mark?"""
+    if self.ldr_mark is None:
+      return False
+    return self._usec_compare(usec, self.ldr_mark)
 
   def is_hdr_mark(self, usec):
     """Is usec the header mark?"""
@@ -290,6 +301,9 @@ def convert_rawdata(data_str):
 
 def dump_constants(message, defines, name="", output=sys.stdout):
   """Dump the key constants and generate the C++ #defines."""
+  ldr_mark = None
+  if message.ldr_mark is not None:
+    ldr_mark = avg_list(message.mark_buckets[message.ldr_mark])
   hdr_mark = avg_list(message.mark_buckets[message.hdr_mark])
   bit_mark = avg_list(message.mark_buckets[message.bit_mark])
   hdr_space = avg_list(message.space_buckets[message.hdr_space])
@@ -309,6 +323,9 @@ def dump_constants(message, defines, name="", output=sys.stdout):
   defines.append("const uint16_t k%sHdrSpace = %d;" % (name, hdr_space))
   defines.append("const uint16_t k%sOneSpace = %d;" % (name, one_space))
   defines.append("const uint16_t k%sZeroSpace = %d;" % (name, zero_space))
+  if ldr_mark:
+    output.write("k%sLdrMark   = %d\n" % (name, ldr_mark))
+    defines.append("const uint16_t k%sLdrMark = %d;" % (name, ldr_mark))
 
   avg_gaps = [avg_list(message.space_buckets[x]) for x in message.gaps]
   if len(message.gaps) == 1:
@@ -420,27 +437,40 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  uint16_t pos = 0;",
       "  uint16_t used = 0;"])
 
+  # states are:
+  #  HM:  Header/Leader mark
+  #  HS:  Header space
+  #  BM:  Bit mark
+  #  BS:  Bit space
+  #  GS:  Gap space
+  #  UNK: Unknown state.
   for usec in message.timings:
-    # Handle header marks.
-    if (message.is_hdr_mark(usec) and count % 2 and
-        not message.is_bit_mark(usec)):
+    # Handle header/leader marks.
+    if ((message.is_hdr_mark(usec) or message.is_ldr_mark(usec)) and
+        count % 2 and not message.is_bit_mark(usec)):
       state = "HM"
+      if message.is_hdr_mark(usec):
+        mark_type = "H"  # Header
+      else:
+        mark_type = "L"  # Leader
       if binary_value:
         message.display_binary(binary_value)
         code["send"].extend(message.add_data_code(binary_value, name, False))
         code["recv"].extend(message.add_data_decode_code(binary_value, name,
                                                          False))
         message.section_count = message.section_count + 1
-        code_info["lastmark"] = "k%sHdrMark" % name
+        code_info["lastmark"] = "k%s%sdrMark" % (name, mark_type)
         total_bits = total_bits + binary_value
-      code_info["firstmark"] = "k%sHdrMark" % name
+      code_info["firstmark"] = "k%s%sdrMark" % (name, mark_type)
       binary_value = add_bit(binary_value, "reset")
-      output.write("k%sHdrMark+" % name)
-      code["send"].extend(["    // Header", "    mark(k%sHdrMark);" % name])
+      output.write("k%s%sdrMark+" % (name, mark_type))
+      code["send"].extend(["    // %seader" % mark_type,
+                           "    mark(k%s%sdrMark);" % (name, mark_type)])
       code["recv"].extend([
           "",
-          "  // Header",
-          "  if (!matchMark(results->rawbuf[offset++], k%sHdrMark))" % name,
+          "  // %seader" % mark_type,
+          "  if (!matchMark(results->rawbuf[offset++], k%s%sdrMark))" % (
+              name, mark_type),
           "    return false;"])
 
     # Handle header spaces.
@@ -473,15 +503,18 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
           "  if (!matchSpace(results->rawbuf[offset++], k%sHdrSpace))" % name,
           "    return false;"])
       code_info["firstspace"] = "k%sHdrSpace" % name
+    # Handle bit marks.
     elif message.is_bit_mark(usec) and count % 2:
       if state not in ("HS", "BS"):
         output.write("k%sBitMark(UNEXPECTED)" % name)
       state = "BM"
+    # Handle "zero" spaces
     elif message.is_zero_space(usec):
       if state != "BM":
         output.write("k%sZeroSpace(UNEXPECTED)" % name)
       state = "BS"
       binary_value = binary64_value = add_bit(binary_value, 0, output)
+    # Handle "one" spaces
     elif message.is_one_space(usec):
       if state != "BM":
         output.write("k%sOneSpace(UNEXPECTED)" % name)
@@ -490,7 +523,6 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
     elif message.is_gap(usec):
       if state != "BM":
         output.write("UNEXPECTED->")
-      state = "GS"
       output.write("GAP(%d)" % usec)
       code_info["lastspace"] = "k%sSpaceGap" % name
       if binary64_value:
@@ -506,18 +538,21 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
         code["recv"].extend(message.add_data_decode_code(binary_value, name))
         message.section_count = message.section_count + 1
       else:
-        code["send"].extend(["    // Gap", "    mark(k%sBitMark);" % name])
-        code["recv"].extend([
-            "",
-            "  // Gap",
-            "  if (!matchMark(results->rawbuf[offset++], k%sBitMark))" % name,
-            "    return false;"])
+        code["recv"].extend(["",
+                             "  // Gap"])
+        code["send"].extend(["    // Gap"])
+        if state == "BM":
+          code["send"].extend(["    mark(k%sBitMark);" % name])
+          code["recv"].extend([
+              "  if (!matchMark(results->rawbuf[offset++], k%sBitMark))" % name,
+              "    return false;"])
       code["send"].append("    space(k%sSpaceGap);" % name)
       code["recv"].extend([
           "  if (!matchSpace(results->rawbuf[offset++], k%sSpaceGap))" % name,
           "    return false;"])
       total_bits = total_bits + binary_value
       binary_value = binary64_value = add_bit(binary_value, "reset")
+      state = "GS"
     else:
       output.write("UNKNOWN(%d)" % usec)
       state = "UNK"
