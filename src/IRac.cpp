@@ -143,6 +143,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_HITACHI_AC
     case decode_type_t::HITACHI_AC:
 #endif
+#if SEND_HITACHI_AC424
+    case decode_type_t::HITACHI_AC424:
+#endif
 #if SEND_KELVINATOR
     case decode_type_t::KELVINATOR:
 #endif
@@ -663,6 +666,29 @@ void IRac::hitachi(IRHitachiAc *ac,
   ac->send();
 }
 #endif  // SEND_HITACHI_AC
+
+#if SEND_HITACHI_AC424
+void IRac::hitachi424(IRHitachiAc424 *ac,
+                      const bool on, const stdAc::opmode_t mode,
+                      const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // TODO(jamsinclair): Add Swing(V) support.
+  // No Swing(H) setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_HITACHI_AC424
 
 #if SEND_KELVINATOR
 void IRac::kelvinator(IRKelvinatorAC *ac,
@@ -1383,6 +1409,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HITACHI_AC
+#if SEND_HITACHI_AC424
+    case HITACHI_AC424:
+    {
+      IRHitachiAc424 ac(_pin, _inverted, _modulation);
+      hitachi424(&ac, on, send.mode, degC, send.fanspeed);
+      break;
+    }
+#endif  // SEND_HITACHI_AC424
 #if SEND_KELVINATOR
     case KELVINATOR:
     {
@@ -2057,6 +2091,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_HITACHI_AC
+#if DECODE_HITACHI_AC424
+      case decode_type_t::HITACHI_AC424: {
+        IRHitachiAc424 ac(0);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HITACHI_AC424
 #if DECODE_WHIRLPOOL_AC
       case decode_type_t::WHIRLPOOL_AC: {
         IRWhirlpoolAc ac(0);
@@ -2223,6 +2264,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+#if DECODE_HITACHI_AC424
+      case decode_type_t::HITACHI_AC424: {
+        IRHitachiAc424 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC424
 #if DECODE_KELVINATOR
       case decode_type_t::KELVINATOR: {
         IRKelvinatorAC ac(kGpioUnused);

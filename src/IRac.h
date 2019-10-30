@@ -216,6 +216,11 @@ void electra(IRElectraAc *ac,
                const float degrees, const stdAc::fanspeed_t fan,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh);
 #endif  // SEND_HITACHI_AC
+#if SEND_HITACHI_AC424
+  void hitachi424(IRHitachiAc424 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan);
+#endif  // SEND_HITACHI_AC424
 #if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,
                   const bool on, const stdAc::opmode_t mode,

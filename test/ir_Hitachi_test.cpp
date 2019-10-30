@@ -819,7 +819,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HITACHI_AC424", typeToString(decode_type_t::HITACHI_AC424));
   ASSERT_EQ(decode_type_t::HITACHI_AC424, strToDecodeType("HITACHI_AC424"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC424));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC424));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC424));
 }
 
 // Decode a 'real' HitachiAc424 message.
@@ -909,6 +909,11 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   EXPECT_EQ(HITACHI_AC424, irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAc424Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc424Bits);
+  IRHitachiAc ac(0);
+  ac.setRaw(irsend.capture.state);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto)",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestDecodeHitachiAc424, SyntheticExample) {
@@ -1059,7 +1064,7 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.setTemp(kHitachiAc424MinTemp);
   ac.setFan(kHitachiAc424FanMin);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Quiet)",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min)",
       ac.toString());
 }
 
@@ -1077,7 +1082,7 @@ TEST(TestIRHitachiAcClass424, toCommon) {
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
-  // Todo:
+  // TODO(jamsinclair): Add support.
   ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
   // Unsupported.
   ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
