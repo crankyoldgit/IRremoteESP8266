@@ -95,7 +95,7 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_AMCOR
     case decode_type_t::AMCOR:
 #endif
-#if SEND_AMCOR
+#if SEND_ARGO
     case decode_type_t::ARGO:
 #endif
 #if SEND_COOLIX
@@ -2135,6 +2135,22 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN128
+      case decode_type_t::DAIKIN128: {
+        IRDaikin128 ac(0);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN128
+#if DECODE_DAIKIN152
+      case decode_type_t::DAIKIN152: {
+        IRDaikin152 ac(0);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN152
 #if DECODE_DAIKIN160
       case decode_type_t::DAIKIN160: {
         IRDaikin160 ac(kGpioUnused);
