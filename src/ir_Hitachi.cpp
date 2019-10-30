@@ -551,12 +551,11 @@ void IRHitachiAc424::stateReset(void) {
   setPower(true);
   setMode(kHitachiAc424Cool);
   setFan(kHitachiAc424FanAuto);
-  setInvertedStates();
 }
 
 void IRHitachiAc424::setInvertedStates(void) {
-  for (uint8_t i = 3; i < kHitachiAc424StateLength; i+=2)
-    remote_state[i+1] = ~remote_state[i];
+  for (uint8_t i = 3; i < kHitachiAc424StateLength - 1; i += 2)
+    remote_state[i + 1] = ~remote_state[i];
 }
 
 void IRHitachiAc424::begin(void) { _irsend.begin(); }
@@ -577,12 +576,12 @@ void IRHitachiAc424::send(const uint16_t repeat) {
 #endif  // SEND_HITACHI_AC424
 
 bool IRHitachiAc424::getPower(void) {
-  return GETBIT8(remote_state[27],
-    kHitachiAc424PowerOffset);
+  return GETBIT8(remote_state[kHitachiAc424PowerByte],
+                 kHitachiAc424PowerOffset);
 }
 
 void IRHitachiAc424::setPower(const bool on) {
-  setBit(&remote_state[27], kHitachiAc424PowerOffset, on);
+  setBit(&remote_state[kHitachiAc424PowerByte], kHitachiAc424PowerOffset, on);
 }
 
 void IRHitachiAc424::on(void) { setPower(true); }
@@ -590,26 +589,28 @@ void IRHitachiAc424::on(void) { setPower(true); }
 void IRHitachiAc424::off(void) { setPower(false); }
 
 uint8_t IRHitachiAc424::getMode(void) {
-  return GETBITS8(remote_state[25], kLowNibble, kNibbleSize);
+  return GETBITS8(remote_state[kHitachiAc424ModeByte], kLowNibble, kNibbleSize);
 }
 
 void IRHitachiAc424::setMode(const uint8_t mode) {
   uint8_t newMode = mode;
   switch (mode) {
     // Fan mode sets a special temp.
-    case kHitachiAc424Fan: setTemp(27, false); break;
+    case kHitachiAc424Fan: setTemp(kHitachiAc424FanTemp, false); break;
     case kHitachiAc424Heat:
     case kHitachiAc424Cool:
     case kHitachiAc424Dry: break;
     default: newMode = kHitachiAc424Cool;
   }
-  setBits(&remote_state[25], kLowNibble, kNibbleSize, newMode);
+  setBits(&remote_state[kHitachiAc424ModeByte], kLowNibble, kNibbleSize,
+          newMode);
   if (newMode != kHitachiAc424Fan) setTemp(_previoustemp);
   setFan(getFan());  // Reset the fan speed after the mode change.
 }
 
 uint8_t IRHitachiAc424::getTemp(void) {
-  return remote_state[13] >> 2;
+  return GETBITS8(remote_state[kHitachiAc424TempByte], kHitachiAc424TempOffset,
+                  kHitachiAc424TempSize);
 }
 
 void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious) {
@@ -617,11 +618,12 @@ void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious) {
   if (setPrevious) _previoustemp = celsius;
   temp = std::min(celsius, kHitachiAc424MaxTemp);
   temp = std::max(temp, kHitachiAc424MinTemp);
-  remote_state[13] = temp << 2;
+  setBits(&remote_state[kHitachiAc424TempByte], kHitachiAc424TempOffset,
+          kHitachiAc424TempSize, temp);
 }
 
 uint8_t IRHitachiAc424::getFan(void) {
-  return GETBITS8(remote_state[25], kHighNibble, kNibbleSize);
+  return GETBITS8(remote_state[kHitachiAc424FanByte], kHighNibble, kNibbleSize);
 }
 
 void IRHitachiAc424::setFan(const uint8_t speed) {
@@ -639,7 +641,8 @@ void IRHitachiAc424::setFan(const uint8_t speed) {
   }
 
   newSpeed = std::min(newSpeed, fanMax);
-  setBits(&remote_state[25], kHighNibble, kNibbleSize, newSpeed);
+  setBits(&remote_state[kHitachiAc424FanByte], kHighNibble, kNibbleSize,
+          newSpeed);
   remote_state[9] = 0x92;
   remote_state[29] = 0x00;
 
@@ -708,7 +711,7 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
 
-  //  todo:
+  // TODO(jamsinclair): Add support.
   result.swingv = stdAc::swingv_t::kOff;
 
   // Not supported.
@@ -728,15 +731,23 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRHitachiAc424::toString(void) {
   String result = "";
-  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(60);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), 0, kHitachiAc424Cool,
                             kHitachiAc424Heat, kHitachiAc424Dry,
                             kHitachiAc424Fan);
   result += addTempToString(getTemp());
-  // Todo: Does not handle max fan, overload method?
-  result += addFanToString(getFan(), kHitachiAc424FanHigh, kHitachiAc424FanLow,
-                           kHitachiAc424FanAuto, kHitachiAc424FanMin,
-                           kHitachiAc424FanMedium);
+  result += addIntToString(getFan(), kFanStr);
+  result += kSpaceLBraceStr;
+  switch (getFan()) {
+    case kHitachiAc424FanAuto:   result += kAutoStr; break;
+    case kHitachiAc424FanMax:    result += kMaxStr; break;
+    case kHitachiAc424FanHigh:   result += kHighStr; break;
+    case kHitachiAc424FanMedium: result += kMedStr; break;
+    case kHitachiAc424FanLow:    result += kLowStr; break;
+    case kHitachiAc424FanMin:    result += kMinStr; break;
+    default:                     result += kUnknownStr;
+  }
+  result += ')';
   return result;
 }

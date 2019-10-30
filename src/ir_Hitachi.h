@@ -39,13 +39,23 @@ const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
+
 // HitachiAc424
+// Byte[13]
+const uint8_t kHitachiAc424TempByte = 13;
+const uint8_t kHitachiAc424TempOffset = 2;
+const uint8_t kHitachiAc424TempSize = 6;
+const uint8_t kHitachiAc424MinTemp = 16;   // 16C
+const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
+const uint8_t kHitachiAc424FanTemp = 27;   // 27C
+
+// Byte[25]
+const uint8_t kHitachiAc424ModeByte = 25;
 const uint8_t kHitachiAc424Fan = 1;
 const uint8_t kHitachiAc424Cool = 3;
 const uint8_t kHitachiAc424Dry = 5;
 const uint8_t kHitachiAc424Heat = 6;
-const uint8_t kHitachiAc424MinTemp = 16;   // 16C
-const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
+const uint8_t kHitachiAc424FanByte = kHitachiAc424ModeByte;
 const uint8_t kHitachiAc424FanMin = 1;
 const uint8_t kHitachiAc424FanLow = 2;
 const uint8_t kHitachiAc424FanMedium = 3;
@@ -53,6 +63,8 @@ const uint8_t kHitachiAc424FanHigh = 4;
 const uint8_t kHitachiAc424FanAuto = 5;
 const uint8_t kHitachiAc424FanMax = 6;
 const uint8_t kHitachiAc424FanMaxDry = 2;
+// Byte[27]
+const uint8_t kHitachiAc424PowerByte = 27;
 const uint8_t kHitachiAc424PowerOffset = 4;
 
 // Classes

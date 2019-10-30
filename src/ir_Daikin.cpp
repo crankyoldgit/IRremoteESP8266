@@ -1373,7 +1373,6 @@ void IRDaikin216::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin216StateLength);
 }
 
-
 void IRDaikin216::on(void) { setPower(true); }
 
 void IRDaikin216::off(void) { setPower(false); }
