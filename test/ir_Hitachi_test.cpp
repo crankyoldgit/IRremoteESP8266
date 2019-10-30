@@ -932,3 +932,162 @@ TEST(TestDecodeHitachiAc424, SyntheticExample) {
   ASSERT_EQ(kHitachiAc424Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
 }
+
+// Tests for IRHitachiAc424 class.
+TEST(TestIRHitachiAc424Class, SetInvertedStates) {
+  IRHitachiAc424 ac(0);
+
+  uint8_t raw[kHitachiAc424StateLength] = {
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00};
+  uint8_t expected[kHitachiAc424StateLength] = {
+    0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+    0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+    0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+    0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+    0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+    0xFF, 0x00, 0xFF};
+
+  ac.setRaw(raw);
+  EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc424Bits);
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetPower) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetTemp) {
+  IRHitachiAc424 ac(0);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kHitachiAc424MinTemp);
+  EXPECT_EQ(kHitachiAc424MinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MinTemp - 1);
+  EXPECT_EQ(kHitachiAc424MinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MaxTemp);
+  EXPECT_EQ(kHitachiAc424MaxTemp, ac.getTemp());
+  ac.setTemp(kHitachiAc424MaxTemp + 1);
+  EXPECT_EQ(kHitachiAc424MaxTemp, ac.getTemp());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetMode) {
+  IRHitachiAc424 ac(0);
+  ac.setMode(kHitachiAc424Cool);
+  ac.setFan(kHitachiAc424FanAuto);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAc424Cool, ac.getMode());
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+  ac.setMode(kHitachiAc424Fan);
+  EXPECT_EQ(kHitachiAc424Fan, ac.getMode());
+  EXPECT_EQ(27, ac.getTemp());
+  EXPECT_NE(kHitachiAc424FanAuto, ac.getFan());
+  ac.setMode(kHitachiAc424Heat);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_EQ(kHitachiAc424Heat, ac.getMode());
+  ac.setMode(kHitachiAc424Dry);
+  EXPECT_EQ(kHitachiAc424Dry, ac.getMode());
+  EXPECT_NE(kHitachiAc424FanAuto, ac.getFan());
+}
+
+TEST(TestIRHitachiAc424Class, SetAndGetFan) {
+  IRHitachiAc424 ac(0);
+  ac.setMode(kHitachiAc424Cool);  // All fan options are available in this mode.
+  ac.setFan(kHitachiAc424FanAuto);
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc424FanLow);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(kHitachiAc424FanHigh, ac.getFan());
+  ac.setFan(kHitachiAc424FanMax + 1);
+  EXPECT_EQ(kHitachiAc424FanMax, ac.getFan());
+  ac.setFan(kHitachiAc424FanMin - 1);
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+
+  ac.setFan(kHitachiAc424FanAuto);
+  ac.setMode(kHitachiAc424Fan);  // No auto-fan in Fan mode.
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+  ac.setFan(kHitachiAc424FanMax);
+  EXPECT_EQ(kHitachiAc424FanMax, ac.getFan());
+
+  // Only min, low and auto fan settings in Dry mode.
+  ac.setMode(kHitachiAc424Dry);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(kHitachiAc424FanMin, ac.getFan());
+  ac.setFan(kHitachiAc424FanAuto);
+  EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
+
+  // Check additional bytes set by min & max fan
+  ac.setMode(kHitachiAc424Cool);
+  ac.setFan(kHitachiAc424FanMax);
+  EXPECT_EQ(ac.getRaw()[9], 0xA9);
+  EXPECT_EQ(ac.getRaw()[29], 0x30);
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(ac.getRaw()[9], 0x98);
+  EXPECT_EQ(ac.getRaw()[29], 0x00);
+  ac.setFan(kHitachiAc424FanLow);
+  EXPECT_EQ(ac.getRaw()[9], 0x92);
+  EXPECT_EQ(ac.getRaw()[29], 0x00);
+}
+
+TEST(TestIRHitachiAc424Class, HumanReadable) {
+  IRHitachiAc424 ac(0);
+
+  ac.setMode(kHitachiAc424Heat);
+  ac.setTemp(kHitachiAc424MaxTemp);
+  ac.on();
+  ac.setFan(kHitachiAc424FanHigh);
+  EXPECT_EQ(
+      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High)",
+      ac.toString());
+  ac.setMode(kHitachiAc424Cool);
+  ac.setTemp(kHitachiAc424MinTemp);
+  ac.setFan(kHitachiAc424FanMin);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Quiet)",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAcClass424, toCommon) {
+  IRHitachiAc424 ac(0);
+  ac.setPower(true);
+  ac.setMode(kHitachiAc424Cool);
+  ac.setTemp(20);
+  ac.setFan(kHitachiAc424FanMax);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::HITACHI_AC424, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  // Todo:
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

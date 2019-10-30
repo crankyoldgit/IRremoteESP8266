@@ -39,6 +39,21 @@ const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
+// HitachiAc424
+const uint8_t kHitachiAc424Fan = 1;
+const uint8_t kHitachiAc424Cool = 3;
+const uint8_t kHitachiAc424Dry = 5;
+const uint8_t kHitachiAc424Heat = 6;
+const uint8_t kHitachiAc424MinTemp = 16;   // 16C
+const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
+const uint8_t kHitachiAc424FanMin = 1;
+const uint8_t kHitachiAc424FanLow = 2;
+const uint8_t kHitachiAc424FanMedium = 3;
+const uint8_t kHitachiAc424FanHigh = 4;
+const uint8_t kHitachiAc424FanAuto = 5;
+const uint8_t kHitachiAc424FanMax = 6;
+const uint8_t kHitachiAc424FanMaxDry = 2;
+const uint8_t kHitachiAc424PowerOffset = 4;
 
 // Classes
 class IRHitachiAc {
@@ -89,6 +104,49 @@ class IRHitachiAc {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAcStateLength];
   void checksum(const uint16_t length = kHitachiAcStateLength);
+  uint8_t _previoustemp;
+};
+
+class IRHitachiAc424 {
+ public:
+  explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+  void stateReset(void);
+#if SEND_HITACHI_AC424
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_HITACHI_AC424
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp, bool setPrevious = true);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc424StateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // The state of the IR remote in IR code form.
+  uint8_t remote_state[kHitachiAc424StateLength];
+  void setInvertedStates(void);
   uint8_t _previoustemp;
 };
 
