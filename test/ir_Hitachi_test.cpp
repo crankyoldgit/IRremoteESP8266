@@ -969,8 +969,10 @@ TEST(TestIRHitachiAc424Class, SetAndGetPower) {
   EXPECT_FALSE(ac.getPower());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
 }
 
 TEST(TestIRHitachiAc424Class, SetAndGetTemp) {
@@ -1050,6 +1052,16 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(ac.getRaw()[29], 0x00);
 }
 
+
+TEST(TestIRHitachiAc424Class, SetAndGetButton) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  ac.setButton(kHitachiAc424ButtonTempUp);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonTempUp);
+  ac.setButton(kHitachiAc424ButtonVSwing);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonVSwing);
+}
 
 TEST(TestIRHitachiAc424Class, ToggleSwingVertical) {
   IRHitachiAc424 ac(0);
