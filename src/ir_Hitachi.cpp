@@ -537,7 +537,6 @@ void IRHitachiAc424::stateReset(void) {
   remote_state[3]  = 0x40;
   remote_state[5]  = 0xFF;
   remote_state[7]  = 0xCC;
-  remote_state[11] = 0x13;  // Button Action
   remote_state[33] = 0x80;
   remote_state[35] = 0x03;
   remote_state[37] = 0x01;
@@ -581,6 +580,7 @@ bool IRHitachiAc424::getPower(void) {
 }
 
 void IRHitachiAc424::setPower(const bool on) {
+  setButton(kHitachiAc424ButtonPower);
   setBit(&remote_state[kHitachiAc424PowerByte], kHitachiAc424PowerOffset, on);
 }
 
