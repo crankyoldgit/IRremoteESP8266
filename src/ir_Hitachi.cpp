@@ -726,10 +726,8 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
 
-  // TODO(jamsinclair): Add support.
-  result.swingv = stdAc::swingv_t::kOff;
-
   // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.turbo = false;
