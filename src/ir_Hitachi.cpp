@@ -654,6 +654,21 @@ void IRHitachiAc424::setFan(const uint8_t speed) {
   }
 }
 
+uint8_t IRHitachiAc424::getButton(void) {
+  return remote_state[kHitachiAc424ButtonByte];
+}
+
+// The remote sends the type of button pressed on send
+void IRHitachiAc424::setButton(const uint8_t type) {
+  remote_state[kHitachiAc424ButtonByte] = type;
+}
+
+// The remote does not keep state of the vertical swing.
+// A byte is sent indicating the swing button is pressed on the remote
+void IRHitachiAc424::toggleSwingVertical(void) {
+  setButton(kHitachiAc424ButtonVSwing);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHitachiAc424::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {

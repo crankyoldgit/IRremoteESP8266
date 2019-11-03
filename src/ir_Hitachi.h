@@ -147,6 +147,9 @@ class IRHitachiAc424 {
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
+  uint8_t getButton(void);
+  void setButton(const uint8_t type);
+  void toggleSwingVertical(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   uint8_t* getRaw(void);
