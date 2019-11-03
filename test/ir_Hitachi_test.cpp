@@ -1050,6 +1050,15 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(ac.getRaw()[29], 0x00);
 }
 
+
+TEST(TestIRHitachiAc424Class, ToggleSwingVertical) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  ac.toggleSwingVertical();
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonVSwing);
+}
+
 TEST(TestIRHitachiAc424Class, HumanReadable) {
   IRHitachiAc424 ac(0);
 
