@@ -135,14 +135,12 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
     // it isn`t special so might affect Temp|mode|Fan
     if (new_code == kCoolixCmdFan) {
       setMode(kCoolixFan);
-    } else {
-      // must be a command changing Temp|Mode|Fan
-      // it is safe to just copy to remote var
-      remote_state = new_code;
+      return;
     }
-  } else {
-    remote_state = new_code;
   }
+  // must be a command changing Temp|Mode|Fan
+  // it is safe to just copy to remote var
+  remote_state = new_code;
 }
 
 // Return true if the current state is a special state.
