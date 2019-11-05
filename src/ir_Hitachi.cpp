@@ -576,12 +576,12 @@ void IRHitachiAc424::send(const uint16_t repeat) {
 #endif  // SEND_HITACHI_AC424
 
 bool IRHitachiAc424::getPower(void) {
-  return GETBIT8(remote_state[kHitachiAc424PowerByte],
-                 kHitachiAc424PowerOffset);
+  return remote_state[kHitachiAc424PowerByte] == kHitachiAc424PowerOn;
 }
 
 void IRHitachiAc424::setPower(const bool on) {
-  setBit(&remote_state[kHitachiAc424PowerByte], kHitachiAc424PowerOffset, on);
+  remote_state[kHitachiAc424PowerByte] = on ? kHitachiAc424PowerOn
+    : kHitachiAc424PowerOff;
 }
 
 void IRHitachiAc424::on(void) { setPower(true); }
