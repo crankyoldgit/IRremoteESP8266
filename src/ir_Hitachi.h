@@ -43,9 +43,7 @@ const uint8_t kHitachiAcSwingOffset = 7;
 // HitachiAc424
 // Byte[11]
 const uint8_t kHitachiAc424ButtonByte = 11;
-const uint8_t kHitachiAc424ButtonPower = 0x13;
-// TODO(jamsinclair): Get correct value for Mode Button. Currently same as Power
-// const uint8_t kHitachiAc424ButtonMode = 0x13;
+const uint8_t kHitachiAc424ButtonPowerMode = 0x13;
 const uint8_t kHitachiAc424ButtonFan = 0x42;
 const uint8_t kHitachiAc424ButtonTempDown = 0x43;
 const uint8_t kHitachiAc424ButtonTempUp = 0x44;

@@ -579,7 +579,7 @@ bool IRHitachiAc424::getPower(void) {
 }
 
 void IRHitachiAc424::setPower(const bool on) {
-  setButton(kHitachiAc424ButtonPower);
+  setButton(kHitachiAc424ButtonPowerMode);
   remote_state[kHitachiAc424PowerByte] = on ? kHitachiAc424PowerOn
     : kHitachiAc424PowerOff;
 }
@@ -678,7 +678,7 @@ void IRHitachiAc424::setSwingVToggle(const bool on) {
     button = kHitachiAc424ButtonSwingV;  // Set the button to SwingV.
   else if (button == kHitachiAc424ButtonSwingV)  // Asked to unset it
     // It was set previous, so use Power as a default
-    button = kHitachiAc424ButtonPower;
+    button = kHitachiAc424ButtonPowerMode;
   setButton(button);
 }
 
@@ -784,9 +784,9 @@ String IRHitachiAc424::toString(void) {
   result += addIntToString(getButton(), kButtonStr);
   result += kSpaceLBraceStr;
   switch (getButton()) {
-    case kHitachiAc424ButtonPower:    result += kPowerStr; break;
-    // TODO(jamsinclair): Get correct value for Mode Button.
-    // case kHitachiAc424ButtonMode:     result += kModeStr; break;
+    case kHitachiAc424ButtonPowerMode:
+      result += kPowerStr + '/' + kModeStr;
+      break;
     case kHitachiAc424ButtonFan:      result += kFanStr; break;
     case kHitachiAc424ButtonSwingV:   result += kSwingVStr; break;
     case kHitachiAc424ButtonTempDown: result += kTempDownStr; break;
