@@ -1112,7 +1112,7 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
       ac.toString());
 }
 
-TEST(TestIRHitachiAcClass424, toCommon) {
+TEST(TestIRHitachiAc424Class, toCommon) {
   IRHitachiAc424 ac(0);
   ac.setPower(true);
   ac.setMode(kHitachiAc424Cool);

@@ -1,6 +1,7 @@
 // Copyright 2017-2018 David Conran
 
 #include "ir_Coolix.h"
+#include "IRac.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -745,4 +746,57 @@ TEST(TestCoolixACClass, Issue722) {
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s1680m560s560"
       // 564,1620,566,1618,562  // Raw data matches what is expected.
       "m560s1680m560s1680m560s105040", ac._irsend.outputStr());
+}
+
+TEST(TestCoolixACClass, Issue985) {
+  IRrecv irrecv(0);
+  IRCoolixAC ac(0);
+
+  // Test that if we ONLY turn the power off, it only sends a "power off" mesg.
+  // i.e. Code from: https://github.com/crankyoldgit/IRremoteESP8266/issues/985#issue-516210106
+  // First block in the first code included.
+  ac.setPower(false);
+  ac.send();
+
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kCoolixOff, ac._irsend.capture.value);
+  EXPECT_EQ("Power: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+  ac._irsend.reset();
+
+  // Turn the unit on, cool mode, and set the temp.
+  // Code from: https://github.com/crankyoldgit/IRremoteESP8266/issues/985#issue-516210106
+  // Second block in the first code included.
+  uint8_t aircon_temp = 20;  // Random value chosen.
+  ac.setPower(true);
+  ac.setMode(kCoolixCool);
+  ac.setTemp(aircon_temp);
+  ac.send();
+
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  EXPECT_NE(kCoolixOff, ac._irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Fan: 5 (Auto), Temp: 20C, Zone Follow: Off, "
+      "Sensor Temp: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+  ac._irsend.reset();
+
+  // Now repeat the first block again.
+  // i.e. Code from: https://github.com/crankyoldgit/IRremoteESP8266/issues/985#issue-516210106
+  // First block in the first code included.
+  ac.setPower(false);
+  ac.send();
+
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kCoolixOff, ac._irsend.capture.value);
+  EXPECT_EQ("Power: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
