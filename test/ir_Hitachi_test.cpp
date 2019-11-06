@@ -913,7 +913,7 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
-      "Swing(V) Toggle: Off, Button: 19 (Power)",
+      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
