@@ -645,6 +645,9 @@ void IRHitachiAc424::setFan(const uint8_t speed) {
   }
 
   newSpeed = std::min(newSpeed, fanMax);
+  // Handle the setting the button value if we are going to change the value.
+  if (newSpeed != getFan()) setButton(kHitachiAc424ButtonFan);
+  // Set the values
   setBits(&remote_state[kHitachiAc424FanByte], kHighNibble, kNibbleSize,
           newSpeed);
   remote_state[9] = 0x92;

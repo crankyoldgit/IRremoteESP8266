@@ -1017,6 +1017,7 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
   ac.setFan(kHitachiAc424FanLow);
   EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  EXPECT_EQ(kHitachiAc424ButtonFan, ac.getButton());
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(kHitachiAc424FanHigh, ac.getFan());
   ac.setFan(kHitachiAc424FanMax + 1);
@@ -1085,7 +1086,7 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(
       "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High), "
-      "Swing(V) Toggle: Off, Button: 19 (Power)",
+      "Swing(V) Toggle: Off, Button: 66 (Fan)",
       ac.toString());
   ac.setMode(kHitachiAc424Cool);
   ac.setFan(kHitachiAc424FanMin);
