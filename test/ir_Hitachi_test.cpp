@@ -970,10 +970,10 @@ TEST(TestIRHitachiAc424Class, SetAndGetPower) {
   EXPECT_FALSE(ac.getPower());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
 }
 
 TEST(TestIRHitachiAc424Class, SetAndGetTemp) {
@@ -1058,7 +1058,7 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
 TEST(TestIRHitachiAc424Class, SetAndGetButton) {
   IRHitachiAc424 ac(0);
   ac.on();
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
   ac.setButton(kHitachiAc424ButtonTempUp);
   EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonTempUp);
   ac.setButton(kHitachiAc424ButtonSwingV);
@@ -1068,13 +1068,13 @@ TEST(TestIRHitachiAc424Class, SetAndGetButton) {
 TEST(TestIRHitachiAc424Class, ToggleSwingVertical) {
   IRHitachiAc424 ac(0);
   ac.on();
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
   ac.setSwingVToggle(true);
   EXPECT_TRUE(ac.getSwingVToggle());
   EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonSwingV);
   ac.setSwingVToggle(false);
   EXPECT_FALSE(ac.getSwingVToggle());
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
 }
 
 TEST(TestIRHitachiAc424Class, HumanReadable) {
