@@ -615,11 +615,15 @@ uint8_t IRHitachiAc424::getTemp(void) {
 
 void IRHitachiAc424::setTemp(const uint8_t celsius, bool setPrevious) {
   uint8_t temp;
-  if (setPrevious) _previoustemp = celsius;
   temp = std::min(celsius, kHitachiAc424MaxTemp);
   temp = std::max(temp, kHitachiAc424MinTemp);
   setBits(&remote_state[kHitachiAc424TempByte], kHitachiAc424TempOffset,
           kHitachiAc424TempSize, temp);
+  if (_previoustemp > temp)
+    setButton(kHitachiAc424ButtonTempDown);
+  else if (_previoustemp < temp)
+    setButton(kHitachiAc424ButtonTempUp);
+  if (setPrevious) _previoustemp = temp;
 }
 
 uint8_t IRHitachiAc424::getFan(void) {
@@ -659,14 +663,24 @@ uint8_t IRHitachiAc424::getButton(void) {
 }
 
 // The remote sends the type of button pressed on send
-void IRHitachiAc424::setButton(const uint8_t type) {
-  remote_state[kHitachiAc424ButtonByte] = type;
+void IRHitachiAc424::setButton(const uint8_t button) {
+  remote_state[kHitachiAc424ButtonByte] = button;
 }
 
 // The remote does not keep state of the vertical swing.
 // A byte is sent indicating the swing button is pressed on the remote
-void IRHitachiAc424::toggleSwingVertical(void) {
-  setButton(kHitachiAc424ButtonVSwing);
+void IRHitachiAc424::setSwingVToggle(const bool on) {
+  uint8_t button = getButton();  // Get the current button value.
+  if (on)
+    button = kHitachiAc424ButtonSwingV;  // Set the button to SwingV.
+  else if (button == kHitachiAc424ButtonSwingV)  // Asked to unset it
+    // It was set previous, so use Power as a default
+    button = kHitachiAc424ButtonPower;
+  setButton(button);
+}
+
+bool IRHitachiAc424::getSwingVToggle(void) {
+  return getButton() == kHitachiAc424ButtonSwingV;
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -725,9 +739,9 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-
+  result.swingv = this->getSwingVToggle() ? stdAc::swingv_t::kAuto
+                                                 : stdAc::swingv_t::kOff;
   // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.turbo = false;
@@ -744,7 +758,7 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRHitachiAc424::toString(void) {
   String result = "";
-  result.reserve(60);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), 0, kHitachiAc424Cool,
                             kHitachiAc424Heat, kHitachiAc424Dry,
@@ -760,6 +774,21 @@ String IRHitachiAc424::toString(void) {
     case kHitachiAc424FanLow:    result += kLowStr; break;
     case kHitachiAc424FanMin:    result += kMinStr; break;
     default:                     result += kUnknownStr;
+  }
+  result += ')';
+  result += addBoolToString(getSwingVToggle(),
+                            kSwingVStr + ' ' + kToggleStr);
+  result += addIntToString(getButton(), kButtonStr);
+  result += kSpaceLBraceStr;
+  switch (getButton()) {
+    case kHitachiAc424ButtonPower:    result += kPowerStr; break;
+    // TODO(jamsinclair): Get correct value for Mode Button.
+    // case kHitachiAc424ButtonMode:     result += kModeStr; break;
+    case kHitachiAc424ButtonFan:      result += kFanStr; break;
+    case kHitachiAc424ButtonSwingV:   result += kSwingVStr; break;
+    case kHitachiAc424ButtonTempDown: result += kTempDownStr; break;
+    case kHitachiAc424ButtonTempUp:   result += kTempUpStr; break;
+    default: result += kUnknownStr;
   }
   result += ')';
   return result;

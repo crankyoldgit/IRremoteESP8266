@@ -912,7 +912,8 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto)",
+      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
+      "Swing(V) Toggle: Off, Button: 19 (Power)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -1059,16 +1060,20 @@ TEST(TestIRHitachiAc424Class, SetAndGetButton) {
   EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
   ac.setButton(kHitachiAc424ButtonTempUp);
   EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonTempUp);
-  ac.setButton(kHitachiAc424ButtonVSwing);
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonVSwing);
+  ac.setButton(kHitachiAc424ButtonSwingV);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonSwingV);
 }
 
 TEST(TestIRHitachiAc424Class, ToggleSwingVertical) {
   IRHitachiAc424 ac(0);
   ac.on();
   EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
-  ac.toggleSwingVertical();
-  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonVSwing);
+  ac.setSwingVToggle(true);
+  EXPECT_TRUE(ac.getSwingVToggle());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonSwingV);
+  ac.setSwingVToggle(false);
+  EXPECT_FALSE(ac.getSwingVToggle());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPower);
 }
 
 TEST(TestIRHitachiAc424Class, HumanReadable) {
@@ -1079,13 +1084,30 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.on();
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(
-      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High)",
+      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High), "
+      "Swing(V) Toggle: Off, Button: 19 (Power)",
       ac.toString());
   ac.setMode(kHitachiAc424Cool);
-  ac.setTemp(kHitachiAc424MinTemp);
   ac.setFan(kHitachiAc424FanMin);
+  ac.setTemp(kHitachiAc424MinTemp);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min)",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      ac.toString());
+  ac.setSwingVToggle(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: On, Button: 129 (Swing(V))",
+      ac.toString());
+  ac.setTemp(ac.getTemp() + 1);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 17C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 68 (Temp Up)",
+      ac.toString());
+  ac.setTemp(ac.getTemp() - 1);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
       ac.toString());
 }
 

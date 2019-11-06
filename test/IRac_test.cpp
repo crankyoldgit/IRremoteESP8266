@@ -572,14 +572,19 @@ TEST(TestIRac, Hitachi424) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max)";
+      "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max), "
+      "Swing(V) Toggle: Off, Button: 19 (Power)";
+  char expected_swingv[] =
+      "Power: On, Mode: 3 (Cool), Temp: 26C, Fan: 1 (Min), "
+      "Swing(V) Toggle: On, Button: 129 (Swing(V))";
 
   ac.begin();
   irac.hitachi424(&ac,
                   true,                         // Power
                   stdAc::opmode_t::kHeat,       // Mode
                   25,                           // Celsius
-                  stdAc::fanspeed_t::kMax);     // Fan speed
+                  stdAc::fanspeed_t::kMax,      // Fan speed
+                  stdAc::swingv_t::kOff);       // Swing(V)
 
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
@@ -587,6 +592,21 @@ TEST(TestIRac, Hitachi424) {
   ASSERT_EQ(HITACHI_AC424, ac._irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAc424Bits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+  ac._irsend.reset();
+  irac.hitachi424(&ac,
+                  true,                         // Power
+                  stdAc::opmode_t::kCool,       // Mode
+                  26,                           // Celsius
+                  stdAc::fanspeed_t::kMin,      // Fan speed
+                  stdAc::swingv_t::kAuto);      // Swing(V)
+
+  ASSERT_EQ(expected_swingv, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC424, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc424Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_swingv, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Kelvinator) {
