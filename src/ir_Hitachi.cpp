@@ -606,6 +606,7 @@ void IRHitachiAc424::setMode(const uint8_t mode) {
           newMode);
   if (newMode != kHitachiAc424Fan) setTemp(_previoustemp);
   setFan(getFan());  // Reset the fan speed after the mode change.
+  setButton(kHitachiAc424ButtonPowerMode);
 }
 
 uint8_t IRHitachiAc424::getTemp(void) {
