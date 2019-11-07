@@ -573,7 +573,7 @@ TEST(TestIRac, Hitachi424) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max), "
-      "Swing(V) Toggle: Off, Button: 19 (Power)";
+      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)";
   char expected_swingv[] =
       "Power: On, Mode: 3 (Cool), Temp: 26C, Fan: 1 (Min), "
       "Swing(V) Toggle: On, Button: 129 (Swing(V))";
