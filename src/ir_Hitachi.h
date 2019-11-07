@@ -41,6 +41,14 @@ const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
 
 // HitachiAc424
+// Byte[11]
+const uint8_t kHitachiAc424ButtonByte = 11;
+const uint8_t kHitachiAc424ButtonPowerMode = 0x13;
+const uint8_t kHitachiAc424ButtonFan = 0x42;
+const uint8_t kHitachiAc424ButtonTempDown = 0x43;
+const uint8_t kHitachiAc424ButtonTempUp = 0x44;
+const uint8_t kHitachiAc424ButtonSwingV = 0x81;
+
 // Byte[13]
 const uint8_t kHitachiAc424TempByte = 13;
 const uint8_t kHitachiAc424TempOffset = 2;
@@ -139,6 +147,10 @@ class IRHitachiAc424 {
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
+  uint8_t getButton(void);
+  void setButton(const uint8_t button);
+  void setSwingVToggle(const bool on);
+  bool getSwingVToggle(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   uint8_t* getRaw(void);

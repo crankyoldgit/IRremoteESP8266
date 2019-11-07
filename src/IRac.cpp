@@ -670,13 +670,15 @@ void IRac::hitachi(IRHitachiAc *ac,
 #if SEND_HITACHI_AC424
 void IRac::hitachi424(IRHitachiAc424 *ac,
                       const bool on, const stdAc::opmode_t mode,
-                      const float degrees, const stdAc::fanspeed_t fan) {
+                      const float degrees, const stdAc::fanspeed_t fan,
+                      const stdAc::swingv_t swingv) {
   ac->begin();
-  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // TODO(jamsinclair): Add Swing(V) support.
+  ac->setPower(on);
+  // SwingVToggle is special. Needs to be last method called.
+  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Swing(H) setting available.
   // No Quiet setting available.
   // No Turbo setting available.
@@ -1174,6 +1176,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.light = desired.light ^ prev->light;
         break;
       case decode_type_t::MIDEA:
+      case decode_type_t::HITACHI_AC424:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
           result.swingv = stdAc::swingv_t::kAuto;
@@ -1413,7 +1416,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HITACHI_AC424:
     {
       IRHitachiAc424 ac(_pin, _inverted, _modulation);
-      hitachi424(&ac, on, send.mode, degC, send.fanspeed);
+      hitachi424(&ac, on, send.mode, degC, send.fanspeed, send.swingv);
       break;
     }
 #endif  // SEND_HITACHI_AC424

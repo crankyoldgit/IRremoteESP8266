@@ -912,7 +912,8 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   IRHitachiAc ac(0);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto)",
+      "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
+      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -969,8 +970,10 @@ TEST(TestIRHitachiAc424Class, SetAndGetPower) {
   EXPECT_FALSE(ac.getPower());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
 }
 
 TEST(TestIRHitachiAc424Class, SetAndGetTemp) {
@@ -1014,6 +1017,7 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(kHitachiAc424FanAuto, ac.getFan());
   ac.setFan(kHitachiAc424FanLow);
   EXPECT_EQ(kHitachiAc424FanLow, ac.getFan());
+  EXPECT_EQ(kHitachiAc424ButtonFan, ac.getButton());
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(kHitachiAc424FanHigh, ac.getFan());
   ac.setFan(kHitachiAc424FanMax + 1);
@@ -1050,6 +1054,29 @@ TEST(TestIRHitachiAc424Class, SetAndGetFan) {
   EXPECT_EQ(ac.getRaw()[29], 0x00);
 }
 
+
+TEST(TestIRHitachiAc424Class, SetAndGetButton) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
+  ac.setButton(kHitachiAc424ButtonTempUp);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonTempUp);
+  ac.setButton(kHitachiAc424ButtonSwingV);
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonSwingV);
+}
+
+TEST(TestIRHitachiAc424Class, ToggleSwingVertical) {
+  IRHitachiAc424 ac(0);
+  ac.on();
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
+  ac.setSwingVToggle(true);
+  EXPECT_TRUE(ac.getSwingVToggle());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonSwingV);
+  ac.setSwingVToggle(false);
+  EXPECT_FALSE(ac.getSwingVToggle());
+  EXPECT_EQ(ac.getButton(), kHitachiAc424ButtonPowerMode);
+}
+
 TEST(TestIRHitachiAc424Class, HumanReadable) {
   IRHitachiAc424 ac(0);
 
@@ -1058,13 +1085,30 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.on();
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(
-      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High)",
+      "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High), "
+      "Swing(V) Toggle: Off, Button: 66 (Fan)",
       ac.toString());
   ac.setMode(kHitachiAc424Cool);
-  ac.setTemp(kHitachiAc424MinTemp);
   ac.setFan(kHitachiAc424FanMin);
+  ac.setTemp(kHitachiAc424MinTemp);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min)",
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      ac.toString());
+  ac.setSwingVToggle(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: On, Button: 129 (Swing(V))",
+      ac.toString());
+  ac.setTemp(ac.getTemp() + 1);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 17C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 68 (Temp Up)",
+      ac.toString());
+  ac.setTemp(ac.getTemp() - 1);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
+      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
       ac.toString());
 }
 
@@ -1082,9 +1126,8 @@ TEST(TestIRHitachiAc424Class, toCommon) {
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
-  // TODO(jamsinclair): Add support.
-  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
   // Unsupported.
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
   ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
