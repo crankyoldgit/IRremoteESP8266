@@ -632,26 +632,38 @@ String IRFujitsuAC::toString(void) {
           result += kSwingHStr;
           break;
         case kFujitsuAcSwingBoth:
-          result += kSwingVStr + '+' + kSwingHStr;
+          result += kSwingVStr;
+          result += '+';
+          result += kSwingHStr;
           break;
         default:
           result += kUnknownStr;
       }
       result += ')';
   }
-  result += kCommaSpaceStr + kCommandStr + kColonSpaceStr;
+  result += kCommaSpaceStr;
+  result += kCommandStr;
+  result += kColonSpaceStr;
   switch (this->getCmd()) {
     case kFujitsuAcCmdStepHoriz:
-      result += kStepStr + ' ' + kSwingHStr;
+      result += kStepStr;
+      result += ' ';
+      result += kSwingHStr;
       break;
     case kFujitsuAcCmdStepVert:
-      result += kStepStr + ' ' + kSwingVStr;
+      result += kStepStr;
+      result += ' ';
+      result += kSwingVStr;
       break;
     case kFujitsuAcCmdToggleSwingHoriz:
-      result += kToggleStr + ' ' + kSwingHStr;
+      result += kToggleStr;
+      result += ' ';
+      result += kSwingHStr;
       break;
     case kFujitsuAcCmdToggleSwingVert:
-      result += kToggleStr + ' ' + kSwingVStr;
+    result += kToggleStr;
+    result += ' ';
+    result += kSwingVStr;
       break;
     case kFujitsuAcCmdEcono:
       result += kEconoStr;
@@ -663,7 +675,7 @@ String IRFujitsuAC::toString(void) {
       result += kNAStr;
   }
   if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E)
-    result += addBoolToString(getOutsideQuiet(), kOutsideStr + ' ' + kQuietStr);
+    result += addBoolToString(getOutsideQuiet(), kOutsideQuietStr);
   return result;
 }
 

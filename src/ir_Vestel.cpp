@@ -469,7 +469,7 @@ String IRVestelAc::toString(void) {
   // Not a time command, it's a normal command.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kVestelAcAuto, kVestelAcCool,
-                            kVestelAcHeat,   kVestelAcDry, kVestelAcFan);
+                            kVestelAcHeat, kVestelAcDry, kVestelAcFan);
   result += addTempToString(getTemp());
   result += addIntToString(getFan(), kFanStr);
   result += kSpaceLBraceStr;
@@ -487,10 +487,14 @@ String IRVestelAc::toString(void) {
       result += kHighStr;
       break;
     case kVestelAcFanAutoCool:
-      result += kAutoStr + ' ' + kCoolStr;
+      result += kAutoStr;
+      result += ' ';
+      result += kCoolStr;
       break;
     case kVestelAcFanAutoHot:
-      result += kAutoStr + ' ' + kHeatStr;
+      result += kAutoStr;
+      result += ' ';
+      result += kHeatStr;
       break;
     default:
       result += kUnknownStr;

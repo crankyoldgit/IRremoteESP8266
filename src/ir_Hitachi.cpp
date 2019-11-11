@@ -780,13 +780,14 @@ String IRHitachiAc424::toString(void) {
     default:                     result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSwingVToggle(),
-                            kSwingVStr + ' ' + kToggleStr);
+  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
   result += addIntToString(getButton(), kButtonStr);
   result += kSpaceLBraceStr;
   switch (getButton()) {
     case kHitachiAc424ButtonPowerMode:
-      result += kPowerStr + '/' + kModeStr;
+      result += kPowerStr;
+      result += '/';
+      result += kModeStr;
       break;
     case kHitachiAc424ButtonFan:      result += kFanStr; break;
     case kHitachiAc424ButtonSwingV:   result += kSwingVStr; break;

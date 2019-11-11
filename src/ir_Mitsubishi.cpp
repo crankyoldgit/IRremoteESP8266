@@ -745,9 +745,16 @@ String IRMitsubishiAC::toString(void) {
   result += addIntToString(this->getVane(), kSwingVStr);
   result += kSpaceLBraceStr;
   switch (this->getVane()) {
-    case kMitsubishiAcVaneAuto:     result += kAutoStr; break;
-    case kMitsubishiAcVaneAutoMove: result += kAutoStr + ' ' + kMoveStr; break;
-    default:                        result += kUnknownStr;
+    case kMitsubishiAcVaneAuto:
+      result += kAutoStr;
+      break;
+    case kMitsubishiAcVaneAutoMove:
+      result += kAutoStr;
+      result += ' ';
+      result += kMoveStr;
+      break;
+    default:
+      result += kUnknownStr;
   }
   result += ')';
   result += addIntToString(this->getWideVane(), kSwingHStr);
@@ -760,7 +767,9 @@ String IRMitsubishiAC::toString(void) {
   result += addLabeledString(minsToString(getClock() * 10), kClockStr);
   result += addLabeledString(minsToString(getStartClock() * 10), kOnTimerStr);
   result += addLabeledString(minsToString(getStopClock() * 10), kOffTimerStr);
-  result += kCommaSpaceStr + kTimerStr + kColonSpaceStr;
+  result += kCommaSpaceStr;
+  result += kTimerStr;
+  result += kColonSpaceStr;
   switch (this->getTimer()) {
     case kMitsubishiAcNoTimer:
       result += '-';
@@ -772,7 +781,9 @@ String IRMitsubishiAC::toString(void) {
       result += kStopStr;
       break;
     case kMitsubishiAcStartStopTimer:
-      result += kStartStr + '+' + kStopStr;
+      result += kStartStr;
+      result += '+';
+      result += kStopStr;
       break;
     default:
       result += F("? (");

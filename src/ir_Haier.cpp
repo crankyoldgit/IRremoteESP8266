@@ -414,10 +414,14 @@ String IRHaierAC::toString(void) {
       result += kSleepStr;
       break;
     case kHaierAcCmdTimerSet:
-      result += kTimerStr + ' ' + kSetStr;
+      result += kTimerStr;
+      result += ' ';
+      result += kSetStr;
       break;
     case kHaierAcCmdTimerCancel:
-      result += kTimerStr + ' ' + kCancelStr;
+      result += kTimerStr;
+      result += ' ';
+      result += kCancelStr;
       break;
     case kHaierAcCmdHealth:
       result += kHealthStr;
