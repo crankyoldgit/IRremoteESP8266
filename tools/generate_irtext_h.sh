@@ -26,8 +26,8 @@ cat >${OUTPUT} << EOF
 EOF
 
 # Parse and output contents of INPUT file.
-egrep "^(const )?char" ${INPUT} | cut -f1 -d= |
-    sed 's/ PROGMEM//;s/ $/;/;s/^/extern /' | sort -u >> ${OUTPUT}
+sed 's/ PROGMEM//' ${INPUT} | egrep "^(const )?char" | cut -f1 -d= |
+    sed 's/ $/;/;s/^/extern /' | sort -u >> ${OUTPUT}
 
 # Footer
 cat >> ${OUTPUT} << EOF
