@@ -300,9 +300,9 @@ String IRGoodweatherAc::toString(void) {
   result += addFanToString(getFan(), kGoodweatherFanHigh, kGoodweatherFanLow,
                            kGoodweatherFanAuto, kGoodweatherFanAuto,
                            kGoodweatherFanMed);
-  result += addLabeledString(getTurbo() ? kToggleStr : F("-"), kTurboStr);
-  result += addLabeledString(getLight() ? kToggleStr : F("-"), kLightStr);
-  result += addLabeledString(getSleep() ? kToggleStr : F("-"), kSleepStr);
+  result += addLabeledString(getTurbo() ? kToggleStr : "-", kTurboStr);
+  result += addLabeledString(getLight() ? kToggleStr : "-", kLightStr);
+  result += addLabeledString(getSleep() ? kToggleStr : "-", kSleepStr);
   result += addIntToString(getSwing(), kSwingStr);
   result += kSpaceLBraceStr;
   switch (this->getSwing()) {

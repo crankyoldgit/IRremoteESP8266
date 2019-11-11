@@ -91,7 +91,7 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 // Returns:
 //  A decode_type_t enum.
 decode_type_t strToDecodeType(const char * const str) {
-  if (!strcasecmp(str, kUnknownStr.c_str()))
+  if (!strcasecmp(str, kUnknownStr))
     return decode_type_t::UNKNOWN;
   else if (!strcasecmp(str, "UNUSED"))
     return decode_type_t::UNUSED;
@@ -487,7 +487,11 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       result = kUnknownStr;
       break;
   }
-  if (isRepeat) result += kSpaceLBraceStr + kRepeatStr + ')';
+  if (isRepeat) {
+    result += kSpaceLBraceStr;
+    result += kRepeatStr;
+    result += ')';
+  }
   return result;
 }
 
@@ -683,16 +687,20 @@ String resultToHumanReadableBasic(const decode_results * const results) {
   // Reserve some space for the string to reduce heap fragmentation.
   output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
   // Show Encoding standard
-  output += kProtocolStr + F("  : ");
+  output += kProtocolStr;
+  output += F("  : ");
   output += typeToString(results->decode_type, results->repeat);
   output += '\n';
 
   // Show Code & length
-  output += kCodeStr + F("      : ");
+  output += kCodeStr;
+  output += F("      : ");
   output += resultToHexidecimal(results);
   output += kSpaceLBraceStr;
   output += uint64ToString(results->bits);
-  output += ' ' + kBitsStr + F(")\n");
+  output += ' ';
+  output += kBitsStr;
+  output +=  F(")\n");
   return output;
 }
 
@@ -891,10 +899,10 @@ namespace irutils {
     result += kSpaceLBraceStr;
     if ((uint8_t)(day_of_week + offset) < 7)
 #if UNIT_TEST
-      result += kThreeLetterDayOfWeekStr.substr(
+      result += String(kThreeLetterDayOfWeekStr).substr(
           (day_of_week + offset) * 3, 3);
 #else  // UNIT_TEST
-      result += kThreeLetterDayOfWeekStr.substring(
+      result += String(kThreeLetterDayOfWeekStr).substring(
           (day_of_week + offset) * 3, (day_of_week + offset) * 3 + 3);
 #endif  // UNIT_TEST
     else
@@ -991,21 +999,22 @@ namespace irutils {
 
     String result = "";
     if (days)
-      result += uint64ToString(days) + ' ' + ((days > 1) ? kDaysStr : kDayStr);
+      result += uint64ToString(days) + ' ' + String((days > 1) ? kDaysStr
+                                                               : kDayStr);
     if (hours) {
       if (result.length()) result += ' ';
-      result += uint64ToString(hours) + ' ' + ((hours > 1) ? kHoursStr
-                                                           : kHourStr);
+      result += uint64ToString(hours) + ' ' + String((hours > 1) ? kHoursStr
+                                                                 : kHourStr);
     }
     if (minutes) {
       if (result.length()) result += ' ';
-      result += uint64ToString(minutes) + ' ' + ((minutes > 1) ? kMinutesStr
-                                                               : kMinuteStr);
+      result += uint64ToString(minutes) + ' ' + String(
+          (minutes > 1) ? kMinutesStr : kMinuteStr);
     }
     if (seconds) {
       if (result.length()) result += ' ';
-      result += uint64ToString(seconds) + ' ' + ((seconds > 1) ? kSecondsStr
-                                                               : kSecondStr);
+      result += uint64ToString(seconds) + ' ' + String(
+          (seconds > 1) ? kSecondsStr : kSecondStr);
     }
     return result;
   }

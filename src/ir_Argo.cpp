@@ -332,7 +332,9 @@ String IRArgoAC::toString(void) {
       result += kDryStr;
       break;
     case kArgoHeatAuto:
-      result += kHeatStr + ' ' + kAutoStr;
+      result += kHeatStr;
+      result += ' ';
+      result += kAutoStr;
       break;
     case kArgoOff:
       result += kOffStr;
@@ -361,7 +363,9 @@ String IRArgoAC::toString(void) {
   }
   result += ')';
   result += addTempToString(getTemp());
-  result += kCommaSpaceStr + kRoomStr + ' ';
+  result += kCommaSpaceStr;
+  result += kRoomStr;
+  result += ' ';
   result += addTempToString(getRoomTemp(), true, false);
   result += addBoolToString(getMax(), kMaxStr);
   result += addBoolToString(getiFeel(), kIFeelStr);

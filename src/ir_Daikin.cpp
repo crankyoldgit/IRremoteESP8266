@@ -1102,10 +1102,19 @@ String IRDaikin2::toString(void) {
     case kDaikin2SwingVHigh:
       result += kHighestStr;
       break;
-    case 2: result += kHighStr; break;
-    case 3: result += kUpperStr + kMiddleStr; break;
-    case 4: result += kLowerStr + kMiddleStr; break;
-    case 5: result += kLowStr; break;
+    case 2:
+      result += kHighStr;
+      break;
+    case 3:
+      result += kUpperStr;
+      result += kMiddleStr;
+      break;
+    case 4:
+      result += kLowerStr;
+      result += kMiddleStr;
+      break;
+    case 5:
+      result += kLowStr;
       break;
     case kDaikin2SwingVLow:
       result += kLowestStr;
@@ -1146,7 +1155,7 @@ String IRDaikin2::toString(void) {
       kOffTimerStr);
   result += addLabeledString(
       getSleepTimerEnabled() ? minsToString(getSleepTime()) : kOffStr,
-      kSleepStr + ' ' + kTimerStr);
+      kSleepTimerStr);
   result += addIntToString(getBeep(), kBeepStr);
   result += kSpaceLBraceStr;
   switch (getBeep()) {
@@ -1185,7 +1194,7 @@ String IRDaikin2::toString(void) {
       getFreshAir() ? (getFreshAirHigh() ? kHighStr : kOnStr) : kOffStr,
       kFreshStr);
   result += addBoolToString(getEye(), kEyeStr);
-  result += addBoolToString(getEyeAuto(), kEyeStr + ' ' + kAutoStr);
+  result += addBoolToString(getEyeAuto(), kEyeAutoStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
   result += addBoolToString(getPurify(), kPurifyStr);
@@ -2693,8 +2702,7 @@ uint8_t IRDaikin128::getLightToggle(void) {
 String IRDaikin128::toString(void) {
   String result = "";
   result.reserve(240);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPowerToggle(), kPowerStr + ' ' + kToggleStr,
-                            false);
+  result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
   result += addModeToString(getMode(), kDaikin128Auto, kDaikin128Cool,
                             kDaikin128Heat, kDaikin128Dry, kDaikin128Fan);
   result += addTempToString(getTemp());
@@ -2711,7 +2719,7 @@ String IRDaikin128::toString(void) {
   result += addLabeledString(minsToString(getOnTimer()), kOnTimerStr);
   result += addBoolToString(getOffTimerEnabled(), kOffTimerStr);
   result += addLabeledString(minsToString(getOffTimer()), kOffTimerStr);
-  result += addIntToString(getLightToggle(), kLightStr + ' ' + kToggleStr);
+  result += addIntToString(getLightToggle(), kLightToggleStr);
   result += kSpaceLBraceStr;
   switch (getLightToggle()) {
     case kDaikin128BitCeiling: result += kCeilingStr; break;

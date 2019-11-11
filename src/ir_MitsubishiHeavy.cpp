@@ -501,10 +501,14 @@ String IRMitsubishiHeavy152Ac::toString(void) {
       result += kMaxRightStr;
       break;
     case kMitsubishiHeavy152SwingHLeftRight:
-      result += kLeftStr + ' ' + kRightStr;
+      result += kLeftStr;
+      result += ' ';
+      result += kRightStr;
       break;
     case kMitsubishiHeavy152SwingHRightLeft:
-      result += kRightStr + ' ' + kLeftStr;
+      result += kRightStr;
+      result += ' ';
+      result += kLeftStr;
       break;
     case kMitsubishiHeavy152SwingHOff:
       result += kOffStr;
@@ -924,10 +928,14 @@ String IRMitsubishiHeavy88Ac::toString(void) {
       result += kMaxRightStr;
       break;
     case kMitsubishiHeavy88SwingHLeftRight:
-      result += kLeftStr + ' ' + kRightStr;
+      result += kLeftStr;
+      result += ' ';
+      result += kRightStr;
       break;
     case kMitsubishiHeavy88SwingHRightLeft:
-      result += kRightStr + ' ' + kLeftStr;
+      result += kRightStr;
+      result += ' ';
+      result += kLeftStr;
       break;
     case kMitsubishiHeavy88SwingH3D:
       result += k3DStr;

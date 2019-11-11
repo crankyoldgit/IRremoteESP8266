@@ -496,23 +496,38 @@ String IRCoolixAC::toString(void) {
   if (!getPower()) return result;  // If it's off, there is no other info.
   // Special modes.
   if (getSwing()) {
-    result += kCommaSpaceStr + kSwingStr + kColonSpaceStr + kToggleStr;
+    result += kCommaSpaceStr;
+    result += kSwingStr;
+    result += kColonSpaceStr;
+    result += kToggleStr;
     return result;
   }
   if (getSleep()) {
-    result += kCommaSpaceStr + kSleepStr + kColonSpaceStr + kToggleStr;
+    result += kCommaSpaceStr;
+    result += kSleepStr;
+    result += kColonSpaceStr;
+    result += kToggleStr;
     return result;
   }
   if (getTurbo()) {
-    result += kCommaSpaceStr + kTurboStr + kColonSpaceStr + kToggleStr;
+    result += kCommaSpaceStr;
+    result += kTurboStr;
+    result += kColonSpaceStr;
+    result += kToggleStr;
     return result;
   }
   if (getLed()) {
-    result += kCommaSpaceStr + kLightStr + kColonSpaceStr + kToggleStr;
+    result += kCommaSpaceStr;
+    result += kLightStr;
+    result += kColonSpaceStr;
+    result += kToggleStr;
     return result;
   }
   if (getClean()) {
-    result += kCommaSpaceStr + kCleanStr + kColonSpaceStr + kToggleStr;
+    result += kCommaSpaceStr;
+    result += kCleanStr;
+    result += kColonSpaceStr;
+    result += kToggleStr;
     return result;
   }
   result += addModeToString(getMode(), kCoolixAuto, kCoolixCool, kCoolixHeat,
@@ -524,7 +539,8 @@ String IRCoolixAC::toString(void) {
       result += kAutoStr;
       break;
     case kCoolixFanAuto0:
-      result += kAutoStr + '0';
+      result += kAutoStr;
+      result += '0';
       break;
     case kCoolixFanMax:
       result += kMaxStr;
@@ -550,8 +566,7 @@ String IRCoolixAC::toString(void) {
   result += addBoolToString(getZoneFollow(), kZoneFollowStr);
   result += addLabeledString(
       (getSensorTemp() > kCoolixSensorTempMax)
-          ? kOffStr : uint64ToString(getSensorTemp()) + F("C"),
-      kSensorStr + ' ' + kTempStr);
+          ? kOffStr : uint64ToString(getSensorTemp()) + 'C', kSensorTempStr);
   return result;
 }
 

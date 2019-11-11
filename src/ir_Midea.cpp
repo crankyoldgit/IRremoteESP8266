@@ -387,7 +387,7 @@ String IRMideaAC::toString(void) {
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
     result += addBoolToString(getSleep(), kSleepStr);
   }
-  result += addBoolToString(getSwingVToggle(), kSwingVStr + ' ' + kToggleStr,
+  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr,
                             !isSwingVToggle());
   return result;
 }

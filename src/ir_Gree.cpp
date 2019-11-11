@@ -490,7 +490,7 @@ String IRGreeAC::toString(void) {
   result += addBoolToString(getLight(), kLightStr);
   result += addBoolToString(getSleep(), kSleepStr);
   result += addLabeledString(getSwingVerticalAuto() ? kAutoStr : kManualStr,
-                             kSwingVStr + ' ' + kModeStr);
+                             kSwingVModeStr);
   result += addIntToString(getSwingVerticalPosition(), kSwingVStr);
   result += kSpaceLBraceStr;
   switch (getSwingVerticalPosition()) {

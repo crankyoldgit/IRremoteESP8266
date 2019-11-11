@@ -472,7 +472,7 @@ String IRWhirlpoolAc::toString(void) {
   String result = "";
   result.reserve(200);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::WHIRLPOOL_AC, getModel(), false);
-  result += addBoolToString(getPowerToggle(), kPowerStr + ' ' + kToggleStr);
+  result += addBoolToString(getPowerToggle(), kPowerToggleStr);
   result += addModeToString(getMode(), kWhirlpoolAcAuto, kWhirlpoolAcCool,
                             kWhirlpoolAcHeat, kWhirlpoolAcDry, kWhirlpoolAcFan);
   result += addTempToString(getTemp());
