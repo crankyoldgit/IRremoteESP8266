@@ -349,6 +349,37 @@
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
 
+// Compound words/phrases/descriptions from pre-defined words.
+// Note: Obviously these need to be defined *after* their component words.
+#ifndef D_STR_EYEAUTO
+#define D_STR_EYEAUTO D_STR_EYE " " D_STR_AUTO
+#endif  // D_STR_EYEAUTO
+#ifndef D_STR_LIGHTTOGGLE
+#define D_STR_LIGHTTOGGLE D_STR_LIGHT " " D_STR_TOGGLE
+#endif  // D_STR_LIGHTTOGGLE
+#ifndef D_STR_OUTSIDEQUIET
+#define D_STR_OUTSIDEQUIET D_STR_OUTSIDE " " D_STR_QUIET
+#endif  // D_STR_OUTSIDEQUIET
+#ifndef D_STR_POWERTOGGLE
+#define D_STR_POWERTOGGLE D_STR_POWER " " D_STR_TOGGLE
+#endif  // D_STR_POWERTOGGLE
+#ifndef D_STR_SENSORTEMP
+#define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
+#endif  // D_STR_SENSORTEMP
+#ifndef D_STR_SLEEP_TIMER
+#define D_STR_SLEEP_TIMER D_STR_SLEEP " " D_STR_TIMER
+#endif  // D_STR_SLEEP_TIMER
+#ifndef D_STR_SWINGVMODE
+#define D_STR_SWINGVMODE D_STR_SWINGV " " D_STR_MODE
+#endif  // D_STR_SWINGVMODE
+#ifndef D_STR_SWINGVTOGGLE
+#define D_STR_SWINGVTOGGLE D_STR_SWINGV " " D_STR_TOGGLE
+#endif  // D_STR_SWINGVTOGGLE
+
+// Separators
+#ifndef D_CHR_TIME_SEP
+#define D_CHR_TIME_SEP ':'
+#endif  // D_CHR_TIME_SEP
 #ifndef D_STR_SPACELBRACE
 #define D_STR_SPACELBRACE " ("
 #endif  // D_STR_SPACELBRACE
@@ -359,9 +390,6 @@
 #define D_STR_COLONSPACE ": "
 #endif  // D_STR_COLONSPACE
 
-#ifndef D_CHR_TIME_SEP
-#define D_CHR_TIME_SEP ':'
-#endif  // D_CHR_TIME_SEP
 #ifndef D_STR_DAY
 #define D_STR_DAY "Day"
 #endif  // D_STR_DAY
