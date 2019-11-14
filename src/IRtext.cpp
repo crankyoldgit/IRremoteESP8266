@@ -125,13 +125,24 @@ const PROGMEM char* kCentreStr = D_STR_CENTRE;
 const PROGMEM char* kTopStr = D_STR_TOP;
 const PROGMEM char* kBottomStr = D_STR_BOTTOM;
 
+// Compound words/phrases/descriptions from pre-defined words.
+const PROGMEM char* kEyeAutoStr = D_STR_EYEAUTO;
+const PROGMEM char* kLightToggleStr = D_STR_LIGHTTOGGLE;
+const PROGMEM char* kOutsideQuietStr = D_STR_OUTSIDEQUIET;
+const PROGMEM char* kPowerToggleStr = D_STR_POWERTOGGLE;
+const PROGMEM char* kSensorTempStr = D_STR_SENSORTEMP;
+const PROGMEM char* kSleepTimerStr = D_STR_SLEEP_TIMER;
+const PROGMEM char* kSwingVModeStr = D_STR_SWINGVMODE;
+const PROGMEM char* kSwingVToggleStr = D_STR_SWINGVTOGGLE;
+
+// Separators
+char kTimeSep = D_CHR_TIME_SEP;
 const PROGMEM char* kSpaceLBraceStr = D_STR_SPACELBRACE;
 const PROGMEM char* kCommaSpaceStr = D_STR_COMMASPACE;
 const PROGMEM char* kColonSpaceStr = D_STR_COLONSPACE;
 
 // IRutils
 //  - Time
-char kTimeSep = D_CHR_TIME_SEP;
 const PROGMEM char* kDayStr = D_STR_DAY;
 const PROGMEM char* kDaysStr = D_STR_DAYS;
 const PROGMEM char* kHourStr = D_STR_HOUR;
@@ -151,13 +162,3 @@ const PROGMEM char* kFalseStr = D_STR_FALSE;
 const PROGMEM char* kRepeatStr = D_STR_REPEAT;
 const PROGMEM char* kCodeStr = D_STR_CODE;
 const PROGMEM char* kBitsStr = D_STR_BITS;
-
-// Misc
-const PROGMEM char* kEyeAutoStr = D_STR_EYE " " D_STR_AUTO;
-const PROGMEM char* kLightToggleStr = D_STR_LIGHT " " D_STR_TOGGLE;
-const PROGMEM char* kOutsideQuietStr = D_STR_OUTSIDE " " D_STR_QUIET;
-const PROGMEM char* kPowerToggleStr = D_STR_POWER " " D_STR_TOGGLE;
-const PROGMEM char* kSensorTempStr = D_STR_SENSOR " " D_STR_TEMP;
-const PROGMEM char* kSleepTimerStr = D_STR_SLEEP " " D_STR_TIMER;
-const PROGMEM char* kSwingVModeStr = D_STR_SWINGV " " D_STR_MODE;
-const PROGMEM char* kSwingVToggleStr = D_STR_SWINGV " " D_STR_TOGGLE;
