@@ -241,20 +241,20 @@
  *       - "dry"
  *       - "fan_only"
  *     fan_modes:
- *       - "auto"
- *       - "min"
- *       - "low"
- *       - "medium"
- *       - "high"
- *       - "max"
+ *       - "Auto"
+ *       - "Min"
+ *       - "Low"
+ *       - "Medium"
+ *       - "High"
+ *       - "Max"
  *     swing_modes:
- *       - "off"
- *       - "auto"
- *       - "highest"
- *       - "high"
- *       - "middle"
- *       - "low"
- *       - "lowest"
+ *       - "Off"
+ *       - "Auto"
+ *       - "Highest"
+ *       - "High"
+ *       - "Middle"
+ *       - "Low"
+ *       - "Lowest"
  *     power_command_topic: "ir_server/ac/cmnd/power"
  *     mode_command_topic: "ir_server/ac/cmnd/mode"
  *     mode_state_topic: "ir_server/ac/stat/mode"
@@ -353,6 +353,7 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRsend.h>
+#include <IRtext.h>
 #include <IRtimer.h>
 #include <IRutils.h>
 #include <IRac.h>
@@ -2514,6 +2515,8 @@ void sendMQTTDiscovery(const char *topic) {
       "\"pow_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_POWER "\","
       "\"mode_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_MODE "\","
       "\"mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_MODE "\","
+      // I don't know why, but the modes need to be lower case to work with
+      // Home Assistant & Google Home.
       "\"modes\":[\"off\",\"auto\",\"cool\",\"heat\",\"dry\",\"fan_only\"],"
       "\"temp_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_TEMP "\","
       "\"temp_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_TEMP "\","
@@ -2522,11 +2525,13 @@ void sendMQTTDiscovery(const char *topic) {
       "\"temp_step\":\"1\","
       "\"fan_mode_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_FANSPEED "\","
       "\"fan_mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_FANSPEED "\","
-      "\"fan_modes\":[\"auto\",\"min\",\"low\",\"medium\",\"high\",\"max\"],"
+      "\"fan_modes\":[\"" D_STR_AUTO "\",\"" D_STR_MIN "\",\"" D_STR_LOW "\",\""
+                      D_STR_MEDIUM "\",\"" D_STR_HIGH "\",\"" D_STR_MAX "\"],"
       "\"swing_mode_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_SWINGV "\","
       "\"swing_mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_SWINGV "\","
-      "\"swing_modes\":["
-        "\"off\",\"auto\",\"highest\",\"high\",\"middle\",\"low\",\"lowest\"]"
+      "\"swing_modes\":[\"" D_STR_OFF "\",\"" D_STR_AUTO "\",\"" D_STR_HIGHEST
+                        "\",\"" D_STR_HIGH "\",\"" D_STR_MIDDLE "\",\""
+                        D_STR_LOW "\",\"" D_STR_LOWEST "\"]"
       "}").c_str(), true)) {
     mqttLog("MQTT climate discovery successful sent.");
     hasDiscoveryBeenSent = true;
@@ -2961,16 +2966,13 @@ bool sendClimate(const String topic_prefix, const bool retain,
     diff = true;
     success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
+  String mode_str = IRac::opmodeToString(next.mode);
+  mode_str.toLowerCase();
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
   if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
-    diff = true;
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
-    success &= sendString(topic_prefix + KEY_MODE,
-                          (next.power ? IRac::opmodeToString(next.mode)
-                                      : F("off")),
-                          retain);
-  }
+    if (!next.power) mode_str = F("off");
 #else  // MQTT_CLIMATE_HA_MODE
   // In non-Home Assistant mode, power and mode are not bound together.
   if (prev.power != next.power || forceMQTT) {
@@ -2978,11 +2980,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
   }
   if (prev.mode != next.mode || forceMQTT) {
-    diff = true;
-    success &= sendString(topic_prefix + KEY_MODE,
-                          IRac::opmodeToString(next.mode), retain);
-  }
 #endif  // MQTT_CLIMATE_HA_MODE
+    success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
+    diff = true;
+  }
   if (prev.degrees != next.degrees || forceMQTT) {
     diff = true;
     success &= sendFloat(topic_prefix + KEY_TEMP, next.degrees, retain);
