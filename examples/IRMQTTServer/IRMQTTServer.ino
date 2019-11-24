@@ -2967,6 +2967,8 @@ bool sendClimate(const String topic_prefix, const bool retain,
     success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
   String mode_str = IRac::opmodeToString(next.mode);
+  // I don't know why, but the modes need to be lower case to work with
+  // Home Assistant & Google Home.
   mode_str.toLowerCase();
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
