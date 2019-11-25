@@ -1,5 +1,20 @@
 # Release Notes
 
+## _v2.7.1 (20191125)_
+
+**[Bug Fixes]**
+- Hitachi424Ac: Fix Incorrect Power Byte Values (#987)
+- Coolix: Fix setPower(false) issue. (#990)
+
+**[Features]**
+- Use `char*` instead of `String` for common text. Saves ~1-3k. (#992, #989)
+- Hitachi424Ac: Add Vertical Swing ability (#986)
+
+**[Misc]**
+- IRMQTTServer: Update HA example/discovery message. (#995)
+- Move newly added common text to a better location. (#993)
+
+
 ## _v2.7.0 (20191030)_
 
 **[Bug Fixes]**
