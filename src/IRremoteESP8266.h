@@ -382,6 +382,7 @@ const uint16_t kSingleRepeat = 1;
 
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
+const uint16_t kAlokaBits = 32;
 const uint16_t kAmcorStateLength = 8;
 const uint16_t kAmcorBits = kAmcorStateLength * 8;
 const uint16_t kAmcorDefaultRepeat = kSingleRepeat;
