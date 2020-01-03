@@ -25,6 +25,7 @@
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
 #include "ir_Kelvinator.h"
+#include "ir_LG.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
@@ -148,6 +149,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_KELVINATOR
     case decode_type_t::KELVINATOR:
+#endif
+#if SEND_LG
+    case decode_type_t::LG:
 #endif
 #if SEND_MIDEA
     case decode_type_t::MIDEA:
@@ -718,6 +722,29 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
   ac->send();
 }
 #endif  // SEND_KELVINATOR
+
+#if SEND_LG
+void IRac::lg(IRLgAc *ac,
+              const bool on, const stdAc::opmode_t mode,
+              const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Vertical swing setting available.
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_LG
 
 #if SEND_MIDEA
 void IRac::midea(IRMideaAC *ac,
@@ -1439,6 +1466,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_KELVINATOR
+#if SEND_LG
+    case LG:
+    {
+      IRLgAc ac(_pin, _inverted, _modulation);
+      lg(&ac, send.power, send.mode, send.degrees, send.fanspeed);
+      break;
+    }
+#endif  // SEND_LG
 #if SEND_MIDEA
     case MIDEA:
     {
@@ -2139,6 +2174,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_TCL112AC
+#if DECODE_LG
+      case decode_type_t::LG: {
+        IRLgAc ac(0);
+        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        return ac.isValidLgAc() ? ac.toString() : "";
+      }
+#endif  // DECODE_LG
       default:
         return "";
     }
@@ -2309,6 +2351,15 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_KELVINATOR
+#if DECODE_LG
+      case decode_type_t::LG: {
+        IRLgAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        if (!ac.isValidLgAc()) return false;
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_LG
 #if DECODE_MIDEA
       case decode_type_t::MIDEA: {
         IRMideaAC ac(kGpioUnused);
