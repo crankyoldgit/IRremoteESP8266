@@ -4,6 +4,7 @@
 //   Brand: LG,  Model: 6711A20083V remote
 //   Brand: LG,  Model: AKB74395308 remote
 //   Brand: General Electric,  Model: AG1BH09AW101 Split A/C
+//   Brand: General Electric,  Model: 6711AR2853M A/C Remote
 
 #ifndef IR_LG_H_
 #define IR_LG_H_
@@ -31,12 +32,13 @@ const uint8_t kLgAcFanAuto = 5;    // 0b101
 const uint8_t kLgAcTempOffset = 8;  // Nr. of bits
 const uint8_t kLgAcTempSize = 4;  // Nr. of bits
 const uint8_t kLgAcTempAdjust = 15;
-const uint8_t kLgAcMinTemp = 18;  // Celsius
+const uint8_t kLgAcMinTemp = 16;  // Celsius
 const uint8_t kLgAcMaxTemp = 30;  // Celsius
 const uint8_t kLgAcModeOffset = 12;  // Nr. of bits
 const uint8_t kLgAcModeSize = 3;  // Nr. of bits
 const uint8_t kLgAcCool = 0;  // 0b000
 const uint8_t kLgAcDry = 1;   // 0b001
+const uint8_t kLgAcFan = 2;   // 0b010
 const uint8_t kLgAcAuto = 3;  // 0b011
 const uint8_t kLgAcHeat = 4;  // 0b100
 const uint8_t kLgAcPowerOffset = 18;  // Nr. of bits

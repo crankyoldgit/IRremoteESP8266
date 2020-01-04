@@ -589,19 +589,19 @@ TEST(TestIRLgAcClass, HumanReadable) {
   ac.setFan(kLgAcFanLow);
   ac.setTemp(kLgAcMinTemp);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 0 (Low)",
+      "Power: On, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
   ac.setTemp(ac.getTemp() + 1);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Temp: 19C, Fan: 0 (Low)",
+      "Power: On, Mode: 0 (Cool), Temp: 17C, Fan: 0 (Low)",
       ac.toString());
   ac.setTemp(ac.getTemp() - 1);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 0 (Low)",
+      "Power: On, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
   ac.setPower(false);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (Cool), Temp: 18C, Fan: 0 (Low)",
+      "Power: Off, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
 }
 
@@ -662,4 +662,73 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::LG2, strToDecodeType("LG2"));
   ASSERT_FALSE(hasACState(decode_type_t::LG2));
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::LG2));
+}
+
+TEST(TestIRLgAcClass, KnownExamples) {
+  IRLgAc ac(0);
+  // Ref:
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570646648
+
+  // Temp
+  ac.setRaw(0x880C152);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 16C, Fan: 5 (Auto)",
+      ac.toString());
+
+  ac.setRaw(0x880CF50);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 30C, Fan: 5 (Auto)",
+      ac.toString());
+
+  // Modes
+  ac.setRaw(0x880960F);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Dry), Temp: 21C, Fan: 0 (Low)",
+      ac.toString());
+
+  ac.setRaw(0x880C758);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 22C, Fan: 5 (Auto)",
+      ac.toString());
+
+  ac.setRaw(0x8808855);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Temp: 23C, Fan: 5 (Auto)",
+      ac.toString());
+
+  // Fan speeds
+  ac.setRaw(0x880870F);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 0 (Low)",
+      ac.toString());
+
+  ac.setRaw(0x8808721);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 2 (Medium)",
+      ac.toString());
+
+  ac.setRaw(0x8808743);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 4 (High)",
+      ac.toString());
+
+  ac.setRaw(0x8808754);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 5 (Auto)",
+      ac.toString());
+
+  ac.setRaw(0x880A745);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Fan), Temp: 22C, Fan: 4 (High)",
+      ac.toString());
 }

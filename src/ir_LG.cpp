@@ -414,6 +414,7 @@ void IRLgAc::setMode(const uint8_t mode) {
     case kLgAcDry:
     case kLgAcHeat:
     case kLgAcCool:
+    case kLgAcFan:
       setBits(&remote_state, kLgAcModeOffset, kLgAcModeSize, mode);
       break;
     default:  // If we get an unexpected mode, default to AUTO.
@@ -426,6 +427,7 @@ uint8_t IRLgAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kLgAcCool;
     case stdAc::opmode_t::kHeat: return kLgAcHeat;
+    case stdAc::opmode_t::kFan:  return kLgAcFan;
     case stdAc::opmode_t::kDry:  return kLgAcDry;
     default:                     return kLgAcAuto;
   }
@@ -437,6 +439,7 @@ stdAc::opmode_t IRLgAc::toCommonMode(const uint8_t mode) {
     case kLgAcCool: return stdAc::opmode_t::kCool;
     case kLgAcHeat: return stdAc::opmode_t::kHeat;
     case kLgAcDry:  return stdAc::opmode_t::kDry;
+    case kLgAcFan:  return stdAc::opmode_t::kFan;
     default:        return stdAc::opmode_t::kAuto;
   }
 }
@@ -494,7 +497,7 @@ String IRLgAc::toString(void) {
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kLgAcAuto, kLgAcCool,
-                            kLgAcHeat, kLgAcDry, kLgAcAuto);
+                            kLgAcHeat, kLgAcDry, kLgAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kLgAcFanHigh, kLgAcFanLow,
                            kLgAcFanAuto, kLgAcFanAuto, kLgAcFanMedium);
