@@ -16,6 +16,7 @@
 
 using irutils::addBoolToString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::setBit;
@@ -301,15 +302,41 @@ IRLgAc::IRLgAc(const uint16_t pin, const bool inverted,
                const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
-void IRLgAc::stateReset(void) { setRaw(kLgAcStateReset); }
+void IRLgAc::stateReset(void) {
+  setRaw(kLgAcStateReset);
+  setModel(lg_ac_remote_model_t::GE6711AR2853M);
+}
 
 void IRLgAc::begin(void) { _irsend.begin(); }
 
 #if SEND_LG
 void IRLgAc::send(const uint16_t repeat) {
-  _irsend.sendLG(this->getRaw(), kLgBits, repeat);
+  _irsend.send(this->_protocol, this->getRaw(), kLgBits, repeat);
 }
 #endif  // SEND_LG
+
+void IRLgAc::setModel(const lg_ac_remote_model_t model) {
+  switch (model) {
+    case lg_ac_remote_model_t::AKB75215403:
+      _protocol = decode_type_t::LG2;
+      break;
+    case lg_ac_remote_model_t::GE6711AR2853M:
+      // FALL THRU
+    default:
+      _protocol = decode_type_t::LG;
+  }
+}
+
+lg_ac_remote_model_t IRLgAc::getModel(void) {
+  switch (_protocol) {
+    case LG2:
+      return lg_ac_remote_model_t::AKB75215403;
+    case LG:
+      // FALL THRU
+    default:
+      return lg_ac_remote_model_t::GE6711AR2853M;
+  }
+}
 
 uint32_t IRLgAc::getRaw(void) {
   checksum();
@@ -470,7 +497,7 @@ stdAc::fanspeed_t IRLgAc::toCommonFanSpeed(const uint8_t speed) {
 stdAc::state_t IRLgAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::LG;
-  result.model = -1;  // Unused.
+  result.model = this->getModel();
   result.power = this->getPower();
   result.mode = this->toCommonMode(this->getMode());
   result.celsius = true;
@@ -495,7 +522,8 @@ stdAc::state_t IRLgAc::toCommon(void) {
 String IRLgAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModelToString(_protocol, getModel(), false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kLgAcAuto, kLgAcCool,
                             kLgAcHeat, kLgAcDry, kLgAcFan);
   result += addTempToString(getTemp());

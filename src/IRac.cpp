@@ -152,6 +152,7 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_LG
     case decode_type_t::LG:
+    case decode_type_t::LG2:
 #endif
 #if SEND_MIDEA
     case decode_type_t::MIDEA:
@@ -724,10 +725,11 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 #endif  // SEND_KELVINATOR
 
 #if SEND_LG
-void IRac::lg(IRLgAc *ac,
+void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan) {
   ac->begin();
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1468,9 +1470,11 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #endif  // SEND_KELVINATOR
 #if SEND_LG
     case LG:
+    case LG2:
     {
       IRLgAc ac(_pin, _inverted, _modulation);
-      lg(&ac, send.power, send.mode, send.degrees, send.fanspeed);
+      lg(&ac, (lg_ac_remote_model_t)send.model, send.power, send.mode,
+         send.degrees, send.fanspeed);
       break;
     }
 #endif  // SEND_LG
@@ -2175,9 +2179,17 @@ namespace IRAcUtils {
       }
 #endif  // DECODE_TCL112AC
 #if DECODE_LG
-      case decode_type_t::LG: {
+      case decode_type_t::LG:
+      case decode_type_t::LG2: {
         IRLgAc ac(0);
         ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        switch (result->decode_type) {
+          case decode_type_t::LG2:
+            ac.setModel(lg_ac_remote_model_t::AKB75215403);
+            break;
+          default:
+            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
+        }
         return ac.isValidLgAc() ? ac.toString() : "";
       }
 #endif  // DECODE_LG
@@ -2352,10 +2364,18 @@ namespace IRAcUtils {
       }
 #endif  // DECODE_KELVINATOR
 #if DECODE_LG
-      case decode_type_t::LG: {
+      case decode_type_t::LG:
+      case decode_type_t::LG2: {
         IRLgAc ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
         if (!ac.isValidLgAc()) return false;
+        switch (decode->decode_type) {
+          case decode_type_t::LG2:
+            ac.setModel(lg_ac_remote_model_t::AKB75215403);
+            break;
+          default:
+            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
+        }
         *result = ac.toCommon();
         break;
       }

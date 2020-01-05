@@ -473,7 +473,8 @@ TEST(TestDecodeLG, Issue620) {
   EXPECT_EQ(0x872, irsend.capture.command);
   ac.setRaw(irsend.capture.value);
   ASSERT_TRUE(ac.isValidLgAc());
-  EXPECT_EQ("Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 2 (Medium)",
+  EXPECT_EQ("Model: 1 (GE6711AR2853M), "
+            "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 2 (Medium)",
             ac.toString());
   // The following seems to match the rawData above.
   EXPECT_EQ(
@@ -552,7 +553,7 @@ TEST(TestIRLgAcClass, toCommon) {
   ac.setFan(kLgAcFanHigh);
   // Now test it.
   ASSERT_EQ(decode_type_t::LG, ac.toCommon().protocol);
-  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(lg_ac_remote_model_t::GE6711AR2853M, ac.toCommon().model);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
@@ -570,12 +571,17 @@ TEST(TestIRLgAcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+
+  // Change models
+  ac.setModel(AKB75215403);
+  ASSERT_EQ(lg_ac_remote_model_t::AKB75215403, ac.toCommon().model);
 }
 
 TEST(TestIRLgAcClass, HumanReadable) {
   IRLgAc ac(0);
 
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: Off, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
       ac.toString());
   ac.setMode(kLgAcHeat);
@@ -583,24 +589,29 @@ TEST(TestIRLgAcClass, HumanReadable) {
   ac.on();
   ac.setFan(kLgAcFanHigh);
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 4 (Heat), Temp: 30C, Fan: 4 (High)",
       ac.toString());
   ac.setMode(kLgAcCool);
   ac.setFan(kLgAcFanLow);
   ac.setTemp(kLgAcMinTemp);
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
   ac.setTemp(ac.getTemp() + 1);
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 17C, Fan: 0 (Low)",
       ac.toString());
   ac.setTemp(ac.getTemp() - 1);
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
   ac.setPower(false);
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: Off, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
       ac.toString());
 }
@@ -611,12 +622,14 @@ TEST(TestIRLgAcClass, SetAndGetRaw) {
   ac.setRaw(0x8800A4E);
   ASSERT_EQ(0x8800A4E, ac.getRaw());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 25C, Fan: 4 (High)",
       ac.toString());
 
   ac.setRaw(0x88C0051);
   ASSERT_EQ(0x88C0051, ac.getRaw());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: Off, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
       ac.toString());
 }
@@ -630,6 +643,7 @@ TEST(TestIRLgAcClass, MessageConstruction) {
   ac.setFan(kLgAcFanHigh);
   ASSERT_EQ(0x8800A4E, ac.getRaw());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 25C, Fan: 4 (High)",
       ac.toString());
 }
@@ -661,7 +675,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("LG2", typeToString(decode_type_t::LG2));
   ASSERT_EQ(decode_type_t::LG2, strToDecodeType("LG2"));
   ASSERT_FALSE(hasACState(decode_type_t::LG2));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::LG2));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG2));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -673,12 +687,14 @@ TEST(TestIRLgAcClass, KnownExamples) {
   ac.setRaw(0x880C152);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 4 (Heat), Temp: 16C, Fan: 5 (Auto)",
       ac.toString());
 
   ac.setRaw(0x880CF50);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 4 (Heat), Temp: 30C, Fan: 5 (Auto)",
       ac.toString());
 
@@ -686,18 +702,21 @@ TEST(TestIRLgAcClass, KnownExamples) {
   ac.setRaw(0x880960F);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 1 (Dry), Temp: 21C, Fan: 0 (Low)",
       ac.toString());
 
   ac.setRaw(0x880C758);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 4 (Heat), Temp: 22C, Fan: 5 (Auto)",
       ac.toString());
 
   ac.setRaw(0x8808855);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 23C, Fan: 5 (Auto)",
       ac.toString());
 
@@ -705,30 +724,155 @@ TEST(TestIRLgAcClass, KnownExamples) {
   ac.setRaw(0x880870F);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 0 (Low)",
       ac.toString());
 
   ac.setRaw(0x8808721);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 2 (Medium)",
       ac.toString());
 
   ac.setRaw(0x8808743);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 4 (High)",
       ac.toString());
 
   ac.setRaw(0x8808754);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 22C, Fan: 5 (Auto)",
       ac.toString());
 
   ac.setRaw(0x880A745);
   ASSERT_TRUE(ac.isValidLgAc());
   EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 2 (Fan), Temp: 22C, Fan: 4 (High)",
       ac.toString());
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570794029
+  ac.setRaw(0x8800347);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 4 (High)",
+      ac.toString());
+  ac.setRaw(0x8808440);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 19C, Fan: 4 (High)",
+      ac.toString());
+  ac.setRaw(0x8800459);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 19C, Fan: 5 (Auto)",
+      ac.toString());
+  ac.setRaw(0x8809946);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 1 (Dry), Temp: 24C, Fan: 4 (High)",
+      ac.toString());
+  ac.setRaw(0x880A341);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 2 (Fan), Temp: 18C, Fan: 4 (High)",
+      ac.toString());
+  ac.setRaw(0x8810045);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 15C, Fan: 4 (High)",
+      ac.toString());
+  ac.setRaw(0x8810056);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
+      ac.toString());
+}
+
+// Verify decoding of LG2 message.
+TEST(TestDecodeLG2, Issue1008) {
+  IRsendTest irsend(0);
+  IRrecv capture(0);
+  irsend.begin();
+
+  irsend.reset();
+  // From https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570794029
+  // First entry.
+  uint16_t rawData[59] = {
+      3272, 9844, 506, 1588, 536, 498, 534, 498, 536, 498, 534, 1540, 534, 506,
+      534, 498, 534, 500, 532, 500, 534, 498, 534, 498, 534, 506, 534, 500, 534,
+      498, 534, 498, 534, 498, 534, 500, 534, 498, 534, 1566, 508, 1566, 508,
+      500, 534, 1540, 534, 506, 534, 500, 534, 500, 534, 1560, 508, 1540, 534,
+      1558, 508};  // UNKNOWN AFC3034C
+  irsend.sendRaw(rawData, 59, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(capture.decode(&irsend.capture));
+  ASSERT_EQ(LG2, irsend.capture.decode_type);
+  EXPECT_EQ(kLgBits, irsend.capture.bits);
+  EXPECT_EQ(0x8800347, irsend.capture.value);
+
+  irsend.reset();
+  IRLgAc ac(0);
+  ac.setRaw(0x8800347);
+  ac.setModel(lg_ac_remote_model_t::AKB75215403);  // aka. 2
+  ac.send();
+
+  char expected[] =
+      "Model: 2 (AKB75215403), "
+      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 4 (High)";
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRLgAcClass, DifferentModels) {
+  IRLgAc ac(0);
+  IRrecv capture(0);
+
+  ac.setRaw(0x8800347);
+
+  ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);  // aka. 1
+  ac._irsend.reset();
+  ac.send();
+
+  char expected1[] =
+      "Model: 1 (GE6711AR2853M), "
+      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 4 (High)";
+  ASSERT_EQ(expected1, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG, ac._irsend.capture.decode_type);  // Not "LG2"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected1, IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+
+  ac.setModel(lg_ac_remote_model_t::AKB75215403);  // aka. 2
+  ac._irsend.reset();
+  ac.send();
+
+  char expected2[] =
+      "Model: 2 (AKB75215403), "
+      "Power: On, Mode: 0 (Cool), Temp: 18C, Fan: 4 (High)";
+  ASSERT_EQ(expected2, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected2, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }

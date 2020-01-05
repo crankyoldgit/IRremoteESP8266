@@ -232,7 +232,7 @@ void electra(IRElectraAc *ac,
                   const bool filter, const bool clean);
 #endif  // SEND_KELVINATOR
 #if SEND_LG
-  void lg(IRLgAc *ac,
+  void lg(IRLgAc *ac, const lg_ac_remote_model_t model,
           const bool on, const stdAc::opmode_t mode,
           const float degrees, const stdAc::fanspeed_t fan);
 #endif  // SEND_LG

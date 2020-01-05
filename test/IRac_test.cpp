@@ -646,14 +646,16 @@ TEST(TestIRac, LG) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
+      "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 1 (Dry), Temp: 27C, Fan: 2 (Medium)";
 
   ac.begin();
   irac.lg(&ac,
-          true,                         // Power
-          stdAc::opmode_t::kDry,        // Mode
-          27,                           // Degrees C
-          stdAc::fanspeed_t::kMedium);  // Fan speed
+          lg_ac_remote_model_t::GE6711AR2853M,  // Model
+          true,                                 // Power
+          stdAc::opmode_t::kDry,                // Mode
+          27,                                   // Degrees C
+          stdAc::fanspeed_t::kMedium);          // Fan speed
 
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();

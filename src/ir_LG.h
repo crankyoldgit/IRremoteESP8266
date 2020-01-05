@@ -3,6 +3,8 @@
 // Supports:
 //   Brand: LG,  Model: 6711A20083V remote
 //   Brand: LG,  Model: AKB74395308 remote
+//   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
+//   Brand: LG,  Model: AKB75215403 remote (LG2)
 //   Brand: General Electric,  Model: AG1BH09AW101 Split A/C
 //   Brand: General Electric,  Model: 6711AR2853M A/C Remote
 
@@ -86,6 +88,8 @@ class IRLgAc {
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
+  void setModel(const lg_ac_remote_model_t model);
+  lg_ac_remote_model_t getModel(void);
 #ifndef UNIT_TEST
 
  private:
@@ -96,6 +100,7 @@ class IRLgAc {
   // The state of the IR remote in IR code form.
   uint32_t remote_state;
   uint8_t _temp;
+  decode_type_t _protocol;
   void checksum(void);
   void _setTemp(const uint8_t value);
 };
