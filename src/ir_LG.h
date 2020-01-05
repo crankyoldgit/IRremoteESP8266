@@ -51,7 +51,7 @@ const uint8_t kLgAcSignatureOffset = 20;  // Nr. of bits
 const uint8_t kLgAcSignatureSize = 8;  // Nr. of bits
 const uint8_t kLgAcSignature = 0x88;
 
-const uint32_t kLgAcStateReset = 0x88C0051;  // Off, Cool, 15C, Fan Auto
+const uint32_t kLgAcOffCommand = 0x88C0051;
 
 uint8_t calcLGChecksum(uint16_t data);
 

@@ -582,7 +582,7 @@ TEST(TestIRLgAcClass, HumanReadable) {
 
   EXPECT_EQ(
       "Model: 1 (GE6711AR2853M), "
-      "Power: Off, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
+      "Power: Off",
       ac.toString());
   ac.setMode(kLgAcHeat);
   ac.setTemp(kLgAcMaxTemp);
@@ -612,7 +612,7 @@ TEST(TestIRLgAcClass, HumanReadable) {
   ac.setPower(false);
   EXPECT_EQ(
       "Model: 1 (GE6711AR2853M), "
-      "Power: Off, Mode: 0 (Cool), Temp: 16C, Fan: 0 (Low)",
+      "Power: Off",
       ac.toString());
 }
 
@@ -630,7 +630,7 @@ TEST(TestIRLgAcClass, SetAndGetRaw) {
   ASSERT_EQ(0x88C0051, ac.getRaw());
   EXPECT_EQ(
       "Model: 1 (GE6711AR2853M), "
-      "Power: Off, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
+      "Power: Off",
       ac.toString());
 }
 

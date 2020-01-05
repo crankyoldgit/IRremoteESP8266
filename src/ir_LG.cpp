@@ -303,7 +303,7 @@ IRLgAc::IRLgAc(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 void IRLgAc::stateReset(void) {
-  setRaw(kLgAcStateReset);
+  setRaw(kLgAcOffCommand);
   setModel(lg_ac_remote_model_t::GE6711AR2853M);
 }
 
@@ -311,7 +311,12 @@ void IRLgAc::begin(void) { _irsend.begin(); }
 
 #if SEND_LG
 void IRLgAc::send(const uint16_t repeat) {
-  _irsend.send(this->_protocol, this->getRaw(), kLgBits, repeat);
+  if (this->getPower())
+    _irsend.send(this->_protocol, this->getRaw(), kLgBits, repeat);
+  else
+    // Always send the special Off command if the power is set to off.
+    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570763580
+    _irsend.send(this->_protocol, kLgAcOffCommand, kLgBits, repeat);
 }
 #endif  // SEND_LG
 
@@ -524,11 +529,13 @@ String IRLgAc::toString(void) {
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(_protocol, getModel(), false);
   result += addBoolToString(getPower(), kPowerStr);
-  result += addModeToString(getMode(), kLgAcAuto, kLgAcCool,
-                            kLgAcHeat, kLgAcDry, kLgAcFan);
-  result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kLgAcFanHigh, kLgAcFanLow,
-                           kLgAcFanAuto, kLgAcFanAuto, kLgAcFanMedium);
+  if (getPower()) {  // Only display the rest if is in power on state.
+    result += addModeToString(getMode(), kLgAcAuto, kLgAcCool,
+                              kLgAcHeat, kLgAcDry, kLgAcFan);
+    result += addTempToString(getTemp());
+    result += addFanToString(getFan(), kLgAcFanHigh, kLgAcFanLow,
+                             kLgAcFanAuto, kLgAcFanAuto, kLgAcFanMedium);
+  }
   return result;
 }
 
