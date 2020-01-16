@@ -47,6 +47,7 @@ const int8_t kDefaultIrLed = 4;  // <=- CHANGE_ME (optional)
 const bool kInvertTxOutput = false;
 
 // Default GPIO the IR demodulator is connected to/controlled by. GPIO 14 = D5.
+// Note: GPIO 16 won't work on the ESP8266 as it does not have interrupts.
 const int8_t kDefaultIrRx = 14;  // <=- CHANGE_ME (optional)
 
 // Enable/disable receiving/decoding IR messages entirely.

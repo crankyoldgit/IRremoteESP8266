@@ -23,6 +23,7 @@
 
 // An IR detector/demodulator is connected to GPIO pin 14(D5 on a NodeMCU
 // board).
+// Note: GPIO 16 won't work on the ESP8266 as it does not have interrupts.
 const uint16_t kRecvPin = 14;
 
 IRrecv irrecv(kRecvPin);
