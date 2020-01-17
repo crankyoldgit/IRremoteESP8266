@@ -65,6 +65,8 @@ class RawIRMessage():
   def _usec_compare(self, seen, expected):
     """Compare two usec values and see if they match within a
        subtractive margin."""
+    if expected is None:
+      return False
     return expected - self.margin < seen <= expected
 
   def _usec_compares(self, usecs, expecteds):
@@ -214,19 +216,25 @@ class RawIRMessage():
     if len(self.marks) > 2:  # Possible leader mark?
       self.ldr_mark = self.marks[0]
       self.hdr_mark = self.marks[1]
-    else:
+    elif len(self.marks) > 1:  # At least two marks
       # Largest mark is likely the kHdrMark
       self.hdr_mark = self.marks[0]
+    else:
+      # Probably no header mark.
+      self.hdr_mark = 0
 
-    if self.is_space_encoded() and len(self.spaces) >= 3:
+    if self.is_space_encoded() and len(self.spaces) >= 2:
       if self.verbose and len(self.marks) > 2:
         self.output.write("DANGER: Unusual number of mark timings!")
       # We should have 3 space candidates at least.
       # They should be: zero_space (smallest), one_space, & hdr_space (largest)
       spaces = list(self.spaces)
-      self.zero_space = spaces.pop()
-      self.one_space = spaces.pop()
-      self.hdr_space = spaces.pop()
+      if spaces:
+        self.zero_space = spaces.pop()
+      if spaces:
+        self.one_space = spaces.pop()
+      if spaces:
+        self.hdr_space = spaces.pop()
       # Rest are probably message gaps
       self.gaps = spaces
 
@@ -302,11 +310,15 @@ def convert_rawdata(data_str):
 def dump_constants(message, defines, name="", output=sys.stdout):
   """Dump the key constants and generate the C++ #defines."""
   ldr_mark = None
+  hdr_mark = 0
+  hdr_space = 0
   if message.ldr_mark is not None:
     ldr_mark = avg_list(message.mark_buckets[message.ldr_mark])
-  hdr_mark = avg_list(message.mark_buckets[message.hdr_mark])
+  if message.hdr_mark != 0:
+    hdr_mark = avg_list(message.mark_buckets[message.hdr_mark])
   bit_mark = avg_list(message.mark_buckets[message.bit_mark])
-  hdr_space = avg_list(message.space_buckets[message.hdr_space])
+  if message.hdr_space is not None:
+    hdr_space = avg_list(message.space_buckets[message.hdr_space])
   one_space = avg_list(message.space_buckets[message.one_space])
   zero_space = avg_list(message.space_buckets[message.zero_space])
 
