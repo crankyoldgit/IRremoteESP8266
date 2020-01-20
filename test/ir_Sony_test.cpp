@@ -360,3 +360,138 @@ TEST(TestEncodeSony, Issue476) {
   EXPECT_EQ(0xE2, (0x7156 >> 7) & 0xFF);      // extended (top 8 of 15 bits)
   EXPECT_EQ(0x6AB47, irsend.encodeSony(20, 0x56, 0x1A, 0xE2));
 }
+
+// Encoding & Decode 15 bit Sony messages. Issue #1018
+TEST(TestEncodeSony, Issue1018) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  irsend.reset();
+  irsend.sendSony(0x240C, 15);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SONY, irsend.capture.decode_type);
+  EXPECT_EQ(15, irsend.capture.bits);
+  EXPECT_EQ(0x240C, irsend.capture.value);   // 15 bits
+  EXPECT_EQ(0x30, irsend.capture.address);
+  EXPECT_EQ(0x12, irsend.capture.command);
+  EXPECT_EQ(
+      "f40000d33"
+      "m2400s600"  // Message
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+      "m600s22200"
+      "m2400s600"  // Repeat #1
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+      "m600s22200"
+      "m2400s600"  // Repeat #2
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+      "m600s22200",
+      irsend.outputStr());
+
+  irsend.reset();
+  uint16_t rawData[127] = {
+      2448, 550,
+      648, 544, 1250, 546, 648, 548, 648, 550, 1272, 524, 648, 550, 644, 550,
+      674, 524, 648, 550, 648, 544, 674, 524, 1270, 524, 1246, 550, 674, 524,
+      648, 22404,
+      2474, 524,
+      674, 520, 1250, 548, 648, 544, 674, 524, 1270, 524, 648, 550, 648, 546,
+      674, 524, 648, 546, 652, 546, 674, 524, 1270, 524, 1272, 522, 674, 520,
+      648, 22404,
+      2452, 544,
+      674, 524, 1270, 524, 674, 518, 674, 522, 1246, 550, 674, 524, 648, 544,
+      674, 524, 648, 546, 674, 524, 674, 518, 1276, 518, 1276, 524, 648, 546,
+      674, 22380,
+      2474, 520,
+      674, 524, 1250, 544, 674, 524, 674, 518, 1276, 520, 674, 522, 674, 524,
+      674, 520, 674, 524, 674, 524, 674, 518, 1276, 518, 1276, 524, 672, 524,
+      648};  // SONY 240C
+
+  irsend.sendRaw(rawData, 127, 40);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SONY, irsend.capture.decode_type);
+  EXPECT_EQ(15, irsend.capture.bits);
+  EXPECT_EQ(0x240C, irsend.capture.value);   // 15 bits
+  EXPECT_EQ(0x30, irsend.capture.address);
+  EXPECT_EQ(0x12, irsend.capture.command);
+  EXPECT_EQ(
+      "f40000d50"
+      "m2448s550"  // Message
+      "m648s544m1250s546m648s548m648s550m1272s524m648s550m644s550"
+      "m674s524m648s550m648s544m674s524m1270s524m1246s550m674s524"
+      "m648s22404"
+      "m2474s524"  // Repeat #1
+      "m674s520m1250s548m648s544m674s524m1270s524m648s550m648s546"
+      "m674s524m648s546m652s546m674s524m1270s524m1272s522m674s520"
+      "m648s22404"
+      "m2452s544"  // Repeat #2
+      "m674s524m1270s524m674s518m674s522m1246s550m674s524m648s544"
+      "m674s524m648s546m674s524m674s518m1276s518m1276s524m648s546"
+      "m674s22380"
+      "m2474s520"  // Repeat #3
+      "m674s524m1250s544m674s524m674s518m1276s520m674s522m674s524"
+      "m674s520m674s524m674s524m674s518m1276s518m1276s524m672s524"
+      "m648",
+      irsend.outputStr());
+
+  // Now see if we can reproduce it with `sendSony`
+  irsend.reset();
+  irsend.sendSony(0x240C, 15, 3);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SONY, irsend.capture.decode_type);
+  EXPECT_EQ(15, irsend.capture.bits);
+  EXPECT_EQ(0x240C, irsend.capture.value);   // 15 bits
+  EXPECT_EQ(0x30, irsend.capture.address);
+  EXPECT_EQ(0x12, irsend.capture.command);
+
+  // Compare expected result with real `rawData` result.
+  // Comparison notes:
+  //   * Seems visually the same. i.e. '1' where '1's should be etc.
+  //   * Timings are *roughly* the same. They should be within device
+  //     tollerance.
+  // TL;DR: Looks fine/the same/as expected.
+  EXPECT_EQ(
+      "f40000d33"
+      "m2400s600"  // Message
+  //  "m2448s550"  (Commented out data is from `rawData` sample above.)
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+  //  "m648s544m1250s546m648s548m648s550m1272s524m648s550m644s550"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+  //  "m674s524m648s550m648s544m674s524m1270s524m1246s550m674s524"
+      "m600s22200"
+  //  "m648s22404"
+      "m2400s600"  // Repeat #1
+  //  "m2474s524"
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+  //  "m674s520m1250s548m648s544m674s524m1270s524m648s550m648s546"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+  //  "m674s524m648s546m652s546m674s524m1270s524m1272s522m674s520"
+      "m600s22200"
+  //  "m648s22404"
+      "m2400s600"  // Repeat #2
+  //  "m2452s544"
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+  //  "m674s524m1270s524m674s518m674s522m1246s550m674s524m648s544"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+  //  "m674s524m648s546m674s524m674s518m1276s518m1276s524m648s546"
+      "m600s22200"
+  //  "m674s22380"
+      "m2400s600"  // Repeat #3
+  //  "m2474s520"
+      "m600s600m1200s600m600s600m600s600m1200s600m600s600m600s600"
+  //  "m674s524m1250s544m674s524m674s518m1276s520m674s522m674s524"
+      "m600s600m600s600m600s600m600s600m1200s600m1200s600m600s600"
+  //  "m674s520m674s524m674s524m674s518m1276s518m1276s524m672s524"
+      "m600s22200",
+  //  "m648"  // (Trailing space is ignored in real captures.)
+      irsend.outputStr());
+}
