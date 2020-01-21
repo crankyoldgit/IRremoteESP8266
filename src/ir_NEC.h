@@ -10,9 +10,10 @@
 #include "IRremoteESP8266.h"
 
 // Supports:
-//   Brand: Yamaha,  Model: RAV561 remote
-//   Brand: Yamaha,  Model: RXV585B A/V Receiver
-//   Brand: Aloka,   Model: SleepyLights LED Lamp
+//   Brand: Yamaha,   Model: RAV561 remote
+//   Brand: Yamaha,   Model: RXV585B A/V Receiver
+//   Brand: Aloka,    Model: SleepyLights LED Lamp
+//   Brand: Toshiba,  Model: 42TL838 LCD TV
 
 // Constants
 // Ref:
