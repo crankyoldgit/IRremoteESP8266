@@ -8,6 +8,8 @@
 //   Brand: Panasonic,  Model: CS-ME10CKPG A/C
 //   Brand: Panasonic,  Model: CS-ME12CKPG A/C
 //   Brand: Panasonic,  Model: CS-ME14CKPG A/C
+//   Brand: Panasonic,  Model: PKR series A/C (Use DKE)
+//   Brand: Panasonic,  Model: CS-E7PKR A/C (Use DKE)
 //   Brand: Panasonic,  Model: RKR series A/C
 //   Brand: Panasonic,  Model: CS-Z9RKR A/C
 //   Brand: Panasonic,  Model: NKE series A/C

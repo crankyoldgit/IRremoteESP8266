@@ -130,7 +130,7 @@ enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
   kPanasonicLke = 1,
   kPanasonicNke = 2,
-  kPanasonicDke = 3,
+  kPanasonicDke = 3,  // PKR too.
   kPanasonicJke = 4,
   kPanasonicCkp = 5,
   kPanasonicRkr = 6,
