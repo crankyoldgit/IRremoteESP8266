@@ -233,7 +233,7 @@ def main():
     fout.write("| {} | **{}** | {} | {} | {} |\n".format(
         makeurl(protocol, protocol + ".cpp"),
         brand,
-        "<BR>".join(codes),
+        "<BR>".join(codes).replace("|", "\\|"),
         "<BR>".join(acmodels),
         acsupport,
     ))
