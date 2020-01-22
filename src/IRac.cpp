@@ -1799,7 +1799,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
   } else if (!strcasecmp(str, "NKE") || !strcasecmp(str, "PANASONICNKE")) {
     return panasonic_ac_remote_model_t::kPanasonicNke;
-  } else if (!strcasecmp(str, "DKE") || !strcasecmp(str, "PANASONICDKE")) {
+  } else if (!strcasecmp(str, "DKE") || !strcasecmp(str, "PANASONICDKE") ||
+             !strcasecmp(str, "PKR") || !strcasecmp(str, "PANASONICPKR")) {
     return panasonic_ac_remote_model_t::kPanasonicDke;
   } else if (!strcasecmp(str, "JKE") || !strcasecmp(str, "PANASONICJKE")) {
     return panasonic_ac_remote_model_t::kPanasonicJke;

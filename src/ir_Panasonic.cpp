@@ -25,8 +25,8 @@
 //   Code by crankyoldgit
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, CKP, RKR, & NKE series. (In theory)
-//     CS-YW9MKD, CS-Z9RKR (confirmed)
+//     JKE, LKE, DKE, CKP, PKR, RKR, & NKE series. (In theory)
+//     CS-YW9MKD, CS-Z9RKR, CS-E7PKR (confirmed)
 //     CS-ME14CKPG / CS-ME12CKPG / CS-ME10CKPG
 //   A/C Remotes:
 //     A75C3747 (confirmed)
@@ -202,8 +202,9 @@ bool IRrecv::decodePanasonic(decode_results *results, const uint16_t nbits,
 //:
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, CKP, RKR, & NKE series.
+//     JKE, LKE, DKE, CKP, PKR, RKR, & NKE series.
 //     CS-YW9MKD
+//     CS-E7PKR
 //   A/C Remotes:
 //     A75C3747
 //     A75C3704
@@ -798,8 +799,9 @@ String IRPanasonicAc::toString(void) {
 //
 // Panasonic A/C models supported:
 //   A/C Series/models:
-//     JKE, LKE, DKE, & NKE series.
+//     JKE, LKE, DKE, PKR, & NKE series.
 //     CS-YW9MKD
+//     CS-E7PKR
 //   A/C Remotes:
 //     A75C3747 (Confirmed)
 //     A75C3704
