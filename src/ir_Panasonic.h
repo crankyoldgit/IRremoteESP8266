@@ -4,6 +4,7 @@
 //   Brand: Panasonic,  Model: TV
 //   Brand: Panasonic,  Model: JKE series A/C
 //   Brand: Panasonic,  Model: DKE series A/C
+//   Brand: Panasonic,  Model: DKE(W) series A/C
 //   Brand: Panasonic,  Model: CKP series A/C
 //   Brand: Panasonic,  Model: CS-ME10CKPG A/C
 //   Brand: Panasonic,  Model: CS-ME12CKPG A/C
@@ -14,11 +15,9 @@
 //   Brand: Panasonic,  Model: CS-Z9RKR A/C
 //   Brand: Panasonic,  Model: NKE series A/C
 //   Brand: Panasonic,  Model: CS-YW9MKD A/C
-//   Brand: Panasonic,  Model: A75C3747 remote
-//   Brand: Panasonic,  Model: A75C3704 remote
 //   Brand: Panasonic,  Model: A75C2311 remote (CKP)
-//   Brand: Panasonic,  Model: A75C3747 remote
-//   Brand: Panasonic,  Model: A75C3747 remote
+//   Brand: Panasonic,  Model: A75C2616-1 remote (DKE)
+//   Brand: Panasonic,  Model: A75C3704 remote
 //   Brand: Panasonic,  Model: A75C3747 remote
 
 #ifndef IR_PANASONIC_H_
@@ -86,6 +85,9 @@ const uint8_t kPanasonicAcTimeOverflowSize = 3;  // Bits
 const uint16_t kPanasonicAcTimeMax = 23 * 60 + 59;  // Mins since midnight.
 const uint16_t kPanasonicAcTimeSpecial = 0x600;
 
+const uint8_t kPanasonicAcIonFilterByte = 22;  // Byte
+const uint8_t kPanasonicAcIonFilterOffset = 0;  // Bit
+
 const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
     0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,
     0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
@@ -123,6 +125,8 @@ class IRPanasonicAc {
   bool getQuiet(void);
   void setPowerful(const bool on);
   bool getPowerful(void);
+  void setIon(const bool on);
+  bool getIon(void);
   void setModel(const panasonic_ac_remote_model_t model);
   panasonic_ac_remote_model_t getModel(void);
   void setSwingVertical(const uint8_t elevation);

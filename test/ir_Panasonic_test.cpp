@@ -736,6 +736,26 @@ TEST(TestIRPanasonicAcClass, QuietAndPowerful) {
   EXPECT_FALSE(pana.getPowerful());
 }
 
+TEST(TestIRPanasonicAcClass, SetAndGetIon) {
+  IRPanasonicAc ac(0);
+  // Ion Filter only works for DKE.
+  ac.setModel(kPanasonicDke);
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+  ac.setIon(false);
+  EXPECT_FALSE(ac.getIon());
+  ac.setIon(true);
+  EXPECT_TRUE(ac.getIon());
+
+  // Now try a different (a guess at unsupported) model.
+  ac.setModel(kPanasonicRkr);
+  EXPECT_FALSE(ac.getIon());
+  ac.setIon(true);
+  EXPECT_FALSE(ac.getIon());
+  ac.setIon(false);
+  EXPECT_FALSE(ac.getIon());
+}
+
 TEST(TestIRPanasonicAcClass, HumanReadable) {
   IRPanasonicAc pana(0);
   EXPECT_EQ(
@@ -767,7 +787,7 @@ TEST(TestIRPanasonicAcClass, HumanReadable) {
   EXPECT_EQ(
       "Model: 3 (DKE), Power: Off, Mode: 4 (Heat), Temp: 30C, "
       "Fan: 4 (High), Swing(V): 15 (Auto), "
-      "Swing(H): 11 (Right), Quiet: On, Powerful: Off, "
+      "Swing(H): 11 (Right), Quiet: On, Powerful: Off, Ion: Off, "
       "Clock: 00:00, On Timer: Off, Off Timer: Off",
       pana.toString());
 }
@@ -1179,4 +1199,39 @@ TEST(TestIRPanasonicAcClass, toCommon) {
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
   ASSERT_EQ(kPanasonicAcSwingVMiddle,
             IRPanasonicAc::convertSwingV(stdAc::swingv_t::kMiddle));
+}
+
+//
+// Test for DKE/DKW model / see issue #1024
+TEST(TestDecodePanasonicAC, DkeIonRealMessages) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Data from Issue #1024
+  // 0x0220E004000000060220E004004F3280AF0D000660000001000630
+  uint8_t dkeIonOff[kPanasonicAcStateLength] = {
+      0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,
+      0x20, 0xE0, 0x04, 0x00, 0x4F, 0x32, 0x80, 0xAF, 0x0D,
+      0x00, 0x06, 0x60, 0x00, 0x00, 0x01, 0x00, 0x06, 0x30};
+
+  // 0x0220E004000000060220E004004F3280AF0D000660000101000631
+  uint8_t dkeIonOn[kPanasonicAcStateLength] = {
+      0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06, 0x02,
+      0x20, 0xE0, 0x04, 0x00, 0x4F, 0x32, 0x80, 0xAF, 0x0D,
+      0x00, 0x06, 0x60, 0x00, 0x01, 0x01, 0x00, 0x06, 0x31};
+
+  IRPanasonicAc ac(0);
+  ac.setRaw(dkeIonOff);
+  EXPECT_EQ(
+      "Model: 3 (DKE), Power: On, Mode: 4 (Heat), Temp: 25C, Fan: 7 (Auto), "
+      "Swing(V): 15 (Auto), Swing(H): 13 (Auto), Quiet: Off, Powerful: Off, "
+      "Ion: Off, Clock: 00:00, On Timer: 00:00, Off Timer: 00:00",
+      ac.toString());
+  ac.setRaw(dkeIonOn);
+  EXPECT_EQ(
+      "Model: 3 (DKE), Power: On, Mode: 4 (Heat), Temp: 25C, Fan: 7 (Auto), "
+      "Swing(V): 15 (Auto), Swing(H): 13 (Auto), Quiet: Off, Powerful: Off, "
+      "Ion: On, Clock: 00:00, On Timer: 00:00, Off Timer: 00:00",
+      ac.toString());
 }
