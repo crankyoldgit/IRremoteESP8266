@@ -565,8 +565,8 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t good_entries_trailing_space = 12;
-  uint16_t good_trailing_space_data[good_entries_trailing_space] = {
+  const uint16_t kgood_entries_trailing_space = 12;
+  uint16_t good_trailing_space_data[kgood_entries_trailing_space] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -576,8 +576,8 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
       3000,  // Footer mark
       15000};  // Footer space
 
-  uint16_t good_entries_no_trailing_space = 11;
-  uint16_t good_no_trailing_space_data[good_entries_no_trailing_space] = {
+  const uint16_t kgood_entries_no_trailing_space = 11;
+  uint16_t good_no_trailing_space_data[kgood_entries_no_trailing_space] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -588,7 +588,7 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(good_trailing_space_data, good_entries_trailing_space, 38000);
+  irsend.sendRaw(good_trailing_space_data, kgood_entries_trailing_space, 38000);
   irsend.makeDecodeResult();
   uint64_t result_data = 0;
   uint16_t entries_used = 0;
@@ -607,7 +607,7 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(good_entries_trailing_space, entries_used);
+  EXPECT_EQ(kgood_entries_trailing_space, entries_used);
 
   // Same again but with a footer space mis-match, which should fail.
   result_data = 0;
@@ -628,7 +628,7 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
   // Same again as first part but with no footer space data as the last entry.
   irsend.reset();
   result_data = 0;
-  irsend.sendRaw(good_no_trailing_space_data, good_entries_no_trailing_space,
+  irsend.sendRaw(good_no_trailing_space_data, kgood_entries_no_trailing_space,
                  38000);
   irsend.makeDecodeResult();
   entries_used = irrecv.matchGeneric(
@@ -646,7 +646,7 @@ TEST(TestMatchGeneric, NormalWithNoAtleast) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(good_entries_no_trailing_space, entries_used);
+  EXPECT_EQ(kgood_entries_no_trailing_space, entries_used);
 }
 
 
@@ -655,8 +655,8 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t good_entries_trailing_space = 12;
-  uint16_t good_trailing_space_data[good_entries_trailing_space] = {
+  const uint16_t kgood_entries_trailing_space = 12;
+  uint16_t good_trailing_space_data[kgood_entries_trailing_space] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -666,8 +666,8 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
       3000,  // Footer mark
       15000};  // Footer space
 
-  uint16_t good_entries_no_trailing_space = 11;
-  uint16_t good_no_trailing_space_data[good_entries_no_trailing_space] = {
+  const uint16_t kgood_entries_no_trailing_space = 11;
+  uint16_t good_no_trailing_space_data[kgood_entries_no_trailing_space] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -678,7 +678,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(good_trailing_space_data, good_entries_trailing_space, 38000);
+  irsend.sendRaw(good_trailing_space_data, kgood_entries_trailing_space, 38000);
   irsend.makeDecodeResult();
   uint64_t result_data = 0;
   uint16_t entries_used = 0;
@@ -697,7 +697,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(good_entries_trailing_space, entries_used);
+  EXPECT_EQ(kgood_entries_trailing_space, entries_used);
 
   // Same again but with a footer space under-match.
   result_data = 0;
@@ -716,7 +716,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(good_entries_trailing_space, entries_used);
+  EXPECT_EQ(kgood_entries_trailing_space, entries_used);
 
   // Same again but with a footer space under-match using less bits so the
   // atleast footer isn't the last entry in the buffer.
@@ -737,7 +737,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   EXPECT_EQ(0b101, result_data);
   // -2 because we reduced nbits by 1.
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset - 2, entries_used);
-  EXPECT_EQ(good_entries_trailing_space - 2, entries_used);
+  EXPECT_EQ(kgood_entries_trailing_space - 2, entries_used);
 
   // Same again but with a footer space over-match, which should fail.
   result_data = 0;
@@ -758,7 +758,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   // Same as first part but with no footer space data as the last entry.
   irsend.reset();
   result_data = 0;
-  irsend.sendRaw(good_no_trailing_space_data, good_entries_no_trailing_space,
+  irsend.sendRaw(good_no_trailing_space_data, kgood_entries_no_trailing_space,
                  38000);
   irsend.makeDecodeResult();
   entries_used = irrecv.matchGeneric(
@@ -776,7 +776,7 @@ TEST(TestMatchGeneric, NormalWithAtleast) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(good_entries_no_trailing_space, entries_used);
+  EXPECT_EQ(kgood_entries_no_trailing_space, entries_used);
 }
 
 TEST(TestMatchGeneric, FailureCases) {
@@ -784,8 +784,8 @@ TEST(TestMatchGeneric, FailureCases) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t entries = 11;
-  uint16_t data[entries] = {
+  const uint16_t kentries = 11;
+  uint16_t data[kentries] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -796,7 +796,7 @@ TEST(TestMatchGeneric, FailureCases) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(data, entries, 38000);
+  irsend.sendRaw(data, kentries, 38000);
   irsend.makeDecodeResult();
   uint16_t entries_used = 0;
 
@@ -942,8 +942,8 @@ TEST(TestMatchGeneric, MissingHeaderFooter) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t entries = 11;
-  uint16_t data[entries] = {
+  const uint16_t kentries = 11;
+  uint16_t data[kentries] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -954,7 +954,7 @@ TEST(TestMatchGeneric, MissingHeaderFooter) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(data, entries, 38000);
+  irsend.sendRaw(data, kentries, 38000);
   irsend.makeDecodeResult();
   uint16_t entries_used = 0;
 
@@ -976,7 +976,7 @@ TEST(TestMatchGeneric, MissingHeaderFooter) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset - 1, entries_used);
-  EXPECT_EQ(entries - 1, entries_used);
+  EXPECT_EQ(kentries - 1, entries_used);
 
   // No header match (should fail)
   entries_used = irrecv.matchGeneric(
@@ -1010,7 +1010,7 @@ TEST(TestMatchGeneric, MissingHeaderFooter) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - offset, entries_used);
-  EXPECT_EQ(entries - 2, entries_used);
+  EXPECT_EQ(kentries - 2, entries_used);
 }
 
 TEST(TestMatchGeneric, BitOrdering) {
@@ -1018,8 +1018,8 @@ TEST(TestMatchGeneric, BitOrdering) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t entries = 11;
-  uint16_t data[entries] = {
+  const uint16_t kentries = 11;
+  uint16_t data[kentries] = {
       8000,  // Header mark
       4000,  // Header space
       500, 2000,  // Bit #0 (1)
@@ -1030,7 +1030,7 @@ TEST(TestMatchGeneric, BitOrdering) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(data, entries, 38000);
+  irsend.sendRaw(data, kentries, 38000);
   irsend.makeDecodeResult();
   uint16_t entries_used = 0;
 
@@ -1052,7 +1052,7 @@ TEST(TestMatchGeneric, BitOrdering) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b1010, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(entries, entries_used);
+  EXPECT_EQ(kentries, entries_used);
 
   // LSB order
   entries_used = irrecv.matchGeneric(
@@ -1070,7 +1070,7 @@ TEST(TestMatchGeneric, BitOrdering) {
   ASSERT_NE(0, entries_used);
   EXPECT_EQ(0b0101, result_data);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(entries, entries_used);
+  EXPECT_EQ(kentries, entries_used);
 }
 
 TEST(TestMatchGeneric, UsingBytes) {
@@ -1078,8 +1078,8 @@ TEST(TestMatchGeneric, UsingBytes) {
   IRrecv irrecv(1);
   irsend.begin();
 
-  uint16_t entries = 32;
-  uint16_t data[entries] = {
+  const uint16_t kentries = 32;
+  uint16_t data[kentries] = {
       // No header
       500, 2000,   // Byte #0 Bit #0 (1)
       500, 1000,   // Byte #0 Bit #1 (0)
@@ -1100,7 +1100,7 @@ TEST(TestMatchGeneric, UsingBytes) {
 
   uint16_t offset = kStartOffset;
   irsend.reset();
-  irsend.sendRaw(data, entries, 38000);
+  irsend.sendRaw(data, kentries, 38000);
   irsend.makeDecodeResult();
   uint16_t entries_used = 0;
 
@@ -1123,7 +1123,7 @@ TEST(TestMatchGeneric, UsingBytes) {
   EXPECT_EQ(0b10101010, result_data[0]);
   EXPECT_EQ(0b11110000, result_data[1]);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(entries, entries_used);
+  EXPECT_EQ(kentries, entries_used);
 
   // LSB order
   entries_used = irrecv.matchGeneric(
@@ -1142,7 +1142,7 @@ TEST(TestMatchGeneric, UsingBytes) {
   EXPECT_EQ(0b01010101, result_data[0]);
   EXPECT_EQ(0b00001111, result_data[1]);
   EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
-  EXPECT_EQ(entries, entries_used);
+  EXPECT_EQ(kentries, entries_used);
 
   // Asking for too much.
   entries_used = irrecv.matchGeneric(
