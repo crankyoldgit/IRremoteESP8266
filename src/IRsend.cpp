@@ -515,6 +515,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
       return kDishMinRepeat;
     case SONY:
       return kSonyMinRepeat;
+    case SONY_38K:
+      return kSonyMinRepeat + 1;
     default:
       return kNoRepeat;
   }
@@ -545,6 +547,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 16;
     case RC6:
     case SONY:
+    case SONY_38K:
       return 20;
     case COOLIX:
     case INAX:
@@ -817,6 +820,9 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_SONY
     case SONY:
       sendSony(data, nbits, min_repeat);
+      break;
+    case SONY_38K:
+      sendSony38(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_TECO
