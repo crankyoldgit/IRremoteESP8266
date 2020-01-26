@@ -443,7 +443,11 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
   } else {
     // Set defaults for non-zero values that are not implicitly set for when
     // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
     result.swingv = stdAc::swingv_t::kOff;
+    result.turbo = false;
+    result.clean = false;
+    result.light = false;
     result.sleep = -1;
   }
   // Not supported.
