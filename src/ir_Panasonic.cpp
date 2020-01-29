@@ -311,6 +311,8 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
     default:
       break;
   }
+  // Reset the Ion filter.
+  setIon(getIon());
 }
 
 panasonic_ac_remote_model_t IRPanasonicAc::getModel(void) {
@@ -589,6 +591,22 @@ bool IRPanasonicAc::isOffTimerEnabled(void) {
   return GETBIT8(remote_state[13], kPanasonicAcOffTimerOffset);
 }
 
+bool IRPanasonicAc::getIon(void) {
+  switch (this->getModel()) {
+    case kPanasonicDke:
+      return GETBIT8(remote_state[kPanasonicAcIonFilterByte],
+                     kPanasonicAcIonFilterOffset);
+    default:
+      return false;
+  }
+}
+
+void IRPanasonicAc::setIon(const bool on) {
+  if (this->getModel() == kPanasonicDke)
+    setBit(&remote_state[kPanasonicAcIonFilterByte],
+           kPanasonicAcIonFilterOffset, on);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -693,10 +711,10 @@ stdAc::state_t IRPanasonicAc::toCommon(void) {
   result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
   result.quiet = this->getQuiet();
   result.turbo = this->getPowerful();
+  result.filter = this->getIon();
   // Not supported.
   result.econo = false;
   result.clean = false;
-  result.filter = false;
   result.light = false;
   result.beep = false;
   result.sleep = -1;
@@ -775,6 +793,8 @@ String IRPanasonicAc::toString(void) {
   }
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
+  if (getModel() == kPanasonicDke)
+    result += addBoolToString(getIon(), kIonStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(
       isOnTimerEnabled() ? minsToString(getOnTimer()) : kOffStr,

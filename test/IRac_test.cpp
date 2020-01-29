@@ -851,6 +851,7 @@ TEST(TestIRac, Panasonic) {
                  stdAc::swingh_t::kLeft,      // Horizontal swing
                  true,                        // Quiet
                  false,                       // Turbo
+                 false,                       // Filter
                  19 * 60 + 17);               // Clock
   ASSERT_EQ(expected_nke, ac.toString());
   ac._irsend.makeDecodeResult();
@@ -862,7 +863,8 @@ TEST(TestIRac, Panasonic) {
   char expected_dke[] =
       "Model: 3 (DKE), Power: On, Mode: 3 (Cool), Temp: 18C, Fan: 4 (High), "
       "Swing(V): 2 (High), Swing(H): 6 (Middle), "
-      "Quiet: Off, Powerful: On, Clock: 19:17, On Timer: Off, Off Timer: Off";
+      "Quiet: Off, Powerful: On, Ion: On, "
+      "Clock: 19:17, On Timer: Off, Off Timer: Off";
   ac._irsend.reset();
   irac.panasonic(&ac,
                kPanasonicDke,               // Model
@@ -874,6 +876,7 @@ TEST(TestIRac, Panasonic) {
                stdAc::swingh_t::kMiddle,    // Horizontal swing
                false,                       // Quiet
                true,                        // Turbo
+               true,                        // Filter
                19 * 60 + 17);               // Clock
   ASSERT_EQ(expected_dke, ac.toString());
   ac._irsend.makeDecodeResult();

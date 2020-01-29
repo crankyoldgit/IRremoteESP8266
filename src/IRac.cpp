@@ -940,7 +940,8 @@ void IRac::panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
                      const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                     const bool quiet, const bool turbo, const int16_t clock) {
+                     const bool quiet, const bool turbo, const bool filter,
+                     const int16_t clock) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -951,9 +952,9 @@ void IRac::panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
   ac->setSwingHorizontal(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
   ac->setPowerful(turbo);
+  ac->setIon(filter);
   // No Light setting available.
   // No Econo setting available.
-  // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
   // No Sleep setting available.
