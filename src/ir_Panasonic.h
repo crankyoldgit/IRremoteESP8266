@@ -4,16 +4,16 @@
 //   Brand: Panasonic,  Model: TV
 //   Brand: Panasonic,  Model: JKE series A/C
 //   Brand: Panasonic,  Model: DKE series A/C
-//   Brand: Panasonic,  Model: DKE(W) series A/C
+//   Brand: Panasonic,  Model: DKW series A/C (DKE)
+//   Brand: Panasonic,  Model: PKR series A/C (DKE)
 //   Brand: Panasonic,  Model: CKP series A/C
+//   Brand: Panasonic,  Model: NKE series A/C
+//   Brand: Panasonic,  Model: RKR series A/C
 //   Brand: Panasonic,  Model: CS-ME10CKPG A/C
 //   Brand: Panasonic,  Model: CS-ME12CKPG A/C
 //   Brand: Panasonic,  Model: CS-ME14CKPG A/C
-//   Brand: Panasonic,  Model: PKR series A/C (Use DKE)
-//   Brand: Panasonic,  Model: CS-E7PKR A/C (Use DKE)
-//   Brand: Panasonic,  Model: RKR series A/C
+//   Brand: Panasonic,  Model: CS-E7PKR A/C (DKE)
 //   Brand: Panasonic,  Model: CS-Z9RKR A/C
-//   Brand: Panasonic,  Model: NKE series A/C
 //   Brand: Panasonic,  Model: CS-YW9MKD A/C
 //   Brand: Panasonic,  Model: A75C2311 remote (CKP)
 //   Brand: Panasonic,  Model: A75C2616-1 remote (DKE)
