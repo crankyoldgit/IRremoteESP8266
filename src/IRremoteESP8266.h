@@ -670,8 +670,9 @@ enum decode_type_t {
   MITSUBISHI136,
   MITSUBISHI112,
   HITACHI_AC424,
+  SONY_38K,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HITACHI_AC424,
+  kLastDecodeType = SONY_38K,
 };
 
 // Message lengths & required repeat values

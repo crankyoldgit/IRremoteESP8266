@@ -203,6 +203,8 @@ class IRsend {
   // a Sony command that will be accepted be a device.
   void sendSony(uint64_t data, uint16_t nbits = kSony20Bits,
                 uint16_t repeat = kSonyMinRepeat);
+  void sendSony38(uint64_t data, uint16_t nbits = kSony20Bits,
+                  uint16_t repeat = kSonyMinRepeat + 1);
   uint32_t encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
                       uint16_t extended = 0);
 #endif
@@ -561,6 +563,10 @@ class IRsend {
   uint8_t _dutycycle;
   bool modulation;
   uint32_t calcUSecPeriod(uint32_t hz, bool use_offset = true);
+#if SEND_SONY
+  void _sendSony(uint64_t data, uint16_t nbits,
+                 uint16_t repeat, uint16_t freq);
+#endif
 };
 
 #endif  // IRSEND_H_
