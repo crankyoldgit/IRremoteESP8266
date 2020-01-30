@@ -84,6 +84,7 @@ _delayMicroseconds	KEYWORD2
 _getTime	KEYWORD2
 _getTimer	KEYWORD2
 _matchGeneric	KEYWORD2
+_sendSony	KEYWORD2
 _setMode	KEYWORD2
 _setTemp	KEYWORD2
 _setTime	KEYWORD2
@@ -459,6 +460,7 @@ sendSharpAc	KEYWORD2
 sendSharpRaw	KEYWORD2
 sendSherwood	KEYWORD2
 sendSony	KEYWORD2
+sendSony38	KEYWORD2
 sendTcl112Ac	KEYWORD2
 sendTeco	KEYWORD2
 sendToshibaAC	KEYWORD2
@@ -1024,6 +1026,7 @@ SONY	LITERAL1
 SONY_12_BITS	LITERAL1
 SONY_15_BITS	LITERAL1
 SONY_20_BITS	LITERAL1
+SONY_38K	LITERAL1
 TCL112AC	LITERAL1
 TECO	LITERAL1
 TIMEOUT_MS	LITERAL1
@@ -2606,6 +2609,8 @@ kPanasonicAcFanMed	LITERAL1
 kPanasonicAcFanMin	LITERAL1
 kPanasonicAcFanModeTemp	LITERAL1
 kPanasonicAcHeat	LITERAL1
+kPanasonicAcIonFilterByte	LITERAL1
+kPanasonicAcIonFilterOffset	LITERAL1
 kPanasonicAcMaxTemp	LITERAL1
 kPanasonicAcMessageGap	LITERAL1
 kPanasonicAcMinTemp	LITERAL1
@@ -2896,6 +2901,7 @@ kSlowStr	LITERAL1
 kSony12Bits	LITERAL1
 kSony15Bits	LITERAL1
 kSony20Bits	LITERAL1
+kSonyAltFreq	LITERAL1
 kSonyHdrMark	LITERAL1
 kSonyHdrMarkTicks	LITERAL1
 kSonyMinBits	LITERAL1
@@ -2908,6 +2914,7 @@ kSonyRptLength	LITERAL1
 kSonyRptLengthTicks	LITERAL1
 kSonySpace	LITERAL1
 kSonySpaceTicks	LITERAL1
+kSonyStdFreq	LITERAL1
 kSonyTick	LITERAL1
 kSonyZeroMark	LITERAL1
 kSonyZeroMarkTicks	LITERAL1
