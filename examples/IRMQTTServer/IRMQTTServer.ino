@@ -271,7 +271,7 @@
  *
  * #### Home Assistant MQTT Discovery
  *   There is an option for this: 'Send MQTT Discovery' under the 'Admin' menu.
- *   It will produce a single MQTT Cliamte Discovery message for Home Assistant
+ *   It will produce a single MQTT Climate Discovery message for Home Assistant
  *   provided you have everything configured correctly here and in HA.
  *   This message has MQTT RETAIN set on it, so it only ever needs to be sent
  *   once or if the config details change etc.
