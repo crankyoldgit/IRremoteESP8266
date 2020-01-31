@@ -19,6 +19,8 @@
 // Supports:
 //   Brand: AUX,  Model: KFR-35GW/BpNFW=3 A/C
 //   Brand: AUX,  Model: YKR-T/011 remote
+//   Brand: Electra,  Model: Classic INV 17 / AXW12DCS A/C
+//   Brand: Electra,  Model: YKR-M/003E remote
 
 // Ref:
 //  https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
