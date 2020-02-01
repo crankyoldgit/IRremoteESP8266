@@ -2679,7 +2679,7 @@ uint64_t getUInt64fromHex(char const *str) {
 //   code:     Numeric payload of the IR message. Most protocols use this.
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
 //   bits:     Nr. of bits in the protocol. 0 means use the protocol's default.
-//   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
+//   repeat:   Nr. of times the message is to be repeated. (Not all protocols.)
 // Returns:
 //   bool: Successfully sent or not.
 bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
@@ -3098,7 +3098,7 @@ bool decodeCommonAc(const decode_results *decode) {
   }
 #if IGNORE_DECODED_AC_PROTOCOL
   if (climate[0]->next.protocol != decode_type_t::UNKNOWN) {
-    // Use the previous protcol/model if set.
+    // Use the previous protocol/model if set.
     state.protocol = climate[0]->next.protocol;
     state.model = climate[0]->next.model;
   }
