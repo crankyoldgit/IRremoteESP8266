@@ -2256,7 +2256,9 @@ bool mqttPublish(const char* topic, const char* payload, boolean retained) {
   debug(topic);
   debug("Payload:");
   debug(payload);
-  return mqtt_client.publish(topic, payload, retained);
+  bool success = mqtt_client.publish(topic, payload, retained);
+  if (!success) debug("Failed to send properly!");
+  return success;
 }
 
 void mqttLog(const char* str) {
@@ -2985,72 +2987,72 @@ bool sendClimate(const String topic_prefix, const bool retain,
   mode_str.toLowerCase();
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
-  if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
+  if ((prev.power != next.power) || (prev.mode != next.mode) || forceMQTT) {
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
     if (!next.power) mode_str = F("off");
 #else  // MQTT_CLIMATE_HA_MODE
   // In non-Home Assistant mode, power and mode are not bound together.
-  if (prev.power != next.power || forceMQTT) {
+  if ((prev.power != next.power) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
   }
-  if (prev.mode != next.mode || forceMQTT) {
+  if ((prev.mode != next.mode) || forceMQTT) {
 #endif  // MQTT_CLIMATE_HA_MODE
-    success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
     diff = true;
+    success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
   }
-  if (prev.degrees != next.degrees || forceMQTT) {
+  if ((prev.degrees != next.degrees) || forceMQTT) {
     diff = true;
     success &= sendFloat(topic_prefix + KEY_TEMP, next.degrees, retain);
   }
-  if (prev.celsius != next.celsius || forceMQTT) {
+  if ((prev.celsius != next.celsius) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_CELSIUS, next.celsius, retain);
   }
-  if (prev.fanspeed != next.fanspeed || forceMQTT) {
+  if ((prev.fanspeed != next.fanspeed) || forceMQTT) {
     diff = true;
     success &= sendString(topic_prefix + KEY_FANSPEED,
                           IRac::fanspeedToString(next.fanspeed), retain);
   }
-  if (prev.swingv != next.swingv || forceMQTT) {
+  if ((prev.swingv != next.swingv) || forceMQTT) {
     diff = true;
     success &= sendString(topic_prefix + KEY_SWINGV,
                           IRac::swingvToString(next.swingv), retain);
   }
-  if (prev.swingh != next.swingh || forceMQTT) {
+  if ((prev.swingh != next.swingh) || forceMQTT) {
     diff = true;
     success &= sendString(topic_prefix + KEY_SWINGH,
                           IRac::swinghToString(next.swingh), retain);
   }
-  if (prev.quiet != next.quiet || forceMQTT) {
+  if ((prev.quiet != next.quiet) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_QUIET, next.quiet, retain);
   }
-  if (prev.turbo != next.turbo || forceMQTT) {
+  if ((prev.turbo != next.turbo) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_TURBO, next.turbo, retain);
   }
-  if (prev.econo != next.econo || forceMQTT) {
+  if ((prev.econo != next.econo) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_ECONO, next.econo, retain);
   }
-  if (prev.light != next.light || forceMQTT) {
+  if ((prev.light != next.light) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_LIGHT, next.light, retain);
   }
-  if (prev.filter != next.filter || forceMQTT) {
+  if ((prev.filter != next.filter) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_FILTER, next.filter, retain);
   }
-  if (prev.clean != next.clean || forceMQTT) {
+  if ((prev.clean != next.clean) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_CLEAN, next.clean, retain);
   }
-  if (prev.beep != next.beep || forceMQTT) {
+  if ((prev.beep != next.beep) || forceMQTT) {
     diff = true;
     success &= sendBool(topic_prefix + KEY_BEEP, next.beep, retain);
   }
-  if (prev.sleep != next.sleep || forceMQTT) {
+  if ((prev.sleep != next.sleep) || forceMQTT) {
     diff = true;
     success &= sendInt(topic_prefix + KEY_SLEEP, next.sleep, retain);
   }
