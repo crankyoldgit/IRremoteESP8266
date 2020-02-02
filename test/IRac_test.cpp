@@ -332,21 +332,23 @@ TEST(TestIRac, Daikin216) {
 }
 
 TEST(TestIRac, Electra) {
-  IRElectraAc ac(0);
-  IRac irac(0);
-  IRrecv capture(0);
+  IRElectraAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 6 (Fan), Temp: 26C, Fan: 1 (High), "
-      "Swing(V): On, Swing(H): On";
+      "Swing(V): On, Swing(H): On, Light: On, Clean: On";
 
   ac.begin();
   irac.electra(&ac,
-                 true,                        // Power
-                 stdAc::opmode_t::kFan,       // Mode
-                 26,                          // Celsius
-                 stdAc::fanspeed_t::kHigh,    // Fan speed
-                 stdAc::swingv_t::kAuto,      // Veritcal swing
-                 stdAc::swingh_t::kLeft);     // Horizontal swing
+               true,                        // Power
+               stdAc::opmode_t::kFan,       // Mode
+               26,                          // Celsius
+               stdAc::fanspeed_t::kHigh,    // Fan speed
+               stdAc::swingv_t::kAuto,      // Veritcal swing
+               stdAc::swingh_t::kLeft,      // Horizontal swing
+               true,                        // Light
+               true);                       // Clean
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

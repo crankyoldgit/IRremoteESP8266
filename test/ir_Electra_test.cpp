@@ -101,7 +101,7 @@ TEST(TestDecodeElectraAC, RealExampleDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off",
+      "Swing(V): Off, Swing(H): Off, Light: Off, Clean: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -232,19 +232,65 @@ TEST(TestIRElectraAcClass, HumanReadable) {
   ac.setRaw(on_cool_32C_auto_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 32C, Fan: 5 (Auto), "
-      "Swing(V): Off, Swing(H): Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Off, Clean: Off", ac.toString());
   uint8_t on_cool_16C_auto_voff[13] = {
       0xC3, 0x47, 0xE0, 0x00, 0xA0, 0x00, 0x20,
       0x00, 0x00, 0x20, 0x00, 0x41, 0x0B};
   ac.setRaw(on_cool_16C_auto_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 5 (Auto), "
-      "Swing(V): Off, Swing(H): Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Off, Clean: Off", ac.toString());
   uint8_t on_cool_16C_low_voff[13] = {
       0xC3, 0x47, 0xE0, 0x00, 0x60, 0x00, 0x20,
       0x00, 0x00, 0x20, 0x00, 0x41, 0xCB};
   ac.setRaw(on_cool_16C_low_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Off, Clean: Off", ac.toString());
+}
+
+TEST(TestIRElectraAcClass, Clean) {
+  IRElectraAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+
+  ac.setClean(false);
+  EXPECT_FALSE(ac.getClean());
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+
+  ac.setClean(false);
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1033#issuecomment-581133127
+  uint8_t on[13] = {0xC3, 0x87, 0xE0, 0x00, 0x60, 0x00, 0x20, 0x00, 0x00, 0x24,
+                    0x00, 0x19, 0xE7};
+  ac.setRaw(on);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
+      "Swing(V): Off, Swing(H): Off, Light: On, Clean: On", ac.toString());
+}
+
+TEST(TestIRElectraAcClass, Light) {
+  IRElectraAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+
+  ac.setLight(false);
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1033#issuecomment-581133127
+  uint8_t on[13] = {0xC3, 0x87, 0xE0, 0x00, 0x60, 0x00, 0x20, 0x00, 0x00, 0x24,
+                    0x00, 0x19, 0xE7};
+  ac.setRaw(on);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
+      "Swing(V): Off, Swing(H): Off, Light: On, Clean: On", ac.toString());
 }

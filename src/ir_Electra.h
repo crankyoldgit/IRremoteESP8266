@@ -59,8 +59,12 @@ const uint8_t kElectraAcDry =      0b010;
 const uint8_t kElectraAcHeat =     0b100;
 const uint8_t kElectraAcFan =      0b110;
 // state[9]
-const uint8_t kElectraAcPowerOffset = 5;
-
+//
+const uint8_t kElectraAcCleanOffset = 2;  // Bit 0b00000100
+const uint8_t kElectraAcPowerOffset = 5;  // Bit 0b00100000
+// state[11]
+//
+const uint8_t kElectraAcLightOffset = 4;  // Bit 0b00010000
 
 // Classes
 class IRElectraAc {
@@ -88,6 +92,10 @@ class IRElectraAc {
   bool getSwingV(void);
   void setSwingH(const bool on);
   bool getSwingH(void);
+  void setClean(const bool on);
+  bool getClean(void);
+  void setLight(const bool on);
+  bool getLight(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kElectraAcStateLength);

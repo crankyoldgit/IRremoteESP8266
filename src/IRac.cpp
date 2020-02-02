@@ -466,7 +466,8 @@ void IRac::electra(IRElectraAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv,
-                   const stdAc::swingh_t swingh) {
+                   const stdAc::swingh_t swingh,
+                   const bool light, const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -476,10 +477,11 @@ void IRac::electra(IRElectraAc *ac,
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
   // No Turbo setting available.
+  ac->setLight(light);
   // No Light setting available.
   // No Econo setting available.
   // No Filter setting available.
-  // No Clean setting available.
+  ac->setClean(clean);
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
@@ -1389,7 +1391,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
       electra(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.swingh);
+              send.swingh, send.light, send.clean);
       break;
     }
 #endif  // SEND_ELECTRA_AC

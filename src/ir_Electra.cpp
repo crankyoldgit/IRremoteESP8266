@@ -233,6 +233,22 @@ bool IRElectraAc::getSwingH(void) {
                    kElectraAcSwingSize);
 }
 
+void IRElectraAc::setLight(const bool on) {
+  setBit(&remote_state[11], kElectraAcLightOffset, on);
+}
+
+bool IRElectraAc::getLight(void) {
+  return GETBIT8(remote_state[11], kElectraAcLightOffset);
+}
+
+void IRElectraAc::setClean(const bool on) {
+  setBit(&remote_state[9], kElectraAcCleanOffset, on);
+}
+
+bool IRElectraAc::getClean(void) {
+  return GETBIT8(remote_state[9], kElectraAcCleanOffset);
+}
+
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRElectraAc::toCommon(void) {
   stdAc::state_t result;
@@ -246,13 +262,13 @@ stdAc::state_t IRElectraAc::toCommon(void) {
                                     : stdAc::swingv_t::kOff;
   result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
+  result.light = this->getLight();
+  result.clean = this->getClean();
   // Not supported.
   result.model = -1;  // No models used.
   result.quiet = false;
   result.turbo = false;
   result.econo = false;
-  result.clean = false;
-  result.light = false;
   result.filter = false;
   result.beep = false;
   result.sleep = -1;
@@ -273,6 +289,8 @@ String IRElectraAc::toString(void) {
                            kElectraAcFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getClean(), kCleanStr);
   return result;
 }
 
