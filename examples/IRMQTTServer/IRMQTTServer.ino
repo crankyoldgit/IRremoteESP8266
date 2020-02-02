@@ -2246,19 +2246,6 @@ void unsubscribing(const String topic_name) {
   debug(topic_name.c_str());
 }
 
-// Send an MQTT message and log what we did to debug.
-bool mqttPublish(const char* topic, const char* payload, boolean retained) {
-  if (retained)
-    debug("MQTT publish (with retain):");
-  else
-    debug("MQTT publish:");
-  debug("Topic:");
-  debug(topic);
-  debug("Payload:");
-  debug(payload);
-  return mqtt_client.publish(topic, payload, retained);
-}
-
 void mqttLog(const char* str) {
   debug(str);
   mqtt_client.publish(MqttLog.c_str(), str);
@@ -2797,7 +2784,7 @@ bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
 bool sendInt(const String topic, const int32_t num, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqttPublish(topic.c_str(), String(num).c_str(), retain);
+  return mqtt_client.publish(topic.c_str(), String(num).c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
@@ -2806,7 +2793,7 @@ bool sendInt(const String topic, const int32_t num, const bool retain) {
 bool sendBool(const String topic, const bool on, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqttPublish(topic.c_str(), (on ? "on" : "off"), retain);
+  return mqtt_client.publish(topic.c_str(), (on ? "on" : "off"), retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
@@ -2815,7 +2802,7 @@ bool sendBool(const String topic, const bool on, const bool retain) {
 bool sendString(const String topic, const String str, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqttPublish(topic.c_str(), str.c_str(), retain);
+  return mqtt_client.publish(topic.c_str(), str.c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
@@ -2824,7 +2811,7 @@ bool sendString(const String topic, const String str, const bool retain) {
 bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqttPublish(topic.c_str(), String(temp, 1).c_str(), retain);
+  return mqtt_client.publish(topic.c_str(), String(temp, 1).c_str(), retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
