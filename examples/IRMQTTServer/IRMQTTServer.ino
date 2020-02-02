@@ -2985,11 +2985,6 @@ bool sendClimate(const String topic_prefix, const bool retain,
   // I don't know why, but the modes need to be lower case to work with
   // Home Assistant & Google Home.
   mode_str.toLowerCase();
-  debug("sendClimate debug:");
-  debug(String(String("Prev power is ") +
-               String(prev.power ? "on" : "off")).c_str());
-  debug(String(String("Next power is ") +
-               String(next.power ? "on" : "off")).c_str());
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
   if ((prev.power != next.power) || (prev.mode != next.mode) || forceMQTT) {
