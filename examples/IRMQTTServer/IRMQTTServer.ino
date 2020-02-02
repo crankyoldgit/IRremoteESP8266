@@ -2993,8 +2993,11 @@ bool sendClimate(const String topic_prefix, const bool retain,
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
   if ((prev.power != next.power) || (prev.mode != next.mode) || forceMQTT) {
+    diff = true;
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
     if (!next.power) mode_str = F("off");
+    success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
+  }
 #else  // MQTT_CLIMATE_HA_MODE
   // In non-Home Assistant mode, power and mode are not bound together.
   if ((prev.power != next.power) || forceMQTT) {
@@ -3002,10 +3005,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
   }
   if ((prev.mode != next.mode) || forceMQTT) {
-#endif  // MQTT_CLIMATE_HA_MODE
     diff = true;
     success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
   }
+#endif  // MQTT_CLIMATE_HA_MODE
   if ((prev.degrees != next.degrees) || forceMQTT) {
     diff = true;
     success &= sendFloat(topic_prefix + KEY_TEMP, next.degrees, retain);
