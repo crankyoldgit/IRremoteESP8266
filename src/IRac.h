@@ -54,6 +54,7 @@ class IRac {
                         const bool beep, const int16_t sleep,
                         const int16_t clock);
   static void initState(stdAc::state_t *state);
+  void markAsSent(void);
   bool sendAc(void);
   bool sendAc(const stdAc::state_t desired, const stdAc::state_t *prev = NULL);
   bool sendAc(const decode_type_t vendor, const int16_t model,

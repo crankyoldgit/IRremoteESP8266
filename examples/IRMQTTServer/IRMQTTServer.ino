@@ -3094,6 +3094,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
     lastClimateIr.reset();
     irClimateCounter++;
   }
+  // Mark the "next" value as old/previous.
+  if (ac != NULL) {
+    ac->markAsSent();
+  }
   return success;
 }
 
@@ -3126,15 +3130,15 @@ bool decodeCommonAc(const decode_results *decode) {
     state.model = climate[0]->next.model;
   }
 #endif  // IGNORE_DECODED_AC_PROTOCOL
-// Continue to use the previously prefered temperature units.
-// i.e. Keep using Celsius or Fahrenheit.
-if (climate[0]->next.celsius != state.celsius) {
-  // We've got a mismatch, so we need to convert.
-  state.degrees = climate[0]->next.celsius ? fahrenheitToCelsius(state.degrees)
-                                           : celsiusToFahrenheit(state.degrees);
-  state.celsius = climate[0]->next.celsius;
-}
-climate[0]->next = state;  // Copy over the new climate state.
+  // Continue to use the previously prefered temperature units.
+  // i.e. Keep using Celsius or Fahrenheit.
+  if (climate[0]->next.celsius != state.celsius) {
+    // We've got a mismatch, so we need to convert.
+    state.degrees = climate[0]->next.celsius ?
+        fahrenheitToCelsius(state.degrees) : celsiusToFahrenheit(state.degrees);
+    state.celsius = climate[0]->next.celsius;
+  }
+  climate[0]->next = state;  // Copy over the new climate state.
 #if MQTT_ENABLE
   sendClimate(genStatTopic(0), true, false, REPLAY_DECODED_AC_MESSAGE,
               REPLAY_DECODED_AC_MESSAGE, climate[0]);
