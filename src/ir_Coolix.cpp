@@ -27,16 +27,16 @@
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
 // pulse parameters in usec
-const uint16_t kCoolixTick = 560;  // Approximately 21 cycles at 38kHz
-const uint16_t kCoolixBitMarkTicks = 1;
+const uint16_t kCoolixTick = 276;  // Approximately 10.5 cycles at 38kHz
+const uint16_t kCoolixBitMarkTicks = 2;
 const uint16_t kCoolixBitMark = kCoolixBitMarkTicks * kCoolixTick;
-const uint16_t kCoolixOneSpaceTicks = 3;
+const uint16_t kCoolixOneSpaceTicks = 6;
 const uint16_t kCoolixOneSpace = kCoolixOneSpaceTicks * kCoolixTick;
-const uint16_t kCoolixZeroSpaceTicks = 1;
+const uint16_t kCoolixZeroSpaceTicks = 2;
 const uint16_t kCoolixZeroSpace = kCoolixZeroSpaceTicks * kCoolixTick;
-const uint16_t kCoolixHdrMarkTicks = 8;
+const uint16_t kCoolixHdrMarkTicks = 17;
 const uint16_t kCoolixHdrMark = kCoolixHdrMarkTicks * kCoolixTick;
-const uint16_t kCoolixHdrSpaceTicks = 8;
+const uint16_t kCoolixHdrSpaceTicks = 16;
 const uint16_t kCoolixHdrSpace = kCoolixHdrSpaceTicks * kCoolixTick;
 const uint16_t kCoolixMinGapTicks = kCoolixHdrMarkTicks + kCoolixZeroSpaceTicks;
 const uint16_t kCoolixMinGap = kCoolixMinGapTicks * kCoolixTick;
@@ -57,11 +57,10 @@ using irutils::setBits;
 //   nbits:  Nr. of bits of data to be sent. Typically kCoolixBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: BETA / Probably works.
+// Status: STABLE / Confirmed Working.
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp
-// TODO(anyone): Verify repeat functionality against a real unit.
 void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
