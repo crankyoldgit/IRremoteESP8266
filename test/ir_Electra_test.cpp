@@ -294,3 +294,29 @@ TEST(TestIRElectraAcClass, Light) {
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
       "Swing(V): Off, Swing(H): Off, Light: On, Clean: On", ac.toString());
 }
+
+TEST(TestIRElectraAcClass, ConstructKnownState) {
+  IRElectraAc ac(kGpioUnused);
+  // Data from:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1033#issuecomment-581133127
+  // A/C on - Cooling mode - 24° - Fan speed set to 1 - Light set to on
+  // - flaps off - turbo off - clean on
+  const uint8_t on_cool_24C_fan1_swing_off_turbo_off_clean_on[13] = {
+      0xC3, 0x87, 0xE0, 0x00, 0x60, 0x00, 0x20,
+      0x00, 0x00, 0x24, 0x00, 0x19, 0xE7};
+  ac.stateReset();
+  ac.on();
+  ac.setMode(kElectraAcCool);
+  ac.setTemp(24);
+  ac.setSwingH(false);
+  ac.setSwingV(false);
+  ac.setFan(kElectraAcFanLow);
+  ac.setLight(true);
+  ac.setClean(true);
+
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
+      "Swing(V): Off, Swing(H): Off, Light: On, Clean: On", ac.toString());
+  EXPECT_STATE_EQ(on_cool_24C_fan1_swing_off_turbo_off_clean_on,
+                  ac.getRaw(), kElectraAcBits);
+}
