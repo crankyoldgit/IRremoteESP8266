@@ -800,3 +800,44 @@ TEST(TestCoolixACClass, Issue985) {
   EXPECT_EQ(kCoolixOff, ac._irsend.capture.value);
   EXPECT_EQ("Power: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
+
+TEST(TestCoolixACClass, PowerStateWithSetRaw) {
+  IRrecv irrecv(kGpioUnused);
+  IRCoolixAC ac(kGpioUnused);
+
+  // Problem reported that power is always off via decodeToState()
+  // Ref:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/pull/1040
+  //   https://github.com/arendst/Tasmota/issues/7660
+
+  const uint32_t on_code =  0xB2BFCC;  // A valid "on" message.
+
+  // Check the off case.
+  ac.setRaw(kCoolixOff);
+  ASSERT_FALSE(ac.getPower());
+  EXPECT_FALSE(ac.toCommon().power);
+
+  // Check the "on" case.
+  ac.setRaw(on_code);
+  ASSERT_TRUE(ac.getPower());
+  EXPECT_TRUE(ac.toCommon().power);
+  // Now check the reported decodeToState() is also fixed.
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  EXPECT_EQ(on_code, ac._irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Heat), Fan: 5 (Auto), Temp: 25C, Zone Follow: Off, "
+      "Sensor Temp: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t result;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &result));
+  EXPECT_TRUE(result.power);
+
+  // Recheck the off case to ensure it changes.
+  ac.setRaw(kCoolixOff);
+  ASSERT_FALSE(ac.getPower());
+  EXPECT_FALSE(ac.toCommon().power);
+}

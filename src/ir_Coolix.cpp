@@ -130,6 +130,7 @@ void IRCoolixAC::send(const uint16_t repeat) {
 uint32_t IRCoolixAC::getRaw() { return remote_state; }
 
 void IRCoolixAC::setRaw(const uint32_t new_code) {
+  powerFlag = true;  // Everything that is not the special power off mesg is On.
   if (!handleSpecialState(new_code)) {
     // it isn`t special so might affect Temp|mode|Fan
     if (new_code == kCoolixCmdFan) {
