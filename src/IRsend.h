@@ -158,7 +158,7 @@ class IRsend {
   VIRTUAL uint16_t mark(uint16_t usec);
   VIRTUAL void space(uint32_t usec);
   int8_t calibrate(uint16_t hz = 38000U);
-  void sendRaw(uint16_t buf[], uint16_t len, uint16_t hz);
+  void sendRaw(const uint16_t buf[], const uint16_t len, const uint16_t hz);
   void sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,
                 uint32_t zerospace, uint64_t data, uint16_t nbits,
                 bool MSBfirst = true);
@@ -535,7 +535,10 @@ class IRsend {
                  const uint16_t nbytes = kAmcorStateLength,
                  const uint16_t repeat = kAmcorDefaultRepeat);
 #endif  // SEND_AMCOR
-
+#if SEND_EPSON
+  void sendEpson(uint64_t data, uint16_t nbits = kEpsonBits,
+                 uint16_t repeat = kEpsonMinRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

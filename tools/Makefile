@@ -51,7 +51,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o ir_Pioneer.o \
             ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o \
             ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Argo.o \
-						ir_Trotec.o ir_Neoclima.o ir_Amcor.o
+						ir_Trotec.o ir_Neoclima.o ir_Amcor.o ir_Epson.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRtext.o IRac.o $(PROTOCOLS)
@@ -233,6 +233,9 @@ ir_Neoclima.o : $(USER_DIR)/ir_Neoclima.cpp $(USER_DIR)/ir_Neoclima.h $(COMMON_D
 
 ir_Amcor.o : $(USER_DIR)/ir_Amcor.cpp $(USER_DIR)/ir_Amcor.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Amcor.cpp
+
+ir_Epson.o : $(USER_DIR)/ir_Epson.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Epson.cpp
 
 IRac.o : $(USER_DIR)/IRac.cpp $(USER_DIR)/IRac.h $(COMMON_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES)  -c $(USER_DIR)/IRac.cpp
