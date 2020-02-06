@@ -3364,3 +3364,39 @@ TEST(TestDaikin152Class, BuildKnownState) {
       0x00, 0x00, 0x00, 0x00, 0x00, 0xC5, 0x00, 0x00, 0x6F};
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin152Bits);
 }
+
+TEST(TestDaikin2Class, Issue1035) {
+  IRDaikin2 ac(kGpioUnused);
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1035#issuecomment-580963572
+  const uint8_t on_code[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x15, 0x43, 0x90, 0x29, 0x0C, 0x80, 0x04,
+      0xC0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xC1, 0x2D, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x09, 0x2A, 0x00, 0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0x0C};
+  const uint8_t off_code[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x15, 0xC3, 0x90, 0x29, 0x0C, 0x80, 0x04,
+      0xC0, 0x16, 0x24, 0x00, 0x00, 0xBE, 0xD1, 0xBD, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x08, 0x2A, 0x00, 0xB0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0x0B};
+
+  ac.setRaw(on_code);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Auto), Temp: 21C, Fan: 11 (Quiet), "
+      "Swing(V): 1 (Highest), Swing(H): 190 (Auto), Clock: 13:09, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
+      "Light: 1 (High), Mould: On, Clean: On, Fresh: On, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_NE(ac.toCommon().mode, stdAc::opmode_t::kOff);
+
+  ac.setRaw(off_code);
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (Auto), Temp: 21C, Fan: 11 (Quiet), "
+      "Swing(V): 1 (Highest), Swing(H): 190 (Auto), Clock: 13:09, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
+      "Light: 1 (High), Mould: On, Clean: On, Fresh: On, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      ac.toString());
+  ASSERT_FALSE(ac.toCommon().power);
+}

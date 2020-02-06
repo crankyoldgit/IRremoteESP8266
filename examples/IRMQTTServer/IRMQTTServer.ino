@@ -2679,7 +2679,7 @@ uint64_t getUInt64fromHex(char const *str) {
 //   code:     Numeric payload of the IR message. Most protocols use this.
 //   code_str: The unparsed code to be sent. Used by complex protocol encodings.
 //   bits:     Nr. of bits in the protocol. 0 means use the protocol's default.
-//   repeat:   Nr. of times the message is to be repeated. (Not all protcols.)
+//   repeat:   Nr. of times the message is to be repeated. (Not all protocols.)
 // Returns:
 //   bool: Successfully sent or not.
 bool sendIRCode(IRsend *irsend, decode_type_t const ir_type,
@@ -3071,6 +3071,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
     lastClimateIr.reset();
     irClimateCounter++;
   }
+  // Mark the "next" value as old/previous.
+  if (ac != NULL) {
+    ac->markAsSent();
+  }
   return success;
 }
 
@@ -3098,20 +3102,20 @@ bool decodeCommonAc(const decode_results *decode) {
   }
 #if IGNORE_DECODED_AC_PROTOCOL
   if (climate[0]->next.protocol != decode_type_t::UNKNOWN) {
-    // Use the previous protcol/model if set.
+    // Use the previous protocol/model if set.
     state.protocol = climate[0]->next.protocol;
     state.model = climate[0]->next.model;
   }
 #endif  // IGNORE_DECODED_AC_PROTOCOL
-// Continue to use the previously prefered temperature units.
-// i.e. Keep using Celsius or Fahrenheit.
-if (climate[0]->next.celsius != state.celsius) {
-  // We've got a mismatch, so we need to convert.
-  state.degrees = climate[0]->next.celsius ? fahrenheitToCelsius(state.degrees)
-                                           : celsiusToFahrenheit(state.degrees);
-  state.celsius = climate[0]->next.celsius;
-}
-climate[0]->next = state;  // Copy over the new climate state.
+  // Continue to use the previously prefered temperature units.
+  // i.e. Keep using Celsius or Fahrenheit.
+  if (climate[0]->next.celsius != state.celsius) {
+    // We've got a mismatch, so we need to convert.
+    state.degrees = climate[0]->next.celsius ?
+        fahrenheitToCelsius(state.degrees) : celsiusToFahrenheit(state.degrees);
+    state.celsius = climate[0]->next.celsius;
+  }
+  climate[0]->next = state;  // Copy over the new climate state.
 #if MQTT_ENABLE
   sendClimate(genStatTopic(0), true, false, REPLAY_DECODED_AC_MESSAGE,
               REPLAY_DECODED_AC_MESSAGE, climate[0]);

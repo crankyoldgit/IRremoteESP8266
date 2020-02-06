@@ -45,7 +45,7 @@ IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   _inverted = inverted;
   _modulation = use_modulation;
   initState(&next);
-  _prev = next;
+  this->markAsSent();
 }
 
 void IRac::initState(stdAc::state_t *state,
@@ -1628,13 +1628,18 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   return true;  // Success.
 }
 
+// Update the previous state to the current one.
+void IRac::markAsSent(void) {
+  _prev = next;
+}
+
 // Send an A/C message based soley on our internal state.
 //
 // Returns:
 //   boolean: True, if accepted/converted/attempted. False, if unsupported.
 bool IRac::sendAc(void) {
   bool success = this->sendAc(next, &_prev);
-  _prev = next;
+  if (success) this->markAsSent();
   return success;
 }
 

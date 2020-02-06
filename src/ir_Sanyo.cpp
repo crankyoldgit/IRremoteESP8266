@@ -96,7 +96,7 @@ uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint8_t command) {
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // This protocol appears to be another 42-bit variant of the NEC protcol.
+  // This protocol appears to be another 42-bit variant of the NEC protocol.
   sendNEC(data, nbits, repeat);
 }
 #endif  // SEND_SANYO
