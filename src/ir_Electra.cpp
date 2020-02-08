@@ -233,11 +233,11 @@ bool IRElectraAc::getSwingH(void) {
                    kElectraAcSwingSize);
 }
 
-void IRElectraAc::setLight(const bool on) {
+void IRElectraAc::setLightToggle(const bool on) {
   setBit(&remote_state[11], kElectraAcLightOffset, on);
 }
 
-bool IRElectraAc::getLight(void) {
+bool IRElectraAc::getLightToggle(void) {
   return GETBIT8(remote_state[11], kElectraAcLightOffset);
 }
 
@@ -262,7 +262,7 @@ stdAc::state_t IRElectraAc::toCommon(void) {
                                     : stdAc::swingv_t::kOff;
   result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
-  result.light = this->getLight();
+  result.light = this->getLightToggle();
   result.clean = this->getClean();
   // Not supported.
   result.model = -1;  // No models used.
@@ -279,7 +279,7 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRElectraAc::toString(void) {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
@@ -289,7 +289,7 @@ String IRElectraAc::toString(void) {
                            kElectraAcFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
-  result += addBoolToString(getLight(), kLightStr);
+  result += addLabeledString(getLightToggle() ? kToggleStr : "-", kLightStr);
   result += addBoolToString(getClean(), kCleanStr);
   return result;
 }

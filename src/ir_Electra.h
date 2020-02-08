@@ -94,8 +94,8 @@ class IRElectraAc {
   bool getSwingH(void);
   void setClean(const bool on);
   bool getClean(void);
-  void setLight(const bool on);
-  bool getLight(void);
+  void setLightToggle(const bool on);
+  bool getLightToggle(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kElectraAcStateLength);

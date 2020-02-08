@@ -467,7 +467,7 @@ void IRac::electra(IRElectraAc *ac,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv,
                    const stdAc::swingh_t swingh,
-                   const bool light, const bool clean) {
+                   const bool lighttoggle, const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -477,7 +477,7 @@ void IRac::electra(IRElectraAc *ac,
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
   // No Turbo setting available.
-  ac->setLight(light);
+  ac->setLightToggle(lighttoggle);
   // No Light setting available.
   // No Econo setting available.
   // No Filter setting available.
@@ -1219,6 +1219,9 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         break;
       case decode_type_t::DAIKIN128:
         result.power = desired.power ^ prev->power;
+        result.light = desired.light ^ prev->light;
+        break;
+      case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
       case decode_type_t::MIDEA:
