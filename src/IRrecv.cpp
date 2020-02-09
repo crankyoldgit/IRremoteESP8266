@@ -307,7 +307,7 @@ void IRrecv::setTolerance(const uint8_t percent) {
 // Get the base tolerance percentage for matching incoming IR messages.
 uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 
-#if ENABLE_HIGHPASS_FILTER_OPTION
+#if ENABLE_NOISE_FILTER_OPTION
 // Remove or merge pulses in the capture buffer that are too short.
 // Args:
 //   results:  Ptr to the decode_results we are going to filter/modify.
@@ -334,7 +334,7 @@ void IRrecv::crudeHighPassFilter(decode_results *results, const uint8_t floor) {
     }
   }
 }
-#endif  // ENABLE_HIGHPASS_FILTER_OPTION
+#endif  // ENABLE_NOISE_FILTER_OPTION
 
 // Decodes the received IR message.
 // If the interrupt state is saved, we will immediately resume waiting
@@ -426,9 +426,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   results->command = 0;
   results->repeat = false;
 
-#if ENABLE_HIGHPASS_FILTER_OPTION
+#if ENABLE_NOISE_FILTER_OPTION
   crudeHighPassFilter(results, noise_floor);
-#endif  // ENABLE_HIGHPASS_FILTER_OPTION
+#endif  // ENABLE_NOISE_FILTER_OPTION
   // Keep looking for protocols until we've run out of entries to skip or we
   // find a valid protocol message.
   for (uint16_t offset = kStartOffset;

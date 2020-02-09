@@ -602,9 +602,9 @@
 //         decoding of some protocols. You have been warned. Here Be Dragons!
 //
 // See: `irrecv::decode()` in IRrecv.cpp for more info.
-#ifndef ENABLE_HIGHPASS_FILTER_OPTION
-#define ENABLE_HIGHPASS_FILTER_OPTION true
-#endif  // ENABLE_HIGHPASS_FILTER_OPTION
+#ifndef ENABLE_NOISE_FILTER_OPTION
+#define ENABLE_NOISE_FILTER_OPTION true
+#endif  // ENABLE_NOISE_FILTER_OPTION
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
