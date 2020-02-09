@@ -89,19 +89,17 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 //   http://www.sbprojects.com/knowledge/ir/nec.php
 bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset &&
-      results->rawlen != kNecRptLength + offset - 1)
+  if (results->rawlen < kNecRptLength + offset - 1)
     return false;  // Can't possibly be a valid NEC message.
   if (strict && nbits != kNECBits)
     return false;  // Not strictly an NEC message.
 
   uint64_t data = 0;
 
-  // Header
+  // Header - All NEC messages have this Header Mark.
   if (!matchMark(results->rawbuf[offset++], kNecHdrMark)) return false;
   // Check if it is a repeat code.
-  if (results->rawlen == kNecRptLength &&
-      matchSpace(results->rawbuf[offset], kNecRptSpace) &&
+  if (matchSpace(results->rawbuf[offset], kNecRptSpace) &&
       matchMark(results->rawbuf[offset + 1], kNecBitMark)) {
     results->value = kRepeat;
     results->decode_type = NEC;
