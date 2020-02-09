@@ -312,7 +312,7 @@ uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 // Args:
 //   results:  Ptr to the decode_results we are going to filter/modify.
 //   floor:  Only allow values in the buffer large than this. (in micro seconds)
-void IRrecv::crudeHighPassFilter(decode_results *results, const uint8_t floor) {
+void IRrecv::crudeNoiseFilter(decode_results *results, const uint8_t floor) {
   if (floor == 0) return;  // Nothing to do.
   const uint8_t kTickFloor = floor / kRawTick;
   for (uint16_t offset = kStartOffset; offset + 1 < results->rawlen;) {
@@ -427,7 +427,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   results->repeat = false;
 
 #if ENABLE_NOISE_FILTER_OPTION
-  crudeHighPassFilter(results, noise_floor);
+  crudeNoiseFilter(results, noise_floor);
 #endif  // ENABLE_NOISE_FILTER_OPTION
   // Keep looking for protocols until we've run out of entries to skip or we
   // find a valid protocol message.

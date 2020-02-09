@@ -221,7 +221,7 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
-  void crudeHighPassFilter(decode_results *results, const uint8_t floor = 0);
+  void crudeNoiseFilter(decode_results *results, const uint8_t floor = 0);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,

@@ -1358,7 +1358,7 @@ TEST(TestDecode, SkippingInDecode) {
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 }
 
-TEST(TestDecode, CrudeHighPassFilter) {
+TEST(TestDecode, CrudeNoiseFilter) {
   IRsendTest irsend(0);
   IRrecv irrecv(1);
   irsend.begin();
