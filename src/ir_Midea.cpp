@@ -397,6 +397,8 @@ String IRMideaAC::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kMideaBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -404,7 +406,8 @@ String IRMideaAC::toString(void) {
 //
 // Status: Alpha / Needs testing against a real device.
 //
-bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict) {
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != kMideaBits) return false;  // Not strictly a MIDEA message.
@@ -414,12 +417,11 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t nbits, bool strict) {
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
   if (results->rawlen <
-      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1)
+      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1 + offset)
     return false;  // Can't possibly be a valid MIDEA message.
 
   uint64_t data = 0;
   uint64_t inverted = 0;
-  uint16_t offset = kStartOffset;
 
   if (nbits > sizeof(data) * 8)
     return false;  // We can't possibly capture a Midea packet that big.

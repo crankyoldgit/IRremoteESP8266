@@ -478,7 +478,8 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0x1234567890DF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0x1234567890DF, irsend.capture.value);
@@ -490,7 +491,8 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -502,7 +504,8 @@ TEST(TestDecodeMidea, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMidea(0xFFFFFFFFFFA0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFA0, irsend.capture.value);
@@ -534,20 +537,23 @@ TEST(TestDecodeMidea, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendMidea(0xA18263FFFF6E, kMideaBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_FALSE(irsend.capture.repeat);
 
   irsend.makeDecodeResult(2 * (2 * kMideaBits + 4));
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
 
   irsend.makeDecodeResult(4 * (2 * kMideaBits + 4));
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 true));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
@@ -563,9 +569,10 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
   irsend.sendMidea(0x12, 8);  // Illegal value Midea 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                  true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, 8, false));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, 8, false));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0x12, irsend.capture.value);
@@ -574,13 +581,14 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
   irsend.sendMidea(0x12345678, 32);  // Illegal value Midea 32-bit message.
   irsend.makeDecodeResult();
   // Shouldn't pass with strict when we ask for less bits than we got.
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, true));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                  true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kStartOffset, 32, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, 32, false));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -589,7 +597,7 @@ TEST(TestDecodeMidea, DecodeWithNonStrictSizes) {
   irsend.reset();
   irsend.sendMidea(0x123456, kMideaBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, 9, false));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kStartOffset, 9, false));
 }
 
 // Decode (non-standard) 64-bit messages.
@@ -603,7 +611,7 @@ TEST(TestDecodeMidea, Decode64BitMessages) {
   irsend.sendMidea(0xFFFFFFFFFFFFFFFF, 64);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, 64, false));
+  ASSERT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFFFFFFF, irsend.capture.value);
@@ -625,7 +633,8 @@ TEST(TestDecodeMidea, FailToDecodeNonMideaExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kMideaBits, false));
+  ASSERT_FALSE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                  false));
 }
 
 // Decode against a real capture reported by a user. See issue #354
@@ -768,7 +777,8 @@ TEST(TestDecodeMidea, Issue887) {
   irsend.reset();
   irsend.sendMidea(hwaddr);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeMidea(&irsend.capture, kMideaBits, false));
+  EXPECT_TRUE(irrecv.decodeMidea(&irsend.capture, kStartOffset, kMideaBits,
+                                 false));
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(hwaddr, irsend.capture.value);

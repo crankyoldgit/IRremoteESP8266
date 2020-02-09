@@ -414,21 +414,22 @@ String IRKelvinatorAC::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kKelvinatorBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: STABLE / Known working.
-bool IRrecv::decodeKelvinator(decode_results *results, uint16_t nbits,
-                              bool strict) {
-  if (results->rawlen <
-      2 * (nbits + kKelvinatorCmdFooterBits) + (kHeader + kFooter + 1) * 2 - 1)
+bool IRrecv::decodeKelvinator(decode_results *results, uint16_t offset,
+                              const uint16_t nbits, const bool strict) {
+  if (results->rawlen <=
+      2 * (nbits + kKelvinatorCmdFooterBits) + (kHeader + kFooter + 1) * 2 - 1 +
+      offset)
     return false;  // Can't possibly be a valid Kelvinator message.
   if (strict && nbits != kKelvinatorBits)
     return false;  // Not strictly a Kelvinator message.
-
-  uint16_t offset = kStartOffset;
 
   // There are two messages back-to-back in a full Kelvinator IR message
   // sequence.

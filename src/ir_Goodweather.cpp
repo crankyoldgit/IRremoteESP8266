@@ -370,23 +370,24 @@ String IRGoodweatherAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kGoodweatherBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: ALPHA / Untested.
-bool IRrecv::decodeGoodweather(decode_results* results,
+bool IRrecv::decodeGoodweather(decode_results* results, uint16_t offset,
                                const uint16_t nbits,
                                const bool strict) {
-  if (results->rawlen < 2 * (2 * nbits) + kHeader + 2 * kFooter - 1)
+  if (results->rawlen < 2 * (2 * nbits) + kHeader + 2 * kFooter - 1 + offset)
     return false;  // Can't possibly be a valid Goodweather message.
   if (strict && nbits != kGoodweatherBits)
     return false;  // Not strictly a Goodweather message.
 
   uint64_t dataSoFar = 0;
   uint16_t dataBitsSoFar = 0;
-  uint16_t offset = kStartOffset;
   match_result_t data_result;
 
   // Header

@@ -959,17 +959,17 @@ String IRMitsubishiHeavy88Ac::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
-//            Typically kMitsubishiHeavy88Bits or kMitsubishiHeavy152Bits.
+//            Typically kMitsubishiHeavy88Bits or kMitsubishiHeavy152Bits (def).
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: BETA / Appears to be working. Needs testing against a real device.
-bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
+bool IRrecv::decodeMitsubishiHeavy(decode_results* results, uint16_t offset,
                                    const uint16_t nbits, const bool strict) {
-  // Check if can possibly be a valid MitsubishiHeavy message.
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1) return false;
   if (strict) {
     switch (nbits) {
       case kMitsubishiHeavy88Bits:
@@ -980,7 +980,6 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results,
     }
   }
 
-  uint16_t offset = kStartOffset;
   uint16_t used;
   used = matchGeneric(results->rawbuf + offset, results->state,
                       results->rawlen - offset, nbits,

@@ -347,6 +347,8 @@ int16_t IRrecv::getRClevel(decode_results *results, uint16_t *offset,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -363,14 +365,14 @@ int16_t IRrecv::getRClevel(decode_results *results, uint16_t *offset,
 //   https://en.wikipedia.org/wiki/Manchester_code
 // TODO(anyone):
 //   Serious testing of the RC-5X and strict aspects needs to be done.
-bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < kRc5SamplesMin + kHeader - 1) return false;
+bool IRrecv::decodeRC5(decode_results *results, uint16_t offset,
+                       const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= kRc5SamplesMin + kHeader - 1 + offset) return false;
 
   // Compliance
   if (strict && nbits != kRC5Bits && nbits != kRC5XBits)
     return false;  // It's neither RC-5 or RC-5X.
 
-  uint16_t offset = kStartOffset;
   uint16_t used = 0;
   bool is_rc5x = false;
   uint64_t data = 0;
@@ -432,6 +434,8 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -444,8 +448,10 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t nbits, bool strict) {
 //   https://en.wikipedia.org/wiki/Manchester_code
 // TODO(anyone):
 //   Testing of the strict compliance aspects.
-bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < kHeader + 2 + 4)  // Up to the double-wide T bit.
+bool IRrecv::decodeRC6(decode_results *results, uint16_t offset,
+                       const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= kHeader + 2 + 4 + offset)
+    // Up to the double-wide T bit.
     return false;  // Smaller than absolute smallest possible RC6 message.
 
   if (strict) {  // Compliance
@@ -455,7 +461,7 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
     // Also due to potential melding with the start bit, we can only count
     // the start bit as 1, instead of a more typical 2 value. The header still
     // remains as normal.
-    if (results->rawlen < nbits + kHeader + 1)
+    if (results->rawlen <= nbits + kHeader + 1 + offset)
       return false;  // Don't have enough entries/samples to be valid.
     switch (nbits) {
       case kRC6Mode0Bits:
@@ -465,8 +471,6 @@ bool IRrecv::decodeRC6(decode_results *results, uint16_t nbits, bool strict) {
         return false;  // Asking for the wrong number of bits.
     }
   }
-
-  uint16_t offset = kStartOffset;
 
   // Header
   if (!matchMark(results->rawbuf[offset], kRc6HdrMark)) return false;

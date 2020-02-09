@@ -96,6 +96,8 @@ uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kPioneerBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -103,15 +105,14 @@ uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
 //
 // Status: BETA / Should be working. (Self decodes & real examples)
 //
-bool IRrecv::decodePioneer(decode_results *results, const uint16_t nbits,
-                           const bool strict) {
-  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1)
+bool IRrecv::decodePioneer(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
     return false;  // Can't possibly be a valid Pioneer message.
   if (strict && nbits != kPioneerBits)
     return false;  // Not strictly an Pioneer message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   results->value = 0;
   for (uint16_t section = 0; section < 2; section++) {
     // Match Header + Data + Footer

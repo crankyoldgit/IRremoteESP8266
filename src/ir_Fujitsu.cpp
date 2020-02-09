@@ -684,22 +684,25 @@ String IRFujitsuAC::toString(void) {
 // Places successful decode information in the results pointer.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kFujitsuAcBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status:  ALPHA / Untested.
+// Status:  STABLE / Working.
 //
 // Ref:
 //
-bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t nbits,
-                             bool strict) {
-  uint16_t offset = kStartOffset;
+bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t offset,
+                             const uint16_t nbits,
+                             const bool strict) {
   uint16_t dataBitsSoFar = 0;
 
   // Have we got enough data to successfully decode?
-  if (results->rawlen < (2 * kFujitsuAcMinBits) + kHeader + kFooter - 1)
+  if (results->rawlen < (2 * kFujitsuAcMinBits) + kHeader + kFooter - 1 +
+      offset)
     return false;  // Can't possibly be a valid message.
 
   // Compliance

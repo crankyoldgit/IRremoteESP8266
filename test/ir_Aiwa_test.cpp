@@ -130,7 +130,8 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                      kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7F, irsend.capture.value);
@@ -142,7 +143,8 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                      kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -154,7 +156,8 @@ TEST(TestDecodeAiwa, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7FFF);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                      kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7FFF, irsend.capture.value);
@@ -173,7 +176,8 @@ TEST(TestDecodeAiwa, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendAiwaRCT501(0x7F, kAiwaRcT501Bits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                      kAiwaRcT501Bits, true));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(kAiwaRcT501Bits, irsend.capture.bits);
   EXPECT_EQ(0x7F, irsend.capture.value);
@@ -193,7 +197,8 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1D8113F00FF, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // MUST pass with strict on.
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                      kAiwaRcT501Bits, true));
   ASSERT_EQ(0x7F, irsend.capture.value);
 
   irsend.reset();
@@ -202,10 +207,12 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1234567890A, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                       kAiwaRcT501Bits, true));
   // Should fail if strict off too.
   ASSERT_FALSE(
-      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
+      irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, kAiwaRcT501Bits,
+                              false));
 
   irsend.reset();
   // Use sendNEC(data, 42) to make/send an illegal value Aiwa message.
@@ -213,7 +220,8 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x1D8113F00FE, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                       kAiwaRcT501Bits, true));
   // Should fail if strict off too.
   ASSERT_FALSE(
       irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
@@ -224,10 +232,12 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictValues) {
   irsend.sendNEC(0x0D8113F00FF, 42, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                       kAiwaRcT501Bits, true));
   // Should fail if strict off too.
   ASSERT_FALSE(
-      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
+      irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, kAiwaRcT501Bits,
+                              false));
 }
 
 // Decode unsupported Aiwa messages.
@@ -240,9 +250,10 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictSizes) {
   irsend.sendAiwaRCT501(0x0, 8);  // Illegal size Aiwa 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                       kAiwaRcT501Bits, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, 8, false));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, 8, false));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -251,12 +262,15 @@ TEST(TestDecodeAiwa, DecodeWithNonStrictSizes) {
   irsend.sendAiwaRCT501(0x12345678, 32);  // Illegal size Aiwa 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset,
+                                       kAiwaRcT501Bits, true));
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, 32,
+                                       true));
 
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, 32, false));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, 32,
+                                      false));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -273,7 +287,8 @@ TEST(TestDecodeAiwa, Decode64BitMessages) {
   irsend.sendAiwaRCT501(0x1FFFFFFFFF, 37);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, 37, false));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, 37,
+                                      false));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(37, irsend.capture.bits);
   EXPECT_EQ(0x1FFFFFFFFF, irsend.capture.value);
@@ -283,7 +298,8 @@ TEST(TestDecodeAiwa, Decode64BitMessages) {
   irsend.sendNEC(0x76044FFFFFFFFFFF, 64, kAiwaRcT501MinRepeats);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, 37, false));
+  ASSERT_TRUE(irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, 37,
+                                      false));
   EXPECT_EQ(AIWA_RC_T501, irsend.capture.decode_type);
   EXPECT_EQ(37, irsend.capture.bits);
   EXPECT_EQ(0x1FFFFFFFFF, irsend.capture.value);
@@ -316,7 +332,7 @@ TEST(TestDecodeAiwa, DecodeGlobalCacheExample) {
   EXPECT_FALSE(irsend.capture.repeat);
 
   // Confirm what the 42-bit NEC decode is.
-  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, 42, false));
+  ASSERT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 42, false));
   EXPECT_EQ(0x1D8113F00FF, irsend.capture.value);
 }
 
@@ -336,5 +352,6 @@ TEST(TestDecodeAiwa, FailToDecodeNonAiwaExample) {
 
   ASSERT_FALSE(irrecv.decodeAiwaRCT501(&irsend.capture));
   ASSERT_FALSE(
-      irrecv.decodeAiwaRCT501(&irsend.capture, kAiwaRcT501Bits, false));
+      irrecv.decodeAiwaRCT501(&irsend.capture, kStartOffset, kAiwaRcT501Bits,
+                              false));
 }

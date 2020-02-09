@@ -768,7 +768,8 @@ TEST(TestDecodeHaierAC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendHaierAC(expectedState);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeHaierAC(&irsend.capture, kHaierACBits, true));
+  ASSERT_TRUE(irrecv.decodeHaierAC(&irsend.capture, kStartOffset, kHaierACBits,
+                                   true));
   EXPECT_EQ(HAIER_AC, irsend.capture.decode_type);
   EXPECT_EQ(kHaierACBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);

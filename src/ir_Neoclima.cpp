@@ -463,6 +463,8 @@ String IRNeoclimaAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect. Typically kNeoclimaBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -472,13 +474,12 @@ String IRNeoclimaAc::toString(void) {
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/764
-bool IRrecv::decodeNeoclima(decode_results *results, const uint16_t nbits,
-                            const bool strict) {
+bool IRrecv::decodeNeoclima(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
   // Compliance
   if (strict && nbits != kNeoclimaBits)
     return false;  // Incorrect nr. of bits per spec.
 
-  uint16_t offset = kStartOffset;
   // Match Main Header + Data + Footer
   uint16_t used;
   used = matchGeneric(results->rawbuf + offset, results->state,

@@ -74,6 +74,8 @@ void IRsend::sendMWM(const uint8_t data[], const uint16_t nbytes,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -81,16 +83,16 @@ void IRsend::sendMWM(const uint8_t data[], const uint16_t nbytes,
 //
 // Status: Implemented.
 //
-bool IRrecv::decodeMWM(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeMWM(decode_results *results, uint16_t offset,
+                       const uint16_t nbits, const bool strict) {
   DPRINTLN("DEBUG: decodeMWM");
 
   // Compliance
-  if (results->rawlen < kMWMMinSamples) {
+  if (results->rawlen <= kMWMMinSamples + offset) {
     DPRINTLN("DEBUG: decodeMWM: too few samples");
     return false;
   }
 
-  uint16_t offset = kStartOffset;
   uint16_t used = 0;
   uint64_t data = 0;
   uint16_t frame_bits = 0;

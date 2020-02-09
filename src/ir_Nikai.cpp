@@ -48,6 +48,8 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kNikaiBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -56,12 +58,12 @@ void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Status: STABLE / Working.
 //
-bool IRrecv::decodeNikai(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeNikai(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict) {
   if (strict && nbits != kNikaiBits)
     return false;  // We expect Nikai to be a certain sized message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,

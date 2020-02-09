@@ -853,6 +853,8 @@ String IRHaierACYRW02::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kHaierACBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -860,17 +862,15 @@ String IRHaierACYRW02::toString(void) {
 //
 // Status: STABLE / Known to be working.
 //
-bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
-                           bool strict) {
+bool IRrecv::decodeHaierAC(decode_results* results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
   if (strict) {
     if (nbits != kHaierACBits)
       return false;  // Not strictly a HAIER_AC message.
   }
 
-  if (results->rawlen < (2 * nbits + kHeader) + kFooter - 1)
+  if (results->rawlen <= (2 * nbits + kHeader) + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid HAIER_AC message.
-
-  uint16_t offset = kStartOffset;
 
   // Pre-Header
   if (!matchMark(results->rawbuf[offset++], kHaierAcHdr)) return false;
@@ -903,6 +903,8 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kHaierACYRW02Bits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -910,15 +912,15 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t nbits,
 //
 // Status: BETA / Appears to be working.
 //
-bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t nbits,
-                                bool strict) {
+bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t offset,
+                                const uint16_t nbits, const bool strict) {
   if (strict) {
     if (nbits != kHaierACYRW02Bits)
       return false;  // Not strictly a HAIER_AC_YRW02 message.
   }
 
   // The protocol is almost exactly the same as HAIER_AC
-  if (!decodeHaierAC(results, nbits, false)) return false;
+  if (!decodeHaierAC(results, offset, nbits, false)) return false;
 
   // Compliance
   if (strict) {

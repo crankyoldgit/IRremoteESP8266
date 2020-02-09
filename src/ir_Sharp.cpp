@@ -168,6 +168,8 @@ void IRsend::sendSharp(const uint16_t address, uint16_t const command,
 //
 // Args:
 //   results:   Ptr to the data to decode and where to store the decode result.
+//   offset:    The starting index to use when attempting to decode the raw data
+//              Typically/Defaults to kStartOffset.
 //   nbits:     Nr. of data bits to expect. Typically kSharpBits.
 //   strict:    Flag indicating if we should perform strict matching.
 //   expansion: Should we expect the expansion bit to be set. Default is true.
@@ -185,9 +187,10 @@ void IRsend::sendSharp(const uint16_t address, uint16_t const command,
 //   http://www.sbprojects.com/knowledge/ir/sharp.php
 //   http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 //   http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
-bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
-                         const bool strict, const bool expansion) {
-  if (results->rawlen < 2 * nbits + kFooter - 1)
+bool IRrecv::decodeSharp(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict,
+                         const bool expansion) {
+  if (results->rawlen <= 2 * nbits + kFooter - 1 + offset)
     return false;  // Not enough entries to be a Sharp message.
   // Compliance
   if (strict) {
@@ -196,12 +199,12 @@ bool IRrecv::decodeSharp(decode_results *results, const uint16_t nbits,
 #ifdef UNIT_TEST
     // An in spec message has the data sent normally, then inverted. So we
     // expect twice as many entries than to just get the results.
-    if (results->rawlen < 2 * (2 * nbits + kFooter)) return false;
+    if (results->rawlen <= (2 * (2 * nbits + kFooter)) - 1 + offset)
+      return false;
 #endif
   }
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Data + Footer
   uint16_t used;
@@ -496,6 +499,8 @@ String IRSharpAc::toString(void) {
 // Decode the supplied Sharp A/C message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion. (kSharpAcBits)
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
@@ -506,16 +511,11 @@ String IRSharpAc::toString(void) {
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/638
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
-bool IRrecv::decodeSharpAc(decode_results *results, const uint16_t nbits,
-                           const bool strict) {
-  // Is there enough data to match successfully?
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;
-
+bool IRrecv::decodeSharpAc(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
   // Compliance
   if (strict && nbits != kSharpAcBits) return false;
 
-  uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
   uint16_t used;
   used = matchGeneric(results->rawbuf + offset, results->state,

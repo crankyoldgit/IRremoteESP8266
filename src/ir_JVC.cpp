@@ -92,6 +92,8 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits of data to expect. Typically kJvcBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -103,14 +105,14 @@ uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
 //   JVC repeat codes don't have a header.
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php
-bool IRrecv::decodeJVC(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeJVC(decode_results *results, uint16_t offset,
+                       const uint16_t nbits, const bool strict) {
   if (strict && nbits != kJvcBits)
     return false;  // Must be called with the correct nr. of bits.
-  if (results->rawlen < 2 * nbits + kFooter - 1)
+  if (results->rawlen <= 2 * nbits + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid JVC message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   bool isRepeat = true;
 
   // Header

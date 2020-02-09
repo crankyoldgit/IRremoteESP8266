@@ -67,6 +67,8 @@ uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion, inc. the 8 bit header.
 //            Typically kMagiquestBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -77,17 +79,16 @@ uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
 //
 // Ref:
 //   https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
-bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t nbits,
-                             bool strict) {
+bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
   uint16_t bits = 0;
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
-  if (results->rawlen < (2 * kMagiquestBits)) {
+  if (results->rawlen < (2 * kMagiquestBits) + offset - 1) {
     DPRINT("Not enough bits to be Magiquest - Rawlen: ");
     DPRINT(results->rawlen);
     DPRINT(" Expected: ");
-    DPRINTLN((2 * kMagiquestBits));
+    DPRINTLN(2 * kMagiquestBits + offset - 1);
     return false;
   }
 

@@ -109,6 +109,8 @@ uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion. Typically kSamsungBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
@@ -121,15 +123,12 @@ uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
 //   They differ on their compliance criteria and how they repeat.
 // Ref:
 //  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
-bool IRrecv::decodeSAMSUNG(decode_results *results, const uint16_t nbits,
-                           const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid Samsung message.
+bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
   if (strict && nbits != kSamsungBits)
     return false;  // We expect Samsung to be 32 bits of message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,
@@ -201,6 +200,8 @@ void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kSamsung36Bits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -214,9 +215,9 @@ void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/621
-bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
-                             const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter * 2 - 1)
+bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter * 2 - 1 + offset)
     return false;  // Can't possibly be a valid Samsung message.
   // We need to be looking for > 16 bits to make sense.
   if (nbits <= 16) return false;
@@ -224,7 +225,6 @@ bool IRrecv::decodeSamsung36(decode_results *results, const uint16_t nbits,
     return false;  // We expect nbits to be 36 bits of message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   uint16_t used;
@@ -687,6 +687,8 @@ String IRSamsungAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kSamsungAcBits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -696,13 +698,11 @@ String IRSamsungAc::toString(void) {
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
-bool IRrecv::decodeSamsungAC(decode_results *results, const uint16_t nbits,
-                             const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1)
+bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1 + offset)
     return false;  // Can't possibly be a valid Samsung A/C message.
   if (nbits != kSamsungAcBits && nbits != kSamsungAcExtendedBits) return false;
-
-  uint16_t offset = kStartOffset;
 
   // Message Header
   if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark)) return false;

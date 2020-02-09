@@ -127,6 +127,8 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -139,12 +141,11 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //   GlobalCache's Control Tower's Mitsubishi TV data.
-bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t nbits,
-                              bool strict) {
+bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t offset,
+                              const uint16_t nbits, const bool strict) {
   if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
-  uint16_t offset = kStartOffset;
   uint64_t data = 0;
 
   // Match Data + Footer
@@ -206,6 +207,8 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -219,14 +222,13 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/441
-bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t nbits,
-                               bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + (kFooter * 2) - 1)
+bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= 2 * nbits + kHeader + (kFooter * 2) - 1 + offset)
     return false;  // Shorter than shortest possibly expected.
   if (strict && nbits != kMitsubishiBits)
     return false;  // Request is out of spec.
 
-  uint16_t offset = kStartOffset;
   results->value = 0;
 
   // Header
@@ -287,6 +289,8 @@ void IRsend::sendMitsubishiAC(const unsigned char data[], const uint16_t nbytes,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -296,9 +300,10 @@ void IRsend::sendMitsubishiAC(const unsigned char data[], const uint16_t nbytes,
 //
 // Ref:
 // https://www.analysir.com/blog/2015/01/06/reverse-engineering-mitsubishi-ac-infrared-protocol/
-bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
-                                bool strict) {
-  if (results->rawlen < ((kMitsubishiACBits * 2) + 2)) {
+bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
+                                const uint16_t nbits,
+                                const bool strict) {
+  if (results->rawlen <= ((kMitsubishiACBits * 2) + 2) + offset) {
     DPRINTLN("Shorter than shortest possibly expected.");
     return false;  // Shorter than shortest possibly expected.
   }
@@ -306,10 +311,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t nbits,
     DPRINTLN("Request is out of spec.");
     return false;  // Request is out of spec.
   }
-  uint16_t offset = kStartOffset;
-  for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) {
-    results->state[i] = 0;
-  }
+  for (uint8_t i = 0; i < kMitsubishiACStateLength; i++) results->state[i] = 0;
   bool failure = false;
   uint8_t rep = 0;
   do {
@@ -825,6 +827,8 @@ void IRsend::sendMitsubishi136(const unsigned char data[],
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -834,16 +838,15 @@ void IRsend::sendMitsubishi136(const unsigned char data[],
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/888
-bool IRrecv::decodeMitsubishi136(decode_results *results, const uint16_t nbits,
+bool IRrecv::decodeMitsubishi136(decode_results *results, uint16_t offset,
+                                 const uint16_t nbits,
                                  const bool strict) {
-  // Too short to match?
-  if (results->rawlen < (2 * nbits) + kHeader + kFooter - 1) return false;
   if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
   if (strict) {  // Do checks to see if it matches the spec.
     if (nbits != kMitsubishi136Bits) return false;
   }
-  uint16_t used = matchGeneric(results->rawbuf + kStartOffset, results->state,
-                               results->rawlen - kStartOffset, nbits,
+  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
+                               results->rawlen - offset, nbits,
                                kMitsubishi136HdrMark, kMitsubishi136HdrSpace,
                                kMitsubishi136BitMark, kMitsubishi136OneSpace,
                                kMitsubishi136BitMark, kMitsubishi136ZeroSpace,
@@ -1174,6 +1177,8 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -1191,14 +1196,14 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/619
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/947
-bool IRrecv::decodeMitsubishi112(decode_results *results, const uint16_t nbits,
-                                 const bool strict) {
-  if (results->rawlen < ((2 * nbits) + kHeader + kFooter - 1)) return false;
+bool IRrecv::decodeMitsubishi112(decode_results *results, uint16_t offset,
+                                 const uint16_t nbits, const bool strict) {
+  if (results->rawlen < (2 * nbits) + kHeader + kFooter - 1 + offset)
+    return false;
   if (nbits % 8 != 0) return false;  // Not a multiple of an 8 bit byte.
   if (strict) {  // Do checks to see if it matches the spec.
     if (nbits != kMitsubishi112Bits && nbits != kTcl112AcBits) return false;
   }
-  uint16_t offset = kStartOffset;
   decode_type_t typeguess = decode_type_t::UNKNOWN;
   uint16_t hdrspace;
   uint16_t bitmark;

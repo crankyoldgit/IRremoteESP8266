@@ -353,7 +353,8 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendTeco(expectedState);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeTeco(&irsend.capture, kTecoBits, true));
+  ASSERT_TRUE(irrecv.decodeTeco(&irsend.capture, kStartOffset, kTecoBits,
+                                true));
   EXPECT_EQ(TECO, irsend.capture.decode_type);
   EXPECT_EQ(kTecoBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);

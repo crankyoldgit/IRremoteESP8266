@@ -316,6 +316,8 @@ String IRToshibaAC::toString(void) {
 // Places successful decode information in the results pointer.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kToshibaACBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
@@ -325,10 +327,8 @@ String IRToshibaAC::toString(void) {
 //
 // Ref:
 //
-bool IRrecv::decodeToshibaAC(decode_results* results, const uint16_t nbits,
-                             const bool strict) {
-  uint16_t offset = kStartOffset;
-
+bool IRrecv::decodeToshibaAC(decode_results* results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
   // Compliance
   if (strict && nbits != kToshibaACBits)
     return false;  // Must be called with the correct nr. of bytes.

@@ -407,7 +407,8 @@ TEST(TestDecodeVestelAc, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendVestelAc(expectedState);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeVestelAc(&irsend.capture, kVestelAcBits, true));
+  ASSERT_TRUE(irrecv.decodeVestelAc(&irsend.capture, kStartOffset,
+                                    kVestelAcBits, true));
   EXPECT_EQ(VESTEL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kVestelAcBits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);

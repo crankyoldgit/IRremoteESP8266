@@ -579,17 +579,19 @@ String IRCoolixAC::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kCoolixBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: BETA / Probably working.
-bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
-                          bool strict) {
+bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t offset,
+                          const uint16_t nbits, const bool strict) {
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
-  if (results->rawlen < 2 * 2 * nbits + kHeader + kFooter - 1)
+  if (results->rawlen <= 2 * 2 * nbits + kHeader + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid COOLIX message.
   if (strict && nbits != kCoolixBits)
     return false;      // Not strictly a COOLIX message.
@@ -598,7 +600,6 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t nbits,
 
   uint64_t data = 0;
   uint64_t inverted = 0;
-  uint16_t offset = kStartOffset;
 
   if (nbits > sizeof(data) * 8)
     return false;  // We can't possibly capture a Coolix packet that big.

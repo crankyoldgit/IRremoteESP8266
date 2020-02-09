@@ -162,7 +162,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x0);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0, irsend.capture.value);
@@ -172,7 +172,7 @@ TEST(TestDecodeNEC, NormalNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x12345678);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 32, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -189,7 +189,7 @@ TEST(TestDecodeNEC, ShortNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x0, 16);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 16, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 16, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(16, irsend.capture.bits);
   EXPECT_EQ(0, irsend.capture.value);
@@ -200,13 +200,13 @@ TEST(TestDecodeNEC, ShortNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x0, 32);
   irsend.makeDecodeResult();
-  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 16, false));
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 16, false));
 
   // Send 16 bits of data, but fail because we are expecting 17.
   irsend.reset();
   irsend.sendNEC(0x0, 16);
   irsend.makeDecodeResult();
-  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 17, false));
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 17, false));
 }
 
 // Longer NEC-like messages (without strict naturally)
@@ -218,7 +218,7 @@ TEST(TestDecodeNEC, LongerNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x1234567890ABCDEF, 64);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, 64, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0x1234567890ABCDEF, irsend.capture.value);
@@ -229,7 +229,7 @@ TEST(TestDecodeNEC, LongerNECDecodeWithoutStrict) {
   irsend.reset();
   irsend.sendNEC(0x0, 63);
   irsend.makeDecodeResult();
-  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, 64, false));
+  EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture, kStartOffset, 64, false));
 }
 
 // Incorrect decoding reported in Issue #243
@@ -299,7 +299,7 @@ TEST(TestDecodeNEC, NonStrictNECDecode_Issue264) {
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
   EXPECT_FALSE(irrecv.decodeNEC(&irsend.capture));  // Not strictly NEC
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kNECBits, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, kNECBits, false));
   EXPECT_EQ(0x77E1A040, irsend.capture.value);
 
   // Do it all again, but with a normal decode.
@@ -331,7 +331,7 @@ TEST(TestDecodeNEC, AutoReceiveCalibration) {
 
   irsend.sendRaw(rawData, 67, 38);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kNECBits, false));
+  EXPECT_TRUE(irrecv.decodeNEC(&irsend.capture, kStartOffset, kNECBits, false));
   EXPECT_EQ(NEC, irsend.capture.decode_type);
   EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x77E1A040, irsend.capture.value);

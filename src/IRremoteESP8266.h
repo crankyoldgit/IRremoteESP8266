@@ -589,6 +589,22 @@
 #define ALLOW_DELAY_CALLS true
 #endif  // ALLOW_DELAY_CALLS
 
+// Enable a run-time settable high-pass filter on captured data **before**
+// trying any protocol decoding.
+// i.e. Try to remove/merge any really short pulses detected in the raw data.
+// Note: Even when this option is enabled, it is _off_ by default, and requires
+//       a user who knows what they are doing to enable it.
+//       The option to disable this feature is here if your project is _really_
+//       tight on resources. i.e. Saves a small handful of bytes and cpu time.
+// WARNING: If you use this feature at runtime, you can no longer trust the
+//          **raw** data captured. It will now have been slightly **cooked**!
+// DANGER: If you set the `noise_floor` value too high, it **WILL** break
+//         decoding of some protocols. You have been warned. Here Be Dragons!
+//
+// See: `irrecv::decode()` in IRrecv.cpp for more info.
+#ifndef ENABLE_HIGHPASS_FILTER_OPTION
+#define ENABLE_HIGHPASS_FILTER_OPTION true
+#endif  // ENABLE_HIGHPASS_FILTER_OPTION
 /*
  * Always add to the end of the list and should never remove entries
  * or change order. Projects may save the type number for later usage
