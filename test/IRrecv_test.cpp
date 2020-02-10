@@ -1358,7 +1358,7 @@ TEST(TestDecode, SkippingInDecode) {
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
 }
 
-TEST(TestDecode, CrudeNoiseFilter) {
+TEST(TestCrudeNoiseFilter, General) {
   IRsendTest irsend(0);
   IRrecv irrecv(1);
   irsend.begin();
@@ -1483,4 +1483,109 @@ TEST(TestDecode, CrudeNoiseFilter) {
   EXPECT_EQ(kNECBits, irsend.capture.bits);
   EXPECT_EQ(0x4BB640BF, irsend.capture.value);
   EXPECT_EQ(69, irsend.capture.rawlen);
+}
+
+TEST(TestCrudeNoiseFilter, NoiseMidSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1042#issuecomment-583895303
+  uint16_t rawData[71] = {
+      482, 1370, 9082, 1558, 342, 2514, 662, 470, 660, 468, 658, 1588, 662, 466,
+      662, 466, 662, 466, 662, 466, 662, 466, 662, 1586, 660, 1588, 662, 466,
+      662, 1588, 662, 1586, 662, 1586, 660, 1588, 662, 1586, 662, 468, 660,
+      1588, 662, 468, 662, 466, 660, 466, 662, 464, 662, 466, 662, 466, 662,
+      1588, 660, 466, 662, 1586, 662, 1588, 660, 1586, 662, 1586, 662, 1586,
+      664, 1594, 662};  // UNKNOWN B0784C9E
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 71, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  const uint16_t prev_length = irsend.capture.rawlen;
+  // Now with the filter set to 350, to remove the 342 mark at rawData[4].
+  // Note: a mark of 350us is huge.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1, 350));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x20DF40BF, irsend.capture.value);
+  EXPECT_EQ(prev_length - 2, irsend.capture.rawlen);
+  EXPECT_EQ(
+      "uint16_t rawData[69] = {482, 1370,  9082, 4414,  662, 470,  660, 468,  "
+      "658, 1588,  662, 466,  662, 466,  662, 466,  662, 466,  662, 466,  662, "
+      "1586,  660, 1588,  662, 466,  662, 1588,  662, 1586,  662, 1586,  660, "
+      "1588,  662, 1586,  662, 468,  660, 1588,  662, 468,  662, 466,  660, "
+      "466,  662, 464,  662, 466,  662, 466,  662, 1588,  660, 466,  662, "
+      "1586,  662, 1588,  660, 1586,  662, 1586,  662, 1586,  664, 1594,  "
+      "662};  // NEC 20DF40BF\n"
+      "uint32_t address = 0x4;\n"
+      "uint32_t command = 0x2;\n"
+      "uint64_t data = 0x20DF40BF;\n",
+      resultToSourceCode(&irsend.capture));
+
+  // Data modified as rawData2[3] which was 882 is too far out of spec. for a
+  // NEC bit mark.
+  uint16_t rawData2[7] = {
+      9066, 2026, 600, 13906, 222, 992, 734};  // UNKNOWN 8FDE36A7
+  irsend.reset();
+  irsend.sendRaw(rawData2, 7, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(0, irsend.capture.bits);
+  EXPECT_TRUE(irsend.capture.repeat);
+  // Now with the filter set to 250, to remove the 222 mark at rawData2[4].
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 350));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(0, irsend.capture.bits);
+  EXPECT_TRUE(irsend.capture.repeat);
+  EXPECT_EQ(
+      "uint16_t rawData[5] = {9066, 2026,  600, 15120,  734};  "
+      "// NEC (Repeat) FFFFFFFFFFFFFFFF\n"
+      "uint64_t data = 0xFFFFFFFFFFFFFFFF;\n",
+      resultToSourceCode(&irsend.capture));
+}
+
+TEST(TestCrudeNoiseFilter, NoiseAtEndOfSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1042#issuecomment-583895303
+  uint16_t rawData[69] = {  // UNKNOWN B52869E1
+      9078, 4386, 662, 468, 660, 466, 662, 1588, 660, 468, 660, 468, 662, 466,
+      662, 466, 662, 466, 662, 1588, 660, 1588, 660, 466, 662, 1590, 660, 1586,
+      662, 1586, 662, 1588, 662, 1584, 662, 1588, 662, 1588, 660, 466, 686, 442,
+      662, 466, 662, 466, 662, 466, 662, 468, 662, 466, 662, 466, 662, 1586,
+      662, 1588, 662, 1586, 644, 1600, 662, 1586, 688, 1566, 684, 2638, 146};
+  irsend.reset();
+  irsend.sendRaw(rawData, 69, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  const uint16_t prev_length = irsend.capture.rawlen;
+
+  // Now with the filter set to 200, to remove the 146 mark at at the end.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 200));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x20DFC03F, irsend.capture.value);
+  EXPECT_EQ(prev_length - 2, irsend.capture.rawlen);
+  EXPECT_EQ(
+      "uint16_t rawData[67] = {9078, 4386,  662, 468,  660, 466,  662, 1588,  "
+      "660, 468,  660, 468,  662, 466,  662, 466,  662, 466,  662, 1588,  660, "
+      "1588,  660, 466,  662, 1590,  660, 1586,  662, 1586,  662, 1588,  662, "
+      "1584,  662, 1588,  662, 1588,  660, 466,  686, 442,  662, 466,  662, "
+      "466,  662, 466,  662, 468,  662, 466,  662, 466,  662, 1586,  662, 1588,"
+      "  662, 1586,  644, 1600,  662, 1586,  688, 1566,  684};  "
+      "// NEC 20DFC03F\n"
+      "uint32_t address = 0x4;\n"
+      "uint32_t command = 0x3;\n"
+      "uint64_t data = 0x20DFC03F;\n",
+      resultToSourceCode(&irsend.capture));
 }
