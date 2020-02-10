@@ -50,6 +50,10 @@ const uint8_t kElectraAcFanAuto =    0b101;
 const uint8_t kElectraAcFanLow =     0b011;
 const uint8_t kElectraAcFanMed =     0b010;
 const uint8_t kElectraAcFanHigh =    0b001;
+// state[5]
+//                      TurboMask =    0b00010000;
+const uint8_t kElectraAcTurboOffset = 4;
+
 // state[6]
 //                            Mode 0b11100000
 const uint8_t kElectraAcModeOffset = 5;
@@ -96,6 +100,8 @@ class IRElectraAc {
   bool getClean(void);
   void setLightToggle(const bool on);
   bool getLightToggle(void);
+  void setTurbo(const bool on);
+  bool getTurbo(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kElectraAcStateLength);

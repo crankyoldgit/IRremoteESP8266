@@ -337,7 +337,7 @@ TEST(TestIRac, Electra) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 6 (Fan), Temp: 26C, Fan: 1 (High), "
-      "Swing(V): On, Swing(H): On, Light: Toggle, Clean: On";
+      "Swing(V): On, Swing(H): On, Light: Toggle, Clean: On, Turbo: On";
 
   ac.begin();
   irac.electra(&ac,
@@ -347,6 +347,7 @@ TEST(TestIRac, Electra) {
                stdAc::fanspeed_t::kHigh,    // Fan speed
                stdAc::swingv_t::kAuto,      // Veritcal swing
                stdAc::swingh_t::kLeft,      // Horizontal swing
+               true,                        // Turbo
                true,                        // Light (toggle)
                true);                       // Clean
   ASSERT_EQ(expected, ac.toString());

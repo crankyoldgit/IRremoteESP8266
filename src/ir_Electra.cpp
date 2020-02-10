@@ -249,6 +249,13 @@ bool IRElectraAc::getClean(void) {
   return GETBIT8(remote_state[9], kElectraAcCleanOffset);
 }
 
+void IRElectraAc::setTurbo(const bool on) {
+  setBit(&remote_state[5], kElectraAcTurboOffset, on);
+}
+
+bool IRElectraAc::getTurbo(void) {
+  return GETBIT8(remote_state[5], kElectraAcTurboOffset);
+}
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRElectraAc::toCommon(void) {
   stdAc::state_t result;
@@ -263,11 +270,11 @@ stdAc::state_t IRElectraAc::toCommon(void) {
   result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
   result.light = this->getLightToggle();
+  result.turbo = this->getTurbo();
   result.clean = this->getClean();
   // Not supported.
   result.model = -1;  // No models used.
   result.quiet = false;
-  result.turbo = false;
   result.econo = false;
   result.filter = false;
   result.beep = false;
@@ -279,7 +286,7 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRElectraAc::toString(void) {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(130);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
@@ -291,6 +298,7 @@ String IRElectraAc::toString(void) {
   result += addBoolToString(getSwingH(), kSwingHStr);
   result += addLabeledString(getLightToggle() ? kToggleStr : "-", kLightStr);
   result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
   return result;
 }
 

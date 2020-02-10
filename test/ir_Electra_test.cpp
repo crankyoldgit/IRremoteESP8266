@@ -101,7 +101,7 @@ TEST(TestDecodeElectraAC, RealExampleDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off",
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -233,21 +233,24 @@ TEST(TestIRElectraAcClass, HumanReadable) {
   ac.setRaw(on_cool_32C_auto_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 32C, Fan: 5 (Auto), "
-      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
+      ac.toString());
   uint8_t on_cool_16C_auto_voff[13] = {
       0xC3, 0x47, 0xE0, 0x00, 0xA0, 0x00, 0x20,
       0x00, 0x00, 0x20, 0x00, 0x41, 0x0B};
   ac.setRaw(on_cool_16C_auto_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 5 (Auto), "
-      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
+      ac.toString());
   uint8_t on_cool_16C_low_voff[13] = {
       0xC3, 0x47, 0xE0, 0x00, 0x60, 0x00, 0x20,
       0x00, 0x00, 0x20, 0x00, 0x41, 0xCB};
   ac.setRaw(on_cool_16C_low_voff);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
+      ac.toString());
 }
 
 TEST(TestIRElectraAcClass, Clean) {
@@ -270,7 +273,34 @@ TEST(TestIRElectraAcClass, Clean) {
   ac.setRaw(on);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On, Turbo: Off",
+      ac.toString());
+}
+
+TEST(TestIRElectraAcClass, Turbo) {
+  IRElectraAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+
+  ac.setTurbo(false);
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1033#issuecomment-583888046
+  const uint8_t on[13] = {
+      0xC3, 0x87, 0xE0, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00, 0x20, 0x00, 0x08,
+      0x12};
+
+  ac.setRaw(on);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
+      ac.toString());
 }
 
 TEST(TestIRElectraAcClass, LightToggle) {
@@ -293,7 +323,8 @@ TEST(TestIRElectraAcClass, LightToggle) {
   ac.setRaw(on);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On, Turbo: Off",
+       ac.toString());
 }
 
 TEST(TestIRElectraAcClass, ConstructKnownState) {
@@ -319,7 +350,8 @@ TEST(TestIRElectraAcClass, ConstructKnownState) {
 
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On", ac.toString());
+      "Swing(V): Off, Swing(H): Off, Light: Toggle, Clean: On, Turbo: Off",
+      ac.toString());
   EXPECT_STATE_EQ(on_cool_24C_fan1_swing_off_turbo_off_clean_on,
                   ac.getRaw(), kElectraAcBits);
 }
