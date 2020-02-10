@@ -321,7 +321,7 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
     uint16_t curr = results->rawbuf[offset];
     uint16_t next = results->rawbuf[offset + 1];
     uint16_t addition = curr + next;
-    if (curr < kTickFloor) {  // Is it to short?
+    if (curr < kTickFloor) {  // Is it too short?
       // Shuffle the buffer down. i.e. Remove the mark & space pair.
       // Note: `memcpy()` can't be used as rawbuf is `volatile`.
       for (uint16_t i = offset + 2; i <= results->rawlen && i < kBufSize; i++)
