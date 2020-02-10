@@ -126,7 +126,7 @@ class IRrecv {
   void setTolerance(const uint8_t percent = kTolerance);
   uint8_t getTolerance(void);
   bool decode(decode_results *results, irparams_t *save = NULL,
-              uint8_t max_skip = 0, uint8_t noise_floor = 0);
+              uint8_t max_skip = 0, uint16_t noise_floor = 0);
   void enableIRIn(const bool pullup = false);
   void disableIRIn(void);
   void resume(void);
@@ -221,7 +221,7 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
-  void crudeNoiseFilter(decode_results *results, const uint8_t floor = 0);
+  void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,

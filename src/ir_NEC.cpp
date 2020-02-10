@@ -100,7 +100,9 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
   if (!matchMark(results->rawbuf[offset++], kNecHdrMark)) return false;
   // Check if it is a repeat code.
   if (matchSpace(results->rawbuf[offset], kNecRptSpace) &&
-      matchMark(results->rawbuf[offset + 1], kNecBitMark)) {
+      matchMark(results->rawbuf[offset + 1], kNecBitMark) &&
+      (offset + 2 <= results->rawlen ||
+       matchAtLeast(results->rawbuf[offset + 2], kNecMinGap))) {
     results->value = kRepeat;
     results->decode_type = NEC;
     results->bits = 0;

@@ -312,17 +312,19 @@ uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 // Args:
 //   results:  Ptr to the decode_results we are going to filter/modify.
 //   floor:  Only allow values in the buffer large than this. (in micro seconds)
-void IRrecv::crudeNoiseFilter(decode_results *results, const uint8_t floor) {
+void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
   if (floor == 0) return;  // Nothing to do.
-  const uint8_t kTickFloor = floor / kRawTick;
-  for (uint16_t offset = kStartOffset; offset + 1 < results->rawlen;) {
+  const uint16_t kTickFloor = floor / kRawTick;
+  const uint16_t kBufSize = getBufSize();
+  uint16_t offset = kStartOffset;
+  while (offset < results->rawlen && offset + 2 < kBufSize) {
     uint16_t curr = results->rawbuf[offset];
     uint16_t next = results->rawbuf[offset + 1];
     uint16_t addition = curr + next;
     if (curr < kTickFloor) {  // Is it to short?
       // Shuffle the buffer down. i.e. Remove the mark & space pair.
       // Note: `memcpy()` can't be used as rawbuf is `volatile`.
-      for (uint16_t i = offset + 2; i < results->rawlen; i++)
+      for (uint16_t i = offset + 2; i <= results->rawlen && i < kBufSize; i++)
         results->rawbuf[i - 2] = results->rawbuf[i];
       if (offset > 1) {  // There is a previous pair we can add to.
         // Merge this pair into into the previous space.
@@ -380,7 +382,7 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint8_t floor) {
 // Returns:
 //   A boolean indicating if an IR message is ready or not.
 bool IRrecv::decode(decode_results *results, irparams_t *save,
-                    uint8_t max_skip, uint8_t noise_floor) {
+                    uint8_t max_skip, uint16_t noise_floor) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
   if (irparams.rcvstate != kStopState) return false;
