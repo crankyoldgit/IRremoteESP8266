@@ -299,7 +299,7 @@ TEST(TestIRElectraAcClass, Turbo) {
   ac.setRaw(on);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: On",
       ac.toString());
 }
 

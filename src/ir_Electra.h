@@ -51,8 +51,8 @@ const uint8_t kElectraAcFanLow =     0b011;
 const uint8_t kElectraAcFanMed =     0b010;
 const uint8_t kElectraAcFanHigh =    0b001;
 // state[5]
-//                      TurboMask =    0b00010000;
-const uint8_t kElectraAcTurboOffset = 4;
+//                      TurboMask =    0b01000000;
+const uint8_t kElectraAcTurboOffset = 6;
 
 // state[6]
 //                            Mode 0b11100000
