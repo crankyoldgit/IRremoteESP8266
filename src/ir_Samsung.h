@@ -62,6 +62,10 @@ const uint8_t kSamsungAcPowerful10Size = 1;  // Mask 0b00000110
 const uint16_t kSamsungACSectionLength = 7;
 const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
 
+const uint8_t kSamsungAcDisplaykOn = 0x71;
+const uint8_t kSamsungAcDisplaykOff = 0x61;
+const uint8_t kSamsungAcVirusDoctorMask = 0x01;
+
 // Classes
 class IRSamsungAc {
  public:
@@ -99,6 +103,7 @@ class IRSamsungAc {
   bool getQuiet(void);
   void setPowerful(const bool on);
   bool getPowerful(void);
+  
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
