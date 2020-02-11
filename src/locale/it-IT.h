@@ -168,7 +168,8 @@
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \
     "ATTENZIONE: il codice IR è troppo grande per il buffer (>= %d). " \
-    "Non fare affidamento a questi risultati finché questo problema non si risolve." \
+    "Non fare affidamento a questi risultati finché questo problema " \
+    "non si risolve." \
     "Modifica e aumenta `kCaptureBufferSize`."
 #endif  // D_WARN_BUFFERFULL
 
