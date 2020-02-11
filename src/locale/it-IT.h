@@ -12,8 +12,6 @@
 #define D_STR_OFF "Spento"
 #define D_STR_MODE "Modalità"
 #define D_STR_TOGGLE "Alterna"
-#define D_STR_TURBO "Turbo"
-#define D_STR_SUPER "Super"
 #define D_STR_SLEEP "Stand-by"
 #define D_STR_LIGHT "Leggero"
 #define D_STR_POWERFUL "Forte"
@@ -22,7 +20,6 @@
 #define D_STR_SWING "Swing"
 #define D_STR_SWINGH D_STR_SWING"(O)"  // Set `D_STR_SWING` first!
 #define D_STR_SWINGV D_STR_SWING"(V)"  // Set `D_STR_SWING` first!
-#define D_STR_BEEP "Beep"
 #define D_STR_MOULD "Muffa"
 #define D_STR_CLEAN "Pulizia"
 #define D_STR_PURIFY "Purifica"
@@ -31,11 +28,8 @@
 #define D_STR_OFFTIMER D_STR_OFF " " D_STR_TIMER  // Set `D_STR_OFF` first!
 #define D_STR_CLOCK "Orologio"
 #define D_STR_COMMAND "Comando"
-#define D_STR_XFAN "XFan"
-#define D_STR_HEALTH "Health"
 #define D_STR_MODEL "Modello"
 #define D_STR_TEMP "Temp"
-#define D_STR_IFEEL "IFeel"
 #define D_STR_HUMID "Umido"
 #define D_STR_SAVE "Salca"
 #define D_STR_EYE "Occhio"
@@ -48,8 +42,6 @@
 #define D_STR_NIGHT "Notte"
 #define D_STR_SILENT "Silenzioso"
 #define D_STR_FILTER "Filtro"
-#define D_STR_3D "3D"
-#define D_STR_CELSIUS "Celsius"
 #define D_STR_UP "Su"
 #define D_STR_TEMPUP D_STR_TEMP " " D_STR_UP  // Set `D_STR_TEMP` first!
 #define D_STR_DOWN "Giù"
@@ -60,11 +52,9 @@
 #define D_STR_MOVE "Muovi"
 #define D_STR_SET "Imposta"
 #define D_STR_CANCEL "Annulla"
-#define D_STR_COMFORT "Comfort"
 #define D_STR_SENSOR "Sensore"
 #define D_STR_WEEKLY "Settimanale"
 #define D_STR_WEEKLYTIMER D_STR_WEEKLY " " D_STR_TIMER  // Needs `D_STR_WEEKLY`!
-#define D_STR_WIFI "WiFi"
 #define D_STR_LAST "Ultimo"
 #define D_STR_FAST "Veloce"
 #define D_STR_SLOW "Lento"
@@ -75,13 +65,10 @@
 #define D_STR_LOUD "Rumoroso"
 #define D_STR_UPPER "Superiore"
 #define D_STR_LOWER "Inferiore"
-#define D_STR_BREEZE "Breeze"
 #define D_STR_CIRCULATE "Circolare"
 #define D_STR_CEILING "Soffitto"
 #define D_STR_WALL "Muro"
 #define D_STR_ROOM "Camera"
-#define D_STR_6THSENSE "6th Sense"
-#define D_STR_ZONEFOLLOW "Zone Follow"
 #define D_STR_FIXED "Fisso"
 
 #define D_STR_AUTO "Auto"
@@ -95,18 +82,14 @@
 
 #define D_STR_MAX "Max"
 #define D_STR_MAXIMUM "Massimo"
-#define D_STR_MIN "Min"
 #define D_STR_MINIMUM "Minimo"
-#define D_STR_MED "Med"
 #define D_STR_MEDIUM "Medio"
 
 #define D_STR_HIGHEST "Molto alto"
 #define D_STR_HIGH "Alto"
-#define D_STR_HI "Hi"
 #define D_STR_MID "Med"
 #define D_STR_MIDDLE "Medio"
 #define D_STR_LOW "Basso"
-#define D_STR_LO "Lo"
 #define D_STR_LOWEST "Bassissimo"
 #define D_STR_RIGHT "Destra"
 #define D_STR_MAXRIGHT D_STR_MAX " " D_STR_RIGHT  // Set `D_STR_MAX` first!
@@ -150,7 +133,6 @@
 #define D_STR_THREELETTERDAYS "DomLunMarMerGioVenSab"
 
 #define D_STR_YES "Sì"
-#define D_STR_NO "No"
 #define D_STR_TRUE "Vero"
 #define D_STR_FALSE "Falso"
 
@@ -159,7 +141,6 @@
 #define D_STR_BITS "Bit"
 // IRrecvDumpV2
 
-#define D_STR_TIMESTAMP "Timestamp"
 #define D_STR_LIBRARY "Libreria"
 #define D_STR_MESGDESC "Desc. Mess."
 #define D_STR_IRRECVDUMP_STARTUP \
