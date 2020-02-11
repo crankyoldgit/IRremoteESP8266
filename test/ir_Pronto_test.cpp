@@ -366,3 +366,28 @@ TEST(TestSendPronto, NormalPlusRepeatSequence) {
       "m8892s2210m546s95212",
       irsend.outputStr());
 }
+
+// Tests for #1034
+TEST(TestSendPronto, Issue1034) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // JVC code allegedly.
+  uint16_t pronto_test[40] = {
+      0x0000, 0x006c, 0x0001, 0x0011, 0x0140, 0x00a0, 0x0014, 0x003c, 0x0014,
+      0x003c, 0x0014, 0x0014, 0x0014, 0x0014, 0x0014, 0x0014, 0x0014, 0x003c,
+      0x0014, 0x0014, 0x0014, 0x003c, 0x0014, 0x0014, 0x0014, 0x0014, 0x0014,
+      0x0014, 0x0014, 0x0014, 0x0014, 0x003c, 0x0014, 0x0014, 0x0014, 0x0014,
+      0x0014, 0x0014, 0x0014, 0x0384};
+
+  irsend.reset();
+  irsend.sendPronto(pronto_test, 40, 1);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(JVC, irsend.capture.decode_type);
+  EXPECT_EQ(kJvcBits, irsend.capture.bits);
+  EXPECT_EQ(0xc508, irsend.capture.value);
+  EXPECT_EQ(0xa3, irsend.capture.address);
+  EXPECT_EQ(0x10, irsend.capture.command);
+}
