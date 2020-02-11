@@ -103,6 +103,11 @@ class IRSamsungAc {
   bool getQuiet(void);
   void setPowerful(const bool on);
   bool getPowerful(void);
+
+  void setDisplay(const bool state);
+  bool getDisplay();
+  void setVirusDoctor(const bool state);
+  bool getVirusDoctor();
   
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],

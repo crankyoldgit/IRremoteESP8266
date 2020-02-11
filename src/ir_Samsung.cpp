@@ -570,6 +570,30 @@ void IRSamsungAc::setPowerful(const bool on) {
   }
 }
 
+bool IRSamsungAc::getDisplay(void) {
+  return remote_state[10];
+}
+
+void IRSamsungAc::setDisplay(const bool state) {
+  if (state) {
+    remote_state[10] = kSamsungAcDisplaykOn;
+    } else {
+    remote_state[10] = kSamsungAcDisplaykOff;
+  }
+}
+
+bool IRSamsungAc::getVirusDoctor(void) {
+  return remote_state[11] & kSamsungAcVirusDoctorMask;
+}
+
+void IRSamsungAc::setVirusDoctor(const bool state) {
+  if (state) {
+    remote_state[11] |= kSamsungAcVirusDoctorMask;
+    } else {
+    remote_state[11] &= ~kSamsungAcVirusDoctorMask;
+  }
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
