@@ -18,7 +18,9 @@
 
 // Supports:
 //   Brand: Samsung,  Model: UA55H6300 TV
+//   Brand: Samsung,  Model: DB63-03556X003 remote
 //   Brand: Samsung,  Model: IEC-R03 remote
+//   Brand: Samsung,  Model: AR09FSSDAWKNFA A/C
 //   Brand: Samsung,  Model: AR12KSFPEWQNET A/C
 //   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C
 
