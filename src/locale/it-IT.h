@@ -12,7 +12,7 @@
 #define D_STR_OFF "Spento"
 #define D_STR_MODE "Modalità"
 #define D_STR_TOGGLE "Alterna"
-#define D_STR_SLEEP "Stand-by"
+#define D_STR_SLEEP "Sonno"
 #define D_STR_LIGHT "Leggero"
 #define D_STR_POWERFUL "Forte"
 #define D_STR_QUIET "Silenzioso"
