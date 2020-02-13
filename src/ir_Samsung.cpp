@@ -571,27 +571,24 @@ void IRSamsungAc::setPowerful(const bool on) {
 }
 
 bool IRSamsungAc::getDisplay(void) {
-  return remote_state[10];
+  return GETBIT8(remote_state[10], kSamsungAcDisplayOffset);
 }
 
-void IRSamsungAc::setDisplay(const bool state) {
-  if (state) {
-    remote_state[10] = kSamsungAcDisplaykOn;
-    } else {
-    remote_state[10] = kSamsungAcDisplaykOff;
-  }
+void IRSamsungAc::setDisplay(const bool on) {
+  setBit(&remote_state[10], kSamsungAcDisplayOffset, on);
+  //if (on) {
+  //  remote_state[10] = kSamsungAcDisplaykOn;
+  //  } else {
+  //   remote_state[10] = kSamsungAcDisplaykOff;
+  //}
 }
 
-bool IRSamsungAc::getVirusDoctor(void) {
-  return remote_state[11] & kSamsungAcVirusDoctorMask;
+bool IRSamsungAc::getIon(void) {
+  return GETBIT8(remote_state[11], kSamsungAcIonOffset);
 }
 
-void IRSamsungAc::setVirusDoctor(const bool state) {
-  if (state) {
-    remote_state[11] |= kSamsungAcVirusDoctorMask;
-    } else {
-    remote_state[11] &= ~kSamsungAcVirusDoctorMask;
-  }
+void IRSamsungAc::setIon(const bool on) {
+  setBit(&remote_state[11], kSamsungAcIonOffset, on);
 }
 
 // Convert a standard A/C mode into its native mode.
