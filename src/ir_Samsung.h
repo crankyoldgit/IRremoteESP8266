@@ -105,8 +105,8 @@ class IRSamsungAc {
 
   void setDisplay(const bool on);
   bool getDisplay(void);
-  void setVIon(const bool on);
-  bool getVIon(void);
+  void setIon(const bool on);
+  bool getIon(void);
   
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
