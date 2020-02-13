@@ -570,6 +570,22 @@ void IRSamsungAc::setPowerful(const bool on) {
   }
 }
 
+bool IRSamsungAc::getDisplay(void) {
+  return GETBIT8(remote_state[10], kSamsungAcDisplayOffset);
+}
+
+void IRSamsungAc::setDisplay(const bool on) {
+  setBit(&remote_state[10], kSamsungAcDisplayOffset, on);
+}
+
+bool IRSamsungAc::getIon(void) {
+  return GETBIT8(remote_state[11], kSamsungAcIonOffset);
+}
+
+void IRSamsungAc::setIon(const bool on) {
+  setBit(&remote_state[11], kSamsungAcIonOffset, on);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
