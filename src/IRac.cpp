@@ -968,7 +968,8 @@ void IRac::samsung(IRSamsungAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-                   const bool quiet, const bool turbo, const bool clean,
+                   const bool quiet, const bool turbo, const bool light,
+                   const bool filter, const bool clean,
                    const bool beep, const bool prevpower,
                    const bool forcepower) {
   ac->begin();
@@ -981,9 +982,9 @@ void IRac::samsung(IRSamsungAc *ac,
   // No Horizontal swing setting available.
   ac->setQuiet(quiet);
   ac->setPowerful(turbo);
-  // No Light setting available.
+  ac->setDisplay(light);
   // No Econo setting available.
-  // No Filter setting available.
+  ac->setIon(filter);
   ac->setClean(clean);
   ac->setBeep(beep);
   // No Sleep setting available.
@@ -1557,7 +1558,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRSamsungAc ac(_pin, _inverted, _modulation);
       samsung(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.quiet, send.turbo, send.clean, send.beep, prev->power);
+              send.quiet, send.turbo, send.light, send.filter, send.clean,
+              send.beep, prev->power);
       break;
     }
 #endif  // SEND_SAMSUNG_AC
