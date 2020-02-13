@@ -576,11 +576,6 @@ bool IRSamsungAc::getDisplay(void) {
 
 void IRSamsungAc::setDisplay(const bool on) {
   setBit(&remote_state[10], kSamsungAcDisplayOffset, on);
-  //if (on) {
-  //  remote_state[10] = kSamsungAcDisplaykOn;
-  //  } else {
-  //   remote_state[10] = kSamsungAcDisplaykOff;
-  //}
 }
 
 bool IRSamsungAc::getIon(void) {
