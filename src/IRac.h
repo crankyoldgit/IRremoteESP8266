@@ -300,7 +300,8 @@ void electra(IRElectraAc *ac,
   void samsung(IRSamsungAc *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-               const bool quiet, const bool turbo, const bool clean,
+               const bool quiet, const bool turbo, const bool light,
+               const bool filter, const bool clean,
                const bool beep, const bool prevpower = true,
                const bool forcepower = true);
 #endif  // SEND_SAMSUNG_AC

@@ -647,11 +647,11 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
   result.turbo = this->getPowerful();
   result.clean = this->getClean();
   result.beep = this->getBeep();
+  result.light = this->getDisplay();
+  result.filter = this->getIon();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
-  result.filter = false;
-  result.light = false;
   result.sleep = -1;
   result.clock = -1;
   return result;
@@ -660,7 +660,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSamsungAc::toString(void) {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(115);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
@@ -695,6 +695,8 @@ String IRSamsungAc::toString(void) {
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getDisplay(), kLightStr);
+  result += addBoolToString(getIon(), kIonStr);
   return result;
 }
 
