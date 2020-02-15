@@ -513,20 +513,21 @@ String IRGreeAC::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kGreeBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
-bool IRrecv::decodeGree(decode_results* results, uint16_t nbits, bool strict) {
-  if (results->rawlen <
-      2 * (nbits + kGreeBlockFooterBits) + (kHeader + kFooter + 1))
+// Status: STABLE / Working.
+bool IRrecv::decodeGree(decode_results* results, uint16_t offset,
+                        const uint16_t nbits, bool const strict) {
+  if (results->rawlen <=
+      2 * (nbits + kGreeBlockFooterBits) + (kHeader + kFooter + 1) - 1 + offset)
     return false;  // Can't possibly be a valid Gree message.
   if (strict && nbits != kGreeBits)
     return false;  // Not strictly a Gree message.
-
-  uint16_t offset = kStartOffset;
 
   // There are two blocks back-to-back in a full Gree IR message
   // sequence.

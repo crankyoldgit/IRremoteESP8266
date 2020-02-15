@@ -69,6 +69,8 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -78,16 +80,15 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
-bool IRrecv::decodeWhynter(decode_results *results, uint16_t nbits,
-                           bool strict) {
-  if (results->rawlen < 2 * nbits + 2 * kHeader + kFooter - 1)
+bool IRrecv::decodeWhynter(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= 2 * nbits + 2 * kHeader + kFooter - 1 + offset)
     return false;  // We don't have enough entries to possibly match.
 
   // Compliance
   if (strict && nbits != kWhynterBits)
     return false;  // Incorrect nr. of bits per spec.
 
-  uint16_t offset = kStartOffset;
   uint64_t data = 0;
   // Pre-Header
   // Sequence begins with a bit mark and a zero space.

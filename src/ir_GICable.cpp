@@ -58,19 +58,20 @@ void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kGicableBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: Alpha / Not tested against a real device.
-bool IRrecv::decodeGICable(decode_results *results, uint16_t nbits,
-                           bool strict) {
+bool IRrecv::decodeGICable(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
   if (strict && nbits != kGicableBits)
     return false;  // Not strictly an GICABLE message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
   uint16_t used;
   used = matchGeneric(results->rawbuf + offset, &data,

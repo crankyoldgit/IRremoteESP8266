@@ -359,13 +359,15 @@ String IRHitachiAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
 //            Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Probably works.
 //
 // Supported devices:
 //  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
@@ -373,11 +375,10 @@ String IRHitachiAc::toString(void) {
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
-bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
-                             const bool strict) {
+bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
   const uint8_t k_tolerance = _tolerance + 5;
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Can't possibly be a valid HitachiAC message.
+
   if (strict) {
     switch (nbits) {
       case kHitachiAcBits:
@@ -388,7 +389,6 @@ bool IRrecv::decodeHitachiAC(decode_results *results, const uint16_t nbits,
         return false;  // Not strictly a Hitachi message.
     }
   }
-  uint16_t offset = kStartOffset;
   uint16_t hmark;
   uint32_t hspace;
   if (nbits == kHitachiAc1Bits) {
@@ -475,6 +475,8 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kHitachiAc424Bits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -489,14 +491,14 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/973
-bool IRrecv::decodeHitachiAc424(decode_results *results, const uint16_t nbits,
+bool IRrecv::decodeHitachiAc424(decode_results *results, uint16_t offset,
+                                const uint16_t nbits,
                                 const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kHeader + kFooter - 1)
+  if (results->rawlen < 2 * nbits + kHeader + kHeader + kFooter - 1 + offset)
     return false;  // Too short a message to match.
   if (strict && nbits != kHitachiAc424Bits)
     return false;
 
-  uint16_t offset = kStartOffset;
   uint16_t used;
 
   // Leader

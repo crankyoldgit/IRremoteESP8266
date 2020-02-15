@@ -64,7 +64,10 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Expected nr. of data bits. (Typically kDenonBits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
@@ -72,7 +75,8 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeDenon(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict) {
   // Compliance
   if (strict) {
     switch (nbits) {
@@ -92,15 +96,14 @@ bool IRrecv::decodeDenon(decode_results *results, uint16_t nbits, bool strict) {
   // Ditto for Panasonic, it's the same except for a different
   // manufacturer code.
 
-  if (!decodeSharp(results, nbits, true, false) &&
-      !decodePanasonic(results, nbits, true, kDenonManufacturer)) {
+  if (!decodeSharp(results, offset, nbits, true, false) &&
+      !decodePanasonic(results, offset, nbits, true, kDenonManufacturer)) {
     // We couldn't decode it as expected, so try the old legacy method.
     // NOTE: I don't think this following protocol actually exists.
     //       Looks like a partial version of the Sharp protocol.
     if (strict && nbits != kDenonLegacyBits) return false;
 
     uint64_t data = 0;
-    uint16_t offset = kStartOffset;
 
     // Match Header + Data + Footer
     if (!matchGeneric(results->rawbuf + offset, &data,

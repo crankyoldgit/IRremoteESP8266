@@ -53,6 +53,8 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // i.e. normal + inverted + normal
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kCarrierAcBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -61,16 +63,15 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Status: ALPHA / Untested.
 //
-bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t nbits,
-                             bool strict) {
-  if (results->rawlen < ((2 * nbits + kHeader + kFooter) * 3) - 1)
+bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
+  if (results->rawlen < ((2 * nbits + kHeader + kFooter) * 3) - 1 + offset)
     return false;  // Can't possibly be a valid Carrier message.
   if (strict && nbits != kCarrierAcBits)
     return false;  // We expect Carrier to be 32 bits of message.
 
   uint64_t data = 0;
   uint64_t prev_data = 0;
-  uint16_t offset = kStartOffset;
 
   for (uint8_t i = 0; i < 3; i++) {
     prev_data = data;

@@ -542,6 +542,8 @@ String IRWhirlpoolAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kWhirlpoolAcBits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -552,16 +554,15 @@ String IRWhirlpoolAc::toString(void) {
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/509
-bool IRrecv::decodeWhirlpoolAC(decode_results *results, const uint16_t nbits,
-                               const bool strict) {
-  if (results->rawlen < 2 * nbits + 4 + kHeader + kFooter - 1)
+bool IRrecv::decodeWhirlpoolAC(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + 4 + kHeader + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid Whirlpool A/C message.
   if (strict) {
     if (nbits != kWhirlpoolAcBits) return false;
   }
 
-  uint16_t offset = kStartOffset;
-  uint8_t sectionSize[kWhirlpoolAcSections] = {6, 8, 7};
+  const uint8_t sectionSize[kWhirlpoolAcSections] = {6, 8, 7};
 
   // Header
   if (!matchMark(results->rawbuf[offset++], kWhirlpoolAcHdrMark)) return false;

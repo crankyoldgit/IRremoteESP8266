@@ -161,7 +161,8 @@ TEST(TestDecodeCarrierAC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCarrierAC(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kCarrierAcBits, true));
+  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kStartOffset,
+                                     kCarrierAcBits, true));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
   EXPECT_EQ(kCarrierAcBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -172,7 +173,8 @@ TEST(TestDecodeCarrierAC, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendCarrierAC(0xB335ABE2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kCarrierAcBits, true));
+  ASSERT_TRUE(irrecv.decodeCarrierAC(&irsend.capture, kStartOffset,
+                                     kCarrierAcBits, true));
   EXPECT_EQ(CARRIER_AC, irsend.capture.decode_type);
   EXPECT_EQ(kCarrierAcBits, irsend.capture.bits);
   EXPECT_EQ(0xB335ABE2, irsend.capture.value);

@@ -168,7 +168,8 @@ TEST(TestDecode, DecodePanasonic) {
   irsend.reset();
   irsend.sendPanasonic64(0x40040190ED7C);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kPanasonicBits, true));
+  ASSERT_TRUE(irrecv.decodePanasonic(&irsend.capture, kStartOffset,
+                                     kPanasonicBits, true));
   EXPECT_EQ(PANASONIC, irsend.capture.decode_type);
   EXPECT_EQ(kPanasonicBits, irsend.capture.bits);
   EXPECT_EQ(0x40040190ED7C, irsend.capture.value);
@@ -1243,4 +1244,348 @@ TEST(TestIRrecv, Tolerance) {
   irsend.makeDecodeResult();
   result = irrecv.matchData(irsend.capture.rawbuf + 1, 5, 1500, 500, 500, 1500);
   ASSERT_FALSE(result.success);
+}
+
+TEST(TestDecode, SkippingInDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Normal (default) usage.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Explicitly use the default (no skipping)
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  // Enable the least amount of actual skipping.
+  // Should still decode normal data.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Crank up the amount of actual skipping.
+  // Should still decode normal data.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 10));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Introduce some noise before the actual message.
+
+  // Should not match as NEC anymore.
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  // Now with explicit default options set.
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+
+  // Now with 1 skip, which it should match as NEC as there is only one
+  // mark + space pair of noise.
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Now with more than 1 skip, which it should match as NEC as there is only
+  // one mark + space pair of noise.
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 5));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+
+  // Test multiple noise pairs.
+
+  irsend.reset();
+  irsend.mark(160);
+  irsend.space(60);
+  irsend.mark(60);
+  irsend.space(160);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  // Default decode parameters should fail to detect as NEC.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  // A single skip should fail to detect as NEC, as there are two pairs of noise
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  // However, two skips should match it correctly.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 2));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  // And so should more than 2 skips.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 10));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+}
+
+TEST(TestCrudeNoiseFilter, General) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Normal (default) usage.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // Explicitly no filtering.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // Filter out anything less than 100usecs of which there should be none.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // Add small noise at the start, but don't filter it
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(69 + 2, irsend.capture.rawlen);
+
+  // Add small noise at the start, but filter it this time
+  irsend.reset();
+  irsend.mark(60);
+  irsend.space(60);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  irsend.reset();
+  irsend.mark(60);  // Less than the filter floor.
+  irsend.space(560);
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  irsend.reset();
+  irsend.mark(100);  // Higher than the filter floor.
+  irsend.space(200);  // Higher than the filter floor.
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_NE(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(69 + 2, irsend.capture.rawlen);
+
+  irsend.reset();
+  irsend.mark(160);  // Higher than the filter floor.
+  irsend.space(60);  // Lower than the filter floor.
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // Multiple noise at the start
+  irsend.reset();
+  irsend.mark(60);  // Lower than the filter floor.
+  irsend.space(60);  // Lower than the filter floor.
+  irsend.mark(60);  // Lower than the filter floor.
+  irsend.space(60);  // Lower than the filter floor.
+  irsend.mark(60);  // Lower than the filter floor.
+  irsend.space(60);  // Lower than the filter floor.
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // A mix of noise that should be removed.
+  irsend.reset();
+  irsend.mark(60);    // Lower than the filter floor.
+  irsend.space(160);  // Higher than the filter floor.
+  irsend.mark(160);   // Higher than the filter floor.
+  irsend.space(60);   // Lower than the filter floor.
+  irsend.mark(160);   // Higher than the filter floor.
+  irsend.space(60);   // Lower than the filter floor.
+  irsend.sendNEC(0x4BB640BF);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+
+  // Add noise that should be removed to the end of a message.
+  irsend.reset();
+  irsend.sendNEC(0x4BB640BF);
+  irsend.mark(60);    // Lower than the filter floor.
+  irsend.space(160);  // Higher than the filter floor.
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 100));
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x4BB640BF, irsend.capture.value);
+  EXPECT_EQ(69, irsend.capture.rawlen);
+}
+
+TEST(TestCrudeNoiseFilter, NoiseMidSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1042#issuecomment-583895303
+  uint16_t rawData[71] = {
+      482, 1370, 9082, 1558, 342, 2514, 662, 470, 660, 468, 658, 1588, 662, 466,
+      662, 466, 662, 466, 662, 466, 662, 466, 662, 1586, 660, 1588, 662, 466,
+      662, 1588, 662, 1586, 662, 1586, 660, 1588, 662, 1586, 662, 468, 660,
+      1588, 662, 468, 662, 466, 660, 466, 662, 464, 662, 466, 662, 466, 662,
+      1588, 660, 466, 662, 1586, 662, 1588, 660, 1586, 662, 1586, 662, 1586,
+      664, 1594, 662};  // UNKNOWN B0784C9E
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 71, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  const uint16_t prev_length = irsend.capture.rawlen;
+  // Now with the filter set to 350, to remove the 342 mark at rawData[4].
+  // Note: a mark of 350us is huge.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 1, 350));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x20DF40BF, irsend.capture.value);
+  EXPECT_EQ(prev_length - 2, irsend.capture.rawlen);
+  EXPECT_EQ(
+      "uint16_t rawData[69] = {482, 1370,  9082, 4414,  662, 470,  660, 468,  "
+      "658, 1588,  662, 466,  662, 466,  662, 466,  662, 466,  662, 466,  662, "
+      "1586,  660, 1588,  662, 466,  662, 1588,  662, 1586,  662, 1586,  660, "
+      "1588,  662, 1586,  662, 468,  660, 1588,  662, 468,  662, 466,  660, "
+      "466,  662, 464,  662, 466,  662, 466,  662, 1588,  660, 466,  662, "
+      "1586,  662, 1588,  660, 1586,  662, 1586,  662, 1586,  664, 1594,  "
+      "662};  // NEC 20DF40BF\n"
+      "uint32_t address = 0x4;\n"
+      "uint32_t command = 0x2;\n"
+      "uint64_t data = 0x20DF40BF;\n",
+      resultToSourceCode(&irsend.capture));
+
+  // Data modified as rawData2[3] which was 882 is too far out of spec. for a
+  // NEC bit mark.
+  uint16_t rawData2[7] = {
+      9066, 2026, 600, 13906, 222, 992, 734};  // UNKNOWN 8FDE36A7
+  irsend.reset();
+  irsend.sendRaw(rawData2, 7, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(0, irsend.capture.bits);
+  EXPECT_TRUE(irsend.capture.repeat);
+  // Now with the filter set to 250, to remove the 222 mark at rawData2[4].
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 350));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(0, irsend.capture.bits);
+  EXPECT_TRUE(irsend.capture.repeat);
+  EXPECT_EQ(
+      "uint16_t rawData[5] = {9066, 2026,  600, 15120,  734};  "
+      "// NEC (Repeat) FFFFFFFFFFFFFFFF\n"
+      "uint64_t data = 0xFFFFFFFFFFFFFFFF;\n",
+      resultToSourceCode(&irsend.capture));
+}
+
+TEST(TestCrudeNoiseFilter, NoiseAtEndOfSample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1042#issuecomment-583895303
+  uint16_t rawData[69] = {  // UNKNOWN B52869E1
+      9078, 4386, 662, 468, 660, 466, 662, 1588, 660, 468, 660, 468, 662, 466,
+      662, 466, 662, 466, 662, 1588, 660, 1588, 660, 466, 662, 1590, 660, 1586,
+      662, 1586, 662, 1588, 662, 1584, 662, 1588, 662, 1588, 660, 466, 686, 442,
+      662, 466, 662, 466, 662, 466, 662, 468, 662, 466, 662, 466, 662, 1586,
+      662, 1588, 662, 1586, 644, 1600, 662, 1586, 688, 1566, 684, 2638, 146};
+  irsend.reset();
+  irsend.sendRaw(rawData, 69, 38);
+  irsend.makeDecodeResult();
+  // Try with no filter first.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 0));
+  EXPECT_NE(NEC, irsend.capture.decode_type);
+  const uint16_t prev_length = irsend.capture.rawlen;
+
+  // Now with the filter set to 200, to remove the 146 mark at at the end.
+  EXPECT_TRUE(irrecv.decode(&irsend.capture, NULL, 0, 200));
+  EXPECT_EQ(NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kNECBits, irsend.capture.bits);
+  EXPECT_EQ(0x20DFC03F, irsend.capture.value);
+  EXPECT_EQ(prev_length - 2, irsend.capture.rawlen);
+  EXPECT_EQ(
+      "uint16_t rawData[67] = {9078, 4386,  662, 468,  660, 466,  662, 1588,  "
+      "660, 468,  660, 468,  662, 466,  662, 466,  662, 466,  662, 1588,  660, "
+      "1588,  660, 466,  662, 1590,  660, 1586,  662, 1586,  662, 1588,  662, "
+      "1584,  662, 1588,  662, 1588,  660, 466,  686, 442,  662, 466,  662, "
+      "466,  662, 466,  662, 468,  662, 466,  662, 466,  662, 1586,  662, 1588,"
+      "  662, 1586,  644, 1600,  662, 1586,  688, 1566,  684};  "
+      "// NEC 20DFC03F\n"
+      "uint32_t address = 0x4;\n"
+      "uint32_t command = 0x3;\n"
+      "uint64_t data = 0x20DFC03F;\n",
+      resultToSourceCode(&irsend.capture));
 }

@@ -68,6 +68,8 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kNECBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -85,22 +87,22 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/nec.php
-bool IRrecv::decodeNEC(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 &&
-      results->rawlen != kNecRptLength)
+bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
+                       const uint16_t nbits, const bool strict) {
+  if (results->rawlen < kNecRptLength + offset - 1)
     return false;  // Can't possibly be a valid NEC message.
   if (strict && nbits != kNECBits)
     return false;  // Not strictly an NEC message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
-  // Header
+  // Header - All NEC messages have this Header Mark.
   if (!matchMark(results->rawbuf[offset++], kNecHdrMark)) return false;
   // Check if it is a repeat code.
-  if (results->rawlen == kNecRptLength &&
-      matchSpace(results->rawbuf[offset], kNecRptSpace) &&
-      matchMark(results->rawbuf[offset + 1], kNecBitMark)) {
+  if (matchSpace(results->rawbuf[offset], kNecRptSpace) &&
+      matchMark(results->rawbuf[offset + 1], kNecBitMark) &&
+      (offset + 2 <= results->rawlen ||
+       matchAtLeast(results->rawbuf[offset + 2], kNecMinGap))) {
     results->value = kRepeat;
     results->decode_type = NEC;
     results->bits = 0;

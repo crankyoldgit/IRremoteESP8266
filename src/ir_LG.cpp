@@ -176,13 +176,15 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kLgBits or kLg32Bits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should work.
+// Status: STABLE / Working.
 //
 // Note:
 //   LG 32bit protocol appears near identical to the Samsung protocol.
@@ -193,19 +195,18 @@ uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
 
 // Ref:
 //   https://funembedded.wordpress.com/2014/11/08/ir-remote-control-for-lg-conditioner-using-stm32f302-mcu-on-mbed-platform/
-bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
+                      const uint16_t nbits, const bool strict) {
   if (nbits >= kLg32Bits) {
-    if (results->rawlen < 2 * nbits + 2 * (kHeader + kFooter) - 1)
+    if (results->rawlen <= 2 * nbits + 2 * (kHeader + kFooter) - 1 + offset)
       return false;  // Can't possibly be a valid LG32 message.
   } else {
-    if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
+    if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
       return false;  // Can't possibly be a valid LG message.
   }
   if (strict && nbits != kLgBits && nbits != kLg32Bits)
     return false;  // Doesn't comply with expected LG protocol.
-
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   bool isLg2 = false;
 
   // Header
@@ -280,7 +281,6 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t nbits, bool strict) {
 
   if (strict && (data & 0xF) != calcLGChecksum(command))
     return false;  // The last 4 bits sent are the expected checksum.
-
   // Success
   if (isLg2)
     results->decode_type = LG2;

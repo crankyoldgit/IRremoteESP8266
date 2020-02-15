@@ -49,6 +49,8 @@ void IRsend::sendInax(const uint64_t data, const uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kInaxBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -57,13 +59,12 @@ void IRsend::sendInax(const uint64_t data, const uint16_t nbits,
 //
 // Status: Stable / Known working.
 //
-bool IRrecv::decodeInax(decode_results *results, const uint16_t nbits,
-                        const bool strict) {
+bool IRrecv::decodeInax(decode_results *results, uint16_t offset,
+                        const uint16_t nbits, const bool strict) {
   if (strict && nbits != kInaxBits)
     return false;  // We expect Inax to be a certain sized message.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,

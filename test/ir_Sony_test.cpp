@@ -193,7 +193,7 @@ TEST(TestDecodeSony, SonyDecodeWithUnexpectedLegalSize) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony20Bits, 0x1, 0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSonyMinBits));
+  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSonyMinBits));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(kSony20Bits, irsend.capture.bits);
   EXPECT_EQ(0x81080, irsend.capture.value);
@@ -204,7 +204,7 @@ TEST(TestDecodeSony, SonyDecodeWithUnexpectedLegalSize) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony12Bits, 21, 1), kSony12Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSony20Bits));
+  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
   EXPECT_EQ(kSony12Bits, irsend.capture.bits);
   EXPECT_EQ(0xA90, irsend.capture.value);
@@ -215,22 +215,28 @@ TEST(TestDecodeSony, SonyDecodeWithUnexpectedLegalSize) {
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony12Bits, 21, 1), kSony12Bits);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
 
   // 15-bit message should be regected when using strict and a different size.
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony15Bits, 21, 1), kSony15Bits);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
 
   // 20-bit message should be regected when using strict and a different size.
   irsend.reset();
   irsend.sendSony(irsend.encodeSony(kSony20Bits, 1, 1, 1), kSony20Bits);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  ASSERT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
 }
 
 // Decode unsupported Sony messages. i.e non-standard sizes.
@@ -243,10 +249,14 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   irsend.sendSony(0xFF, 8);  // Illegal 8-bit Sony-like message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSonyMinBits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSonyMinBits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
   // Should work with a 'normal' match (not strict)
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
@@ -259,10 +269,14 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   irsend.sendSony(0x1FFF, 13);  // Illegal 13-bit Sony-like message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSonyMinBits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSonyMinBits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
   // Should work with a 'normal' match (not strict)
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
@@ -275,10 +289,14 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   irsend.sendSony(0x1FFFF, 17);  // Illegal 17-bit Sony-like message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSonyMinBits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSonyMinBits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
   // Should work with a 'normal' match (not strict)
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
@@ -291,10 +309,14 @@ TEST(TestDecodeSony, SonyDecodeWithIllegalSize) {
   irsend.sendSony(0x1FFFFF, 21);  // Illegal 21-bit Sony-like message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSonyMinBits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony15Bits, true));
-  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kSony20Bits, true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSonyMinBits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony15Bits,
+                                 true));
+  EXPECT_FALSE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony20Bits,
+                                 true));
   // Should work with a 'normal' match (not strict)
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(SONY, irsend.capture.decode_type);
@@ -336,7 +358,8 @@ TEST(TestDecodeSony, DecodeGlobalCacheExample) {
   EXPECT_EQ(0x1, irsend.capture.address);
   EXPECT_EQ(0x2E, irsend.capture.command);
   // With strict and correct size.
-  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kSony12Bits, true));
+  ASSERT_TRUE(irrecv.decodeSony(&irsend.capture, kStartOffset, kSony12Bits,
+                                true));
 }
 
 // Encoding & Decode 20 bit Sony messages. Issue #476

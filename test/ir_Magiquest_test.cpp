@@ -93,7 +93,8 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(0x0);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kStartOffset,
+                                     kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
   EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -104,7 +105,8 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(irsend.encodeMagiQuest(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kStartOffset,
+                                     kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
   EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x10001, irsend.capture.value);
@@ -115,7 +117,8 @@ TEST(TestDecodeMagiQuest, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendMagiQuest(irsend.encodeMagiQuest(0x12345678, 0xABCD));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kMagiquestBits, true));
+  ASSERT_TRUE(irrecv.decodeMagiQuest(&irsend.capture, kStartOffset,
+                                     kMagiquestBits, true));
   EXPECT_EQ(MAGIQUEST, irsend.capture.decode_type);
   EXPECT_EQ(kMagiquestBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678ABCD, irsend.capture.value);

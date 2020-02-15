@@ -107,7 +107,8 @@ TEST(TestDecodeSamsung, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSAMSUNG(0xE0E09966);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   true));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0xE0E09966, irsend.capture.value);
@@ -118,7 +119,8 @@ TEST(TestDecodeSamsung, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSAMSUNG(irsend.encodeSAMSUNG(0x07, 0x99));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   true));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0xE0E09966, irsend.capture.value);
@@ -129,7 +131,8 @@ TEST(TestDecodeSamsung, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSAMSUNG(irsend.encodeSAMSUNG(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   true));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0x8080807F, irsend.capture.value);
@@ -147,7 +150,8 @@ TEST(TestDecodeSamsung, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendSAMSUNG(0xE0E09966, kSamsungBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   true));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0xE0E09966, irsend.capture.value);
@@ -165,9 +169,11 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   irsend.sendSAMSUNG(0x0);  // Illegal value Samsung 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -178,9 +184,11 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   irsend.sendSAMSUNG(0x12345678);  // Illegal value Samsung 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                   false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungBits, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -192,12 +200,14 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   irsend.sendSAMSUNG(irsend.encodeSAMSUNG(0, 0), 36);
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    true));
   // Shouldn't pass if strict off and wrong expected bit size.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    false));
   // Re-decode with correct bit size.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, 36, true));
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 36, false));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, 36, true));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, 36, false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(36, irsend.capture.bits);
   EXPECT_EQ(0xFF, irsend.capture.value);  // We told it to expect 8 bits less.
@@ -214,7 +224,7 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
 
   // Should pass if strict off if we ask for correct nr. of bits sent.
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 16, false));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, 16, false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(16, irsend.capture.bits);
   EXPECT_EQ(0xFF, irsend.capture.value);  // We told it to expect 4 bits less.
@@ -222,7 +232,7 @@ TEST(TestDecodeSamsung, DecodeWithNonStrictValues) {
   EXPECT_EQ(0x00, irsend.capture.command);
 
   // Should fail as we are expecting less bits than there are.
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, 12, false));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, 12, false));
 }
 
 // Decode (non-standard) 64-bit messages.
@@ -236,9 +246,10 @@ TEST(TestDecodeSamsung, Decode64BitMessages) {
   // Illegal value & size Samsung 64-bit message.
   irsend.sendSAMSUNG(0xFFFFFFFFFFFFFFFF, 64);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, true));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    true));
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, 64, false));
+  ASSERT_TRUE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(SAMSUNG, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFFFFFFF, irsend.capture.value);
@@ -289,7 +300,8 @@ TEST(TestDecodeSamsung, FailToDecodeNonSamsungExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kSamsungBits, false));
+  ASSERT_FALSE(irrecv.decodeSAMSUNG(&irsend.capture, kStartOffset, kSamsungBits,
+                                    false));
 }
 
 // General housekeeping

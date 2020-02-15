@@ -307,6 +307,37 @@ void IRrecv::setTolerance(const uint8_t percent) {
 // Get the base tolerance percentage for matching incoming IR messages.
 uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 
+#if ENABLE_NOISE_FILTER_OPTION
+// Remove or merge pulses in the capture buffer that are too short.
+// Args:
+//   results:  Ptr to the decode_results we are going to filter/modify.
+//   floor:  Only allow values in the buffer large than this. (in micro seconds)
+void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
+  if (floor == 0) return;  // Nothing to do.
+  const uint16_t kTickFloor = floor / kRawTick;
+  const uint16_t kBufSize = getBufSize();
+  uint16_t offset = kStartOffset;
+  while (offset < results->rawlen && offset + 2 < kBufSize) {
+    uint16_t curr = results->rawbuf[offset];
+    uint16_t next = results->rawbuf[offset + 1];
+    uint16_t addition = curr + next;
+    if (curr < kTickFloor) {  // Is it too short?
+      // Shuffle the buffer down. i.e. Remove the mark & space pair.
+      // Note: `memcpy()` can't be used as rawbuf is `volatile`.
+      for (uint16_t i = offset + 2; i <= results->rawlen && i < kBufSize; i++)
+        results->rawbuf[i - 2] = results->rawbuf[i];
+      if (offset > 1) {  // There is a previous pair we can add to.
+        // Merge this pair into into the previous space.
+        results->rawbuf[offset - 1] += addition;
+      }
+      results->rawlen -= 2;  // Adjust the length.
+    } else {
+      offset++;  // Move along.
+    }
+  }
+}
+#endif  // ENABLE_NOISE_FILTER_OPTION
+
 // Decodes the received IR message.
 // If the interrupt state is saved, we will immediately resume waiting
 // for the next IR message to avoid missing messages.
@@ -317,9 +348,41 @@ uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 //   results:  A pointer to where the decoded IR message will be stored.
 //   save:  A pointer to an irparams_t instance in which to save
 //          the interrupt's memory/state. NULL means don't save it.
+//   max_skip:  Maximum Nr. of pulses at the begining of a capture we can skip
+//              when attempting to find a protocol we can successfully decode.
+//              This parameter can dramatically improve detection of protocols
+//              when there is light IR interference just before an incoming IR
+//              message, however, it comes at a steep performace price.
+//              CAUTION: Increasing this value will dramatically (linnearly)
+//                       increase the cpu time & usage to decode protocols.
+//                       e.g. 0 -> 1 will be a 2x increase in cpu usage/time.
+//                            0 -> 2 will be a 3x increase etc.
+//                       If you are going to do this, consider disabling
+//                       protocol decoding for protocols you are not expecting.
+//              (Default is 0. No skipping.)
+//   noise_floor:  Pulses below this size (in usecs) will be removed or merged
+//                 prior to any decoding. This is to try to remove noise/poor
+//                 readings & slighly increase the chances of a successful
+//                 decode but at the cost of data fidelity & integrity.
+//                 (Defaults to 0 usecs. i.e. Don't filter; which is safe!)
+//                 DANGER: **Here Be Dragons!**
+//                   If you set the `filter_floor` value too high, it **WILL**
+//                   break decoding of some protocols. You have been warned!
+//                   **Any** non-zero value has the potential to **cook** the
+//                   captured raw data. i.e. The data is going to lie to you.
+//                   It may obscure hardware, circuit, & environment issues thus
+//                   making it impossible to support you accurately or
+//                   confidently.
+//                   Values of <= 50 usecs will probably be safe.
+//                   51 - 100 usecs **might** be okay.
+//                   100 - 150 usecs is "Danger, Will Robinson!".
+//                   150 - 200 usecs expect broken protocols.
+//                   At 200+ usecs, you **have** protocols you can't decode!!
+//
 // Returns:
 //   A boolean indicating if an IR message is ready or not.
-bool IRrecv::decode(decode_results *results, irparams_t *save) {
+bool IRrecv::decode(decode_results *results, irparams_t *save,
+                    uint8_t max_skip, uint16_t noise_floor) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
   if (irparams.rcvstate != kStopState) return false;
@@ -365,320 +428,334 @@ bool IRrecv::decode(decode_results *results, irparams_t *save) {
   results->command = 0;
   results->repeat = false;
 
+#if ENABLE_NOISE_FILTER_OPTION
+  crudeNoiseFilter(results, noise_floor);
+#endif  // ENABLE_NOISE_FILTER_OPTION
+  // Keep looking for protocols until we've run out of entries to skip or we
+  // find a valid protocol message.
+  for (uint16_t offset = kStartOffset;
+       offset <= (max_skip * 2) + kStartOffset;
+       offset += 2) {
 #if DECODE_AIWA_RC_T501
-  DPRINTLN("Attempting Aiwa RC T501 decode");
-  // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
-  // because the protocols are similar. This protocol is more specific than
-  // those ones, so should got before them.
-  if (decodeAiwaRCT501(results)) return true;
+    DPRINTLN("Attempting Aiwa RC T501 decode");
+    // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
+    // because the protocols are similar. This protocol is more specific than
+    // those ones, so should go before them.
+    if (decodeAiwaRCT501(results, offset)) return true;
 #endif
 #if DECODE_SANYO
-  DPRINTLN("Attempting Sanyo LC7461 decode");
-  // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
-  // similar in timings & structure, but the Sanyo one is much longer than the
-  // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
-  // reduce false detection as a NEC packet.
-  if (decodeSanyoLC7461(results)) return true;
+    DPRINTLN("Attempting Sanyo LC7461 decode");
+    // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
+    // similar in timings & structure, but the Sanyo one is much longer than the
+    // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
+    // reduce false detection as a NEC packet.
+    if (decodeSanyoLC7461(results, offset)) return true;
 #endif
 #if DECODE_CARRIER_AC
-  DPRINTLN("Attempting Carrier AC decode");
-  // Try decodeCarrierAC() before decodeNEC() because the protocols are
-  // similar in timings & structure, but the Carrier one is much longer than the
-  // NEC protocol (3x32 bits vs 1x32 bits) so this one should be tried first to
-  // try to reduce false detection as a NEC packet.
-  if (decodeCarrierAC(results)) return true;
+    DPRINTLN("Attempting Carrier AC decode");
+    // Try decodeCarrierAC() before decodeNEC() because the protocols are
+    // similar in timings & structure, but the Carrier one is much longer than
+    // the NEC protocol (3x32 bits vs 1x32 bits) so this one should be tried
+    // first to try to reduce false detection as a NEC packet.
+    if (decodeCarrierAC(results, offset)) return true;
 #endif
 #if DECODE_PIONEER
-  DPRINTLN("Attempting Pioneer decode");
-  // Try decodePioneer() before decodeNEC() because the protocols are
-  // similar in timings & structure, but the Pioneer one is much longer than the
-  // NEC protocol (2x32 bits vs 1x32 bits) so this one should be tried first to
-  // try to reduce false detection as a NEC packet.
-  if (decodePioneer(results)) return true;
+    DPRINTLN("Attempting Pioneer decode");
+    // Try decodePioneer() before decodeNEC() because the protocols are
+    // similar in timings & structure, but the Pioneer one is much longer than
+    // the NEC protocol (2x32 bits vs 1x32 bits) so this one should be tried
+    // first to try to reduce false detection as a NEC packet.
+    if (decodePioneer(results, offset)) return true;
 #endif
 #if DECODE_NEC
-  DPRINTLN("Attempting NEC decode");
-  if (decodeNEC(results)) return true;
+    DPRINTLN("Attempting NEC decode");
+    if (decodeNEC(results, offset)) return true;
 #endif
 #if DECODE_SONY
-  DPRINTLN("Attempting Sony decode");
-  if (decodeSony(results)) return true;
+    DPRINTLN("Attempting Sony decode");
+    if (decodeSony(results, offset)) return true;
 #endif
 #if DECODE_MITSUBISHI
-  DPRINTLN("Attempting Mitsubishi decode");
-  if (decodeMitsubishi(results)) return true;
+    DPRINTLN("Attempting Mitsubishi decode");
+    if (decodeMitsubishi(results, offset)) return true;
 #endif
 #if DECODE_MITSUBISHI_AC
-  DPRINTLN("Attempting Mitsubishi AC decode");
-  if (decodeMitsubishiAC(results)) return true;
+    DPRINTLN("Attempting Mitsubishi AC decode");
+    if (decodeMitsubishiAC(results, offset)) return true;
 #endif
 #if DECODE_MITSUBISHI2
-  DPRINTLN("Attempting Mitsubishi2 decode");
-  if (decodeMitsubishi2(results)) return true;
+    DPRINTLN("Attempting Mitsubishi2 decode");
+    if (decodeMitsubishi2(results, offset)) return true;
 #endif
 #if DECODE_RC5
-  DPRINTLN("Attempting RC5 decode");
-  if (decodeRC5(results)) return true;
+    DPRINTLN("Attempting RC5 decode");
+    if (decodeRC5(results, offset)) return true;
 #endif
 #if DECODE_RC6
-  DPRINTLN("Attempting RC6 decode");
-  if (decodeRC6(results)) return true;
+    DPRINTLN("Attempting RC6 decode");
+    if (decodeRC6(results, offset)) return true;
 #endif
 #if DECODE_RCMM
-  DPRINTLN("Attempting RC-MM decode");
-  if (decodeRCMM(results)) return true;
+    DPRINTLN("Attempting RC-MM decode");
+    if (decodeRCMM(results, offset)) return true;
 #endif
 #if DECODE_FUJITSU_AC
-  // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
-  // message which looks exactly the same as a Panasonic/Denon message.
-  DPRINTLN("Attempting Fujitsu A/C decode");
-  if (decodeFujitsuAC(results)) return true;
+    // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
+    // message which looks exactly the same as a Panasonic/Denon message.
+    DPRINTLN("Attempting Fujitsu A/C decode");
+    if (decodeFujitsuAC(results, offset)) return true;
 #endif
 #if DECODE_DENON
-  // Denon needs to precede Panasonic as it is a special case of Panasonic.
-  DPRINTLN("Attempting Denon decode");
-  if (decodeDenon(results, kDenon48Bits) || decodeDenon(results, kDenonBits) ||
-      decodeDenon(results, kDenonLegacyBits))
-    return true;
+    // Denon needs to precede Panasonic as it is a special case of Panasonic.
+    DPRINTLN("Attempting Denon decode");
+    if (decodeDenon(results, offset, kDenon48Bits) ||
+        decodeDenon(results, offset, kDenonBits) ||
+        decodeDenon(results, offset, kDenonLegacyBits))
+      return true;
 #endif
 #if DECODE_PANASONIC
-  DPRINTLN("Attempting Panasonic decode");
-  if (decodePanasonic(results)) return true;
+    DPRINTLN("Attempting Panasonic decode");
+    if (decodePanasonic(results, offset)) return true;
 #endif
 #if DECODE_LG
-  DPRINTLN("Attempting LG (28-bit) decode");
-  if (decodeLG(results, kLgBits, true)) return true;
-  DPRINTLN("Attempting LG (32-bit) decode");
-  // LG32 should be tried before Samsung
-  if (decodeLG(results, kLg32Bits, true)) return true;
+    DPRINTLN("Attempting LG (28-bit) decode");
+    if (decodeLG(results, offset, kLgBits, true)) return true;
+    DPRINTLN("Attempting LG (32-bit) decode");
+    // LG32 should be tried before Samsung
+    if (decodeLG(results, offset, kLg32Bits, true)) return true;
 #endif
 #if DECODE_GICABLE
-  // Note: Needs to happen before JVC decode, because it looks similar except
-  //       with a required NEC-like repeat code.
-  DPRINTLN("Attempting GICable decode");
-  if (decodeGICable(results)) return true;
+    // Note: Needs to happen before JVC decode, because it looks similar except
+    //       with a required NEC-like repeat code.
+    DPRINTLN("Attempting GICable decode");
+    if (decodeGICable(results, offset)) return true;
 #endif
 #if DECODE_JVC
-  DPRINTLN("Attempting JVC decode");
-  if (decodeJVC(results)) return true;
+    DPRINTLN("Attempting JVC decode");
+    if (decodeJVC(results, offset)) return true;
 #endif
 #if DECODE_SAMSUNG
-  DPRINTLN("Attempting SAMSUNG decode");
-  if (decodeSAMSUNG(results)) return true;
+    DPRINTLN("Attempting SAMSUNG decode");
+    if (decodeSAMSUNG(results, offset)) return true;
 #endif
 #if DECODE_SAMSUNG36
-  DPRINTLN("Attempting Samsung36 decode");
-  if (decodeSamsung36(results)) return true;
+    DPRINTLN("Attempting Samsung36 decode");
+    if (decodeSamsung36(results, offset)) return true;
 #endif
 #if DECODE_WHYNTER
-  DPRINTLN("Attempting Whynter decode");
-  if (decodeWhynter(results)) return true;
+    DPRINTLN("Attempting Whynter decode");
+    if (decodeWhynter(results, offset)) return true;
 #endif
 #if DECODE_DISH
-  DPRINTLN("Attempting DISH decode");
-  if (decodeDISH(results)) return true;
+    DPRINTLN("Attempting DISH decode");
+    if (decodeDISH(results, offset)) return true;
 #endif
 #if DECODE_SHARP
-  DPRINTLN("Attempting Sharp decode");
-  if (decodeSharp(results)) return true;
+    DPRINTLN("Attempting Sharp decode");
+    if (decodeSharp(results, offset)) return true;
 #endif
 #if DECODE_COOLIX
-  DPRINTLN("Attempting Coolix decode");
-  if (decodeCOOLIX(results)) return true;
+    DPRINTLN("Attempting Coolix decode");
+    if (decodeCOOLIX(results, offset)) return true;
 #endif
 #if DECODE_NIKAI
-  DPRINTLN("Attempting Nikai decode");
-  if (decodeNikai(results)) return true;
+    DPRINTLN("Attempting Nikai decode");
+    if (decodeNikai(results, offset)) return true;
 #endif
 #if DECODE_KELVINATOR
-  // Kelvinator based-devices use a similar code to Gree ones, to avoid false
-  // matches this needs to happen before decodeGree().
-  DPRINTLN("Attempting Kelvinator decode");
-  if (decodeKelvinator(results)) return true;
+    // Kelvinator based-devices use a similar code to Gree ones, to avoid false
+    // matches this needs to happen before decodeGree().
+    DPRINTLN("Attempting Kelvinator decode");
+    if (decodeKelvinator(results, offset)) return true;
 #endif
 #if DECODE_DAIKIN
-  DPRINTLN("Attempting Daikin decode");
-  if (decodeDaikin(results)) return true;
+    DPRINTLN("Attempting Daikin decode");
+    if (decodeDaikin(results, offset)) return true;
 #endif
 #if DECODE_DAIKIN2
-  DPRINTLN("Attempting Daikin2 decode");
-  if (decodeDaikin2(results)) return true;
+    DPRINTLN("Attempting Daikin2 decode");
+    if (decodeDaikin2(results, offset)) return true;
 #endif
 #if DECODE_DAIKIN216
-  DPRINTLN("Attempting Daikin216 decode");
-  if (decodeDaikin216(results)) return true;
+    DPRINTLN("Attempting Daikin216 decode");
+    if (decodeDaikin216(results, offset)) return true;
 #endif
 #if DECODE_TOSHIBA_AC
-  DPRINTLN("Attempting Toshiba AC decode");
-  if (decodeToshibaAC(results)) return true;
+    DPRINTLN("Attempting Toshiba AC decode");
+    if (decodeToshibaAC(results, offset)) return true;
 #endif
 #if DECODE_MIDEA
-  DPRINTLN("Attempting Midea decode");
-  if (decodeMidea(results)) return true;
+    DPRINTLN("Attempting Midea decode");
+    if (decodeMidea(results, offset)) return true;
 #endif
 #if DECODE_MAGIQUEST
-  DPRINTLN("Attempting Magiquest decode");
-  if (decodeMagiQuest(results)) return true;
+    DPRINTLN("Attempting Magiquest decode");
+    if (decodeMagiQuest(results, offset)) return true;
 #endif
-/* NOTE: Disabled due to poor quality.
+  /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
-  // The Sanyo S866500B decoder is very poor quality & depricated.
-  // *IF* you are going to enable it, do it near last to avoid false positive
-  // matches.
-  DPRINTLN("Attempting Sanyo SA8650B decode");
-  if (decodeSanyo(results))
-    return true;
+    // The Sanyo S866500B decoder is very poor quality & depricated.
+    // *IF* you are going to enable it, do it near last to avoid false positive
+    // matches.
+    DPRINTLN("Attempting Sanyo SA8650B decode");
+    if (decodeSanyo(results, offset))
+      return true;
 #endif
-*/
+  */
 #if DECODE_NEC
-  // Some devices send NEC-like codes that don't follow the true NEC spec.
-  // This should detect those. e.g. Apple TV remote etc.
-  // This needs to be done after all other codes that use strict and some
-  // other protocols that are NEC-like as well, as turning off strict may
-  // cause this to match other valid protocols.
-  DPRINTLN("Attempting NEC (non-strict) decode");
-  if (decodeNEC(results, kNECBits, false)) {
-    results->decode_type = NEC_LIKE;
-    return true;
-  }
+    // Some devices send NEC-like codes that don't follow the true NEC spec.
+    // This should detect those. e.g. Apple TV remote etc.
+    // This needs to be done after all other codes that use strict and some
+    // other protocols that are NEC-like as well, as turning off strict may
+    // cause this to match other valid protocols.
+    DPRINTLN("Attempting NEC (non-strict) decode");
+    if (decodeNEC(results, offset, kNECBits, false)) {
+      results->decode_type = NEC_LIKE;
+      return true;
+    }
 #endif
 #if DECODE_LASERTAG
-  DPRINTLN("Attempting Lasertag decode");
-  if (decodeLasertag(results)) return true;
+    DPRINTLN("Attempting Lasertag decode");
+    if (decodeLasertag(results, offset)) return true;
 #endif
 #if DECODE_GREE
-  // Gree based-devices use a similar code to Kelvinator ones, to avoid false
-  // matches this needs to happen after decodeKelvinator().
-  DPRINTLN("Attempting Gree decode");
-  if (decodeGree(results)) return true;
+    // Gree based-devices use a similar code to Kelvinator ones, to avoid false
+    // matches this needs to happen after decodeKelvinator().
+    DPRINTLN("Attempting Gree decode");
+    if (decodeGree(results, offset)) return true;
 #endif
 #if DECODE_HAIER_AC
-  DPRINTLN("Attempting Haier AC decode");
-  if (decodeHaierAC(results)) return true;
+    DPRINTLN("Attempting Haier AC decode");
+    if (decodeHaierAC(results, offset)) return true;
 #endif
 #if DECODE_HAIER_AC_YRW02
-  DPRINTLN("Attempting Haier AC YR-W02 decode");
-  if (decodeHaierACYRW02(results)) return true;
+    DPRINTLN("Attempting Haier AC YR-W02 decode");
+    if (decodeHaierACYRW02(results, offset)) return true;
 #endif
 #if DECODE_HITACHI_AC424
-  // HitachiAc424 should be checked before HitachiAC & HitachiAC2
-  DPRINTLN("Attempting Hitachi AC 424 decode");
-  if (decodeHitachiAc424(results, kHitachiAc424Bits)) return true;
+    // HitachiAc424 should be checked before HitachiAC & HitachiAC2
+    DPRINTLN("Attempting Hitachi AC 424 decode");
+    if (decodeHitachiAc424(results, offset, kHitachiAc424Bits)) return true;
 #endif  // DECODE_HITACHI_AC2
 #if DECODE_HITACHI_AC2
-  // HitachiAC2 should be checked before HitachiAC
-  DPRINTLN("Attempting Hitachi AC2 decode");
-  if (decodeHitachiAC(results, kHitachiAc2Bits)) return true;
+    // HitachiAC2 should be checked before HitachiAC
+    DPRINTLN("Attempting Hitachi AC2 decode");
+    if (decodeHitachiAC(results, offset, kHitachiAc2Bits)) return true;
 #endif  // DECODE_HITACHI_AC2
 #if DECODE_HITACHI_AC
-  DPRINTLN("Attempting Hitachi AC decode");
-  if (decodeHitachiAC(results, kHitachiAcBits)) return true;
+    DPRINTLN("Attempting Hitachi AC decode");
+    if (decodeHitachiAC(results, offset, kHitachiAcBits)) return true;
 #endif
 #if DECODE_HITACHI_AC1
-  DPRINTLN("Attempting Hitachi AC1 decode");
-  if (decodeHitachiAC(results, kHitachiAc1Bits)) return true;
+    DPRINTLN("Attempting Hitachi AC1 decode");
+    if (decodeHitachiAC(results, offset, kHitachiAc1Bits)) return true;
 #endif
 #if DECODE_WHIRLPOOL_AC
-  DPRINTLN("Attempting Whirlpool AC decode");
-  if (decodeWhirlpoolAC(results)) return true;
+    DPRINTLN("Attempting Whirlpool AC decode");
+    if (decodeWhirlpoolAC(results, offset)) return true;
 #endif
 #if DECODE_SAMSUNG_AC
-  DPRINTLN("Attempting Samsung AC (extended) decode");
-  // Check the extended size first, as it should fail fast due to longer length.
-  if (decodeSamsungAC(results, kSamsungAcExtendedBits, false)) return true;
-  // Now check for the more common length.
-  DPRINTLN("Attempting Samsung AC decode");
-  if (decodeSamsungAC(results, kSamsungAcBits)) return true;
+    DPRINTLN("Attempting Samsung AC (extended) decode");
+    // Check the extended size first, as it should fail fast due to longer
+    // length.
+    if (decodeSamsungAC(results, offset, kSamsungAcExtendedBits, false))
+      return true;
+    // Now check for the more common length.
+    DPRINTLN("Attempting Samsung AC decode");
+    if (decodeSamsungAC(results, offset, kSamsungAcBits)) return true;
 #endif
 #if DECODE_ELECTRA_AC
-  DPRINTLN("Attempting Electra AC decode");
-  if (decodeElectraAC(results)) return true;
+    DPRINTLN("Attempting Electra AC decode");
+    if (decodeElectraAC(results, offset)) return true;
 #endif
 #if DECODE_PANASONIC_AC
-  DPRINTLN("Attempting Panasonic AC decode");
-  if (decodePanasonicAC(results)) return true;
-  DPRINTLN("Attempting Panasonic AC short decode");
-  if (decodePanasonicAC(results, kPanasonicAcShortBits)) return true;
+    DPRINTLN("Attempting Panasonic AC decode");
+    if (decodePanasonicAC(results, offset)) return true;
+    DPRINTLN("Attempting Panasonic AC short decode");
+    if (decodePanasonicAC(results, offset, kPanasonicAcShortBits)) return true;
 #endif
 #if DECODE_LUTRON
-  DPRINTLN("Attempting Lutron decode");
-  if (decodeLutron(results)) return true;
+    DPRINTLN("Attempting Lutron decode");
+    if (decodeLutron(results, offset)) return true;
 #endif
 #if DECODE_MWM
-  DPRINTLN("Attempting MWM decode");
-  if (decodeMWM(results)) return true;
+    DPRINTLN("Attempting MWM decode");
+    if (decodeMWM(results, offset)) return true;
 #endif
 #if DECODE_VESTEL_AC
-  DPRINTLN("Attempting Vestel AC decode");
-  if (decodeVestelAc(results)) return true;
+    DPRINTLN("Attempting Vestel AC decode");
+    if (decodeVestelAc(results, offset)) return true;
 #endif
 #if DECODE_MITSUBISHI112 || DECODE_TCL112AC
-  // Mitsubish112 and Tcl112 share the same decoder.
-  DPRINTLN("Attempting Mitsubishi112/TCL112AC decode");
-  if (decodeMitsubishi112(results)) return true;
+    // Mitsubish112 and Tcl112 share the same decoder.
+    DPRINTLN("Attempting Mitsubishi112/TCL112AC decode");
+    if (decodeMitsubishi112(results, offset)) return true;
 #endif  // DECODE_MITSUBISHI112 || DECODE_TCL112AC
 #if DECODE_TECO
-  DPRINTLN("Attempting Teco decode");
-  if (decodeTeco(results)) return true;
+    DPRINTLN("Attempting Teco decode");
+    if (decodeTeco(results, offset)) return true;
 #endif
 #if DECODE_LEGOPF
-  DPRINTLN("Attempting LEGOPF decode");
-  if (decodeLegoPf(results)) return true;
+    DPRINTLN("Attempting LEGOPF decode");
+    if (decodeLegoPf(results, offset)) return true;
 #endif
 #if DECODE_MITSUBISHIHEAVY
-  DPRINTLN("Attempting MITSUBISHIHEAVY (152 bit) decode");
-  if (decodeMitsubishiHeavy(results, kMitsubishiHeavy152Bits)) return true;
-  DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
-  if (decodeMitsubishiHeavy(results, kMitsubishiHeavy88Bits)) return true;
+    DPRINTLN("Attempting MITSUBISHIHEAVY (152 bit) decode");
+    if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy152Bits))
+      return true;
+    DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
+    if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy88Bits))
+      return true;
 #endif
 #if DECODE_ARGO
-  DPRINTLN("Attempting Argo decode");
-  if (decodeArgo(results)) return true;
+    DPRINTLN("Attempting Argo decode");
+    if (decodeArgo(results, offset)) return true;
 #endif  // DECODE_ARGO
 #if DECODE_SHARP_AC
-  DPRINTLN("Attempting SHARP_AC decode");
-  if (decodeSharpAc(results)) return true;
+    DPRINTLN("Attempting SHARP_AC decode");
+    if (decodeSharpAc(results, offset)) return true;
 #endif
 #if DECODE_GOODWEATHER
-  DPRINTLN("Attempting GOODWEATHER decode");
-  if (decodeGoodweather(results)) return true;
+    DPRINTLN("Attempting GOODWEATHER decode");
+    if (decodeGoodweather(results, offset)) return true;
 #endif  // DECODE_GOODWEATHER
 #if DECODE_INAX
-  DPRINTLN("Attempting Inax decode");
-  if (decodeInax(results)) return true;
+    DPRINTLN("Attempting Inax decode");
+    if (decodeInax(results, offset)) return true;
 #endif  // DECODE_INAX
 #if DECODE_TROTEC
-  DPRINTLN("Attempting Trotec decode");
-  if (decodeTrotec(results)) return true;
+    DPRINTLN("Attempting Trotec decode");
+    if (decodeTrotec(results, offset)) return true;
 #endif  // DECODE_TROTEC
 #if DECODE_DAIKIN160
-  DPRINTLN("Attempting Daikin160 decode");
-  if (decodeDaikin160(results)) return true;
+    DPRINTLN("Attempting Daikin160 decode");
+    if (decodeDaikin160(results, offset)) return true;
 #endif  // DECODE_DAIKIN160
 #if DECODE_NEOCLIMA
-  DPRINTLN("Attempting Neoclima decode");
-  if (decodeNeoclima(results)) return true;
+    DPRINTLN("Attempting Neoclima decode");
+    if (decodeNeoclima(results, offset)) return true;
 #endif  // DECODE_NEOCLIMA
 #if DECODE_DAIKIN176
-  DPRINTLN("Attempting Daikin176 decode");
-  if (decodeDaikin176(results)) return true;
+    DPRINTLN("Attempting Daikin176 decode");
+    if (decodeDaikin176(results, offset)) return true;
 #endif  // DECODE_DAIKIN176
 #if DECODE_DAIKIN128
-  DPRINTLN("Attempting Daikin128 decode");
-  if (decodeDaikin128(results)) return true;
+    DPRINTLN("Attempting Daikin128 decode");
+    if (decodeDaikin128(results, offset)) return true;
 #endif  // DECODE_DAIKIN128
 #if DECODE_AMCOR
-  DPRINTLN("Attempting Amcor decode");
-  if (decodeAmcor(results)) return true;
+    DPRINTLN("Attempting Amcor decode");
+    if (decodeAmcor(results, offset)) return true;
 #endif  // DECODE_AMCOR
 #if DECODE_DAIKIN152
-  DPRINTLN("Attempting Daikin152 decode");
-  if (decodeDaikin152(results)) return true;
+    DPRINTLN("Attempting Daikin152 decode");
+    if (decodeDaikin152(results, offset)) return true;
 #endif  // DECODE_DAIKIN152
 #if DECODE_MITSUBISHI136
-  DPRINTLN("Attempting Mitsubishi136 decode");
-  if (decodeMitsubishi136(results)) return true;
+    DPRINTLN("Attempting Mitsubishi136 decode");
+    if (decodeMitsubishi136(results, offset)) return true;
 #endif  // DECODE_MITSUBISHI136
+  }
   // Typically new protocols are added above this line.
 #if DECODE_HASH
   // decodeHash returns a hash on any input.

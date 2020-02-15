@@ -67,20 +67,20 @@ void IRsend::sendLegoPf(const uint64_t data, const uint16_t nbits,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kLegoPfBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: Alpha / Untested.
-bool IRrecv::decodeLegoPf(decode_results* results,
+// Status: BETA / Appears to work.
+bool IRrecv::decodeLegoPf(decode_results* results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Check if can possibly be a valid LEGO message.
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1) return false;
   if (strict && nbits != kLegoPfBits) return false;  // Not what is expected
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,

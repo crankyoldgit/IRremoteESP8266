@@ -56,6 +56,8 @@ void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
 // Decode the supplied Amcor HVAC message.
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion.
 //            Typically kAmcorBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
@@ -64,14 +66,12 @@ void IRsend::sendAmcor(const unsigned char data[], const uint16_t nbytes,
 //
 // Status: STABLE / Reported as working.
 //
-bool IRrecv::decodeAmcor(decode_results *results, uint16_t nbits,
-                         bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader - 1)
+bool IRrecv::decodeAmcor(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
     return false;  // Can't possibly be a valid Amcor message.
   if (strict && nbits != kAmcorBits)
     return false;  // We expect Amcor to be 64 bits of message.
-
-  uint16_t offset = kStartOffset;
 
   uint16_t used;
   // Header + Data Block (64 bits) + Footer

@@ -298,18 +298,19 @@ String IRTecoAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kTecoBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
 // Status: STABLE / Tested.
-bool IRrecv::decodeTeco(decode_results* results,
+bool IRrecv::decodeTeco(decode_results* results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   if (strict && nbits != kTecoBits) return false;  // Not what is expected
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,
                     results->rawlen - offset, nbits,

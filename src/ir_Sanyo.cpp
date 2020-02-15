@@ -106,6 +106,8 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -123,12 +125,12 @@ void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://slydiman.narod.ru/scr/kb/sanyo.htm
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 //   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
-bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t nbits,
-                               bool strict) {
+bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
   if (strict && nbits != kSanyoLC7461Bits)
     return false;  // Not strictly in spec.
   // This protocol is basically a 42-bit variant of the NEC protocol.
-  if (!decodeNEC(results, nbits, false))
+  if (!decodeNEC(results, offset, nbits, false))
     return false;  // Didn't match a NEC format (without strict)
 
   // Bits 30 to 42+.

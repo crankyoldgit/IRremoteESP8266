@@ -69,6 +69,8 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of bits to expect in the data portion. Typically kDishBits.
 //   strict:  Flag to indicate if we strictly adhere to the specification.
 // Returns:
@@ -84,13 +86,11 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //   http://www.hifi-remote.com/wiki/index.php?title=Dish
 //   http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
 //   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
-bool IRrecv::decodeDISH(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1)
-    return false;  // Not enough entries to be valid.
+bool IRrecv::decodeDISH(decode_results *results, uint16_t offset,
+                        const uint16_t nbits, const bool strict) {
   if (strict && nbits != kDishBits) return false;  // Not strictly compliant.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,

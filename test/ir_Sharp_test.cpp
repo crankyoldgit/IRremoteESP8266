@@ -196,7 +196,8 @@ TEST(TestDecodeSharp, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSharpRaw(0x454A);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  EXPECT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                 true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);
   EXPECT_EQ(0x454A, irsend.capture.value);
@@ -208,7 +209,8 @@ TEST(TestDecodeSharp, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSharpRaw(irsend.encodeSharp(0x07, 0x99));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                 true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);
   EXPECT_EQ(0x7266, irsend.capture.value);
@@ -220,7 +222,8 @@ TEST(TestDecodeSharp, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendSharpRaw(irsend.encodeSharp(0x1, 0x1));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                 true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);
   EXPECT_EQ(0x4202, irsend.capture.value);
@@ -239,7 +242,8 @@ TEST(TestDecodeSharp, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendSharpRaw(0x7266, kSharpBits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                 true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);
   EXPECT_EQ(0x7266, irsend.capture.value);
@@ -247,7 +251,8 @@ TEST(TestDecodeSharp, NormalDecodeWithRepeatAndStrict) {
   EXPECT_EQ(0x99, irsend.capture.command);
 
   irsend.makeDecodeResult(2 * (2 * kSharpBits + kFooter));
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                 true));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(kSharpBits, irsend.capture.bits);
   EXPECT_EQ(0x7266, irsend.capture.value);
@@ -263,9 +268,10 @@ TEST(TestDecodeSharp, DecodeWithNonStrict) {
   irsend.sendSharpRaw(0x0, 8);  // Illegal length Sharp 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                  true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, 8, false));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, 8, false));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0x0, irsend.capture.value);
@@ -276,12 +282,13 @@ TEST(TestDecodeSharp, DecodeWithNonStrict) {
   irsend.sendSharpRaw(0x12345678, 32);  // Illegal length Sharp 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, true));
+  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                  true));
 
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kStartOffset, 32, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, 32, false));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -300,7 +307,7 @@ TEST(TestDecodeSharp, Decode64BitMessages) {
   irsend.sendSharpRaw(0xFFFFFFFFFFFFFFFF, 64);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, 64, false));
+  ASSERT_TRUE(irrecv.decodeSharp(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(SHARP, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFFFFFFF, irsend.capture.value);
@@ -350,7 +357,8 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, false));
+  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                  false));
 
   // Test only half of a good message, as it is sent (sort of) twice.
   uint16_t gc_half[35] = {38000, 1,  1,  10, 70, 10, 30, 10, 30, 10, 30,  10,
@@ -361,7 +369,8 @@ TEST(TestDecodeSharp, FailToDecodeNonSharpExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kSharpBits, false));
+  ASSERT_FALSE(irrecv.decodeSharp(&irsend.capture, kStartOffset, kSharpBits,
+                                  false));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165

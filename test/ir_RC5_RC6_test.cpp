@@ -202,7 +202,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(0x175);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -214,7 +214,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(0x175);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -227,7 +227,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(0x175, kRC5XBits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -239,7 +239,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(irsend.encodeRC5(0x00, 0x0B, true));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x80B, irsend.capture.value);
@@ -251,7 +251,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(irsend.encodeRC5X(0x02, 0x41, true), kRC5XBits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits, true));
   EXPECT_EQ(RC5X, irsend.capture.decode_type);
   EXPECT_EQ(kRC5XBits, irsend.capture.bits);
   EXPECT_EQ(0x1881, irsend.capture.value);
@@ -264,7 +264,7 @@ TEST(TestDecodeRC5, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC5(irsend.encodeRC5X(0x02, 0x41, true), kRC5XBits);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
 }
 
 // Decode normal repeated RC5 messages.
@@ -277,7 +277,7 @@ TEST(TestDecodeRC5, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC5(0x174, kRC5Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x174, irsend.capture.value);
@@ -288,7 +288,7 @@ TEST(TestDecodeRC5, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC5(0x175, kRC5Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(kRC5Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -299,7 +299,7 @@ TEST(TestDecodeRC5, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC5(irsend.encodeRC5X(0x02, 0x41, true), kRC5XBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits, true));
   EXPECT_EQ(RC5X, irsend.capture.decode_type);
   EXPECT_EQ(kRC5XBits, irsend.capture.bits);
   EXPECT_EQ(0x1881, irsend.capture.value);
@@ -317,10 +317,11 @@ TEST(TestDecodeRC5, DecodeWithNonStrictValues) {
   irsend.sendRC5(0xFA, 8);  // Illegal value RC5 8-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits,
+                                true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, 8, false));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 8, false));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0xFA, irsend.capture.value);
@@ -331,14 +332,15 @@ TEST(TestDecodeRC5, DecodeWithNonStrictValues) {
   irsend.sendRC5(0x12345678, 32);  // Illegal size RC5 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits,
+                                true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 32, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, 32, false));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(RC5, irsend.capture.decode_type);
   EXPECT_EQ(31, irsend.capture.bits);
   EXPECT_EQ(0x12345678, irsend.capture.value);
@@ -347,14 +349,15 @@ TEST(TestDecodeRC5, DecodeWithNonStrictValues) {
   irsend.sendRC5(0x87654321, 32);  // Illegal size RC5 32-bit message.
   irsend.makeDecodeResult();
   // Should fail with strict on.
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5XBits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5XBits,
+                                true));
 
   irsend.makeDecodeResult();
   // Should fail with strict when we ask for the wrong bit size.
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, 32, true));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 32, true));
   // Should pass if strict off.
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, 32, false));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 32, false));
   EXPECT_EQ(RC5X, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0x87654321, irsend.capture.value);
@@ -371,7 +374,7 @@ TEST(TestDecodeRC5, Decode64BitMessages) {
   irsend.sendRC5(0xFFFFFFFFFFFFFFFF, 64);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, 64, false));
+  ASSERT_TRUE(irrecv.decodeRC5(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(RC5X, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFFFFFFFFFFFFFFFF, irsend.capture.value);
@@ -392,7 +395,8 @@ TEST(TestDecodeRC5, FailToDecodeNonRC5Example) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kRC5Bits, false));
+  ASSERT_FALSE(irrecv.decodeRC5(&irsend.capture, kStartOffset, kRC5Bits,
+                                false));
 }
 
 //                      RRRRRR   CCCCC            666
@@ -688,7 +692,8 @@ TEST(TestDecodeRC6, NormalMode0DecodeWithStrict) {
   irsend.reset();
   irsend.sendRC6(0x175);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6Mode0Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -700,7 +705,8 @@ TEST(TestDecodeRC6, NormalMode0DecodeWithStrict) {
   irsend.reset();
   irsend.sendRC6(irsend.encodeRC6(0x1234567, 0x89, kRC6Mode0Bits));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6Mode0Bits, irsend.capture.bits);
   EXPECT_EQ(0x56789, irsend.capture.value);
@@ -712,7 +718,8 @@ TEST(TestDecodeRC6, NormalMode0DecodeWithStrict) {
   irsend.reset();
   irsend.sendRC6(0x123456789, kRC6Mode0Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6Mode0Bits, irsend.capture.bits);
   EXPECT_EQ(0x56789, irsend.capture.value);
@@ -731,7 +738,8 @@ TEST(TestDecodeRC6, Normal36BitDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC6(0x175, kRC6_36Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6_36Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -743,7 +751,8 @@ TEST(TestDecodeRC6, Normal36BitDecodeWithStrict) {
   irsend.reset();
   irsend.sendRC6(irsend.encodeRC6(0x1234567, 0x89, kRC6_36Bits), kRC6_36Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6_36Bits, irsend.capture.bits);
   EXPECT_EQ(0x123456789, irsend.capture.value);
@@ -762,7 +771,8 @@ TEST(TestDecodeRC6, NormalMode0DecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC6(0x174, kRC6Mode0Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6Mode0Bits, irsend.capture.bits);
   EXPECT_EQ(0x174, irsend.capture.value);
@@ -773,7 +783,8 @@ TEST(TestDecodeRC6, NormalMode0DecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC6(0x175, kRC6Mode0Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6Mode0Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -791,7 +802,8 @@ TEST(TestDecodeRC6, Normal36BitDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC6(0x175, kRC6_36Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6_36Bits, irsend.capture.bits);
   EXPECT_EQ(0x175, irsend.capture.value);
@@ -802,7 +814,8 @@ TEST(TestDecodeRC6, Normal36BitDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendRC6(0x174, kRC6_36Bits, 1);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                               true));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6_36Bits, irsend.capture.bits);
   EXPECT_EQ(0x174, irsend.capture.value);
@@ -881,7 +894,7 @@ TEST(TestDecodeRC6, Decode36BitGlobalCacheExample) {
   irsend.sendGC(gc_test, 65);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits));
+  ASSERT_TRUE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits));
   EXPECT_EQ(RC6, irsend.capture.decode_type);
   EXPECT_EQ(kRC6_36Bits, irsend.capture.bits);
   EXPECT_EQ(0xC800F742A, irsend.capture.value);
@@ -905,18 +918,26 @@ TEST(TestDecodeRC5, FailToDecodeNonRC6Example) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, false));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                                true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                                false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                                true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, kStartOffset,
+                                false));
 
   irsend.reset();
   irsend.sendRC5(0x0);
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6Mode0Bits, false));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, true));
-  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                                true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6Mode0Bits,
+                                false));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kStartOffset, kRC6_36Bits,
+                                true));
+  ASSERT_FALSE(irrecv.decodeRC6(&irsend.capture, kRC6_36Bits, kStartOffset,
+                                false));
 }

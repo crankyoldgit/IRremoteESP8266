@@ -58,6 +58,8 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kLutronBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -69,8 +71,8 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/515
-bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
-                          bool strict) {
+bool IRrecv::decodeLutron(decode_results *results, uint16_t offset,
+                          const uint16_t nbits, const bool strict) {
   // Technically the smallest number of entries for the smallest message is '1'.
   // i.e. All the bits set to 1, would produce a single huge mark signal.
   // So no minimum length check is required.
@@ -81,8 +83,7 @@ bool IRrecv::decodeLutron(decode_results *results, uint16_t nbits,
   int16_t bitsSoFar = -1;
 
   if (nbits > sizeof(data) * 8) return false;  // To large to store the data.
-  for (uint16_t offset = kStartOffset;
-       bitsSoFar < nbits && offset < results->rawlen; offset++) {
+  for (; bitsSoFar < nbits && offset < results->rawlen; offset++) {
     uint16_t entry = results->rawbuf[offset];
     // It has to be large enough to qualify as a bit.
     if (!matchAtLeast(entry, kLutronTick, 0, kLutronDelta)) {

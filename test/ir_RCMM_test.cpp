@@ -91,7 +91,8 @@ TEST(TestDecodeRCMM, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRCMM(0xe0a600);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kRCMMBits, true));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, kRCMMBits,
+                                true));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(kRCMMBits, irsend.capture.bits);
   EXPECT_EQ(0xe0a600, irsend.capture.value);
@@ -103,7 +104,7 @@ TEST(TestDecodeRCMM, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRCMM(0x600, 12);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 12, true));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 12, true));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(12, irsend.capture.bits);
   EXPECT_EQ(0x600, irsend.capture.value);
@@ -115,7 +116,7 @@ TEST(TestDecodeRCMM, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRCMM(0x28e0a600, 32);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 32, true));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 32, true));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(32, irsend.capture.bits);
   EXPECT_EQ(0x28e0a600, irsend.capture.value);
@@ -134,15 +135,15 @@ TEST(TestDecodeRCMM, IllegalDecodeWithStrict) {
   irsend.reset();
   irsend.sendRCMM(0x0, 8);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, 8, true));
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, 12, true));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 8, true));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 12, true));
 
   // Illegal RCMM 36-bit message.
   irsend.reset();
   irsend.sendRCMM(0x0, 36);
   irsend.makeDecodeResult();
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, 12, true));
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, 36, true));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 12, true));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 36, true));
 }
 
 // Decodes without strict mode.
@@ -155,13 +156,13 @@ TEST(TestDecodeRCMM, DecodeWithoutStrict) {
   irsend.reset();
   irsend.sendRCMM(0x55, 8);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 8, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 8, false));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0x55, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 12, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 12, false));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(8, irsend.capture.bits);
   EXPECT_EQ(0x55, irsend.capture.value);
@@ -172,18 +173,18 @@ TEST(TestDecodeRCMM, DecodeWithoutStrict) {
   irsend.reset();
   irsend.sendRCMM(0x123456789, 36);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 12, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 12, false));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(36, irsend.capture.bits);
   EXPECT_EQ(0x123456789, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 24, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 24, false));
   EXPECT_EQ(36, irsend.capture.bits);
   EXPECT_EQ(0x123456789, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 36, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 36, false));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(36, irsend.capture.bits);
   EXPECT_EQ(0x123456789, irsend.capture.value);
@@ -202,7 +203,7 @@ TEST(TestDecodeRCMM, Decode64BitMessages) {
   irsend.sendRCMM(0xFEDCBA9876543210, 64);
   irsend.makeDecodeResult();
   // Should work with a 'normal' match (not strict)
-  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, 64, false));
+  ASSERT_TRUE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, 64, false));
   EXPECT_EQ(RCMM, irsend.capture.decode_type);
   EXPECT_EQ(64, irsend.capture.bits);
   EXPECT_EQ(0xFEDCBA9876543210, irsend.capture.value);
@@ -226,7 +227,8 @@ TEST(TestDecodeRCMM, FailToDecodeNonRCMMExample) {
   irsend.makeDecodeResult();
 
   ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture));
-  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kRCMMBits, false));
+  ASSERT_FALSE(irrecv.decodeRCMM(&irsend.capture, kStartOffset, kRCMMBits,
+                                 false));
 }
 
 // Issue 281 Debugging

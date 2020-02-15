@@ -281,6 +281,8 @@ String IRElectraAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kElectraAcBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -288,14 +290,14 @@ String IRElectraAc::toString(void) {
 //
 // Status: STABLE / Known working.
 //
-bool IRrecv::decodeElectraAC(decode_results *results, uint16_t nbits,
-                             bool strict) {
+bool IRrecv::decodeElectraAC(decode_results *results, uint16_t offset,
+                             const uint16_t nbits,
+                             const bool strict) {
   if (strict) {
     if (nbits != kElectraAcBits)
       return false;  // Not strictly a ELECTRA_AC message.
   }
 
-  uint16_t offset = kStartOffset;
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, results->state,
                     results->rawlen - offset, nbits,

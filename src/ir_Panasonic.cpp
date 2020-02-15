@@ -142,6 +142,8 @@ uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   Nr. of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -153,13 +155,13 @@ uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
 // Ref:
 //   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
 //   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
-bool IRrecv::decodePanasonic(decode_results *results, const uint16_t nbits,
-                             const bool strict, const uint32_t manufacturer) {
+bool IRrecv::decodePanasonic(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict,
+                             const uint32_t manufacturer) {
   if (strict && nbits != kPanasonicBits)
     return false;  // Request is out of spec.
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,
@@ -810,6 +812,8 @@ String IRPanasonicAc::toString(void) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kPanasonicAcBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -825,19 +829,17 @@ String IRPanasonicAc::toString(void) {
 //   A/C Remotes:
 //     A75C3747 (Confirmed)
 //     A75C3704
-bool IRrecv::decodePanasonicAC(decode_results *results, const uint16_t nbits,
-                               const bool strict) {
+bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
   uint8_t min_nr_of_messages = 1;
   if (strict) {
     if (nbits != kPanasonicAcBits && nbits != kPanasonicAcShortBits)
       return false;  // Not strictly a PANASONIC_AC message.
   }
 
-  if (results->rawlen <
-      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1)
+  if (results->rawlen <=
+      min_nr_of_messages * (2 * nbits + kHeader + kFooter) - 1 + offset)
     return false;  // Can't possibly be a valid PANASONIC_AC message.
-
-  uint16_t offset = kStartOffset;
 
   // Match Header + Data #1 + Footer
   uint16_t used;

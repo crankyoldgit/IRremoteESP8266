@@ -134,6 +134,8 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -145,8 +147,9 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
 //   SONY protocol, SIRC (Serial Infra-Red Control) can be 12,15,20 bits long.
 // Ref:
 // http://www.sbprojects.com/knowledge/ir/sirc.php
-bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader - 1)
+bool IRrecv::decodeSony(decode_results *results, uint16_t offset,
+                        const uint16_t nbits, const bool strict) {
+  if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
     return false;  // Message is smaller than we expected.
 
   // Compliance
@@ -162,7 +165,6 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t nbits, bool strict) {
   }
 
   uint64_t data = 0;
-  uint16_t offset = kStartOffset;
   uint16_t actualBits;
 
   // Header
