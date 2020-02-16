@@ -473,7 +473,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   // similar in timings & structure, but the Epson one is much longer than the
   // NEC protocol (3x32 identical bits vs 1x32 bits) so this one should be tried
   // first to try to reduce false detection as a NEC packet.
-  if (decodeEpson(results)) return true;
+  if (decodeEpson(results, offset)) return true;
 #endif
 #if DECODE_NEC
     DPRINTLN("Attempting NEC decode");

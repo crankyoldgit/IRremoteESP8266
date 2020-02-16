@@ -35,6 +35,8 @@ void IRsend::sendEpson(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect. Typically kNECBits.
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
@@ -50,11 +52,12 @@ void IRsend::sendEpson(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Ref:
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
-bool IRrecv::decodeEpson(decode_results *results, uint16_t nbits, bool strict) {
+bool IRrecv::decodeEpson(decode_results *results, uint16_t offset,
+                         const uint16_t nbits, const bool strict) {
   const uint8_t kEpsonMinMesgsForDecode = 2;
 
   if (results->rawlen < kEpsonMinMesgsForDecode * (2 * nbits + kHeader +
-                                                   kFooter) - 1)
+                                                   kFooter) + offset - 1)
     return false;  // Can't possibly be a valid Epson message.
   if (strict && nbits != kEpsonBits)
     return false;  // Not strictly an Epson message.
@@ -62,7 +65,6 @@ bool IRrecv::decodeEpson(decode_results *results, uint16_t nbits, bool strict) {
   uint64_t data = 0;
   uint64_t first_data = 0;
   bool first = true;
-  uint16_t offset = kStartOffset;
 
   for (uint8_t i = 0; i < kEpsonMinMesgsForDecode; i++) {
     // Match Header + Data + Footer
