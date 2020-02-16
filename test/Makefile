@@ -39,7 +39,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
 	ir_Whirlpool_test ir_Lutron_test ir_Electra_test ir_Pioneer_test \
   ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test IRac_test \
 	ir_MitsubishiHeavy_test ir_Trotec_test ir_Argo_test ir_Goodweather_test \
-	ir_Inax_test ir_Neoclima_test ir_Amcor_test
+	ir_Inax_test ir_Neoclima_test ir_Amcor_test ir_Epson_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -85,7 +85,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 	ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
 	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o ir_Argo.o \
 	ir_Trotec.o ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Neoclima.o \
-  ir_Amcor.o
+  ir_Amcor.o ir_Epson.o
 
 # All the IR Protocol header files.
 PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
@@ -622,4 +622,13 @@ ir_Amcor_test.o : ir_Amcor_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Amcor_test.cpp
 
 ir_Amcor_test : $(COMMON_OBJ) ir_Amcor_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Epson.o : $(USER_DIR)/ir_Epson.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Epson.cpp
+
+ir_Epson_test.o : ir_Epson_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Epson_test.cpp
+
+ir_Epson_test : $(COMMON_OBJ) ir_Epson_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

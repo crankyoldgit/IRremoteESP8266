@@ -544,15 +544,20 @@ class IRrecv {
                     const bool strict = true);
 #endif
 #if DECODE_NEOCLIMA
-bool decodeNeoclima(decode_results *results, uint16_t offset = kStartOffset,
-                    const uint16_t nbits = kNeoclimaBits,
-                    const bool strict = true);
+  bool decodeNeoclima(decode_results *results, uint16_t offset = kStartOffset,
+                      const uint16_t nbits = kNeoclimaBits,
+                      const bool strict = true);
 #endif  // DECODE_NEOCLIMA
 #if DECODE_AMCOR
-bool decodeAmcor(decode_results *results, uint16_t offset = kStartOffset,
-                 const uint16_t nbits = kAmcorBits,
-                 const bool strict = true);
+  bool decodeAmcor(decode_results *results, uint16_t offset = kStartOffset,
+                   const uint16_t nbits = kAmcorBits,
+                   const bool strict = true);
 #endif  // DECODE_AMCOR
+#if DECODE_EPSON
+  bool decodeEpson(decode_results *results, uint16_t offset = kStartOffset,
+                   const uint16_t nbits = kEpsonBits,
+                   const bool strict = true);
+#endif  // DECODE_EPSON
 };
 
 #endif  // IRRECV_H_

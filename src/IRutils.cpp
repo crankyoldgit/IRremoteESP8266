@@ -125,6 +125,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::DISH;
   else if (!strcasecmp(str, "ELECTRA_AC"))
     return decode_type_t::ELECTRA_AC;
+  else if (!strcasecmp(str, "EPSON"))
+    return decode_type_t::EPSON;
   else if (!strcasecmp(str, "FUJITSU_AC"))
     return decode_type_t::FUJITSU_AC;
   else if (!strcasecmp(str, "GICABLE"))
@@ -309,6 +311,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case ELECTRA_AC:
       result = F("ELECTRA_AC");
+      break;
+    case EPSON:
+      result = F("EPSON");
       break;
     case FUJITSU_AC:
       result = F("FUJITSU_AC");

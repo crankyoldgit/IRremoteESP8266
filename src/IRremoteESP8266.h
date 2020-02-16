@@ -565,6 +565,13 @@
 #define SEND_HITACHI_AC424     _IR_ENABLE_DEFAULT_
 #endif  // SEND_HITACHI_AC424
 
+#ifndef DECODE_EPSON
+#define DECODE_EPSON   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_EPSON
+#ifndef SEND_EPSON
+#define SEND_EPSON     _IR_ENABLE_DEFAULT_
+#endif  // SEND_EPSON
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -687,8 +694,9 @@ enum decode_type_t {
   MITSUBISHI112,
   HITACHI_AC424,
   SONY_38K,
+  EPSON,  // 75
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SONY_38K,
+  kLastDecodeType = EPSON,
 };
 
 // Message lengths & required repeat values
@@ -736,6 +744,8 @@ const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
+const uint16_t kEpsonBits = 32;
+const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;
 const uint16_t kElectraAcBits = kElectraAcStateLength * 8;
 const uint16_t kElectraAcMinRepeat = kNoRepeat;
