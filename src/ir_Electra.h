@@ -68,7 +68,14 @@ const uint8_t kElectraAcCleanOffset = 2;  // Bit 0b00000100
 const uint8_t kElectraAcPowerOffset = 5;  // Bit 0b00100000
 // state[11]
 //
-const uint8_t kElectraAcLightOffset = 4;  // Bit 0b00010000
+const uint8_t kElectraAcLightOn  = 0x15;
+// Light has known ON values of 0x15 (0b00010101) or 0x19 (0b00011001)
+//   Thus common bits ON are: 0b00010001 (0x11)
+// We will use this for the getLight() test.
+const uint8_t kElectraAcLightMask = 0x11;
+// and known OFF values of 0x08 (0b00001000) & 0x05 (0x00000101)
+const uint8_t kElectraAcLightOff = 0x08;
+
 
 // Classes
 class IRElectraAc {

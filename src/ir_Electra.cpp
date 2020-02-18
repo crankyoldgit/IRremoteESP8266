@@ -66,7 +66,7 @@ IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
 void IRElectraAc::stateReset(void) {
   for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
   remote_state[0] = 0xC3;
-  remote_state[11] = 0x08;
+  remote_state[11] = kElectraAcLightOff;
   // [12] is the checksum.
 }
 
@@ -234,11 +234,11 @@ bool IRElectraAc::getSwingH(void) {
 }
 
 void IRElectraAc::setLightToggle(const bool on) {
-  setBit(&remote_state[11], kElectraAcLightOffset, on);
+  remote_state[11] = on ? kElectraAcLightOn : kElectraAcLightOff;
 }
 
 bool IRElectraAc::getLightToggle(void) {
-  return GETBIT8(remote_state[11], kElectraAcLightOffset);
+  return (remote_state[11] & kElectraAcLightMask) == kElectraAcLightMask;
 }
 
 void IRElectraAc::setClean(const bool on) {
