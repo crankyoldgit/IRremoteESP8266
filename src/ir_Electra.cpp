@@ -66,7 +66,7 @@ IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
 void IRElectraAc::stateReset(void) {
   for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
   remote_state[0] = 0xC3;
-  remote_state[11] = kElectraAcLightOff;
+  remote_state[11] = kElectraAcLightToggleOff;
   // [12] is the checksum.
 }
 
@@ -234,7 +234,7 @@ bool IRElectraAc::getSwingH(void) {
 }
 
 void IRElectraAc::setLightToggle(const bool on) {
-  remote_state[11] = on ? kElectraAcLightOn : kElectraAcLightOff;
+  remote_state[11] = on ? kElectraAcLightToggleOn : kElectraAcLightToggleOff;
 }
 
 bool IRElectraAc::getLightToggle(void) {
