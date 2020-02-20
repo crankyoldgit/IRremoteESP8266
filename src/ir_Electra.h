@@ -71,8 +71,8 @@ const uint8_t kElectraAcPowerOffset = 5;  // Bit 0b00100000
 const uint8_t kElectraAcLightToggleOn  = 0x15;
 // Light has known ON values of 0x15 (0b00010101) or 0x19 (0b00011001)
 //   Thus common bits ON are: 0b00010001 (0x11)
-// We will use this for the getLight() test.
-const uint8_t kElectraAcLightMask = 0x11;
+// We will use this for the getLightToggle() test.
+const uint8_t kElectraAcLightToggleMask = 0x11;
 // and known OFF values of 0x08 (0b00001000) & 0x05 (0x00000101)
 const uint8_t kElectraAcLightToggleOff = 0x08;
 

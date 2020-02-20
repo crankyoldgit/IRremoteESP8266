@@ -238,7 +238,8 @@ void IRElectraAc::setLightToggle(const bool on) {
 }
 
 bool IRElectraAc::getLightToggle(void) {
-  return (remote_state[11] & kElectraAcLightMask) == kElectraAcLightMask;
+  return (remote_state[11] & kElectraAcLightToggleMask) ==
+      kElectraAcLightToggleMask;
 }
 
 void IRElectraAc::setClean(const bool on) {
