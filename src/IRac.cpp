@@ -466,7 +466,8 @@ void IRac::electra(IRElectraAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv,
-                   const stdAc::swingh_t swingh) {
+                   const stdAc::swingh_t swingh, const bool turbo,
+                   const bool lighttoggle, const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -475,11 +476,12 @@ void IRac::electra(IRElectraAc *ac,
   ac->setSwingV(swingv != stdAc::swingv_t::kOff);
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
-  // No Turbo setting available.
+  ac->setTurbo(turbo);
+  ac->setLightToggle(lighttoggle);
   // No Light setting available.
   // No Econo setting available.
   // No Filter setting available.
-  // No Clean setting available.
+  ac->setClean(clean);
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
@@ -1220,6 +1222,9 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.power = desired.power ^ prev->power;
         result.light = desired.light ^ prev->light;
         break;
+      case decode_type_t::ELECTRA_AC:
+        result.light = desired.light ^ prev->light;
+        break;
       case decode_type_t::MIDEA:
       case decode_type_t::HITACHI_AC424:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
@@ -1390,7 +1395,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
       electra(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.swingh);
+              send.swingh, send.turbo, send.light, send.clean);
       break;
     }
 #endif  // SEND_ELECTRA_AC

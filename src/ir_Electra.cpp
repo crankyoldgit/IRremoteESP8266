@@ -66,7 +66,7 @@ IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
 void IRElectraAc::stateReset(void) {
   for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
   remote_state[0] = 0xC3;
-  remote_state[11] = 0x08;
+  remote_state[11] = kElectraAcLightToggleOff;
   // [12] is the checksum.
 }
 
@@ -233,6 +233,30 @@ bool IRElectraAc::getSwingH(void) {
                    kElectraAcSwingSize);
 }
 
+void IRElectraAc::setLightToggle(const bool on) {
+  remote_state[11] = on ? kElectraAcLightToggleOn : kElectraAcLightToggleOff;
+}
+
+bool IRElectraAc::getLightToggle(void) {
+  return (remote_state[11] & kElectraAcLightToggleMask) ==
+      kElectraAcLightToggleMask;
+}
+
+void IRElectraAc::setClean(const bool on) {
+  setBit(&remote_state[9], kElectraAcCleanOffset, on);
+}
+
+bool IRElectraAc::getClean(void) {
+  return GETBIT8(remote_state[9], kElectraAcCleanOffset);
+}
+
+void IRElectraAc::setTurbo(const bool on) {
+  setBit(&remote_state[5], kElectraAcTurboOffset, on);
+}
+
+bool IRElectraAc::getTurbo(void) {
+  return GETBIT8(remote_state[5], kElectraAcTurboOffset);
+}
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRElectraAc::toCommon(void) {
   stdAc::state_t result;
@@ -246,13 +270,13 @@ stdAc::state_t IRElectraAc::toCommon(void) {
                                     : stdAc::swingv_t::kOff;
   result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
+  result.light = this->getLightToggle();
+  result.turbo = this->getTurbo();
+  result.clean = this->getClean();
   // Not supported.
   result.model = -1;  // No models used.
   result.quiet = false;
-  result.turbo = false;
   result.econo = false;
-  result.clean = false;
-  result.light = false;
   result.filter = false;
   result.beep = false;
   result.sleep = -1;
@@ -263,7 +287,7 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRElectraAc::toString(void) {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(130);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
@@ -273,6 +297,9 @@ String IRElectraAc::toString(void) {
                            kElectraAcFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
+  result += addLabeledString(getLightToggle() ? kToggleStr : "-", kLightStr);
+  result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
   return result;
 }
 

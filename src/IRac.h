@@ -171,7 +171,8 @@ void electra(IRElectraAc *ac,
              const bool on, const stdAc::opmode_t mode,
              const float degrees, const stdAc::fanspeed_t fan,
              const stdAc::swingv_t swingv,
-             const stdAc::swingh_t swingh);
+             const stdAc::swingh_t swingh, const bool turbo,
+             const bool lighttoggle, const bool clean);
 #endif  // SEND_ELECTRA_AC
 #if SEND_FUJITSU_AC
   void fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
