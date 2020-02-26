@@ -1,5 +1,25 @@
 # Release Notes
 
+## _v2.7.4 (20200226)_
+
+**[Bug Fixes]**
+- IRMQTTServer: Fix bug when receiving an IR A/C message and not re-transmitting it. (#1035, #1038)
+- Coolix: `setRaw()` doesn't update power state. (#1040, #1041)
+
+**[Features]**
+- Electra: Add improved feature support. (#1033, #1051)
+- Add support for Epson protocol. (#1034, #1050)
+- Add options to `decode()` to aid detection. Improve NEC detection. (#1042, #1046)
+- SamsungAc: Add support for Light & Ion (VirusDoctor). (#1045, #1048, #1049)
+- Add Italian (it-IT) locale/language support. (#1047) (kudos @egueli)
+- gc_decode: Add repeat support for pronto codes. (#1034, #1043)
+
+**[Misc]**
+- Update supported SamsungAc devices (#1045)
+- Coolix: Subtle protocol timing adjustments (#1036, #1037)
+- Add supported Electra device model info (#1033)
+
+
 ## _v2.7.3 (20200130)_
 
 **[Features]**
