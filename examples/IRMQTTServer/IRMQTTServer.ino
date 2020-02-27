@@ -449,6 +449,7 @@ String MqttClimate;  // Sub-topic for the climate topics.
 String MqttClimateCmnd;  // Sub-topic for the climate command topics.
 #if MQTT_DISCOVERY_ENABLE
 String MqttDiscovery;
+String MqttUniqueId;
 #endif  // MQTT_DISCOVERY_ENABLE
 String MqttHAName;
 String MqttClientId;
@@ -1228,6 +1229,7 @@ void handleInfo(void) {
     "<h3>General</h3>"
     "<p>Hostname: " + String(Hostname) + "<br>"
     "IP address: " + WiFi.localIP().toString() + "<br>"
+    "MAC address: " + WiFi.macAddress() + "<br>"
     "Booted: " + timeSince(1) + "<br>" +
     "Version: " _MY_VERSION_ "<br>"
     "Built: " __DATE__
@@ -2033,6 +2035,8 @@ void init_vars(void) {
   // Sub-topic for the climate stat topics.
 #if MQTT_DISCOVERY_ENABLE
   MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
+  MqttUniqueId = WiFi.macAddress();
+  MqttUniqueId.replace(":", "");
 #endif  // MQTT_DISCOVERY_ENABLE
   MqttHAName = String(Hostname) + "_aircon";
   // Create a unique MQTT client id.
@@ -2531,7 +2535,16 @@ void sendMQTTDiscovery(const char *topic) {
       "\"swing_mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_SWINGV "\","
       "\"swing_modes\":[\"" D_STR_OFF "\",\"" D_STR_AUTO "\",\"" D_STR_HIGHEST
                         "\",\"" D_STR_HIGH "\",\"" D_STR_MIDDLE "\",\""
-                        D_STR_LOW "\",\"" D_STR_LOWEST "\"]"
+                        D_STR_LOW "\",\"" D_STR_LOWEST "\"],"
+      "\"uniq_id\":\"" + MqttUniqueId + "\","
+      "\"device\":{"
+        "\"identifiers\":[\"" + MqttUniqueId + "\"],"
+        "\"connections\":[[\"mac\",\"" + WiFi.macAddress() + "\"]],"
+        "\"manufacturer\":\"IRremoteESP8266\","
+        "\"model\":\"IRMQTTServer\","
+        "\"name\":\"" + Hostname + "\","
+        "\"sw_version\":\"" _MY_VERSION_ "\""
+        "}"
       "}").c_str(), true)) {
     mqttLog("MQTT climate discovery successful sent.");
     hasDiscoveryBeenSent = true;
