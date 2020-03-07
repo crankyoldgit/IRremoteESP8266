@@ -2198,6 +2198,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_HITACHI_AC
+#if DECODE_HITACHI_AC1
+      case decode_type_t::HITACHI_AC1: {
+        IRHitachiAc1 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HITACHI_AC1
 #if DECODE_HITACHI_AC424
       case decode_type_t::HITACHI_AC424: {
         IRHitachiAc424 ac(0);

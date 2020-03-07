@@ -362,6 +362,234 @@ String IRHitachiAc::toString(void) {
   return result;
 }
 
+// Class for handling the remote control on a Hitachi 13 byte A/C message.
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1056
+
+IRHitachiAc1::IRHitachiAc1(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+void IRHitachiAc1::stateReset(void) {
+  for (uint8_t i = 0; i < kHitachiAc1StateLength; i++) remote_state[i] = 0x00;
+}
+
+void IRHitachiAc1::begin(void) { _irsend.begin(); }
+
+/*
+// TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
+
+uint8_t IRHitachiAc1::calcChecksum(const uint8_t state[],
+                                  const uint16_t length) {
+  uint8_t sum = 0x4F;
+  for (uint16_t i = 0; i < length - 1; i++) sum += reverseBits(state[i], 8);
+  return reverseBits(sum, 8) & 0xFC;
+}
+
+void IRHitachiAc1::checksum(const uint16_t length) {
+  remote_state[length - 1] = calcChecksum(remote_state, length);
+}
+
+bool IRHitachiAc1::validChecksum(const uint8_t state[], const uint16_t length) {
+  if (length < 2) return true;  // Assume true for lengths that are too short.
+  return (state[length - 1] == calcChecksum(state, length));
+}
+*/
+
+uint8_t *IRHitachiAc1::getRaw(void) {
+  // TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
+  // checksum();
+  return remote_state;
+}
+
+void IRHitachiAc1::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(remote_state, new_code, std::min(length, kHitachiAc1StateLength));
+}
+
+// TODO(soumaxetuirk): Disabled until checksum() works.
+/*
+#if SEND_HITACHI_AC
+void IRHitachiAc1::send(const uint16_t repeat) {
+  _irsend.sendHitachiAC1(getRaw(), kHitachiAc1StateLength, repeat);
+  // Clear the toggle bits as we have actioned them by sending them.
+  setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerToggleOffset,
+         false);
+  setSwingToggle(false);
+}
+#endif  // SEND_HITACHI_AC
+*/
+
+bool IRHitachiAc1::getPower(void) {
+  return GETBIT8(remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerOffset);
+}
+
+void IRHitachiAc1::setPower(const bool on) {
+  if (on != getPower())  // Is the power changing?
+    // Then set the power toggle bit.
+    setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerToggleOffset,
+           true);
+  setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerOffset, on);
+}
+
+void IRHitachiAc1::on(void) { setPower(true); }
+
+void IRHitachiAc1::off(void) { setPower(false); }
+
+uint8_t IRHitachiAc1::getMode(void) {
+  return GETBITS8(remote_state[kHitachiAc1ModeByte], kHitachiAc1ModeOffset,
+                  kHitachiAc1ModeSize);
+}
+
+void IRHitachiAc1::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAc1Fan:
+    case kHitachiAc1Auto:
+    case kHitachiAc1Heat:
+    case kHitachiAc1Cool:
+    case kHitachiAc1Dry:
+      setBits(&remote_state[kHitachiAc1ModeByte], kHitachiAc1ModeOffset,
+              kHitachiAc1ModeSize, mode);
+      break;
+    default: setMode(kHitachiAc1Auto);
+  }
+}
+
+uint8_t IRHitachiAc1::getTemp(void) {
+  return reverseBits(GETBITS8(remote_state[kHitachiAc1TempByte],
+                              kHitachiAc1TempOffset, kHitachiAc1TempSize),
+                     kHitachiAc1TempSize) + kHitachiAc1TempDelta;
+}
+
+void IRHitachiAc1::setTemp(const uint8_t celsius) {
+  uint8_t temp = std::min(celsius, kHitachiAcMaxTemp);
+  temp = std::max(temp, kHitachiAcMinTemp);
+  temp -= kHitachiAc1TempDelta;
+  temp = reverseBits(temp, kHitachiAc1TempSize);
+  setBits(&remote_state[kHitachiAc1TempByte], kHitachiAc1TempOffset,
+          kHitachiAc1TempSize, temp);
+}
+
+uint8_t IRHitachiAc1::getFan(void) {
+  return GETBITS8(remote_state[kHitachiAc1FanByte], kHitachiAc1FanOffset,
+                  kHitachiAc1FanSize);
+}
+
+void IRHitachiAc1::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kHitachiAc1FanAuto:
+    case kHitachiAc1FanHigh:
+    case kHitachiAc1FanMed:
+    case kHitachiAc1FanLow:
+      setBits(&remote_state[kHitachiAc1FanByte], kHitachiAc1FanOffset,
+              kHitachiAc1FanSize, speed);
+      break;
+    default: setFan(kHitachiAc1FanAuto);
+  }
+}
+
+bool IRHitachiAc1::getSwingToggle(void) {
+  return GETBIT8(remote_state[kHitachiAc1SwingByte],
+                 kHitachiAc1SwingToggleOffset);
+}
+
+void IRHitachiAc1::setSwingToggle(const bool toggle) {
+  setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingToggleOffset,
+         toggle);
+}
+
+bool IRHitachiAc1::getSwing(void) {
+  return GETBIT8(remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingOffset);
+}
+
+void IRHitachiAc1::setSwing(const bool on) {
+  setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingOffset, on);
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRHitachiAc1::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kHitachiAc1Cool;
+    case stdAc::opmode_t::kHeat: return kHitachiAc1Heat;
+    case stdAc::opmode_t::kDry:  return kHitachiAc1Dry;
+    case stdAc::opmode_t::kFan:  return kHitachiAc1Fan;
+    default:                     return kHitachiAc1Auto;
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRHitachiAc1::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:    return kHitachiAc1FanLow;
+    case stdAc::fanspeed_t::kMedium: return kHitachiAc1FanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:    return kHitachiAc1FanHigh;
+    default:                         return kHitachiAc1FanAuto;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRHitachiAc1::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAc1Cool: return stdAc::opmode_t::kCool;
+    case kHitachiAc1Heat: return stdAc::opmode_t::kHeat;
+    case kHitachiAc1Dry:  return stdAc::opmode_t::kDry;
+    case kHitachiAc1Fan:  return stdAc::opmode_t::kFan;
+    default:              return stdAc::opmode_t::kAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRHitachiAc1::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kHitachiAc1FanHigh:     return stdAc::fanspeed_t::kMax;
+    case kHitachiAc1FanMed:      return stdAc::fanspeed_t::kMedium;
+    case kHitachiAc1FanLow:      return stdAc::fanspeed_t::kLow;
+    default:                     return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRHitachiAc1::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::HITACHI_AC1;
+  result.model = -1;  // No models used.
+  result.power = this->getPower();
+  result.mode = this->toCommonMode(this->getMode());
+  result.celsius = true;
+  result.degrees = this->getTemp();
+  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
+                                     stdAc::swingv_t::kOff;
+  // Not supported.
+  result.quiet = false;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+// Convert the internal state into a human readable string.
+String IRHitachiAc1::toString(void) {
+  String result = "";
+  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(getMode(), kHitachiAc1Auto, kHitachiAc1Cool,
+                            kHitachiAc1Heat, kHitachiAc1Dry, kHitachiAc1Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kHitachiAc1FanHigh, kHitachiAc1FanLow,
+                           kHitachiAc1FanAuto, kHitachiAc1FanAuto,
+                           kHitachiAc1FanMed);
+  result += addBoolToString(getSwing(), kSwingStr);
+  return result;
+}
+
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
 // Decode the supplied Hitachi A/C message.
 //
@@ -420,6 +648,10 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
     if (nbits / 8 == kHitachiAcStateLength &&
         !IRHitachiAc::validChecksum(results->state, kHitachiAcStateLength))
       return false;
+    // TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
+    // if (nbits / 8 == kHitachiAc1StateLength &&
+    //    !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
+    //   return false;
   }
 
   // Success

@@ -1508,3 +1508,151 @@ TEST(TestHitachiAc3Class, hasInvertedStates) {
   EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
                                               kHitachiAc3MinStateLength - 2));
 }
+
+// HitachiAc1 Class tests
+
+TEST(TestIRHitachiAc1Class, SetAndGetPower) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetTemp) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp - 1);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp + 1);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B46
+  const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0x68};
+  ac.setRaw(cool_31_auto);
+  EXPECT_EQ(31, ac.getTemp());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetMode) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setMode(kHitachiAc1Auto);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+  ac.setMode(kHitachiAc1Cool);
+  EXPECT_EQ(kHitachiAc1Cool, ac.getMode());
+  ac.setMode(kHitachiAc1Fan);
+  EXPECT_EQ(kHitachiAc1Fan, ac.getMode());
+  ac.setMode(kHitachiAc1Heat);
+  EXPECT_EQ(kHitachiAc1Heat, ac.getMode());
+  ac.setMode(kHitachiAc1Dry);
+  EXPECT_EQ(kHitachiAc1Dry, ac.getMode());
+  ac.setMode(0);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetFan) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setFan(kHitachiAc1FanAuto);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc1FanLow);
+  EXPECT_EQ(kHitachiAc1FanLow, ac.getFan());
+  ac.setFan(kHitachiAc1FanHigh);
+  EXPECT_EQ(kHitachiAc1FanHigh, ac.getFan());
+  ac.setFan(kHitachiAc1FanMed);
+  EXPECT_EQ(kHitachiAc1FanMed, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(0);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+}
+
+TEST(TestIRHitachiAc1Class, HumanReadable) {
+  IRHitachiAc1 ac(kGpioUnused);
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=A47:B47
+  const uint8_t cool_32_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x30,
+      0x04};
+  ac.setRaw(cool_32_auto);
+  EXPECT_EQ(
+      "Power: On, Mode: 6 (Cool), Temp: 32C, Fan: 1 (Auto), Swing: Off",
+      ac.toString());
+}
+
+/* Disabled until HITACHIAC1 checksum is working.
+TEST(TestIRHitachiAc1Class, Checksum) {
+  IRHitachiAc1 ac(kGpioUnused);
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=A47:B47
+  const uint8_t cool_32_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x30,
+      0x04};
+  EXPECT_TRUE(ac.validChecksum(cool_32_auto));
+  EXPECT_EQ(0x04, ac.calcChecksum(cool_32_auto));
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B46
+  const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0x68};
+  EXPECT_TRUE(ac.validChecksum(cool_31_auto));
+  EXPECT_EQ(0x68, ac.calcChecksum(cool_31_auto));
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B13
+  const uint8_t auto_25_auto_swing_on[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4, 0x00, 0x00, 0x00, 0x00, 0x61,
+      0x24};
+  EXPECT_TRUE(ac.validChecksum(auto_25_auto_swing_on));
+  EXPECT_EQ(0x24, ac.calcChecksum(auto_25_auto_swing_on));
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B45
+  const uint8_t cool_30_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0xC4};
+  const uint8_t cool_30_auto_rev[kHitachiAc1StateLength] = {
+      0x4D, 0x75, 0xB2, 0x89, 0x0F, 0x86, 0x2F, 0x00, 0x00, 0x00, 0x00, 0x04,
+      0x23};
+  const uint8_t cool_31_auto_rev[kHitachiAc1StateLength] = {
+      0x4D, 0x75, 0xB2, 0x89, 0x0F, 0x86, 0x31, 0x00, 0x00, 0x00, 0x00, 0x04,
+      0x16};
+  EXPECT_TRUE(ac.validChecksum(cool_30_auto));
+  EXPECT_EQ(0xC4, ac.calcChecksum(cool_30_auto));
+}
+*/
+
+TEST(TestIRHitachiAc1Class, toCommon) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setPower(true);
+  ac.setMode(kHitachiAc1Cool);
+  ac.setTemp(20);
+  ac.setFan(kHitachiAc1FanHigh);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::HITACHI_AC1, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}

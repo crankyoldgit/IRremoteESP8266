@@ -9,6 +9,8 @@
 //   Brand: Hitachi,  Model: RAR-8P2 remote
 //   Brand: Hitachi,  Model: RAS-AJ25H A/C
 //   Brand: Hitachi,  Model: PC-LH3B (HITACHI_AC3)
+//   Brand: Hitachi,  Model: KAZE-312KSDP A/C (HITACHI_AC1)
+//   Brand: Hitachi,  Model: R-LT0541-HTA/Y.K.1.1-1 V2.3 remote (HITACHI_AC1)
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
@@ -77,6 +79,40 @@ const uint8_t kHitachiAc424PowerByte = 27;
 const uint8_t kHitachiAc424PowerOn = 0xF1;
 const uint8_t kHitachiAc424PowerOff = 0xE1;
 
+// HitachiAc1
+// Byte[5] (Mode & Fan)
+const uint8_t kHitachiAc1ModeByte = 5;
+const uint8_t kHitachiAc1ModeOffset = 4;
+const uint8_t kHitachiAc1ModeSize = 4;  // Mask 0b11110000
+const uint8_t kHitachiAc1Dry = 2;            // 0b0010
+const uint8_t kHitachiAc1Fan = 4;            // 0b0100
+const uint8_t kHitachiAc1Cool = 6;           // 0b0110
+const uint8_t kHitachiAc1Heat = 9;           // 0b1001
+const uint8_t kHitachiAc1Auto = 15;          // 0b1110
+const uint8_t kHitachiAc1FanByte = kHitachiAc1ModeByte;
+const uint8_t kHitachiAc1FanOffset = 0;
+const uint8_t kHitachiAc1FanSize = 4;  // Mask 0b0001111
+const uint8_t kHitachiAc1FanAuto = 1;          // 0b0001
+const uint8_t kHitachiAc1FanHigh = 2;          // 0b0010
+const uint8_t kHitachiAc1FanMed = 4;           // 0b0100
+const uint8_t kHitachiAc1FanLow = 8;           // 0b1000
+
+// Byte[6] (Temperature)
+// Note: Temp is stored in LSB order.
+const uint8_t kHitachiAc1TempByte = 6;
+const uint8_t kHitachiAc1TempOffset = 2;
+const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
+const uint8_t kHitachiAc1TempDelta = 7;
+
+// Byte[11] (Power/Swing)
+const uint8_t kHitachiAc1PowerByte = 11;
+const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
+const uint8_t kHitachiAc1PowerToggleOffset = 4;  // Mask 0b00010000
+const uint8_t kHitachiAc1SwingByte = kHitachiAc1PowerByte;
+const uint8_t kHitachiAc1SwingOffset = 6;        // Mask 0b01000000
+const uint8_t kHitachiAc1SwingToggleOffset = 0;  // Mask 0b00000001
+
+
 // Classes
 class IRHitachiAc {
  public:
@@ -127,6 +163,56 @@ class IRHitachiAc {
   uint8_t remote_state[kHitachiAcStateLength];
   void checksum(const uint16_t length = kHitachiAcStateLength);
   uint8_t _previoustemp;
+};
+
+class IRHitachiAc1 {
+ public:
+  explicit IRHitachiAc1(const uint16_t pin, const bool inverted = false,
+                        const bool use_modulation = true);
+
+  void stateReset(void);
+#if SEND_HITACHI_AC1
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_HITACHI_AC1
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void);
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingToggle(const bool toggle);
+  bool getSwingToggle(void);
+  void setSwing(const bool on);
+  bool getSwing(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc1StateLength);
+  static bool validChecksum(const uint8_t state[],
+                            const uint16_t length = kHitachiAc1StateLength);
+  static uint8_t calcChecksum(const uint8_t state[],
+                              const uint16_t length = kHitachiAc1StateLength);
+  uint8_t convertMode(const stdAc::opmode_t mode);
+  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // The state of the IR remote in IR code form.
+  uint8_t remote_state[kHitachiAc1StateLength];
+  void checksum(const uint16_t length = kHitachiAc1StateLength);
 };
 
 class IRHitachiAc424 {
