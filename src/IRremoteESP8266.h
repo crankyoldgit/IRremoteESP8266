@@ -572,6 +572,13 @@
 #define SEND_EPSON     _IR_ENABLE_DEFAULT_
 #endif  // SEND_EPSON
 
+#ifndef DECODE_SYMPHONY
+#define DECODE_SYMPHONY   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_SYMPHONY
+#ifndef SEND_SYMPHONY
+#define SEND_SYMPHONY     _IR_ENABLE_DEFAULT_
+#endif  // SEND_SYMPHONY
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -695,8 +702,9 @@ enum decode_type_t {
   HITACHI_AC424,
   SONY_38K,
   EPSON,  // 75
+  SYMPHONY,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = EPSON,
+  kLastDecodeType = SYMPHONY,
 };
 
 // Message lengths & required repeat values
@@ -857,6 +865,8 @@ const uint16_t kSony15Bits = 15;
 const uint16_t kSony20Bits = 20;
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
+const uint16_t kSymphonyBits = 11;
+const uint16_t kSymphonyDefaultRepeat = kNoRepeat;
 const uint16_t kTcl112AcStateLength = 14;
 const uint16_t kTcl112AcBits = kTcl112AcStateLength * 8;
 const uint16_t kTcl112AcDefaultRepeat = kNoRepeat;

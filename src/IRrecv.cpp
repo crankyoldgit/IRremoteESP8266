@@ -763,8 +763,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Mitsubishi136 decode");
     if (decodeMitsubishi136(results, offset)) return true;
 #endif  // DECODE_MITSUBISHI136
-  }
+#if DECODE_SYMPHONY
+    DPRINTLN("Attempting Symphony decode");
+    if (decodeSymphony(results, offset)) return true;
+#endif  // DECODE_SYMPHONY
   // Typically new protocols are added above this line.
+  }
 #if DECODE_HASH
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
