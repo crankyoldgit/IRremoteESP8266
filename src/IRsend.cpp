@@ -509,6 +509,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case MITSUBISHI2:
     case MITSUBISHI_AC:
     case SHERWOOD:
+    case SYMPHONY:
     case TOSHIBA_AC:
       return kSingleRepeat;
     // Special
