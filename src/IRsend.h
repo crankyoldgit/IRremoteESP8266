@@ -539,6 +539,10 @@ class IRsend {
   void sendEpson(uint64_t data, uint16_t nbits = kEpsonBits,
                  uint16_t repeat = kEpsonMinRepeat);
 #endif
+#if SEND_SYMPHONY
+  void sendSymphony(uint64_t data, uint16_t nbits = kSymphonyBits,
+                    uint16_t repeat = kSymphonyDefaultRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

@@ -232,6 +232,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::SONY;
   else if (!strcasecmp(str, "SONY_38K"))
     return decode_type_t::SONY_38K;
+  else if (!strcasecmp(str, "SYMPHONY"))
+    return decode_type_t::SYMPHONY;
   else if (!strcasecmp(str, "TCL112AC"))
     return decode_type_t::TCL112AC;
   else if (!strcasecmp(str, "TECO"))
@@ -470,6 +472,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case SONY_38K:
       result = F("SONY_38K");
+      break;
+    case SYMPHONY:
+      result = F("SYMPHONY");
       break;
     case TCL112AC:
       result = F("TCL112AC");

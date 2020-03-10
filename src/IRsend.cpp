@@ -509,6 +509,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case MITSUBISHI2:
     case MITSUBISHI_AC:
     case SHERWOOD:
+    case SYMPHONY:
     case TOSHIBA_AC:
       return kSingleRepeat;
     // Special
@@ -532,6 +533,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 //   int16_t:  The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
+    case SYMPHONY:
+      return 11;
     case RC5:
       return 12;
     case LASERTAG:
@@ -832,6 +835,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       break;
     case SONY_38K:
       sendSony38(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_SYMPHONY
+    case SYMPHONY:
+      sendSymphony(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_TECO
