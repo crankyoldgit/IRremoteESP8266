@@ -72,7 +72,8 @@ bool IRrecv::decodeSymphony(decode_results *results, uint16_t offset,
                     0, 0,  // No Header
                     kSymphonyOneMark, kSymphonyOneSpace,
                     kSymphonyZeroMark, kSymphonyZeroSpace,
-                    kSymphonyFooterMark, kSymphonyFooterGap, true))
+                    kSymphonyFooterMark, kSymphonyFooterGap, true,
+                    _tolerance, 0))
     return false;
 
   // Success
