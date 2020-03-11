@@ -816,6 +816,11 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC2));
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC2));
 
+  ASSERT_EQ("HITACHI_AC184", typeToString(decode_type_t::HITACHI_AC184));
+  ASSERT_EQ(decode_type_t::HITACHI_AC184, strToDecodeType("HITACHI_AC184"));
+  ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC184));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC184));
+
   ASSERT_EQ("HITACHI_AC424", typeToString(decode_type_t::HITACHI_AC424));
   ASSERT_EQ(decode_type_t::HITACHI_AC424, strToDecodeType("HITACHI_AC424"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC424));
@@ -1113,7 +1118,7 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
 }
 
 TEST(TestIRHitachiAc424Class, toCommon) {
-  IRHitachiAc424 ac(0);
+  IRHitachiAc424 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kHitachiAc424Cool);
   ac.setTemp(20);
@@ -1138,4 +1143,72 @@ TEST(TestIRHitachiAc424Class, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDecodeHitachiAc184, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc184StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE6, 0x19, 0x89, 0x76, 0x01,
+      0xFE, 0x3F, 0xC0, 0x2F, 0xD0, 0x18, 0xE7, 0x00, 0xFF, 0xA0, 0x5F};
+
+  irsend.reset();
+  irsend.sendHitachiAc184(expected);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC184, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc184Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a 'real' HitachiAc184 message.
+TEST(TestDecodeHitachiAc184, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc184StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE6, 0x19, 0x89, 0x76, 0x01,
+      0xFE, 0x3F, 0xC0, 0x2F, 0xD0, 0x18, 0xE7, 0x00, 0xFF, 0xA0, 0x5F};
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-597519432
+  uint16_t rawData[371] = {
+      // Power Off
+      3422, 1660, 464, 1264, 438, 426, 438, 402, 486, 426, 440, 402, 462, 402,
+      488, 428, 438, 402, 460, 404, 488, 426, 440, 424, 436, 428, 462, 1240,
+      466, 398, 462, 404, 486, 426, 438, 402, 464, 400, 490, 400, 464, 426, 438,
+      402, 488, 428, 436, 428, 462, 376, 486, 404, 474, 416, 438, 400, 488, 402,
+      462, 426, 438, 426, 458, 1246, 464, 426, 436, 1244, 488, 1266, 434, 1268,
+      436, 1242, 486, 1242, 462, 1240, 464, 426, 462, 1266, 438, 1242, 462,
+      1240, 514, 1214, 466, 1236, 462, 1266, 464, 1264, 438, 1266, 438, 1240,
+      488, 400, 466, 424, 440, 402, 486, 404, 462, 402, 464, 402, 488, 426, 438,
+      402, 462, 402, 488, 1264, 438, 1242, 460, 428, 462, 428, 436, 1264, 440,
+      1240, 488, 1240, 464, 1240, 460, 402, 490, 424, 440, 1264, 438, 1242, 512,
+      402, 438, 426, 466, 398, 464, 1266, 440, 400, 462, 402, 488, 1264, 438,
+      402, 462, 402, 482, 432, 438, 1264, 436, 404, 488, 1240, 462, 1264, 438,
+      402, 486, 1246, 456, 1266, 438, 1238, 488, 402, 462, 1240, 462, 402, 512,
+      402, 438, 428, 438, 426, 462, 430, 434, 428, 438, 402, 512, 376, 462,
+      1240, 464, 1264, 458, 1270, 436, 1242, 462, 1240, 486, 1242, 460, 1242,
+      462, 1242, 486, 1240, 464, 1240, 464, 1238, 492, 1264, 436, 1266, 440,
+      400, 488, 426, 436, 430, 434, 430, 460, 404, 462, 426, 438, 402, 488, 426,
+      436, 1264, 466, 1238, 462, 1242, 462, 1266, 438, 1238, 490, 1264, 438,
+      426, 438, 1240, 486, 406, 462, 402, 462, 400, 488, 428, 436, 426, 438,
+      402, 484, 1268, 438, 426, 436, 1242, 488, 1266, 436, 402, 462, 402, 502,
+      386, 464, 1240, 464, 1240, 488, 426, 438, 426, 438, 402, 488, 1240, 462,
+      1266, 438, 1242, 486, 428, 440, 424, 438, 1266, 460, 1268, 438, 1264, 438,
+      404, 486, 428, 438, 426, 438, 402, 490, 400, 462, 426, 436, 402, 490, 426,
+      438, 1240, 462, 1268, 460, 1268, 434, 1266, 436, 1240, 514, 1238, 438,
+      1240, 488, 1240, 460, 406, 464, 426, 436, 402, 488, 402, 462, 402, 462,
+      1264, 462, 404, 462, 1266, 434, 1268, 464, 1264, 438, 1242, 464, 1238,
+      488, 1266, 438, 402, 462, 1268, 458, 430, 410};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 371, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC184, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc184Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc184Bits);
 }

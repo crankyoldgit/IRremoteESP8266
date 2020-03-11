@@ -411,6 +411,20 @@
 #define SEND_HITACHI_AC2       _IR_ENABLE_DEFAULT_
 #endif  // SEND_HITACHI_AC2
 
+#ifndef DECODE_HITACHI_AC184
+#define DECODE_HITACHI_AC184   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HITACHI_AC184
+#ifndef SEND_HITACHI_AC184
+#define SEND_HITACHI_AC184     _IR_ENABLE_DEFAULT_
+#endif  // SEND_HITACHI_AC184
+
+#ifndef DECODE_HITACHI_AC424
+#define DECODE_HITACHI_AC424   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HITACHI_AC424
+#ifndef SEND_HITACHI_AC424
+#define SEND_HITACHI_AC424     _IR_ENABLE_DEFAULT_
+#endif  // SEND_HITACHI_AC424
+
 #ifndef DECODE_GICABLE
 #define DECODE_GICABLE         _IR_ENABLE_DEFAULT_
 #endif  // DECODE_GICABLE
@@ -558,13 +572,6 @@
 #define SEND_DAIKIN152         _IR_ENABLE_DEFAULT_
 #endif  // SEND_DAIKIN152
 
-#ifndef DECODE_HITACHI_AC424
-#define DECODE_HITACHI_AC424   _IR_ENABLE_DEFAULT_
-#endif  // DECODE_HITACHI_AC424
-#ifndef SEND_HITACHI_AC424
-#define SEND_HITACHI_AC424     _IR_ENABLE_DEFAULT_
-#endif  // SEND_HITACHI_AC424
-
 #ifndef DECODE_EPSON
 #define DECODE_EPSON   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_EPSON
@@ -589,7 +596,7 @@
      DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
-     DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424)
+     DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC184)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -703,8 +710,9 @@ enum decode_type_t {
   SONY_38K,
   EPSON,  // 75
   SYMPHONY,
+  HITACHI_AC184,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SYMPHONY,
+  kLastDecodeType = HITACHI_AC184,
 };
 
 // Message lengths & required repeat values
@@ -782,6 +790,8 @@ const uint16_t kHitachiAc1StateLength = 13;
 const uint16_t kHitachiAc1Bits = kHitachiAc1StateLength * 8;
 const uint16_t kHitachiAc2StateLength = 53;
 const uint16_t kHitachiAc2Bits = kHitachiAc2StateLength * 8;
+const uint16_t kHitachiAc184StateLength = 23;
+const uint16_t kHitachiAc184Bits = kHitachiAc184StateLength * 8;
 const uint16_t kHitachiAc424StateLength = 53;
 const uint16_t kHitachiAc424Bits = kHitachiAc424StateLength * 8;
 const uint16_t kInaxBits = 24;

@@ -485,6 +485,12 @@ class IRrecv {
                         const uint16_t nbits = kHitachiAc1Bits,
                         const bool strict = true);
 #endif
+#if DECODE_HITACHI_AC184
+  bool decodeHitachiAc184(decode_results *results,
+                          uint16_t offset = kStartOffset,
+                          const uint16_t nbits = kHitachiAc184Bits,
+                          const bool strict = true);
+#endif  // DECODE_HITACHI_AC184
 #if DECODE_HITACHI_AC424
   bool decodeHitachiAc424(decode_results *results,
                           uint16_t offset = kStartOffset,
