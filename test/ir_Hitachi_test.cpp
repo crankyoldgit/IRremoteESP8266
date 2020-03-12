@@ -1212,3 +1212,64 @@ TEST(TestDecodeHitachiAc184, RealExample) {
   ASSERT_EQ(kHitachiAc184Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc184Bits);
 }
+
+// Decode a 'real' "short" HitachiAc184 message.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-597592537
+TEST(TestDecodeHitachiAc184, RealShortExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc184ShortStateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE3, 0x1C, 0x89, 0x76, 0x08,
+      0xF7, 0x3F, 0xC0, 0x15, 0xEA};
+
+  uint16_t rawData[275] = {
+      // Change Temp
+      3422, 1636, 490, 1242, 484, 380, 488, 400, 466, 426, 432, 406, 490, 400,
+      464, 426, 462, 398, 466, 376, 492, 400, 458, 404, 490, 400, 466, 1262,
+      434, 430, 464, 400, 490, 400, 458, 380, 490, 374, 490, 426, 432, 430, 464,
+      400, 464, 426, 460, 402, 468, 372, 490, 400, 460, 404, 490, 374, 490, 400,
+      484, 378, 490, 398, 464, 1240, 490, 398, 466, 1238, 464, 1266, 434, 1268,
+      466, 1238, 466, 1240, 484, 1218, 490, 400, 460, 1246, 484, 1242, 466,
+      1214, 488, 1240, 486, 1218, 490, 1214, 488, 1266, 434, 1242, 490, 1214,
+      490, 424, 460, 404, 464, 374, 492, 424, 434, 430, 466, 400, 464, 426, 464,
+      376, 492, 1236, 464, 1240, 488, 402, 466, 374, 490, 400, 458, 1244, 490,
+      1238, 496, 1234, 436, 404, 488, 400, 464, 1240, 484, 1244, 464, 1238, 466,
+      426, 434, 430, 466, 400, 464, 1264, 434, 406, 490, 374, 490, 1264, 458,
+      404, 466, 400, 466, 424, 466, 1238, 464, 400, 466, 1238, 486, 1216, 490,
+      400, 464, 1240, 486, 1240, 466, 1238, 460, 432, 432, 430, 468, 374, 488,
+      426, 462, 1242, 464, 400, 466, 426, 434, 404, 490, 374, 490, 1240, 484,
+      1244, 466, 1240, 462, 428, 436, 1242, 490, 1212, 490, 1264, 466, 1236,
+      466, 1214, 490, 1240, 488, 1240, 466, 1236, 466, 1264, 434, 1268, 464,
+      400, 494, 400, 430, 406, 488, 376, 488, 428, 432, 432, 462, 402, 462, 426,
+      458, 1220, 488, 1214, 490, 1240, 484, 406, 466, 1212, 490, 426, 462, 1216,
+      488, 400, 464, 402, 488, 402, 462, 374, 492, 1262, 460, 380, 488, 1240,
+      464, 428, 462, 1214, 492, 1236, 462, 1216, 490};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 275, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC184, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc184ShortBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc184ShortBits);
+}
+
+TEST(TestDecodeHitachiAc184, SyntheticShortExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc184ShortStateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE3, 0x1C, 0x89, 0x76, 0x08,
+      0xF7, 0x3F, 0xC0, 0x15, 0xEA};
+
+  irsend.reset();
+  irsend.sendHitachiAc184(expected, kHitachiAc184ShortStateLength);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC184, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc184ShortBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}

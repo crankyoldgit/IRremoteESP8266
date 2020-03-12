@@ -815,11 +815,14 @@ String IRHitachiAc424::toString(void) {
 //
 // Note: This protocol is almost exactly the same as HitachiAC424 except this
 //       variant has subtle timing differences.
+//       There are two typical sizes:
+//       * kHitachiAc184ShortStateLength (Temp Changes)
+//       * kHitachiAc184StateLength (everything else)
 //
 // Args:
 //   data: An array of bytes containing the IR command.
 //         It is assumed to be in LSBF order for this code.
-//   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc184StateLength)
+//   nbytes: Nr. of bytes of data in the array.
 //   repeat: Nr. of times the message is to be repeated.
 //
 // Status: BETA / Probably working fine.
@@ -862,7 +865,7 @@ bool IRrecv::decodeHitachiAc184(decode_results *results, uint16_t offset,
                                 const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
     return false;  // Too short a message to match.
-  if (strict && nbits != kHitachiAc184Bits)
+  if (strict && nbits != kHitachiAc184Bits && nbits != kHitachiAc184ShortBits)
     return false;
 
   // Header + Data + Footer
