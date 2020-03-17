@@ -815,9 +815,12 @@ String IRHitachiAc424::toString(void) {
 //
 // Note: This protocol is almost exactly the same as HitachiAC424 except this
 //       variant has subtle timing differences.
-//       There are two typical sizes:
-//       * kHitachiAc3MinStateLength (Temp Changes)
-//       * kHitachiAc3StateLength (everything else)
+//       There are five(5) typical sizes:
+//       * kHitachiAc3MinStateLength (Cancel Timer)
+//       * kHitachiAc3MinStateLength + 2 (Change Temp)
+//       * kHitachiAc3StateLength - 6 (Change Mode)
+//       * kHitachiAc3StateLength- 4 (Normal)
+//       * kHitachiAc3StateLength (Set Timer)
 //
 // Args:
 //   data: An array of bytes containing the IR command.
@@ -838,11 +841,58 @@ void IRsend::sendHitachiAc3(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_HITACHI_AC3
 
+
+// Class for handling the remote control on a Hitachi_AC3 53 A/C message
+IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+// Reset to auto fan, cooling, 23° Celcius
+void IRHitachiAc3::stateReset(void) {
+  for (uint8_t i = 0; i < kHitachiAc3StateLength; i++)
+    remote_state[i] = 0x00;
+  remote_state[0]  = 0x01;
+  remote_state[1]  = 0x10;
+  remote_state[3]  = 0x40;
+  remote_state[5]  = 0xFF;
+  remote_state[7]  = 0xE8;
+  remote_state[9]  = 0x89;
+  remote_state[11] = 0x0B;
+  remote_state[13] = 0x3F;
+  remote_state[15] = 0x15;
+  remote_state[21] = 0x4B;
+  remote_state[23] = 0x18;
+  setInvertedStates();
+}
+
+void IRHitachiAc3::setInvertedStates(const uint16_t length) {
+  for (uint8_t i = 3; i < length - 1; i += 2)
+    remote_state[i + 1] = ~remote_state[i];
+}
+
+bool IRHitachiAc3::hasInvertedStates(const uint8_t state[],
+                                     const uint16_t length) {
+  for (uint8_t i = 3; i < length - 1; i += 2)
+    if ((state[i + 1] ^ state[i]) != 0xFF) return false;
+  return true;
+}
+
+void IRHitachiAc3::begin(void) { _irsend.begin(); }
+
+uint8_t *IRHitachiAc3::getRaw(void) {
+  setInvertedStates();
+  return remote_state;
+}
+
+void IRHitachiAc3::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(remote_state, new_code, std::min(length, kHitachiAc3StateLength));
+}
+
 #if DECODE_HITACHI_AC3
-// Decode the supplied Hitachi 184 bit A/C message.
+// Decode the supplied HitachiAc3 A/C message.
 //
 // Note: This protocol is almost exactly the same as HitachiAC424 except this
-//       variant has subtle timing differences.
+//       variant has subtle timing differences and multiple lengths.
 //
 // Args:
 //   results: Ptr to the data to decode and where to store the decode result.
@@ -888,6 +938,9 @@ bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
                     kUseDefTol, 0, false))
     return false;  // We failed to find any data.
 
+  // Compliance
+  if (strict && !IRHitachiAc3::hasInvertedStates(results->state, nbits / 8))
+    return false;
   // Success
   results->decode_type = decode_type_t::HITACHI_AC3;
   results->bits = nbits;

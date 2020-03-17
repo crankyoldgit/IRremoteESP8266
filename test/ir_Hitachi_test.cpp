@@ -1479,3 +1479,30 @@ TEST(TestDecodeHitachiAc3, SyntheticChangeModeExample) {
   ASSERT_EQ(expectedBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
 }
+
+TEST(TestHitachiAc3Class, hasInvertedStates) {
+  const uint8_t good_state[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xEA, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+  // bad_state[kHitachiAc3MinStateLength + 1] has been modified to be different.
+  // i.e. Anything larger than kHitachiAc3MinStateLength should fail.
+  //      kHitachiAc3MinStateLength or shorter should pass.
+  const uint8_t bad_state[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xE0, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(good_state,
+                                              kHitachiAc3StateLength));
+
+  for (uint8_t len = kHitachiAc3StateLength;
+       len > kHitachiAc3MinStateLength;
+       len -= 2) {
+    EXPECT_FALSE(IRHitachiAc3::hasInvertedStates(bad_state, len));
+  }
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
+                                              kHitachiAc3MinStateLength));
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
+                                              kHitachiAc3MinStateLength - 2));
+}

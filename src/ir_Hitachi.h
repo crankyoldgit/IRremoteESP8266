@@ -176,4 +176,32 @@ class IRHitachiAc424 {
   uint8_t _previoustemp;
 };
 
+class IRHitachiAc3 {
+ public:
+  explicit IRHitachiAc3(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+  void stateReset(void);
+#if SEND_HITACHI_AC3
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_HITACHI_AC3
+  void begin(void);
+  uint8_t getMode(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc3StateLength);
+  static bool hasInvertedStates(const uint8_t state[], const uint16_t length);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  // The state of the IR remote in IR code form.
+  uint8_t remote_state[kHitachiAc3StateLength];
+  void setInvertedStates(const uint16_t length = kHitachiAc3StateLength);
+};
+
 #endif  // IR_HITACHI_H_
