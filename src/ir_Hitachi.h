@@ -8,7 +8,7 @@
 //   Brand: Hitachi,  Model: Series VI A/C (Circa 2007)
 //   Brand: Hitachi,  Model: RAR-8P2 remote
 //   Brand: Hitachi,  Model: RAS-AJ25H A/C
-//   Brand: Hitachi,  Model: PC-LH3B (HITACHI_AC184)
+//   Brand: Hitachi,  Model: PC-LH3B (HITACHI_AC3)
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
