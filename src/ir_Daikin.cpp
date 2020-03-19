@@ -3187,3 +3187,92 @@ String IRDaikin152::toString(void) {
   result += addBoolToString(getComfort(), kComfortStr);
   return result;
 }
+
+#if SEND_DAIKIN64
+// Send a Daikin 64 bit A/C message.
+//
+// Args:
+//   data: A uint64_t containing the IR command/code.
+//
+// Supported devices:
+// - Daikin FFN-C.
+//
+// Status: Beta / Probably Working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+void IRsend::sendDaikin64(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  enableIROut(kDaikin64Freq);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    for (uint8_t i = 0; i < 2; i++) {
+      // Leader
+      mark(kDaikin64LdrMark);
+      space(kDaikin64LdrSpace);
+    }
+    // Header + Data + Footer #1
+    sendGeneric(kDaikin64HdrMark, kDaikin64HdrSpace,
+                kDaikin64BitMark, kDaikin64OneSpace,
+                kDaikin64BitMark, kDaikin64ZeroSpace,
+                kDaikin64BitMark, kDaikin64Gap,
+                data, nbits, kDaikin64Freq, false, 0, 50);
+    // Footer #2
+    mark(kDaikin64HdrMark);
+    space(kDefaultMessageGap);  // A guess of the gap between messages.
+  }
+}
+#endif  // SEND_DAIKIN64
+
+#if DECODE_DAIKIN64
+// Decode the supplied Daikin 64 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin64Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin FFN-C.
+//
+// Status: Beta / Probably Working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kDaikin64Overhead - offset)
+    return false;  // Too short a message to match.
+  // Compliance
+  if (strict && nbits != kDaikin64Bits)
+    return false;
+
+  // Leader
+  for (uint8_t i = 0; i < 2; i++) {
+    if (!matchMark(results->rawbuf[offset++], kDaikin64LdrMark))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin64LdrSpace))
+      return false;
+  }
+  // Header + Data + Footer #1
+  uint16_t used = matchGeneric(results->rawbuf + offset, &results->value,
+                               results->rawlen - offset, nbits,
+                               kDaikin64HdrMark, kDaikin64HdrSpace,
+                               kDaikin64BitMark, kDaikin64OneSpace,
+                               kDaikin64BitMark, kDaikin64ZeroSpace,
+                               kDaikin64BitMark, kDaikin64Gap,
+                               false, _tolerance, kMarkExcess, false);
+  if (used == 0) return false;
+  offset += used;
+  // Footer #2
+  if (!matchMark(results->rawbuf[offset++], kDaikin64HdrMark))
+    return false;
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN64;
+  results->bits = nbits;
+  results->command = 0;
+  results->address = 0;
+  return true;
+}
+#endif  // DAIKIN64

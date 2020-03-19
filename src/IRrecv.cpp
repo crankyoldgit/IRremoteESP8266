@@ -781,6 +781,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Symphony decode");
     if (decodeSymphony(results, offset)) return true;
 #endif  // DECODE_SYMPHONY
+#if DECODE_DAIKIN64
+    DPRINTLN("Attempting Daikin64 decode");
+    if (decodeDaikin64(results, offset)) return true;
+#endif  // DECODE_DAIKIN64
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

@@ -604,6 +604,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kDaikin2Bits;
     case DAIKIN216:
       return kDaikin216Bits;
+    case DAIKIN64:
+      return kDaikin64Bits;
     case ELECTRA_AC:
       return kElectraAcBits;
     case GREE:
@@ -684,6 +686,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_COOLIX
     case COOLIX:
       sendCOOLIX(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_DAIKIN64
+    case DAIKIN64:
+      sendDaikin64(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_DENON

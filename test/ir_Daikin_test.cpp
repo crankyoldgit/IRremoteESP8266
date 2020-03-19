@@ -1545,6 +1545,11 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::DAIKIN216, strToDecodeType("DAIKIN216"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN216));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN216));
+
+  ASSERT_EQ("DAIKIN64", typeToString(decode_type_t::DAIKIN64));
+  ASSERT_EQ(decode_type_t::DAIKIN64, strToDecodeType("DAIKIN64"));
+  ASSERT_FALSE(hasACState(decode_type_t::DAIKIN64));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN64));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/582#issuecomment-453863879
@@ -3399,4 +3404,46 @@ TEST(TestDaikin2Class, Issue1035) {
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
   ASSERT_FALSE(ac.toCommon().power);
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+// Data from:
+//   https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=726071135&range=A1
+TEST(TestDecodeDaikin64, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  uint16_t rawData[137] = {
+      9864, 9778, 9810, 9728, 4666, 2482, 384, 342, 390, 922, 386, 928, 388,
+      348, 388, 920, 386, 348, 390, 342, 384, 330, 414, 342, 390, 922, 386, 348,
+      390, 342, 382, 352, 384, 352, 382, 924, 386, 356, 382, 344, 384, 350, 388,
+      346, 390, 342, 386, 348, 386, 928, 388, 348, 388, 354, 388, 888, 412, 928,
+      390, 896, 416, 348, 386, 348, 388, 346, 388, 342, 384, 358, 388, 340, 384,
+      926, 384, 932, 386, 346, 388, 922, 384, 350, 384, 348, 384, 358, 382, 338,
+      394, 922, 388, 928, 386, 350, 384, 926, 390, 344, 388, 342, 386, 356, 388,
+      338, 382, 928, 382, 932, 390, 344, 386, 924, 390, 344, 388, 314, 414, 356,
+      384, 344, 386, 346, 390, 926, 386, 924, 388, 924, 388, 926, 386, 924, 388,
+      350, 388, 20258, 4670};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 137, kDaikin64Freq);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
+}
+
+TEST(TestDecodeDaikin64, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin64(0x7C16161607204216);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
 }

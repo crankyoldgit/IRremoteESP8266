@@ -17,6 +17,8 @@
 //   Brand: Daikin,  Model: FTXB09AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
 //   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
+//   Brand: Daikin,  Model: FFN-C/FCN-F Series A/C (DAIKIN64)
+//   Brand: Daikin,  Model: DGS01 remote (DAIKIN64)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -429,6 +431,17 @@ const uint8_t kDaikin152ComfortByte = kDaikin152EconoByte;   // Mask 0b00000010
 const uint8_t kDaikin152ComfortOffset = 1;                   // Mask 0b00000010
 const uint8_t kDaikin152SensorByte = kDaikin152EconoByte;    // Mask 0b00001000
 const uint8_t kDaikin152SensorOffset = 3;                    // Mask 0b00001000
+
+const uint16_t kDaikin64HdrMark = kDaikin128HdrMark;
+const uint16_t kDaikin64BitMark = kDaikin128BitMark;
+const uint16_t kDaikin64HdrSpace = kDaikin128HdrSpace;
+const uint16_t kDaikin64OneSpace = kDaikin128OneSpace;
+const uint16_t kDaikin64ZeroSpace = kDaikin128ZeroSpace;
+const uint16_t kDaikin64LdrMark = kDaikin128LeaderMark;
+const uint16_t kDaikin64Gap = kDaikin128Gap;
+const uint16_t kDaikin64LdrSpace = kDaikin128LeaderSpace;
+const uint16_t kDaikin64Freq = kDaikin128Freq;  // Hz.
+const uint16_t kDaikin64Overhead = 9;
 
 
 // Legacy defines.
