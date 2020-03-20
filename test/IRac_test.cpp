@@ -331,6 +331,32 @@ TEST(TestIRac, Daikin216) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
+TEST(TestIRac, Daikin64) {
+  IRDaikin64 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 27C, Fan: 8 (Low), "
+      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: On";
+
+  ac.begin();
+  irac.daikin64(&ac,
+                true,                        // Power (Toggle)
+                stdAc::opmode_t::kCool,      // Mode
+                27,                          // Celsius
+                stdAc::fanspeed_t::kLow,     // Fan Speed
+                stdAc::swingv_t::kAuto,      // Veritcal swing
+                false,                       // Quiet
+                false,                       // Turbo
+                360);                        // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(DAIKIN64, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Electra) {
   IRElectraAc ac(kGpioUnused);
   IRac irac(kGpioUnused);

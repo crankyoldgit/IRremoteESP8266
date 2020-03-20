@@ -3400,17 +3400,111 @@ stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
   }
 }
 
+uint8_t IRDaikin64::getFan(void) {
+  return GETBITS64(remote_state, kDaikin64FanOffset, kDaikin64FanSize);
+}
+
+void IRDaikin64::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kDaikin64FanQuiet:
+    case kDaikin64FanTurbo:
+    case kDaikin64FanAuto:
+    case kDaikin64FanHigh:
+    case kDaikin64FanMed:
+    case kDaikin64FanLow:
+      setBits(&remote_state, kDaikin64FanOffset, kDaikin64FanSize, speed);
+      break;
+    default:
+      this->setFan(kDaikin64FanAuto);
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:    return kDaikin64FanQuiet;
+    case stdAc::fanspeed_t::kLow:    return kDaikin64FanLow;
+    case stdAc::fanspeed_t::kMedium: return kDaikin64FanMed;
+    case stdAc::fanspeed_t::kHigh:   return kDaikin64FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kDaikin64FanTurbo;
+    default:                         return kDaikin64FanAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDaikin64FanTurbo: return stdAc::fanspeed_t::kMax;
+    case kDaikin64FanHigh:  return stdAc::fanspeed_t::kHigh;
+    case kDaikin64FanMed:   return stdAc::fanspeed_t::kMedium;
+    case kDaikin64FanLow:   return stdAc::fanspeed_t::kLow;
+    case kDaikinFanQuiet:   return stdAc::fanspeed_t::kMin;
+    default:                return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+bool IRDaikin64::getTurbo(void) {
+  return getFan() == kDaikin64FanTurbo;
+}
+
+void IRDaikin64::setTurbo(const bool on) {
+  if (on) {
+    setFan(kDaikin64FanTurbo);
+  } else {
+    if (getFan() == kDaikin64FanTurbo) setFan(kDaikin64FanAuto);
+  }
+}
+
+bool IRDaikin64::getQuiet(void) {
+  return getFan() == kDaikin64FanQuiet;
+}
+
+void IRDaikin64::setQuiet(const bool on) {
+  if (on) {
+    setFan(kDaikin64FanQuiet);
+  } else {
+    if (getFan() == kDaikin64FanQuiet) setFan(kDaikin64FanAuto);
+  }
+}
+
+void IRDaikin64::setSwingVertical(const bool on) {
+  setBit(&remote_state, kDaikin64SwingVBit, on);
+}
+
+bool IRDaikin64::getSwingVertical(void) {
+  return GETBIT64(remote_state, kDaikin64SwingVBit);
+}
+
+void IRDaikin64::setSleep(const bool on) {
+  setBit(&remote_state, kDaikin64SleepBit, on);
+}
+
+bool IRDaikin64::getSleep(void) {
+  return GETBIT64(remote_state, kDaikin64SleepBit);
+}
+
 // Convert the internal state into a human readable string.
 String IRDaikin64::toString(void) {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
   result += addModeToString(getMode(), 0xFF, kDaikin64Cool,
                             0xFF, kDaikin64Dry, kDaikin64Fan);
   result += addTempToString(getTemp());
-  // result += addFanToString(getFan(), kDaikin128FanHigh, kDaikin128FanLow,
-  //                          kDaikin128FanAuto, kDaikin128FanQuiet,
-  //                          kDaikin128FanMed);
+  if (!getTurbo()) {
+    result += addFanToString(getFan(), kDaikin64FanHigh, kDaikin64FanLow,
+                             kDaikin64FanAuto, kDaikin64FanQuiet,
+                             kDaikin64FanMed);
+  } else {
+    result += addIntToString(getFan(), kFanStr);
+    result += kSpaceLBraceStr;
+    result += kTurboStr;
+    result += ')';
+  }
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getSleep(), kSleepStr);
   return result;
 }
 
@@ -3424,19 +3518,19 @@ stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   result.mode = toCommonMode(getMode());
   result.celsius = true;
   result.degrees = getTemp();
-  // result.fanspeed = toCommonFanSpeed(getFan());
-  // result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
-  //                                    : stdAc::swingv_t::kOff;
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
+                                     : stdAc::swingv_t::kOff;
+  result.turbo = getTurbo();
+  result.quiet = getQuiet();
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.clean = false;
   result.filter = false;
   result.beep = false;
-  result.quiet = false;
-  result.turbo = false;
   result.econo = false;
   result.light = false;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }

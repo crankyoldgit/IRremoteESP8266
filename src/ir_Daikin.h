@@ -446,6 +446,14 @@ const uint16_t kDaikin64Overhead = 9;
 const uint64_t kDaikin64KnownGoodState = 0x7C16161607204216;
 const uint8_t kDaikin64ModeOffset = 8;
 const uint8_t kDaikin64ModeSize = 4;  // Mask 0b111100000000
+const uint8_t kDaikin64FanOffset = kDaikin64ModeOffset + kDaikin64ModeSize;
+const uint8_t kDaikin64FanSize = 4;  // Mask 0b1111000000000000
+const uint8_t kDaikin64FanAuto =  0b0001;
+const uint8_t kDaikin64FanLow =   0b1000;
+const uint8_t kDaikin64FanMed =   0b0100;
+const uint8_t kDaikin64FanHigh =  0b0010;
+const uint8_t kDaikin64FanQuiet = 0b1001;
+const uint8_t kDaikin64FanTurbo = 0b0011;
 const uint8_t kDaikin64Dry =  0b001;
 const uint8_t kDaikin64Cool = 0b010;
 const uint8_t kDaikin64Fan =  0b100;
@@ -453,6 +461,8 @@ const uint8_t kDaikin64TempOffset = 48;
 const uint8_t kDaikin64TempSize = 8;  // Mask 0b11111111 << 47
 const uint8_t kDaikin64MinTemp = 16;  // Celsius
 const uint8_t kDaikin64MaxTemp = 30;  // Celsius
+const uint8_t kDaikin64SwingVBit = 56;
+const uint8_t kDaikin64SleepBit = kDaikin64SwingVBit + 1;
 const uint8_t kDaikin64PowerToggleBit = 59;
 const uint8_t kDaikin64ChecksumOffset = 60;
 const uint8_t kDaikin64ChecksumSize = 4;  // Mask 0b1111 << 59
@@ -931,18 +941,14 @@ class IRDaikin64 {
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
-  void setSwingV(const bool on);
-  bool getSwingV(void);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void);
+  void setSleep(const bool on);
+  bool getSleep(void);
   bool getQuiet(void);
   void setQuiet(const bool on);
-  bool getPowerful(void);
-  void setPowerful(const bool on);
-  void setSensor(const bool on);
-  bool getSensor(void);
-  void setEcono(const bool on);
-  bool getEcono(void);
-  void setComfort(const bool on);
-  bool getComfort(void);
+  bool getTurbo(void);
+  void setTurbo(const bool on);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

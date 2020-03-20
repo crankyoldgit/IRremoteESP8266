@@ -467,14 +467,21 @@ void IRac::daikin216(IRDaikin216 *ac,
 #if SEND_DAIKIN64
 void IRac::daikin64(IRDaikin64 *ac,
                   const bool on, const stdAc::opmode_t mode,
-                  const float degrees) {
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo, const int16_t sleep) {
   ac->begin();
   ac->setPowerToggle(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setTurbo(turbo);
+  ac->setQuiet(quiet);
+  ac->setSleep(sleep >= 0);
   ac->send();
 }
-#endif  // SEND_DAIKIN128
+#endif  // SEND_DAIKIN64
 
 #if SEND_ELECTRA_AC
 void IRac::electra(IRElectraAc *ac,
@@ -1248,6 +1255,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         else
           result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
+      case decode_type_t::DAIKIN64:
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
         break;
@@ -1409,7 +1417,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case DAIKIN64:
     {
       IRDaikin64 ac(_pin, _inverted, _modulation);
-      daikin64(&ac, send.power, send.mode, degC);
+      daikin64(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+               send.quiet, send.turbo, send.sleep);
       break;
     }
 #endif  // SEND_DAIKIN64

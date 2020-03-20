@@ -3433,7 +3433,8 @@ TEST(TestDecodeDaikin64, RealExample) {
   ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
   EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
   EXPECT_EQ(
-      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C",
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -3543,17 +3544,116 @@ TEST(TestDaikin64Class, PowerToggle) {
   EXPECT_TRUE(ac.getPowerToggle());
 }
 
+TEST(TestDaikin64Class, FanSpeed) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+  ac.setFan(5);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanHigh);
+  EXPECT_EQ(kDaikin64FanHigh, ac.getFan());
+
+  // Beyond Quiet should default to Auto.
+  ac.setFan(kDaikin64FanQuiet + 1);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanMed);
+  EXPECT_EQ(kDaikin64FanMed, ac.getFan());
+
+  ac.setFan(kDaikin64FanLow);
+  EXPECT_EQ(kDaikin64FanLow, ac.getFan());
+
+  ac.setFan(kDaikin64FanTurbo);
+  EXPECT_EQ(kDaikin64FanTurbo, ac.getFan());
+
+  ac.setFan(kDaikin64FanAuto);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanQuiet);
+  EXPECT_EQ(kDaikin64FanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin64Class, Turbo) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setFan(kDaikin64FanAuto);
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_EQ(kDaikin64FanTurbo, ac.getFan());
+  ac.setTurbo(false);
+  EXPECT_NE(kDaikin64FanTurbo, ac.getFan());
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestDaikin64Class, Quiet) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setFan(kDaikin64FanAuto);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kDaikin64FanQuiet, ac.getFan());
+  ac.setQuiet(false);
+  EXPECT_NE(kDaikin64FanQuiet, ac.getFan());
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+}
+
+TEST(TestDaikin64Class, Sleep) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestDaikin64Class, SwingVertical) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+}
+
 // Test human readable output.
 TEST(TestDaikin64Class, HumanReadable) {
   IRDaikin64 ac(kGpioUnused);
-
   EXPECT_EQ(
-      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C",
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off",
       ac.toString());
   ac.setPowerToggle(false);
   ac.setMode(kDaikin64Fan);
   ac.setTemp(30);
+  ac.setFan(kDaikin64FanAuto);
+  ac.setSwingVertical(true);
   EXPECT_EQ(
-      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C",
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 1 (Auto), "
+      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: Off",
+      ac.toString());
+  ac.setTurbo(true);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 3 (Turbo), "
+      "Turbo: On, Quiet: Off, Swing(V): On, Sleep: Off",
+      ac.toString());
+  ac.setQuiet(true);
+  ac.setSleep(true);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 9 (Quiet), "
+      "Turbo: Off, Quiet: On, Swing(V): On, Sleep: On",
       ac.toString());
 }
