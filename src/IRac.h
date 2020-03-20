@@ -166,6 +166,11 @@ void daikin216(IRDaikin216 *ac,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                const bool quiet, const bool turbo);
 #endif  // SEND_DAIKIN216
+#if SEND_DAIKIN64
+  void daikin64(IRDaikin64 *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees);
+#endif  // SEND_DAIKIN64
 #if SEND_ELECTRA_AC
 void electra(IRElectraAc *ac,
              const bool on, const stdAc::opmode_t mode,

@@ -1549,7 +1549,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN64", typeToString(decode_type_t::DAIKIN64));
   ASSERT_EQ(decode_type_t::DAIKIN64, strToDecodeType("DAIKIN64"));
   ASSERT_FALSE(hasACState(decode_type_t::DAIKIN64));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN64));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN64));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/582#issuecomment-453863879
@@ -3432,6 +3432,9 @@ TEST(TestDecodeDaikin64, RealExample) {
   ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
   EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestDecodeDaikin64, SyntheticExample) {
@@ -3446,4 +3449,111 @@ TEST(TestDecodeDaikin64, SyntheticExample) {
   ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
   EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
+}
+
+TEST(TestDaikin64Class, ChecksumAndSetGetRaw) {
+  IRDaikin64 ac(kGpioUnused);
+
+  const uint64_t valid = 0x7C16161607204216;
+  const uint64_t invalid = 0x1C16161607204216;
+  ASSERT_NE(valid, invalid);
+  ASSERT_EQ(0x07, IRDaikin64::calcChecksum(valid));
+  ASSERT_TRUE(IRDaikin64::validChecksum(valid));
+  ASSERT_FALSE(IRDaikin64::validChecksum(invalid));
+  ac.setRaw(valid);
+  ASSERT_EQ(valid, ac.getRaw());
+  ac.setRaw(invalid);
+  ASSERT_EQ(valid, ac.getRaw());
+}
+
+TEST(TestDaikin64Class, Temperature) {
+  IRDaikin64 ac(0);
+  ac.begin();
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MaxTemp);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp - 1);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MaxTemp + 1);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp + 1);
+  EXPECT_EQ(kDaikin64MinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=1521758824&range=R2:AG2
+  const uint64_t deg16 = 0x8C16105500001216;
+  ac.setRaw(deg16);
+  EXPECT_EQ(16, ac.getTemp());
+}
+
+TEST(TestDaikin64Class, OperatingMode) {
+  IRDaikin64 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikin64Cool);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  ac.setMode(kDaikin64Fan);
+  EXPECT_EQ(kDaikin64Fan, ac.getMode());
+
+  ac.setMode(kDaikin64Dry);
+  EXPECT_EQ(kDaikin64Dry, ac.getMode());
+
+  ac.setMode(kDaikin64Fan + 1);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=1521758824&range=R2:AG2
+  const uint64_t cool = 0x8C16105500001216;
+  ac.setMode(kDaikin64Dry);
+  ac.setRaw(cool);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+}
+
+TEST(TestDaikin64Class, PowerToggle) {
+  IRDaikin64 ac(0);
+  ac.begin();
+
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
+// Test human readable output.
+TEST(TestDaikin64Class, HumanReadable) {
+  IRDaikin64 ac(kGpioUnused);
+
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C",
+      ac.toString());
+  ac.setPowerToggle(false);
+  ac.setMode(kDaikin64Fan);
+  ac.setTemp(30);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C",
+      ac.toString());
 }

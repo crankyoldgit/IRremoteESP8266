@@ -123,6 +123,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN216
     case decode_type_t::DAIKIN216:
 #endif
+#if SEND_DAIKIN64
+    case decode_type_t::DAIKIN64:
+#endif
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
 #endif
@@ -460,6 +463,18 @@ void IRac::daikin216(IRDaikin216 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN216
+
+#if SEND_DAIKIN64
+void IRac::daikin64(IRDaikin64 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees) {
+  ac->begin();
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->send();
+}
+#endif  // SEND_DAIKIN128
 
 #if SEND_ELECTRA_AC
 void IRac::electra(IRElectraAc *ac,
@@ -1390,6 +1405,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN216
+#if SEND_DAIKIN64
+    case DAIKIN64:
+    {
+      IRDaikin64 ac(_pin, _inverted, _modulation);
+      daikin64(&ac, send.power, send.mode, degC);
+      break;
+    }
+#endif  // SEND_DAIKIN64
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
     {
@@ -2005,6 +2028,13 @@ namespace IRAcUtils {
       case decode_type_t::DAIKIN216: {
         IRDaikin216 ac(0);
         ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN64
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(result->value);  // Daikin64 uses value instead of state.
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN216

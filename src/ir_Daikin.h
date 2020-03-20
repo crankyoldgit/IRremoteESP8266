@@ -443,6 +443,19 @@ const uint16_t kDaikin64LdrSpace = kDaikin128LeaderSpace;
 const uint16_t kDaikin64Freq = kDaikin128Freq;  // Hz.
 const uint16_t kDaikin64Overhead = 9;
 
+const uint64_t kDaikin64KnownGoodState = 0x7C16161607204216;
+const uint8_t kDaikin64ModeOffset = 8;
+const uint8_t kDaikin64ModeSize = 4;  // Mask 0b111100000000
+const uint8_t kDaikin64Dry =  0b001;
+const uint8_t kDaikin64Cool = 0b010;
+const uint8_t kDaikin64Fan =  0b100;
+const uint8_t kDaikin64TempOffset = 48;
+const uint8_t kDaikin64TempSize = 8;  // Mask 0b11111111 << 47
+const uint8_t kDaikin64MinTemp = 16;  // Celsius
+const uint8_t kDaikin64MaxTemp = 30;  // Celsius
+const uint8_t kDaikin64PowerToggleBit = 59;
+const uint8_t kDaikin64ChecksumOffset = 60;
+const uint8_t kDaikin64ChecksumSize = 4;  // Mask 0b1111 << 59
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -891,6 +904,59 @@ class IRDaikin152 {
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin152StateLength];
+  void stateReset();
+  void checksum();
+};
+
+// Class to emulate a Daikin DGS01 remote.
+class IRDaikin64 {
+ public:
+  explicit IRDaikin64(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+#if SEND_DAIKIN64
+  void send(const uint16_t repeat = kDaikin64DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_DAIKIN64
+  void begin();
+  uint64_t getRaw();
+  void setRaw(const uint64_t new_state);
+  static uint8_t calcChecksum(const uint64_t state);
+  static bool validChecksum(const uint64_t state);
+  void setPowerToggle(const bool on);
+  bool getPowerToggle(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingV(const bool on);
+  bool getSwingV(void);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  bool getPowerful(void);
+  void setPowerful(const bool on);
+  void setSensor(const bool on);
+  bool getSensor(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
+  void setComfort(const bool on);
+  bool getComfort(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint64_t remote_state;
   void stateReset();
   void checksum();
 };
