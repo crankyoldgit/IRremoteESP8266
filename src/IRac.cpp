@@ -469,7 +469,8 @@ void IRac::daikin64(IRDaikin64 *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv,
-                  const bool quiet, const bool turbo, const int16_t sleep) {
+                  const bool quiet, const bool turbo,
+                  const int16_t sleep, const int16_t clock) {
   ac->begin();
   ac->setPowerToggle(on);
   ac->setMode(ac->convertMode(mode));
@@ -479,6 +480,7 @@ void IRac::daikin64(IRDaikin64 *ac,
   ac->setTurbo(turbo);
   ac->setQuiet(quiet);
   ac->setSleep(sleep >= 0);
+  ac->setClock(clock);
   ac->send();
 }
 #endif  // SEND_DAIKIN64
@@ -1418,7 +1420,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRDaikin64 ac(_pin, _inverted, _modulation);
       daikin64(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-               send.quiet, send.turbo, send.sleep);
+               send.quiet, send.turbo, send.sleep, send.clock);
       break;
     }
 #endif  // SEND_DAIKIN64

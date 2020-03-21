@@ -3434,7 +3434,8 @@ TEST(TestDecodeDaikin64, RealExample) {
   EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
   EXPECT_EQ(
       "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
-      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off",
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -3629,12 +3630,27 @@ TEST(TestDaikin64Class, SwingVertical) {
   EXPECT_TRUE(ac.getSwingVertical());
 }
 
+TEST(TestDaikin64Class, Clock) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
+  ac.setClock(23 * 60 + 59 + 1);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(24 * 60 + 99);
+  EXPECT_EQ(0, ac.getClock());
+}
+
 // Test human readable output.
 TEST(TestDaikin64Class, HumanReadable) {
   IRDaikin64 ac(kGpioUnused);
   EXPECT_EQ(
       "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
-      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off",
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setPowerToggle(false);
   ac.setMode(kDaikin64Fan);
@@ -3643,17 +3659,26 @@ TEST(TestDaikin64Class, HumanReadable) {
   ac.setSwingVertical(true);
   EXPECT_EQ(
       "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 1 (Auto), "
-      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: Off",
+      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setTurbo(true);
+  ac.setOffTimeEnabled(true);
+  ac.setOffTime(23 * 60 + 30);
   EXPECT_EQ(
       "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 3 (Turbo), "
-      "Turbo: On, Quiet: Off, Swing(V): On, Sleep: Off",
+      "Turbo: On, Quiet: Off, Swing(V): On, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: 23:30",
       ac.toString());
   ac.setQuiet(true);
   ac.setSleep(true);
+  ac.setClock(12 * 60 + 31);
+  ac.setOnTimeEnabled(true);
+  ac.setOnTime(8 * 60 + 59);
+  ac.setOffTimeEnabled(false);
   EXPECT_EQ(
       "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 9 (Quiet), "
-      "Turbo: Off, Quiet: On, Swing(V): On, Sleep: On",
+      "Turbo: Off, Quiet: On, Swing(V): On, Sleep: On, "
+      "Clock: 12:31, On Timer: 08:30, Off Timer: Off",
       ac.toString());
 }

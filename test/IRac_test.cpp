@@ -337,7 +337,8 @@ TEST(TestIRac, Daikin64) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power Toggle: On, Mode: 2 (Cool), Temp: 27C, Fan: 8 (Low), "
-      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: On";
+      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: On, "
+      "Clock: 17:59, On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.daikin64(&ac,
@@ -348,7 +349,8 @@ TEST(TestIRac, Daikin64) {
                 stdAc::swingv_t::kAuto,      // Veritcal swing
                 false,                       // Quiet
                 false,                       // Turbo
-                360);                        // Sleep
+                360,                         // Sleep
+                17 * 60 + 59);               // Clock
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

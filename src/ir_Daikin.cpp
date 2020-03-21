@@ -3483,6 +3483,69 @@ bool IRDaikin64::getSleep(void) {
   return GETBIT64(remote_state, kDaikin64SleepBit);
 }
 
+void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
+  uint16_t mins = mins_since_midnight;
+  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64ClockOffset, kDaikin64ClockMinsSize,
+          uint8ToBcd(mins % 60));  // Mins
+  setBits(&remote_state, kDaikin64ClockOffset + kDaikin64ClockMinsSize,
+          kDaikin64ClockHoursSize, uint8ToBcd(mins / 60));  // Hours
+}
+
+uint16_t IRDaikin64::getClock(void) {
+  return bcdToUint8(GETBITS64(remote_state,
+                              kDaikin64ClockOffset + kDaikin64ClockMinsSize,
+                              kDaikin64ClockHoursSize)) * 60 +
+         bcdToUint8(GETBITS64(remote_state, kDaikin64ClockOffset,
+                              kDaikin64ClockMinsSize));
+}
+
+void IRDaikin64::setOnTimeEnabled(const bool on) {
+  setBit(&remote_state, kDaikin64OnTimeEnableBit, on);
+}
+
+bool IRDaikin64::getOnTimeEnabled(void) {
+  return GETBIT64(remote_state, kDaikin64OnTimeEnableBit);
+}
+
+uint16_t IRDaikin64::getOnTime(void) {
+  return bcdToUint8(GETBITS64(remote_state, kDaikin64OnTimeOffset,
+                              kDaikin64OnTimeSize)) * 60 +
+      (GETBIT64(remote_state, kDaikin64OnTimeHalfHourBit) ? 30 : 0);
+}
+
+void IRDaikin64::setOnTime(const uint16_t mins_since_midnight) {
+  uint16_t halfhours = mins_since_midnight / 30;
+  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64OnTimeOffset, kDaikin64OnTimeSize,
+          uint8ToBcd(halfhours / 2));  // Hours
+  // Half Hour
+  setBit(&remote_state, kDaikin64OnTimeHalfHourBit, halfhours % 2);
+}
+
+void IRDaikin64::setOffTimeEnabled(const bool on) {
+  setBit(&remote_state, kDaikin64OffTimeEnableBit, on);
+}
+
+bool IRDaikin64::getOffTimeEnabled(void) {
+  return GETBIT64(remote_state, kDaikin64OffTimeEnableBit);
+}
+
+uint16_t IRDaikin64::getOffTime(void) {
+  return bcdToUint8(GETBITS64(remote_state, kDaikin64OffTimeOffset,
+                               kDaikin64OffTimeSize)) * 60 +
+      (GETBIT64(remote_state, kDaikin64OffTimeHalfHourBit) ? 30 : 0);
+}
+
+void IRDaikin64::setOffTime(const uint16_t mins_since_midnight) {
+  uint16_t halfhours = mins_since_midnight / 30;
+  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64OffTimeOffset, kDaikin64OffTimeSize,
+          uint8ToBcd(halfhours / 2));  // Hours
+  // Half Hour
+  setBit(&remote_state, kDaikin64OffTimeHalfHourBit, halfhours % 2);
+}
+
 // Convert the internal state into a human readable string.
 String IRDaikin64::toString(void) {
   String result = "";
@@ -3505,6 +3568,13 @@ String IRDaikin64::toString(void) {
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getSwingVertical(), kSwingVStr);
   result += addBoolToString(getSleep(), kSleepStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
+  result += addLabeledString(getOnTimeEnabled()
+                             ? minsToString(getOnTime()) : kOffStr,
+                             kOnTimerStr);
+  result += addLabeledString(getOffTimeEnabled()
+                             ? minsToString(getOffTime()) : kOffStr,
+                             kOffTimerStr);
   return result;
 }
 
@@ -3524,6 +3594,7 @@ stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   result.turbo = getTurbo();
   result.quiet = getQuiet();
   result.sleep = getSleep() ? 0 : -1;
+  result.clock = getClock();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.clean = false;
@@ -3531,6 +3602,5 @@ stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   result.beep = false;
   result.econo = false;
   result.light = false;
-  result.clock = -1;
   return result;
 }

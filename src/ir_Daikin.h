@@ -446,6 +446,9 @@ const uint16_t kDaikin64Overhead = 9;
 const uint64_t kDaikin64KnownGoodState = 0x7C16161607204216;
 const uint8_t kDaikin64ModeOffset = 8;
 const uint8_t kDaikin64ModeSize = 4;  // Mask 0b111100000000
+const uint8_t kDaikin64Dry =  0b001;
+const uint8_t kDaikin64Cool = 0b010;
+const uint8_t kDaikin64Fan =  0b100;
 const uint8_t kDaikin64FanOffset = kDaikin64ModeOffset + kDaikin64ModeSize;
 const uint8_t kDaikin64FanSize = 4;  // Mask 0b1111000000000000
 const uint8_t kDaikin64FanAuto =  0b0001;
@@ -454,9 +457,22 @@ const uint8_t kDaikin64FanMed =   0b0100;
 const uint8_t kDaikin64FanHigh =  0b0010;
 const uint8_t kDaikin64FanQuiet = 0b1001;
 const uint8_t kDaikin64FanTurbo = 0b0011;
-const uint8_t kDaikin64Dry =  0b001;
-const uint8_t kDaikin64Cool = 0b010;
-const uint8_t kDaikin64Fan =  0b100;
+const uint8_t kDaikin64ClockOffset = kDaikin64FanOffset + kDaikin64FanSize;
+const uint8_t kDaikin64ClockMinsSize = 8;
+const uint8_t kDaikin64ClockHoursSize = 8;
+const uint8_t kDaikin64ClockSize = kDaikin64ClockMinsSize +
+    kDaikin64ClockHoursSize;  // Mask 0b1111111111111111 << 15
+const uint8_t kDaikin64OnTimeOffset = kDaikin64ClockOffset +
+                                      kDaikin64ClockSize;
+const uint8_t kDaikin64OnTimeSize = 6;
+const uint8_t kDaikin64OnTimeHalfHourBit = kDaikin64OnTimeOffset +
+                                           kDaikin64OnTimeSize;
+const uint8_t kDaikin64OnTimeEnableBit = kDaikin64OnTimeHalfHourBit + 1;
+const uint8_t kDaikin64OffTimeOffset = kDaikin64OnTimeEnableBit + 1;
+const uint8_t kDaikin64OffTimeSize = 6;
+const uint8_t kDaikin64OffTimeHalfHourBit = kDaikin64OffTimeOffset +
+                                            kDaikin64OffTimeSize;
+const uint8_t kDaikin64OffTimeEnableBit = kDaikin64OffTimeHalfHourBit + 1;
 const uint8_t kDaikin64TempOffset = 48;
 const uint8_t kDaikin64TempSize = 8;  // Mask 0b11111111 << 47
 const uint8_t kDaikin64MinTemp = 16;  // Celsius
@@ -949,6 +965,16 @@ class IRDaikin64 {
   void setQuiet(const bool on);
   bool getTurbo(void);
   void setTurbo(const bool on);
+  void setClock(const uint16_t mins_since_midnight);
+  uint16_t getClock(void);
+  void setOnTimeEnabled(const bool on);
+  bool getOnTimeEnabled(void);
+  void setOnTime(const uint16_t mins_since_midnight);
+  uint16_t getOnTime(void);
+  void setOffTimeEnabled(const bool on);
+  bool getOffTimeEnabled(void);
+  void setOffTime(const uint16_t mins_since_midnight);
+  uint16_t getOffTime(void);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
