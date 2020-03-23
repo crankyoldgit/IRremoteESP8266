@@ -56,14 +56,15 @@ void setup() {
   printState();
   Serial.println("Setting desired state for A/C.");
   ac.off();
-  ac.setFan(1);
-  ac.setMode(kGreeCool); // kGreeAuto , kGreeDry ,kGreeCool , kGreeFan , kGreeHeat
-  ac.setTemp(20); // 16-30C 
-  ac.setSwingVertical(1,kGreeSwingAuto);
-  ac.setXFan(0);
-  ac.setLight(0);
-  ac.setSleep(0);
-  ac.setTurbo(0);
+  ac.setFan(true);
+  // kGreeAuto, kGreeDry, kGreeCool, kGreeFan, kGreeHeat
+  ac.setMode(kGreeCool);
+  ac.setTemp(20);  // 16-30C
+  ac.setSwingVertical(true, kGreeSwingAuto);
+  ac.setXFan(false);
+  ac.setLight(false);
+  ac.setSleep(false);
+  ac.setTurbo(false);
 }
 
 void loop() {
