@@ -2350,7 +2350,7 @@ namespace IRAcUtils {
       case decode_type_t::DAIKIN64: {
         IRDaikin64 ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_DAIKIN64
