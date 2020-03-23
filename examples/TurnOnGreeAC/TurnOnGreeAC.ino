@@ -1,4 +1,5 @@
 /* Copyright 2016, 2018 David Conran
+*  Copyright 2020 Sadid Rafsun Tulon
 *
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
 * as specified by kIrLed below.
@@ -56,7 +57,7 @@ void setup() {
   printState();
   Serial.println("Setting desired state for A/C.");
   ac.off();
-  ac.setFan(true);
+  ac.setFan(1);
   // kGreeAuto, kGreeDry, kGreeCool, kGreeFan, kGreeHeat
   ac.setMode(kGreeCool);
   ac.setTemp(20);  // 16-30C
