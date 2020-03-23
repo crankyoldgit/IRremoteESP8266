@@ -7,7 +7,7 @@
 * TL;DR: The IR LED needs to be driven by a transistor for a good result.
 *
 * Suggested circuit:
-*     https://github.com/markszabo/IRremoteESP8266/wiki#ir-sending
+*     https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-sending
 *
 * Common mistakes & tips:
 *   * Don't just connect the IR LED directly to the pin, it won't
@@ -25,11 +25,9 @@
 *     for your first time. e.g. ESP-12 etc.
 */
 #include <Arduino.h>
-#endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <ir_Gree.h>
-#include <ir_Kelvinator.h>
 
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRGreeAC ac(kIrLed);  // Set the GPIO to be used for sending messages.
@@ -56,7 +54,7 @@ void setup() {
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
-  ac.off();
+  ac.on();
   ac.setFan(1);
   // kGreeAuto, kGreeDry, kGreeCool, kGreeFan, kGreeHeat
   ac.setMode(kGreeCool);
