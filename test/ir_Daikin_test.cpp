@@ -3437,6 +3437,8 @@ TEST(TestDecodeDaikin64, RealExample) {
       "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
       "Clock: 07:20, On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 TEST(TestDecodeDaikin64, SyntheticExample) {

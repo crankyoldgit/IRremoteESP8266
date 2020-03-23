@@ -2346,6 +2346,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN64
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN64
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(kGpioUnused);
