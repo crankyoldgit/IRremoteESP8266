@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham, David Conran
-
+#include "IRac.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
@@ -316,6 +316,12 @@ TEST(TestDecodeFujitsuAC, SyntheticShortMessages) {
   ASSERT_EQ(kFujitsuAcMinBits + 8, irsend.capture.bits);
   uint8_t expected_arrah2e[7] = {0x14, 0x63, 0x0, 0x10, 0x10, 0x02, 0xFD};
   EXPECT_STATE_EQ(expected_arrah2e, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Model: 1 (ARRAH2E), Power: Off, Mode: 0 (Auto), Temp: 16C, "
+      "Fan: 0 (Auto), Clean: Off, Filter: Off, Swing: 0 (Off), Command: N/A",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 
   irsend.reset();
 

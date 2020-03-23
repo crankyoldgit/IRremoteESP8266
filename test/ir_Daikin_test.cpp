@@ -2581,6 +2581,8 @@ TEST(TestDecodeDaikin128, RealExample) {
       "On Timer: Off, On Timer: 07:30, Off Timer: Off, Off Timer: 22:00, "
       "Light Toggle: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
@@ -2971,6 +2973,8 @@ TEST(TestDecodeDaikin152, RealExample) {
       "Power: Off, Mode: 0 (Auto), Temp: 26C, Fan: 2 (UNKNOWN), Swing(V): Off, "
       "Powerful: Off, Quiet: On, Econo: Off, Sensor: Off, Comfort: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/873
@@ -3006,6 +3010,8 @@ TEST(TestDecodeDaikin152, SyntheticExample) {
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 1 (Low), Swing(V): On, "
       "Powerful: Off, Quiet: Off, Econo: Off, Sensor: Off, Comfort: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 TEST(TestDaikin2ClassNew, Issue908) {

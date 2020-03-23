@@ -1,6 +1,7 @@
 // Copyright 2017, 2018 David Conran
 
 #include "ir_Panasonic.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -889,14 +890,13 @@ TEST(TestDecodePanasonicAC, SyntheticExample) {
   EXPECT_EQ(kPanasonicAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
-
-  IRPanasonicAc pana(0);
-  pana.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 4 (JKE), Power: Off, Mode: 3 (Cool), Temp: 25C, "
       "Fan: 7 (Auto), Swing(V): 15 (Auto), Quiet: Off, "
       "Powerful: Off, Clock: 00:00, On Timer: Off, Off Timer: Off",
-      pana.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Tests for general utility functions.

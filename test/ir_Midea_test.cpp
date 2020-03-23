@@ -1,6 +1,7 @@
 // Copyright 2017 David Conran
 
 #include "ir_Midea.h"
+#include "IRac.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -669,6 +670,12 @@ TEST(TestDecodeMidea, DecodeRealExample) {
   EXPECT_EQ(MIDEA, irsend.capture.decode_type);
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 18C/65F, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestMideaACClass, toCommon) {

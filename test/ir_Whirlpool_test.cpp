@@ -1,6 +1,7 @@
 // Copyright 2018 David Conran
 
 #include "ir_Whirlpool.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -66,13 +67,13 @@ TEST(TestDecodeWhirlpoolAC, SyntheticDecode) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRWhirlpoolAc ac(0);
-  ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power Toggle: Off, Mode: 1 (Auto), Temp: 25C, "
       "Fan: 0 (Auto), Swing: Off, Light: On, Clock: 17:31, On Timer: Off, "
       "Off Timer: Off, Sleep: Off, Super: Off, Command: 2 (Temp)",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {

@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran
 
 #include "ir_MitsubishiHeavy.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRremoteESP8266.h"
@@ -742,7 +743,9 @@ TEST(TestDecodeMitsubishiHeavy, ZmsRealExample) {
       "Power: On, Mode: 4 (Heat), Temp: 24C, Fan: 4 (Max), "
       "Swing(V): 0 (Auto), Swing(H): 0 (Auto), Silent: Off, Turbo: Off, "
       "Econo: Off, Night: Off, Filter: Off, 3D: Off, Clean: Off",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Decode a Synthetic MitsubishiHeavy 152Bit message.
@@ -847,7 +850,9 @@ TEST(TestDecodeMitsubishiHeavy, ZjsSyntheticExample) {
       "Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 0 (Auto), "
       "Swing(V): 0 (Off), Swing(H): 6 (Left Right), Turbo: Off, Econo: Off, "
       "3D: Off, Clean: Off",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestMitsubishiHeavy152AcClass, toCommon) {

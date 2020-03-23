@@ -1,6 +1,7 @@
 // Copyright 2017 David Conran
 
 #include "ir_Kelvinator.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRremoteESP8266.h"
@@ -519,6 +520,13 @@ TEST(TestDecodeKelvinator, NormalSynthetic) {
   EXPECT_EQ(KELVINATOR, irsend.capture.decode_type);
   ASSERT_EQ(kKelvinatorBits, irsend.capture.bits);
   EXPECT_STATE_EQ(kelv_code, irsend.capture.state, kKelvinatorBits);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 27C, Fan: 1 (Low), Turbo: Off, "
+      "Quiet: Off, XFan: On, Ion: Off, Light: Off, "
+      "Swing(H): Off, Swing(V): Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestKelvinatorClass, toCommon) {

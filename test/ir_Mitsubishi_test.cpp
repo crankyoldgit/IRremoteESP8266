@@ -1230,6 +1230,8 @@ TEST(TestDecodeMitsubishi136, DecodeRealExample) {
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 3 (High), "
       "Swing(V): 3 (Highest), Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Self decode a synthetic example.
@@ -1719,6 +1721,8 @@ TEST(TestDecodeMitsubishi112, DecodeRealExample) {
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 2 (Quiet), "
       "Swing(V): 7 (Auto), Swing(H): 12 (Auto), Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Self decode a synthetic example.

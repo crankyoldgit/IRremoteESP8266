@@ -1,6 +1,7 @@
 // Copyright 2017 David Conran
 
 #include "ir_Sharp.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -407,12 +408,10 @@ TEST(TestDecodeSharpAc, RealExample) {
   ASSERT_EQ(SHARP_AC, irsend.capture.decode_type);
   ASSERT_EQ(kSharpAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-
-  IRSharpAc ac(0);
-  ac.begin();
-  ac.setRaw(irsend.capture.state);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 2 (Auto)",
-            ac.toString());
+            IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165

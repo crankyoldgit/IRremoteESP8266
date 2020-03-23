@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran
 
 #include "ir_Goodweather.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -276,11 +277,12 @@ uint16_t rawData_FAD2BE31[197] = {
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
-  ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 22C, Fan: 3 (Low), Turbo: -, Light: -, "
       "Sleep: -, Swing: 1 (Slow), Command: 4 (Swing)",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 

@@ -1,6 +1,7 @@
 // Copyright 2018 David Conran
 
 #include "ir_Haier.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -818,13 +819,13 @@ TEST(TestDecodeHaierAC, RealExample1) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
-  IRHaierAC haier(0);
-  haier.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Command: 1 (On), Mode: 1 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Swing: 0 (Off), Sleep: Off, Health: Off, "
       "Clock: 00:01, On Timer: Off, Off Timer: Off",
-      haier.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Decode a "real" example message.

@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran
 
 #include "ir_Teco.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -387,7 +388,6 @@ TEST(TestDecodeTeco, NormalDecodeWithStrict) {
 TEST(TestDecodeTeco, RealNormalExample) {
   IRsendTest irsend(0);
   IRrecv irrecv(0);
-  IRTecoAc ac(0);
   irsend.begin();
 
   uint16_t rawData1[73] = {
@@ -408,12 +408,12 @@ TEST(TestDecodeTeco, RealNormalExample) {
   EXPECT_EQ(expected1, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
-  ac.begin();
-  ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 27C, Fan: 0 (Auto), Sleep: On, "
       "Swing: On, Light: Off, Humid: Off, Save: Off, Timer: Off",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 
   uint16_t rawData2[73] = {
     9048, 4472, 636, 548, 636, 1654, 638, 546, 642, 1650, 642, 546, 638,
@@ -433,12 +433,11 @@ TEST(TestDecodeTeco, RealNormalExample) {
   EXPECT_EQ(expected2, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
-  ac.begin();
-  ac.setRaw(irsend.capture.value);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Dry), Temp: 21C, Fan: 2 (Medium), Sleep: Off, "
       "Swing: On, Light: Off, Humid: Off, Save: Off, Timer: Off",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 

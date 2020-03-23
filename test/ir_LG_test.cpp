@@ -843,6 +843,8 @@ TEST(TestDecodeLG2, Issue1008) {
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
 TEST(TestIRLgAcClass, DifferentModels) {
@@ -864,6 +866,8 @@ TEST(TestIRLgAcClass, DifferentModels) {
   ASSERT_EQ(LG, ac._irsend.capture.decode_type);  // Not "LG2"
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected1, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 
 
   ac.setModel(lg_ac_remote_model_t::AKB75215403);  // aka. 2
@@ -879,4 +883,5 @@ TEST(TestIRLgAcClass, DifferentModels) {
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected2, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
