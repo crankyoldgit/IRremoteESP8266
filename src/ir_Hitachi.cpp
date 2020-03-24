@@ -37,6 +37,14 @@ const uint16_t kHitachiAc424BitMark = 463;
 const uint16_t kHitachiAc424OneSpace = 1208;
 const uint16_t kHitachiAc424ZeroSpace = 372;
 
+// Support for HitachiAc3 protocol
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060
+const uint16_t kHitachiAc3HdrMark = 3400;    // Header
+const uint16_t kHitachiAc3HdrSpace = 1660;   // Header
+const uint16_t kHitachiAc3BitMark = 460;
+const uint16_t kHitachiAc3OneSpace = 1250;
+const uint16_t kHitachiAc3ZeroSpace = 410;
+
 using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
@@ -800,3 +808,142 @@ String IRHitachiAc424::toString(void) {
   result += ')';
   return result;
 }
+
+
+#if SEND_HITACHI_AC3
+// Send HITACHI_AC3 messages
+//
+// Note: This protocol is almost exactly the same as HitachiAC424 except this
+//       variant has subtle timing differences.
+//       There are five(5) typical sizes:
+//       * kHitachiAc3MinStateLength (Cancel Timer)
+//       * kHitachiAc3MinStateLength + 2 (Change Temp)
+//       * kHitachiAc3StateLength - 6 (Change Mode)
+//       * kHitachiAc3StateLength- 4 (Normal)
+//       * kHitachiAc3StateLength (Set Timer)
+//
+// Args:
+//   data: An array of bytes containing the IR command.
+//         It is assumed to be in LSBF order for this code.
+//   nbytes: Nr. of bytes of data in the array.
+//   repeat: Nr. of times the message is to be repeated.
+//
+// Status: BETA / Probably working fine.
+void IRsend::sendHitachiAc3(const uint8_t data[], const uint16_t nbytes,
+                              const uint16_t repeat) {
+  // Header + Data + Footer
+  sendGeneric(kHitachiAc3HdrMark, kHitachiAc3HdrSpace,
+              kHitachiAc3BitMark, kHitachiAc3OneSpace,
+              kHitachiAc3BitMark, kHitachiAc3ZeroSpace,
+              kHitachiAc3BitMark, kHitachiAcMinGap,
+              data, nbytes,  // Bytes
+              kHitachiAcFreq, false, repeat, kDutyDefault);
+}
+#endif  // SEND_HITACHI_AC3
+
+
+// Class for handling the remote control on a Hitachi_AC3 53 A/C message
+IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+// Reset to auto fan, cooling, 23° Celcius
+void IRHitachiAc3::stateReset(void) {
+  for (uint8_t i = 0; i < kHitachiAc3StateLength; i++)
+    remote_state[i] = 0x00;
+  remote_state[0]  = 0x01;
+  remote_state[1]  = 0x10;
+  remote_state[3]  = 0x40;
+  remote_state[5]  = 0xFF;
+  remote_state[7]  = 0xE8;
+  remote_state[9]  = 0x89;
+  remote_state[11] = 0x0B;
+  remote_state[13] = 0x3F;
+  remote_state[15] = 0x15;
+  remote_state[21] = 0x4B;
+  remote_state[23] = 0x18;
+  setInvertedStates();
+}
+
+void IRHitachiAc3::setInvertedStates(const uint16_t length) {
+  for (uint8_t i = 3; i < length - 1; i += 2)
+    remote_state[i + 1] = ~remote_state[i];
+}
+
+bool IRHitachiAc3::hasInvertedStates(const uint8_t state[],
+                                     const uint16_t length) {
+  for (uint8_t i = 3; i < length - 1; i += 2)
+    if ((state[i + 1] ^ state[i]) != 0xFF) return false;
+  return true;
+}
+
+void IRHitachiAc3::begin(void) { _irsend.begin(); }
+
+uint8_t *IRHitachiAc3::getRaw(void) {
+  setInvertedStates();
+  return remote_state;
+}
+
+void IRHitachiAc3::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(remote_state, new_code, std::min(length, kHitachiAc3StateLength));
+}
+
+#if DECODE_HITACHI_AC3
+// Decode the supplied HitachiAc3 A/C message.
+//
+// Note: This protocol is almost exactly the same as HitachiAC424 except this
+//       variant has subtle timing differences and multiple lengths.
+//
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
+//   nbits:   The number of data bits to expect. Typically kHitachiAc3Bits.
+//   strict:  Flag indicating if we should perform strict matching.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Status: BETA / Probably works fine.
+//
+// Supported devices:
+//  Hitachi PC-LH3B
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1060
+bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
+                                const uint16_t nbits,
+                                const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
+    return false;  // Too short a message to match.
+  if (strict) {
+    // Check the requested bit length.
+    switch (nbits) {
+      case kHitachiAc3MinBits:  // Cancel Timer (Min Size)
+      case kHitachiAc3MinBits + 2 * 8:  // Change Temp
+      case kHitachiAc3Bits - 6 * 8:  // Change Mode
+      case kHitachiAc3Bits - 4 * 8:  // Normal
+      case kHitachiAc3Bits:  // Set Temp (Max Size)
+        break;
+      default: return false;
+    }
+  }
+
+  // Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kHitachiAc3HdrMark, kHitachiAc3HdrSpace,
+                    kHitachiAc3BitMark, kHitachiAc3OneSpace,
+                    kHitachiAc3BitMark, kHitachiAc3ZeroSpace,
+                    kHitachiAc3BitMark, kHitachiAcMinGap, true,
+                    kUseDefTol, 0, false))
+    return false;  // We failed to find any data.
+
+  // Compliance
+  if (strict && !IRHitachiAc3::hasInvertedStates(results->state, nbits / 8))
+    return false;
+  // Success
+  results->decode_type = decode_type_t::HITACHI_AC3;
+  results->bits = nbits;
+  return true;
+}
+#endif  // DECODE_HITACHI_AC3

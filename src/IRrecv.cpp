@@ -641,10 +641,28 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeHaierACYRW02(results, offset)) return true;
 #endif
 #if DECODE_HITACHI_AC424
-    // HitachiAc424 should be checked before HitachiAC & HitachiAC2
+    // HitachiAc424 should be checked before HitachiAC, HitachiAC2,
+    // & HitachiAC184
     DPRINTLN("Attempting Hitachi AC 424 decode");
     if (decodeHitachiAc424(results, offset, kHitachiAc424Bits)) return true;
-#endif  // DECODE_HITACHI_AC2
+#endif  // DECODE_HITACHI_AC424
+#if DECODE_MITSUBISHI136
+    // Needs to happen before HitachiAc3 decode.
+    DPRINTLN("Attempting Mitsubishi136 decode");
+    if (decodeMitsubishi136(results, offset)) return true;
+#endif  // DECODE_MITSUBISHI136
+#if DECODE_HITACHI_AC3
+    // HitachiAc3 should be checked before HitachiAC & HitachiAC2
+    // Attempt normal before the short version.
+    DPRINTLN("Attempting Hitachi AC3 decode");
+    // Order these in decreasing bit size, as it is more optimal.
+    if (decodeHitachiAc3(results, offset, kHitachiAc3Bits) ||
+        decodeHitachiAc3(results, offset, kHitachiAc3Bits - 4 * 8) ||
+        decodeHitachiAc3(results, offset, kHitachiAc3Bits - 6 * 8) ||
+        decodeHitachiAc3(results, offset, kHitachiAc3MinBits + 2 * 8) ||
+        decodeHitachiAc3(results, offset, kHitachiAc3MinBits))
+      return true;
+#endif  // DECODE_HITACHI_AC3
 #if DECODE_HITACHI_AC2
     // HitachiAC2 should be checked before HitachiAC
     DPRINTLN("Attempting Hitachi AC2 decode");
@@ -759,10 +777,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin152 decode");
     if (decodeDaikin152(results, offset)) return true;
 #endif  // DECODE_DAIKIN152
-#if DECODE_MITSUBISHI136
-    DPRINTLN("Attempting Mitsubishi136 decode");
-    if (decodeMitsubishi136(results, offset)) return true;
-#endif  // DECODE_MITSUBISHI136
 #if DECODE_SYMPHONY
     DPRINTLN("Attempting Symphony decode");
     if (decodeSymphony(results, offset)) return true;

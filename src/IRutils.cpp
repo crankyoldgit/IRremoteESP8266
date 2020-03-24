@@ -147,6 +147,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::HITACHI_AC1;
   else if (!strcasecmp(str, "HITACHI_AC2"))
     return decode_type_t::HITACHI_AC2;
+  else if (!strcasecmp(str, "HITACHI_AC3"))
+    return decode_type_t::HITACHI_AC3;
   else if (!strcasecmp(str, "HITACHI_AC424"))
     return decode_type_t::HITACHI_AC424;
   else if (!strcasecmp(str, "INAX"))
@@ -347,6 +349,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
     case HITACHI_AC2:
       result = F("HITACHI_AC2");
       break;
+    case HITACHI_AC3:
+      result = F("HITACHI_AC3");
+      break;
     case HITACHI_AC424:
       result = F("HITACHI_AC424");
       break;
@@ -530,6 +535,7 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC:
     case HITACHI_AC1:
     case HITACHI_AC2:
+    case HITACHI_AC3:
     case HITACHI_AC424:
     case KELVINATOR:
     case MITSUBISHI136:

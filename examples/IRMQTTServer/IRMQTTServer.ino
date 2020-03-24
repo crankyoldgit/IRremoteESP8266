@@ -1518,6 +1518,23 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, kFujitsuAcStateLength);
       break;
+    case HITACHI_AC3:
+      // HitachiAc3 has two distinct & different size states, so make a best
+      // guess which one we are being presented with based on the number of
+      // hexadecimal digits provided. i.e. Zero-pad if you need to to get
+      // the correct length/byte size.
+      stateSize = inputLength / 2;  // Every two hex chars is a byte.
+      // Use at least the minimum size.
+      stateSize = std::max(stateSize,
+                           (uint16_t) (kHitachiAc3MinStateLength));
+      // If we think it isn't a "short" message.
+      if (stateSize > kHitachiAc3MinStateLength)
+        // Then it probably the "normal" size.
+        stateSize = std::max(stateSize,
+                             (uint16_t) (kHitachiAc3StateLength));
+      // Lastly, it should never exceed the maximum "normal" size.
+      stateSize = std::min(stateSize, kHitachiAc3StateLength);
+      break;
     case MWM:
       // MWM has variable size states, so make a best guess
       // which one we are being presented with based on the number of

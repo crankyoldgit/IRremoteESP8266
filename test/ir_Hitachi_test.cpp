@@ -816,6 +816,11 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC2));
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC2));
 
+  ASSERT_EQ("HITACHI_AC3", typeToString(decode_type_t::HITACHI_AC3));
+  ASSERT_EQ(decode_type_t::HITACHI_AC3, strToDecodeType("HITACHI_AC3"));
+  ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC3));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC3));
+
   ASSERT_EQ("HITACHI_AC424", typeToString(decode_type_t::HITACHI_AC424));
   ASSERT_EQ(decode_type_t::HITACHI_AC424, strToDecodeType("HITACHI_AC424"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC424));
@@ -1113,7 +1118,7 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
 }
 
 TEST(TestIRHitachiAc424Class, toCommon) {
-  IRHitachiAc424 ac(0);
+  IRHitachiAc424 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kHitachiAc424Cool);
   ac.setTemp(20);
@@ -1138,4 +1143,366 @@ TEST(TestIRHitachiAc424Class, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestDecodeHitachiAc3, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc3StateLength - 4] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE6, 0x19, 0x89, 0x76, 0x01,
+      0xFE, 0x3F, 0xC0, 0x2F, 0xD0, 0x18, 0xE7, 0x00, 0xFF, 0xA0, 0x5F};
+
+  irsend.reset();
+  irsend.sendHitachiAc3(expected, kHitachiAc3StateLength - 4);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc3Bits - 32, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a 'real' HitachiAc3 message.
+TEST(TestDecodeHitachiAc3, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc3StateLength - 4] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE6, 0x19, 0x89, 0x76, 0x01,
+      0xFE, 0x3F, 0xC0, 0x2F, 0xD0, 0x18, 0xE7, 0x00, 0xFF, 0xA0, 0x5F};
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-597519432
+  uint16_t rawData[371] = {
+      // Power Off
+      3422, 1660, 464, 1264, 438, 426, 438, 402, 486, 426, 440, 402, 462, 402,
+      488, 428, 438, 402, 460, 404, 488, 426, 440, 424, 436, 428, 462, 1240,
+      466, 398, 462, 404, 486, 426, 438, 402, 464, 400, 490, 400, 464, 426, 438,
+      402, 488, 428, 436, 428, 462, 376, 486, 404, 474, 416, 438, 400, 488, 402,
+      462, 426, 438, 426, 458, 1246, 464, 426, 436, 1244, 488, 1266, 434, 1268,
+      436, 1242, 486, 1242, 462, 1240, 464, 426, 462, 1266, 438, 1242, 462,
+      1240, 514, 1214, 466, 1236, 462, 1266, 464, 1264, 438, 1266, 438, 1240,
+      488, 400, 466, 424, 440, 402, 486, 404, 462, 402, 464, 402, 488, 426, 438,
+      402, 462, 402, 488, 1264, 438, 1242, 460, 428, 462, 428, 436, 1264, 440,
+      1240, 488, 1240, 464, 1240, 460, 402, 490, 424, 440, 1264, 438, 1242, 512,
+      402, 438, 426, 466, 398, 464, 1266, 440, 400, 462, 402, 488, 1264, 438,
+      402, 462, 402, 482, 432, 438, 1264, 436, 404, 488, 1240, 462, 1264, 438,
+      402, 486, 1246, 456, 1266, 438, 1238, 488, 402, 462, 1240, 462, 402, 512,
+      402, 438, 428, 438, 426, 462, 430, 434, 428, 438, 402, 512, 376, 462,
+      1240, 464, 1264, 458, 1270, 436, 1242, 462, 1240, 486, 1242, 460, 1242,
+      462, 1242, 486, 1240, 464, 1240, 464, 1238, 492, 1264, 436, 1266, 440,
+      400, 488, 426, 436, 430, 434, 430, 460, 404, 462, 426, 438, 402, 488, 426,
+      436, 1264, 466, 1238, 462, 1242, 462, 1266, 438, 1238, 490, 1264, 438,
+      426, 438, 1240, 486, 406, 462, 402, 462, 400, 488, 428, 436, 426, 438,
+      402, 484, 1268, 438, 426, 436, 1242, 488, 1266, 436, 402, 462, 402, 502,
+      386, 464, 1240, 464, 1240, 488, 426, 438, 426, 438, 402, 488, 1240, 462,
+      1266, 438, 1242, 486, 428, 440, 424, 438, 1266, 460, 1268, 438, 1264, 438,
+      404, 486, 428, 438, 426, 438, 402, 490, 400, 462, 426, 436, 402, 490, 426,
+      438, 1240, 462, 1268, 460, 1268, 434, 1266, 436, 1240, 514, 1238, 438,
+      1240, 488, 1240, 460, 406, 464, 426, 436, 402, 488, 402, 462, 402, 462,
+      1264, 462, 404, 462, 1266, 434, 1268, 464, 1264, 438, 1242, 464, 1238,
+      488, 1266, 438, 402, 462, 1268, 458, 430, 410};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 371, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc3Bits - 32, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestDecodeHitachiAc3, SyntheticTempChangeExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint16_t expectedLength = kHitachiAc3MinStateLength + 2;
+  uint8_t expected[expectedLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE3, 0x1C, 0x89, 0x76, 0x08,
+      0xF7, 0x3F, 0xC0, 0x15, 0xEA};
+
+  irsend.reset();
+  irsend.sendHitachiAc3(expected, expectedLength);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedLength * 8, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a 'real' Temp Change HitachiAc3 message.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-597592537
+TEST(TestDecodeHitachiAc3, RealTempChangeExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3MinStateLength + 2] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE3, 0x1C, 0x89, 0x76, 0x08,
+      0xF7, 0x3F, 0xC0, 0x15, 0xEA};
+  const uint16_t expectedBits = kHitachiAc3MinBits + 2 * 8;
+
+  const uint16_t rawData[275] = {
+      // Change Temp
+      3422, 1636, 490, 1242, 484, 380, 488, 400, 466, 426, 432, 406, 490, 400,
+      464, 426, 462, 398, 466, 376, 492, 400, 458, 404, 490, 400, 466, 1262,
+      434, 430, 464, 400, 490, 400, 458, 380, 490, 374, 490, 426, 432, 430, 464,
+      400, 464, 426, 460, 402, 468, 372, 490, 400, 460, 404, 490, 374, 490, 400,
+      484, 378, 490, 398, 464, 1240, 490, 398, 466, 1238, 464, 1266, 434, 1268,
+      466, 1238, 466, 1240, 484, 1218, 490, 400, 460, 1246, 484, 1242, 466,
+      1214, 488, 1240, 486, 1218, 490, 1214, 488, 1266, 434, 1242, 490, 1214,
+      490, 424, 460, 404, 464, 374, 492, 424, 434, 430, 466, 400, 464, 426, 464,
+      376, 492, 1236, 464, 1240, 488, 402, 466, 374, 490, 400, 458, 1244, 490,
+      1238, 496, 1234, 436, 404, 488, 400, 464, 1240, 484, 1244, 464, 1238, 466,
+      426, 434, 430, 466, 400, 464, 1264, 434, 406, 490, 374, 490, 1264, 458,
+      404, 466, 400, 466, 424, 466, 1238, 464, 400, 466, 1238, 486, 1216, 490,
+      400, 464, 1240, 486, 1240, 466, 1238, 460, 432, 432, 430, 468, 374, 488,
+      426, 462, 1242, 464, 400, 466, 426, 434, 404, 490, 374, 490, 1240, 484,
+      1244, 466, 1240, 462, 428, 436, 1242, 490, 1212, 490, 1264, 466, 1236,
+      466, 1214, 490, 1240, 488, 1240, 466, 1236, 466, 1264, 434, 1268, 464,
+      400, 494, 400, 430, 406, 488, 376, 488, 428, 432, 432, 462, 402, 462, 426,
+      458, 1220, 488, 1214, 490, 1240, 484, 406, 466, 1212, 490, 426, 462, 1216,
+      488, 400, 464, 402, 488, 402, 462, 374, 492, 1262, 460, 380, 488, 1240,
+      464, 428, 462, 1214, 492, 1236, 462, 1216, 490};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 275, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, expectedBits);
+}
+
+// Decode a 'real' Cancel Timer HitachiAc3 message.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-598631576
+TEST(TestDecodeHitachiAc3, RealCancelTimerExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3MinStateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE2, 0x1D, 0x89, 0x76, 0x0D,
+      0xF2, 0x3F, 0xC0};
+  const uint16_t expectedBits = kHitachiAc3MinBits;
+
+  const uint16_t rawData[243] = {
+      // Cancel Timer
+      3368, 1688, 460, 1244, 456, 434, 458, 406, 456, 408, 480, 410, 458, 406,
+      458, 406, 484, 406, 458, 406, 458, 432, 428, 464, 456, 380, 458, 1242,
+      458, 432, 456, 406, 486, 378, 430, 458, 456, 408, 458, 406, 456, 434, 456,
+      410, 454, 408, 454, 434, 460, 404, 458, 406, 454, 436, 456, 408, 458, 406,
+      458, 432, 456, 434, 430, 1246, 484, 404, 484, 1218, 458, 1244, 484, 1244,
+      460, 1244, 456, 1270, 430, 1274, 460, 404, 484, 1218, 486, 1244, 456,
+      1244, 456, 1248, 454, 1272, 460, 1268, 432, 1246, 484, 1244, 458, 1244,
+      462, 404, 456, 434, 458, 432, 432, 408, 456, 434, 460, 404, 460, 404, 484,
+      406, 432, 432, 458, 1298, 402, 432, 460, 404, 460, 404, 482, 1244, 460,
+      1270, 462, 1214, 456, 1272, 460, 404, 456, 1246, 486, 1244, 458, 1244,
+      458, 406, 454, 460, 434, 404, 460, 1268, 430, 460, 432, 406, 458, 1244,
+      456, 434, 458, 406, 456, 432, 460, 1268, 432, 406, 458, 1244, 484, 1272,
+      432, 430, 432, 1298, 378, 1298, 458, 1244, 484, 406, 460, 1242, 458, 406,
+      458, 1246, 456, 1272, 458, 406, 458, 432, 458, 404, 460, 404, 456, 408,
+      484, 1272, 432, 432, 432, 406, 454, 1272, 458, 1246, 458, 1244, 484, 1268,
+      436, 1242, 458, 1298, 402, 1274, 456, 1244, 458, 1244, 486, 1242, 458,
+      408, 486, 378, 454, 460, 434, 406, 458, 406, 484, 406, 458, 406, 458, 408,
+      452, 1302, 434, 1244, 430};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 243, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, expectedBits);
+}
+
+TEST(TestDecodeHitachiAc3, SyntheticCancelTimerExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3MinStateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE2, 0x1D, 0x89, 0x76, 0x0D,
+      0xF2, 0x3F, 0xC0};
+
+  irsend.reset();
+  irsend.sendHitachiAc3(expected, kHitachiAc3MinStateLength);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc3MinBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a 'real' Set Timer HitachiAc3 message.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-598631576
+TEST(TestDecodeHitachiAc3, RealSetTimerExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xEA, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+  const uint16_t expectedBits = kHitachiAc3Bits;
+
+  const uint16_t rawData[435] = {
+      // Set Timer
+      3364, 1668, 486, 1244, 458, 406, 456, 436, 430, 434, 430, 434, 456, 408,
+      484, 432, 428, 432, 414, 450, 458, 432, 432, 432, 430, 436, 458, 1270,
+      430, 408, 456, 408, 454, 462, 404, 460, 428, 408, 486, 404, 456, 408, 458,
+      406, 484, 406, 456, 434, 432, 408, 484, 406, 454, 436, 404, 432, 486, 430,
+      430, 408, 456, 432, 458, 1270, 406, 434, 456, 1246, 484, 1244, 456, 1274,
+      432, 1244, 486, 1268, 432, 1244, 454, 412, 454, 1272, 430, 1272, 456,
+      1274, 456, 1246, 456, 1244, 458, 1270, 458, 1246, 456, 1254, 450, 1246,
+      484, 408, 456, 434, 430, 408, 486, 430, 404, 460, 430, 408, 486, 404, 458,
+      406, 458, 406, 486, 404, 458, 432, 430, 1272, 456, 408, 458, 1244, 458,
+      1244, 456, 1274, 456, 1246, 456, 1270, 460, 1250, 426, 460, 404, 1270,
+      484, 432, 404, 462, 402, 460, 458, 1244, 456, 386, 452, 460, 458, 1244,
+      458, 406, 458, 406, 486, 430, 416, 1260, 458, 406, 484, 1270, 406, 1296,
+      430, 410, 482, 1246, 456, 1246, 456, 1246, 456, 434, 458, 1244, 456, 1272,
+      458, 408, 458, 1244, 456, 410, 484, 404, 454, 410, 456, 408, 484, 406,
+      458, 432, 430, 1246, 484, 406, 454, 1248, 458, 1244, 486, 1248, 428, 1270,
+      456, 1266, 464, 1244, 458, 1246, 456, 1246, 484, 1270, 430, 1246, 456,
+      434, 430, 460, 406, 432, 430, 432, 484, 432, 406, 432, 458, 406, 484, 432,
+      432, 1266, 434, 1274, 430, 1298, 428, 408, 456, 1246, 486, 430, 432, 1270,
+      404, 434, 484, 432, 430, 408, 456, 406, 460, 1268, 458, 408, 456, 1246,
+      486, 406, 456, 1244, 456, 1248, 456, 1300, 430, 408, 456, 408, 484, 432,
+      430, 434, 428, 434, 460, 430, 404, 434, 458, 406, 486, 1242, 458, 1270,
+      430, 1246, 484, 1244, 456, 1270, 432, 1248, 484, 1244, 456, 1246, 456,
+      408, 486, 404, 456, 408, 456, 432, 462, 430, 406, 458, 432, 432, 428,
+      436, 456, 1246, 456, 1246, 484, 1244, 454, 1268, 438, 1244, 488, 1266,
+      430, 1246, 458, 1244, 486, 1244, 430, 1298, 430, 434, 460, 1242, 458, 430,
+      430, 408, 486, 1242, 456, 434, 404, 462, 456, 430, 432, 1246, 456, 408,
+      486, 1270, 430, 1246, 460, 404, 482, 1246, 458, 406, 456, 408, 484, 404,
+      458, 1270, 430, 1274, 458, 432, 430, 408, 456, 406, 486, 1244, 458, 1242,
+      458, 1246, 484, 406, 458, 432, 430, 1246, 486, 1242, 456, 1272, 430, 434,
+      458, 406, 458, 406, 458, 406, 486, 404, 458, 406, 458, 430, 430, 460, 430,
+      1270, 430, 1248, 484, 1244, 456, 1244, 458, 1246, 484, 1244, 456, 1246,
+      460, 1244, 458};  // UNKNOWN D3A5A0BA
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 435, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, expectedBits);
+}
+
+TEST(TestDecodeHitachiAc3, SyntheticSetTimerExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xEA, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+
+  irsend.reset();
+  irsend.sendHitachiAc3(expected, kHitachiAc3StateLength);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc3Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a 'real' Change Mode HitachiAc3 message.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1060#issuecomment-598631576
+TEST(TestDecodeHitachiAc3, RealChangeModeExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3StateLength - 6] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE5, 0x1A, 0x89, 0x76, 0x04,
+      0xFB, 0x3F, 0xC0, 0x1B, 0xE4, 0x14, 0xEB, 0x02, 0xFD};
+  const uint16_t expectedBits = kHitachiAc3Bits - 6 * 8;
+
+  const uint16_t rawData[339] = {
+      // Change Mode
+      3364, 1666, 488, 1268, 404, 434, 454, 434, 460, 404, 458, 406, 458, 406,
+      484, 432, 432, 430, 432, 408, 484, 406, 458, 432, 432, 406, 486, 1242,
+      458, 430, 430, 408, 454, 436, 456, 408, 458, 406, 484, 432, 428, 434, 430,
+      408, 484, 406, 458, 430, 432, 408, 484, 430, 430, 432, 432, 408, 482, 408,
+      456, 408, 458, 432, 458, 1246, 458, 430, 430, 1246, 486, 1242, 458, 1270,
+      432, 1246, 486, 1242, 458, 1268, 432, 434, 430, 1272, 456, 1246, 458,
+      1270, 460, 1244, 458, 1246, 456, 1272, 460, 1242, 456, 1270, 434, 1246,
+      486, 430, 430, 434, 432, 406, 484, 430, 432, 432, 430, 408, 484, 432, 432,
+      432, 430, 1246, 484, 406, 458, 1246, 456, 408, 486, 404, 458, 1268, 434,
+      1270, 430, 1274, 456, 408, 458, 1270, 460, 404, 458, 1244, 458, 1246, 486,
+      430, 430, 432, 460, 378, 488, 1240, 460, 404, 458, 408, 486, 1242, 458,
+      432, 430, 434, 460, 430, 432, 1246, 458, 406, 488, 1240, 430, 1272, 458,
+      406, 486, 1242, 430, 1298, 430, 1274, 428, 432, 430, 436, 456, 408, 482,
+      1248, 458, 406, 430, 462, 456, 404, 458, 432, 430, 408, 486, 1266, 436,
+      1242, 458, 406, 486, 1242, 456, 1246, 458, 1244, 488, 1240, 458, 1244,
+      458, 1272, 460, 1242, 456, 1246, 458, 1246, 486, 1242, 458, 1270, 432,
+      406, 458, 458, 434, 430, 432, 406, 486, 406, 456, 408, 458, 432, 484, 406,
+      430, 1272, 460, 1216, 486, 1242, 456, 1246, 458, 406, 486, 1268, 432,
+      1244, 458, 406, 486, 404, 460, 432, 430, 406, 488, 402, 458, 1272, 428,
+      434, 460, 404, 460, 1242, 458, 1246, 480, 1244, 462, 428, 432, 432, 460,
+      1244, 458, 432, 430, 1246, 488, 402, 456, 408, 458, 406, 486, 1268, 432,
+      1246, 460, 430, 460, 1244, 458, 406, 458, 1244, 486, 1242, 458, 1244, 458,
+      432, 462, 1242, 456, 408, 456, 406, 486, 428, 434, 406, 458, 406, 456,
+      434, 458, 1244, 460, 430, 462, 1240, 458, 1244, 460, 1244, 486, 1244, 458,
+      1242, 488, 1214, 460};  // UNKNOWN C1EA1036
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 339, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, expectedBits);
+}
+
+TEST(TestDecodeHitachiAc3, SyntheticChangeModeExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc3StateLength - 6] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE5, 0x1A, 0x89, 0x76, 0x04,
+      0xFB, 0x3F, 0xC0, 0x1B, 0xE4, 0x14, 0xEB, 0x02, 0xFD};
+  const uint16_t expectedBits = kHitachiAc3Bits - 6 * 8;
+
+  irsend.reset();
+  irsend.sendHitachiAc3(expected, kHitachiAc3StateLength - 6);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HITACHI_AC3, irsend.capture.decode_type);
+  ASSERT_EQ(expectedBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+TEST(TestHitachiAc3Class, hasInvertedStates) {
+  const uint8_t good_state[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xEA, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+  // bad_state[kHitachiAc3MinStateLength + 1] has been modified to be different.
+  // i.e. Anything larger than kHitachiAc3MinStateLength should fail.
+  //      kHitachiAc3MinStateLength or shorter should pass.
+  const uint8_t bad_state[kHitachiAc3StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xE8, 0x17, 0x89, 0x76, 0x0B,
+      0xF4, 0x3F, 0xC0, 0x15, 0xE0, 0x00, 0xFF, 0x00, 0xFF, 0x4B, 0xB4, 0x18,
+      0xE7, 0x00, 0xFF};
+
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(good_state,
+                                              kHitachiAc3StateLength));
+
+  for (uint8_t len = kHitachiAc3StateLength;
+       len > kHitachiAc3MinStateLength;
+       len -= 2) {
+    EXPECT_FALSE(IRHitachiAc3::hasInvertedStates(bad_state, len));
+  }
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
+                                              kHitachiAc3MinStateLength));
+  EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
+                                              kHitachiAc3MinStateLength - 2));
 }
