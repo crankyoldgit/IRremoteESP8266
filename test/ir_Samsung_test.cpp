@@ -2,6 +2,7 @@
 
 #include <string>
 #include "ir_Samsung.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -1047,13 +1048,12 @@ TEST(TestDecodeSamsungAC, DecodeCoolSample) {
   ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
   EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-
-  IRSamsungAc samsung(0);
-  samsung.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
       "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Light: On, Ion: Off",
-      samsung.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestDecodeSamsungAC, Issue604DecodeExtended) {

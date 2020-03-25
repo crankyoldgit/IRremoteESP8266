@@ -2,6 +2,7 @@
 
 #include "ir_Neoclima.h"
 #include <algorithm>
+#include "IRac.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "IRrecv.h"
@@ -12,6 +13,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("NEOCLIMA", typeToString(decode_type_t::NEOCLIMA));
   ASSERT_EQ(decode_type_t::NEOCLIMA, strToDecodeType("NEOCLIMA"));
   ASSERT_TRUE(hasACState(decode_type_t::NEOCLIMA));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::NEOCLIMA));
 }
 
 // Test sending typical data only.
@@ -83,7 +85,9 @@ TEST(TestDecodeNeoclima, RealExample) {
       "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Hold: Off, "
       "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
       "Button: 0 (Power)",
-      ac.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Self decode.

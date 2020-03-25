@@ -920,6 +920,8 @@ TEST(TestDecodeHitachiAc424, RealExample) {
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
       "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestDecodeHitachiAc424, SyntheticExample) {

@@ -773,6 +773,8 @@ TEST(TestCoolixACClass, Issue985) {
   EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
   EXPECT_EQ(kCoolixOff, ac._irsend.capture.value);
   EXPECT_EQ("Power: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 
   ac._irsend.reset();
 
@@ -793,6 +795,7 @@ TEST(TestCoolixACClass, Issue985) {
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 5 (Auto), Temp: 20C, Zone Follow: Off, "
       "Sensor Temp: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 
   ac._irsend.reset();
 
@@ -808,6 +811,7 @@ TEST(TestCoolixACClass, Issue985) {
   EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
   EXPECT_EQ(kCoolixOff, ac._irsend.capture.value);
   EXPECT_EQ("Power: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
 TEST(TestCoolixACClass, PowerStateWithSetRaw) {

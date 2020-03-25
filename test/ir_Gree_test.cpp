@@ -1,6 +1,7 @@
 // Copyright 2017 David Conran
 
 #include "ir_Gree.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRremoteESP8266.h"
@@ -576,7 +577,9 @@ TEST(TestDecodeGree, NormalRealExample) {
       "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 26C, Fan: 1 (Low), "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing(V) Mode: Manual, Swing(V): 2 (UNKNOWN), Timer: Off",
-      irgree.toString());
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestGreeClass, toCommon) {

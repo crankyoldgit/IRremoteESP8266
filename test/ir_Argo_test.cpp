@@ -1,5 +1,6 @@
 // Copyright 2019 David Conran
 #include "ir_Argo.h"
+#include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -105,6 +106,12 @@ TEST(TestDecodeArgo, SyntheticDecode) {
   EXPECT_EQ(decode_type_t::ARGO, irsend.capture.decode_type);
   EXPECT_EQ(kArgoBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, Room Temp: 21C, "
+      "Max: On, IFeel: On, Night: On",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 

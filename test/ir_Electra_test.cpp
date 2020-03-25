@@ -103,6 +103,8 @@ TEST(TestDecodeElectraAC, RealExampleDecode) {
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 3 (Low), "
       "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestIRElectraAcClass, Power) {
