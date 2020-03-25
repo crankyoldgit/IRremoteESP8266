@@ -3187,3 +3187,420 @@ String IRDaikin152::toString(void) {
   result += addBoolToString(getComfort(), kComfortStr);
   return result;
 }
+
+#if SEND_DAIKIN64
+// Send a Daikin 64 bit A/C message.
+//
+// Args:
+//   data: A uint64_t containing the IR command/code.
+//
+// Supported devices:
+// - Daikin FFN-C.
+//
+// Status: Beta / Probably Working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+void IRsend::sendDaikin64(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  enableIROut(kDaikin64Freq);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    for (uint8_t i = 0; i < 2; i++) {
+      // Leader
+      mark(kDaikin64LdrMark);
+      space(kDaikin64LdrSpace);
+    }
+    // Header + Data + Footer #1
+    sendGeneric(kDaikin64HdrMark, kDaikin64HdrSpace,
+                kDaikin64BitMark, kDaikin64OneSpace,
+                kDaikin64BitMark, kDaikin64ZeroSpace,
+                kDaikin64BitMark, kDaikin64Gap,
+                data, nbits, kDaikin64Freq, false, 0, 50);
+    // Footer #2
+    mark(kDaikin64HdrMark);
+    space(kDefaultMessageGap);  // A guess of the gap between messages.
+  }
+}
+#endif  // SEND_DAIKIN64
+
+#if DECODE_DAIKIN64
+// Decode the supplied Daikin 64 bit A/C message.
+// Args:
+//   results: Ptr to the data to decode and where to store the decode result.
+//   offset:  The starting index to use when attempting to decode the raw data.
+//            Typically/Defaults to kStartOffset.
+//   nbits:   Nr. of bits to expect in the data portion. (kDaikin64Bits)
+//   strict:  Flag to indicate if we strictly adhere to the specification.
+// Returns:
+//   boolean: True if it can decode it, false if it can't.
+//
+// Supported devices:
+// - Daikin FFN-C.
+//
+// Status: Beta / Probably Working.
+//
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kDaikin64Overhead - offset)
+    return false;  // Too short a message to match.
+  // Compliance
+  if (strict && nbits != kDaikin64Bits)
+    return false;
+
+  // Leader
+  for (uint8_t i = 0; i < 2; i++) {
+    if (!matchMark(results->rawbuf[offset++], kDaikin64LdrMark))
+      return false;
+    if (!matchSpace(results->rawbuf[offset++], kDaikin64LdrSpace))
+      return false;
+  }
+  // Header + Data + Footer #1
+  uint16_t used = matchGeneric(results->rawbuf + offset, &results->value,
+                               results->rawlen - offset, nbits,
+                               kDaikin64HdrMark, kDaikin64HdrSpace,
+                               kDaikin64BitMark, kDaikin64OneSpace,
+                               kDaikin64BitMark, kDaikin64ZeroSpace,
+                               kDaikin64BitMark, kDaikin64Gap,
+                               false, _tolerance, kMarkExcess, false);
+  if (used == 0) return false;
+  offset += used;
+  // Footer #2
+  if (!matchMark(results->rawbuf[offset++], kDaikin64HdrMark))
+    return false;
+
+  // Compliance
+  if (strict && !IRDaikin64::validChecksum(results->value)) return false;
+  // Success
+  results->decode_type = decode_type_t::DAIKIN64;
+  results->bits = nbits;
+  results->command = 0;
+  results->address = 0;
+  return true;
+}
+#endif  // DAIKIN64
+
+// Class for handling Daikin 64 bit / 19 byte A/C messages.
+//
+// Code by crankyoldgit.
+//
+// Supported Remotes: Daikin ARC480A5 remote
+//
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
+//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
+IRDaikin64::IRDaikin64(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+void IRDaikin64::begin(void) { _irsend.begin(); }
+
+#if SEND_DAIKIN64
+void IRDaikin64::send(const uint16_t repeat) {
+  _irsend.sendDaikin64(getRaw(), kDaikin64Bits, repeat);
+}
+#endif  // SEND_DAIKIN64
+
+// Calc the checksum for a given state.
+// Args:
+//   state:  The value to calc the checksum of.
+// Returns:
+//   A 4-bit checksum stored in a uint_8.
+uint8_t IRDaikin64::calcChecksum(const uint64_t state) {
+  uint64_t data = GETBITS64(state, 0, kDaikin64ChecksumOffset);
+  uint8_t result = 0;
+  for (; data; data >>= 4)  // Add each nibble together.
+    result += GETBITS64(data, 0, 4);
+  return result & 0xF;
+}
+
+// Verify the checksum is valid for a given state.
+// Args:
+//   state:  The array to verify the checksum of.
+//   length: The size of the state.
+// Returns:
+//   A boolean.
+bool IRDaikin64::validChecksum(const uint64_t state) {
+  // Validate the checksum of the given state.
+  return (GETBITS64(state, kDaikin64ChecksumOffset,
+                    kDaikin64ChecksumSize) == calcChecksum(state));
+}
+
+// Calculate and set the checksum values for the internal state.
+void IRDaikin64::checksum(void) {
+  setBits(&remote_state, kDaikin64ChecksumOffset, kDaikin64ChecksumSize,
+          calcChecksum(remote_state));
+}
+
+void IRDaikin64::stateReset(void) {
+  remote_state = kDaikin64KnownGoodState;
+}
+
+uint64_t IRDaikin64::getRaw(void) {
+  checksum();  // Ensure correct settings before sending.
+  return remote_state;
+}
+
+void IRDaikin64::setRaw(const uint64_t new_state) { remote_state = new_state; }
+
+void IRDaikin64::setPowerToggle(const bool on) {
+  setBit(&remote_state, kDaikin64PowerToggleBit, on);
+}
+
+bool IRDaikin64::getPowerToggle(void) {
+  return GETBIT64(remote_state, kDaikin64PowerToggleBit);
+}
+
+// Set the temp in deg C
+void IRDaikin64::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(temp, kDaikin64MinTemp);
+  degrees = std::min(degrees, kDaikin64MaxTemp);
+  setBits(&remote_state, kDaikin64TempOffset,
+          kDaikin64TempSize, uint8ToBcd(degrees));
+}
+
+uint8_t IRDaikin64::getTemp(void) {
+  return bcdToUint8(GETBITS64(remote_state, kDaikin64TempOffset,
+                              kDaikin64TempSize));
+}
+
+uint8_t IRDaikin64::getMode(void) {
+  return GETBITS64(remote_state, kDaikin64ModeOffset, kDaikin64ModeSize);
+}
+
+void IRDaikin64::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikin64Fan:
+    case kDaikin64Dry:
+    case kDaikin64Cool:
+      break;
+    default:
+      this->setMode(kDaikin64Cool);
+      return;
+  }
+  setBits(&remote_state, kDaikin64ModeOffset, kDaikin64ModeSize, mode);
+}
+
+// Convert a standard A/C mode into its native mode.
+uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kDry: return kDaikin64Dry;
+    case stdAc::opmode_t::kFan: return kDaikin64Fan;
+    default: return kDaikinCool;
+  }
+}
+
+// Convert a native mode to it's common equivalent.
+stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kDaikin64Cool: return stdAc::opmode_t::kCool;
+    case kDaikin64Dry:  return stdAc::opmode_t::kDry;
+    case kDaikin64Fan:  return stdAc::opmode_t::kFan;
+    default: return stdAc::opmode_t::kAuto;
+  }
+}
+
+uint8_t IRDaikin64::getFan(void) {
+  return GETBITS64(remote_state, kDaikin64FanOffset, kDaikin64FanSize);
+}
+
+void IRDaikin64::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kDaikin64FanQuiet:
+    case kDaikin64FanTurbo:
+    case kDaikin64FanAuto:
+    case kDaikin64FanHigh:
+    case kDaikin64FanMed:
+    case kDaikin64FanLow:
+      setBits(&remote_state, kDaikin64FanOffset, kDaikin64FanSize, speed);
+      break;
+    default:
+      this->setFan(kDaikin64FanAuto);
+  }
+}
+
+// Convert a standard A/C Fan speed into its native fan speed.
+uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:    return kDaikin64FanQuiet;
+    case stdAc::fanspeed_t::kLow:    return kDaikin64FanLow;
+    case stdAc::fanspeed_t::kMedium: return kDaikin64FanMed;
+    case stdAc::fanspeed_t::kHigh:   return kDaikin64FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kDaikin64FanTurbo;
+    default:                         return kDaikin64FanAuto;
+  }
+}
+
+// Convert a native fan speed to it's common equivalent.
+stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDaikin64FanTurbo: return stdAc::fanspeed_t::kMax;
+    case kDaikin64FanHigh:  return stdAc::fanspeed_t::kHigh;
+    case kDaikin64FanMed:   return stdAc::fanspeed_t::kMedium;
+    case kDaikin64FanLow:   return stdAc::fanspeed_t::kLow;
+    case kDaikinFanQuiet:   return stdAc::fanspeed_t::kMin;
+    default:                return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+bool IRDaikin64::getTurbo(void) {
+  return getFan() == kDaikin64FanTurbo;
+}
+
+void IRDaikin64::setTurbo(const bool on) {
+  if (on) {
+    setFan(kDaikin64FanTurbo);
+  } else {
+    if (getFan() == kDaikin64FanTurbo) setFan(kDaikin64FanAuto);
+  }
+}
+
+bool IRDaikin64::getQuiet(void) {
+  return getFan() == kDaikin64FanQuiet;
+}
+
+void IRDaikin64::setQuiet(const bool on) {
+  if (on) {
+    setFan(kDaikin64FanQuiet);
+  } else {
+    if (getFan() == kDaikin64FanQuiet) setFan(kDaikin64FanAuto);
+  }
+}
+
+void IRDaikin64::setSwingVertical(const bool on) {
+  setBit(&remote_state, kDaikin64SwingVBit, on);
+}
+
+bool IRDaikin64::getSwingVertical(void) {
+  return GETBIT64(remote_state, kDaikin64SwingVBit);
+}
+
+void IRDaikin64::setSleep(const bool on) {
+  setBit(&remote_state, kDaikin64SleepBit, on);
+}
+
+bool IRDaikin64::getSleep(void) {
+  return GETBIT64(remote_state, kDaikin64SleepBit);
+}
+
+void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
+  uint16_t mins = mins_since_midnight;
+  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64ClockOffset, kDaikin64ClockMinsSize,
+          uint8ToBcd(mins % 60));  // Mins
+  setBits(&remote_state, kDaikin64ClockOffset + kDaikin64ClockMinsSize,
+          kDaikin64ClockHoursSize, uint8ToBcd(mins / 60));  // Hours
+}
+
+uint16_t IRDaikin64::getClock(void) {
+  return bcdToUint8(GETBITS64(remote_state,
+                              kDaikin64ClockOffset + kDaikin64ClockMinsSize,
+                              kDaikin64ClockHoursSize)) * 60 +
+         bcdToUint8(GETBITS64(remote_state, kDaikin64ClockOffset,
+                              kDaikin64ClockMinsSize));
+}
+
+void IRDaikin64::setOnTimeEnabled(const bool on) {
+  setBit(&remote_state, kDaikin64OnTimeEnableBit, on);
+}
+
+bool IRDaikin64::getOnTimeEnabled(void) {
+  return GETBIT64(remote_state, kDaikin64OnTimeEnableBit);
+}
+
+uint16_t IRDaikin64::getOnTime(void) {
+  return bcdToUint8(GETBITS64(remote_state, kDaikin64OnTimeOffset,
+                              kDaikin64OnTimeSize)) * 60 +
+      (GETBIT64(remote_state, kDaikin64OnTimeHalfHourBit) ? 30 : 0);
+}
+
+void IRDaikin64::setOnTime(const uint16_t mins_since_midnight) {
+  uint16_t halfhours = mins_since_midnight / 30;
+  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64OnTimeOffset, kDaikin64OnTimeSize,
+          uint8ToBcd(halfhours / 2));  // Hours
+  // Half Hour
+  setBit(&remote_state, kDaikin64OnTimeHalfHourBit, halfhours % 2);
+}
+
+void IRDaikin64::setOffTimeEnabled(const bool on) {
+  setBit(&remote_state, kDaikin64OffTimeEnableBit, on);
+}
+
+bool IRDaikin64::getOffTimeEnabled(void) {
+  return GETBIT64(remote_state, kDaikin64OffTimeEnableBit);
+}
+
+uint16_t IRDaikin64::getOffTime(void) {
+  return bcdToUint8(GETBITS64(remote_state, kDaikin64OffTimeOffset,
+                               kDaikin64OffTimeSize)) * 60 +
+      (GETBIT64(remote_state, kDaikin64OffTimeHalfHourBit) ? 30 : 0);
+}
+
+void IRDaikin64::setOffTime(const uint16_t mins_since_midnight) {
+  uint16_t halfhours = mins_since_midnight / 30;
+  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
+  setBits(&remote_state, kDaikin64OffTimeOffset, kDaikin64OffTimeSize,
+          uint8ToBcd(halfhours / 2));  // Hours
+  // Half Hour
+  setBit(&remote_state, kDaikin64OffTimeHalfHourBit, halfhours % 2);
+}
+
+// Convert the internal state into a human readable string.
+String IRDaikin64::toString(void) {
+  String result = "";
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
+  result += addModeToString(getMode(), 0xFF, kDaikin64Cool,
+                            0xFF, kDaikin64Dry, kDaikin64Fan);
+  result += addTempToString(getTemp());
+  if (!getTurbo()) {
+    result += addFanToString(getFan(), kDaikin64FanHigh, kDaikin64FanLow,
+                             kDaikin64FanAuto, kDaikin64FanQuiet,
+                             kDaikin64FanMed);
+  } else {
+    result += addIntToString(getFan(), kFanStr);
+    result += kSpaceLBraceStr;
+    result += kTurboStr;
+    result += ')';
+  }
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
+  result += addLabeledString(getOnTimeEnabled()
+                             ? minsToString(getOnTime()) : kOffStr,
+                             kOnTimerStr);
+  result += addLabeledString(getOffTimeEnabled()
+                             ? minsToString(getOffTime()) : kOffStr,
+                             kOffTimerStr);
+  return result;
+}
+
+// Convert the A/C state to it's common equivalent.
+stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
+  stdAc::state_t result;
+  if (prev != NULL) result = *prev;
+  result.protocol = decode_type_t::DAIKIN64;
+  result.model = -1;  // No models used.
+  result.power ^= getPowerToggle();
+  result.mode = toCommonMode(getMode());
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
+                                     : stdAc::swingv_t::kOff;
+  result.turbo = getTurbo();
+  result.quiet = getQuiet();
+  result.sleep = getSleep() ? 0 : -1;
+  result.clock = getClock();
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.clean = false;
+  result.filter = false;
+  result.beep = false;
+  result.econo = false;
+  result.light = false;
+  return result;
+}

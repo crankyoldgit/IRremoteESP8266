@@ -119,6 +119,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::DAIKIN2;
   else if (!strcasecmp(str, "DAIKIN216"))
     return decode_type_t::DAIKIN216;
+  else if (!strcasecmp(str, "DAIKIN64"))
+    return decode_type_t::DAIKIN64;
   else if (!strcasecmp(str, "DENON"))
     return decode_type_t::DENON;
   else if (!strcasecmp(str, "DISH"))
@@ -306,6 +308,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
       break;
     case DAIKIN216:
       result = F("DAIKIN216");
+      break;
+    case DAIKIN64:
+      result = F("DAIKIN64");
       break;
     case DENON:
       result = F("DENON");

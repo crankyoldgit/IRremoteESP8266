@@ -17,6 +17,8 @@
 //   Brand: Daikin,  Model: FTXB09AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
 //   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
+//   Brand: Daikin,  Model: FFN-C/FCN-F Series A/C (DAIKIN64)
+//   Brand: Daikin,  Model: DGS01 remote (DAIKIN64)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -430,6 +432,56 @@ const uint8_t kDaikin152ComfortOffset = 1;                   // Mask 0b00000010
 const uint8_t kDaikin152SensorByte = kDaikin152EconoByte;    // Mask 0b00001000
 const uint8_t kDaikin152SensorOffset = 3;                    // Mask 0b00001000
 
+const uint16_t kDaikin64HdrMark = kDaikin128HdrMark;
+const uint16_t kDaikin64BitMark = kDaikin128BitMark;
+const uint16_t kDaikin64HdrSpace = kDaikin128HdrSpace;
+const uint16_t kDaikin64OneSpace = kDaikin128OneSpace;
+const uint16_t kDaikin64ZeroSpace = kDaikin128ZeroSpace;
+const uint16_t kDaikin64LdrMark = kDaikin128LeaderMark;
+const uint16_t kDaikin64Gap = kDaikin128Gap;
+const uint16_t kDaikin64LdrSpace = kDaikin128LeaderSpace;
+const uint16_t kDaikin64Freq = kDaikin128Freq;  // Hz.
+const uint16_t kDaikin64Overhead = 9;
+
+const uint64_t kDaikin64KnownGoodState = 0x7C16161607204216;
+const uint8_t kDaikin64ModeOffset = 8;
+const uint8_t kDaikin64ModeSize = 4;  // Mask 0b111100000000
+const uint8_t kDaikin64Dry =  0b001;
+const uint8_t kDaikin64Cool = 0b010;
+const uint8_t kDaikin64Fan =  0b100;
+const uint8_t kDaikin64FanOffset = kDaikin64ModeOffset + kDaikin64ModeSize;
+const uint8_t kDaikin64FanSize = 4;  // Mask 0b1111000000000000
+const uint8_t kDaikin64FanAuto =  0b0001;
+const uint8_t kDaikin64FanLow =   0b1000;
+const uint8_t kDaikin64FanMed =   0b0100;
+const uint8_t kDaikin64FanHigh =  0b0010;
+const uint8_t kDaikin64FanQuiet = 0b1001;
+const uint8_t kDaikin64FanTurbo = 0b0011;
+const uint8_t kDaikin64ClockOffset = kDaikin64FanOffset + kDaikin64FanSize;
+const uint8_t kDaikin64ClockMinsSize = 8;
+const uint8_t kDaikin64ClockHoursSize = 8;
+const uint8_t kDaikin64ClockSize = kDaikin64ClockMinsSize +
+    kDaikin64ClockHoursSize;  // Mask 0b1111111111111111 << 15
+const uint8_t kDaikin64OnTimeOffset = kDaikin64ClockOffset +
+                                      kDaikin64ClockSize;
+const uint8_t kDaikin64OnTimeSize = 6;
+const uint8_t kDaikin64OnTimeHalfHourBit = kDaikin64OnTimeOffset +
+                                           kDaikin64OnTimeSize;
+const uint8_t kDaikin64OnTimeEnableBit = kDaikin64OnTimeHalfHourBit + 1;
+const uint8_t kDaikin64OffTimeOffset = kDaikin64OnTimeEnableBit + 1;
+const uint8_t kDaikin64OffTimeSize = 6;
+const uint8_t kDaikin64OffTimeHalfHourBit = kDaikin64OffTimeOffset +
+                                            kDaikin64OffTimeSize;
+const uint8_t kDaikin64OffTimeEnableBit = kDaikin64OffTimeHalfHourBit + 1;
+const uint8_t kDaikin64TempOffset = 48;
+const uint8_t kDaikin64TempSize = 8;  // Mask 0b11111111 << 47
+const uint8_t kDaikin64MinTemp = 16;  // Celsius
+const uint8_t kDaikin64MaxTemp = 30;  // Celsius
+const uint8_t kDaikin64SwingVBit = 56;
+const uint8_t kDaikin64SleepBit = kDaikin64SwingVBit + 1;
+const uint8_t kDaikin64PowerToggleBit = 59;
+const uint8_t kDaikin64ChecksumOffset = 60;
+const uint8_t kDaikin64ChecksumSize = 4;  // Mask 0b1111 << 59
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
@@ -878,6 +930,65 @@ class IRDaikin152 {
 #endif
   // # of bytes per command
   uint8_t remote_state[kDaikin152StateLength];
+  void stateReset();
+  void checksum();
+};
+
+// Class to emulate a Daikin DGS01 remote.
+class IRDaikin64 {
+ public:
+  explicit IRDaikin64(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+#if SEND_DAIKIN64
+  void send(const uint16_t repeat = kDaikin64DefaultRepeat);
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_DAIKIN64
+  void begin();
+  uint64_t getRaw();
+  void setRaw(const uint64_t new_state);
+  static uint8_t calcChecksum(const uint64_t state);
+  static bool validChecksum(const uint64_t state);
+  void setPowerToggle(const bool on);
+  bool getPowerToggle(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp();
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void);
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void);
+  void setSleep(const bool on);
+  bool getSleep(void);
+  bool getQuiet(void);
+  void setQuiet(const bool on);
+  bool getTurbo(void);
+  void setTurbo(const bool on);
+  void setClock(const uint16_t mins_since_midnight);
+  uint16_t getClock(void);
+  void setOnTimeEnabled(const bool on);
+  bool getOnTimeEnabled(void);
+  void setOnTime(const uint16_t mins_since_midnight);
+  uint16_t getOnTime(void);
+  void setOffTimeEnabled(const bool on);
+  bool getOffTimeEnabled(void);
+  void setOffTime(const uint16_t mins_since_midnight);
+  uint16_t getOffTime(void);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
+  String toString(void);
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;
+#else
+  IRsendTest _irsend;
+#endif
+  uint64_t remote_state;
   void stateReset();
   void checksum();
 };

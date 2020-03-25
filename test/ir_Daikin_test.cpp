@@ -1545,6 +1545,11 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::DAIKIN216, strToDecodeType("DAIKIN216"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN216));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN216));
+
+  ASSERT_EQ("DAIKIN64", typeToString(decode_type_t::DAIKIN64));
+  ASSERT_EQ(decode_type_t::DAIKIN64, strToDecodeType("DAIKIN64"));
+  ASSERT_FALSE(hasACState(decode_type_t::DAIKIN64));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN64));
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/582#issuecomment-453863879
@@ -3399,4 +3404,283 @@ TEST(TestDaikin2Class, Issue1035) {
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
       ac.toString());
   ASSERT_FALSE(ac.toCommon().power);
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+// Data from:
+//   https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=726071135&range=A1
+TEST(TestDecodeDaikin64, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  uint16_t rawData[137] = {
+      9864, 9778, 9810, 9728, 4666, 2482, 384, 342, 390, 922, 386, 928, 388,
+      348, 388, 920, 386, 348, 390, 342, 384, 330, 414, 342, 390, 922, 386, 348,
+      390, 342, 382, 352, 384, 352, 382, 924, 386, 356, 382, 344, 384, 350, 388,
+      346, 390, 342, 386, 348, 386, 928, 388, 348, 388, 354, 388, 888, 412, 928,
+      390, 896, 416, 348, 386, 348, 388, 346, 388, 342, 384, 358, 388, 340, 384,
+      926, 384, 932, 386, 346, 388, 922, 384, 350, 384, 348, 384, 358, 382, 338,
+      394, 922, 388, 928, 386, 350, 384, 926, 390, 344, 388, 342, 386, 356, 388,
+      338, 382, 928, 382, 932, 390, 344, 386, 924, 390, 344, 388, 314, 414, 356,
+      384, 344, 386, 346, 390, 926, 386, 924, 388, 924, 388, 926, 386, 924, 388,
+      350, 388, 20258, 4670};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 137, kDaikin64Freq);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}
+
+TEST(TestDecodeDaikin64, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDaikin64(0x7C16161607204216);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x7C16161607204216, irsend.capture.value);
+}
+
+TEST(TestDaikin64Class, ChecksumAndSetGetRaw) {
+  IRDaikin64 ac(kGpioUnused);
+
+  const uint64_t valid = 0x7C16161607204216;
+  const uint64_t invalid = 0x1C16161607204216;
+  ASSERT_NE(valid, invalid);
+  ASSERT_EQ(0x07, IRDaikin64::calcChecksum(valid));
+  ASSERT_TRUE(IRDaikin64::validChecksum(valid));
+  ASSERT_FALSE(IRDaikin64::validChecksum(invalid));
+  ac.setRaw(valid);
+  ASSERT_EQ(valid, ac.getRaw());
+  ac.setRaw(invalid);
+  ASSERT_EQ(valid, ac.getRaw());
+}
+
+TEST(TestDaikin64Class, Temperature) {
+  IRDaikin64 ac(0);
+  ac.begin();
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MaxTemp);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp - 1);
+  EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MaxTemp + 1);
+  EXPECT_EQ(kDaikin64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikin64MinTemp + 1);
+  EXPECT_EQ(kDaikin64MinTemp + 1, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=1521758824&range=R2:AG2
+  const uint64_t deg16 = 0x8C16105500001216;
+  ac.setRaw(deg16);
+  EXPECT_EQ(16, ac.getTemp());
+}
+
+TEST(TestDaikin64Class, OperatingMode) {
+  IRDaikin64 ac(0);
+  ac.begin();
+
+  ac.setMode(kDaikin64Cool);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  ac.setMode(kDaikin64Fan);
+  EXPECT_EQ(kDaikin64Fan, ac.getMode());
+
+  ac.setMode(kDaikin64Dry);
+  EXPECT_EQ(kDaikin64Dry, ac.getMode());
+
+  ac.setMode(kDaikin64Fan + 1);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1sxjLQCRLMFM1FQpttBXsye2JG5hHIe2BrKnKDuPV9Bw/edit#gid=1521758824&range=R2:AG2
+  const uint64_t cool = 0x8C16105500001216;
+  ac.setMode(kDaikin64Dry);
+  ac.setRaw(cool);
+  EXPECT_EQ(kDaikin64Cool, ac.getMode());
+}
+
+TEST(TestDaikin64Class, PowerToggle) {
+  IRDaikin64 ac(0);
+  ac.begin();
+
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
+TEST(TestDaikin64Class, FanSpeed) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(0);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+  ac.setFan(5);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanHigh);
+  EXPECT_EQ(kDaikin64FanHigh, ac.getFan());
+
+  // Beyond Quiet should default to Auto.
+  ac.setFan(kDaikin64FanQuiet + 1);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanMed);
+  EXPECT_EQ(kDaikin64FanMed, ac.getFan());
+
+  ac.setFan(kDaikin64FanLow);
+  EXPECT_EQ(kDaikin64FanLow, ac.getFan());
+
+  ac.setFan(kDaikin64FanTurbo);
+  EXPECT_EQ(kDaikin64FanTurbo, ac.getFan());
+
+  ac.setFan(kDaikin64FanAuto);
+  EXPECT_EQ(kDaikin64FanAuto, ac.getFan());
+
+  ac.setFan(kDaikin64FanQuiet);
+  EXPECT_EQ(kDaikin64FanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin64Class, Turbo) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setFan(kDaikin64FanAuto);
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_EQ(kDaikin64FanTurbo, ac.getFan());
+  ac.setTurbo(false);
+  EXPECT_NE(kDaikin64FanTurbo, ac.getFan());
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestDaikin64Class, Quiet) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setFan(kDaikin64FanAuto);
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_EQ(kDaikin64FanQuiet, ac.getFan());
+  ac.setQuiet(false);
+  EXPECT_NE(kDaikin64FanQuiet, ac.getFan());
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+}
+
+TEST(TestDaikin64Class, Sleep) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestDaikin64Class, SwingVertical) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(false);
+  EXPECT_FALSE(ac.getSwingVertical());
+  ac.setSwingVertical(true);
+  EXPECT_TRUE(ac.getSwingVertical());
+}
+
+TEST(TestDaikin64Class, Clock) {
+  IRDaikin64 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(23 * 60 + 59);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
+  ac.setClock(23 * 60 + 59 + 1);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(24 * 60 + 99);
+  EXPECT_EQ(0, ac.getClock());
+}
+
+// Test human readable output.
+TEST(TestDaikin64Class, HumanReadable) {
+  IRDaikin64 ac(kGpioUnused);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (Cool), Temp: 16C, Fan: 4 (Medium), "
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setPowerToggle(false);
+  ac.setMode(kDaikin64Fan);
+  ac.setTemp(30);
+  ac.setFan(kDaikin64FanAuto);
+  ac.setSwingVertical(true);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 1 (Auto), "
+      "Turbo: Off, Quiet: Off, Swing(V): On, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setTurbo(true);
+  ac.setOffTimeEnabled(true);
+  ac.setOffTime(23 * 60 + 30);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 3 (Turbo), "
+      "Turbo: On, Quiet: Off, Swing(V): On, Sleep: Off, "
+      "Clock: 07:20, On Timer: Off, Off Timer: 23:30",
+      ac.toString());
+  ac.setQuiet(true);
+  ac.setSleep(true);
+  ac.setClock(12 * 60 + 31);
+  ac.setOnTimeEnabled(true);
+  ac.setOnTime(8 * 60 + 59);
+  ac.setOffTimeEnabled(false);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 4 (Fan), Temp: 30C, Fan: 9 (Quiet), "
+      "Turbo: Off, Quiet: On, Swing(V): On, Sleep: On, "
+      "Clock: 12:31, On Timer: 08:30, Off Timer: Off",
+      ac.toString());
 }

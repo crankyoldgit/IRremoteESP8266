@@ -123,6 +123,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN216
     case decode_type_t::DAIKIN216:
 #endif
+#if SEND_DAIKIN64
+    case decode_type_t::DAIKIN64:
+#endif
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
 #endif
@@ -460,6 +463,27 @@ void IRac::daikin216(IRDaikin216 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN216
+
+#if SEND_DAIKIN64
+void IRac::daikin64(IRDaikin64 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv,
+                  const bool quiet, const bool turbo,
+                  const int16_t sleep, const int16_t clock) {
+  ac->begin();
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setTurbo(turbo);
+  ac->setQuiet(quiet);
+  ac->setSleep(sleep >= 0);
+  ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_DAIKIN64
 
 #if SEND_ELECTRA_AC
 void IRac::electra(IRElectraAc *ac,
@@ -1233,6 +1257,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         else
           result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
+      case decode_type_t::DAIKIN64:
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
         break;
@@ -1390,6 +1415,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN216
+#if SEND_DAIKIN64
+    case DAIKIN64:
+    {
+      IRDaikin64 ac(_pin, _inverted, _modulation);
+      daikin64(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+               send.quiet, send.turbo, send.sleep, send.clock);
+      break;
+    }
+#endif  // SEND_DAIKIN64
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
     {
@@ -2008,6 +2042,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN64
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(result->value);  // Daikin64 uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_DAIKIN216
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(0);
@@ -2305,6 +2346,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN64
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_DAIKIN64
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(kGpioUnused);
