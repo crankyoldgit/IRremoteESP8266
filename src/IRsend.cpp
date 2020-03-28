@@ -563,6 +563,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LG:
     case LG2:
       return 28;
+    case AIRWELL:
     case CARRIER_AC:
     case EPSON:
     case NEC:
@@ -673,6 +674,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
                   const uint16_t nbits, const uint16_t repeat) {
   uint16_t min_repeat = std::max(IRsend::minRepeats(type), repeat);
   switch (type) {
+#if SEND_AIRWELL
+    case AIRWELL:
+      sendAirwell(data, nbits, min_repeat);
+      break;
+#endif
 #if SEND_AIWA_RC_T501
     case AIWA_RC_T501:
       sendAiwaRCT501(data, nbits, min_repeat);

@@ -785,6 +785,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin64 decode");
     if (decodeDaikin64(results, offset)) return true;
 #endif  // DECODE_DAIKIN64
+#if DECODE_AIRWELL
+    DPRINTLN("Attempting Airwell decode");
+    if (decodeAirwell(results, offset)) return true;
+#endif  // DECODE_AIRWELL
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1291,5 +1295,122 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                        hdrmark, hdrspace, onemark, onespace,
                        zeromark, zerospace, footermark, footerspace, atleast,
                        tolerance, excess, MSBfirst);
+}
+
+// Match & decode a Manchester Code <= 64bit IR message.
+// The data is stored at result_ptr.
+// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
+// that requirement.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//   result_ptr: A pointer to where to start storing the bits we decoded.
+//   remaining: The size of the capture buffer are remaining.
+//   nbits:        Nr. of data bits we expect.
+//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
+//   hdrspace:     Nr. of uSeconds for the expected header space signal.
+//   half_period:  Nr. of uSeconds for half the clock's period. (1/2 wavelength)
+//   footermark:   Nr. of uSeconds for the expected footer mark signal.
+//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
+//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
+//   GEThomas: Use G.E. Thomas (true/default) or IEEE 802.3 (false) convention?
+// Returns:
+//   A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+//
+// Ref:
+//   https://en.wikipedia.org/wiki/Manchester_code
+//   http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
+uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
+                                 uint64_t *result_ptr,
+                                 const uint16_t remaining,
+                                 const uint16_t nbits,
+                                 const uint16_t hdrmark,
+                                 const uint32_t hdrspace,
+                                 const uint16_t half_period,
+                                 const uint16_t footermark,
+                                 const uint32_t footerspace,
+                                 const bool atleast,
+                                 const uint8_t tolerance,
+                                 const int16_t excess,
+                                 const bool MSBfirst,
+                                 const bool GEThomas) {
+  uint16_t bitsSoFar = 0;
+  uint16_t offset = 0;
+  uint64_t data = 0;
+  bool currentBit = GEThomas;
+
+  // Calculate how much remaining buffer is required.
+  uint16_t min_remaining = nbits;  // Shortest case. Longest case is 2 * nbits.
+
+  if (hdrmark) min_remaining++;
+  if (hdrspace) min_remaining++;
+  if (footermark) min_remaining++;
+  // Don't need to extend for footerspace because it could be the end of message
+
+  // Check if there is enough capture buffer to possibly have the message.
+  if (remaining < min_remaining) return 0;  // Nope, so abort.
+
+  // Header
+  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
+    return 0;
+  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
+                              excess))
+    return 0;
+
+  // Data
+  for (; bitsSoFar <= nbits && offset < remaining; offset++, bitsSoFar++) {
+    DPRINT("DEBUG: matchManchester: offset = ");
+    DPRINTLN(uint64ToString(offset));
+    // Check if it is long or short.
+    if (match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
+      DPRINTLN("DEBUG: matchManchester: detected a 'long' section");
+      currentBit = !currentBit;
+    } else if (match(*(data_ptr + offset++), half_period, tolerance, excess) &&
+               (offset >= remaining ||
+                match(*(data_ptr + offset), half_period, tolerance,
+                      excess))) {
+      DPRINTLN("DEBUG: matchManchester: detected a 'short' section.");
+      // No change to currentBit polarity.
+    } else {
+      DPRINTLN("DEBUG: matchManchester: detected UNEXPECTED section. Abort!");
+      return 0;  // Neither, so exit.
+    }
+    // Append the appropriate bit value.
+    data <<= 1;
+    data += currentBit;
+    DPRINT("DEBUG: matchManchester: bitsSoFar = ");
+    DPRINTLN(uint64ToString(bitsSoFar));
+  }
+  DPRINT("DEBUG: matchManchester: offset = ");
+  DPRINTLN(uint64ToString(offset));
+  if (bitsSoFar <= nbits) return 0;  // Not enough bits found.
+  // Footer
+  if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
+                               excess))
+    return 0;
+  // If we have something still to match & haven't reached the end of the buffer
+  if (footerspace && offset < remaining) {
+      if (atleast) {
+        if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
+      } else {
+        if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+          return 0;
+      }
+      offset++;
+  }
+
+  if (!MSBfirst) data = reverseBits(data, nbits);
+  *result_ptr = data;
+  DPRINT("DEBUG: matchManchester: offset = ");
+  DPRINTLN(uint64ToString(offset));
+  DPRINT("DEBUG: matchManchester: bitsSoFar = ");
+  DPRINTLN(uint64ToString(bitsSoFar));
+  DPRINT("DEBUG: matchManchester: data = ");
+  DPRINTLN(uint64ToString(data, 16));
+  return offset;
 }
 // End of IRrecv class -------------------

@@ -553,6 +553,10 @@ class IRsend {
   void sendSymphony(uint64_t data, uint16_t nbits = kSymphonyBits,
                     uint16_t repeat = kSymphonyDefaultRepeat);
 #endif
+#if SEND_AIRWELL
+  void sendAirwell(uint64_t data, uint16_t nbits = kAirwellBits,
+                   uint16_t repeat = kAirwellMinRepeats);
+#endif
 
  protected:
 #ifdef UNIT_TEST

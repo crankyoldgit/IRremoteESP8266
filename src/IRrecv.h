@@ -221,6 +221,20 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
+  uint16_t matchManchester(volatile const uint16_t *data_ptr,
+                           uint64_t *result_ptr,
+                           const uint16_t remaining,
+                           const uint16_t nbits,
+                           const uint16_t hdrmark,
+                           const uint32_t hdrspace,
+                           const uint16_t clock_period,
+                           const uint16_t footermark,
+                           const uint32_t footerspace,
+                           const bool atleast = false,
+                           const uint8_t tolerance = kUseDefTol,
+                           const int16_t excess = kMarkExcess,
+                           const bool MSBfirst = true,
+                           const bool GEThomas = true);
   void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
@@ -574,6 +588,11 @@ class IRrecv {
                    const uint16_t nbits = kSymphonyBits,
                    const bool strict = true);
 #endif  // DECODE_SYMPHONY
+#if DECODE_AIRWELL
+  bool decodeAirwell(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kAirwellBits,
+                     const bool strict = true);
+#endif  // DECODE_AIRWELL
 };
 
 #endif  // IRRECV_H_
