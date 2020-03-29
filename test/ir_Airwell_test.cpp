@@ -15,7 +15,7 @@
 TEST(TestDecodeAirwell, RealExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
-  // ON / OFF / 25 degres heat
+  // ON / OFF / 25 degrees heat
   const uint16_t rawData_1[163] = {
       2860, 3862,
       1924, 1952, 1926, 1952, 956, 984, 1924, 1028, 952, 958, 980, 956, 982,

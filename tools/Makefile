@@ -51,7 +51,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o ir_Pioneer.o \
             ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o \
             ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Argo.o \
-						ir_Trotec.o ir_Neoclima.o ir_Amcor.o ir_Epson.o ir_Symphony.o \
+            ir_Trotec.o ir_Neoclima.o ir_Amcor.o ir_Epson.o ir_Symphony.o \
             ir_Airwell.o
 
 # Common object files
