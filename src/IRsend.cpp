@@ -462,6 +462,102 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   }
 }
 
+// Generic method for sending Manchester code data.
+// Will send leading or trailing 0's if the nbits is larger than the number
+// of bits in data.
+//
+// Args:
+//   half_period: Nr. of uSeconds for half the clock's period. (1/2 wavelength)
+//   data:        The data to be transmitted.
+//   nbits:       Nr. of bits of data to be sent.
+//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
+//   GEThomas:    Use G.E. Thomas (true/default) or IEEE 802.3 (false).
+void IRsend::sendManchesterData(const uint16_t half_period,
+                                const uint64_t data,
+                                const uint16_t nbits, const bool MSBfirst,
+                                const bool GEThomas) {
+  if (nbits == 0) return;  // Nothing to send.
+  uint16_t bits = nbits;
+  uint64_t copy = (GEThomas) ? data : ~data;
+
+  if (MSBfirst) {  // Send the MSB first.
+    // Send 0's until we get down to a bit size we can actually manage.
+    if (bits > (sizeof(data) * 8)) {
+      sendManchesterData(half_period, 0ULL, bits - sizeof(data) * 8, MSBfirst,
+                         GEThomas);
+      bits = sizeof(data) * 8;
+    }
+    // Send the supplied data.
+    for (uint64_t mask = 1ULL << (bits - 1); mask; mask >>= 1)
+      if (copy & mask) {
+        mark(half_period);
+        space(half_period);
+      } else {
+        space(half_period);
+        mark(half_period);
+      }
+  } else {  // Send the Least Significant Bit (LSB) first / MSB last.
+    for (bits = 0; bits < nbits; bits++, copy >>= 1)
+      if (copy & 1) {
+        mark(half_period);
+        space(half_period);
+      } else {
+        space(half_period);
+        mark(half_period);
+      }
+  }
+}
+
+// Generic method for sending Manchester code messages.
+// Will send leading or trailing 0's if the nbits is larger than the number
+// of bits in data.
+//
+// Args:
+//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
+//                A value of 0 means no header mark.
+//   headerspace: Nr. of usecs for the led to be off after the header mark.
+//                A value of 0 means no header space.
+//   half_period: Nr. of uSeconds for half the clock's period. (1/2 wavelength)
+//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
+//                A value of 0 means no footer mark.
+//   gap:         Min. nr. of usecs for the led to be off after the footer mark.
+//                This is effectively the absolute minimum gap between messages.
+//   data:        The data to be transmitted.
+//   nbits:       Nr. of bits of data to be sent.
+//   frequency:   The frequency we want to modulate at.
+//                Assumes < 1000 means kHz otherwise it is in Hz.
+//                Most common value is 38000 or 38, for 38kHz.
+//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
+//   repeat:      Nr. of extra times the message will be sent.
+//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+//   dutycycle:   Percentage duty cycle of the LED.
+//                e.g. 25 = 25% = 1/4 on, 3/4 off.
+//                If you are not sure, try 50 percent.
+//   GEThomas:    Use G.E. Thomas (true/default) or IEEE 802.3 (false).
+void IRsend::sendManchester(const uint16_t headermark,
+                            const uint32_t headerspace,
+                            const uint16_t half_period,
+                            const uint16_t footermark, const uint32_t gap,
+                            const uint64_t data, const uint16_t nbits,
+                            const uint16_t frequency, const bool MSBfirst,
+                            const uint16_t repeat, const uint8_t dutycycle,
+                            const bool GEThomas) {
+  // Setup
+  enableIROut(frequency, dutycycle);
+
+  // We always send a message, even for repeat=0, hence '<= repeat'.
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Header
+    if (headermark) mark(headermark);
+    if (headerspace) space(headerspace);
+    // Data
+    sendManchesterData(half_period, data, nbits, MSBfirst, GEThomas);
+    // Footer
+    if (footermark) mark(footermark);
+    if (gap) space(gap);
+  }
+}
+
 #if SEND_RAW
 // Send a raw IRremote message.
 //
