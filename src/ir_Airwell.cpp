@@ -36,20 +36,9 @@ void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
       // Header
       mark(kAirwellHdrMark);
       space(kAirwellHdrMark);
-
       // Data
-      space(kAirwellHalfClockPeriod);  // 1
-      mark(kAirwellHalfClockPeriod);
-      mark(kAirwellHalfClockPeriod);  // 0
-      space(kAirwellHalfClockPeriod);
-      for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
-        if (data & mask) {  // 1
-          space(kAirwellHalfClockPeriod);    // 1 is space, then mark.
-          mark(kAirwellHalfClockPeriod);
-        } else {         // 0
-          mark(kAirwellHalfClockPeriod);  // 0 is mark, then space.
-          space(kAirwellHalfClockPeriod);
-        }
+      sendManchesterData(kAirwellHalfClockPeriod, 0b10, 2, true, false);
+      sendManchesterData(kAirwellHalfClockPeriod, data, nbits, true, false);
     }
     // Footer
     mark(kAirwellHdrMark + kAirwellHalfClockPeriod);
