@@ -1304,6 +1304,7 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 //
 // Args:
 //   data_ptr: A pointer to where we are at in the capture buffer.
+//             NOTE: It is assumed to be pointing to a "Mark", not a "Space".
 //   result_ptr: A pointer to where to start storing the bits we decoded.
 //   remaining: The size of the capture buffer are remaining.
 //   nbits:        Nr. of data bits we expect.
@@ -1339,11 +1340,13 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                                  const bool GEThomas) {
   uint16_t bitsSoFar = 0;
   uint16_t offset = 0;
+  // uint16_t footer_remaining = 0;
   uint64_t data = 0;
-  bool currentBit = GEThomas;
+  bool currentBit = false;
 
   // Calculate how much remaining buffer is required.
-  uint16_t min_remaining = nbits;  // Shortest case. Longest case is 2 * nbits.
+  // Shortest case. Longest case is 2 * nbits.
+  uint16_t min_remaining = nbits + 2;
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -1356,12 +1359,21 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
   // Header
   if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
     return 0;
-  if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
+  // Manchester Code always has a guaranteed 2x half_period (T2) at the start
+  // of the data section. e.g. a sync header. If it is a GEThomas-style, then
+  // it is space(T);mark(2xT);space(T), thus we need to check for that space
+  // plus any requested "header" space.
+  if ((hdrspace || GEThomas) &&
+      !matchSpace(*(data_ptr + offset++),
+                  hdrspace + ((GEThomas) ? half_period : 0), tolerance, excess))
+    return 0;
+  // If it not GEThomas-style, then there must be a mark(half_period) next.
+  if (!GEThomas && !matchMark(*(data_ptr + offset++), half_period, tolerance,
                               excess))
     return 0;
 
   // Data
-  for (; bitsSoFar <= nbits && offset < remaining; offset++, bitsSoFar++) {
+  for (; offset < remaining && bitsSoFar <= nbits; offset++, bitsSoFar++) {
     DPRINT("DEBUG: matchManchester: offset = ");
     DPRINTLN(uint64ToString(offset));
     // Check if it is long or short.
@@ -1370,27 +1382,32 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
       currentBit = !currentBit;
     } else if (match(*(data_ptr + offset++), half_period, tolerance, excess) &&
                (offset >= remaining ||
-                match(*(data_ptr + offset), half_period, tolerance,
-                      excess))) {
+                match(*(data_ptr + offset), half_period, tolerance, excess))) {
       DPRINTLN("DEBUG: matchManchester: detected a 'short' section.");
       // No change to currentBit polarity.
     } else {
       DPRINTLN("DEBUG: matchManchester: detected UNEXPECTED section. Abort!");
       return 0;  // Neither, so exit.
     }
-    // Append the appropriate bit value.
-    data <<= 1;
-    data += currentBit;
+    if (bitsSoFar) {
+      // Append the appropriate bit value.
+      data <<= 1;
+      data |= currentBit;
+    }
+
     DPRINT("DEBUG: matchManchester: bitsSoFar = ");
     DPRINTLN(uint64ToString(bitsSoFar));
+    DPRINT("DEBUG: matchManchester: data = ");
+    DPRINTLN(uint64ToString(data, 16));
   }
   DPRINT("DEBUG: matchManchester: offset = ");
   DPRINTLN(uint64ToString(offset));
   if (bitsSoFar <= nbits) return 0;  // Not enough bits found.
   // Footer
-  if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
+  if (footermark && !matchMark(*(data_ptr + offset), footermark, tolerance,
                                excess))
     return 0;
+  offset++;
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
       if (atleast) {

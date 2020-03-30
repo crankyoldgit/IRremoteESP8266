@@ -550,6 +550,9 @@ void IRsend::sendManchester(const uint16_t headermark,
     // Header
     if (headermark) mark(headermark);
     if (headerspace) space(headerspace);
+    // Data Marker/sync
+    // This guarantees a double width half_period. i.e. a Period or T2.
+    sendManchesterData(half_period, 0b01, 2, true, GEThomas);
     // Data
     sendManchesterData(half_period, data, nbits, MSBfirst, GEThomas);
     // Footer
