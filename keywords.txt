@@ -2770,7 +2770,7 @@ kRightMaxStr	LITERAL1
 kRightStr	LITERAL1
 kRoomStr	LITERAL1
 kSamsung36Bits	LITERAL1
-kSamsungACSectionLength	LITERAL1
+kSamsungAcSectionLength	LITERAL1
 kSamsungAcAuto	LITERAL1
 kSamsungAcAutoTemp	LITERAL1
 kSamsungAcBeepOffset	LITERAL1

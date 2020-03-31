@@ -977,7 +977,8 @@ TEST(TestIRac, Samsung) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Light: On, Ion: Off";
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off";
 
   ac.begin();
   irac.samsung(&ac,
@@ -1027,7 +1028,8 @@ TEST(TestIRac, Samsung) {
   // desired state.
   char expected_on[] =
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Light: On, Ion: Off";
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off";
   ASSERT_EQ(expected_on, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
