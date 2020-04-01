@@ -96,6 +96,36 @@ TEST(TestDecodeAirwell, SyntheticExample) {
   EXPECT_EQ(
       "f38000d50"
       "m2850s3800"
+      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
+      "m2850s3800"
+      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
+      "m2850s3800"
+      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
+      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
+      "m3800s100000",
+      irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendAirwell(0x4F2FE7E4);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
+  EXPECT_EQ(kAirwellBits, irsend.capture.bits);
+  EXPECT_EQ(0x4F2FE7E4, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "f38000d50"
+      "m2850s3800"
       "m1900s1900m1900s1900m950s950m1900s950m950s950m950s950m950"
       "s1900m950s950m1900s1900m1900s950m950s950m950s950m950s950"
       "m950s950m950s950m950s1900m950s950m1900s950m950s950m950"
@@ -113,7 +143,6 @@ TEST(TestDecodeAirwell, SyntheticExample) {
       "m4750s100000",
       irsend.outputStr());
 
-/*
   irsend.reset();
   irsend.sendAirwell(0x70F8181B);
   irsend.makeDecodeResult();
@@ -124,7 +153,6 @@ TEST(TestDecodeAirwell, SyntheticExample) {
   EXPECT_EQ(0x70F8181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
-*/
 }
 
 TEST(TestUtils, Housekeeping) {

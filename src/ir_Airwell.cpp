@@ -29,18 +29,12 @@ const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 // Ref:
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
 void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  // Set 38kHz IR carrier frequency.
-  enableIROut(38000);
-  for (uint16_t r = 0; r <= repeat; r++) {
-    for (uint16_t i = 0; i < 3; i++) {
-      // Header + Data
-      sendManchester(kAirwellHdrMark, kAirwellHdrMark, kAirwellHalfClockPeriod,
-                     0, 0, data, nbits, 38000, true, kNoRepeat, kDutyDefault, true);
-    }
-    // Footer
-    mark(kAirwellHdrMark + kAirwellHalfClockPeriod);
-    space(kDefaultMessageGap);  // A guess.
-  }
+  // Header + Data
+  sendManchester(kAirwellHdrMark, kAirwellHdrMark, kAirwellHalfClockPeriod,
+                 0, 0, data, nbits, 38000, true, repeat);
+  // Footer
+  mark(kAirwellHdrMark + kAirwellHalfClockPeriod);
+  space(kDefaultMessageGap);  // A guess.
 }
 #endif
 
@@ -74,7 +68,7 @@ bool IRrecv::decodeAirwell(decode_results *results, uint16_t offset,
                                   results->rawlen - offset, nbits,
                                   kAirwellHdrMark, kAirwellHdrMark,
                                   kAirwellHalfClockPeriod,
-                                  kAirwellHdrSpace, kAirwellHdrSpace,
+                                  kAirwellHdrMark, kAirwellHdrSpace,
                                   true);
   if (used == 0) return false;
   offset += used;

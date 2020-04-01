@@ -612,14 +612,16 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case TOSHIBA_AC:
       return kSingleRepeat;
     // Special
+    case AIRWELL:
+      return kAirwellMinRepeats;
     case DISH:
       return kDishMinRepeat;
+    case EPSON:
+      return kEpsonMinRepeat;
     case SONY:
       return kSonyMinRepeat;
     case SONY_38K:
       return kSonyMinRepeat + 1;
-    case EPSON:
-      return kEpsonMinRepeat;
     default:
       return kNoRepeat;
   }

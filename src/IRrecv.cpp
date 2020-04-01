@@ -1338,11 +1338,13 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                                  const int16_t excess,
                                  const bool MSBfirst,
                                  const bool GEThomas) {
-  uint16_t bitsSoFar = 0;
   uint16_t offset = 0;
-  // uint16_t footer_remaining = 0;
   uint64_t data = 0;
+  uint16_t nr_of_half_periods = GEThomas;
+  // 2 per bit, and 4 extra for the timing sync.
+  uint16_t expected_half_periods = 2 * nbits + 4;
   bool currentBit = false;
+  bool merged_period = false;
 
   // Calculate how much remaining buffer is required.
   // Shortest case. Longest case is 2 * nbits.
@@ -1367,67 +1369,92 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
       !matchSpace(*(data_ptr + offset++),
                   hdrspace + ((GEThomas) ? half_period : 0), tolerance, excess))
     return 0;
-  // If it not GEThomas-style, then there must be a mark(half_period) next.
-  if (!GEThomas && !matchMark(*(data_ptr + offset++), half_period, tolerance,
-                              excess))
-    return 0;
 
   // Data
-  for (; offset < remaining && bitsSoFar <= nbits; offset++, bitsSoFar++) {
-    DPRINT("DEBUG: matchManchester: offset = ");
-    DPRINTLN(uint64ToString(offset));
-    // Check if it is long or short.
-    if (match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
-      DPRINTLN("DEBUG: matchManchester: detected a 'long' section");
+  // Loop until we find a 'long' pulse. This is the timing sync per protocol.
+  while ((offset < remaining) && (nr_of_half_periods < expected_half_periods) &&
+         !match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
+    // Was it not a short pulse?
+    if (!match(*(data_ptr + offset), half_period, tolerance, excess))
+      return 0;
+    nr_of_half_periods++;
+    offset++;
+  }
+
+  // Data (cont.)
+
+  // We are now pointing to the first 'long' pulse.
+  // Loop through the buffer till we run out of buffer, or nr of half periods.
+  while (offset < remaining && nr_of_half_periods < expected_half_periods) {
+    // Only if there is enough half_periods left for a long pulse &
+    // Is it a 'long' pulse?
+    if (nr_of_half_periods < expected_half_periods - 1 &&
+        match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
+      // Yes, so invert the value we will append.
       currentBit = !currentBit;
-    } else if (match(*(data_ptr + offset++), half_period, tolerance, excess) &&
-               (offset >= remaining ||
-                match(*(data_ptr + offset), half_period, tolerance, excess))) {
-      DPRINTLN("DEBUG: matchManchester: detected a 'short' section.");
-      // No change to currentBit polarity.
-    } else {
-      DPRINTLN("DEBUG: matchManchester: detected UNEXPECTED section. Abort!");
-      return 0;  // Neither, so exit.
-    }
-    if (bitsSoFar) {
-      // Append the appropriate bit value.
+      nr_of_half_periods += 2;  // A 'long' pulse is two half periods.
+      offset++;
+      // Append the bit value.
       data <<= 1;
       data |= currentBit;
+    } else if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
+      // or is it part of a 'short' pulse pair?
+      nr_of_half_periods++;
+      offset++;
+      // Look for the second half of the 'short' pulse pair.
+      // Do we have enough buffer or nr of half periods?
+      if (offset < remaining && nr_of_half_periods < expected_half_periods) {
+        // We do, so look for it.
+        if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
+          // Found it!
+          nr_of_half_periods++;
+          // No change of the polarity of the bit we will append.
+          // Append the bit value.
+          data <<= 1;
+          data |= currentBit;
+          offset++;
+        } else {
+          // It's not what we expected.
+          return 0;
+        }
+      }
+    } else if (nr_of_half_periods == expected_half_periods - 1 &&
+               matchAtLeast(*(data_ptr + offset), half_period, tolerance,
+                            excess)) {
+      // Special case when we are at the end of the expected nr of periods.
+      // i.e. The pulse could be merged with the footer.
+      merged_period = true;
+      nr_of_half_periods++;
+      break;
+    } else {
+      // It's neither, so abort.
+      return 0;
     }
-
-    DPRINT("DEBUG: matchManchester: bitsSoFar = ");
-    DPRINTLN(uint64ToString(bitsSoFar));
-    DPRINT("DEBUG: matchManchester: data = ");
-    DPRINTLN(uint64ToString(data, 16));
   }
-  DPRINT("DEBUG: matchManchester: offset = ");
-  DPRINTLN(uint64ToString(offset));
-  if (bitsSoFar <= nbits) return 0;  // Not enough bits found.
+  // Did we collect the expected amount of data?
+  if (nr_of_half_periods < expected_half_periods) return 0;
+
   // Footer
-  if (footermark && !matchMark(*(data_ptr + offset), footermark, tolerance,
-                               excess))
+  if (footermark && !matchMark(*(data_ptr + offset++),
+                               footermark + (merged_period ? half_period : 0),
+                               tolerance, excess))
     return 0;
-  offset++;
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
-      if (atleast) {
-        if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
-          return 0;
-      } else {
-        if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
-          return 0;
-      }
-      offset++;
+    if (atleast) {
+      if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+        return 0;
+    } else {
+      if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+        return 0;
+    }
+    offset++;
   }
 
+  // Clean up and process the data.
   if (!MSBfirst) data = reverseBits(data, nbits);
-  *result_ptr = data;
-  DPRINT("DEBUG: matchManchester: offset = ");
-  DPRINTLN(uint64ToString(offset));
-  DPRINT("DEBUG: matchManchester: bitsSoFar = ");
-  DPRINTLN(uint64ToString(bitsSoFar));
-  DPRINT("DEBUG: matchManchester: data = ");
-  DPRINTLN(uint64ToString(data, 16));
+  // Trim the data to size to remove timing sync.
+  *result_ptr = GETBITS64(data, 0, nbits);
   return offset;
 }
 // End of IRrecv class -------------------

@@ -736,7 +736,7 @@ const uint16_t kNoRepeat = 0;
 const uint16_t kSingleRepeat = 1;
 
 const uint16_t kAirwellBits = 32;
-const uint16_t kAirwellMinRepeats = kNoRepeat;
+const uint16_t kAirwellMinRepeats = 2;
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kAlokaBits = 32;
