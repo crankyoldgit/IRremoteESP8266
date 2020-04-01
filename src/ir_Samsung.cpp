@@ -271,7 +271,7 @@ bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
-  if (nbytes < kSamsungAcStateLength && nbytes % kSamsungACSectionLength)
+  if (nbytes < kSamsungAcStateLength && nbytes % kSamsungAcSectionLength)
     return;  // Not an appropriate number of bytes to send a proper message.
 
   enableIROut(38);
@@ -281,11 +281,11 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
     space(kSamsungAcHdrSpace);
     // Send in 7 byte sections.
     for (uint16_t offset = 0; offset < nbytes;
-         offset += kSamsungACSectionLength) {
+         offset += kSamsungAcSectionLength) {
       sendGeneric(kSamsungAcSectionMark, kSamsungAcSectionSpace,
                   kSamsungAcBitMark, kSamsungAcOneSpace, kSamsungAcBitMark,
                   kSamsungAcZeroSpace, kSamsungAcBitMark, kSamsungAcSectionGap,
-                  data + offset, kSamsungACSectionLength,  // 7 bytes == 56 bits
+                  data + offset, kSamsungAcSectionLength,  // 7 bytes == 56 bits
                   38000, false, 0, 50);                    // Send in LSBF order
     }
     // Complete made up guess at inter-message gap.
@@ -379,10 +379,10 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   // Copy/convert the internal state to an extended state.
-  for (uint16_t i = 0; i < kSamsungACSectionLength; i++)
+  for (uint16_t i = 0; i < kSamsungAcSectionLength; i++)
     extended_state[i] = remote_state[i];
-  for (uint16_t i = kSamsungACSectionLength; i < kSamsungAcStateLength; i++)
-    extended_state[i + kSamsungACSectionLength] = remote_state[i];
+  for (uint16_t i = kSamsungAcSectionLength; i < kSamsungAcStateLength; i++)
+    extended_state[i + kSamsungAcSectionLength] = remote_state[i];
   // extended_state[8] seems special. This is a guess on how to calculate it.
   extended_state[8] = (extended_state[1] & 0x9F) | 0x40;
   // Send it.
@@ -425,7 +425,7 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   // Shrink the extended state into a normal state.
   if (length > kSamsungAcStateLength) {
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
-      remote_state[i - kSamsungACSectionLength] = remote_state[i];
+      remote_state[i - kSamsungAcSectionLength] = remote_state[i];
   }
 }
 
@@ -550,14 +550,15 @@ void IRSamsungAc::setQuiet(const bool on) {
 
 bool IRSamsungAc::getPowerful(void) {
   return !(remote_state[8] & kSamsungAcPowerfulMask8) &&
-         GETBITS8(remote_state[10], kSamsungAcPowerful10Offset,
-                  kSamsungAcPowerful10Offset) &&
+         (GETBITS8(remote_state[10], kSamsungAcPowerful10Offset,
+                   kSamsungAcPowerful10Size) == kSamsungAcPowerful10On) &&
          (this->getFan() == kSamsungAcFanTurbo);
 }
 
 void IRSamsungAc::setPowerful(const bool on) {
+  uint8_t off_value = this->getBreeze() ? kSamsungAcBreezeOn : 0b000;
   setBits(&remote_state[10], kSamsungAcPowerful10Offset,
-          kSamsungAcPowerful10Offset, on ? 0b11: 0b00);
+          kSamsungAcPowerful10Size, on ? kSamsungAcPowerful10On : off_value);
   if (on) {
     remote_state[8] &= ~kSamsungAcPowerfulMask8;  // Bit needs to be cleared.
     // Powerful mode sets fan speed to Turbo.
@@ -567,6 +568,26 @@ void IRSamsungAc::setPowerful(const bool on) {
     remote_state[8] |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
     // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
     if (this->getFan() == kSamsungAcFanTurbo) this->setFan(kSamsungAcFanAuto);
+  }
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
+// Are the vanes closed over the fan outlet, to stop direct wind? Aka. WindFree
+bool IRSamsungAc::getBreeze(void) {
+  return (GETBITS8(remote_state[10], kSamsungAcBreezeOffset,
+                   kSamsungAcBreezeSize) == kSamsungAcBreezeOn) &&
+         (this->getFan() == kSamsungAcFanAuto && !getSwing());
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
+// Closes the vanes over the fan outlet, to stop direct wind. Aka. WindFree
+void IRSamsungAc::setBreeze(const bool on) {
+  uint8_t off_value = this->getPowerful() ? kSamsungAcPowerful10On : 0b000;
+  setBits(&remote_state[10], kSamsungAcBreezeOffset,
+          kSamsungAcBreezeSize, on ? kSamsungAcBreezeOn : off_value);
+  if (on) {
+    this->setFan(kSamsungAcFanAuto);
+    this->setSwing(false);
   }
 }
 
@@ -695,6 +716,7 @@ String IRSamsungAc::toString(void) {
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getBreeze(), kBreezeStr);
   result += addBoolToString(getDisplay(), kLightStr);
   result += addBoolToString(getIon(), kIonStr);
   return result;
@@ -726,17 +748,17 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t offset,
   if (!matchMark(results->rawbuf[offset++], kSamsungAcBitMark)) return false;
   if (!matchSpace(results->rawbuf[offset++], kSamsungAcHdrSpace)) return false;
   // Section(s)
-  for (uint16_t pos = 0; pos <= (nbits / 8) - kSamsungACSectionLength;
-       pos += kSamsungACSectionLength) {
+  for (uint16_t pos = 0; pos <= (nbits / 8) - kSamsungAcSectionLength;
+       pos += kSamsungAcSectionLength) {
     uint16_t used;
     // Section Header + Section Data (7 bytes) + Section Footer
     used = matchGeneric(results->rawbuf + offset, results->state + pos,
-                        results->rawlen - offset, kSamsungACSectionLength * 8,
+                        results->rawlen - offset, kSamsungAcSectionLength * 8,
                         kSamsungAcSectionMark, kSamsungAcSectionSpace,
                         kSamsungAcBitMark, kSamsungAcOneSpace,
                         kSamsungAcBitMark, kSamsungAcZeroSpace,
                         kSamsungAcBitMark, kSamsungAcSectionGap,
-                        pos + kSamsungACSectionLength >= nbits / 8,
+                        pos + kSamsungAcSectionLength >= nbits / 8,
                         _tolerance, 0, false);
     if (used == 0) return false;
     offset += used;

@@ -19,22 +19,59 @@
 // Supports:
 //   Brand: Samsung,  Model: UA55H6300 TV
 //   Brand: Samsung,  Model: DB63-03556X003 remote
+//   Brand: Samsung,  Model: DB93-16761C remote
 //   Brand: Samsung,  Model: IEC-R03 remote
 //   Brand: Samsung,  Model: AR09FSSDAWKNFA A/C
 //   Brand: Samsung,  Model: AR12KSFPEWQNET A/C
 //   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C
+//   Brand: Samsung,  Model: AR12NXCXAWKXEU A/C
 
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 
 // Constants
+// Byte[1]
+// Checksum                                        0b11110000 ???
+const uint8_t kSamsungAcPower1Offset = 5;  // Mask 0b00100000
+const uint8_t kSamsungAcQuiet1Offset = 4;  // Mask 0b00010000
+// Byte[5]
+const uint8_t kSamsungAcQuiet5Offset = 5;
+// Byte[6]
+const uint8_t kSamsungAcPower6Offset = 4;  // Mask 0b00110000
+const uint8_t kSamsungAcPower6Size = 2;  // Bits
+// Byte[8]
+// Checksum                             0b11110000 ???
+const uint8_t kSamsungAcPowerfulMask8 = 0b01010000;
+// Byte[9]
+const uint8_t kSamsungAcSwingOffset = 4;  // Mask 0b01110000
+const uint8_t kSamsungAcSwingSize = 3;  // Bits
+const uint8_t kSamsungAcSwingMove =                0b010;
+const uint8_t kSamsungAcSwingStop =                0b111;
+// Byte[10]
+const uint8_t kSamsungAcPowerful10Offset = 1;  // Mask 0b00001110
+const uint8_t kSamsungAcPowerful10Size = 3;    // Mask 0b00001110
+const uint8_t kSamsungAcPowerful10On =                     0b011;
+// Breeze (aka. WindFree)
+const uint8_t kSamsungAcBreezeOffset = kSamsungAcPowerful10Offset;
+const uint8_t kSamsungAcBreezeSize = kSamsungAcPowerful10Size;
+const uint8_t kSamsungAcBreezeOn =                         0b101;
+const uint8_t kSamsungAcDisplayOffset = 4;     // Mask 0b00010000
+const uint8_t kSamsungAcClean10Offset = 7;     // Mask 0b10000000
+// Byte[11]
+const uint8_t kSamsungAcIonOffset = 0;      // Mask 0b00000001
+const uint8_t kSamsungAcClean11Offset = 1;  // Mask 0b00000010
+const uint8_t kSamsungAcMinTemp = 16;   // C   Mask 0b11110000
+const uint8_t kSamsungAcMaxTemp = 30;   // C   Mask 0b11110000
+const uint8_t kSamsungAcAutoTemp = 25;  // C   Mask 0b11110000
+// Byte[12]
+const uint8_t kSamsungAcModeOffset = 4;  // Mask 0b01110000
 const uint8_t kSamsungAcAuto = 0;
 const uint8_t kSamsungAcCool = 1;
 const uint8_t kSamsungAcDry = 2;
 const uint8_t kSamsungAcFan = 3;
 const uint8_t kSamsungAcHeat = 4;
-const uint8_t kSamsungAcModeOffset = 4;  // Mask 0b01110000
-const uint8_t kSamsungAcFanOffest = 1;  // Mask 0b00001110
+const uint8_t kSamsungAcFanOffest = 1;   // Mask 0b00001110
 const uint8_t kSamsungAcFanSize = 3;  // Bits
 const uint8_t kSamsungAcFanAuto = 0;
 const uint8_t kSamsungAcFanLow = 2;
@@ -42,28 +79,10 @@ const uint8_t kSamsungAcFanMed = 4;
 const uint8_t kSamsungAcFanHigh = 5;
 const uint8_t kSamsungAcFanAuto2 = 6;
 const uint8_t kSamsungAcFanTurbo = 7;
-const uint8_t kSamsungAcMinTemp = 16;   // 16C
-const uint8_t kSamsungAcMaxTemp = 30;   // 30C
-const uint8_t kSamsungAcAutoTemp = 25;  // 25C
-const uint8_t kSamsungAcPower1Offset = 5;
-const uint8_t kSamsungAcPower6Offset = 4;  // Mask 0b00110000
-const uint8_t kSamsungAcPower6Size = 2;  // Bits
-const uint8_t kSamsungAcSwingOffset = 4;  // Mask 0b01110000
-const uint8_t kSamsungAcSwingSize = 3;  // Bits
-const uint8_t kSamsungAcSwingMove = 0b010;
-const uint8_t kSamsungAcSwingStop = 0b111;
-const uint8_t kSamsungAcBeepOffset = 1;
-const uint8_t kSamsungAcClean10Offset = 7;
-const uint8_t kSamsungAcClean11Offset = 1;     // 0b00000010
-const uint8_t kSamsungAcQuiet1Offset = 4;
-const uint8_t kSamsungAcQuiet5Offset = 5;
-const uint8_t kSamsungAcPowerfulMask8 = 0b01010000;
-const uint8_t kSamsungAcPowerful10Offset = 1;  // Mask 0b00000110
-const uint8_t kSamsungAcPowerful10Size = 1;  // Mask 0b00000110
-const uint8_t kSamsungAcDisplayOffset = 4;  // Mask 0b00010000
-const uint8_t kSamsungAcIonOffset = 0;  // Mask 0b00000001
+// Byte[13]
+const uint8_t kSamsungAcBeepOffset = 1;  // Mask 0b00000010
 
-const uint16_t kSamsungACSectionLength = 7;
+const uint16_t kSamsungAcSectionLength = 7;
 const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
 
 // Classes
@@ -103,7 +122,8 @@ class IRSamsungAc {
   bool getQuiet(void);
   void setPowerful(const bool on);
   bool getPowerful(void);
-
+  void setBreeze(const bool on);
+  bool getBreeze(void);
   void setDisplay(const bool on);
   bool getDisplay(void);
   void setIon(const bool on);
