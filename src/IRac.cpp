@@ -147,6 +147,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_HITACHI_AC
     case decode_type_t::HITACHI_AC:
 #endif
+#if SEND_HITACHI_AC1
+    case decode_type_t::HITACHI_AC1:
+#endif
 #if SEND_HITACHI_AC424
     case decode_type_t::HITACHI_AC424:
 #endif
@@ -697,6 +700,30 @@ void IRac::hitachi(IRHitachiAc *ac,
   ac->send();
 }
 #endif  // SEND_HITACHI_AC
+
+#if SEND_HITACHI_AC1
+void IRac::hitachi1(IRHitachiAc1 *ac,
+                    const bool on, const stdAc::opmode_t mode,
+                    const float degrees, const stdAc::fanspeed_t fan,
+                    const stdAc::swingv_t swingv) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  // No Swing(H) setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_HITACHI_AC1
 
 #if SEND_HITACHI_AC424
 void IRac::hitachi424(IRHitachiAc424 *ac,
@@ -1491,6 +1518,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HITACHI_AC
+#if SEND_HITACHI_AC1
+    case HITACHI_AC1:
+    {
+      IRHitachiAc1 ac(_pin, _inverted, _modulation);
+      hitachi1(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
+      break;
+    }
+#endif  // SEND_HITACHI_AC1
 #if SEND_HITACHI_AC424
     case HITACHI_AC424:
     {
@@ -2417,6 +2452,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+#if DECODE_HITACHI_AC1
+      case decode_type_t::HITACHI_AC1: {
+        IRHitachiAc1 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC1
 #if DECODE_HITACHI_AC424
       case decode_type_t::HITACHI_AC424: {
         IRHitachiAc424 ac(kGpioUnused);

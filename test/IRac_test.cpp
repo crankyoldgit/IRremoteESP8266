@@ -631,6 +631,31 @@ TEST(TestIRac, Hitachi) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Hitachi1) {
+  IRHitachiAc1 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 15 (Auto), Temp: 19C, Fan: 4 (Medium), Swing: Off";
+
+  ac.begin();
+  irac.hitachi1(&ac,
+                true,                        // Power
+                stdAc::opmode_t::kAuto,      // Mode
+                19,                          // Celsius
+                stdAc::fanspeed_t::kMedium,  // Fan speed
+                stdAc::swingv_t::kOff);      // Veritcal swing
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC1, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc1Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
 TEST(TestIRac, Hitachi424) {
   IRHitachiAc424 ac(0);
   IRac irac(0);

@@ -809,7 +809,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HITACHI_AC1", typeToString(decode_type_t::HITACHI_AC1));
   ASSERT_EQ(decode_type_t::HITACHI_AC1, strToDecodeType("HITACHI_AC1"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC1));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC1));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC1));
 
   ASSERT_EQ("HITACHI_AC2", typeToString(decode_type_t::HITACHI_AC2));
   ASSERT_EQ(decode_type_t::HITACHI_AC2, strToDecodeType("HITACHI_AC2"));
