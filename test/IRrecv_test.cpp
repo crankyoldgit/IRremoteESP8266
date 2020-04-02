@@ -1617,7 +1617,7 @@ TEST(TestManchesterCode, matchManchester) {
   uint16_t offset = 1;
   uint64_t result = 0;
   uint16_t nbits = 32;
-  EXPECT_EQ(55, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+  EXPECT_EQ(56, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
                                        2860, 3800, 1000, 0, 3800));
   EXPECT_EQ(0x4F2FE7E4, result);

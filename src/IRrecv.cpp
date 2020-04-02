@@ -1344,7 +1344,6 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
   // 2 per bit, and 4 extra for the timing sync.
   uint16_t expected_half_periods = 2 * nbits + 4;
   bool currentBit = false;
-  bool merged_period = false;
 
   // Calculate how much remaining buffer is required.
   // Shortest case. Longest case is 2 * nbits.
@@ -1423,7 +1422,6 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                             excess)) {
       // Special case when we are at the end of the expected nr of periods.
       // i.e. The pulse could be merged with the footer.
-      merged_period = true;
       nr_of_half_periods++;
       break;
     } else {
@@ -1435,10 +1433,13 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
   if (nr_of_half_periods < expected_half_periods) return 0;
 
   // Footer
-  if (footermark && !matchMark(*(data_ptr + offset++),
-                               footermark + (merged_period ? half_period : 0),
-                               tolerance, excess))
+  if (footermark &&
+      !(matchMark(*(data_ptr + offset), footermark + half_period,
+                  tolerance, excess) ||
+        matchMark(*(data_ptr + offset), footermark,
+                    tolerance, excess)))
     return 0;
+  offset++;
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
     if (atleast) {

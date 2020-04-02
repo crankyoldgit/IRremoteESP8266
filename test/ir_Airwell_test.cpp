@@ -155,6 +155,57 @@ TEST(TestDecodeAirwell, SyntheticExample) {
   EXPECT_EQ(0x0, irsend.capture.command);
 }
 
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
+// Data from:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1069#issuecomment-607659677
+TEST(TestDecodeAirwell, RealExample2) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  // "When I change from 22° to 23° :"
+  const uint16_t rawData[175] = {
+      2890, 2918,
+      924, 1006, 946, 1886, 1986, 1922, 978, 958, 1952, 1000, 952, 956, 974,
+      964, 976, 1884, 1016, 952, 1948, 1006, 944, 962, 980, 958, 982, 958, 952,
+      982, 978, 960, 980, 956, 986, 956, 974, 1888, 1014, 954, 1948, 1002, 948,
+      960, 980, 960, 950, 986, 1006, 962, 980, 1854, 1036, 932, 1948, 1928, 984,
+      954,
+      3918, 2920,
+      922, 1008, 942, 1888, 1984, 1926, 984, 950, 1952, 1000, 952, 956, 984,
+      956, 954, 1908, 1014, 952, 1948, 1002, 948, 960, 950, 986, 984, 956, 954,
+      984, 956, 984, 946, 992, 948, 992, 948, 1910, 1012, 958, 1954, 996, 922,
+      984, 956, 986, 956, 980, 950, 988, 954, 1910, 1010, 956, 1946, 1932, 978,
+      962,
+      3922, 2914,
+      918, 1010, 920, 1912, 1980, 1928, 982, 956, 1944, 1006, 924, 982, 958,
+      982, 948, 1912, 1008, 958, 1952, 1000, 920, 988, 952, 982, 958, 984, 958,
+      978, 952, 986, 986, 952, 958, 984, 946, 1912, 1010, 962, 1948, 1004, 926,
+      980, 950, 988, 952, 984, 956, 982, 948, 1916, 1016, 952, 1950, 1926, 984,
+      952, 4830}; // UNKNOWN 8E34167B
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 175, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
+  ASSERT_EQ(kAirwellBits, irsend.capture.bits);
+  EXPECT_EQ(0xB0C0181B, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+
+  // Resend it as a synthetic to see if it decodes to the same value.
+  irsend.reset();
+  irsend.sendAirwell(0xB0C0181B);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
+  ASSERT_EQ(kAirwellBits, irsend.capture.bits);
+  EXPECT_EQ(0xB0C0181B, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+}
+
 TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("AIRWELL", typeToString(decode_type_t::AIRWELL));
   ASSERT_EQ(decode_type_t::AIRWELL, strToDecodeType("AIRWELL"));
