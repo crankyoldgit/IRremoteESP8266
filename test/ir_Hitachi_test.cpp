@@ -1591,13 +1591,14 @@ TEST(TestIRHitachiAc1Class, HumanReadable) {
       ac.toString());
 }
 
-/* Disabled until HITACHIAC1 checksum is working.
 TEST(TestIRHitachiAc1Class, Checksum) {
+  // Reverse Table: 2=4, B=D, A=5, E=7, 1=8, 3=C, 0=0, 6=6, 9=9, F=F
   IRHitachiAc1 ac(kGpioUnused);
   // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=A47:B47
   const uint8_t cool_32_auto[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x30,
       0x04};
+  // Reversed: 4D, 75, B2, 89, 0F, 86, 33, 00, 00, 00, 00, 0C, 20
   EXPECT_TRUE(ac.validChecksum(cool_32_auto));
   EXPECT_EQ(0x04, ac.calcChecksum(cool_32_auto));
 
@@ -1605,6 +1606,7 @@ TEST(TestIRHitachiAc1Class, Checksum) {
   const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
       0x68};
+  // Reversed: 4D, 75, B2, 89, 0F, 86, 31, 00, 00, 00, 00, 04, 16
   EXPECT_TRUE(ac.validChecksum(cool_31_auto));
   EXPECT_EQ(0x68, ac.calcChecksum(cool_31_auto));
 
@@ -1612,22 +1614,16 @@ TEST(TestIRHitachiAc1Class, Checksum) {
   const uint8_t auto_25_auto_swing_on[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4, 0x00, 0x00, 0x00, 0x00, 0x61,
       0x24};
+  // Reversed: 4D, 75, B2, 89, 0F, 87, 25, 00, 00, 00, 00, 86, 42
   EXPECT_TRUE(ac.validChecksum(auto_25_auto_swing_on));
   EXPECT_EQ(0x24, ac.calcChecksum(auto_25_auto_swing_on));
   // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B45
   const uint8_t cool_30_auto[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x20,
       0xC4};
-  const uint8_t cool_30_auto_rev[kHitachiAc1StateLength] = {
-      0x4D, 0x75, 0xB2, 0x89, 0x0F, 0x86, 0x2F, 0x00, 0x00, 0x00, 0x00, 0x04,
-      0x23};
-  const uint8_t cool_31_auto_rev[kHitachiAc1StateLength] = {
-      0x4D, 0x75, 0xB2, 0x89, 0x0F, 0x86, 0x31, 0x00, 0x00, 0x00, 0x00, 0x04,
-      0x16};
   EXPECT_TRUE(ac.validChecksum(cool_30_auto));
   EXPECT_EQ(0xC4, ac.calcChecksum(cool_30_auto));
 }
-*/
 
 TEST(TestIRHitachiAc1Class, toCommon) {
   IRHitachiAc1 ac(kGpioUnused);

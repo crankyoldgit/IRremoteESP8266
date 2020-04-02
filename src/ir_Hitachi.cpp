@@ -376,14 +376,16 @@ void IRHitachiAc1::stateReset(void) {
 
 void IRHitachiAc1::begin(void) { _irsend.begin(); }
 
-/*
-// TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
-
 uint8_t IRHitachiAc1::calcChecksum(const uint8_t state[],
-                                  const uint16_t length) {
-  uint8_t sum = 0x4F;
-  for (uint16_t i = 0; i < length - 1; i++) sum += reverseBits(state[i], 8);
-  return reverseBits(sum, 8) & 0xFC;
+                                   const uint16_t length) {
+  uint8_t sum = 0;
+  for (uint16_t i = 5; i < length - 1; i++) {
+    sum += reverseBits(GETBITS8(state[i], kLowNibble, kNibbleSize),
+                       kNibbleSize);
+    sum += reverseBits(GETBITS8(state[i], kHighNibble, kNibbleSize),
+                       kNibbleSize);
+  }
+  return reverseBits(sum, 8);
 }
 
 void IRHitachiAc1::checksum(const uint16_t length) {
@@ -394,11 +396,9 @@ bool IRHitachiAc1::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < 2) return true;  // Assume true for lengths that are too short.
   return (state[length - 1] == calcChecksum(state, length));
 }
-*/
 
 uint8_t *IRHitachiAc1::getRaw(void) {
-  // TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
-  // checksum();
+  checksum();
   return remote_state;
 }
 
@@ -406,8 +406,6 @@ void IRHitachiAc1::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kHitachiAc1StateLength));
 }
 
-// TODO(soumaxetuirk): Disabled until checksum() works.
-/*
 #if SEND_HITACHI_AC
 void IRHitachiAc1::send(const uint16_t repeat) {
   _irsend.sendHitachiAC1(getRaw(), kHitachiAc1StateLength, repeat);
@@ -417,7 +415,6 @@ void IRHitachiAc1::send(const uint16_t repeat) {
   setSwingToggle(false);
 }
 #endif  // SEND_HITACHI_AC
-*/
 
 bool IRHitachiAc1::getPower(void) {
   return GETBIT8(remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerOffset);
@@ -648,10 +645,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
     if (nbits / 8 == kHitachiAcStateLength &&
         !IRHitachiAc::validChecksum(results->state, kHitachiAcStateLength))
       return false;
-    // TODO(soumaxetuirk): Workout the checksum alg. for this protocol.
-    // if (nbits / 8 == kHitachiAc1StateLength &&
-    //    !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
-    //   return false;
+    if (nbits / 8 == kHitachiAc1StateLength &&
+       !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
+      return false;
   }
 
   // Success
