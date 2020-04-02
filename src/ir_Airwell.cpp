@@ -24,7 +24,7 @@ const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 //           Typically kAirwellBits.
 //   repeat: The number of times the command is to be repeated.
 //
-// Status: ALPHA / Experimental! May change at any time.
+// Status: BETA / Appears to be working.
 //
 // Ref:
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
@@ -50,7 +50,7 @@ void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Experimental! May change at any time.
+// Status: BETA / Appears to be working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
