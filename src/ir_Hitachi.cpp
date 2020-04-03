@@ -421,8 +421,7 @@ void IRHitachiAc1::setRaw(const uint8_t new_code[], const uint16_t length) {
 void IRHitachiAc1::send(const uint16_t repeat) {
   _irsend.sendHitachiAC1(getRaw(), kHitachiAc1StateLength, repeat);
   // Clear the toggle bits as we have actioned them by sending them.
-  setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerToggleOffset,
-         false);
+  setPowerToggle(false);
   setSwingToggle(false);
 }
 #endif  // SEND_HITACHI_AC
@@ -453,11 +452,18 @@ bool IRHitachiAc1::getPower(void) {
 }
 
 void IRHitachiAc1::setPower(const bool on) {
-  if (on != getPower())  // Is the power changing?
-    // Then set the power toggle bit.
-    setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerToggleOffset,
-           true);
+  // If the power changes, set the power toggle bit.
+  if (on != getPower()) setPowerToggle(true);
   setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerOffset, on);
+}
+
+bool IRHitachiAc1::getPowerToggle(void) {
+  return GETBIT8(remote_state[kHitachiAc1PowerByte],
+                 kHitachiAc1PowerToggleOffset);
+}
+
+void IRHitachiAc1::setPowerToggle(const bool on) {
+  setBit(&remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerToggleOffset, on);
 }
 
 void IRHitachiAc1::on(void) { setPower(true); }
@@ -534,6 +540,24 @@ void IRHitachiAc1::setSwing(const bool on) {
   setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingOffset, on);
 }
 
+uint8_t IRHitachiAc1::getSleep(void) {
+  return GETBITS8(remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
+                  kHitachiAc1SleepSize);
+}
+
+void IRHitachiAc1::setSleep(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAc1Sleep1:
+    case kHitachiAc1Sleep2:
+    case kHitachiAc1Sleep3:
+    case kHitachiAc1Sleep4:
+    case kHitachiAc1SleepOff: break;
+    default: setSleep(kHitachiAc1SleepOff);
+  }
+  setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
+          kHitachiAc1SleepSize, mode);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRHitachiAc1::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -590,6 +614,7 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
                                      stdAc::swingv_t::kOff;
+  result.sleep = this->getSleep() ? 0 : -1;
   // Not supported.
   result.quiet = false;
   result.turbo = false;
@@ -599,7 +624,6 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
   result.light = false;
   result.beep = false;
   result.swingh = stdAc::swingh_t::kOff;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -607,16 +631,21 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRHitachiAc1::toString(void) {
   String result = "";
-  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::HITACHI_AC1, getModel(), false);
   result += addBoolToString(getPower(), kPowerStr);
+  result += addBoolToString(getPowerToggle(), kPowerToggleStr);
   result += addModeToString(getMode(), kHitachiAc1Auto, kHitachiAc1Cool,
                             kHitachiAc1Heat, kHitachiAc1Dry, kHitachiAc1Fan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHitachiAc1FanHigh, kHitachiAc1FanLow,
                            kHitachiAc1FanAuto, kHitachiAc1FanAuto,
                            kHitachiAc1FanMed);
-  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
+  result += addBoolToString(getSwing(), kSwingVModeStr);
+  result += addLabeledString((getSleep() != 0) ? uint64ToString(getSleep())
+                                               : kOffStr,
+                             kSleepStr);
   return result;
 }
 

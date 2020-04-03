@@ -229,9 +229,11 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_HITACHI_AC
 #if SEND_HITACHI_AC1
   void hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
-                const bool on, const stdAc::opmode_t mode,
+                const bool on, const bool power_toggle,
+                const stdAc::opmode_t mode,
                 const float degrees, const stdAc::fanspeed_t fan,
-                const stdAc::swingv_t swingv);
+                const stdAc::swingv_t swingv, const bool swing_toggle,
+                const int16_t sleep = -1);
 #endif  // SEND_HITACHI_AC1
 #if SEND_HITACHI_AC424
   void hitachi424(IRHitachiAc424 *ac,

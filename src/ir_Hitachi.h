@@ -109,13 +109,23 @@ const uint8_t kHitachiAc1TempByte = 6;
 const uint8_t kHitachiAc1TempOffset = 2;
 const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
 const uint8_t kHitachiAc1TempDelta = 7;
-// Byte[11] (Power/Swing)
+// Byte[11] (Power/Swing/Sleep)
 const uint8_t kHitachiAc1PowerByte = 11;
 const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
 const uint8_t kHitachiAc1PowerToggleOffset = 4;  // Mask 0b00010000
 const uint8_t kHitachiAc1SwingByte = kHitachiAc1PowerByte;
 const uint8_t kHitachiAc1SwingOffset = 6;        // Mask 0b01000000
 const uint8_t kHitachiAc1SwingToggleOffset = 0;  // Mask 0b00000001
+const uint8_t kHitachiAc1SleepByte = kHitachiAc1PowerByte;
+const uint8_t kHitachiAc1SleepOffset = 1;        // Mask 0b00001110
+const uint8_t kHitachiAc1SleepSize = 3;          // Mask 0b00001110
+const uint8_t kHitachiAc1SleepOff =                          0b000;
+const uint8_t kHitachiAc1Sleep1 =                            0b001;
+const uint8_t kHitachiAc1Sleep2 =                            0b010;
+// TODO(soumaxetuirk): Confirm this value. It looks wrong.
+const uint8_t kHitachiAc1Sleep3 =                           0b1110;  // ????
+const uint8_t kHitachiAc1Sleep4 =                            0b100;
+
 
 
 // Classes
@@ -187,6 +197,8 @@ class IRHitachiAc1 {
   hitachi_ac1_remote_model_t getModel(void);
   void setPower(const bool on);
   bool getPower(void);
+  void setPowerToggle(const bool on);
+  bool getPowerToggle(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
@@ -197,6 +209,8 @@ class IRHitachiAc1 {
   bool getSwingToggle(void);
   void setSwing(const bool on);
   bool getSwing(void);
+  void setSleep(const uint8_t mode);
+  uint8_t getSleep(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc1StateLength);

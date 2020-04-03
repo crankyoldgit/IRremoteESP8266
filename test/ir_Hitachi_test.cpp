@@ -573,8 +573,9 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   ASSERT_EQ(kHitachiAc1Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc1Bits);
   EXPECT_EQ(
-      "Model: 2 (R-LT0541-HTA-B), Power: Off, Mode: 6 (Cool), Temp: 23C, "
-      "Fan: 1 (Auto), Swing: Off",
+      "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
+      "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -1518,13 +1519,20 @@ TEST(TestHitachiAc3Class, hasInvertedStates) {
 TEST(TestIRHitachiAc1Class, SetAndGetPower) {
   IRHitachiAc1 ac(kGpioUnused);
   ac.on();
+  ac.setPowerToggle(false);
   EXPECT_TRUE(ac.getPower());
+  EXPECT_FALSE(ac.getPowerToggle());
   ac.off();
   EXPECT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
 }
 
 TEST(TestIRHitachiAc1Class, SetAndGetTemp) {
@@ -1591,13 +1599,19 @@ TEST(TestIRHitachiAc1Class, HumanReadable) {
       0x04};
   ac.setRaw(cool_32_auto);
   EXPECT_EQ(
-      "Model: 1 (R-LT0541-HTA-A), Power: On, Mode: 6 (Cool), Temp: 32C, "
-      "Fan: 1 (Auto), Swing: Off",
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: On, Mode: 6 (Cool), "
+      "Temp: 32C, Fan: 1 (Auto), Swing(V) Toggle: Off, Swing(V) Mode: Off, "
+      "Sleep: Off",
       ac.toString());
   ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+  ac.setSwing(true);
+  ac.setSwingToggle(true);
+  ac.setSleep(kHitachiAc1Sleep2);
+  ac.setPowerToggle(false);
   EXPECT_EQ(
-      "Model: 2 (R-LT0541-HTA-B), Power: On, Mode: 6 (Cool), Temp: 32C, "
-      "Fan: 1 (Auto), Swing: Off",
+      "Model: 2 (R-LT0541-HTA-B), Power: On, Power Toggle: Off, "
+      "Mode: 6 (Cool), Temp: 32C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 2",
       ac.toString());
 }
 
@@ -1663,4 +1677,62 @@ TEST(TestIRHitachiAc1Class, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestIRHitachiAc1Class, ReconstructKnownGood) {
+  IRHitachiAc1 ac(kGpioUnused);
+  const uint8_t known_good[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84,
+      0x00, 0x00, 0x00, 0x00, 0x10, 0x98};
+  ac.stateReset();
+  ac.setPower(false);
+  ac.setPowerToggle(true);
+  ac.setMode(kHitachiAc1Cool);
+  ac.setTemp(23);
+  ac.setFan(kHitachiAc1FanAuto);
+  ac.setSwing(false);
+  ac.setSwingToggle(false);
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+
+  EXPECT_STATE_EQ(known_good, ac.getRaw(), kHitachiAc1Bits);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
+      "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAc1Class, Swing) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setSwing(false);
+  EXPECT_FALSE(ac.getSwing());
+  ac.setSwingToggle(false);
+  EXPECT_FALSE(ac.getSwingToggle());
+
+  ac.setSwing(true);
+  EXPECT_TRUE(ac.getSwing());
+  EXPECT_FALSE(ac.getSwingToggle());
+  ac.setSwingToggle(true);
+  EXPECT_TRUE(ac.getSwing());
+  EXPECT_TRUE(ac.getSwingToggle());
+
+  ac.setSwing(false);
+  EXPECT_FALSE(ac.getSwing());
+  ac.setSwingToggle(false);
+  EXPECT_FALSE(ac.getSwingToggle());
+
+  const uint8_t swing_on_with_toggle[kHitachiAc1StateLength] = {
+    0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4,
+    0x00, 0x00, 0x00, 0x00, 0x61, 0x24};
+  ac.setRaw(swing_on_with_toggle);
+  EXPECT_TRUE(ac.getSwing());
+  EXPECT_TRUE(ac.getSwingToggle());
+  const uint8_t swing_off_with_toggle[kHitachiAc1StateLength] = {
+    0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4,
+    0x00, 0x00, 0x00, 0x00, 0x21, 0x44};
+  ac.setRaw(swing_off_with_toggle);
+  EXPECT_FALSE(ac.getSwing());
+  EXPECT_TRUE(ac.getSwingToggle());
+  ac.setSwingToggle(true);
+  EXPECT_STATE_EQ(swing_off_with_toggle, ac.getRaw(), kHitachiAc1Bits);
 }

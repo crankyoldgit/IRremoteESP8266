@@ -636,19 +636,22 @@ TEST(TestIRac, Hitachi1) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Model: 1 (R-LT0541-HTA-A), Power: On, Mode: 15 (Auto), Temp: 19C, "
-      "Fan: 4 (Medium), Swing: Off";
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: Off, "
+      "Mode: 15 (Auto), Temp: 19C, Fan: 4 (Medium), "
+      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 1";
 
   ac.begin();
   irac.hitachi1(&ac,
                 hitachi_ac1_remote_model_t::R_LT0541_HTA_A,  // Model
                 true,                                        // Power
+                false,                                       // Power Toggle
                 stdAc::opmode_t::kAuto,                      // Mode
                 19,                                          // Celsius
                 stdAc::fanspeed_t::kMedium,                  // Fan speed
-                stdAc::swingv_t::kOff);                      // Veritcal swing
+                stdAc::swingv_t::kAuto,                      // Vertical swing
+                true,                                        // Swing(V) toggle
+                5 * 60 + 37);                                // Sleep
 
-  ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(HITACHI_AC1, ac._irsend.capture.decode_type);
