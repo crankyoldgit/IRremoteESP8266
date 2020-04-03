@@ -638,7 +638,8 @@ TEST(TestIRac, Hitachi1) {
   char expected[] =
       "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: Off, "
       "Mode: 15 (Auto), Temp: 19C, Fan: 4 (Medium), "
-      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 1";
+      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 1, "
+      "On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.hitachi1(&ac,

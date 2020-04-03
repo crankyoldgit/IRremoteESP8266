@@ -52,6 +52,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -390,7 +391,7 @@ void IRHitachiAc1::begin(void) { _irsend.begin(); }
 uint8_t IRHitachiAc1::calcChecksum(const uint8_t state[],
                                    const uint16_t length) {
   uint8_t sum = 0;
-  for (uint16_t i = 5; i < length - 1; i++) {
+  for (uint16_t i = kHitachiAc1ChecksumStartByte; i < length - 1; i++) {
     sum += reverseBits(GETBITS8(state[i], kLowNibble, kNibbleSize),
                        kNibbleSize);
     sum += reverseBits(GETBITS8(state[i], kHighNibble, kNibbleSize),
@@ -545,6 +546,30 @@ uint8_t IRHitachiAc1::getSleep(void) {
                   kHitachiAc1SleepSize);
 }
 
+void IRHitachiAc1::setOnTimer(const uint16_t mins) {
+  const uint16_t mins_lsb = reverseBits(mins, kHitachiAc1TimerSize);
+  remote_state[kHitachiAc1OnTimerLowByte] = GETBITS16(mins_lsb, 8, 8);
+  remote_state[kHitachiAc1OnTimerHighByte] = GETBITS16(mins_lsb, 0, 8);
+}
+
+uint16_t IRHitachiAc1::getOnTimer(void) {
+  return reverseBits(
+      (remote_state[kHitachiAc1OnTimerLowByte] << 8) |
+      remote_state[kHitachiAc1OnTimerHighByte], kHitachiAc1TimerSize);
+}
+
+void IRHitachiAc1::setOffTimer(const uint16_t mins) {
+  const uint16_t mins_lsb = reverseBits(mins, kHitachiAc1TimerSize);
+  remote_state[kHitachiAc1OffTimerLowByte] = GETBITS16(mins_lsb, 8, 8);
+  remote_state[kHitachiAc1OffTimerHighByte] = GETBITS16(mins_lsb, 0, 8);
+}
+
+uint16_t IRHitachiAc1::getOffTimer(void) {
+  return reverseBits(
+      (remote_state[kHitachiAc1OffTimerLowByte] << 8) |
+      remote_state[kHitachiAc1OffTimerHighByte], kHitachiAc1TimerSize);
+}
+
 void IRHitachiAc1::setSleep(const uint8_t mode) {
   switch (mode) {
     case kHitachiAc1Sleep1:
@@ -643,9 +668,14 @@ String IRHitachiAc1::toString(void) {
                            kHitachiAc1FanMed);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getSwing(), kSwingVModeStr);
-  result += addLabeledString((getSleep() != 0) ? uint64ToString(getSleep())
-                                               : kOffStr,
+  result += addLabeledString(getSleep() ? uint64ToString(getSleep()) : kOffStr,
                              kSleepStr);
+  result += addLabeledString(getOnTimer() ? minsToString(getOnTimer())
+                                          : kOffStr,
+                            kOnTimerStr);
+  result += addLabeledString(getOffTimer() ? minsToString(getOffTimer())
+                                           : kOffStr,
+                            kOffTimerStr);
   return result;
 }
 

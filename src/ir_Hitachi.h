@@ -109,6 +109,14 @@ const uint8_t kHitachiAc1TempByte = 6;
 const uint8_t kHitachiAc1TempOffset = 2;
 const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
 const uint8_t kHitachiAc1TempDelta = 7;
+// Note: Timers are nr. of minutes & stored in LSB order.
+// Byte[7-8] (Off Timer)
+const uint8_t kHitachiAc1TimerSize = 16;  // Mask 0b1111111111111111
+const uint8_t kHitachiAc1OffTimerLowByte = 7;
+const uint8_t kHitachiAc1OffTimerHighByte = 8;
+// Byte[9-10] (On Timer)
+const uint8_t kHitachiAc1OnTimerLowByte = 9;
+const uint8_t kHitachiAc1OnTimerHighByte = 10;
 // Byte[11] (Power/Swing/Sleep)
 const uint8_t kHitachiAc1PowerByte = 11;
 const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
@@ -125,7 +133,8 @@ const uint8_t kHitachiAc1Sleep2 =                            0b010;
 // TODO(soumaxetuirk): Confirm this value. It looks wrong.
 const uint8_t kHitachiAc1Sleep3 =                           0b1110;  // ????
 const uint8_t kHitachiAc1Sleep4 =                            0b100;
-
+// Byte[12] (Checksum)
+const uint8_t kHitachiAc1ChecksumStartByte = 5;
 
 
 // Classes
@@ -211,6 +220,10 @@ class IRHitachiAc1 {
   bool getSwing(void);
   void setSleep(const uint8_t mode);
   uint8_t getSleep(void);
+  void setOnTimer(const uint16_t mins);
+  uint16_t getOnTimer(void);
+  void setOffTimer(const uint16_t mins);
+  uint16_t getOffTimer(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc1StateLength);

@@ -575,7 +575,8 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   EXPECT_EQ(
       "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
       "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
-      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off",
+      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -1601,17 +1602,20 @@ TEST(TestIRHitachiAc1Class, HumanReadable) {
   EXPECT_EQ(
       "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: On, Mode: 6 (Cool), "
       "Temp: 32C, Fan: 1 (Auto), Swing(V) Toggle: Off, Swing(V) Mode: Off, "
-      "Sleep: Off",
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
   ac.setSwing(true);
   ac.setSwingToggle(true);
   ac.setSleep(kHitachiAc1Sleep2);
   ac.setPowerToggle(false);
+  ac.setOnTimer(2 * 60 + 39);
+  ac.setOffTimer(10 * 60 + 17);
   EXPECT_EQ(
       "Model: 2 (R-LT0541-HTA-B), Power: On, Power Toggle: Off, "
       "Mode: 6 (Cool), Temp: 32C, Fan: 1 (Auto), "
-      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 2",
+      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 2, "
+      "On Timer: 02:39, Off Timer: 10:17",
       ac.toString());
 }
 
@@ -1698,7 +1702,8 @@ TEST(TestIRHitachiAc1Class, ReconstructKnownGood) {
   EXPECT_EQ(
       "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
       "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
-      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off",
+      "Swing(V) Toggle: Off, Swing(V) Mode: Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 }
 
