@@ -572,6 +572,10 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   EXPECT_EQ(HITACHI_AC1, irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAc1Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc1Bits);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: Off, Mode: 6 (Cool), Temp: 23C, "
+      "Fan: 1 (Auto), Swing: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 // Tests for sendHitachiAC2().
@@ -1587,7 +1591,13 @@ TEST(TestIRHitachiAc1Class, HumanReadable) {
       0x04};
   ac.setRaw(cool_32_auto);
   EXPECT_EQ(
-      "Power: On, Mode: 6 (Cool), Temp: 32C, Fan: 1 (Auto), Swing: Off",
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Mode: 6 (Cool), Temp: 32C, "
+      "Fan: 1 (Auto), Swing: Off",
+      ac.toString());
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: On, Mode: 6 (Cool), Temp: 32C, "
+      "Fan: 1 (Auto), Swing: Off",
       ac.toString());
 }
 
@@ -1631,9 +1641,11 @@ TEST(TestIRHitachiAc1Class, toCommon) {
   ac.setMode(kHitachiAc1Cool);
   ac.setTemp(20);
   ac.setFan(kHitachiAc1FanHigh);
+  ac.setSwing(false);
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
   // Now test it.
   ASSERT_EQ(decode_type_t::HITACHI_AC1, ac.toCommon().protocol);
-  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(2, ac.toCommon().model);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);

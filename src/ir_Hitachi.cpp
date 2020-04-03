@@ -49,6 +49,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::setBit;
@@ -372,6 +373,16 @@ IRHitachiAc1::IRHitachiAc1(const uint16_t pin, const bool inverted,
 
 void IRHitachiAc1::stateReset(void) {
   for (uint8_t i = 0; i < kHitachiAc1StateLength; i++) remote_state[i] = 0x00;
+  // Copy in a known good state.
+  remote_state[0] = 0xB2;
+  remote_state[1] = 0xAE;
+  remote_state[2] = 0x4D;
+  remote_state[3] = 0x91;
+  remote_state[4] = 0xF0;
+  remote_state[5] = 0xE1;
+  remote_state[6] = 0xA4;
+  remote_state[11] = 0x61;
+  remote_state[12] = 0x24;
 }
 
 void IRHitachiAc1::begin(void) { _irsend.begin(); }
@@ -415,6 +426,27 @@ void IRHitachiAc1::send(const uint16_t repeat) {
   setSwingToggle(false);
 }
 #endif  // SEND_HITACHI_AC
+
+hitachi_ac1_remote_model_t IRHitachiAc1::getModel(void) {
+  switch (GETBITS8(remote_state[kHitachiAc1ModelByte], kHitachiAc1ModelOffset,
+                   kHitachiAc1ModelSize)) {
+    case kHitachiAc1Model_B: return hitachi_ac1_remote_model_t::R_LT0541_HTA_B;
+    default:                 return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
+  }
+}
+
+void IRHitachiAc1::setModel(const hitachi_ac1_remote_model_t model) {
+  uint8_t value = 0;
+  switch (model) {
+    case hitachi_ac1_remote_model_t::R_LT0541_HTA_B:
+      value = kHitachiAc1Model_B;
+      break;
+    default:
+      value = kHitachiAc1Model_A;  // i.e. 'A' mode.
+  }
+  setBits(&remote_state[kHitachiAc1ModelByte], kHitachiAc1ModelOffset,
+          kHitachiAc1ModelSize, value);
+}
 
 bool IRHitachiAc1::getPower(void) {
   return GETBIT8(remote_state[kHitachiAc1PowerByte], kHitachiAc1PowerOffset);
@@ -550,7 +582,7 @@ stdAc::fanspeed_t IRHitachiAc1::toCommonFanSpeed(const uint8_t speed) {
 stdAc::state_t IRHitachiAc1::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::HITACHI_AC1;
-  result.model = -1;  // No models used.
+  result.model = this->getModel();
   result.power = this->getPower();
   result.mode = this->toCommonMode(this->getMode());
   result.celsius = true;
@@ -576,7 +608,8 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
 String IRHitachiAc1::toString(void) {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModelToString(decode_type_t::HITACHI_AC1, getModel(), false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kHitachiAc1Auto, kHitachiAc1Cool,
                             kHitachiAc1Heat, kHitachiAc1Dry, kHitachiAc1Fan);
   result += addTempToString(getTemp());

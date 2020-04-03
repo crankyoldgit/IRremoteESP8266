@@ -867,6 +867,15 @@ namespace irutils {
           default: return kUnknownStr;
         }
         break;
+      case decode_type_t::HITACHI_AC1:
+        switch (model) {
+          case hitachi_ac1_remote_model_t::R_LT0541_HTA_A:
+            return F("R-LT0541-HTA-A");
+          case hitachi_ac1_remote_model_t::R_LT0541_HTA_B:
+            return F("R-LT0541-HTA-B");
+          default: return kUnknownStr;
+        }
+        break;
       case decode_type_t::LG:
       case decode_type_t::LG2:
         switch (model) {

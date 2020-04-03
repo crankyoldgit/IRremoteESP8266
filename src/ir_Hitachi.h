@@ -80,6 +80,13 @@ const uint8_t kHitachiAc424PowerOn = 0xF1;
 const uint8_t kHitachiAc424PowerOff = 0xE1;
 
 // HitachiAc1
+// Byte[3] (Model)
+const uint8_t kHitachiAc1ModelByte = 3;
+const uint8_t kHitachiAc1ModelOffset = 6;  // Mask 0b11000000
+const uint8_t kHitachiAc1Model_A =                 0b10;
+const uint8_t kHitachiAc1Model_B =                 0b01;
+const uint8_t kHitachiAc1ModelSize = 2;
+
 // Byte[5] (Mode & Fan)
 const uint8_t kHitachiAc1ModeByte = 5;
 const uint8_t kHitachiAc1ModeOffset = 4;
@@ -96,14 +103,12 @@ const uint8_t kHitachiAc1FanAuto = 1;          // 0b0001
 const uint8_t kHitachiAc1FanHigh = 2;          // 0b0010
 const uint8_t kHitachiAc1FanMed = 4;           // 0b0100
 const uint8_t kHitachiAc1FanLow = 8;           // 0b1000
-
 // Byte[6] (Temperature)
 // Note: Temp is stored in LSB order.
 const uint8_t kHitachiAc1TempByte = 6;
 const uint8_t kHitachiAc1TempOffset = 2;
 const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
 const uint8_t kHitachiAc1TempDelta = 7;
-
 // Byte[11] (Power/Swing)
 const uint8_t kHitachiAc1PowerByte = 11;
 const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
@@ -178,6 +183,8 @@ class IRHitachiAc1 {
   void begin(void);
   void on(void);
   void off(void);
+  void setModel(const hitachi_ac1_remote_model_t model);
+  hitachi_ac1_remote_model_t getModel(void);
   void setPower(const bool on);
   bool getPower(void);
   void setTemp(const uint8_t temp);

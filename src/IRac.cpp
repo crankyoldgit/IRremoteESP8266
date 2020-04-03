@@ -702,11 +702,12 @@ void IRac::hitachi(IRHitachiAc *ac,
 #endif  // SEND_HITACHI_AC
 
 #if SEND_HITACHI_AC1
-void IRac::hitachi1(IRHitachiAc1 *ac,
+void IRac::hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
                     const bool on, const stdAc::opmode_t mode,
                     const float degrees, const stdAc::fanspeed_t fan,
                     const stdAc::swingv_t swingv) {
   ac->begin();
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1522,7 +1523,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HITACHI_AC1:
     {
       IRHitachiAc1 ac(_pin, _inverted, _modulation);
-      hitachi1(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
+      hitachi1(&ac, (hitachi_ac1_remote_model_t)send.model, send.power,
+               send.mode, degC, send.fanspeed, send.swingv);
       break;
     }
 #endif  // SEND_HITACHI_AC1
@@ -1865,6 +1867,11 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return gree_ac_remote_model_t::YAW1F;
   } else if (!strcasecmp(str, "YBOFB")) {
     return gree_ac_remote_model_t::YBOFB;
+  // HitachiAc1 models
+  } else if (!strcasecmp(str, "R-LT0541-HTA-A")) {
+    return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
+  } else if (!strcasecmp(str, "R-LT0541-HTA-B")) {
+    return hitachi_ac1_remote_model_t::R_LT0541_HTA_B;
   // Fujitsu A/C models
   } else if (!strcasecmp(str, "ARRAH2E")) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
