@@ -38,8 +38,10 @@ const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
 const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcBytePower = 5;
-const uint8_t kSharpAcBitPowerOffset = 4;
-const uint8_t kSharpAcBitModeNonAutoOffset = 5;  // 0b00100000
+const uint8_t kSharpAcBitPowerOffset = 4;  // 0b00xx0000
+const uint8_t kSharpAcOnFromOn = 0;
+const uint8_t kSharpAcOnFromOff = 1;
+const uint8_t kSharpAcOffFromOn = 2;
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
@@ -63,6 +65,7 @@ class IRSharpAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
+  void setPower(const bool on, const bool prev);
   bool getPower(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
