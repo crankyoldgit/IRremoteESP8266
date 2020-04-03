@@ -16,6 +16,7 @@
 
 // Equipment it seems compatible with:
 //  * Sharp LC-52D62U
+//  * Sharp AC AH-A5SAY - juliussin
 //  * <Add models (devices & remotes) you've gotten it working with here>
 //
 
@@ -339,7 +340,20 @@ void IRSharpAc::on(void) { setPower(true); }
 void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  if (on)
+    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOff);
+  else
+    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOffFromOn);
+}
+
+void IRSharpAc::setPower(const bool on, const bool prev) {
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, !on);
+  if (on && prev)
+    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOn);
+  else if (on && !prev)
+    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOff);
+  else
+    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOffFromOn);
 }
 
 bool IRSharpAc::getPower(void) {
@@ -357,7 +371,6 @@ void IRSharpAc::setTemp(const uint8_t temp) {
       return;
     default:
       remote[kSharpAcByteTemp] = 0xC0;
-      setBit(&remote[kSharpAcByteManual], kSharpAcBitTempManualOffset);
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
@@ -375,11 +388,10 @@ uint8_t IRSharpAc::getMode(void) {
 }
 
 void IRSharpAc::setMode(const uint8_t mode) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitModeNonAutoOffset,
-         mode != kSharpAcAuto);
   switch (mode) {
     case kSharpAcAuto:
     case kSharpAcDry:
+      this->setFan(2); // When Dry or Auto, Fan always 2(Auto)
       this->setTemp(0);  // Dry/Auto have no temp setting.
       // FALLTHRU
     case kSharpAcCool:
@@ -399,8 +411,6 @@ void IRSharpAc::setFan(const uint8_t speed) {
     case kSharpAcFanMed:
     case kSharpAcFanHigh:
     case kSharpAcFanMax:
-      setBit(&remote[kSharpAcByteManual], kSharpAcBitFanManualOffset,
-             speed != kSharpAcFanAuto);
       setBits(&remote[kSharpAcByteFan], kSharpAcFanOffset, kSharpAcFanSize,
               speed);
       break;
