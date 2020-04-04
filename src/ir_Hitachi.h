@@ -130,8 +130,7 @@ const uint8_t kHitachiAc1SleepSize = 3;          // Mask 0b00001110
 const uint8_t kHitachiAc1SleepOff =                          0b000;
 const uint8_t kHitachiAc1Sleep1 =                            0b001;
 const uint8_t kHitachiAc1Sleep2 =                            0b010;
-// TODO(soumaxetuirk): Confirm this value. It looks wrong.
-const uint8_t kHitachiAc1Sleep3 =                           0b1110;  // ????
+const uint8_t kHitachiAc1Sleep3 =                            0b011;
 const uint8_t kHitachiAc1Sleep4 =                            0b100;
 // Byte[12] (Checksum)
 const uint8_t kHitachiAc1ChecksumStartByte = 5;

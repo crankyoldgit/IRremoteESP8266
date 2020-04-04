@@ -546,6 +546,11 @@ uint8_t IRHitachiAc1::getSleep(void) {
                   kHitachiAc1SleepSize);
 }
 
+void IRHitachiAc1::setSleep(const uint8_t mode) {
+  setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
+          kHitachiAc1SleepSize, std::min(mode, kHitachiAc1Sleep4));
+}
+
 void IRHitachiAc1::setOnTimer(const uint16_t mins) {
   const uint16_t mins_lsb = reverseBits(mins, kHitachiAc1TimerSize);
   remote_state[kHitachiAc1OnTimerLowByte] = GETBITS16(mins_lsb, 8, 8);
@@ -568,19 +573,6 @@ uint16_t IRHitachiAc1::getOffTimer(void) {
   return reverseBits(
       (remote_state[kHitachiAc1OffTimerLowByte] << 8) |
       remote_state[kHitachiAc1OffTimerHighByte], kHitachiAc1TimerSize);
-}
-
-void IRHitachiAc1::setSleep(const uint8_t mode) {
-  switch (mode) {
-    case kHitachiAc1Sleep1:
-    case kHitachiAc1Sleep2:
-    case kHitachiAc1Sleep3:
-    case kHitachiAc1Sleep4:
-    case kHitachiAc1SleepOff: break;
-    default: setSleep(kHitachiAc1SleepOff);
-  }
-  setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
-          kHitachiAc1SleepSize, mode);
 }
 
 // Convert a standard A/C mode into its native mode.
