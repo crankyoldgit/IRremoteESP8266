@@ -1589,3 +1589,107 @@ TEST(TestCrudeNoiseFilter, NoiseAtEndOfSample) {
       "uint64_t data = 0x20DFC03F;\n",
       resultToSourceCode(&irsend.capture));
 }
+
+TEST(TestManchesterCode, matchManchester) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+
+  const uint16_t rawData[163] = {
+      2860, 3862,
+      1924, 1952, 1926, 1952, 956, 984, 1924, 1028, 952, 958, 980, 956, 982,
+      1882, 1016, 950, 1958, 1920, 1948, 1004, 954, 956, 984, 956, 952, 984,
+      974, 966, 974, 964, 974, 1888, 1010, 960, 1948, 1002, 946, 962, 978,
+      962, 976, 960, 948, 992, 978, 1886, 982, 984, 1924, 1954, 952, 986,
+      3892, 3862,
+      1924, 1954, 1924, 1954, 984, 952, 1956, 996, 954, 990, 948, 958, 980,
+      1882, 1016, 952, 1958, 1920, 1956, 994, 944, 962, 986, 956, 972, 962,
+      976, 962, 978, 964, 952, 1908, 1010, 960, 1948, 1002, 946, 960, 978,
+      962, 946, 990, 978, 960, 978, 1888, 1008, 954, 1952, 1928, 982, 956,
+      3920, 3830,
+      1946, 1934, 1954, 1922, 976, 962, 1946, 1006, 922, 990, 948, 988, 950,
+      1910, 1008, 964, 1922, 1952, 1924, 1030, 920, 984, 954, 986, 952, 986,
+      952, 984, 954, 986, 952, 1910, 1010, 960, 1928, 1024, 944, 996, 924,
+      984, 954, 988, 950, 984, 954, 1910, 1008, 960, 1920, 1958, 980, 958,
+      4800};
+  irsend.sendRaw(rawData, 163, 38);
+  irsend.makeDecodeResult();
+
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  uint16_t nbits = 32;
+  EXPECT_EQ(56, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       2860, 3800, 1000, 0, 3800));
+  EXPECT_EQ(0x4F2FE7E4, result);
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 55, 38);  // Send just the bare minimum.
+  irsend.makeDecodeResult();
+
+  EXPECT_EQ(55, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       2860, 3800, 1000, 0, 3800));
+  EXPECT_EQ(0x4F2FE7E4, result);
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 52, 38);  // Now, just too short.
+  irsend.makeDecodeResult();
+
+  EXPECT_EQ(0, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                      irsend.capture.rawlen - offset, nbits,
+                                      2860, 3800, 1000, 0, 0));
+}
+
+TEST(TestManchesterCode, ManchesterLoopBackGEThomasTest) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  uint16_t nbits = 32;
+  irsend.begin();
+  irsend.reset();
+  irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x12345678, nbits);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       5000, 7000, 1000, 0, 10000, true,
+                                       kUseDefTol, kMarkExcess, true, true));
+  EXPECT_EQ(0x12345678, result);
+
+  irsend.reset();
+  irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x87654321, nbits);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       5000, 7000, 1000, 0, 10000, true,
+                                       kUseDefTol, kMarkExcess, true, true));
+  EXPECT_EQ(0x87654321, result);
+}
+
+TEST(TestManchesterCode, ManchesterLoopBackIEEE802_3Test) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  uint16_t nbits = 32;
+  irsend.begin();
+  irsend.reset();
+  irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x12345678, nbits, 38000,
+                        true, kNoRepeat, kDutyDefault, false);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       5000, 7000, 1000, 0, 10000, true,
+                                       kUseDefTol, kMarkExcess, true, false));
+  EXPECT_EQ(0x12345678, result);
+
+  irsend.reset();
+  irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x87654321, nbits, 38000,
+                        true, kNoRepeat, kDutyDefault, false);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(54, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+                                       irsend.capture.rawlen - offset, nbits,
+                                       5000, 7000, 1000, 0, 10000, true,
+                                       kUseDefTol, kMarkExcess, true, false));
+  EXPECT_EQ(0x87654321, result);
+}

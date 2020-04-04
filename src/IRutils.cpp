@@ -95,6 +95,8 @@ decode_type_t strToDecodeType(const char * const str) {
     return decode_type_t::UNKNOWN;
   else if (!strcasecmp(str, "UNUSED"))
     return decode_type_t::UNUSED;
+  else if (!strcasecmp(str, "AIRWELL"))
+    return decode_type_t::AIRWELL;
   else if (!strcasecmp(str, "AIWA_RC_T501"))
     return decode_type_t::AIWA_RC_T501;
   else if (!strcasecmp(str, "AMCOR"))
@@ -272,6 +274,9 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
   switch (protocol) {
     case UNUSED:
       result = F("UNUSED");
+      break;
+    case AIRWELL:
+      result = F("AIRWELL");
       break;
     case AIWA_RC_T501:
       result = F("AIWA_RC_T501");

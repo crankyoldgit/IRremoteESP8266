@@ -162,6 +162,17 @@ class IRsend {
   void sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,
                 uint32_t zerospace, uint64_t data, uint16_t nbits,
                 bool MSBfirst = true);
+  void sendManchesterData(const uint16_t half_period, const uint64_t data,
+                          const uint16_t nbits, const bool MSBfirst = true,
+                          const bool GEThomas = true);
+  void sendManchester(const uint16_t headermark, const uint32_t headerspace,
+                      const uint16_t half_period, const uint16_t footermark,
+                      const uint32_t gap, const uint64_t data,
+                      const uint16_t nbits, const uint16_t frequency = 38,
+                      const bool MSBfirst = true,
+                      const uint16_t repeat = kNoRepeat,
+                      const uint8_t dutycycle = kDutyDefault,
+                      const bool GEThomas = true);
   void sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                    const uint16_t onemark, const uint32_t onespace,
                    const uint16_t zeromark, const uint32_t zerospace,
@@ -552,6 +563,10 @@ class IRsend {
 #if SEND_SYMPHONY
   void sendSymphony(uint64_t data, uint16_t nbits = kSymphonyBits,
                     uint16_t repeat = kSymphonyDefaultRepeat);
+#endif
+#if SEND_AIRWELL
+  void sendAirwell(uint64_t data, uint16_t nbits = kAirwellBits,
+                   uint16_t repeat = kAirwellMinRepeats);
 #endif
 
  protected:

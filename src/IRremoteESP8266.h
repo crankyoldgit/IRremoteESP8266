@@ -593,6 +593,13 @@
 #define SEND_DAIKIN64         _IR_ENABLE_DEFAULT_
 #endif  // SEND_DAIKIN64
 
+#ifndef DECODE_AIRWELL
+#define DECODE_AIRWELL       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_AIRWELL
+#ifndef SEND_AIRWELL
+#define SEND_AIRWELL         _IR_ENABLE_DEFAULT_
+#endif  // SEND_AIRWELL
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -719,14 +726,17 @@ enum decode_type_t {
   SYMPHONY,
   HITACHI_AC3,
   DAIKIN64,
+  AIRWELL,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DAIKIN64,
+  kLastDecodeType = AIRWELL,
 };
 
 // Message lengths & required repeat values
 const uint16_t kNoRepeat = 0;
 const uint16_t kSingleRepeat = 1;
 
+const uint16_t kAirwellBits = 32;
+const uint16_t kAirwellMinRepeats = 2;
 const uint16_t kAiwaRcT501Bits = 15;
 const uint16_t kAiwaRcT501MinRepeats = kSingleRepeat;
 const uint16_t kAlokaBits = 32;

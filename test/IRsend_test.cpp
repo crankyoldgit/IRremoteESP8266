@@ -786,3 +786,80 @@ TEST(TestSend, defaultBits) {
     }
   }
 }
+
+// Tests sendManchester().
+
+// Test sending zero bits.
+TEST(TestSendManchester, SendZeroBits) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  irsend.sendManchester(0, 0, 1, 0, 0, 0b1, 0);
+  EXPECT_EQ("f36000d25m0f38000d50s1m2s1", irsend.outputStr());
+  irsend.sendManchester(1, 2, 100, 3, 4, 0b1, 0);
+  EXPECT_EQ("f38000d50m1s102m200s100m3s4", irsend.outputStr());
+}
+
+// Test sending zero and one.
+TEST(TestSendManchester, SendSingleBit) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  irsend.sendManchester(1000, 2000, 100, 3000, 4000, 0b0, 1);
+  EXPECT_EQ("f38000d50m1000s2100m200s200m3100s4000", irsend.outputStr());
+  irsend.sendManchester(1000, 2000, 100, 3000, 4000, 0b0, 1, 38, true,
+                        kNoRepeat, kDutyDefault, false);
+  EXPECT_EQ("f38000d50m1000s2000m100s200m200s100m3000s4000",
+            irsend.outputStr());
+}
+
+// Test sending bit order.
+TEST(TestSendManchester, TestingBitSendOrder) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  irsend.sendManchester(1000, 2000, 100, 3000, 0, 0b10, 2);
+  EXPECT_EQ("f38000d50m1000s2100m200s100m100s200m3100", irsend.outputStr());
+  irsend.sendManchester(1000, 2000, 100, 3000, 0, 0b10, 2, 38, false);
+  EXPECT_EQ("f38000d50m1000s2100m200s200m200s100m3000", irsend.outputStr());
+  irsend.sendManchester(1000, 2000, 100, 3000, 0, 0b0001, 4, 38, true);
+  EXPECT_EQ("f38000d50m1000s2100m200s200m100s100m100s100m200s100m3000",
+            irsend.outputStr());
+  irsend.sendManchester(1000, 2000, 100, 3000, 0, 0b0001, 4, 38, false);
+  EXPECT_EQ("f38000d50m1000s2100m200s100m100s200m100s100m100s100m3100",
+            irsend.outputStr());
+}
+
+// Test sending typical data.
+TEST(TestSendManchester, SendTypicalData) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  // Example from https://en.wikipedia.org/wiki/Manchester_code diagram
+  irsend.sendManchester(0, 0, 100, 0, 0, 0b10100111001, 11, 38, true);
+  EXPECT_EQ(
+      "f38000d50"
+      "m0s100m200s100"
+      "m100s200m200s200m100s100m200s100m100s100m100s200m100s100m200s100",
+      irsend.outputStr());
+  irsend.sendManchester(100, 200, 1, 300, 0, 0x1234567890ABCDEF, 64, 38, true);
+  EXPECT_EQ(
+      "f38000d50"
+      "m100s201"
+      "m2s2m1s1m1s1m2s2m1s1m2s2m1s1m1s1m2s1m1s2m2s2m1s1m1s1m2s2m2s2m2s1m1s2m1s1"
+      "m2s1m1s1m1s1m1s2m1s1m1s1m2s2m1s1m2s2m1s1m1s1m1s1m2s2m2s2m2s2m2s1m1s1m1s1"
+      "m1s2m1s1m2s1m1s2m2s1m1s1m1s1m1s2m2s1m1s1m1s1m1s1m300",
+      irsend.outputStr());
+}
+
+// Test sending more than expected bits.
+TEST(TestSendManchester, SendOverLargeData) {
+  IRsendTest irsend(0);
+  irsend.begin();
+  irsend.sendManchester(100, 200, 1, 300, 0, 0xFFFFFFFFFFFFFFFF, 70, 38, true);
+  EXPECT_EQ(
+      "f38000d50"
+      "m100s201"
+      "m2s2m1s1m1s1m1s1m1s1m1s1m2s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1"
+      "m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1"
+      "m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1"
+      "m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1m1s1"
+      "m300",
+      irsend.outputStr());
+}

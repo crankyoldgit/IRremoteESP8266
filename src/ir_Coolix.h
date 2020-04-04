@@ -23,6 +23,7 @@
 //   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 //   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
+//   Brand: Airwell, Model: RC08B remote
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 // Kudos:

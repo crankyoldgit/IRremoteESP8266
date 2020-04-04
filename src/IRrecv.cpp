@@ -785,6 +785,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin64 decode");
     if (decodeDaikin64(results, offset)) return true;
 #endif  // DECODE_DAIKIN64
+#if DECODE_AIRWELL
+    DPRINTLN("Attempting Airwell decode");
+    if (decodeAirwell(results, offset)) return true;
+#endif  // DECODE_AIRWELL
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1291,5 +1295,167 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                        hdrmark, hdrspace, onemark, onespace,
                        zeromark, zerospace, footermark, footerspace, atleast,
                        tolerance, excess, MSBfirst);
+}
+
+// Match & decode a Manchester Code <= 64bit IR message.
+// The data is stored at result_ptr.
+// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
+// that requirement.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//             NOTE: It is assumed to be pointing to a "Mark", not a "Space".
+//   result_ptr: A pointer to where to start storing the bits we decoded.
+//   remaining: The size of the capture buffer are remaining.
+//   nbits:        Nr. of data bits we expect.
+//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
+//   hdrspace:     Nr. of uSeconds for the expected header space signal.
+//   half_period:  Nr. of uSeconds for half the clock's period. (1/2 wavelength)
+//   footermark:   Nr. of uSeconds for the expected footer mark signal.
+//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
+//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
+//   GEThomas: Use G.E. Thomas (true/default) or IEEE 802.3 (false) convention?
+// Returns:
+//   A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+//
+// Ref:
+//   https://en.wikipedia.org/wiki/Manchester_code
+//   http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
+uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
+                                 uint64_t *result_ptr,
+                                 const uint16_t remaining,
+                                 const uint16_t nbits,
+                                 const uint16_t hdrmark,
+                                 const uint32_t hdrspace,
+                                 const uint16_t half_period,
+                                 const uint16_t footermark,
+                                 const uint32_t footerspace,
+                                 const bool atleast,
+                                 const uint8_t tolerance,
+                                 const int16_t excess,
+                                 const bool MSBfirst,
+                                 const bool GEThomas) {
+  uint16_t offset = 0;
+  uint64_t data = 0;
+  uint16_t nr_of_half_periods = GEThomas;
+  // 2 per bit, and 4 extra for the timing sync.
+  uint16_t expected_half_periods = 2 * nbits + 4;
+  bool currentBit = false;
+
+  // Calculate how much remaining buffer is required.
+  // Shortest case. Longest case is 2 * nbits.
+  uint16_t min_remaining = nbits + 2;
+
+  if (hdrmark) min_remaining++;
+  if (hdrspace) min_remaining++;
+  if (footermark) min_remaining++;
+  // Don't need to extend for footerspace because it could be the end of message
+
+  // Check if there is enough capture buffer to possibly have the message.
+  if (remaining < min_remaining) return 0;  // Nope, so abort.
+
+  // Header
+  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
+    return 0;
+  // Manchester Code always has a guaranteed 2x half_period (T2) at the start
+  // of the data section. e.g. a sync header. If it is a GEThomas-style, then
+  // it is space(T);mark(2xT);space(T), thus we need to check for that space
+  // plus any requested "header" space.
+  if ((hdrspace || GEThomas) &&
+      !matchSpace(*(data_ptr + offset++),
+                  hdrspace + ((GEThomas) ? half_period : 0), tolerance, excess))
+    return 0;
+
+  // Data
+  // Loop until we find a 'long' pulse. This is the timing sync per protocol.
+  while ((offset < remaining) && (nr_of_half_periods < expected_half_periods) &&
+         !match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
+    // Was it not a short pulse?
+    if (!match(*(data_ptr + offset), half_period, tolerance, excess))
+      return 0;
+    nr_of_half_periods++;
+    offset++;
+  }
+
+  // Data (cont.)
+
+  // We are now pointing to the first 'long' pulse.
+  // Loop through the buffer till we run out of buffer, or nr of half periods.
+  while (offset < remaining && nr_of_half_periods < expected_half_periods) {
+    // Only if there is enough half_periods left for a long pulse &
+    // Is it a 'long' pulse?
+    if (nr_of_half_periods < expected_half_periods - 1 &&
+        match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
+      // Yes, so invert the value we will append.
+      currentBit = !currentBit;
+      nr_of_half_periods += 2;  // A 'long' pulse is two half periods.
+      offset++;
+      // Append the bit value.
+      data <<= 1;
+      data |= currentBit;
+    } else if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
+      // or is it part of a 'short' pulse pair?
+      nr_of_half_periods++;
+      offset++;
+      // Look for the second half of the 'short' pulse pair.
+      // Do we have enough buffer or nr of half periods?
+      if (offset < remaining && nr_of_half_periods < expected_half_periods) {
+        // We do, so look for it.
+        if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
+          // Found it!
+          nr_of_half_periods++;
+          // No change of the polarity of the bit we will append.
+          // Append the bit value.
+          data <<= 1;
+          data |= currentBit;
+          offset++;
+        } else {
+          // It's not what we expected.
+          return 0;
+        }
+      }
+    } else if (nr_of_half_periods == expected_half_periods - 1 &&
+               matchAtLeast(*(data_ptr + offset), half_period, tolerance,
+                            excess)) {
+      // Special case when we are at the end of the expected nr of periods.
+      // i.e. The pulse could be merged with the footer.
+      nr_of_half_periods++;
+      break;
+    } else {
+      // It's neither, so abort.
+      return 0;
+    }
+  }
+  // Did we collect the expected amount of data?
+  if (nr_of_half_periods < expected_half_periods) return 0;
+
+  // Footer
+  if (footermark &&
+      !(matchMark(*(data_ptr + offset), footermark + half_period,
+                  tolerance, excess) ||
+        matchMark(*(data_ptr + offset), footermark,
+                    tolerance, excess)))
+    return 0;
+  offset++;
+  // If we have something still to match & haven't reached the end of the buffer
+  if (footerspace && offset < remaining) {
+    if (atleast) {
+      if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+        return 0;
+    } else {
+      if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+        return 0;
+    }
+    offset++;
+  }
+
+  // Clean up and process the data.
+  if (!MSBfirst) data = reverseBits(data, nbits);
+  // Trim the data to size to remove timing sync.
+  *result_ptr = GETBITS64(data, 0, nbits);
+  return offset;
 }
 // End of IRrecv class -------------------
