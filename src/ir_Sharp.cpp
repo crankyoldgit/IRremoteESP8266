@@ -340,12 +340,13 @@ void IRSharpAc::on(void) { setPower(true); }
 void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset,
+         getPower() != on);
   setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, !on);
 }
 
 void IRSharpAc::setPower(const bool on, const bool prev) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  setPower(on);
   setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, prev);
 }
 

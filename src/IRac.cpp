@@ -1023,10 +1023,11 @@ void IRac::samsung(IRSamsungAc *ac,
 
 #if SEND_SHARP_AC
 void IRac::sharp(IRSharpAc *ac,
-                 const bool on, const stdAc::opmode_t mode,
+                 const bool on, const bool prev_power,
+                 const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan) {
   ac->begin();
-  ac->setPower(on);
+  ac->setPower(on, prev_power);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -1606,7 +1607,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SHARP_AC:
     {
       IRSharpAc ac(_pin, _inverted, _modulation);
-      sharp(&ac, send.power, send.mode, degC, send.fanspeed);
+      bool prev_power = !send.power;
+      if (prev != NULL) prev_power = prev->power;
+      sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed);
       break;
     }
 #endif  // SEND_SHARP_AC

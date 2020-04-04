@@ -316,7 +316,7 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_SAMSUNG_AC
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac,
-             const bool on, const stdAc::opmode_t mode,
+             const bool on, const bool prev_power, const stdAc::opmode_t mode,
              const float degrees, const stdAc::fanspeed_t fan);
 #endif  // SEND_SHARP_AC
 #if SEND_TCL112AC

@@ -587,7 +587,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   uint8_t on_auto_auto[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
       0x01};
-  ac.on();
+  ac.setPower(true, false);
   ac.setMode(kSharpAcAuto);
   ac.setTemp(kSharpAcMinTemp);
   ac.setFan(kSharpAcFanAuto);
@@ -599,7 +599,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
       0x51};
   ac.stateReset();
-  ac.on();
+  ac.setPower(true, true);
   ac.setMode(kSharpAcCool);
   ac.setTemp(28);
   ac.setFan(kSharpAcFanAuto);

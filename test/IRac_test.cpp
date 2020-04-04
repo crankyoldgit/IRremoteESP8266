@@ -1044,6 +1044,7 @@ TEST(TestIRac, Sharp) {
   ac.begin();
   irac.sharp(&ac,
              true,                         // Power
+             true,                         // Previous Power
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
              stdAc::fanspeed_t::kMedium);  // Fan speed
