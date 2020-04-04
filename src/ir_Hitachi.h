@@ -122,7 +122,8 @@ const uint8_t kHitachiAc1PowerByte = 11;
 const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
 const uint8_t kHitachiAc1PowerToggleOffset = 4;  // Mask 0b00010000
 const uint8_t kHitachiAc1SwingByte = kHitachiAc1PowerByte;
-const uint8_t kHitachiAc1SwingOffset = 6;        // Mask 0b01000000
+const uint8_t kHitachiAc1SwingHOffset = 7;        // Mask 0b10000000
+const uint8_t kHitachiAc1SwingVOffset = 6;        // Mask 0b01000000
 const uint8_t kHitachiAc1SwingToggleOffset = 0;  // Mask 0b00000001
 const uint8_t kHitachiAc1SleepByte = kHitachiAc1PowerByte;
 const uint8_t kHitachiAc1SleepOffset = 1;        // Mask 0b00001110
@@ -215,8 +216,10 @@ class IRHitachiAc1 {
   uint8_t getMode(void);
   void setSwingToggle(const bool toggle);
   bool getSwingToggle(void);
-  void setSwing(const bool on);
-  bool getSwing(void);
+  void setSwingV(const bool on);
+  bool getSwingV(void);
+  void setSwingH(const bool on);
+  bool getSwingH(void);
   void setSleep(const uint8_t mode);
   uint8_t getSleep(void);
   void setOnTimer(const uint16_t mins);

@@ -638,7 +638,7 @@ TEST(TestIRac, Hitachi1) {
   char expected[] =
       "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: Off, "
       "Mode: 15 (Auto), Temp: 19C, Fan: 4 (Medium), "
-      "Swing(V) Toggle: On, Swing(V) Mode: On, Sleep: 2, "
+      "Swing(V) Toggle: On, Swing(V): On, Swing(H): On, Sleep: 2, "
       "On Timer: Off, Off Timer: Off";
 
   ac.begin();
@@ -650,7 +650,8 @@ TEST(TestIRac, Hitachi1) {
                 19,                                          // Celsius
                 stdAc::fanspeed_t::kMedium,                  // Fan speed
                 stdAc::swingv_t::kAuto,                      // Vertical swing
-                true,                                        // Swing(V) toggle
+                stdAc::swingh_t::kLeft,                      // Horizontal swing
+                true,                                        // Swing toggle
                 5 * 60 + 37);                                // Sleep
 
   ac._irsend.makeDecodeResult();

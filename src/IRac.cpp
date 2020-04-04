@@ -706,8 +706,8 @@ void IRac::hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
                     const bool on, const bool power_toggle,
                     const stdAc::opmode_t mode,
                     const float degrees, const stdAc::fanspeed_t fan,
-                    const stdAc::swingv_t swingv, const bool swing_toggle,
-                    const int16_t sleep) {
+                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                    const bool swing_toggle, const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -715,7 +715,8 @@ void IRac::hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   ac->setSwingToggle(swing_toggle);
   ac->setSleep((sleep >= 0) ? kHitachiAc1Sleep2 : kHitachiAc1SleepOff);
   // No Sleep setting available.
@@ -1532,11 +1533,12 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       bool swing_toggle = false;
       if (prev != NULL) {
         power_toggle = (send.power != prev->power);
-        swing_toggle = (send.swingv != prev->swingv);
+        swing_toggle = (send.swingv != prev->swingv) ||
+                       (send.swingh != prev->swingh);
       }
       hitachi1(&ac, (hitachi_ac1_remote_model_t)send.model, send.power,
                power_toggle, send.mode, degC, send.fanspeed, send.swingv,
-               swing_toggle, send.sleep);
+               send.swingh, swing_toggle, send.sleep);
       break;
     }
 #endif  // SEND_HITACHI_AC1

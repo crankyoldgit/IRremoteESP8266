@@ -533,12 +533,20 @@ void IRHitachiAc1::setSwingToggle(const bool toggle) {
          toggle);
 }
 
-bool IRHitachiAc1::getSwing(void) {
-  return GETBIT8(remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingOffset);
+bool IRHitachiAc1::getSwingV(void) {
+  return GETBIT8(remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingVOffset);
 }
 
-void IRHitachiAc1::setSwing(const bool on) {
-  setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingOffset, on);
+void IRHitachiAc1::setSwingV(const bool on) {
+  setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingVOffset, on);
+}
+
+bool IRHitachiAc1::getSwingH(void) {
+  return GETBIT8(remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingHOffset);
+}
+
+void IRHitachiAc1::setSwingH(const bool on) {
+  setBit(&remote_state[kHitachiAc1SwingByte], kHitachiAc1SwingHOffset, on);
 }
 
 uint8_t IRHitachiAc1::getSleep(void) {
@@ -629,8 +637,10 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
+  result.swingv = this->getSwingV() ? stdAc::swingv_t::kAuto :
+                                      stdAc::swingv_t::kOff;
+  result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto :
+                                      stdAc::swingh_t::kOff;
   result.sleep = this->getSleep() ? 0 : -1;
   // Not supported.
   result.quiet = false;
@@ -640,7 +650,6 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
   result.filter = false;
   result.light = false;
   result.beep = false;
-  result.swingh = stdAc::swingh_t::kOff;
   result.clock = -1;
   return result;
 }
@@ -648,7 +657,7 @@ stdAc::state_t IRHitachiAc1::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRHitachiAc1::toString(void) {
   String result = "";
-  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(170);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::HITACHI_AC1, getModel(), false);
   result += addBoolToString(getPower(), kPowerStr);
   result += addBoolToString(getPowerToggle(), kPowerToggleStr);
@@ -659,7 +668,8 @@ String IRHitachiAc1::toString(void) {
                            kHitachiAc1FanAuto, kHitachiAc1FanAuto,
                            kHitachiAc1FanMed);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
-  result += addBoolToString(getSwing(), kSwingVModeStr);
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(getSwingH(), kSwingHStr);
   result += addLabeledString(getSleep() ? uint64ToString(getSleep()) : kOffStr,
                              kSleepStr);
   result += addLabeledString(getOnTimer() ? minsToString(getOnTimer())
