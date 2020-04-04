@@ -3,6 +3,7 @@
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C
+//   Brand: Sharp,  Model: AH-AxSAY A/C
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -38,10 +39,8 @@ const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
 const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcBytePower = 5;
-const uint8_t kSharpAcBitPowerOffset = 4;  // 0b00xx0000
-const uint8_t kSharpAcOnFromOn = 3;
-const uint8_t kSharpAcOnFromOff = 1;
-const uint8_t kSharpAcOffFromOn = 2;
+const uint8_t kSharpAcBitPowerOffset = 4;  // 0b000x0000
+const uint8_t kSharpAcBitPreviousPowerOffset = 5;  // 0b00x00000
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
