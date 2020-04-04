@@ -1538,8 +1538,9 @@ TEST(TestIRHitachiAc1Class, SetAndGetPower) {
 
 TEST(TestIRHitachiAc1Class, SetAndGetTemp) {
   IRHitachiAc1 ac(kGpioUnused);
-  ac.setTemp(25);
-  EXPECT_EQ(25, ac.getTemp());
+  ac.setMode(kHitachiAc1Cool);  // All temps possible in Cool mode.
+  ac.setTemp(26);
+  EXPECT_EQ(26, ac.getTemp());
   ac.setTemp(kHitachiAcMinTemp);
   EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
   ac.setTemp(kHitachiAcMinTemp - 1);
@@ -1548,6 +1549,13 @@ TEST(TestIRHitachiAc1Class, SetAndGetTemp) {
   EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
   ac.setTemp(kHitachiAcMaxTemp + 1);
   EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+
+  // Can't change temp in Auto mode.
+  ac.setMode(kHitachiAc1Auto);  // All temps possible in Cool mode.
+  EXPECT_EQ(kHitachiAc1TempAuto, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp);
+  EXPECT_EQ(kHitachiAc1TempAuto, ac.getTemp());
+
   // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B46
   const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
       0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
@@ -1576,6 +1584,7 @@ TEST(TestIRHitachiAc1Class, SetAndGetMode) {
 
 TEST(TestIRHitachiAc1Class, SetAndGetFan) {
   IRHitachiAc1 ac(kGpioUnused);
+  ac.setMode(kHitachiAc1Cool);  // All speeds possible in Cool mode.
   ac.setFan(kHitachiAc1FanAuto);
   EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
   ac.setFan(kHitachiAc1FanLow);
@@ -1588,6 +1597,12 @@ TEST(TestIRHitachiAc1Class, SetAndGetFan) {
   ac.setFan(255);
   EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
   ac.setFan(0);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+
+  // Can't change temp in Auto mode.
+  ac.setMode(kHitachiAc1Auto);  // All temps possible in Cool mode.
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc1FanLow);
   EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
 }
 

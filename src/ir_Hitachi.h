@@ -109,6 +109,7 @@ const uint8_t kHitachiAc1TempByte = 6;
 const uint8_t kHitachiAc1TempOffset = 2;
 const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
 const uint8_t kHitachiAc1TempDelta = 7;
+const uint8_t kHitachiAc1TempAuto = 25;  // Celsius
 // Note: Timers are nr. of minutes & stored in LSB order.
 // Byte[7-8] (Off Timer)
 const uint8_t kHitachiAc1TimerSize = 16;  // Mask 0b1111111111111111
@@ -210,7 +211,7 @@ class IRHitachiAc1 {
   bool getPowerToggle(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
-  void setFan(const uint8_t speed);
+  void setFan(const uint8_t speed, const bool force = false);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);

@@ -478,15 +478,25 @@ uint8_t IRHitachiAc1::getMode(void) {
 
 void IRHitachiAc1::setMode(const uint8_t mode) {
   switch (mode) {
-    case kHitachiAc1Fan:
     case kHitachiAc1Auto:
+      setTemp(kHitachiAc1TempAuto);
+      setFan(kHitachiAc1FanAuto, true);
+      // FALL THRU
+    case kHitachiAc1Fan:
     case kHitachiAc1Heat:
     case kHitachiAc1Cool:
     case kHitachiAc1Dry:
       setBits(&remote_state[kHitachiAc1ModeByte], kHitachiAc1ModeOffset,
               kHitachiAc1ModeSize, mode);
+      setSleep(getSleep());  // Correct the sleep mode if required.
       break;
     default: setMode(kHitachiAc1Auto);
+  }
+  switch (mode) {
+    case kHitachiAc1Fan:
+    case kHitachiAc1Heat:
+      // Auto fan speed not available in these modes, change if needed.
+      if (getFan() == kHitachiAc1FanAuto) setFan(kHitachiAc1FanLow);
   }
 }
 
@@ -497,6 +507,7 @@ uint8_t IRHitachiAc1::getTemp(void) {
 }
 
 void IRHitachiAc1::setTemp(const uint8_t celsius) {
+  if (getMode() == kHitachiAc1Auto) return;  // Can't change temp in Auto mode.
   uint8_t temp = std::min(celsius, kHitachiAcMaxTemp);
   temp = std::max(temp, kHitachiAcMinTemp);
   temp -= kHitachiAc1TempDelta;
@@ -510,9 +521,20 @@ uint8_t IRHitachiAc1::getFan(void) {
                   kHitachiAc1FanSize);
 }
 
-void IRHitachiAc1::setFan(const uint8_t speed) {
+void IRHitachiAc1::setFan(const uint8_t speed, const bool force) {
+  if (!force) {
+    switch (getMode()) {
+      case kHitachiAc1Auto:
+      case kHitachiAc1Dry: return;  // Speed change not allowed in these modes.
+    }
+  }
   switch (speed) {
     case kHitachiAc1FanAuto:
+      switch (getMode()) {
+        case kHitachiAc1Heat:
+        case kHitachiAc1Fan: return;  // Auto speed not allowed in these modes.
+      }
+      // FALL THRU
     case kHitachiAc1FanHigh:
     case kHitachiAc1FanMed:
     case kHitachiAc1FanLow:
@@ -555,8 +577,17 @@ uint8_t IRHitachiAc1::getSleep(void) {
 }
 
 void IRHitachiAc1::setSleep(const uint8_t mode) {
-  setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
-          kHitachiAc1SleepSize, std::min(mode, kHitachiAc1Sleep4));
+  // Sleep modes only available in Auto & Cool modes, otherwise it's off.
+  switch (getMode()) {
+    case kHitachiAc1Auto:
+    case kHitachiAc1Cool:
+      setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
+              kHitachiAc1SleepSize, std::min(mode, kHitachiAc1Sleep4));
+      break;
+    default:
+      setBits(&remote_state[kHitachiAc1SleepByte], kHitachiAc1SleepOffset,
+              kHitachiAc1SleepSize, kHitachiAc1SleepOff);
+  }
 }
 
 void IRHitachiAc1::setOnTimer(const uint16_t mins) {
