@@ -637,7 +637,7 @@ TEST(TestIRac, Hitachi1) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: Off, "
-      "Mode: 15 (Auto), Temp: 19C, Fan: 4 (Medium), "
+      "Mode: 14 (Auto), Temp: 19C, Fan: 4 (Medium), "
       "Swing(V) Toggle: On, Swing(V): On, Swing(H): On, Sleep: 2, "
       "On Timer: Off, Off Timer: Off";
 
