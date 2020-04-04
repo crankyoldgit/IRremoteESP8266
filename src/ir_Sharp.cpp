@@ -16,7 +16,7 @@
 
 // Equipment it seems compatible with:
 //  * Sharp LC-52D62U
-//  * Sharp AC AH-A5SAY - juliussin
+//  * Sharp AH-AxSAY A/C (Remote CRMC-A907 JBEZ)
 //  * <Add models (devices & remotes) you've gotten it working with here>
 //
 
@@ -340,20 +340,13 @@ void IRSharpAc::on(void) { setPower(true); }
 void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
-  if (on)
-    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOff);
-  else
-    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOffFromOn);
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, !on);
 }
 
 void IRSharpAc::setPower(const bool on, const bool prev) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, !on);
-  if (on && prev)
-    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOn);
-  else if (on && !prev)
-    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOnFromOff);
-  else
-    setBits(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, 2, kSharpAcOffFromOn);
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, prev);
 }
 
 bool IRSharpAc::getPower(void) {
@@ -391,7 +384,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kSharpAcAuto:
     case kSharpAcDry:
-      this->setFan(2); // When Dry or Auto, Fan always 2(Auto)
+      this->setFan(2);  // When Dry or Auto, Fan always 2(Auto)
       this->setTemp(0);  // Dry/Auto have no temp setting.
       // FALLTHRU
     case kSharpAcCool:
