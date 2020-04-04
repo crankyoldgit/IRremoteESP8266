@@ -10,6 +10,8 @@
 #define D_STR_SLEEP "Pause"
 #define D_STR_LIGHT "Lumière"
 #define D_STR_POWERFUL "Puissance"
+#define D_STR_PREVIOUS "Precedente"
+#define D_STR_PREVIOUSPOWER D_STR_POWER " " D_STR_PREVIOUS
 #define D_STR_QUIET "Silence"
 #define D_STR_ECONO "Economie"
 #define D_STR_BEEP "Bip"

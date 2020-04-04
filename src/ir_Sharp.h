@@ -66,6 +66,8 @@ class IRSharpAc {
   void setPower(const bool on);
   void setPower(const bool on, const bool prev);
   bool getPower(void);
+  void setPreviousPower(const bool on);
+  bool getPreviousPower(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t fan);

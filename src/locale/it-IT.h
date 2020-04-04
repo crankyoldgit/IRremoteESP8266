@@ -8,6 +8,8 @@
 #define D_STR_UNKNOWN "SCONOSCIUTO"
 #define D_STR_PROTOCOL "Protocollo"
 #define D_STR_POWER "Accensione"
+#define D_STR_PREVIOUS "Precedente"
+#define D_STR_PREVIOUSPOWER D_STR_POWER " " D_STR_PREVIOUS
 #define D_STR_ON "Acceso"
 #define D_STR_OFF "Spento"
 #define D_STR_MODE "Modalità"

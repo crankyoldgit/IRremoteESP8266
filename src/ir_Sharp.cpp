@@ -335,19 +335,26 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote, new_code, std::min(length, kSharpAcStateLength));
 }
 
+void IRSharpAc::setPreviousPower(const bool on) {
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, on);
+}
+
+bool IRSharpAc::getPreviousPower(void) {
+  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset);
+}
+
 void IRSharpAc::on(void) { setPower(true); }
 
 void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset,
-         getPower() != on);
+  setPreviousPower(getPower());
   setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
 }
 
 void IRSharpAc::setPower(const bool on, const bool prev) {
   setPower(on);
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, prev);
+  setPreviousPower(prev);
 }
 
 bool IRSharpAc::getPower(void) {
@@ -489,8 +496,9 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
-  result.reserve(60);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
+  result += addBoolToString(getPreviousPower(), kPreviousPowerStr);
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());
