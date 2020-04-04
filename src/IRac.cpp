@@ -717,7 +717,7 @@ void IRac::hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
   ac->setFan(ac->convertFan(fan));
   ac->setSwing(swingv != stdAc::swingv_t::kOff);
   ac->setSwingToggle(swing_toggle);
-  ac->setSleep((sleep >= 0) ? kHitachiAc1Sleep1 : kHitachiAc1SleepOff);
+  ac->setSleep((sleep >= 0) ? kHitachiAc1Sleep2 : kHitachiAc1SleepOff);
   // No Sleep setting available.
   // No Swing(H) setting available.
   // No Quiet setting available.
