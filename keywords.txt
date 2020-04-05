@@ -2871,7 +2871,7 @@ kSharpAcBitPowerOffset	LITERAL1
 kSharpAcBitTempManualOffset	LITERAL1
 kSharpAcBits	LITERAL1
 kSharpAcByteFan	LITERAL1
-kSharpAcByteManual	LITERAL1
+kSharpAcByteButton	LITERAL1
 kSharpAcByteMode	LITERAL1
 kSharpAcBytePower	LITERAL1
 kSharpAcByteTemp	LITERAL1

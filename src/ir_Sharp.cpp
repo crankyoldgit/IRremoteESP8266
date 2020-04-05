@@ -350,6 +350,7 @@ void IRSharpAc::off(void) { setPower(false); }
 void IRSharpAc::setPower(const bool on) {
   setPreviousPower(getPower());
   setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  setButton(kSharpAcButtonPowerMode);
 }
 
 void IRSharpAc::setPower(const bool on, const bool prev) {
@@ -361,6 +362,24 @@ bool IRSharpAc::getPower(void) {
   return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPowerOffset);
 }
 
+void IRSharpAc::setButton(const uint8_t button) {
+  switch (button) {
+    case kSharpAcButtonPowerMode:
+    case kSharpAcButtonTemp:
+    case kSharpAcButtonFan:
+      setBits(&remote[kSharpAcByteButton], kSharpAcButtonOffset,
+              kSharpAcButtonSize, button);
+      break;
+    default:
+      setButton(kSharpAcButtonPowerMode);
+  }
+}
+
+uint8_t IRSharpAc::getButton(void) {
+  return GETBITS8(remote[kSharpAcByteButton], kSharpAcButtonOffset,
+                  kSharpAcButtonSize);
+}
+
 // Set the temp in deg C
 void IRSharpAc::setTemp(const uint8_t temp) {
   switch (this->getMode()) {
@@ -368,7 +387,6 @@ void IRSharpAc::setTemp(const uint8_t temp) {
     case kSharpAcAuto:
     case kSharpAcDry:
       remote[kSharpAcByteTemp] = 0;
-      remote[kSharpAcByteManual] = 0;  // When in Dry/Auto this byte is 0.
       return;
     default:
       remote[kSharpAcByteTemp] = 0xC0;
@@ -377,6 +395,7 @@ void IRSharpAc::setTemp(const uint8_t temp) {
   degrees = std::min(degrees, kSharpAcMaxTemp);
   setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
           degrees - kSharpAcMinTemp);
+  setButton(kSharpAcButtonTemp);
 }
 
 uint8_t IRSharpAc::getTemp(void) {
@@ -402,6 +421,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
     default:
       this->setMode(kSharpAcAuto);
   }
+  setButton(kSharpAcButtonPowerMode);
 }
 
 // Set the speed of the fan
@@ -418,6 +438,7 @@ void IRSharpAc::setFan(const uint8_t speed) {
     default:
       this->setFan(kSharpAcFanAuto);
   }
+  setButton(kSharpAcButtonFan);
 }
 
 uint8_t IRSharpAc::getFan(void) {

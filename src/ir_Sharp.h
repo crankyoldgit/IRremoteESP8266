@@ -46,10 +46,12 @@ const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
 const uint8_t kSharpAcFanOffset = 4;  // Mask 0b01110000
 const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
-const uint8_t kSharpAcByteManual = 10;
-const uint8_t kSharpAcBitFanManualOffset = 0;   // 0b00000001
-const uint8_t kSharpAcBitTempManualOffset = 2;  // 0b00000100
-
+const uint8_t kSharpAcByteButton = 10;
+const uint8_t kSharpAcButtonOffset = 0;
+const uint8_t kSharpAcButtonSize = 3;  // Mask 0b00000xxx
+const uint8_t kSharpAcButtonPowerMode =             0b000;  // 0
+const uint8_t kSharpAcButtonTemp =                  0b100;  // 4
+const uint8_t kSharpAcButtonFan =                   0b101;  // 5
 
 class IRSharpAc {
  public:
@@ -74,6 +76,8 @@ class IRSharpAc {
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
+  void setButton(const uint8_t button);
+  uint8_t getButton(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);
