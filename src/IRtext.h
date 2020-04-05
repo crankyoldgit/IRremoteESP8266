@@ -104,6 +104,7 @@ extern const char* kOutsideStr;
 extern const char* kPowerfulStr;
 extern const char* kPowerStr;
 extern const char* kPowerToggleStr;
+extern const char* kPreviousPowerStr;
 extern const char* kProtocolStr;
 extern const char* kPurifyStr;
 extern const char* kQuietStr;

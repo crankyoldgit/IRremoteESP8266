@@ -130,6 +130,7 @@ const PROGMEM char* kEyeAutoStr = D_STR_EYEAUTO;
 const PROGMEM char* kLightToggleStr = D_STR_LIGHTTOGGLE;
 const PROGMEM char* kOutsideQuietStr = D_STR_OUTSIDEQUIET;
 const PROGMEM char* kPowerToggleStr = D_STR_POWERTOGGLE;
+const PROGMEM char* kPreviousPowerStr = D_STR_PREVIOUSPOWER;
 const PROGMEM char* kSensorTempStr = D_STR_SENSORTEMP;
 const PROGMEM char* kSleepTimerStr = D_STR_SLEEP_TIMER;
 const PROGMEM char* kSwingVModeStr = D_STR_SWINGVMODE;

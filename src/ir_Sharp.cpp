@@ -16,6 +16,7 @@
 
 // Equipment it seems compatible with:
 //  * Sharp LC-52D62U
+//  * Sharp AH-AxSAY A/C (Remote CRMC-A907 JBEZ)
 //  * <Add models (devices & remotes) you've gotten it working with here>
 //
 
@@ -334,16 +335,49 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote, new_code, std::min(length, kSharpAcStateLength));
 }
 
+void IRSharpAc::setPreviousPower(const bool on) {
+  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, on);
+}
+
+bool IRSharpAc::getPreviousPower(void) {
+  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset);
+}
+
 void IRSharpAc::on(void) { setPower(true); }
 
 void IRSharpAc::off(void) { setPower(false); }
 
 void IRSharpAc::setPower(const bool on) {
+  setPreviousPower(getPower());
   setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
+  setButton(kSharpAcButtonPowerMode);
+}
+
+void IRSharpAc::setPower(const bool on, const bool prev) {
+  setPower(on);
+  setPreviousPower(prev);
 }
 
 bool IRSharpAc::getPower(void) {
   return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPowerOffset);
+}
+
+void IRSharpAc::setButton(const uint8_t button) {
+  switch (button) {
+    case kSharpAcButtonPowerMode:
+    case kSharpAcButtonTemp:
+    case kSharpAcButtonFan:
+      setBits(&remote[kSharpAcByteButton], kSharpAcButtonOffset,
+              kSharpAcButtonSize, button);
+      break;
+    default:
+      setButton(kSharpAcButtonPowerMode);
+  }
+}
+
+uint8_t IRSharpAc::getButton(void) {
+  return GETBITS8(remote[kSharpAcByteButton], kSharpAcButtonOffset,
+                  kSharpAcButtonSize);
 }
 
 // Set the temp in deg C
@@ -353,16 +387,15 @@ void IRSharpAc::setTemp(const uint8_t temp) {
     case kSharpAcAuto:
     case kSharpAcDry:
       remote[kSharpAcByteTemp] = 0;
-      remote[kSharpAcByteManual] = 0;  // When in Dry/Auto this byte is 0.
       return;
     default:
       remote[kSharpAcByteTemp] = 0xC0;
-      setBit(&remote[kSharpAcByteManual], kSharpAcBitTempManualOffset);
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
   setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
           degrees - kSharpAcMinTemp);
+  setButton(kSharpAcButtonTemp);
 }
 
 uint8_t IRSharpAc::getTemp(void) {
@@ -375,11 +408,10 @@ uint8_t IRSharpAc::getMode(void) {
 }
 
 void IRSharpAc::setMode(const uint8_t mode) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitModeNonAutoOffset,
-         mode != kSharpAcAuto);
   switch (mode) {
     case kSharpAcAuto:
     case kSharpAcDry:
+      this->setFan(2);  // When Dry or Auto, Fan always 2(Auto)
       this->setTemp(0);  // Dry/Auto have no temp setting.
       // FALLTHRU
     case kSharpAcCool:
@@ -389,6 +421,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
     default:
       this->setMode(kSharpAcAuto);
   }
+  setButton(kSharpAcButtonPowerMode);
 }
 
 // Set the speed of the fan
@@ -399,14 +432,13 @@ void IRSharpAc::setFan(const uint8_t speed) {
     case kSharpAcFanMed:
     case kSharpAcFanHigh:
     case kSharpAcFanMax:
-      setBit(&remote[kSharpAcByteManual], kSharpAcBitFanManualOffset,
-             speed != kSharpAcFanAuto);
       setBits(&remote[kSharpAcByteFan], kSharpAcFanOffset, kSharpAcFanSize,
               speed);
       break;
     default:
       this->setFan(kSharpAcFanAuto);
   }
+  setButton(kSharpAcButtonFan);
 }
 
 uint8_t IRSharpAc::getFan(void) {
@@ -485,8 +517,9 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
-  result.reserve(60);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
+  result += addBoolToString(getPreviousPower(), kPreviousPowerStr);
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());

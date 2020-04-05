@@ -1039,11 +1039,13 @@ TEST(TestIRac, Sharp) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium)";
+      "Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
+      "Fan: 3 (Medium)";
 
   ac.begin();
   irac.sharp(&ac,
              true,                         // Power
+             true,                         // Previous Power
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
              stdAc::fanspeed_t::kMedium);  // Fan speed

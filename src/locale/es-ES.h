@@ -7,6 +7,8 @@
 #define D_STR_UNKNOWN "DESCONOCIDO"
 #define D_STR_PROTOCOL "Protocolo"
 #define D_STR_POWER "Poder"
+#define D_STR_PREVIOUS "Anterior"
+#define D_STR_PREVIOUSPOWER D_STR_POWER " " D_STR_PREVIOUS
 #define D_STR_ON "Encendido"
 #define D_STR_OFF "Apagado"
 #define D_STR_MODE "Modo"

@@ -24,6 +24,9 @@
 #ifndef D_STR_POWER
 #define D_STR_POWER "Power"
 #endif  // D_STR_POWER
+#ifndef D_STR_PREVIOUS
+#define D_STR_PREVIOUS "Previous"
+#endif  // D_STR_PREVIOUS
 #ifndef D_STR_ON
 #define D_STR_ON "On"
 #endif  // D_STR_ON
@@ -363,6 +366,9 @@
 #ifndef D_STR_POWERTOGGLE
 #define D_STR_POWERTOGGLE D_STR_POWER " " D_STR_TOGGLE
 #endif  // D_STR_POWERTOGGLE
+#ifndef D_STR_PREVIOUSPOWER
+#define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
+#endif  // D_STR_PREVIOUSPOWER
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP

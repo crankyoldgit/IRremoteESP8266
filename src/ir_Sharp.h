@@ -3,6 +3,7 @@
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C
+//   Brand: Sharp,  Model: AH-AxSAY A/C
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -38,17 +39,19 @@ const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
 const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcBytePower = 5;
-const uint8_t kSharpAcBitPowerOffset = 4;
-const uint8_t kSharpAcBitModeNonAutoOffset = 5;  // 0b00100000
+const uint8_t kSharpAcBitPowerOffset = 4;  // 0b000x0000
+const uint8_t kSharpAcBitPreviousPowerOffset = 5;  // 0b00x00000
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
 const uint8_t kSharpAcFanOffset = 4;  // Mask 0b01110000
 const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
-const uint8_t kSharpAcByteManual = 10;
-const uint8_t kSharpAcBitFanManualOffset = 0;   // 0b00000001
-const uint8_t kSharpAcBitTempManualOffset = 2;  // 0b00000100
-
+const uint8_t kSharpAcByteButton = 10;
+const uint8_t kSharpAcButtonOffset = 0;
+const uint8_t kSharpAcButtonSize = 3;  // Mask 0b00000xxx
+const uint8_t kSharpAcButtonPowerMode =             0b000;  // 0
+const uint8_t kSharpAcButtonTemp =                  0b100;  // 4
+const uint8_t kSharpAcButtonFan =                   0b101;  // 5
 
 class IRSharpAc {
  public:
@@ -63,13 +66,18 @@ class IRSharpAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
+  void setPower(const bool on, const bool prev);
   bool getPower(void);
+  void setPreviousPower(const bool on);
+  bool getPreviousPower(void);
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t fan);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
+  void setButton(const uint8_t button);
+  uint8_t getButton(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);
