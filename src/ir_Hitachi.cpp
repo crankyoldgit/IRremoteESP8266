@@ -480,7 +480,6 @@ void IRHitachiAc1::setMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAc1Auto:
       setTemp(kHitachiAc1TempAuto);
-      setFan(kHitachiAc1FanAuto, true);
       // FALL THRU
     case kHitachiAc1Fan:
     case kHitachiAc1Heat:
@@ -489,6 +488,7 @@ void IRHitachiAc1::setMode(const uint8_t mode) {
       setBits(&remote_state[kHitachiAc1ModeByte], kHitachiAc1ModeOffset,
               kHitachiAc1ModeSize, mode);
       setSleep(getSleep());  // Correct the sleep mode if required.
+      setFan(getFan());  // Correct the fan speed if required.
       break;
     default: setMode(kHitachiAc1Auto);
   }
@@ -524,8 +524,12 @@ uint8_t IRHitachiAc1::getFan(void) {
 void IRHitachiAc1::setFan(const uint8_t speed, const bool force) {
   if (!force) {
     switch (getMode()) {
+      case kHitachiAc1Dry:
+        setFan(kHitachiAc1FanLow, true);  // Dry is locked to Low speed.
+        return;
       case kHitachiAc1Auto:
-      case kHitachiAc1Dry: return;  // Speed change not allowed in these modes.
+        setFan(kHitachiAc1FanAuto, true);  // Auto is locked to Auto speed.
+        return;
     }
   }
   switch (speed) {
