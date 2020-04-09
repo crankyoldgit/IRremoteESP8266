@@ -93,166 +93,166 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 decode_type_t strToDecodeType(const char * const str) {
   if (!strcasecmp(str, kUnknownStr))
     return decode_type_t::UNKNOWN;
-  else if (!strcasecmp(str, "UNUSED"))
+  else if (!strcasecmp(str, kUnusedStr))
     return decode_type_t::UNUSED;
-  else if (!strcasecmp(str, "AIRWELL"))
+  else if (!strcasecmp(str, kAirwellStr))
     return decode_type_t::AIRWELL;
-  else if (!strcasecmp(str, "AIWA_RC_T501"))
+  else if (!strcasecmp(str, kAiwaRcT501Str))
     return decode_type_t::AIWA_RC_T501;
-  else if (!strcasecmp(str, "AMCOR"))
+  else if (!strcasecmp(str, kAmcorStr))
     return decode_type_t::AMCOR;
-  else if (!strcasecmp(str, "ARGO"))
+  else if (!strcasecmp(str, kArgoStr))
     return decode_type_t::ARGO;
-  else if (!strcasecmp(str, "CARRIER_AC"))
+  else if (!strcasecmp(str, kCarrierAcStr))
     return decode_type_t::CARRIER_AC;
-  else if (!strcasecmp(str, "COOLIX"))
+  else if (!strcasecmp(str, kCoolixStr))
     return decode_type_t::COOLIX;
-  else if (!strcasecmp(str, "DAIKIN"))
+  else if (!strcasecmp(str, kDaikinStr))
     return decode_type_t::DAIKIN;
-  else if (!strcasecmp(str, "DAIKIN128"))
+  else if (!strcasecmp(str, kDaikin128Str))
     return decode_type_t::DAIKIN128;
-  else if (!strcasecmp(str, "DAIKIN152"))
+  else if (!strcasecmp(str, kDaikin152Str))
     return decode_type_t::DAIKIN152;
-  else if (!strcasecmp(str, "DAIKIN160"))
+  else if (!strcasecmp(str, kDaikin160Str))
     return decode_type_t::DAIKIN160;
-  else if (!strcasecmp(str, "DAIKIN176"))
+  else if (!strcasecmp(str, kDaikin176Str))
     return decode_type_t::DAIKIN176;
-  else if (!strcasecmp(str, "DAIKIN2"))
+  else if (!strcasecmp(str, kDaikin2Str))
     return decode_type_t::DAIKIN2;
-  else if (!strcasecmp(str, "DAIKIN216"))
+  else if (!strcasecmp(str, kDaikin216Str))
     return decode_type_t::DAIKIN216;
-  else if (!strcasecmp(str, "DAIKIN64"))
+  else if (!strcasecmp(str, kDaikin64Str))
     return decode_type_t::DAIKIN64;
-  else if (!strcasecmp(str, "DENON"))
+  else if (!strcasecmp(str, kDenonStr))
     return decode_type_t::DENON;
-  else if (!strcasecmp(str, "DISH"))
+  else if (!strcasecmp(str, kDishStr))
     return decode_type_t::DISH;
-  else if (!strcasecmp(str, "ELECTRA_AC"))
+  else if (!strcasecmp(str, kElectraAcStr))
     return decode_type_t::ELECTRA_AC;
-  else if (!strcasecmp(str, "EPSON"))
+  else if (!strcasecmp(str, kEpsonStr))
     return decode_type_t::EPSON;
-  else if (!strcasecmp(str, "FUJITSU_AC"))
+  else if (!strcasecmp(str, kFujitsuAcStr))
     return decode_type_t::FUJITSU_AC;
-  else if (!strcasecmp(str, "GICABLE"))
+  else if (!strcasecmp(str, kGICableStr))
     return decode_type_t::GICABLE;
-  else if (!strcasecmp(str, "GLOBALCACHE"))
+  else if (!strcasecmp(str, kGlobalCacheStr))
     return decode_type_t::GLOBALCACHE;
-  else if (!strcasecmp(str, "GOODWEATHER"))
+  else if (!strcasecmp(str, kGoodweatherStr))
     return decode_type_t::GOODWEATHER;
-  else if (!strcasecmp(str, "GREE"))
+  else if (!strcasecmp(str, kGreeStr))
     return decode_type_t::GREE;
-  else if (!strcasecmp(str, "HAIER_AC"))
+  else if (!strcasecmp(str, kHaierAcStr))
     return decode_type_t::HAIER_AC;
-  else if (!strcasecmp(str, "HAIER_AC_YRW02"))
+  else if (!strcasecmp(str, kHaierAcYrw02Str))
     return decode_type_t::HAIER_AC_YRW02;
-  else if (!strcasecmp(str, "HITACHI_AC"))
+  else if (!strcasecmp(str, kHitachiAcStr))
     return decode_type_t::HITACHI_AC;
-  else if (!strcasecmp(str, "HITACHI_AC1"))
+  else if (!strcasecmp(str, kHitachiAc1Str))
     return decode_type_t::HITACHI_AC1;
-  else if (!strcasecmp(str, "HITACHI_AC2"))
+  else if (!strcasecmp(str, kHitachiAc2Str))
     return decode_type_t::HITACHI_AC2;
-  else if (!strcasecmp(str, "HITACHI_AC3"))
+  else if (!strcasecmp(str, kHitachiAc3Str))
     return decode_type_t::HITACHI_AC3;
-  else if (!strcasecmp(str, "HITACHI_AC424"))
+  else if (!strcasecmp(str, kHitachiAc424Str))
     return decode_type_t::HITACHI_AC424;
-  else if (!strcasecmp(str, "INAX"))
+  else if (!strcasecmp(str, kInaxStr))
     return decode_type_t::INAX;
-  else if (!strcasecmp(str, "JVC"))
+  else if (!strcasecmp(str, kJvcStr))
     return decode_type_t::JVC;
-  else if (!strcasecmp(str, "KELVINATOR"))
+  else if (!strcasecmp(str, kKelvinatorStr))
     return decode_type_t::KELVINATOR;
-  else if (!strcasecmp(str, "LEGOPF"))
-    return decode_type_t::LEGOPF;
-  else if (!strcasecmp(str, "LG"))
-    return decode_type_t::LG;
-  else if (!strcasecmp(str, "LG2"))
-    return decode_type_t::LG2;
-  else if (!strcasecmp(str, "LASERTAG"))
+  else if (!strcasecmp(str, kLasertagStr))
     return decode_type_t::LASERTAG;
-  else if (!strcasecmp(str, "LUTRON"))
+  else if (!strcasecmp(str, kLegopfStr))
+    return decode_type_t::LEGOPF;
+  else if (!strcasecmp(str, kLgStr))
+    return decode_type_t::LG;
+  else if (!strcasecmp(str, kLg2Str))
+    return decode_type_t::LG2;
+  else if (!strcasecmp(str, kLutronStr))
     return decode_type_t::LUTRON;
-  else if (!strcasecmp(str, "MAGIQUEST"))
+  else if (!strcasecmp(str, kMagiquestStr))
     return decode_type_t::MAGIQUEST;
-  else if (!strcasecmp(str, "MIDEA"))
+  else if (!strcasecmp(str, kMideaStr))
     return decode_type_t::MIDEA;
-  else if (!strcasecmp(str, "MITSUBISHI"))
+  else if (!strcasecmp(str, kMitsubishiStr))
     return decode_type_t::MITSUBISHI;
-  else if (!strcasecmp(str, "MITSUBISHI2"))
+  else if (!strcasecmp(str, kMitsubishi2Str))
     return decode_type_t::MITSUBISHI2;
-  else if (!strcasecmp(str, "MITSUBISHI_AC"))
+  else if (!strcasecmp(str, kMitsubishiAcStr))
     return decode_type_t::MITSUBISHI_AC;
-  else if (!strcasecmp(str, "MITSUBISHI136"))
+  else if (!strcasecmp(str, kMitsubishi136Str))
     return decode_type_t::MITSUBISHI136;
-  else if (!strcasecmp(str, "MITSUBISHI112"))
+  else if (!strcasecmp(str, kMitsubishi112Str))
     return decode_type_t::MITSUBISHI112;
-  else if (!strcasecmp(str, "MITSUBISHI_HEAVY_88"))
+  else if (!strcasecmp(str, kMitsubishiHeavy88Str))
     return decode_type_t::MITSUBISHI_HEAVY_88;
-  else if (!strcasecmp(str, "MITSUBISHI_HEAVY_152"))
+  else if (!strcasecmp(str, kMitsubishiHeavy152Str))
     return decode_type_t::MITSUBISHI_HEAVY_152;
-  else if (!strcasecmp(str, "MWM"))
+  else if (!strcasecmp(str, kMwmStr))
     return decode_type_t::MWM;
-  else if (!strcasecmp(str, "NEOCLIMA"))
+  else if (!strcasecmp(str, kNeoclimaStr))
     return decode_type_t::NEOCLIMA;
-  else if (!strcasecmp(str, "NEC"))
+  else if (!strcasecmp(str, kNecStr))
     return decode_type_t::NEC;
-  else if (!strcasecmp(str, "NEC_LIKE") ||
-           !strcasecmp(str, "NEC (NON-STRICT)"))
+  else if (!strcasecmp(str, kNecLikeStr) ||
+           !strcasecmp(str, kNecNonStrictStr))
     return decode_type_t::NEC_LIKE;
-  else if (!strcasecmp(str, "NIKAI"))
+  else if (!strcasecmp(str, kNikaiStr))
     return decode_type_t::NIKAI;
-  else if (!strcasecmp(str, "PANASONIC"))
+  else if (!strcasecmp(str, kPanasonicStr))
     return decode_type_t::PANASONIC;
-  else if (!strcasecmp(str, "PANASONIC_AC"))
+  else if (!strcasecmp(str, kPanasonicAcStr))
     return decode_type_t::PANASONIC_AC;
-  else if (!strcasecmp(str, "PIONEER"))
+  else if (!strcasecmp(str, kPioneerStr))
     return decode_type_t::PIONEER;
-  else if (!strcasecmp(str, "PRONTO"))
+  else if (!strcasecmp(str, kProntoStr))
     return decode_type_t::PRONTO;
-  else if (!strcasecmp(str, "RAW"))
+  else if (!strcasecmp(str, kRawStr))
     return decode_type_t::RAW;
-  else if (!strcasecmp(str, "RC5"))
+  else if (!strcasecmp(str, kRc5Str))
     return decode_type_t::RC5;
-  else if (!strcasecmp(str, "RC5X"))
+  else if (!strcasecmp(str, kRc5XStr))
     return decode_type_t::RC5X;
-  else if (!strcasecmp(str, "RC6"))
+  else if (!strcasecmp(str, kRc6Str))
     return decode_type_t::RC6;
-  else if (!strcasecmp(str, "RCMM"))
+  else if (!strcasecmp(str, kRcmmStr))
     return decode_type_t::RCMM;
-  else if (!strcasecmp(str, "SAMSUNG"))
+  else if (!strcasecmp(str, kSamsungStr))
     return decode_type_t::SAMSUNG;
-  else if (!strcasecmp(str, "SAMSUNG36"))
+  else if (!strcasecmp(str, kSamsung36Str))
     return decode_type_t::SAMSUNG36;
-  else if (!strcasecmp(str, "SAMSUNG_AC"))
+  else if (!strcasecmp(str, kSamsungAcStr))
     return decode_type_t::SAMSUNG_AC;
-  else if (!strcasecmp(str, "SANYO"))
+  else if (!strcasecmp(str, kSanyoStr))
     return decode_type_t::SANYO;
-  else if (!strcasecmp(str, "SANYO_LC7461"))
+  else if (!strcasecmp(str, kSanyoLc7461Str))
     return decode_type_t::SANYO_LC7461;
-  else if (!strcasecmp(str, "SHARP"))
+  else if (!strcasecmp(str, kSharpStr))
     return decode_type_t::SHARP;
-  else if (!strcasecmp(str, "SHARP_AC"))
+  else if (!strcasecmp(str, kSharpAcStr))
     return decode_type_t::SHARP_AC;
-  else if (!strcasecmp(str, "SHERWOOD"))
+  else if (!strcasecmp(str, kSherwoodStr))
     return decode_type_t::SHERWOOD;
-  else if (!strcasecmp(str, "SONY"))
+  else if (!strcasecmp(str, kSonyStr))
     return decode_type_t::SONY;
-  else if (!strcasecmp(str, "SONY_38K"))
+  else if (!strcasecmp(str, kSony38KStr))
     return decode_type_t::SONY_38K;
-  else if (!strcasecmp(str, "SYMPHONY"))
+  else if (!strcasecmp(str, kSymphonyStr))
     return decode_type_t::SYMPHONY;
-  else if (!strcasecmp(str, "TCL112AC"))
+  else if (!strcasecmp(str, kTcl112AcStr))
     return decode_type_t::TCL112AC;
-  else if (!strcasecmp(str, "TECO"))
+  else if (!strcasecmp(str, kTecoStr))
     return decode_type_t::TECO;
-  else if (!strcasecmp(str, "TOSHIBA_AC"))
+  else if (!strcasecmp(str, kToshibaAcStr))
     return decode_type_t::TOSHIBA_AC;
-  else if (!strcasecmp(str, "TROTEC"))
+  else if (!strcasecmp(str, kTrotecStr))
     return decode_type_t::TROTEC;
-  else if (!strcasecmp(str, "VESTEL_AC"))
+  else if (!strcasecmp(str, kVestelAcStr))
     return decode_type_t::VESTEL_AC;
-  else if (!strcasecmp(str, "WHIRLPOOL_AC"))
+  else if (!strcasecmp(str, kWhirlpoolAcStr))
     return decode_type_t::WHIRLPOOL_AC;
-  else if (!strcasecmp(str, "WHYNTER"))
+  else if (!strcasecmp(str, kWhynterStr))
     return decode_type_t::WHYNTER;
   // Handle integer values of the type by converting to a string and back again.
   decode_type_t result = strToDecodeType(
@@ -273,244 +273,244 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
   switch (protocol) {
     case UNUSED:
-      result = F("UNUSED");
+      result = kUnusedStr;
       break;
     case AIRWELL:
-      result = F("AIRWELL");
+      result = kAirwellStr;
       break;
     case AIWA_RC_T501:
-      result = F("AIWA_RC_T501");
+      result = kAiwaRcT501Str;
       break;
     case AMCOR:
-      result = F("AMCOR");
+      result = kAmcorStr;
       break;
     case ARGO:
-      result = F("ARGO");
+      result = kArgoStr;
       break;
     case CARRIER_AC:
-      result = F("CARRIER_AC");
+      result = kCarrierAcStr;
       break;
     case COOLIX:
-      result = F("COOLIX");
+      result = kCoolixStr;
       break;
     case DAIKIN:
-      result = F("DAIKIN");
+      result = kDaikinStr;
       break;
     case DAIKIN128:
-      result = F("DAIKIN128");
+      result = kDaikin128Str;
       break;
     case DAIKIN152:
-      result = F("DAIKIN152");
+      result = kDaikin152Str;
       break;
     case DAIKIN160:
-      result = F("DAIKIN160");
+      result = kDaikin160Str;
       break;
     case DAIKIN176:
-      result = F("DAIKIN176");
+      result = kDaikin176Str;
       break;
     case DAIKIN2:
-      result = F("DAIKIN2");
+      result = kDaikin2Str;
       break;
     case DAIKIN216:
-      result = F("DAIKIN216");
+      result = kDaikin216Str;
       break;
     case DAIKIN64:
-      result = F("DAIKIN64");
+      result = kDaikin64Str;
       break;
     case DENON:
-      result = F("DENON");
+      result = kDenonStr;
       break;
     case DISH:
-      result = F("DISH");
+      result = kDishStr;
       break;
     case ELECTRA_AC:
-      result = F("ELECTRA_AC");
+      result = kElectraAcStr;
       break;
     case EPSON:
-      result = F("EPSON");
+      result = kEpsonStr;
       break;
     case FUJITSU_AC:
-      result = F("FUJITSU_AC");
+      result = kFujitsuAcStr;
       break;
     case GICABLE:
-      result = F("GICABLE");
+      result = kGICableStr;
       break;
     case GLOBALCACHE:
-      result = F("GLOBALCACHE");
+      result = kGlobalCacheStr;
       break;
     case GOODWEATHER:
-      result = F("GOODWEATHER");
+      result = kGoodweatherStr;
       break;
     case GREE:
-      result = F("GREE");
+      result = kGreeStr;
       break;
     case HAIER_AC:
-      result = F("HAIER_AC");
+      result = kHaierAcStr;
       break;
     case HAIER_AC_YRW02:
-      result = F("HAIER_AC_YRW02");
+      result = kHaierAcYrw02Str;
       break;
     case HITACHI_AC:
-      result = F("HITACHI_AC");
+      result = kHitachiAcStr;
       break;
     case HITACHI_AC1:
-      result = F("HITACHI_AC1");
+      result = kHitachiAc1Str;
       break;
     case HITACHI_AC2:
-      result = F("HITACHI_AC2");
+      result = kHitachiAc2Str;
       break;
     case HITACHI_AC3:
-      result = F("HITACHI_AC3");
+      result = kHitachiAc3Str;
       break;
     case HITACHI_AC424:
-      result = F("HITACHI_AC424");
+      result = kHitachiAc424Str;
       break;
     case INAX:
-      result = F("INAX");
+      result = kInaxStr;
       break;
     case JVC:
-      result = F("JVC");
+      result = kJvcStr;
       break;
     case KELVINATOR:
-      result = F("KELVINATOR");
+      result = kKelvinatorStr;
       break;
     case LEGOPF:
-      result = F("LEGOPF");
+      result = kLegopfStr;
       break;
     case LG:
-      result = F("LG");
+      result = kLgStr;
       break;
     case LG2:
-      result = F("LG2");
+      result = kLg2Str;
       break;
     case LASERTAG:
-      result = F("LASERTAG");
+      result = kLasertagStr;
       break;
     case LUTRON:
-      result = F("LUTRON");
+      result = kLutronStr;
       break;
     case MAGIQUEST:
-      result = F("MAGIQUEST");
+      result = kMagiquestStr;
       break;
     case MIDEA:
-      result = F("MIDEA");
+      result = kMideaStr;
       break;
     case MITSUBISHI:
-      result = F("MITSUBISHI");
+      result = kMitsubishiStr;
       break;
     case MITSUBISHI2:
-      result = F("MITSUBISHI2");
+      result = kMitsubishi2Str;
       break;
     case MITSUBISHI_AC:
-      result = F("MITSUBISHI_AC");
+      result = kMitsubishiAcStr;
       break;
     case MITSUBISHI136:
-      result = F("MITSUBISHI136");
+      result = kMitsubishi136Str;
       break;
     case MITSUBISHI112:
-      result = F("MITSUBISHI112");
+      result = kMitsubishi112Str;
       break;
     case MITSUBISHI_HEAVY_88:
-      result = F("MITSUBISHI_HEAVY_88");
+      result = kMitsubishiHeavy88Str;
       break;
     case MITSUBISHI_HEAVY_152:
-      result = F("MITSUBISHI_HEAVY_152");
+      result = kMitsubishiHeavy152Str;
       break;
     case MWM:
-      result = F("MWM");
+      result = kMwmStr;
       break;
     case NEOCLIMA:
-      result = F("NEOCLIMA");
+      result = kNeoclimaStr;
       break;
     case NEC:
-      result = F("NEC");
+      result = kNecStr;
       break;
     case NEC_LIKE:
-      result = F("NEC (non-strict)");
+      result = kNecNonStrictStr;
       break;
     case NIKAI:
-      result = F("NIKAI");
+      result = kNikaiStr;
       break;
     case PANASONIC:
-      result = F("PANASONIC");
+      result = kPanasonicStr;
       break;
     case PANASONIC_AC:
-      result = F("PANASONIC_AC");
+      result = kPanasonicAcStr;
       break;
     case PIONEER:
-      result = F("PIONEER");
+      result = kPioneerStr;
       break;
     case PRONTO:
-      result = F("PRONTO");
+      result = kProntoStr;
       break;
     case RAW:
-      result = F("RAW");
+      result = kRawStr;
       break;
     case RC5:
-      result = F("RC5");
+      result = kRc5Str;
       break;
     case RC5X:
-      result = F("RC5X");
+      result = kRc5XStr;
       break;
     case RC6:
-      result = F("RC6");
+      result = kRc6Str;
       break;
     case RCMM:
-      result = F("RCMM");
+      result = kRcmmStr;
       break;
     case SAMSUNG:
-      result = F("SAMSUNG");
+      result = kSamsungStr;
       break;
     case SAMSUNG36:
-      result = F("SAMSUNG36");
+      result = kSamsung36Str;
       break;
     case SAMSUNG_AC:
-      result = F("SAMSUNG_AC");
+      result = kSamsungAcStr;
       break;
     case SANYO:
-      result = F("SANYO");
+      result = kSanyoStr;
       break;
     case SANYO_LC7461:
-      result = F("SANYO_LC7461");
+      result = kSanyoLc7461Str;
       break;
     case SHARP:
-      result = F("SHARP");
+      result = kSharpStr;
       break;
     case SHARP_AC:
-      result = F("SHARP_AC");
+      result = kSharpAcStr;
       break;
     case SHERWOOD:
-      result = F("SHERWOOD");
+      result = kSherwoodStr;
       break;
     case SONY:
-      result = F("SONY");
+      result = kSonyStr;
       break;
     case SONY_38K:
-      result = F("SONY_38K");
+      result = kSony38KStr;
       break;
     case SYMPHONY:
-      result = F("SYMPHONY");
+      result = kSymphonyStr;
       break;
     case TCL112AC:
-      result = F("TCL112AC");
+      result = kTcl112AcStr;
       break;
     case TECO:
-      result = F("TECO");
+      result = kTecoStr;
       break;
     case TOSHIBA_AC:
-      result = F("TOSHIBA_AC");
+      result = kToshibaAcStr;
       break;
     case TROTEC:
-      result = F("TROTEC");
+      result = kTrotecStr;
       break;
     case VESTEL_AC:
-      result = F("VESTEL_AC");
+      result = kVestelAcStr;
       break;
     case WHIRLPOOL_AC:
-      result = F("WHIRLPOOL_AC");
+      result = kWhirlpoolAcStr;
       break;
     case WHYNTER:
-      result = F("WHYNTER");
+      result = kWhynterStr;
       break;
     case UNKNOWN:
     default:

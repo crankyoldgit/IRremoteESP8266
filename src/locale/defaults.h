@@ -450,6 +450,251 @@
 #define D_STR_BITS "Bits"
 #endif  // D_STR_BITS
 
+// Protocols Names
+#ifndef D_STR_AIRWELL
+#define D_STR_AIRWELL "AIRWELL"
+#endif  // D_STR_AIRWELL
+#ifndef D_STR_AIWA_RC_T501
+#define D_STR_AIWA_RC_T501 "AIWA_RC_T501"
+#endif  // D_STR_AIWA_RC_T501
+#ifndef D_STR_AMCOR
+#define D_STR_AMCOR "AMCOR"
+#endif  // D_STR_AMCOR
+#ifndef D_STR_ARGO
+#define D_STR_ARGO "ARGO"
+#endif  // D_STR_ARGO
+#ifndef D_STR_CARRIER_AC
+#define D_STR_CARRIER_AC "CARRIER_AC"
+#endif  // D_STR_CARRIER_AC
+#ifndef D_STR_COOLIX
+#define D_STR_COOLIX "COOLIX"
+#endif  // D_STR_COOLIX
+#ifndef D_STR_DAIKIN
+#define D_STR_DAIKIN "DAIKIN"
+#endif  // D_STR_DAIKIN
+#ifndef D_STR_DAIKIN128
+#define D_STR_DAIKIN128 "DAIKIN128"
+#endif  // D_STR_DAIKIN128
+#ifndef D_STR_DAIKIN152
+#define D_STR_DAIKIN152 "DAIKIN152"
+#endif  // D_STR_DAIKIN152
+#ifndef D_STR_DAIKIN160
+#define D_STR_DAIKIN160 "DAIKIN160"
+#endif  // D_STR_DAIKIN160
+#ifndef D_STR_DAIKIN176
+#define D_STR_DAIKIN176 "DAIKIN176"
+#endif  // D_STR_DAIKIN176
+#ifndef D_STR_DAIKIN2
+#define D_STR_DAIKIN2 "DAIKIN2"
+#endif  // D_STR_DAIKIN2
+#ifndef D_STR_DAIKIN216
+#define D_STR_DAIKIN216 "DAIKIN216"
+#endif  // D_STR_DAIKIN216
+#ifndef D_STR_DAIKIN64
+#define D_STR_DAIKIN64 "DAIKIN64"
+#endif  // D_STR_DAIKIN64
+#ifndef D_STR_DENON
+#define D_STR_DENON "DENON"
+#endif  // D_STR_DENON
+#ifndef D_STR_DISH
+#define D_STR_DISH "DISH"
+#endif  // D_STR_DISH
+#ifndef D_STR_ELECTRA_AC
+#define D_STR_ELECTRA_AC "ELECTRA_AC"
+#endif  // D_STR_ELECTRA_AC
+#ifndef D_STR_EPSON
+#define D_STR_EPSON "EPSON"
+#endif  // D_STR_EPSON
+#ifndef D_STR_FUJITSU_AC
+#define D_STR_FUJITSU_AC "FUJITSU_AC"
+#endif  // D_STR_FUJITSU_AC
+#ifndef D_STR_GICABLE
+#define D_STR_GICABLE "GICABLE"
+#endif  // D_STR_GICABLE
+#ifndef D_STR_GLOBALCACHE
+#define D_STR_GLOBALCACHE "GLOBALCACHE"
+#endif  // D_STR_GLOBALCACHE
+#ifndef D_STR_GOODWEATHER
+#define D_STR_GOODWEATHER "GOODWEATHER"
+#endif  // D_STR_GOODWEATHER
+#ifndef D_STR_GREE
+#define D_STR_GREE "GREE"
+#endif  // D_STR_GREE
+#ifndef D_STR_HAIER_AC
+#define D_STR_HAIER_AC "HAIER_AC"
+#endif  // D_STR_HAIER_AC
+#ifndef D_STR_HAIER_AC_YRW02
+#define D_STR_HAIER_AC_YRW02 "HAIER_AC_YRW02"
+#endif  // D_STR_HAIER_AC_YRW02
+#ifndef D_STR_HITACHI_AC
+#define D_STR_HITACHI_AC "HITACHI_AC"
+#endif  // D_STR_HITACHI_AC
+#ifndef D_STR_HITACHI_AC1
+#define D_STR_HITACHI_AC1 "HITACHI_AC1"
+#endif  // D_STR_HITACHI_AC1
+#ifndef D_STR_HITACHI_AC2
+#define D_STR_HITACHI_AC2 "HITACHI_AC2"
+#endif  // D_STR_HITACHI_AC2
+#ifndef D_STR_HITACHI_AC3
+#define D_STR_HITACHI_AC3 "HITACHI_AC3"
+#endif  // D_STR_HITACHI_AC3
+#ifndef D_STR_HITACHI_AC424
+#define D_STR_HITACHI_AC424 "HITACHI_AC424"
+#endif  // D_STR_HITACHI_AC424
+#ifndef D_STR_INAX
+#define D_STR_INAX "INAX"
+#endif  // D_STR_INAX
+#ifndef D_STR_JVC
+#define D_STR_JVC "JVC"
+#endif  // D_STR_JVC
+#ifndef D_STR_KELVINATOR
+#define D_STR_KELVINATOR "KELVINATOR"
+#endif  // D_STR_KELVINATOR
+#ifndef D_STR_LASERTAG
+#define D_STR_LASERTAG "LASERTAG"
+#endif  // D_STR_LASERTAG
+#ifndef D_STR_LEGOPF
+#define D_STR_LEGOPF "LEGOPF"
+#endif  // D_STR_LEGOPF
+#ifndef D_STR_LG
+#define D_STR_LG "LG"
+#endif  // D_STR_LG
+#ifndef D_STR_LG2
+#define D_STR_LG2 "LG2"
+#endif  // D_STR_LG2
+#ifndef D_STR_LUTRON
+#define D_STR_LUTRON "LUTRON"
+#endif  // D_STR_LUTRON
+#ifndef D_STR_MAGIQUEST
+#define D_STR_MAGIQUEST "MAGIQUEST"
+#endif  // D_STR_MAGIQUEST
+#ifndef D_STR_MIDEA
+#define D_STR_MIDEA "MIDEA"
+#endif  // D_STR_MIDEA
+#ifndef D_STR_MITSUBISHI
+#define D_STR_MITSUBISHI "MITSUBISHI"
+#endif  // D_STR_MITSUBISHI
+#ifndef D_STR_MITSUBISHI112
+#define D_STR_MITSUBISHI112 "MITSUBISHI112"
+#endif  // D_STR_MITSUBISHI112
+#ifndef D_STR_MITSUBISHI136
+#define D_STR_MITSUBISHI136 "MITSUBISHI136"
+#endif  // D_STR_MITSUBISHI136
+#ifndef D_STR_MITSUBISHI2
+#define D_STR_MITSUBISHI2 "MITSUBISHI2"
+#endif  // D_STR_MITSUBISHI2
+#ifndef D_STR_MITSUBISHI_AC
+#define D_STR_MITSUBISHI_AC "MITSUBISHI_AC"
+#endif  // D_STR_MITSUBISHI_AC
+#ifndef D_STR_MITSUBISHI_HEAVY_152
+#define D_STR_MITSUBISHI_HEAVY_152 "MITSUBISHI_HEAVY_152"
+#endif  // D_STR_MITSUBISHI_HEAVY_152
+#ifndef D_STR_MITSUBISHI_HEAVY_88
+#define D_STR_MITSUBISHI_HEAVY_88 "MITSUBISHI_HEAVY_88"
+#endif  // D_STR_MITSUBISHI_HEAVY_88
+#ifndef D_STR_MWM
+#define D_STR_MWM "MWM"
+#endif  // D_STR_MWM
+#ifndef D_STR_NEC
+#define D_STR_NEC "NEC"
+#endif  // D_STR_NEC
+#ifndef D_STR_NEC_LIKE
+#define D_STR_NEC_LIKE D_STR_NEC "_LIKE"
+#endif  // D_STR_NEC_LIKE
+#ifndef D_STR_NEC_NON_STRICT
+#define D_STR_NEC_NON_STRICT D_STR_NEC " (NON-STRICT)"
+#endif  // D_STR_NEC_NON_STRICT
+#ifndef D_STR_NEOCLIMA
+#define D_STR_NEOCLIMA "NEOCLIMA"
+#endif  // D_STR_NEOCLIMA
+#ifndef D_STR_NIKAI
+#define D_STR_NIKAI "NIKAI"
+#endif  // D_STR_NIKAI
+#ifndef D_STR_PANASONIC
+#define D_STR_PANASONIC "PANASONIC"
+#endif  // D_STR_PANASONIC
+#ifndef D_STR_PANASONIC_AC
+#define D_STR_PANASONIC_AC "PANASONIC_AC"
+#endif  // D_STR_PANASONIC_AC
+#ifndef D_STR_PIONEER
+#define D_STR_PIONEER "PIONEER"
+#endif  // D_STR_PIONEER
+#ifndef D_STR_PRONTO
+#define D_STR_PRONTO "PRONTO"
+#endif  // D_STR_PRONTO
+#ifndef D_STR_RAW
+#define D_STR_RAW "RAW"
+#endif  // D_STR_RAW
+#ifndef D_STR_RC5
+#define D_STR_RC5 "RC5"
+#endif  // D_STR_RC5
+#ifndef D_STR_RC5X
+#define D_STR_RC5X "RC5X"
+#endif  // D_STR_RC5X
+#ifndef D_STR_RC6
+#define D_STR_RC6 "RC6"
+#endif  // D_STR_RC6
+#ifndef D_STR_RCMM
+#define D_STR_RCMM "RCMM"
+#endif  // D_STR_RCMM
+#ifndef D_STR_SAMSUNG
+#define D_STR_SAMSUNG "SAMSUNG"
+#endif  // D_STR_SAMSUNG
+#ifndef D_STR_SAMSUNG36
+#define D_STR_SAMSUNG36 "SAMSUNG36"
+#endif  // D_STR_SAMSUNG36
+#ifndef D_STR_SAMSUNG_AC
+#define D_STR_SAMSUNG_AC "SAMSUNG_AC"
+#endif  // D_STR_SAMSUNG_AC
+#ifndef D_STR_SANYO
+#define D_STR_SANYO "SANYO"
+#endif  // D_STR_SANYO
+#ifndef D_STR_SANYO_LC7461
+#define D_STR_SANYO_LC7461 "SANYO_LC7461"
+#endif  // D_STR_SANYO_LC7461
+#ifndef D_STR_SHARP
+#define D_STR_SHARP "SHARP"
+#endif  // D_STR_SHARP
+#ifndef D_STR_SHARP_AC
+#define D_STR_SHARP_AC "SHARP_AC"
+#endif  // D_STR_SHARP_AC
+#ifndef D_STR_SHERWOOD
+#define D_STR_SHERWOOD "SHERWOOD"
+#endif  // D_STR_SHERWOOD
+#ifndef D_STR_SONY
+#define D_STR_SONY "SONY"
+#endif  // D_STR_SONY
+#ifndef D_STR_SONY_38K
+#define D_STR_SONY_38K "SONY_38K"
+#endif  // D_STR_SONY_38K
+#ifndef D_STR_SYMPHONY
+#define D_STR_SYMPHONY "SYMPHONY"
+#endif  // D_STR_SYMPHONY
+#ifndef D_STR_TCL112AC
+#define D_STR_TCL112AC "TCL112AC"
+#endif  // D_STR_TCL112AC
+#ifndef D_STR_TECO
+#define D_STR_TECO "TECO"
+#endif  // D_STR_TECO
+#ifndef D_STR_TOSHIBA_AC
+#define D_STR_TOSHIBA_AC "TOSHIBA_AC"
+#endif  // D_STR_TOSHIBA_AC
+#ifndef D_STR_TROTEC
+#define D_STR_TROTEC "TROTEC"
+#endif  // D_STR_TROTEC
+#ifndef D_STR_UNUSED
+#define D_STR_UNUSED "UNUSED"
+#endif  // D_STR_UNUSED
+#ifndef D_STR_VESTEL_AC
+#define D_STR_VESTEL_AC "VESTEL_AC"
+#endif  // D_STR_VESTEL_AC
+#ifndef D_STR_WHIRLPOOL_AC
+#define D_STR_WHIRLPOOL_AC "WHIRLPOOL_AC"
+#endif  // D_STR_WHIRLPOOL_AC
+#ifndef D_STR_WHYNTER
+#define D_STR_WHYNTER "WHYNTER"
+#endif  // D_STR_WHYNTER
+
 // IRrecvDumpV2
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"
