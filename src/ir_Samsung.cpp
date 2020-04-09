@@ -72,7 +72,7 @@ using irutils::setBits;
 //   nbits:  The bit size of the message being sent. typically kSamsungBits.
 //   repeat: The number of times the message is to be repeated.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 //
 // Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 void IRsend::sendSAMSUNG(const uint64_t data, const uint16_t nbits,
@@ -92,7 +92,7 @@ void IRsend::sendSAMSUNG(const uint64_t data, const uint16_t nbits,
 // Returns:
 //   A raw 32-bit Samsung message suitable for sendSAMSUNG().
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
   uint8_t revcustomer = reverseBits(customer, sizeof(customer) * 8);
   uint8_t revcommand = reverseBits(command, sizeof(command) * 8);

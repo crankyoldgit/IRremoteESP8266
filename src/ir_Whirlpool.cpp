@@ -56,7 +56,7 @@ using irutils::setBits;
 //   nbytes: Nr. of bytes of data in the array. (>=kWhirlpoolAcStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Probably works.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/509

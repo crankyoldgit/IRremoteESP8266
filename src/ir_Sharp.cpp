@@ -57,7 +57,7 @@ using irutils::setBits;
 //   nbits:  Nr. of bits of data to be sent. Typically kSharpBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: BETA / Previously working fine.
+// Status: STABLE / Working fine.
 //
 // Notes:
 //   This procedure handles the inversion of bits required per protocol.
@@ -103,7 +103,7 @@ void IRsend::sendSharpRaw(const uint64_t data, const uint16_t nbits,
 // Returns:
 //   An uint32_t containing the raw Sharp message for sendSharpRaw().
 //
-// Status: BETA / Should work okay.
+// Status: STABLE / Works okay.
 //
 // Notes:
 //   Assumes the standard Sharp bit sizes.
@@ -539,7 +539,7 @@ String IRSharpAc::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Known working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/638

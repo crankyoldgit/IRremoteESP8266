@@ -593,7 +593,7 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
 // Args:
 //   data: An array of kDaikin2StateLength bytes containing the IR command.
 //
-// Status: BETA/Appears to work.
+// Status: STABLE / Expected to work.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
@@ -1219,7 +1219,7 @@ String IRDaikin2::toString(void) {
 // - Daikin FTXZ25NV1B, FTXZ35NV1B, FTXZ50NV1B Aircon
 // - Daikin ARC477A1 remote
 //
-// Status: BETA / Work as expected.
+// Status: STABLE / Works as expected.
 //
 // Ref:
 //   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
@@ -1565,7 +1565,7 @@ String IRDaikin216::toString(void) {
 // Supported devices:
 // - Daikin ARC433B69 remote.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
@@ -2283,7 +2283,7 @@ String IRDaikin176::toString(void) {
 // Supported devices:
 // - Daikin BRC4C153 remote.
 //
-// Status: BETA / Probably works.
+// Status: STABLE / Expected to work.
 //
 
 bool IRrecv::decodeDaikin176(decode_results *results, uint16_t offset,

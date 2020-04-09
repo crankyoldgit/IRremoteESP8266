@@ -78,7 +78,7 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   A raw JVC message.
 //
-// Status: BETA / Should work fine.
+// Status: STABLE / Works fine.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/jvc.php

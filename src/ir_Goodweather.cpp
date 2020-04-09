@@ -34,7 +34,7 @@ using irutils::setBits;
 //   nbits: Nr. of bits of data in the message. (Default is kGoodweatherBits)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Needs testing on real device.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/697
@@ -377,7 +377,7 @@ String IRGoodweatherAc::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Probably works.
 bool IRrecv::decodeGoodweather(decode_results* results, uint16_t offset,
                                const uint16_t nbits,
                                const bool strict) {

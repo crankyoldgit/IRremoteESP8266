@@ -74,7 +74,7 @@ void IRsend::sendLegoPf(const uint64_t data, const uint16_t nbits,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Appears to work.
+// Status: STABLE / Appears to work.
 bool IRrecv::decodeLegoPf(decode_results* results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Check if can possibly be a valid LEGO message.

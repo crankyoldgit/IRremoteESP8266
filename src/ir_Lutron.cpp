@@ -65,7 +65,7 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: STABLE / Working.
 //
 // Notes:
 //

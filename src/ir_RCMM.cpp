@@ -45,7 +45,7 @@ const uint16_t kRcmmExcess = 50;
 //   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
 //   repeat: The nr. of times the message should be sent.
 //
-// Status:  BETA / Should be working.
+// Status:  STABLE / Should be working.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php
@@ -102,7 +102,7 @@ void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status:  BETA / Should be working.
+// Status:  STABLE / Should be working.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rcmm.php

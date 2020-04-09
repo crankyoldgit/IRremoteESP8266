@@ -470,7 +470,7 @@ String IRNeoclimaAc::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Known working
+// Status: STABLE / Known working
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/764

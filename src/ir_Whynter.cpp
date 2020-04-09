@@ -76,7 +76,7 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA  Strict mode is ALPHA.
+// Status: STABLE / Working. Strict mode is ALPHA.
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp

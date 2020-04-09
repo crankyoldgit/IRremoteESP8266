@@ -41,7 +41,7 @@ const uint32_t kPioneerMinGap = kPioneerMinGapTicks * kPioneerTick;
 //           Typically kPioneerBits.
 //   repeat: The number of times the command is to be repeated.
 //
-// Status: BETA / Expected to be working.
+// Status: STABLE / Expected to be working.
 //
 // Ref:
 //  http://adrian-kingston.com/IRFormatPioneer.htm
@@ -75,7 +75,7 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
 // Returns:
 //   A raw 64-bit Pioneer message code.
 //
-// Status: BETA / Expected to work.
+// Status: STABLE / Expected to work.
 //
 // Note:
 //   Address & Command can be take from a decode result OR from the spreadsheets
@@ -103,7 +103,7 @@ uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working. (Self decodes & real examples)
+// Status: STABLE / Should be working. (Self decodes & real examples)
 //
 bool IRrecv::decodePioneer(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {

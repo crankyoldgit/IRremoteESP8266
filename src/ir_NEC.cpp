@@ -44,7 +44,7 @@ void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   A raw 32-bit NEC message.
 //
-// Status: BETA / Expected to work.
+// Status: STABLE / Expected to work.
 //
 // Ref:
 //  http://www.sbprojects.com/knowledge/ir/nec.php

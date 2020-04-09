@@ -184,7 +184,7 @@ uint64_t IRsend::toggleRC5(uint64_t data) { return data ^ kRc5ToggleMask; }
 //  Returns:
 //    A data message suitable for use in sendRC6() with the toggle bit flipped.
 //
-// Status: BETA / Should work fine.
+// Status: STABLE / Should work fine.
 //
 // Ref:
 //   http://www.sbprojects.com/knowledge/ir/rc6.php

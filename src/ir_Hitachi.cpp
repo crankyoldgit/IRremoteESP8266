@@ -64,7 +64,7 @@ using irutils::setBits;
 //   nbytes: Nr. of bytes of data in the array. (>=kHitachiAcStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: STABLE / Working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
@@ -90,7 +90,7 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
 //   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc1StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: BETA / Appears to work.
+// Status: STABLE / Confirmed Working.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
@@ -117,7 +117,7 @@ void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
 //   nbytes: Nr. of bytes of data in the array. (>=kHitachiAc2StateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: BETA / Appears to work.
+// Status: STABLE / Expected to work.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
@@ -729,7 +729,7 @@ String IRHitachiAc1::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Probably works.
+// Status: STABLE / Expected to work.
 //
 // Supported devices:
 //  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
@@ -1185,7 +1185,7 @@ String IRHitachiAc424::toString(void) {
 //   nbytes: Nr. of bytes of data in the array.
 //   repeat: Nr. of times the message is to be repeated.
 //
-// Status: BETA / Probably working fine.
+// Status: STABLE / Working fine.
 void IRsend::sendHitachiAc3(const uint8_t data[], const uint16_t nbytes,
                               const uint16_t repeat) {
   // Header + Data + Footer
@@ -1260,7 +1260,7 @@ void IRHitachiAc3::setRaw(const uint8_t new_code[], const uint16_t length) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Probably works fine.
+// Status: STABLE / Works fine.
 //
 // Supported devices:
 //  Hitachi PC-LH3B

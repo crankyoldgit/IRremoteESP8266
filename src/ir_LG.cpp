@@ -157,7 +157,7 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   A raw 28-bit LG message code suitable for sendLG() etc.
 //
-// Status: BETA / Should work.
+// Status: STABLE / Works.
 //
 // Notes:
 //   e.g. Sequence of bits = address + command + checksum.

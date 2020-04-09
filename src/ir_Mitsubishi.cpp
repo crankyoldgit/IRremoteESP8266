@@ -107,7 +107,7 @@ using irutils::setBits;
 //   nbits:  Nr. of bits of data to be sent. Typically kMitsubishiBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: ALPHA / untested.
+// Status: STABLE / Working.
 //
 // Notes:
 //   This protocol appears to have no header.
@@ -134,7 +134,7 @@ void IRsend::sendMitsubishi(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / previously working.
+// Status: STABLE / Working.
 //
 // Notes:
 //   This protocol appears to have no header.
@@ -174,7 +174,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t offset,
 //   nbits:  Nr. of bits of data to be sent. Typically kMitsubishiBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: ALPHA / untested.
+// Status: BETA / Probably works.
 //
 // Notes:
 //   Based on a Mitsubishi HC3000 projector's remote.
@@ -214,7 +214,7 @@ void IRsend::sendMitsubishi2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Works with simulated data.
+// Status: STABLE / Works.
 //
 // Notes:
 //   Hardware supported:
@@ -270,7 +270,7 @@ bool IRrecv::decodeMitsubishi2(decode_results *results, uint16_t offset,
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = kMitsubishiACMinRepeat).
 //
-// Status: BETA / Appears to be working.
+// Status: STABLE / Working.
 //
 void IRsend::sendMitsubishiAC(const unsigned char data[], const uint16_t nbytes,
                               const uint16_t repeat) {
@@ -296,7 +296,7 @@ void IRsend::sendMitsubishiAC(const unsigned char data[], const uint16_t nbytes,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Under development
+// Status: BETA / Probably works
 //
 // Ref:
 // https://www.analysir.com/blog/2015/01/06/reverse-engineering-mitsubishi-ac-infrared-protocol/
@@ -804,7 +804,7 @@ String IRMitsubishiAC::toString(void) {
 //   repeat: Nr. of times the message is to be repeated.
 //          (Default = kMitsubishi136MinRepeat).
 //
-// Status: ALPHA / Probably working. Needs to be tested against a real device.
+// Status: BETA / Probably working. Needs to be tested against a real device.
 //
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/888

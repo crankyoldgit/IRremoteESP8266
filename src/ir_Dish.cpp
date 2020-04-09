@@ -37,7 +37,7 @@ const uint16_t kDishRptSpace = kDishRptSpaceTicks * kDishTick;
 //   nbits:  The bit size of the command being sent.
 //   repeat: The number of times you want the command to be repeated.
 //
-// Status: BETA / Previously working.
+// Status: STABLE / Working.
 //
 // Note:
 //   Dishplayer is a different protocol.

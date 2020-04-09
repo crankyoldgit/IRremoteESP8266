@@ -30,7 +30,7 @@ const uint16_t kCarrierAcGap = 20000;
 //   nbits:  The bit size of the message being sent. typically kCarrierAcBits.
 //   repeat: The number of times the message is to be repeated.
 //
-// Status: BETA / Appears to work on real devices.
+// Status: STABLE / Work on real devices.
 //
 void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -61,7 +61,7 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Probably works.
 //
 bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {

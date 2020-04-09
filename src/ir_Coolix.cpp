@@ -586,7 +586,7 @@ String IRCoolixAC::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Probably working.
+// Status: STABLE / Known Working.
 bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // The protocol sends the data normal + inverted, alternating on

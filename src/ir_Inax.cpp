@@ -31,7 +31,7 @@ const uint16_t kInaxMinGap = 40000;
 //   nbits:  The bit size of the message being sent. typically kInaxBits.
 //   repeat: The number of times the message is to be repeated.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Working.
 //
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/706
 void IRsend::sendInax(const uint64_t data, const uint16_t nbits,

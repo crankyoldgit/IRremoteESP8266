@@ -38,7 +38,7 @@ using irutils::setBits;
 // Args:
 //   data: An array of kArgoStateLength bytes containing the IR command.
 //
-// Status: ALPHA / Untested.
+// Status: BETA / Probably works.
 
 void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
                       const uint16_t repeat) {
@@ -385,7 +385,7 @@ String IRArgoAC::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Probably doesn't work.
+// Status: BETA / Probably works.
 //
 // Note:
 //   This decoder is based soley off sendArgo(). We have no actual captures

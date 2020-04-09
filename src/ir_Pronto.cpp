@@ -21,7 +21,7 @@ const uint16_t kProntoDataOffset = 4;
 //   len: Nr. of entries in the data[] array.
 //   repeat: Nr. of times to repeat the message.
 //
-// Status: ALPHA / Not tested in the real world.
+// Status: STABLE / Known working.
 //
 // Note:
 //   Pronto codes are typically represented in hexadecimal.

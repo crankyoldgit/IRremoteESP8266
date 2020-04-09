@@ -82,7 +82,7 @@ using irutils::setBits;
 //   nbits:  The number of bits of the message to be sent. (kPanasonicBits).
 //   repeat: The number of times the command is to be repeated.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 //
 // Note:
 //   This protocol is a modified version of Kaseikyo.
@@ -121,7 +121,7 @@ void IRsend::sendPanasonic(const uint16_t address, const uint32_t data,
 // Returns:
 //   A raw uint64_t Panasonic message.
 //
-// Status: BETA / Should be working..
+// Status: STABLE / Should be working..
 //
 // Note:
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
@@ -149,7 +149,7 @@ uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 // Note:
 //   Panasonic 48-bit protocol is a modified version of Kaseikyo.
 // Ref:

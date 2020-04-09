@@ -245,7 +245,7 @@ String IRTrotecESP::toString(void) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Probably works. Untested on real devices.
+// Status: STABLE / Works. Untested on real devices.
 //
 // Ref:
 bool IRrecv::decodeTrotec(decode_results *results, uint16_t offset,

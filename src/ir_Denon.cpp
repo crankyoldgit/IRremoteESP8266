@@ -40,7 +40,7 @@ const uint64_t kDenonManufacturer = 0x2A4CULL;
 //   nbits:  Nr. of bits of data to be sent. Typically kDenonBits.
 //   repeat: Nr. of additional times the message is to be sent.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 //
 // Notes:
 //   Some Denon devices use a Kaseikyo/Panasonic 48-bit format
@@ -71,7 +71,7 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should work fine.
+// Status: STABLE / Should work fine.
 //
 // Ref:
 //   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp

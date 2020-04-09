@@ -50,7 +50,7 @@ using irutils::setBits;
 //   nbytes: Nr. of bytes of data in the array. (>=kGreeStateLength)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: STABLE / Working.
 //
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
@@ -84,7 +84,7 @@ void IRsend::sendGree(const unsigned char data[], const uint16_t nbytes,
 //   nbits: Nr. of bits of data in the message. (Default is kGreeBits)
 //   repeat: Nr. of times the message is to be repeated. (Default = 0).
 //
-// Status: ALPHA / Untested.
+// Status: STABLE / Working.
 //
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp

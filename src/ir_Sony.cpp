@@ -106,7 +106,7 @@ void IRsend::_sendSony(uint64_t data, uint16_t nbits, uint16_t repeat,
 // Returns:
 //   A sendSony compatible data message.
 //
-// Status: BETA / Should be working.
+// Status: STABLE / Should be working.
 uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
                             uint16_t extended) {
   uint32_t result = 0;
@@ -141,7 +141,7 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: BETA / Should be working. strict mode is ALPHA / Untested.
+// Status: STABLE / Should be working. strict mode is ALPHA / Untested.
 //
 // Notes:
 //   SONY protocol, SIRC (Serial Infra-Red Control) can be 12,15,20 bits long.
