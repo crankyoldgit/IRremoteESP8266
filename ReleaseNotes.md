@@ -1,5 +1,23 @@
 # Release Notes
 
+## _v2.7.5 (20200409)_
+
+**[Features]**
+- Detailed support for `HITACHI_AC1` protocol. (#1056, #1061, #1072)
+- update sharp to match Sharp AH-A5SAY (#1074)
+- Experimental support for AIRWELL protocol. (#1069, #1070)
+- SamsungAC: Add Breeze (Aka WindFree) control (#1062, #1071)
+- Support for Daikin FFN-C A/C (#1064, #1065)
+- Add basic support for HITACHI_AC3 protocol. (#1060, #1063)
+- Add support for `SYMPHONY` 11 bit protocol. (#1057, #1058)
+- IRMQTTServer: Improve Home-Assistant discovery by sending a 'device' with the discovery packet (#1055)
+
+**[Misc]**
+- Clean up support status of various protocols.
+- Add `decodeToState()` unit tests to all supported protocols (#1067, #1068)
+- Add Gree AC example code. (#1066)
+
+
 ## _v2.7.4 (20200226)_
 
 **[Bug Fixes]**
