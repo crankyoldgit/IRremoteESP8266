@@ -572,6 +572,12 @@ TEST(TestDecodeHitachiAC1, NormalRealExample) {
   EXPECT_EQ(HITACHI_AC1, irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAc1Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(hitachi_code, irsend.capture.state, kHitachiAc1Bits);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
+      "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: Off, Swing(V): Off, Swing(H): Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 // Tests for sendHitachiAC2().
@@ -809,7 +815,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HITACHI_AC1", typeToString(decode_type_t::HITACHI_AC1));
   ASSERT_EQ(decode_type_t::HITACHI_AC1, strToDecodeType("HITACHI_AC1"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC1));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC1));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC1));
 
   ASSERT_EQ("HITACHI_AC2", typeToString(decode_type_t::HITACHI_AC2));
   ASSERT_EQ(decode_type_t::HITACHI_AC2, strToDecodeType("HITACHI_AC2"));
@@ -1507,4 +1513,291 @@ TEST(TestHitachiAc3Class, hasInvertedStates) {
                                               kHitachiAc3MinStateLength));
   EXPECT_TRUE(IRHitachiAc3::hasInvertedStates(bad_state,
                                               kHitachiAc3MinStateLength - 2));
+}
+
+// HitachiAc1 Class tests
+
+TEST(TestIRHitachiAc1Class, SetAndGetPower) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.on();
+  ac.setPowerToggle(false);
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetTemp) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setMode(kHitachiAc1Cool);  // All temps possible in Cool mode.
+  ac.setTemp(26);
+  EXPECT_EQ(26, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp - 1);
+  EXPECT_EQ(kHitachiAcMinTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+  ac.setTemp(kHitachiAcMaxTemp + 1);
+  EXPECT_EQ(kHitachiAcMaxTemp, ac.getTemp());
+
+  // Can't change temp in Auto mode.
+  ac.setMode(kHitachiAc1Auto);  // All temps possible in Cool mode.
+  EXPECT_EQ(kHitachiAc1TempAuto, ac.getTemp());
+  ac.setTemp(kHitachiAcMinTemp);
+  EXPECT_EQ(kHitachiAc1TempAuto, ac.getTemp());
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B46
+  const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0x68};
+  ac.setRaw(cool_31_auto);
+  EXPECT_EQ(31, ac.getTemp());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetMode) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setMode(kHitachiAc1Auto);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+  ac.setMode(kHitachiAc1Cool);
+  EXPECT_EQ(kHitachiAc1Cool, ac.getMode());
+  ac.setMode(kHitachiAc1Fan);
+  EXPECT_EQ(kHitachiAc1Fan, ac.getMode());
+  ac.setMode(kHitachiAc1Heat);
+  EXPECT_EQ(kHitachiAc1Heat, ac.getMode());
+  ac.setMode(kHitachiAc1Dry);
+  EXPECT_EQ(kHitachiAc1Dry, ac.getMode());
+  ac.setMode(0);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kHitachiAc1Auto, ac.getMode());
+}
+
+TEST(TestIRHitachiAc1Class, SetAndGetFan) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setMode(kHitachiAc1Cool);  // All speeds possible in Cool mode.
+  ac.setFan(kHitachiAc1FanAuto);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc1FanLow);
+  EXPECT_EQ(kHitachiAc1FanLow, ac.getFan());
+  ac.setFan(kHitachiAc1FanHigh);
+  EXPECT_EQ(kHitachiAc1FanHigh, ac.getFan());
+  ac.setFan(kHitachiAc1FanMed);
+  EXPECT_EQ(kHitachiAc1FanMed, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(0);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+
+  // Can't change speed in Auto mode. Locked to auto speed.
+  ac.setMode(kHitachiAc1Auto);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  ac.setFan(kHitachiAc1FanLow);
+  EXPECT_EQ(kHitachiAc1FanAuto, ac.getFan());
+  // Can't change speed in Dry mode. Locked to low speed.
+  ac.setMode(kHitachiAc1Dry);
+  EXPECT_EQ(kHitachiAc1FanLow, ac.getFan());
+  ac.setFan(kHitachiAc1FanHigh);
+  EXPECT_EQ(kHitachiAc1FanLow, ac.getFan());
+}
+
+TEST(TestIRHitachiAc1Class, HumanReadable) {
+  IRHitachiAc1 ac(kGpioUnused);
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=A47:B47
+  const uint8_t cool_32_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x30,
+      0x04};
+  ac.setRaw(cool_32_auto);
+  EXPECT_EQ(
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: On, Mode: 6 (Cool), "
+      "Temp: 32C, Fan: 1 (Auto), Swing(V) Toggle: Off, "
+      "Swing(V): Off, Swing(H): Off, "
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+  ac.setSwingV(true);
+  ac.setSwingToggle(true);
+  ac.setSleep(kHitachiAc1Sleep2);
+  ac.setPowerToggle(false);
+  ac.setOnTimer(2 * 60 + 39);
+  ac.setOffTimer(10 * 60 + 17);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: On, Power Toggle: Off, "
+      "Mode: 6 (Cool), Temp: 32C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: On, Swing(V): On, Swing(H): Off, Sleep: 2, "
+      "On Timer: 02:39, Off Timer: 10:17",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAc1Class, Checksum) {
+  // Reverse Table: 2=4, B=D, A=5, E=7, 1=8, 3=C, 0=0, 6=6, 9=9, F=F
+  IRHitachiAc1 ac(kGpioUnused);
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=A47:B47
+  const uint8_t cool_32_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x30,
+      0x04};
+  // Reversed: 4D, 75, B2, 89, 0F, 86, 33, 00, 00, 00, 00, 0C, 20
+  EXPECT_TRUE(ac.validChecksum(cool_32_auto));
+  EXPECT_EQ(0x04, ac.calcChecksum(cool_32_auto));
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B46
+  const uint8_t cool_31_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0x68};
+  // Reversed: 4D, 75, B2, 89, 0F, 86, 31, 00, 00, 00, 00, 04, 16
+  EXPECT_TRUE(ac.validChecksum(cool_31_auto));
+  EXPECT_EQ(0x68, ac.calcChecksum(cool_31_auto));
+
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B13
+  const uint8_t auto_25_auto_swing_on[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4, 0x00, 0x00, 0x00, 0x00, 0x61,
+      0x24};
+  // Reversed: 4D, 75, B2, 89, 0F, 87, 25, 00, 00, 00, 00, 86, 42
+  EXPECT_TRUE(ac.validChecksum(auto_25_auto_swing_on));
+  EXPECT_EQ(0x24, ac.calcChecksum(auto_25_auto_swing_on));
+  // Ref: https://docs.google.com/spreadsheets/d/10eKpJEWJppUYktPRLCcAIwzfFXjtkOZNyn1reh5MFfU/edit#gid=0&range=B45
+  const uint8_t cool_30_auto[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x61, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x20,
+      0xC4};
+  EXPECT_TRUE(ac.validChecksum(cool_30_auto));
+  EXPECT_EQ(0xC4, ac.calcChecksum(cool_30_auto));
+}
+
+TEST(TestIRHitachiAc1Class, toCommon) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setPower(true);
+  ac.setMode(kHitachiAc1Cool);
+  ac.setTemp(20);
+  ac.setFan(kHitachiAc1FanHigh);
+  ac.setSwingV(false);
+  ac.setSwingH(true);
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::HITACHI_AC1, ac.toCommon().protocol);
+  ASSERT_EQ(2, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+TEST(TestIRHitachiAc1Class, ReconstructKnownGood) {
+  IRHitachiAc1 ac(kGpioUnused);
+  const uint8_t known_good[kHitachiAc1StateLength] = {
+      0xB2, 0xAE, 0x4D, 0x51, 0xF0, 0x61, 0x84,
+      0x00, 0x00, 0x00, 0x00, 0x10, 0x98};
+  ac.stateReset();
+  ac.setPower(false);
+  ac.setPowerToggle(true);
+  ac.setMode(kHitachiAc1Cool);
+  ac.setTemp(23);
+  ac.setFan(kHitachiAc1FanAuto);
+  ac.setSwingV(false);
+  ac.setSwingH(false);
+  ac.setSwingToggle(false);
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_B);
+
+  EXPECT_STATE_EQ(known_good, ac.getRaw(), kHitachiAc1Bits);
+  EXPECT_EQ(
+      "Model: 2 (R-LT0541-HTA-B), Power: Off, Power Toggle: On, "
+      "Mode: 6 (Cool), Temp: 23C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: Off, Swing(V): Off, Swing(H): Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
+      ac.toString());
+}
+
+TEST(TestIRHitachiAc1Class, Swing) {
+  IRHitachiAc1 ac(kGpioUnused);
+  ac.setSwingV(false);
+  EXPECT_FALSE(ac.getSwingV());
+  ac.setSwingToggle(false);
+  EXPECT_FALSE(ac.getSwingToggle());
+
+  ac.setSwingV(true);
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_FALSE(ac.getSwingToggle());
+  ac.setSwingToggle(true);
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_TRUE(ac.getSwingToggle());
+
+  ac.setSwingV(false);
+  EXPECT_FALSE(ac.getSwingV());
+  ac.setSwingToggle(false);
+  EXPECT_FALSE(ac.getSwingToggle());
+
+  const uint8_t swing_on_with_toggle[kHitachiAc1StateLength] = {
+    0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4,
+    0x00, 0x00, 0x00, 0x00, 0x61, 0x24};
+  ac.setRaw(swing_on_with_toggle);
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_FALSE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingToggle());
+  const uint8_t swing_off_with_toggle[kHitachiAc1StateLength] = {
+    0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0xE1, 0xA4,
+    0x00, 0x00, 0x00, 0x00, 0x21, 0x44};
+  ac.setRaw(swing_off_with_toggle);
+  EXPECT_FALSE(ac.getSwingV());
+  EXPECT_FALSE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingToggle());
+  ac.setSwingToggle(true);
+  EXPECT_STATE_EQ(swing_off_with_toggle, ac.getRaw(), kHitachiAc1Bits);
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1056#issuecomment-609374682
+TEST(TestIRHitachiAc1Class, FanSpeedInDryMode) {
+  IRHitachiAc1 ac(kGpioUnused);
+  // IRhvac {"Vendor":"HITACHI_AC1", "Power":"On","Mode":"dry","FanSpeed":"low"
+  //         "Temp":22.5}
+  const uint8_t state[kHitachiAc1StateLength] = {  // Code generated by Tasmota.
+      0xB2, 0xAE, 0x4D, 0x91, 0xF0, 0x21, 0xF8,
+      0x00, 0x00, 0x00, 0x00, 0x31, 0x0C};
+  ac.setRaw(state);
+  EXPECT_EQ(
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: On, Mode: 2 (Dry), "
+      "Temp: 22C, Fan: 1 (Auto), "
+      "Swing(V) Toggle: On, Swing(V): Off, Swing(H): Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.stateReset();
+  // Build it via the build order in IRac::hitachi1()
+  ac.setModel(hitachi_ac1_remote_model_t::R_LT0541_HTA_A);
+  ac.setPower(true);
+  ac.setPowerToggle(true);
+  ac.setMode(kHitachiAc1Dry);
+  ac.setTemp(22.5);
+  ac.setFan(kHitachiAc1FanLow);
+  ac.setSwingV(false);
+  ac.setSwingH(false);
+  ac.setSwingToggle(true);
+  ac.setSleep(0);
+  EXPECT_EQ(
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: On, Mode: 2 (Dry), "
+      "Temp: 22C, Fan: 8 (Low), "
+      "Swing(V) Toggle: On, Swing(V): Off, Swing(H): Off, Sleep: Off, "
+      "On Timer: Off, Off Timer: Off",
+      ac.toString());
 }

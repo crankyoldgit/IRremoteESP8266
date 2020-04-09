@@ -631,6 +631,38 @@ TEST(TestIRac, Hitachi) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Hitachi1) {
+  IRHitachiAc1 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Model: 1 (R-LT0541-HTA-A), Power: On, Power Toggle: Off, "
+      "Mode: 6 (Cool), Temp: 19C, Fan: 4 (Medium), "
+      "Swing(V) Toggle: On, Swing(V): On, Swing(H): On, Sleep: 2, "
+      "On Timer: Off, Off Timer: Off";
+
+  ac.begin();
+  irac.hitachi1(&ac,
+                hitachi_ac1_remote_model_t::R_LT0541_HTA_A,  // Model
+                true,                                        // Power
+                false,                                       // Power Toggle
+                stdAc::opmode_t::kCool,                      // Mode
+                19,                                          // Celsius
+                stdAc::fanspeed_t::kMedium,                  // Fan speed
+                stdAc::swingv_t::kAuto,                      // Vertical swing
+                stdAc::swingh_t::kLeft,                      // Horizontal swing
+                true,                                        // Swing toggle
+                5 * 60 + 37);                                // Sleep
+
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC1, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc1Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
 TEST(TestIRac, Hitachi424) {
   IRHitachiAc424 ac(0);
   IRac irac(0);

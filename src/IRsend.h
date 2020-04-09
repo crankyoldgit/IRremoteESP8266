@@ -126,6 +126,11 @@ enum gree_ac_remote_model_t {
   YBOFB,     // (2) Green, YBOFB2, YAPOF3
 };
 
+enum hitachi_ac1_remote_model_t {
+  R_LT0541_HTA_A = 1,  // (1) R-LT0541-HTA Remote in "A" setting. (Default)
+  R_LT0541_HTA_B,      // (2) R-LT0541-HTA Remote in "B" setting.
+};
+
 enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
   kPanasonicLke = 1,
