@@ -163,6 +163,7 @@ extern const char* kPowerToggleStr;
 extern const char* kPreviousPowerStr;
 extern const char* kProntoStr;
 extern const char* kProtocolStr;
+extern const char *kProtocolNamesStrArray[kLastDecodeType + 1];
 extern const char* kPurifyStr;
 extern const char* kQuietStr;
 extern const char* kRawStr;
