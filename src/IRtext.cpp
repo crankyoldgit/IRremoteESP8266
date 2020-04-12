@@ -248,85 +248,85 @@ const PROGMEM char* kWhirlpoolAcStr = D_STR_WHIRLPOOL_AC;
 const PROGMEM char* kWhynterStr = D_STR_WHYNTER;
 
 // Needs to be in decode_type_t order.
-const PROGMEM char *kProtocolNamesStrArray[kLastDecodeType + 1] = {
-  kUnusedStr,
-  kRc5Str,
-  kRc6Str,
-  kNecStr,
-  kSonyStr,
-  kPanasonicStr,
-  kJvcStr,
-  kSamsungStr,
-  kWhynterStr,
-  kAiwaRcT501Str,
-  kLgStr,
-  kSanyoStr,
-  kMitsubishiStr,
-  kDishStr,
-  kSharpStr,
-  kCoolixStr,
-  kDaikinStr,
-  kDenonStr,
-  kKelvinatorStr,
-  kSherwoodStr,
-  kMitsubishiAcStr,
-  kRcmmStr,
-  kSanyoLc7461Str,
-  kRc5XStr,
-  kGreeStr,
-  kProntoStr,
-  kNecLikeStr,
-  kArgoStr,
-  kTrotecStr,
-  kNikaiStr,
-  kRawStr,
-  kGlobalCacheStr,
-  kToshibaAcStr,
-  kFujitsuAcStr,
-  kMideaStr,
-  kMagiquestStr,
-  kLasertagStr,
-  kCarrierAcStr,
-  kHaierAcStr,
-  kMitsubishi2Str,
-  kHitachiAcStr,
-  kHitachiAc1Str,
-  kHitachiAc2Str,
-  kGICableStr,
-  kHaierAcYrw02Str,
-  kWhirlpoolAcStr,
-  kSamsungAcStr,
-  kLutronStr,
-  kElectraAcStr,
-  kPanasonicAcStr,
-  kPioneerStr,
-  kLg2Str,
-  kMwmStr,
-  kDaikin2Str,
-  kVestelAcStr,
-  kTecoStr,
-  kSamsung36Str,
-  kTcl112AcStr,
-  kLegopfStr,
-  kMitsubishiHeavy88Str,
-  kMitsubishiHeavy152Str,
-  kDaikin216Str,
-  kSharpAcStr,
-  kGoodweatherStr,
-  kInaxStr,
-  kDaikin160Str,
-  kNeoclimaStr,
-  kDaikin176Str,
-  kDaikin128Str,
-  kAmcorStr,
-  kDaikin152Str,
-  kMitsubishi136Str,
-  kMitsubishi112Str,
-  kHitachiAc424Str,
-  kSony38KStr,
-  kEpsonStr,
-  kSymphonyStr,
-  kHitachiAc3Str,
-  kDaikin64Str,
-  kAirwellStr,
-};
+const PROGMEM char *kAllProtocolNamesStr =
+    D_STR_UNUSED "\x0"
+    D_STR_RC5 "\x0"
+    D_STR_RC6 "\x0"
+    D_STR_NEC "\x0"
+    D_STR_SONY "\x0"
+    D_STR_PANASONIC "\x0"
+    D_STR_JVC "\x0"
+    D_STR_SAMSUNG "\x0"
+    D_STR_WHYNTER "\x0"
+    D_STR_AIWA_RC_T501 "\x0"
+    D_STR_LG "\x0"
+    D_STR_SANYO "\x0"
+    D_STR_MITSUBISHI "\x0"
+    D_STR_DISH "\x0"
+    D_STR_SHARP "\x0"
+    D_STR_COOLIX "\x0"
+    D_STR_DAIKIN "\x0"
+    D_STR_DENON "\x0"
+    D_STR_KELVINATOR "\x0"
+    D_STR_SHERWOOD "\x0"
+    D_STR_MITSUBISHI_AC "\x0"
+    D_STR_RCMM "\x0"
+    D_STR_SANYO_LC7461 "\x0"
+    D_STR_RC5X "\x0"
+    D_STR_GREE "\x0"
+    D_STR_PRONTO "\x0"
+    D_STR_NEC_LIKE "\x0"
+    D_STR_ARGO "\x0"
+    D_STR_TROTEC "\x0"
+    D_STR_NIKAI "\x0"
+    D_STR_RAW "\x0"
+    D_STR_GLOBALCACHE "\x0"
+    D_STR_TOSHIBA_AC "\x0"
+    D_STR_FUJITSU_AC "\x0"
+    D_STR_MIDEA "\x0"
+    D_STR_MAGIQUEST "\x0"
+    D_STR_LASERTAG "\x0"
+    D_STR_CARRIER_AC "\x0"
+    D_STR_HAIER_AC "\x0"
+    D_STR_MITSUBISHI2 "\x0"
+    D_STR_HITACHI_AC "\x0"
+    D_STR_HITACHI_AC1 "\x0"
+    D_STR_HITACHI_AC2 "\x0"
+    D_STR_GICABLE "\x0"
+    D_STR_HAIER_AC_YRW02 "\x0"
+    D_STR_WHIRLPOOL_AC "\x0"
+    D_STR_SAMSUNG_AC "\x0"
+    D_STR_LUTRON "\x0"
+    D_STR_ELECTRA_AC "\x0"
+    D_STR_PANASONIC_AC "\x0"
+    D_STR_PIONEER "\x0"
+    D_STR_LG2 "\x0"
+    D_STR_MWM "\x0"
+    D_STR_DAIKIN2 "\x0"
+    D_STR_VESTEL_AC "\x0"
+    D_STR_TECO "\x0"
+    D_STR_SAMSUNG36 "\x0"
+    D_STR_TCL112AC "\x0"
+    D_STR_LEGOPF "\x0"
+    D_STR_MITSUBISHI_HEAVY_88 "\x0"
+    D_STR_MITSUBISHI_HEAVY_152 "\x0"
+    D_STR_DAIKIN216 "\x0"
+    D_STR_SHARP_AC "\x0"
+    D_STR_GOODWEATHER "\x0"
+    D_STR_INAX "\x0"
+    D_STR_DAIKIN160 "\x0"
+    D_STR_NEOCLIMA "\x0"
+    D_STR_DAIKIN176 "\x0"
+    D_STR_DAIKIN128 "\x0"
+    D_STR_AMCOR "\x0"
+    D_STR_DAIKIN152 "\x0"
+    D_STR_MITSUBISHI136 "\x0"
+    D_STR_MITSUBISHI112 "\x0"
+    D_STR_HITACHI_AC424 "\x0"
+    D_STR_SONY_38K "\x0"
+    D_STR_EPSON "\x0"
+    D_STR_SYMPHONY "\x0"
+    D_STR_HITACHI_AC3 "\x0"
+    D_STR_DAIKIN64 "\x0"
+    D_STR_AIRWELL "\x0"
+    "\x0";  // This string requires double null termination.

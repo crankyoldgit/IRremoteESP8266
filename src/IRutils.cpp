@@ -91,9 +91,14 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 // Returns:
 //  A decode_type_t enum.
 decode_type_t strToDecodeType(const char * const str) {
-  for (uint16_t i = 0; i <= (uint16_t)kLastDecodeType; i++) {
-    if (!strcasecmp(str, kProtocolNamesStrArray[i])) return (decode_type_t)i;
+  const char *ptr = kAllProtocolNamesStr;
+  uint16_t length = strlen(ptr);
+  for (uint16_t i = 0; length; i++) {
+    if (!strcasecmp(str, ptr)) return (decode_type_t)i;
+    ptr += length + 1;
+    length = strlen(ptr);
   }
+
   // Handle integer values of the type by converting to a string and back again.
   decode_type_t result = strToDecodeType(
       typeToString((decode_type_t)atoi(str)).c_str());
@@ -111,10 +116,18 @@ decode_type_t strToDecodeType(const char * const str) {
 //   A string containing the protocol name.
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
-  if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN)
+  const char *ptr = kAllProtocolNamesStr;
+  if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
     result = kUnknownStr;
-  else
-    result = kProtocolNamesStrArray[protocol];
+  } else {
+    for (uint16_t i = 0; i <= protocol && strlen(ptr); i++) {
+      if (i == protocol) {
+        result = ptr;
+        break;
+      }
+      ptr += strlen(ptr) + 1;
+    }
+  }
   if (isRepeat) {
     result += kSpaceLBraceStr;
     result += kRepeatStr;
