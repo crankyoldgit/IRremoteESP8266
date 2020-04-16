@@ -1,4 +1,4 @@
-// Copyright 2019 - MiaoYi (@Caffreyfans)
+// Copyright 2020 - MiaoYi (@Caffreyfans)
 // Locale/language file for China / Simplified.
 // This file will override the default values located in `defaults.h`.
 #ifndef LOCALE_ZH_CN_H_
