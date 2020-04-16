@@ -1,8 +1,8 @@
 // Copyright 2019 - MiaoYi (@Caffreyfans)
 // Locale/language file for China / Simplified.
 // This file will override the default values located in `defaults.h`.
-#ifndef LOCALE_DEFAULTS_H_
-#define LOCALE_DEFAULTS_H_
+#ifndef LOCALE_ZH_CN_H_
+#define LOCALE_ZH_CN_H_
 
 #ifndef D_STR_UNKNOWN
 #define D_STR_UNKNOWN "未知"
@@ -107,7 +107,7 @@
 #define D_STR_SAVE "保存"
 #endif  // D_STR_SAVE
 #ifndef D_STR_EYE
-#define D_STR_EYE "眼""
+#define D_STR_EYE "眼"
 #endif  // D_STR_EYE
 #ifndef D_STR_FOLLOW
 #define D_STR_FOLLOW "跟随"
@@ -293,7 +293,7 @@
 #define D_STR_HIGH "高"
 #endif  // D_STR_HIGH
 #ifndef D_STR_HI
-#define D_STR_HI "嗨""
+#define D_STR_HI "嗨"
 #endif  // D_STR_HI
 #ifndef D_STR_MID
 #define D_STR_MID "中"
@@ -412,15 +412,17 @@
 #ifndef D_STR_NOW
 #define D_STR_NOW "现在"
 #endif  // D_STR_NOW
+/* This is not three letter days. Disabled.
 #ifndef D_STR_THREELETTERDAYS
 #define D_STR_THREELETTERDAYS "周一至周末"
 #endif  // D_STR_THREELETTERDAYS
+*/ 
 
 #ifndef D_STR_YES
 #define D_STR_YES "是"
 #endif  // D_STR_YES
 #ifndef D_STR_NO
-#define D_STR_NO "否""
+#define D_STR_NO "否"
 #endif  // D_STR_NO
 #ifndef D_STR_TRUE
 #define D_STR_TRUE "正确"
@@ -460,4 +462,4 @@
     "编辑并增加 `kCaptureBufferSize`."
 #endif  // D_WARN_BUFFERFULL
 
-#endif  // LOCALE_DEFAULTS_H_
+#endif  // LOCALE_ZH_CN_H_
