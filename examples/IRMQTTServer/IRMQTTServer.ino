@@ -358,12 +358,17 @@
 #include <IRutils.h>
 #include <IRac.h>
 #if MQTT_ENABLE
+#include <PubSubClient.h>
 // --------------------------------------------------------------------
 // * * * IMPORTANT * * *
 // You must change <PubSubClient.h> to have the following value.
 // #define MQTT_MAX_PACKET_SIZE 768
 // --------------------------------------------------------------------
-#include <PubSubClient.h>
+// Check that the user has set MQTT_MAX_PACKET_SIZE to an appropriate size.
+#if MQTT_MAX_PACKET_SIZE < 768
+#error "MQTT_MAX_PACKET_SIZE in <PubSubClient.h> is too small. "\
+  "Increase the value per comments."
+#endif  // MQTT_MAX_PACKET_SIZE < 768
 #endif  // MQTT_ENABLE
 #include <algorithm>  // NOLINT(build/include)
 #include <memory>
@@ -1289,6 +1294,7 @@ void handleInfo(void) {
                              : "Disconnected " + timeSince(lastConnectedTime)) +
     ")</i><br>"
     "Disconnections: " + String(mqttDisconnectCounter - 1) + "<br>"
+    "Max Packet Size: " + MQTT_MAX_PACKET_SIZE + "<br>"
     "Client id: " + MqttClientId + "<br>"
     "Command topic(s): " + listOfCommandTopics() + "<br>"
     "Acknowledgements topic: " + MqttAck + "<br>"
@@ -1330,6 +1336,7 @@ void handleInfo(void) {
             timeElapsed(lastDiscovery.elapsed()) :
             String("<i>Never</i>"))) +
         "<br>"
+    "Discovery topic: " + MqttDiscovery + "<br>" +
 #endif  // MQTT_DISCOVERY_ENABLE
     "Command topics: " + MqttClimate + channel_re + '/' + MQTT_CLIMATE_CMND +
         '/' + kClimateTopics +
