@@ -274,16 +274,16 @@
 #define D_STR_MAXIMUM "最小"
 #endif  // D_STR_MAXIMUM
 #ifndef D_STR_MIN
-#define D_STR_MIN "Min"
+#define D_STR_MIN "最低"
 #endif  // D_STR_MIN
 #ifndef D_STR_MINIMUM
-#define D_STR_MINIMUM "Minimum"
+#define D_STR_MINIMUM "最低"
 #endif  // D_STR_MINIMUM
 #ifndef D_STR_MED
-#define D_STR_MED "Med"
+#define D_STR_MED "中"
 #endif  // D_STR_MED
 #ifndef D_STR_MEDIUM
-#define D_STR_MEDIUM "介质"
+#define D_STR_MEDIUM "中"
 #endif  // D_STR_MEDIUM
 
 #ifndef D_STR_HIGHEST
@@ -305,7 +305,7 @@
 #define D_STR_LOW "低"
 #endif  // D_STR_LOW
 #ifndef D_STR_LO
-#define D_STR_LO "Lo"
+#define D_STR_LO "低"
 #endif  // D_STR_LO
 #ifndef D_STR_LOWEST
 #define D_STR_LOWEST "最低"
@@ -329,7 +329,7 @@
 #define D_STR_LEFTMAX_NOSPACE D_STR_LEFT D_STR_MAX  // Set `D_STR_MAX` first!
 #endif  // D_STR_LEFTMAX_NOSPACE
 #ifndef D_STR_WIDE
-#define D_STR_WIDE "Wide"
+#define D_STR_WIDE "扫风"
 #endif  // D_STR_WIDE
 #ifndef D_STR_CENTRE
 #define D_STR_CENTRE "中间"
@@ -459,7 +459,7 @@
 #define D_WARN_BUFFERFULL \
     "警告: 红外编码数组过大(>= %d). " \
     "在解决此问题之前，不应信任此结果. " \
-    "编辑并增加 `kCaptureBufferSize`."
+    "编辑并增加 `kCaptureBufferSize` 变量."
 #endif  // D_WARN_BUFFERFULL
 
 #endif  // LOCALE_ZH_CN_H_
