@@ -996,7 +996,7 @@ String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
 String htmlHeader(const String title, const String h1_text) {
   String html = F("<html><head><title>");
   html += title;
-  html += F("</title></head><body><center><h1>");
+  html += F("</title><meta http-equiv=\"Content-Type\"content=\"text/html;charset=utf-8\"></head><body><center><h1>");
   if (h1_text.length())
     html += h1_text;
   else
