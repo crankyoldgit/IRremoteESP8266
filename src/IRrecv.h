@@ -598,6 +598,11 @@ class IRrecv {
                      const uint16_t nbits = kDelonghiAcBits,
                      const bool strict = true);
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DOSHISHA
+bool decodeDoshisha(decode_results *results, uint16_t offset = kStartOffset,
+                    const uint16_t nbits = kDoshishaBits,
+                    const bool strict = true);
+#endif  // DECODE_DOSHISHA
 };
 
 #endif  // IRRECV_H_

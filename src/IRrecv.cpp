@@ -793,6 +793,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Delonghi AC decode");
     if (decodeDelonghiAc(results, offset)) return true;
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DOSHISHA
+    DPRINTLN("Attempting Doshisha decode");
+    if (decodeDoshisha(results, offset)) return true;
+#endif  // DECODE_DOSHISHA
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

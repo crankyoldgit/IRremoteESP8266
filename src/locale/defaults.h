@@ -502,6 +502,9 @@
 #ifndef D_STR_DISH
 #define D_STR_DISH "DISH"
 #endif  // D_STR_DISH
+#ifndef D_STR_DOSHISHA
+#define D_STR_DOSHISHA "DOSHISHA"
+#endif  // D_STR_DOSHISHA
 #ifndef D_STR_ELECTRA_AC
 #define D_STR_ELECTRA_AC "ELECTRA_AC"
 #endif  // D_STR_ELECTRA_AC

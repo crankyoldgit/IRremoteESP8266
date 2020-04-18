@@ -607,6 +607,13 @@
 #define SEND_DELONGHI_AC        _IR_ENABLE_DEFAULT_
 #endif  // SEND_DELONGHI_AC
 
+#ifndef DECODE_DOSHISHA
+#define DECODE_DOSHISHA       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_DOSHISHA
+#ifndef SEND_DOSHISHA
+#define SEND_DOSHISHA         _IR_ENABLE_DEFAULT_
+#endif  // SEND_DOSHISHA
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -735,8 +742,9 @@ enum decode_type_t {
   DAIKIN64,
   AIRWELL,
   DELONGHI_AC,  // 80
+  DOSHISHA,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DELONGHI_AC,
+  kLastDecodeType = DOSHISHA,
 };
 
 // Message lengths & required repeat values
@@ -790,6 +798,7 @@ const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
+const uint16_t kDoshishaBits = 40;
 const uint16_t kEpsonBits = 32;
 const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;

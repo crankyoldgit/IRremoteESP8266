@@ -248,5 +248,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_DAIKIN64 "\x0"
     D_STR_AIRWELL "\x0"
     D_STR_DELONGHI_AC "\x0"
+    D_STR_DOSHISHA "\x0"
     // New protocol strings should be added just above this line.
     "\x0";  // This string requires double null termination.
