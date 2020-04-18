@@ -330,7 +330,6 @@
 #endif  // D_STR_LEFTMAX_NOSPACE
 #ifndef D_STR_WIDE
 #define D_STR_WIDE "扫风"
-
 #endif  // D_STR_WIDE
 #ifndef D_STR_CENTRE
 #define D_STR_CENTRE "中间"
