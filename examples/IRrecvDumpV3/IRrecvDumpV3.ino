@@ -1,5 +1,5 @@
 /*
- * IRremoteESP8266: IRrecvDumpV2 - dump details of IR codes with IRrecv
+ * IRremoteESP8266: IRrecvDumpV3 - dump details of IR codes with IRrecv
  * An IR detector/demodulator must be connected to the input kRecvPin.
  *
  * Copyright 2009 Ken Shirriff, http://arcfn.com
@@ -9,6 +9,9 @@
  *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-receiving
  *
  * Changes:
+ *   Version 1.1 May, 2020
+ *     - Create DumpV3 from DumpV2
+ *     - Add OTA Base
  *   Version 1.0 October, 2019
  *     - Internationalisation (i18n) support.
  *     - Stop displaying the legacy raw timing info.
@@ -23,6 +26,10 @@
  *       reduce the likelihood of miscaptures.
  * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009,
  */
+
+// Allow over air update
+// #define OTA_ENABLE true
+#include "BaseOTA.h"
 
 #include <Arduino.h>
 #include <IRrecv.h>
@@ -110,6 +117,7 @@ decode_results results;  // Somewhere to store the results
 
 // This section of code runs only once at start-up.
 void setup() {
+  OTAwifi();  // start default wifi (previously saved on the ESP) for OTA
 #if defined(ESP8266)
   Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
 #else  // ESP8266
@@ -118,6 +126,7 @@ void setup() {
   while (!Serial)  // Wait for the serial connection to be establised.
     delay(50);
   Serial.printf("\n" D_STR_IRRECVDUMP_STARTUP "\n", kRecvPin);
+  OTAinit();  // setup OTA handlers and show IP
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
@@ -153,4 +162,5 @@ void loop() {
     Serial.println();    // Blank line between entries
     yield();             // Feed the WDT (again)
   }
+  OTAloopHandler();
 }
