@@ -9,6 +9,8 @@
  *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-receiving
  *
  * Changes:
+ *   Version 1.1 April, 2020
+ *     - Add OTA Base
  *   Version 1.0 October, 2019
  *     - Internationalisation (i18n) support.
  *     - Stop displaying the legacy raw timing info.
@@ -23,6 +25,17 @@
  *       reduce the likelihood of miscaptures.
  * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009,
  */
+
+// Allow over air update
+#ifndef OTA_ENABLE
+#define OTA_ENABLE false
+#endif  // OTA_ENABLE
+#if OTA_ENABLE
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#endif  // OTA_ENABLE
 
 #include <Arduino.h>
 #include <IRrecv.h>
@@ -108,8 +121,53 @@ const uint16_t kMinUnknownSize = 12;
 IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
 decode_results results;  // Somewhere to store the results
 
+#if OTA_ENABLE
+void initializeOTA() {
+  // See BasicOTA ESP example for source and settings
+
+  ArduinoOTA
+    .onStart([]() {
+      String type;
+      if (ArduinoOTA.getCommand() == U_FLASH)
+        type = "sketch";
+      else
+        type = "filesystem";
+
+      Serial.println("Start updating " + type);
+    })
+    .onEnd([]() {
+      Serial.println("\nEnd");
+    })
+    .onProgress([](unsigned int progress, unsigned int total) {
+      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    })
+    .onError([](ota_error_t error) {
+      Serial.printf("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    });
+
+  ArduinoOTA.begin();
+  Serial.println();
+  if (WiFi.waitForConnectResult() == WL_CONNECTED) {
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("Wifi Connection Failed.");
+  }
+}
+#endif  // OTA_ENABLE
+
 // This section of code runs only once at start-up.
 void setup() {
+#if OTA_ENABLE
+  // start default wifi (previously saved on the ESP) for OTA
+  WiFi.mode(WIFI_STA);
+  WiFi.begin();
+#endif  // OTA_ENABLE
 #if defined(ESP8266)
   Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
 #else  // ESP8266
@@ -118,6 +176,9 @@ void setup() {
   while (!Serial)  // Wait for the serial connection to be establised.
     delay(50);
   Serial.printf("\n" D_STR_IRRECVDUMP_STARTUP "\n", kRecvPin);
+#if OTA_ENABLE
+    initializeOTA();
+#endif  // OTA_ENABLE
 #if DECODE_HASH
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
@@ -153,4 +214,7 @@ void loop() {
     Serial.println();    // Blank line between entries
     yield();             // Feed the WDT (again)
   }
+#if OTA_ENABLE
+  ArduinoOTA.handle();
+#endif  // OTA_ENABLE
 }
