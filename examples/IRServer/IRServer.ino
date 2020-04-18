@@ -66,7 +66,7 @@ void handleRoot() {
   server.send(200, "text/html",
               "<html>" \
                 "<head><title>" HOSTNAME " Demo </title>" \
-                "<meta http-equiv=\"Content-Type\" \
+                "<meta http-equiv=\"Content-Type\" "\
                     "content=\"text/html;charset=utf-8\">" \
                 "</head>" \
                 "<body>" \
