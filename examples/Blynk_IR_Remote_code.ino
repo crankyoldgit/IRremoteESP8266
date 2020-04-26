@@ -97,6 +97,8 @@
 
  */
 
+// check complete video tutorial here for program explanation https://www.youtube.com/watch?v=LqmkDKu54XY&t=17s
+
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
