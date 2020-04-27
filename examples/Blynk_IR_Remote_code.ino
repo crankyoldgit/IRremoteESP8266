@@ -128,44 +128,44 @@ char pass[] = "YourPassword";
   BLYNK_WRITE(V51) {  // Power button
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FE50AF,32);
+      irsend.sendNEC(0x1FE50AF);
     }
   }
 
   BLYNK_WRITE(V52) {  // Mute button
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FE30CF,32);
+      irsend.sendNEC(0x1FE30CF);
     }
   }
 
   BLYNK_WRITE(V53) {  // Song Forward
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FEE01F,32);
+      irsend.sendNEC(0x1FEE01F);
     }
   }
 
   BLYNK_WRITE(V54) {  // Song Backward
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FEA05F,32);
+      irsend.sendNEC(0x1FEA05F);
       delay(10); // double tap back button to back one song
-      irsend.sendNEC(0x1FEA05F,32);
+      irsend.sendNEC(0x1FEA05F);
     }
   }
 
   BLYNK_WRITE(V55) {  // Volume --
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FEC03F,32);
+      irsend.sendNEC(0x1FEC03F);
     }
   }
 
   BLYNK_WRITE(V56) {  // Volume ++
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FE40BF,32);
+      irsend.sendNEC(0x1FE40BF);
     }
   }
 
