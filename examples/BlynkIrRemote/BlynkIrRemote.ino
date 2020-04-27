@@ -31,10 +31,10 @@
   Change WiFi ssid, pass, and Blynk auth token to run :)
   Feel free to apply it to any other example. It's simple!
  *************************************************************/
- 
+
  /*
  // After decoding received below codes
- 
+
  // Power button
 
 18:12:33.993 -> Protocol  : NEC
@@ -150,7 +150,7 @@ char pass[] = "YourPassword";
     if (param.asInt() == 0) {
       // Serial.println("NEC");
       irsend.sendNEC(0x1FEA05F);
-      delay(10); // double tap back button to back one song
+      delay(10);  // double tap back button to back one song
       irsend.sendNEC(0x1FEA05F);
     }
   }
@@ -172,7 +172,7 @@ char pass[] = "YourPassword";
   BLYNK_WRITE(V57) {  // Play/Pause
     if (param.asInt() == 0) {
       // Serial.println("NEC");
-      irsend.sendNEC(0x1FE32CD,32);
+      irsend.sendNEC(0x1FE32CD);
     }
   }
 
