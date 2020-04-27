@@ -105,9 +105,15 @@
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
-
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
+#else
+#include <WiFi.h>
+#endif  // ESP8266
+#if defined(ESP32)
+#include <BlynkSimpleEsp32.h>
+#endif  // ESP32
 
 // IR library
 #include <IRremoteESP8266.h>
@@ -177,8 +183,10 @@ char pass[] = "YourPassword";
   }
 
 void setup() {
+#if defined(BLYNK_PRINT)
   // Debug console
-  Serial.begin(9600);
+  Serial.begin(115200);
+#endif  // BLYNK_PRINT
 
   Blynk.begin(auth, ssid, pass);
 }
