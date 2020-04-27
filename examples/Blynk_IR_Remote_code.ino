@@ -1,4 +1,7 @@
 /*************************************************************
+  Emulate a physical remote via an iOS and Android App.
+  Copyright Gaurav Barwalia 2020
+
   Download latest Blynk library here:
     https://github.com/blynkkk/blynk-library/releases/latest
 
@@ -106,7 +109,7 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
-//IR library
+// IR library
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 
@@ -122,66 +125,64 @@ char auth[] = "YourAuthToken";
 char ssid[] = "YourNetworkName";
 char pass[] = "YourPassword";
 
-  BLYNK_WRITE(V51) { // Power button
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FE50AF,32);
-  }
-  }
-
-  BLYNK_WRITE(V52) { // Mute button
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FE30CF,32);
-  }
+  BLYNK_WRITE(V51) {  // Power button
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FE50AF,32);
+    }
   }
 
-  BLYNK_WRITE(V53) { // Song Forward
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FEE01F,32);
-  }
-  }
-
-  BLYNK_WRITE(V54) { // Song Backward
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FEA05F,32);
-  delay(10); // double tap back button to back one song
-  irsend.sendNEC(0x1FEA05F,32);
-  }
+  BLYNK_WRITE(V52) {  // Mute button
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FE30CF,32);
+    }
   }
 
-  BLYNK_WRITE(V55) { // Volume --
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FEC03F,32);
-  }
-  }
-
-  BLYNK_WRITE(V56) { // Volume ++
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FE40BF,32);
-  }
+  BLYNK_WRITE(V53) {  // Song Forward
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FEE01F,32);
+    }
   }
 
-  BLYNK_WRITE(V57) { // Play/Pause
-  if (param.asInt() == 0) {
-  //Serial.println("NEC");
-  irsend.sendNEC(0x1FE32CD,32);
-  }
+  BLYNK_WRITE(V54) {  // Song Backward
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FEA05F,32);
+      delay(10); // double tap back button to back one song
+      irsend.sendNEC(0x1FEA05F,32);
+    }
   }
 
-void setup()
-{
+  BLYNK_WRITE(V55) {  // Volume --
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FEC03F,32);
+    }
+  }
+
+  BLYNK_WRITE(V56) {  // Volume ++
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FE40BF,32);
+    }
+  }
+
+  BLYNK_WRITE(V57) {  // Play/Pause
+    if (param.asInt() == 0) {
+      // Serial.println("NEC");
+      irsend.sendNEC(0x1FE32CD,32);
+    }
+  }
+
+void setup() {
   // Debug console
   Serial.begin(9600);
 
   Blynk.begin(auth, ssid, pass);
 }
 
-void loop()
-{
+void loop() {
   Blynk.run();
 }
