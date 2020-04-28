@@ -1059,13 +1059,14 @@ void IRac::samsung(IRSamsungAc *ac,
 void IRac::sharp(IRSharpAc *ac,
                  const bool on, const bool prev_power,
                  const stdAc::opmode_t mode,
-                 const float degrees, const stdAc::fanspeed_t fan) {
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv) {
   ac->begin();
   ac->setPower(on, prev_power);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  ac->setSwingToggle(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
@@ -1284,8 +1285,9 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
-      case decode_type_t::MIDEA:
       case decode_type_t::HITACHI_AC424:
+      case decode_type_t::MIDEA:
+      case decode_type_t::SHARP_AC:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
           result.swingv = stdAc::swingv_t::kAuto;
@@ -1660,7 +1662,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRSharpAc ac(_pin, _inverted, _modulation);
       bool prev_power = !send.power;
       if (prev != NULL) prev_power = prev->power;
-      sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed);
+      sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed,
+            send.swingv);
       break;
     }
 #endif  // SEND_SHARP_AC

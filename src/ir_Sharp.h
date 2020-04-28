@@ -39,13 +39,20 @@ const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
 const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcBytePower = 5;
-const uint8_t kSharpAcBitPowerOffset = 4;  // 0b000x0000
+const uint8_t kSharpAcBitPowerOffset = 4;          // 0b000x0000
 const uint8_t kSharpAcBitPreviousPowerOffset = 5;  // 0b00x00000
+const uint8_t kSharpAcByteTurbo = kSharpAcBytePower;
+const uint8_t kSharpAcBitTurboOffset = 4;             // 0b000x0000
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
 const uint8_t kSharpAcFanOffset = 4;  // Mask 0b01110000
 const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
+const uint8_t kSharpAcByteSwing = 8;
+const uint8_t kSharpAcSwingOffset = 0;
+const uint8_t kSharpAcSwingSize = 3;  // Mask 0b00000xxx
+const uint8_t kSharpAcSwingToggle =                0b111;
+const uint8_t kSharpAcSwingNoToggle =              0b000;
 const uint8_t kSharpAcByteButton = 10;
 const uint8_t kSharpAcButtonOffset = 0;
 const uint8_t kSharpAcButtonSize = 3;  // Mask 0b00000xxx
@@ -78,6 +85,10 @@ class IRSharpAc {
   uint8_t getMode(void);
   void setButton(const uint8_t button);
   uint8_t getButton(void);
+  bool getTurbo(void);
+  void setTurbo(const bool on);
+  bool getSwingToggle(void);
+  void setSwingToggle(const bool on);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);

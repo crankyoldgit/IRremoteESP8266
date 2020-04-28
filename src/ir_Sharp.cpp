@@ -445,6 +445,30 @@ uint8_t IRSharpAc::getFan(void) {
   return GETBITS8(remote[kSharpAcByteFan], kSharpAcFanOffset, kSharpAcFanSize);
 }
 
+bool IRSharpAc::getTurbo(void) {
+  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
+  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
+  return !GETBIT8(remote[kSharpAcByteTurbo], kSharpAcBitTurboOffset);
+}
+
+void IRSharpAc::setTurbo(const bool on) {
+  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
+  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
+
+  // setBit(&remote[kSharpAcByteTurbo], kSharpAcBitTurboOffset, !on);
+  if (on) setFan(kSharpAcFanMax);
+}
+
+bool IRSharpAc::getSwingToggle(void) {
+  return GETBITS8(remote[kSharpAcByteSwing], kSharpAcSwingOffset,
+                  kSharpAcSwingSize) == kSharpAcSwingToggle;
+}
+
+void IRSharpAc::setSwingToggle(const bool on) {
+  setBits(&remote[kSharpAcByteSwing], kSharpAcSwingOffset, kSharpAcSwingSize,
+          on ? kSharpAcSwingToggle : kSharpAcSwingNoToggle);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -499,11 +523,12 @@ stdAc::state_t IRSharpAc::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.turbo = this->getTurbo();
+  result.swingv = this->getSwingToggle() ? stdAc::swingv_t::kAuto
+                                         : stdAc::swingv_t::kOff;
   // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
-  result.turbo = false;
   result.clean = false;
   result.beep = false;
   result.econo = false;
@@ -525,6 +550,10 @@ String IRSharpAc::toString(void) {
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
                            kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);
+  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
+  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
+  // result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   return result;
 }
 
