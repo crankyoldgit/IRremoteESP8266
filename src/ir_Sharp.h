@@ -4,6 +4,8 @@
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C
 //   Brand: Sharp,  Model: AH-AxSAY A/C
+//   Brand: Sharp,  Model: AH-XP10NRY A/C
+//   Brand: Sharp,  Model: CRMC-820JBEZ remote
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -57,8 +59,12 @@ const uint8_t kSharpAcByteButton = 10;
 const uint8_t kSharpAcButtonOffset = 0;
 const uint8_t kSharpAcButtonSize = 3;  // Mask 0b00000xxx
 const uint8_t kSharpAcButtonPowerMode =             0b000;  // 0
+const uint8_t kSharpAcButtonTurbo =                 0b001;  // 1
 const uint8_t kSharpAcButtonTemp =                  0b100;  // 4
 const uint8_t kSharpAcButtonFan =                   0b101;  // 5
+const uint8_t kSharpAcButtonSwing =                 0b110;  // 6
+const uint8_t kSharpAcByteIon = 11;
+const uint8_t kSharpAcBitIonOffset = 2;  // Mask 0b00000x00
 
 class IRSharpAc {
  public:
@@ -89,6 +95,8 @@ class IRSharpAc {
   void setTurbo(const bool on);
   bool getSwingToggle(void);
   void setSwingToggle(const bool on);
+  bool getIon(void);
+  void setIon(const bool on);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);

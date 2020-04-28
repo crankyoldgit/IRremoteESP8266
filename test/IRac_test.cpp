@@ -1072,7 +1072,7 @@ TEST(TestIRac, Sharp) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-      "Fan: 3 (Medium), Swing(V) Toggle: On";
+      "Fan: 3 (Medium), Swing(V) Toggle: On, Ion: On";
 
   ac.begin();
   irac.sharp(&ac,
@@ -1081,7 +1081,9 @@ TEST(TestIRac, Sharp) {
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
              stdAc::fanspeed_t::kMedium,   // Fan speed
-             stdAc::swingv_t::kAuto);      // Veritcal swing
+             stdAc::swingv_t::kAuto,       // Veritcal swing
+             false,                        // Turbo
+             true);                        // Filter (Ion)
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

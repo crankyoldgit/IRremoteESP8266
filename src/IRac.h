@@ -326,7 +326,7 @@ void electra(IRElectraAc *ac,
   void sharp(IRSharpAc *ac,
              const bool on, const bool prev_power, const stdAc::opmode_t mode,
              const float degrees, const stdAc::fanspeed_t fan,
-             const stdAc::swingv_t swingv);
+             const stdAc::swingv_t swingv, const bool turbo, const bool filter);
 #endif  // SEND_SHARP_AC
 #if SEND_TCL112AC
   void tcl112(IRTcl112Ac *ac,

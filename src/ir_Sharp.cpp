@@ -365,8 +365,10 @@ bool IRSharpAc::getPower(void) {
 void IRSharpAc::setButton(const uint8_t button) {
   switch (button) {
     case kSharpAcButtonPowerMode:
+    case kSharpAcButtonTurbo:
     case kSharpAcButtonTemp:
     case kSharpAcButtonFan:
+    case kSharpAcButtonSwing:
       setBits(&remote[kSharpAcByteButton], kSharpAcButtonOffset,
               kSharpAcButtonSize, button);
       break;
@@ -457,6 +459,7 @@ void IRSharpAc::setTurbo(const bool on) {
 
   // setBit(&remote[kSharpAcByteTurbo], kSharpAcBitTurboOffset, !on);
   if (on) setFan(kSharpAcFanMax);
+  setButton(kSharpAcButtonTurbo);
 }
 
 bool IRSharpAc::getSwingToggle(void) {
@@ -467,6 +470,17 @@ bool IRSharpAc::getSwingToggle(void) {
 void IRSharpAc::setSwingToggle(const bool on) {
   setBits(&remote[kSharpAcByteSwing], kSharpAcSwingOffset, kSharpAcSwingSize,
           on ? kSharpAcSwingToggle : kSharpAcSwingNoToggle);
+  if (on) setButton(kSharpAcButtonSwing);
+}
+
+
+bool IRSharpAc::getIon(void) {
+  return GETBIT8(remote[kSharpAcByteIon], kSharpAcBitIonOffset);
+}
+
+void IRSharpAc::setIon(const bool on) {
+  setBit(&remote[kSharpAcByteIon], kSharpAcBitIonOffset, on);
+  if (on) setButton(kSharpAcButtonSwing);
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -526,13 +540,13 @@ stdAc::state_t IRSharpAc::toCommon(void) {
   result.turbo = this->getTurbo();
   result.swingv = this->getSwingToggle() ? stdAc::swingv_t::kAuto
                                          : stdAc::swingv_t::kOff;
+  result.filter = this->getIon();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.clean = false;
   result.beep = false;
   result.econo = false;
-  result.filter = false;
   result.light = false;
   result.sleep = -1;
   result.clock = -1;
@@ -554,6 +568,7 @@ String IRSharpAc::toString(void) {
   // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
   // result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
+  result += addBoolToString(getIon(), kIonStr);
   return result;
 }
 
