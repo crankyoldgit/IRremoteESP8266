@@ -660,7 +660,7 @@ TEST(TestSharpAcClass, KnownStates) {
       0xD1};
   ASSERT_TRUE(ac.validChecksum(cool_fan4_28_ion_on));
   ac.setRaw(cool_fan4_28_ion_on);
-  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
+  EXPECT_EQ("Power: -, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
             "Swing(V) Toggle: Off, Ion: On, Econo: -",
             ac.toString());
   /* Unsupported / Not yet reverse engineered.
@@ -807,14 +807,14 @@ TEST(TestSharpAcClass, Turbo) {
   EXPECT_TRUE(ac.getTurbo());
   EXPECT_EQ(kSharpAcFanMax, ac.getFan());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: On, "
+      "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: On, "
       "Swing(V) Toggle: Off, Ion: On, Econo: -",
       ac.toString());
 
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getTurbo());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
+      "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
       "Swing(V) Toggle: Off, Ion: On, Econo: -",
       ac.toString());
 }

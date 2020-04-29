@@ -345,6 +345,15 @@ uint8_t IRSharpAc::getPowerSpecial(void) {
                   kSharpAcPowerSetSpecialOffset, kSharpAcPowerSpecialSize);
 }
 
+bool IRSharpAc::isPowerSpecial(void) {
+  switch (getPowerSpecial()) {
+    case kSharpAcPowerSetSpecialOff:
+    case kSharpAcPowerSetSpecialOn:
+    case kSharpAcPowerTimerSetting: return true;
+    default: return false;
+  }
+}
+
 void IRSharpAc::on(void) { setPower(true); }
 
 void IRSharpAc::off(void) { setPower(false); }
@@ -359,7 +368,7 @@ bool IRSharpAc::getPower(void) {
   switch (getPowerSpecial()) {
     case kSharpAcPowerUnknown:
     case kSharpAcPowerOff: return false;
-    default: return true;
+    default: return true;  // Everything else is "probably" on.
   }
 }
 
@@ -560,8 +569,10 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result += addLabeledString(isPowerSpecial() ? "-"
+                                              : (getPower() ? kOnStr : kOffStr),
+                             kPowerStr, false);
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());

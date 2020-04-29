@@ -1068,7 +1068,6 @@ void IRac::sharp(IRSharpAc *ac,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingToggle(swingv != stdAc::swingv_t::kOff);
-  ac->setTurbo(turbo);
   // Econo  deliberately not used as it cycles through 3 modes uncontrolably.
   // ac->setEconoToggle(econo);
   ac->setIon(filter);
@@ -1081,6 +1080,11 @@ void IRac::sharp(IRSharpAc *ac,
   // No Clock setting available.
   // Do setMode() again as it can affect fan speed and temp.
   ac->setMode(ac->convertMode(mode));
+  if (turbo) {
+    ac->send();  // Send the current state.
+    // Set up turbo mode as it needs to be sent after everything else.
+    ac->setTurbo(true);
+  }
   ac->send();
 }
 #endif  // SEND_SHARP_AC
