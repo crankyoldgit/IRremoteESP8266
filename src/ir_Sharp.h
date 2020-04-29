@@ -40,29 +40,43 @@ const uint8_t kSharpAcFanMin =  0b100;  // 4 (FAN1)
 const uint8_t kSharpAcFanMed =  0b011;  // 3 (FAN2)
 const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
 const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
+// Byte[4]
 const uint8_t kSharpAcByteTemp = 4;
+// Byte[5]
 const uint8_t kSharpAcBytePowerSpecial = 5;
-const uint8_t kSharpAcBitPowerOffset = 4;          // 0b000x0000
-const uint8_t kSharpAcBitPreviousPowerOffset = 5;  // 0b00x00000
 const uint8_t kSharpAcPowerSetSpecialOffset = kHighNibble;  // 0bxxxx0000
-const uint8_t kSharpAcPowerSpecialSize = kNibbleSize;    // 0bxxxx0000
-const uint8_t kSharpAcPowerUnknown = 0;                  // 0b0000
-const uint8_t kSharpAcPowerOnFromOff = 1;                // 0b0001
-const uint8_t kSharpAcPowerOff = 2;                      // 0b0010
-const uint8_t kSharpAcPowerOn = 3;                       // 0b0011 (Normal)
+const uint8_t kSharpAcPowerSpecialSize = kNibbleSize;       // 0bxxxx0000
+const uint8_t kSharpAcPowerUnknown = 0;                     // 0b0000
+const uint8_t kSharpAcPowerOnFromOff = 1;                   // 0b0001
+const uint8_t kSharpAcPowerOff = 2;                         // 0b0010
+const uint8_t kSharpAcPowerOn = 3;                          // 0b0011 (Normal)
 const uint8_t kSharpAcPowerSetSpecialOn = 6;                // 0b0110
 const uint8_t kSharpAcPowerSetSpecialOff = 7;               // 0b0111
-const uint8_t kSharpAcPowerTimerSetting = 8;             // 0b1000
+const uint8_t kSharpAcPowerTimerSetting = 8;                // 0b1000
+// Byte[6]
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
 const uint8_t kSharpAcFanOffset = 4;  // Mask 0b01110000
 const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
+// Byte[7]
+const uint8_t kSharpAcByteTimer = 7;
+const uint8_t kSharpAcTimerIncrement = 30;  // Mins
+const uint8_t kSharpAcTimerHoursOffset = kLowNibble;
+const uint8_t kSharpAcTimerHoursSize = kNibbleSize;   // Mask 0b0000xxxx
+const uint8_t kSharpAcTimerHoursOff =                             0b0000;
+const uint8_t kSharpAcTimerHoursMax =                             0b1100;  // 12
+const uint8_t kSharpAcBitTimerType = 6;               // Mask 0b0x000000
+const uint8_t kSharpAcOffTimerType =                           0b0;
+const uint8_t kSharpAcOnTimerType =                            0b1;
+const uint8_t kSharpAcBitTimerEnabled = 7;            // Mask 0bx0000000
+// Byte[8]
 const uint8_t kSharpAcByteSwing = 8;
 const uint8_t kSharpAcSwingOffset = 0;
 const uint8_t kSharpAcSwingSize = 3;  // Mask 0b00000xxx
 const uint8_t kSharpAcSwingToggle =                0b111;
 const uint8_t kSharpAcSwingNoToggle =              0b000;
+// Byte[10]
 const uint8_t kSharpAcByteSpecial = 10;  // Mask 0bxxxxxxxx
 const uint8_t kSharpAcSpecialPower =              0x00;
 const uint8_t kSharpAcSpecialTurbo =              0x01;
@@ -71,8 +85,11 @@ const uint8_t kSharpAcSpecialFan =                0x05;
 const uint8_t kSharpAcSpecialSwing =              0x06;
 const uint8_t kSharpAcSpecialTimer =              0xC0;
 const uint8_t kSharpAcSpecialTimerHalfHour =      0xDE;
+// Byte[11]
 const uint8_t kSharpAcByteIon = 11;
 const uint8_t kSharpAcBitIonOffset = 2;  // Mask 0b00000x00
+// Byte[12] (Checksum)
+
 
 class IRSharpAc {
  public:
@@ -105,6 +122,10 @@ class IRSharpAc {
   void setIon(const bool on);
   bool getEconoToggle(void);
   void setEconoToggle(const bool on);
+  uint16_t getTimerTime(void);
+  bool getTimerEnabled(void);
+  bool getTimerType(void);
+  void setTimer(bool enable, bool timer_type, uint16_t mins);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);

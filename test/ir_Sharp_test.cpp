@@ -460,7 +460,7 @@ TEST(TestSharpAcClass, Checksum) {
 }
 
 TEST(TestSharpAcClass, Temperature) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
   ac.setMode(kSharpAcCool);  // Cool mode doesn't have temp restrictions.
 
@@ -496,7 +496,7 @@ TEST(TestSharpAcClass, Temperature) {
 }
 
 TEST(TestSharpAcClass, OperatingMode) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(25);
@@ -530,7 +530,7 @@ TEST(TestSharpAcClass, OperatingMode) {
 
 
 TEST(TestSharpAcClass, FanSpeed) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -565,7 +565,7 @@ TEST(TestSharpAcClass, FanSpeed) {
 }
 
 TEST(TestSharpAcClass, ReconstructKnownState) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   uint8_t on_auto_auto[kSharpAcStateLength] = {
@@ -596,7 +596,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/638#issue-421064165
 TEST(TestSharpAcClass, KnownStates) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   uint8_t off_auto_auto[kSharpAcStateLength] = {
@@ -682,7 +682,7 @@ TEST(TestSharpAcClass, KnownStates) {
 }
 
 TEST(TestSharpAcClass, toCommon) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kSharpAcCool);
   ac.setTemp(20);
@@ -781,7 +781,7 @@ TEST(TestSharpAcClass, Power) {
 }
 
 TEST(TestSharpAcClass, Turbo) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   ac.setFan(kSharpAcFanMin);
@@ -820,7 +820,7 @@ TEST(TestSharpAcClass, Turbo) {
 }
 
 TEST(TestSharpAcClass, SwingToggle) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingToggle(false);
@@ -847,7 +847,7 @@ TEST(TestSharpAcClass, SwingToggle) {
 }
 
 TEST(TestSharpAcClass, Ion) {
-  IRSharpAc ac(0);
+  IRSharpAc ac(kGpioUnused);
   ac.begin();
 
   ac.setIon(false);
@@ -870,4 +870,93 @@ TEST(TestSharpAcClass, Ion) {
   EXPECT_TRUE(ac.getIon());
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getIon());
+}
+
+TEST(TestSharpAcClass, Timers) {
+  IRSharpAc ac(kGpioUnused);
+  ac.begin();
+
+  // Off cases
+  ac.setTimer(false, kSharpAcOffTimerType, 0);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(0, ac.getTimerTime());
+
+  ac.setTimer(false, kSharpAcOnTimerType, 0);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(0, ac.getTimerTime());
+
+  ac.setTimer(true, kSharpAcOnTimerType, 0);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(0, ac.getTimerTime());
+
+  ac.setTimer(false, kSharpAcOffTimerType, 12 * 60);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(0, ac.getTimerTime());
+
+  ac.setTimer(true, kSharpAcOnTimerType, kSharpAcTimerIncrement - 1);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(0, ac.getTimerTime());
+
+  // Trivial cases
+  ac.setTimer(true, kSharpAcOnTimerType, 30);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOnTimerType, ac.getTimerType());
+  EXPECT_EQ(30, ac.getTimerTime());
+  EXPECT_TRUE(ac.isPowerSpecial());
+
+  ac.setTimer(true, kSharpAcOffTimerType, 60);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(60, ac.getTimerTime());
+
+  ac.setTimer(true, kSharpAcOnTimerType, 91);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOnTimerType, ac.getTimerType());
+  EXPECT_EQ(90, ac.getTimerTime());
+
+  // Bounds checks
+  ac.setTimer(true, kSharpAcOnTimerType, kSharpAcTimerHoursMax * 60);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOnTimerType, ac.getTimerType());
+  EXPECT_EQ(kSharpAcTimerHoursMax * 60, ac.getTimerTime());
+
+  ac.setTimer(false, kSharpAcOffTimerType, 0);  // Known good.
+  ac.setTimer(true, kSharpAcOnTimerType, kSharpAcTimerHoursMax * 60 +
+                                         kSharpAcTimerIncrement);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOnTimerType, ac.getTimerType());
+  EXPECT_EQ(kSharpAcTimerHoursMax * 60, ac.getTimerTime());
+
+  // ref: https://docs.google.com/spreadsheets/d/1otzVFM5_tegrZ4ROCLgQ_jvJaWCDlZs1vC-YuR1FFXM/edit#gid=0&range=E51
+  const uint8_t off_timer_8_5_hrs[] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xC6, 0x81, 0x72,
+      0x88, 0x08, 0x80, 0xDE, 0xF4, 0x21};
+  ac.setRaw(off_timer_8_5_hrs);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOffTimerType, ac.getTimerType());
+  EXPECT_EQ(8 * 60 + 30, ac.getTimerTime());
+  EXPECT_TRUE(ac.isPowerSpecial());
+  EXPECT_EQ(
+      "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, Off Timer: 08:30",
+      ac.toString());
+
+  // ref: https://docs.google.com/spreadsheets/d/1otzVFM5_tegrZ4ROCLgQ_jvJaWCDlZs1vC-YuR1FFXM/edit#gid=0&range=E80
+  const uint8_t on_timer_12_hrs[] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xC6, 0x81, 0x72,
+      0xCC, 0x08, 0x80, 0xC0, 0xF4, 0xD1};
+  ac.setRaw(on_timer_12_hrs);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(kSharpAcOnTimerType, ac.getTimerType());
+  EXPECT_EQ(12 * 60, ac.getTimerTime());
+  EXPECT_TRUE(ac.isPowerSpecial());
+  EXPECT_EQ(
+      "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, On Timer: 12:00",
+      ac.toString());
 }

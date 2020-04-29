@@ -46,6 +46,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -496,6 +497,47 @@ void IRSharpAc::setEconoToggle(const bool on) {
   setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
 }
 
+// Returns how long the timer is set for, in minutes.
+uint16_t IRSharpAc::getTimerTime(void) {
+  return GETBITS8(remote[kSharpAcByteTimer], kSharpAcTimerHoursOffset,
+                  kSharpAcTimerHoursSize) * kSharpAcTimerIncrement * 2 +
+      ((getSpecial() == kSharpAcSpecialTimerHalfHour) ? kSharpAcTimerIncrement
+                                                      : 0);
+}
+
+bool IRSharpAc::getTimerEnabled(void) {
+  return GETBIT8(remote[kSharpAcByteTimer], kSharpAcBitTimerEnabled);
+}
+
+bool IRSharpAc::getTimerType(void) {
+  return GETBIT8(remote[kSharpAcByteTimer], kSharpAcBitTimerType);
+}
+
+// Set or cancel the timer function.
+// Args:
+//   enable:     Is the timer to be enabled (true) or canceled(false)?
+//   timer_type: An On (true) or an Off (false). Ignored if canceled.
+//   mins:       Nr. of minutes the timer is to be set to.
+//                 Rounds down to 30 min increments.
+//                 (max: 720 mins (12h), 0 is Off)
+void IRSharpAc::setTimer(bool enable, bool timer_type, uint16_t mins) {
+  uint8_t half_hours = std::min(mins / kSharpAcTimerIncrement,
+                                kSharpAcTimerHoursMax * 2);
+  if (half_hours == 0) enable = false;
+  if (!enable) {
+    half_hours = 0;
+    timer_type = kSharpAcOffTimerType;
+  }
+  setBit(&remote[kSharpAcByteTimer], kSharpAcBitTimerEnabled, enable);
+  setBit(&remote[kSharpAcByteTimer], kSharpAcBitTimerType, timer_type);
+  setBits(&remote[kSharpAcByteTimer], kSharpAcTimerHoursOffset,
+          kSharpAcTimerHoursSize, half_hours / 2);
+  // Handle non-round hours.
+  setSpecial((half_hours % 2) ? kSharpAcSpecialTimerHalfHour
+                              : kSharpAcSpecialTimer);
+  setPowerSpecial(kSharpAcPowerTimerSetting);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -569,7 +611,7 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(125);  // Reserve some heap for the string to reduce fragging.
   result += addLabeledString(isPowerSpecial() ? "-"
                                               : (getPower() ? kOnStr : kOffStr),
                              kPowerStr, false);
@@ -582,6 +624,9 @@ String IRSharpAc::toString(void) {
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getIon(), kIonStr);
   result += addLabeledString(getEconoToggle() ? kToggleStr : "-", kEconoStr);
+  if (getTimerEnabled())
+    result += addLabeledString(minsToString(getTimerTime()),
+                               getTimerType() ? kOnTimerStr : kOffTimerStr);
   return result;
 }
 
