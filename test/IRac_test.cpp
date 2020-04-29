@@ -1071,8 +1071,8 @@ TEST(TestIRac, Sharp) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-      "Fan: 3 (Medium), Swing(V) Toggle: On, Ion: On";
+      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
+      "Turbo: Off, Swing(V) Toggle: On, Ion: On, Econo: -";
 
   ac.begin();
   irac.sharp(&ac,

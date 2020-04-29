@@ -335,52 +335,51 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote, new_code, std::min(length, kSharpAcStateLength));
 }
 
-void IRSharpAc::setPreviousPower(const bool on) {
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset, on);
+void IRSharpAc::setPowerSpecial(const uint8_t value) {
+  setBits(&remote[kSharpAcBytePowerSpecial], kSharpAcPowerSetSpecialOffset,
+          kSharpAcPowerSpecialSize, value);
 }
 
-bool IRSharpAc::getPreviousPower(void) {
-  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPreviousPowerOffset);
+uint8_t IRSharpAc::getPowerSpecial(void) {
+  return GETBITS8(remote[kSharpAcBytePowerSpecial],
+                  kSharpAcPowerSetSpecialOffset, kSharpAcPowerSpecialSize);
 }
 
 void IRSharpAc::on(void) { setPower(true); }
 
 void IRSharpAc::off(void) { setPower(false); }
 
-void IRSharpAc::setPower(const bool on) {
-  setPreviousPower(getPower());
-  setBit(&remote[kSharpAcBytePower], kSharpAcBitPowerOffset, on);
-  setButton(kSharpAcButtonPowerMode);
-}
-
-void IRSharpAc::setPower(const bool on, const bool prev) {
-  setPower(on);
-  setPreviousPower(prev);
+void IRSharpAc::setPower(const bool on, const bool prev_on) {
+  setPowerSpecial(on ? (prev_on ? kSharpAcPowerOn : kSharpAcPowerOnFromOff)
+                     : kSharpAcPowerOff);
+  setSpecial(kSharpAcSpecialPower);
 }
 
 bool IRSharpAc::getPower(void) {
-  return GETBIT8(remote[kSharpAcBytePower], kSharpAcBitPowerOffset);
-}
-
-void IRSharpAc::setButton(const uint8_t button) {
-  switch (button) {
-    case kSharpAcButtonPowerMode:
-    case kSharpAcButtonTurbo:
-    case kSharpAcButtonTemp:
-    case kSharpAcButtonFan:
-    case kSharpAcButtonSwing:
-      setBits(&remote[kSharpAcByteButton], kSharpAcButtonOffset,
-              kSharpAcButtonSize, button);
-      break;
-    default:
-      setButton(kSharpAcButtonPowerMode);
+  switch (getPowerSpecial()) {
+    case kSharpAcPowerUnknown:
+    case kSharpAcPowerOff: return false;
+    default: return true;
   }
 }
 
-uint8_t IRSharpAc::getButton(void) {
-  return GETBITS8(remote[kSharpAcByteButton], kSharpAcButtonOffset,
-                  kSharpAcButtonSize);
+void IRSharpAc::setSpecial(const uint8_t mode) {
+  switch (mode) {
+    case kSharpAcSpecialPower:
+    case kSharpAcSpecialTurbo:
+    case kSharpAcSpecialTempEcono:
+    case kSharpAcSpecialFan:
+    case kSharpAcSpecialSwing:
+    case kSharpAcSpecialTimer:
+    case kSharpAcSpecialTimerHalfHour:
+      remote[kSharpAcByteSpecial] = mode;
+      break;
+    default:
+      setSpecial(kSharpAcSpecialPower);
+  }
 }
+
+uint8_t IRSharpAc::getSpecial(void) { return remote[kSharpAcByteSpecial]; }
 
 // Set the temp in deg C
 void IRSharpAc::setTemp(const uint8_t temp) {
@@ -397,7 +396,7 @@ void IRSharpAc::setTemp(const uint8_t temp) {
   degrees = std::min(degrees, kSharpAcMaxTemp);
   setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
           degrees - kSharpAcMinTemp);
-  setButton(kSharpAcButtonTemp);
+  setSpecial(kSharpAcSpecialTempEcono);
 }
 
 uint8_t IRSharpAc::getTemp(void) {
@@ -423,7 +422,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
     default:
       this->setMode(kSharpAcAuto);
   }
-  setButton(kSharpAcButtonPowerMode);
+  setSpecial(kSharpAcSpecialPower);
 }
 
 // Set the speed of the fan
@@ -440,7 +439,7 @@ void IRSharpAc::setFan(const uint8_t speed) {
     default:
       this->setFan(kSharpAcFanAuto);
   }
-  setButton(kSharpAcButtonFan);
+  setSpecial(kSharpAcSpecialFan);
 }
 
 uint8_t IRSharpAc::getFan(void) {
@@ -448,18 +447,14 @@ uint8_t IRSharpAc::getFan(void) {
 }
 
 bool IRSharpAc::getTurbo(void) {
-  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
-  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
-  return !GETBIT8(remote[kSharpAcByteTurbo], kSharpAcBitTurboOffset);
+  return (getPowerSpecial() == kSharpAcPowerSetSpecialOn) &&
+         (getSpecial() == kSharpAcSpecialTurbo);
 }
 
 void IRSharpAc::setTurbo(const bool on) {
-  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
-  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
-
-  // setBit(&remote[kSharpAcByteTurbo], kSharpAcBitTurboOffset, !on);
   if (on) setFan(kSharpAcFanMax);
-  setButton(kSharpAcButtonTurbo);
+  setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
+  setSpecial(kSharpAcSpecialTurbo);
 }
 
 bool IRSharpAc::getSwingToggle(void) {
@@ -470,9 +465,8 @@ bool IRSharpAc::getSwingToggle(void) {
 void IRSharpAc::setSwingToggle(const bool on) {
   setBits(&remote[kSharpAcByteSwing], kSharpAcSwingOffset, kSharpAcSwingSize,
           on ? kSharpAcSwingToggle : kSharpAcSwingNoToggle);
-  if (on) setButton(kSharpAcButtonSwing);
+  if (on) setSpecial(kSharpAcSpecialSwing);
 }
-
 
 bool IRSharpAc::getIon(void) {
   return GETBIT8(remote[kSharpAcByteIon], kSharpAcBitIonOffset);
@@ -480,7 +474,17 @@ bool IRSharpAc::getIon(void) {
 
 void IRSharpAc::setIon(const bool on) {
   setBit(&remote[kSharpAcByteIon], kSharpAcBitIonOffset, on);
-  if (on) setButton(kSharpAcButtonSwing);
+  if (on) setSpecial(kSharpAcSpecialSwing);
+}
+
+bool IRSharpAc::getEconoToggle(void) {
+  return (getPowerSpecial() == kSharpAcPowerSetSpecialOn) &&
+         (getSpecial() == kSharpAcSpecialTempEcono);
+}
+
+void IRSharpAc::setEconoToggle(const bool on) {
+  if (on) setSpecial(kSharpAcSpecialTempEcono);
+  setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
 }
 
 // Convert a standard A/C mode into its native mode.
@@ -541,12 +545,12 @@ stdAc::state_t IRSharpAc::toCommon(void) {
   result.swingv = this->getSwingToggle() ? stdAc::swingv_t::kAuto
                                          : stdAc::swingv_t::kOff;
   result.filter = this->getIon();
+  result.econo = this->getEconoToggle();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.clean = false;
   result.beep = false;
-  result.econo = false;
   result.light = false;
   result.sleep = -1;
   result.clock = -1;
@@ -558,17 +562,15 @@ String IRSharpAc::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addBoolToString(getPreviousPower(), kPreviousPowerStr);
   result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
                             kSharpAcDry, kSharpAcAuto);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
                            kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);
-  // TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
-  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
-  // result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getIon(), kIonStr);
+  result += addLabeledString(getEconoToggle() ? kToggleStr : "-", kEconoStr);
   return result;
 }
 

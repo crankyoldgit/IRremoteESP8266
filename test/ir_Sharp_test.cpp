@@ -408,8 +408,8 @@ TEST(TestDecodeSharpAc, RealExample) {
   ASSERT_EQ(SHARP_AC, irsend.capture.decode_type);
   ASSERT_EQ(kSharpAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 27C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -447,23 +447,6 @@ TEST(TestIRUtils, SharpAc) {
 }
 
 // Tests for IRSharpAc class.
-
-TEST(TestSharpAcClass, Power) {
-  IRSharpAc ac(0);
-  ac.begin();
-
-  ac.on();
-  EXPECT_TRUE(ac.getPower());
-
-  ac.off();
-  EXPECT_FALSE(ac.getPower());
-
-  ac.setPower(true);
-  EXPECT_TRUE(ac.getPower());
-
-  ac.setPower(false);
-  EXPECT_FALSE(ac.getPower());
-}
 
 TEST(TestSharpAcClass, Checksum) {
   uint8_t state[kSharpAcStateLength] = {
@@ -593,8 +576,8 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   ac.setFan(kSharpAcFanAuto);
   ac.setMode(kSharpAcAuto);
   EXPECT_STATE_EQ(on_auto_auto, ac.getRaw(), kSharpAcBits);
-  EXPECT_EQ("Power: On, Previous Power: Off, Mode: 0 (Auto), Temp: 15C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
 
   uint8_t cool_auto_28[kSharpAcStateLength] = {
@@ -605,8 +588,8 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   ac.setMode(kSharpAcCool);
   ac.setFan(kSharpAcFanAuto);
   ac.setTemp(28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   EXPECT_STATE_EQ(cool_auto_28, ac.getRaw(), kSharpAcBits);
 }
@@ -621,64 +604,64 @@ TEST(TestSharpAcClass, KnownStates) {
       0x31};
   ASSERT_TRUE(ac.validChecksum(off_auto_auto));
   ac.setRaw(off_auto_auto);
-  EXPECT_EQ("Power: Off, Previous Power: On, Mode: 0 (Auto), Temp: 15C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: Off, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t on_auto_auto[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
       0x01};
   ASSERT_TRUE(ac.validChecksum(on_auto_auto));
   ac.setRaw(on_auto_auto);
-  EXPECT_EQ("Power: On, Previous Power: Off, Mode: 0 (Auto), Temp: 15C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_auto_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
       0x51};
   ASSERT_TRUE(ac.validChecksum(cool_auto_28));
   ac.setRaw(cool_auto_28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_fan1_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x42, 0x00, 0x08, 0x80, 0x05, 0xE0,
       0x21};
   ASSERT_TRUE(ac.validChecksum(cool_fan1_28));
   ac.setRaw(cool_fan1_28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 4 (Low), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 4 (Low), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_fan2_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x32, 0x00, 0x08, 0x80, 0x05, 0xE0,
       0x51};
   ASSERT_TRUE(ac.validChecksum(cool_fan2_28));
   ac.setRaw(cool_fan2_28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 3 (Medium), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
+            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_fan3_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x52, 0x00, 0x08, 0x80, 0x05, 0xE0,
       0x31};
   ASSERT_TRUE(ac.validChecksum(cool_fan3_28));
   ac.setRaw(cool_fan3_28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 5 (UNKNOWN), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 5 (UNKNOWN), "
+            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_fan4_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x72, 0x00, 0x08, 0x80, 0x05, 0xE0,
       0x11};
   ASSERT_TRUE(ac.validChecksum(cool_fan4_28));
   ac.setRaw(cool_fan4_28);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 7 (High), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
   uint8_t cool_fan4_28_ion_on[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x61, 0x72, 0x08, 0x08, 0x80, 0x00, 0xE4,
       0xD1};
   ASSERT_TRUE(ac.validChecksum(cool_fan4_28_ion_on));
   ac.setRaw(cool_fan4_28_ion_on);
-  EXPECT_EQ("Power: Off, Previous Power: On, Mode: 2 (Cool), Temp: 28C, "
-            "Fan: 7 (High), Swing(V) Toggle: Off, Ion: On",
+  EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: On, Econo: -",
             ac.toString());
   /* Unsupported / Not yet reverse engineered.
   uint8_t cool_fan4_28_eco1[kSharpAcStateLength] = {
@@ -693,8 +676,8 @@ TEST(TestSharpAcClass, KnownStates) {
       0x11};
   ASSERT_TRUE(ac.validChecksum(dry_auto));
   ac.setRaw(dry_auto);
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 3 (Dry), Temp: 15C, "
-            "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: Off",
+  EXPECT_EQ("Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
             ac.toString());
 }
 
@@ -726,32 +709,20 @@ TEST(TestSharpAcClass, toCommon) {
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
 
-TEST(TestSharpAcClass, PreviousPower) {
+TEST(TestSharpAcClass, Power) {
   IRSharpAc ac(kGpioUnused);
   ac.setPower(false, false);
   EXPECT_FALSE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
-  EXPECT_TRUE(ac.getPreviousPower());
-  ac.setPower(true);
+  ac.on();
   EXPECT_TRUE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
-  ac.setPower(true);
-  EXPECT_TRUE(ac.getPower());
-  EXPECT_TRUE(ac.getPreviousPower());
-  ac.setPreviousPower(false);
-  EXPECT_TRUE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
-  ac.setPreviousPower(true);
-  EXPECT_TRUE(ac.getPower());
-  EXPECT_TRUE(ac.getPreviousPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
   ac.setPower(true, false);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
 
   // Data from: https://github.com/crankyoldgit/IRremoteESP8266/pull/1074#discussion_r403407146
   // Command ON (previously OFF) -> 0xAA 5A CF 10 CB 11 22 00 08 80 00 E0 51
@@ -760,21 +731,18 @@ TEST(TestSharpAcClass, PreviousPower) {
       0x00, 0x08, 0x80, 0x00, 0xE0, 0x51};
   ac.setRaw(on_prev_off);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_FALSE(ac.getPreviousPower());
   // Command ON (previously ON)  -> 0xAA 5A CF 10 CB 31 22 00 08 80 04 E0 31
   const uint8_t on_prev_on[] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCB, 0x31, 0x22,
       0x00, 0x08, 0x80, 0x04, 0xE0, 0x31};
   ac.setRaw(on_prev_on);
   EXPECT_TRUE(ac.getPower());
-  EXPECT_TRUE(ac.getPreviousPower());
   // Command OFF (previously ON) -> 0xAA 5A CF 10 CB 21 22 00 08 80 00 E0 61
   const uint8_t off_prev_on[] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCB, 0x21, 0x22,
       0x00, 0x08, 0x80, 0x00, 0xE0, 0x61};
   ac.setRaw(off_prev_on);
   EXPECT_FALSE(ac.getPower());
-  EXPECT_TRUE(ac.getPreviousPower());
   /* Extra test data if needed.
   // Power:OFF<Previously ON> Mode:2(Cool) Fan:2(Auto) Temp:22
   const uint8_t collect1[13] = {
@@ -812,9 +780,6 @@ TEST(TestSharpAcClass, PreviousPower) {
   */
 }
 
-// TODO(crankyoldgit): Setting Turbo is disabled until this is worked out.
-// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-620366634
-/*
 TEST(TestSharpAcClass, Turbo) {
   IRSharpAc ac(0);
   ac.begin();
@@ -841,15 +806,18 @@ TEST(TestSharpAcClass, Turbo) {
   ac.setRaw(on_state);
   EXPECT_TRUE(ac.getTurbo());
   EXPECT_EQ(kSharpAcFanMax, ac.getFan());
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 21C, "
-            "Fan: 7 (High), Turbo: On", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: On, "
+      "Swing(V) Toggle: Off, Ion: On, Econo: -",
+      ac.toString());
 
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getTurbo());
-  EXPECT_EQ("Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 21C, "
-            "Fan: 7 (High), Turbo: Off", ac.toString());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
+      "Swing(V) Toggle: Off, Ion: On, Econo: -",
+      ac.toString());
 }
-*/
 
 TEST(TestSharpAcClass, SwingToggle) {
   IRSharpAc ac(0);
@@ -873,17 +841,9 @@ TEST(TestSharpAcClass, SwingToggle) {
       0x00, 0x08, 0x80, 0x04, 0xF4, 0x41};
   ac.setRaw(on_state);
   EXPECT_TRUE(ac.getSwingToggle());
-  EXPECT_EQ(
-      "Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 2 (Auto), Swing(V) Toggle: On, Ion: On",
-      ac.toString());
 
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getSwingToggle());
-  EXPECT_EQ(
-      "Power: On, Previous Power: On, Mode: 2 (Cool), Temp: 24C, "
-      "Fan: 2 (Auto), Swing(V) Toggle: Off, Ion: On",
-      ac.toString());
 }
 
 TEST(TestSharpAcClass, Ion) {

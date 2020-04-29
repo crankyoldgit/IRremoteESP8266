@@ -1069,12 +1069,12 @@ void IRac::sharp(IRSharpAc *ac,
   ac->setFan(ac->convertFan(fan));
   ac->setSwingToggle(swingv != stdAc::swingv_t::kOff);
   ac->setTurbo(turbo);
+  // Econo  deliberately not used as it cycles through 3 modes uncontrolably.
+  // ac->setEconoToggle(econo);
   ac->setIon(filter);
   // No Horizontal swing setting available.
   // No Quiet setting available.
-  // No Turbo setting available.
   // No Light setting available.
-  // No Econo setting available.
   // No Clean setting available.
   // No Beep setting available.
   // No Sleep setting available.
