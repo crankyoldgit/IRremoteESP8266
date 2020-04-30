@@ -95,7 +95,7 @@ class IRGoodweatherAc {
   void stateReset(void);
 #if SEND_GOODWEATHER
   void send(const uint16_t repeat = kGoodweatherMinRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GOODWEATHER
   void begin(void);
   void on(void);

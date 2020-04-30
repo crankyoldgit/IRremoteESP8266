@@ -141,7 +141,7 @@ class IRKelvinatorAC {
   void stateReset(void);
 #if SEND_KELVINATOR
   void send(const uint16_t repeat = kKelvinatorDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_KELVINATOR
   void begin(void);
   void on(void);

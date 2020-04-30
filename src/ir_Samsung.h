@@ -99,7 +99,7 @@ class IRSamsungAc {
                     const bool calcchecksum = true);
   void sendOn(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendOff(const uint16_t repeat = kSamsungAcDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SAMSUNG_AC
   void begin(void);
   void on(void);

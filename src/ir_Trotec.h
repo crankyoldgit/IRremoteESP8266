@@ -69,7 +69,7 @@ class IRTrotecESP {
 
 #if SEND_TROTEC
   void send(const uint16_t repeat = kTrotecDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TROTEC
   void begin(void);
 

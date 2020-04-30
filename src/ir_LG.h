@@ -67,7 +67,7 @@ class IRLgAc {
   bool isValidLgAc(void);
 #if SEND_LG
   void send(const uint16_t repeat = kLgDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_LG
   void begin(void);
   void on(void);
