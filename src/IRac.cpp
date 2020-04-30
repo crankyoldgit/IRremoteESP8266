@@ -1061,7 +1061,7 @@ void IRac::sharp(IRSharpAc *ac,
                  const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
                  const stdAc::swingv_t swingv, const bool turbo,
-                 const bool filter) {
+                 const bool filter, const bool clean) {
   ac->begin();
   ac->setPower(on, prev_power);
   ac->setMode(ac->convertMode(mode));
@@ -1074,12 +1074,18 @@ void IRac::sharp(IRSharpAc *ac,
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Light setting available.
-  // No Clean setting available.
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
   // Do setMode() again as it can affect fan speed and temp.
   ac->setMode(ac->convertMode(mode));
+  // Clean after mode, as it can affect the mode, temp & fan speed.
+  if (clean) {
+    // A/C needs to be off before we can enter clean mode.
+    ac->setPower(false, prev_power);
+    ac->send();
+  }
+  ac->setClean(clean);
   if (turbo) {
     ac->send();  // Send the current state.
     // Set up turbo mode as it needs to be sent after everything else.
@@ -1669,7 +1675,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       bool prev_power = !send.power;
       if (prev != NULL) prev_power = prev->power;
       sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed,
-            send.swingv, send.turbo, send.filter);
+            send.swingv, send.turbo, send.filter, send.clean);
       break;
     }
 #endif  // SEND_SHARP_AC

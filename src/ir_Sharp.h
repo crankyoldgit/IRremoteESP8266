@@ -29,19 +29,10 @@ const uint16_t kSharpAcZeroSpace = 500;
 const uint16_t kSharpAcOneSpace = 1400;
 const uint32_t kSharpAcGap = kDefaultMessageGap;
 
-const uint8_t kSharpAcAuto = 0b000;
-const uint8_t kSharpAcDry = 0b011;
-const uint8_t kSharpAcCool = 0b010;
-const uint8_t kSharpAcHeat = 0b001;
-const uint8_t kSharpAcMinTemp = 15;  // Celsius
-const uint8_t kSharpAcMaxTemp = 30;  // Celsius
-const uint8_t kSharpAcFanAuto = 0b010;  // 2
-const uint8_t kSharpAcFanMin =  0b100;  // 4 (FAN1)
-const uint8_t kSharpAcFanMed =  0b011;  // 3 (FAN2)
-const uint8_t kSharpAcFanHigh = 0b101;  // 5 (FAN3)
-const uint8_t kSharpAcFanMax =  0b111;  // 7 (FAN4)
 // Byte[4]
 const uint8_t kSharpAcByteTemp = 4;
+const uint8_t kSharpAcMinTemp = 15;  // Celsius
+const uint8_t kSharpAcMaxTemp = 30;  // Celsius
 // Byte[5]
 const uint8_t kSharpAcBytePowerSpecial = 5;
 const uint8_t kSharpAcPowerSetSpecialOffset = kHighNibble;  // 0bxxxx0000
@@ -55,10 +46,21 @@ const uint8_t kSharpAcPowerSetSpecialOff = 7;               // 0b0111
 const uint8_t kSharpAcPowerTimerSetting = 8;                // 0b1000
 // Byte[6]
 const uint8_t kSharpAcByteMode = 6;
-const uint8_t kSharpAcModeSize = 2;  // Mask 0b00000011;
+const uint8_t kSharpAcModeSize = 2;        // Mask 0b000000xx;
+const uint8_t kSharpAcAuto =                             0b00;
+const uint8_t kSharpAcDry =                              0b11;
+const uint8_t kSharpAcCool =                             0b10;
+const uint8_t kSharpAcHeat =                             0b01;
+const uint8_t kSharpAcByteClean = kSharpAcByteMode;
+const uint8_t kSharpAcBitCleanOffset = 3;  // Mask 0b0000x000
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
-const uint8_t kSharpAcFanOffset = 4;  // Mask 0b01110000
+const uint8_t kSharpAcFanOffset = 4;       // Mask 0b0xxx0000
 const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
+const uint8_t kSharpAcFanAuto =                     0b010;  // 2
+const uint8_t kSharpAcFanMin =                      0b100;  // 4 (FAN1)
+const uint8_t kSharpAcFanMed =                      0b011;  // 3 (FAN2)
+const uint8_t kSharpAcFanHigh =                     0b101;  // 5 (FAN3)
+const uint8_t kSharpAcFanMax =                      0b111;  // 7 (FAN4)
 // Byte[7]
 const uint8_t kSharpAcByteTimer = 7;
 const uint8_t kSharpAcTimerIncrement = 30;  // Mins
@@ -126,6 +128,8 @@ class IRSharpAc {
   bool getTimerEnabled(void);
   bool getTimerType(void);
   void setTimer(bool enable, bool timer_type, uint16_t mins);
+  bool getClean(void);
+  void setClean(const bool on);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSharpAcStateLength);

@@ -409,7 +409,7 @@ TEST(TestDecodeSharpAc, RealExample) {
   ASSERT_EQ(kSharpAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -577,7 +577,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   ac.setMode(kSharpAcAuto);
   EXPECT_STATE_EQ(on_auto_auto, ac.getRaw(), kSharpAcBits);
   EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
 
   uint8_t cool_auto_28[kSharpAcStateLength] = {
@@ -589,7 +589,7 @@ TEST(TestSharpAcClass, ReconstructKnownState) {
   ac.setFan(kSharpAcFanAuto);
   ac.setTemp(28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   EXPECT_STATE_EQ(cool_auto_28, ac.getRaw(), kSharpAcBits);
 }
@@ -605,7 +605,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(off_auto_auto));
   ac.setRaw(off_auto_auto);
   EXPECT_EQ("Power: Off, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t on_auto_auto[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x20, 0x00, 0x08, 0x80, 0x00, 0xE0,
@@ -613,7 +613,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(on_auto_auto));
   ac.setRaw(on_auto_auto);
   EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_auto_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x22, 0x00, 0x08, 0x80, 0x04, 0xE0,
@@ -621,7 +621,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_auto_28));
   ac.setRaw(cool_auto_28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_fan1_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x42, 0x00, 0x08, 0x80, 0x05, 0xE0,
@@ -629,7 +629,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_fan1_28));
   ac.setRaw(cool_fan1_28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 4 (Low), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_fan2_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x32, 0x00, 0x08, 0x80, 0x05, 0xE0,
@@ -637,7 +637,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_fan2_28));
   ac.setRaw(cool_fan2_28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
-            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_fan3_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x52, 0x00, 0x08, 0x80, 0x05, 0xE0,
@@ -645,7 +645,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_fan3_28));
   ac.setRaw(cool_fan3_28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 5 (UNKNOWN), "
-            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_fan4_28[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x31, 0x72, 0x00, 0x08, 0x80, 0x05, 0xE0,
@@ -653,7 +653,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_fan4_28));
   ac.setRaw(cool_fan4_28);
   EXPECT_EQ("Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
   uint8_t cool_fan4_28_ion_on[kSharpAcStateLength] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xCD, 0x61, 0x72, 0x08, 0x08, 0x80, 0x00, 0xE4,
@@ -661,7 +661,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(cool_fan4_28_ion_on));
   ac.setRaw(cool_fan4_28_ion_on);
   EXPECT_EQ("Power: -, Mode: 2 (Cool), Temp: 28C, Fan: 7 (High), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: On, Econo: -",
+            "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off",
             ac.toString());
   /* Unsupported / Not yet reverse engineered.
   uint8_t cool_fan4_28_eco1[kSharpAcStateLength] = {
@@ -677,7 +677,7 @@ TEST(TestSharpAcClass, KnownStates) {
   ASSERT_TRUE(ac.validChecksum(dry_auto));
   ac.setRaw(dry_auto);
   EXPECT_EQ("Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
-            "Swing(V) Toggle: Off, Ion: Off, Econo: -",
+            "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
             ac.toString());
 }
 
@@ -808,14 +808,14 @@ TEST(TestSharpAcClass, Turbo) {
   EXPECT_EQ(kSharpAcFanMax, ac.getFan());
   EXPECT_EQ(
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: On, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -",
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off",
       ac.toString());
 
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getTurbo());
   EXPECT_EQ(
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -",
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off",
       ac.toString());
 }
 
@@ -943,7 +943,7 @@ TEST(TestSharpAcClass, Timers) {
   EXPECT_TRUE(ac.isPowerSpecial());
   EXPECT_EQ(
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -, Off Timer: 08:30",
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off, Off Timer: 08:30",
       ac.toString());
 
   // ref: https://docs.google.com/spreadsheets/d/1otzVFM5_tegrZ4ROCLgQ_jvJaWCDlZs1vC-YuR1FFXM/edit#gid=0&range=E80
@@ -957,6 +957,53 @@ TEST(TestSharpAcClass, Timers) {
   EXPECT_TRUE(ac.isPowerSpecial());
   EXPECT_EQ(
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -, On Timer: 12:00",
+      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off, On Timer: 12:00",
       ac.toString());
+}
+
+TEST(TestSharpAcClass, Clean) {
+  IRSharpAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kSharpAcCool);
+  ac.setTemp(25);
+  ASSERT_NE(kSharpAcDry, ac.getMode());
+  ASSERT_NE(kSharpAcMinTemp, ac.getTemp());
+  ASSERT_NE(kSharpAcFanAuto, ac.getFan());
+
+  ac.setClean(false);
+  EXPECT_FALSE(ac.getClean());
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+  ASSERT_EQ(kSharpAcDry, ac.getMode());
+  ASSERT_EQ(kSharpAcMinTemp, ac.getTemp());
+  ASSERT_EQ(kSharpAcFanAuto, ac.getFan());
+
+  ac.setClean(false);
+  EXPECT_FALSE(ac.getClean());
+
+  // ref: https://docs.google.com/spreadsheets/d/1otzVFM5_tegrZ4ROCLgQ_jvJaWCDlZs1vC-YuR1FFXM/edit#gid=1057982086&range=B82:D85
+  const uint8_t clean_on_state[] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x11, 0x2B,
+      0x00, 0x08, 0x80, 0x00, 0xF0, 0xA1};
+  const uint8_t clean_off_state[] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCA, 0x11, 0x72,
+      0x00, 0x08, 0x80, 0x00, 0xF0, 0x01};
+  ac.setRaw(clean_on_state);
+  EXPECT_TRUE(ac.getClean());
+  EXPECT_EQ(
+    "Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: On",
+    ac.toString());
+  ac.setRaw(clean_off_state);
+  EXPECT_FALSE(ac.getClean());
+  EXPECT_EQ(
+    "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    ac.toString());
+
+  // Try constructing the clean on state.
+  ac.setClean(true);
+  EXPECT_STATE_EQ(clean_on_state, ac.getRaw(), kSharpAcBits);
 }

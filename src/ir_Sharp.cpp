@@ -422,8 +422,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kSharpAcAuto:
     case kSharpAcDry:
-      this->setFan(2);  // When Dry or Auto, Fan always 2(Auto)
-      this->setTemp(0);  // Dry/Auto have no temp setting.
+      this->setFan(kSharpAcFanAuto);  // When Dry or Auto, Fan always 2(Auto)
       // FALLTHRU
     case kSharpAcCool:
     case kSharpAcHeat:
@@ -432,6 +431,8 @@ void IRSharpAc::setMode(const uint8_t mode) {
     default:
       this->setMode(kSharpAcAuto);
   }
+  // Dry/Auto have no temp setting. This step will enforce it.
+  this->setTemp(this->getTemp());
   setSpecial(kSharpAcSpecialPower);
 }
 
@@ -538,6 +539,17 @@ void IRSharpAc::setTimer(bool enable, bool timer_type, uint16_t mins) {
   setPowerSpecial(kSharpAcPowerTimerSetting);
 }
 
+bool IRSharpAc::getClean(void) {
+  return GETBIT8(remote[kSharpAcByteClean], kSharpAcBitCleanOffset);
+}
+
+// Note: A/C unit needs to be "Off" before clean mode can be entered.
+void IRSharpAc::setClean(const bool on) {
+  // Clean mode appears to be just default dry mode, with an extra bit set.
+  if (on) setMode(kSharpAcDry);
+  setBit(&remote[kSharpAcByteClean], kSharpAcBitCleanOffset, on);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -597,10 +609,10 @@ stdAc::state_t IRSharpAc::toCommon(void) {
                                          : stdAc::swingv_t::kOff;
   result.filter = this->getIon();
   result.econo = this->getEconoToggle();
+  result.clean = this->getClean();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
-  result.clean = false;
   result.beep = false;
   result.light = false;
   result.sleep = -1;
@@ -611,7 +623,7 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
-  result.reserve(125);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(135);  // Reserve some heap for the string to reduce fragging.
   result += addLabeledString(isPowerSpecial() ? "-"
                                               : (getPower() ? kOnStr : kOffStr),
                              kPowerStr, false);
@@ -624,6 +636,7 @@ String IRSharpAc::toString(void) {
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getIon(), kIonStr);
   result += addLabeledString(getEconoToggle() ? kToggleStr : "-", kEconoStr);
+  result += addBoolToString(getClean(), kCleanStr);
   if (getTimerEnabled())
     result += addLabeledString(minsToString(getTimerTime()),
                                getTimerType() ? kOnTimerStr : kOffTimerStr);
