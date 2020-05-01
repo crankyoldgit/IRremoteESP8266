@@ -100,7 +100,7 @@ class IRSharpAc {
 
 #if SEND_SHARP_AC
   void send(const uint16_t repeat = kSharpAcDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SHARP_AC
   void begin(void);
   void on(void);
@@ -108,7 +108,7 @@ class IRSharpAc {
   void setPower(const bool on, const bool prev_on = true);
   bool getPower(void);
   bool isPowerSpecial(void);
-  void setTemp(const uint8_t temp);
+  void setTemp(const uint8_t temp, const bool save = true);
   uint8_t getTemp(void);
   void setFan(const uint8_t fan);
   uint8_t getFan(void);
@@ -150,6 +150,7 @@ class IRSharpAc {
 #endif
   // # of bytes per command
   uint8_t remote[kSharpAcStateLength];
+  uint8_t _prevtemp;
   void stateReset(void);
   void checksum(void);
   static uint8_t calcChecksum(uint8_t state[],

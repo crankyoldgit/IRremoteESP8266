@@ -325,6 +325,7 @@ void IRSharpAc::stateReset(void) {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x01, 0x00, 0x00, 0x08, 0x80, 0x00, 0xE0,
       0x01};
   memcpy(remote, reset, kSharpAcStateLength);
+  _prevtemp = getTemp();
 }
 
 uint8_t *IRSharpAc::getRaw(void) {
@@ -392,7 +393,10 @@ void IRSharpAc::setSpecial(const uint8_t mode) {
 uint8_t IRSharpAc::getSpecial(void) { return remote[kSharpAcByteSpecial]; }
 
 // Set the temp in deg C
-void IRSharpAc::setTemp(const uint8_t temp) {
+// Args:
+//   temp: Desired Temperature (Celsius)
+//   save: Do we save this Temperature as a user set temp? (Default: true)
+void IRSharpAc::setTemp(const uint8_t temp, const bool save) {
   switch (this->getMode()) {
     // Auto & Dry don't allow temp changes and have a special temp.
     case kSharpAcAuto:
@@ -404,6 +408,7 @@ void IRSharpAc::setTemp(const uint8_t temp) {
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
+  if (save) _prevtemp = degrees;
   setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
           degrees - kSharpAcMinTemp);
   setSpecial(kSharpAcSpecialTempEcono);
@@ -432,7 +437,7 @@ void IRSharpAc::setMode(const uint8_t mode) {
       this->setMode(kSharpAcAuto);
   }
   // Dry/Auto have no temp setting. This step will enforce it.
-  this->setTemp(this->getTemp());
+  this->setTemp(_prevtemp, false);
   setSpecial(kSharpAcSpecialPower);
 }
 

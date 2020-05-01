@@ -493,6 +493,16 @@ TEST(TestSharpAcClass, Temperature) {
 
   ac.setTemp(29);
   EXPECT_EQ(29, ac.getTemp());
+
+  // Auto & Dry have special temps. Per request, we should revert to the
+  // previous temp when we exit those modes.
+
+  ac.setMode(kSharpAcAuto);
+  EXPECT_EQ(kSharpAcMinTemp, ac.getTemp());
+  ac.setMode(kSharpAcDry);
+  EXPECT_EQ(kSharpAcMinTemp, ac.getTemp());
+  ac.setMode(kSharpAcCool);
+  EXPECT_EQ(29, ac.getTemp());
 }
 
 TEST(TestSharpAcClass, OperatingMode) {
