@@ -593,6 +593,11 @@ class IRrecv {
                      const uint16_t nbits = kAirwellBits,
                      const bool strict = true);
 #endif  // DECODE_AIRWELL
+#if DECODE_DELONGHI_AC
+  bool decodeDelonghiAc(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kDelonghiAcBits,
+                     const bool strict = true);
+#endif  // DECODE_DELONGHI_AC
 };
 
 #endif  // IRRECV_H_

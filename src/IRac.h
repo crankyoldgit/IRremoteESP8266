@@ -11,6 +11,7 @@
 #include "ir_Argo.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
+#include "ir_Delonghi.h"
 #include "ir_Fujitsu.h"
 #include "ir_Electra.h"
 #include "ir_Goodweather.h"

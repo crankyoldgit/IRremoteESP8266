@@ -52,7 +52,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
             ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o \
             ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Argo.o \
             ir_Trotec.o ir_Neoclima.o ir_Amcor.o ir_Epson.o ir_Symphony.o \
-            ir_Airwell.o
+            ir_Airwell.o ir_Delonghi.o
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRtext.o IRac.o $(PROTOCOLS)
@@ -243,6 +243,9 @@ ir_Symphony.o : $(USER_DIR)/ir_Symphony.cpp $(GTEST_HEADERS)
 
 ir_Airwell.o : $(USER_DIR)/ir_Airwell.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Airwell.cpp
+
+ir_Delonghi.o : $(USER_DIR)/ir_Delonghi.cpp $(USER_DIR)/ir_Delonghi.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Delonghi.cpp
 
 IRac.o : $(USER_DIR)/IRac.cpp $(USER_DIR)/IRac.h $(COMMON_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES)  -c $(USER_DIR)/IRac.cpp

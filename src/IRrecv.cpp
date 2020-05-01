@@ -789,6 +789,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Airwell decode");
     if (decodeAirwell(results, offset)) return true;
 #endif  // DECODE_AIRWELL
+#if DECODE_DELONGHI_AC
+    DPRINTLN("Attempting Delonghi AC decode");
+    if (decodeDelonghiAc(results, offset)) return true;
+#endif  // DECODE_DELONGHI_AC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

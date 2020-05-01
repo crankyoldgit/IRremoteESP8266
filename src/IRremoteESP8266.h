@@ -573,32 +573,39 @@
 #endif  // SEND_DAIKIN152
 
 #ifndef DECODE_EPSON
-#define DECODE_EPSON   _IR_ENABLE_DEFAULT_
+#define DECODE_EPSON           _IR_ENABLE_DEFAULT_
 #endif  // DECODE_EPSON
 #ifndef SEND_EPSON
-#define SEND_EPSON     _IR_ENABLE_DEFAULT_
+#define SEND_EPSON             _IR_ENABLE_DEFAULT_
 #endif  // SEND_EPSON
 
 #ifndef DECODE_SYMPHONY
-#define DECODE_SYMPHONY   _IR_ENABLE_DEFAULT_
+#define DECODE_SYMPHONY        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_SYMPHONY
 #ifndef SEND_SYMPHONY
-#define SEND_SYMPHONY     _IR_ENABLE_DEFAULT_
+#define SEND_SYMPHONY          _IR_ENABLE_DEFAULT_
 #endif  // SEND_SYMPHONY
 
 #ifndef DECODE_DAIKIN64
-#define DECODE_DAIKIN64       _IR_ENABLE_DEFAULT_
+#define DECODE_DAIKIN64        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_DAIKIN64
 #ifndef SEND_DAIKIN64
-#define SEND_DAIKIN64         _IR_ENABLE_DEFAULT_
+#define SEND_DAIKIN64          _IR_ENABLE_DEFAULT_
 #endif  // SEND_DAIKIN64
 
 #ifndef DECODE_AIRWELL
-#define DECODE_AIRWELL       _IR_ENABLE_DEFAULT_
+#define DECODE_AIRWELL         _IR_ENABLE_DEFAULT_
 #endif  // DECODE_AIRWELL
 #ifndef SEND_AIRWELL
-#define SEND_AIRWELL         _IR_ENABLE_DEFAULT_
+#define SEND_AIRWELL           _IR_ENABLE_DEFAULT_
 #endif  // SEND_AIRWELL
+
+#ifndef DECODE_DELONGHI_AC
+#define DECODE_DELONGHI_AC      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_DELONGHI_AC
+#ifndef SEND_DELONGHI_AC
+#define SEND_DELONGHI_AC        _IR_ENABLE_DEFAULT_
+#endif  // SEND_DELONGHI_AC
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -727,8 +734,9 @@ enum decode_type_t {
   HITACHI_AC3,
   DAIKIN64,
   AIRWELL,
+  DELONGHI_AC,  // 80
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = AIRWELL,
+  kLastDecodeType = DELONGHI_AC,
 };
 
 // Message lengths & required repeat values
@@ -775,6 +783,8 @@ const uint16_t kDaikin176DefaultRepeat = kNoRepeat;
 const uint16_t kDaikin216StateLength = 27;
 const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
 const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
+const uint16_t kDelonghiAcBits = 64;
+const uint16_t kDelonghiAcDefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
 const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;

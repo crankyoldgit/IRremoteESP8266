@@ -689,6 +689,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 56;
     case AMCOR:
     case PIONEER:
+    case DELONGHI_AC:
       return 64;
     case ARGO:
       return kArgoBits;
@@ -798,6 +799,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_DAIKIN64
     case DAIKIN64:
       sendDaikin64(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_DELONGHI_AC
+    case DELONGHI_AC:
+      sendDelonghiAc(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_DENON
