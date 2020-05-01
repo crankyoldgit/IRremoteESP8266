@@ -217,7 +217,7 @@ class IRHaierAC {
 
 #if SEND_HAIER_AC
   void send(const uint16_t repeat = kHaierAcDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HAIER_AC
   void begin(void);
 

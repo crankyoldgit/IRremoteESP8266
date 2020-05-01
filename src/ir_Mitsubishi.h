@@ -159,7 +159,7 @@ class IRMitsubishiAC {
   static bool validChecksum(const uint8_t* data);
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI_AC
   void begin(void);
   void on(void);
@@ -217,7 +217,7 @@ class IRMitsubishi136 {
   void stateReset(void);
 #if SEND_MITSUBISHI136
   void send(const uint16_t repeat = kMitsubishi136MinRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI136
   void begin(void);
   static bool validChecksum(const uint8_t* data,
@@ -267,7 +267,7 @@ class IRMitsubishi112 {
   void stateReset(void);
 #if SEND_MITSUBISHI112
   void send(const uint16_t repeat = kMitsubishi112MinRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI112
   void begin(void);
   void on(void);

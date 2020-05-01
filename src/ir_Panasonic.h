@@ -102,7 +102,7 @@ class IRPanasonicAc {
   void stateReset(void);
 #if SEND_PANASONIC
   void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_PANASONIC
   void begin(void);
   void on(void);

@@ -86,7 +86,7 @@ class IRAmcorAc {
   void stateReset();
 #if SEND_AMCOR
   void send(const uint16_t repeat = kAmcorDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_AMCOR
   void begin();
   static uint8_t calcChecksum(const uint8_t state[],
