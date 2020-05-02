@@ -3692,10 +3692,10 @@ TEST(TestDaikin64Class, HumanReadable) {
 }
 
 TEST(TestDecodeDaikin64, Issue1092) {
-   IRsendTest irsend(kGpioUnused);
-   IRrecv irrecv(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
 
-   uint16_t rawData[137] = {
+  uint16_t rawData[137] = {
       9792, 9786, 9818, 9860, 4600, 2532, 338, 422, 332, 950, 362, 950, 360,
       378, 354, 954, 386, 378, 334, 376, 356, 382, 360, 380, 364, 946, 354, 410,
       334, 380, 364, 972, 328, 386, 358, 380, 364, 374, 358, 380, 362, 376, 356,
@@ -3707,19 +3707,19 @@ TEST(TestDecodeDaikin64, Issue1092) {
       358, 380, 364, 374, 358, 952, 360, 380, 362, 376, 356, 382, 382, 928, 362,
       376, 356, 20348, 4628};  // UNKNOWN C508A32A
 
-   irsend.begin();
-   irsend.reset();
-   irsend.sendRaw(rawData, 137, kDaikin64Freq);
-   irsend.makeDecodeResult();
-   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-   ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
-   ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
-   EXPECT_EQ(0x4426161600001216, irsend.capture.value);
-   EXPECT_EQ(
-       "Power Toggle: Off, Mode: 2 (Cool), Temp: 26C, Fan: 1 (Auto), "
-       "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
-       "Clock: 00:00, On Timer: Off, Off Timer: Off",
-       IRAcUtils::resultAcToString(&irsend.capture));
-   stdAc::state_t result, prev;
-   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
- }
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 137, kDaikin64Freq);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::DAIKIN64, irsend.capture.decode_type);
+  ASSERT_EQ(kDaikin64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x4426161600001216, irsend.capture.value);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 2 (Cool), Temp: 26C, Fan: 1 (Auto), "
+      "Turbo: Off, Quiet: Off, Swing(V): Off, Sleep: Off, "
+      "Clock: 00:00, On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}

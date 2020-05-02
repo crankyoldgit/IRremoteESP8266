@@ -102,11 +102,23 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
 #define MQTT_CLIMATE_JSON false
+
 // Use Home Assistant-style operation modes.
-// i.e. Change the climate mode to "off" when turning the power "off".
+// TL;DR: Power and Mode are linked together. One changes the other.
+// i.e.
+//  - When power is set to "off", the mode is set to "off".
+//  - When the mode changes from "off" to something else, power is set to "on".
 // See: https://www.home-assistant.io/components/climate.mqtt/#modes
-// Change to false, if your home automation system doesn't like this.
+// *** WARNING ***
+// This setting will cause IRMQTTServer to forget what the previous operation
+// mode was. e.g. a power "on" -> "off" -> "on" will cause it to use the
+// default mode for your A/C, not the previous mode.
+// Typically this is "Auto" or "Cool" mode.
+// Change to false, if your home automation system doesn't like this, or if
+// you want IRMQTTServer to be the authoritative source for controling your
+// A/C.
 #define MQTT_CLIMATE_HA_MODE true
+
 // Do we send an IR message when we reboot and recover the existing A/C state?
 // If set to `false` you may miss requested state changes while the ESP was
 // down. If set to `true`, it will resend the previous desired state sent to the
@@ -239,7 +251,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.4.9"
+#define _MY_VERSION_ "v1.5.0-alpha"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds

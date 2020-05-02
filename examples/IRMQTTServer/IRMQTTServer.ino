@@ -2964,40 +2964,47 @@ void updateClimate(stdAc::state_t *state, const String str,
     *state = jsonToState(*state, payload.c_str());
   else
 #endif  // MQTT_CLIMATE_JSON
-  if (str.equals(prefix + KEY_PROTOCOL))
+  if (str.equals(prefix + KEY_PROTOCOL)) {
     state->protocol = strToDecodeType(payload.c_str());
-  else if (str.equals(prefix + KEY_MODEL))
+  } else if (str.equals(prefix + KEY_MODEL)) {
     state->model = IRac::strToModel(payload.c_str());
-  else if (str.equals(prefix + KEY_POWER))
+  } else if (str.equals(prefix + KEY_POWER)) {
     state->power = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_MODE))
+#if MQTT_CLIMATE_HA_MODE
+    if (!state->power) state->mode = stdAc::opmode_t::kOff;
+#endif  // MQTT_CLIMATE_HA_MODE
+  } else if (str.equals(prefix + KEY_MODE)) {
     state->mode = IRac::strToOpmode(payload.c_str());
-  else if (str.equals(prefix + KEY_TEMP))
+#if MQTT_CLIMATE_HA_MODE
+    state->power = (state->mode != stdAc::opmode_t::kOff);
+#endif  // MQTT_CLIMATE_HA_MODE
+  } else if (str.equals(prefix + KEY_TEMP)) {
     state->degrees = payload.toFloat();
-  else if (str.equals(prefix + KEY_FANSPEED))
+  } else if (str.equals(prefix + KEY_FANSPEED)) {
     state->fanspeed = IRac::strToFanspeed(payload.c_str());
-  else if (str.equals(prefix + KEY_SWINGV))
+  } else if (str.equals(prefix + KEY_SWINGV)) {
     state->swingv = IRac::strToSwingV(payload.c_str());
-  else if (str.equals(prefix + KEY_SWINGH))
+  } else if (str.equals(prefix + KEY_SWINGH)) {
     state->swingh = IRac::strToSwingH(payload.c_str());
-  else if (str.equals(prefix + KEY_QUIET))
+  } else if (str.equals(prefix + KEY_QUIET)) {
     state->quiet = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_TURBO))
+  } else if (str.equals(prefix + KEY_TURBO)) {
     state->turbo = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_ECONO))
+  } else if (str.equals(prefix + KEY_ECONO)) {
     state->econo = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_LIGHT))
+  } else if (str.equals(prefix + KEY_LIGHT)) {
     state->light = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_BEEP))
+  } else if (str.equals(prefix + KEY_BEEP)) {
     state->beep = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_FILTER))
+  } else if (str.equals(prefix + KEY_FILTER)) {
     state->filter = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_CLEAN))
+  } else if (str.equals(prefix + KEY_CLEAN)) {
     state->clean = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_CELSIUS))
+  } else if (str.equals(prefix + KEY_CELSIUS)) {
     state->celsius = IRac::strToBool(payload.c_str());
-  else if (str.equals(prefix + KEY_SLEEP))
+  } else if (str.equals(prefix + KEY_SLEEP)) {
     state->sleep = payload.toInt();
+  }
 }
 
 bool sendClimate(const String topic_prefix, const bool retain,
