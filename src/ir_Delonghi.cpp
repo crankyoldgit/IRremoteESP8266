@@ -6,6 +6,7 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
+#include <algorithm>
 
 using irutils::addBoolToString;
 using irutils::addModeToString;
