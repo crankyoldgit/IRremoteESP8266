@@ -251,7 +251,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.5.0-alpha"
+#define _MY_VERSION_ "v1.5.0"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
