@@ -11,7 +11,9 @@
 using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
+using irutils::addLabeledString;
 using irutils::addTempToString;
+using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -310,6 +312,35 @@ bool IRDelonghiAc::getSleep(void) {
   return GETBIT64(remote_state, kDelonghiAcSleepBit);
 }
 
+void IRDelonghiAc::setTimerEnabled(const bool on) {
+  setBit(&remote_state, kDelonghiAcTimerEnableBit, on);
+}
+
+bool IRDelonghiAc::getTimerEnabled(void) {
+  return GETBIT64(remote_state, kDelonghiAcTimerEnableBit);
+}
+
+// Set the On timer to activate in nr of minutes.
+// Args:
+//   nr_of_mins: Total nr of mins to wait before waking the device.
+//               (Max 23 hrs and 59 minutes. i.e. 1439 mins)
+void IRDelonghiAc::setOnTimer(const uint16_t nr_of_mins) {
+  uint16_t value = std::min(kDelonghiAcTimerMax, nr_of_mins);
+  setBits(&remote_state, kDelonghiAcOnTimerMinsOffset, kDelonghiAcMinsSize,
+          value % 60);  // Minutes.
+  setBits(&remote_state, kDelonghiAcOnTimerHoursOffset, kDelonghiAcHoursSize,
+          value / 60);  // Hours.
+  // Enable or not?
+  setTimerEnabled(getTimerEnabled() || value);
+}
+
+uint16_t IRDelonghiAc::getOnTimer(void) {
+  return GETBITS64(remote_state, kDelonghiAcOnTimerHoursOffset,
+                   kDelonghiAcHoursSize) * 60 +
+      GETBITS64(remote_state, kDelonghiAcOnTimerMinsOffset,
+                      kDelonghiAcMinsSize);
+}
+
 // Convert the A/C state to it's common equivalent.
 stdAc::state_t IRDelonghiAc::toCommon(void) {
   stdAc::state_t result;
@@ -348,5 +379,8 @@ String IRDelonghiAc::toString(void) {
   result += addTempToString(getTemp(), !getTempUnit());
   result += addBoolToString(getBoost(), kTurboStr);
   result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getTimerEnabled(), kTimerStr);
+  uint16_t mins = getOnTimer();
+  result += addLabeledString(mins ? minsToString(mins) : kOffStr, kOnTimerStr);
   return result;
 }

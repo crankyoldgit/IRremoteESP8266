@@ -75,8 +75,18 @@ const uint8_t kDelonghiAcDry =    0b001;
 const uint8_t kDelonghiAcFan =    0b010;
 const uint8_t kDelonghiAcAuto =   0b100;
 const uint8_t kDelonghiAcBoostBit = kDelonghiAcModeOffset +
-    kDelonghiAcModeSize;  // 17 (Aka Turbo)
-const uint8_t kDelonghiAcSleepBit = kDelonghiAcBoostBit + 1;  // 18
+    kDelonghiAcModeSize;  // 20 (Aka Turbo)
+const uint8_t kDelonghiAcSleepBit = kDelonghiAcBoostBit + 1;  // 21
+// Two zero bits
+const uint8_t kDelonghiAcTimerEnableBit = kDelonghiAcSleepBit + 3;  // 24
+const uint8_t kDelonghiAcHoursSize = 5;  // Max 23 hrs
+const uint8_t kDelonghiAcMinsSize = 6;  // Max 59 mins
+const uint16_t kDelonghiAcTimerMax = 23 * 60 + 59;
+const uint8_t kDelonghiAcOnTimerHoursOffset = kDelonghiAcTimerEnableBit +
+    1;  // 25
+const uint8_t kDelonghiAcOnTimerMinsOffset = kDelonghiAcOnTimerHoursOffset +
+    kDelonghiAcHoursSize + 2;  // 32  (inc another two zero bits)
+// Next available bit is kDelonghiAcOnTimerMinsOffset + kDelonghiAcMinsSize = 38
 const uint8_t kDelonghiAcChecksumOffset = 56;
 const uint8_t kDelonghiAcChecksumSize = 8;
 
@@ -112,6 +122,10 @@ class IRDelonghiAc {
   bool getBoost();  // Aka Turbo
   void setSleep(const bool on);
   bool getSleep();
+  void setTimerEnabled(const bool on);
+  bool getTimerEnabled(void);
+  void setOnTimer(const uint16_t nr_of_mins);
+  uint16_t getOnTimer(void);
   uint64_t getRaw();
   void setRaw(const uint64_t state);
   uint8_t convertMode(const stdAc::opmode_t mode);

@@ -67,7 +67,7 @@ TEST(TestDecodeDelonghiAc, RealExample) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 3 (Low), Temp: 90F, "
-      "Turbo: Off, Sleep: Off",
+      "Turbo: Off, Sleep: Off, Timer: On, On Timer: 06:13",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -263,4 +263,38 @@ TEST(TestIRDelonghiAcClass, Sleep) {
   EXPECT_TRUE(ac.getSleep());
   ac.setSleep(false);
   EXPECT_FALSE(ac.getSleep());
+}
+
+TEST(TestIRDelonghiAcClass, OnTimer) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTimerEnabled(false);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  ac.setTimerEnabled(true);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  ac.setTimerEnabled(false);
+  EXPECT_FALSE(ac.getTimerEnabled());
+
+  ac.setOnTimer(0);
+  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOnTimer(1);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(1, ac.getOnTimer());
+
+  ac.setOnTimer(61);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(61, ac.getOnTimer());
+
+  ac.setTimerEnabled(false);
+  ac.setOnTimer(23 * 60 + 59);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
+
+  ac.setTimerEnabled(false);
+  ac.setOnTimer(24 * 60);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
 }
