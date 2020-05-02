@@ -13,7 +13,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DELONGHI_AC", typeToString(decode_type_t::DELONGHI_AC));
   ASSERT_EQ(decode_type_t::DELONGHI_AC, strToDecodeType("DELONGHI_AC"));
   ASSERT_FALSE(hasACState(decode_type_t::DELONGHI_AC));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DELONGHI_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DELONGHI_AC));
   ASSERT_EQ(kDelonghiAcBits, IRsend::defaultBits(decode_type_t::DELONGHI_AC));
   ASSERT_EQ(kDelonghiAcDefaultRepeat,
             IRsend::minRepeats(decode_type_t::DELONGHI_AC));
@@ -65,4 +65,202 @@ TEST(TestDecodeDelonghiAc, RealExample) {
   EXPECT_EQ(0x6900000D0D01FB53, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Cool), Fan: 3 (Low), Temp: 90F, "
+      "Turbo: Off, Sleep: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Tests for IRDelonghiAc class.
+
+TEST(TestIRDelonghiAcClass, Power) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+
+  // Ref:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1096#issuecomment-622521726
+  ac.setRaw(0x5500000000010153);  // Power on
+  EXPECT_TRUE(ac.getPower());
+  ac.setRaw(0x5400000000000153);  // Power off
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRDelonghiAcClass, Temperature) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  // Celsius
+  ac.setTemp(0);
+  EXPECT_EQ(kDelonghiAcTempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDelonghiAcTempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMinC);
+  EXPECT_EQ(kDelonghiAcTempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMaxC);
+  EXPECT_EQ(kDelonghiAcTempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMinC - 1);
+  EXPECT_EQ(kDelonghiAcTempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMaxC + 1);
+  EXPECT_EQ(kDelonghiAcTempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(29, false);
+  EXPECT_EQ(29, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  // Fahrenheit
+  ac.setTemp(0, true);
+  EXPECT_EQ(kDelonghiAcTempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(255, true);
+  EXPECT_EQ(kDelonghiAcTempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMinF, true);
+  EXPECT_EQ(kDelonghiAcTempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMaxF, true);
+  EXPECT_EQ(kDelonghiAcTempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMinF - 1, true);
+  EXPECT_EQ(kDelonghiAcTempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghiAcTempMaxF + 1, true);
+  EXPECT_EQ(kDelonghiAcTempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(66, true);
+  EXPECT_EQ(66, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(75, true);
+  EXPECT_EQ(75, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(80, true);
+  EXPECT_EQ(80, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(88, true);
+  EXPECT_EQ(88, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+}
+
+TEST(TestIRDelonghiAcClass, OperatingMode) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kDelonghiAcAuto);
+  EXPECT_EQ(kDelonghiAcAuto, ac.getMode());
+  EXPECT_EQ(17, ac.getTemp());  // Check for special temp
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());  // Look for fan speed enforcement
+
+  ac.setMode(kDelonghiAcCool);
+  EXPECT_EQ(kDelonghiAcCool, ac.getMode());
+
+  ac.setMode(kDelonghiAcDry);
+  EXPECT_EQ(kDelonghiAcDry, ac.getMode());
+  EXPECT_EQ(17, ac.getTemp());  // Check for special temp
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());  // Look for fan speed enforcement
+
+  ac.setMode(kDelonghiAcFan);
+  EXPECT_EQ(kDelonghiAcFan, ac.getMode());
+  EXPECT_EQ(23, ac.getTemp());  // Check for special temp
+  EXPECT_NE(kDelonghiAcFanAuto, ac.getFan());  // Look for fan speed enforcement
+
+  ac.setMode(kDelonghiAcAuto + 1);
+  EXPECT_EQ(kDelonghiAcAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDelonghiAcAuto, ac.getMode());
+}
+
+TEST(TestIRDelonghiAcClass, FanSpeed) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(0);
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());
+
+  ac.setFan(kDelonghiAcFanHigh);
+  EXPECT_EQ(kDelonghiAcFanHigh, ac.getFan());
+
+  ac.setFan(kDelonghiAcFanLow + 1);
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(2);
+  EXPECT_EQ(2, ac.getFan());
+
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
+}
+
+TEST(TestIRDelonghiAcClass, Boost) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setBoost(false);
+  EXPECT_FALSE(ac.getBoost());
+  ac.setBoost(true);
+  EXPECT_TRUE(ac.getBoost());
+  ac.setBoost(false);
+  EXPECT_FALSE(ac.getBoost());
+}
+
+TEST(TestIRDelonghiAcClass, Sleep) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
 }

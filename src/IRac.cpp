@@ -126,6 +126,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN64
     case decode_type_t::DAIKIN64:
 #endif
+#if SEND_DELONGHI_AC
+    case decode_type_t::DELONGHI_AC:
+#endif
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
 #endif
@@ -487,6 +490,22 @@ void IRac::daikin64(IRDaikin64 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN64
+
+#if SEND_DELONGHI_AC
+void IRac::delonghiac(IRDelonghiAc *ac,
+                  const bool on, const stdAc::opmode_t mode, const bool celsius,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const bool turbo, const int16_t sleep) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->setBoost(turbo);
+  ac->setSleep(sleep >= 0);
+  ac->send();
+}
+#endif  // SEND_DELONGHI_AC
 
 #if SEND_ELECTRA_AC
 void IRac::electra(IRElectraAc *ac,
@@ -1459,6 +1478,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN64
+#if SEND_DELONGHI_AC
+    case DELONGHI_AC:
+    {
+      IRDelonghiAc ac(_pin, _inverted, _modulation);
+      delonghiac(&ac, send.power, send.mode, send.celsius, degC, send.fanspeed,
+                 send.turbo, send.sleep);
+      break;
+    }
+#endif  // SEND_DELONGHI_AC
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
     {
@@ -2107,7 +2135,14 @@ namespace IRAcUtils {
         ac.setRaw(result->value);  // Daikin64 uses value instead of state.
         return ac.toString();
       }
-#endif  // DECODE_DAIKIN216
+#endif  // DECODE_DAIKIN64
+#if DECODE_DELONGHI_AC
+      case decode_type_t::DELONGHI_AC: {
+        IRDelonghiAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // DelonghiAc uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_DELONGHI_AC
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(0);
@@ -2420,6 +2455,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_DAIKIN64
+#if DECODE_DELONGHI_AC
+      case decode_type_t::DELONGHI_AC: {
+        IRDelonghiAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DELONGHI_AC
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(kGpioUnused);

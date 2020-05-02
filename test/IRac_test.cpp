@@ -4,6 +4,7 @@
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
 #include "ir_Daikin.h"
+#include "ir_Delonghi.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
@@ -374,6 +375,31 @@ TEST(TestIRac, Daikin64) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(DAIKIN64, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDaikin64Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, DelonghiAc) {
+  IRDelonghiAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 0 (Cool), Fan: 2 (Medium), Temp: 77F, "
+      "Turbo: On, Sleep: On";
+
+  ac.begin();
+  irac.delonghiac(&ac,
+                true,                        // Power
+                stdAc::opmode_t::kCool,      // Mode
+                false,                       // Celsius (i.e. Fahrenheit)
+                77,                          // Degrees (F)
+                stdAc::fanspeed_t::kMedium,  // Fan Speed
+                true,                        // Turbo
+                360);                        // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(decode_type_t::DELONGHI_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kDelonghiAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
