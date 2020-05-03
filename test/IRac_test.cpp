@@ -384,7 +384,7 @@ TEST(TestIRac, DelonghiAc) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 0 (Cool), Fan: 2 (Medium), Temp: 77F, "
-      "Turbo: On, Sleep: On, Timer: Off, On Timer: Off";
+      "Turbo: On, Sleep: On, On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.delonghiac(&ac,

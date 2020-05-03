@@ -67,7 +67,7 @@ TEST(TestDecodeDelonghiAc, RealExample) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 3 (Low), Temp: 90F, "
-      "Turbo: Off, Sleep: Off, Timer: On, On Timer: 06:13",
+      "Turbo: Off, Sleep: Off, On Timer: 06:13, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -287,32 +287,66 @@ TEST(TestIRDelonghiAcClass, OnTimer) {
   IRDelonghiAc ac(kGpioUnused);
   ac.begin();
 
-  ac.setTimerEnabled(false);
-  EXPECT_FALSE(ac.getTimerEnabled());
-  ac.setTimerEnabled(true);
-  EXPECT_TRUE(ac.getTimerEnabled());
-  ac.setTimerEnabled(false);
-  EXPECT_FALSE(ac.getTimerEnabled());
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(true);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
 
   ac.setOnTimer(0);
-  EXPECT_FALSE(ac.getTimerEnabled());
+  EXPECT_FALSE(ac.getOnTimerEnabled());
   EXPECT_EQ(0, ac.getOnTimer());
 
   ac.setOnTimer(1);
-  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
   EXPECT_EQ(1, ac.getOnTimer());
 
   ac.setOnTimer(61);
-  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
   EXPECT_EQ(61, ac.getOnTimer());
 
-  ac.setTimerEnabled(false);
+  ac.setOnTimerEnabled(false);
   ac.setOnTimer(23 * 60 + 59);
-  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
   EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
 
-  ac.setTimerEnabled(false);
+  ac.setOnTimerEnabled(false);
   ac.setOnTimer(24 * 60);
-  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
   EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
+}
+
+TEST(TestIRDelonghiAcClass, OffTimer) {
+  IRDelonghiAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(true);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+
+  ac.setOffTimer(0);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(1);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(1, ac.getOffTimer());
+
+  ac.setOffTimer(61);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(61, ac.getOffTimer());
+
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(23 * 60 + 59);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
+
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(24 * 60);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
 }

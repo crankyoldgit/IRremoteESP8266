@@ -321,12 +321,12 @@ bool IRDelonghiAc::getSleep(void) {
   return GETBIT64(remote_state, kDelonghiAcSleepBit);
 }
 
-void IRDelonghiAc::setTimerEnabled(const bool on) {
-  setBit(&remote_state, kDelonghiAcTimerEnableBit, on);
+void IRDelonghiAc::setOnTimerEnabled(const bool on) {
+  setBit(&remote_state, kDelonghiAcOnTimerEnableBit, on);
 }
 
-bool IRDelonghiAc::getTimerEnabled(void) {
-  return GETBIT64(remote_state, kDelonghiAcTimerEnableBit);
+bool IRDelonghiAc::getOnTimerEnabled(void) {
+  return GETBIT64(remote_state, kDelonghiAcOnTimerEnableBit);
 }
 
 // Set the On timer to activate in nr of minutes.
@@ -340,13 +340,42 @@ void IRDelonghiAc::setOnTimer(const uint16_t nr_of_mins) {
   setBits(&remote_state, kDelonghiAcOnTimerHoursOffset, kDelonghiAcHoursSize,
           value / 60);  // Hours.
   // Enable or not?
-  setTimerEnabled(getTimerEnabled() || value);
+  setOnTimerEnabled(value > 0);
 }
 
 uint16_t IRDelonghiAc::getOnTimer(void) {
   return GETBITS64(remote_state, kDelonghiAcOnTimerHoursOffset,
                    kDelonghiAcHoursSize) * 60 +
       GETBITS64(remote_state, kDelonghiAcOnTimerMinsOffset,
+                      kDelonghiAcMinsSize);
+}
+
+void IRDelonghiAc::setOffTimerEnabled(const bool on) {
+  setBit(&remote_state, kDelonghiAcOffTimerEnableBit, on);
+}
+
+bool IRDelonghiAc::getOffTimerEnabled(void) {
+  return GETBIT64(remote_state, kDelonghiAcOffTimerEnableBit);
+}
+
+// Set the Off timer to activate in nr of minutes.
+// Args:
+//   nr_of_mins: Total nr of mins to wait before waking the device.
+//               (Max 23 hrs and 59 minutes. i.e. 1439 mins)
+void IRDelonghiAc::setOffTimer(const uint16_t nr_of_mins) {
+  uint16_t value = std::min(kDelonghiAcTimerMax, nr_of_mins);
+  setBits(&remote_state, kDelonghiAcOffTimerMinsOffset, kDelonghiAcMinsSize,
+          value % 60);  // Minutes.
+  setBits(&remote_state, kDelonghiAcOffTimerHoursOffset, kDelonghiAcHoursSize,
+          value / 60);  // Hours.
+  // Enable or not?
+  setOffTimerEnabled(value > 0);
+}
+
+uint16_t IRDelonghiAc::getOffTimer(void) {
+  return GETBITS64(remote_state, kDelonghiAcOffTimerHoursOffset,
+                   kDelonghiAcHoursSize) * 60 +
+      GETBITS64(remote_state, kDelonghiAcOffTimerMinsOffset,
                       kDelonghiAcMinsSize);
 }
 
@@ -388,8 +417,13 @@ String IRDelonghiAc::toString(void) {
   result += addTempToString(getTemp(), !getTempUnit());
   result += addBoolToString(getBoost(), kTurboStr);
   result += addBoolToString(getSleep(), kSleepStr);
-  result += addBoolToString(getTimerEnabled(), kTimerStr);
   uint16_t mins = getOnTimer();
-  result += addLabeledString(mins ? minsToString(mins) : kOffStr, kOnTimerStr);
+  result += addLabeledString((mins && getOnTimerEnabled()) ? minsToString(mins)
+                                                           : kOffStr,
+                             kOnTimerStr);
+  mins = getOffTimer();
+  result += addLabeledString((mins && getOffTimerEnabled()) ? minsToString(mins)
+                                                            : kOffStr,
+                             kOffTimerStr);
   return result;
 }

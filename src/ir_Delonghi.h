@@ -78,16 +78,24 @@ const uint8_t kDelonghiAcBoostBit = kDelonghiAcModeOffset +
     kDelonghiAcModeSize;  // 20 (Aka Turbo)
 const uint8_t kDelonghiAcSleepBit = kDelonghiAcBoostBit + 1;  // 21
 // Two zero bits
-const uint8_t kDelonghiAcTimerEnableBit = kDelonghiAcSleepBit + 3;  // 24
+const uint8_t kDelonghiAcOnTimerEnableBit = kDelonghiAcSleepBit + 3;  // 24
 const uint8_t kDelonghiAcHoursSize = 5;  // Max 23 hrs
 const uint8_t kDelonghiAcMinsSize = 6;  // Max 59 mins
 const uint16_t kDelonghiAcTimerMax = 23 * 60 + 59;
-const uint8_t kDelonghiAcOnTimerHoursOffset = kDelonghiAcTimerEnableBit +
+const uint8_t kDelonghiAcOnTimerHoursOffset = kDelonghiAcOnTimerEnableBit +
     1;  // 25
 const uint8_t kDelonghiAcOnTimerMinsOffset = kDelonghiAcOnTimerHoursOffset +
     kDelonghiAcHoursSize + 2;  // 32  (inc another two zero bits)
-// Next available bit is kDelonghiAcOnTimerMinsOffset + kDelonghiAcMinsSize = 38
-const uint8_t kDelonghiAcChecksumOffset = 56;
+// Two zero bits
+const uint8_t kDelonghiAcOffTimerEnableBit = kDelonghiAcOnTimerMinsOffset +
+    kDelonghiAcMinsSize + 2;  // 40
+const uint8_t kDelonghiAcOffTimerHoursOffset = kDelonghiAcOffTimerEnableBit +
+    1;  // 41
+const uint8_t kDelonghiAcOffTimerMinsOffset = kDelonghiAcOffTimerHoursOffset +
+    kDelonghiAcHoursSize + 2;  // 48  (inc another two zero bits)
+// Two zero bits
+const uint8_t kDelonghiAcChecksumOffset = kDelonghiAcOffTimerMinsOffset +
+    kDelonghiAcMinsSize + 2;  // 56
 const uint8_t kDelonghiAcChecksumSize = 8;
 
 
@@ -122,10 +130,14 @@ class IRDelonghiAc {
   bool getBoost();  // Aka Turbo
   void setSleep(const bool on);
   bool getSleep();
-  void setTimerEnabled(const bool on);
-  bool getTimerEnabled(void);
+  void setOnTimerEnabled(const bool on);
+  bool getOnTimerEnabled(void);
   void setOnTimer(const uint16_t nr_of_mins);
   uint16_t getOnTimer(void);
+  void setOffTimerEnabled(const bool on);
+  bool getOffTimerEnabled(void);
+  void setOffTimer(const uint16_t nr_of_mins);
+  uint16_t getOffTimer(void);
   uint64_t getRaw();
   void setRaw(const uint64_t state);
   uint8_t convertMode(const stdAc::opmode_t mode);
