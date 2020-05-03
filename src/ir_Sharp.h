@@ -110,9 +110,9 @@ class IRSharpAc {
   bool isPowerSpecial(void);
   void setTemp(const uint8_t temp, const bool save = true);
   uint8_t getTemp(void);
-  void setFan(const uint8_t fan);
+  void setFan(const uint8_t fan, const bool save = true);
   uint8_t getFan(void);
-  void setMode(const uint8_t mode);
+  void setMode(const uint8_t mode, const bool save = true);
   uint8_t getMode(void);
   void setSpecial(const uint8_t mode);
   uint8_t getSpecial(void);
@@ -150,13 +150,16 @@ class IRSharpAc {
 #endif
   // # of bytes per command
   uint8_t remote[kSharpAcStateLength];
-  uint8_t _prevtemp;
+  uint8_t _temp;  // Saved copy of the desired temp.
+  uint8_t _mode;  // Saved copy of the desired mode.
+  uint8_t _fan;  // Saved copy of the desired fan speed.
   void stateReset(void);
   void checksum(void);
   static uint8_t calcChecksum(uint8_t state[],
                               const uint16_t length = kSharpAcStateLength);
   void setPowerSpecial(const uint8_t value);
   uint8_t getPowerSpecial(void);
+  void clearPowerSpecial(void);
 };
 
 #endif  // IR_SHARP_H_

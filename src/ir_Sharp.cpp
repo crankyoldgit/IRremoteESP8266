@@ -325,7 +325,9 @@ void IRSharpAc::stateReset(void) {
       0xAA, 0x5A, 0xCF, 0x10, 0x00, 0x01, 0x00, 0x00, 0x08, 0x80, 0x00, 0xE0,
       0x01};
   memcpy(remote, reset, kSharpAcStateLength);
-  _prevtemp = getTemp();
+  _temp = getTemp();
+  _mode = getMode();
+  _fan = getFan();
 }
 
 uint8_t *IRSharpAc::getRaw(void) {
@@ -347,6 +349,12 @@ uint8_t IRSharpAc::getPowerSpecial(void) {
                   kSharpAcPowerSetSpecialOffset, kSharpAcPowerSpecialSize);
 }
 
+// Clear the "special"/non-normal bits in the power section.
+// e.g. for normal/common command modes.
+void IRSharpAc::clearPowerSpecial(void) {
+  setPowerSpecial(getPowerSpecial() & kSharpAcPowerOn);
+}
+
 bool IRSharpAc::isPowerSpecial(void) {
   switch (getPowerSpecial()) {
     case kSharpAcPowerSetSpecialOff:
@@ -363,6 +371,8 @@ void IRSharpAc::off(void) { setPower(false); }
 void IRSharpAc::setPower(const bool on, const bool prev_on) {
   setPowerSpecial(on ? (prev_on ? kSharpAcPowerOn : kSharpAcPowerOnFromOff)
                      : kSharpAcPowerOff);
+  // Power operations are incompatible with clean mode.
+  if (getClean()) setClean(false);
   setSpecial(kSharpAcSpecialPower);
 }
 
@@ -408,10 +418,11 @@ void IRSharpAc::setTemp(const uint8_t temp, const bool save) {
   }
   uint8_t degrees = std::max(temp, kSharpAcMinTemp);
   degrees = std::min(degrees, kSharpAcMaxTemp);
-  if (save) _prevtemp = degrees;
+  if (save) _temp = degrees;
   setBits(&remote[kSharpAcByteTemp], kLowNibble, kNibbleSize,
           degrees - kSharpAcMinTemp);
   setSpecial(kSharpAcSpecialTempEcono);
+  clearPowerSpecial();
 }
 
 uint8_t IRSharpAc::getTemp(void) {
@@ -423,26 +434,32 @@ uint8_t IRSharpAc::getMode(void) {
   return GETBITS8(remote[kSharpAcByteMode], kLowNibble, kSharpAcModeSize);
 }
 
-void IRSharpAc::setMode(const uint8_t mode) {
+void IRSharpAc::setMode(const uint8_t mode, const bool save) {
   switch (mode) {
     case kSharpAcAuto:
     case kSharpAcDry:
-      this->setFan(kSharpAcFanAuto);  // When Dry or Auto, Fan always 2(Auto)
+      // When Dry or Auto, Fan always 2(Auto)
+      this->setFan(kSharpAcFanAuto, false);
       // FALLTHRU
     case kSharpAcCool:
     case kSharpAcHeat:
       setBits(&remote[kSharpAcByteMode], kLowNibble, kSharpAcModeSize, mode);
       break;
     default:
-      this->setMode(kSharpAcAuto);
+      this->setMode(kSharpAcAuto, save);
+      return;
   }
   // Dry/Auto have no temp setting. This step will enforce it.
-  this->setTemp(_prevtemp, false);
+  this->setTemp(_temp, false);
+  // Save the mode in case we need to revert to it. eg. Clean
+  if (save) _mode = mode;
+
   setSpecial(kSharpAcSpecialPower);
+  clearPowerSpecial();
 }
 
 // Set the speed of the fan
-void IRSharpAc::setFan(const uint8_t speed) {
+void IRSharpAc::setFan(const uint8_t speed, const bool save) {
   switch (speed) {
     case kSharpAcFanAuto:
     case kSharpAcFanMin:
@@ -454,8 +471,11 @@ void IRSharpAc::setFan(const uint8_t speed) {
       break;
     default:
       this->setFan(kSharpAcFanAuto);
+      return;
   }
+  if (save) _fan = speed;
   setSpecial(kSharpAcSpecialFan);
+  clearPowerSpecial();
 }
 
 uint8_t IRSharpAc::getFan(void) {
@@ -467,6 +487,9 @@ bool IRSharpAc::getTurbo(void) {
          (getSpecial() == kSharpAcSpecialTurbo);
 }
 
+// Note: If you use this method, you will need to send it before making
+//       other changes to the settings, as they may overright some of the bits
+//       used by this setting.
 void IRSharpAc::setTurbo(const bool on) {
   if (on) setFan(kSharpAcFanMax);
   setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
@@ -490,6 +513,7 @@ bool IRSharpAc::getIon(void) {
 
 void IRSharpAc::setIon(const bool on) {
   setBit(&remote[kSharpAcByteIon], kSharpAcBitIonOffset, on);
+  clearPowerSpecial();
   if (on) setSpecial(kSharpAcSpecialSwing);
 }
 
@@ -498,6 +522,7 @@ bool IRSharpAc::getEconoToggle(void) {
          (getSpecial() == kSharpAcSpecialTempEcono);
 }
 
+// Warning: Probably incompatible with `setTurbo()`
 void IRSharpAc::setEconoToggle(const bool on) {
   if (on) setSpecial(kSharpAcSpecialTempEcono);
   setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
@@ -548,11 +573,19 @@ bool IRSharpAc::getClean(void) {
   return GETBIT8(remote[kSharpAcByteClean], kSharpAcBitCleanOffset);
 }
 
-// Note: A/C unit needs to be "Off" before clean mode can be entered.
+// Note: Officially A/C unit needs to be "Off" before clean mode can be entered.
 void IRSharpAc::setClean(const bool on) {
   // Clean mode appears to be just default dry mode, with an extra bit set.
-  if (on) setMode(kSharpAcDry);
+  if (on) {
+    setMode(kSharpAcDry, false);
+    setPower(true, false);
+  } else {
+    // Restore the previous operation mode & fan speed.
+    setMode(_mode, false);
+    setFan(_fan, false);
+  }
   setBit(&remote[kSharpAcByteClean], kSharpAcBitCleanOffset, on);
+  clearPowerSpecial();
 }
 
 // Convert a standard A/C mode into its native mode.

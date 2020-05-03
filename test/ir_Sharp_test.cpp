@@ -1016,4 +1016,52 @@ TEST(TestSharpAcClass, Clean) {
   // Try constructing the clean on state.
   ac.setClean(true);
   EXPECT_STATE_EQ(clean_on_state, ac.getRaw(), kSharpAcBits);
+
+  // Try to replicate the exact sequence of commands to activate clean mode
+  // and compare it to captured values from the real remote.
+  // Ref:
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1091#issuecomment-622378747
+  ac.stateReset();
+  // AC OFF (Mode Cool, Temp 25, Ion OFF, Fan 7)
+  ac.setMode(kSharpAcCool);
+  ac.setIon(false);
+  ac.setTemp(25);
+  ac.setFan(7);
+  ac.setPower(false);
+  EXPECT_EQ(
+    "Power: Off, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    ac.toString());
+  // Clean ON
+  ac.setClean(true);
+  EXPECT_EQ(
+    "Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: On",
+    ac.toString());
+  // Clean OFF (state is identical to `off_msg`).
+  // i.e. It just clears the clean settings & turns off the device.
+  ac.setClean(false);
+  ac.setPower(false, true);
+  EXPECT_EQ(
+    "Power: Off, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    ac.toString());
+  // Clean ON
+  ac.setClean(true);
+  EXPECT_EQ(
+    "Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: On",
+    ac.toString());
+  // AC OFF
+  ac.off();
+  EXPECT_EQ(
+    "Power: Off, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    ac.toString());
+  // AC ON (Mode Cool, Temp 25, Ion OFF, Fan 7)
+  ac.on();
+  EXPECT_EQ(
+    "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), Turbo: Off, "
+    "Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    ac.toString());
 }
