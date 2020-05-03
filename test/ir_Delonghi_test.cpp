@@ -197,6 +197,14 @@ TEST(TestIRDelonghiAcClass, OperatingMode) {
 
   ac.setMode(kDelonghiAcCool);
   EXPECT_EQ(kDelonghiAcCool, ac.getMode());
+  // Check changing to another mode that has a fixed temp and back keeps the
+  // existing temp. Only for Cool mode.
+  ac.setTemp(22);
+  EXPECT_EQ(22, ac.getTemp());
+  ac.setMode(kDelonghiAcAuto);
+  EXPECT_NE(22, ac.getTemp());
+  ac.setMode(kDelonghiAcCool);
+  EXPECT_EQ(22, ac.getTemp());
 
   ac.setMode(kDelonghiAcDry);
   EXPECT_EQ(kDelonghiAcDry, ac.getMode());
@@ -218,6 +226,7 @@ TEST(TestIRDelonghiAcClass, OperatingMode) {
 TEST(TestIRDelonghiAcClass, FanSpeed) {
   IRDelonghiAc ac(kGpioUnused);
   ac.begin();
+  ac.setMode(kDelonghiAcCool);  // All fan speeds available in this mode.
 
   ac.setFan(0);
   EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());
@@ -239,6 +248,15 @@ TEST(TestIRDelonghiAcClass, FanSpeed) {
 
   ac.setFan(3);
   EXPECT_EQ(3, ac.getFan());
+
+  // Confirm changing to fan mode handles speed behaviour correctly.
+  ac.setFan(kDelonghiAcFanLow);
+  ac.setMode(kDelonghiAcFan);
+  EXPECT_EQ(kDelonghiAcFanLow, ac.getFan());
+  ac.setMode(kDelonghiAcAuto);
+  EXPECT_EQ(kDelonghiAcFanAuto, ac.getFan());
+  ac.setMode(kDelonghiAcFan);
+  EXPECT_NE(kDelonghiAcFanAuto, ac.getFan());
 }
 
 TEST(TestIRDelonghiAcClass, Boost) {

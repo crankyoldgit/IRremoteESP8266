@@ -142,6 +142,8 @@ class IRDelonghiAc {
   IRsendTest _irsend;
 #endif
   uint64_t remote_state;  // The state of the IR remote.
+  uint8_t _saved_temp;  // The previously user requested temp value.
+  uint8_t _saved_temp_units;  // The previously user requested temp units.
   void checksum(void);
 };
 #endif  // IR_DELONGHI_H_

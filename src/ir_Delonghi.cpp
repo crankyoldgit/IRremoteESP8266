@@ -133,7 +133,11 @@ void IRDelonghiAc::checksum(void) {
           calcChecksum(remote_state));
 }
 
-void IRDelonghiAc::stateReset(void) { remote_state = 0x5400000000000153; }
+void IRDelonghiAc::stateReset(void) {
+  remote_state = 0x5400000000000153;
+  _saved_temp = 23;  // DegC  (Random reasonable default value)
+  _saved_temp_units = 0;  // Celsius
+}
 
 uint64_t IRDelonghiAc::getRaw(void) {
   checksum();  // Ensure correct bit array before returning
@@ -177,7 +181,10 @@ void IRDelonghiAc::setTemp(const uint8_t degrees, const bool fahrenheit,
       temp_max = kDelonghiAcTempMaxF;
     }
     temp = std::max(temp_min, degrees);
-    temp = std::min(temp_max, temp) - temp_min + 1;
+    temp = std::min(temp_max, temp);
+    _saved_temp = temp;
+    _saved_temp_units = fahrenheit;
+    temp = temp - temp_min + 1;
   }
   setBits(&remote_state, kDelonghiAcTempOffset, kDelonghiAcTempSize,
           temp);
@@ -195,7 +202,7 @@ void IRDelonghiAc::setFan(const uint8_t speed) {
     case kDelonghiAcFan:
       // Fan mode can't have auto fan speed.
       if (speed == kDelonghiAcFanAuto) {
-        setFan(kDelonghiAcFanHigh);
+        if (getFan() == kDelonghiAcFanAuto) setFan(kDelonghiAcFanHigh);
         return;
       }
       break;
@@ -268,6 +275,8 @@ void IRDelonghiAc::setMode(const uint8_t mode) {
   }
   setBits(&remote_state, kDelonghiAcModeOffset, kDelonghiAcModeSize, mode);
   setFan(getFan());  // Re-force any fan speed constraints.
+  // Restore previous temp settings for cool mode.
+  if (mode == kDelonghiAcCool) setTemp(_saved_temp, _saved_temp_units);
 }
 
 // Convert a standard A/C mode into its native mode.
