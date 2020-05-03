@@ -349,4 +349,14 @@ TEST(TestIRDelonghiAcClass, OffTimer) {
   ac.setOffTimer(24 * 60);
   EXPECT_TRUE(ac.getOffTimerEnabled());
   EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
+
+  // Real Data
+  // From: https://github.com/crankyoldgit/IRremoteESP8266/issues/1096#issuecomment-623115619
+  // Setting off timer to 8:51 when the time on the remote displayed 16:05.
+  // (8:51 + 24:00 - 16:05 == 32:51 - 16:05 == 16:46) i.e. Turn off in 16h46m.
+  ac.setRaw(0xB12E210000000F53);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(16 * 60 + 46, ac.getOffTimer());
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  EXPECT_EQ(0, ac.getOnTimer());
 }
