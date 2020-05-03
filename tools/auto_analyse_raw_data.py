@@ -425,27 +425,25 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
       "// Function should be safe up to 64 bits.",
-      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
-      " const bool strict) {" % def_name,
-      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
+      "bool IRrecv::decode%s(decode_results *results, uint16_t offset,"
+      " const uint16_t nbits, const bool strict) {" % def_name,
+      "  if (results->rawlen < 2 * nbits + k%sOverhead - offset)" % name,
       "    return false;  // Too short a message to match.",
       "  if (strict && nbits != k%sBits)" % name,
       "    return false;",
       "",
-      "  uint16_t offset = kStartOffset;",
       "  uint64_t data = 0;",
       "  match_result_t data_result;"])
   code["recv64+"].extend([
       "#if DECODE_%s" % def_name.upper(),
       "// Function should be safe over 64 bits.",
-      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
-      " const bool strict) {" % def_name,
-      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
+      "bool IRrecv::decode%s(decode_results *results, uint16_t offset,"
+      " const uint16_t nbits, const bool strict) {" % def_name,
+      "  if (results->rawlen < 2 * nbits + k%sOverhead - offset)" % name,
       "    return false;  // Too short a message to match.",
       "  if (strict && nbits != k%sBits)" % name,
       "    return false;",
       "",
-      "  uint16_t offset = kStartOffset;",
       "  uint16_t pos = 0;",
       "  uint16_t used = 0;"])
 
