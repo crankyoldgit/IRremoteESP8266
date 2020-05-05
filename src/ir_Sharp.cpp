@@ -488,7 +488,7 @@ bool IRSharpAc::getTurbo(void) {
 }
 
 // Note: If you use this method, you will need to send it before making
-//       other changes to the settings, as they may overright some of the bits
+//       other changes to the settings, as they may overwrite some of the bits
 //       used by this setting.
 void IRSharpAc::setTurbo(const bool on) {
   if (on) setFan(kSharpAcFanMax);
