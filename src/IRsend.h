@@ -582,6 +582,11 @@ class IRsend {
                     const uint16_t repeat = kNoRepeat);
   uint64_t encodeDoshisha(const uint8_t command, const uint8_t channel = 0);
 #endif  // SEND_DOSHISHA
+#if SEND_MULTIBRACKETS
+  void sendMultibrackets(const uint64_t data,
+                         const uint16_t nbits = kMultibracketsBits,
+                         const uint16_t repeat = kMultibracketsDefaultRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

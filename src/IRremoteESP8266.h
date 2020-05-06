@@ -614,6 +614,12 @@
 #define SEND_DOSHISHA         _IR_ENABLE_DEFAULT_
 #endif  // SEND_DOSHISHA
 
+#ifndef DECODE_MULTIBRACKETS
+#define DECODE_MULTIBRACKETS  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_MULTIBRACKETS
+#ifndef SEND_MULTIBRACKETS
+#define SEND_MULTIBRACKETS    _IR_ENABLE_DEFAULT_
+#endif  // SEND_MULTIBRACKETS
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -743,8 +749,9 @@ enum decode_type_t {
   AIRWELL,
   DELONGHI_AC,  // 80
   DOSHISHA,
+  MULTIBRACKETS,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DOSHISHA,
+  kLastDecodeType = MULTIBRACKETS,
 };
 
 // Message lengths & required repeat values
@@ -871,6 +878,8 @@ const uint16_t kMitsubishiHeavy88MinRepeat = kNoRepeat;
 const uint16_t kMitsubishiHeavy152StateLength = 19;
 const uint16_t kMitsubishiHeavy152Bits = kMitsubishiHeavy152StateLength * 8;
 const uint16_t kMitsubishiHeavy152MinRepeat = kNoRepeat;
+const uint16_t kMultibracketsBits = 8;
+const uint16_t kMultibracketsDefaultRepeat = kSingleRepeat;
 const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
 const uint16_t kNeoclimaStateLength = 12;

@@ -797,6 +797,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Doshisha decode");
     if (decodeDoshisha(results, offset)) return true;
 #endif  // DECODE_DOSHISHA
+#if DECODE_MULTIBRACKETS
+    DPRINTLN("Attempting Multibrackets decode");
+    if (decodeMultibrackets(results, offset)) return true;
+#endif  // DECODE_MULTIBRACKETS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

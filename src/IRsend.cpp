@@ -607,6 +607,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case MITSUBISHI:
     case MITSUBISHI2:
     case MITSUBISHI_AC:
+    case MULTIBRACKETS:
     case SHERWOOD:
     case SYMPHONY:
     case TOSHIBA_AC:
@@ -634,6 +635,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 //   int16_t:  The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
+    case MULTIBRACKETS:
+      return 8;
     case SYMPHONY:
       return 11;
     case RC5:
@@ -894,6 +897,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_MITSUBISHI2
     case MITSUBISHI2:
       sendMitsubishi2(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_MULTIBRACKETS
+    case MULTIBRACKETS:
+      sendMultibrackets(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_NIKAI
