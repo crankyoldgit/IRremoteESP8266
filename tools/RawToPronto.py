@@ -4,26 +4,10 @@
 # Copyright 2020 David Conran
 import argparse
 import sys
+from auto_analyse_raw_data import convert_rawdata
 
-def convert_rawdata(data_str):
-  """Parse a C++ rawdata declaration into a list of values."""
-  start = data_str.find('{')
-  end = data_str.find('}')
-  if end == -1:
-    end = len(data_str)
-  if start > end:
-    raise ValueError("Raw Data not parsible due to parentheses placement.")
-  data_str = data_str[start + 1:end]
-  results = []
-  for timing in [x.strip() for x in data_str.split(',')]:
-    try:
-      results.append(int(timing))
-    except ValueError:
-      raise ValueError(
-          "Raw Data contains a non-numeric value of '%s'." % timing)
-  return results
 
-def parse_and_report(rawdata_str, hz, verbose, output=sys.stdout):
+def parse_and_report(rawdata_str, hertz, verbose, output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
 
   # Parse the input.
@@ -33,11 +17,11 @@ def parse_and_report(rawdata_str, hz, verbose, output=sys.stdout):
 
   result = ["0000"]
   # Work out the frequency code.
-  pronto_freq = int(1000000.0 / (hz * 0.241246))
+  pronto_freq = int(1000000.0 / (hertz * 0.241246))
   if verbose:
-    output.write("Pronto frequency is %X (%d Hz).\n" % (pronto_freq, hz))
+    output.write("Pronto frequency is %X (%d Hz).\n" % (pronto_freq, hertz))
   result.append("%04X" % pronto_freq)
-  period = 1000000.0/max(1, hz)
+  period = 1000000.0/max(1, hertz)
   if verbose:
     output.write("Pronto period is %f uSecs.\n" % period)
   # Add the lengths to the code.
@@ -58,9 +42,10 @@ def main():
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   arg_parser.add_argument(
       "--hz",
+      "--hertz",
       type=int,
       help="Frequency of the protocol to use in code generation. E.g. 38000Hz",
-      dest="hz",
+      dest="hertz",
       required=True)
   arg_parser.add_argument(
       "-v",
@@ -93,7 +78,7 @@ def main():
       data = input_file.read()
   else:
     data = arg_options.rawdata
-  parse_and_report(data, arg_options.hz, arg_options.verbose)
+  parse_and_report(data, arg_options.hertz, arg_options.verbose)
 
 
 if __name__ == '__main__':
