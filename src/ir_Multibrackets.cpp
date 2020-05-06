@@ -64,7 +64,7 @@ void IRsend::sendMultibrackets(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
 //
-// Status: ALPHA / Not yet working.
+// Status: BETA / Appears to be working.
 //
 // Ref:
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1103

@@ -78,3 +78,21 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kMultibracketsDefaultRepeat,
             IRsend::minRepeats(decode_type_t::MULTIBRACKETS));
 }
+
+TEST(TestDecodeMultibrackets, ShortNoRepeatExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  // The 1 + ok keypress: (edited to be bare minimum)
+  uint16_t rawData[3] = {20100, 20472, 15092};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 3, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(decode_type_t::MULTIBRACKETS, irsend.capture.decode_type);
+  ASSERT_EQ(kMultibracketsBits, irsend.capture.bits);
+  EXPECT_EQ(0x87, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+}
