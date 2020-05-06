@@ -8,7 +8,7 @@ import argparse
 import sys
 
 
-class RawIRMessage():
+class RawIRMessage(object):
   """Basic analyse functions & structure for raw IR messages."""
 
   # pylint: disable=too-many-instance-attributes
@@ -679,6 +679,34 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
     for line in code["recv64+"]:
       output.write("%s\n" % line)
 
+def add_rawdata_args(parser):
+  """Add the arguments for feeding in the rawdata string(s)."""
+  arg_group = parser.add_mutually_exclusive_group(required=True)
+  arg_group.add_argument(
+      "rawdata",
+      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
+      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
+      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
+      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
+      nargs="?")
+  arg_group.add_argument(
+      "-f", "--file", help="Read in a rawData line from the file.")
+  arg_group.add_argument(
+      "--stdin",
+      help="Read in a rawData line from STDIN.",
+      action="store_true",
+      default=False)
+
+def get_rawdata(arg_options):
+  """Return the rawdata string(s) as per the options."""
+  if arg_options.stdin:
+    return sys.stdin.read()
+  elif arg_options.file:
+    with open(arg_options.file) as input_file:
+      return input_file.read()
+  else:
+    return arg_options.rawdata
+
 
 def main():
   """Parse the commandline arguments and call the method."""
@@ -699,16 +727,6 @@ def main():
       help="Name of the protocol/device to use in code generation. E.g. Onkyo",
       dest="name",
       default="")
-  arg_group = arg_parser.add_mutually_exclusive_group(required=True)
-  arg_group.add_argument(
-      "rawdata",
-      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
-      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
-      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
-      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
-      nargs="?")
-  arg_group.add_argument(
-      "-f", "--file", help="Read in a rawData line from the file.")
   arg_parser.add_argument(
       "-r",
       "--range",
@@ -717,22 +735,11 @@ def main():
       " it the same value.",
       dest="margin",
       default=200)
-  arg_group.add_argument(
-      "--stdin",
-      help="Read in a rawData line from STDIN.",
-      action="store_true",
-      default=False)
+  add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
 
-  if arg_options.stdin:
-    data = sys.stdin.read()
-  elif arg_options.file:
-    with open(arg_options.file) as input_file:
-      data = input_file.read()
-  else:
-    data = arg_options.rawdata
-  parse_and_report(data, arg_options.margin, arg_options.gen_code,
-                   arg_options.name)
+  parse_and_report(get_rawdata(arg_options), arg_options.margin,
+                   arg_options.gen_code, arg_options.name)
 
 
 if __name__ == '__main__':

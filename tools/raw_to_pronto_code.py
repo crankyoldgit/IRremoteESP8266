@@ -4,7 +4,7 @@
 # Copyright 2020 David Conran
 import argparse
 import sys
-from auto_analyse_raw_data import convert_rawdata
+from auto_analyse_raw_data import convert_rawdata, add_rawdata_args, get_rawdata
 
 
 def parse_and_report(rawdata_str, hertz, verbose, output=sys.stdout):
@@ -54,31 +54,10 @@ def main():
       action="store_true",
       dest="verbose",
       default=False)
-  arg_group = arg_parser.add_mutually_exclusive_group(required=True)
-  arg_group.add_argument(
-      "rawdata",
-      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
-      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
-      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
-      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
-      nargs="?")
-  arg_group.add_argument(
-      "-f", "--file", help="Read in a rawData line from the file.")
-  arg_group.add_argument(
-      "--stdin",
-      help="Read in a rawData line from STDIN.",
-      action="store_true",
-      default=False)
+  add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
-
-  if arg_options.stdin:
-    data = sys.stdin.read()
-  elif arg_options.file:
-    with open(arg_options.file) as input_file:
-      data = input_file.read()
-  else:
-    data = arg_options.rawdata
-  parse_and_report(data, arg_options.hertz, arg_options.verbose)
+  parse_and_report(get_rawdata(arg_options), arg_options.hertz,
+                   arg_options.verbose)
 
 
 if __name__ == '__main__':
