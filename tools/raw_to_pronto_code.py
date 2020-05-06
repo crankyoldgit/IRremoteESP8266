@@ -15,7 +15,8 @@ def parse_and_report(rawdata_str, hertz, end_usecs, verbose, output=sys.stdout):
   if verbose:
     output.write("Found %d timing entries.\n" % len(rawdata))
 
-  if end_usecs > 0:
+  # Do we need to pad out the rawdata to make it even in length?
+  if end_usecs > 0 and len(rawdata) % 2 == 1:
     rawdata.append(end_usecs)
 
   result = ["0000"]
@@ -24,7 +25,7 @@ def parse_and_report(rawdata_str, hertz, end_usecs, verbose, output=sys.stdout):
   if verbose:
     output.write("Pronto frequency is %X (%d Hz).\n" % (pronto_freq, hertz))
   result.append("%04X" % pronto_freq)
-  period = 1000000.0/max(1, hertz)
+  period = 1000000.0 / max(1, hertz)
   if verbose:
     output.write("Pronto period is %f uSecs.\n" % period)
   # Add the lengths to the code.
@@ -32,6 +33,8 @@ def parse_and_report(rawdata_str, hertz, end_usecs, verbose, output=sys.stdout):
   result.append("%04X" % 0)  # Repeat (not used by this program)
 
   # Add the data.
+  if verbose:
+    output.write("Raw data: %s " % rawdata)
   for i in rawdata:
     result.append("%04X" % int(i / period))
   output.write("Pronto code = '%s'\n" % " ".join(result))
