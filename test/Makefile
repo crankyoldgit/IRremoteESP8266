@@ -40,7 +40,7 @@ TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
   ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test IRac_test \
 	ir_MitsubishiHeavy_test ir_Trotec_test ir_Argo_test ir_Goodweather_test \
 	ir_Inax_test ir_Neoclima_test ir_Amcor_test ir_Epson_test ir_Symphony_test \
-  ir_Airwell_test
+  ir_Airwell_test ir_Delonghi_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -86,7 +86,7 @@ PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
 	ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
 	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o ir_Argo.o \
 	ir_Trotec.o ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Neoclima.o \
-  ir_Amcor.o ir_Epson.o ir_Symphony.o ir_Airwell.o
+  ir_Amcor.o ir_Epson.o ir_Symphony.o ir_Airwell.o ir_Delonghi.o
 
 # All the IR Protocol header files.
 PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
@@ -100,6 +100,7 @@ PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
 		$(USER_DIR)/ir_Midea.h \
 		$(USER_DIR)/ir_Toshiba.h \
 		$(USER_DIR)/ir_Daikin.h \
+		$(USER_DIR)/ir_Delonghi.h \
 		$(USER_DIR)/ir_Goodweather.h \
 		$(USER_DIR)/ir_Kelvinator.h \
 		$(USER_DIR)/ir_Mitsubishi.h \
@@ -650,4 +651,13 @@ ir_Airwell_test.o : ir_Airwell_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Airwell_test.cpp
 
 ir_Airwell_test : $(COMMON_OBJ) ir_Airwell_test.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+ir_Delonghi.o : $(USER_DIR)/ir_Delonghi.h $(USER_DIR)/ir_Delonghi.cpp $(COMMON_DEPS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_Delonghi.cpp
+
+ir_Delonghi_test.o : ir_Delonghi_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Delonghi_test.cpp
+
+ir_Delonghi_test : $(COMMON_OBJ) ir_Delonghi_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

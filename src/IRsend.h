@@ -573,6 +573,10 @@ class IRsend {
   void sendAirwell(uint64_t data, uint16_t nbits = kAirwellBits,
                    uint16_t repeat = kAirwellMinRepeats);
 #endif
+#if SEND_DELONGHI_AC
+  void sendDelonghiAc(uint64_t data, uint16_t nbits = kDelonghiAcBits,
+                      uint16_t repeat = kDelonghiAcDefaultRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

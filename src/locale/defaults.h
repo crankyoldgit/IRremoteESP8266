@@ -492,6 +492,9 @@
 #endif  // D_STR_DAIKIN216
 #ifndef D_STR_DAIKIN64
 #define D_STR_DAIKIN64 "DAIKIN64"
+#ifndef D_STR_DELONGHI_AC
+#define D_STR_DELONGHI_AC "DELONGHI_AC"
+#endif  // D_STR_DELONGHI_AC
 #endif  // D_STR_DAIKIN64
 #ifndef D_STR_DENON
 #define D_STR_DENON "DENON"
