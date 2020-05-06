@@ -7,13 +7,16 @@ import sys
 from auto_analyse_raw_data import convert_rawdata, add_rawdata_args, get_rawdata
 
 
-def parse_and_report(rawdata_str, hertz, verbose, output=sys.stdout):
+def parse_and_report(rawdata_str, hertz, end_usecs, verbose, output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
 
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
   if verbose:
     output.write("Found %d timing entries.\n" % len(rawdata))
+
+  if end_usecs > 0:
+    rawdata.append(end_usecs)
 
   result = ["0000"]
   # Work out the frequency code.
@@ -25,7 +28,7 @@ def parse_and_report(rawdata_str, hertz, verbose, output=sys.stdout):
   if verbose:
     output.write("Pronto period is %f uSecs.\n" % period)
   # Add the lengths to the code.
-  result.append("%04X" % len(rawdata))  # Initial burst
+  result.append("%04X" % int(len(rawdata) / 2))  # Initial burst
   result.append("%04X" % 0)  # Repeat (not used by this program)
 
   # Add the data.
@@ -48,6 +51,13 @@ def main():
       dest="hertz",
       required=True)
   arg_parser.add_argument(
+      "--gap",
+      "--endgap",
+      type=int,
+      help="Nr. of uSeconds of gap to add to the end of the message.",
+      dest="usecs",
+      default=100000)
+  arg_parser.add_argument(
       "-v",
       "--verbose",
       help="Increase output verbosity",
@@ -57,7 +67,7 @@ def main():
   add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
   parse_and_report(get_rawdata(arg_options), arg_options.hertz,
-                   arg_options.verbose)
+                   arg_options.usecs, arg_options.verbose)
 
 
 if __name__ == '__main__':

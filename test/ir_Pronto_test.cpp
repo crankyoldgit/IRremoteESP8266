@@ -391,3 +391,23 @@ TEST(TestSendPronto, Issue1034) {
   EXPECT_EQ(0xa3, irsend.capture.address);
   EXPECT_EQ(0x10, irsend.capture.command);
 }
+
+// Tests for #1103
+TEST(TestSendPronto, Issue1103) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+  // Based on raw data:
+  //   uint16_t rawData[7] = {20100, 20472, 15092, 30704, 20102, 20472, 15086};
+  // and output from `raw_to_pronto_code.py --hz 38000`:
+  // Pronto code = '0000 006D 0004 0000 02FB 0309 023D 048E 02FB 0309 023D 0ED8'
+  uint16_t pronto_test[12] = {
+      0x0000, 0x006D, 0x0004, 0x0000, 0x02FB, 0x0309, 0x023D, 0x048E,
+      0x02FB, 0x0309, 0x023D, 0x0ED8};
+  irsend.reset();
+  irsend.sendPronto(pronto_test, 12);
+  EXPECT_EQ(
+      "f38028d50m19838s20202m14898s30316m19838s20202m14898s98800",
+      irsend.outputStr());
+  // Which matches the `rawData` above.
+}
