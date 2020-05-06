@@ -30,7 +30,7 @@ def parse_and_report(rawdata_str, hertz, verbose, output=sys.stdout):
 
   # Add the data.
   for i in rawdata:
-    result.append("%04X" % (int(i) / period))
+    result.append("%04X" % int(i / period))
   output.write("Pronto code = '%s'\n" % " ".join(result))
 
 
