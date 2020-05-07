@@ -50,6 +50,7 @@
 | [Mitsubishi](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Mitsubishi.cpp) | **[Mitsubishi](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Mitsubishi.h)** | HC3000 Projector<BR>KM14A 0179213 remote<BR>MS-GK24VA A/C<BR>TV |  | Yes |
 | [Mitsubishi](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Mitsubishi.cpp) | **[Mitsubishi Electric](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Mitsubishi.h)** | 001CP T7WE10714 remote<BR>KPOA remote<BR>MSH-A24WV / MUH-A24WV A/C<BR>PEAD-RP71JAA Ducted A/C |  | Yes |
 | [MitsubishiHeavy](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_MitsubishiHeavy.cpp) | **[Mitsubishi Heavy Industries](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_MitsubishiHeavy.h)** | RKX502A001C remote<BR>RLA502A700B remote<BR>SRKxxZJ-S A/C<BR>SRKxxZM-S A/C<BR>SRKxxZMXA-S A/C |  | Yes |
+| [Multibrackets](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Multibrackets.cpp) | **Multibrackets** | Motorized Swing mount large - 4500 |  | - |
 | [NEC](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.cpp) | **[Aloka](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.h)** | SleepyLights LED Lamp |  | - |
 | [NEC](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.cpp) | **[Toshiba](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.h)** | 42TL838 LCD TV |  | - |
 | [NEC](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.cpp) | **[Yamaha](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_NEC.h)** | RAV561 remote<BR>RXV585B A/V Receiver |  | - |
@@ -134,6 +135,7 @@
 - MITSUBISHI_AC
 - MITSUBISHI_HEAVY_152
 - MITSUBISHI_HEAVY_88
+- MULTIBRACKETS
 - MWM
 - NEC
 - NEC_LIKE

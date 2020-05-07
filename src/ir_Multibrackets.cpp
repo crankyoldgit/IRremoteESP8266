@@ -6,13 +6,13 @@
 // Multibrackets protocol.
 //
 // Supports:
-//   Brand: Multibrackets,  Model: Motorized Swing mount large (4500)
+//   Brand: Multibrackets,  Model: Motorized Swing mount large - 4500
 
-const uint8_t kMultibracketsOverhead = 4;
 const uint16_t kMultibracketsTick = 5000;  // uSeconds
 const uint16_t kMultibracketsHdrMark = 3 * kMultibracketsTick;  // uSeconds
 const uint16_t kMultibracketsFooterSpace = 6 * kMultibracketsTick;  // uSeconds
 const uint8_t kMultibracketsTolerance = 5;  // Percent
+const uint16_t kMultibracketsFreq = 38000;  // Hertz
 
 #if SEND_MULTIBRACKETS
 // Send a Miltibrackets formatted message.
@@ -29,7 +29,7 @@ const uint8_t kMultibracketsTolerance = 5;  // Percent
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1103
 //  http://info.multibrackets.com/data/common/manuals/4500_code.pdf
 void IRsend::sendMultibrackets(uint64_t data, uint16_t nbits, uint16_t repeat) {
-  enableIROut(38000);
+  enableIROut(kMultibracketsFreq);
   for (uint16_t r = 0; r <= repeat; r++) {
     uint16_t bits = nbits;
     // Header
@@ -75,31 +75,28 @@ bool IRrecv::decodeMultibrackets(decode_results *results, uint16_t offset,
   if (strict && nbits != kMultibracketsBits)
     return false;  // Doesn't match our protocol defn.
 
+  // Check there is enough unprocessed buffer left.
   if (results->rawlen < offset) return false;
+
   // Header
   int32_t remaining = *(results->rawbuf + offset);
   if (!matchAtLeast(remaining, kMultibracketsHdrMark, kMultibracketsTolerance))
     return false;
-  remaining -= (kMultibracketsHdrMark / kRawTick);
+  remaining -= (kMultibracketsHdrMark / kRawTick);  // Remove the header.
+
+  // We are done with the header. Onto the data.
   bool bit = true;
   uint16_t bitsSoFar = 0;
   uint64_t data = 0;
-
-
-  // We are done with the header. Onto the data.
   // Keep going till we run out of message or expected bits.
   while (offset <= results->rawlen && bitsSoFar < nbits) {
-    // Have we finished processing this rawbuf point?
+    // Have we finished processing this rawbuf value yet?
     if (remaining <= 0) {  // No more possible "bits" left in this value.
       // Invert the bit for next time, and move along the rawbuf.
       bit = !bit;
       offset++;
-      if (offset > results->rawlen) {
-        break;  // End of buffer. No more to process
-      } else {
-        // Load the next data point.
-        remaining = *(results->rawbuf + offset);
-      }
+      // Load the next data point if there is one.
+      if (offset <= results->rawlen) remaining = *(results->rawbuf + offset);
     } else {  // Look for more bits in this entry.
       if (matchAtLeast(remaining, kMultibracketsTick,
           kMultibracketsTolerance)) {  // There is!
@@ -112,9 +109,7 @@ bool IRrecv::decodeMultibrackets(decode_results *results, uint16_t offset,
   }
 
   // Compliance
-  if (bitsSoFar != nbits) {
-    return false;
-  }
+  if (bitsSoFar != nbits) return false;
 
   // Footer
   if (results->rawlen <= offset && !matchAtLeast(*(results->rawbuf + offset),
