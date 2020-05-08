@@ -1309,6 +1309,92 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                        tolerance, excess, MSBfirst);
 }
 
+// Match & decode a generic/typical constant bit time <= 64bit IR message.
+// The data is stored at result_ptr.
+// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
+// that requirement.
+//
+// Args:
+//   data_ptr: A pointer to where we are at in the capture buffer.
+//   result_ptr: A pointer to where to start storing the bits we decoded.
+//   remaining: The size of the capture buffer are remaining.
+//   nbits:        Nr. of data bits we expect.
+//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
+//   hdrspace:     Nr. of uSeconds for the expected header space signal.
+//   one:          Nr. of uSeconds in an expected mark signal for a '1' bit.
+//   zero:         Nr. of uSeconds in an expected mark signal for a '0' bit.
+//   footermark:   Nr. of uSeconds for the expected footer mark signal.
+//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
+//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
+//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
+//   excess:  Nr. of useconds. (Def: kMarkExcess)
+//   MSBfirst: Bit order to save the data in. (Def: true)
+// Returns:
+//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+//
+// Note: one + zero add up to the total time for a bit.
+// e.g. mark(one) + space(zero) is a `1`, mark(zero) + space(one) is a `0`.
+uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
+                                          uint64_t *result_ptr,
+                                          const uint16_t remaining,
+                                          const uint16_t nbits,
+                                          const uint16_t hdrmark,
+                                          const uint32_t hdrspace,
+                                          const uint16_t one,
+                                          const uint32_t zero,
+                                          const uint16_t footermark,
+                                          const uint32_t footerspace,
+                                          const bool atleast,
+                                          const uint8_t tolerance,
+                                          const int16_t excess,
+                                          const bool MSBfirst) {
+  uint16_t offset = 0;
+  uint64_t result = 0;
+  // If we expect a footermark, then this can be processed like normal.
+  if (footermark)
+    return _matchGeneric(data_ptr, result_ptr, NULL, true, remaining, nbits,
+                         hdrmark, hdrspace, one, zero, zero, one,
+                         footermark, footerspace, atleast,
+                         tolerance, excess, MSBfirst);
+  // Overwise handle like normal, except for the last bit. and no footer.
+  uint16_t bits = (nbits > 0) ? nbits - 1 : 0;  // Make sure we don't underflow.
+  offset = _matchGeneric(data_ptr, &result, NULL, true, remaining, bits,
+                         hdrmark, hdrspace, one, zero, zero, one, 0, 0, false,
+                         tolerance, excess, true);
+  if (!offset) return 0;  // Didn't match.
+  // Now for the last bit.
+  if (remaining <= offset) return 0;  // Not enough buffer.
+  result <<= 1;
+  bool last_bit = 0;
+  // Is the mark a '1' or a `0`?
+  if (matchMark(*(data_ptr + offset), one, tolerance, excess)) {  // 1
+    last_bit = 1;
+    result |= 1;
+  } else if (matchMark(*(data_ptr + offset), zero, tolerance, excess)) {  // 0
+    last_bit = 0;
+  } else {
+    return 0;  // It's neither, so fail.
+  }
+  offset++;
+  uint32_t expected_space = (last_bit ? zero : one) + footerspace;
+  // If we are not at the end of the buffer, check for at least the expected
+  // space value.
+  if (remaining > offset) {
+    if (atleast) {
+      if (!matchAtLeast(*(data_ptr + offset), expected_space, tolerance,
+                        excess))
+        return false;
+    } else {
+      if (!matchSpace(*(data_ptr + offset), expected_space, tolerance))
+        return false;
+    }
+    offset++;
+  }
+  if (!MSBfirst) result = reverseBits(result, nbits);
+  *result_ptr = result;
+  return offset;
+}
+
 // Match & decode a Manchester Code <= 64bit IR message.
 // The data is stored at result_ptr.
 // Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
