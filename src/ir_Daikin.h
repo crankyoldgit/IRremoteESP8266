@@ -444,7 +444,8 @@ const uint16_t kDaikin64LdrMark = kDaikin128LeaderMark;
 const uint16_t kDaikin64Gap = kDaikin128Gap;
 const uint16_t kDaikin64LdrSpace = kDaikin128LeaderSpace;
 const uint16_t kDaikin64Freq = kDaikin128Freq;  // Hz.
-const uint16_t kDaikin64Overhead = 9;
+const uint8_t kDaikin64Overhead = 9;
+const int8_t  kDaikin64ToleranceDelta = 5;  // +5%
 
 const uint64_t kDaikin64KnownGoodState = 0x7C16161607204216;
 const uint8_t kDaikin64ModeOffset = 8;
