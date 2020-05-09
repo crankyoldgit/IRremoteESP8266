@@ -42,17 +42,8 @@ clean :
 
 
 # All the IR protocol object files.
-PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
-            ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o \
-            ir_Denon.o ir_Dish.o ir_Panasonic.o ir_Whynter.o ir_Coolix.o \
-            ir_Aiwa.o ir_Sherwood.o ir_Kelvinator.o ir_Daikin.o ir_Gree.o \
-            ir_Pronto.o ir_GlobalCache.o ir_Nikai.o ir_Toshiba.o ir_Midea.o \
-            ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o ir_Hitachi.o \
-            ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o ir_Pioneer.o \
-            ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o \
-            ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Argo.o \
-            ir_Trotec.o ir_Neoclima.o ir_Amcor.o ir_Epson.o ir_Symphony.o \
-            ir_Airwell.o ir_Delonghi.o
+PROTOCOL_OBJS = $(patsubst %.cpp,%.o,$(wildcard $(USER_DIR)/ir_*.cpp))
+PROTOCOLS = $(patsubst $(USER_DIR)/%,%,$(PROTOCOL_OBJS))
 
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRtext.o IRac.o $(PROTOCOLS)

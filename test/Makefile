@@ -26,21 +26,8 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include -DUNIT_TEST -D_IR_LOCALE_=en-AU
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
 
-# All tests produced by this Makefile.  Remember to add new tests you
-# created to the list.
-TESTS = IRutils_test IRsend_test ir_NEC_test ir_GlobalCache_test \
-        ir_Sherwood_test ir_Sony_test ir_Samsung_test ir_Kelvinator_test \
-        ir_JVC_test ir_RCMM_test ir_LG_test ir_Mitsubishi_test ir_Sharp_test \
-        ir_RC5_RC6_test ir_Panasonic_test ir_Dish_test ir_Whynter_test \
-        ir_Aiwa_test ir_Denon_test ir_Sanyo_test ir_Daikin_test ir_Coolix_test \
-        ir_Gree_test IRrecv_test ir_Pronto_test ir_Fujitsu_test ir_Nikai_test \
-        ir_Toshiba_test ir_Midea_test ir_Magiquest_test ir_Lasertag_test \
-	ir_Carrier_test ir_Haier_test ir_Hitachi_test ir_GICable_test \
-	ir_Whirlpool_test ir_Lutron_test ir_Electra_test ir_Pioneer_test \
-	ir_MWM_test ir_Vestel_test ir_Teco_test ir_Tcl_test ir_Lego_test IRac_test \
-	ir_MitsubishiHeavy_test ir_Trotec_test ir_Argo_test ir_Goodweather_test \
-	ir_Inax_test ir_Neoclima_test ir_Amcor_test ir_Epson_test ir_Symphony_test \
-	ir_Airwell_test ir_Delonghi_test
+# All tests produced by this Makefile. generated from all *_test.cpp files
+TESTS = $(patsubst %.cpp,%,$(wildcard *_test.cpp))
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -78,46 +65,12 @@ install-googletest :
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
 # All the IR protocol object files.
-PROTOCOLS = ir_NEC.o ir_Sony.o ir_Samsung.o ir_JVC.o ir_RCMM.o ir_RC5_RC6.o \
-	ir_LG.o ir_Mitsubishi.o ir_Fujitsu.o ir_Sharp.o ir_Sanyo.o ir_Denon.o ir_Dish.o \
-	ir_Panasonic.o ir_Whynter.o ir_Coolix.o ir_Aiwa.o ir_Sherwood.o \
-	ir_Kelvinator.o ir_Daikin.o ir_Gree.o ir_Pronto.o ir_Nikai.o ir_Toshiba.o \
-	ir_Midea.o ir_Magiquest.o ir_Lasertag.o ir_Carrier.o ir_Haier.o \
-	ir_Hitachi.o ir_GICable.o ir_Whirlpool.o ir_Lutron.o ir_Electra.o \
-	ir_Pioneer.o ir_MWM.o ir_Vestel.o ir_Teco.o ir_Tcl.o ir_Lego.o ir_Argo.o \
-	ir_Trotec.o ir_MitsubishiHeavy.o ir_Goodweather.o ir_Inax.o ir_Neoclima.o \
-	ir_Amcor.o ir_Epson.o ir_Symphony.o ir_Airwell.o ir_Delonghi.o
+PROTOCOL_OBJS = $(patsubst %.cpp,%.o,$(wildcard $(USER_DIR)/ir_*.cpp))
+PROTOCOLS = $(patsubst $(USER_DIR)/%,%,$(PROTOCOL_OBJS))
 
 # All the IR Protocol header files.
-PROTOCOLS_H = $(USER_DIR)/ir_Amcor.h \
-		$(USER_DIR)/ir_Argo.h \
-		$(USER_DIR)/ir_Gree.h \
-		$(USER_DIR)/ir_Magiquest.h \
-		$(USER_DIR)/ir_Coolix.h \
-		$(USER_DIR)/ir_Electra.h \
-		$(USER_DIR)/ir_Haier.h \
-		$(USER_DIR)/ir_Hitachi.h \
-		$(USER_DIR)/ir_Midea.h \
-		$(USER_DIR)/ir_Toshiba.h \
-		$(USER_DIR)/ir_Daikin.h \
-		$(USER_DIR)/ir_Delonghi.h \
-		$(USER_DIR)/ir_Goodweather.h \
-		$(USER_DIR)/ir_Kelvinator.h \
-		$(USER_DIR)/ir_Mitsubishi.h \
-		$(USER_DIR)/ir_MitsubishiHeavy.h \
-		$(USER_DIR)/ir_NEC.h \
-		$(USER_DIR)/ir_Neoclima.h \
-		$(USER_DIR)/ir_Sharp.h \
-		$(USER_DIR)/ir_Samsung.h \
-		$(USER_DIR)/ir_Trotec.h \
-		$(USER_DIR)/ir_Fujitsu.h \
-		$(USER_DIR)/ir_LG.h \
-		$(USER_DIR)/ir_Panasonic.h \
-		$(USER_DIR)/ir_Whirlpool.h \
-		$(USER_DIR)/ir_Vestel.h \
-		$(USER_DIR)/ir_Tcl.h \
-		$(USER_DIR)/ir_Teco.h \
-		$(USER_DIR)/ir_Trotec.h
+PROTOCOLS_H = $(wildcard $(USER_DIR)/ir_*.h)
+
 # Common object files
 COMMON_OBJ = IRutils.o IRtimer.o IRsend.o IRrecv.o IRac.o ir_GlobalCache.o \
              IRtext.o $(PROTOCOLS) gtest_main.a
