@@ -7,6 +7,13 @@
 //   Brand: SamHop,    Model: SM3015 Fan Remote Control
 //   Brand: SamHop,    Model: SM5021 Encoder chip
 //   Brand: SamHop,    Model: SM5032 Decoder chip
+//   Brand: Blyss,     Model: Owen-SW-5 3 Fan
+//   Brand: Blyss,     Model: WP-YK8 090218 remote
+//   Brand: Westinghouse,  Model: Ceiling fan
+//   Brand: Westinghouse,  Model: 78095 Remote
+//   Brand: Satellite Electronic,  Model: ID6 Remote
+//   Brand: Satellite Electronic,  Model: JY199I Fan driver
+//   Brand: Satellite Electronic,  Model: JY199I-L Fan driver
 
 #include <algorithm>
 #include "IRrecv.h"
