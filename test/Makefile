@@ -101,6 +101,9 @@ gtest.a : gtest-all.o
 gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
+# Keep all intermediate files.
+.SECONDARY:
+
 # Builds our test.  A test should link with either gtest.a or
 # gtest_main.a, depending on whether it defines its own main()
 # function.
@@ -138,28 +141,19 @@ IRac.o : $(USER_DIR)/IRac.cpp $(USER_DIR)/IRac.h $(COMMON_DEPS) $(GTEST_HEADERS)
 IRac_test.o : IRac_test.cpp $(USER_DIR)/IRac.h $(COMMON_DEPS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c IRac_test.cpp
 
-ir_Lasertag.o : $(USER_DIR)/ir_Lasertag.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lasertag.cpp
-
-ir_Lasertag_test.o : ir_Lasertag_test.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_Lasertag_test.cpp
-
-ir_Lasertag_test : $(COMMON_OBJ) ir_Lasertag_test.o ir_RC5_RC6.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
-
 # new specific targets goes above this line
 
 ir_%.o : $(USER_DIR)/ir_%.h $(USER_DIR)/ir_%.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_'$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_$*.cpp
 
 ir_%.o : $(USER_DIR)/ir_%.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_'$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_$*.cpp
 
-ir_%_test.o : ir_%_test.cpp $(USER_DIR)/ir_'$*'.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_'$*'_test.cpp
+ir_%_test.o : ir_%_test.cpp $(USER_DIR)/ir_$%.h $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_$*_test.cpp
 
 ir_%_test.o : ir_%_test.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_'$*'_test.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c ir_$*_test.cpp
 
 %_test : $(COMMON_OBJ) %_test.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

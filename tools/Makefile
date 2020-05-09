@@ -41,6 +41,9 @@ clean :
 	rm -f  *.o *.pyc gc_decode mode2_decode
 
 
+# Keep all intermediate files.
+.SECONDARY:
+
 # All the IR protocol object files.
 PROTOCOL_OBJS = $(patsubst %.cpp,%.o,$(wildcard $(USER_DIR)/ir_*.cpp))
 PROTOCOLS = $(patsubst $(USER_DIR)/%,%,$(PROTOCOL_OBJS))
@@ -67,25 +70,19 @@ IRsend.o : $(USER_DIR)/IRsend.cpp $(USER_DIR)/IRsend.h $(USER_DIR)/IRremoteESP82
 IRrecv.o : $(USER_DIR)/IRrecv.cpp $(USER_DIR)/IRrecv.h $(USER_DIR)/IRremoteESP8266.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/IRrecv.cpp
 
-ir_Lasertag.o : $(USER_DIR)/ir_Lasertag.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_Lasertag.cpp
-
-ir_MWM.o : $(USER_DIR)/ir_MWM.cpp $(USER_DIR)/ir_RC5_RC6.cpp $(COMMON_DEPS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/ir_MWM.cpp
-
 # new specific targets goes above this line
 
 %_decode : $(COMMON_OBJ) %_decode.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_%.o : $(USER_DIR)/ir_%.h $(USER_DIR)/ir_%.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_'$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_$*.cpp
 
 ir_%.o : $(USER_DIR)/ir_%.cpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_'$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/ir_$*.cpp
 
 %.o : %.cpp $(COMMON_TEST_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c '$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $*.cpp
 
 %.o : $(USER_DIR)/%.cpp $(USER_DIR)/%.h $(COMMON_DEPS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/'$*'.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(USER_DIR)/$*.cpp
