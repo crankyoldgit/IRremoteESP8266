@@ -64,7 +64,8 @@ const uint16_t kStateSizeMax = 0;
 #endif
 
 // Types
-// information for the interrupt handler
+
+/// Information for the interrupt handler
 typedef struct {
   uint8_t recvpin;   // pin for IR data from detector
   uint8_t rcvstate;  // state machine
@@ -78,7 +79,7 @@ typedef struct {
   uint8_t timeout;   // Nr. of milliSeconds before we give up.
 } irparams_t;
 
-// results from a data match
+/// Results from a data match
 typedef struct {
   bool success;   // Was the match successful?
   uint64_t data;  // The data found.
@@ -87,7 +88,7 @@ typedef struct {
 
 // Classes
 
-// Results returned from the decoder
+/// Results returned from the decoder
 class decode_results {
  public:
   decode_type_t decode_type;  // NEC, SONY, RC5, UNKNOWN
@@ -109,7 +110,7 @@ class decode_results {
   bool repeat;  // Is the result a repeat code?
 };
 
-// main class for receiving IR
+/// Class for receiving IR messages.
 class IRrecv {
  public:
 #if defined(ESP32)

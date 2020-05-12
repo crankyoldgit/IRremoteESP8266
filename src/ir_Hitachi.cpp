@@ -139,9 +139,9 @@ void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
 ///  Hitachi A/C Remote: RAS-22NK
 /// Status: Beta / Probably works.
 /// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
-/// @param data An array of bytes containing the IR command.
-/// @param nbytes Nr. of bytes of data in the array.
-/// @param repeat Nr. of times the message is to be repeated. (Default = 0).
+/// @param[in] data An array of bytes containing the IR command.
+/// @param[in] nbytes Nr. of bytes of data in the array.
+/// @param[in] repeat Nr. of times the message is to be repeated. (Default = 0).
 void IRsend::sendHitachiAc344(const unsigned char data[], const uint16_t nbytes,
                               const uint16_t repeat) {
   if (nbytes < kHitachiAc344StateLength)
@@ -747,14 +747,14 @@ String IRHitachiAc1::toString(void) {
 ///   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 ///   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 ///   https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
-/// @param results Ptr to the data to decode and where to store the result.
-/// @param offset The starting index to use when attempting to decode the raw
-///   data. Typically/Defaults to kStartOffset.
-/// @param nbits The number of data bits to expect.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
 ///   Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
 ///   kHitachiAc344Bits
-/// @param strict Flag indicating if we should perform strict matching.
-/// @param MSBfirst Is the data per byte stored in MSB First (true) or
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @param[in] MSBfirst Is the data per byte stored in MSB First (true) or
 ///   LSB First order(false)?
 /// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
@@ -1353,15 +1353,15 @@ void IRHitachiAc344::stateReset(void) {
 
 #if SEND_HITACHI_AC344
 /// Create and send the IR message to the A/C.
-/// @param repeat Nr. of times to repeat the message.
+/// @param[in] repeat Nr. of times to repeat the message.
 void IRHitachiAc344::send(const uint16_t repeat) {
   _irsend.sendHitachiAc344(getRaw(), kHitachiAc344StateLength, repeat);
 }
 #endif  // SEND_HITACHI_AC344
 
 /// Set the internal state from a valid code for this protocol.
-/// @param new_code A valid code for this protocol.
-/// @param length Size (in bytes) of the code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+/// @param[in] length Size (in bytes) of the code for this protocol.
 void IRHitachiAc344::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kHitachiAc344StateLength));
 }

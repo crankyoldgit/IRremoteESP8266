@@ -42,6 +42,8 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 decode_type_t strToDecodeType(const char *str);
 float celsiusToFahrenheit(const float deg);
 float fahrenheitToCelsius(const float deg);
+/// Namespace for covering common functions & procedures for advancd protocol
+/// handlers
 namespace irutils {
   String addBoolToString(const bool value, const String label,
                          const bool precomma = true);
