@@ -599,10 +599,16 @@ class IRrecv {
                      const bool strict = true);
 #endif  // DECODE_DELONGHI_AC
 #if DECODE_DOSHISHA
-bool decodeDoshisha(decode_results *results, uint16_t offset = kStartOffset,
-                    const uint16_t nbits = kDoshishaBits,
-                    const bool strict = true);
+  bool decodeDoshisha(decode_results *results, uint16_t offset = kStartOffset,
+                      const uint16_t nbits = kDoshishaBits,
+                      const bool strict = true);
 #endif  // DECODE_DOSHISHA
+#if DECODE_MULTIBRACKETS
+  bool decodeMultibrackets(decode_results *results,
+                           uint16_t offset = kStartOffset,
+                           const uint16_t nbits = kMultibracketsBits,
+                           const bool strict = true);
+#endif  // DECODE_MULTIBRACKETS
 };
 
 #endif  // IRRECV_H_
