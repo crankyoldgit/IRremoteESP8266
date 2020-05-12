@@ -66,7 +66,11 @@
 | [Sharp](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Sharp.cpp) | **[Sharp](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Sharp.h)** | AH-AxSAY A/C<BR>AH-XP10NRY A/C<BR>AY-ZP40KR A/C<BR>CRMC-820JBEZ remote<BR>LC-52D62U TV |  | Yes |
 | [Sherwood](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Sherwood.cpp) | **Sherwood** | RC-138 remote<BR>RD6505(B) Receiver |  | - |
 | [Sony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Sony.cpp) | **Sony** | HT-CT380 Soundbar (Uses 38kHz & 3 repeats) |  | - |
+| [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Blyss** | Owen-SW-5 3 Fan<BR>WP-YK8 090218 remote |  | - |
+| [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **SamHop** | SM3015 Fan Remote Control<BR>SM5021 Encoder chip<BR>SM5032 Decoder chip |  | - |
+| [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Satellite Electronic** | ID6 Remote<BR>JY199I Fan driver<BR>JY199I-L Fan driver |  | - |
 | [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Symphony** | Air Cooler 3Di |  | - |
+| [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Westinghouse** | 78095 Remote<BR>Ceiling fan |  | - |
 | [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **[Leberg](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.h)** | LBS-TOR07 A/C |  | Yes |
 | [Teco](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Teco.cpp) | **[Alaska](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Teco.h)** | SAC9010QC A/C<BR>SAC9010QC remote |  | Yes |
 | [Toshiba](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Toshiba.cpp) | **[Toshiba](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Toshiba.h)** | Akita EVO II<BR>RAS 18SKP-ES<BR>RAS-B13N3KV2<BR>RAS-B13N3KVP-E<BR>WC-L03SE<BR>WH-TA04NE |  | Yes |
