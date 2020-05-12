@@ -648,6 +648,12 @@
 #ifndef SEND_MULTIBRACKETS
 #define SEND_MULTIBRACKETS     _IR_ENABLE_DEFAULT_
 #endif  // SEND_MULTIBRACKETS
+#ifndef DECODE_ZEPEAL
+#define DECODE_ZEPEAL          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ZEPEAL
+#ifndef SEND_ZEPEAL
+#define SEND_ZEPEAL            _IR_ENABLE_DEFAULT_
+#endif  // SEND_ZEPEAL
 
 #ifndef DECODE_CORONA_AC
 #define DECODE_CORONA_AC       _IR_ENABLE_DEFAULT_
@@ -794,8 +800,9 @@ enum decode_type_t {
   HITACHI_AC344,  // 85
   CORONA_AC,
   MIDEA24,
+  ZEPEAL,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MIDEA24,
+  kLastDecodeType = ZEPEAL
 };
 
 // Message lengths & required repeat values
@@ -999,6 +1006,8 @@ const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhirlpoolAcDefaultRepeat = kNoRepeat;
 const uint16_t kWhynterBits = 32;
 const uint8_t  kVestelAcBits = 56;
+const uint16_t kZepealBits = 16;
+const uint16_t kZepealMinRepeat = 4;
 
 
 // Legacy defines. (Deprecated)

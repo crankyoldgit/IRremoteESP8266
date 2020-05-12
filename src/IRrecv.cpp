@@ -850,6 +850,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Midea-Nec decode");
     if (decodeMidea24(results, offset)) return true;
 #endif  // DECODE_MIDEA24
+#if DECODE_ZEPEAL
+    DPRINTLN("Attempting Zepeal decode");
+    if (decodeZepeal(results, offset)) return true;
+#endif  // DECODE_ZEPEAL
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
