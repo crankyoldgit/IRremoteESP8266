@@ -6,10 +6,12 @@
 #include "IRutils.h"
 
 // Supports:
-//   Brand: Doshisha,  Model: LED Light CZ-S50D, Remote RCZ01
-//   (RCZ01 Remote also compatible with CZ-S32D / CZ-S38D https://www.doshisha-led.com/SHOP/4550084042961.html)
-
-// https://www.doshisha-led.com/
+//   Brand: Doshisha,  Model: CZ-S32D LED Light
+//   Brand: Doshisha,  Model: CZ-S38D LED Light
+//   Brand: Doshisha,  Model: CZ-S50D LED Light
+//   Brand: Doshisha,  Model: RCZ01 remote
+//
+// Ref: https://www.doshisha-led.com/
 
 const uint16_t kDoshishaHdrMark = 3412;
 const uint16_t kDoshishaHdrSpace = 1722;
