@@ -678,6 +678,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 35;
     case SAMSUNG36:
       return 36;
+    case DOSHISHA:
+      return kDoshishaBits;  // 40
     case SANYO_LC7461:
       return kSanyoLC7461Bits;  // 42
     case GOODWEATHER:
@@ -814,6 +816,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_DISH
     case DISH:
       sendDISH(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_DOSHISHA
+    case DOSHISHA:
+      sendDoshisha(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_EPSON

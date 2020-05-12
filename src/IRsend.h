@@ -577,6 +577,11 @@ class IRsend {
   void sendDelonghiAc(uint64_t data, uint16_t nbits = kDelonghiAcBits,
                       uint16_t repeat = kDelonghiAcDefaultRepeat);
 #endif
+#if SEND_DOSHISHA
+  void sendDoshisha(const uint64_t data, uint16_t nbits = kDoshishaBits,
+                    const uint16_t repeat = kNoRepeat);
+  uint64_t encodeDoshisha(const uint8_t command, const uint8_t channel = 0);
+#endif  // SEND_DOSHISHA
 
  protected:
 #ifdef UNIT_TEST
