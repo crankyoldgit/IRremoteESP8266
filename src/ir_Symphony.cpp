@@ -71,7 +71,7 @@ void IRsend::sendSymphony(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1057
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1105
-//   https://pdf1.alldatasheet.com/datasheet-pdf/view/124369/ANALOGICTECH/SM5021B.html
+//   https://www.alldatasheet.com/datasheet-pdf/pdf/124369/ANALOGICTECH/SM5021B.html
 bool IRrecv::decodeSymphony(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   uint64_t data = 0;
