@@ -76,7 +76,11 @@ const uint8_t kGreeWiFiOffset = 6;       // Mask 0b0x000000
 const uint8_t kGreeIFeelOffset = 2;      // Mask 0b00000x00
 const uint8_t kGreeDisplayTempOffset = 0;
 const uint8_t kGreeDisplayTempSize = 2;  // Mask 0b000000xx
-const uint8_t kGreeDisplayTempOff =                    0b00;
+const uint8_t kGreeDisplayTempOff =                    0b00;  // 0
+const uint8_t kGreeDisplayTempSet =                    0b01;  // 1
+const uint8_t kGreeDisplayTempInside =                 0b10;  // 2
+const uint8_t kGreeDisplayTempOutside =                0b11;  // 3
+
 
 // Legacy defines.
 #define GREE_AUTO kGreeAuto

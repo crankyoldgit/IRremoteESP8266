@@ -520,11 +520,20 @@ String IRGreeAC::toString(void) {
   result += addLabeledString(
       getTimerEnabled() ? minsToString(getTimer()) : kOffStr, kTimerStr);
   uint8_t src = getDisplayTempSource();
-  result += addIntToString(src, kSensorTempStr);
+  result += addIntToString(src, kDisplayTempStr);
   result += kSpaceLBraceStr;
   switch (src) {
     case kGreeDisplayTempOff:
       result += kOffStr;
+      break;
+    case kGreeDisplayTempSet:
+      result += kSetStr;
+      break;
+    case kGreeDisplayTempInside:
+      result += kInsideStr;
+      break;
+    case kGreeDisplayTempOutside:
+      result += kOutsideStr;
       break;
     default: result += kUnknownStr;
   }

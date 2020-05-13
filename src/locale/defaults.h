@@ -189,6 +189,9 @@
 #ifndef D_STR_SENSOR
 #define D_STR_SENSOR "Sensor"
 #endif  // D_STR_SENSOR
+#ifndef D_STR_DISPLAY
+#define D_STR_DISPLAY "Display"
+#endif  // D_STR_DISPLAY
 #ifndef D_STR_WEEKLY
 #define D_STR_WEEKLY "Weekly"
 #endif  // D_STR_WEEKLY
@@ -216,6 +219,9 @@
 #ifndef D_STR_NA
 #define D_STR_NA "N/A"
 #endif  // D_STR_NA
+#ifndef D_STR_INSIDE
+#define D_STR_INSIDE "Inside"
+#endif  // D_STR_INSIDE
 #ifndef D_STR_OUTSIDE
 #define D_STR_OUTSIDE "Outside"
 #endif  // D_STR_OUTSIDE
@@ -369,6 +375,9 @@
 #ifndef D_STR_PREVIOUSPOWER
 #define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
 #endif  // D_STR_PREVIOUSPOWER
+#ifndef D_STR_DISPLAYTEMP
+#define D_STR_DISPLAYTEMP D_STR_DISPLAY " " D_STR_TEMP
+#endif  // D_STR_DISPLAYTEMP
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP
