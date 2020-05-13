@@ -8,7 +8,7 @@ import argparse
 import sys
 
 
-class RawIRMessage(object):
+class RawIRMessage():
   """Basic analyse functions & structure for raw IR messages."""
 
   # pylint: disable=too-many-instance-attributes
@@ -701,7 +701,7 @@ def get_rawdata(arg_options):
   """Return the rawdata string(s) as per the options."""
   if arg_options.stdin:
     return sys.stdin.read()
-  elif arg_options.file:
+  if arg_options.file:
     with open(arg_options.file) as input_file:
       return input_file.read()
   else:
