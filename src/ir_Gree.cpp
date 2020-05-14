@@ -379,6 +379,14 @@ void IRGreeAC::setTimer(const uint16_t minutes) {
 /// Set temperature display mode.
 /// i.e. Internal, External temperature sensing.
 /// @param[in] mode The desired temp source to display.
+/// @note In order for the A/C unit properly accept these settings. You must
+/// cycle (send) in the following order:
+/// kGreeDisplayTempOff(0) -> kGreeDisplayTempSet(1) ->
+/// kGreeDisplayTempInside(2) ->kGreeDisplayTempOutside(3) ->
+/// kGreeDisplayTempOff(0).
+/// The unit will no behave correctly if the changes of this setting are sent
+/// out of order.
+/// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1118#issuecomment-628242152
 void IRGreeAC::setDisplayTempSource(const uint8_t mode) {
   setBits(&remote_state[5], kGreeDisplayTempOffset, kGreeDisplayTempSize, mode);
 }
