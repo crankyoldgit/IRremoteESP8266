@@ -376,6 +376,28 @@ void IRGreeAC::setTimer(const uint16_t minutes) {
           hours % 10);
 }
 
+/// Set temperature display mode.
+/// i.e. Internal, External temperature sensing.
+/// @param[in] mode The desired temp source to display.
+/// @note In order for the A/C unit properly accept these settings. You must
+/// cycle (send) in the following order:
+/// kGreeDisplayTempOff(0) -> kGreeDisplayTempSet(1) ->
+/// kGreeDisplayTempInside(2) ->kGreeDisplayTempOutside(3) ->
+/// kGreeDisplayTempOff(0).
+/// The unit will no behave correctly if the changes of this setting are sent
+/// out of order.
+/// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1118#issuecomment-628242152
+void IRGreeAC::setDisplayTempSource(const uint8_t mode) {
+  setBits(&remote_state[5], kGreeDisplayTempOffset, kGreeDisplayTempSize, mode);
+}
+/// Get the temperature display mode.
+/// i.e. Internal, External temperature sensing.
+/// @return The current temp source being displayed.
+uint8_t IRGreeAC::getDisplayTempSource(void) {
+  return GETBITS8(remote_state[5], kGreeDisplayTempOffset,
+                  kGreeDisplayTempSize);
+}
+
 // Convert a standard A/C mode into its native mode.
 uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -475,7 +497,7 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRGreeAC::toString(void) {
   String result = "";
-  result.reserve(150);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::GREE, getModel(), false);
   result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
@@ -505,6 +527,25 @@ String IRGreeAC::toString(void) {
   result += ')';
   result += addLabeledString(
       getTimerEnabled() ? minsToString(getTimer()) : kOffStr, kTimerStr);
+  uint8_t src = getDisplayTempSource();
+  result += addIntToString(src, kDisplayTempStr);
+  result += kSpaceLBraceStr;
+  switch (src) {
+    case kGreeDisplayTempOff:
+      result += kOffStr;
+      break;
+    case kGreeDisplayTempSet:
+      result += kSetStr;
+      break;
+    case kGreeDisplayTempInside:
+      result += kInsideStr;
+      break;
+    case kGreeDisplayTempOutside:
+      result += kOutsideStr;
+      break;
+    default: result += kUnknownStr;
+  }
+  result += ')';
   return result;
 }
 
