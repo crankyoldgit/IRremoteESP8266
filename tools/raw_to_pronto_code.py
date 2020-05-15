@@ -8,8 +8,9 @@ from auto_analyse_raw_data import convert_rawdata, add_rawdata_args, get_rawdata
 
 
 # pylint: disable=too-many-arguments
-def parse_and_report(rawdata_str, hertz, end_usecs, use_repeat, generate_code,
-                     verbose, output=sys.stdout):
+def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
+                     use_initial=False, generate_code=False, verbose=False,
+                     output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
 
   # Parse the input.
@@ -31,12 +32,12 @@ def parse_and_report(rawdata_str, hertz, end_usecs, use_repeat, generate_code,
   if verbose:
     output.write("Pronto period is %f uSecs.\n" % period)
   # Add the lengths to the code.
-  if use_repeat:
-    result.append("%04x" % 0)  # No Initial burst
-    result.append("%04x" % int(len(rawdata) / 2))  # Repeat code length
-  else:
+  if use_initial:
     result.append("%04x" % int(len(rawdata) / 2))  # Initial burst code length
-    result.append("%04x" % 0)  # No Repeat
+    result.append("%04x" % 0)  # No Repeat code length
+  else:
+    result.append("%04x" % 0)  # No Initial burst code length
+    result.append("%04x" % int(len(rawdata) / 2))  # Repeat code length
 
   # Add the data.
   if verbose:
@@ -79,11 +80,11 @@ def main():
       dest="usecs",
       default=100000)
   arg_parser.add_argument(
-      "-r",
-      "--repeat_code",
+      "-i",
+      "--initial_burst",
       action='store_true',
-      help="Send using the 'repeat' section of the pronto code.",
-      dest="use_repeat")
+      help="Send using only the 'inital burst' section of the pronto code.",
+      dest="use_initial")
   arg_parser.add_argument(
       "-v",
       "--verbose",
@@ -94,7 +95,7 @@ def main():
   add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
   parse_and_report(get_rawdata(arg_options), arg_options.hertz,
-                   arg_options.usecs, arg_options.use_repeat,
+                   arg_options.usecs, arg_options.use_initial,
                    arg_options.generate_code, arg_options.verbose)
 
 
