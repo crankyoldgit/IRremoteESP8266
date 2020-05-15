@@ -619,15 +619,15 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 
 #if SEND_GREE
 void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
-                const bool on, const stdAc::opmode_t mode, const float degrees,
-                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-                const bool turbo, const bool light, const bool clean,
-                const int16_t sleep) {
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const bool turbo,
+                const bool light, const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees);
+  ac->setTemp(degrees, !celsius);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
                        ac->convertSwingV(swingv));
@@ -1535,9 +1535,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRGreeAC ac(_pin, (gree_ac_remote_model_t)send.model, _inverted,
                   _modulation);
-      gree(&ac, (gree_ac_remote_model_t)send.model, send.power, send.mode, degC,
-           send.fanspeed, send.swingv, send.turbo, send.light, send.clean,
-           send.sleep);
+      gree(&ac, (gree_ac_remote_model_t)send.model, send.power, send.mode,
+           send.celsius, send.degrees, send.fanspeed, send.swingv, send.turbo,
+           send.light, send.clean, send.sleep);
       break;
     }
 #endif  // SEND_GREE

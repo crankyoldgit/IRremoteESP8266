@@ -210,17 +210,60 @@ bool IRGreeAC::getPower(void) {
   return GETBIT8(remote_state[0], kGreePower1Offset);
 }
 
-// Set the temp. in deg C
-void IRGreeAC::setTemp(const uint8_t temp) {
-  uint8_t new_temp = std::max((uint8_t)kGreeMinTemp, temp);
-  new_temp = std::min((uint8_t)kGreeMaxTemp, new_temp);
-  if (getMode() == kGreeAuto) new_temp = 25;
-  setBits(&remote_state[1], kLowNibble, kGreeTempSize, new_temp - kGreeMinTemp);
+/// Set the default temperature units to use.
+/// @param[in] on Use Fahrenheit as the units.
+/// true is Fahrenheit, false is Celsius.
+void IRGreeAC::setUseFahrenheit(const bool on) {
+  setBit(&remote_state[3], kGreeUseFahrenheitOffset, on);
 }
 
-// Return the set temp. in deg C
+/// Get the default temperature units in use.
+/// @return true is Fahrenheit, false is Celsius.
+bool IRGreeAC::getUseFahrenheit(void) {
+  return GETBIT8(remote_state[3], kGreeUseFahrenheitOffset);
+}
+
+/// Set the temp. in degrees
+/// @param[in] temp Desired temperature in Degrees.
+/// @param[in] fahrenheit Use units of Fahrenheit and set that as units used.
+/// false is Celsius (Default), true is Fahrenheit.
+/// @note The unit actually works in Celsius with a special optional
+/// "extra degree" when sing Fahrenheit.
+void IRGreeAC::setTemp(const uint8_t temp, const bool fahrenheit) {
+  float safecelsius = temp;
+  if (fahrenheit)
+    // Covert to F, and add a fudge factor to round to the expected degree.
+    // Why 0.6 you ask?! Because it works. Ya'd thing 0.5 would be good for
+    // rounding, but Noooooo!
+    safecelsius = fahrenheitToCelsius(temp + 0.6);
+  setUseFahrenheit(fahrenheit);  // Set the correct Temp units.
+
+  // Make sure we have desired temp in the correct range.
+  safecelsius = std::max(static_cast<float>(kGreeMinTempC), safecelsius);
+  safecelsius = std::min(static_cast<float>(kGreeMaxTempC), safecelsius);
+  // An operating mode of Auto locks the temp to a specific value. Do so.
+  if (getMode() == kGreeAuto) safecelsius = 25;
+
+  // Set the "main" Celsius degrees.
+  setBits(&remote_state[1], kGreeTempOffset, kGreeTempSize,
+          safecelsius - kGreeMinTempC);
+  // Deal with the extra degree fahrenheit difference.
+  setBit(&remote_state[3], kGreeTempExtraDegreeFOffset,
+         (uint8_t)(safecelsius * 2) & 1);
+}
+
+/// Return the set temperature
+/// @return The temperature in degrees in the current units (C/F) set.
 uint8_t IRGreeAC::getTemp(void) {
-  return GETBITS8(remote_state[1], kLowNibble, kGreeTempSize) + kGreeMinTemp;
+  uint8_t deg = kGreeMinTempC + GETBITS8(remote_state[1], kGreeTempOffset,
+                                         kGreeTempSize);
+  if (getUseFahrenheit()) {
+    deg = celsiusToFahrenheit(deg);
+    // Retreive the "extra" fahrenheit from elsewhere in the code.
+    if (GETBIT8(remote_state[3], kGreeTempExtraDegreeFOffset)) deg++;
+    deg = std::max(deg, kGreeMinTempF);  // Cover the fact that 61F is < 16C
+  }
+  return deg;
 }
 
 // Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
@@ -473,7 +516,7 @@ stdAc::state_t IRGreeAC::toCommon(void) {
   result.model = this->getModel();
   result.power = this->getPower();
   result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
+  result.celsius = !this->getUseFahrenheit();
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   if (this->getSwingVerticalAuto())
@@ -502,7 +545,7 @@ String IRGreeAC::toString(void) {
   result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
                             kGreeDry, kGreeFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), !getUseFahrenheit());
   result += addFanToString(getFan(), kGreeFanMax, kGreeFanMin, kGreeFanAuto,
                            kGreeFanAuto, kGreeFanMed);
   result += addBoolToString(getTurbo(), kTurboStr);

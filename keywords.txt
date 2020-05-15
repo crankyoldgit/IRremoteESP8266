@@ -1922,8 +1922,8 @@ kGreeHdrSpace	LITERAL1
 kGreeHeat	LITERAL1
 kGreeIFeelOffset	LITERAL1
 kGreeLightOffset	LITERAL1
-kGreeMaxTemp	LITERAL1
-kGreeMinTemp	LITERAL1
+kGreeMaxTempC	LITERAL1
+kGreeMinTempC	LITERAL1
 kGreeMsgSpace	LITERAL1
 kGreeOneSpace	LITERAL1
 kGreePower1Offset	LITERAL1

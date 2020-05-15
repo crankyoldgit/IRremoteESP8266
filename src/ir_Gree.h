@@ -9,6 +9,7 @@
 //   Brand: Green,  Model: YBOFB remote
 //   Brand: Green,  Model: YBOFB2 remote
 //   Brand: Gree,  Model: YAA1FBF remote
+//   Brand: Gree,  Model: YB1F2F remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -43,14 +44,17 @@ const uint8_t kGreeFanMax = 3;
 const uint8_t kGreeSwingAutoOffset = 6;
 const uint8_t kGreeSleepOffset = 7;
 // Byte[1]
-const uint8_t kGreeTempSize = 4;
-const uint8_t kGreeMinTemp = 16;  // Celsius
-const uint8_t kGreeMaxTemp = 30;  // Celsius
-const uint8_t kGreeTimerHalfHrOffset = 4;
+const uint8_t kGreeTempOffset = 0;
+const uint8_t kGreeTempSize = 4;            // Mask 0b0000xxxx
+const uint8_t kGreeMinTempC = 16;  // Celsius
+const uint8_t kGreeMaxTempC = 30;  // Celsius
+const uint8_t kGreeMinTempF = 61;  // Fahrenheit
+const uint8_t kGreeMaxTempF = 86;  // Fahrenheit
+const uint8_t kGreeTimerHalfHrOffset = 4;   // Mask 0b000x0000
 const uint8_t kGreeTimerTensHrOffset = 5;
-const uint8_t kGreeTimerTensHrSize = 2;  // Bits
+const uint8_t kGreeTimerTensHrSize = 2;     // Mask 0b0xx00000
 const uint16_t kGreeTimerMax = 24 * 60;
-const uint8_t kGreeTimerEnabledOffset = 7;
+const uint8_t kGreeTimerEnabledOffset = 7;  // Mask 0bx0000000
 // Byte[2]
 const uint8_t kGreeTimerHoursOffset = 0;
 const uint8_t kGreeTimerHoursSize = 4;  // Bits
@@ -59,6 +63,9 @@ const uint8_t kGreeLightOffset = 5;
 // This might not be used. See #814
 const uint8_t kGreePower2Offset = 6;
 const uint8_t kGreeXfanOffset = 7;
+// Byte[3]
+const uint8_t kGreeTempExtraDegreeFOffset = 2;  // Mask 0b00000x00
+const uint8_t kGreeUseFahrenheitOffset = 3;     // Mask 0b0000x000
 // Byte[4]
 const uint8_t kGreeSwingSize = 4;  // Bits
 const uint8_t kGreeSwingLastPos =    0b0000;
@@ -88,8 +95,8 @@ const uint8_t kGreeDisplayTempOutside =                0b11;  // 3
 #define GREE_DRY kGreeDry
 #define GREE_FAN kGreeFan
 #define GREE_HEAT kGreeHeat
-#define GREE_MIN_TEMP kGreeMinTemp
-#define GREE_MAX_TEMP kGreeMaxTemp
+#define GREE_MIN_TEMP kGreeMinTempC
+#define GREE_MAX_TEMP kGreeMaxTempC
 #define GREE_FAN_MAX kGreeFanMax
 #define GREE_SWING_LAST_POS kGreeSwingLastPos
 #define GREE_SWING_AUTO kGreeSwingAuto
@@ -122,8 +129,10 @@ class IRGreeAC {
   gree_ac_remote_model_t getModel(void);
   void setPower(const bool on);
   bool getPower(void);
-  void setTemp(const uint8_t temp);
+  void setTemp(const uint8_t temp, const bool fahrenheit = false);
   uint8_t getTemp(void);
+  void setUseFahrenheit(const bool on);
+  bool getUseFahrenheit(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
   void setMode(const uint8_t new_mode);
