@@ -49,7 +49,7 @@ class TestRawToPronto(unittest.TestCase):
         "Pronto code = "
         "'0000 0047 0004 0000 0485 049b 0365 06e8 0485 049b 0364 1680'\n")
 
-  def test_parse_and_report_using_repeat(self):
+  def test_using_repeat(self):
     """Tests for the parse_and_report() function @38kHz using repeat section."""
 
     output = StringIO()
