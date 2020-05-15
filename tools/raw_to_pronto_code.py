@@ -8,8 +8,8 @@ from auto_analyse_raw_data import convert_rawdata, add_rawdata_args, get_rawdata
 
 
 # pylint: disable=too-many-arguments
-def parse_and_report(rawdata_str, hertz, end_usecs, use_repeat, verbose,
-                     output=sys.stdout):
+def parse_and_report(rawdata_str, hertz, end_usecs, use_repeat, generate_code,
+                     verbose, output=sys.stdout):
   """Analyse the rawdata c++ definition of a IR message."""
 
   # Parse the input.
@@ -43,7 +43,11 @@ def parse_and_report(rawdata_str, hertz, end_usecs, use_repeat, verbose,
     output.write("Raw data: %s " % rawdata)
   for i in rawdata:
     result.append("%04x" % int(i / period))
-  output.write("Pronto code = '%s'\n" % " ".join(result))
+  if generate_code:
+    output.write("uint16_t pronto[%d] = {0x%s};\n" % (len(result),
+                                                      ", 0x".join(result)))
+  else:
+    output.write("Pronto code = '%s'\n" % " ".join(result))
 # pylint: enable=too-many-arguments
 
 
@@ -61,6 +65,12 @@ def main():
       dest="hertz",
       required=True)
   arg_parser.add_argument(
+      "-c",
+      "--code",
+      action='store_true',
+      help="Output C/C++ code instead of human-readable.",
+      dest="generate_code")
+  arg_parser.add_argument(
       "-g",
       "--gap",
       "--endgap",
@@ -69,23 +79,23 @@ def main():
       dest="usecs",
       default=100000)
   arg_parser.add_argument(
+      "-r",
+      "--repeat_code",
+      action='store_true',
+      help="Send using the 'repeat' section of the pronto code.",
+      dest="use_repeat")
+  arg_parser.add_argument(
       "-v",
       "--verbose",
       help="Increase output verbosity",
       action="store_true",
       dest="verbose",
       default=False)
-  arg_parser.add_argument(
-      "-r",
-      "--repeat_code",
-      action='store_true',
-      help="Send using the 'repeat' section of the pronto code.",
-      dest="use_repeat")
   add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
   parse_and_report(get_rawdata(arg_options), arg_options.hertz,
                    arg_options.usecs, arg_options.use_repeat,
-                   arg_options.verbose)
+                   arg_options.generate_code, arg_options.verbose)
 
 
 if __name__ == '__main__':
