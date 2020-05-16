@@ -423,4 +423,15 @@ TEST(TestSendPronto, Issue1103) {
       "f38028d50m20066s20435m15069s30665",
       irsend.outputStr());
   // Which pretty much matches the `rawData` above.
+
+  // Ref:
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1103#issuecomment-628946514
+  uint16_t pronto_test_using_repeat[12] = {
+      0x0000, 0x006D, 0x0000, 0x0004, 0x02fb, 0x0309, 0x023d, 0x048e, 0x02fb,
+      0x0309, 0x023d, 0x0474};
+  irsend.reset();
+  irsend.sendPronto(pronto_test_using_repeat, 12);
+  EXPECT_EQ(
+      "f38028d50m20066s20435m15069s30665m20066s20435m15069s29982",
+      irsend.outputStr());
 }
