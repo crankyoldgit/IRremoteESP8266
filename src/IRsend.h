@@ -466,6 +466,10 @@ class IRsend {
   void sendCarrierAC(uint64_t data, uint16_t nbits = kCarrierAcBits,
                      uint16_t repeat = kCarrierAcMinRepeat);
 #endif
+#if SEND_CARRIER_AC40
+  void sendCarrierAC40(uint64_t data, uint16_t nbits = kCarrierAc40Bits,
+                       uint16_t repeat = kCarrierAc40MinRepeat);
+#endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
   void sendHaierAC(const unsigned char data[],
                    const uint16_t nbytes = kHaierACStateLength,

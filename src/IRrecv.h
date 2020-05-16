@@ -485,7 +485,13 @@ class IRrecv {
   bool decodeCarrierAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kCarrierAcBits,
                        const bool strict = true);
-#endif
+#endif  // DECODE_CARRIER_AC
+#if DECODE_CARRIER_AC40
+  bool decodeCarrierAC40(decode_results *results,
+                         uint16_t offset = kStartOffset,
+                         const uint16_t nbits = kCarrierAc40Bits,
+                         const bool strict = true);
+#endif  // DECODE_CARRIER_AC40
 #if DECODE_GOODWEATHER
   bool decodeGoodweather(decode_results *results,
                          uint16_t offset = kStartOffset,

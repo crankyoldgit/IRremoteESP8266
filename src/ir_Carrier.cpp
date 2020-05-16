@@ -1,4 +1,4 @@
-// Copyright 2018 David Conran
+// Copyright 2018, 2020 David Conran
 
 // Supports:
 //   Brand: Carrier/Surrey,  Model: 42QG5A55970 remote
@@ -21,6 +21,14 @@ const uint16_t kCarrierAcBitMark = 628;
 const uint16_t kCarrierAcOneSpace = 1320;
 const uint16_t kCarrierAcZeroSpace = 532;
 const uint16_t kCarrierAcGap = 20000;
+
+const uint16_t kCarrierAc40HdrMark = 8402;
+const uint16_t kCarrierAc40HdrSpace = 4166;
+const uint16_t kCarrierAc40BitMark = 547;
+const uint16_t kCarrierAc40OneSpace = 1540;
+const uint16_t kCarrierAc40ZeroSpace = 497;
+const uint16_t kCarrierAc40Freq = 38;  // kHz. (An educated guess)
+
 
 #if SEND_CARRIER_AC
 // Send a Carrier HVAC formatted message.
@@ -100,4 +108,53 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t offset,
   results->command = data & 0xFFFF;
   return true;
 }
-#endif
+#endif  // DECODE_CARRIER_AC
+
+#if SEND_CARRIER_AC40
+/// Send a Carrier 40bit HVAC formatted message.
+/// Status: Alpha / Yet to be tested against a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The bit size of the message being sent.
+/// @param[in] repeat The number of times the message is to be repeated.
+void IRsend::sendCarrierAC40(const uint64_t data, const uint16_t nbits,
+                             const uint16_t repeat) {
+  sendGeneric(kCarrierAc40HdrMark, kCarrierAc40HdrSpace, kCarrierAc40BitMark,
+              kCarrierAc40OneSpace, kCarrierAc40BitMark, kCarrierAc40ZeroSpace,
+              kCarrierAc40BitMark, kCarrierAcGap,
+              data, nbits, kCarrierAc40Freq, true, repeat, kDutyDefault);
+}
+#endif  // SEND_CARRIER_AC40
+
+#if DECODE_CARRIER_AC40
+/// Decode the supplied Carrier 40-bit HVAC message.
+/// Carrier HVAC messages contain only 40 bits, but it is sent three(3) times.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
+    return false;  // Can't possibly be a valid Carrier message.
+  if (strict && nbits != kCarrierAc40Bits)
+    return false;  // We expect Carrier to be 40 bits of message.
+
+  if (!matchGeneric(results->rawbuf + offset, &(results->value),
+                    results->rawlen - offset, nbits,
+                    kCarrierAc40HdrMark, kCarrierAc40HdrSpace,
+                    kCarrierAc40BitMark, kCarrierAc40OneSpace,
+                    kCarrierAc40BitMark, kCarrierAc40ZeroSpace,
+                    kCarrierAc40BitMark, kCarrierAcGap, true)) return false;
+
+  // Success
+  results->bits = nbits;
+  results->decode_type = CARRIER_AC40;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
+#endif  // DECODE_CARRIER_AC40
