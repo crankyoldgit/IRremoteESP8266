@@ -403,28 +403,41 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
 
   code["send"].extend([
       "#if SEND_%s" % def_name.upper(),
-      "// Function should be safe up to 64 bits.",
+      "/// Send a %s formatted message." % name,
+      "/// Function should be safe up to 64 bits.",
+      "/// Status: ALPHA / Untested.",
+      "/// @param[in] data containing the IR command.",
+      "/// @param[in] nbits Nr. of bits to send. usually k%sBits" % name,
+      "/// @param[in] repeat Nr. of times the message is to be repeated.",
       "void IRsend::send%s(const uint64_t data, const uint16_t"
       " nbits, const uint16_t repeat) {" % def_name,
       "  enableIROut(k%sFreq);" % name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint64_t send_data = data;"])
   code["send64+"].extend([
-      "// Args:",
-      "//   data: An array of bytes containing the IR command.",
-      "//         It is assumed to be in MSB order for this code.\n"
-      "//   nbytes: Nr. of bytes of data in the array."
+      "/// @param[in] data An array of bytes containing the IR command.",
+      "///                 It is assumed to be in MSB order for this code.",
+      "/// @param[in] nbytes Nr. of bytes of data in the array."
       " (>=k%sStateLength)" % name,
-      "//   repeat: Nr. of times the message is to be repeated.",
-      "//",
-      "// Status: ALPHA / Untested.",
+      "/// @param[in] repeat Nr. of times the message is to be repeated.",
       "void IRsend::send%s(const uint8_t data[], const uint16_t nbytes,"
       " const uint16_t repeat) {" % def_name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint16_t pos = 0;"])
   code["recv"].extend([
       "#if DECODE_%s" % def_name.upper(),
-      "// Function should be safe up to 64 bits.",
+      "/// Decode the supplied %s message." % name,
+      "/// Function should be safe up to 64 bits.",
+      "/// Status: ALPHA / Untested.",
+      "/// @param[in,out] results Ptr to the data to decode &"
+      " where to store the decode",
+      "/// @param[in] offset The starting index to use when"
+      " attempting to decode the",
+      "///   raw data. Typically/Defaults to kStartOffset.",
+      "/// @param[in] nbits The number of data bits to expect.",
+      "/// @param[in] strict Flag indicating if we should perform strict"
+      " matching.",
+      "/// @return A boolean. True if it can decode it, false if it can't.",
       "bool IRrecv::decode%s(decode_results *results, uint16_t offset,"
       " const uint16_t nbits, const bool strict) {" % def_name,
       "  if (results->rawlen < 2 * nbits + k%sOverhead - offset)" % name,
@@ -436,7 +449,18 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  match_result_t data_result;"])
   code["recv64+"].extend([
       "#if DECODE_%s" % def_name.upper(),
-      "// Function should be safe over 64 bits.",
+      "/// Decode the supplied %s message." % name,
+      "/// Function should be safe over 64 bits.",
+      "/// Status: ALPHA / Untested.",
+      "/// @param[in,out] results Ptr to the data to decode &"
+      " where to store the decode",
+      "/// @param[in] offset The starting index to use when"
+      " attempting to decode the",
+      "///   raw data. Typically/Defaults to kStartOffset.",
+      "/// @param[in] nbits The number of data bits to expect.",
+      "/// @param[in] strict Flag indicating if we should perform"
+      " strict matching.",
+      "/// @return A boolean. True if it can decode it, false if it can't.",
       "bool IRrecv::decode%s(decode_results *results, uint16_t offset,"
       " const uint16_t nbits, const bool strict) {" % def_name,
       "  if (results->rawlen < 2 * nbits + k%sOverhead - offset)" % name,
@@ -628,7 +652,7 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   else:
     def_name = "TBD"
   output.write("\nGenerating a VERY rough code outline:\n\n"
-               "// Copyright 2019 David Conran (crankyoldgit)\n"
+               "// Copyright 2020 David Conran (crankyoldgit)\n"
                "// Support for %s protocol\n\n"
                '#include "IRrecv.h"\n'
                '#include "IRsend.h"\n'
@@ -654,12 +678,15 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
     code["send64+"] = [
         "",
         "#if SEND_%s" % def_name.upper(),
-        "// Alternative >64bit function to send %s messages" % def_name.upper(),
-        "// Where data is:",
-        "//   uint8_t data[k%sStateLength] = {0x%s};" % (
+        "/// Send a %s formatted message." % name,
+        "/// Alternative >64bit function to send %s messages" %
+        def_name.upper(),
+        "/// Status: ALPHA / Untested.",
+        "/// Where data is:",
+        "///   uint8_t data[k%sStateLength] = {0x%s};" % (
             name, ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
                               for i in range(0, len(bits_str), 8))),
-        "//"] + code["send64+"]
+        "///"] + code["send64+"]
     for line in code["send64+"]:
       output.write("%s\n" % line)
   output.write("\n")
