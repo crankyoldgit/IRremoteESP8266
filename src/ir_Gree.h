@@ -8,7 +8,6 @@
 //   Brand: RusClimate,  Model: YAW1F remote
 //   Brand: Green,  Model: YBOFB remote
 //   Brand: Green,  Model: YBOFB2 remote
-//   Brand: Gree,  Model: YAA1FBF remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -32,7 +31,7 @@ const uint8_t kGreeDry = 2;
 const uint8_t kGreeFan = 3;
 const uint8_t kGreeHeat = 4;
 
-// Byte[0]
+// Byte 0
 const uint8_t kGreePower1Offset = 3;
 const uint8_t kGreeFanOffset = 4;
 const uint8_t kGreeFanSize = 2;  // Bits
@@ -42,7 +41,7 @@ const uint8_t kGreeFanMed = 2;
 const uint8_t kGreeFanMax = 3;
 const uint8_t kGreeSwingAutoOffset = 6;
 const uint8_t kGreeSleepOffset = 7;
-// Byte[1]
+// Byte 1
 const uint8_t kGreeTempSize = 4;
 const uint8_t kGreeMinTemp = 16;  // Celsius
 const uint8_t kGreeMaxTemp = 30;  // Celsius
@@ -51,7 +50,8 @@ const uint8_t kGreeTimerTensHrOffset = 5;
 const uint8_t kGreeTimerTensHrSize = 2;  // Bits
 const uint16_t kGreeTimerMax = 24 * 60;
 const uint8_t kGreeTimerEnabledOffset = 7;
-// Byte[2]
+
+// Byte 2
 const uint8_t kGreeTimerHoursOffset = 0;
 const uint8_t kGreeTimerHoursSize = 4;  // Bits
 const uint8_t kGreeTurboOffset = 4;
@@ -59,7 +59,7 @@ const uint8_t kGreeLightOffset = 5;
 // This might not be used. See #814
 const uint8_t kGreePower2Offset = 6;
 const uint8_t kGreeXfanOffset = 7;
-// Byte[4]
+// Byte 4
 const uint8_t kGreeSwingSize = 4;  // Bits
 const uint8_t kGreeSwingLastPos =    0b0000;
 const uint8_t kGreeSwingAuto =       0b0001;
@@ -71,16 +71,9 @@ const uint8_t kGreeSwingDown =       0b0110;
 const uint8_t kGreeSwingDownAuto =   0b0111;
 const uint8_t kGreeSwingMiddleAuto = 0b1001;
 const uint8_t kGreeSwingUpAuto =     0b1011;
-// Byte[5]
-const uint8_t kGreeWiFiOffset = 6;       // Mask 0b0x000000
-const uint8_t kGreeIFeelOffset = 2;      // Mask 0b00000x00
-const uint8_t kGreeDisplayTempOffset = 0;
-const uint8_t kGreeDisplayTempSize = 2;  // Mask 0b000000xx
-const uint8_t kGreeDisplayTempOff =                    0b00;  // 0
-const uint8_t kGreeDisplayTempSet =                    0b01;  // 1
-const uint8_t kGreeDisplayTempInside =                 0b10;  // 2
-const uint8_t kGreeDisplayTempOutside =                0b11;  // 3
-
+// byte 5
+const uint8_t kGreeIFeelOffset = 2;
+const uint8_t kGreeWiFiOffset = 6;
 
 // Legacy defines.
 #define GREE_AUTO kGreeAuto
@@ -113,7 +106,7 @@ class IRGreeAC {
   void stateReset(void);
 #if SEND_GREE
   void send(const uint16_t repeat = kGreeDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GREE
   void begin(void);
   void on(void);
@@ -145,8 +138,6 @@ class IRGreeAC {
   uint8_t getSwingVerticalPosition(void);
   uint16_t getTimer(void);
   void setTimer(const uint16_t minutes);
-  void setDisplayTempSource(const uint8_t mode);
-  uint8_t getDisplayTempSource(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   uint8_t convertSwingV(const stdAc::swingv_t swingv);

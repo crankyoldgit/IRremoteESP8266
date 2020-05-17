@@ -74,7 +74,7 @@ class IRMideaAC {
   void stateReset(void);
 #if SEND_MIDEA
   void send(const uint16_t repeat = kMideaMinRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MIDEA
   void begin(void);
   void on(void);

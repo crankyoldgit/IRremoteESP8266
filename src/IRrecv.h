@@ -221,20 +221,6 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
-  uint16_t matchGenericConstBitTime(volatile uint16_t *data_ptr,
-                                    uint64_t *result_ptr,
-                                    const uint16_t remaining,
-                                    const uint16_t nbits,
-                                    const uint16_t hdrmark,
-                                    const uint32_t hdrspace,
-                                    const uint16_t one,
-                                    const uint32_t zero,
-                                    const uint16_t footermark,
-                                    const uint32_t footerspace,
-                                    const bool atleast = false,
-                                    const uint8_t tolerance = kUseDefTol,
-                                    const int16_t excess = kMarkExcess,
-                                    const bool MSBfirst = true);
   uint16_t matchManchester(volatile const uint16_t *data_ptr,
                            uint64_t *result_ptr,
                            const uint16_t remaining,
@@ -607,22 +593,13 @@ class IRrecv {
                      const uint16_t nbits = kAirwellBits,
                      const bool strict = true);
 #endif  // DECODE_AIRWELL
-#if DECODE_DELONGHI_AC
-  bool decodeDelonghiAc(decode_results *results, uint16_t offset = kStartOffset,
-                     const uint16_t nbits = kDelonghiAcBits,
-                     const bool strict = true);
-#endif  // DECODE_DELONGHI_AC
-#if DECODE_DOSHISHA
-  bool decodeDoshisha(decode_results *results, uint16_t offset = kStartOffset,
-                      const uint16_t nbits = kDoshishaBits,
-                      const bool strict = true);
-#endif  // DECODE_DOSHISHA
-#if DECODE_MULTIBRACKETS
-  bool decodeMultibrackets(decode_results *results,
-                           uint16_t offset = kStartOffset,
-                           const uint16_t nbits = kMultibracketsBits,
-                           const bool strict = true);
-#endif  // DECODE_MULTIBRACKETS
+
+#if DECODE_TESTCARRIER
+  bool decodeTestCarrier(decode_results *results,
+                         const uint16_t nbits = kTestCarrierBits,
+                         const bool strict = true);
+#endif  // DECODE_TESTEXAMPLE
 };
+
 
 #endif  // IRRECV_H_

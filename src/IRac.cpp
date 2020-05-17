@@ -126,9 +126,6 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN64
     case decode_type_t::DAIKIN64:
 #endif
-#if SEND_DELONGHI_AC
-    case decode_type_t::DELONGHI_AC:
-#endif
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
 #endif
@@ -490,22 +487,6 @@ void IRac::daikin64(IRDaikin64 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN64
-
-#if SEND_DELONGHI_AC
-void IRac::delonghiac(IRDelonghiAc *ac,
-                  const bool on, const stdAc::opmode_t mode, const bool celsius,
-                  const float degrees, const stdAc::fanspeed_t fan,
-                  const bool turbo, const int16_t sleep) {
-  ac->begin();
-  ac->setPower(on);
-  ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees, !celsius);
-  ac->setFan(ac->convertFan(fan));
-  ac->setBoost(turbo);
-  ac->setSleep(sleep >= 0);
-  ac->send();
-}
-#endif  // SEND_DELONGHI_AC
 
 #if SEND_ELECTRA_AC
 void IRac::electra(IRElectraAc *ac,
@@ -1078,38 +1059,25 @@ void IRac::samsung(IRSamsungAc *ac,
 void IRac::sharp(IRSharpAc *ac,
                  const bool on, const bool prev_power,
                  const stdAc::opmode_t mode,
-                 const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv, const bool turbo,
-                 const bool filter, const bool clean) {
+                 const float degrees, const stdAc::fanspeed_t fan) {
   ac->begin();
   ac->setPower(on, prev_power);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwingToggle(swingv != stdAc::swingv_t::kOff);
-  // Econo  deliberately not used as it cycles through 3 modes uncontrolably.
-  // ac->setEconoToggle(econo);
-  ac->setIon(filter);
+  // No Vertical swing setting available.
   // No Horizontal swing setting available.
   // No Quiet setting available.
+  // No Turbo setting available.
   // No Light setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Clean setting available.
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
   // Do setMode() again as it can affect fan speed and temp.
   ac->setMode(ac->convertMode(mode));
-  // Clean after mode, as it can affect the mode, temp & fan speed.
-  if (clean) {
-    // A/C needs to be off before we can enter clean mode.
-    ac->setPower(false, prev_power);
-    ac->send();
-  }
-  ac->setClean(clean);
-  if (turbo) {
-    ac->send();  // Send the current state.
-    // Set up turbo mode as it needs to be sent after everything else.
-    ac->setTurbo(true);
-  }
   ac->send();
 }
 #endif  // SEND_SHARP_AC
@@ -1316,9 +1284,8 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
-      case decode_type_t::HITACHI_AC424:
       case decode_type_t::MIDEA:
-      case decode_type_t::SHARP_AC:
+      case decode_type_t::HITACHI_AC424:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
           result.swingv = stdAc::swingv_t::kAuto;
@@ -1492,15 +1459,6 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN64
-#if SEND_DELONGHI_AC
-    case DELONGHI_AC:
-    {
-      IRDelonghiAc ac(_pin, _inverted, _modulation);
-      delonghiac(&ac, send.power, send.mode, send.celsius, degC, send.fanspeed,
-                 send.turbo, send.sleep);
-      break;
-    }
-#endif  // SEND_DELONGHI_AC
 #if SEND_ELECTRA_AC
     case ELECTRA_AC:
     {
@@ -1702,8 +1660,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRSharpAc ac(_pin, _inverted, _modulation);
       bool prev_power = !send.power;
       if (prev != NULL) prev_power = prev->power;
-      sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed,
-            send.swingv, send.turbo, send.filter, send.clean);
+      sharp(&ac, send.power, prev_power, send.mode, degC, send.fanspeed);
       break;
     }
 #endif  // SEND_SHARP_AC
@@ -2150,14 +2107,7 @@ namespace IRAcUtils {
         ac.setRaw(result->value);  // Daikin64 uses value instead of state.
         return ac.toString();
       }
-#endif  // DECODE_DAIKIN64
-#if DECODE_DELONGHI_AC
-      case decode_type_t::DELONGHI_AC: {
-        IRDelonghiAc ac(kGpioUnused);
-        ac.setRaw(result->value);  // DelonghiAc uses value instead of state.
-        return ac.toString();
-      }
-#endif  // DECODE_DELONGHI_AC
+#endif  // DECODE_DAIKIN216
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(0);
@@ -2470,14 +2420,6 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_DAIKIN64
-#if DECODE_DELONGHI_AC
-      case decode_type_t::DELONGHI_AC: {
-        IRDelonghiAc ac(kGpioUnused);
-        ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
-        break;
-      }
-#endif  // DECODE_DELONGHI_AC
 #if DECODE_ELECTRA_AC
       case decode_type_t::ELECTRA_AC: {
         IRElectraAc ac(kGpioUnused);

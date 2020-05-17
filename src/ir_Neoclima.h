@@ -92,7 +92,7 @@ class IRNeoclimaAc {
   void stateReset(void);
 #if SEND_NEOCLIMA
   void send(const uint16_t repeat = kNeoclimaMinRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_NEOCLIMA
   void begin(void);
   void setButton(const uint8_t button);

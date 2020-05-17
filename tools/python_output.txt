@@ -1,0 +1,113 @@
+Potential Mark Candidates:
+[8968, 504]
+Potential Space Candidates:
+[4526, 1736, 618]
+
+Guessing encoding type:
+Looks like it uses space encoding. Yay!
+
+Guessing key value:
+kTestCarrierHdrMark   = 8968
+kTestCarrierHdrSpace  = 4526
+kTestCarrierBitMark   = 503
+kTestCarrierOneSpace  = 1736
+kTestCarrierZeroSpace = 615
+
+Decoding protocol based on analysis so far:
+
+kTestCarrierHdrMark+kTestCarrierHdrSpace+0010000110101010010001101100000000001000000000000000001000000010
+  Bits: 64
+  Hex:  0x21AA46C008000202 (MSB first)
+        0x4040001003625584 (LSB first)
+  Dec:  2425829139874316802 (MSB first)
+        4629700485713122692 (LSB first)
+  Bin:  0b0010000110101010010001101100000000001000000000000000001000000010 (MSB first)
+        0b0100000001000000000000000001000000000011011000100101010110000100 (LSB first)
+
+Total Nr. of suspected bits: 64
+
+Generating a VERY rough code outline:
+
+// Copyright 2019 David Conran (crankyoldgit)
+// Support for TestCarrier protocol
+
+#include "IRrecv.h"
+#include "IRsend.h"
+#include "IRutils.h"
+
+// WARNING: This probably isn't directly usable. It's a guide only.
+
+// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/Adding-support-for-a-new-IR-protocol
+// for details of how to include this in the library.
+const uint16_t kTestCarrierHdrMark = 8968;
+const uint16_t kTestCarrierBitMark = 503;
+const uint16_t kTestCarrierHdrSpace = 4526;
+const uint16_t kTestCarrierOneSpace = 1736;
+const uint16_t kTestCarrierZeroSpace = 615;
+const uint16_t kTestCarrierFreq = 38000;  // Hz. (Guessing the most common frequency.)
+const uint16_t kTestCarrierBits = 64;  // Move to IRremoteESP8266.h
+const uint16_t kTestCarrierOverhead = 3;
+#if SEND_TESTCARRIER
+// Function should be safe up to 64 bits.
+void IRsend::sendTestCarrier(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {
+  enableIROut(kTestCarrierFreq);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    uint64_t send_data = data;
+    // Header
+    mark(kTestCarrierHdrMark);
+    space(kTestCarrierHdrSpace);
+    // Data Section #1
+    // e.g. data = 0x21AA46C008000202, nbits = 64
+    sendData(kTestCarrierBitMark, kTestCarrierOneSpace, kTestCarrierBitMark, kTestCarrierZeroSpace, send_data, 64, true);
+    send_data >>= 64;
+    // Footer
+    mark(kTestCarrierBitMark);
+    space(kDefaultMessageGap);  // A 100% made up guess of the gap between messages.
+  }
+}
+#endif  // SEND_TESTCARRIER
+
+#if DECODE_TESTCARRIER
+// Function should be safe up to 64 bits.
+bool IRrecv::decodeTestCarrier(decode_results *results, const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kTestCarrierOverhead)
+    return false;  // Too short a message to match.
+  if (strict && nbits != kTestCarrierBits)
+    return false;
+
+  uint16_t offset = kStartOffset;
+  uint64_t data = 0;
+  match_result_t data_result;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], kTestCarrierHdrMark))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], kTestCarrierHdrSpace))
+    return false;
+
+  // Data Section #1
+  // e.g. data_result.data = 0x21AA46C008000202, nbits = 64
+  data_result = matchData(&(results->rawbuf[offset]), 64,
+                          kTestCarrierBitMark, kTestCarrierOneSpace,
+                          kTestCarrierBitMark, kTestCarrierZeroSpace);
+  offset += data_result.used;
+  if (data_result.success == false) return false;  // Fail
+  data <<= 64;  // Make room for the new bits of data.
+  data |= data_result.data;
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], kTestCarrierBitMark))
+    return false;
+
+  // Success
+  results->decode_type = decode_type_t::TESTCARRIER;
+  results->bits = nbits;
+  results->value = data;
+  results->command = 0;
+  results->address = 0;
+  return true;
+}
+#endif  // DECODE_TESTCARRIER
+
+C:\Users\wahib>C:\Users\wahib\.platformio\lib\IRremoteESP8266_ID1089\tools\auto_analyse_raw_data.py -g -n TestCarrier -f C:\Users\wahib\.platformio\lib\IRremoteESP8266_ID1089\tools\Rawdata.txt
+

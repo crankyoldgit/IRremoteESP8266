@@ -189,9 +189,6 @@
 #ifndef D_STR_SENSOR
 #define D_STR_SENSOR "Sensor"
 #endif  // D_STR_SENSOR
-#ifndef D_STR_DISPLAY
-#define D_STR_DISPLAY "Display"
-#endif  // D_STR_DISPLAY
 #ifndef D_STR_WEEKLY
 #define D_STR_WEEKLY "Weekly"
 #endif  // D_STR_WEEKLY
@@ -219,9 +216,6 @@
 #ifndef D_STR_NA
 #define D_STR_NA "N/A"
 #endif  // D_STR_NA
-#ifndef D_STR_INSIDE
-#define D_STR_INSIDE "Inside"
-#endif  // D_STR_INSIDE
 #ifndef D_STR_OUTSIDE
 #define D_STR_OUTSIDE "Outside"
 #endif  // D_STR_OUTSIDE
@@ -375,9 +369,6 @@
 #ifndef D_STR_PREVIOUSPOWER
 #define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
 #endif  // D_STR_PREVIOUSPOWER
-#ifndef D_STR_DISPLAYTEMP
-#define D_STR_DISPLAYTEMP D_STR_DISPLAY " " D_STR_TEMP
-#endif  // D_STR_DISPLAYTEMP
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP
@@ -501,9 +492,6 @@
 #endif  // D_STR_DAIKIN216
 #ifndef D_STR_DAIKIN64
 #define D_STR_DAIKIN64 "DAIKIN64"
-#ifndef D_STR_DELONGHI_AC
-#define D_STR_DELONGHI_AC "DELONGHI_AC"
-#endif  // D_STR_DELONGHI_AC
 #endif  // D_STR_DAIKIN64
 #ifndef D_STR_DENON
 #define D_STR_DENON "DENON"
@@ -511,9 +499,6 @@
 #ifndef D_STR_DISH
 #define D_STR_DISH "DISH"
 #endif  // D_STR_DISH
-#ifndef D_STR_DOSHISHA
-#define D_STR_DOSHISHA "DOSHISHA"
-#endif  // D_STR_DOSHISHA
 #ifndef D_STR_ELECTRA_AC
 #define D_STR_ELECTRA_AC "ELECTRA_AC"
 #endif  // D_STR_ELECTRA_AC
@@ -607,9 +592,6 @@
 #ifndef D_STR_MITSUBISHI_HEAVY_88
 #define D_STR_MITSUBISHI_HEAVY_88 "MITSUBISHI_HEAVY_88"
 #endif  // D_STR_MITSUBISHI_HEAVY_88
-#ifndef D_STR_MULTIBRACKETS
-#define D_STR_MULTIBRACKETS "MULTIBRACKETS"
-#endif  // D_STR_MULTIBRACKETS
 #ifndef D_STR_MWM
 #define D_STR_MWM "MWM"
 #endif  // D_STR_MWM
@@ -693,6 +675,14 @@
 #endif  // D_STR_TCL112AC
 #ifndef D_STR_TECO
 #define D_STR_TECO "TECO"
+
+
+#ifndef D_STR_TESTCARRIER
+#define D_STR_TESTCARRIER "TESTCARRIER"
+#endif  // D_STR_TESTCARIER
+
+
+
 #endif  // D_STR_TECO
 #ifndef D_STR_TOSHIBA_AC
 #define D_STR_TOSHIBA_AC "TOSHIBA_AC"
@@ -712,6 +702,8 @@
 #ifndef D_STR_WHYNTER
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
+
+
 
 // IRrecvDumpV2
 #ifndef D_STR_TIMESTAMP

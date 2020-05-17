@@ -106,7 +106,7 @@ class IRCoolixAC {
   void stateReset();
 #if SEND_COOLIX
   void send(const uint16_t repeat = kCoolixDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_COOLIX
   void begin();
   void on();

@@ -573,20 +573,12 @@ class IRsend {
   void sendAirwell(uint64_t data, uint16_t nbits = kAirwellBits,
                    uint16_t repeat = kAirwellMinRepeats);
 #endif
-#if SEND_DELONGHI_AC
-  void sendDelonghiAc(uint64_t data, uint16_t nbits = kDelonghiAcBits,
-                      uint16_t repeat = kDelonghiAcDefaultRepeat);
-#endif
-#if SEND_DOSHISHA
-  void sendDoshisha(const uint64_t data, uint16_t nbits = kDoshishaBits,
-                    const uint16_t repeat = kNoRepeat);
-  uint64_t encodeDoshisha(const uint8_t command, const uint8_t channel = 0);
-#endif  // SEND_DOSHISHA
-#if SEND_MULTIBRACKETS
-  void sendMultibrackets(const uint64_t data,
-                         const uint16_t nbits = kMultibracketsBits,
-                         const uint16_t repeat = kMultibracketsDefaultRepeat);
-#endif
+
+#if SEND_TESTCARRIER
+// Function should be safe up to 64 bits.
+void sendTestCarrier(const uint64_t data, const uint16_t nbits = kTestCarrierBits,
+                         const uint16_t repeat = kNoRepeat);
+#endif  // SEND_TESTCARIER
 
  protected:
 #ifdef UNIT_TEST

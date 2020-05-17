@@ -133,7 +133,7 @@ class IRMitsubishiHeavy152Ac {
   void stateReset(void);
 #if SEND_MITSUBISHIHEAVY
   void send(const uint16_t repeat = kMitsubishiHeavy152MinRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHIHEAVY
   void begin(void);
   void on(void);

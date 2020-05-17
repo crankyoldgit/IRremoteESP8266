@@ -1,8 +1,5 @@
 // Copyright 2019 - David Conran (@crankyoldgit)
 
-/// @warn If you add or remove an entry in this file, you should run:
-///   '../tools/generate_irtext_h.sh' to rebuild the `IRtext.h` file.
-
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif  // UNIT_TEST
@@ -82,7 +79,6 @@ const PROGMEM char* kSlowStr = D_STR_SLOW;
 const PROGMEM char* kAirFlowStr = D_STR_AIRFLOW;
 const PROGMEM char* kStepStr = D_STR_STEP;
 const PROGMEM char* kNAStr = D_STR_NA;
-const PROGMEM char* kInsideStr = D_STR_INSIDE;
 const PROGMEM char* kOutsideStr = D_STR_OUTSIDE;
 const PROGMEM char* kLoudStr = D_STR_LOUD;
 const PROGMEM char* kLowerStr = D_STR_LOWER;
@@ -135,7 +131,6 @@ const PROGMEM char* kLightToggleStr = D_STR_LIGHTTOGGLE;
 const PROGMEM char* kOutsideQuietStr = D_STR_OUTSIDEQUIET;
 const PROGMEM char* kPowerToggleStr = D_STR_POWERTOGGLE;
 const PROGMEM char* kPreviousPowerStr = D_STR_PREVIOUSPOWER;
-const PROGMEM char* kDisplayTempStr = D_STR_DISPLAYTEMP;
 const PROGMEM char* kSensorTempStr = D_STR_SENSORTEMP;
 const PROGMEM char* kSleepTimerStr = D_STR_SLEEP_TIMER;
 const PROGMEM char* kSwingVModeStr = D_STR_SWINGVMODE;
@@ -252,8 +247,5 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_HITACHI_AC3 "\x0"
     D_STR_DAIKIN64 "\x0"
     D_STR_AIRWELL "\x0"
-    D_STR_DELONGHI_AC "\x0"
-    D_STR_DOSHISHA "\x0"
-    D_STR_MULTIBRACKETS "\x0"
-    // New protocol strings should be added just above this line.
+    D_STR_TESTCARRIER "\x0"
     "\x0";  // This string requires double null termination.

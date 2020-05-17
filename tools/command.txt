@@ -1,0 +1,1 @@
+C:\Users\wahib\.platformio\lib\IRremoteESP8266_ID1089\tools\auto_analyse_raw_data.py -g -n Carrier -f C:\Users\wahib\.platformio\lib\IRremoteESP8266_ID1089\tools\Rawdata.txt

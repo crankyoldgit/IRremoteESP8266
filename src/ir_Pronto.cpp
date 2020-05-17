@@ -69,7 +69,7 @@ void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
   uint16_t seq_1_start = kProntoDataOffset;
   uint16_t seq_2_start = kProntoDataOffset + seq_1_len;
 
-  uint32_t periodic_time_x10 = calcUSecPeriod(hz / 10, false);
+  uint32_t periodic_time = calcUSecPeriod(hz, false);
 
   // Normal (1st sequence) case.
   // Is there a first (normal) sequence to send?
@@ -78,8 +78,8 @@ void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
     if (seq_1_len + seq_1_start > len) return;
     // Send the contents of the 1st sequence.
     for (uint16_t i = seq_1_start; i < seq_1_start + seq_1_len; i += 2) {
-      mark((data[i] * periodic_time_x10) / 10);
-      space((data[i + 1] * periodic_time_x10) / 10);
+      mark(data[i] * periodic_time);
+      space(data[i + 1] * periodic_time);
     }
   } else {
     // There was no first sequence to send, it is implied that we have to send
@@ -96,8 +96,8 @@ void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
     // Send the contents of the 2nd sequence.
     for (uint16_t r = 0; r < repeat; r++)
       for (uint16_t i = seq_2_start; i < seq_2_start + seq_2_len; i += 2) {
-        mark((data[i] * periodic_time_x10) / 10);
-        space((data[i + 1] * periodic_time_x10) / 10);
+        mark(data[i] * periodic_time);
+        space(data[i + 1] * periodic_time);
       }
   }
 }

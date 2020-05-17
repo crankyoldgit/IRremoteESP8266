@@ -3261,8 +3261,7 @@ bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
                                kDaikin64BitMark, kDaikin64OneSpace,
                                kDaikin64BitMark, kDaikin64ZeroSpace,
                                kDaikin64BitMark, kDaikin64Gap,
-                               false, _tolerance + kDaikin64ToleranceDelta,
-                               kMarkExcess, false);
+                               false, _tolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
   // Footer #2

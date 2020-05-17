@@ -573,53 +573,42 @@
 #endif  // SEND_DAIKIN152
 
 #ifndef DECODE_EPSON
-#define DECODE_EPSON           _IR_ENABLE_DEFAULT_
+#define DECODE_EPSON   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_EPSON
 #ifndef SEND_EPSON
-#define SEND_EPSON             _IR_ENABLE_DEFAULT_
+#define SEND_EPSON     _IR_ENABLE_DEFAULT_
 #endif  // SEND_EPSON
 
 #ifndef DECODE_SYMPHONY
-#define DECODE_SYMPHONY        _IR_ENABLE_DEFAULT_
+#define DECODE_SYMPHONY   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_SYMPHONY
 #ifndef SEND_SYMPHONY
-#define SEND_SYMPHONY          _IR_ENABLE_DEFAULT_
+#define SEND_SYMPHONY     _IR_ENABLE_DEFAULT_
 #endif  // SEND_SYMPHONY
 
 #ifndef DECODE_DAIKIN64
-#define DECODE_DAIKIN64        _IR_ENABLE_DEFAULT_
+#define DECODE_DAIKIN64       _IR_ENABLE_DEFAULT_
 #endif  // DECODE_DAIKIN64
 #ifndef SEND_DAIKIN64
-#define SEND_DAIKIN64          _IR_ENABLE_DEFAULT_
+#define SEND_DAIKIN64         _IR_ENABLE_DEFAULT_
 #endif  // SEND_DAIKIN64
 
 #ifndef DECODE_AIRWELL
-#define DECODE_AIRWELL         _IR_ENABLE_DEFAULT_
+#define DECODE_AIRWELL       _IR_ENABLE_DEFAULT_
 #endif  // DECODE_AIRWELL
 #ifndef SEND_AIRWELL
-#define SEND_AIRWELL           _IR_ENABLE_DEFAULT_
+#define SEND_AIRWELL         _IR_ENABLE_DEFAULT_
 #endif  // SEND_AIRWELL
 
-#ifndef DECODE_DELONGHI_AC
-#define DECODE_DELONGHI_AC      _IR_ENABLE_DEFAULT_
-#endif  // DECODE_DELONGHI_AC
-#ifndef SEND_DELONGHI_AC
-#define SEND_DELONGHI_AC        _IR_ENABLE_DEFAULT_
-#endif  // SEND_DELONGHI_AC
 
-#ifndef DECODE_DOSHISHA
-#define DECODE_DOSHISHA       _IR_ENABLE_DEFAULT_
-#endif  // DECODE_DOSHISHA
-#ifndef SEND_DOSHISHA
-#define SEND_DOSHISHA         _IR_ENABLE_DEFAULT_
-#endif  // SEND_DOSHISHA
+#ifndef DECODE_TESTCARRIER
+#define DECODE_TESTCARRIER       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TESTCARIER
+#ifndef SEND_TESTCARRIER
+#define SEND_TESTCARRIER         _IR_ENABLE_DEFAULT_
+#endif  // SEND_TESTCARRIER
 
-#ifndef DECODE_MULTIBRACKETS
-#define DECODE_MULTIBRACKETS  _IR_ENABLE_DEFAULT_
-#endif  // DECODE_MULTIBRACKETS
-#ifndef SEND_MULTIBRACKETS
-#define SEND_MULTIBRACKETS    _IR_ENABLE_DEFAULT_
-#endif  // SEND_MULTIBRACKETS
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -747,11 +736,9 @@ enum decode_type_t {
   HITACHI_AC3,
   DAIKIN64,
   AIRWELL,
-  DELONGHI_AC,  // 80
-  DOSHISHA,
-  MULTIBRACKETS,
+  TESTCARRIER,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MULTIBRACKETS,
+  kLastDecodeType = TESTCARRIER,
 };
 
 // Message lengths & required repeat values
@@ -798,14 +785,11 @@ const uint16_t kDaikin176DefaultRepeat = kNoRepeat;
 const uint16_t kDaikin216StateLength = 27;
 const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
 const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
-const uint16_t kDelonghiAcBits = 64;
-const uint16_t kDelonghiAcDefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
 const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
-const uint16_t kDoshishaBits = 40;
 const uint16_t kEpsonBits = 32;
 const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;
@@ -860,6 +844,7 @@ const uint16_t kMagiquestBits = 56;
 const uint16_t kMideaBits = 48;
 const uint16_t kMideaMinRepeat = kNoRepeat;
 const uint16_t kMitsubishiBits = 16;
+const uint16_t kTestCarrierBits = 64;  // Move to IRremoteESP8266.h
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 //               Based on marcosamarinho's code.
 const uint16_t kMitsubishiMinRepeat = kSingleRepeat;
@@ -878,8 +863,6 @@ const uint16_t kMitsubishiHeavy88MinRepeat = kNoRepeat;
 const uint16_t kMitsubishiHeavy152StateLength = 19;
 const uint16_t kMitsubishiHeavy152Bits = kMitsubishiHeavy152StateLength * 8;
 const uint16_t kMitsubishiHeavy152MinRepeat = kNoRepeat;
-const uint16_t kMultibracketsBits = 8;
-const uint16_t kMultibracketsDefaultRepeat = kSingleRepeat;
 const uint16_t kNikaiBits = 24;
 const uint16_t kNECBits = 32;
 const uint16_t kNeoclimaStateLength = 12;
@@ -925,8 +908,8 @@ const uint16_t kSony15Bits = 15;
 const uint16_t kSony20Bits = 20;
 const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
-const uint16_t kSymphonyBits = 12;
-const uint16_t kSymphonyDefaultRepeat = 3;
+const uint16_t kSymphonyBits = 11;
+const uint16_t kSymphonyDefaultRepeat = kSingleRepeat;
 const uint16_t kTcl112AcStateLength = 14;
 const uint16_t kTcl112AcBits = kTcl112AcStateLength * 8;
 const uint16_t kTcl112AcDefaultRepeat = kNoRepeat;
@@ -1000,7 +983,7 @@ const uint8_t  kVestelAcBits = 56;
 #define WHYNTER_BITS                  kWhynterBits
 
 // Turn on Debugging information by uncommenting the following line.
-// #define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
 #ifdef UNIT_TEST

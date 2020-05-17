@@ -147,7 +147,7 @@ class IRHitachiAc {
   void stateReset(void);
 #if SEND_HITACHI_AC
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC
   void begin(void);
   void on(void);
@@ -198,7 +198,7 @@ class IRHitachiAc1 {
   void stateReset(void);
 #if SEND_HITACHI_AC1
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC1
   void begin(void);
   void on(void);
@@ -260,7 +260,7 @@ class IRHitachiAc424 {
   void stateReset(void);
 #if SEND_HITACHI_AC424
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC424
   void begin(void);
   void on(void);
@@ -307,7 +307,7 @@ class IRHitachiAc3 {
   void stateReset(void);
 #if SEND_HITACHI_AC3
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  uint8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC3
   void begin(void);
   uint8_t getMode(void);
