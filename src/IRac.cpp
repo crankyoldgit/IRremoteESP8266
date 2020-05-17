@@ -20,6 +20,7 @@
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
+#include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
@@ -105,6 +106,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif  // SEND_CARRIER_AC64
 #if SEND_COOLIX
     case decode_type_t::COOLIX:
+#endif
+#if SEND_CORONA_AC
+    case decode_type_t::CORONA_AC:
 #endif
 #if SEND_DAIKIN
     case decode_type_t::DAIKIN:
@@ -341,6 +345,29 @@ void IRac::coolix(IRCoolixAC *ac,
   ac->send();
 }
 #endif  // SEND_COOLIX
+
+#if SEND_CORONA_AC
+void IRac::corona(IRCoronaAc *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv, const bool econo) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV((int8_t)swingv >= 0);
+  // No Quiet setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Turbo setting available.
+  ac->setEcono(econo);
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  ac->send();
+}
+#endif  // SEND_CARRIER_AC64
 
 #if SEND_DAIKIN
 void IRac::daikin(IRDaikinESP *ac,
@@ -1371,6 +1398,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
+      case decode_type_t::CORONA_AC:
       case decode_type_t::HITACHI_AC344:
       case decode_type_t::HITACHI_AC424:
       case decode_type_t::MIDEA:
@@ -1485,6 +1513,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_COOLIX
+#if SEND_CORONA_AC
+    case CORONA_AC:
+    {
+      IRCoronaAc ac(_pin, _inverted, _modulation);
+      corona(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+             send.econo);
+      break;
+    }
+#endif  // SEND_CORONA_AC
 #if SEND_DAIKIN
     case DAIKIN:
     {
@@ -2370,6 +2407,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_COOLIX
+#if DECODE_CORONA_AC
+      case decode_type_t::CORONA_AC: {
+        IRCoronaAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_CORONA_AC
 #if DECODE_PANASONIC_AC
       case decode_type_t::PANASONIC_AC: {
         if (result->bits > kPanasonicAcShortBits) {
@@ -2493,6 +2537,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_COOLIX
+#if DECODE_CORONA_AC
+      case decode_type_t::CORONA_AC: {
+        IRCoronaAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_CARRIER_AC64
 #if DECODE_CARRIER_AC64
       case decode_type_t::CARRIER_AC64: {
         IRCarrierAc64 ac(kGpioUnused);

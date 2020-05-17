@@ -642,6 +642,13 @@
 #define SEND_MULTIBRACKETS     _IR_ENABLE_DEFAULT_
 #endif  // SEND_MULTIBRACKETS
 
+#ifndef DECODE_CORONA_AC
+#define DECODE_CORONA_AC       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CORONA_AC
+#ifndef SEND_CORONA_AC
+#define SEND_CORONA_AC         _IR_ENABLE_DEFAULT_
+#endif  // SEND_CORONA_AC
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -653,7 +660,7 @@
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
-     DECODE_HITACHI_AC344)
+     DECODE_HITACHI_AC344 || DECODE_CORONA_AC)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -778,8 +785,9 @@ enum decode_type_t {
   CARRIER_AC40,
   CARRIER_AC64,
   HITACHI_AC344,  // 85
+  CORONA_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HITACHI_AC344,
+  kLastDecodeType = CORONA_AC,
 };
 
 // Message lengths & required repeat values
@@ -805,6 +813,10 @@ const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
 const uint16_t kCarrierAc64Bits = 64;
 const uint16_t kCarrierAc64MinRepeat = kNoRepeat;
+const uint16_t kCoronaAcStateLengthShort = 7;
+const uint16_t kCoronaAcStateLength = kCoronaAcStateLengthShort * 3;
+const uint16_t kCoronaAcBitsShort = kCoronaAcStateLengthShort * 8;
+const uint16_t kCoronaAcBits = kCoronaAcStateLength * 8;
 const uint16_t kDaikinStateLength = 35;
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
 const uint16_t kDaikinStateLengthShort = kDaikinStateLength - 8;

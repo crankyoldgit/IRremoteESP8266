@@ -484,6 +484,9 @@
 #ifndef D_STR_COOLIX
 #define D_STR_COOLIX "COOLIX"
 #endif  // D_STR_COOLIX
+#ifndef D_STR_CORONA_AC
+#define D_STR_CORONA_AC "CORONA_AC"
+#endif  // D_STR_CORONA_AC
 #ifndef D_STR_DAIKIN
 #define D_STR_DAIKIN "DAIKIN"
 #endif  // D_STR_DAIKIN
