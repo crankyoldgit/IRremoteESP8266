@@ -544,7 +544,7 @@ TEST(TestIRac, Gree) {
   IRac irac(0);
   IRrecv capture(0);
   char expected[] =
-      "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 22C, "
+      "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 71F, "
       "Fan: 2 (Medium), Turbo: Off, IFeel: Off, WiFi: Off, XFan: On, "
       "Light: On, Sleep: On, Swing(V) Mode: Manual, "
       "Swing(V): 3 (UNKNOWN), Timer: Off, Display Temp: 0 (Off)";
@@ -554,7 +554,8 @@ TEST(TestIRac, Gree) {
             gree_ac_remote_model_t::YAW1F,  // Model
             true,                           // Power
             stdAc::opmode_t::kCool,         // Mode
-            22,                             // Celsius
+            false,                          // Celsius
+            71,                             // Degrees (F)
             stdAc::fanspeed_t::kMedium,     // Fan speed
             stdAc::swingv_t::kHigh,         // Veritcal swing
             false,                          // Turbo
