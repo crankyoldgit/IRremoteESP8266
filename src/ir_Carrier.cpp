@@ -21,13 +21,21 @@ const uint16_t kCarrierAcBitMark = 628;
 const uint16_t kCarrierAcOneSpace = 1320;
 const uint16_t kCarrierAcZeroSpace = 532;
 const uint16_t kCarrierAcGap = 20000;
+const uint16_t kCarrierAcFreq = 38;  // kHz. (An educated guess)
 
 const uint16_t kCarrierAc40HdrMark = 8402;
 const uint16_t kCarrierAc40HdrSpace = 4166;
 const uint16_t kCarrierAc40BitMark = 547;
 const uint16_t kCarrierAc40OneSpace = 1540;
 const uint16_t kCarrierAc40ZeroSpace = 497;
-const uint16_t kCarrierAc40Freq = 38;  // kHz. (An educated guess)
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
+const uint16_t kCarrierAc64HdrMark = 8940;
+const uint16_t kCarrierAc64HdrSpace = 4556;
+const uint16_t kCarrierAc64BitMark = 503;
+const uint16_t kCarrierAc64OneSpace = 1736;
+const uint16_t kCarrierAc64ZeroSpace = 615;
+const uint32_t kCarrierAc64Gap = kDefaultMessageGap;  // A guess.
 
 
 #if SEND_CARRIER_AC
@@ -121,7 +129,7 @@ void IRsend::sendCarrierAC40(const uint64_t data, const uint16_t nbits,
   sendGeneric(kCarrierAc40HdrMark, kCarrierAc40HdrSpace, kCarrierAc40BitMark,
               kCarrierAc40OneSpace, kCarrierAc40BitMark, kCarrierAc40ZeroSpace,
               kCarrierAc40BitMark, kCarrierAcGap,
-              data, nbits, kCarrierAc40Freq, true, repeat, kDutyDefault);
+              data, nbits, kCarrierAcFreq, true, repeat, kDutyDefault);
 }
 #endif  // SEND_CARRIER_AC40
 
@@ -158,3 +166,53 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_CARRIER_AC40
+
+#if SEND_CARRIER_AC64
+/// Send a Carrier 64bit HVAC formatted message.
+/// Status: Alpha / Yet to be tested against a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The bit size of the message being sent.
+/// @param[in] repeat The number of times the message is to be repeated.
+void IRsend::sendCarrierAC64(const uint64_t data, const uint16_t nbits,
+                             const uint16_t repeat) {
+  sendGeneric(kCarrierAc64HdrMark, kCarrierAc64HdrSpace, kCarrierAc64BitMark,
+              kCarrierAc64OneSpace, kCarrierAc64BitMark, kCarrierAc64ZeroSpace,
+              kCarrierAc64BitMark, kCarrierAc64Gap,
+              data, nbits, kCarrierAcFreq, false, repeat, kDutyDefault);
+}
+#endif  // SEND_CARRIER_AC64
+
+#if DECODE_CARRIER_AC64
+/// Decode the supplied Carrier 64-bit HVAC message.
+/// Carrier HVAC messages contain only 64 bits, but it is sent three(3) times.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+bool IRrecv::decodeCarrierAC64(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
+    return false;  // Can't possibly be a valid Carrier message.
+  if (strict && nbits != kCarrierAc64Bits)
+    return false;  // We expect Carrier to be 64 bits of message.
+
+  if (!matchGeneric(results->rawbuf + offset, &(results->value),
+                    results->rawlen - offset, nbits,
+                    kCarrierAc64HdrMark, kCarrierAc64HdrSpace,
+                    kCarrierAc64BitMark, kCarrierAc64OneSpace,
+                    kCarrierAc64BitMark, kCarrierAc64ZeroSpace,
+                    kCarrierAc64BitMark, kCarrierAc64Gap, true,
+                    kUseDefTol, kMarkExcess, false)) return false;
+
+  // Success
+  results->bits = nbits;
+  results->decode_type = CARRIER_AC64;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
+#endif  // DECODE_CARRIER_AC64

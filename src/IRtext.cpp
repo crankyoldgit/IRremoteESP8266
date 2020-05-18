@@ -1,4 +1,4 @@
-// Copyright 2019 - David Conran (@crankyoldgit)
+// Copyright 2019-2020 - David Conran (@crankyoldgit)
 
 /// @warn If you add or remove an entry in this file, you should run:
 ///   '../tools/generate_irtext_h.sh' to rebuild the `IRtext.h` file.
@@ -256,5 +256,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_DOSHISHA "\x0"
     D_STR_MULTIBRACKETS "\x0"
     D_STR_CARRIER_AC40 "\x0"
+    D_STR_CARRIER_AC64 "\x0"
     // New protocol strings should be added just above this line.
     "\x0";  // This string requires double null termination.

@@ -390,6 +390,13 @@
 #define SEND_CARRIER_AC40      _IR_ENABLE_DEFAULT_
 #endif  // SEND_CARRIER_AC40
 
+#ifndef DECODE_CARRIER_AC64
+#define DECODE_CARRIER_AC64    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CARRIER_AC64
+#ifndef SEND_CARRIER_AC64
+#define SEND_CARRIER_AC64      _IR_ENABLE_DEFAULT_
+#endif  // SEND_CARRIER_AC64
+
 #ifndef DECODE_HAIER_AC
 #define DECODE_HAIER_AC        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_HAIER_AC
@@ -627,6 +634,7 @@
 #ifndef SEND_MULTIBRACKETS
 #define SEND_MULTIBRACKETS    _IR_ENABLE_DEFAULT_
 #endif  // SEND_MULTIBRACKETS
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -758,8 +766,9 @@ enum decode_type_t {
   DOSHISHA,
   MULTIBRACKETS,
   CARRIER_AC40,
+  CARRIER_AC64,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CARRIER_AC40,
+  kLastDecodeType = CARRIER_AC64,
 };
 
 // Message lengths & required repeat values
@@ -783,6 +792,8 @@ const uint16_t kCarrierAcBits = 32;
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
 const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
+const uint16_t kCarrierAc64Bits = 64;
+const uint16_t kCarrierAc64MinRepeat = kNoRepeat;
 const uint16_t kDaikinStateLength = 35;
 const uint16_t kDaikinBits = kDaikinStateLength * 8;
 const uint16_t kDaikinStateLengthShort = kDaikinStateLength - 8;

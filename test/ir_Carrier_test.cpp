@@ -251,6 +251,16 @@ TEST(TestUtils, Housekeeping) {
             IRsend::defaultBits(decode_type_t::CARRIER_AC40));
   ASSERT_EQ(kCarrierAc40MinRepeat,
             IRsend::minRepeats(decode_type_t::CARRIER_AC40));
+
+  // CARRIER_AC64
+  ASSERT_EQ("CARRIER_AC64", typeToString(decode_type_t::CARRIER_AC64));
+  ASSERT_EQ(decode_type_t::CARRIER_AC64, strToDecodeType("CARRIER_AC64"));
+  ASSERT_FALSE(hasACState(decode_type_t::CARRIER_AC64));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::CARRIER_AC64));
+  ASSERT_EQ(kCarrierAc64Bits,
+            IRsend::defaultBits(decode_type_t::CARRIER_AC64));
+  ASSERT_EQ(kCarrierAc64MinRepeat,
+            IRsend::minRepeats(decode_type_t::CARRIER_AC64));
 }
 
 /// Decode a "real" example message.
@@ -325,5 +335,71 @@ TEST(TestDecodeCarrierAC40, SyntheticExample) {
       "m547s1540m547s1540m547s497m547s497m547s497m547s497m547s497m547s497"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s1540m547s497m547s497"
       "m547s20000",
+      irsend.outputStr());
+}
+
+/// Decode a "real" example message.
+TEST(TestDecodeCarrierAC64, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+  // Data from:
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1127#issuecomment-629713855
+  const uint16_t rawData[131] = {
+      8940, 4556,
+      504, 616, 504, 616, 502, 1736, 504, 616, 504, 616, 504, 616, 502, 616,
+      502, 1736, 504, 1736, 502, 616, 504, 1736, 504, 616, 502, 1736, 504, 616,
+      502, 1736, 502, 616, 504, 616, 504, 1736, 502, 1736, 504, 1736, 502, 1736,
+      504, 616, 502, 1736, 502, 616, 504, 616, 504, 1736, 504, 1736, 504, 1736,
+      504, 616, 504, 1736, 502, 616, 502, 616, 504, 616, 504, 616, 502, 616,
+      502, 616, 504, 1736, 504, 616, 504, 616, 502, 616, 504, 616, 504, 616,
+      502, 616, 502, 616, 504, 616, 504, 616, 504, 616, 502, 616, 504, 616,
+      504, 616, 502, 616, 502, 616, 504, 616, 504, 616, 504, 1736, 504, 616,
+      504, 616, 504, 616, 504, 616, 504, 616, 504, 616, 504, 616, 502, 1736,
+      504, 586, 502};
+
+  irsend.sendRaw(rawData, 131, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(CARRIER_AC64, irsend.capture.decode_type);
+  EXPECT_EQ(kCarrierAc64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x404000102E5E5584, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+}
+
+/// Send & Decode a synthetic message.
+TEST(TestDecodeCarrierAC64, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+
+  irsend.sendCarrierAC64(0x404000102E5E5584);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(CARRIER_AC64, irsend.capture.decode_type);
+  EXPECT_EQ(kCarrierAc64Bits, irsend.capture.bits);
+  EXPECT_EQ(0x404000102E5E5584, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(
+      "f38000d50m"
+      // Header
+      "8940s4556"
+      // Data
+      "m503s615m503s615m503s1736m503s615m503s615m503s615m503s615m503s1736"
+      "m503s1736m503s615m503s1736m503s615m503s1736m503s615m503s1736m503s615"
+      "m503s615m503s1736m503s1736m503s1736m503s1736m503s615m503s1736m503s615"
+      "m503s615m503s1736m503s1736m503s1736m503s615m503s1736m503s615m503s615"
+      "m503s615m503s615m503s615m503s615m503s1736m503s615m503s615m503s615"
+      "m503s615m503s615m503s615m503s615m503s615m503s615m503s615m503s615"
+      "m503s615m503s615m503s615m503s615m503s615m503s615m503s1736m503s615"
+      "m503s615m503s615m503s615m503s615m503s615m503s615m503s1736m503s615"
+      // Footer
+      "m503s100000",
       irsend.outputStr());
 }
