@@ -801,6 +801,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Multibrackets decode");
     if (decodeMultibrackets(results, offset)) return true;
 #endif  // DECODE_MULTIBRACKETS
+#if DECODE_CARRIER_AC40
+    DPRINTLN("Attempting Carrier 40bit decode");
+    if (decodeCarrierAC40(results, offset)) return true;
+#endif  // DECODE_CARRIER_AC40
+#if DECODE_CARRIER_AC64
+    DPRINTLN("Attempting Carrier 64bit decode");
+    if (decodeCarrierAC64(results, offset)) return true;
+#endif  // DECODE_CARRIER_AC64
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

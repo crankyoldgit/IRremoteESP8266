@@ -614,6 +614,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     // Special
     case AIRWELL:
       return kAirwellMinRepeats;
+    case CARRIER_AC40:
+      return kCarrierAc40MinRepeat;
     case DISH:
       return kDishMinRepeat;
     case EPSON:
@@ -681,6 +683,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 35;
     case SAMSUNG36:
       return 36;
+    case CARRIER_AC40:
+      return kCarrierAc40Bits;  // 40
     case DOSHISHA:
       return kDoshishaBits;  // 40
     case SANYO_LC7461:
@@ -693,8 +697,9 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case VESTEL_AC:
       return 56;
     case AMCOR:
-    case PIONEER:
+    case CARRIER_AC64:
     case DELONGHI_AC:
+    case PIONEER:
       return 64;
     case ARGO:
       return kArgoBits;
@@ -728,8 +733,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc1Bits;
     case HITACHI_AC2:
       return kHitachiAc2Bits;
-      case HITACHI_AC3:
-        return kHitachiAc3Bits;
+    case HITACHI_AC3:
+      return kHitachiAc3Bits;
     case HITACHI_AC424:
       return kHitachiAc424Bits;
     case KELVINATOR:
@@ -796,6 +801,16 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendCarrierAC(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_CARRIER_AC40
+    case CARRIER_AC40:
+      sendCarrierAC40(data, nbits, min_repeat);
+      break;
+#endif  // SEND_CARRIER_AC40
+#if SEND_CARRIER_AC64
+    case CARRIER_AC64:
+      sendCarrierAC64(data, nbits, min_repeat);
+      break;
+#endif  // SEND_CARRIER_AC64
 #if SEND_COOLIX
     case COOLIX:
       sendCOOLIX(data, nbits, min_repeat);
