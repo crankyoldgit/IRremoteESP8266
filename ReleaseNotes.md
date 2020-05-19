@@ -1,5 +1,36 @@
 # Release Notes
 
+## _v2.7.7 (20200519)_
+
+**[BREAKING CHANGES]**
+- Fix Symphony protocol. (#1107, #1105)
+  * Now 12 bits and bits are inverted. All previous codes will no longer work.
+- IRMQTTServer: Better handle power & mode operations for Home Assistant. (#1099, #1092)
+  * When `MQTT_CLIMATE_HA_MODE` is enabled (default) this will break previous operation mode resumption when power is changed.
+
+**[Bug Fixes]**
+- Set correct return type for `.calibrate()` (#1095, #1093)
+
+**[Features]**
+- Add basic support for Carrier 40 & 64 bit protocols. (#1125, #1112, #1127)
+- Gree: Enable native support for Fahrenheit (#1124, #1121)
+- Gree: Add option to control display temp source. (#1120, #1118)
+- Add support for Multibrackets protocol. (#1106, #1103)
+- Add RawToPronto.py tool & improve `sendPronto()` precision (#1104, #1103)
+- Add support for `Doshisha` LED light protocol (#1115)
+- Introduce IRrecvDumpV3 with basic OTA update support (#1111)
+- Add detailed support for Delonghi A/C (#1098, #1096)
+- Improved support for SharpAc. (#1094, #1091)
+- Update auto_analyse to use new decode call structure. (#1102, #1097)
+- Added Blynk app example (#1090)
+
+**[Misc]**
+- update auto_analyse script to use new param documentation (#1126)
+- Improve `raw_to_pronto_code.py` (#1122, #1103)
+- Use pattern rules in Makefiles to reduce specific rule (#1110)
+- Update list of supported Daikin models. (#1101)
+
+
 ## _v2.7.6 (20200425)_
 
 **[Features]**

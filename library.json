@@ -1,6 +1,6 @@
 {
   "name": "IRremoteESP8266",
-  "version": "2.7.6",
+  "version": "2.7.7",
   "keywords": "infrared, ir, remote, esp8266, esp32",
   "description": "Send and receive infrared signals with multiple protocols (ESP8266/ESP32)",
   "repository":
@@ -36,6 +36,11 @@
     {
       "name": "Massimiliano Pinto",
       "url": "https://github.com/pintomax/",
+      "maintainer": true
+    },
+    {
+      "name": "Christian Nilsson",
+      "url": "https://github.com/NiKiZe",
       "maintainer": true
     }
   ],
