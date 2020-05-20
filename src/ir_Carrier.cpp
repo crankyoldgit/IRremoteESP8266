@@ -184,7 +184,6 @@ void IRsend::sendCarrierAC64(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_CARRIER_AC64
 /// Decode the supplied Carrier 64-bit HVAC message.
-/// Carrier HVAC messages contain only 64 bits, but it is sent three(3) times.
 /// Status: BETA / Probably works.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
