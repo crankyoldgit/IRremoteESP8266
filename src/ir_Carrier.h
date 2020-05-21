@@ -113,5 +113,7 @@ class IRCarrierAc64 {
 #endif
   uint64_t remote_state;  // The state of the IR remote.
   void checksum(void);
+  void _cancelOnTimer(void);
+  void _cancelOffTimer(void);
 };
 #endif  // IR_CARRIER_H_

@@ -579,12 +579,12 @@ TEST(TestCarrierAc64Class, HumanReadable) {
   ac.setOnTimer(5 * 60 + 59);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
-      "Sleep: Off, On Timer: 05:00, Off Timer: 08:00",
+      "Sleep: Off, On Timer: 05:00, Off Timer: Off",
       ac.toString());
   ac.setOnTimer(59);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
-      "Sleep: Off, On Timer: Off, Off Timer: 08:00",
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setSleep(true);
   EXPECT_EQ(
@@ -604,6 +604,7 @@ TEST(TestCarrierAc64Class, ReconstructKnownState) {
   ac.setTemp(16);
   ac.setFan(kCarrierAc64FanLow);
   ac.setSwingV(true);
+  ac.setOnTimer(3 * 60);
   ac.setSleep(true);
   EXPECT_EQ(expected, ac.getRaw());
   EXPECT_EQ(

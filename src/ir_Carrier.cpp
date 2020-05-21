@@ -421,22 +421,25 @@ bool IRCarrierAc64::getSwingV(void) {
 /// Set the Sleep mode of the A/C.
 /// @param on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setSleep(const bool on) {
-  setBit(&remote_state, kCarrierAc64SleepOffset, on);
   if (on) {
-    // Sleep sets specific values in the On & Off timer times, but has them
-    // disabled.
+    // Sleep sets a default value in the Off timer, and disables both timers.
     setOffTimer(2 * 60);
-    setOnTimer(3 * 60);
     // Clear the enable bits for each timer.
-    setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, false);
-    setBit(&remote_state, kCarrierAc64OnTimerEnableOffset, false);
+    _cancelOnTimer();
+    _cancelOffTimer();
   }
+  setBit(&remote_state, kCarrierAc64SleepOffset, on);
 }
 
 /// Get the Sleep mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRCarrierAc64::getSleep(void) {
   return GETBIT64(remote_state, kCarrierAc64SleepOffset);
+}
+
+/// Clear the On Timer enable bit.
+void IRCarrierAc64::_cancelOnTimer(void) {
+  setBit(&remote_state, kCarrierAc64OnTimerEnableOffset, false);
 }
 
 /// Get the current On Timer time.
@@ -458,6 +461,15 @@ void IRCarrierAc64::setOnTimer(const uint16_t nr_of_mins) {
   setBit(&remote_state, kCarrierAc64OnTimerEnableOffset, hours);  // Enable
   setBits(&remote_state, kCarrierAc64OnTimerOffset, kCarrierAc64TimerSize,
           std::max(kCarrierAc64TimerMin, hours));  // Hours
+  if (hours) {  // If enabled, disable the Off Timer & Sleep mode.
+    _cancelOffTimer();
+    setSleep(false);
+  }
+}
+
+/// Clear the Off Timer enable bit.
+void IRCarrierAc64::_cancelOffTimer(void) {
+  setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, false);
 }
 
 /// Get the current Off Timer time.
@@ -476,9 +488,14 @@ uint16_t IRCarrierAc64::getOffTimer(void) {
 /// @note The A/C protocol only supports one hour increments.
 void IRCarrierAc64::setOffTimer(const uint16_t nr_of_mins) {
   uint8_t hours = std::min((uint8_t)(nr_of_mins / 60), kCarrierAc64TimerMax);
-  setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, hours);  // Enable
+  // The time can be changed in sleep mode, but doesn't set the flag.
+  setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, hours && !getSleep());
   setBits(&remote_state, kCarrierAc64OffTimerOffset, kCarrierAc64TimerSize,
           std::max(kCarrierAc64TimerMin, hours));  // Hours
+  if (hours) {  // If enabled, disable the On Timer & Sleep mode.
+    _cancelOnTimer();
+    setSleep(false);
+  }
 }
 
 /// Convert the internal state into a human readable string.
