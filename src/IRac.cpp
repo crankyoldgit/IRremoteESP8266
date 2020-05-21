@@ -18,6 +18,7 @@
 #include "IRutils.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Carrier.h"
 #include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Electra.h"
@@ -99,6 +100,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_ARGO
     case decode_type_t::ARGO:
 #endif
+#if SEND_CARRIER_AC64
+    case decode_type_t::CARRIER_AC64:
+#endif  // SEND_CARRIER_AC64
 #if SEND_COOLIX
     case decode_type_t::COOLIX:
 #endif
@@ -259,6 +263,29 @@ void IRac::argo(IRArgoAC *ac,
   ac->send();
 }
 #endif  // SEND_ARGO
+
+#if SEND_CARRIER_AC64
+void IRac::carrier64(IRCarrierAc64 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv, const int16_t sleep) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV((int8_t)swingv >= 0);
+  // No Quiet setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Turbo setting available.
+  // No Economy setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Convert to a boolean.
+  ac->send();
+}
+#endif  // SEND_CARRIER_AC64
 
 #if SEND_COOLIX
 void IRac::coolix(IRCoolixAC *ac,
@@ -1411,6 +1438,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_ARGO
+#if SEND_CARRIER_AC64
+    case CARRIER_AC64:
+    {
+      IRCarrierAc64 ac(_pin, _inverted, _modulation);
+      carrier64(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+                send.sleep);
+      break;
+    }
+#endif  // SEND_CARRIER_AC64
 #if SEND_COOLIX
     case COOLIX:
     {
@@ -2095,6 +2131,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_ARGO
+#if DECODE_CARRIER_AC64
+      case decode_type_t::CARRIER_AC64: {
+        IRCarrierAc64 ac(kGpioUnused);
+        ac.setRaw(result->value);  // CARRIER_AC64 uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_CARRIER_AC64
 #if DECODE_DAIKIN
       case decode_type_t::DAIKIN: {
         IRDaikinESP ac(0);
@@ -2406,6 +2449,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_COOLIX
+#if DECODE_CARRIER_AC64
+      case decode_type_t::CARRIER_AC64: {
+        IRCarrierAc64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_CARRIER_AC64
 #if DECODE_DAIKIN
       case decode_type_t::DAIKIN: {
         IRDaikinESP ac(kGpioUnused);

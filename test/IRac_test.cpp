@@ -3,6 +3,8 @@
 #include <string>
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Carrier.h"
+#include "ir_Coolix.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
 #include "ir_Electra.h"
@@ -78,6 +80,40 @@ TEST(TestIRac, Argo) {
   EXPECT_EQ(kArgoFlapAuto, ac.getFlap());
   EXPECT_FALSE(ac.getMax());  // Turbo
   EXPECT_FALSE(ac.getNight());  // Sleep
+}
+
+TEST(TestIRac, Carrier64) {
+  IRCarrierAc64 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  char expected[] =
+      "Power: On, Mode: 1 (Heat), Temp: 21C, Fan: 3 (High), Swing(V): On, "
+      "Sleep: On, On Timer: Off, Off Timer: Off";
+
+  ac.begin();
+  irac.carrier64(&ac,
+            true,                        // Power
+            stdAc::opmode_t::kHeat,      // Mode
+            21,                          // Celsius
+            stdAc::fanspeed_t::kHigh,    // Fan speed
+            stdAc::swingv_t::kAuto,      // Veritcal swing
+            1);                         // Sleep
+  EXPECT_TRUE(ac.getPower());  // Power.
+  EXPECT_EQ(kCarrierAc64Heat, ac.getMode());  // Operating mode.
+  EXPECT_EQ(21, ac.getTemp());  // Temperature.
+  EXPECT_EQ(kCarrierAc64FanHigh, ac.getFan());  // Fan Speed
+  EXPECT_TRUE(ac.getSwingV());  // SwingV
+  EXPECT_TRUE(ac.getSleep());  // Sleep
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(CARRIER_AC64, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCarrierAc64Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
 TEST(TestIRac, Coolix) {
