@@ -184,7 +184,7 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
 
 #if SEND_CARRIER_AC64
 /// Send a Carrier 64bit HVAC formatted message.
-/// Status: Alpha / Yet to be tested against a real device.
+/// Status: STABLE / Known to be working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The bit size of the message being sent.
 /// @param[in] repeat The number of times the message is to be repeated.
@@ -199,7 +199,7 @@ void IRsend::sendCarrierAC64(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_CARRIER_AC64
 /// Decode the supplied Carrier 64-bit HVAC message.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Known to be working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
