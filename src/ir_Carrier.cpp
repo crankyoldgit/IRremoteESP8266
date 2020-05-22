@@ -357,7 +357,7 @@ uint8_t IRCarrierAc64::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kHeat: return kCarrierAc64Heat;
     case stdAc::opmode_t::kFan: return kCarrierAc64Fan;
-    default: return kDaikinCool;
+    default: return kCarrierAc64Cool;
   }
 }
 
@@ -371,7 +371,6 @@ stdAc::opmode_t IRCarrierAc64::toCommonMode(const uint8_t mode) {
     default: return stdAc::opmode_t::kCool;
   }
 }
-
 
 uint8_t IRCarrierAc64::getFan(void) {
   return GETBITS64(remote_state, kCarrierAc64FanOffset, kCarrierAc64FanSize);
