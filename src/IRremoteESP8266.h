@@ -390,6 +390,13 @@
 #define SEND_CARRIER_AC40      _IR_ENABLE_DEFAULT_
 #endif  // SEND_CARRIER_AC40
 
+#ifndef DECODE_CARRIER_AC48
+#define DECODE_CARRIER_AC48    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CARRIER_AC48
+#ifndef SEND_CARRIER_AC48
+#define SEND_CARRIER_AC48      _IR_ENABLE_DEFAULT_
+#endif  // SEND_CARRIER_AC48
+
 #ifndef DECODE_CARRIER_AC64
 #define DECODE_CARRIER_AC64    _IR_ENABLE_DEFAULT_
 #endif  // DECODE_CARRIER_AC64
@@ -653,7 +660,7 @@
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
-     DECODE_HITACHI_AC344)
+     DECODE_HITACHI_AC344 || DECODE_CARRIER_AC48)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -776,8 +783,9 @@ enum decode_type_t {
   CARRIER_AC40,
   CARRIER_AC64,
   HITACHI_AC344,  // 85
+  CARRIER_AC48,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HITACHI_AC344,
+  kLastDecodeType = CARRIER_AC48,
 };
 
 // Message lengths & required repeat values
@@ -801,6 +809,9 @@ const uint16_t kCarrierAcBits = 32;
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
 const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
+const uint16_t kCarrierAc48Bits = 96;
+const uint16_t kCarrierAC48StateLength = 12;
+const uint16_t kCarrierAc48MinRepeat = kNoRepeat;
 const uint16_t kCarrierAc64Bits = 64;
 const uint16_t kCarrierAc64MinRepeat = kNoRepeat;
 const uint16_t kDaikinStateLength = 35;

@@ -141,6 +141,7 @@ bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
     case AMCOR:
     case ARGO:
+    case CARRIER_AC48:
     case DAIKIN:
     case DAIKIN128:
     case DAIKIN152:

@@ -692,6 +692,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case GOODWEATHER:
     case MIDEA:
     case PANASONIC:
+    case CARRIER_AC48:
       return 48;
     case MAGIQUEST:
     case VESTEL_AC:
@@ -1038,6 +1039,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendArgo(state, nbytes);
       break;
 #endif  // SEND_ARGO
+#if SEND_CARRIER_AC48
+    case CARRIER_AC48:
+      sendCarrier_AC48(state, nbytes);
+      break;
+#endif  // SEND_CARRIER_AC48
 #if SEND_DAIKIN
     case DAIKIN:
       sendDaikin(state, nbytes);
