@@ -492,6 +492,12 @@ class IRrecv {
                          const uint16_t nbits = kCarrierAc40Bits,
                          const bool strict = true);
 #endif  // DECODE_CARRIER_AC40
+#if DECODE_CARRIER_AC48
+  bool decodeCarrier_AC48(decode_results *results,
+                         uint16_t offset = kStartOffset,
+                         const uint16_t nbits = kCarrierAc48Bits,
+                         const bool strict = true);
+#endif  // DECODE_CARRIER_AC48
 #if DECODE_CARRIER_AC64
   bool decodeCarrierAC64(decode_results *results,
                          uint16_t offset = kStartOffset,
