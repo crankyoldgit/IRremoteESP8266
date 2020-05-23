@@ -11,6 +11,7 @@
 //   Brand: Hitachi,  Model: PC-LH3B (HITACHI_AC3)
 //   Brand: Hitachi,  Model: KAZE-312KSDP A/C (HITACHI_AC1)
 //   Brand: Hitachi,  Model: R-LT0541-HTA/Y.K.1.1-1 V2.3 remote (HITACHI_AC1)
+//   Brand: Hitachi,  Model: RAS-22NK remote (HITACHI_AC344)
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_

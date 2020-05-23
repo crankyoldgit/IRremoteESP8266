@@ -432,6 +432,13 @@
 #define SEND_HITACHI_AC3       _IR_ENABLE_DEFAULT_
 #endif  // SEND_HITACHI_AC3
 
+#ifndef DECODE_HITACHI_AC344
+#define DECODE_HITACHI_AC344   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HITACHI_AC344
+#ifndef SEND_HITACHI_AC344
+#define SEND_HITACHI_AC344     _IR_ENABLE_DEFAULT_
+#endif  // SEND_HITACHI_AC344
+
 #ifndef DECODE_HITACHI_AC424
 #define DECODE_HITACHI_AC424   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_HITACHI_AC424
@@ -645,7 +652,8 @@
      DECODE_DAIKIN216 || DECODE_SHARP_AC || DECODE_DAIKIN160 || \
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
-     DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3)
+     DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
+     DECODE_HITACHI_AC344)
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
 #else
 #define DECODE_AC false   // We don't need that infrastructure.
@@ -767,8 +775,9 @@ enum decode_type_t {
   MULTIBRACKETS,
   CARRIER_AC40,
   CARRIER_AC64,
+  HITACHI_AC344,  // 85
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CARRIER_AC64,
+  kLastDecodeType = HITACHI_AC344,
 };
 
 // Message lengths & required repeat values
@@ -861,6 +870,8 @@ const uint16_t kHitachiAc3StateLength = 27;
 const uint16_t kHitachiAc3Bits = kHitachiAc3StateLength * 8;
 const uint16_t kHitachiAc3MinStateLength = 15;
 const uint16_t kHitachiAc3MinBits = kHitachiAc3MinStateLength * 8;
+const uint16_t kHitachiAc344StateLength = 43;
+const uint16_t kHitachiAc344Bits = kHitachiAc344StateLength * 8;
 const uint16_t kHitachiAc424StateLength = 53;
 const uint16_t kHitachiAc424Bits = kHitachiAc424StateLength * 8;
 const uint16_t kInaxBits = 24;

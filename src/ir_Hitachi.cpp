@@ -56,7 +56,7 @@ using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
-#if (SEND_HITACHI_AC || SEND_HITACHI_AC2)
+#if (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC344)
 // Send a Hitachi A/C message.
 //
 // Args:
@@ -77,7 +77,7 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
               kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, true,
               repeat, 50);
 }
-#endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2)
+#endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC344)
 
 #if SEND_HITACHI_AC1
 // Send a Hitachi A/C 13-byte message.
@@ -129,6 +129,24 @@ void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
   sendHitachiAC(data, nbytes, repeat);
 }
 #endif  // SEND_HITACHI_AC2
+
+#if SEND_HITACHI_AC344
+/// Send a Hitachi A/C 43-byte message.
+///  Basically the same as sendHitatchiAC() except different size.
+/// For devices:
+///  Hitachi A/C Remote: RAS-22NK
+/// Status: Beta / Probably works.
+/// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
+/// @param data An array of bytes containing the IR command.
+/// @param nbytes Nr. of bytes of data in the array.
+/// @param repeat Nr. of times the message is to be repeated. (Default = 0).
+void IRsend::sendHitachiAc344(const unsigned char data[], const uint16_t nbytes,
+                              const uint16_t repeat) {
+  if (nbytes < kHitachiAc344StateLength)
+    return;  // Not enough bytes to send a proper message.
+  sendHitachiAC(data, nbytes, repeat);
+}
+#endif  // SEND_HITACHI_AC344
 
 // Class for handling the remote control on a Hitachi 28 byte A/C message.
 // Inspired by:
@@ -716,7 +734,8 @@ String IRHitachiAc1::toString(void) {
   return result;
 }
 
-#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
+#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || \
+     DECODE_HITACHI_AC344)
 // Decode the supplied Hitachi A/C message.
 //
 // Args:
@@ -724,7 +743,8 @@ String IRHitachiAc1::toString(void) {
 //   offset:  The starting index to use when attempting to decode the raw data.
 //            Typically/Defaults to kStartOffset.
 //   nbits:   The number of data bits to expect.
-//            Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits
+//            Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
+//            kHitachiAc344Bits
 //   strict:  Flag indicating if we should perform strict matching.
 // Returns:
 //   boolean: True if it can decode it, false if it can't.
@@ -746,6 +766,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
       case kHitachiAcBits:
       case kHitachiAc1Bits:
       case kHitachiAc2Bits:
+      case kHitachiAc344Bits:
         break;  // Okay to continue.
       default:
         return false;  // Not strictly a Hitachi message.
@@ -782,14 +803,17 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
   // Success
   switch (nbits) {
     case kHitachiAc1Bits:
-      results->decode_type = HITACHI_AC1;
+      results->decode_type = decode_type_t::HITACHI_AC1;
       break;
     case kHitachiAc2Bits:
-      results->decode_type = HITACHI_AC2;
+      results->decode_type = decode_type_t::HITACHI_AC2;
+      break;
+    case kHitachiAc344Bits:
+      results->decode_type = decode_type_t::HITACHI_AC344;
       break;
     case kHitachiAcBits:
     default:
-      results->decode_type = HITACHI_AC;
+      results->decode_type = decode_type_t::HITACHI_AC;
   }
   results->bits = nbits;
   // No need to record the state as we stored it as we decoded it.
@@ -797,7 +821,8 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
   // is a union data type.
   return true;
 }
-#endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2)
+#endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 ||
+        //  DECODE_HITACHI_AC344)
 
 #if SEND_HITACHI_AC424
 // Send HITACHI_AC424 messages

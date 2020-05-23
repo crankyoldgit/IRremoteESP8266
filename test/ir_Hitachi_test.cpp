@@ -811,16 +811,28 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::HITACHI_AC, strToDecodeType("HITACHI_AC"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC));
+  ASSERT_EQ(kHitachiAcBits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC));
 
   ASSERT_EQ("HITACHI_AC1", typeToString(decode_type_t::HITACHI_AC1));
   ASSERT_EQ(decode_type_t::HITACHI_AC1, strToDecodeType("HITACHI_AC1"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC1));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC1));
+  ASSERT_EQ(kHitachiAc1Bits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC1));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC1));
 
   ASSERT_EQ("HITACHI_AC2", typeToString(decode_type_t::HITACHI_AC2));
   ASSERT_EQ(decode_type_t::HITACHI_AC2, strToDecodeType("HITACHI_AC2"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC2));
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC2));
+  ASSERT_EQ(kHitachiAc2Bits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC2));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC2));
 
   ASSERT_EQ("HITACHI_AC3", typeToString(decode_type_t::HITACHI_AC3));
   ASSERT_EQ(decode_type_t::HITACHI_AC3, strToDecodeType("HITACHI_AC3"));
@@ -831,6 +843,19 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::HITACHI_AC424, strToDecodeType("HITACHI_AC424"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC424));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC424));
+  ASSERT_EQ(kHitachiAc424Bits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC424));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC424));
+
+  ASSERT_EQ("HITACHI_AC344", typeToString(decode_type_t::HITACHI_AC344));
+  ASSERT_EQ(decode_type_t::HITACHI_AC344, strToDecodeType("HITACHI_AC344"));
+  ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC344));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC344));
+  ASSERT_EQ(kHitachiAc344Bits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC344));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC344));
 }
 
 // Decode a 'real' HitachiAc424 message.
@@ -1800,4 +1825,99 @@ TEST(TestIRHitachiAc1Class, FanSpeedInDryMode) {
       "Swing(V) Toggle: On, Swing(V): Off, Swing(H): Off, Sleep: Off, "
       "On Timer: Off, Off Timer: Off",
       ac.toString());
+}
+
+// Decode a 'real' HitachiAc344 message.
+TEST(TestDecodeHitachiAc344, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc344StateLength] = {
+      0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x19, 0xE6, 0xC8,
+      0x37, 0x16, 0xE9, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0xC8, 0x37, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0,
+      0x3F, 0x04, 0xFB, 0x00, 0xFF, 0x00, 0xFF};
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134#issue-622516158
+  const uint16_t rawData[691] = {3410, 1624, 482, 1226, 458, 464, 458, 462, 456,
+      464, 460, 460, 462, 460, 460, 462, 460, 460, 460, 462, 460, 462, 456, 466,
+      458, 462, 456, 1228, 462, 460, 460, 462, 460, 462, 458, 462, 456, 466,
+      456, 464, 458, 464, 456, 466, 460, 460, 460, 462, 460, 460, 458, 464, 456,
+      464, 458, 464, 456, 464, 460, 462, 454, 466, 458, 1226, 460, 462, 456,
+      1226, 456, 1230, 456, 1228, 456, 1230, 458, 1228, 456, 1228, 456, 464,
+      456, 1230, 454, 1230, 458, 1228, 458, 1226, 454, 1230, 454, 1230, 454,
+      1230, 458, 1228, 458, 1230, 452, 468, 456, 464, 454, 468, 456, 464, 418,
+      502, 456, 466, 458, 464, 458, 462, 458, 464, 454, 468, 456, 1230, 454,
+      1230, 454, 466, 456, 464, 456, 1228, 456, 1230, 456, 1230, 456, 1230, 456,
+      464, 458, 464, 458, 1228, 456, 1230, 456, 464, 454, 466, 456, 466, 456,
+      464, 458, 462, 458, 1228, 458, 1228, 458, 464, 454, 468, 456, 1228, 458,
+      1228, 458, 1228, 456, 1228, 456, 464, 454, 468, 456, 1228, 458, 1226, 458,
+      464, 458, 1226, 456, 1230, 454, 468, 458, 462, 452, 1232, 460, 462, 458,
+      460, 460, 462, 456, 466, 458, 462, 456, 1230, 456, 1228, 460, 462, 460,
+      1226, 458, 1228, 458, 1226, 460, 460, 456, 468, 458, 464, 456, 1226, 460,
+      462, 458, 1228, 456, 1228, 458, 462, 462, 1224, 460, 1226, 458, 1226, 460,
+      464, 458, 1228, 456, 462, 460, 462, 460, 1226, 460, 460, 462, 460, 458,
+      462, 458, 462, 456, 464, 460, 460, 462, 460, 462, 460, 460, 1224, 462,
+      1224, 462, 1224, 458, 1226, 462, 1224, 460, 1224, 400, 1284, 446, 1240,
+      446, 476, 458, 462, 464, 458, 462, 460, 460, 460, 458, 462, 462, 462, 456,
+      464, 460, 1226, 460, 1226, 460, 1224, 462, 1224, 460, 1224, 460, 1224,
+      460, 1224, 462, 1224, 462, 460, 460, 462, 460, 460, 458, 464, 458, 462,
+      458, 464, 458, 462, 460, 460, 462, 1224, 460, 1226, 458, 1228, 456, 1226,
+      462, 1222, 460, 1228, 458, 1226, 460, 1226, 460, 460, 458, 462, 460, 462,
+      460, 460, 460, 462, 460, 462, 458, 464, 460, 458, 460, 1226, 456, 1228,
+      462, 1224, 460, 1224, 458, 1228, 458, 1226, 458, 1228, 462, 1224, 460,
+      462, 460, 462, 458, 464, 460, 460, 456, 466, 458, 462, 460, 460, 462,
+      458, 460, 1224, 460, 1224, 458, 1226, 460, 1224, 460, 1226, 460, 1226,
+      458, 1228, 456, 1230, 456, 1228, 462, 1224, 460, 460, 458, 462, 458,
+      1228, 456, 466, 458, 462, 454, 468, 458, 462, 458, 462, 460, 1226, 456,
+      1228, 458, 464, 420, 1264, 458, 1228, 458, 1228, 456, 1228, 454, 468, 456,
+      464, 456, 466, 456, 1228, 460, 1226, 456, 1230, 456, 1228, 456, 464, 456,
+      1230, 458, 1226, 458, 1226, 452, 468, 456, 466, 376, 546, 456, 466, 456,
+      464, 456, 466, 458, 464, 458, 464, 456, 466, 424, 496, 456, 464, 416, 504,
+      454, 1230, 454, 1232, 456, 1228, 456, 1228, 456, 1230, 456, 1230, 454,
+      1230, 460, 1226, 426, 496, 424, 496, 456, 466, 374, 546, 454, 468, 374,
+      544, 458, 464, 456, 464, 458, 1228, 424, 1262, 454, 1232, 426, 1258, 458,
+      1228, 426, 1260, 454, 1230, 456, 1228, 426, 496, 374, 546, 426, 494, 426,
+      496, 424, 496, 426, 496, 424, 496, 456, 1230, 456, 1230, 456, 1228, 458,
+      1228, 456, 1230, 456, 1230, 456, 1230, 424, 1260, 458, 464, 426, 1258,
+      456, 1230, 422, 500, 456, 466, 418, 504, 424, 496, 426, 496, 456, 464,
+      420, 500, 454, 468, 456, 1230, 424, 1260, 420, 1264, 422, 1264, 418,
+      1266, 420, 1264, 420, 500, 456, 466, 426, 494, 454, 468, 456, 464, 420,
+      1266, 452, 470, 454, 466, 374, 1310, 456, 1228, 456, 1230, 452, 1232, 420,
+      1266, 424, 498, 456, 1230, 456, 1230, 456, 466, 450, 470, 456, 464, 376,
+      546, 456, 466, 422, 498, 426, 496, 458, 464, 424, 1260, 454, 1232, 454,
+      1232, 454, 1232, 458, 1228, 422, 1262, 456, 1228, 454, 1230, 456, 468,
+      416, 504, 422, 498, 424, 498, 454, 466, 456, 466, 422, 500, 456, 466, 374,
+      1310, 418, 1266, 424, 1262, 422, 1262, 376, 1310, 376, 1308, 422, 1264,
+      424, 1262, 350};  // UNKNOWN 919B8582
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 691, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC344, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc344Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Decode a synthetic HitachiAc344 message.
+TEST(TestDecodeHitachiAc344, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint8_t expected[kHitachiAc344StateLength] = {
+      0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x19, 0xE6, 0xC8,
+      0x37, 0x16, 0xE9, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0xC8, 0x37, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x01, 0xFE, 0xC0,
+      0x3F, 0x04, 0xFB, 0x00, 0xFF, 0x00, 0xFF};
+
+  irsend.reset();
+  irsend.sendHitachiAc344(expected);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC344, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc344Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
 }
