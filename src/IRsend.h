@@ -508,7 +508,7 @@ class IRsend {
                       const uint16_t nbytes,  // No default as there as so many
                                               // different sizes
                       const uint16_t repeat = kHitachiAcDefaultRepeat);
-#endif  // SEND_HITACHI_AC344
+#endif  // SEND_HITACHI_AC3
 #if SEND_HITACHI_AC344
   void sendHitachiAc344(const unsigned char data[],
                         const uint16_t nbytes = kHitachiAc344StateLength,
