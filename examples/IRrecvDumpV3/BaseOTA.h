@@ -10,8 +10,15 @@
 
 #if OTA_ENABLE
 
-#include <WiFi.h>
+#if defined(ESP8266)
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#elif defined(ESP32)  // ESP8266 - ESP32
 #include <ESPmDNS.h>
+#include <WiFi.h>
+#else  // ESP8266 - ESP32
+#error Invalid platform
+#endif  // ESP8266 - ESP32
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
