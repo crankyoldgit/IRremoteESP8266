@@ -28,8 +28,11 @@
  */
 
 // Allow over air update
-// #define OTA_ENABLE true
+#define OTA_ENABLE true
 #include "BaseOTA.h"
+
+// Required lib for websocket https://github.com/me-no-dev/ESPAsyncWebServer#async-websocket-plugin
+#include <ESPAsyncWebServer.h>
 
 #include <Arduino.h>
 #include <IRrecv.h>
@@ -115,6 +118,24 @@ const uint16_t kMinUnknownSize = 12;
 IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
 decode_results results;  // Somewhere to store the results
 
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
+
+void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
+               AwsEventType type, void * arg, uint8_t *data, size_t len) {
+  uint32_t cliid = client->id();
+  switch(type) {
+    case WS_EVT_CONNECT:
+      Serial.println("connect");
+      client->text(D_STR_IRRECVDUMP_STARTUP);
+      Serial.printf("WS: [%u] Connected\n", cliid);
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("Client [%u] disconnected\n", cliid);
+      break;
+  }
+}
+
 // This section of code runs only once at start-up.
 void setup() {
   OTAwifi();  // start default wifi (previously saved on the ESP) for OTA
@@ -132,6 +153,39 @@ void setup() {
   irrecv.setUnknownThreshold(kMinUnknownSize);
 #endif  // DECODE_HASH
   irrecv.enableIRIn();  // Start the receiver
+
+  // Add web service to MDNS
+  MDNS.addService("http", "tcp", 80);
+  MDNS.addService("ws", "tcp", 80);
+
+  // handle index
+  server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/html",
+      "<html><head><script>\n"
+      "'use strict';\n"
+      "var d=document,c=console;\n"
+      "var ws = new WebSocket('ws://'+location.hostname+'/ws', ['arduino']);\n"
+      "ws.onopen = function() {ws.send('Connect ' + new Date());};\n"
+      "ws.onerror = function(ev) {c.log('WebSocket Error ', ev);};\n"
+      "ws.onclose = function(ev) {c.log('ws closed');};\n"
+      "ws.onmessage = function(ev) {\n"
+      "  c.log('Server: ', ev.data);\n"
+      "  var p = d.body.appendChild(d.createElement('pre'));\n"
+      "  p.textContent = ev.data;\n"
+      "  p.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});\n"
+      "};\n"
+      "</script></head><body>\n"
+      "</body></html>");
+  });
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
+  server.begin();  // start webserver
+}
+
+// helper function to output to both Serial and websockets
+void display(const String str) {
+  Serial.print(str);
+  ws.textAll(str);
 }
 
 // The repeating section of the code
@@ -145,12 +199,12 @@ void loop() {
     if (results.overflow)
       Serial.printf(D_WARN_BUFFERFULL "\n", kCaptureBufferSize);
     // Display the library version the message was captured with.
-    Serial.println(D_STR_LIBRARY "   : v" _IRREMOTEESP8266_VERSION_ "\n");
+    display(D_STR_LIBRARY "   : v" _IRREMOTEESP8266_VERSION_ "\n");
     // Display the basic output of what we found.
-    Serial.print(resultToHumanReadableBasic(&results));
+    display(resultToHumanReadableBasic(&results));
     // Display any extra A/C info if we have it.
     String description = IRAcUtils::resultAcToString(&results);
-    if (description.length()) Serial.println(D_STR_MESGDESC ": " + description);
+    if (description.length()) display(D_STR_MESGDESC ": " + description);
     yield();  // Feed the WDT as the text output can take a while to print.
 #if LEGACY_TIMING_INFO
     // Output legacy RAW timing info of the result.
@@ -158,7 +212,7 @@ void loop() {
     yield();  // Feed the WDT (again)
 #endif  // LEGACY_TIMING_INFO
     // Output the results as source code
-    Serial.println(resultToSourceCode(&results));
+    display(resultToSourceCode(&results));
     Serial.println();    // Blank line between entries
     yield();             // Feed the WDT (again)
   }
