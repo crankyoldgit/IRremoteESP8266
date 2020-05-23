@@ -197,14 +197,17 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
 /// Alternative >64bit function to send CARRIER_AC48 messages
 /// Status: ALPHA / Untested.
 /// Where data is:
-///   uint8_t data[kCARRIER_AC48StateLength] = {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5, 0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
+/// uint8_t data[kCARRIER_AC48StateLength] =
+///  {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5, 0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
 ///
 /// @param[in] data An array of bytes containing the IR command.
 ///                 It is assumed to be in MSB order for this code.
-/// @param[in] nbytes Nr. of bytes of data in the array. (>=kCARRIER_AC48StateLength)
+/// @param[in] nbytes Nr. of bytes of data in the array.
+///        (>=kCARRIER_AC48StateLength)
 /// @param[in] repeat Nr. of times the message is to be repeated.
-void IRsend::sendCarrier_AC48(const uint8_t data[], const uint16_t nbytes, const uint16_t repeat) {
-  for (uint16_t r = 0; r <= repeat; r++) {
+void IRsend::sendCarrier_AC48(const uint8_t data[],
+                            const uint16_t nbytes, const uint16_t repeat) {
+    for (uint16_t r = 0; r <= repeat; r++) {
     uint16_t pos = 0;
     // Data Section #1
     // e.g.
@@ -242,8 +245,9 @@ void IRsend::sendCarrier_AC48(const uint8_t data[], const uint16_t nbytes, const
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeCarrier_AC48(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kCarrier_AC48Overhead - offset)
+bool IRrecv::decodeCarrier_AC48(decode_results *results, uint16_t offset,
+                               const uint16_t nbits, const bool strict) {
+    if (results->rawlen < 2 * nbits + kCarrier_AC48Overhead - offset)
     return false;  // Too short a message to match.
   if (strict && nbits != kCarrierAc48Bits)
     return false;
