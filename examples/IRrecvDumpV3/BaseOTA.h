@@ -5,7 +5,7 @@
 #define EXAMPLES_IRRECVDUMPV3_BASEOTA_H_
 
 #ifndef OTA_ENABLE
-#define OTA_ENABLE false
+#error OTA_ENABLED need to be defined
 #endif  // OTA_ENABLE
 
 #if OTA_ENABLE

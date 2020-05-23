@@ -28,7 +28,10 @@
  */
 
 // Allow over air update
-#define OTA_ENABLE true
+// #define OTA_ENABLE false
+#ifndef OTA_ENABLE
+#error You must set OTA_ENABLED to either false or true
+#endif  // OTA_ENABLE
 #include "BaseOTA.h"
 
 // Required lib for websocket https://github.com/me-no-dev/ESPAsyncWebServer#async-websocket-plugin
@@ -124,7 +127,7 @@ AsyncWebSocket ws("/ws");
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
                AwsEventType type, void * arg, uint8_t *data, size_t len) {
   uint32_t cliid = client->id();
-  switch(type) {
+  switch (type) {
     case WS_EVT_CONNECT:
       Serial.println("connect");
       client->text(D_STR_IRRECVDUMP_STARTUP);
@@ -172,7 +175,8 @@ void setup() {
       "  c.log('Server: ', ev.data);\n"
       "  var p = d.body.appendChild(d.createElement('pre'));\n"
       "  p.textContent = ev.data;\n"
-      "  p.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});\n"
+      "  p.scrollIntoView({behavior:'smooth',"
+      " block:'end', inline:'nearest'});\n"
       "};\n"
       "</script></head><body>\n"
       "</body></html>");
