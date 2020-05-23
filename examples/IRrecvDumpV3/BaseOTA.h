@@ -4,12 +4,6 @@
 #ifndef EXAMPLES_IRRECVDUMPV3_BASEOTA_H_
 #define EXAMPLES_IRRECVDUMPV3_BASEOTA_H_
 
-#ifndef OTA_ENABLE
-#error OTA_ENABLED need to be defined
-#endif  // OTA_ENABLE
-
-#if OTA_ENABLE
-
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -19,6 +13,13 @@
 #else  // ESP8266 - ESP32
 #error Invalid platform
 #endif  // ESP8266 - ESP32
+
+#ifndef OTA_ENABLE
+#error OTA_ENABLE need to be defined
+#endif  // OTA_ENABLE
+
+#if OTA_ENABLE
+
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 

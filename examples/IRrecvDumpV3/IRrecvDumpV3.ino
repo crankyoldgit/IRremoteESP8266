@@ -30,7 +30,7 @@
 // Allow over air update
 // #define OTA_ENABLE false
 #ifndef OTA_ENABLE
-#error You must set OTA_ENABLED to either false or true
+#error You must set OTA_ENABLE to either false or true
 #endif  // OTA_ENABLE
 #include "BaseOTA.h"
 
