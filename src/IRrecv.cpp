@@ -663,6 +663,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
         decodeHitachiAc3(results, offset, kHitachiAc3MinBits))
       return true;
 #endif  // DECODE_HITACHI_AC3
+#if DECODE_HITACHI_AC344
+    // HitachiAC344 should be checked before HitachiAC
+    DPRINTLN("Attempting Hitachi AC344 decode");
+    if (decodeHitachiAC(results, offset, kHitachiAc344Bits)) return true;
+#endif  // DECODE_HITACHI_AC344
 #if DECODE_HITACHI_AC2
     // HitachiAC2 should be checked before HitachiAC
     DPRINTLN("Attempting Hitachi AC2 decode");
