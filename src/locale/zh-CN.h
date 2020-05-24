@@ -441,7 +441,7 @@
 #define D_STR_BITS "位"
 #endif  // D_STR_BITS
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "时间戳记"
 #endif  // D_STR_TIMESTAMP

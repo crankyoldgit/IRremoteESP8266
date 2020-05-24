@@ -103,7 +103,7 @@
 
 #define D_STR_REPEAT "Répetition"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #define D_STR_TIMESTAMP "Horodatage"
 #define D_STR_LIBRARY "Bibliothèque"
 #define D_STR_MESGDESC "Rèférence"

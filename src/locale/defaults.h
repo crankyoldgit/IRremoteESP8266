@@ -722,7 +722,7 @@
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"
 #endif  // D_STR_TIMESTAMP

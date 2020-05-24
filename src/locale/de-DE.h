@@ -112,7 +112,7 @@
 
 #define D_STR_REPEAT "Wiederholen"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #define D_STR_TIMESTAMP "Zeitstempel"
 #define D_STR_LIBRARY "Bibliothek"
 #define D_STR_MESGDESC "Nachr. Beschr."

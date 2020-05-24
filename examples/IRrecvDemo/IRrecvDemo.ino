@@ -2,7 +2,7 @@
  * IRremoteESP8266: IRrecvDemo - demonstrates receiving IR codes with IRrecv
  * This is very simple teaching code to show you how to use the library.
  * If you are trying to decode your Infra-Red remote(s) for later replay,
- * use the IRrecvDumpV2.ino example code instead of this.
+ * use the IRrecvDumpV2.ino (or later) example code instead of this.
  * An IR detector/demodulator must be connected to the input kRecvPin.
  * Copyright 2009 Ken Shirriff, http://arcfn.com
  * Example circuit diagram:

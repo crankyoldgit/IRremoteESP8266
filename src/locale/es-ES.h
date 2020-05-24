@@ -121,7 +121,7 @@
 #define D_STR_REPEAT "Repetir"
 #define D_STR_CODE "Codigo"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #define D_STR_TIMESTAMP "marca de tiempo"
 #define D_STR_LIBRARY "Libreria"
 #define D_STR_IRRECVDUMP_STARTUP \

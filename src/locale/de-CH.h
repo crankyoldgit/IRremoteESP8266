@@ -143,7 +143,7 @@
 #undef D_STR_REPEAT
 #define D_STR_REPEAT "Wiederhole"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #undef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Ziitstämpfel"
 #undef D_STR_IRRECVDUMP_STARTUP
