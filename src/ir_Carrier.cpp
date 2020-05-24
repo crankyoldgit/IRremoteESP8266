@@ -7,7 +7,8 @@
 //   Brand: Carrier/Surrey,  Model: 619EGX0180E0 A/C
 //   Brand: Carrier/Surrey,  Model: 619EGX0220E0 A/C
 //   Brand: Carrier/Surrey,  Model: 53NGK009/012 Inverter
-//   Brand: Carrier/Surrey,  Model: 40MKC*f (A/C) and 40MKQ*F (A/C, Heat Pump)
+//   Brand: Carrier/Surrey,  Model: 40MKC*f A/C
+//   Brand: Carrier/Surrey,  Model: 40MKQ*F A/C, Heat Pump
 
 #include "ir_Carrier.h"
 #include <algorithm>
