@@ -199,7 +199,8 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
 /// Status: ALPHA / Untested.
 /// Where data is:
 /// uint8_t data[kCARRIER_AC48StateLength] =
-///  {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5, 0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
+///  {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5,
+///   0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
 ///
 /// @param[in] data An array of bytes containing the IR command.
 ///                 It is assumed to be in MSB order for this code.
@@ -207,7 +208,7 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
 ///        (>=kCARRIER_AC48StateLength)
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendCarrierAc48(const uint8_t data[],
-                            const uint16_t nbytes, const uint16_t repeat) {
+                             const uint16_t nbytes, const uint16_t repeat) {
     for (uint16_t r = 0; r <= repeat; r++) {
     uint16_t pos = 0;
     // Data Section #1
