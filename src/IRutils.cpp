@@ -139,6 +139,7 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
 // Does the given protocol use a complex state as part of the decode?
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
+    // This is keept sorted by name
     case AMCOR:
     case ARGO:
     case DAIKIN:
