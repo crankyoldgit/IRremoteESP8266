@@ -146,7 +146,7 @@
 #define D_STR_LIBRARY "Libreria"
 #define D_STR_MESGDESC "Desc. Mess."
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 è ora attivo e in attesa di segnali IR dal pin %d"
+    "IRrecvDump è ora attivo e in attesa di segnali IR dal pin %d"
 
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \

@@ -148,7 +148,7 @@
 #define D_STR_TIMESTAMP "Ziitstämpfel"
 #undef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 lauft und wartet uf IR Iigab ufem Pin %d"
+    "IRrecvDump lauft und wartet uf IR Iigab ufem Pin %d"
 #undef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \
     "WARNUNG: IR Code isch zgross für de Buffer (>= %d). " \
