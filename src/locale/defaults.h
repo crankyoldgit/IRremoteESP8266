@@ -722,7 +722,7 @@
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"
 #endif  // D_STR_TIMESTAMP
@@ -734,7 +734,7 @@
 #endif  // D_STR_MESGDESC
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 is now running and waiting for IR input on Pin %d"
+    "IRrecvDump is now running and waiting for IR input on Pin %d"
 #endif  // D_STR_IRRECVDUMP_STARTUP
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \

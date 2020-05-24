@@ -575,7 +575,7 @@ void IRsend::sendManchester(const uint16_t headermark,
 //   Even elements are Mark times (On), Odd elements are Space times (Off).
 //
 // Ref:
-//   examples/IRrecvDumpV2/IRrecvDumpV2.ino
+//   examples/IRrecvDumpV2/IRrecvDumpV2.ino (or later)
 void IRsend::sendRaw(const uint16_t buf[], const uint16_t len,
                      const uint16_t hz) {
   // Set IR carrier frequency

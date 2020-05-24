@@ -711,7 +711,7 @@ def add_rawdata_args(parser):
   arg_group = parser.add_mutually_exclusive_group(required=True)
   arg_group.add_argument(
       "rawdata",
-      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
+      help="A rawData line from IRrecvDumpV2+. e.g. 'uint16_t rawbuf[37] = {"
       "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
       "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
       "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
