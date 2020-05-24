@@ -1041,7 +1041,7 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
 #endif  // SEND_ARGO
 #if SEND_CARRIER_AC48
     case CARRIER_AC48:
-      sendCarrier_AC48(state, nbytes);
+      sendCarrierAc48(state, nbytes);
       break;
 #endif  // SEND_CARRIER_AC48
 #if SEND_DAIKIN

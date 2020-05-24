@@ -812,7 +812,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif  // DECODE_CARRIER_AC40
 #if DECODE_CARRIER_AC48
     DPRINTLN("Attempting Carrier 48bit decode");
-    if (decodeCarrier_AC48(results, offset)) return true;
+    if (decodeCarrierAc48(results, offset)) return true;
 #endif  // DECODE_CARRIER_AC48
 #if DECODE_CARRIER_AC64
     DPRINTLN("Attempting Carrier 64bit decode");

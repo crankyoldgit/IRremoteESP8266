@@ -46,14 +46,14 @@ const uint16_t kCarrierAc40BitMark = 547;
 const uint16_t kCarrierAc40OneSpace = 1540;
 const uint16_t kCarrierAc40ZeroSpace = 497;
 
-const uint16_t kCarrier_AC48HdrMark = 4416;
-const uint16_t kCarrier_AC48BitMark = 515;
-const uint16_t kCarrier_AC48HdrSpace = 4412;
-const uint16_t kCarrier_AC48OneSpace = 1674;
-const uint16_t kCarrier_AC48ZeroSpace = 582;
-const uint16_t kCarrier_AC48SpaceGap = 5298;
-const uint16_t kCarrier_AC48Freq = 38000;  // Hz.
-const uint16_t kCarrier_AC48Overhead = 7;
+const uint16_t kCarrierAc48HdrMark = 4416;
+const uint16_t kCarrierAc48BitMark = 515;
+const uint16_t kCarrierAc48HdrSpace = 4412;
+const uint16_t kCarrierAc48OneSpace = 1674;
+const uint16_t kCarrierAc48ZeroSpace = 582;
+const uint16_t kCarrierAc48SpaceGap = 5298;
+const uint16_t kCarrierAc48Freq = 38000;  // Hz.
+const uint16_t kCarrierAc48Overhead = 7;
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 const uint16_t kCarrierAc64HdrMark = 8940;
@@ -206,7 +206,7 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
 /// @param[in] nbytes Nr. of bytes of data in the array.
 ///        (>=kCARRIER_AC48StateLength)
 /// @param[in] repeat Nr. of times the message is to be repeated.
-void IRsend::sendCarrier_AC48(const uint8_t data[],
+void IRsend::sendCarrierAc48(const uint8_t data[],
                             const uint16_t nbytes, const uint16_t repeat) {
     for (uint16_t r = 0; r <= repeat; r++) {
     uint16_t pos = 0;
@@ -214,23 +214,23 @@ void IRsend::sendCarrier_AC48(const uint8_t data[],
     // e.g.
     //   bits = 48; bytes = 6;
     //   *(data + pos) = {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5};
-    sendGeneric(kCarrier_AC48HdrMark, kCarrier_AC48HdrSpace,
-                kCarrier_AC48BitMark, kCarrier_AC48OneSpace,
-                kCarrier_AC48BitMark, kCarrier_AC48ZeroSpace,
-                kCarrier_AC48BitMark, kCarrier_AC48SpaceGap,
+    sendGeneric(kCarrierAc48HdrMark, kCarrierAc48HdrSpace,
+                kCarrierAc48BitMark, kCarrierAc48OneSpace,
+                kCarrierAc48BitMark, kCarrierAc48ZeroSpace,
+                kCarrierAc48BitMark, kCarrierAc48SpaceGap,
                 data + pos, 6,  // Bytes
-                kCarrier_AC48Freq, true, kNoRepeat, kDutyDefault);
+                kCarrierAc48Freq, true, kNoRepeat, kDutyDefault);
     pos += 6;  // Adjust by how many bytes of data we sent
     // Data Section #2
     // e.g.
     //   bits = 48; bytes = 6;
     //   *(data + pos) = {0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
-    sendGeneric(kCarrier_AC48HdrMark, kCarrier_AC48HdrSpace,
-                kCarrier_AC48BitMark, kCarrier_AC48OneSpace,
-                kCarrier_AC48BitMark, kCarrier_AC48ZeroSpace,
-                kCarrier_AC48BitMark, kDefaultMessageGap,
+    sendGeneric(kCarrierAc48HdrMark, kCarrierAc48HdrSpace,
+                kCarrierAc48BitMark, kCarrierAc48OneSpace,
+                kCarrierAc48BitMark, kCarrierAc48ZeroSpace,
+                kCarrierAc48BitMark, kDefaultMessageGap,
                 data + pos, 6,  // Bytes
-                kCarrier_AC48Freq, true, kNoRepeat, kDutyDefault);
+                kCarrierAc48Freq, true, kNoRepeat, kDutyDefault);
     pos += 6;  // Adjust by how many bytes of data we sent
   }
 }
@@ -246,9 +246,9 @@ void IRsend::sendCarrier_AC48(const uint8_t data[],
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeCarrier_AC48(decode_results *results, uint16_t offset,
+bool IRrecv::decodeCarrierAc48(decode_results *results, uint16_t offset,
                                const uint16_t nbits, const bool strict) {
-    if (results->rawlen < 2 * nbits + kCarrier_AC48Overhead - offset)
+    if (results->rawlen < 2 * nbits + kCarrierAc48Overhead - offset)
     return false;  // Too short a message to match.
   if (strict && nbits != kCarrierAc48Bits)
     return false;
@@ -262,10 +262,10 @@ bool IRrecv::decodeCarrier_AC48(decode_results *results, uint16_t offset,
   //   *(results->state + pos) = {0xA1, 0x20, 0x6B, 0xFF, 0xFF, 0xC5};
   used = matchGeneric(results->rawbuf + offset, results->state + pos,
                       results->rawlen - offset, 48,
-                      kCarrier_AC48HdrMark, kCarrier_AC48HdrSpace,
-                      kCarrier_AC48BitMark, kCarrier_AC48OneSpace,
-                      kCarrier_AC48BitMark, kCarrier_AC48ZeroSpace,
-                      kCarrier_AC48BitMark, kCarrier_AC48SpaceGap, true);
+                      kCarrierAc48HdrMark, kCarrierAc48HdrSpace,
+                      kCarrierAc48BitMark, kCarrierAc48OneSpace,
+                      kCarrierAc48BitMark, kCarrierAc48ZeroSpace,
+                      kCarrierAc48BitMark, kCarrierAc48SpaceGap, true);
   if (used == 0) return false;  // We failed to find any data.
   offset += used;  // Adjust for how much of the message we read.
   pos += 6;  // Adjust by how many bytes of data we read
@@ -276,10 +276,10 @@ bool IRrecv::decodeCarrier_AC48(decode_results *results, uint16_t offset,
   //   *(results->state + pos) = {0x5E, 0xDF, 0x94, 0x00, 0x00, 0x3A};
   used = matchGeneric(results->rawbuf + offset, results->state + pos,
                       results->rawlen - offset, 48,
-                      kCarrier_AC48HdrMark, kCarrier_AC48HdrSpace,
-                      kCarrier_AC48BitMark, kCarrier_AC48OneSpace,
-                      kCarrier_AC48BitMark, kCarrier_AC48ZeroSpace,
-                      kCarrier_AC48BitMark, kDefaultMessageGap, true);
+                      kCarrierAc48HdrMark, kCarrierAc48HdrSpace,
+                      kCarrierAc48BitMark, kCarrierAc48OneSpace,
+                      kCarrierAc48BitMark, kCarrierAc48ZeroSpace,
+                      kCarrierAc48BitMark, kDefaultMessageGap, true);
   if (used == 0) return false;  // We failed to find any data.
   offset += used;  // Adjust for how much of the message we read.
   pos += 6;  // Adjust by how many bytes of data we read
