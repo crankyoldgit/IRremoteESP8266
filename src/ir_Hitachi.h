@@ -254,13 +254,14 @@ class IRHitachiAc1 {
 };
 
 class IRHitachiAc424 {
+  friend class IRHitachiAc344;
  public:
   explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_HITACHI_AC424
-  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  virtual void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC424
   void begin(void);
@@ -279,17 +280,17 @@ class IRHitachiAc424 {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   uint8_t* getRaw(void);
-  void setRaw(const uint8_t new_code[],
-              const uint16_t length = kHitachiAc424StateLength);
+  virtual void setRaw(const uint8_t new_code[],
+                      const uint16_t length = kHitachiAc424StateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
+  virtual stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST
 
- private:
+ protected:
   IRsend _irsend;
 #else
   IRsendTest _irsend;
@@ -303,7 +304,7 @@ class IRHitachiAc424 {
 class IRHitachiAc3 {
  public:
   explicit IRHitachiAc3(const uint16_t pin, const bool inverted = false,
-                       const bool use_modulation = true);
+                        const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_HITACHI_AC3
@@ -326,6 +327,18 @@ class IRHitachiAc3 {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAc3StateLength];
   void setInvertedStates(const uint16_t length = kHitachiAc3StateLength);
+};
+
+class IRHitachiAc344: public IRHitachiAc424 {
+ public:
+  explicit IRHitachiAc344(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc344StateLength);
+  stdAc::state_t toCommon(void);
+#if SEND_HITACHI_AC344
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+#endif  // SEND_HITACHI_AC344
 };
 
 #endif  // IR_HITACHI_H_
