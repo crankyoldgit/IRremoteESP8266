@@ -753,6 +753,10 @@ TEST(TestIRac, Hitachi344) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  EXPECT_EQ(decode_type_t::HITACHI_AC344, r.protocol);
+  EXPECT_TRUE(r.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, r.mode);
+  EXPECT_EQ(25, r.degrees);
 
   ac._irsend.reset();
   irac.hitachi344(&ac,

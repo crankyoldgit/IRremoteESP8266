@@ -924,7 +924,7 @@ IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-// Reset to auto fan, cooling, 23° Celcius
+// Reset to auto fan, cooling, 23° Celsius
 void IRHitachiAc424::stateReset(void) {
   for (uint8_t i = 0; i < kHitachiAc424StateLength; i++)
     remote_state[i] = 0x00;
@@ -1234,7 +1234,7 @@ IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-// Reset to auto fan, cooling, 23° Celcius
+// Reset to auto fan, cooling, 23° Celsius
 void IRHitachiAc3::stateReset(void) {
   for (uint8_t i = 0; i < kHitachiAc3StateLength; i++)
     remote_state[i] = 0x00;
@@ -1335,21 +1335,39 @@ bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_HITACHI_AC3
 
-// Class for handling the remote control on a Hitachi_AC344 43 byte A/C message
+/// Class constructor for handling detailed Hitachi_AC344 43 byte A/C messages.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRHitachiAc344 object.
 IRHitachiAc344::IRHitachiAc344(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
-    : IRHitachiAc424(pin, inverted, use_modulation) {}
+    : IRHitachiAc424(pin, inverted, use_modulation) { stateReset(); }
+
+/// Reset the internal state to auto fan, cooling, 23° Celsius
+void IRHitachiAc344::stateReset(void) {
+  IRHitachiAc424::stateReset();
+  remote_state[37] = 0x00;
+  remote_state[39] = 0x00;
+}
 
 #if SEND_HITACHI_AC344
+/// Create and send the IR message to the A/C.
+/// @param repeat Nr. of times to repeat the message.
 void IRHitachiAc344::send(const uint16_t repeat) {
   _irsend.sendHitachiAc344(getRaw(), kHitachiAc344StateLength, repeat);
 }
 #endif  // SEND_HITACHI_AC344
 
+/// Set the internal state from a valid code for this protocol.
+/// @param new_code A valid code for this protocol.
+/// @param length Size (in bytes) of the code for this protocol.
 void IRHitachiAc344::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kHitachiAc344StateLength));
 }
 
+/// Convert the current A/C state to its common stdAc::state_t equivalent.
+/// @return A stdAc::state_t state.
 stdAc::state_t IRHitachiAc344::toCommon(void) {
   stdAc::state_t result = IRHitachiAc424::toCommon();
   result.protocol = decode_type_t::HITACHI_AC344;
