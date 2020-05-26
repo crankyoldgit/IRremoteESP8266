@@ -746,6 +746,7 @@ String IRHitachiAc1::toString(void) {
 /// Ref:
 ///   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 ///   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
+///   https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
 /// @param results Ptr to the data to decode and where to store the result.
 /// @param offset The starting index to use when attempting to decode the raw
 ///   data. Typically/Defaults to kStartOffset.
@@ -760,7 +761,6 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict,
                              const bool MSBfirst) {
   const uint8_t k_tolerance = _tolerance + 5;
-
 
   if (strict) {
     switch (nbits) {
@@ -800,7 +800,8 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
        !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
       return false;
     if (nbits / 8 == kHitachiAc344StateLength &&
-        !IRHitachiAc3::hasInvertedStates(results->state, nbits / 8))
+        !IRHitachiAc3::hasInvertedStates(results->state,
+                                         kHitachiAc344StateLength))
       return false;
   }
 
