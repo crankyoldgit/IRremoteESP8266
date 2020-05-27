@@ -44,7 +44,7 @@ const uint8_t kHitachiAcAutoTemp = 23;  // 23C
 const uint8_t kHitachiAcPowerOffset = 0;
 const uint8_t kHitachiAcSwingOffset = 7;
 
-// HitachiAc424
+// HitachiAc424 & HitachiAc344
 // Byte[11]
 const uint8_t kHitachiAc424ButtonByte = 11;
 const uint8_t kHitachiAc424ButtonPowerMode = 0x13;
@@ -52,6 +52,11 @@ const uint8_t kHitachiAc424ButtonFan = 0x42;
 const uint8_t kHitachiAc424ButtonTempDown = 0x43;
 const uint8_t kHitachiAc424ButtonTempUp = 0x44;
 const uint8_t kHitachiAc424ButtonSwingV = 0x81;
+const uint8_t kHitachiAc344ButtonPowerMode = kHitachiAc424ButtonPowerMode;
+const uint8_t kHitachiAc344ButtonFan = kHitachiAc424ButtonFan;
+const uint8_t kHitachiAc344ButtonTempDown = kHitachiAc424ButtonTempDown;
+const uint8_t kHitachiAc344ButtonTempUp = kHitachiAc424ButtonTempUp;
+const uint8_t kHitachiAc344ButtonSwingV = kHitachiAc424ButtonSwingV;
 
 // Byte[13]
 const uint8_t kHitachiAc424TempByte = 13;
@@ -59,6 +64,8 @@ const uint8_t kHitachiAc424TempOffset = 2;
 const uint8_t kHitachiAc424TempSize = 6;
 const uint8_t kHitachiAc424MinTemp = 16;   // 16C
 const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
+const uint8_t kHitachiAc344MinTemp = kHitachiAc424MinTemp;
+const uint8_t kHitachiAc344MaxTemp = kHitachiAc424MaxTemp;
 const uint8_t kHitachiAc424FanTemp = 27;   // 27C
 
 // Byte[25]
@@ -67,6 +74,11 @@ const uint8_t kHitachiAc424Fan = 1;
 const uint8_t kHitachiAc424Cool = 3;
 const uint8_t kHitachiAc424Dry = 5;
 const uint8_t kHitachiAc424Heat = 6;
+const uint8_t kHitachiAc344Fan = kHitachiAc424Fan;
+const uint8_t kHitachiAc344Cool = kHitachiAc424Cool;
+const uint8_t kHitachiAc344Dry = kHitachiAc424Dry;
+const uint8_t kHitachiAc344Heat = kHitachiAc424Heat;
+
 const uint8_t kHitachiAc424FanByte = kHitachiAc424ModeByte;
 const uint8_t kHitachiAc424FanMin = 1;
 const uint8_t kHitachiAc424FanLow = 2;
@@ -75,6 +87,13 @@ const uint8_t kHitachiAc424FanHigh = 4;
 const uint8_t kHitachiAc424FanAuto = 5;
 const uint8_t kHitachiAc424FanMax = 6;
 const uint8_t kHitachiAc424FanMaxDry = 2;
+const uint8_t kHitachiAc344FanMin = kHitachiAc424FanMin;
+const uint8_t kHitachiAc344FanLow = kHitachiAc424FanLow;
+const uint8_t kHitachiAc344FanMedium = kHitachiAc424FanMedium;
+const uint8_t kHitachiAc344FanHigh = kHitachiAc424FanHigh;
+const uint8_t kHitachiAc344FanAuto = kHitachiAc424FanAuto;
+const uint8_t kHitachiAc344FanMax = kHitachiAc424FanMax;
+
 // Byte[27]
 const uint8_t kHitachiAc424PowerByte = 27;
 const uint8_t kHitachiAc424PowerOn = 0xF1;
@@ -254,13 +273,14 @@ class IRHitachiAc1 {
 };
 
 class IRHitachiAc424 {
+  friend class IRHitachiAc344;
  public:
   explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
 
-  void stateReset(void);
+  virtual void stateReset(void);
 #if SEND_HITACHI_AC424
-  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  virtual void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC424
   void begin(void);
@@ -279,17 +299,17 @@ class IRHitachiAc424 {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   uint8_t* getRaw(void);
-  void setRaw(const uint8_t new_code[],
-              const uint16_t length = kHitachiAc424StateLength);
+  virtual void setRaw(const uint8_t new_code[],
+                      const uint16_t length = kHitachiAc424StateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
+  virtual stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST
 
- private:
+ protected:
   IRsend _irsend;
 #else
   IRsendTest _irsend;
@@ -303,7 +323,7 @@ class IRHitachiAc424 {
 class IRHitachiAc3 {
  public:
   explicit IRHitachiAc3(const uint16_t pin, const bool inverted = false,
-                       const bool use_modulation = true);
+                        const bool use_modulation = true);
 
   void stateReset(void);
 #if SEND_HITACHI_AC3
@@ -326,6 +346,19 @@ class IRHitachiAc3 {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAc3StateLength];
   void setInvertedStates(const uint16_t length = kHitachiAc3StateLength);
+};
+
+class IRHitachiAc344: public IRHitachiAc424 {
+ public:
+  explicit IRHitachiAc344(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
+  void stateReset(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc344StateLength);
+  stdAc::state_t toCommon(void);
+#if SEND_HITACHI_AC344
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+#endif  // SEND_HITACHI_AC344
 };
 
 #endif  // IR_HITACHI_H_

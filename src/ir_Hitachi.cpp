@@ -72,9 +72,11 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kHitachiAcStateLength)
     return;  // Not enough bytes to send a proper message.
+
+  const bool MSBfirst = (nbytes == kHitachiAc344StateLength) ? false : true;
   sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace, kHitachiAcBitMark,
               kHitachiAcOneSpace, kHitachiAcBitMark, kHitachiAcZeroSpace,
-              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, true,
+              kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, MSBfirst,
               repeat, 50);
 }
 #endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC344)
@@ -736,29 +738,28 @@ String IRHitachiAc1::toString(void) {
 
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || \
      DECODE_HITACHI_AC344)
-// Decode the supplied Hitachi A/C message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//            Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
-//            kHitachiAc344Bits
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Expected to work.
-//
-// Supported devices:
-//  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
+/// Decode the supplied Hitachi A/C message.
+/// Status: STABLE / Expected to work.
+/// Supported devices:
+///  Hitachi A/C Series VI (Circa 2007) / Remote: LT0541-HTA
+///
+/// Ref:
+///   https://github.com/crankyoldgit/IRremoteESP8266/issues/417
+///   https://github.com/crankyoldgit/IRremoteESP8266/issues/453
+///   https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
+/// @param results Ptr to the data to decode and where to store the result.
+/// @param offset The starting index to use when attempting to decode the raw
+///   data. Typically/Defaults to kStartOffset.
+/// @param nbits The number of data bits to expect.
+///   Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
+///   kHitachiAc344Bits
+/// @param strict Flag indicating if we should perform strict matching.
+/// @param MSBfirst Is the data per byte stored in MSB First (true) or
+///   LSB First order(false)?
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
-                             const uint16_t nbits, const bool strict) {
+                             const uint16_t nbits, const bool strict,
+                             const bool MSBfirst) {
   const uint8_t k_tolerance = _tolerance + 5;
 
   if (strict) {
@@ -788,7 +789,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
                     kHitachiAcBitMark, kHitachiAcOneSpace,
                     kHitachiAcBitMark, kHitachiAcZeroSpace,
                     kHitachiAcBitMark, kHitachiAcMinGap, true,
-                    k_tolerance)) return false;
+                    k_tolerance, kMarkExcess, MSBfirst)) return false;
 
   // Compliance
   if (strict) {
@@ -797,6 +798,10 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
       return false;
     if (nbits / 8 == kHitachiAc1StateLength &&
        !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
+      return false;
+    if (nbits / 8 == kHitachiAc344StateLength &&
+        !IRHitachiAc3::hasInvertedStates(results->state,
+                                         kHitachiAc344StateLength))
       return false;
   }
 
@@ -919,7 +924,7 @@ IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-// Reset to auto fan, cooling, 23° Celcius
+// Reset to auto fan, cooling, 23° Celsius
 void IRHitachiAc424::stateReset(void) {
   for (uint8_t i = 0; i < kHitachiAc424StateLength; i++)
     remote_state[i] = 0x00;
@@ -1229,7 +1234,7 @@ IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-// Reset to auto fan, cooling, 23° Celcius
+// Reset to auto fan, cooling, 23° Celsius
 void IRHitachiAc3::stateReset(void) {
   for (uint8_t i = 0; i < kHitachiAc3StateLength; i++)
     remote_state[i] = 0x00;
@@ -1329,3 +1334,42 @@ bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_HITACHI_AC3
+
+/// Class constructor for handling detailed Hitachi_AC344 43 byte A/C messages.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRHitachiAc344 object.
+IRHitachiAc344::IRHitachiAc344(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : IRHitachiAc424(pin, inverted, use_modulation) { stateReset(); }
+
+/// Reset the internal state to auto fan, cooling, 23° Celsius
+void IRHitachiAc344::stateReset(void) {
+  IRHitachiAc424::stateReset();
+  remote_state[37] = 0x00;
+  remote_state[39] = 0x00;
+}
+
+#if SEND_HITACHI_AC344
+/// Create and send the IR message to the A/C.
+/// @param repeat Nr. of times to repeat the message.
+void IRHitachiAc344::send(const uint16_t repeat) {
+  _irsend.sendHitachiAc344(getRaw(), kHitachiAc344StateLength, repeat);
+}
+#endif  // SEND_HITACHI_AC344
+
+/// Set the internal state from a valid code for this protocol.
+/// @param new_code A valid code for this protocol.
+/// @param length Size (in bytes) of the code for this protocol.
+void IRHitachiAc344::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(remote_state, new_code, std::min(length, kHitachiAc344StateLength));
+}
+
+/// Convert the current A/C state to its common stdAc::state_t equivalent.
+/// @return A stdAc::state_t state.
+stdAc::state_t IRHitachiAc344::toCommon(void) {
+  stdAc::state_t result = IRHitachiAc424::toCommon();
+  result.protocol = decode_type_t::HITACHI_AC344;
+  return result;
+}
