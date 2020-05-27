@@ -765,7 +765,13 @@ def main():
   add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
 
-  parse_and_report(get_rawdata(arg_options), arg_options.margin,
+  raw_data = get_rawdata(arg_options).strip()
+  if not raw_data:
+    arg_parser.print_help(sys.stderr)
+    sys.stderr.write("error: no rawdata content\n")
+    sys.exit(1)
+
+  parse_and_report(raw_data, arg_options.margin,
                    arg_options.gen_code, arg_options.name)
 
 
