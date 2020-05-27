@@ -262,7 +262,6 @@ uint8_t IRCarrierAc64::calcChecksum(const uint64_t state) {
 
 /// Verify the checksum is valid for a given state.
 /// @param state The array to verify the checksum of.
-/// @param length The size of the state.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRCarrierAc64::validChecksum(const uint64_t state) {
   // Validate the checksum of the given state.
@@ -330,7 +329,7 @@ void IRCarrierAc64::on(void) { setPower(true); }
 void IRCarrierAc64::off(void) { setPower(false); }
 
 /// Get the operating mode setting of the A/C.
-/// @preturn The current operating mode setting.
+/// @return The current operating mode setting.
 uint8_t IRCarrierAc64::getMode(void) {
   return GETBITS64(remote_state, kCarrierAc64ModeOffset, kCarrierAc64ModeSize);
 }
