@@ -1156,8 +1156,10 @@ stdAc::state_t IRHitachiAc424::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
-String IRHitachiAc424::toString(void) {
+/// Convert the internal state into a human readable string for the settings
+/// that are common to protocols of this nature.
+/// @return A string containing the common settings in human-readable form.
+String IRHitachiAc424::_toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
@@ -1177,7 +1179,6 @@ String IRHitachiAc424::toString(void) {
     default:                     result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
   result += addIntToString(getButton(), kButtonStr);
   result += kSpaceLBraceStr;
   switch (getButton()) {
@@ -1188,12 +1189,19 @@ String IRHitachiAc424::toString(void) {
       break;
     case kHitachiAc424ButtonFan:      result += kFanStr; break;
     case kHitachiAc424ButtonSwingV:   result += kSwingVStr; break;
+    case kHitachiAc344ButtonSwingH:   result += kSwingHStr; break;
     case kHitachiAc424ButtonTempDown: result += kTempDownStr; break;
     case kHitachiAc424ButtonTempUp:   result += kTempUpStr; break;
     default: result += kUnknownStr;
   }
   result += ')';
   return result;
+}
+
+/// Convert the internal state into a human readable string.
+/// @return A string containing the settings in human-readable form.
+String IRHitachiAc424::toString(void) {
+  return _toString() + addBoolToString(getSwingVToggle(), kSwingVToggleStr);
 }
 
 
@@ -1366,10 +1374,91 @@ void IRHitachiAc344::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kHitachiAc344StateLength));
 }
 
+/// Control the vertical swing setting.
+/// @param on True, turns on the feature. False, turns off the feature.
+void IRHitachiAc344::setSwingV(const bool on) {
+  setSwingVToggle(on);  // Set the button value.
+  setBit(&remote_state[kHitachiAc344SwingVByte], kHitachiAc344SwingVOffset, on);
+}
+
+/// Get the current vertical swing setting.
+/// @return True, if the setting is on. False, it is off.
+bool IRHitachiAc344::getSwingV(void) {
+  return GETBIT8(remote_state[kHitachiAc344SwingVByte],
+                 kHitachiAc344SwingVOffset);
+}
+
+/// Control the horizontal swing setting.
+/// @param position The position to set the horizontal swing to.
+void IRHitachiAc344::setSwingH(const uint8_t position) {
+  if (position > kHitachiAc344SwingHLeftMax)
+    return setSwingH(kHitachiAc344SwingHMiddle);
+  setBits(&remote_state[kHitachiAc344SwingHByte], kHitachiAc344SwingHOffset,
+         kHitachiAc344SwingHSize, position);
+  setButton(kHitachiAc344ButtonSwingH);
+}
+
+/// Get the current horizontal swing setting.
+/// @return The current position horizontal swing is set to.
+uint8_t IRHitachiAc344::getSwingH(void) {
+  return GETBITS8(remote_state[kHitachiAc344SwingHByte],
+                 kHitachiAc344SwingHOffset, kHitachiAc344SwingHSize);
+}
+
+/// Convert a standard A/C horizontal swing into its native setting.
+/// @return The equivilent native horizontal swing position.
+uint8_t IRHitachiAc344::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kAuto:     return kHitachiAc344SwingHAuto;
+    case stdAc::swingh_t::kLeftMax:  return kHitachiAc344SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kHitachiAc344SwingHLeft;
+    case stdAc::swingh_t::kRight:    return kHitachiAc344SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kHitachiAc344SwingHRightMax;
+    default:                         return kHitachiAc344SwingHMiddle;
+  }
+}
+
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @return The common horizontal swing position.
+stdAc::swingh_t IRHitachiAc344::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case kHitachiAc344SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kHitachiAc344SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kHitachiAc344SwingHRight:    return stdAc::swingh_t::kRight;
+    case kHitachiAc344SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kHitachiAc344SwingHAuto:     return stdAc::swingh_t::kAuto;
+    default:                          return stdAc::swingh_t::kOff;
+  }
+}
+
 /// Convert the current A/C state to its common stdAc::state_t equivalent.
 /// @return A stdAc::state_t state.
 stdAc::state_t IRHitachiAc344::toCommon(void) {
   stdAc::state_t result = IRHitachiAc424::toCommon();
   result.protocol = decode_type_t::HITACHI_AC344;
+  result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = toCommonSwingH(getSwingH());
+  return result;
+}
+
+/// Convert the internal state into a human readable string.
+/// @return A string containing the settings in human-readable form.
+String IRHitachiAc344::toString(void) {
+  String result;
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result += _toString();
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addIntToString(getSwingH(), kSwingHStr);
+  result += kSpaceLBraceStr;
+  switch (getSwingH()) {
+    case kHitachiAc344SwingHLeftMax:  result += kLeftMaxStr; break;
+    case kHitachiAc344SwingHLeft:     result += kLeftStr; break;
+    case kHitachiAc344SwingHMiddle:   result += kMiddleStr; break;
+    case kHitachiAc344SwingHRight:    result += kRightStr; break;
+    case kHitachiAc344SwingHRightMax: result += kRightMaxStr; break;
+    case kHitachiAc344SwingHAuto:     result += kAutoStr; break;
+    default:                          result += kUnknownStr;
+  }
+  result += ')';
   return result;
 }

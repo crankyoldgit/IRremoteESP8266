@@ -363,7 +363,7 @@ stdAc::fanspeed_t IRMitsubishiHeavy152Ac::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+// Convert a native horizontal swing to it's common equivalent.
 stdAc::swingh_t IRMitsubishiHeavy152Ac::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
     case kMitsubishiHeavy152SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;

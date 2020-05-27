@@ -949,7 +949,7 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V) Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -1124,29 +1124,29 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(
       "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High), "
-      "Swing(V) Toggle: Off, Button: 66 (Fan)",
+      "Button: 66 (Fan), Swing(V) Toggle: Off",
       ac.toString());
   ac.setMode(kHitachiAc424Cool);
   ac.setFan(kHitachiAc424FanMin);
   ac.setTemp(kHitachiAc424MinTemp);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      "Button: 67 (Temp Down), Swing(V) Toggle: Off",
       ac.toString());
   ac.setSwingVToggle(true);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: On, Button: 129 (Swing(V))",
+      "Button: 129 (Swing(V)), Swing(V) Toggle: On",
       ac.toString());
   ac.setTemp(ac.getTemp() + 1);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 17C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 68 (Temp Up)",
+      "Button: 68 (Temp Up), Swing(V) Toggle: Off",
       ac.toString());
   ac.setTemp(ac.getTemp() - 1);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      "Button: 67 (Temp Down), Swing(V) Toggle: Off",
       ac.toString());
 }
 
@@ -1922,7 +1922,7 @@ TEST(TestDecodeHitachiAc344, SyntheticExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 26C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V): On, Swing(H): 3 (Middle)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -1940,7 +1940,7 @@ TEST(TestIRHitachiAc344, ExampleMessages) {
   ac.setRaw(state);
   EXPECT_EQ(
       "Power: On, Mode: 6 (Heat), Temp: 17C, Fan: 5 (Auto), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V): Off, Swing(H): 3 (Middle)",
       ac.toString());
 }
 

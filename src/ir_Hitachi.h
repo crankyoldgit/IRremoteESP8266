@@ -52,11 +52,13 @@ const uint8_t kHitachiAc424ButtonFan = 0x42;
 const uint8_t kHitachiAc424ButtonTempDown = 0x43;
 const uint8_t kHitachiAc424ButtonTempUp = 0x44;
 const uint8_t kHitachiAc424ButtonSwingV = 0x81;
+const uint8_t kHitachiAc424ButtonSwingH = 0x8C;
 const uint8_t kHitachiAc344ButtonPowerMode = kHitachiAc424ButtonPowerMode;
 const uint8_t kHitachiAc344ButtonFan = kHitachiAc424ButtonFan;
 const uint8_t kHitachiAc344ButtonTempDown = kHitachiAc424ButtonTempDown;
 const uint8_t kHitachiAc344ButtonTempUp = kHitachiAc424ButtonTempUp;
 const uint8_t kHitachiAc344ButtonSwingV = kHitachiAc424ButtonSwingV;
+const uint8_t kHitachiAc344ButtonSwingH = kHitachiAc424ButtonSwingH;
 
 // Byte[13]
 const uint8_t kHitachiAc424TempByte = 13;
@@ -98,6 +100,21 @@ const uint8_t kHitachiAc344FanMax = kHitachiAc424FanMax;
 const uint8_t kHitachiAc424PowerByte = 27;
 const uint8_t kHitachiAc424PowerOn = 0xF1;
 const uint8_t kHitachiAc424PowerOff = 0xE1;
+
+// Byte[35]
+const uint8_t kHitachiAc344SwingHByte = 35;
+const uint8_t kHitachiAc344SwingHOffset = 0;  // Mask 0b00000xxx
+const uint8_t kHitachiAc344SwingHSize = 3;    // Mask 0b00000xxx
+const uint8_t kHitachiAc344SwingHAuto = 0;              // 0b000
+const uint8_t kHitachiAc344SwingHRightMax = 1;          // 0b001
+const uint8_t kHitachiAc344SwingHRight = 2;             // 0b010
+const uint8_t kHitachiAc344SwingHMiddle = 3;            // 0b011
+const uint8_t kHitachiAc344SwingHLeft = 4;              // 0b100
+const uint8_t kHitachiAc344SwingHLeftMax = 5;           // 0b101
+
+// Byte[37]
+const uint8_t kHitachiAc344SwingVByte = 37;
+const uint8_t kHitachiAc344SwingVOffset = 5;  // Mask 0b00x00000
 
 // HitachiAc1
 // Byte[3] (Model)
@@ -317,6 +334,7 @@ class IRHitachiAc424 {
   // The state of the IR remote in IR code form.
   uint8_t remote_state[kHitachiAc424StateLength];
   void setInvertedStates(void);
+  String _toString(void);
   uint8_t _previoustemp;
 };
 
@@ -359,6 +377,13 @@ class IRHitachiAc344: public IRHitachiAc424 {
 #if SEND_HITACHI_AC344
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif  // SEND_HITACHI_AC344
+  void setSwingV(const bool on);
+  bool getSwingV(void);
+  void setSwingH(const uint8_t position);
+  uint8_t getSwingH(void);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
+  String toString(void);
 };
 
 #endif  // IR_HITACHI_H_
