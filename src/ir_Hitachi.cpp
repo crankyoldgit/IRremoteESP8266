@@ -1375,7 +1375,7 @@ void IRHitachiAc344::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 /// Control the vertical swing setting.
-/// @param on True, turns on the feature. False, turns off the feature.
+/// @param[in] on True, turns on the feature. False, turns off the feature.
 void IRHitachiAc344::setSwingV(const bool on) {
   setSwingVToggle(on);  // Set the button value.
   setBit(&remote_state[kHitachiAc344SwingVByte], kHitachiAc344SwingVOffset, on);
@@ -1389,7 +1389,7 @@ bool IRHitachiAc344::getSwingV(void) {
 }
 
 /// Control the horizontal swing setting.
-/// @param position The position to set the horizontal swing to.
+/// @param[in] position The position to set the horizontal swing to.
 void IRHitachiAc344::setSwingH(const uint8_t position) {
   if (position > kHitachiAc344SwingHLeftMax)
     return setSwingH(kHitachiAc344SwingHMiddle);
@@ -1406,6 +1406,7 @@ uint8_t IRHitachiAc344::getSwingH(void) {
 }
 
 /// Convert a standard A/C horizontal swing into its native setting.
+/// @param[in] position A stdAc::swingh_t position to convert.
 /// @return The equivilent native horizontal swing position.
 uint8_t IRHitachiAc344::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
@@ -1419,6 +1420,7 @@ uint8_t IRHitachiAc344::convertSwingH(const stdAc::swingh_t position) {
 }
 
 /// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRHitachiAc344::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
