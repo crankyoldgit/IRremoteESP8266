@@ -599,50 +599,21 @@ namespace irutils {
       char c = unescaped[i];
       switch (c) {
         // ';!-"<>=&#{}() are all unsafe.
-        case '\'':
-          result += F("&apos;");
-          break;
-        case ';':
-          result += F("&semi;");
-          break;
-        case '!':
-          result += F("&excl;");
-          break;
-        case '-':
-          result += F("&dash;");
-          break;
-        case '\"':
-          result += F("&quot;");
-          break;
-        case '<':
-          result += F("&lt;");
-          break;
-        case '>':
-          result += F("&gt;");
-          break;
-        case '=':
-          result += F("&#equals;");
-          break;
-        case '&':
-          result += F("&amp;");
-          break;
-        case '#':
-          result += F("&num;");
-          break;
-        case '{':
-          result += F("&lcub;");
-          break;
-        case '}':
-          result += F("&rcub;");
-          break;
-        case '(':
-          result += F("&lpar;");
-          break;
-        case ')':
-          result += F("&rpar;");
-          break;
-        default:
-          result += c;
+        case '\'': result += F("&apos;"); break;
+        case ';':  result += F("&semi;"); break;
+        case '!':  result += F("&excl;"); break;
+        case '-':  result += F("&dash;"); break;
+        case '\"': result += F("&quot;"); break;
+        case '<':  result += F("&lt;"); break;
+        case '>':  result += F("&gt;"); break;
+        case '=':  result += F("&#equals;"); break;
+        case '&':  result += F("&amp;"); break;
+        case '#':  result += F("&num;"); break;
+        case '{':  result += F("&lcub;"); break;
+        case '}':  result += F("&rcub;"); break;
+        case '(':  result += F("&lpar;"); break;
+        case ')':  result += F("&rpar;"); break;
+        default:   result += c;
       }
     }
     return result;

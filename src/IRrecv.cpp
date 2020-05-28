@@ -187,15 +187,15 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 
 // Class destructor
 IRrecv::~IRrecv(void) {
+  disableIRIn();
+#if defined(ESP32)
+  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
+#endif  // ESP32
   delete[] irparams.rawbuf;
   if (irparams_save != NULL) {
     delete[] irparams_save->rawbuf;
     delete irparams_save;
   }
-  disableIRIn();
-#if defined(ESP32)
-  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
-#endif  // ESP32
 }
 
 // Set up and (re)start the IR capture mechanism.

@@ -117,9 +117,9 @@ class IRPanasonicAc {
   uint8_t getMode(void);
   void setRaw(const uint8_t state[]);
   uint8_t *getRaw(void);
-  static bool validChecksum(uint8_t *state,
+  static bool validChecksum(const uint8_t *state,
                             const uint16_t length = kPanasonicAcStateLength);
-  static uint8_t calcChecksum(uint8_t *state,
+  static uint8_t calcChecksum(const uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);
   void setQuiet(const bool on);
   bool getQuiet(void);
@@ -166,8 +166,6 @@ class IRPanasonicAc {
   uint8_t _swingh;
   uint8_t _temp;
   void fixChecksum(const uint16_t length = kPanasonicAcStateLength);
-  static uint8_t calcChecksum(const uint8_t *state,
-                              const uint16_t length = kPanasonicAcStateLength);
   static uint16_t _getTime(const uint8_t ptr[]);
   static void _setTime(uint8_t * const ptr, const uint16_t mins_since_midnight,
                        const bool round_down);

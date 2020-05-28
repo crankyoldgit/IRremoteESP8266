@@ -249,13 +249,14 @@ void IRPanasonicAc::begin(void) { _irsend.begin(); }
 //   length: The size of the state.
 // Returns:
 //   A boolean.
-bool IRPanasonicAc::validChecksum(uint8_t state[], const uint16_t length) {
+bool IRPanasonicAc::validChecksum(const uint8_t *state, const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] ==
           sumBytes(state, length - 1, kPanasonicAcChecksumInit));
 }
 
-uint8_t IRPanasonicAc::calcChecksum(uint8_t state[], const uint16_t length) {
+uint8_t IRPanasonicAc::calcChecksum(const uint8_t *state,
+                                    const uint16_t length) {
   return sumBytes(state, length - 1, kPanasonicAcChecksumInit);
 }
 
