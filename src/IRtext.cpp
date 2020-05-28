@@ -1,6 +1,7 @@
 // Copyright 2019-2020 - David Conran (@crankyoldgit)
 
-/// @warn If you add or remove an entry in this file, you should run:
+/// @file IRtext.cpp
+/// @warning If you add or remove an entry in this file, you should run:
 ///   '../tools/generate_irtext_h.sh' to rebuild the `IRtext.h` file.
 
 #ifndef UNIT_TEST

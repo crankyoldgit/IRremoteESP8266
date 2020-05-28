@@ -1025,7 +1025,7 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 //   nbytes: How many bytes are in the state.
 // Returns:
 //   bool: True if it is a type we can attempt to send, false if not.
-bool IRsend::send(const decode_type_t type, const unsigned char *state,
+bool IRsend::send(const decode_type_t type, const uint8_t *state,
                   const uint16_t nbytes) {
   switch (type) {
 #if SEND_AMCOR

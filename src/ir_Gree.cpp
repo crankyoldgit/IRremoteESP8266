@@ -54,7 +54,7 @@ using irutils::setBits;
 //
 // Ref:
 //   https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.cpp
-void IRsend::sendGree(const unsigned char data[], const uint16_t nbytes,
+void IRsend::sendGree(const uint8_t data[], const uint16_t nbytes,
                       const uint16_t repeat) {
   if (nbytes < kGreeStateLength)
     return;  // Not enough bytes to send a proper message.
