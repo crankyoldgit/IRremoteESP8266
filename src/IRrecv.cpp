@@ -87,7 +87,6 @@ static void USE_IRAM_ATTR read_timeout(void) {
 }
 
 /// Interrupt handler for changes on the GPIO pin handling incoming IR messages.
-///
 static void USE_IRAM_ATTR gpio_intr() {
   uint32_t now = micros();
   static uint32_t start = 0;
@@ -277,7 +276,7 @@ void IRrecv::disableIRIn(void) {
 }
 
 /// Resume collection of received IR data.
-/// @note This is required if `decode()`` is successful and `save_buffer` was
+/// @note This is required if `decode()` is successful and `save_buffer` was
 ///   not set when the class was instanciated.
 /// @see IRrecv class constructor
 void IRrecv::resume(void) {
