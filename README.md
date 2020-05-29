@@ -1,4 +1,4 @@
-# IRremote ESP8266 Library
+# IRremoteESP8266 Library
 
 [![Build Status](https://travis-ci.org/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.org/crankyoldgit/IRremoteESP8266)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
@@ -39,6 +39,10 @@ Before reporting an issue or asking for help, please try to follow our [Troubles
 
 ## Frequently Asked Questions
 Some common answers to common questions and problems are on our [F.A.Q. wiki page](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Frequently-Asked-Questions).
+
+## Library API Documentation
+This library uses [Doxygen](https://www.doxygen.nl/index.html) to [automatically document](https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/) the [library's](https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/) [API](https://en.wikipedia.org/wiki/Application_programming_interface).
+You can find it [here](https://crankyoldgit.github.io/IRremoteESP8266/doxygen/html/).
 
 ## Installation
 ##### Official releases via the Arduino IDE v1.8+ (Windows & Linux)
