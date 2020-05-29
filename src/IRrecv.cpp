@@ -62,11 +62,19 @@ irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
 
 #ifndef UNIT_TEST
 #if defined(ESP8266)
+/// Interrupt handler for when the timer runs out.
+/// It signals to the library that capturing of IR data has stopped.
+/// @param[in] arg Unused. (ESP8266 Only)
 static void USE_IRAM_ATTR read_timeout(void *arg __attribute__((unused))) {
   os_intr_lock();
 #endif  // ESP8266
+/// @cond IGNORE
 #if defined(ESP32)
+/// Interrupt handler for when the timer runs out.
+/// It signals to the library that capturing of IR data has stopped.
+/// @note ESP32 version
 static void USE_IRAM_ATTR read_timeout(void) {
+/// @endcond
   portENTER_CRITICAL(&irremote_mux);
 #endif  // ESP32
   if (irparams.rawlen) irparams.rcvstate = kStopState;
@@ -78,6 +86,7 @@ static void USE_IRAM_ATTR read_timeout(void) {
 #endif  // ESP32
 }
 
+/// Interrupt handler for changes on the GPIO pin handling incoming IR messages.
 static void USE_IRAM_ATTR gpio_intr() {
   uint32_t now = micros();
   static uint32_t start = 0;
@@ -128,17 +137,18 @@ static void USE_IRAM_ATTR gpio_intr() {
 
 // Start of IRrecv class -------------------
 
-// Class constructor
-// Args:
-//   recvpin: GPIO pin the IR receiver module's data pin is connected to.
-//   bufsize: Nr. of entries to have in the capture buffer. (Default: kRawBuf)
-//   timeout: Nr. of milli-Seconds of no signal before we stop capturing data.
-//            (Default: kTimeoutMs)
-//   save_buffer: Use a second (save) buffer to decode from. (Default: false)
-//   timer_num: Which ESP32 timer number to use? ESP32 only, otherwise unused.
-//              (Range: 0-3. Default: kDefaultESP32Timer)
-// Returns:
-//   An IRrecv class object.
+/// Class constructor
+/// Args:
+/// @param[in] recvpin The GPIO pin the IR receiver module's data pin is
+///   connected to.
+/// @param[in] bufsize Nr. of entries to have in the capture buffer.
+///   (Default: kRawBuf)
+/// @param[in] timeout Nr. of milli-Seconds of no signal before we stop
+///   capturing data. (Default: kTimeoutMs)
+/// @param[in] save_buffer Use a second (save) buffer to decode from.
+///   (Default: false)
+/// @param[in] timer_num Nr. of the ESP32 timer to use (0 to 3) (ESP32 Only)
+/// @return An IRrecv class object.
 #if defined(ESP32)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
@@ -146,8 +156,21 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
   // There are only 4 timers. 0 to 3.
   _timer_num = std::min(timer_num, (uint8_t)3);
 #else  // ESP32
+/// @cond IGNORE
+/// Class constructor
+/// Args:
+/// @param[in] recvpin The GPIO pin the IR receiver module's data pin is
+///   connected to.
+/// @param[in] bufsize Nr. of entries to have in the capture buffer.
+///   (Default: kRawBuf)
+/// @param[in] timeout Nr. of milli-Seconds of no signal before we stop
+///   capturing data. (Default: kTimeoutMs)
+/// @param[in] save_buffer Use a second (save) buffer to decode from.
+///   (Default: false)
+/// @return An IRrecv class object.
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer) {
+/// @endcond
 #endif  // ESP32
   irparams.recvpin = recvpin;
   irparams.bufsize = bufsize;
@@ -185,7 +208,10 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
   _tolerance = kTolerance;
 }
 
-// Class destructor
+/// Class destructor
+/// Cleans up after the object is no longer needed.
+/// e.g. Frees up all memory used by the various buffers, and disables any
+/// timers or interrupts used.
 IRrecv::~IRrecv(void) {
   disableIRIn();
 #if defined(ESP32)
@@ -198,11 +224,9 @@ IRrecv::~IRrecv(void) {
   }
 }
 
-// Set up and (re)start the IR capture mechanism.
-//
-// Args:
-//   pullup: A flag indicating should the GPIO use the internal pullup resistor.
-//           (Default: `false`. i.e. No.)
+/// Set up and (re)start the IR capture mechanism.
+/// @param[in] pullup A flag indicating should the GPIO use the internal pullup
+/// resistor. (Default: `false`. i.e. No.)
 void IRrecv::enableIRIn(const bool pullup) {
   // ESP32's seem to require explicitly setting the GPIO to INPUT etc.
   // This wasn't required on the ESP8266s, but it shouldn't hurt to make sure.
@@ -237,6 +261,8 @@ void IRrecv::enableIRIn(const bool pullup) {
 #endif  // UNIT_TEST
 }
 
+/// Stop collection of any received IR data.
+/// Disable any timers and interrupts.
 void IRrecv::disableIRIn(void) {
 #ifndef UNIT_TEST
 #if defined(ESP8266)
@@ -249,6 +275,10 @@ void IRrecv::disableIRIn(void) {
 #endif  // UNIT_TEST
 }
 
+/// Resume collection of received IR data.
+/// @note This is required if `decode()` is successful and `save_buffer` was
+///   not set when the class was instanciated.
+/// @see IRrecv class constructor
 void IRrecv::resume(void) {
   irparams.rcvstate = kIdleState;
   irparams.rawlen = 0;
@@ -258,14 +288,12 @@ void IRrecv::resume(void) {
 #endif  // ESP32
 }
 
-// Make a copy of the interrupt state & buffer data.
-// Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
-// Only call this when you know the interrupt handlers won't modify anything.
-// i.e. In kStopState.
-//
-// Args:
-//   src: Pointer to an irparams_t structure to copy from.
-//   dst: Pointer to an irparams_t structure to copy to.
+/// Make a copy of the interrupt state & buffer data.
+/// Needed because irparams is marked as volatile, thus memcpy() isn't allowed.
+/// Only call this when you know the interrupt handlers won't modify anything.
+/// i.e. In kStopState.
+/// @param[in] src Pointer to an irparams_t structure to copy from.
+/// @param[out] dst Pointer to an irparams_t structure to copy to.
 void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
   // Typecast src and dst addresses to (char *)
   char *csrc = (char *)src;  // NOLINT(readability/casting)
@@ -287,31 +315,35 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
   for (uint16_t i = 0; i < dst->bufsize; i++) dst->rawbuf[i] = src->rawbuf[i];
 }
 
-// Obtain the maximum number of entries possible in the capture buffer.
-// i.e. It's size.
+/// Obtain the maximum number of entries possible in the capture buffer.
+/// i.e. It's size.
+/// @return The size of the buffer that is in use by the object.
 uint16_t IRrecv::getBufSize(void) { return irparams.bufsize; }
 
 #if DECODE_HASH
-// Set the minimum length we will consider for reporting UNKNOWN message types.
+/// Set the minimum length we will consider for reporting UNKNOWN message types.
+/// @param[in] length Min nr. of mark/space pulses required to be considered.
 void IRrecv::setUnknownThreshold(const uint16_t length) {
   _unknown_threshold = length;
 }
 #endif  // DECODE_HASH
 
 
-// Set the base tolerance percentage for matching incoming IR messages.
+/// Set the base tolerance percentage for matching incoming IR messages.
+/// @param[in] percent An integer percentage. (0-100)
 void IRrecv::setTolerance(const uint8_t percent) {
   _tolerance = std::min(percent, (uint8_t)100);
 }
 
-// Get the base tolerance percentage for matching incoming IR messages.
+/// Get the base tolerance percentage for matching incoming IR messages.
+/// @return A integer percentage.
 uint8_t IRrecv::getTolerance(void) { return _tolerance; }
 
 #if ENABLE_NOISE_FILTER_OPTION
-// Remove or merge pulses in the capture buffer that are too short.
-// Args:
-//   results:  Ptr to the decode_results we are going to filter/modify.
-//   floor:  Only allow values in the buffer large than this. (in micro seconds)
+/// Remove or merge pulses in the capture buffer that are too short.
+/// @param[in,out] results Ptr to the decode_results we are going to filter.
+/// @param[in] floor Only allow values in the buffer large than this.
+///   (in microSeconds)
 void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
   if (floor == 0) return;  // Nothing to do.
   const uint16_t kTickFloor = floor / kRawTick;
@@ -338,49 +370,44 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
 }
 #endif  // ENABLE_NOISE_FILTER_OPTION
 
-// Decodes the received IR message.
-// If the interrupt state is saved, we will immediately resume waiting
-// for the next IR message to avoid missing messages.
-// Note: There is a trade-off here. Saving the state means less time lost until
-// we can receiving the next message vs. using more RAM. Choose appropriately.
-//
-// Args:
-//   results:  A pointer to where the decoded IR message will be stored.
-//   save:  A pointer to an irparams_t instance in which to save
-//          the interrupt's memory/state. NULL means don't save it.
-//   max_skip:  Maximum Nr. of pulses at the begining of a capture we can skip
-//              when attempting to find a protocol we can successfully decode.
-//              This parameter can dramatically improve detection of protocols
-//              when there is light IR interference just before an incoming IR
-//              message, however, it comes at a steep performace price.
-//              CAUTION: Increasing this value will dramatically (linnearly)
-//                       increase the cpu time & usage to decode protocols.
-//                       e.g. 0 -> 1 will be a 2x increase in cpu usage/time.
-//                            0 -> 2 will be a 3x increase etc.
-//                       If you are going to do this, consider disabling
-//                       protocol decoding for protocols you are not expecting.
-//              (Default is 0. No skipping.)
-//   noise_floor:  Pulses below this size (in usecs) will be removed or merged
-//                 prior to any decoding. This is to try to remove noise/poor
-//                 readings & slighly increase the chances of a successful
-//                 decode but at the cost of data fidelity & integrity.
-//                 (Defaults to 0 usecs. i.e. Don't filter; which is safe!)
-//                 DANGER: **Here Be Dragons!**
-//                   If you set the `filter_floor` value too high, it **WILL**
-//                   break decoding of some protocols. You have been warned!
-//                   **Any** non-zero value has the potential to **cook** the
-//                   captured raw data. i.e. The data is going to lie to you.
-//                   It may obscure hardware, circuit, & environment issues thus
-//                   making it impossible to support you accurately or
-//                   confidently.
-//                   Values of <= 50 usecs will probably be safe.
-//                   51 - 100 usecs **might** be okay.
-//                   100 - 150 usecs is "Danger, Will Robinson!".
-//                   150 - 200 usecs expect broken protocols.
-//                   At 200+ usecs, you **have** protocols you can't decode!!
-//
-// Returns:
-//   A boolean indicating if an IR message is ready or not.
+/// Decodes the received IR message.
+/// If the interrupt state is saved, we will immediately resume waiting
+/// for the next IR message to avoid missing messages.
+/// @note There is a trade-off here. Saving the state means less time lost until
+/// we can receiving the next message vs. using more RAM. Choose appropriately.
+/// @param[out] results A PTR to where the decoded IR message will be stored.
+/// @param[out] save A PTR to an irparams_t instance in which to save
+///   the interrupt's memory/state. NULL means don't save it.
+/// @param[in] max_skip Maximum Nr. of pulses at the begining of a capture we
+///   can skip when attempting to find a protocol we can successfully decode.
+///   This parameter can dramatically improve detection of protocols
+///   when there is light IR interference just before an incoming IR
+///   message, however, it comes at a steep performace price.
+///   (Default is 0. No skipping.)
+/// @warning Increasing the `max_skip` value will dramatically (linearly)
+///   increase the cpu time & usage to decode protocols.
+///   e.g. 0 -> 1 will be a 2x increase in cpu usage/time.
+///        0 -> 2 will be a 3x increase etc.
+///   If you are going to do this, consider disabling protocol decoding for
+///   protocols you are not expecting.
+/// @param[in] noise_floor Pulses below this size (in usecs) will be removed or
+///   merged prior to any decoding. This is to try to remove noise/poor
+///   readings & slighly increase the chances of a successful decode but at the
+///   cost of data fidelity & integrity.
+///   (Defaults to 0 usecs. i.e. Don't filter; which is safe!)
+/// @warning DANGER: **Here Be Dragons!**
+///   If you set the `noise_floor` value too high, it **WILL** break decoding
+///   of some protocols. You have been warned!
+///   **Any** non-zero value has the potential to **cook** the captured raw data
+///   i.e. The raw data is going to lie to you.
+///   It may obscure hardware, circuit, & environment issues thus making it
+///   impossible to support you accurately or confidently.
+///     Values of <= 50 usecs will probably be safe.
+///     51 - 100 usecs **might** be okay.
+///     100 - 150 usecs is "Danger, Will Robinson!".
+///     150 - 200 usecs expect broken protocols.
+///     At 200+ usecs, you **have** protocols you can't decode!!
+/// @return A boolean indicating if an IR message is ready or not.
 bool IRrecv::decode(decode_results *results, irparams_t *save,
                     uint8_t max_skip, uint16_t noise_floor) {
   // Proceed only if an IR message been received.
@@ -831,19 +858,17 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   return false;
 }
 
-// Convert the tolerance percentage into something valid.
+/// Convert the tolerance percentage into something valid.
+/// @param[in] percentage An integer percentage.
 uint8_t IRrecv::_validTolerance(const uint8_t percentage) {
     return (percentage > 100) ? _tolerance : percentage;
 }
 
-// Calculate the lower bound of the nr. of ticks.
-//
-// Args:
-//   usecs:  Nr. of uSeconds.
-//   tolerance:  Percent as an integer. e.g. 10 is 10%
-//   delta:  A non-scaling amount to reduce usecs by.
-// Returns:
-//   Nr. of ticks.
+/// Calculate the lower bound of the nr. of ticks.
+/// @param[in] usecs Nr. of uSeconds.
+/// @param[in] tolerance Percent as an integer. e.g. 10 is 10%
+/// @param[in] delta A non-scaling amount to reduce usecs by.
+/// @return Nr. of ticks.
 uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
                           const uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
@@ -852,31 +877,24 @@ uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
       0));
 }
 
-// Calculate the upper bound of the nr. of ticks.
-//
-// Args:
-//   usecs:  Nr. of uSeconds.
-//   tolerance:  Percent as an integer. e.g. 10 is 10%
-//   delta:  A non-scaling amount to increase usecs by.
-// Returns:
-//   Nr. of ticks.
+/// Calculate the upper bound of the nr. of ticks.
+/// @param[in] usecs Nr. of uSeconds.
+/// @param[in] tolerance Percent as an integer. e.g. 10 is 10%
+/// @param[in] delta A non-scaling amount to increase usecs by.
+/// @return Nr. of ticks.
 uint32_t IRrecv::ticksHigh(const uint32_t usecs, const uint8_t tolerance,
                            const uint16_t delta) {
   return ((uint32_t)(usecs * (1.0 + _validTolerance(tolerance) / 100.0)) + 1 +
           delta);
 }
 
-// Check if we match a pulse(measured) with the desired within
-// +/-tolerance percent and/or +/- a fixed delta range.
-//
-// Args:
-//   measured:  The recorded period of the signal pulse.
-//   desired:  The expected period (in useconds) we are matching against.
-//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
-//   delta:  A non-scaling (+/-) error margin (in useconds).
-//
-// Returns:
-//   Boolean: true if it matches, false if it doesn't.
+/// Check if we match a pulse(measured) with the desired within
+///   +/-tolerance percent and/or +/- a fixed delta range.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] tolerance A percentage expressed as an integer. e.g. 10 is 10%.
+/// @param[in] delta A non-scaling (+/-) error margin (in useconds).
+/// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::match(uint32_t measured, uint32_t desired, uint8_t tolerance,
                    uint16_t delta) {
   measured *= kRawTick;  // Convert to uSecs.
@@ -901,18 +919,13 @@ bool IRrecv::match(uint32_t measured, uint32_t desired, uint8_t tolerance,
           measured <= ticksHigh(desired, tolerance, delta));
 }
 
-// Check if we match a pulse(measured) of at least desired within
-// tolerance percent and/or a fixed delta margin.
-//
-// Args:
-//   measured:  The recorded period of the signal pulse.
-//   desired:  The expected period (in useconds) we are matching against.
-//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
-//   delta:  A non-scaling amount to reduce usecs by.
-
-//
-// Returns:
-//   Boolean: true if it matches, false if it doesn't.
+/// Check if we match a pulse(measured) of at least desired within
+///   tolerance percent and/or a fixed delta margin.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] tolerance A percentage expressed as an integer. e.g. 10 is 10%.
+/// @param[in] delta A non-scaling amount to reduce usecs by.
+/// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                           uint8_t tolerance, uint16_t delta) {
   measured *= kRawTick;  // Convert to uSecs.
@@ -948,17 +961,13 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
                               tolerance, delta);
 }
 
-// Check if we match a mark signal(measured) with the desired within
-// +/-tolerance percent, after an expected is excess is added.
-//
-// Args:
-//   measured:  The recorded period of the signal pulse.
-//   desired:  The expected period (in useconds) we are matching against.
-//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
-//   excess:  Nr. of useconds.
-//
-// Returns:
-//   Boolean: true if it matches, false if it doesn't.
+/// Check if we match a mark signal(measured) with the desired within
+///  +/-tolerance percent, after an expected is excess is added.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] tolerance A percentage expressed as an integer. e.g. 10 is 10%.
+/// @param[in] excess A non-scaling amount to reduce usecs by.
+/// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
                        int16_t excess) {
   DPRINT("Matching MARK ");
@@ -971,17 +980,13 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
   return match(measured, desired + excess, tolerance);
 }
 
-// Check if we match a space signal(measured) with the desired within
-// +/-tolerance percent, after an expected is excess is removed.
-//
-// Args:
-//   measured:  The recorded period of the signal pulse.
-//   desired:  The expected period (in useconds) we are matching against.
-//   tolerance:  A percentage expressed as an integer. e.g. 10 is 10%.
-//   excess:  Nr. of useconds.
-//
-// Returns:
-//   Boolean: true if it matches, false if it doesn't.
+/// Check if we match a space signal(measured) with the desired within
+///  +/-tolerance percent, after an expected is excess is removed.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] tolerance A percentage expressed as an integer. e.g. 10 is 10%.
+/// @param[in] excess A non-scaling amount to reduce usecs by.
+/// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
                         int16_t excess) {
   DPRINT("Matching SPACE ");
@@ -994,23 +999,12 @@ bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
   return match(measured, desired - excess, tolerance);
 }
 
-/* -----------------------------------------------------------------------
- * hashdecode - decode an arbitrary IR code.
- * Instead of decoding using a standard encoding scheme
- * (e.g. Sony, NEC, RC5), the code is hashed to a 32-bit value.
- *
- * The algorithm: look at the sequence of MARK signals, and see if each one
- * is shorter (0), the same length (1), or longer (2) than the previous.
- * Do the same with the SPACE signals.  Hash the resulting sequence of 0's,
- * 1's, and 2's to a 32-bit value.  This will give a unique value for each
- * different code (probably), for most code systems.
- *
- * http://arcfn.com/2010/01/using-arbitrary-remotes-with-arduino.html
- */
-
-// Compare two tick values, returning 0 if newval is shorter,
-// 1 if newval is equal, and 2 if newval is longer
-// Use a tolerance of 20%
+#if DECODE_HASH
+/// Compare two tick values.
+/// @param[in] oldval Nr. of ticks.
+/// @param[in] newval Nr. of ticks.
+/// @return 0 if newval is shorter, 1 if it is equal, & 2 if it is longer.
+/// @note Use a tolerance of 20%
 uint16_t IRrecv::compare(const uint16_t oldval, const uint16_t newval) {
   if (newval < oldval * 0.8)
     return 0;
@@ -1020,11 +1014,18 @@ uint16_t IRrecv::compare(const uint16_t oldval, const uint16_t newval) {
     return 1;
 }
 
-#if DECODE_HASH
-/* Converts the raw code values into a 32-bit hash code.
- * Hopefully this code is unique for each button.
- * This isn't a "real" decoding, just an arbitrary value.
- */
+/// Decode any arbitrary IR message into a 32-bit code value.
+/// Instead of decoding using a standard encoding scheme
+/// (e.g. Sony, NEC, RC5), the code is hashed to a 32-bit value.
+///
+/// The algorithm: look at the sequence of MARK signals, and see if each one
+/// is shorter (0), the same length (1), or longer (2) than the previous.
+/// Do the same with the SPACE signals.  Hash the resulting sequence of 0's,
+/// 1's, and 2's to a 32-bit value.  This will give a unique value for each
+/// different code (probably), for most code systems.
+/// @see http://arcfn.com/2010/01/using-arbitrary-remotes-with-arduino.html
+/// @note This isn't a "real" decoding, just an arbitrary value.
+///   Hopefully this code is unique for each button.
 bool IRrecv::decodeHash(decode_results *results) {
   // Require at least some samples to prevent triggering on noise
   if (results->rawlen < _unknown_threshold) return false;
@@ -1047,23 +1048,21 @@ bool IRrecv::decodeHash(decode_results *results) {
 }
 #endif  // DECODE_HASH
 
-// Match & decode the typical data section of an IR message.
-// The data value is stored in the least significant bits reguardless of the
-// bit ordering requested.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   nbits:     Nr. of data bits we expect.
-//   onemark:   Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
-//   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A match_result_t structure containing the success (or not), the data value,
-//  and how many buffer entries were used.
+/// Match & decode the typical data section of an IR message.
+/// The data value is stored in the least significant bits reguardless of the
+/// bit ordering requested.
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] onemark Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] onespace Nr. of uSecs in an expected space signal for a '1' bit.
+/// @param[in] zeromark Nr. of uSecs in an expected mark signal for a '0' bit.
+/// @param[in] zerospace Nr. of uSecs in an expected space signal for a '0' bit.
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return A match_result_t structure containing the success (or not), the
+///   data value, and how many buffer entries were used.
 match_result_t IRrecv::matchData(
     volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
     const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace,
@@ -1090,24 +1089,22 @@ match_result_t IRrecv::matchData(
   return result;
 }
 
-// Match & decode the typical data section of an IR message.
-// The bytes are stored at result_ptr. The first byte in the result equates to
-// the first byte encountered, and so on.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   result_ptr: A pointer to where to start storing the bytes we decoded.
-//   remaining: The size of the capture buffer are remaining.
-//   nbytes:    Nr. of data bytes we expect.
-//   onemark:   Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   onespace:  Nr. of uSeconds in an expected space signal for a '1' bit.
-//   zeromark:  Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   zerospace: Nr. of uSeconds in an expected space signal for a '0' bit.
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+/// Match & decode the typical data section of an IR message.
+/// The bytes are stored at result_ptr. The first byte in the result equates to
+/// the first byte encountered, and so on.
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @param[out] result_ptr A ptr to where to start storing the bytes we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbytes Nr. of data bytes we expect.
+/// @param[in] onemark Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] onespace Nr. of uSecs in an expected space signal for a '1' bit.
+/// @param[in] zeromark Nr. of uSecs in an expected mark signal for a '0' bit.
+/// @param[in] zerospace Nr. of uSecs in an expected space signal for a '0' bit.
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                             const uint16_t remaining, const uint16_t nbytes,
                             const uint16_t onemark, const uint32_t onespace,
@@ -1128,33 +1125,36 @@ uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
   return offset;
 }
 
-// Match & decode a generic/typical IR message.
-// The data is stored in result_bits_ptr or result_bytes_ptr depending on flag
-// `use_bits`.
-// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
-// that requirement.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   result_bits_ptr: A pointer to where to start storing the bits we decoded.
-//   result_bytes_ptr: A pointer to where to start storing the bytes we decoded.
-//   use_bits: A flag indicating if we are to decode bits or bytes.
-//   remaining: The size of the capture buffer are remaining.
-//   nbits:        Nr. of data bits we expect.
-//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
-//   hdrspace:     Nr. of uSeconds for the expected header space signal.
-//   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   onespace:     Nr. of uSeconds in an expected space signal for a '1' bit.
-//   zeromark:     Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   zerospace:    Nr. of uSeconds in an expected space signal for a '0' bit.
-//   footermark:   Nr. of uSeconds for the expected footer mark signal.
-//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
-//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+/// Match & decode a generic/typical IR message.
+/// The data is stored in result_bits_ptr or result_bytes_ptr depending on flag
+/// `use_bits`.
+/// @note Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean
+/// skip that requirement.
+///
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @param[out] result_bits_ptr A pointer to where to start storing the bits we
+///    decoded.
+/// @param[out] result_bytes_ptr A pointer to where to start storing the bytes
+///    we decoded.
+/// @param[in] use_bits A flag indicating if we are to decode bits or bytes.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] hdrmark Nr. of uSeconds for the expected header mark signal.
+/// @param[in] hdrspace Nr. of uSeconds for the expected header space signal.
+/// @param[in] onemark Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] onespace Nr. of uSecs in an expected space signal for a '1' bit.
+/// @param[in] zeromark Nr. of uSecs in an expected mark signal for a '0' bit.
+/// @param[in] zerospace Nr. of uSecs in an expected space signal for a '0' bit.
+/// @param[in] footermark Nr. of uSeconds for the expected footer mark signal.
+/// @param[in] footerspace Nr. of uSeconds for the expected footer space/gap
+///   signal.
+/// @param[in] atleast Is the match on the footerspace a matchAtLeast or
+///   matchSpace?
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               uint64_t *result_bits_ptr,
                               uint8_t *result_bytes_ptr,
@@ -1230,30 +1230,31 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
   return offset;
 }
 
-// Match & decode a generic/typical <= 64bit IR message.
-// The data is stored at result_ptr.
-// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
-// that requirement.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   result_ptr: A pointer to where to start storing the bits we decoded.
-//   remaining: The size of the capture buffer are remaining.
-//   nbits:        Nr. of data bits we expect.
-//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
-//   hdrspace:     Nr. of uSeconds for the expected header space signal.
-//   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   onespace:     Nr. of uSeconds in an expected space signal for a '1' bit.
-//   zeromark:     Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   zerospace:    Nr. of uSeconds in an expected space signal for a '0' bit.
-//   footermark:   Nr. of uSeconds for the expected footer mark signal.
-//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
-//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+/// Match & decode a generic/typical <= 64bit IR message.
+/// The data is stored at result_ptr.
+/// @note Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean
+///   skip that requirement.
+///
+/// @param[in] data_ptr: A pointer to where we are at in the capture buffer.
+/// @param[out] result_ptr A ptr to where to start storing the bits we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] hdrmark Nr. of uSeconds for the expected header mark signal.
+/// @param[in] hdrspace Nr. of uSeconds for the expected header space signal.
+/// @param[in] onemark Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] onespace Nr. of uSecs in an expected space signal for a '1' bit.
+/// @param[in] zeromark Nr. of uSecs in an expected mark signal for a '0' bit.
+/// @param[in] zerospace Nr. of uSecs in an expected space signal for a '0' bit.
+/// @param[in] footermark Nr. of uSeconds for the expected footer mark signal.
+/// @param[in] footerspace Nr. of uSeconds for the expected footer space/gap
+///   signal.
+/// @param[in] atleast Is the match on the footerspace a matchAtLeast or
+///   matchSpace?
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                               uint64_t *result_ptr,
                               const uint16_t remaining,
@@ -1276,31 +1277,31 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                        tolerance, excess, MSBfirst);
 }
 
-// Match & decode a generic/typical > 64bit IR message.
-// The bytes are stored at result_ptr. The first byte in the result equates to
-// the first byte encountered, and so on.
-// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
-// that requirement.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   result_ptr: A pointer to where to start storing the bytes we decoded.
-//   remaining: The size of the capture buffer are remaining.
-//   nbits:        Nr. of data bits we expect.
-//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
-//   hdrspace:     Nr. of uSeconds for the expected header space signal.
-//   onemark:      Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   onespace:     Nr. of uSeconds in an expected space signal for a '1' bit.
-//   zeromark:     Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   zerospace:    Nr. of uSeconds in an expected space signal for a '0' bit.
-//   footermark:   Nr. of uSeconds for the expected footer mark signal.
-//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
-//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
+/// Match & decode a generic/typical > 64bit IR message.
+/// The bytes are stored at result_ptr. The first byte in the result equates to
+/// the first byte encountered, and so on.
+/// @note Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean
+///   skip that requirement.
+/// @param[in] data_ptr: A pointer to where we are at in the capture buffer.
+/// @param[out] result_ptr A ptr to where to start storing the bytes we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] hdrmark Nr. of uSeconds for the expected header mark signal.
+/// @param[in] hdrspace Nr. of uSeconds for the expected header space signal.
+/// @param[in] onemark Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] onespace Nr. of uSecs in an expected space signal for a '1' bit.
+/// @param[in] zeromark Nr. of uSecs in an expected mark signal for a '0' bit.
+/// @param[in] zerospace Nr. of uSecs in an expected space signal for a '0' bit.
+/// @param[in] footermark Nr. of uSeconds for the expected footer mark signal.
+/// @param[in] footerspace Nr. of uSeconds for the expected footer space/gap
+///   signal.
+/// @param[in] atleast Is the match on the footerspace a matchAtLeast or
+///   matchSpace?
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                               uint8_t *result_ptr,
                               const uint16_t remaining,
@@ -1323,31 +1324,31 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
                        tolerance, excess, MSBfirst);
 }
 
-// Match & decode a generic/typical constant bit time <= 64bit IR message.
-// The data is stored at result_ptr.
-// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
-// that requirement.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//   result_ptr: A pointer to where to start storing the bits we decoded.
-//   remaining: The size of the capture buffer are remaining.
-//   nbits:        Nr. of data bits we expect.
-//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
-//   hdrspace:     Nr. of uSeconds for the expected header space signal.
-//   one:          Nr. of uSeconds in an expected mark signal for a '1' bit.
-//   zero:         Nr. of uSeconds in an expected mark signal for a '0' bit.
-//   footermark:   Nr. of uSeconds for the expected footer mark signal.
-//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
-//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-// Returns:
-//  A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
-//
-// Note: one + zero add up to the total time for a bit.
-// e.g. mark(one) + space(zero) is a `1`, mark(zero) + space(one) is a `0`.
+/// Match & decode a generic/typical constant bit time <= 64bit IR message.
+/// The data is stored at result_ptr.
+/// @note Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean
+///   skip that requirement.
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @note `data_ptr` is assumed to be pointing to a "Mark", not a "Space".
+/// @param[out] result_ptr A ptr to where to start storing the bits we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] hdrmark Nr. of uSeconds for the expected header mark signal.
+/// @param[in] hdrspace Nr. of uSeconds for the expected header space signal.
+/// @param[in] one Nr. of uSeconds in an expected mark signal for a '1' bit.
+/// @param[in] zero Nr. of uSeconds in an expected mark signal for a '0' bit.
+/// @param[in] footermark Nr. of uSeconds for the expected footer mark signal.
+/// @param[in] footerspace Nr. of uSeconds for the expected footer space/gap
+///   signal.
+/// @param[in] atleast Is the match on the footerspace a matchAtLeast or
+///   matchSpace?
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @return If successful, how many buffer entries were used. Otherwise 0.
+/// @note Parameters one + zero add up to the total time for a bit.
+///   e.g. mark(one) + space(zero) is a `1`, mark(zero) + space(one) is a `0`.
 uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
                                           uint64_t *result_ptr,
                                           const uint16_t remaining,
@@ -1409,33 +1410,32 @@ uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
   return offset;
 }
 
-// Match & decode a Manchester Code <= 64bit IR message.
-// The data is stored at result_ptr.
-// Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean skip
-// that requirement.
-//
-// Args:
-//   data_ptr: A pointer to where we are at in the capture buffer.
-//             NOTE: It is assumed to be pointing to a "Mark", not a "Space".
-//   result_ptr: A pointer to where to start storing the bits we decoded.
-//   remaining: The size of the capture buffer are remaining.
-//   nbits:        Nr. of data bits we expect.
-//   hdrmark:      Nr. of uSeconds for the expected header mark signal.
-//   hdrspace:     Nr. of uSeconds for the expected header space signal.
-//   half_period:  Nr. of uSeconds for half the clock's period. (1/2 wavelength)
-//   footermark:   Nr. of uSeconds for the expected footer mark signal.
-//   footerspace:  Nr. of uSeconds for the expected footer space/gap signal.
-//   atleast:      Is the match on the footerspace a matchAtLeast or matchSpace?
-//   tolerance: Percentage error margin to allow. (Def: kUseDefTol)
-//   excess:  Nr. of useconds. (Def: kMarkExcess)
-//   MSBfirst: Bit order to save the data in. (Def: true)
-//   GEThomas: Use G.E. Thomas (true/default) or IEEE 802.3 (false) convention?
-// Returns:
-//   A uint16_t: If successful, how many buffer entries were used. Otherwise 0.
-//
-// Ref:
-//   https://en.wikipedia.org/wiki/Manchester_code
-//   http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
+/// Match & decode a Manchester Code <= 64bit IR message.
+/// The data is stored at result_ptr.
+/// @note Values of 0 for hdrmark, hdrspace, footermark, or footerspace mean
+///   skip that requirement.
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @note `data_ptr` is assumed to be pointing to a "Mark", not a "Space".
+/// @param[out] result_ptr A ptr to where to start storing the bits we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] hdrmark Nr. of uSeconds for the expected header mark signal.
+/// @param[in] hdrspace Nr. of uSeconds for the expected header space signal.
+/// @param[in] half_period Nr. of uSeconds for half the clock's period.
+///   i.e. 1/2 wavelength
+/// @param[in] footermark Nr. of uSeconds for the expected footer mark signal.
+/// @param[in] footerspace Nr. of uSeconds for the expected footer space/gap
+///   signal.
+/// @param[in] atleast Is the match on the footerspace a matchAtLeast or
+///   matchSpace?
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @param[in] GEThomas Use G.E. Thomas (true) or IEEE 802.3 (false) convention?
+/// @return If successful, how many buffer entries were used. Otherwise 0.
+/// @see https://en.wikipedia.org/wiki/Manchester_code
+/// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
 uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                                  uint64_t *result_ptr,
                                  const uint16_t remaining,

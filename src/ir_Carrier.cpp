@@ -248,7 +248,7 @@ IRCarrierAc64::IRCarrierAc64(const uint16_t pin, const bool inverted,
 void IRCarrierAc64::stateReset(void) { remote_state = 0x109000002C2A5584; }
 
 /// Calculate the checksum for a given state.
-/// @param state The value to calc the checksum of.
+/// @param[in] state The value to calc the checksum of.
 /// @return The 4-bit checksum stored in a uint_8.
 uint8_t IRCarrierAc64::calcChecksum(const uint64_t state) {
   uint64_t data = GETBITS64(state,
@@ -261,7 +261,7 @@ uint8_t IRCarrierAc64::calcChecksum(const uint64_t state) {
 }
 
 /// Verify the checksum is valid for a given state.
-/// @param state The array to verify the checksum of.
+/// @param[in] state The array to verify the checksum of.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRCarrierAc64::validChecksum(const uint64_t state) {
   // Validate the checksum of the given state.
@@ -291,11 +291,11 @@ uint64_t IRCarrierAc64::getRaw(void) {
 }
 
 /// Set the internal state from a valid code for this protocol.
-/// @param state A valid code for this protocol.
+/// @param[in] state A valid code for this protocol.
 void IRCarrierAc64::setRaw(const uint64_t state) { remote_state = state; }
 
 /// Set the temp in deg C.
-/// @param temp The desired temperature in Celsius.
+/// @param[in] temp The desired temperature in Celsius.
 void IRCarrierAc64::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kCarrierAc64MinTemp);
   degrees = std::min(degrees, kCarrierAc64MaxTemp);
@@ -311,7 +311,7 @@ uint8_t IRCarrierAc64::getTemp(void) {
 }
 
 /// Change the power setting.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setPower(const bool on) {
   setBit(&remote_state, kCarrierAc64PowerOffset, on);
 }
@@ -335,7 +335,7 @@ uint8_t IRCarrierAc64::getMode(void) {
 }
 
 /// Set the operating mode of the A/C.
-/// @param mode The desired operating mode.
+/// @param[in] mode The desired operating mode.
 void IRCarrierAc64::setMode(const uint8_t mode) {
   switch (mode) {
     case kCarrierAc64Heat:
@@ -350,7 +350,7 @@ void IRCarrierAc64::setMode(const uint8_t mode) {
 }
 
 /// Convert a standard A/C mode into its native mode.
-/// @param mode A stdAc::opmode_t mode to be converted to it's native equivalent
+/// @param[in] mode A stdAc::opmode_t to be converted to it's native equivalent.
 /// @return The corresponding native mode.
 uint8_t IRCarrierAc64::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -361,7 +361,7 @@ uint8_t IRCarrierAc64::convertMode(const stdAc::opmode_t mode) {
 }
 
 /// Convert a native mode to it's common stdAc::opmode_t equivalent.
-/// @param mode A native operation mode to be converted.
+/// @param[in] mode A native operation mode to be converted.
 /// @return The corresponding common stdAc::opmode_t mode.
 stdAc::opmode_t IRCarrierAc64::toCommonMode(const uint8_t mode) {
   switch (mode) {
@@ -405,7 +405,7 @@ stdAc::fanspeed_t IRCarrierAc64::toCommonFanSpeed(const uint8_t speed) {
 }
 
 /// Set the Vertical Swing mode of the A/C.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setSwingV(const bool on) {
   setBit(&remote_state, kCarrierAc64SwingVOffset, on);
 }
@@ -417,7 +417,7 @@ bool IRCarrierAc64::getSwingV(void) {
 }
 
 /// Set the Sleep mode of the A/C.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setSleep(const bool on) {
   if (on) {
     // Sleep sets a default value in the Off timer, and disables both timers.
@@ -452,7 +452,8 @@ uint16_t IRCarrierAc64::getOnTimer(void) {
 }
 
 /// Set the On Timer time.
-/// @param nr_of_mins Number of minutes to set the timer to. (< 60 is disable).
+/// @param[in] nr_of_mins Number of minutes to set the timer to.
+///  (< 60 is disable).
 /// @note The A/C protocol only supports one hour increments.
 void IRCarrierAc64::setOnTimer(const uint16_t nr_of_mins) {
   uint8_t hours = std::min((uint8_t)(nr_of_mins / 60), kCarrierAc64TimerMax);
@@ -482,7 +483,8 @@ uint16_t IRCarrierAc64::getOffTimer(void) {
 }
 
 /// Set the Off Timer time.
-/// @param nr_of_mins Number of minutes to set the timer to. (< 60 is disable).
+/// @param[in] nr_of_mins Number of minutes to set the timer to.
+///  (< 60 is disable).
 /// @note The A/C protocol only supports one hour increments.
 void IRCarrierAc64::setOffTimer(const uint16_t nr_of_mins) {
   uint8_t hours = std::min((uint8_t)(nr_of_mins / 60), kCarrierAc64TimerMax);

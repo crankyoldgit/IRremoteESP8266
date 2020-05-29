@@ -685,11 +685,11 @@
 #ifndef ENABLE_NOISE_FILTER_OPTION
 #define ENABLE_NOISE_FILTER_OPTION true
 #endif  // ENABLE_NOISE_FILTER_OPTION
-/*
- * Always add to the end of the list and should never remove entries
- * or change order. Projects may save the type number for later usage
- * so numbering should always stay the same.
- */
+
+/// Enumerator for defining and numbering of supported IR protocol.
+/// @note Always add to the end of the list and should never remove entries
+///  or change order. Projects may save the type number for later usage
+///  so numbering should always stay the same.
 enum decode_type_t {
   UNKNOWN = -1,
   UNUSED = 0,

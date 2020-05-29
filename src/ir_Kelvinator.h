@@ -133,6 +133,7 @@ const uint8_t kKelvinatorAutoTemp = 25;  // 25C
 */
 
 // Classes
+/// Class for handling detailed Kelvinator A/C messages.
 class IRKelvinatorAC {
  public:
   explicit IRKelvinatorAC(const uint16_t pin, const bool inverted = false,
@@ -141,6 +142,9 @@ class IRKelvinatorAC {
   void stateReset(void);
 #if SEND_KELVINATOR
   void send(const uint16_t repeat = kKelvinatorDefaultRepeat);
+/// Run the calibration to calculate uSec timing offsets for this platform.
+/// @note This will produce a 65ms IR signal pulse at 38kHz. Only ever needs to
+///   be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_KELVINATOR
   void begin(void);

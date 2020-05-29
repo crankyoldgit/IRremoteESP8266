@@ -40,8 +40,9 @@ const uint16_t kMaxAccurateUsecDelay = 16383;
 //  Usecs to wait between messages we don't know the proper gap time.
 const uint32_t kDefaultMessageGap = 100000;
 
-
+/// Enumerators and Structures for the Common A/C API.
 namespace stdAc {
+  /// Common A/C settings for A/C operating modes.
   enum class opmode_t {
     kOff  = -1,
     kAuto =  0,
@@ -53,6 +54,7 @@ namespace stdAc {
     kLastOpmodeEnum = kFan,
   };
 
+  /// Common A/C settings for Fan Speeds.
   enum class fanspeed_t {
     kAuto =   0,
     kMin =    1,
@@ -64,6 +66,7 @@ namespace stdAc {
     kLastFanspeedEnum = kMax,
   };
 
+  /// Common A/C settings for Vertical Swing.
   enum class swingv_t {
     kOff =    -1,
     kAuto =    0,
@@ -76,6 +79,7 @@ namespace stdAc {
     kLastSwingvEnum = kLowest,
   };
 
+  /// Common A/C settings for Horizontal Swing.
   enum class swingh_t {
     kOff =     -1,
     kAuto =     0,  // a.k.a. On.
@@ -89,7 +93,7 @@ namespace stdAc {
     kLastSwinghEnum = kWide,
   };
 
-  // Structure to hold a common A/C state.
+  /// Structure to hold a common A/C state.
   typedef struct {
     decode_type_t protocol;
     int16_t model;
@@ -112,7 +116,7 @@ namespace stdAc {
   } state_t;
 };  // namespace stdAc
 
-
+/// Fujitsu A/C model numbers
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
   ARDB1,        // (2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work)
@@ -121,16 +125,19 @@ enum fujitsu_ac_remote_model_t {
   ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
 };
 
+/// Gree A/C model numbers
 enum gree_ac_remote_model_t {
   YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
   YBOFB,     // (2) Green, YBOFB2, YAPOF3
 };
 
+/// HITACHI_AC1 A/C model numbers
 enum hitachi_ac1_remote_model_t {
   R_LT0541_HTA_A = 1,  // (1) R-LT0541-HTA Remote in "A" setting. (Default)
   R_LT0541_HTA_B,      // (2) R-LT0541-HTA Remote in "B" setting.
 };
 
+/// Panasonic A/C model numbers
 enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
   kPanasonicLke = 1,
@@ -141,11 +148,13 @@ enum panasonic_ac_remote_model_t {
   kPanasonicRkr = 6,
 };
 
+/// Whirlpool A/C model numbers
 enum whirlpool_ac_remote_model_t {
   DG11J13A = 1,  // DG11J1-04 too
   DG11J191,
 };
 
+/// LG A/C model numbers
 enum lg_ac_remote_model_t {
   GE6711AR2853M = 1,  // (1) LG 28-bit Protocol (default)
   AKB75215403,        // (2) LG2 28-bit Protocol
@@ -153,6 +162,11 @@ enum lg_ac_remote_model_t {
 
 
 // Classes
+
+/// Class for sending all basic IR protocols.
+/// @note Originally from https://github.com/shirriff/Arduino-IRremote/
+///  Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
+///  sending IR code on ESP8266
 class IRsend {
  public:
   explicit IRsend(uint16_t IRsendPin, bool inverted = false,
