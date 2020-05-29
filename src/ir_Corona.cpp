@@ -35,7 +35,7 @@ const uint8_t kCoronaTolerance = 5;  // +5%
 
 #if SEND_CORONA_AC
 /// Send a CoronaAc formatted message.
-/// Status: BETA / Appears to be working.
+/// Status: STABLE / Working on real device.
 /// Where data is:
 ///   uint8_t data[kCoronaAcStateLength] = {
 ///   0x28, 0x61, 0x3D, 0x19, 0xE6, 0x37, 0xC8,
@@ -77,7 +77,7 @@ void IRsend::sendCoronaAc(const uint8_t data[],
 
 #if DECODE_CORONA_AC
 /// Decode the supplied CoronaAc message.
-/// Status: BETA / Appears to be working.
+/// Status: STABLE / Appears to be working.
 /// @param[in,out] results Ptr to the data to decode & where to store it
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
