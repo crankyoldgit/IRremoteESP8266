@@ -31,32 +31,32 @@
 // CORONA_AC
 const uint8_t kCoronaAcSectionBytes = 7;  // kCoronaAcStateLengthShort
 const uint8_t kCoronaAcSections = 3;
-const uint8_t kCoronaAcSectionB0Pos = 0;
-const uint8_t kCoronaAcSectionB0 = 0x28;
-const uint8_t kCoronaAcSectionB1Pos = 1;
-const uint8_t kCoronaAcSectionB1 = 0x61;
+const uint8_t kCoronaAcSectionHeader0Pos = 0;
+const uint8_t kCoronaAcSectionHeader0 = 0x28;
+const uint8_t kCoronaAcSectionHeader1Pos = 1;
+const uint8_t kCoronaAcSectionHeader1 = 0x61;
 const uint8_t kCoronaAcSectionLabelPos = 2;
 const uint8_t kCoronaAcSectionLabelBase = 0x0D;  // 0b1101
-const uint8_t kCoronaAcSectionD0Pos = 3;
-const uint8_t kCoronaAcSectionD0InvPos = 4;
-const uint8_t kCoronaAcSectionD1Pos = 5;
-const uint8_t kCoronaAcSectionD1InvPos = 6;
-const uint8_t kCoronaAcSectionD0Base = 0x10;  // D0 Pos 4 always on
+const uint8_t kCoronaAcSectionData0Pos = 3;
+const uint8_t kCoronaAcSectionData0InvPos = 4;
+const uint8_t kCoronaAcSectionData1Pos = 5;
+const uint8_t kCoronaAcSectionData1InvPos = 6;
+const uint8_t kCoronaAcSectionData0Base = 0x10;  // D0 Pos 4 always on
 
 const uint8_t kCoronaAcSettingsSection = 0;
 // D0
 const uint8_t kCoronaAcFanOffset = 0;        // D0 LSB Pos 0-1
 const uint8_t kCoronaAcFanSize = 2;
 const uint8_t kCoronaAcFanAuto =    0b00;  // 0
-const uint8_t kCoronaAcFanHigh =    0b11;  // 3
-const uint8_t kCoronaAcFanMedium =  0b10;  // 2
 const uint8_t kCoronaAcFanLow =     0b01;  // 1
+const uint8_t kCoronaAcFanMedium =  0b10;  // 2
+const uint8_t kCoronaAcFanHigh =    0b11;  // 3
 
 // One bit unknown                           // D0 Pos 2
 const uint8_t kCoronaAcPowerSaveOffset = 3;  // D0 Pos 3
 // One bit unknown always on                 // D0 Pos 4
 // One bit unknown                           // D0 Pos 5
-const uint8_t kCoronaAcSwingVToogleOffset = 6;  // D0 Pos 6
+const uint8_t kCoronaAcSwingVToggleOffset = 6;  // D0 Pos 6
 // One bit unknown                           // D0 MSB Pos 7
 
 // D1
@@ -69,16 +69,16 @@ const uint8_t kCoronaAcTempSize = 4;
 const uint8_t kCoronaAcMinTemp = 17;  // Celsius = 0b0001
 const uint8_t kCoronaAcMaxTemp = 30;  // Celsius = 0b1110
 const uint8_t kCoronaAcPowerOffset =
-  kCoronaAcTempOffset + kCoronaAcTempSize;   // D1 Pos 4
+    kCoronaAcTempOffset + kCoronaAcTempSize;  // D1 Pos 4
 const uint8_t kCoronaAcPowerToggleOffset =
-  kCoronaAcPowerOffset + 1;                  // D1 Pos 5
+    kCoronaAcPowerOffset + 1;                // D1 Pos 5
 const uint8_t kCoronaAcModeOffset =
-  kCoronaAcPowerToggleOffset + 1;            // D1 MSB Pos 6-7
+    kCoronaAcPowerToggleOffset + 1;          // D1 MSB Pos 6-7
 const uint8_t kCoronaAcModeSize = 2;
-const uint8_t kCoronaAcModeCool = 0b10;  // 2
-const uint8_t kCoronaAcModeDry =  0b01;  // 1
-const uint8_t kCoronaAcModeFan =  0b11;  // 3
 const uint8_t kCoronaAcModeHeat = 0b00;  // 0
+const uint8_t kCoronaAcModeDry =  0b01;  // 1
+const uint8_t kCoronaAcModeCool = 0b10;  // 2
+const uint8_t kCoronaAcModeFan =  0b11;  // 3
 
 const uint8_t kCoronaAcOnTimerSection = 1;
 const uint8_t kCoronaAcOffTimerSection = 2;
@@ -105,14 +105,14 @@ class IRCoronaAc {
                            const uint8_t section);
   void setPower(const bool on);
   bool getPower();
-  void setPowerToggle(const bool toggle);
+  void setPowerToggle(const bool on);
   bool getPowerToggle();
   void on();
   void off();
   void setTemp(const uint8_t temp);
   uint8_t getTemp();
-  void setSwingV(const bool on);
-  bool getSwingV(void);
+  void setSwingVToggle(const bool on);
+  bool getSwingVToggle(void);
   void setFan(const uint8_t speed);
   uint8_t getFan();
   void setMode(const uint8_t mode);

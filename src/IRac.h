@@ -123,10 +123,10 @@ void carrier64(IRCarrierAc64 *ac,
               const int16_t sleep = -1);
 #endif  // SEND_COOLIX
 #if SEND_CORONA_AC
-void corona(IRCoronaAc *ac,
-            const bool on, const stdAc::opmode_t mode,
-            const float degrees, const stdAc::fanspeed_t fan,
-            const stdAc::swingv_t swingv, const bool econo);
+  void corona(IRCoronaAc *ac,
+              const bool on, const stdAc::opmode_t mode,
+              const float degrees, const stdAc::fanspeed_t fan,
+              const stdAc::swingv_t swingv, const bool econo);
 #endif  // SEND_CORONA_AC
 #if SEND_DAIKIN
   void daikin(IRDaikinESP *ac,

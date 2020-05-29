@@ -356,7 +356,7 @@ void IRac::corona(IRCoronaAc *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwingV((int8_t)swingv >= 0);
+  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Quiet setting available.
   // No Light setting available.
   // No Filter setting available.
@@ -2410,7 +2410,7 @@ namespace IRAcUtils {
 #if DECODE_CORONA_AC
       case decode_type_t::CORONA_AC: {
         IRCoronaAc ac(kGpioUnused);
-        ac.setRaw(result->state);
+        ac.setRaw(result->state, result->bits / 8);
         return ac.toString();
       }
 #endif  // DECODE_CORONA_AC
@@ -2540,7 +2540,7 @@ namespace IRAcUtils {
 #if DECODE_CORONA_AC
       case decode_type_t::CORONA_AC: {
         IRCoronaAc ac(kGpioUnused);
-        ac.setRaw(decode->state);
+        ac.setRaw(decode->state, decode->bits / 8);
         *result = ac.toCommon();
         break;
       }

@@ -153,8 +153,8 @@ IRCoronaAc::IRCoronaAc(const uint16_t pin, const bool inverted,
 /// @note The state is powered off.
 void IRCoronaAc::stateReset(void) {
   // known good state
-  remote_state[kCoronaAcSectionD0Pos] = kCoronaAcSectionD0Base;
-  remote_state[kCoronaAcSectionD1Pos] = 0x00;  // ensure no unset mem
+  remote_state[kCoronaAcSectionData0Pos] = kCoronaAcSectionData0Base;
+  remote_state[kCoronaAcSectionData1Pos] = 0x00;  // ensure no unset mem
   setTemp(kCoronaAcMinTemp);
   setMode(kCoronaAcModeCool);
   setFan(kCoronaAcFanAuto);
@@ -173,7 +173,7 @@ uint8_t IRCoronaAc::getSectionByte(const uint8_t section) {
   // 2 enabled bits shifted 0-2 bits depending on section
   if (section >= 3)
     return 0b10010000 | b;
-  setBits(&b, 4, 4, 0b11 << section);
+  setBits(&b, kHighNibble, kNibbleSize, 0b11 << section);
   return b;
 }
 
@@ -189,18 +189,18 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   if ((section % kCoronaAcSections) * kCoronaAcSectionBytes != pos)
     return false;
   // all individual sections has the same prefix
-  if (state[pos + kCoronaAcSectionB0Pos] != kCoronaAcSectionB0) {
+  if (state[pos + kCoronaAcSectionHeader0Pos] != kCoronaAcSectionHeader0) {
     DPRINT("State ");
     DPRINT(pos);
     DPRINT(" expected 0x28 was ");
-    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionB0Pos], 16));
+    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionHeader0Pos], 16));
     return false;
   }
-  if (state[pos + kCoronaAcSectionB1Pos] != kCoronaAcSectionB1) {
+  if (state[pos + kCoronaAcSectionHeader1Pos] != kCoronaAcSectionHeader1) {
     DPRINT("State ");
-    DPRINT(pos + kCoronaAcSectionB1Pos);
+    DPRINT(pos + kCoronaAcSectionHeaderByte1Pos);
     DPRINT(" expected 0x61 was ");
-    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionB1Pos], 16));
+    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionHeader1Pos], 16));
     return false;
   }
 
@@ -214,24 +214,20 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   }
 
   // checking inverts
-  uint8_t d0invinv = ~state[pos + kCoronaAcSectionD0InvPos];
-  if (state[pos + kCoronaAcSectionD0Pos] != d0invinv) {
+  uint8_t d0invinv = ~state[pos + kCoronaAcSectionData0InvPos];
+  if (state[pos + kCoronaAcSectionData0Pos] != d0invinv) {
     DPRINT("inverted 3 - 4 not matching, got ");
-    DPRINT(uint64ToString(state[pos + kCoronaAcSectionD0Pos], 16));
+    DPRINT(uint64ToString(state[pos + kCoronaAcSectionData0Pos], 16));
     DPRINT(" vs ");
-    DPRINT(uint64ToString(state[pos + kCoronaAcSectionD0InvPos], 16));
-    DPRINT(" expected ");
-    DPRINTLN(uint64ToString(~state[pos + kCoronaAcSectionD0Pos] & 0xff, 16));
+    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionData0InvPos], 16));
     return false;
   }
-  uint8_t d1invinv = ~state[pos + kCoronaAcSectionD1InvPos];
-  if (state[pos + kCoronaAcSectionD1Pos] != d1invinv) {
+  uint8_t d1invinv = ~state[pos + kCoronaAcSectionData1InvPos];
+  if (state[pos + kCoronaAcSectionData1Pos] != d1invinv) {
     DPRINT("inverted 5 - 6 not matching, got ");
-    DPRINT(uint64ToString(state[pos + kCoronaAcSectionD1Pos], 16));
+    DPRINT(uint64ToString(state[pos + kCoronaAcSectionData1Pos], 16));
     DPRINT(" vs ");
-    DPRINT(uint64ToString(state[pos + kCoronaAcSectionD1InvPos], 16));
-    DPRINT(" expected ");
-    DPRINTLN(uint64ToString(~state[pos + kCoronaAcSectionD1Pos] & 0xff, 16));
+    DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionData1InvPos], 16));
     return false;
   }
   return true;
@@ -243,19 +239,21 @@ void IRCoronaAc::checksum(uint8_t* data) {
   uint8_t pos;
   for (uint8_t section = 0; section < kCoronaAcSections; section++) {
     pos = section * kCoronaAcSectionBytes;
-    data[pos + kCoronaAcSectionB0Pos] = kCoronaAcSectionB0;
-    data[pos + kCoronaAcSectionB1Pos] = kCoronaAcSectionB1;
+    data[pos + kCoronaAcSectionHeader0Pos] = kCoronaAcSectionHeader0;
+    data[pos + kCoronaAcSectionHeader1Pos] = kCoronaAcSectionHeader1;
     data[pos + kCoronaAcSectionLabelPos] = getSectionByte(section);
-    data[pos + kCoronaAcSectionD0InvPos] =
-      ~data[pos + kCoronaAcSectionD0Pos];
-    data[pos + kCoronaAcSectionD1InvPos] =
-      ~data[pos + kCoronaAcSectionD1Pos];
+    data[pos + kCoronaAcSectionData0InvPos] =
+        ~data[pos + kCoronaAcSectionData0Pos];
+    data[pos + kCoronaAcSectionData1InvPos] =
+        ~data[pos + kCoronaAcSectionData1Pos];
   }
 }
 
 void IRCoronaAc::begin(void) { _irsend.begin(); }
 
 #if SEND_CORONA_AC
+/// Send the AC state
+/// @param[in] repeat Nr. of times the message is to be repeated.
 void IRCoronaAc::send(const uint16_t repeat) {
   _irsend.sendCoronaAc(getRaw(), kCoronaAcStateLength, repeat);
 }
@@ -269,33 +267,34 @@ uint8_t* IRCoronaAc::getRaw(void) {
 }
 
 /// Set the internal state from a valid code for this protocol.
-/// @param state A valid code for this protocol.
+/// @param[in] new_code A valid state for this protocol.
+/// @param[in] length of the new_code array.
 void IRCoronaAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kCoronaAcStateLength));
 }
 
 /// Set the temp in deg C.
-/// @param temp The desired temperature in Celsius.
+/// @param[in] temp The desired temperature in Celsius.
 void IRCoronaAc::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kCoronaAcMinTemp);
   degrees = std::min(degrees, kCoronaAcMaxTemp);
-  setBits(&remote_state[kCoronaAcSectionD1Pos], kCoronaAcTempOffset,
+  setBits(&remote_state[kCoronaAcSectionData1Pos], kCoronaAcTempOffset,
           kCoronaAcTempSize, degrees - kCoronaAcMinTemp + 1);
 }
 
 /// Get the current temperature from the internal state.
 /// @return The current temperatue in Celsius.
 uint8_t IRCoronaAc::getTemp(void) {
-  return GETBITS8(remote_state[kCoronaAcSectionD1Pos], kCoronaAcTempOffset,
-      kCoronaAcTempSize) + kCoronaAcMinTemp - 1;
+  return GETBITS8(remote_state[kCoronaAcSectionData1Pos], kCoronaAcTempOffset,
+                  kCoronaAcTempSize) + kCoronaAcMinTemp - 1;
 }
 
 /// Change the power setting.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 /// @note If changed, setPowerToggle is also needed,
 ///       unless timer is or was active
 void IRCoronaAc::setPower(const bool on) {
-  setBit(&remote_state[kCoronaAcSectionD1Pos], kCoronaAcPowerOffset, on);
+  setBit(&remote_state[kCoronaAcSectionData1Pos], kCoronaAcPowerOffset, on);
   // setting power state resets timers that would cause the state
   if (on)
     setOnTimer(kCoronaAcTimerOff);
@@ -306,23 +305,23 @@ void IRCoronaAc::setPower(const bool on) {
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRCoronaAc::getPower(void) {
-  return GETBIT8(remote_state[kCoronaAcSectionD1Pos], kCoronaAcPowerOffset);
+  return GETBIT8(remote_state[kCoronaAcSectionData1Pos], kCoronaAcPowerOffset);
 }
 
 /// Change the power toggle setting.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 /// @note this sets that the AC should change power,
 ///       use setPower to define if the AC should end up as on or off
-void IRCoronaAc::setPowerToggle(const bool toggle) {
-  setBit(&remote_state[kCoronaAcSectionD1Pos],
-      kCoronaAcPowerToggleOffset, toggle);
+void IRCoronaAc::setPowerToggle(const bool on) {
+  setBit(&remote_state[kCoronaAcSectionData1Pos],
+         kCoronaAcPowerToggleOffset, on);
 }
 
 /// Get the value of the current power toggle setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRCoronaAc::getPowerToggle(void) {
-  return GETBIT8(remote_state[kCoronaAcSectionD1Pos],
-      kCoronaAcPowerToggleOffset);
+  return GETBIT8(remote_state[kCoronaAcSectionData1Pos],
+                 kCoronaAcPowerToggleOffset);
 }
 
 /// Change the power setting to On.
@@ -334,19 +333,19 @@ void IRCoronaAc::off(void) { setPower(false); }
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
 uint8_t IRCoronaAc::getMode(void) {
-  return GETBITS8(remote_state[kCoronaAcSectionD1Pos],
-      kCoronaAcModeOffset, kCoronaAcModeSize);
+  return GETBITS8(remote_state[kCoronaAcSectionData1Pos],
+                  kCoronaAcModeOffset, kCoronaAcModeSize);
 }
 
 /// Set the operating mode of the A/C.
-/// @param mode The desired operating mode.
+/// @param[in] mode The desired operating mode.
 void IRCoronaAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kCoronaAcModeCool:
     case kCoronaAcModeDry:
     case kCoronaAcModeFan:
     case kCoronaAcModeHeat:
-      setBits(&remote_state[kCoronaAcSectionD1Pos],
+      setBits(&remote_state[kCoronaAcSectionData1Pos],
               kCoronaAcModeOffset, kCoronaAcModeSize,
               mode);
       return;
@@ -356,7 +355,8 @@ void IRCoronaAc::setMode(const uint8_t mode) {
 }
 
 /// Convert a standard A/C mode into its native mode.
-/// @param mode A stdAc::opmode_t mode to be converted to it's native equivalent
+/// @param[in] mode A stdAc::opmode_t mode to be
+///   converted to it's native equivalent
 /// @return The corresponding native mode.
 uint8_t IRCoronaAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -368,7 +368,7 @@ uint8_t IRCoronaAc::convertMode(const stdAc::opmode_t mode) {
 }
 
 /// Convert a native mode to it's common stdAc::opmode_t equivalent.
-/// @param mode A native operation mode to be converted.
+/// @param[in] mode A native operation mode to be converted.
 /// @return The corresponding common stdAc::opmode_t mode.
 stdAc::opmode_t IRCoronaAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
@@ -382,35 +382,36 @@ stdAc::opmode_t IRCoronaAc::toCommonMode(const uint8_t mode) {
 /// Get the operating speed of the A/C Fan
 /// @return The current operating fan speed setting
 uint8_t IRCoronaAc::getFan(void) {
-  return GETBITS8(remote_state[kCoronaAcSectionD0Pos],
-      kCoronaAcFanOffset, kCoronaAcFanSize);
+  return GETBITS8(remote_state[kCoronaAcSectionData0Pos],
+                  kCoronaAcFanOffset, kCoronaAcFanSize);
 }
 
 /// Set the operating speed of the A/C Fan
-/// @param speed The desired fan speed
+/// @param[in] speed The desired fan speed
 void IRCoronaAc::setFan(const uint8_t speed) {
   if (speed > kCoronaAcFanHigh)
     setFan(kCoronaAcFanAuto);
   else
-    setBits(&remote_state[kCoronaAcSectionD0Pos],
+    setBits(&remote_state[kCoronaAcSectionData0Pos],
             kCoronaAcFanOffset, kCoronaAcFanSize, speed);
 }
 
 /// Change the powersave setting.
-/// @param on true, the setting is on. false, the setting is off.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRCoronaAc::setEcono(const bool on) {
-  setBit(&remote_state[kCoronaAcSectionD0Pos],
-      kCoronaAcPowerSaveOffset, on);
+  setBit(&remote_state[kCoronaAcSectionData0Pos], kCoronaAcPowerSaveOffset, on);
 }
 
 /// Get the value of the current powersave setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRCoronaAc::getEcono(void) {
-  return GETBIT8(remote_state[kCoronaAcSectionD0Pos],
-      kCoronaAcPowerSaveOffset);
+  return GETBIT8(remote_state[kCoronaAcSectionData0Pos],
+                 kCoronaAcPowerSaveOffset);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a standard A/C Fan speed into its native fan speed.
+/// @param[in] speed The desired stdAc::fanspeed_t fan speed
+/// @return The given fan speed in native format
 uint8_t IRCoronaAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -422,7 +423,9 @@ uint8_t IRCoronaAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed to it's common equivalent.
+/// @param[in] speed The desired native fan speed
+/// @return The given fan speed in stdAc::fanspeed_t format
 stdAc::fanspeed_t IRCoronaAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kCoronaAcFanHigh:    return stdAc::fanspeed_t::kHigh;
@@ -432,24 +435,25 @@ stdAc::fanspeed_t IRCoronaAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Set the Vertical Swing mode of the A/C.
-/// @param on true, the setting is on. false, the setting is off.
+/// Set the Vertical Swing toggle setting
+/// @param[in] on true, the setting is on. false, the setting is off.
 /// @note This is a button press, and not a state
 ///       after sending it once you should turn it off
-void IRCoronaAc::setSwingV(const bool on) {
-  setBit(&remote_state[kCoronaAcSectionD0Pos],
-      kCoronaAcSwingVToogleOffset, on);
+void IRCoronaAc::setSwingVToggle(const bool on) {
+  setBit(&remote_state[kCoronaAcSectionData0Pos],
+         kCoronaAcSwingVToggleOffset, on);
 }
 
-/// Get the Vertical Swing mode of the A/C.
+/// Get the Vertical Swing toggle setting
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoronaAc::getSwingV(void) {
-  return GETBIT64(remote_state[kCoronaAcSectionD0Pos],
-      kCoronaAcSwingVToogleOffset);
+bool IRCoronaAc::getSwingVToggle(void) {
+  return GETBIT64(remote_state[kCoronaAcSectionData0Pos],
+                  kCoronaAcSwingVToggleOffset);
 }
 
 /// Set the Timer time
-/// @param nr_of_mins Number of minutes to set the timer to.
+/// @param[in] section index of section, used for offset.
+/// @param[in] nr_of_mins Number of minutes to set the timer to.
 ///   (non in range value is disable).
 ///   Valid is from 1 minute to 12 hours
 void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
@@ -459,8 +463,9 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
     hsecs = nr_of_mins * kCoronaAcTimerUnitsPerMin;
 
   uint8_t pos = section * kCoronaAcSectionBytes;
-  remote_state[pos + kCoronaAcSectionD1Pos] = (hsecs & 0xff00) >> 8;
-  remote_state[pos + kCoronaAcSectionD0Pos] = (hsecs & 0xff);
+  // convert 16 bit value to separate 8 bit parts
+  remote_state[pos + kCoronaAcSectionData1Pos] = hsecs >> 8;
+  remote_state[pos + kCoronaAcSectionData0Pos] = hsecs;
 }
 
 /// Get the current Timer time
@@ -468,8 +473,9 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
 /// @note The A/C protocol supports 2 second increments
 uint16_t IRCoronaAc::_getTimer(const uint8_t section) {
   uint8_t pos = section * kCoronaAcSectionBytes;
-  uint16_t hsecs = remote_state[pos + kCoronaAcSectionD1Pos] << 8
-                 | remote_state[pos + kCoronaAcSectionD0Pos];
+  // combine separate 8 bit parts to 16 bit value
+  uint16_t hsecs = remote_state[pos + kCoronaAcSectionData1Pos] << 8 |
+                   remote_state[pos + kCoronaAcSectionData0Pos];
 
   if (hsecs == kCoronaAcTimerOff)
     return 0;
@@ -484,12 +490,12 @@ uint16_t IRCoronaAc::getOnTimer(void) {
 }
 
 /// Set the On Timer time
-/// @param nr_of_mins Number of minutes to set the timer to.
+/// @param[in] nr_of_mins Number of minutes to set the timer to.
 ///   (0 or kCoronaAcTimerOff is disable).
 void IRCoronaAc::setOnTimer(const uint16_t nr_of_mins) {
   _setTimer(kCoronaAcOnTimerSection, nr_of_mins);
   // if we set a timer value, clear the other timer
-  if (getOnTimer() != 0)
+  if (getOnTimer())
     setOffTimer(kCoronaAcTimerOff);
 }
 
@@ -500,12 +506,12 @@ uint16_t IRCoronaAc::getOffTimer(void) {
 }
 
 /// Set the Off Timer time
-/// @param nr_of_mins Number of minutes to set the timer to.
+/// @param[in] nr_of_mins Number of minutes to set the timer to.
 ///   (0 or kCoronaAcTimerOff is disable).
 void IRCoronaAc::setOffTimer(const uint16_t nr_of_mins) {
   _setTimer(kCoronaAcOffTimerSection, nr_of_mins);
   // if we set a timer value, clear the other timer
-  if (getOffTimer() != 0)
+  if (getOffTimer())
     setOnTimer(kCoronaAcTimerOff);
 }
 
@@ -523,7 +529,7 @@ String IRCoronaAc::toString(void) {
   result += addFanToString(getFan(), kCoronaAcFanHigh, kCoronaAcFanLow,
                            kCoronaAcFanAuto, kCoronaAcFanAuto,
                            kCoronaAcFanMedium);
-  result += addBoolToString(getSwingV(), kSwingVToggleStr);
+  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
   result += addBoolToString(getEcono(), kEconoStr);
   result += addLabeledString(getOnTimer()
                              ? minsToString(getOnTimer()) : kOffStr,
@@ -535,6 +541,7 @@ String IRCoronaAc::toString(void) {
 }
 
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
+/// @param[in] prev previous state, use to toggle correctly
 /// @return A stdAc::state_t state.
 stdAc::state_t IRCoronaAc::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
@@ -550,19 +557,19 @@ stdAc::state_t IRCoronaAc::toCommon(const stdAc::state_t *prev) {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
-  if (getSwingV()) {
-    result.swingv = result.swingv != stdAc::swingv_t::kOff ?
+  if (getSwingVToggle()) {
+    result.swingv = (result.swingv != stdAc::swingv_t::kOff) ?
         stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;  // Invert swing.
   }
-  result.sleep = -1;
+  result.econo = getEcono();
   // Not supported.
+  result.sleep = -1;
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
   result.quiet = false;
   result.clean = false;
   result.filter = false;
   result.beep = false;
-  result.econo = getEcono();
   result.light = false;
   result.clock = -1;
   return result;

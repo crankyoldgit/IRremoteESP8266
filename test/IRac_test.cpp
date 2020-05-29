@@ -5,6 +5,7 @@
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
+#include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
 #include "ir_Electra.h"
@@ -175,6 +176,41 @@ TEST(TestIRac, Coolix) {
       // End of message #2 (i.e. Repeat '1')
       // Note: the two messages (#1 & #2) are identical.
       ac._irsend.outputStr());
+}
+
+TEST(TestIRac, Corona) {
+  IRCoronaAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  char expected[] =
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Fan: 3 (High), Swing(V) Toggle: On, Econo: On, "
+      "On Timer: Off, Off Timer: Off";
+
+  ac.begin();
+  irac.corona(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kHeat,      // Mode
+              21,                          // Celsius
+              stdAc::fanspeed_t::kHigh,    // Fan speed
+              stdAc::swingv_t::kAuto,      // Veritcal swing
+              true);                       // Econo (PowerSave)
+  EXPECT_TRUE(ac.getPower());  // Power.
+  EXPECT_EQ(kCoronaAcModeHeat, ac.getMode());  // Operating mode.
+  EXPECT_EQ(21, ac.getTemp());  // Temperature.
+  EXPECT_EQ(kCoronaAcFanHigh, ac.getFan());  // Fan Speed
+  EXPECT_TRUE(ac.getSwingVToggle());  // SwingV
+  EXPECT_TRUE(ac.getEcono());  // Econo (PowerSave)
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(CORONA_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCoronaAcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
 TEST(TestIRac, Daikin) {

@@ -63,6 +63,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_On, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: On, Mode: 0 (Heat), Temp: 23C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_Off[347] = {
@@ -115,6 +120,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_Off, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: Off, Power Toggle: On, Mode: 0 (Heat), Temp: 23C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_17C[347] = {
@@ -167,6 +177,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_17C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 17C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_18C[347] = {
@@ -219,6 +234,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_18C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 18C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_19C[347] = {
@@ -271,6 +291,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_19C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: On, Mode: 0 (Heat), Temp: 19C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_20C[347] = {
@@ -323,6 +348,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_20C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 20C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_21C[347] = {
@@ -375,6 +405,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_21C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_22C[347] = {
@@ -427,6 +462,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_22C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 22C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_23C[347] = {
@@ -479,6 +519,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_23C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 23C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_24C[347] = {
@@ -531,6 +576,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_24C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 24C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_25C[347] = {
@@ -583,6 +633,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_25C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 25C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_26C[347] = {
@@ -635,6 +690,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_26C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 26C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_30C[347] = {
@@ -687,6 +747,11 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_30C, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestDecodeCoronaAc, RealExample2) {
@@ -742,7 +807,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_TOn5,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: 05:00, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_TOn1[347] = {
@@ -795,7 +865,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_TOn1,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: 01:00, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_TOn2[347] = {
@@ -848,7 +923,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_TOn2,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: 02:00, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_21C2[347] = {
@@ -901,7 +981,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_21C2,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_20C2[347] = {
@@ -954,7 +1039,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_20C2,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 20C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_Off2[347] = {
@@ -1007,7 +1097,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_Off2,
-      irsend.capture.state, irsend.capture.bits);
+                  irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: Off, Power Toggle: On, Mode: 0 (Heat), Temp: 18C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
 
   const uint16_t rawData_U[347] = {
@@ -1060,8 +1155,16 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_U, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 29C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+}
 
-
+TEST(TestDecodeCoronaAc, RealExampleShort) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   const uint16_t rawData_A1[115] = {
       3548, 1658,
       462, 400,  464, 424,  436, 428,  436, 1272, 460, 400,  462, 1266,
@@ -1086,6 +1189,12 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBitsShort, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_A1, irsend.capture.state, irsend.capture.bits);
+  // this is special, but showing what it might be
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 16C, "
+      "Fan: 2 (Medium), Swing(V) Toggle: Off, Econo: Off, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestDecodeCoronaAc, SyntheticExample1) {
@@ -1104,6 +1213,11 @@ TEST(TestDecodeCoronaAc, SyntheticExample1) {
   EXPECT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   EXPECT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(state, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 29C, "
+      "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
   EXPECT_EQ(
     "f38000d50"
@@ -1146,6 +1260,11 @@ TEST(TestDecodeCoronaAc, SyntheticExample1) {
   ASSERT_EQ(decode_type_t::CORONA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBitsShort, irsend.capture.bits);
   EXPECT_STATE_EQ(stateShort, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 16C, "
+      "Fan: 2 (Medium), Swing(V) Toggle: Off, Econo: Off, "
+      "On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
   EXPECT_EQ(
       "f38000d50"
@@ -1351,15 +1470,15 @@ TEST(TestCoronaAcClass, EconoPowerSave) {
   EXPECT_TRUE(ac.getEcono());
 }
 
-TEST(TestCoronaAcClass, SwingVertical) {
+TEST(TestCoronaAcClass, SwingVerticalToggle) {
   IRCoronaAc ac(kGpioUnused);
   ac.begin();
-  ac.setSwingV(true);
-  EXPECT_TRUE(ac.getSwingV());
-  ac.setSwingV(false);
-  EXPECT_FALSE(ac.getSwingV());
-  ac.setSwingV(true);
-  EXPECT_TRUE(ac.getSwingV());
+  ac.setSwingVToggle(true);
+  EXPECT_TRUE(ac.getSwingVToggle());
+  ac.setSwingVToggle(false);
+  EXPECT_FALSE(ac.getSwingVToggle());
+  ac.setSwingVToggle(true);
+  EXPECT_TRUE(ac.getSwingVToggle());
 }
 
 TEST(TestCoronaAcClass, Timer) {
@@ -1452,7 +1571,7 @@ TEST(TestCoronaAcClass, HumanReadable) {
   ac.setMode(kCoronaAcModeFan);
   ac.setTemp(30);
   ac.setFan(kCoronaAcFanAuto);
-  ac.setSwingV(true);
+  ac.setSwingVToggle(true);
   EXPECT_EQ(
       "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: Off, "
@@ -1504,7 +1623,7 @@ TEST(TestCoronaAcClass, ReconstructKnownState) {
   ac.setMode(kCoronaAcModeFan);
   ac.setTemp(19);
   ac.setFan(kCoronaAcFanLow);
-  ac.setSwingV(true);
+  ac.setSwingVToggle(true);
   ac.setOffTimer(3 * 60);
   ac.setEcono(true);
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kCoronaAcBits);
@@ -1524,7 +1643,7 @@ TEST(TestCoronaAcClass, toCommon) {
   ac.setMode(kCoronaAcModeFan);
   ac.setTemp(20);
   ac.setFan(kCoronaAcFanLow);
-  ac.setSwingV(true);
+  ac.setSwingVToggle(true);
   ac.setOffTimer(3 * 60);
   ac.setEcono(true);
   // Now test it.
