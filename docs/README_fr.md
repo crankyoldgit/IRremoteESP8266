@@ -1,33 +1,7 @@
 # IRremoteESP8266 Library
 
-[![Build Status](https://travis-ci.org/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.org/crankyoldgit/IRremoteESP8266)
-[![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Percentage of issues still open")
-[![GitLicense](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
-
 Cette librairie vous permetra de **recevoir et d'envoyer des signaux** infrarouge sur le protocole [ESP8266](https://github.com/esp8266/Arduino) ou sur le protocole
 [ESP32](https://github.com/espressif/arduino-esp32) en utilisant le [Arduino framework](https://www.arduino.cc/) qui utilise la norme 940nm IR LEDs et le module basique de reception d'onde IR. Exemple : TSOP{17,22,24,36,38,44,48}* modules etc.
-
-## v2.7.7 disponible
-Version 2.7.7 de la libraire est maintenant [disponible](https://github.com/crankyoldgit/IRremoteESP8266/releases/latest). Vous pouvez voir le [Release Notes](ReleaseNotes.md) pour tous les changements importants.
-
-#### mise à jour depuis pre-v2.0
-L'utilisation de la librairie à un peu changer depuis la version in v2.0. Si vous voulez l'utiliser vous devrez changer votre utilisation aussi. Vous pouvez vous renseigner sur les précondition d'utilisation ici : [Upgrade to v2.0](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Upgrading-to-v2.0) page.
-
-#### Mise à jour depuis pre-v2.5
-La librairie à changer, elle n'utilise plus les constantes déclarées comme `#define` mais comme :
-[const](https://google.github.io/styleguide/cppguide.html#Constant_Names) avec le nom approprié par le langage
-[C++ style guide](https://google.github.io/styleguide/cppguide.html).
-Il se peut que d'ancien programme ne compile pas.
-Le cas le plus utilisé de `#define`s à été remplacé par  _aliased_ pour limiter
-la compatibilité de revenir en arrière pour les vieux projet. En revenant en arrière seulement la
-nouvelle `kConstantName` style est supporté.
-
-Dans le cas peu probable, votre code serait cassé, alors vous avez peut-être fait référence à
-quelque chose que vous ne devriez probablement pas avoir.Vous devez être capable de determiner le nouveau nom
-qui remplacera l'ancien. exemple : `CONSTANT_NAME` par `kConstantName`.
-Si vous avez un problème examinez le code pour trouver le problème.
 
 ## Protocoles supportés
 Vous pouvez trouver le détails des protocoles et machines supportés
