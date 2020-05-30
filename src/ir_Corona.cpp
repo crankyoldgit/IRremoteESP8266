@@ -155,6 +155,7 @@ void IRCoronaAc::stateReset(void) {
   // known good state
   remote_state[kCoronaAcSectionData0Pos] = kCoronaAcSectionData0Base;
   remote_state[kCoronaAcSectionData1Pos] = 0x00;  // ensure no unset mem
+  setPowerButton(true);  // we default to this on, any timer removes it
   setTemp(kCoronaAcMinTemp);
   setMode(kCoronaAcModeCool);
   setFan(kCoronaAcFanAuto);
@@ -255,14 +256,22 @@ void IRCoronaAc::begin(void) { _irsend.begin(); }
 /// Send the AC state
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRCoronaAc::send(const uint16_t repeat) {
+  // if no timer, always send once without power press
+  if (!getOnTimer() && !getOffTimer()) {
+    setPowerButton(false);
+    _irsend.sendCoronaAc(getRaw(), kCoronaAcStateLength, repeat);
+    // and then with power press
+    setPowerButton(true);
+  }
   _irsend.sendCoronaAc(getRaw(), kCoronaAcStateLength, repeat);
 }
 #endif  // SEND_CORONA_AC
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
+/// @note to get stable AC state, if no timers, send once
+///   without PowerButton set, and once with
 uint8_t* IRCoronaAc::getRaw(void) {
-  updatePowerButton();
   checksum(remote_state);  // Ensure correct check bits before sending.
   return remote_state;
 }
@@ -299,7 +308,7 @@ void IRCoronaAc::_setPower(const bool on) {
 /// Change the power setting. (in practice Standby, remote power)
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @note If changed, setPowerButton is also needed,
-///       unless timer is or was active, handled by updatePowerButton
+///       unless timer is or was active
 void IRCoronaAc::setPower(const bool on) {
   _setPower(on);
   // setting power state resets timers that would cause the state
@@ -307,7 +316,6 @@ void IRCoronaAc::setPower(const bool on) {
     setOnTimer(kCoronaAcTimerOff);
   else
     setOffTimer(kCoronaAcTimerOff);
-  updatePowerButton();
 }
 
 /// Get the current power setting. (in practice Standby, remote power)
@@ -319,16 +327,15 @@ bool IRCoronaAc::getPower(void) {
 /// Change the power button setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @note this sets that the AC should set power,
-///       use setPower to define if the AC should end up as on or off
+///   use setPower to define if the AC should end up as on or off
+///   When no timer is active, the below is a truth table
+///   With AC On, a command with setPower and setPowerButton gives nothing
+///   With AC On, a command with setPower but not setPowerButton is ok
+///   With AC Off, a command with setPower but not setPowerButton gives nothing
+///   With AC Off, a command with setPower and setPowerButton is ok
 void IRCoronaAc::setPowerButton(const bool on) {
   setBit(&remote_state[kCoronaAcSectionData1Pos],
          kCoronaAcPowerButtonOffset, on);
-}
-
-/// Update the power button setting based on if timer is set or not.
-void IRCoronaAc::updatePowerButton(void) {
-  // to be sure we get wanted AC state, always set power button if no timer
-  setPowerButton(!getOnTimer() && !getOffTimer());
 }
 
 /// Get the value of the current power button setting.
@@ -482,8 +489,10 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
   remote_state[pos + kCoronaAcSectionData0Pos] = hsecs;
 
   // if any timer is enabled, then (remote) ac must be on (Standby)
-  if (hsecs != kCoronaAcTimerOff)
+  if (hsecs != kCoronaAcTimerOff) {
     _setPower(true);
+    setPowerButton(false);
+  }
 }
 
 /// Get the current Timer time
@@ -515,7 +524,6 @@ void IRCoronaAc::setOnTimer(const uint16_t nr_of_mins) {
   // if we set a timer value, clear the other timer
   if (getOnTimer())
     setOffTimer(kCoronaAcTimerOff);
-  updatePowerButton();
 }
 
 /// Get the current Off Timer time
@@ -532,7 +540,6 @@ void IRCoronaAc::setOffTimer(const uint16_t nr_of_mins) {
   // if we set a timer value, clear the other timer
   if (getOffTimer())
     setOnTimer(kCoronaAcTimerOff);
-  updatePowerButton();
 }
 
 /// Convert the internal state into a human readable string.

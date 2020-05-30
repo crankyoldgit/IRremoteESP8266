@@ -183,12 +183,18 @@ TEST(TestIRac, Corona) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
 
-  char expected[] =
+  char expectedAfterSent[] =
       "Power: On, Power Button: On, Mode: 0 (Heat), Temp: 21C, "
       "Fan: 3 (High), Swing(V) Toggle: On, Econo: On, "
       "On Timer: Off, Off Timer: Off";
 
+  char expectedCapture[] =
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Fan: 3 (High), Swing(V) Toggle: On, Econo: On, "
+      "On Timer: Off, Off Timer: Off";
+
   ac.begin();
+  // this sends as well
   irac.corona(&ac,
               true,                        // Power
               stdAc::opmode_t::kHeat,      // Mode
@@ -197,18 +203,19 @@ TEST(TestIRac, Corona) {
               stdAc::swingv_t::kAuto,      // Veritcal swing
               true);                       // Econo (PowerSave)
   EXPECT_TRUE(ac.getPower());  // Power.
+  EXPECT_TRUE(ac.getPowerButton());  // Power.button
   EXPECT_EQ(kCoronaAcModeHeat, ac.getMode());  // Operating mode.
   EXPECT_EQ(21, ac.getTemp());  // Temperature.
   EXPECT_EQ(kCoronaAcFanHigh, ac.getFan());  // Fan Speed
   EXPECT_TRUE(ac.getSwingVToggle());  // SwingV
   EXPECT_TRUE(ac.getEcono());  // Econo (PowerSave)
 
-  ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(expectedAfterSent, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(CORONA_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kCoronaAcBits, ac._irsend.capture.bits);
-  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_EQ(expectedCapture, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }

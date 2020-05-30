@@ -1396,14 +1396,14 @@ TEST(TestCoronaAcClass, Power) {
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(0, ac.getOnTimer());
-  EXPECT_TRUE(ac.getPowerButton());
+  EXPECT_FALSE(ac.getPowerButton());
 
   ac.setOffTimer(60);
   EXPECT_FALSE(ac.getPowerButton());
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
   EXPECT_EQ(0, ac.getOffTimer());
-  EXPECT_TRUE(ac.getPowerButton());
+  EXPECT_FALSE(ac.getPowerButton());
 
   ASSERT_EQ(4, kCoronaAcPowerOffset);
   ASSERT_EQ(5, kCoronaAcPowerButtonOffset);
@@ -1491,13 +1491,14 @@ TEST(TestCoronaAcClass, SwingVerticalToggle) {
 TEST(TestCoronaAcClass, Timer) {
   IRCoronaAc ac(kGpioUnused);
   ac.begin();
+  ac.setPowerButton(false);
   ac.setMode(kCoronaAcModeHeat);
   const uint8_t expectedStateNoTimer[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x21, 0xDE,
+      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x01, 0xFE,
       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
   ASSERT_FALSE(ac.getPower());
-  EXPECT_TRUE(ac.getPowerButton());
+  ASSERT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(3 * 60);
@@ -1506,51 +1507,50 @@ TEST(TestCoronaAcClass, Timer) {
       0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0x18, 0xE7, 0x15, 0xEA,  // 5400
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
-  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
-  EXPECT_FALSE(ac.getPowerButton());
+  ASSERT_TRUE(ac.getPower());  // remote should be on from timer
+  ASSERT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOnTimer3H, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(0);
   EXPECT_EQ(0, ac.getOnTimer());
-  EXPECT_TRUE(ac.getPowerButton());
-  EXPECT_TRUE(ac.getPower());  // remote should is still on
+  ASSERT_FALSE(ac.getPowerButton());
+  ASSERT_TRUE(ac.getPower());  // remote should still be on
   ac.off();  // set it to off
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
   ac.setOnTimer(kCoronaAcTimerOff);
   EXPECT_EQ(0, ac.getOnTimer());
-  EXPECT_TRUE(ac.getPowerButton());
+  EXPECT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 
   ac.setOffTimer(1);
   EXPECT_EQ(1, ac.getOffTimer());
-  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
+  ASSERT_TRUE(ac.getPower());  // remote should be on from timer
   const uint8_t expectedStateOffTimer1m[kCoronaAcStateLength] = {
       0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
       0x28, 0x61, 0xCD, 0x1E, 0xE1, 0x00, 0xFF};  // 30
-  EXPECT_FALSE(ac.getPowerButton());
+  ASSERT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOffTimer1m, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(2);
   EXPECT_EQ(2, ac.getOnTimer());
-  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
+  ASSERT_TRUE(ac.getPower());  // remote should be on from timer
   // setting any of the timers needs to reset the other one
   ASSERT_EQ(0, ac.getOffTimer());
   const uint8_t expectedStateOnTimer2m[kCoronaAcStateLength] = {
       0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0x3C, 0xC3, 0x00, 0xFF,  // 60
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
-  EXPECT_FALSE(ac.getPowerButton());
+  ASSERT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOnTimer2m, ac.getRaw(), kCoronaAcBits);
 
   // setting a higher value than max should instead disable
   ac.setOnTimer(kCoronaAcTimerMax + 1);
   ASSERT_EQ(0, ac.getOnTimer());
-  EXPECT_TRUE(ac.getPowerButton());
-  EXPECT_TRUE(ac.getPower());  // remote should is still on
-  ac.off();  // set it to off
-
-  EXPECT_TRUE(ac.getPowerButton());
+  ASSERT_FALSE(ac.getPowerButton());
+  ASSERT_TRUE(ac.getPower());  // remote should still be on
+  ac.off();
+  ASSERT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 }
 
