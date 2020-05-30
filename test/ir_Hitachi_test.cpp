@@ -1965,7 +1965,7 @@ TEST(TestIRHitachiAc344Class, SwingV) {
   // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134#issuecomment-635760537
 
   // https://docs.google.com/spreadsheets/d/1LPd8K9V437oyEMZT6JDv5LlPXh61RPmgeoVcHLWWr7k/edit#gid=874235844&range=G4
-  // aka. On	17	Cool	Auto	SwingV off	SwingH off
+  // aka. On 17 Cool Auto SwingV off SwingH off
   const uint8_t start[43] = {
       0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92, 0x6D, 0x44,
       0xBB, 0x44, 0xBB, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
