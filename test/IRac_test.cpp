@@ -732,7 +732,7 @@ TEST(TestIRac, Hitachi344) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max), "
-      "Button: 19 (Power/Mode), Swing(V): On, Swing(H): 2 (Right)";
+      "Button: 129 (Swing(V)), Swing(V): On, Swing(H): 2 (Right)";
 
   ac.begin();
   irac.hitachi344(&ac,

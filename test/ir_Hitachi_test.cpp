@@ -1926,7 +1926,7 @@ TEST(TestDecodeHitachiAc344, SyntheticExample) {
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
-TEST(TestIRHitachiAc344, ExampleMessages) {
+TEST(TestDecodeIRHitachiAc344, ExampleMessages) {
   IRHitachiAc344 ac(kGpioUnused);
 
   // On, 17, Hot, Auto
@@ -1944,7 +1944,7 @@ TEST(TestIRHitachiAc344, ExampleMessages) {
       ac.toString());
 }
 
-TEST(TestIRHitachiAc344, ReconstructKnownState) {
+TEST(TestIRHitachiAc344Class, ReconstructKnownState) {
   IRHitachiAc344 ac(kGpioUnused);
 
   // On, 17, Hot, Auto
@@ -1958,4 +1958,29 @@ TEST(TestIRHitachiAc344, ReconstructKnownState) {
   ac.setFan(kHitachiAc344FanAuto);
   ac.setButton(kHitachiAc344ButtonPowerMode);
   EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc344Bits);
+}
+
+TEST(TestIRHitachiAc344Class, SwingV) {
+  IRHitachiAc344 ac(kGpioUnused);
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134#issuecomment-635760537
+
+  // https://docs.google.com/spreadsheets/d/1LPd8K9V437oyEMZT6JDv5LlPXh61RPmgeoVcHLWWr7k/edit#gid=874235844&range=G4
+  // aka. On	17	Cool	Auto	SwingV off	SwingH off
+  const uint8_t start[43] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92, 0x6D, 0x44,
+      0xBB, 0x44, 0xBB, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x53, 0xAC, 0xF1, 0x0E, 0x00, 0xFF, 0x00, 0xFF, 0x80, 0x7F, 0x03,
+      0xFC, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
+  ac.setRaw(start);
+  EXPECT_FALSE(ac.getSwingV());
+  const uint8_t turn_on_swingv[43] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92, 0x6D, 0x81,
+      0x7E, 0x44, 0xBB, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x53, 0xAC, 0xF1, 0x0E, 0x00, 0xFF, 0x00, 0xFF, 0x80, 0x7F, 0x03,
+      0xFC, 0x20, 0xDF, 0x00, 0xFF, 0x00, 0xFF};
+  ac.setSwingV(true);  // Turn it on.
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_STATE_EQ(turn_on_swingv, ac.getRaw(), kHitachiAc344Bits);
+  ac.setSwingV(false);
+  EXPECT_FALSE(ac.getSwingV());
 }
