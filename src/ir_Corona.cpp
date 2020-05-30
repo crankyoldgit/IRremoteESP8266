@@ -160,7 +160,7 @@ void IRCoronaAc::stateReset(void) {
   setFan(kCoronaAcFanAuto);
   setOnTimer(kCoronaAcTimerOff);
   setOffTimer(kCoronaAcTimerOff);
-  checksum(remote_state);
+  // headers and checks are fixed in getRaw by checksum(remote_state)
 }
 
 /// Get the byte that identifies the section
@@ -262,7 +262,8 @@ void IRCoronaAc::send(const uint16_t repeat) {
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
 uint8_t* IRCoronaAc::getRaw(void) {
-  checksum(remote_state);  // Ensure correct settings before sending.
+  updatePowerButton();
+  checksum(remote_state);  // Ensure correct check bits before sending.
   return remote_state;
 }
 
@@ -289,39 +290,52 @@ uint8_t IRCoronaAc::getTemp(void) {
                   kCoronaAcTempSize) + kCoronaAcMinTemp - 1;
 }
 
-/// Change the power setting.
+/// Change the power setting. (in practice Standby, remote power)
 /// @param[in] on true, the setting is on. false, the setting is off.
-/// @note If changed, setPowerToggle is also needed,
-///       unless timer is or was active
-void IRCoronaAc::setPower(const bool on) {
+void IRCoronaAc::_setPower(const bool on) {
   setBit(&remote_state[kCoronaAcSectionData1Pos], kCoronaAcPowerOffset, on);
+}
+
+/// Change the power setting. (in practice Standby, remote power)
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note If changed, setPowerButton is also needed,
+///       unless timer is or was active, handled by updatePowerButton
+void IRCoronaAc::setPower(const bool on) {
+  _setPower(on);
   // setting power state resets timers that would cause the state
   if (on)
     setOnTimer(kCoronaAcTimerOff);
   else
     setOffTimer(kCoronaAcTimerOff);
+  updatePowerButton();
 }
 
-/// Get the value of the current power setting.
+/// Get the current power setting. (in practice Standby, remote power)
 /// @return true, the setting is on. false, the setting is off.
 bool IRCoronaAc::getPower(void) {
   return GETBIT8(remote_state[kCoronaAcSectionData1Pos], kCoronaAcPowerOffset);
 }
 
-/// Change the power toggle setting.
+/// Change the power button setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-/// @note this sets that the AC should change power,
+/// @note this sets that the AC should set power,
 ///       use setPower to define if the AC should end up as on or off
-void IRCoronaAc::setPowerToggle(const bool on) {
+void IRCoronaAc::setPowerButton(const bool on) {
   setBit(&remote_state[kCoronaAcSectionData1Pos],
-         kCoronaAcPowerToggleOffset, on);
+         kCoronaAcPowerButtonOffset, on);
 }
 
-/// Get the value of the current power toggle setting.
+/// Update the power button setting based on if timer is set or not.
+void IRCoronaAc::updatePowerButton(void) {
+  // to be sure we get wanted AC state, always set power button if no timer
+  setPowerButton(!getOnTimer() && !getOffTimer());
+}
+
+/// Get the value of the current power button setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoronaAc::getPowerToggle(void) {
+bool IRCoronaAc::getPowerButton(void) {
   return GETBIT8(remote_state[kCoronaAcSectionData1Pos],
-                 kCoronaAcPowerToggleOffset);
+                 kCoronaAcPowerButtonOffset);
 }
 
 /// Change the power setting to On.
@@ -466,6 +480,10 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
   // convert 16 bit value to separate 8 bit parts
   remote_state[pos + kCoronaAcSectionData1Pos] = hsecs >> 8;
   remote_state[pos + kCoronaAcSectionData0Pos] = hsecs;
+
+  // if any timer is enabled, then (remote) ac must be on (Standby)
+  if (hsecs != kCoronaAcTimerOff)
+    _setPower(true);
 }
 
 /// Get the current Timer time
@@ -497,6 +515,7 @@ void IRCoronaAc::setOnTimer(const uint16_t nr_of_mins) {
   // if we set a timer value, clear the other timer
   if (getOnTimer())
     setOffTimer(kCoronaAcTimerOff);
+  updatePowerButton();
 }
 
 /// Get the current Off Timer time
@@ -513,15 +532,16 @@ void IRCoronaAc::setOffTimer(const uint16_t nr_of_mins) {
   // if we set a timer value, clear the other timer
   if (getOffTimer())
     setOnTimer(kCoronaAcTimerOff);
+  updatePowerButton();
 }
 
 /// Convert the internal state into a human readable string.
 /// @return The current internal state expressed as a human readable String.
 String IRCoronaAc::toString(void) {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addBoolToString(getPowerToggle(), kPowerToggleStr);
+  result += addBoolToString(getPowerButton(), kPowerButtonStr);
   result += addModeToString(getMode(), 0xFF, kCoronaAcModeCool,
                             kCoronaAcModeHeat, kCoronaAcModeDry,
                             kCoronaAcModeFan);
@@ -541,15 +561,9 @@ String IRCoronaAc::toString(void) {
 }
 
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
-/// @param[in] prev previous state, use to toggle correctly
 /// @return A stdAc::state_t state.
-stdAc::state_t IRCoronaAc::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRCoronaAc::toCommon() {
   stdAc::state_t result;
-  if (prev != NULL) {
-    result = *prev;
-  } else {
-    result.swingv = stdAc::swingv_t::kOff;
-  }
   result.protocol = decode_type_t::CORONA_AC;
   result.model = -1;  // No models used.
   result.power = getPower();
@@ -557,10 +571,8 @@ stdAc::state_t IRCoronaAc::toCommon(const stdAc::state_t *prev) {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
-  if (getSwingVToggle()) {
-    result.swingv = (result.swingv != stdAc::swingv_t::kOff) ?
-        stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;  // Invert swing.
-  }
+  result.swingv = getSwingVToggle() ?
+      stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
   result.econo = getEcono();
   // Not supported.
   result.sleep = -1;

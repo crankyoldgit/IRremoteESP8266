@@ -70,10 +70,10 @@ const uint8_t kCoronaAcMinTemp = 17;  // Celsius = 0b0001
 const uint8_t kCoronaAcMaxTemp = 30;  // Celsius = 0b1110
 const uint8_t kCoronaAcPowerOffset =
     kCoronaAcTempOffset + kCoronaAcTempSize;  // D1 Pos 4
-const uint8_t kCoronaAcPowerToggleOffset =
+const uint8_t kCoronaAcPowerButtonOffset =
     kCoronaAcPowerOffset + 1;                // D1 Pos 5
 const uint8_t kCoronaAcModeOffset =
-    kCoronaAcPowerToggleOffset + 1;          // D1 MSB Pos 6-7
+    kCoronaAcPowerButtonOffset + 1;          // D1 MSB Pos 6-7
 const uint8_t kCoronaAcModeSize = 2;
 const uint8_t kCoronaAcModeHeat = 0b00;  // 0
 const uint8_t kCoronaAcModeDry =  0b01;  // 1
@@ -105,8 +105,9 @@ class IRCoronaAc {
                            const uint8_t section);
   void setPower(const bool on);
   bool getPower();
-  void setPowerToggle(const bool on);
-  bool getPowerToggle();
+  void setPowerButton(const bool on);
+  void updatePowerButton();
+  bool getPowerButton();
   void on();
   void off();
   void setTemp(const uint8_t temp);
@@ -130,7 +131,7 @@ class IRCoronaAc {
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
+  stdAc::state_t toCommon();
   String toString();
 #ifndef UNIT_TEST
 
@@ -142,6 +143,7 @@ class IRCoronaAc {
   uint8_t remote_state[kCoronaAcStateLength];  // The state of the IR remote.
   static uint8_t getSectionByte(const uint8_t section);
   static void checksum(uint8_t* data);
+  void _setPower(const bool on);
   void _setTimer(const uint8_t section, const uint16_t nr_of_mins);
   uint16_t _getTimer(const uint8_t section);
 };

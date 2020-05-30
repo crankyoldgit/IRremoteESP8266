@@ -184,7 +184,7 @@ TEST(TestIRac, Corona) {
   IRrecv capture(kGpioUnused);
 
   char expected[] =
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Power: On, Power Button: On, Mode: 0 (Heat), Temp: 21C, "
       "Fan: 3 (High), Swing(V) Toggle: On, Econo: On, "
       "On Timer: Off, Off Timer: Off";
 

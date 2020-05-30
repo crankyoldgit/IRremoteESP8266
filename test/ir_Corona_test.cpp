@@ -64,7 +64,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_On, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: On, Mode: 0 (Heat), Temp: 23C, "
+      "Power: On, Power Button: On, Mode: 0 (Heat), Temp: 23C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -121,7 +121,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_Off, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: Off, Power Toggle: On, Mode: 0 (Heat), Temp: 23C, "
+      "Power: Off, Power Button: On, Mode: 0 (Heat), Temp: 23C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -178,7 +178,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_17C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 17C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 17C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -235,7 +235,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_18C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 18C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 18C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -292,7 +292,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_19C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: On, Mode: 0 (Heat), Temp: 19C, "
+      "Power: On, Power Button: On, Mode: 0 (Heat), Temp: 19C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -349,7 +349,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_20C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 20C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 20C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -406,7 +406,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_21C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 21C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -463,7 +463,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_22C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 22C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 22C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -520,7 +520,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_23C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 23C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 23C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -577,7 +577,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_24C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 24C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 24C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -634,7 +634,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_25C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 25C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 25C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -691,7 +691,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_26C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 26C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 26C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -748,7 +748,7 @@ TEST(TestDecodeCoronaAc, RealExample) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_30C, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 30C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -809,7 +809,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_TOn5,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 30C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: 05:00, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -867,7 +867,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_TOn1,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 30C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: 01:00, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -925,7 +925,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_TOn2,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 30C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: 02:00, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -983,7 +983,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_21C2,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 21C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 21C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1041,7 +1041,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_20C2,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 20C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 20C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1099,7 +1099,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   EXPECT_STATE_EQ(expectedState_Off2,
                   irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: Off, Power Toggle: On, Mode: 0 (Heat), Temp: 18C, "
+      "Power: Off, Power Button: On, Mode: 0 (Heat), Temp: 18C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1156,7 +1156,7 @@ TEST(TestDecodeCoronaAc, RealExample2) {
   ASSERT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState_U, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 29C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 29C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1191,7 +1191,7 @@ TEST(TestDecodeCoronaAc, RealExampleShort) {
   EXPECT_STATE_EQ(expectedState_A1, irsend.capture.state, irsend.capture.bits);
   // this is special, but showing what it might be
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 16C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 16C, "
       "Fan: 2 (Medium), Swing(V) Toggle: Off, Econo: Off, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1214,7 +1214,7 @@ TEST(TestDecodeCoronaAc, SyntheticExample1) {
   EXPECT_EQ(kCoronaAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(state, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 29C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 29C, "
       "Fan: 1 (Low), Swing(V) Toggle: Off, Econo: On, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1261,7 +1261,7 @@ TEST(TestDecodeCoronaAc, SyntheticExample1) {
   ASSERT_EQ(kCoronaAcBitsShort, irsend.capture.bits);
   EXPECT_STATE_EQ(stateShort, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 0 (Heat), Temp: 16C, "
+      "Power: On, Power Button: Off, Mode: 0 (Heat), Temp: 16C, "
       "Fan: 2 (Medium), Swing(V) Toggle: Off, Econo: Off, "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -1385,21 +1385,28 @@ TEST(TestCoronaAcClass, Power) {
 
   ac.on();
   EXPECT_TRUE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerButton());
 
   ac.off();
   EXPECT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerButton());
 
   ac.setOnTimer(60);
+  EXPECT_FALSE(ac.getPowerButton());
   ac.setPower(true);
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.getPowerButton());
 
   ac.setOffTimer(60);
+  EXPECT_FALSE(ac.getPowerButton());
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
   EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_TRUE(ac.getPowerButton());
 
   ASSERT_EQ(4, kCoronaAcPowerOffset);
+  ASSERT_EQ(5, kCoronaAcPowerButtonOffset);
 }
 
 TEST(TestCoronaAcClass, Temperature) {
@@ -1486,48 +1493,64 @@ TEST(TestCoronaAcClass, Timer) {
   ac.begin();
   ac.setMode(kCoronaAcModeHeat);
   const uint8_t expectedStateNoTimer[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x01, 0xFE,
+      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x21, 0xDE,
       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
+  ASSERT_FALSE(ac.getPower());
+  EXPECT_TRUE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(3 * 60);
   EXPECT_EQ(3 * 60, ac.getOnTimer());
   const uint8_t expectedStateOnTimer3H[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x01, 0xFE,
+      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0x18, 0xE7, 0x15, 0xEA,  // 5400
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
+  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
+  EXPECT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOnTimer3H, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(0);
   EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.getPowerButton());
+  EXPECT_TRUE(ac.getPower());  // remote should is still on
+  ac.off();  // set it to off
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
   ac.setOnTimer(kCoronaAcTimerOff);
   EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 
   ac.setOffTimer(1);
   EXPECT_EQ(1, ac.getOffTimer());
+  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
   const uint8_t expectedStateOffTimer1m[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x01, 0xFE,
+      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
       0x28, 0x61, 0xCD, 0x1E, 0xE1, 0x00, 0xFF};  // 30
+  EXPECT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOffTimer1m, ac.getRaw(), kCoronaAcBits);
 
   ac.setOnTimer(2);
   EXPECT_EQ(2, ac.getOnTimer());
+  EXPECT_TRUE(ac.getPower());  // remote should be on from timer
   // setting any of the timers needs to reset the other one
   ASSERT_EQ(0, ac.getOffTimer());
   const uint8_t expectedStateOnTimer2m[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x01, 0xFE,
+      0x28, 0x61, 0x3D, 0x10, 0xEF, 0x11, 0xEE,
       0x28, 0x61, 0x6D, 0x3C, 0xC3, 0x00, 0xFF,  // 60
       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
+  EXPECT_FALSE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateOnTimer2m, ac.getRaw(), kCoronaAcBits);
 
   // setting a higher value than max should instead disable
   ac.setOnTimer(kCoronaAcTimerMax + 1);
   ASSERT_EQ(0, ac.getOnTimer());
+  EXPECT_TRUE(ac.getPowerButton());
+  EXPECT_TRUE(ac.getPower());  // remote should is still on
+  ac.off();  // set it to off
 
+  EXPECT_TRUE(ac.getPowerButton());
   EXPECT_STATE_EQ(expectedStateNoTimer, ac.getRaw(), kCoronaAcBits);
 }
 
@@ -1563,7 +1586,7 @@ TEST(TestCoronaAcClass, FanSpeed) {
 TEST(TestCoronaAcClass, HumanReadable) {
   IRCoronaAc ac(kGpioUnused);
   EXPECT_EQ(
-      "Power: Off, Power Toggle: Off, Mode: 2 (Cool), Temp: 17C, "
+      "Power: Off, Power Button: On, Mode: 2 (Cool), Temp: 17C, "
       "Fan: 0 (Auto), Swing(V) Toggle: Off, Econo: Off, "
       "On Timer: Off, Off Timer: Off",
       ac.toString());
@@ -1573,31 +1596,31 @@ TEST(TestCoronaAcClass, HumanReadable) {
   ac.setFan(kCoronaAcFanAuto);
   ac.setSwingVToggle(true);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
+      "Power: On, Power Button: On, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: Off, "
       "On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setOffTimer(8 * 60 + 37);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: Off, "
       "On Timer: Off, Off Timer: 08:37",
       ac.toString());
   ac.setOnTimer(5 * 60 + 59);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: Off, "
       "On Timer: 05:59, Off Timer: Off",
       ac.toString());
   ac.setOnTimer(59);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: Off, "
       "On Timer: 00:59, Off Timer: Off",
       ac.toString());
   ac.setEcono(true);
   EXPECT_EQ(
-      "Power: On, Power Toggle: Off, Mode: 3 (Fan), Temp: 30C, "
+      "Power: On, Power Button: Off, Mode: 3 (Fan), Temp: 30C, "
       "Fan: 0 (Auto), Swing(V) Toggle: On, Econo: On, "
       "On Timer: 00:59, Off Timer: Off",
       ac.toString());
@@ -1606,7 +1629,7 @@ TEST(TestCoronaAcClass, HumanReadable) {
 TEST(TestCoronaAcClass, ReconstructKnownState) {
   IRCoronaAc ac(kGpioUnused);
   const uint8_t expectedState[kCoronaAcStateLength] = {
-      0x28, 0x61, 0x3D, 0x59, 0xA6, 0xF3, 0x0C,
+      0x28, 0x61, 0x3D, 0x59, 0xA6, 0xD3, 0x2C,
       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
       0x28, 0x61, 0xCD, 0x18, 0xE7, 0x15, 0xEA};
   ASSERT_TRUE(IRCoronaAc::validSection(expectedState,
@@ -1619,7 +1642,6 @@ TEST(TestCoronaAcClass, ReconstructKnownState) {
   ac.stateReset();
   // ASSERT_STATE_NE(expectedState, ac.getRaw());
   ac.on();
-  ac.setPowerToggle(true);
   ac.setMode(kCoronaAcModeFan);
   ac.setTemp(19);
   ac.setFan(kCoronaAcFanLow);
@@ -1628,7 +1650,7 @@ TEST(TestCoronaAcClass, ReconstructKnownState) {
   ac.setEcono(true);
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kCoronaAcBits);
   EXPECT_EQ(
-      "Power: On, Power Toggle: On, Mode: 3 (Fan), Temp: 19C, "
+      "Power: On, Power Button: Off, Mode: 3 (Fan), Temp: 19C, "
       "Fan: 1 (Low), Swing(V) Toggle: On, Econo: On, "
       "On Timer: Off, Off Timer: 03:00",
       ac.toString());
@@ -1639,7 +1661,6 @@ TEST(TestCoronaAcClass, toCommon) {
   ac.begin();
   ac.stateReset();
   ac.on();
-  ac.setPowerToggle(true);
   ac.setMode(kCoronaAcModeFan);
   ac.setTemp(20);
   ac.setFan(kCoronaAcFanLow);
