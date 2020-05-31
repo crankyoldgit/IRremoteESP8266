@@ -1394,7 +1394,7 @@ void IRHitachiAc344::setSwingH(const uint8_t position) {
   if (position > kHitachiAc344SwingHLeftMax)
     return setSwingH(kHitachiAc344SwingHMiddle);
   setBits(&remote_state[kHitachiAc344SwingHByte], kHitachiAc344SwingHOffset,
-         kHitachiAc344SwingHSize, position);
+          kHitachiAc344SwingHSize, position);
   setButton(kHitachiAc344ButtonSwingH);
 }
 
@@ -1402,7 +1402,7 @@ void IRHitachiAc344::setSwingH(const uint8_t position) {
 /// @return The current position horizontal swing is set to.
 uint8_t IRHitachiAc344::getSwingH(void) {
   return GETBITS8(remote_state[kHitachiAc344SwingHByte],
-                 kHitachiAc344SwingHOffset, kHitachiAc344SwingHSize);
+                  kHitachiAc344SwingHOffset, kHitachiAc344SwingHSize);
 }
 
 /// Convert a standard A/C horizontal swing into its native setting.
