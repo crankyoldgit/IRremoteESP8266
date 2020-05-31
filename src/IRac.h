@@ -11,6 +11,7 @@
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
+#include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
 #include "ir_Fujitsu.h"
@@ -121,6 +122,12 @@ void carrier64(IRCarrierAc64 *ac,
               const bool turbo, const bool light, const bool clean,
               const int16_t sleep = -1);
 #endif  // SEND_COOLIX
+#if SEND_CORONA_AC
+  void corona(IRCoronaAc *ac,
+              const bool on, const stdAc::opmode_t mode,
+              const float degrees, const stdAc::fanspeed_t fan,
+              const stdAc::swingv_t swingv, const bool econo);
+#endif  // SEND_CORONA_AC
 #if SEND_DAIKIN
   void daikin(IRDaikinESP *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,

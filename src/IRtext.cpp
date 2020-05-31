@@ -135,6 +135,7 @@ const PROGMEM char* kEyeAutoStr = D_STR_EYEAUTO;
 const PROGMEM char* kLightToggleStr = D_STR_LIGHTTOGGLE;
 const PROGMEM char* kOutsideQuietStr = D_STR_OUTSIDEQUIET;
 const PROGMEM char* kPowerToggleStr = D_STR_POWERTOGGLE;
+const PROGMEM char* kPowerButtonStr = D_STR_POWERBUTTON;
 const PROGMEM char* kPreviousPowerStr = D_STR_PREVIOUSPOWER;
 const PROGMEM char* kDisplayTempStr = D_STR_DISPLAYTEMP;
 const PROGMEM char* kSensorTempStr = D_STR_SENSORTEMP;
@@ -259,5 +260,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_CARRIER_AC40 "\x0"
     D_STR_CARRIER_AC64 "\x0"
     D_STR_HITACHI_AC344 "\x0"
+    D_STR_CORONA_AC "\x0"
     // New protocol strings should be added just above this line.
     "\x0";  // This string requires double null termination.

@@ -614,6 +614,11 @@ class IRsend {
                          const uint16_t nbits = kMultibracketsBits,
                          const uint16_t repeat = kMultibracketsDefaultRepeat);
 #endif
+#if SEND_CORONA_AC
+  void sendCoronaAc(const uint8_t data[],
+                    const uint16_t nbytes = kCoronaAcStateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_CORONA_AC
 
  protected:
 #ifdef UNIT_TEST
