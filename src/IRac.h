@@ -260,7 +260,8 @@ void electra(IRElectraAc *ac,
   void hitachi344(IRHitachiAc344 *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
-                  const stdAc::swingv_t swingv);
+                  const stdAc::swingv_t swingv,
+                  const stdAc::swingh_t swingh);
 #endif  // SEND_HITACHI_AC344
 #if SEND_HITACHI_AC424
   void hitachi424(IRHitachiAc424 *ac,

@@ -812,15 +812,14 @@ void IRac::hitachi1(IRHitachiAc1 *ac, const hitachi_ac1_remote_model_t model,
 void IRac::hitachi344(IRHitachiAc344 *ac,
                       const bool on, const stdAc::opmode_t mode,
                       const float degrees, const stdAc::fanspeed_t fan,
-                      const stdAc::swingv_t swingv) {
+                      const stdAc::swingv_t swingv,
+                      const stdAc::swingh_t swingh) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
+  ac->setSwingH(ac->convertSwingH(swingh));
   ac->setPower(on);
-  // SwingVToggle is special. Needs to be last method called.
-  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
-  // No Swing(H) setting available.
   // No Quiet setting available.
   // No Turbo setting available.
   // No Light setting available.
@@ -829,6 +828,9 @@ void IRac::hitachi344(IRHitachiAc344 *ac,
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
+
+  // SwingVToggle is special. Needs to be last method called.
+  ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   ac->send();
 }
 #endif  // SEND_HITACHI_AC344
@@ -1691,7 +1693,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HITACHI_AC344:
     {
       IRHitachiAc344 ac(_pin, _inverted, _modulation);
-      hitachi344(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
+      hitachi344(&ac, send.power, send.mode, degC, send.fanspeed,
+                 send.swingv, send.swingh);
       break;
     }
 #endif  // SEND_HITACHI_AC344

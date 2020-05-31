@@ -949,7 +949,7 @@ TEST(TestDecodeHitachiAc424, RealExample) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 5 (Auto), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V) Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -1124,29 +1124,29 @@ TEST(TestIRHitachiAc424Class, HumanReadable) {
   ac.setFan(kHitachiAc424FanHigh);
   EXPECT_EQ(
       "Power: On, Mode: 6 (Heat), Temp: 32C, Fan: 4 (High), "
-      "Swing(V) Toggle: Off, Button: 66 (Fan)",
+      "Button: 66 (Fan), Swing(V) Toggle: Off",
       ac.toString());
   ac.setMode(kHitachiAc424Cool);
   ac.setFan(kHitachiAc424FanMin);
   ac.setTemp(kHitachiAc424MinTemp);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      "Button: 67 (Temp Down), Swing(V) Toggle: Off",
       ac.toString());
   ac.setSwingVToggle(true);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: On, Button: 129 (Swing(V))",
+      "Button: 129 (Swing(V)), Swing(V) Toggle: On",
       ac.toString());
   ac.setTemp(ac.getTemp() + 1);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 17C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 68 (Temp Up)",
+      "Button: 68 (Temp Up), Swing(V) Toggle: Off",
       ac.toString());
   ac.setTemp(ac.getTemp() - 1);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 67 (Temp Down)",
+      "Button: 67 (Temp Down), Swing(V) Toggle: Off",
       ac.toString());
 }
 
@@ -1922,11 +1922,11 @@ TEST(TestDecodeHitachiAc344, SyntheticExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 3 (Cool), Temp: 26C, Fan: 1 (Min), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V): On, Swing(H): 3 (Middle)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
-TEST(TestIRHitachiAc344, ExampleMessages) {
+TEST(TestDecodeIRHitachiAc344, ExampleMessages) {
   IRHitachiAc344 ac(kGpioUnused);
 
   // On, 17, Hot, Auto
@@ -1940,11 +1940,11 @@ TEST(TestIRHitachiAc344, ExampleMessages) {
   ac.setRaw(state);
   EXPECT_EQ(
       "Power: On, Mode: 6 (Heat), Temp: 17C, Fan: 5 (Auto), "
-      "Swing(V) Toggle: Off, Button: 19 (Power/Mode)",
+      "Button: 19 (Power/Mode), Swing(V): Off, Swing(H): 3 (Middle)",
       ac.toString());
 }
 
-TEST(TestIRHitachiAc344, ReconstructKnownState) {
+TEST(TestIRHitachiAc344Class, ReconstructKnownState) {
   IRHitachiAc344 ac(kGpioUnused);
 
   // On, 17, Hot, Auto
@@ -1958,4 +1958,29 @@ TEST(TestIRHitachiAc344, ReconstructKnownState) {
   ac.setFan(kHitachiAc344FanAuto);
   ac.setButton(kHitachiAc344ButtonPowerMode);
   EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc344Bits);
+}
+
+TEST(TestIRHitachiAc344Class, SwingV) {
+  IRHitachiAc344 ac(kGpioUnused);
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1134#issuecomment-635760537
+
+  // https://docs.google.com/spreadsheets/d/1LPd8K9V437oyEMZT6JDv5LlPXh61RPmgeoVcHLWWr7k/edit#gid=874235844&range=G4
+  // aka. On 17 Cool Auto SwingV off SwingH off
+  const uint8_t start[43] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92, 0x6D, 0x44,
+      0xBB, 0x44, 0xBB, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x53, 0xAC, 0xF1, 0x0E, 0x00, 0xFF, 0x00, 0xFF, 0x80, 0x7F, 0x03,
+      0xFC, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
+  ac.setRaw(start);
+  EXPECT_FALSE(ac.getSwingV());
+  const uint8_t turn_on_swingv[43] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92, 0x6D, 0x81,
+      0x7E, 0x44, 0xBB, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x53, 0xAC, 0xF1, 0x0E, 0x00, 0xFF, 0x00, 0xFF, 0x80, 0x7F, 0x03,
+      0xFC, 0x20, 0xDF, 0x00, 0xFF, 0x00, 0xFF};
+  ac.setSwingV(true);  // Turn it on.
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_STATE_EQ(turn_on_swingv, ac.getRaw(), kHitachiAc344Bits);
+  ac.setSwingV(false);
+  EXPECT_FALSE(ac.getSwingV());
 }
