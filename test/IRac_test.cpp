@@ -732,7 +732,7 @@ TEST(TestIRac, Hitachi344) {
   IRrecv capture(kGpioUnused);
   char expected_swingon[] =
       "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max), "
-      "Button: 129 (Swing(V)), Swing(V): On, Swing(H): 2 (Right)";
+      "Button: 129 (Swing(V)), Swing(V): Off, Swing(H): 2 (Right)";
 
   ac.begin();
   irac.hitachi344(&ac,
@@ -741,7 +741,6 @@ TEST(TestIRac, Hitachi344) {
                   25,                           // Celsius
                   stdAc::fanspeed_t::kMax,      // Fan speed
                   stdAc::swingv_t::kAuto,       // Swing(V)
-                  stdAc::swingv_t::kOff,        // Previous Swing(V)
                   stdAc::swingh_t::kRight);     // Swing(H)
 
   ASSERT_EQ(expected_swingon, ac.toString());
@@ -759,7 +758,7 @@ TEST(TestIRac, Hitachi344) {
 
   char expected_swingoff[] =
       "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 6 (Max), "
-      "Button: 129 (Swing(V)), Swing(V): Off, Swing(H): 2 (Right)";
+      "Button: 19 (Power/Mode), Swing(V): Off, Swing(H): 2 (Right)";
 
   ac._irsend.reset();
   irac.hitachi344(&ac,
@@ -768,7 +767,6 @@ TEST(TestIRac, Hitachi344) {
                   25,                           // Celsius
                   stdAc::fanspeed_t::kMax,      // Fan speed
                   stdAc::swingv_t::kOff,        // Swing(V)
-                  stdAc::swingv_t::kAuto,       // Previous Swing(V)
                   stdAc::swingh_t::kRight);     // Swing(H)
   ASSERT_EQ(expected_swingoff, ac.toString());
   ac._irsend.makeDecodeResult();
