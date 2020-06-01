@@ -3,9 +3,10 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 
-// Airwell "Manchester code" based protocol.
-// Some other Airwell products use the COOLIX protocol.
-//
+/// @file
+/// @brief Airwell "Manchester code" based protocol.
+/// Some other Airwell products use the COOLIX protocol.
+
 // Supports:
 //   Brand: Airwell,  Model: RC08W remote
 
@@ -16,18 +17,12 @@ const uint16_t kAirwellHdrSpace = 4 * kAirwellHalfClockPeriod;  // uSeconds
 const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 
 #if SEND_AIRWELL
-// Send an Airwell Manchester Code formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kAirwellBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: BETA / Appears to be working.
-//
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
+/// Send an Airwell Manchester Code formatted message.
+/// Status: BETA / Appears to be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of the message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
 void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Header + Data
   sendManchester(kAirwellHdrMark, kAirwellHdrMark, kAirwellHalfClockPeriod,
@@ -39,21 +34,17 @@ void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif
 
 #if DECODE_AIRWELL
-// Decode the supplied Airwell "Manchester code" message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kAirwellBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Appears to be working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
+/// Decode the supplied Airwell "Manchester code" message.
+///
+/// Status: BETA / Appears to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
 bool IRrecv::decodeAirwell(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (results->rawlen < nbits + kAirwellOverhead - offset)
