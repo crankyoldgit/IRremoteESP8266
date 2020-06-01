@@ -1,4 +1,8 @@
 // Copyright 2018, 2020 David Conran
+/// @file
+/// @brief Carrier protocols.
+/// @see CarrierAc https://github.com/crankyoldgit/IRremoteESP8266/issues/385
+/// @see CarrierAc64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 
 // Supports:
 //   Brand: Carrier/Surrey,  Model: 42QG5A55970 remote
@@ -28,8 +32,6 @@ using irutils::setBits;
 using irutils::sumNibbles;
 
 // Constants
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/385
 const uint16_t kCarrierAcHdrMark = 8532;
 const uint16_t kCarrierAcHdrSpace = 4228;
 const uint16_t kCarrierAcBitMark = 628;
@@ -44,7 +46,6 @@ const uint16_t kCarrierAc40BitMark = 547;
 const uint16_t kCarrierAc40OneSpace = 1540;
 const uint16_t kCarrierAc40ZeroSpace = 497;
 
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 const uint16_t kCarrierAc64HdrMark = 8940;
 const uint16_t kCarrierAc64HdrSpace = 4556;
 const uint16_t kCarrierAc64BitMark = 503;
@@ -54,15 +55,11 @@ const uint32_t kCarrierAc64Gap = kDefaultMessageGap;  // A guess.
 
 
 #if SEND_CARRIER_AC
-// Send a Carrier HVAC formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically kCarrierAcBits.
-//   repeat: The number of times the message is to be repeated.
-//
-// Status: STABLE / Work on real devices.
-//
+/// Send a Carrier HVAC formatted message.
+/// Status: STABLE / Works on real devices.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++) {
     uint64_t temp_data = data;
@@ -79,21 +76,17 @@ void IRsend::sendCarrierAC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif
 
 #if DECODE_CARRIER_AC
-// Decode the supplied Carrier HVAC message.
-// Carrier HVAC messages contain only 32 bits, but it is sent three(3) times.
-// i.e. normal + inverted + normal
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion.
-//            Typically kCarrierAcBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Probably works.
-//
+/// Decode the supplied Carrier HVAC message.
+/// @note Carrier HVAC messages contain only 32 bits, but it is sent three(3)
+///   times. i.e. normal + inverted + normal
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < ((2 * nbits + kHeader + kFooter) * 3) - 1 + offset)
@@ -234,7 +227,7 @@ bool IRrecv::decodeCarrierAC64(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_CARRIER_AC64
 
-/// Class constructor for handling detailed Carrier 64 bit A/C messages.
+/// Class constructor.
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
@@ -275,9 +268,12 @@ void IRCarrierAc64::checksum(void) {
           calcChecksum(remote_state));
 }
 
+/// Set up hardware to be able to send a message.
 void IRCarrierAc64::begin(void) { _irsend.begin(); }
 
 #if SEND_CARRIER_AC64
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRCarrierAc64::send(const uint16_t repeat) {
   _irsend.sendCarrierAC64(getRaw(), kCarrierAc64Bits, repeat);
 }
@@ -371,10 +367,14 @@ stdAc::opmode_t IRCarrierAc64::toCommonMode(const uint8_t mode) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRCarrierAc64::getFan(void) {
   return GETBITS64(remote_state, kCarrierAc64FanOffset, kCarrierAc64FanSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRCarrierAc64::setFan(const uint8_t speed) {
   if (speed > kCarrierAc64FanHigh)
     setFan(kCarrierAc64FanAuto);
@@ -382,7 +382,9 @@ void IRCarrierAc64::setFan(const uint8_t speed) {
     setBits(&remote_state, kCarrierAc64FanOffset, kCarrierAc64FanSize, speed);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRCarrierAc64::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -394,7 +396,9 @@ uint8_t IRCarrierAc64::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRCarrierAc64::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kCarrierAc64FanHigh:    return stdAc::fanspeed_t::kHigh;
