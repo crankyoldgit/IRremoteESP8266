@@ -98,6 +98,9 @@ class IRCoronaAc {
   void stateReset();
 #if SEND_CORONA_AC
   void send(const uint16_t repeat = kNoRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_CORONA_AC
   void begin();
@@ -136,11 +139,13 @@ class IRCoronaAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif
-  uint8_t remote_state[kCoronaAcStateLength];  // The state of the IR remote.
+  uint8_t remote_state[kCoronaAcStateLength];  ///< The state of the IR remote.
   static uint8_t getSectionByte(const uint8_t section);
   static void checksum(uint8_t* data);
   void _setPower(const bool on);

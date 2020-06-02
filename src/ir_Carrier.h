@@ -1,6 +1,8 @@
-// Carrier A/C
-//
 // Copyright 2020 David Conran
+/// @file
+/// @brief Carrier A/C
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
+/// @see https://docs.google.com/spreadsheets/d/1EZy78L0cn1KDIX1aKq2biptejFqCjD5HO3tLiRvXf48/edit#gid=0
 
 #ifndef IR_CARRIER_H_
 #define IR_CARRIER_H_
@@ -16,14 +18,10 @@
 #include "IRsend_test.h"
 #endif
 
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 
 // Constants
 
 // CARRIER_AC64
-// Ref:
-//   https://docs.google.com/spreadsheets/d/1EZy78L0cn1KDIX1aKq2biptejFqCjD5HO3tLiRvXf48/edit#gid=0
 const uint8_t kCarrierAc64ChecksumOffset = 16;
 const uint8_t kCarrierAc64ChecksumSize = 4;
 const uint8_t kCarrierAc64ModeOffset = kCarrierAc64ChecksumOffset +
@@ -73,6 +71,9 @@ class IRCarrierAc64 {
   void stateReset();
 #if SEND_CARRIER_AC64
   void send(const uint16_t repeat = kCarrierAc64MinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_CARRIER_AC64
   void begin();
@@ -107,11 +108,13 @@ class IRCarrierAc64 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif
-  uint64_t remote_state;  // The state of the IR remote.
+  uint64_t remote_state;  ///< The state of the IR remote.
   void checksum(void);
   void _cancelOnTimer(void);
   void _cancelOffTimer(void);

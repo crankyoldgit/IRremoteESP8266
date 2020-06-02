@@ -1,5 +1,7 @@
 // Copyright 2020 Christian Nilsson
 //
+/// @file
+/// @brief Corona A/C protocol
 /// @note Unsupported:
 ///    - Auto/Max button press (special format)
 
@@ -36,15 +38,15 @@ const uint8_t kCoronaTolerance = 5;  // +5%
 #if SEND_CORONA_AC
 /// Send a CoronaAc formatted message.
 /// Status: STABLE / Working on real device.
-/// Where data is:
-///   uint8_t data[kCoronaAcStateLength] = {
-///   0x28, 0x61, 0x3D, 0x19, 0xE6, 0x37, 0xC8,
-///   0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
-///   0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
-///
 /// @param[in] data An array of bytes containing the IR command.
 /// @param[in] nbytes Nr. of bytes of data in the array.
-///                   (>=kCoronaAcStateLength)
+/// e.g.
+/// @code
+///   uint8_t data[kCoronaAcStateLength] = {
+///       0x28, 0x61, 0x3D, 0x19, 0xE6, 0x37, 0xC8,
+///       0x28, 0x61, 0x6D, 0xFF, 0x00, 0xFF, 0x00,
+///       0x28, 0x61, 0xCD, 0xFF, 0x00, 0xFF, 0x00};
+/// @endcode
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendCoronaAc(const uint8_t data[],
                           const uint16_t nbytes, const uint16_t repeat) {
@@ -165,9 +167,9 @@ void IRCoronaAc::stateReset(void) {
 }
 
 /// Get the byte that identifies the section
-/// @param[in] section index of the section 0-2,
+/// @param[in] section Index of the section 0-2,
 ///            3 and above is used as the special case for short message
-/// @return the byte used for the section
+/// @return The byte used for the section
 uint8_t IRCoronaAc::getSectionByte(const uint8_t section) {
   // base byte
   uint8_t b = kCoronaAcSectionLabelBase;
@@ -180,8 +182,8 @@ uint8_t IRCoronaAc::getSectionByte(const uint8_t section) {
 
 /// Check that a CoronaAc Section part is valid with section byte and inverted
 /// @param[in] state An array of bytes containing the section
-/// @param[in] pos where to start in the state array
-/// @param[in] section which section to work with
+/// @param[in] pos Where to start in the state array
+/// @param[in] section Which section to work with
 ///            Used to get the section byte, and is validated against pos
 /// @return true if section is valid, otherwise false
 bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
@@ -235,7 +237,7 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
 }
 
 /// Calculate and set the check values for the internal state.
-/// @param[in,out] data the array to be modified
+/// @param[in,out] data The array to be modified
 void IRCoronaAc::checksum(uint8_t* data) {
   uint8_t pos;
   for (uint8_t section = 0; section < kCoronaAcSections; section++) {
@@ -250,11 +252,12 @@ void IRCoronaAc::checksum(uint8_t* data) {
   }
 }
 
+/// Set up hardware to be able to send a message.
 void IRCoronaAc::begin(void) { _irsend.begin(); }
 
 #if SEND_CORONA_AC
-/// Send the AC state
-/// @param[in] repeat Nr. of times the message is to be repeated.
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRCoronaAc::send(const uint16_t repeat) {
   // if no timer, always send once without power press
   if (!getOnTimer() && !getOffTimer()) {
@@ -268,8 +271,9 @@ void IRCoronaAc::send(const uint16_t repeat) {
 #endif  // SEND_CORONA_AC
 
 /// Get a copy of the internal state as a valid code for this protocol.
-/// @return A valid code for this protocol based on the current internal state.
-/// @note to get stable AC state, if no timers, send once
+/// @return A Ptr to a valid code for this protocol based on the current
+///   internal state.
+/// @note To get stable AC state, if no timers, send once
 ///   without PowerButton set, and once with
 uint8_t* IRCoronaAc::getRaw(void) {
   checksum(remote_state);  // Ensure correct check bits before sending.
