@@ -106,27 +106,63 @@ def getallacs():
           ret[acprotocol] = models
   return ret
 
+class FnSets():
+  """Container for getalldevices"""
+  def __init__(self):
+    self.fnnomatch = set()
+    self.allhfileprotos = set()
+    self.fnhmatch = set()
+    self.fncppmatch = set()
+
+  def add(self, supports, path):
+    """add the path to correct set based on supports"""
+    if path.suffix == ".h":
+      self.allhfileprotos.add(path.stem)
+    if supports:
+      if path.suffix == ".h":
+        self.fnhmatch.add(path.stem)
+      elif path.suffix == ".cpp":
+        self.fncppmatch.add(path.stem)
+    else:
+      self.fnnomatch.add(path.stem)
+
+  def printwarnings(self):
+    """print warnings"""
+    # all protos with support in .cpp file, when there is a .h file
+    # meaning that the documentation should probably be moved to .h
+    # in the future, with doxygen, that might change
+    if self.fncppmatch & self.allhfileprotos:
+      print("The following files has supports section in .cpp, expected in .h")
+      for path in self.fncppmatch & self.allhfileprotos:
+        print("\t{}".format(path))
+    if self.fncppmatch & self.fnhmatch:
+      print("The following files has supports section in both .h and .cpp")
+      for path in self.fncppmatch & self.fnhmatch:
+        print("\t{}".format(path))
+
 
 def getalldevices():
   """All devices and associated branding and model information (if available)
   """
   allcodes = {}
-  fnnomatch = set()
-  fnmatch = set()
+  sets = FnSets()
   for path in ARGS.directory.iterdir():
     match = ALL_FN.match(path.name)
     if not match:
       continue
     supports = extractsupports(path)
-    if supports:
-      fnmatch.add(path.stem)
-    else:
-      fnnomatch.add(path.stem)
+    sets.add(supports, path)
     protocol = match.group(1)
     for brand, model in supports:
       protocolbrand = (protocol, brand)
-      allcodes[protocolbrand] = allcodes.get(protocolbrand, list()) + [model]
-  nosupports = fnnomatch - fnmatch
+      pbset = allcodes.get(protocolbrand, list())
+      if model in pbset:
+        print("Model %s is duplicated for %s, %s" % (model, protocol, brand))
+      allcodes[protocolbrand] = pbset + [model]
+  nosupports = sets.fnnomatch - sets.fnhmatch - sets.fncppmatch
+
+  sets.printwarnings()
+
   for fnprotocol in nosupports:
     allcodes[(fnprotocol[3:], "Unknown")] = []
   return allcodes, nosupports
@@ -224,6 +260,12 @@ def extractsupports(path):
       else:
         insupports = False
         continue
+    # search and inform about any legacy formated supports data
+    elif any(x in line for x in [ \
+             "seems compatible with",
+             "be compatible with",
+             "it working with here"]):
+      print("\t%s Legacy supports format found\n\t\t%s" % (path.name, line))
   return supports
 
 
@@ -291,15 +333,13 @@ def generate(fout):
       print("\t{}".format(path))
 
 def generatestdout():
-  """Standard out write
-  """
+  """Standard out write"""
   fout = sys.stdout
   fout.write(getmarkdownheader())
   generate(fout)
 
 def generatefile():
-  """Standard out write
-  """
+  """File write, extra detection of changes in existing file"""
   # get file path
   foutpath = getmdfile()
   if ARGS.verbose:
