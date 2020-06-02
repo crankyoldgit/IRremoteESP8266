@@ -135,7 +135,7 @@ def getalldevices():
       allcodes[protocolbrand] = allcodes.get(protocolbrand, list()) + [model]
   nosupports = fnnomatch - fnhmatch - fncppmatch
 
-  #all protos with support in .cpp file, when there is a .h file
+  # all protos with support in .cpp file, when there is a .h file
   # meaning that the documentation should probably be moved to .h
   # in the future, with doxygen, that might change
   print("The following files has supports section in .cpp, expected in .h")
