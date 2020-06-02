@@ -132,7 +132,10 @@ def getalldevices():
     protocol = match.group(1)
     for brand, model in supports:
       protocolbrand = (protocol, brand)
-      allcodes[protocolbrand] = allcodes.get(protocolbrand, list()) + [model]
+      pbset = allcodes.get(protocolbrand, list())
+      if model in pbset:
+        print("Model %s is duplicated for %s, %s" % (model, protocol, brand))
+      allcodes[protocolbrand] = pbset + [model]
   nosupports = fnnomatch - fnhmatch - fncppmatch
 
   # all protos with support in .cpp file, when there is a .h file
