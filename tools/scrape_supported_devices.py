@@ -112,21 +112,36 @@ def getalldevices():
   """
   allcodes = {}
   fnnomatch = set()
-  fnmatch = set()
+  allhfileprotos = set()
+  fnhmatch = set()
+  fncppmatch = set()
   for path in ARGS.directory.iterdir():
     match = ALL_FN.match(path.name)
     if not match:
       continue
+    if path.suffix == ".h":
+      allhfileprotos.add(path.stem)
     supports = extractsupports(path)
     if supports:
-      fnmatch.add(path.stem)
+      if path.suffix == ".h":
+        fnhmatch.add(path.stem)
+      elif path.suffix == ".cpp":
+        fncppmatch.add(path.stem)
     else:
       fnnomatch.add(path.stem)
     protocol = match.group(1)
     for brand, model in supports:
       protocolbrand = (protocol, brand)
       allcodes[protocolbrand] = allcodes.get(protocolbrand, list()) + [model]
-  nosupports = fnnomatch - fnmatch
+  nosupports = fnnomatch - fnhmatch - fncppmatch
+
+  #all protos with support in .cpp file, when there is a .h file
+  # meaning that the documentation should probably be moved to .h
+  # in the future, with doxygen, that might change
+  print("The following files has supports section in .cpp, expected in .h")
+  for path in fncppmatch & allhfileprotos:
+    print("\t{}".format(path))
+
   for fnprotocol in nosupports:
     allcodes[(fnprotocol[3:], "Unknown")] = []
   return allcodes, nosupports
@@ -224,6 +239,12 @@ def extractsupports(path):
       else:
         insupports = False
         continue
+    # search and inform about any legacy formated supports data
+    elif any(x in line for x in [ \
+             "seems compatible with",
+             "be compatible with",
+             "it working with here"]):
+      print("\t%s Legacy supports format found\n\t\t%s" % (path.name, line))
   return supports
 
 
@@ -291,15 +312,13 @@ def generate(fout):
       print("\t{}".format(path))
 
 def generatestdout():
-  """Standard out write
-  """
+  """Standard out write"""
   fout = sys.stdout
   fout.write(getmarkdownheader())
   generate(fout)
 
 def generatefile():
-  """Standard out write
-  """
+  """File write, extra detection of changes in existing file"""
   # get file path
   foutpath = getmdfile()
   if ARGS.verbose:
