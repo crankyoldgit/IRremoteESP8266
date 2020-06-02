@@ -10,6 +10,7 @@ install:
   - sudo apt-get install jq
   - sudo apt-get purge python-enum34
   - sudo apt-get install pylint3
+  - sudo apt-get install doxygen
   - sudo pip install platformio
   - pio update
 script: echo Running checks
@@ -29,7 +30,7 @@ jobs:
       # Check that everything else compiles.
       # i.e. We are splitting the work load in to parallel tasks.
       - find . -regextype egrep -name platformio.ini -type f -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
-    - name: "Unit tests & Linter checks"
+    - name: "Unit tests, Linter, & Documentation checks"
       script:
       # Run all the Tests & check the code linters have no issues.
       # i.e. We are splitting the work load in to parallel tasks.
@@ -49,3 +50,5 @@ jobs:
       - (cd tools; make run_tests)
       # Check that every example directory has a platformio.ini file.
       - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
+      # Check that doxygen completes without errors or warnings.
+      - (DOXYGEN_OUTPUT=$(doxygen 2>&1); if [[ $? -ne 0 || -n "${DOXYGEN_OUTPUT}" ]]; then echo "${DOXYGEN_OUTPUT}"; exit 1; fi)
