@@ -312,7 +312,7 @@ void IRCarrierAc64::setPower(const bool on) {
   setBit(&remote_state, kCarrierAc64PowerOffset, on);
 }
 
-/// Gte the value of the current power setting.
+/// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRCarrierAc64::getPower(void) {
   return GETBIT64(remote_state, kCarrierAc64PowerOffset);
