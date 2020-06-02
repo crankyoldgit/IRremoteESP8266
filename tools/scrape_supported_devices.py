@@ -138,9 +138,14 @@ def getalldevices():
   # all protos with support in .cpp file, when there is a .h file
   # meaning that the documentation should probably be moved to .h
   # in the future, with doxygen, that might change
-  print("The following files has supports section in .cpp, expected in .h")
-  for path in fncppmatch & allhfileprotos:
-    print("\t{}".format(path))
+  if fncppmatch & allhfileprotos:
+    print("The following files has supports section in .cpp, expected in .h")
+    for path in fncppmatch & allhfileprotos:
+      print("\t{}".format(path))
+  if fncppmatch & fnhmatch:
+    print("The following files has supports section in both .h and .cpp")
+    for path in fncppmatch & fnhmatch:
+      print("\t{}".format(path))
 
   for fnprotocol in nosupports:
     allcodes[(fnprotocol[3:], "Unknown")] = []
