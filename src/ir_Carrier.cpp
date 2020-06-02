@@ -4,14 +4,6 @@
 /// @see CarrierAc https://github.com/crankyoldgit/IRremoteESP8266/issues/385
 /// @see CarrierAc64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 
-// Supports:
-//   Brand: Carrier/Surrey,  Model: 42QG5A55970 remote
-//   Brand: Carrier/Surrey,  Model: 619EGX0090E0 A/C
-//   Brand: Carrier/Surrey,  Model: 619EGX0120E0 A/C
-//   Brand: Carrier/Surrey,  Model: 619EGX0180E0 A/C
-//   Brand: Carrier/Surrey,  Model: 619EGX0220E0 A/C
-//   Brand: Carrier/Surrey,  Model: 53NGK009/012 Inverter
-
 #include "ir_Carrier.h"
 #include <algorithm>
 #include "IRac.h"

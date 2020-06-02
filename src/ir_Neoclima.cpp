@@ -8,11 +8,6 @@
 //    https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 //    https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
 
-
-// Supports:
-//   Brand: Neoclima,  Model: NS-09AHTI A/C
-//   Brand: Neoclima,  Model: ZH/TY-01 remote
-
 #include "ir_Neoclima.h"
 #include <algorithm>
 #include <cstring>

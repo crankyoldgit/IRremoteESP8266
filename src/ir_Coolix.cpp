@@ -15,14 +15,6 @@
 #include "IRtext.h"
 #include "IRutils.h"
 
-// Supports:
-//   Brand: Beko, Model: RG57K7(B)/BGEF Remote
-//   Brand: Beko, Model: BINR 070/071 split-type A/C
-//   Brand: Midea, Model: RG52D/BGE Remote
-//   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
-//   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
-//   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
-
 // Constants
 // Pulse parms are *50-100 for the Mark and *50+100 for the space
 // First MARK is the one after the long gap
