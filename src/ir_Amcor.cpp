@@ -5,11 +5,6 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/385
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/834
 
-// Supports:
-//   Brand: Amcor,  Model: ADR-853H A/C
-//   Brand: Amcor,  Model: TAC-495 remote
-//   Brand: Amcor,  Model: TAC-444 remote
-
 #include "ir_Amcor.h"
 #include <algorithm>
 #include <cstring>

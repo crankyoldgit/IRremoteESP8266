@@ -4,6 +4,10 @@
 
 // Analysis by crankyoldgit & AndreyShpilevoy
 
+// Supports:
+//   Brand: Neoclima,  Model: NS-09AHTI A/C
+//   Brand: Neoclima,  Model: ZH/TY-01 remote
+
 #ifndef IR_NEOCLIMA_H_
 #define IR_NEOCLIMA_H_
 
@@ -17,10 +21,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Supports:
-//   Brand: Neoclima,  Model: NS-09AHTI A/C
-//   Brand: Neoclima,  Model: ZH/TY-01 remote
 
 // Ref:
 //  https://github.com/crankyoldgit/IRremoteESP8266/issues/764

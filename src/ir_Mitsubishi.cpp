@@ -426,8 +426,6 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
 //
 // Warning: Consider this very alpha code. Seems to work, but not validated.
 //
-// Equipment it seems compatible with:
-//  * <Add models (A/C & remotes) you've gotten it working with here>
 // Initialise the object.
 IRMitsubishiAC::IRMitsubishiAC(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
@@ -867,11 +865,6 @@ bool IRrecv::decodeMitsubishi136(decode_results *results, uint16_t offset,
 #endif  // DECODE_MITSUBISHI136
 
 // Code to emulate Mitsubishi 136bit A/C IR remote control unit.
-//
-// Equipment it seems compatible with:
-//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
-//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
-
 // Initialise the object.
 IRMitsubishi136::IRMitsubishi136(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
@@ -1265,11 +1258,6 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, uint16_t offset,
 #endif  // DECODE_MITSUBISHI112 || DECODE_TCL112AC
 
 // Code to emulate Mitsubishi 112bit A/C IR remote control unit.
-//
-// Equipment it seems compatible with:
-//   Brand: Mitsubishi Electric,  Model: MSH-A24WV / MUH-A24WV A/C
-//   Brand: Mitsubishi Electric,  Model: KPOA remote
-
 // Initialise the object.
 IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)

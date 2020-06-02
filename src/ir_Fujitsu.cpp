@@ -1,5 +1,8 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2017-2019 David Conran
+
+// Fujitsu A/C support added by Jonny Graham & David Conran
+
 #include "ir_Fujitsu.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -8,16 +11,6 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Fujitsu A/C support added by Jonny Graham & David Conran
-
-// Equipment it seems compatible with:
-//  * Fujitsu ASYG30LFCA with remote AR-RAH2E
-//  * Fujitsu AST9RSGCW with remote AR-DB1
-//  * Fujitsu ASYG7LMCA with remote AR-REB1E
-//  * Fujitsu AR-RAE1E remote.
-//  * Fujitsu General with remote AR-JW2
-//  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Ref:
 // These values are based on averages of measurements

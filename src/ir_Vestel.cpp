@@ -15,10 +15,6 @@
 #include "IRutils.h"
 #include "ir_Haier.h"
 
-// Equipment it seems compatible with:
-//  * Vestel AC Model BIOX CXP-9 (9K BTU)
-//  * <Add models (A/C & remotes) you've gotten it working with here>
-
 // Ref:
 //   None. Totally reverse engineered.
 
