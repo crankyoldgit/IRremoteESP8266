@@ -3,11 +3,11 @@
 
 // Supports:
 //   Brand: Fujitsu,  Model: AR-RAH2E remote
-//   Brand: Fujitsu,  Model: ASYG30LFCA A/C
+//   Brand: Fujitsu,  Model: ASYG30LFCA A/C (ARRAH2E)
 //   Brand: Fujitsu,  Model: AR-DB1 remote
-//   Brand: Fujitsu,  Model: AST9RSGCW A/C
+//   Brand: Fujitsu,  Model: AST9RSGCW A/C (ARDB1)
 //   Brand: Fujitsu,  Model: AR-REB1E remote
-//   Brand: Fujitsu,  Model: ASYG7LMCA A/C
+//   Brand: Fujitsu,  Model: ASYG7LMCA A/C (ARREB1E)
 //   Brand: Fujitsu,  Model: AR-RAE1E remote
 //   Brand: Fujitsu,  Model: AGTV14LAC A/C
 //   Brand: Fujitsu,  Model: AR-RAC1E remote
