@@ -1,5 +1,15 @@
 // Copyright 2018 David Conran
-// Lutron
+
+/// @file
+/// @brief Lutron
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/515
+/// @see http://www.lutron.com/TechnicalDocumentLibrary/048158.doc
+
+// Supports:
+//   Brand: Lutron,  Model: SP-HT remote
+//   Brand: Lutron,  Model: MIR-ITFS remote
+//   Brand: Lutron,  Model: MIR-ITFS-LF remote
+//   Brand: Lutron,  Model: MIR-ITFS-F remote
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -16,8 +26,6 @@
 //   we only care about the 35 bits of data.
 
 // Constants
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/515
 const uint16_t kLutronTick = 2288;
 const uint32_t kLutronGap = 150000;  // Completely made up value.
 const uint16_t kLutronDelta = 400;   // +/- 300 usecs.
@@ -67,10 +75,6 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
 //
 // Status: STABLE / Working.
 //
-// Notes:
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/515
 bool IRrecv::decodeLutron(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Technically the smallest number of entries for the smallest message is '1'.

@@ -1,6 +1,18 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
 
+/// @file
+/// @brief RC-5 & RC-6 support
+/// @see https://en.wikipedia.org/wiki/RC-5
+/// @see http://www.sbprojects.com/knowledge/ir/rc5.php
+/// @see https://www.sbprojects.net/knowledge/ir/rc6.php
+/// @see http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
+
+// Supports:
+//   Brand: Philips,  Model: Standard RC-5 (RC5)
+//   Brand: Philips,  Model: RC-5X (RC5X)
+//   Brand: Philips,  Model: Standard RC-6 (RC6)
+
 // RC-5 & RC-6 support added from https://github.com/z3t0/Arduino-IRremote
 // RC-5X support added by David Conran
 

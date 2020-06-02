@@ -1,6 +1,13 @@
 // Copyright 2017 David Conran
 
-// Pronto code message generation
+/// @file
+/// @brief Pronto code message generation
+/// @see http://www.etcwiki.org/wiki/Pronto_Infrared_Format
+/// @see http://www.remotecentral.com/features/irdisp2.htm
+/// @see http://harctoolbox.org/Glossary.html#ProntoSemantics
+
+// Supports:
+//   Brand: Pronto,  Model: Pronto Hex
 
 #include <algorithm>
 #include "IRsend.h"

@@ -1,7 +1,12 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
 
-// Nikai
+/// @file
+/// @brief Nikai
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/309
+
+// Supports:
+//   Brand: Nikai,  Model: Unknown LCD TV
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -9,8 +14,6 @@
 #include "IRutils.h"
 
 // Constants
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/309
 const uint16_t kNikaiTick = 500;
 const uint16_t kNikaiHdrMarkTicks = 8;
 const uint16_t kNikaiHdrMark = kNikaiHdrMarkTicks * kNikaiTick;
@@ -34,8 +37,6 @@ const uint16_t kNikaiMinGap = kNikaiMinGapTicks * kNikaiTick;
 //   repeat: The number of times the message is to be repeated.
 //
 // Status: STABLE / Working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/309
 void IRsend::sendNikai(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kNikaiHdrMark, kNikaiHdrSpace, kNikaiBitMark, kNikaiOneSpace,
               kNikaiBitMark, kNikaiZeroSpace, kNikaiBitMark, kNikaiMinGap, data,

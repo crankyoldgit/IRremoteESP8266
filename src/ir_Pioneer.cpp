@@ -3,7 +3,13 @@
 // Copyright 2018 Kamil Palczewski
 // Copyright 2019 s-hadinger
 
-// Pioneer remote emulation
+/// @file
+/// @brief Pioneer remote emulation
+/// @see http://www.adrian-kingston.com/IRFormatPioneer.htm
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/547
+
+// Supports:
+//   Brand: Pioneer,  Model: AV Receivers
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -13,8 +19,6 @@
 #include "IRutils.h"
 
 // Constants
-// Ref:
-//  http://www.adrian-kingston.com/IRFormatPioneer.htm
 const uint16_t kPioneerTick = 534;
 const uint16_t kPioneerHdrMarkTicks = 16;
 const uint16_t kPioneerHdrMark = kPioneerHdrMarkTicks * kPioneerTick;

@@ -2,6 +2,9 @@
 // Copyright 2015 kitlaan
 // Copyright 2017 Jason kendall, David Conran
 
+// Supports:
+//   Brand: MagiQuest,  Model: Wand
+
 #ifndef IR_MAGIQUEST_H_
 #define IR_MAGIQUEST_H_
 
