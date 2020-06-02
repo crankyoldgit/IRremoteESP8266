@@ -78,7 +78,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 // Status: STABLE / Known good.
 //
 // Notes:
-//   NEC protocol has three varients/forms.
+//   NEC protocol has three variants/forms.
 //     Normal:   an 8 bit address & an 8 bit command in 32 bit data form.
 //               i.e. address + inverted(address) + command + inverted(command)
 //     Extended: a 16 bit address & an 8 bit command in 32 bit data form.
