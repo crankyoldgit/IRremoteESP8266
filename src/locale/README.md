@@ -58,7 +58,7 @@ that needs to change for your locale.
 Copy or create a corresponding `#&zwj;define D_STR_HELLOWORLD "Hello World"` in your `xx-YY.h` file, and translate the text appropriately
 e.g. `#&zwj;define D_STR_HELLOWORLD "Bonjour le monde"` (French)
 
-Any values you `#define` in `xx-YY.h` will override the corresponding value in the [defaults.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/defaults.h) file.
+Any values you `#&zwj;define` in `xx-YY.h` will override the corresponding value in the [defaults.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/defaults.h) file.
 
 ### Supporting a dialect/regional variant of another _existing_ language/locale.
 Similar to the previous step, if you only need to modify a small subset of the strings used in another locale file, then include the
