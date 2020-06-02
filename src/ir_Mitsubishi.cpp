@@ -1189,7 +1189,7 @@ void IRsend::sendMitsubishi112(const unsigned char data[],
 // Note: Mitsubishi112 & Tcl112Ac are basically the same protocol.
 //       The only significant difference I can see is Mitsubishi112 has a
 //       slightly longer header mark. We will use that to determine which
-//       varient it should be. The other differences require full decoding and
+//       variant it should be. The other differences require full decoding and
 //       only only with certain settings.
 //       There are some other timing differences too, but the tolerances will
 //       overlap.
