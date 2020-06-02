@@ -14,12 +14,6 @@
 #include "IRtext.h"
 #include "IRutils.h"
 
-// Equipment it seems compatible with:
-//  * Sharp LC-52D62U
-//  * Sharp AH-AxSAY A/C (Remote CRMC-A907 JBEZ)
-//  * <Add models (devices & remotes) you've gotten it working with here>
-//
-
 // Constants
 // period time = 1/38000Hz = 26.316 microseconds.
 // Ref:

@@ -1,5 +1,5 @@
 // Copyright 2017 bwze, crankyoldgit
-// Midea
+// Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
 
 #include "ir_Midea.h"
 #include <algorithm>
@@ -10,13 +10,6 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
-//
-// Equipment it seems compatible with:
-//  * Pioneer System Model RYBO12GMFILCAD (12K BTU)
-//  * Pioneer System Model RUBO18GMFILCAD (18K BTU)
-//  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Ref:
 //   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing

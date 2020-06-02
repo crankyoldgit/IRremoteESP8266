@@ -1,9 +1,6 @@
 // Copyright 2018-2019 David Conran
 //
 // Code to emulate Hitachi protocol compatible devices.
-// Should be compatible with:
-// * Hitachi RAS-35THA6 remote
-//
 
 #include "ir_Hitachi.h"
 #include <algorithm>

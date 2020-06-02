@@ -2,10 +2,6 @@
 // Copyright 2017, 2018 David Conran
 //
 // Code to emulate Gree protocol compatible HVAC devices.
-// Should be compatible with:
-// * Heat pumps carrying the "Ultimate" brand name.
-// * EKOKAI air conditioners.
-//
 
 #include "ir_Gree.h"
 #include <algorithm>

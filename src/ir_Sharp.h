@@ -4,6 +4,7 @@
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C
 //   Brand: Sharp,  Model: AH-AxSAY A/C
+//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote
 //   Brand: Sharp,  Model: AH-XP10NRY A/C
 //   Brand: Sharp,  Model: CRMC-820JBEZ remote
 

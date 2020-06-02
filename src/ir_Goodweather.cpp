@@ -2,9 +2,6 @@
 // Copyright 2019 David Conran
 //
 // Code to emulate Goodweather protocol compatible HVAC devices.
-// Should be compatible with:
-// * ZH/JT-03 remote control
-//
 
 #include "ir_Goodweather.h"
 #include <algorithm>

@@ -1,11 +1,6 @@
 // Copyright 2018 David Conran
 //
 // Code to emulate Whirlpool protocol compatible devices.
-// Should be compatible with:
-// * SPIS409L, SPIS412L, SPIW409L, SPIW412L, SPIW418L
-// Remotes:
-// * DG11J1-3A / DG11J1-04
-// * DG11J1-91
 //
 // Note: Smart, iFeel, AroundU, PowerSave, & Silent modes are unsupported.
 //       Advanced 6thSense, Dehumidify, & Sleep modes are not supported.
