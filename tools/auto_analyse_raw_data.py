@@ -410,9 +410,9 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
   code["sendcomhead"].extend([
       "",
       "#if SEND_%s" % def_name.upper(),
+      SAFE64NOTE,
       "/// Send a %s formatted message." % name,
-      "/// Status: ALPHA / Untested.",
-      SAFE64NOTE])
+      "/// Status: ALPHA / Untested."])
   code["send"].extend([
       "/// @param[in] data containing the IR command.",
       "/// @param[in] nbits Nr. of bits to send. usually k%sBits" % name,
@@ -423,7 +423,6 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint64_t send_data = data;"])
   code["send64+"].extend([
-      "/// Alternative >64bit function to send %s messages" % def_name.upper(),
       "/// @param[in] data An array of bytes containing the IR command.",
       "///                 It is assumed to be in MSB order for this code.",
       "/// e.g.",
@@ -444,9 +443,9 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
   code["recvcomhead"].extend([
       "",
       "#if DECODE_%s" % def_name.upper(),
+      SAFE64NOTE,
       "/// Decode the supplied %s message." % name,
       "/// Status: ALPHA / Untested.",
-      SAFE64NOTE,
       "/// @param[in,out] results Ptr to the data to decode &"
       " where to store the decode",
       "/// @param[in] offset The starting index to use when"
@@ -665,13 +664,14 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   # oddities in it.
   for line in code["sendcomhead"] + code["send"] + code["sendcomfoot"]:
     if line == SAFE64NOTE:
-      line = "/// @note Function should be safe up to 64 bits."
+      line = "// Function should be safe up to 64 bits."
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
     for line in code["sendcomhead"] + code["send64+"] + code["sendcomfoot"]:
       if line == SAFE64NOTE:
-        line = "/// @note Function should be safe over 64 bits."
+        line = "// Alternative >64bit function to send %s messages\n" % \
+            def_name.upper() + "// Function should be safe over 64 bits."
       elif line == CODEGEN:
         line = "///   uint8_t data[k%sStateLength] = {0x%s};" % (
             name, ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
@@ -685,7 +685,7 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   # oddities in it.
   for line in code["recvcomhead"] + code["recv"] + code["recvcomfoot"]:
     if line == SAFE64NOTE:
-      line = "/// @note Function should be safe up to 64 bits."
+      line = "// Function should be safe up to 64 bits."
     output.write("%s\n" % line)
 
   # Display the > 64bit version's decode code
@@ -695,7 +695,7 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                    "This won't work!\n")
     for line in code["recvcomhead"] + code["recv64+"] + code["recvcomfoot"]:
       if line == SAFE64NOTE:
-        line = "/// @note Function should be safe over 64 bits."
+        line = "// Function should be safe over 64 bits."
       output.write("%s\n" % line)
 
 def add_rawdata_args(parser):
