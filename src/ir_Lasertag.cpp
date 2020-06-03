@@ -1,5 +1,11 @@
 // Copyright 2017 David Conran
-// Lasertag
+
+/// @file
+/// @brief Lasertag
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/366
+
+// Supports:
+//   Brand: Lasertag,  Model: Phaser emitters
 
 #include <algorithm>
 #include "IRrecv.h"

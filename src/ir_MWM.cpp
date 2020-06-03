@@ -1,8 +1,12 @@
 // Copyright 2018 Brett T. Warden
-
-// MWM
-
 // derived from ir_Lasertag.cpp, Copyright 2017 David Conran
+
+/// @file
+/// @brief Disney Made With Magic (MWM) Support
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/557
+
+// Supports:
+//   Brand: Disney,  Model: Made With Magic (Glow With The Show) wand
 
 #include <algorithm>
 #include "IRrecv.h"
