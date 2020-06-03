@@ -1,5 +1,12 @@
 // Copyright 2018 David Conran
-// G.I. Cable
+
+/// @file
+/// @brief G.I. Cable
+/// @see https://github.com/cyborg5/IRLib2/blob/master/IRLibProtocols/IRLib_P09_GICable.h
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/447
+
+// Supports:
+//   Brand: G.I. Cable,  Model: XRC-200 remote
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -7,10 +14,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-// Ref:
-//   https://github.com/cyborg5/IRLib2/blob/master/IRLibProtocols/IRLib_P09_GICable.h
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/447
 
 // Constants
 const uint16_t kGicableHdrMark = 9000;

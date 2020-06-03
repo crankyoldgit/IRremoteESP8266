@@ -2,6 +2,15 @@
 // Copyright 2016 marcosamarinho
 // Copyright 2017 David Conran
 
+/// @file
+/// @brief Sanyo
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
+/// @see http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+
+// Supports:
+//   Brand: Sanyo,  Model: SA 8650B - disabled
+//   Brand: Sanyo,  Model: LC7461 transmitter IC (SANYO_LC7461)
+
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"

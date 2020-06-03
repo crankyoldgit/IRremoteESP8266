@@ -1,5 +1,12 @@
 // Copyright 2016 Massimiliano Pinto
 // Copyright 2017 David Conran
+/// @file
+/// @brief Denon support
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+/// @see http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
+
+// Supports:
+//   Brand: Denon, Model: AVR-3801 A/V Receiver (probably)
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -10,8 +17,6 @@
 // Ported over by Massimiliano Pinto
 
 // Constants
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 const uint16_t kDenonTick = 263;
 const uint16_t kDenonHdrMarkTicks = 1;
 const uint16_t kDenonHdrMark = kDenonHdrMarkTicks * kDenonTick;
@@ -45,9 +50,6 @@ const uint64_t kDenonManufacturer = 0x2A4CULL;
 // Notes:
 //   Some Denon devices use a Kaseikyo/Panasonic 48-bit format
 //   Others use the Sharp protocol.
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
-//   http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
 void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits >= kPanasonicBits)  // Is this really Panasonic?
     sendPanasonic64(data, nbits, repeat);
