@@ -1,6 +1,6 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
-// Copyright 2018-2019 crankyoldgit
+// Copyright 2018-2020 crankyoldgit
 // Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
 /// @file
