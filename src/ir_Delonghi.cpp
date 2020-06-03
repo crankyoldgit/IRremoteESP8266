@@ -370,7 +370,7 @@ void IRDelonghiAc::setOnTimerEnabled(const bool on) {
   setBit(&remote_state, kDelonghiAcOnTimerEnableBit, on);
 }
 
-/// Get the enable status of the On TImer.
+/// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
 bool IRDelonghiAc::getOnTimerEnabled(void) {
   return GETBIT64(remote_state, kDelonghiAcOnTimerEnableBit);
@@ -404,7 +404,7 @@ void IRDelonghiAc::setOffTimerEnabled(const bool on) {
   setBit(&remote_state, kDelonghiAcOffTimerEnableBit, on);
 }
 
-/// Get the enable status of the Off TImer.
+/// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
 bool IRDelonghiAc::getOffTimerEnabled(void) {
   return GETBIT64(remote_state, kDelonghiAcOffTimerEnableBit);

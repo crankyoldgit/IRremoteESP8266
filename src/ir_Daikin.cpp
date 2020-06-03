@@ -2947,7 +2947,7 @@ void IRDaikin128::setOnTimerEnabled(const bool on) {
          on);
 }
 
-/// Get the enable status of the On TImer.
+/// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getOnTimerEnabled(void) {
   return GETBIT8(remote_state[kDaikin128ByteOnTimer],
