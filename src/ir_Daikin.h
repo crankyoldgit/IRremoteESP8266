@@ -213,6 +213,7 @@ const uint16_t kDaikinGap = 29000;
 const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
+
 const uint16_t kDaikin2Freq = 36700;  // Modulation Frequency in Hz.
 const uint16_t kDaikin2LeaderMark = 10024;
 const uint16_t kDaikin2LeaderSpace = 25180;
@@ -269,6 +270,7 @@ const uint8_t kDaikin2SwingHSwing =    0xBF;
 
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
+
 const uint16_t kDaikin216Freq = 38000;  // Modulation Frequency in Hz.
 const uint16_t kDaikin216HdrMark = 3440;
 const uint16_t kDaikin216HdrSpace = 1750;
@@ -298,6 +300,7 @@ const uint8_t kDaikin216SwingOff = 0b0000;
 const uint8_t kDaikin216ByteSwingH = 17;
 const uint8_t kDaikin216BytePowerful = 21;
 
+
 const uint16_t kDaikin160Freq = 38000;  // Modulation Frequency in Hz.
 const uint16_t kDaikin160HdrMark = 5000;
 const uint16_t kDaikin160HdrSpace = 2145;
@@ -326,6 +329,7 @@ const uint8_t kDaikin160SwingVMiddle =  0x3;
 const uint8_t kDaikin160SwingVHigh =    0x4;
 const uint8_t kDaikin160SwingVHighest = 0x5;
 const uint8_t kDaikin160SwingVAuto =    0xF;
+
 
 const uint16_t kDaikin176Freq = 38000;  // Modulation Frequency in Hz.
 const uint16_t kDaikin176HdrMark = 5070;
@@ -445,6 +449,7 @@ const uint8_t kDaikin152ComfortByte = kDaikin152EconoByte;   // Mask 0b00000010
 const uint8_t kDaikin152ComfortOffset = 1;                   // Mask 0b00000010
 const uint8_t kDaikin152SensorByte = kDaikin152EconoByte;    // Mask 0b00001000
 const uint8_t kDaikin152SensorOffset = 3;                    // Mask 0b00001000
+
 
 const uint16_t kDaikin64HdrMark = kDaikin128HdrMark;
 const uint16_t kDaikin64BitMark = kDaikin128BitMark;
