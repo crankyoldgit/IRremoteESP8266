@@ -65,6 +65,7 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 bool IRrecv::decodeDenon(decode_results *results, uint16_t offset,
                          const uint16_t nbits, const bool strict) {

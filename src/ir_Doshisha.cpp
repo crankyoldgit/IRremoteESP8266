@@ -83,7 +83,7 @@ uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return true if successfully decoded, otherwise false.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeDoshisha(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   if (strict && nbits != kDoshishaBits)
