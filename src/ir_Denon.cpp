@@ -2,6 +2,8 @@
 // Copyright 2017 David Conran
 /// @file
 /// @brief Denon support
+/// Original Denon support added by https://github.com/csBlueChip
+/// Ported over by Massimiliano Pinto
 /// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 /// @see http://assets.denon.com/documentmaster/us/denon%20master%20ir%20hex.xls
 
@@ -13,8 +15,6 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-// Original Denon support added by https://github.com/csBlueChip
-// Ported over by Massimiliano Pinto
 
 // Constants
 const uint16_t kDenonTick = 263;
@@ -38,18 +38,13 @@ const uint32_t kDenonMinGap = kDenonMinGapTicks * kDenonTick;
 const uint64_t kDenonManufacturer = 0x2A4CULL;
 
 #if SEND_DENON
-// Send a Denon message
-//
-// Args:
-//   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically kDenonBits.
-//   repeat: Nr. of additional times the message is to be sent.
-//
-// Status: STABLE / Should be working.
-//
-// Notes:
-//   Some Denon devices use a Kaseikyo/Panasonic 48-bit format
-//   Others use the Sharp protocol.
+/// Send a Denon formatted message.
+/// Status: STABLE / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note Some Denon devices use a Kaseikyo/Panasonic 48-bit format
+///   Others use the Sharp protocol.
 void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits >= kPanasonicBits)  // Is this really Panasonic?
     sendPanasonic64(data, nbits, repeat);
@@ -62,21 +57,16 @@ void IRsend::sendDenon(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif
 
 #if DECODE_DENON
-// Decode a Denon message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Expected nr. of data bits. (Typically kDenonBits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Should work fine.
-//
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
+/// Decode the supplied Delonghi A/C message.
+/// Status: STABLE / Should work fine.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Denon.cpp
 bool IRrecv::decodeDenon(decode_results *results, uint16_t offset,
                          const uint16_t nbits, const bool strict) {
   // Compliance

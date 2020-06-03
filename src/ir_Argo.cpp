@@ -311,7 +311,7 @@ uint8_t IRArgoAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a tdAc::swingv_t enum into it's native setting.
+/// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
 /// @return The native equivilant of the enum.
 uint8_t IRArgoAC::convertSwingV(const stdAc::swingv_t position) {

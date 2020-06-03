@@ -1,17 +1,18 @@
 // Copyright 2020 Christian (nikize)
-// Support for Doshisha protocol
-
-#include "IRrecv.h"
-#include "IRsend.h"
-#include "IRutils.h"
+/// @file
+/// @brief Doshisha protocol support
+/// @see https://www.doshisha-led.com/
 
 // Supports:
 //   Brand: Doshisha,  Model: CZ-S32D LED Light
 //   Brand: Doshisha,  Model: CZ-S38D LED Light
 //   Brand: Doshisha,  Model: CZ-S50D LED Light
 //   Brand: Doshisha,  Model: RCZ01 remote
-//
-// Ref: https://www.doshisha-led.com/
+
+#include "IRrecv.h"
+#include "IRsend.h"
+#include "IRutils.h"
+
 
 const uint16_t kDoshishaHdrMark = 3412;
 const uint16_t kDoshishaHdrSpace = 1722;
@@ -46,15 +47,11 @@ const uint8_t  kRcz01CommandNightLight =     0xC8;
 // end Known commands
 
 #if SEND_DOSHISHA
-// Send an Doshisha formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kDelonghiAcBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: STABLE / working on a real device.
+/// Send a Doshisha formatted message.
+/// Status: STABLE / working on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendDoshisha(const uint64_t data, const uint16_t nbits,
                           const uint16_t repeat) {
   sendGeneric(kDoshishaHdrMark, kDoshishaHdrSpace,
@@ -64,13 +61,11 @@ void IRsend::sendDoshisha(const uint64_t data, const uint16_t nbits,
               data, nbits, kDoshishaFreq, true, repeat, kDutyDefault);
 }
 
-// Encode Doshisha combining constant values with command and channel.
-//
-// Args:
-//   command: The commandcode to be sent.
-//   channel: The one bit channel 0 for CH1 and 1 for CH2
-//
-// Status: STABLE / Working.
+/// Encode Doshisha combining constant values with command and channel.
+/// Status: STABLE / Working.
+/// @param[in] command The command code to be sent.
+/// @param[in] channel The one bit channel 0 for CH1 and 1 for CH2
+/// @return The corresponding Doshisha code.
 uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
   uint64_t data = kRcz01CheckExpected |
     (command & kRcz01CommandMask) |
@@ -80,18 +75,15 @@ uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
 #endif  // SEND_DOSHISHA
 
 #if DECODE_DOSHISHA
-// Decode the supplied Doshisha message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kDelonghiAcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Expected to be working.
+/// Decode the supplied Doshisha message.
+/// Status: STABLE / Expected to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeDoshisha(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   if (strict && nbits != kDoshishaBits)

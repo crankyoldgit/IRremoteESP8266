@@ -292,7 +292,7 @@ void IRCarrierAc64::setTemp(const uint8_t temp) {
 }
 
 /// Get the current temperature from the internal state.
-/// @return The current temperatue in Celsius.
+/// @return The current temperature in Celsius.
 uint8_t IRCarrierAc64::getTemp(void) {
   return GETBITS64(remote_state, kCarrierAc64TempOffset, kCarrierAc64TempSize) +
       kCarrierAc64MinTemp;

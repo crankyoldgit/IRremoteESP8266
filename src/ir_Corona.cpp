@@ -297,7 +297,7 @@ void IRCoronaAc::setTemp(const uint8_t temp) {
 }
 
 /// Get the current temperature from the internal state.
-/// @return The current temperatue in Celsius.
+/// @return The current temperature in Celsius.
 uint8_t IRCoronaAc::getTemp(void) {
   return GETBITS8(remote_state[kCoronaAcSectionData1Pos], kCoronaAcTempOffset,
                   kCoronaAcTempSize) + kCoronaAcMinTemp - 1;
