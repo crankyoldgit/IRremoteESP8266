@@ -1,6 +1,9 @@
 // Copyright 2016 David Conran
-// Gree A/C
-//
+
+/// @file
+/// @brief Support for Gree A/C protocols.
+/// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/GreeHeatpumpIR.h
+
 // Supports:
 //   Brand: Ultimate,  Model: Heat Pump
 //   Brand: EKOKAI,  Model: A/C
@@ -110,16 +113,19 @@ const uint8_t kGreeDisplayTempOutside =                0b11;  // 3
 #define GREE_SWING_UP_AUTO kGreeSwingUpAuto
 
 // Classes
+/// Class for handling detailed Gree A/C messages.
 class IRGreeAC {
  public:
   explicit IRGreeAC(
       const uint16_t pin,
       const gree_ac_remote_model_t model = gree_ac_remote_model_t::YAW1F,
       const bool inverted = false, const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_GREE
   void send(const uint16_t repeat = kGreeDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GREE
   void begin(void);
@@ -171,12 +177,13 @@ class IRGreeAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else  // UNIT_TEST
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif  // UNIT_TEST
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kGreeStateLength];
+  uint8_t remote_state[kGreeStateLength];  ///< The state in native IR code form
   gree_ac_remote_model_t _model;
   void checksum(const uint16_t length = kGreeStateLength);
   void fixup(void);
