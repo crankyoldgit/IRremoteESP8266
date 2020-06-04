@@ -1,18 +1,23 @@
 // Copyright 2015 Kristian Lauszus
 // Copyright 2017 David Conran
 
+/// @file
+/// @brief JVC
+/// @see http://www.sbprojects.com/knowledge/ir/jvc.php
+
+// Supports:
+//   Brand: JVC,  Model: PTU94023B remote
+
+// originally added by Kristian Lauszus
+// (Thanks to zenwheel and other people at the original blog post)
+
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtimer.h"
 #include "IRutils.h"
 
-// JVC originally added by Kristian Lauszus
-// (Thanks to zenwheel and other people at the original blog post)
-
 // Constants
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/jvc.php
 const uint16_t kJvcTick = 75;
 const uint16_t kJvcHdrMarkTicks = 112;
 const uint16_t kJvcHdrMark = kJvcHdrMarkTicks * kJvcTick;
