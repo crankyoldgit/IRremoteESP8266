@@ -4,6 +4,9 @@
 /// Epson is an NEC-like protocol, except it doesn't use the NEC style repeat.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
 
+// Supports:
+//   Brand: Epson,  Model: Projector
+
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <algorithm>
