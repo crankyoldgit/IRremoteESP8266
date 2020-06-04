@@ -3,13 +3,11 @@
 
 /// @file
 /// @brief Global Cache IR format sender
+/// Originally added by Hisham Khalifa (http://www.hishamkhalifa.com)
 /// @see https://irdb.globalcache.com/Home/Database
 
 // Supports:
 //   Brand: Global Cache,  Model: Control Tower IR DB
-
-// originally added by Hisham Khalifa
-//   (http://www.hishamkhalifa.com)
 
 #include <algorithm>
 #include "IRsend.h"
