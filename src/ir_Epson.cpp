@@ -5,7 +5,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
 
 // Supports:
-//   Brand: Epson,  Model: Projector
+//   Brand: Epson,  Model: EN-TW9100W Projector
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
