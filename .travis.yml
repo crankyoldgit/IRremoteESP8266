@@ -1,4 +1,14 @@
 language: c
+addons:
+  apt:
+    packages:
+    - jq
+    - doxygen
+    - graphviz
+    - python3
+    - python3-pip
+    - pylint3
+    - python3-setuptools
 env:
   - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"
 cache:
@@ -6,12 +16,9 @@ cache:
     - "~/.platformio"
 before_install:
   - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
-install:
-  - sudo apt-get install jq
-  - sudo apt-get purge python-enum34
-  - sudo apt-get install pylint3
-  - sudo apt-get install doxygen graphviz
-  - sudo pip install platformio
+  - python --version && pip --version
+  - python3 --version && pip3 --version
+  - sudo pip3 install -U platformio
   - pio update
 script: echo Running checks
 notifications:
@@ -52,3 +59,5 @@ jobs:
       - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
       # Check that doxygen completes without errors or warnings.
       - (DOXYGEN_OUTPUT=$(doxygen 2>&1); if [[ $? -ne 0 || -n "${DOXYGEN_OUTPUT}" ]]; then echo "${DOXYGEN_OUTPUT}"; exit 1; fi)
+      # Check that all files has supported sections.
+      - (SUPPORTED_OUTPUT=$(python3 tools/scrape_supported_devices.py --noout --alert 2>&1); if [[ $? -ne 0 || -n "${SUPPORTED_OUTPUT}" ]]; then echo "${SUPPORTED_OUTPUT}"; exit 1; fi)
