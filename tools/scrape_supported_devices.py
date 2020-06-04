@@ -109,6 +109,7 @@ def getallacs():
 class FnSets():
   """Container for getalldevices"""
   def __init__(self):
+    self.allcodes = {}
     self.fnnomatch = set()
     self.allhfileprotos = set()
     self.fnhmatch = set()
@@ -131,20 +132,37 @@ class FnSets():
     # all protos with support in .cpp file, when there is a .h file
     # meaning that the documentation should probably be moved to .h
     # in the future, with doxygen, that might change
-    if self.fncppmatch & self.allhfileprotos:
+    protosincppwithh = list(self.fncppmatch & self.allhfileprotos)
+    if protosincppwithh:
+      protosincppwithh.sort()
       print("The following files has supports section in .cpp, expected in .h")
-      for path in self.fncppmatch & self.allhfileprotos:
+      for path in protosincppwithh:
         print("\t{}".format(path))
-    if self.fncppmatch & self.fnhmatch:
+
+    protosincppandh = list(self.fncppmatch & self.fnhmatch)
+    if protosincppandh:
+      protosincppandh.sort()
       print("The following files has supports section in both .h and .cpp")
-      for path in self.fncppmatch & self.fnhmatch:
+      for path in protosincppandh:
         print("\t{}".format(path))
+
+    nosupports = self.getnosupports()
+    if nosupports:
+      nosupports.sort()
+      print("The following files had no supports section:")
+      for path in nosupports:
+        print("\t{}".format(path))
+
+    return protosincppwithh or protosincppandh or nosupports
+
+  def getnosupports(self):
+    """get protos without supports sections"""
+    return list(self.fnnomatch - self.fnhmatch - self.fncppmatch)
 
 
 def getalldevices():
   """All devices and associated branding and model information (if available)
   """
-  allcodes = {}
   sets = FnSets()
   for path in ARGS.directory.iterdir():
     match = ALL_FN.match(path.name)
@@ -155,17 +173,14 @@ def getalldevices():
     protocol = match.group(1)
     for brand, model in supports:
       protocolbrand = (protocol, brand)
-      pbset = allcodes.get(protocolbrand, list())
+      pbset = sets.allcodes.get(protocolbrand, list())
       if model in pbset:
         print("Model %s is duplicated for %s, %s" % (model, protocol, brand))
-      allcodes[protocolbrand] = pbset + [model]
-  nosupports = sets.fnnomatch - sets.fnhmatch - sets.fncppmatch
+      sets.allcodes[protocolbrand] = pbset + [model]
 
-  sets.printwarnings()
-
-  for fnprotocol in nosupports:
-    allcodes[(fnprotocol[3:], "Unknown")] = []
-  return allcodes, nosupports
+  for fnprotocol in sets.getnosupports():
+    sets.allcodes[(fnprotocol[3:], "Unknown")] = []
+  return sets
 
 
 def getenums(path):
@@ -196,6 +211,12 @@ def initargs():
   global ARGS  # pylint: disable=global-statement
   parser = argparse.ArgumentParser()
   parser.add_argument(
+      "-n",
+      "--noout",
+      help="generate no output data, combine with --alert to only check",
+      action="store_true",
+  )
+  parser.add_argument(
       "-s",
       "--stdout",
       help="output to stdout rather than SupportedProtocols.md",
@@ -208,7 +229,8 @@ def initargs():
   parser.add_argument(
       "-a",
       "--alert",
-      help="alert if a file does not have a supports section",
+      help="alert if a file does not have a supports section, "
+      "non zero exit code if issues where found",
       action="store_true",
   )
   parser.add_argument(
@@ -230,8 +252,7 @@ def initargs():
   return ARGS
 
 def getmdfile():
-  """Resolves SupportedProtocols.md path
-  """
+  """Resolves SupportedProtocols.md path"""
   foutpath = ARGS.directory / "../SupportedProtocols.md"
   return foutpath.resolve()
 
@@ -284,12 +305,13 @@ def outputprotocols(fout, protocols):
 
 def generate(fout):
   """Generate data to fout
-  """
+  return True on any issues (when alert is active)"""
   decodedprotocols = getdecodedprotocols()
   sendonly = getallprotocols() - decodedprotocols
   allacs = getallacs()
 
-  allcodes, nosupports = getalldevices()
+  sets = getalldevices()
+  allcodes = sets.allcodes
   allbrands = list(allcodes.keys())
   allbrands.sort()
 
@@ -325,28 +347,30 @@ def generate(fout):
   fout.write("\n\n## Send & decodable protocols:\n\n")
   outputprotocols(fout, decodedprotocols)
 
-  if ARGS.alert:
-    nosupports = list(nosupports)
-    nosupports.sort()
-    print("The following files had no supports section:")
-    for path in nosupports:
-      print("\t{}".format(path))
+  return ARGS.alert and sets.printwarnings()
+
+def generatenone():
+  """No out write
+  return True on any issues"""
+  return generate(StringIO())
 
 def generatestdout():
-  """Standard out write"""
+  """Standard out write
+  return True on any issues"""
   fout = sys.stdout
   fout.write(getmarkdownheader())
-  generate(fout)
+  return generate(fout)
 
 def generatefile():
-  """File write, extra detection of changes in existing file"""
+  """File write, extra detection of changes in existing file
+  return True on any issues, but only if there is changes"""
   # get file path
   foutpath = getmdfile()
   if ARGS.verbose:
     print("Output path: {}".format(str(foutpath)))
   # write data to temp memorystream
   ftemp = StringIO()
-  generate(ftemp)
+  ret = generate(ftemp)
   # get old filedata, skipping header
   with getmdfile().open("r", encoding="utf-8") as forg:
     olddata = forg.readlines()[3:]
@@ -356,22 +380,27 @@ def generatefile():
   # if new data is same as old we don't need to write anything
   if newdata == olddata:
     print("No changes, exit without write")
-    return
+    return False
   # write output
   with foutpath.open("w", encoding="utf-8") as fout:
     fout.write(getmarkdownheader())
     fout.write(ftemp.getvalue())
 
+  return ret
+
 def main():
-  """Standard boiler plate"""
+  """Default main function
+  return True on any issues"""
   initargs()
   if ARGS.verbose:
     print("Looking for files in: {}".format(str(ARGS.directory.resolve())))
+  if ARGS.noout:
+    return generatenone()
   if ARGS.stdout:
-    generatestdout()
-  else:
-    generatefile()
+    return generatestdout()
+  # default file
+  return generatefile()
 
 
 if __name__ == "__main__":
-  main()
+  sys.exit(1 if main() else 0)
