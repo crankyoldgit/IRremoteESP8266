@@ -1,6 +1,10 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2018-2019 David Conran
 
+/// @file
+/// @brief Support for Fujitsu A/C protocols.
+/// Fujitsu A/C support added by Jonny Graham
+
 // Supports:
 //   Brand: Fujitsu,  Model: AR-RAH2E remote
 //   Brand: Fujitsu,  Model: ASYG30LFCA A/C (ARRAH2E)
@@ -32,7 +36,6 @@
 #include "IRsend_test.h"
 #endif
 
-// FUJITSU A/C support added by Jonny Graham
 
 // Constants
 const uint8_t kFujitsuAcModeAuto = 0x00;
@@ -94,19 +97,21 @@ const uint8_t kFujitsuAcFilterOffset = 3;
 #define FUJITSU_AC_SWING_HORIZ kFujitsuAcSwingHoriz
 #define FUJITSU_AC_SWING_BOTH kFujitsuAcSwingBoth
 
-
+/// Class for handling detailed Fujitsu A/C messages.
 class IRFujitsuAC {
  public:
   explicit IRFujitsuAC(const uint16_t pin,
                        const fujitsu_ac_remote_model_t model = ARRAH2E,
                        const bool inverted = false,
                        const bool use_modulation = true);
-
   void setModel(const fujitsu_ac_remote_model_t model);
   fujitsu_ac_remote_model_t getModel(void);
   void stateReset(void);
 #if SEND_FUJITSU_AC
   void send(const uint16_t repeat = kFujitsuAcMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_FUJITSU_AC
   void begin(void);
@@ -149,11 +154,13 @@ class IRFujitsuAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif
-  uint8_t remote_state[kFujitsuAcStateLength];
+  uint8_t remote_state[kFujitsuAcStateLength];  ///< The state of the IR remote.
   uint8_t _temp;
   uint8_t _fanSpeed;
   uint8_t _mode;
