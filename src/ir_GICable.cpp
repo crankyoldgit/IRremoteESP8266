@@ -34,7 +34,6 @@ const uint32_t kGicableMinGap =
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-/// @note Dishplayer is a different protocol.
 void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kGicableHdrMark, kGicableHdrSpace, kGicableBitMark,
               kGicableOneSpace, kGicableBitMark, kGicableZeroSpace,
