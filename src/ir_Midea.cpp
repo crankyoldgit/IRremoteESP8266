@@ -83,7 +83,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
     }
   }
 }
-#endif
+#endif  // SEND_MIDEA
 
 // Code to emulate Midea A/C IR remote control unit.
 // Warning: Consider this very alpha code.
@@ -451,3 +451,46 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_MIDEA
+
+#if SEND_MIDEA_NEC
+/// Send a Midea NEC-like formatted message.
+/// Status: Alpha / Untested on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   at least a single repeat.
+void IRsend::sendMideaNec(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  sendNEC(data, nbits, repeat);
+}
+#endif  // SEND_MIDEA_NEC
+
+#if DECODE_MIDEA_NEC
+/// Decode the supplied Midea NEC-like message.
+/// Status: Alpha / Needs testing against a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note This protocol is basically a 48-bit version of the NEC protocol.
+bool IRrecv::decodeMideaNec(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  if (strict) {
+    if (nbits != kMideaNecBits) return false;  // Not strictly a MIDEA message.
+  }
+
+  if (!decodeNEC(results, offset, nbits, false)) return false;
+
+  // Success
+  results->decode_type = decode_type_t::MIDEA_NEC;
+  results->bits = nbits;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
+#endif  // DECODE_MIDEA_NEC

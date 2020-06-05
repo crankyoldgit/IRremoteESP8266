@@ -790,3 +790,74 @@ TEST(TestDecodeMidea, Issue887) {
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(hwaddr, irsend.capture.value);
 }
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
+TEST(TestDecodeMideaNec, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+
+  const uint16_t rawData[103] = {
+      8928, 4412, 590, 1630, 588, 538, 538, 544, 610, 516, 592, 516, 590, 538,
+      568, 536, 538, 568, 592, 518, 588, 1630, 588, 1630, 560, 1680, 592, 1628,
+      594, 1628, 592, 1650, 568, 1630, 558, 1680, 594, 1652, 568, 514, 592, 536,
+      538, 568, 594, 516, 588, 538, 566, 518, 560, 566, 588, 514, 594, 1630,
+      588, 1630, 590, 1630, 560, 1680, 594, 1630, 588, 1652, 568, 1650, 540,
+      1680, 590, 512, 594, 518, 586, 538, 566, 538, 536, 568, 592, 540, 564,
+      540, 566, 540, 538, 1680, 590, 1626, 592, 1630, 588, 1628, 538, 1702, 590,
+      1630, 590, 13318, 8916, 2166, 638};  // UNKNOWN 774B249A
+
+  irsend.sendRaw(rawData, 103, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
+  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+}
+
+TEST(TestDecodeMideaNec, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+
+  irsend.sendMideaNec(0x807FC03FC03F);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
+  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(
+      "f38000d33"
+      "m8960s4480"
+      "m560s1680m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s1680m560s1680m560s560m560s560m560s560m560s560m560s560m560s560"
+      "m560s560m560s560m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
+      "m560s22400"
+      "m8960s2240m560s96320",
+      irsend.outputStr());
+}
+
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("MIDEA", typeToString(decode_type_t::MIDEA));
+  ASSERT_EQ(decode_type_t::MIDEA, strToDecodeType("MIDEA"));
+  ASSERT_FALSE(hasACState(decode_type_t::MIDEA));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::MIDEA));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::MIDEA));
+  ASSERT_EQ(kMideaBits, IRsend::defaultBits(decode_type_t::MIDEA));
+
+  ASSERT_EQ("MIDEA_NEC", typeToString(decode_type_t::MIDEA_NEC));
+  ASSERT_EQ(decode_type_t::MIDEA_NEC, strToDecodeType("MIDEA_NEC"));
+  ASSERT_FALSE(hasACState(decode_type_t::MIDEA_NEC));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MIDEA_NEC));
+  ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::MIDEA_NEC));
+  ASSERT_EQ(kMideaBits, IRsend::defaultBits(decode_type_t::MIDEA_NEC));
+}

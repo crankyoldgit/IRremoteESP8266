@@ -466,7 +466,11 @@ class IRsend {
 #if SEND_MIDEA
   void sendMidea(uint64_t data, uint16_t nbits = kMideaBits,
                  uint16_t repeat = kMideaMinRepeat);
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIDEA_NEC
+  void sendMideaNec(const uint64_t data, const uint16_t nbits = kMideaNecBits,
+                    const uint16_t repeat = kMideaNecMinRepeat);
+#endif  // SEND_MIDEA_NEC
 #if SEND_MAGIQUEST
   void sendMagiQuest(uint64_t data, uint16_t nbits = kMagiquestBits,
                      uint16_t repeat = kNoRepeat);

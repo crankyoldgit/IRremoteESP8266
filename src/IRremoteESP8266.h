@@ -369,6 +369,13 @@
 #define SEND_MIDEA             _IR_ENABLE_DEFAULT_
 #endif  // SEND_MIDEA
 
+#ifndef DECODE_MIDEA_NEC
+#define DECODE_MIDEA_NEC       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_MIDEA_NEC
+#ifndef SEND_MIDEA_NEC
+#define SEND_MIDEA_NEC         _IR_ENABLE_DEFAULT_
+#endif  // SEND_MIDEA_NEC
+
 #ifndef DECODE_LASERTAG
 #define DECODE_LASERTAG        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_LASERTAG
@@ -786,8 +793,9 @@ enum decode_type_t {
   CARRIER_AC64,
   HITACHI_AC344,  // 85
   CORONA_AC,
+  MIDEA_NEC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CORONA_AC,
+  kLastDecodeType = MIDEA_NEC,
 };
 
 // Message lengths & required repeat values
@@ -905,6 +913,8 @@ const uint16_t kLutronBits = 35;
 const uint16_t kMagiquestBits = 56;
 const uint16_t kMideaBits = 48;
 const uint16_t kMideaMinRepeat = kNoRepeat;
+const uint16_t kMideaNecBits = 48;
+const uint16_t kMideaNecMinRepeat = kSingleRepeat;
 const uint16_t kMitsubishiBits = 16;
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 //               Based on marcosamarinho's code.

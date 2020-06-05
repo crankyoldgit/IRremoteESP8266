@@ -846,6 +846,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting CoronaAc decode");
     if (decodeCoronaAc(results, offset)) return true;
 #endif  // DECODE_CORONA_AC
+#if DECODE_MIDEA_NEC
+    DPRINTLN("Attempting Midea-Nec decode");
+    if (decodeMideaNec(results, offset)) return true;
+#endif  // DECODE_MIDEA_NEC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
