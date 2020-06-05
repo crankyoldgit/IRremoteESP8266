@@ -645,6 +645,8 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                "// Copyright 2020 David Conran (crankyoldgit)\n"
                "/// @file\n"
                "/// @brief Support for %s protocol\n\n"
+               "// Supports:\n"
+               "//   Brand: %s,  Model: TODO add device and remote\n\n"
                '#include "IRrecv.h"\n'
                '#include "IRsend.h"\n'
                '#include "IRutils.h"\n\n'
@@ -653,7 +655,7 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                "// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/"
                "Adding-support-for-a-new-IR-protocol\n"
                "// for details of how to include this in the library."
-               "\n" % def_name)
+               "\n" % (def_name, def_name))
   for line in defines:
     output.write("%s\n" % line)
 
