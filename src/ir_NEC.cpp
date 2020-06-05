@@ -11,7 +11,8 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
+     SEND_MIDEA_NEC)
 // Send a raw NEC(Renesas) formatted message.
 //
 // Args:
@@ -61,9 +62,11 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
     return (address << 24) + ((address ^ 0xFF) << 16) + command;  // Normal.
   }
 }
-#endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO )
+#endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO ||
+        //  SEND_MIDEA_NEC)
 
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO || \
+     DECODE_MIDEA_NEC)
 // Decode the supplied NEC message.
 //
 // Args:
@@ -145,4 +148,5 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
     results->address = reverseBits((data >> 16) & UINT16_MAX, 16);
   return true;
 }
-#endif  // DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO
+#endif  // (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 ||
+        // DECODE_SANYO || DECODE_MIDEA_NEC)
