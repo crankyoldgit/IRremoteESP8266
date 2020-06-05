@@ -924,3 +924,31 @@ TEST(TestDecodeMideaNec, RealExample2) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 }
+
+// See https://github.com/crankyoldgit/IRremoteESP8266/issues/1170#issuecomment-639468620
+// for why this test exists.
+TEST(TestDecodeMideaNec, LargeTimeout) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused, 1000, 90);  // Test with a large timeout value
+  irsend.begin();
+  irsend.reset();
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1170#issuecomment-639358566
+  const uint16_t rawData639358566[103] = {
+      8920, 4412, 620, 1606, 614, 512, 592, 512, 536, 568, 618, 512, 590, 492,
+      614, 514, 514, 590, 594, 510, 620, 1624, 592, 1604, 590, 1632, 608, 1626,
+      606, 1616, 618, 1602, 618, 1602, 560, 1682, 622, 1602, 618, 512, 592, 510,
+      538, 568, 590, 512, 622, 488, 616, 490, 614, 488, 560, 568, 620, 1624,
+      594, 1604, 616, 1602, 536, 1684, 640, 1600, 618, 1598, 618, 1602, 590,
+      1630, 612, 512, 622, 510, 594, 514, 592, 512, 534, 568, 620, 512, 594,
+      488, 616, 488, 536, 1702, 594, 1622, 622, 1604, 614, 1624, 594, 1602, 610,
+      1630, 620, 13294, 8914, 2184, 596};  // UNKNOWN 774B249A
+  irsend.reset();
+  irsend.sendRaw(rawData639358566, 103, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
+  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+}

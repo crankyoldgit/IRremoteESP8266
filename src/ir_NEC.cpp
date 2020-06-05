@@ -65,8 +65,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 #endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO ||
         //  SEND_MIDEA_NEC)
 
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO || \
-     DECODE_MIDEA_NEC)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
 // Decode the supplied NEC message.
 //
 // Args:
@@ -149,4 +148,4 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 ||
-        // DECODE_SANYO || DECODE_MIDEA_NEC)
+        // DECODE_SANYO)

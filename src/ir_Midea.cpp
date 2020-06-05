@@ -2,6 +2,7 @@
 // Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
 
 #include "ir_Midea.h"
+#include "ir_NEC.h"
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -30,6 +31,7 @@ const uint16_t kMideaMinGapTicks =
     kMideaHdrMarkTicks + kMideaZeroSpaceTicks + kMideaBitMarkTicks;
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
+const uint16_t kMideaNecMinGap = 13000;  ///< uSecs
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -484,7 +486,12 @@ bool IRrecv::decodeMideaNec(decode_results *results, uint16_t offset,
     if (nbits != kMideaNecBits) return false;  // Not strictly a MIDEA message.
   }
 
-  if (!decodeNEC(results, offset, nbits, false)) return false;
+  if (!matchGeneric(results->rawbuf + offset, &(results->value),
+                    results->rawlen - offset, nbits,
+                    kNecHdrMark, kNecHdrSpace,
+                    kNecBitMark, kNecOneSpace,
+                    kNecBitMark, kNecZeroSpace,
+                    kNecBitMark, kMideaNecMinGap, true)) return false;
 
   // Success
   results->decode_type = decode_type_t::MIDEA_NEC;
