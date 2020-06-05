@@ -14,7 +14,6 @@
 //   Brand: Yamaha,   Model: RXV585B A/V Receiver
 //   Brand: Aloka,    Model: SleepyLights LED Lamp
 //   Brand: Toshiba,  Model: 42TL838 LCD TV
-//   Brand: Midea,  Model: FS40-7AR Stand Fan
 
 // Constants
 // Ref:
