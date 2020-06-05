@@ -861,3 +861,30 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::MIDEA_NEC));
   ASSERT_EQ(kMideaBits, IRsend::defaultBits(decode_type_t::MIDEA_NEC));
 }
+
+TEST(TestDecodeMideaNec, RealExample2) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1170#issuecomment-639271003
+  const uint16_t rawData[103] = {
+      8926, 4412, 590, 1630, 536, 570, 608, 518, 594, 516, 588, 518, 588, 538,
+      538, 568, 592, 514, 590, 518, 588, 1630, 536, 1684, 610, 1628, 594, 1630,
+      588, 1630, 590, 1630, 560, 1680, 592, 1630, 588, 1650, 568, 538, 538, 568,
+      590, 514, 594, 538, 566, 518, 536, 594, 584, 516, 594, 518, 586, 1630,
+      588, 1650, 538, 1682, 592, 1630, 588, 1628, 588, 1630, 560, 1680, 590,
+      1626, 594, 538, 566, 538, 568, 536, 538, 570, 590, 538, 566, 538, 568,
+      538, 538, 568, 590, 1626, 594, 1650, 568, 1628, 558, 1662, 558, 1680, 592,
+      1650, 568, 13312, 8924, 2186, 588};  // UNKNOWN 774B249A
+
+  irsend.sendRaw(rawData, 103, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
+  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+}
