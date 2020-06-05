@@ -201,7 +201,7 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   }
   if (state[pos + kCoronaAcSectionHeader1Pos] != kCoronaAcSectionHeader1) {
     DPRINT("State ");
-    DPRINT(pos + kCoronaAcSectionHeaderByte1Pos);
+    DPRINT(pos + kCoronaAcSectionHeader1Pos);
     DPRINT(" expected 0x61 was ");
     DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionHeader1Pos], 16));
     return false;
