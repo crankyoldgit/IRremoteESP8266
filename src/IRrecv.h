@@ -252,7 +252,8 @@ class IRrecv {
                            const bool GEThomas = true);
   void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
+     SEND_MIDEA_NEC)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,
                  const uint16_t nbits = kNECBits, const bool strict = true);
 #endif

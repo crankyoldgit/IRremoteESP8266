@@ -52,7 +52,7 @@
 #endif  // UNIT_TEST
 
 // Library Version
-#define _IRREMOTEESP8266_VERSION_ "2.7.7"
+#define _IRREMOTEESP8266_VERSION_ "2.7.7-DEBUG-Issue1170"
 
 // Set the language & locale for the library. See the `locale` dir for options.
 #ifndef _IR_LOCALE_
@@ -78,7 +78,7 @@
 //      Kelvinator protocol, you would use:
 //        `-DDECODE_KELVINATOR=false`
 #ifndef _IR_ENABLE_DEFAULT_
-#define _IR_ENABLE_DEFAULT_ true  // Unless set externally, the default is on.
+#define _IR_ENABLE_DEFAULT_ false  // Unless set externally, the default is on.
 #endif  // _IR_ENABLE_DEFAULT_
 
 // Supported IR protocols
@@ -370,10 +370,10 @@
 #endif  // SEND_MIDEA
 
 #ifndef DECODE_MIDEA_NEC
-#define DECODE_MIDEA_NEC       _IR_ENABLE_DEFAULT_
+#define DECODE_MIDEA_NEC       true
 #endif  // DECODE_MIDEA_NEC
 #ifndef SEND_MIDEA_NEC
-#define SEND_MIDEA_NEC         _IR_ENABLE_DEFAULT_
+#define SEND_MIDEA_NEC         true
 #endif  // SEND_MIDEA_NEC
 
 #ifndef DECODE_LASERTAG
@@ -1056,7 +1056,7 @@ const uint8_t  kVestelAcBits = 56;
 #define WHYNTER_BITS                  kWhynterBits
 
 // Turn on Debugging information by uncommenting the following line.
-// #define DEBUG 1
+#define DEBUG 1
 
 #ifdef DEBUG
 #ifdef UNIT_TEST
