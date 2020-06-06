@@ -1948,8 +1948,8 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 /// @return True, if accepted/converted/attempted etc. False, if unsupported.
 bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   // Convert the temp from Fahrenheit to Celsius if we are not in Celsius mode.
-  float degC = desired.celsius ? desired.degrees
-                               : fahrenheitToCelsius(desired.degrees);
+  float degC __attribute__((unused)) =
+      desired.celsius ? desired.degrees : fahrenheitToCelsius(desired.degrees);
   // special `state_t` that is required to be sent based on that.
   stdAc::state_t send = this->handleToggles(this->cleanState(desired), prev);
   // Per vendor settings & setup.
