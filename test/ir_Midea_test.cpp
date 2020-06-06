@@ -792,7 +792,7 @@ TEST(TestDecodeMidea, Issue887) {
 }
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
-TEST(TestDecodeMideaNec, RealExample) {
+TEST(TestDecodeMidea24, RealExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
@@ -811,25 +811,25 @@ TEST(TestDecodeMideaNec, RealExample) {
   irsend.sendRaw(rawData, 103, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
-  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
-  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(MIDEA24, irsend.capture.decode_type);
+  EXPECT_EQ(kMidea24Bits, irsend.capture.bits);
+  EXPECT_EQ(0x80C0C0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 }
 
-TEST(TestDecodeMideaNec, SyntheticExample) {
+TEST(TestDecodeMidea24, SyntheticExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
   irsend.reset();
 
-  irsend.sendMideaNec(0x807FC03FC03F);
+  irsend.sendMidea24(0x80C0C0);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
-  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
-  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(MIDEA24, irsend.capture.decode_type);
+  EXPECT_EQ(kMidea24Bits, irsend.capture.bits);
+  EXPECT_EQ(0x80C0C0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(
@@ -854,15 +854,15 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::MIDEA));
   ASSERT_EQ(kMideaBits, IRsend::defaultBits(decode_type_t::MIDEA));
 
-  ASSERT_EQ("MIDEA_NEC", typeToString(decode_type_t::MIDEA_NEC));
-  ASSERT_EQ(decode_type_t::MIDEA_NEC, strToDecodeType("MIDEA_NEC"));
-  ASSERT_FALSE(hasACState(decode_type_t::MIDEA_NEC));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MIDEA_NEC));
-  ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::MIDEA_NEC));
-  ASSERT_EQ(kMideaBits, IRsend::defaultBits(decode_type_t::MIDEA_NEC));
+  ASSERT_EQ("MIDEA24", typeToString(decode_type_t::MIDEA24));
+  ASSERT_EQ(decode_type_t::MIDEA24, strToDecodeType("MIDEA24"));
+  ASSERT_FALSE(hasACState(decode_type_t::MIDEA24));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MIDEA24));
+  ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::MIDEA24));
+  ASSERT_EQ(kMidea24Bits, IRsend::defaultBits(decode_type_t::MIDEA24));
 }
 
-TEST(TestDecodeMideaNec, RealExample2) {
+TEST(TestDecodeMidea24, RealExample2) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
@@ -882,9 +882,9 @@ TEST(TestDecodeMideaNec, RealExample2) {
   irsend.sendRaw(rawData, 103, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
-  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
-  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(MIDEA24, irsend.capture.decode_type);
+  EXPECT_EQ(kMidea24Bits, irsend.capture.bits);
+  EXPECT_EQ(0x80C0C0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 
@@ -902,7 +902,7 @@ TEST(TestDecodeMideaNec, RealExample2) {
   irsend.sendRaw(rawData639349316, 105, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_NE(MIDEA_NEC, irsend.capture.decode_type);
+  EXPECT_NE(MIDEA24, irsend.capture.decode_type);
 
   // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1170#issuecomment-639358566
   const uint16_t rawData639358566[103] = {
@@ -918,16 +918,16 @@ TEST(TestDecodeMideaNec, RealExample2) {
   irsend.sendRaw(rawData639358566, 103, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
-  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
-  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(MIDEA24, irsend.capture.decode_type);
+  EXPECT_EQ(kMidea24Bits, irsend.capture.bits);
+  EXPECT_EQ(0x80C0C0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 }
 
 // See https://github.com/crankyoldgit/IRremoteESP8266/issues/1170#issuecomment-639468620
 // for why this test exists.
-TEST(TestDecodeMideaNec, LargeTimeout) {
+TEST(TestDecodeMidea24, LargeTimeout) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused, 1000, 90);  // Test with a large timeout value
   irsend.begin();
@@ -946,9 +946,9 @@ TEST(TestDecodeMideaNec, LargeTimeout) {
   irsend.sendRaw(rawData639358566, 103, 38);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(MIDEA_NEC, irsend.capture.decode_type);
-  EXPECT_EQ(kMideaNecBits, irsend.capture.bits);
-  EXPECT_EQ(0x807FC03FC03F, irsend.capture.value);
+  EXPECT_EQ(MIDEA24, irsend.capture.decode_type);
+  EXPECT_EQ(kMidea24Bits, irsend.capture.bits);
+  EXPECT_EQ(0x80C0C0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 }

@@ -31,7 +31,7 @@ const uint16_t kMideaMinGapTicks =
     kMideaHdrMarkTicks + kMideaZeroSpaceTicks + kMideaBitMarkTicks;
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
-const uint16_t kMideaNecMinGap = 13000;  ///< uSecs
+const uint16_t kMidea24MinGap = 13000;  ///< uSecs
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -454,24 +454,34 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_MIDEA
 
-#if SEND_MIDEA_NEC
-/// Send a Midea NEC-like formatted message.
-/// Status: Alpha / Untested on a real device.
+#if SEND_MIDEA24
+/// Send a Midea24 formatted message.
+/// Status: STABLE / Confirmed working on a real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
 /// @note This protocol is basically a 48-bit version of the NEC protocol with
-///   at least a single repeat.
-void IRsend::sendMideaNec(const uint64_t data, const uint16_t nbits,
+///   alternate bytes inverted, thus only 24 bits of real data, and with at
+///   least a single repeat.
+/// @warning Can't be used beyond 32 bits.
+void IRsend::sendMidea24(const uint64_t data, const uint16_t nbits,
                           const uint16_t repeat) {
-  sendNEC(data, nbits, repeat);
+  uint64_t newdata = 0;
+  // Construct the data into bye & inverted byte pairs.
+  for (int16_t i = nbits - 8; i >= 0; i -= 8) {
+    // Shuffle the data to be sent so far.
+    newdata <<= 16;
+    uint8_t next = GETBITS64(data, i, 8);
+    newdata |= ((next << 8) | (next ^ 0xFF));
+  }
+  sendNEC(newdata, nbits * 2, repeat);
 }
-#endif  // SEND_MIDEA_NEC
+#endif  // SEND_MIDEA24
 
-#if DECODE_MIDEA_NEC
-/// Decode the supplied Midea NEC-like message.
-/// Status: Alpha / Needs testing against a real device.
+#if DECODE_MIDEA24
+/// Decode the supplied Midea24 message.
+/// Status: STABLE / Confirmed working on a real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -479,25 +489,44 @@ void IRsend::sendMideaNec(const uint64_t data, const uint16_t nbits,
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-/// @note This protocol is basically a 48-bit version of the NEC protocol.
-bool IRrecv::decodeMideaNec(decode_results *results, uint16_t offset,
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   alternate bytes inverted, thus only 24 bits of real data.
+/// @warning Can't be used beyond 32 bits.
+bool IRrecv::decodeMidea24(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
-  if (strict) {
-    if (nbits != kMideaNecBits) return false;  // Not strictly a MIDEA message.
-  }
+  // Not strictly a MIDEA24 message.
+  if (strict && nbits != kMidea24Bits) return false;
+  if (nbits > 32) return false;  // Can't successfully match something that big.
 
-  if (!matchGeneric(results->rawbuf + offset, &(results->value),
-                    results->rawlen - offset, nbits,
+  uint64_t longdata = 0;
+  if (!matchGeneric(results->rawbuf + offset, &longdata,
+                    results->rawlen - offset, nbits * 2,
                     kNecHdrMark, kNecHdrSpace,
                     kNecBitMark, kNecOneSpace,
                     kNecBitMark, kNecZeroSpace,
-                    kNecBitMark, kMideaNecMinGap, true)) return false;
+                    kNecBitMark, kMidea24MinGap, true)) return false;
+
+  // Build the result by checking every second byte is a complement(inversion)
+  // of the previous one.
+  uint32_t data = 0;
+  for (uint8_t i = nbits * 2; i >= 16;) {
+    // Shuffle the data collected so far.
+    data <<= 8;
+    i -= 8;
+    uint8_t current = GETBITS64(longdata, i, 8);
+    i -= 8;
+    uint8_t next = GETBITS64(longdata, i, 8);
+    // Check they are an inverted pair.
+    if (current != (next ^ 0xFF)) return false;  // They are not, so abort.
+    data |= current;
+  }
 
   // Success
-  results->decode_type = decode_type_t::MIDEA_NEC;
+  results->decode_type = decode_type_t::MIDEA24;
   results->bits = nbits;
+  results->value = data;
   results->address = 0;
   results->command = 0;
   return true;
 }
-#endif  // DECODE_MIDEA_NEC
+#endif  // DECODE_MIDEA24

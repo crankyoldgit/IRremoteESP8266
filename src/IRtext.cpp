@@ -261,6 +261,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_CARRIER_AC64 "\x0"
     D_STR_HITACHI_AC344 "\x0"
     D_STR_CORONA_AC "\x0"
-    D_STR_MIDEA_NEC "\x0"
+    D_STR_MIDEA24 "\x0"
     // New protocol strings should be added just above this line.
     "\x0";  // This string requires double null termination.

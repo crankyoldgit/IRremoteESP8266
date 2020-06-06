@@ -12,7 +12,7 @@
 #include "IRutils.h"
 
 #if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
-     SEND_MIDEA_NEC)
+     SEND_MIDEA24)
 // Send a raw NEC(Renesas) formatted message.
 //
 // Args:
@@ -63,7 +63,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
   }
 }
 #endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO ||
-        //  SEND_MIDEA_NEC)
+        //  SEND_MIDEA24)
 
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
 // Decode the supplied NEC message.

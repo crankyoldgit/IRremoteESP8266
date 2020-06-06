@@ -472,11 +472,11 @@ class IRrecv {
                    const uint16_t nbits = kMideaBits,
                    const bool strict = true);
 #endif  // DECODE_MIDEA
-#if DECODE_MIDEA_NEC
-  bool decodeMideaNec(decode_results *results, uint16_t offset = kStartOffset,
-                      const uint16_t nbits = kMideaNecBits,
-                      const bool strict = true);
-#endif  // DECODE_MIDEA_NEC
+#if DECODE_MIDEA24
+  bool decodeMidea24(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kMidea24Bits,
+                     const bool strict = true);
+#endif  // DECODE_MIDEA24
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kFujitsuAcBits,
