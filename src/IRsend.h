@@ -470,7 +470,7 @@ class IRsend {
 #endif  // SEND_MIDEA
 #if SEND_MIDEA24
   void sendMidea24(const uint64_t data, const uint16_t nbits = kMidea24Bits,
-                    const uint16_t repeat = kMidea24MinRepeat);
+                   const uint16_t repeat = kMidea24MinRepeat);
 #endif  // SEND_MIDEA24
 #if SEND_MAGIQUEST
   void sendMagiQuest(uint64_t data, uint16_t nbits = kMagiquestBits,
