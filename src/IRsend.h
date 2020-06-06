@@ -220,7 +220,8 @@ class IRsend {
             const uint16_t nbits, const uint16_t repeat = kNoRepeat);
   bool send(const decode_type_t type, const uint8_t *state,
             const uint16_t nbytes);
-#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
+     SEND_MIDEA24)
   void sendNEC(uint64_t data, uint16_t nbits = kNECBits,
                uint16_t repeat = kNoRepeat);
   uint32_t encodeNEC(uint16_t address, uint16_t command);
@@ -466,7 +467,11 @@ class IRsend {
 #if SEND_MIDEA
   void sendMidea(uint64_t data, uint16_t nbits = kMideaBits,
                  uint16_t repeat = kMideaMinRepeat);
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIDEA24
+  void sendMidea24(const uint64_t data, const uint16_t nbits = kMidea24Bits,
+                   const uint16_t repeat = kMidea24MinRepeat);
+#endif  // SEND_MIDEA24
 #if SEND_MAGIQUEST
   void sendMagiQuest(uint64_t data, uint16_t nbits = kMagiquestBits,
                      uint16_t repeat = kNoRepeat);

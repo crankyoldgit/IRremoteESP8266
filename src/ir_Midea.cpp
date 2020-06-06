@@ -2,6 +2,7 @@
 // Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
 
 #include "ir_Midea.h"
+#include "ir_NEC.h"
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -30,6 +31,7 @@ const uint16_t kMideaMinGapTicks =
     kMideaHdrMarkTicks + kMideaZeroSpaceTicks + kMideaBitMarkTicks;
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
+const uint16_t kMidea24MinGap = 13000;  ///< uSecs
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -83,7 +85,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
     }
   }
 }
-#endif
+#endif  // SEND_MIDEA
 
 // Code to emulate Midea A/C IR remote control unit.
 // Warning: Consider this very alpha code.
@@ -451,3 +453,80 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_MIDEA
+
+#if SEND_MIDEA24
+/// Send a Midea24 formatted message.
+/// Status: STABLE / Confirmed working on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   alternate bytes inverted, thus only 24 bits of real data, and with at
+///   least a single repeat.
+/// @warning Can't be used beyond 32 bits.
+void IRsend::sendMidea24(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  uint64_t newdata = 0;
+  // Construct the data into bye & inverted byte pairs.
+  for (int16_t i = nbits - 8; i >= 0; i -= 8) {
+    // Shuffle the data to be sent so far.
+    newdata <<= 16;
+    uint8_t next = GETBITS64(data, i, 8);
+    newdata |= ((next << 8) | (next ^ 0xFF));
+  }
+  sendNEC(newdata, nbits * 2, repeat);
+}
+#endif  // SEND_MIDEA24
+
+#if DECODE_MIDEA24
+/// Decode the supplied Midea24 message.
+/// Status: STABLE / Confirmed working on a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   alternate bytes inverted, thus only 24 bits of real data.
+/// @warning Can't be used beyond 32 bits.
+bool IRrecv::decodeMidea24(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  // Not strictly a MIDEA24 message.
+  if (strict && nbits != kMidea24Bits) return false;
+  if (nbits > 32) return false;  // Can't successfully match something that big.
+
+  uint64_t longdata = 0;
+  if (!matchGeneric(results->rawbuf + offset, &longdata,
+                    results->rawlen - offset, nbits * 2,
+                    kNecHdrMark, kNecHdrSpace,
+                    kNecBitMark, kNecOneSpace,
+                    kNecBitMark, kNecZeroSpace,
+                    kNecBitMark, kMidea24MinGap, true)) return false;
+
+  // Build the result by checking every second byte is a complement(inversion)
+  // of the previous one.
+  uint32_t data = 0;
+  for (uint8_t i = nbits * 2; i >= 16;) {
+    // Shuffle the data collected so far.
+    data <<= 8;
+    i -= 8;
+    uint8_t current = GETBITS64(longdata, i, 8);
+    i -= 8;
+    uint8_t next = GETBITS64(longdata, i, 8);
+    // Check they are an inverted pair.
+    if (current != (next ^ 0xFF)) return false;  // They are not, so abort.
+    data |= current;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::MIDEA24;
+  results->bits = nbits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
+#endif  // DECODE_MIDEA24

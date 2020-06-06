@@ -252,7 +252,7 @@ class IRrecv {
                            const bool GEThomas = true);
   void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,
                  const uint16_t nbits = kNECBits, const bool strict = true);
 #endif
@@ -471,7 +471,12 @@ class IRrecv {
   bool decodeMidea(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kMideaBits,
                    const bool strict = true);
-#endif
+#endif  // DECODE_MIDEA
+#if DECODE_MIDEA24
+  bool decodeMidea24(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kMidea24Bits,
+                     const bool strict = true);
+#endif  // DECODE_MIDEA24
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kFujitsuAcBits,

@@ -601,6 +601,9 @@
 #ifndef D_STR_MIDEA
 #define D_STR_MIDEA "MIDEA"
 #endif  // D_STR_MIDEA
+#ifndef D_STR_MIDEA24
+#define D_STR_MIDEA24 "MIDEA24"
+#endif  // D_STR_MIDEA24
 #ifndef D_STR_MITSUBISHI
 #define D_STR_MITSUBISHI "MITSUBISHI"
 #endif  // D_STR_MITSUBISHI

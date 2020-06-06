@@ -2,10 +2,11 @@
 // Midea
 
 // Supports:
-//   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU)
-//   Brand: Pioneer System,  Model: RUBO18GMFILCAD A/C (18K BTU)
-//   Brand: Comfee, Model: MPD1-12CRN7 A/C
-//   Brand: Keystone, Model: RG57H4(B)BGEF remote
+//   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU) (MIDEA)
+//   Brand: Pioneer System,  Model: RUBO18GMFILCAD A/C (18K BTU) (MIDEA)
+//   Brand: Comfee, Model: MPD1-12CRN7 A/C (MIDEA)
+//   Brand: Keystone, Model: RG57H4(B)BGEF remote (MIDEA)
+//   Brand: Midea,  Model: FS40-7AR Stand Fan (MIDEA24)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_

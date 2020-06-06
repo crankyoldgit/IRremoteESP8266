@@ -566,6 +566,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case COOLIX:
     case GICABLE:
     case INAX:
+    case MIDEA24:
     case MITSUBISHI:
     case MITSUBISHI2:
     case MITSUBISHI_AC:
@@ -623,6 +624,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 20;
     case COOLIX:
     case INAX:
+    case MIDEA24:
     case NIKAI:
     case RCMM:
       return 24;
@@ -865,7 +867,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case MIDEA:
       sendMidea(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIDEA24
+    case MIDEA24:
+      sendMidea24(data, nbits, min_repeat);
+      break;
+#endif  // SEND_MIDEA24
 #if SEND_MITSUBISHI
     case MITSUBISHI:
       sendMitsubishi(data, nbits, min_repeat);
