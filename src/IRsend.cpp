@@ -748,7 +748,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
 /// @return True if it is a type we can attempt to send, false if not.
 bool IRsend::send(const decode_type_t type, const uint64_t data,
                   const uint16_t nbits, const uint16_t repeat) {
-  uint16_t min_repeat = std::max(IRsend::minRepeats(type), repeat);
+  uint16_t min_repeat __attribute__((unused)) =
+      std::max(IRsend::minRepeats(type), repeat);
   switch (type) {
 #if SEND_AIRWELL
     case AIRWELL:

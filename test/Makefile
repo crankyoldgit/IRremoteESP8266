@@ -24,7 +24,7 @@ INCLUDES = -I$(USER_DIR) -I.
 CPPFLAGS += -isystem $(GTEST_DIR)/include -DUNIT_TEST -D_IR_LOCALE_=en-AU
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
+CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=gnu++11
 
 # All tests produced by this Makefile. generated from all *_test.cpp files
 TESTS = $(patsubst %.cpp,%,$(wildcard *_test.cpp))
