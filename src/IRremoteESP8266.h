@@ -802,7 +802,7 @@ enum decode_type_t {
   MIDEA24,
   ZEPEAL,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = ZEPEAL
+  kLastDecodeType = ZEPEAL,
 };
 
 // Message lengths & required repeat values
