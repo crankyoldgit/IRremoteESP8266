@@ -7,6 +7,7 @@
 
 // Supports:
 //   Brand: Trotec,  Model: PAC 3200 A/C
+//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C
 
 #ifndef IR_TROTEC_H_
 #define IR_TROTEC_H_
