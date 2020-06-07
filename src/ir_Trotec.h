@@ -4,6 +4,7 @@
 /// @file
 /// @brief Trotec A/C
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/279
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1176
 
 // Supports:
 //   Brand: Trotec,  Model: PAC 3200 A/C
