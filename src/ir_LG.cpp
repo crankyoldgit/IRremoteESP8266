@@ -54,19 +54,6 @@ const uint16_t kLg2HdrSpace = kLg2HdrSpaceTicks * kLgTick;  // 9850
 const uint16_t kLg2BitMarkTicks = 10;
 const uint16_t kLg2BitMark = kLg2BitMarkTicks * kLgTick;  // 500
 
-#if (SEND_LG || DECODE_LG)
-// Calculate the rolling 4-bit wide checksum over all of the data.
-//  Args:
-//    data: The value to be checksum'ed.
-//  Returns:
-//    A 4-bit checksum.
-uint8_t calcLGChecksum(uint16_t data) {
-  return (((data >> 12) + ((data >> 8) & 0xF) + ((data >> 4) & 0xF) +
-           (data & 0xF)) &
-          0xF);
-}
-#endif
-
 #if SEND_LG
 // Send an LG formatted message.
 //
@@ -158,7 +145,7 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 // Notes:
 //   e.g. Sequence of bits = address + command + checksum.
 uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
-  return ((address << 20) | (command << 4) | calcLGChecksum(command));
+  return ((address << 20) | (command << 4) | irutils::sumNibbles(command, 4));
 }
 #endif
 
@@ -275,7 +262,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
   // Compliance
   uint16_t command = (data >> 4) & 0xFFFF;  // The 16 bits before the checksum.
 
-  if (strict && (data & 0xF) != calcLGChecksum(command))
+  if (strict && (data & 0xF) != irutils::sumNibbles(command, 4))
     return false;  // The last 4 bits sent are the expected checksum.
   // Success
   if (isLg2)
@@ -356,7 +343,7 @@ void IRLgAc::setRaw(const uint32_t new_code) {
 // Returns:
 //   A uint8_t of the checksum.
 uint8_t IRLgAc::calcChecksum(const uint32_t state) {
-  return calcLGChecksum(state >> 4);
+  return irutils::sumNibbles(state >> 4, 4);
 }
 
 // Verify the checksum is valid for a given state.
