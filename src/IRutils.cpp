@@ -754,7 +754,7 @@ namespace irutils {
   /// @param[in] count The number of nibbles to sum. Starts from LSB. Max of 16.
   /// @param[in] init Starting value of the calculation to use. (Default is 0)
   /// @param[in] nibbleonly true, the result is 4 bits. false, it's 8 bits.
-  /// @return The 8-bit calculated result of all the nibbles and init value.
+  /// @return The 4/8-bit calculated result of all the nibbles and init value.
   uint8_t sumNibbles(const uint64_t data, const uint8_t count,
                      const uint8_t init, const bool nibbleonly) {
     uint8_t sum = init;
