@@ -69,6 +69,8 @@ namespace irutils {
   String minsToString(const uint16_t mins);
   uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
                      const uint8_t init = 0);
+  uint8_t sumNibbles(const uint64_t data, const uint8_t count = 16,
+                     const uint8_t init = 0, const bool nibbleonly = true);
   uint8_t bcdToUint8(const uint8_t bcd);
   uint8_t uint8ToBcd(const uint8_t integer);
   bool getBit(const uint64_t data, const uint8_t position,

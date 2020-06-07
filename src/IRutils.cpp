@@ -749,6 +749,21 @@ namespace irutils {
     return sum;
   }
 
+  /// Sum all the nibbles together in an integer.
+  /// @param[in] data The integer to be summed.
+  /// @param[in] count The number of nibbles to sum. Starts from LSB. Max of 16.
+  /// @param[in] init Starting value of the calculation to use. (Default is 0)
+  /// @param[in] nibbleonly true, the result is 4 bits. false, it's 8 bits.
+  /// @return The 8-bit calculated result of all the nibbles and init value.
+  uint8_t sumNibbles(const uint64_t data, const uint8_t count,
+                     const uint8_t init, const bool nibbleonly) {
+    uint8_t sum = init;
+    uint64_t copy = data;
+    const uint8_t nrofnibbles = (count < 16) ? count : (64 / 4);
+    for (uint8_t i = 0; i < nrofnibbles; i++, copy >>= 4) sum += copy & 0xF;
+    return nibbleonly ? sum & 0xF : sum;
+  }
+
   /// Convert a byte of Binary Coded Decimal(BCD) into an Integer.
   /// @param[in] bcd The BCD value.
   /// @return A normal Integer value.
