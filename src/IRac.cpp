@@ -258,7 +258,13 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
+// Note: Compiler Warning is disabled because someone could disable all
+//       the protocols before this and it is then unreachable.
+//       "-Wswitch-unreachable" not used as it appears to be an unknown option.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
       return true;
+#pragma GCC diagnostic pop
     default:
       return false;
   }
@@ -3028,7 +3034,13 @@ namespace IRAcUtils {
   /// @param[in] prev A PTR to a state structure which has the prev. state.
   /// @return A boolean indicating success or failure.
   bool decodeToState(const decode_results *decode, stdAc::state_t *result,
-                     const stdAc::state_t *prev) {
+                     const stdAc::state_t *prev
+/// @cond IGNORE
+// *prev flagged as "unused" due to potential compiler warning when some
+// protocols that use it are disabled. It really is used.
+                                                __attribute__((unused))
+/// @endcond
+                    ) {
     if (decode == NULL || result == NULL) return false;  // Safety check.
     switch (decode->decode_type) {
 #if DECODE_AMCOR
