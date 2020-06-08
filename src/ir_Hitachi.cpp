@@ -979,7 +979,8 @@ void IRsend::sendHitachiAc424(const uint8_t data[], const uint16_t nbytes,
 ///   variant has a leader section as well, and subtle timing differences.
 ///   It is also in LSBF order (per byte), rather than MSBF order.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/973
-/// @see https://kadenfan.hitachi.co.jp/support/raj/item/docs/ras_aj22h_a_tori.pdf (Japanese Manual)
+/// @see https://kadenfan.hitachi.co.jp/support/raj/item/docs/ras_aj22h_a_tori.pdf
+///   (Japanese Manual)
 bool IRrecv::decodeHitachiAc424(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,
                                 const bool strict) {
