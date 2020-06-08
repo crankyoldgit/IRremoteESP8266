@@ -1,18 +1,25 @@
-// Hitachi A/C
-//
 // Copyright 2018-2020 David Conran
+/// @file
+/// @brief Support for Hitachi A/C protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/417
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/453
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/973
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1056
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1060
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
 
 // Supports:
 //   Brand: Hitachi,  Model: RAS-35THA6 remote
-//   Brand: Hitachi,  Model: LT0541-HTA remote
-//   Brand: Hitachi,  Model: Series VI A/C (Circa 2007)
-//   Brand: Hitachi,  Model: RAR-8P2 remote
-//   Brand: Hitachi,  Model: RAS-AJ25H A/C
+//   Brand: Hitachi,  Model: LT0541-HTA remote  (HITACHI_AC1)
+//   Brand: Hitachi,  Model: Series VI A/C (Circa 2007) (HITACHI_AC1)
+//   Brand: Hitachi,  Model: RAR-8P2 remote (HITACHI_AC424)
+//   Brand: Hitachi,  Model: RAS-AJ25H A/C (HITACHI_AC424)
 //   Brand: Hitachi,  Model: PC-LH3B (HITACHI_AC3)
 //   Brand: Hitachi,  Model: KAZE-312KSDP A/C (HITACHI_AC1)
 //   Brand: Hitachi,  Model: R-LT0541-HTA/Y.K.1.1-1 V2.3 remote (HITACHI_AC1)
 //   Brand: Hitachi,  Model: RAS-22NK A/C (HITACHI_AC344)
 //   Brand: Hitachi,  Model: RF11T1 remote (HITACHI_AC344)
+
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
@@ -177,14 +184,18 @@ const uint8_t kHitachiAc1ChecksumStartByte = 5;
 
 
 // Classes
+/// Class for handling detailed Hitachi 224-bit A/C messages.
+/// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
 class IRHitachiAc {
  public:
   explicit IRHitachiAc(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_HITACHI_AC
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC
   void begin(void);
@@ -218,16 +229,19 @@ class IRHitachiAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kHitachiAcStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kHitachiAcStateLength];  ///< The state in native code.
   void checksum(const uint16_t length = kHitachiAcStateLength);
   uint8_t _previoustemp;
 };
 
+/// Class for handling detailed Hitachi 104-bit A/C messages.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1056
 class IRHitachiAc1 {
  public:
   explicit IRHitachiAc1(const uint16_t pin, const bool inverted = false,
@@ -236,6 +250,9 @@ class IRHitachiAc1 {
   void stateReset(void);
 #if SEND_HITACHI_AC1
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC1
   void begin(void);
@@ -281,24 +298,28 @@ class IRHitachiAc1 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kHitachiAc1StateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kHitachiAc1StateLength];  ///< The state in native code.
   void checksum(const uint16_t length = kHitachiAc1StateLength);
 };
 
+/// Class for handling detailed Hitachi 53-byte/424-bit A/C messages.
 class IRHitachiAc424 {
   friend class IRHitachiAc344;
  public:
   explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-
   virtual void stateReset(void);
 #if SEND_HITACHI_AC424
   virtual void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC424
   void begin(void);
@@ -327,18 +348,20 @@ class IRHitachiAc424 {
   String toString(void);
 #ifndef UNIT_TEST
 
- protected:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kHitachiAc424StateLength];
+ private:
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kHitachiAc424StateLength];  ///< The state in native code
   void setInvertedStates(void);
   String _toString(void);
   uint8_t _previoustemp;
 };
 
+/// Class for handling detailed Hitachi 15to27-byte/120to216-bit A/C messages.
 class IRHitachiAc3 {
  public:
   explicit IRHitachiAc3(const uint16_t pin, const bool inverted = false,
@@ -347,6 +370,9 @@ class IRHitachiAc3 {
   void stateReset(void);
 #if SEND_HITACHI_AC3
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HITACHI_AC3
   void begin(void);
@@ -358,15 +384,17 @@ class IRHitachiAc3 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kHitachiAc3StateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kHitachiAc3StateLength];  ///< The state in native code.
   void setInvertedStates(const uint16_t length = kHitachiAc3StateLength);
 };
 
+/// Class for handling detailed Hitachi 344-bit A/C messages.
 class IRHitachiAc344: public IRHitachiAc424 {
  public:
   explicit IRHitachiAc344(const uint16_t pin, const bool inverted = false,
@@ -386,5 +414,4 @@ class IRHitachiAc344: public IRHitachiAc424 {
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   String toString(void);
 };
-
 #endif  // IR_HITACHI_H_
