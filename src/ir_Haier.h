@@ -1,10 +1,18 @@
 // Copyright 2018 crankyoldgit
-// The specifics of reverse engineering the protocol details by kuzin2006
+/// @file
+/// @brief Support for Haier A/C protocols.
+/// The specifics of reverse engineering the protocols details:
+/// * HSU07-HEA03 by kuzin2006.
+/// * YR-W02/HSU-09HMC203 by non7top.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/404
+/// @see https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/485
+/// @see https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Supports:
-//   Brand: Haier,  Model: HSU07-HEA03 remote
-//   Brand: Haier,  Model: YR-W02 remote
-//   Brand: Haier,  Model: HSU-09HMC203 A/C
+//   Brand: Haier,  Model: HSU07-HEA03 remote (HAIER_AC)
+//   Brand: Haier,  Model: YR-W02 remote (HAIER_AC_YRW02)
+//   Brand: Haier,  Model: HSU-09HMC203 A/C (HAIER_AC_YRW02)
 
 #ifndef IR_HAIER_H_
 #define IR_HAIER_H_
@@ -17,12 +25,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/404
-//   https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/485
-//   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants
 
@@ -210,13 +212,17 @@ const uint8_t kHaierAcYrw02ButtonSleep = 0xB;
 #define HAIER_AC_YRW02_BUTTON_TURBO kHaierAcYrw02ButtonTurbo
 #define HAIER_AC_YRW02_BUTTON_SLEEP kHaierAcYrw02ButtonSleep
 
+// Classes
+/// Class for handling detailed Haier A/C messages.
 class IRHaierAC {
  public:
   explicit IRHaierAC(const uint16_t pin, const bool inverted = false,
                      const bool use_modulation = true);
-
 #if SEND_HAIER_AC
   void send(const uint16_t repeat = kHaierAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HAIER_AC
   void begin(void);
@@ -265,24 +271,30 @@ class IRHaierAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif
-  uint8_t remote_state[kHaierACStateLength];
+  uint8_t remote_state[kHaierACStateLength];  ///< The state in native code form
   void stateReset(void);
   void checksum(void);
   static uint16_t getTime(const uint8_t ptr[]);
   static void setTime(uint8_t ptr[], const uint16_t nr_mins);
 };
 
+/// Class for handling detailed Haier ACYRW02 A/C messages.
 class IRHaierACYRW02 {
  public:
   explicit IRHaierACYRW02(const uint16_t pin, const bool inverted = false,
                           const bool use_modulation = true);
-
 #if SEND_HAIER_AC_YRW02
   void send(const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_HAIER_AC_YRW02
   void begin(void);
 
@@ -312,7 +324,7 @@ class IRHaierACYRW02 {
   void setTurbo(const uint8_t speed);
 
   uint8_t getSwing(void);
-  void setSwing(const uint8_t state);
+  void setSwing(const uint8_t pos);
 
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
@@ -329,13 +341,14 @@ class IRHaierACYRW02 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kHaierACYRW02StateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kHaierACYRW02StateLength];  ///< The state in native form
   void stateReset(void);
   void checksum(void);
 };
-
 #endif  // IR_HAIER_H_
