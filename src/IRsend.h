@@ -624,6 +624,11 @@ class IRsend {
                     const uint16_t nbytes = kCoronaAcStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_CORONA_AC
+#if SEND_ZEPEAL
+  void sendZepeal(const uint64_t data,
+                  const uint16_t nbits = kZepealBits,
+                  const uint16_t repeat = kZepealMinRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

@@ -646,6 +646,11 @@ class IRrecv {
                       const uint16_t nbits = kCoronaAcBitsShort,
                       const bool strict = true);
 #endif  // DECODE_CORONA_AC
+#if DECODE_ZEPEAL
+bool decodeZepeal(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kZepealBits,
+                  const bool strict = true);
+#endif  // DECODE_ZEPEAL
 };
 
 #endif  // IRRECV_H_

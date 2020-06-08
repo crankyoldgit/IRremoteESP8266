@@ -589,6 +589,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
       return kSonyMinRepeat + 1;
     case SYMPHONY:
       return kSymphonyDefaultRepeat;
+    case ZEPEAL:
+      return kZepealMinRepeat;
     default:
       return kNoRepeat;
   }
@@ -617,6 +619,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LEGOPF:
     case MITSUBISHI:
     case MITSUBISHI2:
+    case ZEPEAL:
       return 16;
     case RC6:
     case SONY:
@@ -977,6 +980,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_WHYNTER
     case WHYNTER:
       sendWhynter(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_ZEPEAL
+    case ZEPEAL:
+      sendZepeal(data, nbits, min_repeat);
       break;
 #endif
     default:
