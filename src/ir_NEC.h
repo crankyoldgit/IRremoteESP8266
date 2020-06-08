@@ -14,6 +14,9 @@
 //   Brand: Yamaha,   Model: RXV585B A/V Receiver
 //   Brand: Aloka,    Model: SleepyLights LED Lamp
 //   Brand: Toshiba,  Model: 42TL838 LCD TV
+//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C
+//   Brand: Duux,  Model: YJ-A081 TR Remote
+//   Brand: Silan Microelectronics,  Model: SC6121-001 IC
 
 // Constants
 // Ref:
