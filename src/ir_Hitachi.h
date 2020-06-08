@@ -20,7 +20,6 @@
 //   Brand: Hitachi,  Model: RAS-22NK A/C (HITACHI_AC344)
 //   Brand: Hitachi,  Model: RF11T1 remote (HITACHI_AC344)
 
-
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
 
