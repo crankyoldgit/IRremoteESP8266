@@ -101,7 +101,7 @@ TEST(TestDecodeZepeal, RealExample) {
     "m424",
     irsend.outputStr());
 
-  // rizumu/oyasumi (rythm/sleep - mode)
+  // rizumu/oyasumi (rhythm/sleep - mode)
   const uint16_t rawData_3[143] = {
       2354, 3386,
       422, 1312,  1278, 462,  1300, 410,  442, 1316,

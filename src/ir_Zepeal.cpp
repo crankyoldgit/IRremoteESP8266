@@ -3,7 +3,7 @@
 /// @file
 /// @brief Support for Zepeal protocol.
 /// This protocol uses fixed length bit encoding.
-/// Company behinde this brand seems to be Denkyosha
+/// Most official information about Zepeal seems to be from Denkyosha
 /// @see https://www.denkyosha.co.jp/
 
 // Supports:
@@ -27,7 +27,16 @@ const uint16_t kZepealGap = 6750;
 
 const uint8_t  kZepealTolerance = 40;
 
-const uint8_t kZepealCheckExpected = 0x6C;
+// Signature limits possible false possitvies,
+// but might need change (removal) if more devices are detected
+const uint8_t kZepealSignature = 0x6C;
+
+// Known Zepeal DRT-A3311(BG) Buttons - documentation rather than actual usage
+const uint16_t kZepealCommandSpeed =    0x6C82;
+const uint16_t kZepealCommandOffOn =    0x6C81;
+const uint16_t kZepealCommandRhythm =   0x6C84;
+const uint16_t kZepealCommandOffTimer = 0x6C88;
+const uint16_t kZepealCommandOnTimer =  0x6CC3;
 
 #if SEND_ZEPEAL
 /// Send a Zepeal formatted message.
@@ -35,7 +44,8 @@ const uint8_t kZepealCheckExpected = 0x6C;
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The bit size of the message being sent.
 /// @param[in] repeat The number of times the message is to be repeated.
-void IRsend::sendZepeal(uint64_t data, uint16_t nbits, uint16_t repeat) {
+void IRsend::sendZepeal(const uint64_t data, const uint16_t nbits,
+                        const uint16_t repeat) {
   sendGeneric(kZepealHdrMark, kZepealHdrSpace,
               kZepealOneMark, kZepealOneSpace,
               kZepealZeroMark, kZepealZeroSpace,
@@ -56,7 +66,7 @@ void IRsend::sendZepeal(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeZepeal(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
-  if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid message.
   if (strict && nbits != kZepealBits)
     return false;  // Not strictly a message.
@@ -71,10 +81,7 @@ bool IRrecv::decodeZepeal(decode_results *results, uint16_t offset,
                       kZepealFooterMark, kZepealGap, true,
                       kZepealTolerance);
   if (!used) return false;
-  // CheckExpected limits possible false possitvies,
-  // but might need change (removal) if more devices are detected
-  if (strict && (data >> 8) != kZepealCheckExpected) return false;
-  offset += used;
+  if (strict && (data >> 8) != kZepealSignature) return false;
 
   // Success
   results->value = data;
