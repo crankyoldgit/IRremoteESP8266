@@ -19,12 +19,10 @@ const uint16_t kDoshishaHdrSpace = 1722;
 const uint16_t kDoshishaBitMark = 420;
 const uint16_t kDoshishaOneSpace = 1310;
 const uint16_t kDoshishaZeroSpace = 452;
-const uint16_t kDoshishaFreq = 38000;
-const uint16_t kDoshishaOverhead = 3;
 
 // basic structure of bits, and mask
-const uint64_t kRcz01CheckMask =     0xffffffff00;
-const uint64_t kRcz01CheckExpected = 0x800B304800;
+const uint64_t kRcz01SignatureMask = 0xffffffff00;
+const uint64_t kRcz01Signature =     0x800B304800;
 const uint8_t  kRcz01CommandMask =           0xFE;
 const uint8_t  kRcz01ChannelMask =           0x01;
 
@@ -48,7 +46,7 @@ const uint8_t  kRcz01CommandNightLight =     0xC8;
 
 #if SEND_DOSHISHA
 /// Send a Doshisha formatted message.
-/// Status: STABLE / working on a real device.
+/// Status: STABLE / Works on real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -58,7 +56,7 @@ void IRsend::sendDoshisha(const uint64_t data, const uint16_t nbits,
               kDoshishaBitMark, kDoshishaOneSpace,
               kDoshishaBitMark, kDoshishaZeroSpace,
               kDoshishaBitMark, kDefaultMessageGap,
-              data, nbits, kDoshishaFreq, true, repeat, kDutyDefault);
+              data, nbits, 38, true, repeat, kDutyDefault);
 }
 
 /// Encode Doshisha combining constant values with command and channel.
@@ -67,7 +65,7 @@ void IRsend::sendDoshisha(const uint64_t data, const uint16_t nbits,
 /// @param[in] channel The one bit channel 0 for CH1 and 1 for CH2
 /// @return The corresponding Doshisha code.
 uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
-  uint64_t data = kRcz01CheckExpected |
+  uint64_t data = kRcz01Signature |
     (command & kRcz01CommandMask) |
     (channel & kRcz01ChannelMask);
   return data;
@@ -76,7 +74,7 @@ uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
 
 #if DECODE_DOSHISHA
 /// Decode the supplied Doshisha message.
-/// Status: STABLE / Expected to be working.
+/// Status: STABLE / Works on real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -86,6 +84,8 @@ uint64_t IRsend::encodeDoshisha(const uint8_t command, const uint8_t channel) {
 /// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeDoshisha(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 + offset)
+    return false;  // Can't possibly be a valid message.
   if (strict && nbits != kDoshishaBits)
     return false;
 
@@ -102,13 +102,13 @@ bool IRrecv::decodeDoshisha(decode_results *results, uint16_t offset,
   // e.g. data = 0x800B3048C0, nbits = 40
 
   // RCZ01 remote commands starts with a lead bit set
-  if ((data & kRcz01CheckMask) != kRcz01CheckExpected) {
+  if ((data & kRcz01SignatureMask) != kRcz01Signature) {
     DPRINT(" decodeDoshisha data ");
     DPRINT(uint64ToString(data, 16));
     DPRINT(" masked ");
-    DPRINT(uint64ToString(data & kRcz01CheckMask, 16));
+    DPRINT(uint64ToString(data & kRcz01SignatureMask, 16));
     DPRINT(" not matching ");
-    DPRINT(uint64ToString(kRcz01CheckExpected, 16));
+    DPRINT(uint64ToString(kRcz01Signature, 16));
     DPRINTLN(" .");
     return false;  // expected lead bits not matching
   }
