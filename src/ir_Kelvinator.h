@@ -1,6 +1,6 @@
-// Kelvinator A/C
-//
 // Copyright 2016 David Conran
+/// @file
+/// @brief Support for Kelvinator A/C protocols.
 
 // Supports:
 //   Brand: Kelvinator,  Model: YALIF Remote
@@ -138,7 +138,6 @@ class IRKelvinatorAC {
  public:
   explicit IRKelvinatorAC(const uint16_t pin, const bool inverted = false,
                           const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_KELVINATOR
   void send(const uint16_t repeat = kKelvinatorDefaultRepeat);
@@ -186,12 +185,13 @@ class IRKelvinatorAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kKelvinatorStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kKelvinatorStateLength];  ///< The state in IR code form.
   void checksum(const uint16_t length = kKelvinatorStateLength);
   void fixup(void);
 };
