@@ -10,8 +10,7 @@ addons:
     - pylint3
     - python3-setuptools
 env:
-  - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"
-  - COMPLEX_EXAMPLES_RE=".*IR(MQTTServer|recvDumpV).*"
+  - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"; COMPLEX_EXAMPLES_RE=".*IR(MQTTServer|recvDumpV).*"
 cache:
   directories:
     - "~/.platformio"
