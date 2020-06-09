@@ -11,6 +11,7 @@ addons:
     - python3-setuptools
 env:
   - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"
+  - COMPLEX_EXAMPLES_RE=".*IR(MQTTServer|recvDumpV).*"
 cache:
   directories:
     - "~/.platformio"
@@ -31,12 +32,12 @@ jobs:
       script:
       # Check that everything compiles but some heavy tasks e.g. IRMQTTServer & IRrecvDumpV2
       # i.e. We are splitting the work load in to parallel tasks.
-      - find . -regextype egrep -name platformio.ini -type f \! -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
+      - find . -regextype egrep -name platformio.ini -type f \! -regex "${COMPLEX_EXAMPLES_RE}" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
     - name: "Compile the complex examples"
       script:
       # Check that everything else compiles.
       # i.e. We are splitting the work load in to parallel tasks.
-      - find . -regextype egrep -name platformio.ini -type f -regex ".*IR(MQTTServer|recvDumpV2).*" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
+      - find . -regextype egrep -name platformio.ini -type f -regex "${COMPLEX_EXAMPLES_RE}" | sed 's,/platformio.ini$,,' | xargs -n 1 pio run --project-dir
     - name: "Unit tests, Linter, & Documentation checks"
       script:
       # Run all the Tests & check the code linters have no issues.
