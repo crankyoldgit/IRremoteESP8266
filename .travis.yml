@@ -13,6 +13,7 @@ env:
   - PLATFORMIO_BUILD_CACHE_DIR="../../.pio/buildcache"
     IRRECVDUMP_RE=".*IRrecvDumpV.*"
     IRMQTTSERVER_RE=".*IRMQTTServer.*"
+    MAKEFLAGS="-j 2"
 cache:
   directories:
     - "~/.platformio"
