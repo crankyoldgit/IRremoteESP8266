@@ -2,14 +2,13 @@
 // Copyright 2017 David Conran
 
 /// @file
-/// @brief JVC
+/// @brief Support for JVC protocols.
+/// Originally added by Kristian Lauszus
+/// Thanks to zenwheel and other people at the original blog post.
 /// @see http://www.sbprojects.com/knowledge/ir/jvc.php
 
 // Supports:
 //   Brand: JVC,  Model: PTU94023B remote
-
-// originally added by Kristian Lauszus
-// (Thanks to zenwheel and other people at the original blog post)
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -38,17 +37,12 @@ const uint16_t kJvcMinGapTicks =
 const uint16_t kJvcMinGap = kJvcMinGapTicks * kJvcTick;
 
 #if SEND_JVC
-// Send a JVC message.
-//
-// Args:
-//   data:   The contents of the command you want to send.
-//   nbits:  The bit size of the command being sent. (kJvcBits)
-//   repeat: The number of times you want the command to be repeated.
-//
-// Status: STABLE.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/jvc.php
+/// Send a JVC formatted message.
+/// Status: STABLE / Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see http://www.sbprojects.com/knowledge/ir/jvc.php
 void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set 38kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(38, 33);
@@ -75,41 +69,28 @@ void IRsend::sendJVC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
 }
 
-// Calculate the raw JVC data based on address and command.
-//
-// Args:
-//   address: An 8-bit address value.
-//   command: An 8-bit command value.
-// Returns:
-//   A raw JVC message.
-//
-// Status: STABLE / Works fine.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/jvc.php
+/// Calculate the raw JVC data based on address and command.
+/// Status: STABLE / Works fine.
+/// @param[in] address An 8-bit address value.
+/// @param[in] command An 8-bit command value.
+/// @return A raw JVC message code, suitable for sendJVC()..
+/// @see http://www.sbprojects.com/knowledge/ir/jvc.php
 uint16_t IRsend::encodeJVC(uint8_t address, uint8_t command) {
   return reverseBits((command << 8) | address, 16);
 }
-#endif
+#endif  // SEND_JVC
 
 #if DECODE_JVC
-// Decode the supplied JVC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits of data to expect. Typically kJvcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE
-//
-// Note:
-//   JVC repeat codes don't have a header.
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/jvc.php
+/// Decode the supplied JVC message.
+/// Status: Stable / Known working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note JVC repeat codes don't have a header.
+/// @see http://www.sbprojects.com/knowledge/ir/jvc.php
 bool IRrecv::decodeJVC(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   if (strict && nbits != kJvcBits)
@@ -147,4 +128,4 @@ bool IRrecv::decodeJVC(decode_results *results, uint16_t offset,
   results->repeat = isRepeat;
   return true;
 }
-#endif
+#endif  // DECODE_JVC

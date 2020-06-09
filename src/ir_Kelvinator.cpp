@@ -1,5 +1,6 @@
 // Copyright 2016 David Conran
-//
+/// @file
+/// @brief Support for Kelvinator A/C protocols.
 /// Code to emulate IR Kelvinator YALIF remote control unit, which should
 /// control at least the following Kelvinator A/C units:
 /// KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC,
@@ -26,7 +27,6 @@
 #include "IRutils.h"
 
 // Constants
-
 const uint16_t kKelvinatorTick = 85;
 const uint16_t kKelvinatorHdrMarkTicks = 106;
 const uint16_t kKelvinatorHdrMark = kKelvinatorHdrMarkTicks * kKelvinatorTick;
@@ -71,11 +71,10 @@ using irutils::setBits;
 
 #if SEND_KELVINATOR
 /// Send a Kelvinator A/C message.
-///
 /// Status: STABLE / Known working.
-/// @param[in] data An array of bytes containing the IR command.
-/// @param[in] nbytes Nr. of bytes of data in the array.
-/// @param[in] repeat Nr. of times the message is to be repeated.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendKelvinator(const unsigned char data[], const uint16_t nbytes,
                             const uint16_t repeat) {
   if (nbytes < kKelvinatorStateLength)
@@ -118,7 +117,7 @@ void IRsend::sendKelvinator(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_KELVINATOR
 
-/// Class for handling detailed Kelvinator A/C messages.
+/// Class constructor
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
@@ -168,6 +167,11 @@ void IRKelvinatorAC::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kKelvinatorStateLength);
 }
 
+/// Calculate the checksum for a given block of state.
+/// @param[in] block A pointer to a block to calc the checksum of.
+/// @param[in] length Length of the block array to checksum.
+/// @return The calculated checksum value.
+/// @note Many Bothans died to bring us this information.
 uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
                                           const uint16_t length) {
   uint8_t sum = kKelvinatorChecksumStart;
@@ -182,7 +186,6 @@ uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
 
 /// Calculate the checksum for the internal state.
 /// @param[in] length Length of the internal state to checksum.
-/// @note Many Bothans died to bring us this information.
 void IRKelvinatorAC::checksum(const uint16_t length) {
   // For each command + options block.
   for (uint16_t offset = 0; offset + 7 < length; offset += 8) {
@@ -476,7 +479,6 @@ String IRKelvinatorAC::toString(void) {
 
 #if DECODE_KELVINATOR
 /// Decode the supplied Kelvinator message.
-///
 /// Status: STABLE / Known working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
