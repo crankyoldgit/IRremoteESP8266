@@ -1,8 +1,13 @@
 // Copyright 2018 crankyoldgit
-// Code to emulate Haier protocol compatible devices.
-// The specifics of reverse engineering the protocols details:
-// * HSU07-HEA03 by kuzin2006.
-// * YR-W02/HSU-09HMC203 by non7top.
+/// @file
+/// @brief Support for Haier A/C protocols.
+/// The specifics of reverse engineering the protocols details:
+/// * HSU07-HEA03 by kuzin2006.
+/// * YR-W02/HSU-09HMC203 by non7top.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/404
+/// @see https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/485
+/// @see https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 #include "ir_Haier.h"
 #include <cstring>
@@ -12,17 +17,6 @@
 #include "IRremoteESP8266.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Supported devices:
-//   * Haier HSU07-HEA03 Remote control.
-//   * Haier YR-W02 Remote control
-//   * Haier HSU-09HMC203 A/C unit.
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/404
-//   https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/485
-//   https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
 
 // Constants
 const uint16_t kHaierAcHdr = 3000;
@@ -43,15 +37,11 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
-// Send a Haier A/C message. (HSU07-HEA03 remote)
-//
-// Args:
-//   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kHaierACStateLength)
-//   repeat: Nr. of times the message is to be repeated. (Default = 0).
-//
-// Status: STABLE / Known to be working.
-//
+/// Send a Haier A/C formatted message. (HSU07-HEA03 remote)
+/// Status: STABLE / Known to be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendHaierAC(const unsigned char data[], const uint16_t nbytes,
                          const uint16_t repeat) {
   if (nbytes < kHaierACStateLength) return;
@@ -70,43 +60,52 @@ void IRsend::sendHaierAC(const unsigned char data[], const uint16_t nbytes,
 #endif  // (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 
 #if SEND_HAIER_AC_YRW02
-// Send a Haier YR-W02 remote A/C message.
-//
-// Args:
-//   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kHaierACYRW02StateLength)
-//   repeat: Nr. of times the message is to be repeated. (Default = 0).
-//
-// Status: Alpha / Untested on a real device.
-//
+/// Send a Haier YR-W02 remote A/C formatted message.
+/// Status: Alpha / Untested on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendHaierACYRW02(const unsigned char data[], const uint16_t nbytes,
                               const uint16_t repeat) {
   if (nbytes >= kHaierACYRW02StateLength) sendHaierAC(data, nbytes, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
 
-// Class for emulating a Haier HSU07-HEA03 remote
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRHaierAC object.
 IRHaierAC::IRHaierAC(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRHaierAC::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRHaierAC::send(const uint16_t repeat) {
   _irsend.sendHaierAC(getRaw(), kHaierACStateLength, repeat);
 }
 #endif  // SEND_HAIER_AC
 
+/// Calculate and set the checksum values for the internal state.
 void IRHaierAC::checksum(void) {
   remote_state[8] = sumBytes(remote_state, kHaierACStateLength - 1);
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] == sumBytes(state, length - 1));
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRHaierAC::stateReset(void) {
   for (uint8_t i = 1; i < kHaierACStateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = kHaierAcPrefix;
@@ -120,15 +119,21 @@ void IRHaierAC::stateReset(void) {
   setCommand(kHaierAcCmdOn);
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRHaierAC::getRaw(void) {
   checksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRHaierAC::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kHaierACStateLength);
 }
 
+/// Set the Command/Button setting of the A/C.
+/// @param[in] command The value of the command/button that was pressed.
 void IRHaierAC::setCommand(const uint8_t command) {
   switch (command) {
     case kHaierAcCmdOff:
@@ -146,10 +151,14 @@ void IRHaierAC::setCommand(const uint8_t command) {
   }
 }
 
+/// Get the Command/Button setting of the A/C.
+/// @return The value of the command/button that was pressed.
 uint8_t IRHaierAC::getCommand(void) {
   return GETBITS8(remote_state[1], kLowNibble, kNibbleSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRHaierAC::setFan(const uint8_t speed) {
   uint8_t new_speed = kHaierAcFanAuto;
   switch (speed) {
@@ -164,6 +173,8 @@ void IRHaierAC::setFan(const uint8_t speed) {
   setBits(&remote_state[5], kLowNibble, kHaierAcSwingSize, new_speed);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRHaierAC::getFan(void) {
   switch (GETBITS8(remote_state[5], kLowNibble, kHaierAcSwingSize)) {
     case 1:  return kHaierAcFanMed;
@@ -173,6 +184,8 @@ uint8_t IRHaierAC::getFan(void) {
   }
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRHaierAC::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
   setCommand(kHaierAcCmdMode);
@@ -181,10 +194,14 @@ void IRHaierAC::setMode(uint8_t mode) {
   setBits(&remote_state[6], kHaierAcModeOffset, kModeBitsSize, new_mode);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRHaierAC::getMode(void) {
   return GETBITS8(remote_state[6], kHaierAcModeOffset, kModeBitsSize);
 }
 
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees celsius.
 void IRHaierAC::setTemp(const uint8_t degrees) {
   uint8_t temp = degrees;
   if (temp < kHaierAcMinTemp)
@@ -201,33 +218,47 @@ void IRHaierAC::setTemp(const uint8_t degrees) {
   setBits(&remote_state[1], kHighNibble, kNibbleSize, temp - kHaierAcMinTemp);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRHaierAC::getTemp(void) {
   return GETBITS8(remote_state[1], kHighNibble, kNibbleSize) + kHaierAcMinTemp;
 }
 
+/// Set the Health (filter) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setHealth(const bool on) {
   setCommand(kHaierAcCmdHealth);
   setBit(&remote_state[4], kHaierAcHealthBitOffset, on);
 }
 
+/// Get the Health (filter) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRHaierAC::getHealth(void) {
   return GETBIT8(remote_state[4], kHaierAcHealthBitOffset);
 }
 
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setSleep(const bool on) {
   setCommand(kHaierAcCmdSleep);
   setBit(&remote_state[7], kHaierAcSleepBitOffset, on);
 }
 
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRHaierAC::getSleep(void) {
   return GETBIT8(remote_state[7], kHaierAcSleepBitOffset);
 }
 
+/// Get the Time value at the given pointer.
+/// @param[in] ptr A Ptr to a location in the internal state to get the time.
 uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
   return GETBITS8(ptr[0], kHaierAcTimeOffset, kHaierAcHoursSize) * 60 +
          GETBITS8(ptr[1], kHaierAcTimeOffset, kHaierAcMinsSize);
 }
 
+/// Get the On Timer value/setting of the A/C.
+/// @return Nr of minutes the timer is set to. -1 is Off/not set etc.
 int16_t IRHaierAC::getOnTimer(void) {
   // Check if the timer is turned on.
   if (GETBIT8(remote_state[3], kHaierAcOnTimerOffset))
@@ -236,6 +267,8 @@ int16_t IRHaierAC::getOnTimer(void) {
     return -1;
 }
 
+/// Get the Off Timer value/setting of the A/C.
+/// @return Nr of minutes the timer is set to. -1 is Off/not set etc.
 int16_t IRHaierAC::getOffTimer(void) {
   // Check if the timer is turned on.
   if (GETBIT8(remote_state[3], kHaierAcOffTimerOffset))
@@ -244,8 +277,13 @@ int16_t IRHaierAC::getOffTimer(void) {
     return -1;
 }
 
+/// Get the clock value of the A/C.
+/// @return The clock time, in Nr of minutes past midnight.
 uint16_t IRHaierAC::getCurrTime(void) { return getTime(remote_state + 2); }
 
+/// Set the Time value at the given pointer.
+/// @param[out] ptr A Ptr to a location in the internal state to set the time.
+/// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   uint16_t mins = nr_mins;
   if (nr_mins > kHaierAcMaxTime) mins = kHaierAcMaxTime;
@@ -253,31 +291,42 @@ void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   setBits(ptr + 1, kHaierAcTimeOffset, kHaierAcMinsSize, mins % 60);  // Minutes
 }
 
+/// Set & enable the On Timer.
+/// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
   setBit(&remote_state[3], kHaierAcOnTimerOffset);
   setTime(remote_state + 6, nr_mins);
 }
 
+/// Set & enable the Off Timer.
+/// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
   setBit(&remote_state[3], kHaierAcOffTimerOffset);
   setTime(remote_state + 4, nr_mins);
 }
 
+/// Cancel/disable the On & Off timers.
 void IRHaierAC::cancelTimers(void) {
   setCommand(kHaierAcCmdTimerCancel);
   setBits(&remote_state[3], kHaierAcOffTimerOffset, 2, 0);
 }
 
+/// Set the clock value for the A/C.
+/// @param[in] nr_mins The clock time, in Nr of minutes past midnight.
 void IRHaierAC::setCurrTime(const uint16_t nr_mins) {
   setTime(remote_state + 2, nr_mins);
 }
 
+/// Get the Vertical Swing position setting of the A/C.
+/// @return The native swing mode.
 uint8_t IRHaierAC::getSwing(void) {
   return GETBITS8(remote_state[2], kHaierAcSwingOffset, kHaierAcSwingSize);
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] cmd The mode to set the vanes to.
 void IRHaierAC::setSwing(const uint8_t cmd) {
   if (cmd == getSwing()) return;  // Nothing to do.
   switch (cmd) {
@@ -291,7 +340,9 @@ void IRHaierAC::setSwing(const uint8_t cmd) {
   }
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHaierAcCool;
@@ -302,7 +353,9 @@ uint8_t IRHaierAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -314,7 +367,9 @@ uint8_t IRHaierAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a standard A/C vertical swing into its native setting.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -327,7 +382,9 @@ uint8_t IRHaierAC::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRHaierAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHaierAcCool: return stdAc::opmode_t::kCool;
@@ -338,7 +395,9 @@ stdAc::opmode_t IRHaierAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRHaierAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHaierAcFanHigh: return stdAc::fanspeed_t::kMax;
@@ -348,7 +407,9 @@ stdAc::fanspeed_t IRHaierAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] pos The enum to be converted.
+/// @return The native equivilant of the enum.
 stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kHaierAcSwingUp:   return stdAc::swingv_t::kHighest;
@@ -358,7 +419,8 @@ stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRHaierAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::HAIER_AC;
@@ -384,7 +446,8 @@ stdAc::state_t IRHaierAC::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRHaierAC::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
@@ -469,29 +532,42 @@ String IRHaierAC::toString(void) {
 }
 // End of IRHaierAC class.
 
-// Class for emulating a Haier YRW02 remote
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRHaierACYRW02 object.
 IRHaierACYRW02::IRHaierACYRW02(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRHaierACYRW02::begin(void) { _irsend.begin(); }
 
 #if SEND_HAIER_AC_YRW02
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRHaierACYRW02::send(const uint16_t repeat) {
   _irsend.sendHaierACYRW02(getRaw(), kHaierACYRW02StateLength, repeat);
 }
 #endif  // SEND_HAIER_AC_YRW02
 
+/// Calculate and set the checksum values for the internal state.
 void IRHaierACYRW02::checksum(void) {
   remote_state[kHaierACYRW02StateLength - 1] =
       sumBytes(remote_state, kHaierACYRW02StateLength - 1);
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] == sumBytes(state, length - 1));
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRHaierACYRW02::stateReset(void) {
   for (uint8_t i = 1; i < kHaierACYRW02StateLength; i++) remote_state[i] = 0x0;
   remote_state[0] = kHaierAcYrw02Prefix;
@@ -506,15 +582,21 @@ void IRHaierACYRW02::stateReset(void) {
   setPower(true);
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRHaierACYRW02::getRaw(void) {
   checksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRHaierACYRW02::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kHaierACYRW02StateLength);
 }
 
+/// Set the Button/Command setting of the A/C.
+/// @param[in] button The value of the button/command that was pressed.
 void IRHaierACYRW02::setButton(uint8_t button) {
   switch (button) {
     case kHaierAcYrw02ButtonTempUp:
@@ -530,10 +612,14 @@ void IRHaierACYRW02::setButton(uint8_t button) {
   }
 }
 
+/// Get the Button/Command setting of the A/C.
+/// @return The value of the button/command that was pressed.
 uint8_t IRHaierACYRW02::getButton(void) {
   return GETBITS8(remote_state[12], kLowNibble, kNibbleSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRHaierACYRW02::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
   setButton(kHaierAcYrw02ButtonMode);
@@ -548,10 +634,14 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
   setBits(&remote_state[7], kHaierAcYrw02ModeOffset, kModeBitsSize, new_mode);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRHaierACYRW02::getMode(void) {
   return GETBITS8(remote_state[7], kHaierAcYrw02ModeOffset, kModeBitsSize);
 }
 
+/// Set the temperature.
+/// @param[in] celsius The temperature in degrees celsius.
 void IRHaierACYRW02::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
   if (temp < kHaierAcMinTemp)
@@ -568,46 +658,68 @@ void IRHaierACYRW02::setTemp(const uint8_t celsius) {
   setBits(&remote_state[1], kHighNibble, kNibbleSize, temp - kHaierAcMinTemp);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRHaierACYRW02::getTemp(void) {
   return GETBITS8(remote_state[1], kHighNibble, kNibbleSize) + kHaierAcMinTemp;
 }
 
+/// Set the Health (filter) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierACYRW02::setHealth(const bool on) {
   setButton(kHaierAcYrw02ButtonHealth);
   setBit(&remote_state[3], kHaierAcYrw02HealthOffset, on);
 }
 
+/// Get the Health (filter) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRHaierACYRW02::getHealth(void) {
   return GETBIT8(remote_state[3], kHaierAcYrw02HealthOffset);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRHaierACYRW02::getPower(void) {
   return GETBIT8(remote_state[4], kHaierAcYrw02PowerOffset);
 }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierACYRW02::setPower(const bool on) {
   setButton(kHaierAcYrw02ButtonPower);
   setBit(&remote_state[4], kHaierAcYrw02PowerOffset, on);
 }
 
+/// Change the power setting to On.
 void IRHaierACYRW02::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRHaierACYRW02::off(void) { setPower(false); }
 
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRHaierACYRW02::getSleep(void) {
   return GETBIT8(remote_state[8], kHaierAcYrw02SleepOffset);
 }
 
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierACYRW02::setSleep(const bool on) {
   setButton(kHaierAcYrw02ButtonSleep);
   setBit(&remote_state[8], kHaierAcYrw02SleepOffset, on);
 }
 
+/// Get the Turbo setting of the A/C.
+/// @return The current turbo speed setting.
 uint8_t IRHaierACYRW02::getTurbo(void) {
   return GETBITS8(remote_state[6], kHaierAcYrw02TurboOffset,
                   kHaierAcYrw02TurboSize);
 }
 
+/// Set the Turbo setting of the A/C.
+/// @param[in] speed The desired turbo speed setting.
+/// @note Valid speeds are kHaierAcYrw02TurboOff, kHaierAcYrw02TurboLow, &
+///   kHaierAcYrw02TurboHigh.
 void IRHaierACYRW02::setTurbo(uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02TurboOff:
@@ -619,11 +731,15 @@ void IRHaierACYRW02::setTurbo(uint8_t speed) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRHaierACYRW02::getFan(void) {
   return GETBITS8(remote_state[5], kHaierAcYrw02FanOffset,
                   kHaierAcYrw02FanSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRHaierACYRW02::setFan(uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02FanLow:
@@ -636,10 +752,14 @@ void IRHaierACYRW02::setFan(uint8_t speed) {
   }
 }
 
+/// Get the Vertical Swing position setting of the A/C.
+/// @return The native position/mode.
 uint8_t IRHaierACYRW02::getSwing(void) {
   return GETBITS8(remote_state[1], kLowNibble, kNibbleSize);
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] pos The position/mode to set the vanes to.
 void IRHaierACYRW02::setSwing(uint8_t pos) {
   uint8_t newpos = pos;
   switch (pos) {
@@ -660,7 +780,9 @@ void IRHaierACYRW02::setSwing(uint8_t pos) {
   setBits(&remote_state[1], kLowNibble, kNibbleSize, newpos);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHaierAcYrw02Cool;
@@ -671,7 +793,9 @@ uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -683,7 +807,9 @@ uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a standard A/C vertical swing into its native setting.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -696,7 +822,9 @@ uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHaierAcYrw02Cool: return stdAc::opmode_t::kCool;
@@ -707,7 +835,9 @@ stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRHaierACYRW02::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02FanHigh: return stdAc::fanspeed_t::kMax;
@@ -717,7 +847,9 @@ stdAc::fanspeed_t IRHaierACYRW02::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] pos The enum to be converted.
+/// @return The native equivilant of the enum.
 stdAc::swingv_t IRHaierACYRW02::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kHaierAcYrw02SwingTop:    return stdAc::swingv_t::kHighest;
@@ -729,7 +861,8 @@ stdAc::swingv_t IRHaierACYRW02::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRHaierACYRW02::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::HAIER_AC_YRW02;
@@ -754,7 +887,8 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRHaierACYRW02::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
@@ -849,19 +983,15 @@ String IRHaierACYRW02::toString(void) {
 // End of IRHaierACYRW02 class.
 
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
-// Decode the supplied Haier HSU07-HEA03 remote message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kHaierACBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Known to be working.
-//
+/// Decode the supplied Haier HSU07-HEA03 remote message.
+/// Status: STABLE / Known to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeHaierAC(decode_results* results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (strict) {
@@ -899,19 +1029,15 @@ bool IRrecv::decodeHaierAC(decode_results* results, uint16_t offset,
 #endif  // (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 
 #if DECODE_HAIER_AC_YRW02
-// Decode the supplied Haier YR-W02 remote A/C message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kHaierACYRW02Bits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Appears to be working.
-//
+/// Decode the supplied Haier YR-W02 remote A/C message.
+/// Status: BETA / Appears to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t offset,
                                 const uint16_t nbits, const bool strict) {
   if (strict) {
