@@ -7,7 +7,7 @@
 
 // Supports:
 //   Brand: LG,  Model: 6711A20083V remote (LG)
-//   Brand: LG,  Model: AKB74395308 remote (LG)
+//   Brand: LG,  Model: AKB74395308 remote (LG2)
 //   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
 //   Brand: LG,  Model: AKB75215403 remote (LG2)
 //   Brand: General Electric,  Model: AG1BH09AW101 Split A/C
