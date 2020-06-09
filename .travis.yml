@@ -34,12 +34,12 @@ jobs:
       script:
       # Check that everything compiles but some heavy tasks e.g. IRMQTTServer & IRrecvDumpV2+
       # i.e. We are splitting the work load in to parallel tasks.
-      - find . -regextype egrep -name platformio.ini -type f \! -regex "${IRRECVDUMP_RE}|${IRMQTTSERVER_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir
+      - find . -regextype egrep -name platformio.ini -type f \! -regex "${IRRECVDUMP_RE}|${IRMQTTSERVER_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir --jobs 2
     - name: "Compile the IRrecvDumpV2+ examples"
       script:
       # Check that IRrecvDumpV2+ compiles.
       # i.e. We are splitting the work load in to parallel tasks.
-      - find . -regextype egrep -name platformio.ini -type f -regex "${IRRECVDUMP_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir
+      - find . -regextype egrep -name platformio.ini -type f -regex "${IRRECVDUMP_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir --jobs 2
     - name: "Unit tests, Linter, Doc checks, & Compile IRMQTTServer"
       script:
       # Run all the Tests & check the code linters have no issues, and that
@@ -66,4 +66,4 @@ jobs:
       # Check that all files has supported sections.
       - (SUPPORTED_OUTPUT=$(python3 tools/scrape_supported_devices.py --noout --alert 2>&1); if [[ $? -ne 0 || -n "${SUPPORTED_OUTPUT}" ]]; then echo "${SUPPORTED_OUTPUT}"; exit 1; fi)
       # Check that IRMQTTServer compiles.
-      - find . -regextype egrep -name platformio.ini -type f -regex "${IRMQTTSERVER_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir
+      - find . -regextype egrep -name platformio.ini -type f -regex "${IRMQTTSERVER_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --project-dir --jobs 2
