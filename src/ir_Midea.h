@@ -1,5 +1,9 @@
 // Copyright 2017 David Conran
-// Midea
+
+/// @file
+/// @brief Support for Midea protocols.
+/// Midea added by crankyoldgit & bwze
+/// @see https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Supports:
 //   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU) (MIDEA)
@@ -21,10 +25,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Midea added by crankyoldgit & bwze
-// Ref:
-//   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Constants
 const uint8_t kMideaACTempOffset = 24;
@@ -67,14 +67,19 @@ const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
 #define MIDEA_AC_MIN_TEMP_C kMideaACMinTempC
 #define MIDEA_AC_MAX_TEMP_C kMideaACMaxTempC
 
+// Classes
+/// Class for handling detailed Midea A/C messages.
+/// @warning Consider this very alpha code.
 class IRMideaAC {
  public:
   explicit IRMideaAC(const uint16_t pin, const bool inverted = false,
                      const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_MIDEA
   void send(const uint16_t repeat = kMideaMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MIDEA
   void begin(void);
@@ -107,11 +112,13 @@ class IRMideaAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint64_t remote_state;
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint64_t remote_state;  ///< The state of the IR remote in IR code form.
   bool _SwingVToggle;
   void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
