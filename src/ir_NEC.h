@@ -1,13 +1,10 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017, 2018 David Conran
 
-// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
-
-#ifndef IR_NEC_H_
-#define IR_NEC_H_
-
-#include <stdint.h>
-#include "IRremoteESP8266.h"
+/// @file
+/// @brief Support for NEC (Renesas) protocols.
+/// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
 
 // Supports:
 //   Brand: Yamaha,   Model: RAV561 remote
@@ -18,9 +15,14 @@
 //   Brand: Duux,  Model: YJ-A081 TR Remote
 //   Brand: Silan Microelectronics,  Model: SC6121-001 IC
 
+#ifndef IR_NEC_H_
+#define IR_NEC_H_
+
+#include <stdint.h>
+#include "IRremoteESP8266.h"
+
+
 // Constants
-// Ref:
-//  http://www.sbprojects.com/knowledge/ir/nec.php
 const uint16_t kNecTick = 560;
 const uint16_t kNecHdrMarkTicks = 16;
 const uint16_t kNecHdrMark = kNecHdrMarkTicks * kNecTick;
