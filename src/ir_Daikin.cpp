@@ -929,9 +929,9 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-/// Convert a stdAc::swingv_t enum into it's native setting.
-/// @param[in] setting The enum to be converted.
-/// @return The native equivilant of the enum.
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
     case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
@@ -1245,9 +1245,9 @@ uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a stdAc::swingh_t enum into it's native setting.
-/// @param[in] setting The enum to be converted.
-/// @return The native equivilant of the enum.
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
     case kDaikin2SwingHSwing: return stdAc::swingh_t::kAuto;
@@ -2085,9 +2085,9 @@ uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-/// Convert a stdAc::swingv_t enum into it's native setting.
-/// @param[in] setting The enum to be converted.
-/// @return The native equivilant of the enum.
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
     case kDaikin160SwingVHighest: return stdAc::swingv_t::kHighest;
@@ -2471,9 +2471,9 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a stdAc::swingh_t enum into it's native setting.
-/// @param[in] setting The enum to be converted.
-/// @return The native equivilant of the enum.
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
     case kDaikin176SwingHOff: return stdAc::swingh_t::kOff;

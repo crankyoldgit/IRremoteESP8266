@@ -473,9 +473,9 @@ class IRsend {
                    const uint16_t repeat = kMidea24MinRepeat);
 #endif  // SEND_MIDEA24
 #if SEND_MAGIQUEST
-  void sendMagiQuest(uint64_t data, uint16_t nbits = kMagiquestBits,
-                     uint16_t repeat = kNoRepeat);
-  uint64_t encodeMagiQuest(uint32_t wand_id, uint16_t magnitude);
+  void sendMagiQuest(const uint64_t data, const uint16_t nbits = kMagiquestBits,
+                     const uint16_t repeat = kNoRepeat);
+  uint64_t encodeMagiQuest(const uint32_t wand_id, const uint16_t magnitude);
 #endif
 #if SEND_LASERTAG
   void sendLasertag(uint64_t data, uint16_t nbits = kLasertagBits,

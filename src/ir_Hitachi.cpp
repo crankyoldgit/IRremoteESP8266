@@ -1048,6 +1048,7 @@ void IRHitachiAc424::stateReset(void) {
   setFan(kHitachiAc424FanAuto);
 }
 
+/// Update the internal consistency check for the protocol.
 void IRHitachiAc424::setInvertedStates(void) {
   for (uint8_t i = 3; i < kHitachiAc424StateLength - 1; i += 2)
     remote_state[i + 1] = ~remote_state[i];
