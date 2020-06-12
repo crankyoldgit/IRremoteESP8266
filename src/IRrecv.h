@@ -312,9 +312,9 @@ class IRrecv {
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
-                     uint16_t bitTime, uint8_t tolerance = kUseDefTol,
-                     int16_t excess = kMarkExcess, uint16_t delta = 0,
-                     uint8_t maxwidth = 3);
+                     uint16_t bitTime, const uint8_t tolerance = kUseDefTol,
+                     const int16_t excess = kMarkExcess,
+                     const uint16_t delta = 0, const uint8_t maxwidth = 3);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t offset = kStartOffset,
