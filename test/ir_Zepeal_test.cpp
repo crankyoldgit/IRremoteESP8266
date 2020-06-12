@@ -25,7 +25,7 @@ TEST(TestDecodeZepeal, RealExample) {
   irsend.sendRaw(rawData_1, 35, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeZepeal(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ZEPEAL, irsend.capture.decode_type);
   ASSERT_EQ(kZepealBits, irsend.capture.bits);
   EXPECT_EQ(0x6C82, irsend.capture.value);
@@ -70,7 +70,7 @@ TEST(TestDecodeZepeal, RealExample) {
   irsend.sendRaw(rawData_2, 179, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeZepeal(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ZEPEAL, irsend.capture.decode_type);
   ASSERT_EQ(kZepealBits, irsend.capture.bits);
   EXPECT_EQ(0x6C81, irsend.capture.value);
@@ -132,7 +132,7 @@ TEST(TestDecodeZepeal, RealExample) {
   irsend.sendRaw(rawData_3, 143, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeZepeal(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ZEPEAL, irsend.capture.decode_type);
   ASSERT_EQ(kZepealBits, irsend.capture.bits);
   EXPECT_EQ(0x6C84, irsend.capture.value);
@@ -170,7 +170,7 @@ TEST(TestDecodeZepeal, RealExample) {
   irsend.sendRaw(rawData_4, 143, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeZepeal(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ZEPEAL, irsend.capture.decode_type);
   ASSERT_EQ(kZepealBits, irsend.capture.bits);
   EXPECT_EQ(0x6C88, irsend.capture.value);
@@ -208,7 +208,7 @@ TEST(TestDecodeZepeal, RealExample) {
   irsend.sendRaw(rawData_5, 143, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeZepeal(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ZEPEAL, irsend.capture.decode_type);
   ASSERT_EQ(kZepealBits, irsend.capture.bits);
   EXPECT_EQ(0x6CC3, irsend.capture.value);

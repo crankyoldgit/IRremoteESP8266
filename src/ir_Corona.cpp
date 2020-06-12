@@ -194,7 +194,7 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   // all individual sections has the same prefix
   if (state[pos + kCoronaAcSectionHeader0Pos] != kCoronaAcSectionHeader0) {
     DPRINT("State ");
-    DPRINT(pos);
+    DPRINT(pos + kCoronaAcSectionHeader0Pos);
     DPRINT(" expected 0x28 was ");
     DPRINTLN(uint64ToString(state[pos + kCoronaAcSectionHeader0Pos], 16));
     return false;
