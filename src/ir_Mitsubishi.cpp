@@ -929,7 +929,7 @@ void IRMitsubishi136::setRaw(const uint8_t *data) {
   memcpy(remote_state, data, kMitsubishi136StateLength);
 }
 
-/// Set the requested power state of the A/C to off.
+/// Set the requested power state of the A/C to on.
 void IRMitsubishi136::on(void) { setPower(true); }
 
 /// Set the requested power state of the A/C to off.
