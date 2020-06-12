@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 
-
 // Constants
 const uint16_t kNecTick = 560;
 const uint16_t kNecHdrMarkTicks = 16;
