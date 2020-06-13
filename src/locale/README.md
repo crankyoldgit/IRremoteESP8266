@@ -10,7 +10,7 @@ There is _no_ runtime option to change locales.
 
 ### Change `_IR_LOCALE_` in the `src/IRremoteESP8266.h` file.
 In the [IRremoteESP8266.h](../IRremoteESP8266.h#L57-L59) file, find and locate the lines that look like:
-```
+```c++
 #ifndef _IR_LOCALE_
 #define _IR_LOCALE_ en-AU
 #endif  // _IR_LOCALE_
@@ -52,19 +52,19 @@ e.g. `en` is English. `de` is German etc. and `YY` is the ISO country code. e.g.
 Modify the comments and all `LOCALE_EN_AU_H_`s in the file to `LOCALE_XX_YY_H_` for your locale.
 
 
-### Override any `#define` values that reside in `defaults.h`
-Go through the [defaults.h](defaults.h) file, and find any `#define` lines that define a macro starting with `D_` that has text
+### Override any `#&zwj;define` values that reside in `defaults.h`
+Go through the [defaults.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/defaults.h) file, and find any `#&zwj;define` lines that define a macro starting with `D_` that has text
 that needs to change for your locale.
-Copy or create a corresponding `#define D_STR_HELLOWORLD "Hello World"` in your `xx-YY.h` file, and translate the text appropriately
-e.g. `#define D_STR_HELLOWORLD "Bonjour le monde"` (French)
+Copy or create a corresponding `#&zwj;define D_STR_HELLOWORLD "Hello World"` in your `xx-YY.h` file, and translate the text appropriately
+e.g. `#&zwj;define D_STR_HELLOWORLD "Bonjour le monde"` (French)
 
-Any values you `#define` in `xx-YY.h` will override the corresponding value in the [defaults.h](defaults.h) file.
+Any values you `#&zwj;define` in `xx-YY.h` will override the corresponding value in the [defaults.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/defaults.h) file.
 
-### Supporting a dialect/regional varient of another _existing_ language/locale.
+### Supporting a dialect/regional variant of another _existing_ language/locale.
 Similar to the previous step, if you only need to modify a small subset of the strings used in another locale file, then include the
-other locale file and then make sure to `#undef` any strings that need to be (re-)changed.
-See the [Swiss-German](de-CH.h) for an example of how to do this. i.e. It `#include "locale/de-DE.h"`s the German locale, and
-redefines any strings that are not standard [German](de-DE.h).
+other locale file and then make sure to `#&zwj;undef` any strings that need to be (re-)changed.
+See the [Swiss-German](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/de-CH.h) for an example of how to do this. i.e. It `#&zwj;include "locale/de-DE.h"`s the German locale, and
+redefines any strings that are not standard [German](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/de-DE.h).
 
 ## Adding new text strings to the library.
 If you need to add an entirely new string to the library to support some feature etc. e.g. _"Widget"_.
@@ -72,26 +72,26 @@ You should first understand how the library tries to do this such that it is eas
 
 1. Use a constant named `kWidgetStr` in the appropriate statement in the `.cpp` file.
 2. Edit [IRtext.cpp](IRtext.cpp), and add the appropriate line for your new constant. e.g.
-```
+```c++
 String kWidgetStr = D_STR_WIDGET;
 ```
 The `kWidgetStr` variable will house the sole copy of the string for the entire library. This limits any duplication.
 The `D_STR_WIDGET` macro will be what is targeted by the different language / locales files.
 
-3. Edit [locale/defaults.h](defaults.h), and add the appropriate stanza for your new string. e.g.
-```
+3. Edit [locale/defaults.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/defaults.h), and add the appropriate stanza for your new string. e.g.
+```c++
 #ifndef D_STR_WIDGET
 #define D_STR_WIDGET "Turbo"
 #endif  // D_STR_WIDGET
 ```
 
 
-4. _(Manual)_ Update [IRtext.h](../IRtext.h), and add the appropriate line for your new constant. e.g.
-```
+4. _(Manual)_ Update [IRtext.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/IRtext.h), and add the appropriate line for your new constant. e.g.
+```c++
 extern const String kWidgetStr;
 ```
-For any file that `#include <IRtext.h>`s this file, it will tell it that the string is stored elsewhere,
+For any file that `#&zwj;include <IRtext.h>`s this file, it will tell it that the string is stored elsewhere,
 and to look for it elsewhere at the object linking stage of the build. This is what makes the string be referenced from a central location.
 
-4. _(Automatic)_ Run `tools/generate_irtext_h.sh` to update [IRtext.h](../IRtext.h).
-In the [src/locale](../locale) directory. Run the `../../tools/generate_irtext_h.sh` command. It will update the file for you automatically.
+4. _(Automatic)_ Run `tools/generate_irtext_h.sh` to update [IRtext.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/IRtext.h).
+In the [src/locale](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/locale/) directory. Run the `../../tools/generate_irtext_h.sh` command. It will update the file for you automatically.

@@ -121,11 +121,11 @@
 #define D_STR_REPEAT "Repetir"
 #define D_STR_CODE "Codigo"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #define D_STR_TIMESTAMP "marca de tiempo"
 #define D_STR_LIBRARY "Libreria"
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 esta ahora corriendo y esperando por comando IR en Pin %d"
+    "IRrecvDump esta ahora corriendo y esperando por comando IR en Pin %d"
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \
     "WARNING: Codigo IR es muy grande para el buffer (>= %d). "\

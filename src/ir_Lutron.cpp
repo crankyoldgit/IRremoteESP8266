@@ -1,5 +1,20 @@
 // Copyright 2018 David Conran
-// Lutron
+
+/// @file
+/// @brief Support for Lutron protocols.
+/// @note The Lutron protocol uses a sort of Run Length encoding to encode
+///   its data. There is no header or footer per-se.
+///   As a mark is the first data we will notice, we always assume the First
+///   bit of the technically 36-bit protocol is '1'. So it is assumed, and thus
+///   we only care about the 35 bits of data.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/515
+/// @see http://www.lutron.com/TechnicalDocumentLibrary/048158.doc
+
+// Supports:
+//   Brand: Lutron,  Model: SP-HT remote
+//   Brand: Lutron,  Model: MIR-ITFS remote
+//   Brand: Lutron,  Model: MIR-ITFS-LF remote
+//   Brand: Lutron,  Model: MIR-ITFS-F remote
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -8,36 +23,21 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-// Notes:
-//   The Lutron protocol uses a sort of Run Length encoding to encode
-//   its data. There is no header or footer per-se.
-//   As a mark is the first data we will notice, we always assume the First
-//   bit of the technically 36-bit protocol is '1'. So it is assumed, and thus
-//   we only care about the 35 bits of data.
 
 // Constants
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/515
 const uint16_t kLutronTick = 2288;
 const uint32_t kLutronGap = 150000;  // Completely made up value.
 const uint16_t kLutronDelta = 400;   // +/- 300 usecs.
 
 #if SEND_LUTRON
-// Send a Lutron formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically kLutronBits
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: Stable / Appears to be working for real devices.
-
-// Notes:
-//   Protocol is really 36 bits long, but the first bit is always a 1.
-//   So, assume the 1 and only have a normal payload of 35 bits.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/515
+/// Send a Lutron formatted message.
+/// Status: Stable / Appears to be working for real devices.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note The protocol is really 36 bits long, but the first bit is always a 1.
+///  So, assume the 1 and only have a normal payload of 35 bits.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/515
 void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(40000, 40);  // 40Khz & 40% dutycycle.
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -54,23 +54,14 @@ void IRsend::sendLutron(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_LUTRON
 
 #if DECODE_LUTRON
-// Decode the supplied Lutron message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kLutronBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Working.
-//
-// Notes:
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/515
+/// Decode the supplied Lutron message.
+/// Status: STABLE / Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeLutron(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Technically the smallest number of entries for the smallest message is '1'.

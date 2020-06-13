@@ -93,7 +93,7 @@ class IRWhirlpoolAc {
 #if SEND_WHIRLPOOL_AC
   void send(const uint16_t repeat = kWhirlpoolAcDefaultRepeat,
             const bool calcchecksum = true);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_WHIRLPOOL_AC
   void begin(void);
   void on(void);

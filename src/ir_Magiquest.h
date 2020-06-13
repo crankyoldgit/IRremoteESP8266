@@ -2,6 +2,14 @@
 // Copyright 2015 kitlaan
 // Copyright 2017 Jason kendall, David Conran
 
+/// @file
+/// @brief Support for MagiQuest protocols.
+/// @see https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
+/// @see https://github.com/mpflaga/Arduino-IRremote
+
+// Supports:
+//   Brand: MagiQuest,  Model: Wand
+
 #ifndef IR_MAGIQUEST_H_
 #define IR_MAGIQUEST_H_
 
@@ -10,7 +18,7 @@
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 
-// MagiQuest packet is both Wand ID and magnitude of swish and flick
+/// MagiQuest packet is both Wand ID and magnitude of swish and flick
 union magiquest {
   uint64_t llword;
   uint8_t byte[8];

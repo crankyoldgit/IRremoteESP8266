@@ -116,7 +116,7 @@ class IRVestelAc {
   void stateReset(void);
 #if SEND_VESTEL_AC
   void send(void);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_VESTEL_AC
   void begin(void);
   void on(void);

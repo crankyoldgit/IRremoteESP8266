@@ -416,7 +416,7 @@
 #ifndef D_STR_THREELETTERDAYS
 #define D_STR_THREELETTERDAYS "周一至周末"
 #endif  // D_STR_THREELETTERDAYS
-*/ 
+*/
 
 #ifndef D_STR_YES
 #define D_STR_YES "是"
@@ -441,7 +441,7 @@
 #define D_STR_BITS "位"
 #endif  // D_STR_BITS
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "时间戳记"
 #endif  // D_STR_TIMESTAMP
@@ -453,7 +453,7 @@
 #endif  // D_STR_MESGDESC
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 运行当中，等待红外信息输入位于引脚 %d"
+    "IRrecvDump 运行当中，等待红外信息输入位于引脚 %d"
 #endif  // D_STR_IRRECVDUMP_STARTUP
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \

@@ -1,20 +1,21 @@
 // Copyright Todd Treece
 // Copyright 2017 David Conran
+/// @file
+/// @brief DISH Network protocol support
+/// DISH support originally by Todd Treece
+/// @see http://unionbridge.org/design/ircommand
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
+/// @see http://www.hifi-remote.com/wiki/index.php?title=Dish
+
+// Supports:
+//   Brand: DISH NETWORK,  Model: echostar 301
 
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
 
-// DISH support originally by Todd Treece
-//   http://unionbridge.org/design/ircommand
-
-// Supports:
-//   Brand: DISH NETWORK,  Model: echostar 301
 
 // Constants
-// Ref:
-//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
-//   http://www.hifi-remote.com/wiki/index.php?title=Dish
 const uint16_t kDishTick = 100;
 const uint16_t kDishHdrMarkTicks = 4;
 const uint16_t kDishHdrMark = kDishHdrMarkTicks * kDishTick;
@@ -30,27 +31,20 @@ const uint16_t kDishRptSpaceTicks = kDishHdrSpaceTicks;
 const uint16_t kDishRptSpace = kDishRptSpaceTicks * kDishTick;
 
 #if SEND_DISH
-// Send an IR command to a DISH NETWORK device.
-//
-// Args:
-//   data:   The contents of the command you want to send.
-//   nbits:  The bit size of the command being sent.
-//   repeat: The number of times you want the command to be repeated.
-//
-// Status: STABLE / Working.
-//
-// Note:
-//   Dishplayer is a different protocol.
-//   Typically a DISH device needs to get a command a total of at least 4
-//   times to accept it. e.g. repeat=3
-//
-//   Here is the LIRC file I found that seems to match the remote codes from the
-//   oscilloscope:
-//     DISH NETWORK (echostar 301):
-//     http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
-//
-// Ref:
-//   http://www.hifi-remote.com/wiki/index.php?title=Dish
+/// Send a DISH NETWORK formatted message.
+/// Status: STABLE / Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note Dishplayer is a different protocol.
+///  Typically a DISH device needs to get a command a total of at least 4
+///  times to accept it. e.g. repeat=3
+///
+///  Here is the LIRC file I found that seems to match the remote codes from the
+///  oscilloscope:
+///    DISH NETWORK (echostar 301):
+/// @see http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
+/// @see http://www.hifi-remote.com/wiki/index.php?title=Dish
 void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(57600);  // Set modulation freq. to 57.6kHz.
   // Header is only ever sent once.
@@ -65,27 +59,21 @@ void IRsend::sendDISH(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif
 
 #if DECODE_DISH
-// Decode the supplied DISH NETWORK message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. Typically kDishBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status:  ALPHA (untested and unconfirmed.)
-//
-// Note:
-//   Dishplayer is a different protocol.
-//   Typically a DISH device needs to get a command a total of at least 4
-//   times to accept it.
-// Ref:
-//   http://www.hifi-remote.com/wiki/index.php?title=Dish
-//   http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
-//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
+/// Decode the supplied DISH NETWORK message.
+/// Status:  ALPHA (untested and unconfirmed.)
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note Dishplayer is a different protocol.
+///  Typically a DISH device needs to get a command a total of at least 4
+///  times to accept it.
+/// @see http://www.hifi-remote.com/wiki/index.php?title=Dish
+/// @see http://lirc.sourceforge.net/remotes/echostar/301_501_3100_5100_58xx_59xx
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Dish.cpp
 bool IRrecv::decodeDISH(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   if (strict && nbits != kDishBits) return false;  // Not strictly compliant.

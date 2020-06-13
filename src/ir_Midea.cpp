@@ -1,7 +1,12 @@
 // Copyright 2017 bwze, crankyoldgit
-// Midea
+/// @file
+/// @brief Support for Midea protocols.
+/// Midea added by crankyoldgit & bwze.
+/// send: bwze/crankyoldgit, decode: crankyoldgit
+/// @see https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 #include "ir_Midea.h"
+#include "ir_NEC.h"
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
@@ -10,16 +15,6 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Midea A/C added by (send) bwze/crankyoldgit & (decode) crankyoldgit
-//
-// Equipment it seems compatible with:
-//  * Pioneer System Model RYBO12GMFILCAD (12K BTU)
-//  * Pioneer System Model RUBO18GMFILCAD (18K BTU)
-//  * <Add models (A/C & remotes) you've gotten it working with here>
-
-// Ref:
-//   https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 
 // Constants
 const uint16_t kMideaTick = 80;
@@ -37,6 +32,7 @@ const uint16_t kMideaMinGapTicks =
     kMideaHdrMarkTicks + kMideaZeroSpaceTicks + kMideaBitMarkTicks;
 const uint16_t kMideaMinGap = kMideaMinGapTicks * kMideaTick;
 const uint8_t kMideaTolerance = 30;  // Percent
+const uint16_t kMidea24MinGap = 13000;  ///< uSecs
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -48,15 +44,11 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_MIDEA
-// Send a Midea message
-//
-// Args:
-//   data:   Contents of the message to be sent.
-//   nbits:  Nr. of bits of data to be sent. Typically kMideaBits.
-//   repeat: Nr. of additional times the message is to be sent.
-//
-// Status: Alpha / Needs testing against a real device.
-//
+/// Send a Midea message
+/// Status: Alpha / Needs testing against a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
@@ -90,28 +82,32 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
     }
   }
 }
-#endif
+#endif  // SEND_MIDEA
 
 // Code to emulate Midea A/C IR remote control unit.
-// Warning: Consider this very alpha code.
 
-// Initialise the object.
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRMideaAC object.
 IRMideaAC::IRMideaAC(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
-// Reset the state of the remote to a known good state/sequence.
+/// Reset the state of the remote to a known good state/sequence.
 void IRMideaAC::stateReset(void) {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state = 0xA1826FFFFF62;
   _SwingVToggle = false;
 }
 
-// Configure the pin for output.
+/// Set up hardware to be able to send a message.
 void IRMideaAC::begin(void) { _irsend.begin(); }
 
 #if SEND_MIDEA
-// Send the current desired state to the IR LED.
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRMideaAC::send(const uint16_t repeat) {
   this->checksum();  // Ensure correct checksum before sending.
   _irsend.sendMidea(remote_state, kMideaBits, repeat);
@@ -123,37 +119,43 @@ void IRMideaAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_MIDEA
 
-// Return a pointer to the internal state date of the remote.
+/// Get a copy of the internal state/code for this protocol.
+/// @return The code for this protocol based on the current internal state.
 uint64_t IRMideaAC::getRaw(void) {
   this->checksum();
   return GETBITS64(remote_state, 0, kMideaBits);
 }
 
-// Override the internal state with the new state.
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newState A valid code for this protocol.
 void IRMideaAC::setRaw(const uint64_t newState) { remote_state = newState; }
 
-// Set the requested power state of the A/C to on.
+/// Set the requested power state of the A/C to on.
 void IRMideaAC::on(void) { setPower(true); }
 
-// Set the requested power state of the A/C to off.
+/// Set the requested power state of the A/C to off.
 void IRMideaAC::off(void) { setPower(false); }
 
-// Set the requested power state of the A/C.
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setPower(const bool on) {
   setBit(&remote_state, kMideaACPowerOffset, on);
 }
 
-// Return the requested power state of the A/C.
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMideaAC::getPower(void) {
   return GETBIT64(remote_state, kMideaACPowerOffset);
 }
 
-// Returns true if we want the A/C unit to work natively in Celsius.
+/// Is the device currently using Celsius or the Fahrenheit temp scale?
+/// @return true, the A/C unit uses Celsius natively, false, is Fahrenheit.
 bool IRMideaAC::getUseCelsius(void) {
   return !GETBIT64(remote_state, kMideaACCelsiusOffset);
 }
 
-// Set the A/C unit to use Celsius natively.
+/// Set the A/C unit to use Celsius natively.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setUseCelsius(const bool on) {
   if (on != getUseCelsius()) {  // We need to change.
     uint8_t native_temp = getTemp(!on);  // Get the old native temp.
@@ -162,10 +164,9 @@ void IRMideaAC::setUseCelsius(const bool on) {
   }
 }
 
-// Set the temperature.
-// Args:
-//   temp:       Temp. in degrees.
-//   useCelsius: Degree type to use. Celsius (true) or Fahrenheit (false)
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
+/// @param[in] useCelsius true, use the Celsius temp scale. false, is Fahrenheit
 void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
   uint8_t max_temp = kMideaACMaxTempF;
   uint8_t min_temp = kMideaACMinTempF;
@@ -184,11 +185,9 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
   setBits(&remote_state, kMideaACTempOffset, kMideaACTempSize, new_temp);
 }
 
-// Return the set temp.
-// Args:
-//   celsius: Flag indicating if the results are in Celsius or Fahrenheit.
-// Returns:
-//   A uint8_t containing the temperature.
+/// Get the current temperature setting.
+/// @param[in] celsius true, the results are in Celsius. false, in Fahrenheit.
+/// @return The current setting for temp. in the requested units/scale.
 uint8_t IRMideaAC::getTemp(const bool celsius) {
   uint8_t temp = GETBITS64(remote_state, kMideaACTempOffset, kMideaACTempSize);
   if (getUseCelsius())
@@ -200,26 +199,27 @@ uint8_t IRMideaAC::getTemp(const bool celsius) {
   return temp;
 }
 
-// Set the speed of the fan,
-// 1-3 set the speed, 0 or anything else set it to auto.
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting. 1-3 set the speed, 0 for auto.
 void IRMideaAC::setFan(const uint8_t fan) {
   setBits(&remote_state, kMideaACFanOffset, kMideaACFanSize,
           (fan > kMideaACFanHigh) ? kMideaACFanAuto : fan);
 }
 
-// Return the requested state of the unit's fan.
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRMideaAC::getFan(void) {
   return GETBITS64(remote_state, kMideaACFanOffset, kMideaACFanSize);
 }
 
-// Get the requested climate operation mode of the a/c unit.
-// Returns:
-//   A uint8_t containing the A/C mode.
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRMideaAC::getMode(void) {
   return GETBITS64(remote_state, kMideaACModeOffset, kModeBitsSize);
 }
 
-// Set the requested climate operation mode of the a/c unit.
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRMideaAC::setMode(const uint8_t mode) {
   switch (mode) {
     case kMideaACAuto:
@@ -234,35 +234,38 @@ void IRMideaAC::setMode(const uint8_t mode) {
   }
 }
 
-// Set the Sleep state of the A/C.
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setSleep(const bool on) {
   setBit(&remote_state, kMideaACSleepOffset, on);
 }
 
-// Return the Sleep state of the A/C.
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMideaAC::getSleep(void) {
   return GETBIT64(remote_state, kMideaACSleepOffset);
 }
 
-// Set the A/C to toggle the vertical swing toggle for the next send.
+/// Set the A/C to toggle the vertical swing toggle for the next send.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setSwingVToggle(const bool on) { _SwingVToggle = on; }
 
-// Return if the message/state is just a Swing V toggle message/command.
+/// Is the current state a vertical swing toggle message?
+/// @return true, it is. false, it isn't.
 bool IRMideaAC::isSwingVToggle(void) {
   return remote_state == kMideaACToggleSwingV;
 }
 
-// Return the Swing V toggle state of the A/C.
+// Get the vertical swing toggle state of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMideaAC::getSwingVToggle(void) {
   _SwingVToggle |= isSwingVToggle();
   return _SwingVToggle;
 }
 
-// Calculate the checksum for a given array.
-// Args:
-//   state:  The state to calculate the checksum over.
-// Returns:
-//   The 8 bit checksum value.
+/// Calculate the checksum for a given state.
+/// @param[in] state The value to calc the checksum of.
+/// @return The calculated checksum value.
 uint8_t IRMideaAC::calcChecksum(const uint64_t state) {
   uint8_t sum = 0;
   uint64_t temp_state = state;
@@ -275,23 +278,22 @@ uint8_t IRMideaAC::calcChecksum(const uint64_t state) {
   return reverseBits(sum, 8);
 }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The state to verify the checksum of.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The state to verify the checksum of.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRMideaAC::validChecksum(const uint64_t state) {
   return GETBITS64(state, 0, 8) == calcChecksum(state);
 }
 
-// Calculate & set the checksum for the current internal state of the remote.
+/// Calculate & set the checksum for the current internal state of the remote.
 void IRMideaAC::checksum(void) {
   // Stored the checksum value in the last byte.
   setBits(&remote_state, 0, 8, calcChecksum(remote_state));
 }
 
-
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMideaACCool;
@@ -302,7 +304,9 @@ uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -314,7 +318,9 @@ uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMideaACCool: return stdAc::opmode_t::kCool;
@@ -325,7 +331,9 @@ stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMideaACFanHigh: return stdAc::fanspeed_t::kMax;
@@ -335,26 +343,28 @@ stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev A Ptr to the previous state.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
   if (prev != NULL) {
     result = *prev;
   } else {
-  // Fixed/Not supported/Non-zero defaults.
-  result.protocol = decode_type_t::MIDEA;
-  result.model = -1;  // No models used.
-  result.swingh = stdAc::swingh_t::kOff;
-  result.swingv = stdAc::swingv_t::kOff;
-  result.quiet = false;
-  result.turbo = false;
-  result.clean = false;
-  result.econo = false;
-  result.filter = false;
-  result.light = false;
-  result.beep = false;
-  result.sleep = -1;
-  result.clock = -1;
+    // Fixed/Not supported/Non-zero defaults.
+    result.protocol = decode_type_t::MIDEA;
+    result.model = -1;  // No models used.
+    result.swingh = stdAc::swingh_t::kOff;
+    result.swingv = stdAc::swingv_t::kOff;
+    result.quiet = false;
+    result.turbo = false;
+    result.clean = false;
+    result.econo = false;
+    result.filter = false;
+    result.light = false;
+    result.beep = false;
+    result.sleep = -1;
+    result.clock = -1;
   }
   if (this->isSwingVToggle()) {
     result.swingv = result.swingv != stdAc::swingv_t::kOff ?
@@ -370,7 +380,8 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
@@ -393,19 +404,15 @@ String IRMideaAC::toString(void) {
 }
 
 #if DECODE_MIDEA
-// Decode the supplied Midea message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kMideaBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Alpha / Needs testing against a real device.
-//
+/// Decode the supplied Midea message.
+/// Status: Alpha / Needs testing against a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+///   Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
+///   kHitachiAc344Bits
+/// @param[in] strict Flag indicating if we should perform strict matching.
 bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
                          const uint16_t nbits, const bool strict) {
   uint8_t min_nr_of_messages = 1;
@@ -458,3 +465,80 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_MIDEA
+
+#if SEND_MIDEA24
+/// Send a Midea24 formatted message.
+/// Status: STABLE / Confirmed working on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1170
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   alternate bytes inverted, thus only 24 bits of real data, and with at
+///   least a single repeat.
+/// @warning Can't be used beyond 32 bits.
+void IRsend::sendMidea24(const uint64_t data, const uint16_t nbits,
+                          const uint16_t repeat) {
+  uint64_t newdata = 0;
+  // Construct the data into bye & inverted byte pairs.
+  for (int16_t i = nbits - 8; i >= 0; i -= 8) {
+    // Shuffle the data to be sent so far.
+    newdata <<= 16;
+    uint8_t next = GETBITS64(data, i, 8);
+    newdata |= ((next << 8) | (next ^ 0xFF));
+  }
+  sendNEC(newdata, nbits * 2, repeat);
+}
+#endif  // SEND_MIDEA24
+
+#if DECODE_MIDEA24
+/// Decode the supplied Midea24 message.
+/// Status: STABLE / Confirmed working on a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note This protocol is basically a 48-bit version of the NEC protocol with
+///   alternate bytes inverted, thus only 24 bits of real data.
+/// @warning Can't be used beyond 32 bits.
+bool IRrecv::decodeMidea24(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  // Not strictly a MIDEA24 message.
+  if (strict && nbits != kMidea24Bits) return false;
+  if (nbits > 32) return false;  // Can't successfully match something that big.
+
+  uint64_t longdata = 0;
+  if (!matchGeneric(results->rawbuf + offset, &longdata,
+                    results->rawlen - offset, nbits * 2,
+                    kNecHdrMark, kNecHdrSpace,
+                    kNecBitMark, kNecOneSpace,
+                    kNecBitMark, kNecZeroSpace,
+                    kNecBitMark, kMidea24MinGap, true)) return false;
+
+  // Build the result by checking every second byte is a complement(inversion)
+  // of the previous one.
+  uint32_t data = 0;
+  for (uint8_t i = nbits * 2; i >= 16;) {
+    // Shuffle the data collected so far.
+    data <<= 8;
+    i -= 8;
+    uint8_t current = GETBITS64(longdata, i, 8);
+    i -= 8;
+    uint8_t next = GETBITS64(longdata, i, 8);
+    // Check they are an inverted pair.
+    if (current != (next ^ 0xFF)) return false;  // They are not, so abort.
+    data |= current;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::MIDEA24;
+  results->bits = nbits;
+  results->value = data;
+  results->address = 0;
+  results->command = 0;
+  return true;
+}
+#endif  // DECODE_MIDEA24

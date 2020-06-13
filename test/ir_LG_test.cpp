@@ -6,24 +6,6 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
-// Tests for calcLGChecksum()
-TEST(TestCalcLGChecksum, General) {
-  EXPECT_EQ(0x0, calcLGChecksum(0x0));
-  EXPECT_EQ(0x1, calcLGChecksum(0x1));
-  EXPECT_EQ(0xF, calcLGChecksum(0xF));
-  EXPECT_EQ(0x4, calcLGChecksum(0x1111));
-  EXPECT_EQ(0x8, calcLGChecksum(0x2222));
-  EXPECT_EQ(0x0, calcLGChecksum(0x4444));
-  EXPECT_EQ(0xA, calcLGChecksum(0x1234));
-  EXPECT_EQ(0xA, calcLGChecksum(0x4321));
-  EXPECT_EQ(0xE, calcLGChecksum(0xABCD));
-  EXPECT_EQ(0x1, calcLGChecksum(0x4AE5));
-  EXPECT_EQ(0xC, calcLGChecksum(0xFFFF));
-  EXPECT_EQ(0x1, calcLGChecksum(0xC005));
-  EXPECT_EQ(0x1, IRLgAc::calcChecksum(0x88C0051));
-  EXPECT_EQ(0x4, calcLGChecksum(0xC035));
-  EXPECT_EQ(0x4, IRLgAc::calcChecksum(0x88C0354));
-}
 
 // Tests for sendLG().
 
@@ -668,6 +650,11 @@ TEST(TestIRLgAcClass, isValidLgAc) {
   // Use a wrong signature.
   ac.setRaw(0x8000A4E);
   ASSERT_FALSE(ac.isValidLgAc());
+}
+
+TEST(TestIRLgAcClass, calcChecksum) {
+  EXPECT_EQ(0x1, IRLgAc::calcChecksum(0x88C0051));
+  EXPECT_EQ(0x4, IRLgAc::calcChecksum(0x88C0354));
 }
 
 TEST(TestUtils, Housekeeping) {

@@ -7,6 +7,8 @@
 import argparse
 import sys
 
+SAFE64NOTE = "--safe64note--"
+CODEGEN = "--codegen--"
 
 class RawIRMessage():
   """Basic analyse functions & structure for raw IR messages."""
@@ -359,10 +361,14 @@ def parse_and_report(rawdata_str, margin, gen_code=False, name="",
   """Analyse the rawdata c++ definition of a IR message."""
   defines = []
   code = {}
+  code["sendcomhead"] = []
   code["send"] = []
   code["send64+"] = []
+  code["sendcomfoot"] = []
+  code["recvcomhead"] = []
   code["recv"] = []
   code["recv64+"] = []
+  code["recvcomfoot"] = []
 
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
@@ -401,53 +407,71 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
   else:
     def_name = "TBD"
 
-  code["send"].extend([
+  code["sendcomhead"].extend([
+      "",
       "#if SEND_%s" % def_name.upper(),
-      "// Function should be safe up to 64 bits.",
+      SAFE64NOTE,
+      "/// Send a %s formatted message." % name,
+      "/// Status: ALPHA / Untested."])
+  code["send"].extend([
+      "/// @param[in] data containing the IR command.",
+      "/// @param[in] nbits Nr. of bits to send. usually k%sBits" % name,
+      "/// @param[in] repeat Nr. of times the message is to be repeated.",
       "void IRsend::send%s(const uint64_t data, const uint16_t"
       " nbits, const uint16_t repeat) {" % def_name,
       "  enableIROut(k%sFreq);" % name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint64_t send_data = data;"])
   code["send64+"].extend([
-      "// Args:",
-      "//   data: An array of bytes containing the IR command.",
-      "//         It is assumed to be in MSB order for this code.\n"
-      "//   nbytes: Nr. of bytes of data in the array."
+      "/// @param[in] data An array of bytes containing the IR command.",
+      "///                 It is assumed to be in MSB order for this code.",
+      "/// e.g.",
+      "/// @code",
+      CODEGEN,
+      "/// @endcode",
+      "/// @param[in] nbytes Nr. of bytes of data in the array."
       " (>=k%sStateLength)" % name,
-      "//   repeat: Nr. of times the message is to be repeated.",
-      "//",
-      "// Status: ALPHA / Untested.",
+      "/// @param[in] repeat Nr. of times the message is to be repeated.",
       "void IRsend::send%s(const uint8_t data[], const uint16_t nbytes,"
       " const uint16_t repeat) {" % def_name,
       "  for (uint16_t r = 0; r <= repeat; r++) {",
       "    uint16_t pos = 0;"])
-  code["recv"].extend([
+  code["sendcomfoot"].extend([
+      "  }",
+      "}",
+      "#endif  // SEND_%s" % def_name.upper()])
+  code["recvcomhead"].extend([
+      "",
       "#if DECODE_%s" % def_name.upper(),
-      "// Function should be safe up to 64 bits.",
-      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
-      " const bool strict) {" % def_name,
-      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
+      SAFE64NOTE,
+      "/// Decode the supplied %s message." % name,
+      "/// Status: ALPHA / Untested.",
+      "/// @param[in,out] results Ptr to the data to decode &"
+      " where to store the decode",
+      "/// @param[in] offset The starting index to use when"
+      " attempting to decode the",
+      "///   raw data. Typically/Defaults to kStartOffset.",
+      "/// @param[in] nbits The number of data bits to expect.",
+      "/// @param[in] strict Flag indicating if we should perform strict"
+      " matching.",
+      "/// @return A boolean. True if it can decode it, false if it can't.",
+      "bool IRrecv::decode%s(decode_results *results, uint16_t offset,"
+      " const uint16_t nbits, const bool strict) {" % def_name,
+      "  if (results->rawlen < 2 * nbits + k%sOverhead - offset)" % name,
       "    return false;  // Too short a message to match.",
       "  if (strict && nbits != k%sBits)" % name,
       "    return false;",
-      "",
-      "  uint16_t offset = kStartOffset;",
+      ""])
+  code["recv"].extend([
       "  uint64_t data = 0;",
       "  match_result_t data_result;"])
   code["recv64+"].extend([
-      "#if DECODE_%s" % def_name.upper(),
-      "// Function should be safe over 64 bits.",
-      "bool IRrecv::decode%s(decode_results *results, const uint16_t nbits,"
-      " const bool strict) {" % def_name,
-      "  if (results->rawlen < 2 * nbits + k%sOverhead)" % name,
-      "    return false;  // Too short a message to match.",
-      "  if (strict && nbits != k%sBits)" % name,
-      "    return false;",
-      "",
-      "  uint16_t offset = kStartOffset;",
       "  uint16_t pos = 0;",
       "  uint16_t used = 0;"])
+  code["recvcomfoot"].extend([
+      "  return true;",
+      "}",
+      "#endif  // DECODE_%s" % def_name.upper()])
 
   # states are:
   #  HM:  Header/Leader mark
@@ -582,14 +606,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
     message.section_count = message.section_count + 1
   code["send"].extend([
       "    space(kDefaultMessageGap);  // A 100% made up guess of the gap"
-      " between messages.",
-      "  }",
-      "}",
-      "#endif  // SEND_%s" % def_name.upper()])
-  code["send64+"].extend([
-      "  }",
-      "}",
-      "#endif  // SEND_%s" % def_name.upper()])
+      " between messages."])
   code["recv"].extend([
       "",
       "  // Success",
@@ -597,18 +614,12 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  results->bits = nbits;",
       "  results->value = data;",
       "  results->command = 0;",
-      "  results->address = 0;",
-      "  return true;",
-      "}",
-      "#endif  // DECODE_%s" % def_name.upper()])
+      "  results->address = 0;"])
   code["recv64+"].extend([
       "",
       "  // Success",
       "  results->decode_type = decode_type_t::%s;" % def_name.upper(),
-      "  results->bits = nbits;",
-      "  return true;",
-      "}",
-      "#endif  // DECODE_%s" % def_name.upper()])
+      "  results->bits = nbits;"])
 
   total_bits = total_bits + binary_value
   output.write("\nTotal Nr. of suspected bits: %d\n" % len(total_bits))
@@ -625,13 +636,17 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
 
 def generate_code(defines, code, bits_str, name="", output=sys.stdout):
   """Output the estimated C++ code to reproduce & decode the IR message."""
+  # pylint: disable=too-many-branches
   if name:
     def_name = name
   else:
     def_name = "TBD"
   output.write("\nGenerating a VERY rough code outline:\n\n"
-               "// Copyright 2019 David Conran (crankyoldgit)\n"
-               "// Support for %s protocol\n\n"
+               "// Copyright 2020 David Conran (crankyoldgit)\n"
+               "/// @file\n"
+               "/// @brief Support for %s protocol\n\n"
+               "// Supports:\n"
+               "//   Brand: %s,  Model: TODO add device and remote\n\n"
                '#include "IRrecv.h"\n'
                '#include "IRsend.h"\n'
                '#include "IRutils.h"\n\n'
@@ -640,7 +655,7 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                "// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/"
                "Adding-support-for-a-new-IR-protocol\n"
                "// for details of how to include this in the library."
-               "\n" % def_name)
+               "\n" % (def_name, def_name))
   for line in defines:
     output.write("%s\n" % line)
 
@@ -649,37 +664,69 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                  "'data' won't work!\n")
   # Display the "normal" version's send code incase there are some
   # oddities in it.
-  for line in code["send"]:
+  for line in code["sendcomhead"] + code["send"] + code["sendcomfoot"]:
+    if line == SAFE64NOTE:
+      line = "// Function should be safe up to 64 bits."
     output.write("%s\n" % line)
 
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
-    code["send64+"] = [
-        "",
-        "#if SEND_%s" % def_name.upper(),
-        "// Alternative >64bit function to send %s messages" % def_name.upper(),
-        "// Where data is:",
-        "//   uint8_t data[k%sStateLength] = {0x%s};" % (
+    for line in code["sendcomhead"] + code["send64+"] + code["sendcomfoot"]:
+      if line == SAFE64NOTE:
+        line = "// Alternative >64bit function to send %s messages\n" % \
+            def_name.upper() + "// Function should be safe over 64 bits."
+      elif line == CODEGEN:
+        line = "///   uint8_t data[k%sStateLength] = {0x%s};" % (
             name, ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
-                              for i in range(0, len(bits_str), 8))),
-        "//"] + code["send64+"]
-    for line in code["send64+"]:
+                              for i in range(0, len(bits_str), 8)))
       output.write("%s\n" % line)
-  output.write("\n")
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
-    output.write("// DANGER: More than 64 bits detected. A uint64_t for "
-                 "'data' won't work!\n")
+    output.write("\n// DANGER: More than 64 bits detected. A uint64_t for "
+                 "'data' won't work!")
+
   # Display the "normal" version's decode code incase there are some
   # oddities in it.
-  for line in code["recv"]:
+  for line in code["recvcomhead"] + code["recv"] + code["recvcomfoot"]:
+    if line == SAFE64NOTE:
+      line = "// Function should be safe up to 64 bits."
     output.write("%s\n" % line)
+
   # Display the > 64bit version's decode code
   if len(bits_str) > 64:  # Is it too big for a uint64_t?
-    output.write("\n// Note: This should be 64+ bit safe.\n")
     if len(bits_str) % 8:
       output.write("\n// WARNING: Data is not a multiple of bytes. "
                    "This won't work!\n")
-    for line in code["recv64+"]:
+    for line in code["recvcomhead"] + code["recv64+"] + code["recvcomfoot"]:
+      if line == SAFE64NOTE:
+        line = "// Function should be safe over 64 bits."
       output.write("%s\n" % line)
+
+def add_rawdata_args(parser):
+  """Add the arguments for feeding in the rawdata string(s)."""
+  arg_group = parser.add_mutually_exclusive_group(required=True)
+  arg_group.add_argument(
+      "rawdata",
+      help="A rawData line from IRrecvDumpV2+. e.g. 'uint16_t rawbuf[37] = {"
+      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
+      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
+      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
+      nargs="?")
+  arg_group.add_argument(
+      "-f", "--file", help="Read in a rawData line from the file.")
+  arg_group.add_argument(
+      "--stdin",
+      help="Read in a rawData line from STDIN.",
+      action="store_true",
+      default=False)
+
+def get_rawdata(arg_options):
+  """Return the rawdata string(s) as per the options."""
+  if arg_options.stdin:
+    return sys.stdin.read()
+  if arg_options.file:
+    with open(arg_options.file) as input_file:
+      return input_file.read()
+  else:
+    return arg_options.rawdata
 
 
 def main():
@@ -701,16 +748,6 @@ def main():
       help="Name of the protocol/device to use in code generation. E.g. Onkyo",
       dest="name",
       default="")
-  arg_group = arg_parser.add_mutually_exclusive_group(required=True)
-  arg_group.add_argument(
-      "rawdata",
-      help="A rawData line from IRrecvDumpV2. e.g. 'uint16_t rawbuf[37] = {"
-      "7930, 3952, 494, 1482, 520, 1482, 494, 1508, 494, 520, 494, 1482, 494, "
-      "520, 494, 1482, 494, 1482, 494, 3978, 494, 520, 494, 520, 494, 520, "
-      "494, 520, 520, 520, 494, 520, 494, 520, 494, 520, 494};'",
-      nargs="?")
-  arg_group.add_argument(
-      "-f", "--file", help="Read in a rawData line from the file.")
   arg_parser.add_argument(
       "-r",
       "--range",
@@ -719,22 +756,17 @@ def main():
       " it the same value.",
       dest="margin",
       default=200)
-  arg_group.add_argument(
-      "--stdin",
-      help="Read in a rawData line from STDIN.",
-      action="store_true",
-      default=False)
+  add_rawdata_args(arg_parser)
   arg_options = arg_parser.parse_args()
 
-  if arg_options.stdin:
-    data = sys.stdin.read()
-  elif arg_options.file:
-    with open(arg_options.file) as input_file:
-      data = input_file.read()
-  else:
-    data = arg_options.rawdata
-  parse_and_report(data, arg_options.margin, arg_options.gen_code,
-                   arg_options.name)
+  raw_data = get_rawdata(arg_options).strip()
+  if not raw_data:
+    arg_parser.print_help(sys.stderr)
+    sys.stderr.write("error: no rawdata content\n")
+    sys.exit(1)
+
+  parse_and_report(raw_data, arg_options.margin,
+                   arg_options.gen_code, arg_options.name)
 
 
 if __name__ == '__main__':

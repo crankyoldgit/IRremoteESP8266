@@ -13,15 +13,21 @@
 TEST(TestSendSymphony, SendDataOnly) {
   IRsendTest irsend(kGpioUnused);
   irsend.begin();
-  irsend.sendSymphony(0x137);
+  irsend.sendSymphony(0xD90);
   EXPECT_EQ(
       "f38000d50"
       "m1250s400m1250s400m400s1250m1250s400m1250s400m400s1250m400s1250m1250s400"
       "m400s1250m400s1250m400s1250"
-      "m400s8000"
+      "m400s7850"
       "m1250s400m1250s400m400s1250m1250s400m1250s400m400s1250m400s1250m1250s400"
       "m400s1250m400s1250m400s1250"
-      "m400s8000",
+      "m400s7850"
+      "m1250s400m1250s400m400s1250m1250s400m1250s400m400s1250m400s1250m1250s400"
+      "m400s1250m400s1250m400s1250"
+      "m400s7850"
+      "m1250s400m1250s400m400s1250m1250s400m1250s400m400s1250m400s1250m1250s400"
+      "m400s1250m400s1250m400s1250"
+      "m400s7850",
       irsend.outputStr());
 }
 
@@ -69,7 +75,7 @@ TEST(TestDecodeSymphony, RealMessageDecode) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
   EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
-  EXPECT_EQ(0x137, irsend.capture.value);
+  EXPECT_EQ(0xD90, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -81,10 +87,10 @@ TEST(TestDecodeSymphony, RealMessageDecode) {
       1198, 1284, 396, 444, 1224, 470, 1200, 470, 1198, 472};
   irsend.sendRaw(power, 23, 38000);
   irsend.makeDecodeResult();
-  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_TRUE(irrecv.decodeSymphony(&irsend.capture));
   EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
   EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
-  EXPECT_EQ(0x137, irsend.capture.value);
+  EXPECT_EQ(0xD90, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -98,7 +104,7 @@ TEST(TestDecodeSymphony, RealMessageDecode) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
   EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
-  EXPECT_EQ(0x13E, irsend.capture.value);
+  EXPECT_EQ(0xD82, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -122,7 +128,7 @@ TEST(TestDecodeSymphony, RealMessageSentViaLibrary) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
   EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
-  EXPECT_EQ(0x137, irsend.capture.value);
+  EXPECT_EQ(0xD90, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
@@ -139,12 +145,47 @@ TEST(TestDecodeSymphony, RealMessageSentViaLibrary) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
   EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
-  EXPECT_EQ(0x137, irsend.capture.value);
+  EXPECT_EQ(0xD90, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 }
 
+// Decode a real SM5021 generated message.
+// Note: This used to fail because it had a "long" mark before the gap in mesg.
+TEST(TestDecodeSymphony, Issue1105) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1105#issuecomment-625327833
+  irsend.reset();
+  uint16_t rawData[191] = {
+      1324, 372, 1322, 398, 448, 1218, 476, 1216, 478, 1216, 478, 1218, 478,
+      1218, 476, 1218, 476, 1220, 474, 1220, 474, 1220, 1346, 7128, 1320, 402,
+      1290, 404, 440, 1252, 442, 1254, 440, 1254, 440, 1254, 440, 1254, 440,
+      1254, 440, 1254, 442, 1254, 440, 1254, 1288, 7186, 1288, 408, 1286, 408,
+      438, 1254, 440, 1254, 440, 1254, 440, 1254, 440, 1254, 440, 1256, 440,
+      1254, 440, 1254, 440, 1254, 1288, 7186, 1288, 408, 1286, 408, 438, 1254,
+      440, 1256, 440, 1254, 440, 1254, 440, 1254, 440, 1254, 438, 1256, 438,
+      1256, 440, 1254, 1288, 7188, 1288, 408, 1286, 408, 438, 1256, 438, 1256,
+      440, 1254, 438, 1256, 438, 1256, 438, 1256, 438, 1256, 438, 1256, 440,
+      1254, 1288, 7188, 1286, 408, 1286, 408, 440, 1254, 438, 1256, 438, 1256,
+      438, 1256, 440, 1254, 438, 1254, 440, 1256, 438, 1256, 440, 1256, 438,
+      8038, 1284, 408, 1286, 408, 438, 1282, 412, 1282, 414, 1280, 414, 1280,
+      414, 1282, 414, 1280, 412, 1276, 412, 1286, 414, 1282, 412, 8062, 1260,
+      434, 1262, 432, 414, 1280, 414, 1282, 412, 1282, 412, 1282, 412, 1282,
+      414, 1280, 414, 1282, 412, 1282, 412, 1282, 412};  // UNKNOWN 827AA7B
+  irsend.sendRaw(rawData, 191, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::SYMPHONY, irsend.capture.decode_type);
+  EXPECT_EQ(kSymphonyBits, irsend.capture.bits);
+  EXPECT_EQ(0xC01, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+}
 
 TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("SYMPHONY", typeToString(decode_type_t::SYMPHONY));

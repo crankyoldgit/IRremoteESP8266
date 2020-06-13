@@ -13,7 +13,7 @@
 
 // Test sending typical data only.
 TEST(TestSendGreeChars, SendData) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t gree_code[kGreeStateLength] = {0x12, 0x34, 0x56, 0x78,
@@ -38,7 +38,7 @@ TEST(TestSendGreeChars, SendData) {
 }
 
 TEST(TestSendGreeUint64, SendData) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -62,7 +62,7 @@ TEST(TestSendGreeUint64, SendData) {
 
 // Test sending with repeats.
 TEST(TestSendGreeChars, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -101,7 +101,7 @@ TEST(TestSendGreeChars, SendWithRepeats) {
 }
 
 TEST(TestSendGreeUint64, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -137,7 +137,7 @@ TEST(TestSendGreeUint64, SendWithRepeats) {
 
 // Test sending atypical sizes.
 TEST(TestSendGreeChars, SendUnexpectedSizes) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t gree_short_code[kGreeStateLength - 1] = {0x12, 0x34, 0x56, 0x78,
@@ -169,7 +169,7 @@ TEST(TestSendGreeChars, SendUnexpectedSizes) {
 }
 
 TEST(TestSendGreeUint64, SendUnexpectedSizes) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -209,138 +209,184 @@ TEST(TestSendGree, CompareUint64ToCharResults) {
 // Tests for IRGreeAC class.
 
 TEST(TestGreeClass, Power) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.on();
-  EXPECT_TRUE(irgree.getPower());
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
 
-  irgree.off();
-  EXPECT_FALSE(irgree.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
 
-  irgree.setPower(true);
-  EXPECT_TRUE(irgree.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
 
-  irgree.setPower(false);
-  EXPECT_FALSE(irgree.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
 }
 
 TEST(TestGreeClass, Temperature) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setMode(kGreeCool);
+  ac.setMode(kGreeCool);
 
-  irgree.setTemp(0);
-  EXPECT_EQ(kGreeMinTemp, irgree.getTemp());
+  ac.setTemp(0);
+  EXPECT_EQ(kGreeMinTempC, ac.getTemp());
 
-  irgree.setTemp(255);
-  EXPECT_EQ(kGreeMaxTemp, irgree.getTemp());
+  ac.setTemp(255);
+  EXPECT_EQ(kGreeMaxTempC, ac.getTemp());
 
-  irgree.setTemp(kGreeMinTemp);
-  EXPECT_EQ(kGreeMinTemp, irgree.getTemp());
+  ac.setTemp(kGreeMinTempC);
+  EXPECT_EQ(kGreeMinTempC, ac.getTemp());
+  EXPECT_FALSE(ac.getUseFahrenheit());
 
-  irgree.setTemp(kGreeMaxTemp);
-  EXPECT_EQ(kGreeMaxTemp, irgree.getTemp());
+  ac.setTemp(kGreeMaxTempC);
+  EXPECT_EQ(kGreeMaxTempC, ac.getTemp());
 
-  irgree.setTemp(kGreeMinTemp - 1);
-  EXPECT_EQ(kGreeMinTemp, irgree.getTemp());
+  ac.setTemp(kGreeMinTempC - 1);
+  EXPECT_EQ(kGreeMinTempC, ac.getTemp());
 
-  irgree.setTemp(kGreeMaxTemp + 1);
-  EXPECT_EQ(kGreeMaxTemp, irgree.getTemp());
+  ac.setTemp(kGreeMaxTempC + 1);
+  EXPECT_EQ(kGreeMaxTempC, ac.getTemp());
 
-  irgree.setTemp(17);
-  EXPECT_EQ(17, irgree.getTemp());
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
 
-  irgree.setTemp(21);
-  EXPECT_EQ(21, irgree.getTemp());
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
 
-  irgree.setTemp(25);
-  EXPECT_EQ(25, irgree.getTemp());
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
 
-  irgree.setTemp(29);
-  EXPECT_EQ(29, irgree.getTemp());
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+
+  // Fahrenheit tests.
+  ac.setTemp(kGreeMinTempF, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMinTempF, ac.getTemp());
+
+  ac.setTemp(kGreeMaxTempF, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMaxTempF, ac.getTemp());
+
+  ac.setTemp(kGreeMaxTempF + 1, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMaxTempF, ac.getTemp());
+
+  ac.setTemp(kGreeMaxTempF - 1, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMaxTempF - 1, ac.getTemp());
+
+  ac.setTemp(kGreeMaxTempF - 2, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMaxTempF - 2, ac.getTemp());
+
+  ac.setTemp(kGreeMinTempF - 1, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMinTempF, ac.getTemp());
+
+  ac.setTemp(kGreeMinTempF + 1, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMinTempF + 1, ac.getTemp());
+
+  ac.setTemp(kGreeMinTempF + 2, true);
+  ASSERT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(kGreeMinTempF + 2, ac.getTemp());
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1121#issuecomment-628946040
+  ac.setUseFahrenheit(false);
+  const uint8_t state[] = {0x09, 0x01, 0x20, 0x5C, 0x00, 0x20, 0x00, 0x20};
+  ac.setRaw(state);
+  EXPECT_TRUE(ac.getUseFahrenheit());
+  EXPECT_EQ(63, ac.getTemp());
+  EXPECT_EQ(
+      "Model: 2 (YBOFB), Power: On, Mode: 1 (Cool), Temp: 63F, Fan: 0 (Auto), "
+      "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
+      "Swing(V) Mode: Manual, Swing(V): 0 (Last), Timer: Off, "
+      "Display Temp: 0 (Off)", ac.toString());
 }
 
 TEST(TestGreeClass, OperatingMode) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setTemp(17);
-  irgree.setMode(kGreeAuto);  // Auto should lock the temp to 25C.
-  EXPECT_EQ(kGreeAuto, irgree.getMode());
-  EXPECT_EQ(25, irgree.getTemp());
-  irgree.setTemp(17);
-  EXPECT_EQ(25, irgree.getTemp());
+  ac.setTemp(17);
+  ac.setMode(kGreeAuto);  // Auto should lock the temp to 25C.
+  EXPECT_EQ(kGreeAuto, ac.getMode());
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(17);
+  EXPECT_EQ(25, ac.getTemp());
 
-  irgree.setMode(kGreeCool);
-  EXPECT_EQ(kGreeCool, irgree.getMode());
+  ac.setMode(kGreeCool);
+  EXPECT_EQ(kGreeCool, ac.getMode());
 
-  irgree.setMode(kGreeHeat);
-  EXPECT_EQ(kGreeHeat, irgree.getMode());
+  ac.setMode(kGreeHeat);
+  EXPECT_EQ(kGreeHeat, ac.getMode());
 
   ASSERT_NE(kGreeFanMax, 1);
-  irgree.setFan(kGreeFanMax);
-  irgree.setMode(kGreeDry);  // Dry should lock the fan to speed 1.
-  EXPECT_EQ(kGreeDry, irgree.getMode());
-  EXPECT_EQ(1, irgree.getFan());
-  irgree.setFan(kGreeFanMax);
-  EXPECT_EQ(1, irgree.getFan());
+  ac.setFan(kGreeFanMax);
+  ac.setMode(kGreeDry);  // Dry should lock the fan to speed 1.
+  EXPECT_EQ(kGreeDry, ac.getMode());
+  EXPECT_EQ(1, ac.getFan());
+  ac.setFan(kGreeFanMax);
+  EXPECT_EQ(1, ac.getFan());
 
-  irgree.setMode(kGreeFan);
-  EXPECT_EQ(kGreeFan, irgree.getMode());
+  ac.setMode(kGreeFan);
+  EXPECT_EQ(kGreeFan, ac.getMode());
 
-  irgree.setMode(kGreeHeat + 1);
-  EXPECT_EQ(kGreeAuto, irgree.getMode());
+  ac.setMode(kGreeHeat + 1);
+  EXPECT_EQ(kGreeAuto, ac.getMode());
 
-  irgree.setMode(255);
-  EXPECT_EQ(kGreeAuto, irgree.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kGreeAuto, ac.getMode());
 }
 
 TEST(TestGreeClass, Light) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setLight(true);
-  EXPECT_TRUE(irgree.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
 
-  irgree.setLight(false);
-  EXPECT_FALSE(irgree.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
 
-  irgree.setLight(true);
-  EXPECT_TRUE(irgree.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
 }
 
 TEST(TestGreeClass, XFan) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setXFan(true);
-  EXPECT_TRUE(irgree.getXFan());
+  ac.setXFan(true);
+  EXPECT_TRUE(ac.getXFan());
 
-  irgree.setXFan(false);
-  EXPECT_FALSE(irgree.getXFan());
+  ac.setXFan(false);
+  EXPECT_FALSE(ac.getXFan());
 
-  irgree.setXFan(true);
-  EXPECT_TRUE(irgree.getXFan());
+  ac.setXFan(true);
+  EXPECT_TRUE(ac.getXFan());
 }
 
 TEST(TestGreeClass, Turbo) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setTurbo(true);
-  EXPECT_TRUE(irgree.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
 
-  irgree.setTurbo(false);
-  EXPECT_FALSE(irgree.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
 
-  irgree.setTurbo(true);
-  EXPECT_TRUE(irgree.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
 }
 
 TEST(TestGreeClass, IFeel) {
-  IRGreeAC ac(0);
+  IRGreeAC ac(kGpioUnused);
   ac.begin();
 
   ac.setIFeel(true);
@@ -362,7 +408,7 @@ TEST(TestGreeClass, IFeel) {
 }
 
 TEST(TestGreeClass, WiFi) {
-  IRGreeAC ac(0);
+  IRGreeAC ac(kGpioUnused);
   ac.begin();
 
   ac.setWiFi(true);
@@ -384,148 +430,150 @@ TEST(TestGreeClass, WiFi) {
 }
 
 TEST(TestGreeClass, Sleep) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setSleep(true);
-  EXPECT_TRUE(irgree.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
 
-  irgree.setSleep(false);
-  EXPECT_FALSE(irgree.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
 
-  irgree.setSleep(true);
-  EXPECT_TRUE(irgree.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
 }
 
 TEST(TestGreeClass, FanSpeed) {
-  IRGreeAC irgree(0);
-  irgree.begin();
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
 
-  irgree.setFan(0);
-  EXPECT_EQ(0, irgree.getFan());
+  ac.setFan(0);
+  EXPECT_EQ(0, ac.getFan());
 
-  irgree.setFan(255);
-  EXPECT_EQ(kGreeFanMax, irgree.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kGreeFanMax, ac.getFan());
 
-  irgree.setFan(kGreeFanMax);
-  EXPECT_EQ(kGreeFanMax, irgree.getFan());
+  ac.setFan(kGreeFanMax);
+  EXPECT_EQ(kGreeFanMax, ac.getFan());
 
-  irgree.setFan(kGreeFanMax + 1);
-  EXPECT_EQ(kGreeFanMax, irgree.getFan());
+  ac.setFan(kGreeFanMax + 1);
+  EXPECT_EQ(kGreeFanMax, ac.getFan());
 
-  irgree.setFan(kGreeFanMax - 1);
-  EXPECT_EQ(kGreeFanMax - 1, irgree.getFan());
+  ac.setFan(kGreeFanMax - 1);
+  EXPECT_EQ(kGreeFanMax - 1, ac.getFan());
 
-  irgree.setFan(1);
-  EXPECT_EQ(1, irgree.getFan());
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
 
-  irgree.setFan(1);
-  EXPECT_EQ(1, irgree.getFan());
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
 
-  irgree.setFan(3);
-  EXPECT_EQ(3, irgree.getFan());
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
 }
 
 TEST(TestGreeClass, VerticalSwing) {
-  IRGreeAC irgree(0);
-  irgree.begin();
-  EXPECT_FALSE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingLastPos, irgree.getSwingVerticalPosition());
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
+  EXPECT_FALSE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingLastPos, ac.getSwingVerticalPosition());
 
-  irgree.setSwingVertical(true, kGreeSwingAuto);
-  EXPECT_TRUE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingAuto, irgree.getSwingVerticalPosition());
+  ac.setSwingVertical(true, kGreeSwingAuto);
+  EXPECT_TRUE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingAuto, ac.getSwingVerticalPosition());
 
-  irgree.setSwingVertical(false, kGreeSwingMiddle);
-  EXPECT_FALSE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingMiddle, irgree.getSwingVerticalPosition());
+  ac.setSwingVertical(false, kGreeSwingMiddle);
+  EXPECT_FALSE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingMiddle, ac.getSwingVerticalPosition());
 
-  irgree.setSwingVertical(true, kGreeSwingDownAuto);
-  EXPECT_TRUE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingDownAuto, irgree.getSwingVerticalPosition());
+  ac.setSwingVertical(true, kGreeSwingDownAuto);
+  EXPECT_TRUE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingDownAuto, ac.getSwingVerticalPosition());
 
   // Out of bounds.
-  irgree.setSwingVertical(false, 255);
-  EXPECT_FALSE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingLastPos, irgree.getSwingVerticalPosition());
-  irgree.setSwingVertical(false, kGreeSwingAuto);
-  EXPECT_FALSE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingLastPos, irgree.getSwingVerticalPosition());
+  ac.setSwingVertical(false, 255);
+  EXPECT_FALSE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingLastPos, ac.getSwingVerticalPosition());
+  ac.setSwingVertical(false, kGreeSwingAuto);
+  EXPECT_FALSE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingLastPos, ac.getSwingVerticalPosition());
 
-  irgree.setSwingVertical(true, 255);
-  EXPECT_TRUE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingAuto, irgree.getSwingVerticalPosition());
-  irgree.setSwingVertical(true, kGreeSwingDown);
-  EXPECT_TRUE(irgree.getSwingVerticalAuto());
-  EXPECT_EQ(kGreeSwingAuto, irgree.getSwingVerticalPosition());
+  ac.setSwingVertical(true, 255);
+  EXPECT_TRUE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingAuto, ac.getSwingVerticalPosition());
+  ac.setSwingVertical(true, kGreeSwingDown);
+  EXPECT_TRUE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(kGreeSwingAuto, ac.getSwingVerticalPosition());
 }
 
 TEST(TestGreeClass, SetAndGetRaw) {
-  IRGreeAC irgree(0);
+  IRGreeAC ac(kGpioUnused);
   uint8_t initialState[kGreeStateLength] = {0x00, 0x09, 0x20, 0x50,
                                             0x00, 0x20, 0x00, 0x50};
   uint8_t expectedState[kGreeStateLength] = {0xA9, 0x05, 0xD0, 0x50,
                                              0x00, 0x20, 0x00, 0xA0};
 
-  EXPECT_STATE_EQ(initialState, irgree.getRaw(), kGreeBits);
+  EXPECT_STATE_EQ(initialState, ac.getRaw(), kGreeBits);
 
   // toggle the power state.
-  irgree.setPower(!irgree.getPower());
-  irgree.setMode(kGreeCool);
-  irgree.setTemp(21);
-  irgree.setFan(2);
-  irgree.setLight(false);
-  irgree.setTurbo(true);
-  irgree.setSleep(true);
-  irgree.setXFan(true);
+  ac.setPower(!ac.getPower());
+  ac.setMode(kGreeCool);
+  ac.setTemp(21);
+  ac.setFan(2);
+  ac.setLight(false);
+  ac.setTurbo(true);
+  ac.setSleep(true);
+  ac.setXFan(true);
 
-  EXPECT_EQ(kGreeCool, irgree.getMode());
-  EXPECT_EQ(21, irgree.getTemp());
-  EXPECT_EQ(2, irgree.getFan());
-  EXPECT_FALSE(irgree.getLight());
-  EXPECT_TRUE(irgree.getTurbo());
-  EXPECT_TRUE(irgree.getSleep());
-  EXPECT_TRUE(irgree.getXFan());
+  EXPECT_EQ(kGreeCool, ac.getMode());
+  EXPECT_EQ(21, ac.getTemp());
+  EXPECT_EQ(2, ac.getFan());
+  EXPECT_FALSE(ac.getLight());
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_TRUE(ac.getXFan());
 
-  EXPECT_STATE_EQ(expectedState, irgree.getRaw(), kGreeBits);
-  irgree.setRaw(initialState);
-  EXPECT_STATE_EQ(initialState, irgree.getRaw(), kGreeBits);
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kGreeBits);
+  ac.setRaw(initialState);
+  EXPECT_STATE_EQ(initialState, ac.getRaw(), kGreeBits);
 }
 
 TEST(TestGreeClass, HumanReadable) {
-  IRGreeAC irgree(0);
+  IRGreeAC ac(kGpioUnused);
 
   EXPECT_EQ(
       "Model: 1 (YAW1F), Power: Off, Mode: 0 (Auto), Temp: 25C, Fan: 0 (Auto), "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
       "Swing(V) Mode: Manual, Swing(V): 0 (Last), "
-      "Timer: Off",
-      irgree.toString());
-  irgree.on();
-  irgree.setMode(kGreeCool);
-  irgree.setTemp(kGreeMinTemp);
-  irgree.setFan(kGreeFanMax);
-  irgree.setXFan(true);
-  irgree.setSleep(true);
-  irgree.setLight(false);
-  irgree.setTurbo(true);
-  irgree.setIFeel(true);
-  irgree.setWiFi(true);
-  irgree.setSwingVertical(true, kGreeSwingAuto);
-  irgree.setTimer(12 * 60 + 30);
+      "Timer: Off, Display Temp: 0 (Off)",
+      ac.toString());
+  ac.on();
+  ac.setMode(kGreeCool);
+  ac.setTemp(kGreeMinTempC);
+  ac.setFan(kGreeFanMax);
+  ac.setXFan(true);
+  ac.setSleep(true);
+  ac.setLight(false);
+  ac.setTurbo(true);
+  ac.setIFeel(true);
+  ac.setWiFi(true);
+  ac.setSwingVertical(true, kGreeSwingAuto);
+  ac.setTimer(12 * 60 + 30);
+  ac.setDisplayTempSource(3);
   EXPECT_EQ(
       "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 3 (High), "
       "Turbo: On, IFeel: On, WiFi: On, XFan: On, Light: Off, Sleep: On, "
-      "Swing(V) Mode: Auto, Swing(V): 1 (Auto), Timer: 12:30",
-      irgree.toString());
+      "Swing(V) Mode: Auto, Swing(V): 1 (Auto), Timer: 12:30, "
+      "Display Temp: 3 (Outside)",
+      ac.toString());
 }
 
 // Tests for decodeGree().
 
 // Decode a synthetic Gree message.
 TEST(TestDecodeGree, NormalSynthetic) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t gree_code[kGreeStateLength] = {0x00, 0x09, 0x20, 0x50,
@@ -542,9 +590,9 @@ TEST(TestDecodeGree, NormalSynthetic) {
 
 // Decode a real Gree message.
 TEST(TestDecodeGree, NormalRealExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
-  IRGreeAC irgree(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  IRGreeAC ac(kGpioUnused);
   irsend.begin();
 
   uint8_t gree_code[kGreeStateLength] = {0x19, 0x0A, 0x60, 0x50,
@@ -572,18 +620,19 @@ TEST(TestDecodeGree, NormalRealExample) {
   EXPECT_EQ(GREE, irsend.capture.decode_type);
   ASSERT_EQ(kGreeBits, irsend.capture.bits);
   EXPECT_STATE_EQ(gree_code, irsend.capture.state, kGreeBits);
-  irgree.setRaw(irsend.capture.state);
+  ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 26C, Fan: 1 (Low), "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
-      "Swing(V) Mode: Manual, Swing(V): 2 (UNKNOWN), Timer: Off",
+      "Swing(V) Mode: Manual, Swing(V): 2 (UNKNOWN), Timer: Off, "
+      "Display Temp: 3 (Outside)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestGreeClass, toCommon) {
-  IRGreeAC ac(0);
+  IRGreeAC ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kGreeCool);
   ac.setTemp(20);
@@ -616,7 +665,7 @@ TEST(TestGreeClass, toCommon) {
 }
 
 TEST(TestGreeClass, Issue814Power) {
-  IRGreeAC ac(0);
+  IRGreeAC ac(kGpioUnused);
   ac.begin();
 
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/814#issuecomment-511263921
@@ -633,7 +682,8 @@ TEST(TestGreeClass, Issue814Power) {
   EXPECT_EQ(
       "Model: 2 (YBOFB), Power: On, Mode: 1 (Cool), Temp: 23C, Fan: 1 (Low), "
       "Turbo: Off, IFeel: Off, WiFi: Off, XFan: Off, Light: On, Sleep: Off, "
-      "Swing(V) Mode: Auto, Swing(V): 1 (Auto), Timer: Off",
+      "Swing(V) Mode: Auto, Swing(V): 1 (Auto), Timer: Off, "
+      "Display Temp: 0 (Off)",
       ac.toString());
   ac.off();
   EXPECT_STATE_EQ(off, ac.getRaw(), kGreeBits);
@@ -650,7 +700,7 @@ TEST(TestGreeClass, Issue814Power) {
 }
 
 TEST(TestGreeClass, Timer) {
-  IRGreeAC ac(0);
+  IRGreeAC ac(kGpioUnused);
   ac.begin();
 
   ac.setTimer(0);
@@ -688,4 +738,26 @@ TEST(TestGreeClass, Timer) {
   ac.setTimer(24 * 60 + 30);
   EXPECT_TRUE(ac.getTimerEnabled());
   EXPECT_EQ(24 * 60, ac.getTimer());
+}
+
+TEST(TestGreeClass, DisplayTempSource) {
+  IRGreeAC ac(kGpioUnused);
+  ac.begin();
+
+  ac.setDisplayTempSource(1);
+  EXPECT_EQ(1, ac.getDisplayTempSource());
+
+  ac.setDisplayTempSource(2);
+  EXPECT_EQ(2, ac.getDisplayTempSource());
+
+  ac.setDisplayTempSource(3);
+  EXPECT_EQ(3, ac.getDisplayTempSource());
+
+  ac.setDisplayTempSource(1);
+  EXPECT_EQ(1, ac.getDisplayTempSource());
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1118#issuecomment-627674014
+  const uint8_t state[8] = {0x4C, 0x04, 0x60, 0x50, 0x01, 0x02, 0x00, 0xA0};
+  ac.setRaw(state);
+  EXPECT_EQ(2, ac.getDisplayTempSource());
 }

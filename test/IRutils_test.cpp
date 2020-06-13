@@ -518,6 +518,7 @@ TEST(TestUtils, MinsToString) {
 }
 
 TEST(TestUtils, sumNibbles) {
+  // PTR/Array variant.
   uint8_t testdata[] = {0x01, 0x23, 0x45};
   EXPECT_EQ(0, irutils::sumNibbles(testdata, 0));
   EXPECT_EQ(1, irutils::sumNibbles(testdata, 0, 1));
@@ -525,6 +526,30 @@ TEST(TestUtils, sumNibbles) {
   EXPECT_EQ(2, irutils::sumNibbles(testdata, 1, 1));
   EXPECT_EQ(15, irutils::sumNibbles(testdata, 3));
   EXPECT_EQ(115, irutils::sumNibbles(testdata, 3, 100));
+
+  // Integer variant.
+  EXPECT_EQ(0x0, irutils::sumNibbles(0x0));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x1));
+  EXPECT_EQ(0xF, irutils::sumNibbles(0xF));
+  EXPECT_EQ(0x4, irutils::sumNibbles(0x1111));
+  EXPECT_EQ(0x8, irutils::sumNibbles(0x2222));
+  EXPECT_EQ(0x0, irutils::sumNibbles(0x4444));
+  EXPECT_EQ(0xA, irutils::sumNibbles(0x1234));
+  EXPECT_EQ(0xA, irutils::sumNibbles(0x4321));
+  EXPECT_EQ(0xE, irutils::sumNibbles(0xABCD));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x4AE5));
+  EXPECT_EQ(0xC, irutils::sumNibbles(0xFFFF));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0xC005));
+  EXPECT_EQ(0x4, irutils::sumNibbles(0xC035));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x88C0051, 1));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051, 1, 1));
+  EXPECT_EQ(0x6, irutils::sumNibbles(0x88C0051, 2));
+  EXPECT_EQ(0x6, irutils::sumNibbles(0x88C0051, 4));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051, 5));
+  EXPECT_EQ(0x22, irutils::sumNibbles(0x88C0051, 16, 0, false));
+  EXPECT_EQ(0x12, irutils::sumNibbles(0x88C0051, 5, 0, false));
+  EXPECT_EQ(0x22, irutils::sumNibbles(0x88C0051, 255, 0, false));
 }
 
 TEST(TestUtils, BCD) {

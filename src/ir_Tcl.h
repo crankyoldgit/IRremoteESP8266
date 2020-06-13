@@ -63,7 +63,7 @@ class IRTcl112Ac {
 
 #if SEND_TCL112AC
   void send(const uint16_t repeat = kTcl112AcDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TCL
   void begin(void);
   uint8_t* getRaw(void);

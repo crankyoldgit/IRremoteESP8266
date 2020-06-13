@@ -7,6 +7,9 @@
 #include <stdint.h>
 
 // Classes
+
+/// This class performs a simple timer in useconds since instantiated.
+/// @note Handles when the system timer wraps around (once).
 class IRtimer {
  public:
   IRtimer();
@@ -20,6 +23,8 @@ class IRtimer {
   uint32_t start;
 };
 
+/// This class performs a simple timer in milli-seoncds since instantiated.
+/// @note Handles when the system timer wraps around (once).
 class TimerMs {
  public:
   TimerMs();

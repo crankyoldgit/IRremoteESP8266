@@ -1,7 +1,10 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
 
-// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @file
+/// @brief Support for NEC (Renesas) protocols.
+/// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
 
 #define __STDC_LIMIT_MACROS
 #include "ir_NEC.h"
@@ -11,18 +14,17 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
-// Send a raw NEC(Renesas) formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically kNECBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: STABLE / Known working.
-//
-// Ref:
-//  http://www.sbprojects.com/knowledge/ir/nec.php
+// This protocol is used by a lot of other protocols, hence the long list.
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
+     SEND_MIDEA24)
+
+/// Send a raw NEC(Renesas) formatted message.
+/// Status: STABLE / Known working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note This protocol appears to have no header.
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
 void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kNecHdrMark, kNecHdrSpace, kNecBitMark, kNecOneSpace, kNecBitMark,
               kNecZeroSpace, kNecBitMark, kNecMinGap, kNecMinCommandLength,
@@ -37,17 +39,12 @@ void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
                 33);
 }
 
-// Calculate the raw NEC data based on address and command.
-// Args:
-//   address: An address value.
-//   command: An 8-bit command value.
-// Returns:
-//   A raw 32-bit NEC message.
-//
-// Status: STABLE / Expected to work.
-//
-// Ref:
-//  http://www.sbprojects.com/knowledge/ir/nec.php
+/// Calculate the raw NEC data based on address and command.
+/// Status: STABLE / Expected to work.
+/// @param[in] address An address value.
+/// @param[in] command An 8-bit command value.
+/// @return A raw 32-bit NEC message suitable for use with `sendNEC()`.
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
 uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
   command &= 0xFF;  // We only want the least significant byte of command.
   // sendNEC() sends MSB first, but protocol says this is LSB first.
@@ -61,32 +58,26 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
     return (address << 24) + ((address ^ 0xFF) << 16) + command;  // Normal.
   }
 }
-#endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO )
+#endif  // (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO ||
+        //  SEND_MIDEA24)
 
+// This protocol is used by a lot of other protocols, hence the long list.
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
-// Decode the supplied NEC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kNECBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Known good.
-//
-// Notes:
-//   NEC protocol has three varients/forms.
-//     Normal:   an 8 bit address & an 8 bit command in 32 bit data form.
-//               i.e. address + inverted(address) + command + inverted(command)
-//     Extended: a 16 bit address & an 8 bit command in 32 bit data form.
-//               i.e. address + command + inverted(command)
-//     Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/nec.php
+/// Decode the supplied NEC (Renesas) message.
+/// Status: STABLE / Known good.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note NEC protocol has three variants/forms.
+///   Normal:   an 8 bit address & an 8 bit command in 32 bit data form.
+///             i.e. address + inverted(address) + command + inverted(command)
+///   Extended: a 16 bit address & an 8 bit command in 32 bit data form.
+///             i.e. address + command + inverted(command)
+///   Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
 bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   if (results->rawlen < kNecRptLength + offset - 1)
@@ -145,4 +136,5 @@ bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
     results->address = reverseBits((data >> 16) & UINT16_MAX, 16);
   return true;
 }
-#endif  // DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO
+#endif  // (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 ||
+        // DECODE_SANYO)

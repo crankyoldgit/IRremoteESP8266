@@ -1,6 +1,15 @@
 // Copyright 2017 stufisher
 // Copyright 2019 crankyoldgit
 
+/// @file
+/// @brief Trotec A/C
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/279
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1176
+
+// Supports:
+//   Brand: Trotec,  Model: PAC 3200 A/C
+//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C
+
 #ifndef IR_TROTEC_H_
 #define IR_TROTEC_H_
 
@@ -69,7 +78,7 @@ class IRTrotecESP {
 
 #if SEND_TROTEC
   void send(const uint16_t repeat = kTrotecDefaultRepeat);
-  uint8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TROTEC
   void begin(void);
 

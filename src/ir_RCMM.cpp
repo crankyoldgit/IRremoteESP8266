@@ -1,6 +1,8 @@
 // Copyright 2017 David Conran
 
-// Send & decode support for Phillips RC-MM added by David Conran
+/// @file
+/// @brief Support for the Phillips RC-MM protocol.
+/// @see http://www.sbprojects.com/knowledge/ir/rcmm.php
 
 // Supports:
 //   Brand: Microsoft,  Model: XBOX 360
@@ -12,8 +14,6 @@
 #include "IRutils.h"
 
 // Constants
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rcmm.php
 const uint16_t kRcmmTick = 28;  // Technically it would be 27.777*
 const uint16_t kRcmmHdrMarkTicks = 15;
 const uint16_t kRcmmHdrMark = 416;
@@ -38,17 +38,11 @@ const uint8_t kRcmmTolerance = 10;
 const uint16_t kRcmmExcess = 50;
 
 #if SEND_RCMM
-// Send a Philips RC-MM packet.
-//
-// Args:
-//   data: The data we want to send. MSB first.
-//   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
-//   repeat: The nr. of times the message should be sent.
-//
-// Status:  STABLE / Should be working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rcmm.php
+/// Send a Philips RC-MM packet.
+/// Status: STABLE / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
   enableIROut(36, 33);
@@ -88,24 +82,17 @@ void IRsend::sendRCMM(uint64_t data, uint16_t nbits, uint16_t repeat) {
     space(std::max(kRcmmRptLength - usecs.elapsed(), kRcmmMinGap));
   }
 }
-#endif
+#endif  // SEND_RCMM
 
 #if DECODE_RCMM
-// Decode a Philips RC-MM packet (between 12 & 32 bits) if possible.
-// Places successful decode information in the results pointer.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. Typically kRCMMBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status:  STABLE / Should be working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rcmm.php
+/// Decode a Philips RC-MM packet (between 12 & 32 bits) if possible.
+/// Status:  STABLE / Should be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeRCMM(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   uint64_t data = 0;
@@ -174,4 +161,4 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t offset,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_RCMM

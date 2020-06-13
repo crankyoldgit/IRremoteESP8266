@@ -40,8 +40,9 @@ const uint16_t kMaxAccurateUsecDelay = 16383;
 //  Usecs to wait between messages we don't know the proper gap time.
 const uint32_t kDefaultMessageGap = 100000;
 
-
+/// Enumerators and Structures for the Common A/C API.
 namespace stdAc {
+  /// Common A/C settings for A/C operating modes.
   enum class opmode_t {
     kOff  = -1,
     kAuto =  0,
@@ -53,6 +54,7 @@ namespace stdAc {
     kLastOpmodeEnum = kFan,
   };
 
+  /// Common A/C settings for Fan Speeds.
   enum class fanspeed_t {
     kAuto =   0,
     kMin =    1,
@@ -64,6 +66,7 @@ namespace stdAc {
     kLastFanspeedEnum = kMax,
   };
 
+  /// Common A/C settings for Vertical Swing.
   enum class swingv_t {
     kOff =    -1,
     kAuto =    0,
@@ -76,6 +79,7 @@ namespace stdAc {
     kLastSwingvEnum = kLowest,
   };
 
+  /// Common A/C settings for Horizontal Swing.
   enum class swingh_t {
     kOff =     -1,
     kAuto =     0,  // a.k.a. On.
@@ -89,7 +93,7 @@ namespace stdAc {
     kLastSwinghEnum = kWide,
   };
 
-  // Structure to hold a common A/C state.
+  /// Structure to hold a common A/C state.
   typedef struct {
     decode_type_t protocol;
     int16_t model;
@@ -112,7 +116,7 @@ namespace stdAc {
   } state_t;
 };  // namespace stdAc
 
-
+/// Fujitsu A/C model numbers
 enum fujitsu_ac_remote_model_t {
   ARRAH2E = 1,  // (1) AR-RAH2E, AR-RAC1E, AR-RAE1E (Default)
   ARDB1,        // (2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work)
@@ -121,16 +125,19 @@ enum fujitsu_ac_remote_model_t {
   ARRY4,        // (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
 };
 
+/// Gree A/C model numbers
 enum gree_ac_remote_model_t {
   YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
   YBOFB,     // (2) Green, YBOFB2, YAPOF3
 };
 
+/// HITACHI_AC1 A/C model numbers
 enum hitachi_ac1_remote_model_t {
   R_LT0541_HTA_A = 1,  // (1) R-LT0541-HTA Remote in "A" setting. (Default)
   R_LT0541_HTA_B,      // (2) R-LT0541-HTA Remote in "B" setting.
 };
 
+/// Panasonic A/C model numbers
 enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
   kPanasonicLke = 1,
@@ -141,11 +148,13 @@ enum panasonic_ac_remote_model_t {
   kPanasonicRkr = 6,
 };
 
+/// Whirlpool A/C model numbers
 enum whirlpool_ac_remote_model_t {
   DG11J13A = 1,  // DG11J1-04 too
   DG11J191,
 };
 
+/// LG A/C model numbers
 enum lg_ac_remote_model_t {
   GE6711AR2853M = 1,  // (1) LG 28-bit Protocol (default)
   AKB75215403,        // (2) LG2 28-bit Protocol
@@ -153,6 +162,11 @@ enum lg_ac_remote_model_t {
 
 
 // Classes
+
+/// Class for sending all basic IR protocols.
+/// @note Originally from https://github.com/shirriff/Arduino-IRremote/
+///  Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
+///  sending IR code on ESP8266
 class IRsend {
  public:
   explicit IRsend(uint16_t IRsendPin, bool inverted = false,
@@ -204,9 +218,10 @@ class IRsend {
   static uint16_t defaultBits(const decode_type_t protocol);
   bool send(const decode_type_t type, const uint64_t data,
             const uint16_t nbits, const uint16_t repeat = kNoRepeat);
-  bool send(const decode_type_t type, const uint8_t state[],
+  bool send(const decode_type_t type, const uint8_t *state,
             const uint16_t nbytes);
-#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO)
+#if (SEND_NEC || SEND_SHERWOOD || SEND_AIWA_RC_T501 || SEND_SANYO || \
+     SEND_MIDEA24)
   void sendNEC(uint64_t data, uint16_t nbits = kNECBits,
                uint16_t repeat = kNoRepeat);
   uint32_t encodeNEC(uint16_t address, uint16_t command);
@@ -297,20 +312,20 @@ class IRsend {
                            const uint8_t subdevice, const uint8_t function);
 #endif
 #if SEND_RC5
-  void sendRC5(uint64_t data, uint16_t nbits = kRC5XBits,
-               uint16_t repeat = kNoRepeat);
-  uint16_t encodeRC5(uint8_t address, uint8_t command,
-                     bool key_released = false);
-  uint16_t encodeRC5X(uint8_t address, uint8_t command,
-                      bool key_released = false);
-  uint64_t toggleRC5(uint64_t data);
+  void sendRC5(const uint64_t data, uint16_t nbits = kRC5XBits,
+               const uint16_t repeat = kNoRepeat);
+  uint16_t encodeRC5(const uint8_t address, const uint8_t command,
+                     const bool key_released = false);
+  uint16_t encodeRC5X(const uint8_t address, const uint8_t command,
+                      const bool key_released = false);
+  uint64_t toggleRC5(const uint64_t data);
 #endif
 #if SEND_RC6
-  void sendRC6(uint64_t data, uint16_t nbits = kRC6Mode0Bits,
-               uint16_t repeat = kNoRepeat);
-  uint64_t encodeRC6(uint32_t address, uint8_t command,
-                     uint16_t mode = kRC6Mode0Bits);
-  uint64_t toggleRC6(uint64_t data, uint16_t nbits = kRC6Mode0Bits);
+  void sendRC6(const uint64_t data, const uint16_t nbits = kRC6Mode0Bits,
+               const uint16_t repeat = kNoRepeat);
+  uint64_t encodeRC6(const uint32_t address, const uint8_t command,
+                     const uint16_t mode = kRC6Mode0Bits);
+  uint64_t toggleRC6(const uint64_t data, const uint16_t nbits = kRC6Mode0Bits);
 #endif
 #if SEND_RCMM
   void sendRCMM(uint64_t data, uint16_t nbits = kRCMMBits,
@@ -452,11 +467,15 @@ class IRsend {
 #if SEND_MIDEA
   void sendMidea(uint64_t data, uint16_t nbits = kMideaBits,
                  uint16_t repeat = kMideaMinRepeat);
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIDEA24
+  void sendMidea24(const uint64_t data, const uint16_t nbits = kMidea24Bits,
+                   const uint16_t repeat = kMidea24MinRepeat);
+#endif  // SEND_MIDEA24
 #if SEND_MAGIQUEST
-  void sendMagiQuest(uint64_t data, uint16_t nbits = kMagiquestBits,
-                     uint16_t repeat = kNoRepeat);
-  uint64_t encodeMagiQuest(uint32_t wand_id, uint16_t magnitude);
+  void sendMagiQuest(const uint64_t data, const uint16_t nbits = kMagiquestBits,
+                     const uint16_t repeat = kNoRepeat);
+  uint64_t encodeMagiQuest(const uint32_t wand_id, const uint16_t magnitude);
 #endif
 #if SEND_LASERTAG
   void sendLasertag(uint64_t data, uint16_t nbits = kLasertagBits,
@@ -465,6 +484,14 @@ class IRsend {
 #if SEND_CARRIER_AC
   void sendCarrierAC(uint64_t data, uint16_t nbits = kCarrierAcBits,
                      uint16_t repeat = kCarrierAcMinRepeat);
+#endif
+#if SEND_CARRIER_AC40
+  void sendCarrierAC40(uint64_t data, uint16_t nbits = kCarrierAc40Bits,
+                       uint16_t repeat = kCarrierAc40MinRepeat);
+#endif
+#if SEND_CARRIER_AC64
+  void sendCarrierAC64(uint64_t data, uint16_t nbits = kCarrierAc64Bits,
+                       uint16_t repeat = kCarrierAc64MinRepeat);
 #endif
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
   void sendHaierAC(const unsigned char data[],
@@ -497,6 +524,11 @@ class IRsend {
                                               // different sizes
                       const uint16_t repeat = kHitachiAcDefaultRepeat);
 #endif  // SEND_HITACHI_AC3
+#if SEND_HITACHI_AC344
+  void sendHitachiAc344(const unsigned char data[],
+                        const uint16_t nbytes = kHitachiAc344StateLength,
+                        const uint16_t repeat = kHitachiAcDefaultRepeat);
+#endif  // SEND_HITACHI_AC344
 #if SEND_HITACHI_AC424
   void sendHitachiAc424(const unsigned char data[],
                         const uint16_t nbytes = kHitachiAc424StateLength,
@@ -572,6 +604,30 @@ class IRsend {
 #if SEND_AIRWELL
   void sendAirwell(uint64_t data, uint16_t nbits = kAirwellBits,
                    uint16_t repeat = kAirwellMinRepeats);
+#endif
+#if SEND_DELONGHI_AC
+  void sendDelonghiAc(uint64_t data, uint16_t nbits = kDelonghiAcBits,
+                      uint16_t repeat = kDelonghiAcDefaultRepeat);
+#endif
+#if SEND_DOSHISHA
+  void sendDoshisha(const uint64_t data, uint16_t nbits = kDoshishaBits,
+                    const uint16_t repeat = kNoRepeat);
+  uint64_t encodeDoshisha(const uint8_t command, const uint8_t channel = 0);
+#endif  // SEND_DOSHISHA
+#if SEND_MULTIBRACKETS
+  void sendMultibrackets(const uint64_t data,
+                         const uint16_t nbits = kMultibracketsBits,
+                         const uint16_t repeat = kMultibracketsDefaultRepeat);
+#endif
+#if SEND_CORONA_AC
+  void sendCoronaAc(const uint8_t data[],
+                    const uint16_t nbytes = kCoronaAcStateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_CORONA_AC
+#if SEND_ZEPEAL
+  void sendZepeal(const uint64_t data,
+                  const uint16_t nbits = kZepealBits,
+                  const uint16_t repeat = kZepealMinRepeat);
 #endif
 
  protected:

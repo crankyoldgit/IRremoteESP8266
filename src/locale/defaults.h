@@ -189,6 +189,9 @@
 #ifndef D_STR_SENSOR
 #define D_STR_SENSOR "Sensor"
 #endif  // D_STR_SENSOR
+#ifndef D_STR_DISPLAY
+#define D_STR_DISPLAY "Display"
+#endif  // D_STR_DISPLAY
 #ifndef D_STR_WEEKLY
 #define D_STR_WEEKLY "Weekly"
 #endif  // D_STR_WEEKLY
@@ -216,6 +219,9 @@
 #ifndef D_STR_NA
 #define D_STR_NA "N/A"
 #endif  // D_STR_NA
+#ifndef D_STR_INSIDE
+#define D_STR_INSIDE "Inside"
+#endif  // D_STR_INSIDE
 #ifndef D_STR_OUTSIDE
 #define D_STR_OUTSIDE "Outside"
 #endif  // D_STR_OUTSIDE
@@ -366,9 +372,15 @@
 #ifndef D_STR_POWERTOGGLE
 #define D_STR_POWERTOGGLE D_STR_POWER " " D_STR_TOGGLE
 #endif  // D_STR_POWERTOGGLE
+#ifndef D_STR_POWERBUTTON
+#define D_STR_POWERBUTTON D_STR_POWER " " D_STR_BUTTON
+#endif  // D_STR_POWERBUTTON
 #ifndef D_STR_PREVIOUSPOWER
 #define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
 #endif  // D_STR_PREVIOUSPOWER
+#ifndef D_STR_DISPLAYTEMP
+#define D_STR_DISPLAYTEMP D_STR_DISPLAY " " D_STR_TEMP
+#endif  // D_STR_DISPLAYTEMP
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP
@@ -466,9 +478,18 @@
 #ifndef D_STR_CARRIER_AC
 #define D_STR_CARRIER_AC "CARRIER_AC"
 #endif  // D_STR_CARRIER_AC
+#ifndef D_STR_CARRIER_AC40
+#define D_STR_CARRIER_AC40 D_STR_CARRIER_AC "40"
+#endif  // D_STR_CARRIER_AC40
+#ifndef D_STR_CARRIER_AC64
+#define D_STR_CARRIER_AC64 D_STR_CARRIER_AC "64"
+#endif  // D_STR_CARRIER_AC64
 #ifndef D_STR_COOLIX
 #define D_STR_COOLIX "COOLIX"
 #endif  // D_STR_COOLIX
+#ifndef D_STR_CORONA_AC
+#define D_STR_CORONA_AC "CORONA_AC"
+#endif  // D_STR_CORONA_AC
 #ifndef D_STR_DAIKIN
 #define D_STR_DAIKIN "DAIKIN"
 #endif  // D_STR_DAIKIN
@@ -493,12 +514,18 @@
 #ifndef D_STR_DAIKIN64
 #define D_STR_DAIKIN64 "DAIKIN64"
 #endif  // D_STR_DAIKIN64
+#ifndef D_STR_DELONGHI_AC
+#define D_STR_DELONGHI_AC "DELONGHI_AC"
+#endif  // D_STR_DELONGHI_AC
 #ifndef D_STR_DENON
 #define D_STR_DENON "DENON"
 #endif  // D_STR_DENON
 #ifndef D_STR_DISH
 #define D_STR_DISH "DISH"
 #endif  // D_STR_DISH
+#ifndef D_STR_DOSHISHA
+#define D_STR_DOSHISHA "DOSHISHA"
+#endif  // D_STR_DOSHISHA
 #ifndef D_STR_ELECTRA_AC
 #define D_STR_ELECTRA_AC "ELECTRA_AC"
 #endif  // D_STR_ELECTRA_AC
@@ -538,6 +565,9 @@
 #ifndef D_STR_HITACHI_AC3
 #define D_STR_HITACHI_AC3 "HITACHI_AC3"
 #endif  // D_STR_HITACHI_AC3
+#ifndef D_STR_HITACHI_AC344
+#define D_STR_HITACHI_AC344 "HITACHI_AC344"
+#endif  // D_STR_HITACHI_AC344
 #ifndef D_STR_HITACHI_AC424
 #define D_STR_HITACHI_AC424 "HITACHI_AC424"
 #endif  // D_STR_HITACHI_AC424
@@ -571,6 +601,9 @@
 #ifndef D_STR_MIDEA
 #define D_STR_MIDEA "MIDEA"
 #endif  // D_STR_MIDEA
+#ifndef D_STR_MIDEA24
+#define D_STR_MIDEA24 "MIDEA24"
+#endif  // D_STR_MIDEA24
 #ifndef D_STR_MITSUBISHI
 #define D_STR_MITSUBISHI "MITSUBISHI"
 #endif  // D_STR_MITSUBISHI
@@ -592,6 +625,9 @@
 #ifndef D_STR_MITSUBISHI_HEAVY_88
 #define D_STR_MITSUBISHI_HEAVY_88 "MITSUBISHI_HEAVY_88"
 #endif  // D_STR_MITSUBISHI_HEAVY_88
+#ifndef D_STR_MULTIBRACKETS
+#define D_STR_MULTIBRACKETS "MULTIBRACKETS"
+#endif  // D_STR_MULTIBRACKETS
 #ifndef D_STR_MWM
 #define D_STR_MWM "MWM"
 #endif  // D_STR_MWM
@@ -694,8 +730,11 @@
 #ifndef D_STR_WHYNTER
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
+#ifndef D_STR_ZEPEAL
+#define D_STR_ZEPEAL "ZEPEAL"
+#endif  // D_STR_ZEPEAL
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"
 #endif  // D_STR_TIMESTAMP
@@ -707,7 +746,7 @@
 #endif  // D_STR_MESGDESC
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 is now running and waiting for IR input on Pin %d"
+    "IRrecvDump is now running and waiting for IR input on Pin %d"
 #endif  // D_STR_IRRECVDUMP_STARTUP
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \
