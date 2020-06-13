@@ -37,6 +37,8 @@ const uint16_t kCarrierAc40HdrSpace = 4166;
 const uint16_t kCarrierAc40BitMark = 547;
 const uint16_t kCarrierAc40OneSpace = 1540;
 const uint16_t kCarrierAc40ZeroSpace = 497;
+const uint32_t kCarrierAc40Gap = 150000;  ///<
+///< @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1190#issuecomment-643380155
 
 const uint16_t kCarrierAc64HdrMark = 8940;
 const uint16_t kCarrierAc64HdrSpace = 4556;
@@ -120,7 +122,7 @@ bool IRrecv::decodeCarrierAC(decode_results *results, uint16_t offset,
 
 #if SEND_CARRIER_AC40
 /// Send a Carrier 40bit HVAC formatted message.
-/// Status: Alpha / Yet to be tested against a real device.
+/// Status: STABLE / Tested against a real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The bit size of the message being sent.
 /// @param[in] repeat The number of times the message is to be repeated.
@@ -128,7 +130,7 @@ void IRsend::sendCarrierAC40(const uint64_t data, const uint16_t nbits,
                              const uint16_t repeat) {
   sendGeneric(kCarrierAc40HdrMark, kCarrierAc40HdrSpace, kCarrierAc40BitMark,
               kCarrierAc40OneSpace, kCarrierAc40BitMark, kCarrierAc40ZeroSpace,
-              kCarrierAc40BitMark, kCarrierAcGap,
+              kCarrierAc40BitMark, kCarrierAc40Gap,
               data, nbits, kCarrierAcFreq, true, repeat, kDutyDefault);
 }
 #endif  // SEND_CARRIER_AC40
@@ -136,7 +138,7 @@ void IRsend::sendCarrierAC40(const uint64_t data, const uint16_t nbits,
 #if DECODE_CARRIER_AC40
 /// Decode the supplied Carrier 40-bit HVAC message.
 /// Carrier HVAC messages contain only 40 bits, but it is sent three(3) times.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Tested against a real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -156,7 +158,7 @@ bool IRrecv::decodeCarrierAC40(decode_results *results, uint16_t offset,
                     kCarrierAc40HdrMark, kCarrierAc40HdrSpace,
                     kCarrierAc40BitMark, kCarrierAc40OneSpace,
                     kCarrierAc40BitMark, kCarrierAc40ZeroSpace,
-                    kCarrierAc40BitMark, kCarrierAcGap, true)) return false;
+                    kCarrierAc40BitMark, kCarrierAc40Gap, true)) return false;
 
   // Success
   results->bits = nbits;
