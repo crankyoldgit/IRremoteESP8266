@@ -2,7 +2,12 @@
 // Copyright 2016 marcosamarinho
 // Copyright 2017,2020 David Conran
 
-// Sony Remote Emulation
+/// @file
+/// @brief Support for Sony SIRC(Serial Infra-Red Control) protocols.
+/// Sony originally added from https://github.com/shirriff/Arduino-IRremote/
+/// Updates from marcosamarinho
+/// @see http://www.sbprojects.com/knowledge/ir/sirc.php
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1018
 
 // Supports:
 //   Brand: Sony,  Model: HT-CT380 Soundbar (Uses 38kHz & 3 repeats)
@@ -12,12 +17,8 @@
 #include "IRsend.h"
 #include "IRutils.h"
 
-// Sony originally added from https://github.com/shirriff/Arduino-IRremote/
-// Updates from marcosamarinho
 
 // Constants
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/sirc.php
 const uint16_t kSonyTick = 200;
 const uint16_t kSonyHdrMarkTicks = 12;
 const uint16_t kSonyHdrMark = kSonyHdrMarkTicks * kSonyTick;
@@ -35,80 +36,57 @@ const uint16_t kSonyStdFreq = 40000;  // kHz
 const uint16_t kSonyAltFreq = 38000;  // kHz
 
 #if SEND_SONY
-// Send a standard Sony/SIRC(Serial Infra-Red Control) message. (40kHz)
-//
-// Args:
-//   data: message to be sent.
-//   nbits: Nr. of bits of the message to be sent.
-//   repeat: Nr. of additional times the message is to be sent. (Default: 2)
-//
-// Status: STABLE / Known working.
-//
-// Notes:
-//   sendSony() should typically be called with repeat=2 as Sony devices
-//   expect the message to be sent at least 3 times.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/sirc.php
-void IRsend::sendSony(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a standard Sony/SIRC(Serial Infra-Red Control) message. (40kHz)
+/// Status: STABLE / Known working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note sendSony() should typically be called with repeat=2 as Sony devices
+///   expect the message to be sent at least 3 times.
+void IRsend::sendSony(const uint64_t data, const uint16_t nbits,
+                      const uint16_t repeat) {
   _sendSony(data, nbits, repeat, kSonyStdFreq);
 }
 
-// Send an alternative 38kHz Sony/SIRC(Serial Infra-Red Control) message.
-//
-// Args:
-//   data: message to be sent.
-//   nbits: Nr. of bits of the message to be sent.
-//   repeat: Nr. of additional times the message is to be sent. (Default: 3)
-//
-// Status: STABLE / Known working.
-//
-// Notes:
-//   - `sendSony38()`` should typically be called with repeat=3 as these Sony
-//      devices expect the message to be sent at least 4 times.
-//   - Messages send via this method will be detected by this library as just
-//     `SONY`, not `SONY_38K` as the library has no way to determine the
-//     modulation frequency used. Hence, there is no `decodeSony38()`.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/sirc.php
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1018
-void IRsend::sendSony38(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send an alternative 38kHz Sony/SIRC(Serial Infra-Red Control) message.
+/// Status: STABLE / Known working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note `sendSony38()` should typically be called with repeat=3 as these Sony
+///   devices expect the message to be sent at least 4 times.
+/// @warning Messages send via this method will be detected by this library as
+///   just `SONY`, not `SONY_38K` as the library has no way to determine the
+///   modulation frequency used. Hence, there is no `decodeSony38()`.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1018
+void IRsend::sendSony38(const uint64_t data, const uint16_t nbits,
+                        const uint16_t repeat) {
   _sendSony(data, nbits, repeat, kSonyAltFreq);
 }
 
-// Internal procedure to generate a Sony/SIRC(Serial Infra-Red Control) message.
-//
-// Args:
-//   data: message to be sent.
-//   nbits: Nr. of bits of the message to be sent.
-//   repeat: Nr. of additional times the message is to be sent.
-//   freq: Frequency of the modulation to transmit at. (Hz or kHz)
-//
-// Status: STABLE / Known working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/sirc.php
-void IRsend::_sendSony(uint64_t data, uint16_t nbits, uint16_t repeat,
-                      uint16_t freq) {
+/// Internal procedure to generate a Sony/SIRC(Serial Infra-Red Control) message
+/// Status: STABLE / Known working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @param[in] freq Frequency of the modulation to transmit at. (Hz or kHz)
+void IRsend::_sendSony(const uint64_t data, const uint16_t nbits,
+                       const uint16_t repeat, const uint16_t freq) {
   sendGeneric(kSonyHdrMark, kSonySpace, kSonyOneMark, kSonySpace, kSonyZeroMark,
               kSonySpace,
               0,  // No Footer mark.
               kSonyMinGap, kSonyRptLength, data, nbits, freq, true, repeat, 33);
 }
 
-// Convert Sony/SIRC command, address, & extended bits into sendSony format.
-// Args:
-//   nbits:    Sony protocol bit size.
-//   command:  Sony command bits.
-//   address:  Sony address bits.
-//   extended: Sony extended bits.
-// Returns:
-//   A sendSony compatible data message.
-//
-// Status: STABLE / Should be working.
-uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
-                            uint16_t extended) {
+/// Convert Sony/SIRC command, address, & extended bits into sendSony format.
+/// Status: STABLE / Should be working.
+/// @param[in] nbits Sony protocol bit size.
+/// @param[in] command Sony command bits.
+/// @param[in] address Sony address bits.
+/// @param[in] extended Sony extended bits.
+/// @return A `sendSony()` etc compatible data message.
+uint32_t IRsend::encodeSony(const uint16_t nbits, const uint16_t command,
+                            const uint16_t address, const uint16_t extended) {
   uint32_t result = 0;
   switch (nbits) {
     case 12:  // 5 address bits.
@@ -127,26 +105,19 @@ uint32_t IRsend::encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
   result = (result << 7) | (command & 0x7F);  // All sizes have 7 command bits.
   return reverseBits(result, nbits);  // sendSony uses reverse ordered bits.
 }
-#endif
+#endif  // SEND_SONY
 
 #if DECODE_SONY
-// Decode the supplied Sony/SIRC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Should be working. strict mode is ALPHA / Untested.
-//
-// Notes:
-//   SONY protocol, SIRC (Serial Infra-Red Control) can be 12,15,20 bits long.
-// Ref:
-// http://www.sbprojects.com/knowledge/ir/sirc.php
+/// Decode the supplied Sony/SIRC message.
+/// Status: STABLE / Should be working. strict mode is ALPHA / Untested.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note SONY protocol, SIRC (Serial Infra-Red Control) can be 12, 15, or 20
+///   bits long.
 bool IRrecv::decodeSony(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
@@ -217,4 +188,4 @@ bool IRrecv::decodeSony(decode_results *results, uint16_t offset,
   }
   return true;
 }
-#endif
+#endif  // DECODE_SONY

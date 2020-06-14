@@ -3,9 +3,14 @@
 // Copyright 2017 David Conran
 
 /// @file
-/// @brief Sanyo
+/// @brief Support for Sanyo protocols.
+/// Sanyo LC7461 support originally by marcosamarinho
+/// Sanyo SA 8650B originally added from
+///   https://github.com/shirriff/Arduino-IRremote/
 /// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
 /// @see http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+/// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 
 // Supports:
 //   Brand: Sanyo,  Model: SA 8650B - disabled
@@ -15,15 +20,9 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 
-// Sanyo SA 8650B originally added from:
-//   https://github.com/shirriff/Arduino-IRremote/
-// Sanyo LC7461 support originally by marcosamarinho
 
 // Constants
 // Sanyo SA 8650B
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
-
 const uint16_t kSanyoSa8650bHdrMark = 3500;  // seen range 3500
 const uint16_t kSanyoSa8650bHdrSpace = 950;  // seen 950
 const uint16_t kSanyoSa8650bOneMark = 2400;  // seen 2400
@@ -31,12 +30,8 @@ const uint16_t kSanyoSa8650bZeroMark = 700;  // seen 700
 // usually see 713 - not using ticks as get number wrapround
 const uint16_t kSanyoSa8650bDoubleSpaceUsecs = 800;
 const uint16_t kSanyoSa8650bRptLength = 45000;
-// Sanyo LC7461
-// Ref:
-//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
-//   http://slydiman.narod.ru/scr/kb/sanyo.htm
-//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 
+// Sanyo LC7461
 const uint16_t kSanyoLc7461AddressMask = (1 << kSanyoLC7461AddressBits) - 1;
 const uint16_t kSanyoLc7461CommandMask = (1 << kSanyoLC7461CommandBits) - 1;
 const uint16_t kSanyoLc7461HdrMark = 9000;
@@ -54,18 +49,15 @@ const uint16_t kSanyoLc7461MinGap =
      kSanyoLc7461BitMark);
 
 #if SEND_SANYO
-// Construct a Sanyo LC7461 message.
-//
-// Args:
-//   address: The 13 bit value of the address(Custom) portion of the protocol.
-//   command: The 8 bit value of the command(Key) portion of the protocol.
-// Returns:
-//   An uint64_t with the encoded raw 42 bit Sanyo LC7461 data value.
-//
-// Notes:
-//   This protocol uses the NEC protocol timings. However, data is
-//   formatted as : address(13 bits), !address, command(8 bits), !command.
-//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+/// Construct a Sanyo LC7461 message.
+/// @param[in] address The 13 bit value of the address(Custom) portion of the
+///   protocol.
+/// @param[in] command The 8 bit value of the command(Key) portion of the
+///   protocol.
+/// @return An uint64_t with the encoded raw 42 bit Sanyo LC7461 data value.
+/// @note This protocol uses the NEC protocol timings. However, data is
+///  formatted as : address(13 bits), !address, command(8 bits), !command.
+///  According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
 uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint8_t command) {
   // Mask our input values to ensure the correct bit sizes.
   address &= kSanyoLc7461AddressMask;
@@ -84,56 +76,44 @@ uint64_t IRsend::encodeSanyoLC7461(uint16_t address, uint8_t command) {
   return data;
 }
 
-// Send a Sanyo LC7461 message.
-//
-// Args:
-//   data:   The contents of the command you want to send.
-//   nbits:  The bit size of the command being sent.
-//   repeat: The number of times you want the command to be repeated.
-//
-// Status: BETA / Probably works.
-//
-// Notes:
-//   Based on @marcosamarinho's work.
-//   This protocol uses the NEC protocol timings. However, data is
-//   formatted as : address(13 bits), !address, command (8 bits), !command.
-//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
-//   Information for this protocol is available at the Sanyo LC7461 datasheet.
-//   Repeats are performed similar to the NEC method of sending a special
-//   repeat message, rather than duplicating the entire message.
-// Ref:
-//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
-//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
-void IRsend::sendSanyoLC7461(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a Sanyo LC7461 message.
+/// Status: BETA / Probably works.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note Based on \@marcosamarinho's work.
+///   This protocol uses the NEC protocol timings. However, data is
+///   formatted as : address(13 bits), !address, command (8 bits), !command.
+///   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+///   Information for this protocol is available at the Sanyo LC7461 datasheet.
+///   Repeats are performed similar to the NEC method of sending a special
+///   repeat message, rather than duplicating the entire message.
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+/// @see http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+void IRsend::sendSanyoLC7461(const uint64_t data, const uint16_t nbits,
+                             const uint16_t repeat) {
   // This protocol appears to be another 42-bit variant of the NEC protocol.
   sendNEC(data, nbits, repeat);
 }
 #endif  // SEND_SANYO
 
 #if DECODE_SANYO
-// Decode the supplied SANYO LC7461 message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Probably works.
-//
-// Notes:
-//   Based on @marcosamarinho's work.
-//   This protocol uses the NEC protocol. However, data is
-//   formatted as : address(13 bits), !address, command (8 bits), !command.
-//   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
-//   Information for this protocol is available at the Sanyo LC7461 datasheet.
-// Ref:
-//   http://slydiman.narod.ru/scr/kb/sanyo.htm
-//   https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
-//   http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
+/// Decode the supplied SANYO LC7461 message.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note Based on \@marcosamarinho's work.
+///   This protocol uses the NEC protocol. However, data is
+///   formatted as : address(13 bits), !address, command (8 bits), !command.
+///   According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
+///   Information for this protocol is available at the Sanyo LC7461 datasheet.
+/// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
+/// @see http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t offset,
                                const uint16_t nbits, const bool strict) {
   if (strict && nbits != kSanyoLC7461Bits)
@@ -171,24 +151,21 @@ bool IRrecv::decodeSanyoLC7461(decode_results *results, uint16_t offset,
 }
 
 /* NOTE: Disabled due to poor quality.
-// Decode the supplied Sanyo SA 8650B message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   nbits:   Nr. of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Depricated.
-//
-// NOTE: This decoder looks like rubbish. Only keeping it for compatibility
-//       with the Arduino IRremote library. Seriously, don't trust it.
-//       If someone has a device that this is supposed to be for, please log an
-//       Issue on github with a rawData dump please. We should probably remove
-//       it. We think this is a Sanyo decoder - serial = SA 8650B
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
+/// Decode the supplied Sanyo SA 8650B message.
+/// Status: Depricated.
+/// @depricated Disabled due to poor quality.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @warning This decoder looks like rubbish. Only keeping it for compatibility
+///   with the Arduino IRremote library. Seriously, don't trust it.
+///   If someone has a device that this is supposed to be for, please log an
+///   Issue on github with a rawData dump please. We should probably remove it.
+///   We think this is a Sanyo decoder - serial = SA 8650B
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Sanyo.cpp
 bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
   if (results->rawlen < 2 * nbits + kHeader - 1)
     return false;  // Shorter than shortest possible.
