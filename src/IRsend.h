@@ -290,8 +290,9 @@ class IRsend {
 #endif
 #if SEND_SANYO
   uint64_t encodeSanyoLC7461(uint16_t address, uint8_t command);
-  void sendSanyoLC7461(uint64_t data, uint16_t nbits = kSanyoLC7461Bits,
-                       uint16_t repeat = kNoRepeat);
+  void sendSanyoLC7461(const uint64_t data,
+                       const uint16_t nbits = kSanyoLC7461Bits,
+                       const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_DISH
   // sendDISH() should typically be called with repeat=3 as DISH devices
