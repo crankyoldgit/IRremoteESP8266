@@ -321,24 +321,30 @@ bool IRNeoclimaAc::getSleep(void) {
   return GETBIT8(remote_state[7],  kNeoclimaSleepOffset);
 }
 
-// A.k.a. Swing
+/// Set the vertical swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setSwingV(const bool on) {
   this->setButton(kNeoclimaButtonSwing);
   setBits(&remote_state[7], kNeoclimaSwingVOffset, kNeoclimaSwingVSize,
           on ? kNeoclimaSwingVOn : kNeoclimaSwingVOff);
 }
 
+/// Get the vertical swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRNeoclimaAc::getSwingV(void) {
   return GETBITS8(remote_state[7], kNeoclimaSwingVOffset,
                   kNeoclimaSwingVSize) == kNeoclimaSwingVOn;
 }
 
-// A.k.a. Air Flow
+/// Set the horizontal swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setSwingH(const bool on) {
   this->setButton(kNeoclimaButtonAirFlow);
   setBit(&remote_state[7], kNeoclimaSwingHOffset, !on);  // Cleared when `on`
 }
 
+/// Get the horizontal swing (Air Flow) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRNeoclimaAc::getSwingH(void) {
   return !GETBIT8(remote_state[7], kNeoclimaSwingHOffset);
 }
@@ -539,6 +545,7 @@ String IRNeoclimaAc::toString(void) {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeNeoclima(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   // Compliance
