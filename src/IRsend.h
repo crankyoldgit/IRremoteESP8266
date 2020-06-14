@@ -232,13 +232,13 @@ class IRsend {
   // Legacy use of this procedure was to only send a single code so call it with
   // repeat=0 for backward compatibility. As of v2.0 it defaults to sending
   // a Sony command that will be accepted be a device.
-  void sendSony(uint64_t data, uint16_t nbits = kSony20Bits,
-                uint16_t repeat = kSonyMinRepeat);
-  void sendSony38(uint64_t data, uint16_t nbits = kSony20Bits,
-                  uint16_t repeat = kSonyMinRepeat + 1);
-  uint32_t encodeSony(uint16_t nbits, uint16_t command, uint16_t address,
-                      uint16_t extended = 0);
-#endif
+  void sendSony(const uint64_t data, const uint16_t nbits = kSony20Bits,
+                const uint16_t repeat = kSonyMinRepeat);
+  void sendSony38(const uint64_t data, const uint16_t nbits = kSony20Bits,
+                  const uint16_t repeat = kSonyMinRepeat + 1);
+  uint32_t encodeSony(const uint16_t nbits, const uint16_t command,
+                      const uint16_t address, const uint16_t extended = 0);
+#endif  // SEND_SONY
 #if SEND_SHERWOOD
   void sendSherwood(uint64_t data, uint16_t nbits = kSherwoodBits,
                     uint16_t repeat = kSherwoodMinRepeat);
@@ -658,9 +658,9 @@ class IRsend {
   bool modulation;
   uint32_t calcUSecPeriod(uint32_t hz, bool use_offset = true);
 #if SEND_SONY
-  void _sendSony(uint64_t data, uint16_t nbits,
-                 uint16_t repeat, uint16_t freq);
-#endif
+  void _sendSony(const uint64_t data, const uint16_t nbits,
+                 const uint16_t repeat, const uint16_t freq);
+#endif  // SEND_SONY
 };
 
 #endif  // IRSEND_H_
