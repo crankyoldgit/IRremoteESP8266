@@ -337,8 +337,8 @@ class IRsend {
                   uint16_t repeat = kCoolixDefaultRepeat);
 #endif
 #if SEND_WHYNTER
-  void sendWhynter(uint64_t data, uint16_t nbits = kWhynterBits,
-                   uint16_t repeat = kNoRepeat);
+  void sendWhynter(const uint64_t data, const uint16_t nbits = kWhynterBits,
+                   const uint16_t repeat = kNoRepeat);
 #endif
 #if SEND_MITSUBISHI
   void sendMitsubishi(uint64_t data, uint16_t nbits = kMitsubishiBits,

@@ -105,6 +105,7 @@ uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 /// @note LG 32bit protocol appears near identical to the Samsung protocol.
 ///   They differ on their compliance criteria and how they repeat.
 /// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
@@ -180,6 +181,7 @@ void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/621
 bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
@@ -318,7 +320,7 @@ bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
 }
 
 /// Update the checksum for the internal state.
-/// @param[in] length The length/size of the nternal array to checksum.
+/// @param[in] length The length/size of the internal array to checksum.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 13) return;
   setBits(&remote_state[length - 6], kHighNibble, kNibbleSize,
@@ -695,7 +697,6 @@ stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRSamsungAc::toCommon(void) {
@@ -776,6 +777,7 @@ String IRSamsungAc::toString(void) {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {

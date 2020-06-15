@@ -1,7 +1,9 @@
 // Copyright 2017 David Conran
 
-// Toshiba A/C support added by David Conran
-
+/// @file
+/// @brief Support for Toshiba protocols.
+/// @see https://github.com/r45635/HVAC-IR-Control
+/// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
 
 #include "ir_Toshiba.h"
 #include <algorithm>
@@ -17,8 +19,6 @@
 // Constants
 
 // Toshiba A/C
-// Ref:
-//   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
 const uint16_t kToshibaAcHdrMark = 4400;
 const uint16_t kToshibaAcHdrSpace = 4300;
 const uint16_t kToshibaAcBitMark = 543;
@@ -36,16 +36,11 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_TOSHIBA_AC
-// Send a Toshiba A/C message.
-//
-// Args:
-//   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kToshibaACStateLength)
-//   repeat: Nr. of times the message is to be repeated.
-//          (Default = kToshibaACMinRepeat).
-//
-// Status: StABLE / Working.
-//
+/// Send a Toshiba A/C message.
+/// Status: STABLE / Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendToshibaAC(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kToshibaACStateLength)
@@ -57,56 +52,53 @@ void IRsend::sendToshibaAC(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_TOSHIBA_AC
 
-// Code to emulate Toshiba A/C IR remote control unit.
-// Inspired and derived from the work done at:
-//   https://github.com/r45635/HVAC-IR-Control
-//
-// Status:  STABLE / Working.
-//
-// Initialise the object.
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+/// @return An IRToshibaAC object.
 IRToshibaAC::IRToshibaAC(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
-// Reset the state of the remote to a known good state/sequence.
+/// Reset the state of the remote to a known good state/sequence.
+/// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L103
 void IRToshibaAC::stateReset(void) {
-  // The state of the IR remote in IR code form.
-  // Known good state obtained from:
-  //   https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L103
   static const uint8_t kReset[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
   memcpy(remote_state, kReset, kToshibaACStateLength);
   mode_state = getMode(true);
 }
 
-// Configure the pin for output.
+/// Set up hardware to be able to send a message.
 void IRToshibaAC::begin(void) { _irsend.begin(); }
 
 #if SEND_TOSHIBA_AC
-// Send the current desired state to the IR LED.
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRToshibaAC::send(const uint16_t repeat) {
   _irsend.sendToshibaAC(getRaw(), kToshibaACStateLength, repeat);
 }
 #endif  // SEND_TOSHIBA_AC
 
-// Return a pointer to the internal state date of the remote.
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRToshibaAC::getRaw(void) {
   this->checksum();
   return remote_state;
 }
 
-// Override the internal state with the new state.
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newState A valid code for this protocol.
 void IRToshibaAC::setRaw(const uint8_t newState[]) {
   memcpy(remote_state, newState, kToshibaACStateLength);
   mode_state = this->getMode(true);
 }
 
-// Calculate the checksum for a given array.
-// Args:
-//   state:  The array to calculate the checksum over.
-//   length: The size of the array.
-// Returns:
-//   The 8 bit checksum value.
+/// Calculate the checksum for a given state.
+/// @param[in] state The array to calc the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return The calculated checksum value.
 uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
   uint8_t checksum = 0;
@@ -118,31 +110,32 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
   return checksum;
 }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRToshibaAC::validChecksum(const uint8_t state[], const uint16_t length) {
   return (length > 1 && state[length - 1] == IRToshibaAC::calcChecksum(state,
                                                                        length));
 }
 
-// Calculate & set the checksum for the current internal state of the remote.
+/// Calculate & set the checksum for the current internal state of the remote.
+/// @param[in] length The length/size of the internal array to checksum.
+
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
   if (length > 1) remote_state[length - 1] = this->calcChecksum(remote_state,
                                                                 length);
 }
 
-// Set the requested power state of the A/C to on.
+/// Set the requested power state of the A/C to on.
 void IRToshibaAC::on(void) { setPower(true); }
 
-// Set the requested power state of the A/C to off.
+/// Set the requested power state of the A/C to off.
 void IRToshibaAC::off(void) { setPower(false); }
 
-// Set the requested power state of the A/C.
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRToshibaAC::setPower(const bool on) {
   setBit(&remote_state[6], kToshibaAcPowerOffset, !on);  // Cleared when on.
   if (on)
@@ -152,12 +145,15 @@ void IRToshibaAC::setPower(const bool on) {
             kToshibaAcHeat);
 }
 
-// Return the requested power state of the A/C.
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRToshibaAC::getPower(void) {
   return !GETBIT8(remote_state[6], kToshibaAcPowerOffset);
 }
 
-// Set the temp. in deg C
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees celsius.
 void IRToshibaAC::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kToshibaAcMinTemp, degrees);
   temp = std::min((uint8_t)kToshibaAcMaxTemp, temp);
@@ -165,14 +161,15 @@ void IRToshibaAC::setTemp(const uint8_t degrees) {
           temp - kToshibaAcMinTemp);
 }
 
-// Return the set temp. in deg C
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRToshibaAC::getTemp(void) {
   return GETBITS8(remote_state[5], kToshibaAcTempOffset, kToshibaAcTempSize) +
       kToshibaAcMinTemp;
 }
 
-// Set the speed of the fan, 0-5.
-// 0 is auto, 1-5 is the speed, 5 is Max.
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting (0 is Auto, 1-5 is the speed, 5 is Max)
 void IRToshibaAC::setFan(const uint8_t speed) {
   uint8_t fan = speed;
   // Bounds check
@@ -182,7 +179,8 @@ void IRToshibaAC::setFan(const uint8_t speed) {
   setBits(&remote_state[6], kToshibaAcFanOffset, kToshibaAcFanSize, fan);
 }
 
-// Return the requested state of the unit's fan.
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
 uint8_t IRToshibaAC::getFan(void) {
   uint8_t fan = GETBITS8(remote_state[6], kToshibaAcFanOffset,
                          kToshibaAcFanSize);
@@ -190,11 +188,9 @@ uint8_t IRToshibaAC::getFan(void) {
   return --fan;
 }
 
-// Get the requested climate operation mode of the a/c unit.
-// Args:
-//   useRaw:  Indicate to get the mode from the state array. (Default: false)
-// Returns:
-//   A uint8_t containing the A/C mode.
+/// Get the operating mode setting of the A/C.
+/// @param[in] useRaw Indicate to get the mode from the internal state array.
+/// @return The current operating mode setting.
 uint8_t IRToshibaAC::getMode(const bool useRaw) {
   if (useRaw)
     return GETBITS8(remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize);
@@ -202,9 +198,10 @@ uint8_t IRToshibaAC::getMode(const bool useRaw) {
     return mode_state;
 }
 
-// Set the requested climate operation mode of the a/c unit.
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note If we get an unexpected mode, default to AUTO.
 void IRToshibaAC::setMode(const uint8_t mode) {
-  // If we get an unexpected mode, default to AUTO.
   switch (mode) {
     case kToshibaAcAuto:
     case kToshibaAcCool:
@@ -220,7 +217,9 @@ void IRToshibaAC::setMode(const uint8_t mode) {
   }
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRToshibaAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kToshibaAcCool;
@@ -231,7 +230,9 @@ uint8_t IRToshibaAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRToshibaAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kToshibaAcFanMax - 4;
@@ -243,7 +244,9 @@ uint8_t IRToshibaAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRToshibaAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kToshibaAcCool: return stdAc::opmode_t::kCool;
@@ -253,7 +256,9 @@ stdAc::opmode_t IRToshibaAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRToshibaAC::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kToshibaAcFanMax:     return stdAc::fanspeed_t::kMax;
@@ -265,7 +270,8 @@ stdAc::fanspeed_t IRToshibaAC::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRToshibaAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::TOSHIBA_AC;
@@ -290,7 +296,8 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
@@ -305,21 +312,14 @@ String IRToshibaAC::toString(void) {
 }
 
 #if DECODE_TOSHIBA_AC
-// Decode a Toshiba AC IR message if possible.
-// Places successful decode information in the results pointer.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kToshibaACBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status:  STABLE / Working.
-//
-// Ref:
-//
+/// Decode the supplied Toshiba A/C message.
+/// Status:  STABLE / Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeToshibaAC(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   // Compliance
