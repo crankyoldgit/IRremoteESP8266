@@ -148,7 +148,6 @@ static void USE_IRAM_ATTR gpio_intr() {
 /// @param[in] save_buffer Use a second (save) buffer to decode from.
 ///   (Default: false)
 /// @param[in] timer_num Nr. of the ESP32 timer to use (0 to 3) (ESP32 Only)
-/// @return An IRrecv class object.
 #if defined(ESP32)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
@@ -167,7 +166,6 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 ///   capturing data. (Default: kTimeoutMs)
 /// @param[in] save_buffer Use a second (save) buffer to decode from.
 ///   (Default: false)
-/// @return An IRrecv class object.
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer) {
 /// @endcond

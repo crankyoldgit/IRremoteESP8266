@@ -130,7 +130,6 @@ void IRsend::sendHitachiAc344(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc object.
 IRHitachiAc::IRHitachiAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -420,7 +419,6 @@ String IRHitachiAc::toString(void) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc1 object.
 IRHitachiAc1::IRHitachiAc1(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1017,7 +1015,6 @@ bool IRrecv::decodeHitachiAc424(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc424 object.
 IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1378,7 +1375,6 @@ void IRsend::sendHitachiAc3(const uint8_t data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc3 object.
 IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1499,7 +1495,6 @@ bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc344 object.
 IRHitachiAc344::IRHitachiAc344(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
     : IRHitachiAc424(pin, inverted, use_modulation) { stateReset(); }

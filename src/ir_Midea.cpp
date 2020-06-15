@@ -90,7 +90,6 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMideaAC object.
 IRMideaAC::IRMideaAC(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }

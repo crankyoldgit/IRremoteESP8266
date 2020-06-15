@@ -109,7 +109,6 @@ void IRsend::sendGree(const uint64_t data, const uint16_t nbits,
 /// @param[in] model The enum of the model to be emulated.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRGreeAC object.
 IRGreeAC::IRGreeAC(const uint16_t pin, const gree_ac_remote_model_t model,
                    const bool inverted, const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {

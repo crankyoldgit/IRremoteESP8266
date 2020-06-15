@@ -75,7 +75,6 @@ void IRsend::sendHaierACYRW02(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHaierAC object.
 IRHaierAC::IRHaierAC(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -536,7 +535,6 @@ String IRHaierAC::toString(void) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHaierACYRW02 object.
 IRHaierACYRW02::IRHaierACYRW02(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
