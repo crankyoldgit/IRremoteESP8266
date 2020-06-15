@@ -314,7 +314,7 @@ String IRTrotecESP::toString(void) {
 bool IRrecv::decodeTrotec(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   if (results->rawlen <= 2 * nbits + kHeader + 2 * kFooter - 1 + offset)
-    return false;  // Can't possibly be a valid Samsung A/C message.
+    return false;  // Can't possibly be a valid Trotec A/C message.
   if (strict && nbits != kTrotecBits) return false;
 
   uint16_t used;

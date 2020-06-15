@@ -167,9 +167,8 @@ uint8_t IRVestelAc::getFan(void) {
   return GETBITS64(remote_state, kVestelAcFanOffset, kVestelAcFanSize);
 }
 
-// Get the requested climate operation mode of the a/c unit.
-// Returns:
-//   A uint8_t containing the A/C mode.
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRVestelAc::getMode(void) {
   return GETBITS64(remote_state, kVestelAcModeOffset, kModeBitsSize);
 }
