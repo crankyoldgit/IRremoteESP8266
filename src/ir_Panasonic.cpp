@@ -194,7 +194,6 @@ void IRsend::sendPanasonicAC(const uint8_t data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc424 object.
 IRPanasonicAc::IRPanasonicAc(const uint16_t pin, const bool inverted,
                              const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }

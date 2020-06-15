@@ -46,7 +46,6 @@
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
 /// @param[in] inverted true, gpio output defaults to high. false, to low.
 /// @param[in] use_modulation true means use frequency modulation. false, don't.
-/// @return An initalised IRac object.
 IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   _pin = pin;
   _inverted = inverted;

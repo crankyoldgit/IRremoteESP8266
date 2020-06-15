@@ -74,7 +74,6 @@ void IRsend::sendMitsubishiHeavy152(const unsigned char data[],
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishiHeavy152Ac object.
 IRMitsubishiHeavy152Ac::IRMitsubishiHeavy152Ac(const uint16_t pin,
                                                const bool inverted,
                                                const bool use_modulation)
@@ -590,7 +589,6 @@ String IRMitsubishiHeavy152Ac::toString(void) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishiHeavy88Ac object.
 IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(const uint16_t pin,
                                              const bool inverted,
                                              const bool use_modulation)
