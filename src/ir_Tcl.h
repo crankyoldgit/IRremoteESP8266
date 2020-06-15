@@ -59,7 +59,7 @@ const uint8_t kTcl112AcSwingVOff =   0b000;
 const uint8_t kTcl112AcBitTurboOffset = 6;
 
 // Classes
-/// Class for handling detailed Samsung A/C messages.
+/// Class for handling detailed TCL A/C messages.
 class IRTcl112Ac {
  public:
   explicit IRTcl112Ac(const uint16_t pin, const bool inverted = false,
