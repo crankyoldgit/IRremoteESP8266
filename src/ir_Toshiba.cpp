@@ -37,7 +37,7 @@ using irutils::setBits;
 
 #if SEND_TOSHIBA_AC
 /// Send a Toshiba A/C message.
-/// Status: StABLE / Working.
+/// Status: STABLE / Working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
