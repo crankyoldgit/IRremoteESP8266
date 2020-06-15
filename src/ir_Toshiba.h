@@ -1,6 +1,9 @@
 // Copyright 2017 David Conran
 
-// Toshiba A/C support added by David Conran
+/// @file
+/// @brief Support for Toshiba protocols.
+/// @see https://github.com/r45635/HVAC-IR-Control
+/// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
 
 // Supports:
 //   Brand: Toshiba,  Model: RAS-B13N3KV2
@@ -54,14 +57,18 @@ const uint8_t kToshibaAcMaxTemp = 30;  // 30C
 #define TOSHIBA_AC_MIN_TEMP kToshibaAcMinTemp
 #define TOSHIBA_AC_MAX_TEMP kToshibaAcMaxTemp
 
+// Classes
+/// Class for handling detailed Toshiba A/C messages.
 class IRToshibaAC {
  public:
   explicit IRToshibaAC(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_TOSHIBA_AC
   void send(const uint16_t repeat = kToshibaACMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TOSHIBA_AC
   void begin(void);
@@ -88,11 +95,13 @@ class IRToshibaAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kToshibaACStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kToshibaACStateLength];  ///< The state in IR code form.
   void checksum(const uint16_t length = kToshibaACStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kToshibaACStateLength);
