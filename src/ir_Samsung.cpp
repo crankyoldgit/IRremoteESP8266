@@ -318,7 +318,7 @@ bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
 }
 
 /// Update the checksum for the internal state.
-/// @param[in] length The length/size of the nternal array to checksum.
+/// @param[in] length The length/size of the internal array to checksum.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 13) return;
   setBits(&remote_state[length - 6], kHighNibble, kNibbleSize,
@@ -694,7 +694,6 @@ stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
     default:                 return stdAc::fanspeed_t::kAuto;
   }
 }
-
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
