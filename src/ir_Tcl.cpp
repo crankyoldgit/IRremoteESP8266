@@ -110,10 +110,10 @@ void IRTcl112Ac::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kTcl112AcStateLength));
 }
 
-// Set the requested power state of the A/C to on.
+/// Set the requested power state of the A/C to on.
 void IRTcl112Ac::on(void) { this->setPower(true); }
 
-// Set the requested power state of the A/C to off.
+/// Set the requested power state of the A/C to off.
 void IRTcl112Ac::off(void) { this->setPower(false); }
 
 /// Change the power setting.
