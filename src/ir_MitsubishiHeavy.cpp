@@ -219,14 +219,20 @@ uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
   return GETBITS8(remote_state[13], kLowNibble, kNibbleSize);
 }
 
+/// Set the Night (Sleep) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
   setBit(&remote_state[15], kMitsubishiHeavyNightOffset, on);
 }
 
+/// Get the Night (Sleep) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getNight(void) {
   return GETBIT8(remote_state[15], kMitsubishiHeavyNightOffset);
 }
 
+/// Set the 3D mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::set3D(const bool on) {
   if (on)
     remote_state[11] |= kMitsubishiHeavy3DMask;
@@ -234,31 +240,45 @@ void IRMitsubishiHeavy152Ac::set3D(const bool on) {
     remote_state[11] &= ~kMitsubishiHeavy3DMask;
 }
 
+/// Get the 3D mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::get3D(void) {
   return (remote_state[11] & kMitsubishiHeavy3DMask) == kMitsubishiHeavy3DMask;
 }
 
+/// Set the Silent (Quiet) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setSilent(const bool on) {
   setBit(&remote_state[15], kMitsubishiHeavySilentOffset, on);
 }
 
+/// Get the Silent (Quiet) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getSilent(void) {
   return GETBIT8(remote_state[15], kMitsubishiHeavySilentOffset);
 }
 
+/// Set the Filter mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setFilter(const bool on) {
   setBit(&remote_state[5], kMitsubishiHeavyFilterOffset, on);
 }
 
+/// Get the Filter mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getFilter(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavyFilterOffset);
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setClean(const bool on) {
   this->setFilter(on);
   setBit(&remote_state[5], kMitsubishiHeavyCleanOffset, on);
 }
 
+/// Get the Clean mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getClean(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavyCleanOffset) && getFilter();
 }
@@ -387,7 +407,9 @@ uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishiHeavyCool: return stdAc::opmode_t::kCool;
@@ -797,6 +819,8 @@ bool IRMitsubishiHeavy88Ac::getEcono(void) {
   return this->getFan() == kMitsubishiHeavy88FanEcono;
 }
 
+/// Set the 3D mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::set3D(const bool on) {
   if (on)
     this->setSwingHorizontal(kMitsubishiHeavy88SwingH3D);
@@ -804,14 +828,20 @@ void IRMitsubishiHeavy88Ac::set3D(const bool on) {
     this->setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
 }
 
+/// Get the 3D mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy88Ac::get3D(void) {
   return this->getSwingHorizontal() == kMitsubishiHeavy88SwingH3D;
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setClean(const bool on) {
   setBit(&remote_state[5], kMitsubishiHeavy88CleanOffset, on);
 }
 
+/// Get the Clean mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy88Ac::getClean(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavy88CleanOffset);
 }
