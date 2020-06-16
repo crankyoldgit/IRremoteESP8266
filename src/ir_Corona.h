@@ -110,7 +110,6 @@ class IRCoronaAc {
   void setPower(const bool on);
   bool getPower();
   void setPowerButton(const bool on);
-  void updatePowerButton();
   bool getPowerButton();
   void on();
   void off();
