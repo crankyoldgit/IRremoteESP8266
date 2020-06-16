@@ -103,8 +103,6 @@ class IRWhirlpoolAc {
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_WHIRLPOOL_AC
   void begin(void);
-  void on(void);
-  void off(void);
   void setPowerToggle(const bool on);
   bool getPowerToggle(void);
   void setSleep(const bool on);
