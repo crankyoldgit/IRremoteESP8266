@@ -88,7 +88,7 @@ class IRac {
   stdAc::state_t getState(void);
   stdAc::state_t getStatePrev(void);
   bool hasStateChanged(void);
-  stdAc::state_t next;  // The state we want the device to be in after we send.
+  stdAc::state_t next;  ///< The state we want the device to be in after we send
 #ifndef UNIT_TEST
 
  private:
