@@ -245,6 +245,7 @@ IRSharpAc::IRSharpAc(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRSharpAc::begin(void) { _irsend.begin(); }
 
 #if SEND_SHARP_AC
