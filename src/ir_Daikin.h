@@ -525,6 +525,7 @@ class IRDaikinESP {
 #if SEND_DAIKIN
   void send(const uint16_t repeat = kDaikinDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -606,6 +607,7 @@ class IRDaikin2 {
 #if SEND_DAIKIN2
   void send(const uint16_t repeat = kDaikin2DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -629,8 +631,6 @@ class IRDaikin2 {
   void setQuiet(const bool on);
   bool getPowerful();
   void setPowerful(const bool on);
-  void setSensor(const bool on);
-  bool getSensor();
   void setEcono(const bool on);
   bool getEcono();
   void setEye(const bool on);
@@ -667,8 +667,6 @@ class IRDaikin2 {
   bool getFreshAirHigh();
   uint8_t* getRaw();
   void setRaw(const uint8_t new_code[]);
-  uint32_t getCommand();
-  void setCommand(uint32_t value);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kDaikin2StateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
@@ -705,6 +703,7 @@ class IRDaikin216 {
 #if SEND_DAIKIN216
   void send(const uint16_t repeat = kDaikin216DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -760,6 +759,7 @@ class IRDaikin160 {
 #if SEND_DAIKIN160
   void send(const uint16_t repeat = kDaikin160DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -811,6 +811,7 @@ class IRDaikin176 {
 #if SEND_DAIKIN176
   void send(const uint16_t repeat = kDaikin176DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -867,6 +868,7 @@ class IRDaikin128 {
 #if SEND_DAIKIN128
   void send(const uint16_t repeat = kDaikin128DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -941,6 +943,7 @@ class IRDaikin152 {
 #if SEND_DAIKIN152
   void send(const uint16_t repeat = kDaikin152DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -974,8 +977,6 @@ class IRDaikin152 {
   bool getComfort(void);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  static stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST
@@ -1002,6 +1003,7 @@ class IRDaikin64 {
 #if SEND_DAIKIN64
   void send(const uint16_t repeat = kDaikin64DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }

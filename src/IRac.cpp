@@ -2358,15 +2358,13 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   return true;  // Success.
 }
 
-// Update the previous state to the current one.
+/// Update the previous state to the current one.
 void IRac::markAsSent(void) {
   _prev = next;
 }
 
-// Send an A/C message based soley on our internal state.
-//
-// Returns:
-//   boolean: True, if accepted/converted/attempted. False, if unsupported.
+/// Send an A/C message based soley on our internal state.
+/// @return True, if accepted/converted/attempted. False, if unsupported.
 bool IRac::sendAc(void) {
   bool success = this->sendAc(next, &_prev);
   if (success) this->markAsSent();

@@ -3067,6 +3067,7 @@ String IRDaikin128::toString(void) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
@@ -3985,6 +3986,7 @@ String IRDaikin64::toString(void) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;

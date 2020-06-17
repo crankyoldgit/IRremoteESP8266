@@ -174,6 +174,7 @@ class IRMitsubishiAC {
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -236,6 +237,7 @@ class IRMitsubishi136 {
 #if SEND_MITSUBISHI136
   void send(const uint16_t repeat = kMitsubishi136MinRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -289,6 +291,7 @@ class IRMitsubishi112 {
 #if SEND_MITSUBISHI112
   void send(const uint16_t repeat = kMitsubishi112MinRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
