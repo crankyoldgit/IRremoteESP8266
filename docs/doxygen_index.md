@@ -52,7 +52,7 @@ constants in the `ir_ProtocolName.cpp` file for the given protocol. This is
 typically a step of last resort.
 
 #### Reducing code size & flash usage.
-You can disable most protocols by either modifying the appropriate `#define`s
+You can disable most protocols by either modifying the appropriate `#&zwj;define`s
 in [IRremoteESP8266.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/IRremoteESP8266.h)
 or passing the appropriate compile-time flags, as documented in the same file.
 
