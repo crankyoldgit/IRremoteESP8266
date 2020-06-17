@@ -47,11 +47,11 @@ be special.
 If you are having problems decoding/receiving a message, look into the
 `tolerance`, `kTolerance`, or IRrecv::setTolerance constants/methods etc first.
 However, if your problems is sending, or adjusting the tolerance doesn't work
-you may need to tweak time per-protocol timing values. These are stored as
+you may need to tweak per-protocol timing values. These are stored as
 constants in the `ir_ProtocolName.cpp` file for the given protocol. This is
-typically a path/action of last resort.
+typically a step of last resort.
 
-#### Reducing flash & code usage.
+#### Reducing code size & flash usage.
 You can disable most protocols by either modifying the appropriate `#define`s
 in [IRremoteESP8266.h](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/IRremoteESP8266.h)
 or passing the appropriate compile-time flags, as documented in the same file.
