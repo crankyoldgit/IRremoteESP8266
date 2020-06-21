@@ -9,6 +9,8 @@
 
 // Supports:
 //   Brand: Airwell,  Model: RC08W remote
+//   Brand: Airwell,  Model: RC04 remote
+//   Brand: Airwell,  Model: DLS 21 DCI R410 AW A/C
 
 const uint8_t kAirwellOverhead = 4;
 const uint16_t kAirwellHalfClockPeriod = 950;  // uSeconds
