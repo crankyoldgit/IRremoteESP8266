@@ -13,7 +13,7 @@
 const uint8_t kAirwellOverhead = 4;
 const uint16_t kAirwellHalfClockPeriod = 950;  // uSeconds
 const uint16_t kAirwellHdrMark = 3 * kAirwellHalfClockPeriod;  // uSeconds
-const uint16_t kAirwellHdrSpace = 4 * kAirwellHalfClockPeriod;  // uSeconds
+const uint16_t kAirwellHdrSpace = 3 * kAirwellHalfClockPeriod;  // uSeconds
 const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 
 #if SEND_AIRWELL
@@ -26,7 +26,7 @@ const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 void IRsend::sendAirwell(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Header + Data
   sendManchester(kAirwellHdrMark, kAirwellHdrMark, kAirwellHalfClockPeriod,
-                 0, 0, data, nbits, 38000, true, repeat);
+                 0, 0, data, nbits, 38000, true, repeat, kDutyDefault, false);
   // Footer
   mark(kAirwellHdrMark + kAirwellHalfClockPeriod);
   space(kDefaultMessageGap);  // A guess.
@@ -60,7 +60,7 @@ bool IRrecv::decodeAirwell(decode_results *results, uint16_t offset,
                                   kAirwellHdrMark, kAirwellHdrMark,
                                   kAirwellHalfClockPeriod,
                                   kAirwellHdrMark, kAirwellHdrSpace,
-                                  true);
+                                  true, kUseDefTol, kMarkExcess, true, false);
   if (used == 0) return false;
   offset += used;
 

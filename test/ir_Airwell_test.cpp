@@ -41,7 +41,7 @@ TEST(TestDecodeAirwell, RealExample) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
   ASSERT_EQ(kAirwellBits, irsend.capture.bits);
-  EXPECT_EQ(0x4F2FE7E4, irsend.capture.value);
+  EXPECT_EQ(0x2B0D0181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 
@@ -73,7 +73,7 @@ TEST(TestDecodeAirwell, RealExample) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
   ASSERT_EQ(kAirwellBits, irsend.capture.bits);
-  EXPECT_EQ(0x8F07E7E4, irsend.capture.value);
+  EXPECT_EQ(0x270F8181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 }
@@ -83,46 +83,16 @@ TEST(TestDecodeAirwell, SyntheticExample) {
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
   irsend.reset();
-  irsend.sendAirwell(0xB0D0181B);
+  irsend.sendAirwell(0x2B0D0181B);
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
   EXPECT_EQ(kAirwellBits, irsend.capture.bits);
-  EXPECT_EQ(0xB0D0181B, irsend.capture.value);
+  EXPECT_EQ(0x2B0D0181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
 
-  EXPECT_EQ(
-      "f38000d50"
-      "m2850s3800"
-      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
-      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
-      "m2850s3800"
-      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
-      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
-      "m2850s3800"
-      "m1900s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
-      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m950s950m950s950m950s950"
-      "m950s950m950s950m1900s950m950s1900m1900s950m950s950"
-      "m3800s100000",
-      irsend.outputStr());
-
-  irsend.reset();
-  irsend.sendAirwell(0x4F2FE7E4);
-  irsend.makeDecodeResult();
-
-  ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
-  EXPECT_EQ(kAirwellBits, irsend.capture.bits);
-  EXPECT_EQ(0x4F2FE7E4, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_EQ(
       "f38000d50"
       "m2850s3800"
@@ -141,6 +111,36 @@ TEST(TestDecodeAirwell, SyntheticExample) {
       "m950s950m950s950m950s1900m950s950m1900s950m950s950m950"
       "s950m950s950m950s950m950s1900m950s950m1900s1900m950s950"
       "m4750s100000",
+      irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendAirwell(0x4F2FE7E4);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
+  EXPECT_EQ(kAirwellBits, irsend.capture.bits);
+  EXPECT_EQ(0x4F2FE7E4, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "f38000d50"
+      "m2850s2850"
+      "m950s950m950s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950m950s950"
+      "m950s950m1900s950m950s1900m950s950m950s950m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s950m950s950"
+      "m2850s2850"
+      "m950s950m950s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950m950s950"
+      "m950s950m1900s950m950s1900m950s950m950s950m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s950m950s950"
+      "m2850s2850"
+      "m950s950m950s950m950s1900m1900s950m950s1900m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s1900m950s950m950s950m950s950m950s950m950s950"
+      "m950s950m1900s950m950s1900m950s950m950s950m950s950m950s950m950s950"
+      "m1900s950m950s1900m1900s950m950s950"
+      "m3800s100000",
       irsend.outputStr());
 
   irsend.reset();
@@ -213,4 +213,41 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::AIRWELL));
   ASSERT_EQ(kAirwellBits, IRsend::defaultBits(decode_type_t::AIRWELL));
   ASSERT_EQ(kAirwellMinRepeats, IRsend::minRepeats(decode_type_t::AIRWELL));
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
+// Data from:
+//   https://docs.google.com/spreadsheets/d/1MeqVsgXQAMSiAx7zNunG8qbFcIT8tqZtcjLmMa0GEng/edit#gid=1053299474&range=M2:GW2
+TEST(TestDecodeAirwell, RealExample3) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  const uint16_t rawData[193] = {
+      3010, 2852,
+      904, 1042, 872, 1052, 872, 1932, 904, 956, 1878, 1050, 874, 1046, 872,
+      956, 876, 1048, 872, 1044, 876, 1046, 874, 958, 872, 1050, 872, 1966,
+      1880, 956, 872, 1048, 874, 1048, 872, 1050, 872, 958, 872, 1050, 872,
+      1048, 872, 1050, 872, 958, 872, 1048, 872, 1050, 872, 1048, 872, 958, 872,
+      1050, 872, 1048, 872, 1050, 872, 1872, 1880, 1048,
+      2978, 2880,
+      872, 1048, 872, 1050, 872, 1964, 872, 958, 1880, 1050, 872, 1050, 872,
+      958, 872, 1050, 872, 1050, 872, 1050, 872, 958, 872, 1050, 872, 1964,
+      1882, 958, 870, 1050, 872, 1048, 872, 1050, 872, 958, 872, 1048, 872,
+      1050, 872, 1050, 872, 958, 872, 1050, 872, 1050, 872, 1050, 872, 958, 872,
+      1050, 872, 1050, 872, 1050, 872, 1874, 1880, 1050,
+      2978, 2880,
+      872, 1050, 872, 1050, 872, 1964, 872, 958, 1880, 1050, 872, 1050, 872,
+      958, 872, 1050, 872, 1050, 872, 1050, 872, 958, 872, 1050, 872, 1964,
+      1880, 958, 872, 1050, 872, 1050, 872, 1050, 872, 958, 872, 1052, 870,
+      1050, 872, 1050, 872, 958, 872, 1050, 872, 1050, 872, 1050, 872, 958, 872,
+      1050, 872, 1050, 872, 1050, 872, 1874, 1880, 1050, 3894};
+  irsend.reset();
+  irsend.sendRaw(rawData, 193, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decodeAirwell(&irsend.capture));
+  ASSERT_EQ(decode_type_t::AIRWELL, irsend.capture.decode_type);
+  ASSERT_EQ(kAirwellBits, irsend.capture.bits);
+  EXPECT_EQ(0x60080002, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
 }

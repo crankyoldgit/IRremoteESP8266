@@ -519,9 +519,6 @@ void IRsend::sendManchester(const uint16_t headermark,
     // Header
     if (headermark) mark(headermark);
     if (headerspace) space(headerspace);
-    // Data Marker/sync
-    // This guarantees a double width half_period. i.e. a Period or T2.
-    sendManchesterData(half_period, 0b01, 2, true, GEThomas);
     // Data
     sendManchesterData(half_period, data, nbits, MSBfirst, GEThomas);
     // Footer
@@ -633,7 +630,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LG:
     case LG2:
       return 28;
-    case AIRWELL:
     case CARRIER_AC:
     case EPSON:
     case NEC:
@@ -642,6 +638,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SHERWOOD:
     case WHYNTER:
       return 32;
+    case AIRWELL:
+      return 34;
     case LUTRON:
     case TECO:
       return 35;
