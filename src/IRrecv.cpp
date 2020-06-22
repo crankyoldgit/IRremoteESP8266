@@ -1461,12 +1461,12 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                                  const bool MSBfirst,
                                  const bool GEThomas) {
   uint16_t offset = 0;
-  int32_t bank = 0;
+  uint16_t bank = 0;
   uint16_t entry = 0;
 
   // Calculate how much remaining buffer is required.
-  // Shortest case. Longest case is 2 * nbits.
-  uint16_t min_remaining = nbits + 2;
+  // Shortest case is nbits. Longest case is 2 * nbits.
+  uint16_t min_remaining = nbits;
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -1489,13 +1489,9 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
         return 0;  // It's not a normal header mark, so fail.
       }
     } else if (!matchMark(entry, hdrmark, tolerance, excess)) {
-      return 0;   // It's not a normal header mark, so fail.
+      return 0;  // It's not a normal header mark, so fail.
     }
   }
-  // Manchester Code always has a guaranteed 2x half_period (T2) at the start
-  // of the data section. e.g. a sync header. If it is a GEThomas-style, then
-  // it is space(T);mark(2xT);space(T), thus we need to check for that space
-  // plus any requested "header" space.
   if (hdrspace) {
     entry = *(data_ptr + offset++);
     // Check to see if the header space has merged with a data space half period
