@@ -1461,15 +1461,12 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
                                  const bool MSBfirst,
                                  const bool GEThomas) {
   uint16_t offset = 0;
-  uint64_t data = 0;
-  uint16_t nr_of_half_periods = GEThomas;
-  // 2 per bit, and 4 extra for the timing sync.
-  uint16_t expected_half_periods = 2 * nbits + 4;
-  bool currentBit = false;
+  uint16_t bank = 0;
+  uint16_t entry = 0;
 
   // Calculate how much remaining buffer is required.
-  // Shortest case. Longest case is 2 * nbits.
-  uint16_t min_remaining = nbits + 2;
+  // Shortest case is nbits. Longest case is 2 * nbits.
+  uint16_t min_remaining = nbits;
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -1480,86 +1477,45 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
   if (remaining < min_remaining) return 0;  // Nope, so abort.
 
   // Header
-  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
-    return 0;
-  // Manchester Code always has a guaranteed 2x half_period (T2) at the start
-  // of the data section. e.g. a sync header. If it is a GEThomas-style, then
-  // it is space(T);mark(2xT);space(T), thus we need to check for that space
-  // plus any requested "header" space.
-  if ((hdrspace || GEThomas) &&
-      !matchSpace(*(data_ptr + offset++),
-                  hdrspace + ((GEThomas) ? half_period : 0), tolerance, excess))
-    return 0;
-
-  // Data
-  // Loop until we find a 'long' pulse. This is the timing sync per protocol.
-  while ((offset < remaining) && (nr_of_half_periods < expected_half_periods) &&
-         !match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
-    // Was it not a short pulse?
-    if (!match(*(data_ptr + offset), half_period, tolerance, excess))
-      return 0;
-    nr_of_half_periods++;
-    offset++;
-  }
-
-  // Data (cont.)
-
-  // We are now pointing to the first 'long' pulse.
-  // Loop through the buffer till we run out of buffer, or nr of half periods.
-  while (offset < remaining && nr_of_half_periods < expected_half_periods) {
-    // Only if there is enough half_periods left for a long pulse &
-    // Is it a 'long' pulse?
-    if (nr_of_half_periods < expected_half_periods - 1 &&
-        match(*(data_ptr + offset), half_period * 2, tolerance, excess)) {
-      // Yes, so invert the value we will append.
-      currentBit = !currentBit;
-      nr_of_half_periods += 2;  // A 'long' pulse is two half periods.
-      offset++;
-      // Append the bit value.
-      data <<= 1;
-      data |= currentBit;
-    } else if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
-      // or is it part of a 'short' pulse pair?
-      nr_of_half_periods++;
-      offset++;
-      // Look for the second half of the 'short' pulse pair.
-      // Do we have enough buffer or nr of half periods?
-      if (offset < remaining && nr_of_half_periods < expected_half_periods) {
-        // We do, so look for it.
-        if (match(*(data_ptr + offset), half_period, tolerance, excess)) {
-          // Found it!
-          nr_of_half_periods++;
-          // No change of the polarity of the bit we will append.
-          // Append the bit value.
-          data <<= 1;
-          data |= currentBit;
-          offset++;
-        } else {
-          // It's not what we expected.
-          return 0;
-        }
+  if (hdrmark) {
+    entry = *(data_ptr + offset++);
+    if (!hdrspace) {  // If we have no Header Space ...
+      // Do we have a data 'mark' half period merged with the header mark?
+      if (matchMark(entry, hdrmark + half_period,
+                    tolerance, excess)) {
+        // Looks like we do.
+        bank = entry * kRawTick - hdrmark;
+      } else if (!matchMark(entry, hdrmark, tolerance, excess)) {
+        return 0;  // It's not a normal header mark, so fail.
       }
-    } else if (nr_of_half_periods == expected_half_periods - 1 &&
-               matchAtLeast(*(data_ptr + offset), half_period, tolerance,
-                            excess)) {
-      // Special case when we are at the end of the expected nr of periods.
-      // i.e. The pulse could be merged with the footer.
-      nr_of_half_periods++;
-      break;
-    } else {
-      // It's neither, so abort.
-      return 0;
+    } else if (!matchMark(entry, hdrmark, tolerance, excess)) {
+      return 0;  // It's not a normal header mark, so fail.
     }
   }
-  // Did we collect the expected amount of data?
-  if (nr_of_half_periods < expected_half_periods) return 0;
+  if (hdrspace) {
+    entry = *(data_ptr + offset++);
+    // Check to see if the header space has merged with a data space half period
+    if (matchSpace(entry, hdrspace + half_period, tolerance, excess)) {
+      // Looks like we do.
+      bank = entry * kRawTick - hdrspace;
+    } else if (!matchSpace(entry, hdrspace, tolerance, excess)) {
+      return 0;  // It's not a normal header space, so fail.
+    }
+  }
 
+  if (!match(bank / kRawTick, half_period, tolerance, excess)) bank = 0;
+  // Data
+  uint16_t used = matchManchesterData(data_ptr + offset, result_ptr,
+                                      remaining - offset, nbits, half_period,
+                                      bank, tolerance, excess, MSBfirst,
+                                      GEThomas);
+  if (!used) return 0;  // Data did match.
+  offset += used;
   // Footer
   if (footermark &&
       !(matchMark(*(data_ptr + offset), footermark + half_period,
                   tolerance, excess) ||
-        matchMark(*(data_ptr + offset), footermark,
-                    tolerance, excess)))
+        matchMark(*(data_ptr + offset), footermark, tolerance, excess)))
     return 0;
   offset++;
   // If we have something still to match & haven't reached the end of the buffer
@@ -1568,15 +1524,127 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
       if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
         return 0;
     } else {
-      if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+      if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess) &&
+          !matchSpace(*(data_ptr + offset), footerspace + half_period,
+                      tolerance, excess))
         return 0;
     }
     offset++;
   }
+  return offset;
+}
+
+/// Match & decode a Manchester Code data (<= 64bits.
+/// @param[in] data_ptr A pointer to where we are at in the capture buffer.
+/// @note `data_ptr` is assumed to be pointing to a "Mark", not a "Space".
+/// @param[out] result_ptr A ptr to where to start storing the bits we decoded.
+/// @param[in] remaining The size of the capture buffer remaining.
+/// @param[in] nbits Nr. of data bits we expect.
+/// @param[in] half_period Nr. of uSeconds for half the clock's period.
+///   i.e. 1/2 wavelength
+/// @param[in] tolerance Percentage error margin to allow. (Default: kUseDefTol)
+/// @param[in] starting_balance Amount of uSeconds to assume exists prior to
+///   the current value pointed too.
+/// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
+/// @param[in] MSBfirst Bit order to save the data in. (Def: true)
+///   true is Most Significant Bit First Order, false is Least Significant First
+/// @param[in] GEThomas Use G.E. Thomas (true) or IEEE 802.3 (false) convention?
+/// @return If successful, how many buffer entries were used. Otherwise 0.
+/// @see https://en.wikipedia.org/wiki/Manchester_code
+/// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
+/// @todo Clean up and optimise this. It is just "get it working code" atm.
+uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
+                                     uint64_t *result_ptr,
+                                     const uint16_t remaining,
+                                     const uint16_t nbits,
+                                     const uint16_t half_period,
+                                     const uint16_t starting_balance,
+                                     const uint8_t tolerance,
+                                     const int16_t excess,
+                                     const bool MSBfirst,
+                                     const bool GEThomas) {
+  uint16_t offset = 0;
+  uint64_t data = 0;
+  uint16_t nr_half_periods = 0;
+  const uint16_t expected_half_periods = nbits * 2;
+  // Flip the bit if we have a starting balance. ie. Carry over from the header.
+  bool currentBit = starting_balance ? !GEThomas : GEThomas;
+  const uint16_t raw_half_period = half_period / kRawTick;
+
+  // Calculate how much remaining buffer is required.
+  // Shortest case is nbits. Longest case is 2 * nbits.
+  uint16_t min_remaining = nbits;
+
+  // Check if there is enough capture buffer to possibly have the message.
+  if (remaining < min_remaining) return 0;  // Nope, so abort.
+
+  // Convert to ticks. Optimisation: Saves on math/extra instructions later.
+  uint16_t bank = starting_balance / kRawTick;
+
+  // Data
+  // Loop through the buffer till we run out of buffer, or nr of half periods.
+  // Possible patterns are:
+  // short + short = 1 bit (Add the value of the previous bit again)
+  // short + long + short = 2 bits (Add the previous bit again, then flip & add)
+  // short + long + long + short = 3 bits (add prev, flip & add, flip & add)
+  // We can't start with a long.
+  //
+  // The general approach is thus:
+  //   Check we have a short interval, next or in the bank.
+  //   If the next timing value is long, act according and reset the bank to
+  //     a short balance.
+  //   or
+  //   If it is short, act accordingly and declare the bank empty.
+  //   Repeat.
+  while ((offset < remaining || bank) &&
+         nr_half_periods < expected_half_periods) {
+    // Get the next entry if we haven't anything existing to process.
+    if (!bank) bank = *(data_ptr + offset++);
+    // Check if we don't have a short interval.
+    if (!match(bank, half_period, tolerance, excess))  return 0;  // Not valid.
+    // We've succeeded in matching half a period, so count it.
+    nr_half_periods++;
+    // We've now used up our bank, so refill it with the next item, unless we
+    // are at the end of the capture buffer.
+    // If we are assume a single half period of "space".
+    if (offset < remaining)
+      bank = *(data_ptr + offset++);
+    else if (offset == remaining)
+      bank = raw_half_period;
+    else
+      return 0;  // We are out of buffer, so abort!
+
+    // Shift the data along and add our new bit.
+    data <<= 1;
+    data |= currentBit;
+
+    // Check if we have a long interval.
+    if (match(bank, half_period * 2, tolerance, excess)) {
+      // It is, so flip the bit we need to append, and remove a half_period of
+      // time from the bank.
+      currentBit = !currentBit;
+      bank -= raw_half_period;
+    } else if (match(bank, half_period, tolerance, excess)) {
+      // It is a short interval, so eat up all the time and move on.
+      bank = 0;
+    } else if (nr_half_periods == expected_half_periods - 1 &&
+               matchAtLeast(bank, half_period, tolerance, excess)) {
+      // We are at the end of the data & it is a short interval, so eat up all
+      // the time and move on.
+      bank = 0;
+      // Reduce the offset as we are at the end of the data doing a
+      // matchAtLeast() because  we could be processing part of a footer.
+      offset--;
+    } else {
+      // The length isn't what we expected (neither long or short), so bail.
+      return 0;
+    }
+    nr_half_periods++;
+  }
 
   // Clean up and process the data.
   if (!MSBfirst) data = reverseBits(data, nbits);
-  // Trim the data to size to remove timing sync.
+  // Trim the data to size.
   *result_ptr = GETBITS64(data, 0, nbits);
   return offset;
 }

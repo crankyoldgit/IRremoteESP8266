@@ -236,6 +236,16 @@ class IRrecv {
                                     const uint8_t tolerance = kUseDefTol,
                                     const int16_t excess = kMarkExcess,
                                     const bool MSBfirst = true);
+  uint16_t matchManchesterData(volatile const uint16_t *data_ptr,
+                               uint64_t *result_ptr,
+                               const uint16_t remaining,
+                               const uint16_t nbits,
+                               const uint16_t half_period,
+                               const uint16_t starting_balance = 0,
+                               const uint8_t tolerance = kUseDefTol,
+                               const int16_t excess = kMarkExcess,
+                               const bool MSBfirst = true,
+                               const bool GEThomas = true);
   uint16_t matchManchester(volatile const uint16_t *data_ptr,
                            uint64_t *result_ptr,
                            const uint16_t remaining,
