@@ -71,6 +71,9 @@ $(function() {
 <div class="title">ir_Doshisha.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Doshisha protocol support.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -84,14 +87,10 @@ Variables</h2></td></tr>
 <tr class="separator:a48f3b70ddd3bc06c628ebe7ce29e74d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a055ae27320600bc7e100ea7e147775f9"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a055ae27320600bc7e100ea7e147775f9">kDoshishaZeroSpace</a> = 452</td></tr>
 <tr class="separator:a055ae27320600bc7e100ea7e147775f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accad8085314d9f2a31ad09d14b43a9e6"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#accad8085314d9f2a31ad09d14b43a9e6">kDoshishaFreq</a> = 38000</td></tr>
-<tr class="separator:accad8085314d9f2a31ad09d14b43a9e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a728f4e93639f4a59285bb063468a686e"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a728f4e93639f4a59285bb063468a686e">kDoshishaOverhead</a> = 3</td></tr>
-<tr class="separator:a728f4e93639f4a59285bb063468a686e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5f4fd7a2d9c4b631b9e143322273fd3"><td class="memItemLeft" align="right" valign="top">const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#ad5f4fd7a2d9c4b631b9e143322273fd3">kRcz01CheckMask</a> = 0xffffffff00</td></tr>
-<tr class="separator:ad5f4fd7a2d9c4b631b9e143322273fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6415b01e6abccec16677dfcd3eea9d78"><td class="memItemLeft" align="right" valign="top">const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a6415b01e6abccec16677dfcd3eea9d78">kRcz01CheckExpected</a> = 0x800B304800</td></tr>
-<tr class="separator:a6415b01e6abccec16677dfcd3eea9d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f3b9cdfba7cc7515611d7145b7318a5"><td class="memItemLeft" align="right" valign="top">const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a1f3b9cdfba7cc7515611d7145b7318a5">kRcz01SignatureMask</a> = 0xffffffff00</td></tr>
+<tr class="separator:a1f3b9cdfba7cc7515611d7145b7318a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35c6dff74ae1702933e33f02f743f616"><td class="memItemLeft" align="right" valign="top">const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a35c6dff74ae1702933e33f02f743f616">kRcz01Signature</a> = 0x800B304800</td></tr>
+<tr class="separator:a35c6dff74ae1702933e33f02f743f616"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148e2f676f895f4e3b77b39780e2ca94"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a148e2f676f895f4e3b77b39780e2ca94">kRcz01CommandMask</a> = 0xFE</td></tr>
 <tr class="separator:a148e2f676f895f4e3b77b39780e2ca94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a085b3d47e4cf8d8b4ba999ae58ec3533"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a085b3d47e4cf8d8b4ba999ae58ec3533">kRcz01ChannelMask</a> = 0x01</td></tr>
@@ -121,7 +120,10 @@ Variables</h2></td></tr>
 <tr class="memitem:a47e9d5bf353cf8aef8199fb74693aa0f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Doshisha_8cpp.html#a47e9d5bf353cf8aef8199fb74693aa0f">kRcz01CommandNightLight</a> = 0xC8</td></tr>
 <tr class="separator:a47e9d5bf353cf8aef8199fb74693aa0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Variable Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Doshisha protocol support. </p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://www.doshisha-led.com/">https://www.doshisha-led.com/</a> </dd></dl>
+</div><h2 class="groupheader">Variable Documentation</h2>
 <a id="a50a4feaff92c4a9fbba6128638fdb2fb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a50a4feaff92c4a9fbba6128638fdb2fb">&#9670;&nbsp;</a></span>kDoshishaBitMark</h2>
 
@@ -130,20 +132,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kDoshishaBitMark = 420</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="accad8085314d9f2a31ad09d14b43a9e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#accad8085314d9f2a31ad09d14b43a9e6">&#9670;&nbsp;</a></span>kDoshishaFreq</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint16_t kDoshishaFreq = 38000</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -192,20 +180,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a728f4e93639f4a59285bb063468a686e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a728f4e93639f4a59285bb063468a686e">&#9670;&nbsp;</a></span>kDoshishaOverhead</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint16_t kDoshishaOverhead = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a055ae27320600bc7e100ea7e147775f9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a055ae27320600bc7e100ea7e147775f9">&#9670;&nbsp;</a></span>kDoshishaZeroSpace</h2>
 
@@ -228,34 +202,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kRcz01ChannelMask = 0x01</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6415b01e6abccec16677dfcd3eea9d78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6415b01e6abccec16677dfcd3eea9d78">&#9670;&nbsp;</a></span>kRcz01CheckExpected</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint64_t kRcz01CheckExpected = 0x800B304800</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad5f4fd7a2d9c4b631b9e143322273fd3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5f4fd7a2d9c4b631b9e143322273fd3">&#9670;&nbsp;</a></span>kRcz01CheckMask</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint64_t kRcz01CheckMask = 0xffffffff00</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -438,6 +384,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kRcz01CommandTimmer60 = 0x52</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a35c6dff74ae1702933e33f02f743f616"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35c6dff74ae1702933e33f02f743f616">&#9670;&nbsp;</a></span>kRcz01Signature</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint64_t kRcz01Signature = 0x800B304800</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1f3b9cdfba7cc7515611d7145b7318a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f3b9cdfba7cc7515611d7145b7318a5">&#9670;&nbsp;</a></span>kRcz01SignatureMask</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint64_t kRcz01SignatureMask = 0xffffffff00</td>
         </tr>
       </table>
 </div><div class="memdoc">

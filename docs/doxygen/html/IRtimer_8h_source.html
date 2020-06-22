@@ -78,45 +78,46 @@ $(function() {
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Classes</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classIRtimer.html">   10</a></span>&#160;<span class="keyword">class </span><a class="code" href="classIRtimer.html">IRtimer</a> {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <a class="code" href="classIRtimer.html#a09d64d689137ef8ca68973bb9e550e76">IRtimer</a>();</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">reset</a>();</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  uint32_t <a class="code" href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">elapsed</a>();</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifdef UNIT_TEST</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classIRtimer.html#aa8e3ff975ae5468b4727790c828fa032">add</a>(uint32_t usecs);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#endif  // UNIT_TEST</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">   20</a></span>&#160;  uint32_t <a class="code" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">start</a>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;};</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classTimerMs.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTimerMs.html">TimerMs</a> {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">TimerMs</a>();</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">reset</a>();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  uint32_t <a class="code" href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">elapsed</a>();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#ifdef UNIT_TEST</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">add</a>(uint32_t msecs);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#endif  // UNIT_TEST</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">   33</a></span>&#160;  uint32_t <a class="code" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">start</a>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif  // IRTIMER_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classIRtimer.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classIRtimer.html">IRtimer</a> {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <a class="code" href="classIRtimer.html#a09d64d689137ef8ca68973bb9e550e76">IRtimer</a>();</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">reset</a>();</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  uint32_t <a class="code" href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">elapsed</a>();</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#ifdef UNIT_TEST</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classIRtimer.html#aa8e3ff975ae5468b4727790c828fa032">add</a>(uint32_t usecs);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif  // UNIT_TEST</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">   23</a></span>&#160;  uint32_t <a class="code" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">start</a>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classTimerMs.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTimerMs.html">TimerMs</a> {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">TimerMs</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">reset</a>();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  uint32_t <a class="code" href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">elapsed</a>();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#ifdef UNIT_TEST</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">add</a>(uint32_t msecs);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif  // UNIT_TEST</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">   38</a></span>&#160;  uint32_t <a class="code" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">start</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif  // IRTIMER_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassTimerMs_html_a15ad2e08a5931397391d48f040722f65"><div class="ttname"><a href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">TimerMs::start</a></div><div class="ttdeci">uint32_t start</div><div class="ttdef"><b>Definition:</b> IRtimer.h:33</div></div>
-<div class="ttc" id="aclassIRtimer_html"><div class="ttname"><a href="classIRtimer.html">IRtimer</a></div><div class="ttdef"><b>Definition:</b> IRtimer.h:10</div></div>
-<div class="ttc" id="aclassIRtimer_html_aa8e3ff975ae5468b4727790c828fa032"><div class="ttname"><a href="classIRtimer.html#aa8e3ff975ae5468b4727790c828fa032">IRtimer::add</a></div><div class="ttdeci">static void add(uint32_t usecs)</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:40</div></div>
-<div class="ttc" id="aclassIRtimer_html_aaaf886de2c9533a8c791242dc575db1a"><div class="ttname"><a href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">IRtimer::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:18</div></div>
-<div class="ttc" id="aclassIRtimer_html_a09d64d689137ef8ca68973bb9e550e76"><div class="ttname"><a href="classIRtimer.html#a09d64d689137ef8ca68973bb9e550e76">IRtimer::IRtimer</a></div><div class="ttdeci">IRtimer()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:16</div></div>
-<div class="ttc" id="aclassIRtimer_html_ad655e585f053580d49d8de7d52cd62a1"><div class="ttname"><a href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">IRtimer::elapsed</a></div><div class="ttdeci">uint32_t elapsed()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:26</div></div>
-<div class="ttc" id="aclassTimerMs_html_ad4aa759c58727393f69863b3461dfc09"><div class="ttname"><a href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">TimerMs::elapsed</a></div><div class="ttdeci">uint32_t elapsed()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:55</div></div>
-<div class="ttc" id="aclassTimerMs_html_a25ab025793a4d432e7d4180cbd31157b"><div class="ttname"><a href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">TimerMs::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:47</div></div>
-<div class="ttc" id="aclassTimerMs_html_a7bf7f8d2fcf76b27b34ea4705810eef5"><div class="ttname"><a href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">TimerMs::TimerMs</a></div><div class="ttdeci">TimerMs()</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:45</div></div>
-<div class="ttc" id="aclassIRtimer_html_aaa087b8688ff8150e0fc1ec6d5c4a52a"><div class="ttname"><a href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">IRtimer::start</a></div><div class="ttdeci">uint32_t start</div><div class="ttdef"><b>Definition:</b> IRtimer.h:20</div></div>
-<div class="ttc" id="aclassTimerMs_html_a77bfc23a029a9172c3dbac03f746b0cb"><div class="ttname"><a href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">TimerMs::add</a></div><div class="ttdeci">static void add(uint32_t msecs)</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:69</div></div>
-<div class="ttc" id="aclassTimerMs_html"><div class="ttname"><a href="classTimerMs.html">TimerMs</a></div><div class="ttdef"><b>Definition:</b> IRtimer.h:23</div></div>
+<div class="ttc" id="aclassTimerMs_html_a15ad2e08a5931397391d48f040722f65"><div class="ttname"><a href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">TimerMs::start</a></div><div class="ttdeci">uint32_t start</div><div class="ttdef"><b>Definition:</b> IRtimer.h:38</div></div>
+<div class="ttc" id="aclassIRtimer_html"><div class="ttname"><a href="classIRtimer.html">IRtimer</a></div><div class="ttdoc">This class performs a simple timer in useconds since instantiated.</div><div class="ttdef"><b>Definition:</b> IRtimer.h:13</div></div>
+<div class="ttc" id="aclassIRtimer_html_aa8e3ff975ae5468b4727790c828fa032"><div class="ttname"><a href="classIRtimer.html#aa8e3ff975ae5468b4727790c828fa032">IRtimer::add</a></div><div class="ttdeci">static void add(uint32_t usecs)</div><div class="ttdoc">Add time to the timer to simulate elapsed time.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:44</div></div>
+<div class="ttc" id="aclassIRtimer_html_aaaf886de2c9533a8c791242dc575db1a"><div class="ttname"><a href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">IRtimer::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Resets the IRtimer object.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:18</div></div>
+<div class="ttc" id="aclassIRtimer_html_a09d64d689137ef8ca68973bb9e550e76"><div class="ttname"><a href="classIRtimer.html#a09d64d689137ef8ca68973bb9e550e76">IRtimer::IRtimer</a></div><div class="ttdeci">IRtimer()</div><div class="ttdoc">Class constructor.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:15</div></div>
+<div class="ttc" id="aclassIRtimer_html_ad655e585f053580d49d8de7d52cd62a1"><div class="ttname"><a href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">IRtimer::elapsed</a></div><div class="ttdeci">uint32_t elapsed()</div><div class="ttdoc">Calculate how many microseconds have elapsed since the timer was started.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:28</div></div>
+<div class="ttc" id="aclassTimerMs_html_ad4aa759c58727393f69863b3461dfc09"><div class="ttname"><a href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">TimerMs::elapsed</a></div><div class="ttdeci">uint32_t elapsed()</div><div class="ttdoc">Calculate how many milliseconds have elapsed since the timer was started.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:61</div></div>
+<div class="ttc" id="aclassTimerMs_html_a25ab025793a4d432e7d4180cbd31157b"><div class="ttname"><a href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">TimerMs::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Resets the TimerMs object.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:51</div></div>
+<div class="ttc" id="aclassTimerMs_html_a7bf7f8d2fcf76b27b34ea4705810eef5"><div class="ttname"><a href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">TimerMs::TimerMs</a></div><div class="ttdeci">TimerMs()</div><div class="ttdoc">Class constructor.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:48</div></div>
+<div class="ttc" id="aclassIRtimer_html_aaa087b8688ff8150e0fc1ec6d5c4a52a"><div class="ttname"><a href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">IRtimer::start</a></div><div class="ttdeci">uint32_t start</div><div class="ttdef"><b>Definition:</b> IRtimer.h:23</div></div>
+<div class="ttc" id="aclassTimerMs_html_a77bfc23a029a9172c3dbac03f746b0cb"><div class="ttname"><a href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">TimerMs::add</a></div><div class="ttdeci">static void add(uint32_t msecs)</div><div class="ttdoc">Add time to the timer to simulate elapsed time.</div><div class="ttdef"><b>Definition:</b> IRtimer.cpp:77</div></div>
+<div class="ttc" id="aclassTimerMs_html"><div class="ttname"><a href="classTimerMs.html">TimerMs</a></div><div class="ttdoc">This class performs a simple timer in milli-seoncds since instantiated.</div><div class="ttdef"><b>Definition:</b> IRtimer.h:28</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
