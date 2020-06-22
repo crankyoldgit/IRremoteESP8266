@@ -1571,6 +1571,7 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   uint64_t data = 0;
   uint16_t nr_half_periods = 0;
   const uint16_t expected_half_periods = nbits * 2;
+  // Flip the bit if we have a starting balance. ie. Carry over from the header.
   bool currentBit = starting_balance ? !GEThomas : GEThomas;
   const uint16_t raw_half_period = half_period / kRawTick;
 
@@ -1579,15 +1580,12 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   uint16_t min_remaining = nbits;
 
   // Check if there is enough capture buffer to possibly have the message.
-  if (remaining < min_remaining) {
-    DPRINTLN("DEBUG: Not enough entries. Aborting!");
-    return 0;  // Nope, so abort.
-  }
+  if (remaining < min_remaining) return 0;  // Nope, so abort.
+
+  // Convert to ticks. Optimisation: Saves on math/extra instructions later.
+  uint16_t bank = starting_balance / kRawTick;
 
   // Data
-  int16_t bank = starting_balance / kRawTick;
-  DPRINT("DEBUG: Pre-Data bank = ");
-  DPRINTLN(bank * kRawTick);
   // Loop through the buffer till we run out of buffer, or nr of half periods.
   // Possible patterns are:
   // short + short = 1 bit (Add the value of the previous bit again)
@@ -1604,66 +1602,47 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   //   Repeat.
   while ((offset < remaining || bank) &&
          nr_half_periods < expected_half_periods) {
-    DPRINT("DEBUG: nr_half_periods = ");
-    DPRINTLN(nr_half_periods);
     // Get the next entry if we haven't anything existing to process.
-    if (!bank) {
-      DPRINTLN("DEBUG: Bank is empty.");
-      DPRINT("DEBUG: offset = ");
-      DPRINTLN(offset);
-      DPRINT("DEBUG: remaining = ");
-      DPRINTLN(remaining);
-      bank = *(data_ptr + offset++);
-      DPRINT("DEBUG: Loading up bank with ");
-      DPRINTLN(bank * kRawTick);
-    }
+    if (!bank) bank = *(data_ptr + offset++);
     // Check if we don't have a short interval.
-    if (!match(bank, half_period, tolerance, excess)) {
-      DPRINTLN("DEBUG: Exiting because we can't find the first half of a pair");
-      return 0;  // Not valid.
-    }
+    if (!match(bank, half_period, tolerance, excess))  return 0;  // Not valid.
+    // We've succeeded in matching half a period, so count it.
     nr_half_periods++;
-    DPRINT("DEBUG: nr_half_periods = ");
-    DPRINTLN(nr_half_periods);
-    // We've now used up our current, so refill it with the next item.
-    DPRINT("DEBUG: offset = ");
-    DPRINTLN(offset);
-    DPRINT("DEBUG: remaining = ");
-    DPRINTLN(remaining);
-    // Get the next entry, unless we are at the end of the buffer. If we are
-    // assume a single half period of "space".
-    if (offset < remaining) {
+    // We've now used up our bank, so refill it with the next item, unless we
+    // are at the end of the capture buffer.
+    // If we are assume a single half period of "space".
+    if (offset < remaining)
       bank = *(data_ptr + offset++);
-    } else if (offset == remaining) {
+    else if (offset == remaining)
       bank = raw_half_period;
-    } else { return 0; }  // We are out of buffer, so abort!
-    // Shift the data along.
+    else
+      return 0;  // We are out of buffer, so abort!
+
+    // Shift the data along and add our new bit.
     data <<= 1;
     data |= currentBit;
-    // Check if it is a long pulse.
+
+    // Check if we have a long interval.
     if (match(bank, half_period * 2, tolerance, excess)) {
-      // It is, so flip the bit we need to append, and remove a half_period.
+      // It is, so flip the bit we need to append, and remove a half_period of
+      // time from the bank.
       currentBit = !currentBit;
       bank -= raw_half_period;
-      DPRINT("DEBUG: Reducing bank to ");
-      DPRINTLN(bank * kRawTick);
     } else if (match(bank, half_period, tolerance, excess)) {
       // It is a short interval, so eat up all the time and move on.
-      DPRINTLN("DEBUG: Not long, so emptying the bank.");
       bank = 0;
     } else if (nr_half_periods == expected_half_periods - 1 &&
                matchAtLeast(bank, half_period, tolerance, excess)) {
-      // It is a short interval, so eat up all the time and move on.
-      DPRINTLN("DEBUG: Not long, so emptying the bank.");
+      // We are at the end of the data & it is a short interval, so eat up all
+      // the time and move on.
       bank = 0;
-      offset--;  // Reduce the offset if we are doing a matchAtLeast()
+      // Reduce the offset as we are at the end of the data doing a
+      // matchAtLeast() because  we could be processing part of a footer.
+      offset--;
     } else {
       // The length isn't what we expected (neither long or short), so bail.
-      DPRINTLN("DEBUG: Unexpected entry size. Aborting!");
       return 0;
     }
-    DPRINT("DEBUG: data = 0b");
-    DPRINTLN(uint64ToString(data, 2));
     nr_half_periods++;
   }
 
