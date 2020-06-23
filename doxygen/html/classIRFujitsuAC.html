@@ -72,13 +72,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Class for handling detailed Fujitsu A/C messages.  
+ <a href="classIRFujitsuAC.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="ir__Fujitsu_8h_source.html">ir_Fujitsu.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for IRFujitsuAC:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRFujitsuAC__coll__graph.png" border="0" usemap="#IRFujitsuAC_coll__map" alt="Collaboration graph"/></div>
 <map name="IRFujitsuAC_coll__map" id="IRFujitsuAC_coll__map">
-<area shape="rect" title=" " alt="" coords="5,95,101,121"/>
+<area shape="rect" title="Class for handling detailed Fujitsu A/C messages." alt="" coords="5,95,101,121"/>
 <area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="20,5,87,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -86,105 +89,148 @@ Collaboration diagram for IRFujitsuAC:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:acdb70f239884507f540b872ba25747ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#acdb70f239884507f540b872ba25747ce">IRFujitsuAC</a> (const uint16_t pin, const <a class="el" href="IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0">fujitsu_ac_remote_model_t</a> model=<a class="el" href="IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0a6ccf47af1067e794e02e21f03389297b">ARRAH2E</a>, const bool inverted=false, const bool use_modulation=true)</td></tr>
+<tr class="memdesc:acdb70f239884507f540b872ba25747ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class Constructor.  <a href="classIRFujitsuAC.html#acdb70f239884507f540b872ba25747ce">More...</a><br /></td></tr>
 <tr class="separator:acdb70f239884507f540b872ba25747ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5393698000d8becf33ff332b32b97c73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a5393698000d8becf33ff332b32b97c73">setModel</a> (const <a class="el" href="IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0">fujitsu_ac_remote_model_t</a> model)</td></tr>
+<tr class="memdesc:a5393698000d8becf33ff332b32b97c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the currently emulated model of the A/C.  <a href="classIRFujitsuAC.html#a5393698000d8becf33ff332b32b97c73">More...</a><br /></td></tr>
 <tr class="separator:a5393698000d8becf33ff332b32b97c73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35c6bfb730014f3a24676f94e8308163"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0">fujitsu_ac_remote_model_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a35c6bfb730014f3a24676f94e8308163">getModel</a> (void)</td></tr>
+<tr class="memdesc:a35c6bfb730014f3a24676f94e8308163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the currently emulated/detected model of the A/C.  <a href="classIRFujitsuAC.html#a35c6bfb730014f3a24676f94e8308163">More...</a><br /></td></tr>
 <tr class="separator:a35c6bfb730014f3a24676f94e8308163"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a603a0e1870f406e4e746a7bb4c37fb70"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a603a0e1870f406e4e746a7bb4c37fb70">stateReset</a> (void)</td></tr>
+<tr class="memdesc:a603a0e1870f406e4e746a7bb4c37fb70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the state of the remote to a known good state/sequence.  <a href="classIRFujitsuAC.html#a603a0e1870f406e4e746a7bb4c37fb70">More...</a><br /></td></tr>
 <tr class="separator:a603a0e1870f406e4e746a7bb4c37fb70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f1aa593cc4503d14c0fbea5cd9823a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a1f1aa593cc4503d14c0fbea5cd9823a1">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a9dd52420366167afb4c8831b4ccd02fa">kFujitsuAcMinRepeat</a>)</td></tr>
+<tr class="memdesc:a1f1aa593cc4503d14c0fbea5cd9823a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRFujitsuAC.html#a1f1aa593cc4503d14c0fbea5cd9823a1">More...</a><br /></td></tr>
 <tr class="separator:a1f1aa593cc4503d14c0fbea5cd9823a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bb6d8456561dfb04ccac95e0e489558"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a8bb6d8456561dfb04ccac95e0e489558">calibrate</a> (void)</td></tr>
+<tr class="memdesc:a8bb6d8456561dfb04ccac95e0e489558"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRFujitsuAC.html#a8bb6d8456561dfb04ccac95e0e489558">More...</a><br /></td></tr>
 <tr class="separator:a8bb6d8456561dfb04ccac95e0e489558"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0dc3fffdafae5970bc367f31029464b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#af0dc3fffdafae5970bc367f31029464b">begin</a> (void)</td></tr>
+<tr class="memdesc:af0dc3fffdafae5970bc367f31029464b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRFujitsuAC.html#af0dc3fffdafae5970bc367f31029464b">More...</a><br /></td></tr>
 <tr class="separator:af0dc3fffdafae5970bc367f31029464b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53c48bc1f32c849263a3aa86ff06b1d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a53c48bc1f32c849263a3aa86ff06b1d4">stepHoriz</a> (void)</td></tr>
+<tr class="memdesc:a53c48bc1f32c849263a3aa86ff06b1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the A/C to step the Horizontal Swing.  <a href="classIRFujitsuAC.html#a53c48bc1f32c849263a3aa86ff06b1d4">More...</a><br /></td></tr>
 <tr class="separator:a53c48bc1f32c849263a3aa86ff06b1d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeba829bb9a9934ad9246a5ba4f4c03fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#aeba829bb9a9934ad9246a5ba4f4c03fc">toggleSwingHoriz</a> (const bool update=true)</td></tr>
+<tr class="memdesc:aeba829bb9a9934ad9246a5ba4f4c03fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the A/C to toggle the Horizontal Swing mode.  <a href="classIRFujitsuAC.html#aeba829bb9a9934ad9246a5ba4f4c03fc">More...</a><br /></td></tr>
 <tr class="separator:aeba829bb9a9934ad9246a5ba4f4c03fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a942f106c27ce04094b5b615f2e174022"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a942f106c27ce04094b5b615f2e174022">stepVert</a> (void)</td></tr>
+<tr class="memdesc:a942f106c27ce04094b5b615f2e174022"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the A/C to step the Vertical Swing.  <a href="classIRFujitsuAC.html#a942f106c27ce04094b5b615f2e174022">More...</a><br /></td></tr>
 <tr class="separator:a942f106c27ce04094b5b615f2e174022"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dc9cc4bda83215fa97896c41b01e584"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a6dc9cc4bda83215fa97896c41b01e584">toggleSwingVert</a> (const bool update=true)</td></tr>
+<tr class="memdesc:a6dc9cc4bda83215fa97896c41b01e584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the A/C to toggle the Vertical Swing mode.  <a href="classIRFujitsuAC.html#a6dc9cc4bda83215fa97896c41b01e584">More...</a><br /></td></tr>
 <tr class="separator:a6dc9cc4bda83215fa97896c41b01e584"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7579944c11b3d31bb069303926307617"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a7579944c11b3d31bb069303926307617">setCmd</a> (const uint8_t cmd)</td></tr>
+<tr class="memdesc:a7579944c11b3d31bb069303926307617"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested (special) command part for the A/C message.  <a href="classIRFujitsuAC.html#a7579944c11b3d31bb069303926307617">More...</a><br /></td></tr>
 <tr class="separator:a7579944c11b3d31bb069303926307617"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a758d209fd0e07cb200b2d4a232b6b0a2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a758d209fd0e07cb200b2d4a232b6b0a2">getCmd</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:a758d209fd0e07cb200b2d4a232b6b0a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested (special) command part for the A/C message.  <a href="classIRFujitsuAC.html#a758d209fd0e07cb200b2d4a232b6b0a2">More...</a><br /></td></tr>
 <tr class="separator:a758d209fd0e07cb200b2d4a232b6b0a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab56c02fc0311ee7f28e780948cbc6a75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ab56c02fc0311ee7f28e780948cbc6a75">setTemp</a> (const uint8_t temp)</td></tr>
+<tr class="memdesc:ab56c02fc0311ee7f28e780948cbc6a75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRFujitsuAC.html#ab56c02fc0311ee7f28e780948cbc6a75">More...</a><br /></td></tr>
 <tr class="separator:ab56c02fc0311ee7f28e780948cbc6a75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9209df913f46821a66a390b8cff37acf"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a9209df913f46821a66a390b8cff37acf">getTemp</a> (void)</td></tr>
+<tr class="memdesc:a9209df913f46821a66a390b8cff37acf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRFujitsuAC.html#a9209df913f46821a66a390b8cff37acf">More...</a><br /></td></tr>
 <tr class="separator:a9209df913f46821a66a390b8cff37acf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0fc10ec0a606434477cb41c60eb49e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#af0fc10ec0a606434477cb41c60eb49e5">setFanSpeed</a> (const uint8_t fan)</td></tr>
+<tr class="memdesc:af0fc10ec0a606434477cb41c60eb49e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRFujitsuAC.html#af0fc10ec0a606434477cb41c60eb49e5">More...</a><br /></td></tr>
 <tr class="separator:af0fc10ec0a606434477cb41c60eb49e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacb180bb884b80c1f8bbbed7e2dd23d5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#aacb180bb884b80c1f8bbbed7e2dd23d5">getFanSpeed</a> (void)</td></tr>
+<tr class="memdesc:aacb180bb884b80c1f8bbbed7e2dd23d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRFujitsuAC.html#aacb180bb884b80c1f8bbbed7e2dd23d5">More...</a><br /></td></tr>
 <tr class="separator:aacb180bb884b80c1f8bbbed7e2dd23d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac125c320f9794aae931bc59ba332a4a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ac125c320f9794aae931bc59ba332a4a8">setMode</a> (const uint8_t mode)</td></tr>
+<tr class="memdesc:ac125c320f9794aae931bc59ba332a4a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRFujitsuAC.html#ac125c320f9794aae931bc59ba332a4a8">More...</a><br /></td></tr>
 <tr class="separator:ac125c320f9794aae931bc59ba332a4a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f9630d81acffc74434ce852b9523d17"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a5f9630d81acffc74434ce852b9523d17">getMode</a> (void)</td></tr>
+<tr class="memdesc:a5f9630d81acffc74434ce852b9523d17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRFujitsuAC.html#a5f9630d81acffc74434ce852b9523d17">More...</a><br /></td></tr>
 <tr class="separator:a5f9630d81acffc74434ce852b9523d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ab8f21b5561e94a322b72a606468b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a60ab8f21b5561e94a322b72a606468b9">setSwing</a> (const uint8_t mode)</td></tr>
+<tr class="memdesc:a60ab8f21b5561e94a322b72a606468b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested swing operation mode of the A/C unit.  <a href="classIRFujitsuAC.html#a60ab8f21b5561e94a322b72a606468b9">More...</a><br /></td></tr>
 <tr class="separator:a60ab8f21b5561e94a322b72a606468b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6f05f1375c3c4662d10026028fadbed"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#af6f05f1375c3c4662d10026028fadbed">getSwing</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:af6f05f1375c3c4662d10026028fadbed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the requested swing operation mode of the A/C unit.  <a href="classIRFujitsuAC.html#af6f05f1375c3c4662d10026028fadbed">More...</a><br /></td></tr>
 <tr class="separator:af6f05f1375c3c4662d10026028fadbed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4dce44cab1f26756d63728cb8d55e65"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ae4dce44cab1f26756d63728cb8d55e65">getRaw</a> (void)</td></tr>
+<tr class="memdesc:ae4dce44cab1f26756d63728cb8d55e65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRFujitsuAC.html#ae4dce44cab1f26756d63728cb8d55e65">More...</a><br /></td></tr>
 <tr class="separator:ae4dce44cab1f26756d63728cb8d55e65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b89d756948affa7029eeeed51916cbb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a9b89d756948affa7029eeeed51916cbb">setRaw</a> (const uint8_t newState[], const uint16_t length)</td></tr>
+<tr class="memdesc:a9b89d756948affa7029eeeed51916cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRFujitsuAC.html#a9b89d756948affa7029eeeed51916cbb">More...</a><br /></td></tr>
 <tr class="separator:a9b89d756948affa7029eeeed51916cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02636372996211d464c7394329921ea0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a02636372996211d464c7394329921ea0">getStateLength</a> (void)</td></tr>
+<tr class="memdesc:a02636372996211d464c7394329921ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length (size) of the state code for the current configuration.  <a href="classIRFujitsuAC.html#a02636372996211d464c7394329921ea0">More...</a><br /></td></tr>
 <tr class="separator:a02636372996211d464c7394329921ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a8d8211f20c8ec299e1fcb588a0846ac2">setPower</a> (const bool <a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a>)</td></tr>
+<tr class="memdesc:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRFujitsuAC.html#a8d8211f20c8ec299e1fcb588a0846ac2">More...</a><br /></td></tr>
 <tr class="separator:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7a320c2d2b8afbd9a04251053831cdd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ae7a320c2d2b8afbd9a04251053831cdd">off</a> (void)</td></tr>
+<tr class="memdesc:ae7a320c2d2b8afbd9a04251053831cdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested power state of the A/C to off.  <a href="classIRFujitsuAC.html#ae7a320c2d2b8afbd9a04251053831cdd">More...</a><br /></td></tr>
 <tr class="separator:ae7a320c2d2b8afbd9a04251053831cdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcb24818d088c879beb7d76ada332f43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a> (void)</td></tr>
+<tr class="memdesc:adcb24818d088c879beb7d76ada332f43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested power state of the A/C to on.  <a href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">More...</a><br /></td></tr>
 <tr class="separator:adcb24818d088c879beb7d76ada332f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d03a83db8bc2084ae2acea17c2c7ae2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a5d03a83db8bc2084ae2acea17c2c7ae2">getPower</a> (void)</td></tr>
+<tr class="memdesc:a5d03a83db8bc2084ae2acea17c2c7ae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRFujitsuAC.html#a5d03a83db8bc2084ae2acea17c2c7ae2">More...</a><br /></td></tr>
 <tr class="separator:a5d03a83db8bc2084ae2acea17c2c7ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f6f18ea39bf28717cb65ff348b1b2f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a7f6f18ea39bf28717cb65ff348b1b2f5">setClean</a> (const bool <a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a>)</td></tr>
+<tr class="memdesc:a7f6f18ea39bf28717cb65ff348b1b2f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Clean mode of the A/C.  <a href="classIRFujitsuAC.html#a7f6f18ea39bf28717cb65ff348b1b2f5">More...</a><br /></td></tr>
 <tr class="separator:a7f6f18ea39bf28717cb65ff348b1b2f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bf872038fc175d1496eae25e9fcdce3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a4bf872038fc175d1496eae25e9fcdce3">getClean</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:a4bf872038fc175d1496eae25e9fcdce3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Clean mode status of the A/C.  <a href="classIRFujitsuAC.html#a4bf872038fc175d1496eae25e9fcdce3">More...</a><br /></td></tr>
 <tr class="separator:a4bf872038fc175d1496eae25e9fcdce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec0048efe87f60406c76ad6bc3ffbc61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#aec0048efe87f60406c76ad6bc3ffbc61">setFilter</a> (const bool <a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a>)</td></tr>
+<tr class="memdesc:aec0048efe87f60406c76ad6bc3ffbc61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Filter mode status of the A/C.  <a href="classIRFujitsuAC.html#aec0048efe87f60406c76ad6bc3ffbc61">More...</a><br /></td></tr>
 <tr class="separator:aec0048efe87f60406c76ad6bc3ffbc61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a430ed6a4b946d1b4527741b42e12a25c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a430ed6a4b946d1b4527741b42e12a25c">getFilter</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:a430ed6a4b946d1b4527741b42e12a25c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Filter mode status of the A/C.  <a href="classIRFujitsuAC.html#a430ed6a4b946d1b4527741b42e12a25c">More...</a><br /></td></tr>
 <tr class="separator:a430ed6a4b946d1b4527741b42e12a25c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a0533cba18739e52014307bf4b1ad07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a9a0533cba18739e52014307bf4b1ad07">setOutsideQuiet</a> (const bool <a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a>)</td></tr>
+<tr class="memdesc:a9a0533cba18739e52014307bf4b1ad07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Outside Quiet mode of the A/C.  <a href="classIRFujitsuAC.html#a9a0533cba18739e52014307bf4b1ad07">More...</a><br /></td></tr>
 <tr class="separator:a9a0533cba18739e52014307bf4b1ad07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a404a06b5022899e622e629ec099864f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a404a06b5022899e622e629ec099864f5">getOutsideQuiet</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:a404a06b5022899e622e629ec099864f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Outside Quiet mode status of the A/C.  <a href="classIRFujitsuAC.html#a404a06b5022899e622e629ec099864f5">More...</a><br /></td></tr>
 <tr class="separator:a404a06b5022899e622e629ec099864f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a242504a5b97c19ff7e369efcadd3916e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a242504a5b97c19ff7e369efcadd3916e">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a242504a5b97c19ff7e369efcadd3916e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRFujitsuAC.html#a242504a5b97c19ff7e369efcadd3916e">More...</a><br /></td></tr>
 <tr class="separator:a242504a5b97c19ff7e369efcadd3916e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a111060b7c93e77fdbd1dc96fc8a6c10f"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a111060b7c93e77fdbd1dc96fc8a6c10f">convertFan</a> (<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a111060b7c93e77fdbd1dc96fc8a6c10f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRFujitsuAC.html#a111060b7c93e77fdbd1dc96fc8a6c10f">More...</a><br /></td></tr>
 <tr class="separator:a111060b7c93e77fdbd1dc96fc8a6c10f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfd6ff9d4449eae7a5268b26058a483f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#adfd6ff9d4449eae7a5268b26058a483f">toCommon</a> (void)</td></tr>
+<tr class="memdesc:adfd6ff9d4449eae7a5268b26058a483f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRFujitsuAC.html#adfd6ff9d4449eae7a5268b26058a483f">More...</a><br /></td></tr>
 <tr class="separator:adfd6ff9d4449eae7a5268b26058a483f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad779b8b86849ab4c6fe3cfc4afe2c7b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ad779b8b86849ab4c6fe3cfc4afe2c7b8">toString</a> (void)</td></tr>
+<tr class="memdesc:ad779b8b86849ab4c6fe3cfc4afe2c7b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRFujitsuAC.html#ad779b8b86849ab4c6fe3cfc4afe2c7b8">More...</a><br /></td></tr>
 <tr class="separator:ad779b8b86849ab4c6fe3cfc4afe2c7b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a26153c647d127356e47d35a7456c6235"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a26153c647d127356e47d35a7456c6235">validChecksum</a> (uint8_t *state, const uint16_t length)</td></tr>
+<tr class="memdesc:a26153c647d127356e47d35a7456c6235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRFujitsuAC.html#a26153c647d127356e47d35a7456c6235">More...</a><br /></td></tr>
 <tr class="separator:a26153c647d127356e47d35a7456c6235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96140e74d31631581003064f70041d02"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a96140e74d31631581003064f70041d02">toCommonMode</a> (const uint8_t mode)</td></tr>
+<tr class="memdesc:a96140e74d31631581003064f70041d02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRFujitsuAC.html#a96140e74d31631581003064f70041d02">More...</a><br /></td></tr>
 <tr class="separator:a96140e74d31631581003064f70041d02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93a35e42d887b5ca6414b295a4a91526"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a93a35e42d887b5ca6414b295a4a91526">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
+<tr class="memdesc:a93a35e42d887b5ca6414b295a4a91526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRFujitsuAC.html#a93a35e42d887b5ca6414b295a4a91526">More...</a><br /></td></tr>
 <tr class="separator:a93a35e42d887b5ca6414b295a4a91526"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:ac885c7952253fcee9bf5b4a889b54da9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ac885c7952253fcee9bf5b4a889b54da9">buildState</a> (void)</td></tr>
+<tr class="memdesc:ac885c7952253fcee9bf5b4a889b54da9"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Re)Build the state from the currently configured settings.  <a href="classIRFujitsuAC.html#ac885c7952253fcee9bf5b4a889b54da9">More...</a><br /></td></tr>
 <tr class="separator:ac885c7952253fcee9bf5b4a889b54da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fc8d7d0f649185e0858974394636a8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a6fc8d7d0f649185e0858974394636a8d">buildFromState</a> (const uint16_t length)</td></tr>
+<tr class="memdesc:a6fc8d7d0f649185e0858974394636a8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the internal state/config from the current (raw) A/C message.  <a href="classIRFujitsuAC.html#a6fc8d7d0f649185e0858974394636a8d">More...</a><br /></td></tr>
 <tr class="separator:a6fc8d7d0f649185e0858974394636a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a2b7fec218b3530b06ce8b49f472e9595"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a2b7fec218b3530b06ce8b49f472e9595">_irsend</a></td></tr>
+<tr class="memdesc:a2b7fec218b3530b06ce8b49f472e9595"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRFujitsuAC.html#a2b7fec218b3530b06ce8b49f472e9595">More...</a><br /></td></tr>
 <tr class="separator:a2b7fec218b3530b06ce8b49f472e9595"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee7ab3704a39669699ba991c976759e3"><td class="memItemLeft" align="right" valign="top">IRsendTest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#aee7ab3704a39669699ba991c976759e3">_irsend</a></td></tr>
-<tr class="separator:aee7ab3704a39669699ba991c976759e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a851b9192e1f18f6a4b2f1726d49ef33b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a851b9192e1f18f6a4b2f1726d49ef33b">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#ac3aa33a8386f73de0f57fc1ff7c6e7d9">kFujitsuAcStateLength</a>]</td></tr>
+<tr class="memdesc:a851b9192e1f18f6a4b2f1726d49ef33b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote.  <a href="classIRFujitsuAC.html#a851b9192e1f18f6a4b2f1726d49ef33b">More...</a><br /></td></tr>
 <tr class="separator:a851b9192e1f18f6a4b2f1726d49ef33b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcff35df74885c63651134ba85359694"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#afcff35df74885c63651134ba85359694">_temp</a></td></tr>
 <tr class="separator:afcff35df74885c63651134ba85359694"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,7 +255,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a4a2f96f4f1cd6650d48ebc3b13fd561c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a4a2f96f4f1cd6650d48ebc3b13fd561c">_filter</a></td></tr>
 <tr class="separator:a4a2f96f4f1cd6650d48ebc3b13fd561c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Class for handling detailed Fujitsu A/C messages. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="acdb70f239884507f540b872ba25747ce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acdb70f239884507f540b872ba25747ce">&#9670;&nbsp;</a></span>IRFujitsuAC()</h2>
 
@@ -256,6 +304,17 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Class Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pin</td><td>GPIO to be used when sending. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>The enum for the model of A/C to be emulated. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">inverted</td><td>Is the output signal to be inverted? </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">use_modulation</td><td>Is frequency modulation to be used? </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -274,6 +333,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set up hardware to be able to send a message. </p>
 
 </div>
 </div>
@@ -301,6 +362,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Build the internal state/config from the current (raw) A/C message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>Size of the current/used (raw) A/C message array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="ac885c7952253fcee9bf5b4a889b54da9"></a>
@@ -326,6 +395,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>(Re)Build the state from the currently configured settings. </p>
 
 </div>
 </div>
@@ -353,6 +424,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Run the calibration to calculate uSec timing offsets for this platform. </p>
+<dl class="section return"><dt>Returns</dt><dd>The uSec timing offset needed per modulation of the IR Led. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This will produce a 65ms IR signal pulse at 38kHz. Only ever needs to be run once per object instantiation, if at all. </dd></dl>
+
 </div>
 </div>
 <a id="a111060b7c93e77fdbd1dc96fc8a6c10f"></a>
@@ -370,6 +445,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
 
 </div>
 </div>
@@ -389,6 +473,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+
 </div>
 </div>
 <a id="a4bf872038fc175d1496eae25e9fcdce3"></a>
@@ -406,6 +499,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the Clean mode status of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Do we get the result from base data? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -425,6 +527,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the requested (special) command part for the A/C message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Do we need to get it from first principles from the raw data? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The special command code. </dd></dl>
+
 </div>
 </div>
 <a id="aacb180bb884b80c1f8bbbed7e2dd23d5"></a>
@@ -442,6 +553,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the current fan speed setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current fan speed. </dd></dl>
 
 </div>
 </div>
@@ -461,6 +575,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the Filter mode status of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Do we get the result from base data? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="a5f9630d81acffc74434ce852b9523d17"></a>
@@ -478,6 +601,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the operating mode setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current operating mode setting. </dd></dl>
 
 </div>
 </div>
@@ -497,6 +623,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the currently emulated/detected model of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The enum representing the model of A/C. </dd></dl>
+
 </div>
 </div>
 <a id="a404a06b5022899e622e629ec099864f5"></a>
@@ -514,6 +643,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the Outside Quiet mode status of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Do we get the result from base data? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -533,6 +671,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the value of the current power setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="ae4dce44cab1f26756d63728cb8d55e65"></a>
@@ -550,6 +691,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get a PTR to the internal state/code for this protocol. </p>
+<dl class="section return"><dt>Returns</dt><dd>PTR to a code for this protocol based on the current internal state. </dd></dl>
 
 </div>
 </div>
@@ -569,6 +713,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the length (size) of the state code for the current configuration. </p>
+<dl class="section return"><dt>Returns</dt><dd>The length of the state array required for this config. </dd></dl>
+
 </div>
 </div>
 <a id="af6f05f1375c3c4662d10026028fadbed"></a>
@@ -586,6 +733,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the requested swing operation mode of the A/C unit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Do we need to get it from first principles from the raw data? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The contents of the swing state/mode. </dd></dl>
 
 </div>
 </div>
@@ -605,6 +761,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the current temperature setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current setting for temp. in degrees celsius. </dd></dl>
+
 </div>
 </div>
 <a id="ae7a320c2d2b8afbd9a04251053831cdd"></a>
@@ -622,6 +781,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the requested power state of the A/C to off. </p>
 
 </div>
 </div>
@@ -641,6 +802,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the requested power state of the A/C to on. </p>
+
 </div>
 </div>
 <a id="a1f1aa593cc4503d14c0fbea5cd9823a1"></a>
@@ -658,6 +821,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the current internal state as an IR message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -677,6 +848,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the Clean mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a7579944c11b3d31bb069303926307617"></a>
@@ -695,6 +874,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the requested (special) command part for the A/C message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cmd</td><td>The special command code. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="af0fc10ec0a606434477cb41c60eb49e5"></a>
@@ -707,11 +894,19 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRFujitsuAC::setFanSpeed </td>
           <td>(</td>
           <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>fan</em></td><td>)</td>
+          <td class="paramname"><em>fanSpeed</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the speed of the fan. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fanSpeed</td><td>The desired setting. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -731,6 +926,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the Filter mode status of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="ac125c320f9794aae931bc59ba332a4a8"></a>
@@ -748,6 +951,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the operating mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The desired operating mode. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -767,6 +978,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the currently emulated model of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>An enum representing the model to support/emulate. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a9a0533cba18739e52014307bf4b1ad07"></a>
@@ -785,6 +1004,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the Outside Quiet mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a8d8211f20c8ec299e1fcb588a0846ac2"></a>
@@ -802,6 +1029,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Change the power setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -831,6 +1066,16 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the internal state from a valid code for this protocol. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">newState</td><td>A valid code for this protocol. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>Size of the newState array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if successful; Otherwise false. (i.e. size check) </dd></dl>
+
 </div>
 </div>
 <a id="a60ab8f21b5561e94a322b72a606468b9"></a>
@@ -843,11 +1088,20 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRFujitsuAC::setSwing </td>
           <td>(</td>
           <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td class="paramname"><em>swingMode</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the requested swing operation mode of the A/C unit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">swingMode</td><td>The swingMode code for the A/C. Vertical, Horizon, or Both. See constants for details. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Not all models support all possible swing modes. </dd></dl>
 
 </div>
 </div>
@@ -867,6 +1121,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the temperature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">temp</td><td>The temperature in degrees celsius. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a603a0e1870f406e4e746a7bb4c37fb70"></a>
@@ -884,6 +1146,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reset the state of the remote to a known good state/sequence. </p>
 
 </div>
 </div>
@@ -903,6 +1167,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Request the A/C to step the Horizontal Swing. </p>
+
 </div>
 </div>
 <a id="a942f106c27ce04094b5b615f2e174022"></a>
@@ -921,6 +1187,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Request the A/C to step the Vertical Swing. </p>
+
 </div>
 </div>
 <a id="adfd6ff9d4449eae7a5268b26058a483f"></a>
@@ -938,6 +1206,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant. </p>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native settings. </dd></dl>
 
 </div>
 </div>
@@ -965,6 +1236,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The native setting to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+
 </div>
 </div>
 <a id="a96140e74d31631581003064f70041d02"></a>
@@ -991,6 +1271,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The native setting to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+
 </div>
 </div>
 <a id="aeba829bb9a9934ad9246a5ba4f4c03fc"></a>
@@ -1008,6 +1297,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Request the A/C to toggle the Horizontal Swing mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">update</td><td>Do we need to update the general swing config? </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1027,6 +1324,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Request the A/C to toggle the Vertical Swing mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">update</td><td>Do we need to update the general swing config? </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="ad779b8b86849ab4c6fe3cfc4afe2c7b8"></a>
@@ -1044,6 +1349,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert the current internal state into a human readable string. </p>
+<dl class="section return"><dt>Returns</dt><dd>A human readable string. </dd></dl>
 
 </div>
 </div>
@@ -1080,6 +1388,16 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Verify the checksum is valid for a given state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The array to verify the checksum of. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>The length of the state array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the state has a valid checksum. Otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -1173,7 +1491,7 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <a id="a2b7fec218b3530b06ce8b49f472e9595"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b7fec218b3530b06ce8b49f472e9595">&#9670;&nbsp;</a></span>_irsend <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b7fec218b3530b06ce8b49f472e9595">&#9670;&nbsp;</a></span>_irsend</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1192,27 +1510,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="aee7ab3704a39669699ba991c976759e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee7ab3704a39669699ba991c976759e3">&#9670;&nbsp;</a></span>_irsend <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">IRsendTest IRFujitsuAC::_irsend</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Instance of the IR send class. </p>
 
 </div>
 </div>
@@ -1389,6 +1687,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The state of the IR remote. </p>
 
 </div>
 </div>

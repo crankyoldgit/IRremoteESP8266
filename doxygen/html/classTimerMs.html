@@ -71,20 +71,27 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>This class performs a simple timer in milli-seoncds since instantiated.  
+ <a href="classTimerMs.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="IRtimer_8h_source.html">IRtimer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7bf7f8d2fcf76b27b34ea4705810eef5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">TimerMs</a> ()</td></tr>
+<tr class="memdesc:a7bf7f8d2fcf76b27b34ea4705810eef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classTimerMs.html#a7bf7f8d2fcf76b27b34ea4705810eef5">More...</a><br /></td></tr>
 <tr class="separator:a7bf7f8d2fcf76b27b34ea4705810eef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25ab025793a4d432e7d4180cbd31157b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">reset</a> ()</td></tr>
+<tr class="memdesc:a25ab025793a4d432e7d4180cbd31157b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the <a class="el" href="classTimerMs.html" title="This class performs a simple timer in milli-seoncds since instantiated.">TimerMs</a> object.  <a href="classTimerMs.html#a25ab025793a4d432e7d4180cbd31157b">More...</a><br /></td></tr>
 <tr class="separator:a25ab025793a4d432e7d4180cbd31157b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4aa759c58727393f69863b3461dfc09"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">elapsed</a> ()</td></tr>
+<tr class="memdesc:ad4aa759c58727393f69863b3461dfc09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate how many milliseconds have elapsed since the timer was started.  <a href="classTimerMs.html#ad4aa759c58727393f69863b3461dfc09">More...</a><br /></td></tr>
 <tr class="separator:ad4aa759c58727393f69863b3461dfc09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a77bfc23a029a9172c3dbac03f746b0cb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">add</a> (uint32_t msecs)</td></tr>
+<tr class="memdesc:a77bfc23a029a9172c3dbac03f746b0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add time to the timer to simulate elapsed time.  <a href="classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb">More...</a><br /></td></tr>
 <tr class="separator:a77bfc23a029a9172c3dbac03f746b0cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -92,7 +99,10 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a15ad2e08a5931397391d48f040722f65"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">start</a></td></tr>
 <tr class="separator:a15ad2e08a5931397391d48f040722f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>This class performs a simple timer in milli-seoncds since instantiated. </p>
+<dl class="section note"><dt>Note</dt><dd>Handles when the system timer wraps around (once). </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7bf7f8d2fcf76b27b34ea4705810eef5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7bf7f8d2fcf76b27b34ea4705810eef5">&#9670;&nbsp;</a></span>TimerMs()</h2>
 
@@ -107,6 +117,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Class constructor. </p>
 
 </div>
 </div>
@@ -135,6 +147,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Add time to the timer to simulate elapsed time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">msecs</td><td>Nr. of mSeconds to be added. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Only used in unit testing. </dd></dl>
+
 </div>
 </div>
 <a id="ad4aa759c58727393f69863b3461dfc09"></a>
@@ -152,6 +173,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Calculate how many milliseconds have elapsed since the timer was started. </p>
+<dl class="section return"><dt>Returns</dt><dd>Nr. of milliseconds. </dd></dl>
+
 </div>
 </div>
 <a id="a25ab025793a4d432e7d4180cbd31157b"></a>
@@ -168,6 +192,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Resets the <a class="el" href="classTimerMs.html" title="This class performs a simple timer in milli-seoncds since instantiated.">TimerMs</a> object. </p>
 
 </div>
 </div>

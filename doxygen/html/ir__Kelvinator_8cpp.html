@@ -71,11 +71,13 @@ $(function() {
 <div class="title">ir_Kelvinator.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Support for Kelvinator A/C protocols. Code to emulate IR Kelvinator YALIF remote control unit, which should control at least the following Kelvinator A/C units: KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC, KSV70HRC, KSV80HRC.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a846cbb5609b1dff139a90487000c7393"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelvinator_8cpp.html#a846cbb5609b1dff139a90487000c7393">kKelvinatorTick</a> = 85</td></tr>
-<tr class="memdesc:a846cbb5609b1dff139a90487000c7393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Code to emulate IR Kelvinator YALIF remote control unit, which should control at least the following Kelvinator A/C units: KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC, KSV70HRC, KSV80HRC.  <a href="ir__Kelvinator_8cpp.html#a846cbb5609b1dff139a90487000c7393">More...</a><br /></td></tr>
 <tr class="separator:a846cbb5609b1dff139a90487000c7393"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ad828958071c75a80928abfb916c0df"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelvinator_8cpp.html#a8ad828958071c75a80928abfb916c0df">kKelvinatorHdrMarkTicks</a> = 106</td></tr>
 <tr class="separator:a8ad828958071c75a80928abfb916c0df"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,7 +136,18 @@ Variables</h2></td></tr>
 <tr class="memitem:a21987b6f00c7f2e9bba94c59bc5b804b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelvinator_8cpp.html#a21987b6f00c7f2e9bba94c59bc5b804b">kKelvinatorTurboOffset</a> = 4</td></tr>
 <tr class="separator:a21987b6f00c7f2e9bba94c59bc5b804b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Variable Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Support for Kelvinator A/C protocols. Code to emulate IR Kelvinator YALIF remote control unit, which should control at least the following Kelvinator A/C units: KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC, KSV70HRC, KSV80HRC. </p>
+<dl class="section note"><dt>Note</dt><dd>Unsupported:<ul>
+<li>All Sleep modes.</li>
+<li>All Timer modes.</li>
+<li>"I Feel" button &amp; mode.</li>
+<li>Energy Saving mode.</li>
+<li>Low Heat mode.</li>
+<li>Fahrenheit. </li>
+</ul>
+</dd></dl>
+</div><h2 class="groupheader">Variable Documentation</h2>
 <a id="a35ffe10c5c1b834703fe44c5eeeb4c8f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a35ffe10c5c1b834703fe44c5eeeb4c8f">&#9670;&nbsp;</a></span>kKelvinatorBasicFanSize</h2>
 
@@ -441,17 +454,6 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Code to emulate IR Kelvinator YALIF remote control unit, which should control at least the following Kelvinator A/C units: KSV26CRC, KSV26HRC, KSV35CRC, KSV35HRC, KSV53HRC, KSV62HRC, KSV70CRC, KSV70HRC, KSV80HRC. </p>
-<dl class="section note"><dt>Note</dt><dd>Unsupported:<ul>
-<li>All Sleep modes.</li>
-<li>All Timer modes.</li>
-<li>"I Feel" button &amp; mode.</li>
-<li>Energy Saving mode.</li>
-<li>Low Heat mode.</li>
-<li>Fahrenheit. </li>
-</ul>
-</dd></dl>
-
 </div>
 </div>
 <a id="a21987b6f00c7f2e9bba94c59bc5b804b"></a>
@@ -556,7 +558,7 @@ Variables</h2></td></tr>
 </div>
 </div><!-- contents -->
 <div class="ttc" id="air__Kelvinator_8cpp_html_a0abc0fdc3d9ac9f12133a46e95d69432"><div class="ttname"><a href="ir__Kelvinator_8cpp.html#a0abc0fdc3d9ac9f12133a46e95d69432">kKelvinatorZeroSpaceTicks</a></div><div class="ttdeci">const uint16_t kKelvinatorZeroSpaceTicks</div><div class="ttdef"><b>Definition:</b> ir_Kelvinator.cpp:39</div></div>
-<div class="ttc" id="air__Kelvinator_8cpp_html_a846cbb5609b1dff139a90487000c7393"><div class="ttname"><a href="ir__Kelvinator_8cpp.html#a846cbb5609b1dff139a90487000c7393">kKelvinatorTick</a></div><div class="ttdeci">const uint16_t kKelvinatorTick</div><div class="ttdoc">Code to emulate IR Kelvinator YALIF remote control unit, which should control at least the following ...</div><div class="ttdef"><b>Definition:</b> ir_Kelvinator.cpp:30</div></div>
+<div class="ttc" id="air__Kelvinator_8cpp_html_a846cbb5609b1dff139a90487000c7393"><div class="ttname"><a href="ir__Kelvinator_8cpp.html#a846cbb5609b1dff139a90487000c7393">kKelvinatorTick</a></div><div class="ttdeci">const uint16_t kKelvinatorTick</div><div class="ttdef"><b>Definition:</b> ir_Kelvinator.cpp:30</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
