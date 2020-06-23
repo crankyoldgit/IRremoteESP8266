@@ -37,9 +37,10 @@
 #include "ir_Whirlpool.h"
 
 // Constants
-const int8_t kGpioUnused = -1;
+const int8_t kGpioUnused = -1;  ///< A placeholder for not using an actual GPIO.
 
 // Class
+/// A universal/common/generic interface for controling supported A/Cs.
 class IRac {
  public:
   explicit IRac(const uint16_t pin, const bool inverted = false,
@@ -93,10 +94,10 @@ class IRac {
 
  private:
 #endif
-  uint16_t _pin;
-  bool _inverted;
-  bool _modulation;
-  stdAc::state_t _prev;  // The state we expect the device to currently be in.
+  uint16_t _pin;  ///< The GPIO to use to transmit messages from.
+  bool _inverted;  ///< IR LED is lit when GPIO is LOW (true) or HIGH (false)?
+  bool _modulation;  ///< Is frequency modulation to be used?
+  stdAc::state_t _prev;  ///< The state we expect the device to currently be in.
 #if SEND_AMCOR
   void amcor(IRAmcorAc *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,
@@ -401,6 +402,7 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
                                     const stdAc::state_t *prev = NULL);
 };  // IRac class
 
+/// Common functions for use with all A/Cs supported by the IRac class.
 namespace IRAcUtils {
   String resultAcToString(const decode_results * const results);
   bool decodeToState(const decode_results *decode, stdAc::state_t *result,
