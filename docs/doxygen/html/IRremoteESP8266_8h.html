@@ -192,7 +192,11 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1340c578f7986b0ed126744127af3907">CARRIER_AC40</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada4122973f5d8ce282457d348857ba0af0">CARRIER_AC64</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1e147eb39adc40e4181940cc2357f070">HITACHI_AC344</a>, 
-<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = HITACHI_AC344
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaf61f2c360f487309cfa466a44fcae106">CORONA_AC</a>, 
+<br />
+&#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada59b5ac5c1d354e50932dc0208d9b0b43">MIDEA24</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1622e3d0835b4d47add716811c7bf797">ZEPEAL</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = ZEPEAL
 <br />
  }</td></tr>
 <tr class="memdesc:ad5b287a488a8c1b7b8661f029ab56fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerator for defining and numbering of supported IR protocol.  <a href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">More...</a><br /></td></tr>
@@ -204,7 +208,7 @@ Variables</h2></td></tr>
 <tr class="separator:a1a49dde7ffbd753f7756cf0c9dc6d826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46835b1e2d279570fd818749e88180d4"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a> = 1</td></tr>
 <tr class="separator:a46835b1e2d279570fd818749e88180d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a570219a14f2d19c7a6ce0aecd37a3b1f"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a570219a14f2d19c7a6ce0aecd37a3b1f">kAirwellBits</a> = 32</td></tr>
+<tr class="memitem:a570219a14f2d19c7a6ce0aecd37a3b1f"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a570219a14f2d19c7a6ce0aecd37a3b1f">kAirwellBits</a> = 34</td></tr>
 <tr class="separator:a570219a14f2d19c7a6ce0aecd37a3b1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a669217ae5aa0baa159f7452f53551875"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a669217ae5aa0baa159f7452f53551875">kAirwellMinRepeats</a> = 2</td></tr>
 <tr class="separator:a669217ae5aa0baa159f7452f53551875"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -242,6 +246,14 @@ Variables</h2></td></tr>
 <tr class="separator:a41bc7ab7289e499ad33901da3eab661a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b2b3670dc74ce9fbf3c8b511422a06c"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a8b2b3670dc74ce9fbf3c8b511422a06c">kCarrierAc64MinRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></td></tr>
 <tr class="separator:a8b2b3670dc74ce9fbf3c8b511422a06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32b65ada4941a9622fbbc60f01b82425"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a32b65ada4941a9622fbbc60f01b82425">kCoronaAcStateLengthShort</a> = 7</td></tr>
+<tr class="separator:a32b65ada4941a9622fbbc60f01b82425"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab18df94a82b365ff30caaabb05a9fcaf"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a> = <a class="el" href="IRremoteESP8266_8h.html#a32b65ada4941a9622fbbc60f01b82425">kCoronaAcStateLengthShort</a> * 3</td></tr>
+<tr class="separator:ab18df94a82b365ff30caaabb05a9fcaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1191a9293b03aa14426083b6f411a4e3"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a1191a9293b03aa14426083b6f411a4e3">kCoronaAcBitsShort</a> = <a class="el" href="IRremoteESP8266_8h.html#a32b65ada4941a9622fbbc60f01b82425">kCoronaAcStateLengthShort</a> * 8</td></tr>
+<tr class="separator:a1191a9293b03aa14426083b6f411a4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf59be616d7e3a5e605b8d1e08f20686"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aaf59be616d7e3a5e605b8d1e08f20686">kCoronaAcBits</a> = <a class="el" href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a> * 8</td></tr>
+<tr class="separator:aaf59be616d7e3a5e605b8d1e08f20686"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1fda5b9f355e526dc66cf58824315a7"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#af1fda5b9f355e526dc66cf58824315a7">kDaikinStateLength</a> = 35</td></tr>
 <tr class="separator:af1fda5b9f355e526dc66cf58824315a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a657f8e60bc1f896d4a46ec101c289485"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a657f8e60bc1f896d4a46ec101c289485">kDaikinBits</a> = <a class="el" href="IRremoteESP8266_8h.html#af1fda5b9f355e526dc66cf58824315a7">kDaikinStateLength</a> * 8</td></tr>
@@ -418,6 +430,10 @@ Variables</h2></td></tr>
 <tr class="separator:afc98096b1e2945e2eaeb07d70d511239"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8876e8e177b8e71154f8cfb42b19160"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aa8876e8e177b8e71154f8cfb42b19160">kMideaMinRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></td></tr>
 <tr class="separator:aa8876e8e177b8e71154f8cfb42b19160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff132faa67b1d07890378df5c9b52a14"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aff132faa67b1d07890378df5c9b52a14">kMidea24Bits</a> = 24</td></tr>
+<tr class="separator:aff132faa67b1d07890378df5c9b52a14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ed4bb62818fc64e4c4b60ef1094059e"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a8ed4bb62818fc64e4c4b60ef1094059e">kMidea24MinRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td></tr>
+<tr class="separator:a8ed4bb62818fc64e4c4b60ef1094059e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd2187340d0b94996136081413e2ad22"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#abd2187340d0b94996136081413e2ad22">kMitsubishiBits</a> = 16</td></tr>
 <tr class="separator:abd2187340d0b94996136081413e2ad22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad88bda81b48f25d30bb5a169d3b6bcec"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ad88bda81b48f25d30bb5a169d3b6bcec">kMitsubishiMinRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td></tr>
@@ -580,6 +596,10 @@ Variables</h2></td></tr>
 <tr class="separator:a4553f6670e241a67104d45216a4ebd98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31945a1ce90b2d4c33b5c91d980d3a7"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ae31945a1ce90b2d4c33b5c91d980d3a7">kVestelAcBits</a> = 56</td></tr>
 <tr class="separator:ae31945a1ce90b2d4c33b5c91d980d3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af09c9402a1c4fa24f692994498641296"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#af09c9402a1c4fa24f692994498641296">kZepealBits</a> = 16</td></tr>
+<tr class="separator:af09c9402a1c4fa24f692994498641296"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb5c734e808d8f108f976f0556bf6e58"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#afb5c734e808d8f108f976f0556bf6e58">kZepealMinRepeat</a> = 4</td></tr>
+<tr class="separator:afb5c734e808d8f108f976f0556bf6e58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="afbeda3fd1bdc8c37d01bdf9f5c8274ff"></a>
@@ -699,6 +719,9 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada1340c578f7986b0ed126744127af3907"></a>CARRIER_AC40&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada4122973f5d8ce282457d348857ba0af0"></a>CARRIER_AC64&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada1e147eb39adc40e4181940cc2357f070"></a>HITACHI_AC344&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadaf61f2c360f487309cfa466a44fcae106"></a>CORONA_AC&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada59b5ac5c1d354e50932dc0208d9b0b43"></a>MIDEA24&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada1622e3d0835b4d47add716811c7bf797"></a>ZEPEAL&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59"></a>kLastDecodeType&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -712,7 +735,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const uint16_t kAirwellBits = 32</td>
+          <td class="memname">const uint16_t kAirwellBits = 34</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -965,6 +988,62 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kCoolixDefaultRepeat = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaf59be616d7e3a5e605b8d1e08f20686"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf59be616d7e3a5e605b8d1e08f20686">&#9670;&nbsp;</a></span>kCoronaAcBits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kCoronaAcBits = <a class="el" href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1191a9293b03aa14426083b6f411a4e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1191a9293b03aa14426083b6f411a4e3">&#9670;&nbsp;</a></span>kCoronaAcBitsShort</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kCoronaAcBitsShort = <a class="el" href="IRremoteESP8266_8h.html#a32b65ada4941a9622fbbc60f01b82425">kCoronaAcStateLengthShort</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab18df94a82b365ff30caaabb05a9fcaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab18df94a82b365ff30caaabb05a9fcaf">&#9670;&nbsp;</a></span>kCoronaAcStateLength</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kCoronaAcStateLength = <a class="el" href="IRremoteESP8266_8h.html#a32b65ada4941a9622fbbc60f01b82425">kCoronaAcStateLengthShort</a> * 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a32b65ada4941a9622fbbc60f01b82425"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32b65ada4941a9622fbbc60f01b82425">&#9670;&nbsp;</a></span>kCoronaAcStateLengthShort</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kCoronaAcStateLengthShort = 7</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2175,6 +2254,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aff132faa67b1d07890378df5c9b52a14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff132faa67b1d07890378df5c9b52a14">&#9670;&nbsp;</a></span>kMidea24Bits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kMidea24Bits = 24</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ed4bb62818fc64e4c4b60ef1094059e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ed4bb62818fc64e4c4b60ef1094059e">&#9670;&nbsp;</a></span>kMidea24MinRepeat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kMidea24MinRepeat = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="afc98096b1e2945e2eaeb07d70d511239"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc98096b1e2945e2eaeb07d70d511239">&#9670;&nbsp;</a></span>kMideaBits</h2>
 
@@ -3367,9 +3474,37 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af09c9402a1c4fa24f692994498641296"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af09c9402a1c4fa24f692994498641296">&#9670;&nbsp;</a></span>kZepealBits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kZepealBits = 16</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb5c734e808d8f108f976f0556bf6e58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb5c734e808d8f108f976f0556bf6e58">&#9670;&nbsp;</a></span>kZepealMinRepeat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kZepealMinRepeat = 4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
-<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:946</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:945</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:976</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:975</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
