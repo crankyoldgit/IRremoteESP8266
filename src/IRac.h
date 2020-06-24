@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #endif
 #include "IRremoteESP8266.h"
+#include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
@@ -98,6 +99,11 @@ class IRac {
   bool _inverted;  ///< IR LED is lit when GPIO is LOW (true) or HIGH (false)?
   bool _modulation;  ///< Is frequency modulation to be used?
   stdAc::state_t _prev;  ///< The state we expect the device to currently be in.
+#if SEND_AIRWELL
+  void airwell(IRAirwellAc *ac,
+               const bool on, const stdAc::opmode_t mode, const float degrees,
+               const stdAc::fanspeed_t fan);
+#endif  // SEND_AIRWELL
 #if SEND_AMCOR
   void amcor(IRAmcorAc *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,

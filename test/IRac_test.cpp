@@ -1,6 +1,7 @@
 // Copyright 2019 David Conran
 
 #include <string>
+#include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
@@ -38,6 +39,29 @@
 #include "gtest/gtest.h"
 
 // Tests for IRac class.
+
+TEST(TestIRac, Airwell) {
+  IRAirwellAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power Toggle: On, Mode: 3 (Auto), Fan: 1 (Medium), Temp: 18C";
+
+  ac.begin();
+  irac.airwell(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kAuto,      // Mode
+               18,                          // Celsius
+               stdAc::fanspeed_t::kMedium);   // Fan speed
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(AIRWELL, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kAirwellBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
 
 TEST(TestIRac, Amcor) {
   IRAmcorAc ac(0);
