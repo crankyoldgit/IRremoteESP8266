@@ -145,10 +145,11 @@ void IRAirwellAc::setMode(const uint8_t mode) {
     case kAirwellDry:
     case kAirwellAuto:
       setBits(&remote_state, kAirwellModeOffset, kAirwellModeSize, mode);
-      return;
+      break;
     default:
       setMode(kAirwellAuto);
   }
+  setFan(getFan());  // Ensure the fan is at the correct speed for the new mode.
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -179,9 +180,11 @@ stdAc::opmode_t IRAirwellAc::toCommonMode(const uint8_t mode) {
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
+/// @note The speed is locked to Low when in Dry mode.
 void IRAirwellAc::setFan(const uint8_t speed) {
   setBits(&remote_state, kAirwellFanOffset, kAirwellFanSize,
-          std::min(speed, kAirwellFanAuto));
+          (getMode() == kAirwellDry) ? kAirwellFanLow
+                                     : std::min(speed, kAirwellFanAuto));
 }
 
 /// Get the current fan speed setting.
