@@ -45,6 +45,9 @@ TEST(TestDecodeAirwell, RealExample) {
   EXPECT_EQ(0x2B0D0181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 2 (Heat), Fan: 3 (Auto), Temp: 25C",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
   const uint16_t rawData_2[175] = {
       2862, 3892,
@@ -77,6 +80,9 @@ TEST(TestDecodeAirwell, RealExample) {
   EXPECT_EQ(0x270F8181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power Toggle: On, Mode: 1 (Cool), Fan: 3 (Auto), Temp: 30C",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 TEST(TestDecodeAirwell, SyntheticExample) {
@@ -193,6 +199,9 @@ TEST(TestDecodeAirwell, RealExample2) {
   EXPECT_EQ(0xB0C0181B, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 2 (Heat), Fan: 3 (Auto), Temp: 23C",
+      IRAcUtils::resultAcToString(&irsend.capture));
 
   // Resend it as a synthetic to see if it decodes to the same value.
   irsend.reset();
