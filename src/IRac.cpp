@@ -16,6 +16,7 @@
 #include "IRremoteESP8266.h"
 #include "IRtext.h"
 #include "IRutils.h"
+#include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
 #include "ir_Carrier.h"
@@ -132,6 +133,9 @@ stdAc::state_t IRac::getStatePrev(void) { return _prev; }
 /// @return true if the protocol is supported by this class, otherwise false.
 bool IRac::isProtocolSupported(const decode_type_t protocol) {
   switch (protocol) {
+#if SEND_AIRWELL
+    case decode_type_t::AIRWELL:
+#endif
 #if SEND_AMCOR
     case decode_type_t::AMCOR:
 #endif
@@ -268,6 +272,34 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
       return false;
   }
 }
+
+#if SEND_AIRWELL
+/// Send an Airwell A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRAirwellAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+void IRac::airwell(IRAirwellAc *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Swing setting available.
+  // No Quiet setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Turbo setting available.
+  // No Economy setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  ac->send();
+}
+#endif  // SEND_AIRWELL
 
 #if SEND_AMCOR
 /// Send an Amcor A/C message with the supplied settings.
@@ -1892,6 +1924,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         else
           result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
+      case decode_type_t::AIRWELL:
       case decode_type_t::DAIKIN64:
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
@@ -1959,6 +1992,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   stdAc::state_t send = this->handleToggles(this->cleanState(desired), prev);
   // Per vendor settings & setup.
   switch (send.protocol) {
+#if SEND_AIRWELL
+    case AIRWELL:
+    {
+      IRAirwellAc ac(_pin, _inverted, _modulation);
+      airwell(&ac, send.power, send.mode, degC, send.fanspeed);
+      break;
+    }
+#endif  // SEND_AIRWELL
 #if SEND_AMCOR
     case AMCOR:
     {
@@ -2715,6 +2756,13 @@ namespace IRAcUtils {
   ///   An empty string if we can't.
   String resultAcToString(const decode_results * const result) {
     switch (result->decode_type) {
+#if DECODE_AIRWELL
+      case decode_type_t::AIRWELL: {
+        IRAirwellAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // AIRWELL uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_AIRWELL
 #if DECODE_AMCOR
       case decode_type_t::AMCOR: {
         IRAmcorAc ac(0);
@@ -2724,7 +2772,7 @@ namespace IRAcUtils {
 #endif  // DECODE_AMCOR
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
-        IRArgoAC ac(0);
+        IRArgoAC ac(kGpioUnused);
         ac.setRaw(result->state);
         return ac.toString();
       }
@@ -3040,6 +3088,14 @@ namespace IRAcUtils {
                     ) {
     if (decode == NULL || result == NULL) return false;  // Safety check.
     switch (decode->decode_type) {
+#if DECODE_AIRWELL
+      case decode_type_t::AIRWELL: {
+        IRAirwellAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_AIRWELL
 #if DECODE_AMCOR
       case decode_type_t::AMCOR: {
         IRAmcorAc ac(kGpioUnused);
