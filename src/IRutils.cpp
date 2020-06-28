@@ -132,6 +132,7 @@ bool hasACState(const decode_type_t protocol) {
     // This is keept sorted by name
     case AMCOR:
     case ARGO:
+    case CARRIER_AC2:
     case CORONA_AC:
     case DAIKIN:
     case DAIKIN128:

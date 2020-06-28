@@ -486,6 +486,11 @@ class IRsend {
   void sendCarrierAC(uint64_t data, uint16_t nbits = kCarrierAcBits,
                      uint16_t repeat = kCarrierAcMinRepeat);
 #endif
+#if SEND_CARRIER_AC2
+  void sendCarrierAc2(const uint8_t data[],
+                      const uint16_t nbytes = kCarrierAc2StateLength,
+                      const uint16_t repeat = kCarrierAc2MinRepeat);
+#endif  // SEND_CARRIER_AC2
 #if SEND_CARRIER_AC40
   void sendCarrierAC40(uint64_t data, uint16_t nbits = kCarrierAc40Bits,
                        uint16_t repeat = kCarrierAc40MinRepeat);

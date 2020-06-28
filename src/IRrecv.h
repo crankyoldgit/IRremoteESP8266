@@ -502,6 +502,11 @@ class IRrecv {
                        const uint16_t nbits = kCarrierAcBits,
                        const bool strict = true);
 #endif  // DECODE_CARRIER_AC
+#if DECODE_CARRIER_AC2
+  bool decodeCarrierAc2(decode_results *results, uint16_t offset = kStartOffset,
+                        const uint16_t nbits = kCarrierAc2Bits,
+                        const bool strict = true);
+#endif  // DECODE_CARRIER_AC2
 #if DECODE_CARRIER_AC40
   bool decodeCarrierAC40(decode_results *results,
                          uint16_t offset = kStartOffset,

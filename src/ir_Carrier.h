@@ -3,6 +3,7 @@
 /// @brief Carrier A/C
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
 /// @see https://docs.google.com/spreadsheets/d/1EZy78L0cn1KDIX1aKq2biptejFqCjD5HO3tLiRvXf48/edit#gid=0
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1205
 
 // Supports:
 //   Brand: Carrier/Surrey,  Model: 42QG5A55970 remote
@@ -11,6 +12,10 @@
 //   Brand: Carrier/Surrey,  Model: 619EGX0180E0 A/C
 //   Brand: Carrier/Surrey,  Model: 619EGX0220E0 A/C
 //   Brand: Carrier/Surrey,  Model: 53NGK009/012 Inverter
+//   Brand: Carrier,  Model: 42NQV060M2 / 38NYV060M2 A/C
+//   Brand: Carrier,  Model: 42NQV050M2 / 38NYV050M2 A/C
+//   Brand: Carrier,  Model: 42NQV035M2 / 38NYV035M2 A/C
+//   Brand: Carrier,  Model: 42NQV025M2 / 38NYV025M2 A/C
 
 #ifndef IR_CARRIER_H_
 #define IR_CARRIER_H_
@@ -67,9 +72,7 @@ const uint8_t kCarrierAc64OnTimerOffset =
 const uint8_t kCarrierAc64OffTimerOffset = kCarrierAc64OnTimerOffset +
                                            kCarrierAc64TimerSize + 4;  // 60
 
-
 // Classes
-
 /// Class for handling detailed Carrier 64 bit A/C messages.
 class IRCarrierAc64 {
  public:

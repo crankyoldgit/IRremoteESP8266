@@ -390,6 +390,13 @@
 #define SEND_CARRIER_AC        _IR_ENABLE_DEFAULT_
 #endif  // SEND_CARRIER_AC
 
+#ifndef DECODE_CARRIER_AC2
+#define DECODE_CARRIER_AC2      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CARRIER_AC2
+#ifndef SEND_CARRIER_AC2
+#define SEND_CARRIER_AC2        _IR_ENABLE_DEFAULT_
+#endif  // SEND_CARRIER_AC2
+
 #ifndef DECODE_CARRIER_AC40
 #define DECODE_CARRIER_AC40    _IR_ENABLE_DEFAULT_
 #endif  // DECODE_CARRIER_AC40
@@ -674,7 +681,7 @@
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
-     DECODE_HITACHI_AC344 || DECODE_CORONA_AC)
+     DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_CARRIER_AC2)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -802,8 +809,9 @@ enum decode_type_t {
   CORONA_AC,
   MIDEA24,
   ZEPEAL,
+  CARRIER_AC2,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = ZEPEAL,
+  kLastDecodeType = CARRIER_AC2,
 };
 
 // Message lengths & required repeat values
@@ -825,6 +833,13 @@ const uint16_t kCoolixBits = 24;
 const uint16_t kCoolixDefaultRepeat = kSingleRepeat;
 const uint16_t kCarrierAcBits = 32;
 const uint16_t kCarrierAcMinRepeat = kNoRepeat;
+const uint16_t kCarrierAc2StateLength = 9;
+const uint16_t kCarrierAc2Bits = kCarrierAc2StateLength * 8;
+const uint16_t kCarrierAc2MinRepeat = kSingleRepeat;
+const uint16_t kCarrierAc2StateLengthShort = kCarrierAc2StateLength - 2;
+const uint16_t kCarrierAc2BitsShort = kCarrierAc2StateLengthShort * 8;
+const uint16_t kCarrierAc2StateLengthLong = kCarrierAc2StateLength + 1;
+const uint16_t kCarrierAc2BitsLong = kCarrierAc2StateLengthLong * 8;
 const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
 const uint16_t kCarrierAc64Bits = 64;
