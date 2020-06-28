@@ -100,13 +100,7 @@ void IRToshibaAC::setRaw(const uint8_t newState[]) {
 /// @return The calculated checksum value.
 uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
-  uint8_t checksum = 0;
-  // Only calculate it for valid lengths.
-  if (length > 1) {
-    // Checksum is simple XOR of all bytes except the last one.
-    for (uint8_t i = 0; i < length - 1; i++) checksum ^= state[i];
-  }
-  return checksum;
+  return length ? xorBytes(state, length - 1) : 0;
 }
 
 /// Verify the checksum is valid for a given state.
