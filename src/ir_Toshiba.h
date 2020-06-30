@@ -4,6 +4,10 @@
 /// @brief Support for Toshiba protocols.
 /// @see https://github.com/r45635/HVAC-IR-Control
 /// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1205
+/// @see https://docs.google.com/spreadsheets/d/1yidE2fvaO9kpCHfKafIdH31q4uaskYR1OwwrkyOxbp0/edit?usp=drivesdk
+/// @see https://www.toshiba-carrier.co.jp/global/about/index.htm
+/// @see http://www.toshiba-carrier.co.th/AboutUs/Pages/CompanyProfile.aspx
 
 // Supports:
 //   Brand: Toshiba,  Model: RAS-B13N3KV2
@@ -12,6 +16,10 @@
 //   Brand: Toshiba,  Model: RAS 18SKP-ES
 //   Brand: Toshiba,  Model: WH-TA04NE
 //   Brand: Toshiba,  Model: WC-L03SE
+//   Brand: Carrier,  Model: 42NQV060M2 / 38NYV060M2 A/C
+//   Brand: Carrier,  Model: 42NQV050M2 / 38NYV050M2 A/C
+//   Brand: Carrier,  Model: 42NQV035M2 / 38NYV035M2 A/C
+//   Brand: Carrier,  Model: 42NQV025M2 / 38NYV025M2 A/C
 
 #ifndef IR_TOSHIBA_H_
 #define IR_TOSHIBA_H_
@@ -28,23 +36,26 @@
 #endif
 
 // Constants
-const uint8_t kToshibaAcModeOffset = 0;
-const uint8_t kToshibaAcModeSize = 2;  // Nr. of bits
-const uint8_t kToshibaAcAuto = 0;
-const uint8_t kToshibaAcCool = 1;
-const uint8_t kToshibaAcDry = 2;
-const uint8_t kToshibaAcHeat = 3;
-const uint8_t kToshibaAcPowerOffset = 2;
-const uint8_t kToshibaAcFanOffset = 5;
-const uint8_t kToshibaAcFanSize = 3;  // Nr. of bits
-const uint8_t kToshibaAcFanAuto = 0b000;
-const uint8_t kToshibaAcFanMin =  0b001;
-const uint8_t kToshibaAcFanMed =  0b011;
-const uint8_t kToshibaAcFanMax =  0b101;
+// Byte[5]
 const uint8_t kToshibaAcTempOffset = 4;
-const uint8_t kToshibaAcTempSize = 4;  // Nr. of bits
+const uint8_t kToshibaAcTempSize = 4;  // Mask 0bxxxx0000
 const uint8_t kToshibaAcMinTemp = 17;  // 17C
 const uint8_t kToshibaAcMaxTemp = 30;  // 30C
+// Byte[6]
+const uint8_t kToshibaAcModeOffset = 0;
+const uint8_t kToshibaAcModeSize = 3;  // Mask 0b00000xxx
+const uint8_t kToshibaAcAuto = 0;                // 0b000
+const uint8_t kToshibaAcCool = 1;                // 0b001
+const uint8_t kToshibaAcDry =  2;                // 0b010
+const uint8_t kToshibaAcHeat = 3;                // 0b011
+const uint8_t kToshibaAcFan =  4;                // 0b100
+const uint8_t kToshibaAcOff =  7;                // 0b111
+const uint8_t kToshibaAcFanOffset = 5;
+const uint8_t kToshibaAcFanSize = 3;   // Mask 0bxxx00000
+const uint8_t kToshibaAcFanAuto = 0;   //      0b000
+const uint8_t kToshibaAcFanMin =  1;   //      0b001
+const uint8_t kToshibaAcFanMed =  3;   //      0b011
+const uint8_t kToshibaAcFanMax =  5;   //      0b101
 
 // Legacy defines. (Deperecated)
 #define TOSHIBA_AC_AUTO kToshibaAcAuto
@@ -82,7 +93,7 @@ class IRToshibaAC {
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode(const bool useRaw = false);
+  uint8_t getMode(const bool raw = false);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
   static bool validChecksum(const uint8_t state[],
@@ -102,11 +113,11 @@ class IRToshibaAC {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kToshibaACStateLength];  ///< The state in IR code form.
+  uint8_t remote_state[kToshibaACStateLengthLong];  ///< The state in code form.
+  uint8_t prev_mode;  ///< Store of the previously set mode.
   void checksum(const uint16_t length = kToshibaACStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kToshibaACStateLength);
-  uint8_t mode_state;
 };
 
 #endif  // IR_TOSHIBA_H_

@@ -4,6 +4,9 @@
 /// @brief Support for Toshiba protocols.
 /// @see https://github.com/r45635/HVAC-IR-Control
 /// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L77
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1205
+/// @see https://www.toshiba-carrier.co.jp/global/about/index.htm
+/// @see http://www.toshiba-carrier.co.th/AboutUs/Pages/CompanyProfile.aspx
 
 #include "ir_Toshiba.h"
 #include <algorithm>
@@ -21,10 +24,10 @@
 // Toshiba A/C
 const uint16_t kToshibaAcHdrMark = 4400;
 const uint16_t kToshibaAcHdrSpace = 4300;
-const uint16_t kToshibaAcBitMark = 543;
-const uint16_t kToshibaAcOneSpace = 1623;
-const uint16_t kToshibaAcZeroSpace = 472;
-const uint16_t kToshibaAcMinGap = 7048;
+const uint16_t kToshibaAcBitMark = 580;
+const uint16_t kToshibaAcOneSpace = 1600;
+const uint16_t kToshibaAcZeroSpace = 490;
+const uint16_t kToshibaAcMinGap = 7400;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -58,7 +61,7 @@ void IRsend::sendToshibaAC(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRToshibaAC::IRToshibaAC(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 /// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266T.ino#L103
@@ -66,7 +69,7 @@ void IRToshibaAC::stateReset(void) {
   static const uint8_t kReset[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
   memcpy(remote_state, kReset, kToshibaACStateLength);
-  mode_state = getMode(true);
+  prev_mode = getMode();
 }
 
 /// Set up hardware to be able to send a message.
@@ -91,7 +94,7 @@ uint8_t* IRToshibaAC::getRaw(void) {
 /// @param[in] newState A valid code for this protocol.
 void IRToshibaAC::setRaw(const uint8_t newState[]) {
   memcpy(remote_state, newState, kToshibaACStateLength);
-  mode_state = this->getMode(true);
+  prev_mode = getMode();
 }
 
 /// Calculate the checksum for a given state.
@@ -130,19 +133,18 @@ void IRToshibaAC::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRToshibaAC::setPower(const bool on) {
-  setBit(&remote_state[6], kToshibaAcPowerOffset, !on);  // Cleared when on.
-  if (on)
-    setMode(mode_state);
-  else
-    setBits(&remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize,
-            kToshibaAcHeat);
+  if (on) {  // On
+    // If not already on, pick the last non-off mode used
+    if (!getPower()) setMode(prev_mode);
+  } else {  // Off
+    setMode(kToshibaAcOff);
+  }
 }
-
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRToshibaAC::getPower(void) {
-  return !GETBIT8(remote_state[6], kToshibaAcPowerOffset);
+  return getMode(true) != kToshibaAcOff;
 }
 
 /// Set the temperature.
@@ -182,13 +184,16 @@ uint8_t IRToshibaAC::getFan(void) {
 }
 
 /// Get the operating mode setting of the A/C.
-/// @param[in] useRaw Indicate to get the mode from the internal state array.
+/// @param[in] raw Get the value without any intelligent processing.
 /// @return The current operating mode setting.
-uint8_t IRToshibaAC::getMode(const bool useRaw) {
-  if (useRaw)
-    return GETBITS8(remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize);
-  else
-    return mode_state;
+uint8_t IRToshibaAC::getMode(const bool raw) {
+  const uint8_t mode = GETBITS8(remote_state[6], kToshibaAcModeOffset,
+                                kToshibaAcModeSize);
+  if (raw) return mode;
+  switch (mode) {
+    case kToshibaAcOff: return prev_mode;
+    default:            return mode;
+  }
 }
 
 /// Set the operating mode of the A/C.
@@ -200,13 +205,14 @@ void IRToshibaAC::setMode(const uint8_t mode) {
     case kToshibaAcCool:
     case kToshibaAcDry:
     case kToshibaAcHeat:
-      mode_state = mode;
-      // Only adjust the remote_state if we have power set to on.
-      if (getPower())
-        setBits(&remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize,
-                mode_state);
-      return;
-    default: this->setMode(kToshibaAcAuto);  // There is no Fan mode.
+    case kToshibaAcFan:
+      prev_mode = mode;
+      // FALL-THRU
+    case kToshibaAcOff:
+      setBits(&remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize,
+              mode);
+      break;
+    default: this->setMode(kToshibaAcAuto);
   }
 }
 
@@ -218,7 +224,7 @@ uint8_t IRToshibaAC::convertMode(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kCool: return kToshibaAcCool;
     case stdAc::opmode_t::kHeat: return kToshibaAcHeat;
     case stdAc::opmode_t::kDry:  return kToshibaAcDry;
-    // No Fan mode.
+    case stdAc::opmode_t::kFan:  return kToshibaAcFan;
     default:                     return kToshibaAcAuto;
   }
 }
@@ -295,8 +301,9 @@ String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
-                            kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
+  if (getPower())
+    result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
+                              kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
                            kToshibaAcFanAuto, kToshibaAcFanAuto,
@@ -316,8 +323,16 @@ String IRToshibaAC::toString(void) {
 bool IRrecv::decodeToshibaAC(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   // Compliance
-  if (strict && nbits != kToshibaACBits)
-    return false;  // Must be called with the correct nr. of bytes.
+  if (strict) {
+    switch (nbits) {  // Must be called with the correct nr. of bits.
+      case kToshibaACBits:
+      case kToshibaACBitsShort:
+      case kToshibaACBitsLong:
+        break;
+      default:
+        return false;
+    }
+  }
 
   // Match Header + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, results->state,
@@ -330,7 +345,7 @@ bool IRrecv::decodeToshibaAC(decode_results* results, uint16_t offset,
   // Compliance
   if (strict) {
     // Check that the checksum of the message is correct.
-    if (!IRToshibaAC::validChecksum(results->state)) return false;
+    if (!IRToshibaAC::validChecksum(results->state, nbits / 8)) return false;
   }
 
   // Success
