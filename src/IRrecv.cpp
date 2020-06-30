@@ -856,14 +856,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Zepeal decode");
     if (decodeZepeal(results, offset)) return true;
 #endif  // DECODE_ZEPEAL
-#if DECODE_CARRIER_AC2
-    DPRINTLN("Attempting Carrier2 72bit decode");
-    if (decodeCarrierAc2(results, offset)) return true;
-    DPRINTLN("Attempting Carrier2 80bit decode");
-    if (decodeCarrierAc2(results, offset, kCarrierAc2BitsLong)) return true;
-    DPRINTLN("Attempting Carrier2 56bit decode");
-    if (decodeCarrierAc2(results, offset, kCarrierAc2BitsShort)) return true;
-#endif  // DECODE_CARRIER_AC2
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

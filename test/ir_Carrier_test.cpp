@@ -3,7 +3,6 @@
 #include "ir_Carrier.h"
 #include "IRac.h"
 #include "IRrecv.h"
-#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -243,16 +242,6 @@ TEST(TestUtils, Housekeeping) {
             IRsend::defaultBits(decode_type_t::CARRIER_AC));
   ASSERT_EQ(kCarrierAcMinRepeat,
             IRsend::minRepeats(decode_type_t::CARRIER_AC));
-
-  // CARRIER_AC2
-  ASSERT_EQ("CARRIER_AC2", typeToString(decode_type_t::CARRIER_AC2));
-  ASSERT_EQ(decode_type_t::CARRIER_AC2, strToDecodeType("CARRIER_AC2"));
-  ASSERT_TRUE(hasACState(decode_type_t::CARRIER_AC2));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::CARRIER_AC2));
-  ASSERT_EQ(kCarrierAc2Bits,
-            IRsend::defaultBits(decode_type_t::CARRIER_AC2));
-  ASSERT_EQ(kCarrierAc2MinRepeat,
-            IRsend::minRepeats(decode_type_t::CARRIER_AC2));
 
   // CARRIER_AC40
   ASSERT_EQ("CARRIER_AC40", typeToString(decode_type_t::CARRIER_AC40));
@@ -622,89 +611,4 @@ TEST(TestCarrierAc64Class, ReconstructKnownState) {
       "Power: On, Mode: 1 (Heat), Temp: 16C, Fan: 1 (Low), Swing(V): On, "
       "Sleep: On, On Timer: Off, Off Timer: Off",
       ac.toString());
-}
-
-// Tests for CarrierAc2
-/// Decode a "real" long example message.
-TEST(TestDecodeCarrierAc2, RealLongExample) {
-  IRsendTest irsend(kGpioUnused);
-  IRrecv irrecv(kGpioUnused);
-  irsend.begin();
-
-  irsend.reset();
-  // Data from:
-  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-650475434
-  const uint16_t high_power_on[327] = {
-    4424, 4320,
-    582, 1574, 588, 1578, 582, 1574, 586, 1578, 586, 496, 582, 492, 586, 1576,
-    586, 492, 586, 492, 588, 496, 584, 496, 584, 496, 584, 1626, 534, 1626,
-    534, 494, 586, 1578, 582, 494, 586, 494, 586, 494, 588, 492, 586, 492,
-    586, 1576, 586, 494, 588, 492, 588, 1574, 588, 1576, 584, 1578, 584, 1574,
-    588, 1574, 588, 492, 588, 1572, 590, 1570, 590, 492, 588, 492, 590, 488,
-    590, 494, 584, 1570, 592, 492, 586, 490, 590, 1572, 590, 490, 590, 1570,
-    590, 490, 590, 1570, 590, 492, 588, 490, 588, 492, 588, 492, 590, 490,
-    590, 494, 586, 490, 590, 490, 588, 490, 590, 490, 588, 492, 590, 490,
-    588, 492, 590, 490, 590, 490, 590, 494, 584, 490, 590, 490, 590, 490,
-    590, 490, 588, 490, 588, 492, 588, 492, 586, 492, 588, 490, 588, 492,
-    588, 490, 590, 1572, 588, 494, 586, 1574, 588, 492, 588, 1572, 590, 1572,
-    588, 492, 588, 492, 586, 494, 588,
-    7422,
-    4424, 4320,
-    586, 1572, 588, 1572, 588, 1576, 584, 1574, 588, 494, 586, 492, 588, 1572,
-    588, 492, 588, 492, 588, 492, 588, 494, 586, 496, 584, 1574, 586, 1578,
-    582, 494, 586, 1578, 584, 494, 586, 492, 588, 492, 586, 496, 584, 494,
-    586, 1578, 584, 494, 586, 494, 584, 1574, 588, 1572, 586, 1574, 588, 1574,
-    588, 1572, 588, 494, 590, 1572, 588, 1574, 588, 492, 588, 492, 588, 492,
-    586, 492, 588, 1572, 588, 498, 582, 492, 588, 1576, 586, 492, 588, 1572,
-    588, 494, 588, 1572, 588, 492, 586, 492, 588, 492, 590, 490, 588, 492,
-    586, 492, 588, 492, 590, 490, 588, 490, 588, 492, 590, 490, 588, 492,
-    590, 490, 588, 490, 590, 490, 590, 490, 592, 488, 592, 494, 584, 494,
-    586, 490, 590, 494, 586, 494, 588, 488, 592, 490, 588, 492, 586, 490,
-    592, 490, 588, 1576, 584, 494, 586, 1570, 590, 494, 586, 1576, 582, 1572,
-    590, 490, 590, 490, 588, 490, 590};  // UNKNOWN 54926187
-
-  const uint8_t expectedState[kCarrierAc2StateLengthLong] = {
-        0xF2, 0x0D, 0x04, 0xFB, 0x09, 0x50, 0x00, 0x00, 0x01, 0x58};
-  irsend.sendRaw(high_power_on, 327, 38000);
-  irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(CARRIER_AC2, irsend.capture.decode_type);
-  EXPECT_EQ(kCarrierAc2BitsLong, irsend.capture.bits);
-  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  EXPECT_EQ(
-      "",
-      IRAcUtils::resultAcToString(&irsend.capture));
-}
-
-/// Decode a "real" short example message.
-TEST(TestDecodeCarrierAc2, RealShortExample) {
-  IRsendTest irsend(kGpioUnused);
-  IRrecv irrecv(kGpioUnused);
-  irsend.begin();
-
-  irsend.reset();
-  // Data from:
-  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-650475096
-  const uint16_t air_direction[115] = {
-      4424, 4318,
-      588, 1574, 588, 1572, 588, 1574, 586, 1572, 590, 490, 586, 494, 586, 1574,
-      588, 492, 586, 494, 586, 494, 586, 496, 584, 492, 588, 1572, 588, 1572,
-      590, 492, 588, 1572, 590, 490, 588, 492, 586, 494, 588, 492, 588, 492,
-      588, 494, 584, 492, 588, 1572, 588, 1574, 588, 1574, 588, 1572, 588, 1572,
-      588, 1572, 588, 1574, 590, 1570, 588, 494, 586, 496, 584, 494, 588, 1572,
-      588, 492, 588, 492, 588, 490, 588, 492, 590, 1572, 588, 492, 588, 496,
-      586, 492, 588, 492, 586, 492, 588, 492, 588, 490, 590, 490, 588, 492,
-      588, 490, 588, 1572, 588, 492, 588, 492, 588, 490, 588, 492, 588, 1572,
-      586};  // UNKNOWN DEB8845C
-  const uint8_t expectedState[kCarrierAc2StateLengthShort] = {
-        0xF2, 0x0D, 0x01, 0xFE, 0x21, 0x00, 0x21};
-  irsend.sendRaw(air_direction, 115, 38000);
-  irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  EXPECT_EQ(CARRIER_AC2, irsend.capture.decode_type);
-  EXPECT_EQ(kCarrierAc2BitsShort, irsend.capture.bits);
-  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  EXPECT_EQ(
-      "",
-      IRAcUtils::resultAcToString(&irsend.capture));
 }

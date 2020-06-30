@@ -559,7 +559,6 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     // Single repeats
     case AIWA_RC_T501:
     case AMCOR:
-    case CARRIER_AC2:
     case COOLIX:
     case GICABLE:
     case INAX:
@@ -666,8 +665,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 64;
     case ARGO:
       return kArgoBits;
-    case CARRIER_AC2:
-      return kCarrierAc2Bits;
     case CORONA_AC:
       return kCoronaAcBits;
     case DAIKIN:
@@ -1012,16 +1009,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendArgo(state, nbytes);
       break;
 #endif  // SEND_ARGO
-#if SEND_CARRIER_AC2
-    case CARRIER_AC2:
-      sendCarrierAc2(state, nbytes);
-      break;
-#endif  // SEND_CARRIER_AC2
 #if SEND_CORONA_AC
     case CORONA_AC:
       sendCoronaAc(state, nbytes);
       break;
-#endif  // SEND_CORONA_AC
+#endif  // SEND_ARGO
 #if SEND_DAIKIN
     case DAIKIN:
       sendDaikin(state, nbytes);

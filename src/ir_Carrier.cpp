@@ -3,7 +3,6 @@
 /// @brief Carrier protocols.
 /// @see CarrierAc https://github.com/crankyoldgit/IRremoteESP8266/issues/385
 /// @see CarrierAc64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1127
-/// @see CarrierAc2 https://github.com/crankyoldgit/IRremoteESP8266/issues/1205
 
 #include "ir_Carrier.h"
 #include <algorithm>
@@ -48,13 +47,6 @@ const uint16_t kCarrierAc64OneSpace = 1736;
 const uint16_t kCarrierAc64ZeroSpace = 615;
 const uint32_t kCarrierAc64Gap = kDefaultMessageGap;  // A guess.
 
-
-const uint16_t kCarrierAc2HdrMark = 4425;
-const uint16_t kCarrierAc2HdrSpace = 4316;
-const uint16_t kCarrierAc2BitMark = 588;
-const uint16_t kCarrierAc2OneSpace = 1572;
-const uint16_t kCarrierAc2ZeroSpace = 491;
-const uint16_t kCarrierAc2Gap = 7420;
 
 #if SEND_CARRIER_AC
 /// Send a Carrier HVAC formatted message.
@@ -551,59 +543,3 @@ stdAc::state_t IRCarrierAc64::toCommon(void) {
   result.clock = -1;
   return result;
 }
-
-#if SEND_CARRIER_AC2
-/// Send a CarrierAc2 formatted message.
-/// Status: ALPHA / Untested.
-/// @param[in] data An array of bytes containing the IR command.
-///                 It is assumed to be in MSB order for this code.
-/// @param[in] nbytes Nr. of bytes of data in the array.
-/// @param[in] repeat Nr. of times the message is to be repeated.
-void IRsend::sendCarrierAc2(const uint8_t data[], const uint16_t nbytes,
-                            const uint16_t repeat) {
-  sendGeneric(kCarrierAc2HdrMark, kCarrierAc2HdrSpace,
-              kCarrierAc2BitMark, kCarrierAc2OneSpace,
-              kCarrierAc2BitMark, kCarrierAc2ZeroSpace,
-              kCarrierAc2BitMark, kCarrierAc2Gap,
-              data, nbytes, kCarrierAcFreq, true, repeat, kDutyDefault);
-}
-#endif  // SEND_CARRIER_AC2
-
-#if DECODE_CARRIER_AC2
-/// Decode the supplied CarrierAc2 message.
-/// Status: ALPHA / Untested.
-/// @param[in,out] results Ptr to the data to decode & where to store the decode
-/// @param[in] offset The starting index to use when attempting to decode the
-///   raw data. Typically/Defaults to kStartOffset.
-/// @param[in] nbits The number of data bits to expect.
-/// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeCarrierAc2(decode_results *results, uint16_t offset,
-                              const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kHeader + kFooter - 1 - offset)
-    return false;  // Too short a message to match.
-  if (strict) {
-    switch (nbits) {
-      case kCarrierAc2Bits:
-      case kCarrierAc2BitsShort:
-      case kCarrierAc2BitsLong:
-        break;
-      default:
-        return false;
-    }
-  }
-
-  // Header + Data + Footer
-  if (!matchGeneric(results->rawbuf + offset, results->state,
-                    results->rawlen - offset, nbits,
-                    kCarrierAc2HdrMark, kCarrierAc2HdrSpace,
-                    kCarrierAc2BitMark, kCarrierAc2OneSpace,
-                    kCarrierAc2BitMark, kCarrierAc2ZeroSpace,
-                    kCarrierAc2BitMark, kCarrierAc2Gap, true)) return false;
-
-  // Success
-  results->decode_type = decode_type_t::CARRIER_AC2;
-  results->bits = nbits;
-  return true;
-}
-#endif  // DECODE_CARRIER_AC2
