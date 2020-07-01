@@ -225,6 +225,7 @@ uint8_t IRToshibaAC::convertMode(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kHeat: return kToshibaAcHeat;
     case stdAc::opmode_t::kDry:  return kToshibaAcDry;
     case stdAc::opmode_t::kFan:  return kToshibaAcFan;
+    case stdAc::opmode_t::kOff:  return kToshibaAcOff;
     default:                     return kToshibaAcAuto;
   }
 }
@@ -251,6 +252,8 @@ stdAc::opmode_t IRToshibaAC::toCommonMode(const uint8_t mode) {
     case kToshibaAcCool: return stdAc::opmode_t::kCool;
     case kToshibaAcHeat: return stdAc::opmode_t::kHeat;
     case kToshibaAcDry:  return stdAc::opmode_t::kDry;
+    case kToshibaAcFan:  return stdAc::opmode_t::kFan;
+    case kToshibaAcOff:  return stdAc::opmode_t::kOff;
     default:             return stdAc::opmode_t::kAuto;
   }
 }
@@ -303,7 +306,7 @@ String IRToshibaAC::toString(void) {
   result += addBoolToString(getPower(), kPowerStr, false);
   if (getPower())
     result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
-                              kToshibaAcHeat, kToshibaAcDry, kToshibaAcAuto);
+                              kToshibaAcHeat, kToshibaAcDry, kToshibaAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
                            kToshibaAcFanAuto, kToshibaAcFanAuto,
