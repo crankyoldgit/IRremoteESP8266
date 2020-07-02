@@ -35,6 +35,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::checkInvertedBytePairs;
+using irutils::invertBytePairs;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -111,17 +113,20 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
 /// @param[in] length The length/size of the array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRToshibaAC::validChecksum(const uint8_t state[], const uint16_t length) {
-  return (length > 1 && state[length - 1] == IRToshibaAC::calcChecksum(state,
-                                                                       length));
+  return (length > 1 &&
+          state[length - 1] == IRToshibaAC::calcChecksum(state, length) &&
+          checkInvertedBytePairs(state, std::min(length,
+                                                 kToshibaAcInvertedSize)));
 }
 
 /// Calculate & set the checksum for the current internal state of the remote.
 /// @param[in] length The length/size of the internal array to checksum.
-
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
-  if (length > 1) remote_state[length - 1] = this->calcChecksum(remote_state,
-                                                                length);
+  if (length > 1) {
+    remote_state[length - 1] = this->calcChecksum(remote_state, length);
+    invertBytePairs(remote_state, std::min(length, kToshibaAcInvertedSize));
+  }
 }
 
 /// Set the requested power state of the A/C to on.
@@ -212,7 +217,7 @@ void IRToshibaAC::setMode(const uint8_t mode) {
       setBits(&remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize,
               mode);
       break;
-    default: this->setMode(kToshibaAcAuto);
+    default: setMode(kToshibaAcAuto);
   }
 }
 

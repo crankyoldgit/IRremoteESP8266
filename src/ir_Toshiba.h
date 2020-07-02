@@ -36,11 +36,22 @@
 #endif
 
 // Constants
+// Byte[0] - 0xF2
+// Byte[1] - 0x0D (inverted previous byte's value)
+// Byte[2] - The expected payload length (in bytes) past the Byte[4].
+const uint8_t kToshibaAcLengthByte = 2;  ///< Byte pos of the "length" attribute
+///< Known lengths are:
+///<   1 (56 bit message)
+///<   3 (72 bit message)
+///<   4 (80 bit message)
+// Byte[3] - The bit-inverted value of the "length" byte.
+const uint16_t kToshibaAcInvertedSize = 4;  ///< Nr. of leading bytes in
+                                            ///< inverted pairs.
 // Byte[5]
-const uint8_t kToshibaAcTempOffset = 4;
-const uint8_t kToshibaAcTempSize = 4;  // Mask 0bxxxx0000
-const uint8_t kToshibaAcMinTemp = 17;  // 17C
-const uint8_t kToshibaAcMaxTemp = 30;  // 30C
+const uint8_t kToshibaAcTempOffset = 4;  ///< Bit offset.
+const uint8_t kToshibaAcTempSize = 4;  ///< Mask 0bxxxx0000
+const uint8_t kToshibaAcMinTemp = 17;  ///< 17C
+const uint8_t kToshibaAcMaxTemp = 30;  ///< 30C
 // Byte[6]
 const uint8_t kToshibaAcModeOffset = 0;
 const uint8_t kToshibaAcModeSize = 3;  // Mask 0b00000xxx

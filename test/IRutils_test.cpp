@@ -744,3 +744,35 @@ TEST(TestUtils, setBits64Bit) {
   irutils::setBits(&data, 32, 4, 0b1001);
   EXPECT_EQ(0x4000000900000013, data);
 }
+
+TEST(TestUtils, InvertedBytePairs) {
+  const uint8_t correct[] = {0x00, 0xFF, 0x01, 0xFE, 0xAA, 0x55};
+  uint8_t wrong[] = {0x00, 0xFF, 0x01, 0xFD, 0xAA, 0x55};
+
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 6));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 5));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 4));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 3));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 2));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 1));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 0));
+
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 5));
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 4));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 3));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 2));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 1));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 0));
+
+  irutils::invertBytePairs(wrong, 0);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  irutils::invertBytePairs(wrong, 1);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  irutils::invertBytePairs(wrong, 2);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+
+  irutils::invertBytePairs(wrong, 6);
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 6));
+  EXPECT_STATE_EQ(correct, wrong, 6 * 8);
+}
