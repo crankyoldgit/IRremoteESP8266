@@ -77,6 +77,12 @@ const uint8_t kToshibaAcFanAuto = 0;   //      0b000
 const uint8_t kToshibaAcFanMin =  1;   //      0b001
 const uint8_t kToshibaAcFanMed =  3;   //      0b011
 const uint8_t kToshibaAcFanMax =  5;   //      0b101
+// Byte[8] (Checksum for 72 bit messages, Eco/Turbo for long 80 bit messages)
+const uint8_t kToshibaAcEcoTurboOffset = 0;
+const uint8_t kToshibaAcEcoTurboSize = 2;  // Mask 0b000000xx
+const uint8_t kToshibaAcTurboOn = 1;       //            0b01
+const uint8_t kToshibaAcEconoOn = 3;       //            0b11
+// Byte[last] - Checksum (xor)
 
 // Legacy defines. (Deperecated)
 #define TOSHIBA_AC_AUTO kToshibaAcAuto
@@ -113,6 +119,10 @@ class IRToshibaAC {
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
+  void setTurbo(const bool on);
+  bool getTurbo(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(const bool raw = false);
   void setRaw(const uint8_t newState[]);

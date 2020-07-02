@@ -1334,25 +1334,76 @@ TEST(TestIRac, Teco) {
 }
 
 TEST(TestIRac, Toshiba) {
-  IRToshibaAC ac(0);
-  IRac irac(0);
-  IRrecv capture(0);
-  char expected[] = "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN)";
+  IRToshibaAC ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN), "
+      "Turbo: Off, Econo: On";
 
   ac.begin();
   irac.toshiba(&ac,
                true,                      // Power
                stdAc::opmode_t::kDry,     // Mode
                29,                        // Celsius
-               stdAc::fanspeed_t::kLow);  // Fan speed
+               stdAc::fanspeed_t::kLow,   // Fan speed
+               stdAc::swingv_t::kOff,     // Vertical Swing
+               false,                     // Turbo
+               true);                     // Econo
   ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(kToshibaACStateLengthLong, ac.getStateLength());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, ac._irsend.capture.decode_type);
-  ASSERT_EQ(kToshibaACBits, ac._irsend.capture.bits);
+  ASSERT_EQ(kToshibaACBitsLong, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  EXPECT_EQ(
+      "f38000d50"
+      "m4400s4300"
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s490m580s1600m580s1600"
+      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s1600m580s1600m580s490m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600"
+      "m580s1600m580s490m580s1600m580s490m580s1600m580s490m580s490m580s490"
+      "m580s7400"
+      "m4400s4300"
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s490m580s1600m580s1600"
+      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s1600m580s1600m580s490m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600"
+      "m580s1600m580s490m580s1600m580s490m580s1600m580s490m580s490m580s490"
+      "m580s7400"
+      "m4400s4300"
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s1600m580s1600m580s490"
+      "m580s490m580s490m580s1600m580s490m580s490m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s1600m580s1600m580s1600m580s490m580s490m580s490m580s490m580s1600"
+      "m580s7400"
+      "m4400s4300"
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s1600m580s1600m580s490"
+      "m580s490m580s490m580s1600m580s490m580s490m580s490m580s490m580s1600"
+      "m580s1600m580s1600m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s1600m580s1600m580s1600m580s490m580s490m580s490m580s490m580s1600"
+      "m580s7400",
+      ac._irsend.outputStr());
 }
 
 TEST(TestIRac, Trotec) {

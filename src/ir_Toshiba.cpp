@@ -46,10 +46,8 @@ using irutils::setBits;
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendToshibaAC(const unsigned char data[], const uint16_t nbytes,
+void IRsend::sendToshibaAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
-  if (nbytes < kToshibaACStateLength)
-    return;  // Not enough bytes to send a proper message.
   sendGeneric(kToshibaAcHdrMark, kToshibaAcHdrSpace, kToshibaAcBitMark,
               kToshibaAcOneSpace, kToshibaAcBitMark, kToshibaAcZeroSpace,
               kToshibaAcBitMark, kToshibaAcMinGap, data, nbytes, 38, true,
@@ -85,7 +83,7 @@ void IRToshibaAC::begin(void) { _irsend.begin(); }
 void IRToshibaAC::send(const uint16_t repeat) {
   _backupState();
   _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
-  if (_send_swing && (getStateLength() == !kToshibaACStateLengthShort)) {
+  if (_send_swing && (getStateLength() != kToshibaACStateLengthShort)) {
     setStateLength(kToshibaACStateLengthShort);
     _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
     _restoreState();
@@ -168,15 +166,16 @@ bool IRToshibaAC::validChecksum(const uint8_t state[], const uint16_t length) {
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
   if (length >= kToshibaAcMinLength) {
-    remote_state[length - 1] = this->calcChecksum(remote_state, length);
+    // Set/clear the short msg bit.
+    setBit(&remote_state[4], kToshibaAcShortMsgBit,
+           getStateLength() == kToshibaACStateLengthShort);
+    // Set/clear the long msg bit.
+    setBit(&remote_state[4], kToshibaAcLongMsgBit,
+          getStateLength() == kToshibaACStateLengthLong);
     invertBytePairs(remote_state, kToshibaAcInvertedLength);
+    // Always do the Xor checksum LAST!
+    remote_state[length - 1] = calcChecksum(remote_state, length);
   }
-  // Set/clear the short msg bit.
-  setBit(&remote_state[4], kToshibaAcShortMsgBit,
-         getStateLength() == kToshibaACStateLengthShort);
-  // Set/clear the long msg bit.
-  setBit(&remote_state[4], kToshibaAcLongMsgBit,
-        getStateLength() == kToshibaACStateLengthLong);
 }
 
 /// Set the requested power state of the A/C to on.
@@ -291,6 +290,46 @@ void IRToshibaAC::setMode(const uint8_t mode) {
   }
 }
 
+/// Get the Turbo (Powerful) setting of the A/C.
+/// @return true, if the current setting is on. Otherwise, false.
+bool IRToshibaAC::getTurbo(void) {
+  if (getStateLength() == kToshibaACStateLengthLong)
+    return remote_state[8] == kToshibaAcTurboOn;
+  return false;
+}
+
+/// Set the Turbo (Powerful) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// Note: Turbo mode is mutually exclusive with Economy mode.
+void IRToshibaAC::setTurbo(const bool on) {
+  if (on) {
+    remote_state[8] = kToshibaAcTurboOn;
+    setStateLength(kToshibaACStateLengthLong);
+  } else {
+    if (!getEcono()) setStateLength(kToshibaACStateLength);
+  }
+}
+
+/// Get the Economy mode setting of the A/C.
+/// @return true, if the current setting is on. Otherwise, false.
+bool IRToshibaAC::getEcono(void) {
+  if (getStateLength() == kToshibaACStateLengthLong)
+    return remote_state[8] == kToshibaAcEconoOn;
+  return false;
+}
+
+/// Set the Economy mode setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// Note: Economy mode is mutually exclusive with Turbo mode.
+void IRToshibaAC::setEcono(const bool on) {
+  if (on) {
+    remote_state[8] = kToshibaAcEconoOn;
+    setStateLength(kToshibaACStateLengthLong);
+  } else {
+    if (!getTurbo()) setStateLength(kToshibaACStateLength);
+  }
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivilant of the enum.
@@ -358,12 +397,12 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.swingv = getSwing() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.turbo = getTurbo();
+  result.econo = getEcono();
   // Not supported.
-  result.turbo = false;
   result.light = false;
   result.filter = false;
-  result.econo = false;
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.clean = false;
@@ -377,7 +416,7 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 /// @return A human readable string.
 String IRToshibaAC::toString(void) {
   String result = "";
-  result.reserve(40);
+  result.reserve(80);
   result += addTempToString(getTemp(), true, false);
   switch (getStateLength()) {
     case kToshibaACStateLengthShort:
@@ -393,6 +432,8 @@ String IRToshibaAC::toString(void) {
       result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
                                kToshibaAcFanAuto, kToshibaAcFanAuto,
                                kToshibaAcFanMed);
+      result += addBoolToString(getTurbo(), kTurboStr);
+      result += addBoolToString(getEcono(), kEconoStr);
   }
   return result;
 }

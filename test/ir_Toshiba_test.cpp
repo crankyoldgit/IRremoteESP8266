@@ -110,50 +110,6 @@ TEST(TestSendToshibaAC, SendWithRepeats) {
       irsend.outputStr());
 }
 
-// Test sending atypical sizes.
-TEST(TestSendToshibaAC, SendUnexpectedSizes) {
-  IRsendTest irsend(kGpioUnused);
-  irsend.begin();
-
-  uint8_t toshiba_short_code[8] = {0x01, 0x02, 0x03, 0x04,
-                                   0x05, 0x06, 0x07, 0x08};
-  uint8_t toshiba_long_code[10] = {0x01, 0x02, 0x03, 0x04, 0x05,
-                                   0x06, 0x07, 0x08, 0x09, 0x0A};
-  irsend.reset();
-  irsend.sendToshibaAC(toshiba_short_code, kToshibaACStateLength - 1);
-  ASSERT_EQ("", irsend.outputStr());
-
-  irsend.reset();
-  irsend.sendToshibaAC(toshiba_long_code, kToshibaACStateLength + 1);
-  ASSERT_EQ(
-      "f38000d50"
-      "m4400s4300"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600m580s1600"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s490"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s1600m580s490"
-      "m580s7400"
-      "m4400s4300"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490"
-      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s1600m580s1600"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s490"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
-      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s1600m580s490"
-      "m580s7400",
-      irsend.outputStr());
-}
-
 // Tests for IRToshibaAC class.
 
 TEST(TestToshibaACClass, Power) {
@@ -355,18 +311,21 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
                                                    0x00, 0xC1, 0x00, 0xC0};
 
   ac.setRaw(initial_state);
-  EXPECT_EQ("Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
+  EXPECT_EQ("Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto), "
+            "Turbo: Off, Econo: Off",
             ac.toString());
   ac.setRaw(modified_state);
-  EXPECT_EQ("Temp: 17C, Power: On, Mode: 1 (Cool), Fan: 5 (High)",
+  EXPECT_EQ("Temp: 17C, Power: On, Mode: 1 (Cool), Fan: 5 (High), "
+            "Turbo: Off, Econo: Off",
             ac.toString());
   ac.setTemp(25);
   ac.setFan(3);
   ac.setMode(kToshibaAcDry);
-  EXPECT_EQ("Temp: 25C, Power: On, Mode: 2 (Dry), Fan: 3 (Medium)",
+  EXPECT_EQ("Temp: 25C, Power: On, Mode: 2 (Dry), Fan: 3 (Medium), "
+            "Turbo: Off, Econo: Off",
             ac.toString());
   ac.off();
-  EXPECT_EQ("Temp: 25C, Power: Off, Fan: 3 (Medium)",
+  EXPECT_EQ("Temp: 25C, Power: Off, Fan: 3 (Medium), Turbo: Off, Econo: Off",
             ac.toString());
 }
 
@@ -419,7 +378,8 @@ TEST(TestDecodeToshibaAC, SyntheticExample) {
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
+      "Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto), Turbo: Off, "
+      "Econo: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -665,8 +625,66 @@ TEST(TestDecodeToshibaAC, RealLongExample) {
   EXPECT_EQ(kToshibaACBitsLong, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 22C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
+      "Temp: 22C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto), Turbo: On, "
+      "Econo: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+
+/// Decode a synthetic long message.
+TEST(TestDecodeToshibaAC, SyntheticLongExample) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+
+  const uint8_t expectedState[kToshibaACStateLengthLong] = {
+        0xF2, 0x0D, 0x04, 0xFB, 0x09, 0x50, 0x00, 0x00, 0x01, 0x58};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendToshibaAC(expectedState, kToshibaACStateLengthLong);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::TOSHIBA_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kToshibaACBitsLong, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "f38000d50"
+    //  4424 4320
+      "m4400s4300"
+    //  582 1574 588 1578 582 1574 586 1578 586 496 582 492 586 1576 586 492
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+    //  586 492 588 496 584 496 584 496 584 1626 534 1626 534 494 586 1578
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+    //  582 494 586 494 586 494 588 492 586 492 586 1576 586 494 588 492
+      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
+    //  588 1574 588 1576 584 1578 584 1574 588 1574 588 492 588 1572 590 1570
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s490m580s1600m580s1600"
+    //  590 492 588 492 590 488 590 494 584 1570 592 492 586 490 590 1572
+      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
+    //  590 490 590 1570 590 490 590 1570 590 492 588 490 588 492 588 492
+      "m580s490m580s1600m580s490m580s1600m580s490m580s490m580s490m580s490"
+    //  590 490 590 494 586 490 590 490 588 490 590 490 588 492 590 490
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+    //  588 492 590 490 590 490 590 494 584 490 590 490 590 490 590 490
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+    //  588 490 588 492 588 492 586 492 588 490 588 492 588 490 590 1572
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
+    //  588 494 586 1574 588 492 588 1572 590 1572 588 492 588 492 586 494
+      "m580s490m580s1600m580s490m580s1600m580s1600m580s490m580s490m580s490"
+    //  588 7422
+      "m580s7400"
+      "m4400s4300"
+      "m580s1600m580s1600m580s1600m580s1600m580s490m580s490m580s1600m580s490"
+      "m580s490m580s490m580s490m580s490m580s1600m580s1600m580s490m580s1600"
+      "m580s490m580s490m580s490m580s490m580s490m580s1600m580s490m580s490"
+      "m580s1600m580s1600m580s1600m580s1600m580s1600m580s490m580s1600m580s1600"
+      "m580s490m580s490m580s490m580s490m580s1600m580s490m580s490m580s1600"
+      "m580s490m580s1600m580s490m580s1600m580s490m580s490m580s490m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s490"
+      "m580s490m580s490m580s490m580s490m580s490m580s490m580s490m580s1600"
+      "m580s490m580s1600m580s490m580s1600m580s1600m580s490m580s490m580s490"
+      "m580s7400",
+      irsend.outputStr());
 }
 
 /// Decode a "real" short example message.
@@ -700,4 +718,24 @@ TEST(TestDecodeToshibaAC, RealShortExample) {
   EXPECT_EQ(
       "Temp: 17C, Swing(V): Off",
       IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestToshibaACClass, ConstructLongState) {
+  IRToshibaAC ac(kGpioUnused);
+  ac.setPower(true);
+  ac.setMode(kToshibaAcDry);
+  ac.setTemp(29);
+  ac.setFan(2);
+  ac.setSwing(false);
+  ac.setTurbo(false);
+  ac.setEcono(true);
+  EXPECT_EQ(
+      "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN), "
+      "Turbo: Off, Econo: On",
+      ac.toString());
+  EXPECT_EQ(kToshibaACStateLengthLong, ac.getStateLength());
+  const uint8_t expectedState[kToshibaACStateLengthLong] = {
+        0xF2, 0x0D, 0x04, 0xFB, 0x09, 0xC0, 0x62, 0x00, 0x03, 0xA8};
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kToshibaACBitsLong);
+  EXPECT_EQ(kToshibaACStateLengthLong, ac.getStateLength());
 }
