@@ -85,10 +85,27 @@ void IRToshibaAC::send(const uint16_t repeat) {
 }
 #endif  // SEND_TOSHIBA_AC
 
-/// Get a PTR to the internal state/code for this protocol.
+/// Get the length of the supplied Toshiba state per it's protocol structure.
+/// @param[in] state The array to get the built-in length from.
+/// @param[in] size The physical size of the state array.
+/// @return Nr. of bytes in use for the provided state message.
+uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
+                                             const uint16_t size) {
+  if (size < kToshibaAcLengthByte) return 0;
+  return state[kToshibaAcLengthByte] + kToshibaAcMinLength;
+}
+
+/// Get the length of the current internal state per the protocol structure.
+/// @return Nr. of bytes in use for the current internal state message.
+uint16_t IRToshibaAC::getStateLength(void) {
+  return getInternalStateLength(remote_state, kToshibaACStateLengthLong);
+}
+
+/// Get a PTR to the internal state/code for this protocol with all integrity
+///   checks passing.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRToshibaAC::getRaw(void) {
-  this->checksum();
+  checksum(getStateLength());
   return remote_state;
 }
 
@@ -113,19 +130,19 @@ uint8_t IRToshibaAC::calcChecksum(const uint8_t state[],
 /// @param[in] length The length/size of the array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRToshibaAC::validChecksum(const uint8_t state[], const uint16_t length) {
-  return (length > 1 &&
-          state[length - 1] == IRToshibaAC::calcChecksum(state, length) &&
-          checkInvertedBytePairs(state, std::min(length,
-                                                 kToshibaAcInvertedSize)));
+  return length >= kToshibaAcMinLength &&
+         state[length - 1] == IRToshibaAC::calcChecksum(state, length) &&
+         checkInvertedBytePairs(state, kToshibaAcInvertedLength) &&
+         IRToshibaAC::getInternalStateLength(state, length) == length;
 }
 
 /// Calculate & set the checksum for the current internal state of the remote.
 /// @param[in] length The length/size of the internal array to checksum.
 void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
-  if (length > 1) {
+  if (length >= kToshibaAcMinLength) {
     remote_state[length - 1] = this->calcChecksum(remote_state, length);
-    invertBytePairs(remote_state, std::min(length, kToshibaAcInvertedSize));
+    invertBytePairs(remote_state, kToshibaAcInvertedLength);
   }
 }
 

@@ -40,12 +40,13 @@
 // Byte[1] - 0x0D (inverted previous byte's value)
 // Byte[2] - The expected payload length (in bytes) past the Byte[4].
 const uint8_t kToshibaAcLengthByte = 2;  ///< Byte pos of the "length" attribute
+const uint8_t kToshibaAcMinLength = 6;  ///< Min Nr. of bytes in a message.
 ///< Known lengths are:
 ///<   1 (56 bit message)
 ///<   3 (72 bit message)
 ///<   4 (80 bit message)
 // Byte[3] - The bit-inverted value of the "length" byte.
-const uint16_t kToshibaAcInvertedSize = 4;  ///< Nr. of leading bytes in
+const uint16_t kToshibaAcInvertedLength = 4;  ///< Nr. of leading bytes in
                                             ///< inverted pairs.
 // Byte[5]
 const uint8_t kToshibaAcTempOffset = 4;  ///< Bit offset.
@@ -107,6 +108,9 @@ class IRToshibaAC {
   uint8_t getMode(const bool raw = false);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
+  static uint16_t getInternalStateLength(const uint8_t state[],
+                                         const uint16_t size);
+  uint16_t getStateLength(void);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kToshibaACStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
