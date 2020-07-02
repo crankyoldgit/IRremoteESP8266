@@ -355,18 +355,18 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
                                                    0x00, 0xC1, 0x00, 0xC0};
 
   ac.setRaw(initial_state);
-  EXPECT_EQ("Power: On, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto)",
+  EXPECT_EQ("Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
             ac.toString());
   ac.setRaw(modified_state);
-  EXPECT_EQ("Power: On, Mode: 1 (Cool), Temp: 17C, Fan: 5 (High)",
+  EXPECT_EQ("Temp: 17C, Power: On, Mode: 1 (Cool), Fan: 5 (High)",
             ac.toString());
   ac.setTemp(25);
   ac.setFan(3);
   ac.setMode(kToshibaAcDry);
-  EXPECT_EQ("Power: On, Mode: 2 (Dry), Temp: 25C, Fan: 3 (Medium)",
+  EXPECT_EQ("Temp: 25C, Power: On, Mode: 2 (Dry), Fan: 3 (Medium)",
             ac.toString());
   ac.off();
-  EXPECT_EQ("Power: Off, Temp: 25C, Fan: 3 (Medium)",
+  EXPECT_EQ("Temp: 25C, Power: Off, Fan: 3 (Medium)",
             ac.toString());
 }
 
@@ -419,7 +419,7 @@ TEST(TestDecodeToshibaAC, SyntheticExample) {
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto)",
+      "Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -665,7 +665,7 @@ TEST(TestDecodeToshibaAC, RealLongExample) {
   EXPECT_EQ(kToshibaACBitsLong, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Auto), Temp: 22C, Fan: 0 (Auto)",
+      "Temp: 22C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -698,6 +698,6 @@ TEST(TestDecodeToshibaAC, RealShortExample) {
   EXPECT_EQ(kToshibaACBitsShort, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (Cool), Temp: 17C, Fan: 0 (Auto)",
+      "Temp: 17C, Swing(V): Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }

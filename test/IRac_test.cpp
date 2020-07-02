@@ -1337,7 +1337,7 @@ TEST(TestIRac, Toshiba) {
   IRToshibaAC ac(0);
   IRac irac(0);
   IRrecv capture(0);
-  char expected[] = "Power: On, Mode: 2 (Dry), Temp: 29C, Fan: 2 (UNKNOWN)";
+  char expected[] = "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN)";
 
   ac.begin();
   irac.toshiba(&ac,

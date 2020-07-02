@@ -47,8 +47,17 @@ const uint8_t kToshibaAcMinLength = 6;  ///< Min Nr. of bytes in a message.
 ///<   4 (80 bit message)
 // Byte[3] - The bit-inverted value of the "length" byte.
 const uint16_t kToshibaAcInvertedLength = 4;  ///< Nr. of leading bytes in
-                                            ///< inverted pairs.
+                                              ///< inverted pairs.
+// Byte[4]
+const uint8_t kToshibaAcShortMsgBit = 5;  ///< Mask 0b00x00000
+const uint8_t kToshibaAcLongMsgBit = 3;   ///< Mask 0b00001000
 // Byte[5]
+const uint8_t kToshibaAcSwingOffset = 0;  ///< Bit offset.
+const uint8_t kToshibaAcSwingSize = 2;       ///< Mask 0b000000xx
+const uint8_t kToshibaAcSwingDirection = 0;  ///<            0b00
+const uint8_t kToshibaAcSwingOff = 1;        ///<            0b01
+const uint8_t kToshibaAcSwingOn = 2;         ///<            0b10
+
 const uint8_t kToshibaAcTempOffset = 4;  ///< Bit offset.
 const uint8_t kToshibaAcTempSize = 4;  ///< Mask 0bxxxx0000
 const uint8_t kToshibaAcMinTemp = 17;  ///< 17C
@@ -113,6 +122,8 @@ class IRToshibaAC {
   uint16_t getStateLength(void);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kToshibaACStateLength);
+  bool getSwing(const bool raw = true);
+  void setSwing(const bool on);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -129,10 +140,16 @@ class IRToshibaAC {
   /// @endcond
 #endif  // UNIT_TEST
   uint8_t remote_state[kToshibaACStateLengthLong];  ///< The state in code form.
+  uint8_t backup[kToshibaACStateLengthLong];  ///< A backup copy of the state.
   uint8_t prev_mode;  ///< Store of the previously set mode.
+  bool _send_swing;  ///< Flag indicating if we need to send a swing message.
+  uint8_t _swing_mode;  ///< The saved swing state/mode/command.
   void checksum(const uint16_t length = kToshibaACStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kToshibaACStateLength);
+  void setStateLength(const uint16_t size);
+  void _backupState(void);
+  void _restoreState(void);
 };
 
 #endif  // IR_TOSHIBA_H_

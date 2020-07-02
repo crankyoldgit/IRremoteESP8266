@@ -72,16 +72,25 @@ void IRToshibaAC::stateReset(void) {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
   memcpy(remote_state, kReset, kToshibaACStateLength);
   prev_mode = getMode();
+  _send_swing = true;  // Force sending the swing state with the first send msg
+                       // batch.
 }
 
 /// Set up hardware to be able to send a message.
 void IRToshibaAC::begin(void) { _irsend.begin(); }
 
 #if SEND_TOSHIBA_AC
-/// Send the current internal state as an IR message.
+/// Send the current internal state as IR messages.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRToshibaAC::send(const uint16_t repeat) {
-  _irsend.sendToshibaAC(getRaw(), kToshibaACStateLength, repeat);
+  _backupState();
+  _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
+  if (_send_swing && (getStateLength() == !kToshibaACStateLengthShort)) {
+    setStateLength(kToshibaACStateLengthShort);
+    _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
+    _restoreState();
+  }
+  _send_swing = false;
 }
 #endif  // SEND_TOSHIBA_AC
 
@@ -101,6 +110,23 @@ uint16_t IRToshibaAC::getStateLength(void) {
   return getInternalStateLength(remote_state, kToshibaACStateLengthLong);
 }
 
+/// Set the internal length of the current internal state per the protocol.
+/// @param[in] size Nr. of bytes in use for the current internal state message.
+void IRToshibaAC::setStateLength(const uint16_t size) {
+  if (size < kToshibaAcMinLength) return;
+  remote_state[kToshibaAcLengthByte] = size - kToshibaAcMinLength;
+}
+
+/// Make a copy of the internal code-form A/C state.
+void IRToshibaAC::_backupState(void) {
+  memcpy(backup, remote_state, kToshibaACStateLengthLong);
+}
+
+/// Recover the internal code-form A/C state from the backup.
+void IRToshibaAC::_restoreState(void) {
+  memcpy(remote_state, backup, kToshibaACStateLengthLong);
+}
+
 /// Get a PTR to the internal state/code for this protocol with all integrity
 ///   checks passing.
 /// @return PTR to a code for this protocol based on the current internal state.
@@ -114,6 +140,7 @@ uint8_t* IRToshibaAC::getRaw(void) {
 void IRToshibaAC::setRaw(const uint8_t newState[]) {
   memcpy(remote_state, newState, kToshibaACStateLength);
   prev_mode = getMode();
+  _send_swing = true;
 }
 
 /// Calculate the checksum for a given state.
@@ -144,6 +171,12 @@ void IRToshibaAC::checksum(const uint16_t length) {
     remote_state[length - 1] = this->calcChecksum(remote_state, length);
     invertBytePairs(remote_state, kToshibaAcInvertedLength);
   }
+  // Set/clear the short msg bit.
+  setBit(&remote_state[4], kToshibaAcShortMsgBit,
+         getStateLength() == kToshibaACStateLengthShort);
+  // Set/clear the long msg bit.
+  setBit(&remote_state[4], kToshibaAcLongMsgBit,
+        getStateLength() == kToshibaACStateLengthLong);
 }
 
 /// Set the requested power state of the A/C to on.
@@ -203,6 +236,26 @@ uint8_t IRToshibaAC::getFan(void) {
                          kToshibaAcFanSize);
   if (fan == kToshibaAcFanAuto) return kToshibaAcFanAuto;
   return --fan;
+}
+
+/// Get the swing setting of the A/C.
+/// @param[in] raw Calculate the answer from just the state data.
+/// @return true, if the current swing mode setting is on. Otherwise, false.
+bool IRToshibaAC::getSwing(const bool raw) {
+  return kToshibaAcSwingOn == (raw ? GETBITS8(remote_state[5],
+                                              kToshibaAcSwingOffset,
+                                              kToshibaAcSwingSize)
+                                   : _swing_mode);
+}
+
+/// Set the swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRToshibaAC::setSwing(const bool on) {
+  _send_swing = true;
+  _swing_mode = on;
+  if (getStateLength() == kToshibaACStateLengthShort)
+    setBits(&remote_state[5], kToshibaAcSwingOffset, kToshibaAcSwingSize,
+            on ? kToshibaAcSwingOn : kToshibaAcSwingOff);
 }
 
 /// Get the operating mode setting of the A/C.
@@ -325,14 +378,22 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 String IRToshibaAC::toString(void) {
   String result = "";
   result.reserve(40);
-  result += addBoolToString(getPower(), kPowerStr, false);
-  if (getPower())
-    result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
-                              kToshibaAcHeat, kToshibaAcDry, kToshibaAcFan);
-  result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
-                           kToshibaAcFanAuto, kToshibaAcFanAuto,
-                           kToshibaAcFanMed);
+  result += addTempToString(getTemp(), true, false);
+  switch (getStateLength()) {
+    case kToshibaACStateLengthShort:
+      result += addBoolToString(getSwing(true), kSwingVStr);
+      break;
+    case kToshibaACStateLengthLong:
+    case kToshibaACStateLength:
+    default:
+      result += addBoolToString(getPower(), kPowerStr);
+      if (getPower())
+        result += addModeToString(getMode(), kToshibaAcAuto, kToshibaAcCool,
+                                  kToshibaAcHeat, kToshibaAcDry, kToshibaAcFan);
+      result += addFanToString(getFan(), kToshibaAcFanMax, kToshibaAcFanMin,
+                               kToshibaAcFanAuto, kToshibaAcFanAuto,
+                               kToshibaAcFanMed);
+  }
   return result;
 }
 
