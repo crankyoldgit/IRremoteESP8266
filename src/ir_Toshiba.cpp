@@ -69,6 +69,7 @@ void IRToshibaAC::stateReset(void) {
   static const uint8_t kReset[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
   memcpy(remote_state, kReset, kToshibaACStateLength);
+  setTemp(22);  // Remote defaults to 22C after factory reset. So do the same.
   prev_mode = getMode();
   _send_swing = true;  // Force sending the swing state with the first send msg
                        // batch.

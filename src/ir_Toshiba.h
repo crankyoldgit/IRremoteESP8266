@@ -55,8 +55,8 @@ const uint8_t kToshibaAcLongMsgBit = 3;   ///< Mask 0b00001000
 const uint8_t kToshibaAcSwingOffset = 0;  ///< Bit offset.
 const uint8_t kToshibaAcSwingSize = 2;       ///< Mask 0b000000xx
 const uint8_t kToshibaAcSwingDirection = 0;  ///<            0b00
-const uint8_t kToshibaAcSwingOff = 1;        ///<            0b01
-const uint8_t kToshibaAcSwingOn = 2;         ///<            0b10
+const uint8_t kToshibaAcSwingOn = 1;         ///<            0b01
+const uint8_t kToshibaAcSwingOff = 2;        ///<            0b10
 
 const uint8_t kToshibaAcTempOffset = 4;  ///< Bit offset.
 const uint8_t kToshibaAcTempSize = 4;  ///< Mask 0bxxxx0000

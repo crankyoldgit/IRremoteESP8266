@@ -235,7 +235,7 @@ TEST(TestToshibaACClass, RawState) {
   ac.begin();
 
   uint8_t initial_state[kToshibaACStateLength] = {0xF2, 0x0D, 0x03, 0xFC, 0x01,
-                                                  0x00, 0x00, 0x00, 0x01};
+                                                  0x50, 0x00, 0x00, 0x51};
   uint8_t modified_state[kToshibaACStateLength] = {0xF2, 0x0D, 0x03, 0xFC, 0x01,
                                                    0x00, 0xC1, 0x00, 0xC0};
 
