@@ -52,9 +52,9 @@ const uint16_t kToshibaAcInvertedLength = 4;  ///< Nr. of leading bytes in
 const uint8_t kToshibaAcShortMsgBit = 5;  ///< Mask 0b00x00000
 const uint8_t kToshibaAcLongMsgBit = 3;   ///< Mask 0b00001000
 // Byte[5]
-const uint8_t kToshibaAcSwingOffset = 0;  ///< Bit offset.
+const uint8_t kToshibaAcSwingOffset = 0;     ///< Bit offset.
 const uint8_t kToshibaAcSwingSize = 2;       ///< Mask 0b000000xx
-const uint8_t kToshibaAcSwingDirection = 0;  ///<            0b00
+const uint8_t kToshibaAcSwingStep = 0;       ///<            0b00
 const uint8_t kToshibaAcSwingOn = 1;         ///<            0b01
 const uint8_t kToshibaAcSwingOff = 2;        ///<            0b10
 
@@ -132,8 +132,8 @@ class IRToshibaAC {
   uint16_t getStateLength(void);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kToshibaACStateLength);
-  bool getSwing(const bool raw = true);
-  void setSwing(const bool on);
+  uint8_t getSwing(const bool raw = true);
+  void setSwing(const uint8_t setting);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

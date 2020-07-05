@@ -86,6 +86,7 @@ void IRToshibaAC::send(const uint16_t repeat) {
   _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
   if (_send_swing && (getStateLength() != kToshibaACStateLengthShort)) {
     setStateLength(kToshibaACStateLengthShort);
+    setSwing(_swing_mode);
     _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
     _restoreState();
   }
@@ -240,22 +241,25 @@ uint8_t IRToshibaAC::getFan(void) {
 
 /// Get the swing setting of the A/C.
 /// @param[in] raw Calculate the answer from just the state data.
-/// @return true, if the current swing mode setting is on. Otherwise, false.
-bool IRToshibaAC::getSwing(const bool raw) {
-  return kToshibaAcSwingOn == (raw ? GETBITS8(remote_state[5],
-                                              kToshibaAcSwingOffset,
-                                              kToshibaAcSwingSize)
-                                   : _swing_mode);
+/// @return The current swing mode setting.
+uint8_t IRToshibaAC::getSwing(const bool raw) {
+  return raw ? GETBITS8(remote_state[5], kToshibaAcSwingOffset,
+                        kToshibaAcSwingSize) : _swing_mode;
 }
 
 /// Set the swing setting of the A/C.
-/// @param[in] on true, the setting is on. false, the setting is off.
-void IRToshibaAC::setSwing(const bool on) {
-  _send_swing = true;
-  _swing_mode = on;
-  if (getStateLength() == kToshibaACStateLengthShort)
-    setBits(&remote_state[5], kToshibaAcSwingOffset, kToshibaAcSwingSize,
-            on ? kToshibaAcSwingOn : kToshibaAcSwingOff);
+/// @param[in] setting The value of the desired setting.
+void IRToshibaAC::setSwing(const uint8_t setting) {
+  switch (setting) {
+    case kToshibaAcSwingStep:
+    case kToshibaAcSwingOn:
+    case kToshibaAcSwingOff:
+      _send_swing = true;
+      _swing_mode = setting;
+      if (getStateLength() == kToshibaACStateLengthShort)
+        setBits(&remote_state[5], kToshibaAcSwingOffset, kToshibaAcSwingSize,
+                setting);
+  }
 }
 
 /// Get the operating mode setting of the A/C.
@@ -398,7 +402,8 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
   result.celsius = true;
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = getSwing() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingv = (getSwing() == kToshibaAcSwingOn) ? stdAc::swingv_t::kAuto
+                                                    : stdAc::swingv_t::kOff;
   result.turbo = getTurbo();
   result.econo = getEcono();
   // Not supported.
@@ -421,7 +426,15 @@ String IRToshibaAC::toString(void) {
   result += addTempToString(getTemp(), true, false);
   switch (getStateLength()) {
     case kToshibaACStateLengthShort:
-      result += addBoolToString(getSwing(true), kSwingVStr);
+      result += addIntToString(getSwing(true), kSwingVStr);
+      result += kSpaceLBraceStr;
+      switch (getSwing(true)) {
+        case kToshibaAcSwingOff: result += kOffStr; break;
+        case kToshibaAcSwingOn: result += kOnStr; break;
+        case kToshibaAcSwingStep: result += kStepStr; break;
+        default: result += kUnknownStr;
+      }
+      result += ')';
       break;
     case kToshibaACStateLengthLong:
     case kToshibaACStateLength:

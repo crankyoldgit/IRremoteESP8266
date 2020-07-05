@@ -1748,7 +1748,9 @@ void IRac::toshiba(IRToshibaAC *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  // The API has no "step" option, so off is off, anything else is on.
+  ac->setSwing((swingv == stdAc::swingv_t::kOff) ? kToshibaAcSwingOff
+                                                 : kToshibaAcSwingOn);
   // No Horizontal swing setting available.
   // No Quiet setting available.
   ac->setTurbo(turbo);

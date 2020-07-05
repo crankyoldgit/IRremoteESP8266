@@ -716,7 +716,7 @@ TEST(TestDecodeToshibaAC, RealShortExample) {
   EXPECT_EQ(kToshibaACBitsShort, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 17C, Swing(V): Off",
+      "Temp: 17C, Swing(V): 0 (Step)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
