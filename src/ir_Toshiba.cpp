@@ -86,6 +86,9 @@ void IRToshibaAC::send(const uint16_t repeat) {
   _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
   if (_send_swing && (getStateLength() != kToshibaACStateLengthShort)) {
     setStateLength(kToshibaACStateLengthShort);
+    // Swing settings expect the min temp to be set.
+    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-653922374
+    setTemp(kToshibaAcMinTemp);
     setSwing(_swing_mode);
     _irsend.sendToshibaAC(getRaw(), getStateLength(), repeat);
     _restoreState();
