@@ -104,7 +104,8 @@ void IRToshibaAC::send(const uint16_t repeat) {
 uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
                                              const uint16_t size) {
   if (size < kToshibaAcLengthByte) return 0;
-  return state[kToshibaAcLengthByte] + kToshibaAcMinLength;
+  return std::min((uint16_t)(state[kToshibaAcLengthByte] + kToshibaAcMinLength),
+                  kToshibaACStateLengthLong);
 }
 
 /// Get the length of the current internal state per the protocol structure.
