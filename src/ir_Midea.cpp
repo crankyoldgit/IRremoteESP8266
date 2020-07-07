@@ -408,7 +408,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  if (!isSwingVToggle() && !isEnergySaverToggle) {
+  if (!isSwingVToggle() && !isEnergySaverToggle()) {
     result += addBoolToString(getPower(), kPowerStr, false);
     result += addModeToString(getMode(), kMideaACAuto, kMideaACCool,
                               kMideaACHeat, kMideaACDry, kMideaACFan);
@@ -421,11 +421,11 @@ String IRMideaAC::toString(void) {
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
     result += addBoolToString(getSleep(), kSleepStr);
   }
-  else if (isEnergySaverToggle) {
+  else if (!isSwingVToggle()) {
     result += addBoolToString(getEnergySaverToggle(), kEconoStr,
                             !isEnergySaverToggle());
   }
-  else if (isSwingVToggle) {
+  else if (!isEnergySaverToggle()) {
     result += addBoolToString(getSwingVToggle(), kSwingVToggleStr,
                             !isSwingVToggle());
   }
