@@ -1735,18 +1735,26 @@ void IRac::teco(IRTecoAc *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Run the device in economical mode.
 void IRac::toshiba(IRToshibaAC *ac,
                    const bool on, const stdAc::opmode_t mode,
-                   const float degrees, const stdAc::fanspeed_t fan) {
+                   const float degrees, const stdAc::fanspeed_t fan,
+                   const stdAc::swingv_t swingv,
+                   const bool turbo, const bool econo) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  // The API has no "step" option, so off is off, anything else is on.
+  ac->setSwing((swingv == stdAc::swingv_t::kOff) ? kToshibaAcSwingOff
+                                                 : kToshibaAcSwingOn);
   // No Horizontal swing setting available.
   // No Quiet setting available.
-  // No Turbo setting available.
+  ac->setTurbo(turbo);
+  ac->setEcono(econo);
   // No Light setting available.
   // No Filter setting available.
   // No Clean setting available.
@@ -2362,7 +2370,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TOSHIBA_AC:
     {
       IRToshibaAC ac(_pin, _inverted, _modulation);
-      toshiba(&ac, send.power, send.mode, degC, send.fanspeed);
+      toshiba(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+              send.turbo, send.econo);
       break;
     }
 #endif  // SEND_TOSHIBA_AC
