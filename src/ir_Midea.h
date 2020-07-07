@@ -26,6 +26,10 @@
 #include "IRsend_test.h"
 #endif
 
+#if DANBY_DAC
+    kSwingVToggleStr = kIonStr;
+#endif
+
 // Constants
 const uint8_t kMideaACTempOffset = 24;
 const uint8_t kMideaACTempSize = 5;  // Bits
@@ -49,6 +53,8 @@ const uint8_t kMideaACFanHigh = 3;  // 0b11
 const uint8_t kMideaACSleepOffset = 38;
 const uint8_t kMideaACPowerOffset = 39;
 const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
+const uint64_t kMideaACToggleEnergySaver = 0x0000A202FFFFFF7E;
+//const uint64_t kMideaACToggleIonizer = 0x0000A201FFFFFF7C;    For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
 
 // Legacy defines. (Deprecated)
 #define MIDEA_AC_COOL kMideaACCool
@@ -104,6 +110,9 @@ class IRMideaAC {
   bool isSwingVToggle(void);
   void setSwingVToggle(const bool on);
   bool getSwingVToggle(void);
+  bool isEnergySaverToggle(void);
+  void setEnergySaverToggle(const bool on);
+  bool getEnergySaverToggle(void);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -121,6 +130,8 @@ class IRMideaAC {
 #endif  // UNIT_TEST
   uint64_t remote_state;  ///< The state of the IR remote in IR code form.
   bool _SwingVToggle;
+  bool _ionizerToggle;
+  bool _energySaverToggle;
   void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
 };

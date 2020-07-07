@@ -99,6 +99,8 @@ void IRMideaAC::stateReset(void) {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
   remote_state = 0xA1826FFFFF62;
   _SwingVToggle = false;
+  _ionizerToggle = false;
+  _energySaverToggle = false;
 }
 
 /// Set up hardware to be able to send a message.
@@ -245,6 +247,8 @@ bool IRMideaAC::getSleep(void) {
   return GETBIT64(remote_state, kMideaACSleepOffset);
 }
 
+/// Toggle
+
 /// Set the A/C to toggle the vertical swing toggle for the next send.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setSwingVToggle(const bool on) { _SwingVToggle = on; }
@@ -261,6 +265,25 @@ bool IRMideaAC::getSwingVToggle(void) {
   _SwingVToggle |= isSwingVToggle();
   return _SwingVToggle;
 }
+
+/// Set the A/C to toggle the energy saver toggle for the next send.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMideaAC::setEnergySaverToggle(const bool on) { _energySaverToggle = on; }
+
+/// Is the current state an energy saver toggle message?
+/// @return true, it is. false, it isn't.
+bool IRMideaAC::isEnergySaverToggle(void) {
+  return remote_state == kMideaACToggleEnergySaver;
+}
+
+// Get the energy saver toggle state of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMideaAC::getEnergySaverToggle(void) {
+  _energySaverToggle |= isEnergySaverToggle();
+  return _energySaverToggle;
+}
+
+
 
 /// Calculate the checksum for a given state.
 /// @param[in] state The value to calc the checksum of.
@@ -376,6 +399,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
   result.degrees = this->getTemp(result.celsius);
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
   result.sleep = this->getSleep() ? 0 : -1;
+  result.econo = this->getEnergySaverToggle();
   return result;
 }
 
@@ -384,7 +408,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 String IRMideaAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  if (!isSwingVToggle()) {
+  if (!isSwingVToggle() && !isEnergySaverToggle) {
     result += addBoolToString(getPower(), kPowerStr, false);
     result += addModeToString(getMode(), kMideaACAuto, kMideaACCool,
                               kMideaACHeat, kMideaACDry, kMideaACFan);
@@ -397,8 +421,18 @@ String IRMideaAC::toString(void) {
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
     result += addBoolToString(getSleep(), kSleepStr);
   }
-  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr,
+  else if (isEnergySaverToggle) {
+    result += addBoolToString(getEnergySaverToggle(), kEconoStr,
+                            !isEnergySaverToggle());
+  }
+  else if (isSwingVToggle) {
+    result += addBoolToString(getSwingVToggle(), kSwingVToggleStr,
                             !isSwingVToggle());
+  }
+  else {
+    result += "Extra messages that are not defined coming through";
+  }
+
   return result;
 }
 
