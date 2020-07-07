@@ -70,9 +70,8 @@ void IRToshibaAC::stateReset(void) {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
   memcpy(remote_state, kReset, kToshibaACStateLength);
   setTemp(22);  // Remote defaults to 22C after factory reset. So do the same.
+  setSwing(kToshibaAcSwingOff);
   prev_mode = getMode();
-  _send_swing = true;  // Force sending the swing state with the first send msg
-                       // batch.
 }
 
 /// Set up hardware to be able to send a message.
@@ -282,7 +281,12 @@ uint8_t IRToshibaAC::getMode(const bool raw) {
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
 /// @note If we get an unexpected mode, default to AUTO.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-654446771
 void IRToshibaAC::setMode(const uint8_t mode) {
+  if (mode != prev_mode)
+      // Changing mode or power turns Econo & Turbo to off on a real remote.
+      // Setting the internal message length to "normal" will do that.
+      setStateLength(kToshibaACStateLength);
   switch (mode) {
     case kToshibaAcAuto:
     case kToshibaAcCool:
