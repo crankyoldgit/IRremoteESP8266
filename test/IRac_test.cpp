@@ -954,7 +954,7 @@ TEST(TestIRac, Midea) {
   IRrecv capture(0);
   char expected[] =
       "Power: On, Mode: 1 (Dry), Celsius: On, Temp: 27C/80F, Fan: 2 (Medium), "
-      "Sleep: On, Swing(V) Toggle: Off";
+      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off";
 
   ac.begin();
   irac.midea(&ac,
@@ -964,6 +964,7 @@ TEST(TestIRac, Midea) {
              27,                          // Degrees
              stdAc::fanspeed_t::kMedium,  // Fan speed
              stdAc::swingv_t::kOff,       // Swing(V)
+             false,                       // Econo
              8 * 60 + 0);                 // Sleep time
 
   ASSERT_EQ(expected, ac.toString());
