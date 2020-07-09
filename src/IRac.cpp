@@ -1263,11 +1263,14 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] econo Run the device in economical mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+/// @note On Danby A/C units, swingv controls the Ion Filter instead.
 void IRac::midea(IRMideaAC *ac,
                  const bool on, const stdAc::opmode_t mode, const bool celsius,
                  const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv, const int16_t sleep) {
+                 const stdAc::swingv_t swingv, const bool econo,
+                 const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1278,6 +1281,7 @@ void IRac::midea(IRMideaAC *ac,
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
+  ac->setEconoToggle(econo);
   // No Light setting available.
   // No Filter setting available.
   // No Clean setting available.
@@ -1921,10 +1925,12 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
+      case decode_type_t::MIDEA:
+        result.econo = desired.econo ^ prev->econo;
+        // FALL THRU
       case decode_type_t::CORONA_AC:
       case decode_type_t::HITACHI_AC344:
       case decode_type_t::HITACHI_AC424:
-      case decode_type_t::MIDEA:
       case decode_type_t::SHARP_AC:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
@@ -2259,7 +2265,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       midea(&ac, send.power, send.mode, send.celsius, send.degrees,
-            send.fanspeed, send.swingv, send.sleep);
+            send.fanspeed, send.swingv, send.econo, send.sleep);
       break;
     }
 #endif  // SEND_MIDEA
