@@ -55,9 +55,10 @@ const uint16_t kSanyoLc7461MinGap =
 
 const uint16_t kSanyoAcHdrMark = 8500;   ///< uSeconds
 const uint16_t kSanyoAcHdrSpace = 4200;  ///< uSeconds
-const uint16_t kSanyoAcBitMark = 575;    ///< uSeconds
-const uint16_t kSanyoAcOneSpace = 1500;  ///< uSeconds
-const uint16_t kSanyoAcZeroSpace = 500;  ///< uSeconds
+const uint16_t kSanyoAcBitMark = 500;    ///< uSeconds
+const uint16_t kSanyoAcOneSpace = 1600;  ///< uSeconds
+const uint16_t kSanyoAcZeroSpace = 550;  ///< uSeconds
+const uint32_t kSanyoAcGap = kDefaultMessageGap;  ///< uSeconds (Guess only)
 const uint16_t kSanyoAcFreq = 38000;  ///< Hz. (Guess only)
 
 #if SEND_SANYO
@@ -248,7 +249,7 @@ void IRsend::sendSanyoAc(const uint8_t data[], const uint16_t nbytes,
   sendGeneric(kSanyoAcHdrMark, kSanyoAcHdrSpace,
               kSanyoAcBitMark, kSanyoAcOneSpace,
               kSanyoAcBitMark, kSanyoAcZeroSpace,
-              kSanyoAcBitMark, kDefaultMessageGap,
+              kSanyoAcBitMark, kSanyoAcGap,
               data, nbytes, kSanyoAcFreq, false, repeat, kDutyDefault);
 }
 #endif  // SEND_SANYO_AC
@@ -274,7 +275,7 @@ bool IRrecv::decodeSanyoAc(decode_results *results, uint16_t offset,
                     kSanyoAcHdrMark, kSanyoAcHdrSpace,
                     kSanyoAcBitMark, kSanyoAcOneSpace,
                     kSanyoAcBitMark, kSanyoAcZeroSpace,
-                    kSanyoAcBitMark, kDefaultMessageGap,
+                    kSanyoAcBitMark, kSanyoAcGap,
                     true, kUseDefTol, kMarkExcess, false)) return false;
 
   // Success
