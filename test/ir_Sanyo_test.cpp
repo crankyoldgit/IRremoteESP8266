@@ -1,5 +1,8 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2020 David Conran
 
+#include "IRac.h"
+#include "IRrecv.h"
+#include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
@@ -256,4 +259,89 @@ TEST(TestDecodeSanyoLC7461, FailToDecodeNonSanyoLC7461Example) {
   ASSERT_FALSE(
       irrecv.decodeSanyoLC7461(&irsend.capture, kStartOffset, kSanyoLC7461Bits,
                                false));
+}
+
+TEST(TestUtils, Housekeeping) {
+  // Sanyo LC7461
+  ASSERT_EQ("SANYO_LC7461", typeToString(decode_type_t::SANYO_LC7461));
+  ASSERT_EQ(decode_type_t::SANYO_LC7461, strToDecodeType("SANYO_LC7461"));
+  ASSERT_FALSE(hasACState(decode_type_t::SANYO_LC7461));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::SANYO_LC7461));
+  ASSERT_EQ(kSanyoLC7461Bits, IRsend::defaultBits(decode_type_t::SANYO_LC7461));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::SANYO_LC7461));
+  // Sanyo A/C
+  ASSERT_EQ("SANYO_AC", typeToString(decode_type_t::SANYO_AC));
+  ASSERT_EQ(decode_type_t::SANYO_AC, strToDecodeType("SANYO_AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::SANYO_AC));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::SANYO_AC));
+  ASSERT_EQ(kSanyoAcBits, IRsend::defaultBits(decode_type_t::SANYO_AC));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::SANYO_AC));
+}
+
+TEST(TestDecodeSanyoAc, DecodeRealExamples) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  // Ref: "On" from https://github.com/crankyoldgit/IRremoteESP8266/issues/1211#issue-650997449
+  const uint16_t rawData[148] = {
+      8456, 4192,
+      624, 448, 584, 1508, 608, 452, 580, 1512, 628, 452, 604, 1468, 560, 1552,
+      600, 472, 584, 1532, 580, 472, 528, 516, 512, 540, 576, 1516, 628, 1472,
+      612, 1508, 612, 452, 580, 1512, 628, 1468, 612, 1496, 632, 444, 580, 480,
+      580, 476, 580, 1496, 564, 508, 576, 480, 576, 480, 580, 476, 584, 472,
+      584, 468, 584, 480, 520, 512, 580, 480, 576, 480, 580, 476, 584, 472,
+      584, 472, 528, 508, 524, 1568, 600, 480, 576, 480, 584, 1492, 560, 512,
+      580, 1536, 576, 480, 580, 476, 580, 476, 528, 528, 524, 1568, 580, 476,
+      584, 476, 580, 476, 580, 472, 528, 512, 520, 536, 576, 480, 580, 480,
+      576, 480, 576, 476, 532, 528, 520, 512, 576, 480, 584, 476, 580, 476,
+      580, 480, 576, 472, 528, 1548, 600, 480, 576, 480, 576, 1520, 592, 1496,
+      600, 476, 580, 480, 576};
+  const uint8_t expectedState[kSanyoAcStateLength] = {
+        0x6A, 0x71, 0x47, 0x00, 0x20, 0x85, 0x00, 0x00, 0x32};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 148, 38000);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SANYO_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSanyoAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  const uint8_t expectedState[kSanyoAcStateLength] = {
+        0x6A, 0x71, 0x47, 0x00, 0x20, 0x85, 0x00, 0x00, 0x32};
+  irsend.begin();
+  irsend.reset();
+  irsend.sendSanyoAc(expectedState);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(SANYO_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSanyoAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  EXPECT_EQ(
+      "f38000d50"
+      "m8500s4200"
+      "m575s500m575s1500m575s500m575s1500m575s500m575s1500m575s1500m575s500"
+      "m575s1500m575s500m575s500m575s500m575s1500m575s1500m575s1500m575s500"
+      "m575s1500m575s1500m575s1500m575s500m575s500m575s500m575s1500m575s500"
+      "m575s500m575s500m575s500m575s500m575s500m575s500m575s500m575s500m575s500"
+      "m575s500m575s500m575s500m575s500m575s1500m575s500m575s500m575s1500"
+      "m575s500m575s1500m575s500m575s500m575s500m575s500m575s1500m575s500"
+      "m575s500m575s500m575s500m575s500m575s500m575s500m575s500m575s500m575s500"
+      "m575s500m575s500m575s500m575s500m575s500m575s500m575s500m575s1500"
+      "m575s500m575s500m575s1500m575s1500m575s500m575s500"
+      "m575s100000",
+      irsend.outputStr());
 }

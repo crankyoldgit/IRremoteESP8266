@@ -1,6 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2016 marcosamarinho
-// Copyright 2017 David Conran
+// Copyright 2017-2020 David Conran
 
 /// @file
 /// @brief Support for Sanyo protocols.
@@ -11,10 +11,15 @@
 /// @see http://pdf.datasheetcatalog.com/datasheet/sanyo/LC7461.pdf
 /// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
 
 // Supports:
 //   Brand: Sanyo,  Model: SA 8650B - disabled
 //   Brand: Sanyo,  Model: LC7461 transmitter IC (SANYO_LC7461)
+//   Brand: Sanyo,  Model: SAP-K121AHA A/C (SANYO_AC)
+//   Brand: Sanyo,  Model: RCS-2HS4E remote (SANYO_AC)
+//   Brand: Sanyo,  Model: SAP-K242AH A/C (SANYO_AC)
+//   Brand: Sanyo,  Model: RCS-2S4E remote (SANYO_AC)
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -47,6 +52,13 @@ const uint16_t kSanyoLc7461MinGap =
      kSanyoLC7461Bits * (kSanyoLc7461BitMark +
                          (kSanyoLc7461OneSpace + kSanyoLc7461ZeroSpace) / 2) +
      kSanyoLc7461BitMark);
+
+const uint16_t kSanyoAcHdrMark = 8500;   ///< uSeconds
+const uint16_t kSanyoAcHdrSpace = 4200;  ///< uSeconds
+const uint16_t kSanyoAcBitMark = 575;    ///< uSeconds
+const uint16_t kSanyoAcOneSpace = 1500;  ///< uSeconds
+const uint16_t kSanyoAcZeroSpace = 500;  ///< uSeconds
+const uint16_t kSanyoAcFreq = 38000;  ///< Hz. (Guess only)
 
 #if SEND_SANYO
 /// Construct a Sanyo LC7461 message.
@@ -221,3 +233,56 @@ bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
 }
 */
 #endif  // DECODE_SANYO
+
+
+#if SEND_SANYO_AC
+/// Send a SanyoAc formatted message.
+/// Status: ALPHA / Untested.
+/// @param[in] data An array of bytes containing the IR command.
+/// @param[in] nbytes Nr. of bytes of data in the array.
+/// @param[in] repeat Nr. of times the message is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
+void IRsend::sendSanyoAc(const uint8_t data[], const uint16_t nbytes,
+                         const uint16_t repeat) {
+  // Header + Data + Footer
+  sendGeneric(kSanyoAcHdrMark, kSanyoAcHdrSpace,
+              kSanyoAcBitMark, kSanyoAcOneSpace,
+              kSanyoAcBitMark, kSanyoAcZeroSpace,
+              kSanyoAcBitMark, kDefaultMessageGap,
+              data, nbytes, kSanyoAcFreq, false, repeat, kDutyDefault);
+}
+#endif  // SEND_SANYO_AC
+
+#if DECODE_SANYO_AC
+/// Decode the supplied SanyoAc message.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
+bool IRrecv::decodeSanyoAc(decode_results *results, uint16_t offset,
+                           const uint16_t nbits, const bool strict) {
+  if (strict && nbits != kSanyoAcBits)
+    return false;
+
+  // Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kSanyoAcHdrMark, kSanyoAcHdrSpace,
+                    kSanyoAcBitMark, kSanyoAcOneSpace,
+                    kSanyoAcBitMark, kSanyoAcZeroSpace,
+                    kSanyoAcBitMark, kDefaultMessageGap,
+                    true, kUseDefTol, kMarkExcess, false)) return false;
+
+  // Success
+  results->decode_type = decode_type_t::SANYO_AC;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_SANYO_AC

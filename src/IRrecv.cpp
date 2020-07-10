@@ -856,6 +856,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Zepeal decode");
     if (decodeZepeal(results, offset)) return true;
 #endif  // DECODE_ZEPEAL
+#if DECODE_SANYO_AC
+    DPRINTLN("Attempting Sanyo AC decode");
+    if (decodeSanyoAc(results, offset)) return true;
+#endif  // DECODE_SANYO_AC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
