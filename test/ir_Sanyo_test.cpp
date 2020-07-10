@@ -309,7 +309,7 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto)",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -329,7 +329,7 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto)",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -442,4 +442,16 @@ TEST(TestSanyoAcClass, FanSpeed) {
 
   ac.setFan(kSanyoAcFanMedium);
   EXPECT_EQ(kSanyoAcFanMedium, ac.getFan());
+}
+
+TEST(TestSanyoAcClass, Sleep) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
 }

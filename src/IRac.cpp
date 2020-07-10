@@ -1619,9 +1619,11 @@ void IRac::samsung(IRSamsungAc *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
 void IRac::sanyo(IRSanyoAc *ac,
                  const bool on, const stdAc::opmode_t mode,
-                 const float degrees, const stdAc::fanspeed_t fan) {
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1636,7 +1638,7 @@ void IRac::sanyo(IRSanyoAc *ac,
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
-  // No Sleep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
   // No Clock setting available.
   ac->send();
 }
@@ -2381,7 +2383,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SANYO_AC:
     {
       IRSanyoAc ac(_pin, _inverted, _modulation);
-      sanyo(&ac, send.power, send.mode, degC, send.fanspeed);
+      sanyo(&ac, send.power, send.mode, degC, send.fanspeed, send.sleep);
       break;
     }
 #endif  // SEND_SANYO_AC

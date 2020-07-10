@@ -64,6 +64,9 @@ const uint8_t kSanyoAcPowerOffset = 6;  ///< Mask 0bxx000000
 const uint8_t kSanyoAcPowerSize = 2;    ///< Mask 0bxx000000
 const uint8_t kSanyoAcPowerOff =                  0b01;  ///< Off
 const uint8_t kSanyoAcPowerOn =                   0b10;  ///< On
+// Byte[6] - Sleep
+const uint8_t kSanyoAcSleepByte = 6;    ///< Index
+const uint8_t kSanyoAcSleepBitOffset = 3;  ///< Mask 0b0000x000
 // Byte[8] - Checksum (8-bit Sum of all preceeding nibbles)
 
 
@@ -93,6 +96,8 @@ class IRSanyoAc {
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
+  void setSleep(const bool on);
+  bool getSleep(void);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
   static bool validChecksum(const uint8_t state[],

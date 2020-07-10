@@ -482,6 +482,18 @@ stdAc::fanspeed_t IRSanyoAc::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
+/// Set the Sleep (Night Setback) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc::setSleep(const bool on) {
+  setBit(&remote_state[kSanyoAcSleepByte], kSanyoAcSleepBitOffset, on);
+}
+
+/// Get the Sleep (Night Setback) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc::getSleep(void) {
+  return GETBIT8(remote_state[kSanyoAcSleepByte], kSanyoAcSleepBitOffset);
+}
+
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRSanyoAc::toCommon(void) {
@@ -493,6 +505,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
@@ -503,7 +516,6 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
   result.quiet = false;
   result.clean = false;
   result.beep = false;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -512,7 +524,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
 /// @return A human readable string.
 String IRSanyoAc::toString(void) {
   String result = "";
-  result.reserve(60);
+  result.reserve(70);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
                             kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
@@ -520,5 +532,6 @@ String IRSanyoAc::toString(void) {
   result += addFanToString(getFan(), kSanyoAcFanHigh, kSanyoAcFanLow,
                            kSanyoAcFanAuto, kSanyoAcFanAuto,
                            kSanyoAcFanMedium);
+  result += addBoolToString(getSleep(), kSleepStr);
   return result;
 }

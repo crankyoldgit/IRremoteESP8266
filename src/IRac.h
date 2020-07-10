@@ -362,7 +362,7 @@ void electra(IRElectraAc *ac,
 #if SEND_SANYO_AC
   void sanyo(IRSanyoAc *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,
-             const stdAc::fanspeed_t fan);
+             const stdAc::fanspeed_t fan, const int16_t sleep = -1);
 #endif  // SEND_SANYO_AC
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac,
