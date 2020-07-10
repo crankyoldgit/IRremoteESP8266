@@ -309,7 +309,8 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off, "
+      "Swing(V): 5 (UpperMiddle)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -329,7 +330,8 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off, "
+      "Swing(V): 5 (UpperMiddle)",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -454,4 +456,26 @@ TEST(TestSanyoAcClass, Sleep) {
   EXPECT_FALSE(ac.getSleep());
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestSanyoAcClass, SwingV) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwingV(kSanyoAcSwingVAuto);
+  EXPECT_EQ(kSanyoAcSwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kSanyoAcSwingVHigh);
+  EXPECT_EQ(kSanyoAcSwingVHigh, ac.getSwingV());
+
+  ac.setSwingV(kSanyoAcSwingVLow);
+  EXPECT_EQ(kSanyoAcSwingVLow, ac.getSwingV());
+
+  ac.setSwingV(kSanyoAcSwingVUpperMiddle);
+  EXPECT_EQ(kSanyoAcSwingVUpperMiddle, ac.getSwingV());
+
+  ac.setSwingV(0);
+  EXPECT_EQ(kSanyoAcSwingVAuto, ac.getSwingV());
+  ac.setSwingV(255);
+  EXPECT_EQ(kSanyoAcSwingVAuto, ac.getSwingV());
 }

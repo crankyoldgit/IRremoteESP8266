@@ -1253,7 +1253,8 @@ TEST(TestIRac, Sanyo) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), Sleep: On";
+      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), Sleep: On, "
+      "Swing(V): 7 (Highest)";
 
   ac.begin();
   irac.sanyo(&ac,
@@ -1261,6 +1262,7 @@ TEST(TestIRac, Sanyo) {
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
              stdAc::fanspeed_t::kMedium,   // Fan speed
+             stdAc::swingv_t::kHighest,    // Vertical Swing
              17);                          // Sleep
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();

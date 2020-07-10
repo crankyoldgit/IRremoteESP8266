@@ -23,6 +23,7 @@
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
+using irutils::addIntToString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::sumNibbles;
@@ -482,6 +483,54 @@ stdAc::fanspeed_t IRSanyoAc::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
+/// Get the vertical swing setting of the A/C.
+/// @return The current swing mode setting.
+uint8_t IRSanyoAc::getSwingV(void) {
+  return GETBITS8(remote_state[kSanyoAcPowerByte], kSanyoAcSwingVOffset,
+                  kSanyoAcSwingVSize);
+}
+
+/// Set the vertical swing setting of the A/C.
+/// @param[in] setting The value of the desired setting.
+void IRSanyoAc::setSwingV(const uint8_t setting) {
+  if (setting == kSanyoAcSwingVAuto ||
+      (setting >= kSanyoAcSwingVLowest && setting <= kSanyoAcSwingVHighest))
+    setBits(&remote_state[kSanyoAcPowerByte], kSanyoAcSwingVOffset,
+            kSanyoAcSwingVSize, setting);
+
+  else
+    setSwingV(kSanyoAcSwingVAuto);
+}
+
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
+uint8_t IRSanyoAc::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest: return kSanyoAcSwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kSanyoAcSwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kSanyoAcSwingVUpperMiddle;
+    case stdAc::swingv_t::kLow:     return kSanyoAcSwingVLow;
+    case stdAc::swingv_t::kLowest:  return kSanyoAcSwingVLowest;
+    default:                        return kSanyoAcSwingVAuto;
+  }
+}
+
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
+stdAc::swingv_t IRSanyoAc::toCommonSwingV(const uint8_t setting) {
+  switch (setting) {
+    case kSanyoAcSwingVHighest:     return stdAc::swingv_t::kHighest;
+    case kSanyoAcSwingVHigh:        return stdAc::swingv_t::kHigh;
+    case kSanyoAcSwingVUpperMiddle:
+    case kSanyoAcSwingVLowerMiddle: return stdAc::swingv_t::kMiddle;
+    case kSanyoAcSwingVLow:         return stdAc::swingv_t::kLow;
+    case kSanyoAcSwingVLowest:      return stdAc::swingv_t::kLowest;
+    default:                        return stdAc::swingv_t::kAuto;
+  }
+}
+
 /// Set the Sleep (Night Setback) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSanyoAc::setSleep(const bool on) {
@@ -506,8 +555,8 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.sleep = getSleep() ? 0 : -1;
+  result.swingv = toCommonSwingV(getSwingV());
   // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
   result.econo = false;
@@ -524,7 +573,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
 /// @return A human readable string.
 String IRSanyoAc::toString(void) {
   String result = "";
-  result.reserve(70);
+  result.reserve(90);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
                             kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
@@ -533,5 +582,24 @@ String IRSanyoAc::toString(void) {
                            kSanyoAcFanAuto, kSanyoAcFanAuto,
                            kSanyoAcFanMedium);
   result += addBoolToString(getSleep(), kSleepStr);
+  result += addIntToString(getSwingV(), kSwingVStr);
+  result += kSpaceLBraceStr;
+  switch (getSwingV()) {
+    case kSanyoAcSwingVHighest: result += kHighestStr; break;
+    case kSanyoAcSwingVHigh:    result += kHighStr; break;
+    case kSanyoAcSwingVUpperMiddle:
+      result += kUpperStr;
+      result += kMiddleStr;
+      break;
+      case kSanyoAcSwingVLowerMiddle:
+        result += kLowerStr;
+        result += kMiddleStr;
+        break;
+    case kSanyoAcSwingVLow:     result += kLowStr; break;
+    case kSanyoAcSwingVLowest:  result += kLowestStr; break;
+    case kSanyoAcSwingVAuto:    result += kAutoStr;   break;
+    default:                    result += kUnknownStr;
+  }
+  result += ')';
   return result;
 }

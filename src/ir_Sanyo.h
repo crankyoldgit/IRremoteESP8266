@@ -58,12 +58,22 @@ const uint8_t kSanyoAcFanAuto =   0;   ///<            0b00
 const uint8_t kSanyoAcFanHigh =   1;   ///<            0b01
 const uint8_t kSanyoAcFanLow =    2;   ///<            0b10
 const uint8_t kSanyoAcFanMedium = 3;   ///<            0b11
-// Byte[5] - Power
+// Byte[5] - Power + SwingV
 const uint8_t kSanyoAcPowerByte = 5;    ///< Index
 const uint8_t kSanyoAcPowerOffset = 6;  ///< Mask 0bxx000000
 const uint8_t kSanyoAcPowerSize = 2;    ///< Mask 0bxx000000
+// const uint8_t kSanyoAcPowerStandby =           0b00;  ///< Standby?
 const uint8_t kSanyoAcPowerOff =                  0b01;  ///< Off
 const uint8_t kSanyoAcPowerOn =                   0b10;  ///< On
+const uint8_t kSanyoAcSwingVOffset = 0;  ///< Mask 0b00000xxx
+const uint8_t kSanyoAcSwingVSize = 3;    ///< Mask 0b00000xxx
+const uint8_t kSanyoAcSwingVAuto =         0;  ///<     0b000
+const uint8_t kSanyoAcSwingVLowest =       2;  ///<     0b010
+const uint8_t kSanyoAcSwingVLow =          3;  ///<     0b011
+const uint8_t kSanyoAcSwingVLowerMiddle =  4;  ///<     0b100
+const uint8_t kSanyoAcSwingVUpperMiddle =  5;  ///<     0b101
+const uint8_t kSanyoAcSwingVHigh =         6;  ///<     0b110
+const uint8_t kSanyoAcSwingVHighest =      7;  ///<     0b111
 // Byte[6] - Sleep
 const uint8_t kSanyoAcSleepByte = 6;    ///< Index
 const uint8_t kSanyoAcSleepBitOffset = 3;  ///< Mask 0b0000x000
@@ -98,14 +108,18 @@ class IRSanyoAc {
   uint8_t getMode(void);
   void setSleep(const bool on);
   bool getSleep(void);
+  void setSwingV(const uint8_t setting);
+  uint8_t getSwingV(void);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kSanyoAcStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
+  uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST
