@@ -13,18 +13,20 @@
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
 
-// Supports:
-//   Brand: Sanyo,  Model: SA 8650B - disabled
-//   Brand: Sanyo,  Model: LC7461 transmitter IC (SANYO_LC7461)
-//   Brand: Sanyo,  Model: SAP-K121AHA A/C (SANYO_AC)
-//   Brand: Sanyo,  Model: RCS-2HS4E remote (SANYO_AC)
-//   Brand: Sanyo,  Model: SAP-K242AH A/C (SANYO_AC)
-//   Brand: Sanyo,  Model: RCS-2S4E remote (SANYO_AC)
-
+#include "ir_Sanyo.h"
 #include <algorithm>
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRutils.h"
 
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addModeToString;
+using irutils::addTempToString;
+using irutils::sumNibbles;
+using irutils::setBit;
+using irutils::setBits;
 
 // Constants
 // Sanyo SA 8650B
@@ -277,6 +279,9 @@ bool IRrecv::decodeSanyoAc(decode_results *results, uint16_t offset,
                     kSanyoAcBitMark, kSanyoAcZeroSpace,
                     kSanyoAcBitMark, kSanyoAcGap,
                     true, kUseDefTol, kMarkExcess, false)) return false;
+  // Compliance
+  if (strict)
+    if (!IRSanyoAc::validChecksum(results->state, nbits / 8)) return false;
 
   // Success
   results->decode_type = decode_type_t::SANYO_AC;
@@ -287,3 +292,67 @@ bool IRrecv::decodeSanyoAc(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_SANYO_AC
+
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRSanyoAc::IRSanyoAc(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Reset the state of the remote to a known good state/sequence.
+/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
+void IRSanyoAc::stateReset(void) {
+  static const uint8_t kReset[kSanyoAcStateLength] = {
+    0x6A, 0x6D, 0x51, 0x00, 0x10, 0x45, 0x00, 0x00, 0x33};
+  memcpy(remote_state, kReset, kSanyoAcStateLength);
+}
+
+/// Set up hardware to be able to send a message.
+void IRSanyoAc::begin(void) { _irsend.begin(); }
+
+#if SEND_SANYO_AC
+/// Send the current internal state as IR messages.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRSanyoAc::send(const uint16_t repeat) {
+  _irsend.sendSanyoAc(getRaw(), kSanyoAcStateLength, repeat);
+}
+#endif  // SEND_SANYO_AC
+
+/// Get a PTR to the internal state/code for this protocol with all integrity
+///   checks passing.
+/// @return PTR to a code for this protocol based on the current internal state.
+uint8_t* IRSanyoAc::getRaw(void) {
+  checksum();
+  return remote_state;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newState A valid code for this protocol.
+void IRSanyoAc::setRaw(const uint8_t newState[]) {
+  memcpy(remote_state, newState, kSanyoAcStateLength);
+}
+
+/// Calculate the checksum for a given state.
+/// @param[in] state The array to calc the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return The calculated checksum value.
+uint8_t IRSanyoAc::calcChecksum(const uint8_t state[],
+                                const uint16_t length) {
+  return length ? sumNibbles(state, length - 1) : 0;
+}
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRSanyoAc::validChecksum(const uint8_t state[], const uint16_t length) {
+  return length && state[length - 1] == IRSanyoAc::calcChecksum(state, length);
+}
+
+/// Calculate & set the checksum for the current internal state of the remote.
+void IRSanyoAc::checksum(void) {
+  // Stored the checksum value in the last byte.
+  remote_state[kSanyoAcStateLength - 1] = calcChecksum(remote_state);
+}
