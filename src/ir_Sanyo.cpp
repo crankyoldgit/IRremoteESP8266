@@ -18,6 +18,7 @@
 #include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
+#include "IRtext.h"
 #include "IRutils.h"
 
 using irutils::addBoolToString;
@@ -355,4 +356,169 @@ bool IRSanyoAc::validChecksum(const uint8_t state[], const uint16_t length) {
 void IRSanyoAc::checksum(void) {
   // Stored the checksum value in the last byte.
   remote_state[kSanyoAcStateLength - 1] = calcChecksum(remote_state);
+}
+
+
+/// Set the requested power state of the A/C to on.
+void IRSanyoAc::on(void) { setPower(true); }
+
+/// Set the requested power state of the A/C to off.
+void IRSanyoAc::off(void) { setPower(false); }
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc::setPower(const bool on) {
+  setBits(&remote_state[kSanyoAcPowerByte], kSanyoAcPowerOffset,
+          kSanyoAcPowerSize, on ? kSanyoAcPowerOn : kSanyoAcPowerOff);
+}
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc::getPower(void) {
+  return GETBITS8(remote_state[kSanyoAcPowerByte], kSanyoAcPowerOffset,
+                  kSanyoAcPowerSize) == kSanyoAcPowerOn;
+}
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRSanyoAc::getMode(void) {
+  return GETBITS8(remote_state[kSanyoAcModeByte], kSanyoAcModeOffset,
+                  kSanyoAcModeSize);
+}
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note If we get an unexpected mode, default to AUTO.
+void IRSanyoAc::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kSanyoAcAuto:
+    case kSanyoAcCool:
+    case kSanyoAcDry:
+    case kSanyoAcHeat:
+      setBits(&remote_state[kSanyoAcModeByte], kSanyoAcModeOffset,
+              kSanyoAcModeSize, mode);
+      break;
+    default: setMode(kSanyoAcAuto);
+  }
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
+uint8_t IRSanyoAc::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kSanyoAcCool;
+    case stdAc::opmode_t::kHeat: return kSanyoAcHeat;
+    case stdAc::opmode_t::kDry:  return kSanyoAcDry;
+    default:                     return kSanyoAcAuto;
+  }
+}
+
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
+stdAc::opmode_t IRSanyoAc::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kSanyoAcCool: return stdAc::opmode_t::kCool;
+    case kSanyoAcHeat: return stdAc::opmode_t::kHeat;
+    case kSanyoAcDry:  return stdAc::opmode_t::kDry;
+    default:           return stdAc::opmode_t::kAuto;
+  }
+}
+
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRSanyoAc::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max((uint8_t)kSanyoAcTempMin, degrees);
+  temp = std::min((uint8_t)kSanyoAcTempMax, temp);
+  setBits(&remote_state[kSanyoAcTempByte], kSanyoAcTempOffset, kSanyoAcTempSize,
+          temp - kSanyoAcTempDelta);
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRSanyoAc::getTemp(void) {
+  return GETBITS8(remote_state[kSanyoAcTempByte], kSanyoAcTempOffset,
+                  kSanyoAcTempSize) + kSanyoAcTempDelta;
+}
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+void IRSanyoAc::setFan(const uint8_t speed) {
+  setBits(&remote_state[kSanyoAcModeByte], kSanyoAcFanOffset, kSanyoAcFanSize,
+          speed);
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
+uint8_t IRSanyoAc::getFan(void) {
+  return GETBITS8(remote_state[kSanyoAcModeByte], kSanyoAcFanOffset,
+                  kSanyoAcFanSize);
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
+uint8_t IRSanyoAc::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:    return kSanyoAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kSanyoAcFanMedium;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:    return kSanyoAcFanHigh;
+    default:                         return kSanyoAcFanAuto;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
+stdAc::fanspeed_t IRSanyoAc::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kSanyoAcFanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kSanyoAcFanMedium: return stdAc::fanspeed_t::kMedium;
+    case kSanyoAcFanLow:    return stdAc::fanspeed_t::kLow;
+    default:                return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
+stdAc::state_t IRSanyoAc::toCommon(void) {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::SANYO_AC;
+  result.model = -1;  // Not supported.
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.turbo = false;
+  result.econo = false;
+  result.light = false;
+  result.filter = false;
+  result.quiet = false;
+  result.clean = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRSanyoAc::toString(void) {
+  String result = "";
+  result.reserve(60);
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
+                            kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(), kSanyoAcFanHigh, kSanyoAcFanLow,
+                           kSanyoAcFanAuto, kSanyoAcFanAuto,
+                           kSanyoAcFanMedium);
+  return result;
 }

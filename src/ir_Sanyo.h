@@ -35,6 +35,37 @@
 
 // Constants
 
+// Sanyo A/C
+// Byte[0] - 0x6A (Fixed?)
+// Byte[1] - Address + Temperature
+const uint8_t kSanyoAcTempByte = 1;    ///< Index
+const uint8_t kSanyoAcTempOffset = 0;  ///< Mask 0b000xxxxx
+const uint8_t kSanyoAcTempSize = 5;    ///< Mask 0b000xxxxx
+const uint8_t kSanyoAcTempMin = 16;    ///< Celsius
+const uint8_t kSanyoAcTempMax = 30;    ///< Celsius
+const uint8_t kSanyoAcTempDelta = 4;   ///< Celsius to Native Temp difference.
+// Byte[4] - Mode + Fan + Timer Enables
+const uint8_t kSanyoAcModeByte = 4;    ///< Index
+const uint8_t kSanyoAcModeOffset = 4;  ///< Mask 0b0xxx0000
+const uint8_t kSanyoAcModeSize =   3;  ///< Mask 0b0xxx0000
+const uint8_t kSanyoAcHeat = 1;        ///<       0b001
+const uint8_t kSanyoAcCool = 2;        ///<       0b010
+const uint8_t kSanyoAcDry =  3;        ///<       0b011
+const uint8_t kSanyoAcAuto = 4;        ///<       0b100
+const uint8_t kSanyoAcFanOffset = 0;   ///< Mask 0b000000xx
+const uint8_t kSanyoAcFanSize =   2;   ///< Mask 0b000000xx
+const uint8_t kSanyoAcFanAuto =   0;   ///<            0b00
+const uint8_t kSanyoAcFanHigh =   1;   ///<            0b01
+const uint8_t kSanyoAcFanLow =    2;   ///<            0b10
+const uint8_t kSanyoAcFanMedium = 3;   ///<            0b11
+// Byte[5] - Power
+const uint8_t kSanyoAcPowerByte = 5;    ///< Index
+const uint8_t kSanyoAcPowerOffset = 6;  ///< Mask 0bxx000000
+const uint8_t kSanyoAcPowerSize = 2;    ///< Mask 0bxx000000
+const uint8_t kSanyoAcPowerOff =                  0b01;  ///< Off
+const uint8_t kSanyoAcPowerOn =                   0b10;  ///< On
+// Byte[8] - Checksum (8-bit Sum of all preceeding nibbles)
+
 
 // Classes
 /// Class for handling detailed Sanyo A/C messages.
@@ -61,7 +92,7 @@ class IRSanyoAc {
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode(const bool raw = false);
+  uint8_t getMode(void);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
   static bool validChecksum(const uint8_t state[],

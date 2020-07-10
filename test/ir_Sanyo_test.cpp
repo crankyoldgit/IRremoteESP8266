@@ -1,5 +1,6 @@
 // Copyright 2017-2020 David Conran
 
+#include "ir_Sanyo.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -273,7 +274,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("SANYO_AC", typeToString(decode_type_t::SANYO_AC));
   ASSERT_EQ(decode_type_t::SANYO_AC, strToDecodeType("SANYO_AC"));
   ASSERT_TRUE(hasACState(decode_type_t::SANYO_AC));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::SANYO_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::SANYO_AC));
   ASSERT_EQ(kSanyoAcBits, IRsend::defaultBits(decode_type_t::SANYO_AC));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::SANYO_AC));
 }
@@ -308,7 +309,7 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -328,7 +329,7 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto)",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -344,4 +345,101 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
       "m500s550m500s550m500s1600m500s1600m500s550m500s550"
       "m500s100000",
       irsend.outputStr());
+}
+
+// Tests for IRSanyoAc class.
+
+TEST(TestSanyoAcClass, Power) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestSanyoAcClass, Temperature) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kSanyoAcTempMin, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kSanyoAcTempMax, ac.getTemp());
+
+  ac.setTemp(kSanyoAcTempMin);
+  EXPECT_EQ(kSanyoAcTempMin, ac.getTemp());
+
+  ac.setTemp(kSanyoAcTempMax);
+  EXPECT_EQ(kSanyoAcTempMax, ac.getTemp());
+
+  ac.setTemp(kSanyoAcTempMin - 1);
+  EXPECT_EQ(kSanyoAcTempMin, ac.getTemp());
+
+  ac.setTemp(kSanyoAcTempMax + 1);
+  EXPECT_EQ(kSanyoAcTempMax, ac.getTemp());
+
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(30);
+  EXPECT_EQ(30, ac.getTemp());
+}
+
+TEST(TestSanyoAcClass, OperatingMode) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kSanyoAcAuto);
+  EXPECT_EQ(kSanyoAcAuto, ac.getMode());
+
+  ac.setMode(kSanyoAcCool);
+  EXPECT_EQ(kSanyoAcCool, ac.getMode());
+
+  ac.setMode(kSanyoAcHeat);
+  EXPECT_EQ(kSanyoAcHeat, ac.getMode());
+
+  ac.setMode(kSanyoAcDry);
+  EXPECT_EQ(kSanyoAcDry, ac.getMode());
+
+  ac.setMode(kSanyoAcAuto + 1);
+  EXPECT_EQ(kSanyoAcAuto, ac.getMode());
+
+  ac.setMode(0);
+  EXPECT_EQ(kSanyoAcAuto, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kSanyoAcAuto, ac.getMode());
+}
+
+TEST(TestSanyoAcClass, FanSpeed) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(kSanyoAcFanAuto);
+  EXPECT_EQ(kSanyoAcFanAuto, ac.getFan());
+
+  ac.setFan(kSanyoAcFanHigh);
+  EXPECT_EQ(kSanyoAcFanHigh, ac.getFan());
+
+  ac.setFan(kSanyoAcFanLow);
+  EXPECT_EQ(kSanyoAcFanLow, ac.getFan());
+
+  ac.setFan(kSanyoAcFanMedium);
+  EXPECT_EQ(kSanyoAcFanMedium, ac.getFan());
 }
