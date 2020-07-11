@@ -24,6 +24,7 @@
 using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addIntToString;
+using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::sumNibbles;
@@ -427,20 +428,45 @@ stdAc::opmode_t IRSanyoAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Set the temperature.
+/// Set the temperature at a given location.
+/// @param[out] ptr A pointer to a temperature byte.
 /// @param[in] degrees The temperature in degrees celsius.
-void IRSanyoAc::setTemp(const uint8_t degrees) {
+void IRSanyoAc::_setTemp(uint8_t *ptr, const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kSanyoAcTempMin, degrees);
   temp = std::min((uint8_t)kSanyoAcTempMax, temp);
-  setBits(&remote_state[kSanyoAcTempByte], kSanyoAcTempOffset, kSanyoAcTempSize,
-          temp - kSanyoAcTempDelta);
+  setBits(ptr, kSanyoAcTempOffset, kSanyoAcTempSize, temp - kSanyoAcTempDelta);
 }
 
-/// Get the current temperature setting.
+/// Get the temperature from a given location.
+/// @param[in] ptr A pointer to a temperature byte.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRSanyoAc::_getTemp(uint8_t *ptr) {
+  return GETBITS8(*ptr, kSanyoAcTempOffset, kSanyoAcTempSize) +
+      kSanyoAcTempDelta;
+}
+
+/// Set the desired temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRSanyoAc::setTemp(const uint8_t degrees) {
+  _setTemp(&remote_state[kSanyoAcTempByte], degrees);
+}
+
+/// Get the current desired temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRSanyoAc::getTemp(void) {
-  return GETBITS8(remote_state[kSanyoAcTempByte], kSanyoAcTempOffset,
-                  kSanyoAcTempSize) + kSanyoAcTempDelta;
+  return _getTemp(&remote_state[kSanyoAcTempByte]);
+}
+
+/// Set the sensor temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRSanyoAc::setSensorTemp(const uint8_t degrees) {
+  _setTemp(&remote_state[kSanyoAcSensorByte], degrees);
+}
+
+/// Get the current sensor temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRSanyoAc::getSensorTemp(void) {
+  return _getTemp(&remote_state[kSanyoAcSensorByte]);
 }
 
 /// Set the speed of the fan.
@@ -543,6 +569,20 @@ bool IRSanyoAc::getSleep(void) {
   return GETBIT8(remote_state[kSanyoAcSleepByte], kSanyoAcSleepBitOffset);
 }
 
+/// Set the Sensor Location setting of the A/C.
+/// i.e. Where the ambient temperature is measured.
+/// @param[in] location true is Unit/Wall, false is Remote/Room.
+void IRSanyoAc::setSensor(const bool location) {
+  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcSensorBitOffset, location);
+}
+
+/// Get the Sensor Location setting of the A/C.
+/// i.e. Where the ambient temperature is measured.
+/// @return true is Unit/Wall, false is Remote/Room.
+bool IRSanyoAc::getSensor(void) {
+  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcSensorBitOffset);
+}
+
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRSanyoAc::toCommon(void) {
@@ -573,7 +613,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
 /// @return A human readable string.
 String IRSanyoAc::toString(void) {
   String result = "";
-  result.reserve(90);
+  result.reserve(130);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
                             kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
@@ -581,7 +621,6 @@ String IRSanyoAc::toString(void) {
   result += addFanToString(getFan(), kSanyoAcFanHigh, kSanyoAcFanLow,
                            kSanyoAcFanAuto, kSanyoAcFanAuto,
                            kSanyoAcFanMedium);
-  result += addBoolToString(getSleep(), kSleepStr);
   result += addIntToString(getSwingV(), kSwingVStr);
   result += kSpaceLBraceStr;
   switch (getSwingV()) {
@@ -589,17 +628,25 @@ String IRSanyoAc::toString(void) {
     case kSanyoAcSwingVHigh:    result += kHighStr; break;
     case kSanyoAcSwingVUpperMiddle:
       result += kUpperStr;
+      result += ' ';
       result += kMiddleStr;
       break;
-      case kSanyoAcSwingVLowerMiddle:
-        result += kLowerStr;
-        result += kMiddleStr;
-        break;
+    case kSanyoAcSwingVLowerMiddle:
+      result += kLowerStr;
+      result += ' ';
+      result += kMiddleStr;
+      break;
     case kSanyoAcSwingVLow:     result += kLowStr; break;
     case kSanyoAcSwingVLowest:  result += kLowestStr; break;
     case kSanyoAcSwingVAuto:    result += kAutoStr;   break;
     default:                    result += kUnknownStr;
   }
   result += ')';
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addLabeledString(getSensor() ? kRoomStr : kWallStr, kSensorStr);
+  result += kCommaSpaceStr;
+  result += kSensorStr;
+  result += ' ';
+  result += addTempToString(getSensorTemp(), true, false);
   return result;
 }

@@ -44,6 +44,10 @@ const uint8_t kSanyoAcTempSize = 5;    ///< Mask 0b000xxxxx
 const uint8_t kSanyoAcTempMin = 16;    ///< Celsius
 const uint8_t kSanyoAcTempMax = 30;    ///< Celsius
 const uint8_t kSanyoAcTempDelta = 4;   ///< Celsius to Native Temp difference.
+// Byte[2] - Ambient Temp + Sensor
+const uint8_t kSanyoAcSensorByte = 2;       ///< Index
+const uint8_t kSanyoAcSensorBitOffset = 2;  ///< Mask 0b00x00000
+// Ambient Temp Mask                                  0b000xxxxx
 // Byte[4] - Mode + Fan + Timer Enables
 const uint8_t kSanyoAcModeByte = 4;    ///< Index
 const uint8_t kSanyoAcModeOffset = 4;  ///< Mask 0b0xxx0000
@@ -102,12 +106,16 @@ class IRSanyoAc {
   bool getPower(void);
   void setTemp(const uint8_t degrees);
   uint8_t getTemp(void);
+  void setSensorTemp(const uint8_t degrees);
+  uint8_t getSensorTemp(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setSleep(const bool on);
   bool getSleep(void);
+  void setSensor(const bool location);
+  bool getSensor(void);
   void setSwingV(const uint8_t setting);
   uint8_t getSwingV(void);
   void setRaw(const uint8_t newState[]);
@@ -135,6 +143,8 @@ class IRSanyoAc {
   void checksum(void);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kSanyoAcStateLength);
+  void _setTemp(uint8_t *ptr, const uint8_t degrees);
+  uint8_t _getTemp(uint8_t *ptr);
 };
 
 #endif  // IR_SANYO_H_

@@ -1641,6 +1641,10 @@ void IRac::sanyo(IRSanyoAc *ac,
   // No Beep setting available.
   ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
   // No Clock setting available.
+
+  // Extra
+  ac->setSensor(true);  // Set the A/C to use the temp sensor in the Unit/Wall.
+  ac->setSensorTemp(degrees);  // Set the sensor temp to the desired temp.
   ac->send();
 }
 #endif  // SEND_SANYO_AC

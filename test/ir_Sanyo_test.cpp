@@ -309,8 +309,8 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V): 5 (UpperMiddle)",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -330,8 +330,8 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V): 5 (UpperMiddle)",
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
