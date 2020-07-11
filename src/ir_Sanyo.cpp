@@ -27,6 +27,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 using irutils::sumNibbles;
 using irutils::setBit;
 using irutils::setBits;
@@ -583,6 +584,29 @@ bool IRSanyoAc::getSensor(void) {
   return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcSensorBitOffset);
 }
 
+/// Get the nr of minutes the Off Timer is set to.
+/// @return The timer time expressed as the number of minutes.
+///   A value of 0 means the Off Timer is off/disabled.
+/// @note The internal precission has a resolution of 1 hour.
+uint16_t IRSanyoAc::getOffTimer(void) {
+  if (GETBIT8(remote_state[kSanyoAcModeByte], kSanyoAcOffTimerEnableBit))
+    return GETBITS8(remote_state[kSanyoAcOffHourByte], kSanyoAcOffHourOffset,
+                    kSanyoAcOffHourSize) * 60;
+  else
+    return 0;
+}
+
+/// Set the nr of minutes for the Off Timer.
+/// @param[in] mins The timer time expressed as nr. of minutes.
+///   A value of 0 means the Off Timer is off/disabled.
+/// @note The internal precission has a resolution of 1 hour.
+void IRSanyoAc::setOffTimer(const uint16_t mins) {
+  const uint8_t hours = std::min((uint8_t)(mins / 60), kSanyoAcHourMax);
+  setBit(&remote_state[kSanyoAcModeByte], kSanyoAcOffTimerEnableBit, hours > 0);
+  setBits(&remote_state[kSanyoAcOffHourByte], kSanyoAcOffHourOffset,
+          kSanyoAcOffHourSize, hours);
+}
+
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRSanyoAc::toCommon(void) {
@@ -613,7 +637,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
 /// @return A human readable string.
 String IRSanyoAc::toString(void) {
   String result = "";
-  result.reserve(130);
+  result.reserve(140);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
                             kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
@@ -648,5 +672,8 @@ String IRSanyoAc::toString(void) {
   result += kSensorStr;
   result += ' ';
   result += addTempToString(getSensorTemp(), true, false);
+  const uint16_t offtime =  getOffTimer();
+  result += addLabeledString(offtime ? minsToString(offtime) : kOffStr,
+                             kOffTimerStr);
   return result;
 }

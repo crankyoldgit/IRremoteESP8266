@@ -310,7 +310,8 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C",
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C, "
+      "Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -331,7 +332,8 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C",
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Sensor: Room, Sensor Temp: 11C, "
+      "Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -478,4 +480,27 @@ TEST(TestSanyoAcClass, SwingV) {
   EXPECT_EQ(kSanyoAcSwingVAuto, ac.getSwingV());
   ac.setSwingV(255);
   EXPECT_EQ(kSanyoAcSwingVAuto, ac.getSwingV());
+}
+
+TEST(TestSanyoAcClass, Timers) {
+  IRSanyoAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOffTimer());
+  ac.setOffTimer(59);
+  EXPECT_EQ(0, ac.getOffTimer());
+  ac.setOffTimer(60);
+  EXPECT_EQ(60, ac.getOffTimer());
+  ac.setOffTimer(61);
+  EXPECT_EQ(60, ac.getOffTimer());
+  ac.setOffTimer(15 * 60 + 59);
+  EXPECT_EQ(15 * 60, ac.getOffTimer());
+  ac.setOffTimer(16 * 60);
+  EXPECT_EQ(15 * 60, ac.getOffTimer());
+
+  const uint8_t offTimer2Hr[kSanyoAcStateLength] = {
+      0x6A, 0x6D, 0x4F, 0x02, 0x14, 0x85, 0x00, 0x00, 0x4A};
+  ac.setRaw(offTimer2Hr);
+  EXPECT_EQ(2 * 60, ac.getOffTimer());
 }

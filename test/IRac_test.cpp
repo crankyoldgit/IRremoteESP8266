@@ -1254,7 +1254,8 @@ TEST(TestIRac, Sanyo) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
-      "Swing(V): 7 (Highest), Sleep: On, Sensor: Wall, Sensor Temp: 28C";
+      "Swing(V): 7 (Highest), Sleep: On, Sensor: Wall, Sensor Temp: 28C, "
+      "Off Timer: Off";
 
   ac.begin();
   irac.sanyo(&ac,

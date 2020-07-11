@@ -48,6 +48,11 @@ const uint8_t kSanyoAcTempDelta = 4;   ///< Celsius to Native Temp difference.
 const uint8_t kSanyoAcSensorByte = 2;       ///< Index
 const uint8_t kSanyoAcSensorBitOffset = 2;  ///< Mask 0b00x00000
 // Ambient Temp Mask                                  0b000xxxxx
+// Byte[3] - Off Hour
+const uint8_t kSanyoAcOffHourByte = 3;    ///< Index
+const uint8_t kSanyoAcOffHourOffset = 0;  ///< Mask 0b0000xxxx
+const uint8_t kSanyoAcOffHourSize = 4;    ///< Mask 0b0000xxxx
+const uint8_t kSanyoAcHourMax = 15;       ///<          0b1111
 // Byte[4] - Mode + Fan + Timer Enables
 const uint8_t kSanyoAcModeByte = 4;    ///< Index
 const uint8_t kSanyoAcModeOffset = 4;  ///< Mask 0b0xxx0000
@@ -56,6 +61,7 @@ const uint8_t kSanyoAcHeat = 1;        ///<       0b001
 const uint8_t kSanyoAcCool = 2;        ///<       0b010
 const uint8_t kSanyoAcDry =  3;        ///<       0b011
 const uint8_t kSanyoAcAuto = 4;        ///<       0b100
+const uint8_t kSanyoAcOffTimerEnableBit = 2;  ///< Mask 0b00000x00
 const uint8_t kSanyoAcFanOffset = 0;   ///< Mask 0b000000xx
 const uint8_t kSanyoAcFanSize =   2;   ///< Mask 0b000000xx
 const uint8_t kSanyoAcFanAuto =   0;   ///<            0b00
@@ -120,6 +126,8 @@ class IRSanyoAc {
   uint8_t getSwingV(void);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
+  uint16_t getOffTimer(void);
+  void setOffTimer(const uint16_t mins);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kSanyoAcStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
