@@ -245,7 +245,7 @@ bool IRrecv::decodeSanyo(decode_results *results, uint16_t nbits, bool strict) {
 
 #if SEND_SANYO_AC
 /// Send a SanyoAc formatted message.
-/// Status: ALPHA / Untested.
+/// Status: STABLE / Reported as working.
 /// @param[in] data An array of bytes containing the IR command.
 /// @param[in] nbytes Nr. of bytes of data in the array.
 /// @param[in] repeat Nr. of times the message is to be repeated.
@@ -263,7 +263,7 @@ void IRsend::sendSanyoAc(const uint8_t data[], const uint16_t nbytes,
 
 #if DECODE_SANYO_AC
 /// Decode the supplied SanyoAc message.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Reported as working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
