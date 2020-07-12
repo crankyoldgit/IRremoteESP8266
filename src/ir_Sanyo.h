@@ -10,6 +10,7 @@
 /// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
+/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
 
 // Supports:
 //   Brand: Sanyo,  Model: SA 8650B - disabled
@@ -36,6 +37,7 @@
 // Constants
 
 // Sanyo A/C
+// Ref: https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
 // Byte[0] - 0x6A (Fixed?)
 // Byte[1] - Address + Temperature
 const uint8_t kSanyoAcTempByte = 1;    ///< Index
@@ -46,8 +48,9 @@ const uint8_t kSanyoAcTempMax = 30;    ///< Celsius
 const uint8_t kSanyoAcTempDelta = 4;   ///< Celsius to Native Temp difference.
 // Byte[2] - Ambient Temp + Sensor
 const uint8_t kSanyoAcSensorByte = 2;       ///< Index
-const uint8_t kSanyoAcSensorBitOffset = 2;  ///< Mask 0b00x00000
-// Ambient Temp Mask                                  0b000xxxxx
+const uint8_t kSanyoAcSensorBit = 2;  ///< Mask 0b00x00000
+// Ambient Temp Mask                            0b000xxxxx
+const uint8_t kSanyoAcBeepBit = 6;    ///< Mask 0b0x000000
 // Byte[3] - Off Hour
 const uint8_t kSanyoAcOffHourByte = 3;    ///< Index
 const uint8_t kSanyoAcOffHourOffset = 0;  ///< Mask 0b0000xxxx
@@ -86,7 +89,7 @@ const uint8_t kSanyoAcSwingVHigh =         6;  ///<     0b110
 const uint8_t kSanyoAcSwingVHighest =      7;  ///<     0b111
 // Byte[6] - Sleep
 const uint8_t kSanyoAcSleepByte = 6;    ///< Index
-const uint8_t kSanyoAcSleepBitOffset = 3;  ///< Mask 0b0000x000
+const uint8_t kSanyoAcSleepBit = 3;  ///< Mask 0b0000x000
 // Byte[8] - Checksum (8-bit Sum of all preceeding nibbles)
 
 
@@ -122,6 +125,8 @@ class IRSanyoAc {
   bool getSleep(void);
   void setSensor(const bool location);
   bool getSensor(void);
+  void setBeep(const bool on);
+  bool getBeep(void);
   void setSwingV(const uint8_t setting);
   uint8_t getSwingV(void);
   void setRaw(const uint8_t newState[]);

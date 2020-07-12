@@ -12,6 +12,7 @@
 /// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Sanyo.cpp
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
+/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
 
 #include "ir_Sanyo.h"
 #include <algorithm>
@@ -561,27 +562,39 @@ stdAc::swingv_t IRSanyoAc::toCommonSwingV(const uint8_t setting) {
 /// Set the Sleep (Night Setback) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSanyoAc::setSleep(const bool on) {
-  setBit(&remote_state[kSanyoAcSleepByte], kSanyoAcSleepBitOffset, on);
+  setBit(&remote_state[kSanyoAcSleepByte], kSanyoAcSleepBit, on);
 }
 
 /// Get the Sleep (Night Setback) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRSanyoAc::getSleep(void) {
-  return GETBIT8(remote_state[kSanyoAcSleepByte], kSanyoAcSleepBitOffset);
+  return GETBIT8(remote_state[kSanyoAcSleepByte], kSanyoAcSleepBit);
 }
 
 /// Set the Sensor Location setting of the A/C.
 /// i.e. Where the ambient temperature is measured.
 /// @param[in] location true is Unit/Wall, false is Remote/Room.
 void IRSanyoAc::setSensor(const bool location) {
-  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcSensorBitOffset, location);
+  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcSensorBit, location);
 }
 
 /// Get the Sensor Location setting of the A/C.
 /// i.e. Where the ambient temperature is measured.
 /// @return true is Unit/Wall, false is Remote/Room.
 bool IRSanyoAc::getSensor(void) {
-  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcSensorBitOffset);
+  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcSensorBit);
+}
+
+/// Set the Beep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc::setBeep(const bool on) {
+  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcBeepBit, on);
+}
+
+/// Get the Beep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc::getBeep(void) {
+  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcBeepBit);
 }
 
 /// Get the nr of minutes the Off Timer is set to.
@@ -620,6 +633,7 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
   result.fanspeed = toCommonFanSpeed(getFan());
   result.sleep = getSleep() ? 0 : -1;
   result.swingv = toCommonSwingV(getSwingV());
+  result.beep = getBeep();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
@@ -628,7 +642,6 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
   result.filter = false;
   result.quiet = false;
   result.clean = false;
-  result.beep = false;
   result.clock = -1;
   return result;
 }
@@ -667,6 +680,7 @@ String IRSanyoAc::toString(void) {
   }
   result += ')';
   result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(getBeep(), kBeepStr);
   result += addLabeledString(getSensor() ? kRoomStr : kWallStr, kSensorStr);
   result += kCommaSpaceStr;
   result += kSensorStr;
