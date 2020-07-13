@@ -503,6 +503,11 @@ TEST(TestSanyoAcClass, Timers) {
       0x6A, 0x6D, 0x4F, 0x02, 0x14, 0x85, 0x00, 0x00, 0x4A};
   ac.setRaw(offTimer2Hr);
   EXPECT_EQ(2 * 60, ac.getOffTimer());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Heat), Temp: 17C, Fan: 0 (Auto), "
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, "
+      "Sensor: Room, Sensor Temp: 19C, Off Timer: 02:00",
+      ac.toString());
 }
 
 TEST(TestSanyoAcClass, Beep) {
