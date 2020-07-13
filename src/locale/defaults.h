@@ -688,6 +688,9 @@
 #ifndef D_STR_SANYO
 #define D_STR_SANYO "SANYO"
 #endif  // D_STR_SANYO
+#ifndef D_STR_SANYO_AC
+#define D_STR_SANYO_AC "SANYO_AC"
+#endif  // D_STR_SANYO_AC
 #ifndef D_STR_SANYO_LC7461
 #define D_STR_SANYO_LC7461 "SANYO_LC7461"
 #endif  // D_STR_SANYO_LC7461

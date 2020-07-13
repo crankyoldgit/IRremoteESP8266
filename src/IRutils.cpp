@@ -161,6 +161,7 @@ bool hasACState(const decode_type_t protocol) {
     case NEOCLIMA:
     case PANASONIC_AC:
     case SAMSUNG_AC:
+    case SANYO_AC:
     case SHARP_AC:
     case TCL112AC:
     case TOSHIBA_AC:
