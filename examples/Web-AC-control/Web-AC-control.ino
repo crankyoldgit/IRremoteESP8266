@@ -6,7 +6,11 @@
   is selected (required for Coolix).
 
 */
+#if defined(ESP8266)
+#include <LittleFS.h>
+#else
 #include <FS.h>
+#endif
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -83,7 +87,11 @@ bool handleFileRead(String path) {
     // If the file exists, either as a compressed archive, or normal
     if (SPIFFS.exists(pathWithGz))  // If there's a compressed version available
       path += ".gz";  // Use the compressed verion
+#if defined(ESP8266)
+    File file = LittleFS.open(path, "r");
+#else
     File file = SPIFFS.open(path, "r");
+#endif
     //  Open the file
     server.streamFile(file, contentType);
     //  Send it to the client
@@ -113,7 +121,11 @@ void handleFileUpload() {  // upload a new file to the SPIFFS
     String filename = upload.filename;
     if (!filename.startsWith("/")) filename = "/" + filename;
     // Serial.print("handleFileUpload Name: "); //Serial.println(filename);
+#if defined(ESP8266)
+    fsUploadFile = LittleFS.open(filename, "w");
+#else
     fsUploadFile = SPIFFS.open(filename, "w");
+#endif
     // Open the file for writing in SPIFFS (create if it doesn't exist)
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {

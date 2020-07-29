@@ -333,7 +333,11 @@
 
 #include "IRMQTTServer.h"
 #include <Arduino.h>
+#if defined(ESP8266)
+#include <LittleFS.h>
+#else
 #include <FS.h>
+#endif
 #include <ArduinoJson.h>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -521,11 +525,19 @@ void saveWifiConfigCallback(void) {
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
   debug("Mounting SPIFFS...");
-  if (SPIFFS.begin()) return true;  // We mounted it okay.
+#if defined(ESP8266)
+  if (LittleFS.begin()) return true;  // We mounted it okay.
+#else
+  if (SPIFFS.begin()) return true;
+#endif
   // We failed the first time.
   debug("Failed to mount SPIFFS!\nFormatting SPIFFS and trying again...");
   SPIFFS.format();
+#if defined(ESP8266)
+  if (!LittleFS.begin()) {  // Did we fail?
+#else
   if (!SPIFFS.begin()) {  // Did we fail?
+#endif
     debug("DANGER: Failed to mount SPIFFS even after formatting!");
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
@@ -556,7 +568,11 @@ bool saveConfig(void) {
   }
 
   if (mountSpiffs()) {
+#if defined(ESP8266)
+    File configFile = LittleFS.open(kConfigFile, "w");
+#else
     File configFile = SPIFFS.open(kConfigFile, "w");
+#endif
     if (!configFile) {
       debug("Failed to open config file for writing.");
     } else {
@@ -577,8 +593,11 @@ bool loadConfigFile(void) {
     debug("mounted the file system");
     if (SPIFFS.exists(kConfigFile)) {
       debug("config file exists");
-
+#if defined(ESP8266)
+      File configFile = LittleFS.open(kConfigFile, "r");
+#else
       File configFile = SPIFFS.open(kConfigFile, "r");
+#endif
       if (configFile) {
         debug("Opened config file");
         size_t size = configFile.size();
