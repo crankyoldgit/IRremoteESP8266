@@ -221,6 +221,7 @@ class IRHaierAC {
 #if SEND_HAIER_AC
   void send(const uint16_t repeat = kHaierAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -292,6 +293,7 @@ class IRHaierACYRW02 {
 #if SEND_HAIER_AC_YRW02
   void send(const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }

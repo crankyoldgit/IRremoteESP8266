@@ -1,8 +1,10 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
 
-// Whynter A/C ARC-110WD added by Francesco Meschia
-// Whynter originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @file
+/// @brief Support for Whynter protocols.
+/// Whynter A/C ARC-110WD added by Francesco Meschia
+/// Whynter originally added from https://github.com/shirriff/Arduino-IRremote/
 
 // Supports:
 //   Brand: Whynter,  Model: ARC-110WD A/C
@@ -13,7 +15,6 @@
 #include "IRutils.h"
 
 // Constants
-
 const uint16_t kWhynterTick = 50;
 const uint16_t kWhynterHdrMarkTicks = 57;
 const uint16_t kWhynterHdrMark = kWhynterHdrMarkTicks * kWhynterTick;
@@ -35,18 +36,14 @@ const uint16_t kWhynterMinGapTicks =
 const uint16_t kWhynterMinGap = kWhynterMinGapTicks * kWhynterTick;
 
 #if SEND_WHYNTER
-// Send a Whynter message.
-//
-// Args:
-//   data: message to be sent.
-//   nbits: Nr. of bits of the message to be sent.
-//   repeat: Nr. of additional times the message is to be sent.
-//
-// Status: STABLE
-//
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
-void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a Whynter message.
+/// Status: STABLE
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+void IRsend::sendWhynter(const uint64_t data, const uint16_t nbits,
+                         const uint16_t repeat) {
   // Set IR carrier frequency
   enableIROut(38);
 
@@ -62,24 +59,18 @@ void IRsend::sendWhynter(uint64_t data, uint16_t nbits, uint16_t repeat) {
         50);
   }
 }
-#endif
+#endif  // SEND_WHYNTER
 
 #if DECODE_WHYNTER
-// Decode the supplied Whynter message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Working. Strict mode is ALPHA.
-//
-// Ref:
-//   https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
+/// Decode the supplied Whynter message.
+/// Status: STABLE / Working. Strict mode is ALPHA.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @see https://github.com/z3t0/Arduino-IRremote/blob/master/ir_Whynter.cpp
 bool IRrecv::decodeWhynter(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (results->rawlen <= 2 * nbits + 2 * kHeader + kFooter - 1 + offset)
@@ -109,4 +100,4 @@ bool IRrecv::decodeWhynter(decode_results *results, uint16_t offset,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_WHYNTER

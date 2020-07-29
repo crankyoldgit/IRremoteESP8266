@@ -103,7 +103,6 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikinESP object.
 IRDaikinESP::IRDaikinESP(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
       : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -716,7 +715,6 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin2 object.
 IRDaikin2::IRDaikin2(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1502,7 +1500,6 @@ void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin216 object.
 IRDaikin216::IRDaikin216(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1867,7 +1864,6 @@ void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin160 object.
 IRDaikin160::IRDaikin160(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -2240,7 +2236,6 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin176 object.
 IRDaikin176::IRDaikin176(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -2640,7 +2635,6 @@ void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin128 object.
 IRDaikin128::IRDaikin128(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -3073,6 +3067,7 @@ String IRDaikin128::toString(void) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
@@ -3252,7 +3247,6 @@ bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin152 object.
 IRDaikin152::IRDaikin152(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -3639,7 +3633,6 @@ bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRDaikin64 object.
 IRDaikin64::IRDaikin64(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -3993,6 +3986,7 @@ String IRDaikin64::toString(void) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;

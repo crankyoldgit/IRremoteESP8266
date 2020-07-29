@@ -52,6 +52,8 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::checkInvertedBytePairs;
+using irutils::invertBytePairs;
 using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
@@ -130,7 +132,6 @@ void IRsend::sendHitachiAc344(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc object.
 IRHitachiAc::IRHitachiAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -420,7 +421,6 @@ String IRHitachiAc::toString(void) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc1 object.
 IRHitachiAc1::IRHitachiAc1(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1017,7 +1017,6 @@ bool IRrecv::decodeHitachiAc424(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc424 object.
 IRHitachiAc424::IRHitachiAc424(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1050,8 +1049,7 @@ void IRHitachiAc424::stateReset(void) {
 
 /// Update the internal consistency check for the protocol.
 void IRHitachiAc424::setInvertedStates(void) {
-  for (uint8_t i = 3; i < kHitachiAc424StateLength - 1; i += 2)
-    remote_state[i + 1] = ~remote_state[i];
+  invertBytePairs(remote_state + 3, kHitachiAc424StateLength - 3);
 }
 
 /// Set up hardware to be able to send a message.
@@ -1378,7 +1376,6 @@ void IRsend::sendHitachiAc3(const uint8_t data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc3 object.
 IRHitachiAc3::IRHitachiAc3(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
@@ -1406,8 +1403,7 @@ void IRHitachiAc3::stateReset(void) {
 /// @param[in] length The size of the state array.
 /// @note This is this protocols integrity check.
 void IRHitachiAc3::setInvertedStates(const uint16_t length) {
-  for (uint8_t i = 3; i < length - 1; i += 2)
-    remote_state[i + 1] = ~remote_state[i];
+  if (length > 3) invertBytePairs(remote_state + 3, length - 3);
 }
 
 /// Check if every second byte of the state, after the fixed header
@@ -1417,9 +1413,7 @@ void IRHitachiAc3::setInvertedStates(const uint16_t length) {
 /// @note This is this protocols integrity check.
 bool IRHitachiAc3::hasInvertedStates(const uint8_t state[],
                                      const uint16_t length) {
-  for (uint8_t i = 3; i < length - 1; i += 2)
-    if ((state[i + 1] ^ state[i]) != 0xFF) return false;
-  return true;
+  return (length <= 3 || checkInvertedBytePairs(state + 3, length - 3));
 }
 
 /// Set up hardware to be able to send a message.
@@ -1499,7 +1493,6 @@ bool IRrecv::decodeHitachiAc3(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc344 object.
 IRHitachiAc344::IRHitachiAc344(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
     : IRHitachiAc424(pin, inverted, use_modulation) { stateReset(); }

@@ -32,7 +32,8 @@ const uint8_t kLgAcChecksumOffset = 0;  // Nr. of bits
 const uint8_t kLgAcChecksumSize = kNibbleSize;  // Nr. of bits
 const uint8_t kLgAcFanOffset = 4;  // Nr. of bits
 const uint8_t kLgAcFanSize = 3;  // Nr. of bits
-const uint8_t kLgAcFanLow = 0;     // 0b000
+const uint8_t kLgAcFanLowest = 0;  // 0b000
+const uint8_t kLgAcFanLow = 1;     // 0b001
 const uint8_t kLgAcFanMedium = 2;  // 0b010
 const uint8_t kLgAcFanHigh = 4;    // 0b100
 const uint8_t kLgAcFanAuto = 5;    // 0b101
@@ -71,6 +72,7 @@ class IRLgAc {
 #if SEND_LG
   void send(const uint16_t repeat = kLgDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }

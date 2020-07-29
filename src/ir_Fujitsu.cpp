@@ -60,7 +60,6 @@ void IRsend::sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] model The enum for the model of A/C to be emulated.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRFujitsuAC object.
 IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
                          const fujitsu_ac_remote_model_t model,
                          const bool inverted, const bool use_modulation)

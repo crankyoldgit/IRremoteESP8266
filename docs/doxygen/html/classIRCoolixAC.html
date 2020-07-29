@@ -72,13 +72,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Class for handling detailed Coolix A/C messages.  
+ <a href="classIRCoolixAC.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="ir__Coolix_8h_source.html">ir_Coolix.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for IRCoolixAC:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRCoolixAC__coll__graph.png" border="0" usemap="#IRCoolixAC_coll__map" alt="Collaboration graph"/></div>
 <map name="IRCoolixAC_coll__map" id="IRCoolixAC_coll__map">
-<area shape="rect" title=" " alt="" coords="5,95,100,121"/>
+<area shape="rect" title="Class for handling detailed Coolix A/C messages." alt="" coords="5,95,100,121"/>
 <area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="19,5,86,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -86,100 +89,145 @@ Collaboration diagram for IRCoolixAC:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a043ad3b74e964e39b111e1fcf9e55f42"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a043ad3b74e964e39b111e1fcf9e55f42">IRCoolixAC</a> (const uint16_t pin, const bool inverted=false, const bool use_modulation=true)</td></tr>
+<tr class="memdesc:a043ad3b74e964e39b111e1fcf9e55f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classIRCoolixAC.html#a043ad3b74e964e39b111e1fcf9e55f42">More...</a><br /></td></tr>
 <tr class="separator:a043ad3b74e964e39b111e1fcf9e55f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88a44b7ba5ac7d5654de4592bd41c207"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a88a44b7ba5ac7d5654de4592bd41c207">stateReset</a> ()</td></tr>
+<tr class="memdesc:a88a44b7ba5ac7d5654de4592bd41c207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRCoolixAC.html#a88a44b7ba5ac7d5654de4592bd41c207">More...</a><br /></td></tr>
 <tr class="separator:a88a44b7ba5ac7d5654de4592bd41c207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaa681d6cfcf04d110b913e8bb27a53c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aaaa681d6cfcf04d110b913e8bb27a53c">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:aaaa681d6cfcf04d110b913e8bb27a53c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRCoolixAC.html#aaaa681d6cfcf04d110b913e8bb27a53c">More...</a><br /></td></tr>
 <tr class="separator:aaaa681d6cfcf04d110b913e8bb27a53c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e39ce5050888210d6ba9b79ae3763e3"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a9e39ce5050888210d6ba9b79ae3763e3">calibrate</a> (void)</td></tr>
+<tr class="memdesc:a9e39ce5050888210d6ba9b79ae3763e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRCoolixAC.html#a9e39ce5050888210d6ba9b79ae3763e3">More...</a><br /></td></tr>
 <tr class="separator:a9e39ce5050888210d6ba9b79ae3763e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a506a5ab28865d0243d75ebb7fe62e4ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a506a5ab28865d0243d75ebb7fe62e4ea">begin</a> ()</td></tr>
+<tr class="memdesc:a506a5ab28865d0243d75ebb7fe62e4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRCoolixAC.html#a506a5ab28865d0243d75ebb7fe62e4ea">More...</a><br /></td></tr>
 <tr class="separator:a506a5ab28865d0243d75ebb7fe62e4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59c414fe0e951cd50083ab1fc45286ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a59c414fe0e951cd50083ab1fc45286ed">on</a> ()</td></tr>
+<tr class="memdesc:a59c414fe0e951cd50083ab1fc45286ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRCoolixAC.html#a59c414fe0e951cd50083ab1fc45286ed">More...</a><br /></td></tr>
 <tr class="separator:a59c414fe0e951cd50083ab1fc45286ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7538665a38e193ecd3a0bed41e9f1417"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a7538665a38e193ecd3a0bed41e9f1417">off</a> ()</td></tr>
+<tr class="memdesc:a7538665a38e193ecd3a0bed41e9f1417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to Off.  <a href="classIRCoolixAC.html#a7538665a38e193ecd3a0bed41e9f1417">More...</a><br /></td></tr>
 <tr class="separator:a7538665a38e193ecd3a0bed41e9f1417"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41dc75b29e7a05eff5f16161cb9b3eeb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a41dc75b29e7a05eff5f16161cb9b3eeb">setPower</a> (const bool state)</td></tr>
+<tr class="memdesc:a41dc75b29e7a05eff5f16161cb9b3eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRCoolixAC.html#a41dc75b29e7a05eff5f16161cb9b3eeb">More...</a><br /></td></tr>
 <tr class="separator:a41dc75b29e7a05eff5f16161cb9b3eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a150e3b827d8002e77135955079c78704"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a150e3b827d8002e77135955079c78704">getPower</a> ()</td></tr>
+<tr class="memdesc:a150e3b827d8002e77135955079c78704"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRCoolixAC.html#a150e3b827d8002e77135955079c78704">More...</a><br /></td></tr>
 <tr class="separator:a150e3b827d8002e77135955079c78704"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d4b4fb810b9f3835ee585b2aa66088f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a1d4b4fb810b9f3835ee585b2aa66088f">setTemp</a> (const uint8_t temp)</td></tr>
+<tr class="memdesc:a1d4b4fb810b9f3835ee585b2aa66088f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRCoolixAC.html#a1d4b4fb810b9f3835ee585b2aa66088f">More...</a><br /></td></tr>
 <tr class="separator:a1d4b4fb810b9f3835ee585b2aa66088f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af90462598f294a75b35e20d986251942"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#af90462598f294a75b35e20d986251942">getTemp</a> ()</td></tr>
+<tr class="memdesc:af90462598f294a75b35e20d986251942"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRCoolixAC.html#af90462598f294a75b35e20d986251942">More...</a><br /></td></tr>
 <tr class="separator:af90462598f294a75b35e20d986251942"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05e660b2b61b9a312e29688289f4bf3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a05e660b2b61b9a312e29688289f4bf3e">setSensorTemp</a> (const uint8_t desired)</td></tr>
+<tr class="memdesc:a05e660b2b61b9a312e29688289f4bf3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the sensor temperature.  <a href="classIRCoolixAC.html#a05e660b2b61b9a312e29688289f4bf3e">More...</a><br /></td></tr>
 <tr class="separator:a05e660b2b61b9a312e29688289f4bf3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebbed796cab76248138e124aac1d535a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aebbed796cab76248138e124aac1d535a">getSensorTemp</a> ()</td></tr>
+<tr class="memdesc:aebbed796cab76248138e124aac1d535a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sensor temperature setting.  <a href="classIRCoolixAC.html#aebbed796cab76248138e124aac1d535a">More...</a><br /></td></tr>
 <tr class="separator:aebbed796cab76248138e124aac1d535a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5deca09ced33931f089f5cd3c07eac4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a5deca09ced33931f089f5cd3c07eac4a">clearSensorTemp</a> ()</td></tr>
+<tr class="memdesc:a5deca09ced33931f089f5cd3c07eac4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the Sensor Temperature setting..  <a href="classIRCoolixAC.html#a5deca09ced33931f089f5cd3c07eac4a">More...</a><br /></td></tr>
 <tr class="separator:a5deca09ced33931f089f5cd3c07eac4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff4189cb1000c6db7d88624fbadbe0cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aff4189cb1000c6db7d88624fbadbe0cb">setFan</a> (const uint8_t speed, const bool modecheck=true)</td></tr>
+<tr class="memdesc:aff4189cb1000c6db7d88624fbadbe0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRCoolixAC.html#aff4189cb1000c6db7d88624fbadbe0cb">More...</a><br /></td></tr>
 <tr class="separator:aff4189cb1000c6db7d88624fbadbe0cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a937c0084f79eaef2a160331993dfb881"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a937c0084f79eaef2a160331993dfb881">getFan</a> ()</td></tr>
+<tr class="memdesc:a937c0084f79eaef2a160331993dfb881"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRCoolixAC.html#a937c0084f79eaef2a160331993dfb881">More...</a><br /></td></tr>
 <tr class="separator:a937c0084f79eaef2a160331993dfb881"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c0094d32aca6a5323f4dc72a03f02e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a5c0094d32aca6a5323f4dc72a03f02e9">setMode</a> (const uint8_t mode)</td></tr>
+<tr class="memdesc:a5c0094d32aca6a5323f4dc72a03f02e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRCoolixAC.html#a5c0094d32aca6a5323f4dc72a03f02e9">More...</a><br /></td></tr>
 <tr class="separator:a5c0094d32aca6a5323f4dc72a03f02e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16772a297404e2c54f951c49bfc608de"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a16772a297404e2c54f951c49bfc608de">getMode</a> ()</td></tr>
+<tr class="memdesc:a16772a297404e2c54f951c49bfc608de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRCoolixAC.html#a16772a297404e2c54f951c49bfc608de">More...</a><br /></td></tr>
 <tr class="separator:a16772a297404e2c54f951c49bfc608de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57e3641e20f072df238b305045e74246"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a57e3641e20f072df238b305045e74246">setSwing</a> ()</td></tr>
+<tr class="memdesc:a57e3641e20f072df238b305045e74246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the Swing mode of the A/C.  <a href="classIRCoolixAC.html#a57e3641e20f072df238b305045e74246">More...</a><br /></td></tr>
 <tr class="separator:a57e3641e20f072df238b305045e74246"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4846bb6a16802158dca3a8b1b7f5b6ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a4846bb6a16802158dca3a8b1b7f5b6ff">getSwing</a> ()</td></tr>
+<tr class="memdesc:a4846bb6a16802158dca3a8b1b7f5b6ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Swing setting of the A/C.  <a href="classIRCoolixAC.html#a4846bb6a16802158dca3a8b1b7f5b6ff">More...</a><br /></td></tr>
 <tr class="separator:a4846bb6a16802158dca3a8b1b7f5b6ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ee44167eca3fc88115fef3e845a3768"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a4ee44167eca3fc88115fef3e845a3768">setSleep</a> ()</td></tr>
+<tr class="memdesc:a4ee44167eca3fc88115fef3e845a3768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the Sleep mode of the A/C.  <a href="classIRCoolixAC.html#a4ee44167eca3fc88115fef3e845a3768">More...</a><br /></td></tr>
 <tr class="separator:a4ee44167eca3fc88115fef3e845a3768"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b22f5427254c3f784f468d53909882c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a0b22f5427254c3f784f468d53909882c">getSleep</a> ()</td></tr>
+<tr class="memdesc:a0b22f5427254c3f784f468d53909882c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRCoolixAC.html#a0b22f5427254c3f784f468d53909882c">More...</a><br /></td></tr>
 <tr class="separator:a0b22f5427254c3f784f468d53909882c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65a04ec9028025155792be5ba0f81927"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a65a04ec9028025155792be5ba0f81927">setTurbo</a> ()</td></tr>
+<tr class="memdesc:a65a04ec9028025155792be5ba0f81927"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the Turbo mode of the A/C.  <a href="classIRCoolixAC.html#a65a04ec9028025155792be5ba0f81927">More...</a><br /></td></tr>
 <tr class="separator:a65a04ec9028025155792be5ba0f81927"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5f87216fb91bbb437c0899b0742a63f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#ab5f87216fb91bbb437c0899b0742a63f">getTurbo</a> ()</td></tr>
+<tr class="memdesc:ab5f87216fb91bbb437c0899b0742a63f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo setting of the A/C.  <a href="classIRCoolixAC.html#ab5f87216fb91bbb437c0899b0742a63f">More...</a><br /></td></tr>
 <tr class="separator:ab5f87216fb91bbb437c0899b0742a63f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3132f99cffa108129dff64a0b68bd614"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a3132f99cffa108129dff64a0b68bd614">setLed</a> ()</td></tr>
+<tr class="memdesc:a3132f99cffa108129dff64a0b68bd614"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the Led (light) mode of the A/C.  <a href="classIRCoolixAC.html#a3132f99cffa108129dff64a0b68bd614">More...</a><br /></td></tr>
 <tr class="separator:a3132f99cffa108129dff64a0b68bd614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7712ebbf103c4d61dc645cb42dcf3f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aa7712ebbf103c4d61dc645cb42dcf3f0">getLed</a> ()</td></tr>
+<tr class="memdesc:aa7712ebbf103c4d61dc645cb42dcf3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Led (light) setting of the A/C.  <a href="classIRCoolixAC.html#aa7712ebbf103c4d61dc645cb42dcf3f0">More...</a><br /></td></tr>
 <tr class="separator:aa7712ebbf103c4d61dc645cb42dcf3f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0087ac58749ef946632fbb5a8b41fe0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a0087ac58749ef946632fbb5a8b41fe0d">setClean</a> ()</td></tr>
+<tr class="memdesc:a0087ac58749ef946632fbb5a8b41fe0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the Clean mode of the A/C.  <a href="classIRCoolixAC.html#a0087ac58749ef946632fbb5a8b41fe0d">More...</a><br /></td></tr>
 <tr class="separator:a0087ac58749ef946632fbb5a8b41fe0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a272f94ef641041835a650dd4fbdda7bf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a272f94ef641041835a650dd4fbdda7bf">getClean</a> ()</td></tr>
+<tr class="memdesc:a272f94ef641041835a650dd4fbdda7bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Clean setting of the A/C.  <a href="classIRCoolixAC.html#a272f94ef641041835a650dd4fbdda7bf">More...</a><br /></td></tr>
 <tr class="separator:a272f94ef641041835a650dd4fbdda7bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a647a41d63301e3d95460323d1fe0ce4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a647a41d63301e3d95460323d1fe0ce4a">getZoneFollow</a> ()</td></tr>
+<tr class="memdesc:a647a41d63301e3d95460323d1fe0ce4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Zone Follow setting of the A/C.  <a href="classIRCoolixAC.html#a647a41d63301e3d95460323d1fe0ce4a">More...</a><br /></td></tr>
 <tr class="separator:a647a41d63301e3d95460323d1fe0ce4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa231938dfcff03325383205edc9c88d2"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aa231938dfcff03325383205edc9c88d2">getRaw</a> ()</td></tr>
+<tr class="memdesc:aa231938dfcff03325383205edc9c88d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a copy of the internal state as a valid code for this protocol.  <a href="classIRCoolixAC.html#aa231938dfcff03325383205edc9c88d2">More...</a><br /></td></tr>
 <tr class="separator:aa231938dfcff03325383205edc9c88d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed28d08743c529a5715331255a8d5507"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aed28d08743c529a5715331255a8d5507">setRaw</a> (const uint32_t new_code)</td></tr>
+<tr class="memdesc:aed28d08743c529a5715331255a8d5507"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRCoolixAC.html#aed28d08743c529a5715331255a8d5507">More...</a><br /></td></tr>
 <tr class="separator:aed28d08743c529a5715331255a8d5507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfb0d2c20322cb4d3cd681a3a54b30fe"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#acfb0d2c20322cb4d3cd681a3a54b30fe">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:acfb0d2c20322cb4d3cd681a3a54b30fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a standard A/C mode into its native mode.  <a href="classIRCoolixAC.html#acfb0d2c20322cb4d3cd681a3a54b30fe">More...</a><br /></td></tr>
 <tr class="separator:acfb0d2c20322cb4d3cd681a3a54b30fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ffa1cfcf82bd905b0f607401200c895"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a7ffa1cfcf82bd905b0f607401200c895">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a7ffa1cfcf82bd905b0f607401200c895"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRCoolixAC.html#a7ffa1cfcf82bd905b0f607401200c895">More...</a><br /></td></tr>
 <tr class="separator:a7ffa1cfcf82bd905b0f607401200c895"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acadeabae7017e49c944eb22528297b3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#acadeabae7017e49c944eb22528297b3a">toCommon</a> (const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *prev=NULL)</td></tr>
+<tr class="memdesc:acadeabae7017e49c944eb22528297b3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the A/C state to it's common <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRCoolixAC.html#acadeabae7017e49c944eb22528297b3a">More...</a><br /></td></tr>
 <tr class="separator:acadeabae7017e49c944eb22528297b3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1282b4071f003ab35d2a97287ba6d2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#ad1282b4071f003ab35d2a97287ba6d2d">toString</a> ()</td></tr>
+<tr class="memdesc:ad1282b4071f003ab35d2a97287ba6d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the internal state into a human readable string.  <a href="classIRCoolixAC.html#ad1282b4071f003ab35d2a97287ba6d2d">More...</a><br /></td></tr>
 <tr class="separator:ad1282b4071f003ab35d2a97287ba6d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a789fb5d5eab2e78d392c8e0b9a194b18"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a789fb5d5eab2e78d392c8e0b9a194b18">toCommonMode</a> (const uint8_t mode)</td></tr>
+<tr class="memdesc:a789fb5d5eab2e78d392c8e0b9a194b18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode to it's common <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> equivalent.  <a href="classIRCoolixAC.html#a789fb5d5eab2e78d392c8e0b9a194b18">More...</a><br /></td></tr>
 <tr class="separator:a789fb5d5eab2e78d392c8e0b9a194b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a0e7219c667eb06897b47a7c36f5fbc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a6a0e7219c667eb06897b47a7c36f5fbc">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
+<tr class="memdesc:a6a0e7219c667eb06897b47a7c36f5fbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRCoolixAC.html#a6a0e7219c667eb06897b47a7c36f5fbc">More...</a><br /></td></tr>
 <tr class="separator:a6a0e7219c667eb06897b47a7c36f5fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:ae9371280e92daa8e1441523026f1ef0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#ae9371280e92daa8e1441523026f1ef0a">setTempRaw</a> (const uint8_t code)</td></tr>
+<tr class="memdesc:ae9371280e92daa8e1441523026f1ef0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the raw (native) temperature value.  <a href="classIRCoolixAC.html#ae9371280e92daa8e1441523026f1ef0a">More...</a><br /></td></tr>
 <tr class="separator:ae9371280e92daa8e1441523026f1ef0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559634f3c6aee54683d4b6ccbbc7a884"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a559634f3c6aee54683d4b6ccbbc7a884">getTempRaw</a> ()</td></tr>
+<tr class="memdesc:a559634f3c6aee54683d4b6ccbbc7a884"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the raw (native) temperature value.  <a href="classIRCoolixAC.html#a559634f3c6aee54683d4b6ccbbc7a884">More...</a><br /></td></tr>
 <tr class="separator:a559634f3c6aee54683d4b6ccbbc7a884"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a425c3f5fb26330266156c133fb9104eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a425c3f5fb26330266156c133fb9104eb">setSensorTempRaw</a> (const uint8_t code)</td></tr>
+<tr class="memdesc:a425c3f5fb26330266156c133fb9104eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the raw (native) sensor temperature value.  <a href="classIRCoolixAC.html#a425c3f5fb26330266156c133fb9104eb">More...</a><br /></td></tr>
 <tr class="separator:a425c3f5fb26330266156c133fb9104eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">setZoneFollow</a> (const bool <a class="el" href="classIRCoolixAC.html#a59c414fe0e951cd50083ab1fc45286ed">on</a>)</td></tr>
+<tr class="memdesc:a0c0f39d8e2e79d8259000695263ec3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the Zone Follow setting.  <a href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">More...</a><br /></td></tr>
 <tr class="separator:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51bde954328ca5887a8353ba5562b3db"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a51bde954328ca5887a8353ba5562b3db">isSpecialState</a> (void)</td></tr>
+<tr class="memdesc:a51bde954328ca5887a8353ba5562b3db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current state is a special state?  <a href="classIRCoolixAC.html#a51bde954328ca5887a8353ba5562b3db">More...</a><br /></td></tr>
 <tr class="separator:a51bde954328ca5887a8353ba5562b3db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af78090c6d8b45b4202a80f1223640390"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#af78090c6d8b45b4202a80f1223640390">handleSpecialState</a> (const uint32_t data)</td></tr>
+<tr class="memdesc:af78090c6d8b45b4202a80f1223640390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust any internal settings based on the type of special state we are supplied. Does nothing if it isn't a special state.  <a href="classIRCoolixAC.html#af78090c6d8b45b4202a80f1223640390">More...</a><br /></td></tr>
 <tr class="separator:af78090c6d8b45b4202a80f1223640390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f39630b328939307bb08c18e56e9ad3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a1f39630b328939307bb08c18e56e9ad3">updateSavedState</a> (void)</td></tr>
+<tr class="memdesc:a1f39630b328939307bb08c18e56e9ad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Backup the current internal state as long as it isn't a special state.  <a href="classIRCoolixAC.html#a1f39630b328939307bb08c18e56e9ad3">More...</a><br /></td></tr>
 <tr class="separator:a1f39630b328939307bb08c18e56e9ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a134cb36681c3fab53074b402bba0a45c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a134cb36681c3fab53074b402bba0a45c">recoverSavedState</a> (void)</td></tr>
+<tr class="memdesc:a134cb36681c3fab53074b402bba0a45c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restore the current internal state from backup as long as it isn't a special state.  <a href="classIRCoolixAC.html#a134cb36681c3fab53074b402bba0a45c">More...</a><br /></td></tr>
 <tr class="separator:a134cb36681c3fab53074b402bba0a45c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a458618f926f8b57e4b9bdeae0d13a70d"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a458618f926f8b57e4b9bdeae0d13a70d">getNormalState</a> (void)</td></tr>
 <tr class="separator:a458618f926f8b57e4b9bdeae0d13a70d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,9 +235,8 @@ Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a6c7033e72fb860bca600ba6ea6e7afef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a6c7033e72fb860bca600ba6ea6e7afef">_irsend</a></td></tr>
+<tr class="memdesc:a6c7033e72fb860bca600ba6ea6e7afef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRCoolixAC.html#a6c7033e72fb860bca600ba6ea6e7afef">More...</a><br /></td></tr>
 <tr class="separator:a6c7033e72fb860bca600ba6ea6e7afef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f2551723b6472417e5d43222a6e8712"><td class="memItemLeft" align="right" valign="top">IRsendTest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a2f2551723b6472417e5d43222a6e8712">_irsend</a></td></tr>
-<tr class="separator:a2f2551723b6472417e5d43222a6e8712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5984ff64ff14df92291618a647da08f9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a5984ff64ff14df92291618a647da08f9">powerFlag</a></td></tr>
 <tr class="separator:a5984ff64ff14df92291618a647da08f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60a8a848951555dba34f2a317d6611ea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a60a8a848951555dba34f2a317d6611ea">turboFlag</a></td></tr>
@@ -209,11 +256,16 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:adf18ad8494466f6301176ce10aa3a075"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#adf18ad8494466f6301176ce10aa3a075">swingVFlag</a></td></tr>
 <tr class="separator:adf18ad8494466f6301176ce10aa3a075"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03bf575961d4d924275cb16a45edaa46"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a03bf575961d4d924275cb16a45edaa46">remote_state</a></td></tr>
+<tr class="memdesc:a03bf575961d4d924275cb16a45edaa46"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote in IR code form.  <a href="classIRCoolixAC.html#a03bf575961d4d924275cb16a45edaa46">More...</a><br /></td></tr>
 <tr class="separator:a03bf575961d4d924275cb16a45edaa46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec0bce8019d7d49a30915394bee56b9a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aec0bce8019d7d49a30915394bee56b9a">saved_state</a></td></tr>
+<tr class="memdesc:aec0bce8019d7d49a30915394bee56b9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy of the state if we required a special mode.  <a href="classIRCoolixAC.html#aec0bce8019d7d49a30915394bee56b9a">More...</a><br /></td></tr>
 <tr class="separator:aec0bce8019d7d49a30915394bee56b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Class for handling detailed Coolix A/C messages. </p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/484">https://github.com/crankyoldgit/IRremoteESP8266/issues/484</a> </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a043ad3b74e964e39b111e1fcf9e55f42"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a043ad3b74e964e39b111e1fcf9e55f42">&#9670;&nbsp;</a></span>IRCoolixAC()</h2>
 
@@ -254,6 +306,16 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Class constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pin</td><td>GPIO to be used when sending. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">inverted</td><td>Is the output signal to be inverted? </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">use_modulation</td><td>Is frequency modulation to be used? </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -271,6 +333,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set up hardware to be able to send a message. </p>
 
 </div>
 </div>
@@ -298,6 +362,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Run the calibration to calculate uSec timing offsets for this platform. </p>
+<dl class="section return"><dt>Returns</dt><dd>The uSec timing offset needed per modulation of the IR Led. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This will produce a 65ms IR signal pulse at 38kHz. Only ever needs to be run once per object instantiation, if at all. </dd></dl>
+
 </div>
 </div>
 <a id="a5deca09ced33931f089f5cd3c07eac4a"></a>
@@ -314,6 +382,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Clear the Sensor Temperature setting.. </p>
 
 </div>
 </div>
@@ -333,6 +403,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+
 </div>
 </div>
 <a id="acfb0d2c20322cb4d3cd681a3a54b30fe"></a>
@@ -351,6 +430,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Convert a standard A/C mode into its native mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>A <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> to be converted to it's native equivalent. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The corresponding native mode. </dd></dl>
+
 </div>
 </div>
 <a id="a272f94ef641041835a650dd4fbdda7bf"></a>
@@ -367,6 +455,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the Clean setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -385,6 +476,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the current fan speed setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current fan speed. </dd></dl>
+
 </div>
 </div>
 <a id="aa7712ebbf103c4d61dc645cb42dcf3f0"></a>
@@ -402,6 +496,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the Led (light) setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="a16772a297404e2c54f951c49bfc608de"></a>
@@ -418,6 +515,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the operating mode setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current operating mode setting. </dd></dl>
 
 </div>
 </div>
@@ -462,6 +562,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the value of the current power setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="aa231938dfcff03325383205edc9c88d2"></a>
@@ -478,6 +581,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get a copy of the internal state as a valid code for this protocol. </p>
+<dl class="section return"><dt>Returns</dt><dd>A valid code for this protocol based on the current internal state. </dd></dl>
 
 </div>
 </div>
@@ -496,6 +602,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the sensor temperature setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current setting for sensor temp. in degrees celsius. </dd></dl>
+
 </div>
 </div>
 <a id="a0b22f5427254c3f784f468d53909882c"></a>
@@ -512,6 +621,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the Sleep setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -530,6 +642,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the Swing setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="af90462598f294a75b35e20d986251942"></a>
@@ -546,6 +661,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the current temperature setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current setting for temp. in degrees celsius. </dd></dl>
 
 </div>
 </div>
@@ -572,6 +690,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Get the raw (native) temperature value. </p>
+<dl class="section return"><dt>Returns</dt><dd>The native temperature value. </dd></dl>
+
 </div>
 </div>
 <a id="ab5f87216fb91bbb437c0899b0742a63f"></a>
@@ -589,6 +710,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the Turbo setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
 </div>
 </div>
 <a id="a647a41d63301e3d95460323d1fe0ce4a"></a>
@@ -605,6 +729,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the Zone Follow setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -632,6 +759,16 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Adjust any internal settings based on the type of special state we are supplied. Does nothing if it isn't a special state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The state we need to act upon. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Special state means commands that are not affecting Temperature/Mode/Fan </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is a special state. false if it isn't. </dd></dl>
+
 </div>
 </div>
 <a id="a51bde954328ca5887a8353ba5562b3db"></a>
@@ -658,6 +795,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Is the current state is a special state? </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. false if it isn't. </dd></dl>
+
 </div>
 </div>
 <a id="a7538665a38e193ecd3a0bed41e9f1417"></a>
@@ -675,6 +815,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Change the power setting to Off. </p>
+
 </div>
 </div>
 <a id="a59c414fe0e951cd50083ab1fc45286ed"></a>
@@ -691,6 +833,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Change the power setting to On. </p>
 
 </div>
 </div>
@@ -718,6 +862,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Restore the current internal state from backup as long as it isn't a special state. </p>
+
 </div>
 </div>
 <a id="aaaa681d6cfcf04d110b913e8bb27a53c"></a>
@@ -736,6 +882,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Send the current internal state as an IR message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a0087ac58749ef946632fbb5a8b41fe0d"></a>
@@ -752,6 +906,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Toggle the Clean mode of the A/C. </p>
 
 </div>
 </div>
@@ -781,6 +937,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the speed of the fan. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The desired setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">modecheck</td><td>Do we enforce any mode limitations before setting? </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a3132f99cffa108129dff64a0b68bd614"></a>
@@ -797,6 +962,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Toggle the Led (light) mode of the A/C. </p>
 
 </div>
 </div>
@@ -816,6 +983,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the operating mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The desired operating mode. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a41dc75b29e7a05eff5f16161cb9b3eeb"></a>
@@ -828,11 +1003,19 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRCoolixAC::setPower </td>
           <td>(</td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>state</em></td><td>)</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Change the power setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -852,6 +1035,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the internal state from a valid code for this protocol. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_code</td><td>A valid code for this protocol. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a05e660b2b61b9a312e29688289f4bf3e"></a>
@@ -869,6 +1060,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the sensor temperature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">desired</td><td>The temperature in degrees celsius. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -896,6 +1095,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Set the raw (native) sensor temperature value. </p>
+<dl class="section note"><dt>Note</dt><dd>Bypasses any checks or additional actions. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>The desired native sensor temperature. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a4ee44167eca3fc88115fef3e845a3768"></a>
@@ -912,6 +1120,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Toggle the Sleep mode of the A/C. </p>
 
 </div>
 </div>
@@ -930,6 +1140,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Toggle the Swing mode of the A/C. </p>
+
 </div>
 </div>
 <a id="a1d4b4fb810b9f3835ee585b2aa66088f"></a>
@@ -942,11 +1154,19 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRCoolixAC::setTemp </td>
           <td>(</td>
           <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>temp</em></td><td>)</td>
+          <td class="paramname"><em>desired</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the temperature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">desired</td><td>The temperature in degrees celsius. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -974,6 +1194,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Set the raw (native) temperature value. </p>
+<dl class="section note"><dt>Note</dt><dd>Bypasses any checks. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>The desired native temperature. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a65a04ec9028025155792be5ba0f81927"></a>
@@ -990,6 +1219,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Toggle the Turbo mode of the A/C. </p>
 
 </div>
 </div>
@@ -1017,6 +1248,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Change the Zone Follow setting. </p>
+<dl class="section note"><dt>Note</dt><dd>Internal use only. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a88a44b7ba5ac7d5654de4592bd41c207"></a>
@@ -1033,6 +1273,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reset the internal state to a fixed known good state. </p>
 
 </div>
 </div>
@@ -1051,6 +1293,15 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert the A/C state to it's common <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">prev</td><td>Ptr to the previous state if required. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> state. </dd></dl>
 
 </div>
 </div>
@@ -1078,6 +1329,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The native setting to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+
 </div>
 </div>
 <a id="a789fb5d5eab2e78d392c8e0b9a194b18"></a>
@@ -1104,6 +1364,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Convert a native mode to it's common <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>A native operation mode to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The corresponding common <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> mode. </dd></dl>
+
 </div>
 </div>
 <a id="ad1282b4071f003ab35d2a97287ba6d2d"></a>
@@ -1120,6 +1389,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert the internal state into a human readable string. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current internal state expressed as a human readable String. </dd></dl>
 
 </div>
 </div>
@@ -1147,11 +1419,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Backup the current internal state as long as it isn't a special state. </p>
+<dl class="section note"><dt>Note</dt><dd>: Must be called before every special state to make sure the remote_state is safe </dd></dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a6c7033e72fb860bca600ba6ea6e7afef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c7033e72fb860bca600ba6ea6e7afef">&#9670;&nbsp;</a></span>_irsend <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c7033e72fb860bca600ba6ea6e7afef">&#9670;&nbsp;</a></span>_irsend</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1170,27 +1445,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a2f2551723b6472417e5d43222a6e8712"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f2551723b6472417e5d43222a6e8712">&#9670;&nbsp;</a></span>_irsend <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">IRsendTest IRCoolixAC::_irsend</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Instance of the IR send class. </p>
 
 </div>
 </div>
@@ -1280,6 +1535,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>The state of the IR remote in IR code form. </p>
+
 </div>
 </div>
 <a id="aec0bce8019d7d49a30915394bee56b9a"></a>
@@ -1301,6 +1558,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Copy of the state if we required a special mode. </p>
 
 </div>
 </div>

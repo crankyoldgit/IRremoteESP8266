@@ -1,5 +1,49 @@
 # Release Notes
 
+## _v2.7.8 (20200622)_
+
+**[BREAKING CHANGES]**
+- Fix Manchester code handling; Increase Airwell to `34` bits. (#1200)
+
+**[Bug Fixes]**
+- Carrier40: Use correct gap value. (#1193)
+
+**[Features]**
+- CarrierAc64: Add detailed support. (#1133)
+- Add experimental support for Hitachi A/C 344 bit protocol (#1139)
+- Automatic & full library code/API documentation via Doxygen (#1150 #1154 #1155 #1156 #1158 #1165 #1167 #1169 #1180 #1184 #1189 #1191 #1194 #1195 #1197 #1198)
+- Hitachi344: Add detailed support and change bit ordering. (#1147)
+- Add Corona AC Protocol (#1152)
+- Hitachi344: Add Swing(H) and improve Swing(V) (#1148)
+- Update auto_analyse_raw_data.py with better code comment sections (#1164)
+- Add support for Midea24 protocol. (#1171)
+- Add basic Zepeal protocol support (#1178)
+
+**[Misc]**
+- scrape_supported_devices.py: avoid changes to SupportedProtocols.md (#1140)
+- auto_analyze nice exit on empty rawdata input (#1141)
+- Comments update + cleanup (#1143)
+- Update D_STR_IRRECVDUMP_STARTUP text and comments. (#1144)
+- Minor code cleanups (#1149)
+- Update `README.md`'s to point to new API docs. (#1151)
+- Update "Supports" sections (#1160)
+- Add a `doxygen` check to CI/Travis. (#1161)
+- scrape_supported_devices: warn about misplaced or legacy supports sections (#1159)
+- Add Supports sections to some files (#1163 #1166)
+- Fix compile error when `DEBUG` is enabled.
+- Add no-output option and return code on error to scrape_supported_devices
+- Travis: Add scrape_supported_devices error check
+- Update auto_analyse_raw_data.py to have a default Supports: section
+- Treat compiler warnings as errors. (#1174)
+- Remove `calcLGChecksum()` and use new generic `sumNibbles()` (#1175)
+- Suppress more potential compiler warnings. (#1179)
+- Load balance travis tasks to reduce wall clock time. (#1183)
+- Set PlatformIO's default baudrate to 115200 (#1188)
+- Some fixes to Doshisha protocol handler
+- Minor cleanups of Corona and Zepeal
+- Enable Doxygen warning when the parameters for a function/method/procedure are wrong/missing. (#1196)
+
+
 ## _v2.7.7 (20200519)_
 
 **[BREAKING CHANGES]**

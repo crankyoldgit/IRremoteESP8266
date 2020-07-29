@@ -193,6 +193,7 @@ class IRHitachiAc {
 #if SEND_HITACHI_AC
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -250,6 +251,7 @@ class IRHitachiAc1 {
 #if SEND_HITACHI_AC1
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -317,6 +319,7 @@ class IRHitachiAc424 {
 #if SEND_HITACHI_AC424
   virtual void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
@@ -370,6 +373,7 @@ class IRHitachiAc3 {
 #if SEND_HITACHI_AC3
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }

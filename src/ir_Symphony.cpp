@@ -1,6 +1,10 @@
 // Copyright 2020 David Conran
 
-// Send & decode support for Symphony added by David Conran
+/// @file
+/// @brief Support for Symphony protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1057
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1105
+/// @see https://www.alldatasheet.com/datasheet-pdf/pdf/124369/ANALOGICTECH/SM5021B.html
 
 // Supports:
 //   Brand: Symphony,  Model: Air Cooler 3Di
@@ -22,8 +26,6 @@
 #include "IRutils.h"
 
 // Constants
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1057
 const uint16_t kSymphonyZeroMark = 400;
 const uint16_t kSymphonyZeroSpace = 1250;
 const uint16_t kSymphonyOneMark = kSymphonyZeroSpace;
@@ -32,19 +34,11 @@ const uint32_t kSymphonyFooterGap = 4 * (kSymphonyZeroMark +
                                          kSymphonyZeroSpace);
 
 #if SEND_SYMPHONY
-// Send a Symphony packet.
-//
-// Args:
-//   data: The data we want to send. MSB first.
-//   nbits: The number of bits of data to send. (Typically 12, 24, or 32[Nokia])
-//   repeat: The nr. of times the message should be sent.
-//
-// Status:  STABLE / Should be working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1057
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1105
-//   https://www.alldatasheet.com/datasheet-pdf/pdf/124369/ANALOGICTECH/SM5021B.html
+/// Send a Symphony packet.
+/// Status:  STABLE / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendSymphony(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(0, 0,
               kSymphonyOneMark, kSymphonyOneSpace,
@@ -55,23 +49,14 @@ void IRsend::sendSymphony(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_SYMPHONY
 
 #if DECODE_SYMPHONY
-// Decode a Symphony packet if possible.
-// Places successful decode information in the results pointer.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. Typically kSymphonyBits
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status:  STABLE / Should be working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1057
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1105
-//   https://www.alldatasheet.com/datasheet-pdf/pdf/124369/ANALOGICTECH/SM5021B.html
+/// Decode the supplied Symphony packet/message.
+/// Status: STABLE / Should be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeSymphony(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   uint64_t data = 0;

@@ -379,7 +379,6 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRHitachiAc424 object.
 /// @warning Consider this very alpha code. Seems to work, but not validated.
 IRMitsubishiAC::IRMitsubishiAC(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
@@ -867,7 +866,6 @@ bool IRrecv::decodeMitsubishi136(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishi136 object.
 IRMitsubishi136::IRMitsubishi136(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
@@ -1289,7 +1287,6 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishi112 object.
 IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }

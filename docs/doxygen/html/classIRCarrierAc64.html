@@ -89,22 +89,25 @@ Collaboration diagram for IRCarrierAc64:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac225c0f24a0e385a145375ff447ab79b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#ac225c0f24a0e385a145375ff447ab79b">IRCarrierAc64</a> (const uint16_t pin, const bool inverted=false, const bool use_modulation=true)</td></tr>
-<tr class="memdesc:ac225c0f24a0e385a145375ff447ab79b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor for handling detailed Carrier 64 bit A/C messages.  <a href="classIRCarrierAc64.html#ac225c0f24a0e385a145375ff447ab79b">More...</a><br /></td></tr>
+<tr class="memdesc:ac225c0f24a0e385a145375ff447ab79b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classIRCarrierAc64.html#ac225c0f24a0e385a145375ff447ab79b">More...</a><br /></td></tr>
 <tr class="separator:ac225c0f24a0e385a145375ff447ab79b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe58c8f97ab4c34fd0cf198b07589694"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#abe58c8f97ab4c34fd0cf198b07589694">stateReset</a> ()</td></tr>
 <tr class="memdesc:abe58c8f97ab4c34fd0cf198b07589694"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRCarrierAc64.html#abe58c8f97ab4c34fd0cf198b07589694">More...</a><br /></td></tr>
 <tr class="separator:abe58c8f97ab4c34fd0cf198b07589694"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aace8aa2d125c6e80bcdd6d96eac722c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#aace8aa2d125c6e80bcdd6d96eac722c2">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a8b2b3670dc74ce9fbf3c8b511422a06c">kCarrierAc64MinRepeat</a>)</td></tr>
+<tr class="memdesc:aace8aa2d125c6e80bcdd6d96eac722c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRCarrierAc64.html#aace8aa2d125c6e80bcdd6d96eac722c2">More...</a><br /></td></tr>
 <tr class="separator:aace8aa2d125c6e80bcdd6d96eac722c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0718376156750e66f98ea0549c75b21b"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a0718376156750e66f98ea0549c75b21b">calibrate</a> (void)</td></tr>
+<tr class="memdesc:a0718376156750e66f98ea0549c75b21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRCarrierAc64.html#a0718376156750e66f98ea0549c75b21b">More...</a><br /></td></tr>
 <tr class="separator:a0718376156750e66f98ea0549c75b21b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d9800edffad8a529971535ada5c00ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a7d9800edffad8a529971535ada5c00ad">begin</a> ()</td></tr>
+<tr class="memdesc:a7d9800edffad8a529971535ada5c00ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRCarrierAc64.html#a7d9800edffad8a529971535ada5c00ad">More...</a><br /></td></tr>
 <tr class="separator:a7d9800edffad8a529971535ada5c00ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8acf59cbf3b02381b5188324030b7727"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a8acf59cbf3b02381b5188324030b7727">setPower</a> (const bool <a class="el" href="classIRCarrierAc64.html#a39c13b713e36fbf94605f251b36bdfae">on</a>)</td></tr>
 <tr class="memdesc:a8acf59cbf3b02381b5188324030b7727"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRCarrierAc64.html#a8acf59cbf3b02381b5188324030b7727">More...</a><br /></td></tr>
 <tr class="separator:a8acf59cbf3b02381b5188324030b7727"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad50ebb44815e55cc0a99f4762939dc54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#ad50ebb44815e55cc0a99f4762939dc54">getPower</a> ()</td></tr>
-<tr class="memdesc:ad50ebb44815e55cc0a99f4762939dc54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gte the value of the current power setting.  <a href="classIRCarrierAc64.html#ad50ebb44815e55cc0a99f4762939dc54">More...</a><br /></td></tr>
+<tr class="memdesc:ad50ebb44815e55cc0a99f4762939dc54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRCarrierAc64.html#ad50ebb44815e55cc0a99f4762939dc54">More...</a><br /></td></tr>
 <tr class="separator:ad50ebb44815e55cc0a99f4762939dc54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39c13b713e36fbf94605f251b36bdfae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a39c13b713e36fbf94605f251b36bdfae">on</a> ()</td></tr>
 <tr class="memdesc:a39c13b713e36fbf94605f251b36bdfae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRCarrierAc64.html#a39c13b713e36fbf94605f251b36bdfae">More...</a><br /></td></tr>
@@ -131,8 +134,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a24f208b955af86f6927ac97b7f7066d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep mode of the A/C.  <a href="classIRCarrierAc64.html#a24f208b955af86f6927ac97b7f7066d5">More...</a><br /></td></tr>
 <tr class="separator:a24f208b955af86f6927ac97b7f7066d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a312027468b508e9d38dd9e23ee99f9e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a312027468b508e9d38dd9e23ee99f9e4">setFan</a> (const uint8_t speed)</td></tr>
+<tr class="memdesc:a312027468b508e9d38dd9e23ee99f9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRCarrierAc64.html#a312027468b508e9d38dd9e23ee99f9e4">More...</a><br /></td></tr>
 <tr class="separator:a312027468b508e9d38dd9e23ee99f9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93bb27688657af434d57f0dd9a159566"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a93bb27688657af434d57f0dd9a159566">getFan</a> ()</td></tr>
+<tr class="memdesc:a93bb27688657af434d57f0dd9a159566"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRCarrierAc64.html#a93bb27688657af434d57f0dd9a159566">More...</a><br /></td></tr>
 <tr class="separator:a93bb27688657af434d57f0dd9a159566"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae462eeec49ff91358f1b9921750ee36d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#ae462eeec49ff91358f1b9921750ee36d">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:ae462eeec49ff91358f1b9921750ee36d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRCarrierAc64.html#ae462eeec49ff91358f1b9921750ee36d">More...</a><br /></td></tr>
@@ -162,6 +167,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8e94b1526b26cec55f1e700c86aaf74e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a standard A/C mode into its native mode.  <a href="classIRCarrierAc64.html#a8e94b1526b26cec55f1e700c86aaf74e">More...</a><br /></td></tr>
 <tr class="separator:a8e94b1526b26cec55f1e700c86aaf74e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a255e6679397434877f1c6c9ac70fff50"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a255e6679397434877f1c6c9ac70fff50">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a255e6679397434877f1c6c9ac70fff50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRCarrierAc64.html#a255e6679397434877f1c6c9ac70fff50">More...</a><br /></td></tr>
 <tr class="separator:a255e6679397434877f1c6c9ac70fff50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c4a84d0d9f1e78ba611e118ddb90635"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a7c4a84d0d9f1e78ba611e118ddb90635">toCommon</a> (void)</td></tr>
 <tr class="memdesc:a7c4a84d0d9f1e78ba611e118ddb90635"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the A/C state to it's common <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRCarrierAc64.html#a7c4a84d0d9f1e78ba611e118ddb90635">More...</a><br /></td></tr>
@@ -182,6 +188,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab17b24d0306b8983886d15175898909e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode to it's common <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> equivalent.  <a href="classIRCarrierAc64.html#ab17b24d0306b8983886d15175898909e">More...</a><br /></td></tr>
 <tr class="separator:ab17b24d0306b8983886d15175898909e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a9149acc82fcc22a5be8dcbe791ab77"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a5a9149acc82fcc22a5be8dcbe791ab77">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
+<tr class="memdesc:a5a9149acc82fcc22a5be8dcbe791ab77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRCarrierAc64.html#a5a9149acc82fcc22a5be8dcbe791ab77">More...</a><br /></td></tr>
 <tr class="separator:a5a9149acc82fcc22a5be8dcbe791ab77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
@@ -199,10 +206,10 @@ Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a17270f2b1d6cab828e2a51fc23b36437"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a17270f2b1d6cab828e2a51fc23b36437">_irsend</a></td></tr>
+<tr class="memdesc:a17270f2b1d6cab828e2a51fc23b36437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRCarrierAc64.html#a17270f2b1d6cab828e2a51fc23b36437">More...</a><br /></td></tr>
 <tr class="separator:a17270f2b1d6cab828e2a51fc23b36437"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2874b0941a81a3285d151cb6e98ef339"><td class="memItemLeft" align="right" valign="top">IRsendTest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a2874b0941a81a3285d151cb6e98ef339">_irsend</a></td></tr>
-<tr class="separator:a2874b0941a81a3285d151cb6e98ef339"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a257272c7cb54f5854e79053c8223a43e"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCarrierAc64.html#a257272c7cb54f5854e79053c8223a43e">remote_state</a></td></tr>
+<tr class="memdesc:a257272c7cb54f5854e79053c8223a43e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote.  <a href="classIRCarrierAc64.html#a257272c7cb54f5854e79053c8223a43e">More...</a><br /></td></tr>
 <tr class="separator:a257272c7cb54f5854e79053c8223a43e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -248,7 +255,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Class constructor for handling detailed Carrier 64 bit A/C messages. </p>
+<p>Class constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pin</td><td>GPIO to be used when sending. </td></tr>
@@ -257,7 +264,6 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classIRCarrierAc64.html" title="Class for handling detailed Carrier 64 bit A/C messages.">IRCarrierAc64</a> object. </dd></dl>
 
 </div>
 </div>
@@ -333,6 +339,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set up hardware to be able to send a message. </p>
+
 </div>
 </div>
 <a id="a20676dcf4b0a6510cc3bce282fbf8504"></a>
@@ -394,6 +402,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Run the calibration to calculate uSec timing offsets for this platform. </p>
+<dl class="section return"><dt>Returns</dt><dd>The uSec timing offset needed per modulation of the IR Led. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This will produce a 65ms IR signal pulse at 38kHz. Only ever needs to be run once per object instantiation, if at all. </dd></dl>
+
 </div>
 </div>
 <a id="a005fab56acf94fe97db7fa92651b2882"></a>
@@ -440,6 +452,15 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+
 </div>
 </div>
 <a id="a8e94b1526b26cec55f1e700c86aaf74e"></a>
@@ -483,6 +504,9 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get the current fan speed setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>The current fan speed. </dd></dl>
 
 </div>
 </div>
@@ -565,7 +589,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Gte the value of the current power setting. </p>
+<p>Get the value of the current power setting. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
@@ -648,7 +672,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current temperature from the internal state. </p>
-<dl class="section return"><dt>Returns</dt><dd>The current temperatue in Celsius. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The current temperature in Celsius. </dd></dl>
 
 </div>
 </div>
@@ -706,6 +730,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Send the current internal state as an IR message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a312027468b508e9d38dd9e23ee99f9e4"></a>
@@ -723,6 +755,14 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the speed of the fan. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The desired setting. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1001,6 +1041,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The native setting to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+
 </div>
 </div>
 <a id="ab17b24d0306b8983886d15175898909e"></a>
@@ -1095,7 +1144,7 @@ Private Attributes</h2></td></tr>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a17270f2b1d6cab828e2a51fc23b36437"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17270f2b1d6cab828e2a51fc23b36437">&#9670;&nbsp;</a></span>_irsend <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a17270f2b1d6cab828e2a51fc23b36437">&#9670;&nbsp;</a></span>_irsend</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1114,27 +1163,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a2874b0941a81a3285d151cb6e98ef339"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2874b0941a81a3285d151cb6e98ef339">&#9670;&nbsp;</a></span>_irsend <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">IRsendTest IRCarrierAc64::_irsend</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Instance of the IR send class. </p>
 
 </div>
 </div>
@@ -1157,6 +1186,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The state of the IR remote. </p>
 
 </div>
 </div>

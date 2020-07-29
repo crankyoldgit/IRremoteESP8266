@@ -33,6 +33,8 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::checkInvertedBytePairs;
+using irutils::invertBytePairs;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -74,7 +76,6 @@ void IRsend::sendMitsubishiHeavy152(const unsigned char data[],
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishiHeavy152Ac object.
 IRMitsubishiHeavy152Ac::IRMitsubishiHeavy152Ac(const uint16_t pin,
                                                const bool inverted,
                                                const bool use_modulation)
@@ -220,14 +221,20 @@ uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
   return GETBITS8(remote_state[13], kLowNibble, kNibbleSize);
 }
 
+/// Set the Night (Sleep) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
   setBit(&remote_state[15], kMitsubishiHeavyNightOffset, on);
 }
 
+/// Get the Night (Sleep) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getNight(void) {
   return GETBIT8(remote_state[15], kMitsubishiHeavyNightOffset);
 }
 
+/// Set the 3D mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::set3D(const bool on) {
   if (on)
     remote_state[11] |= kMitsubishiHeavy3DMask;
@@ -235,31 +242,45 @@ void IRMitsubishiHeavy152Ac::set3D(const bool on) {
     remote_state[11] &= ~kMitsubishiHeavy3DMask;
 }
 
+/// Get the 3D mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::get3D(void) {
   return (remote_state[11] & kMitsubishiHeavy3DMask) == kMitsubishiHeavy3DMask;
 }
 
+/// Set the Silent (Quiet) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setSilent(const bool on) {
   setBit(&remote_state[15], kMitsubishiHeavySilentOffset, on);
 }
 
+/// Get the Silent (Quiet) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getSilent(void) {
   return GETBIT8(remote_state[15], kMitsubishiHeavySilentOffset);
 }
 
+/// Set the Filter mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setFilter(const bool on) {
   setBit(&remote_state[5], kMitsubishiHeavyFilterOffset, on);
 }
 
+/// Get the Filter mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getFilter(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavyFilterOffset);
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setClean(const bool on) {
   this->setFilter(on);
   setBit(&remote_state[5], kMitsubishiHeavyCleanOffset, on);
 }
 
+/// Get the Clean mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy152Ac::getClean(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavyCleanOffset) && getFilter();
 }
@@ -302,32 +323,24 @@ bool IRMitsubishiHeavy152Ac::checkZmsSig(const uint8_t *state) {
 }
 
 /// Calculate the checksum for the current internal state of the remote.
-/// Note: Technically it has no checksum, but does has inverted byte pairs.
+/// Note: Technically it has no checksum, but does have inverted byte pairs.
 void IRMitsubishiHeavy152Ac::checksum(void) {
-  for (uint8_t i = kMitsubishiHeavySigLength - 2;
-       i < kMitsubishiHeavy152StateLength;
-       i += 2) {
-    remote_state[i + 1] = ~remote_state[i];
-  }
+  const uint8_t kOffset = kMitsubishiHeavySigLength - 2;
+  invertBytePairs(remote_state + kOffset,
+                  kMitsubishiHeavy152StateLength - kOffset);
 }
 
 /// Verify the checksum is valid for a given state.
 /// @param[in] state The array to verify the checksum of.
 /// @param[in] length The length/size of the state array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
-/// Note: Technically it has no checksum, but does has inverted byte pairs.
+/// Note: Technically it has no checksum, but does have inverted byte pairs.
 bool IRMitsubishiHeavy152Ac::validChecksum(const uint8_t *state,
                                            const uint16_t length) {
   // Assume anything too short is fine.
   if (length < kMitsubishiHeavySigLength) return true;
-  // Check all the byte pairs.
-  for (uint16_t i = kMitsubishiHeavySigLength - 2;
-       i < length;
-       i += 2) {
-    // XOR of a byte and it's self inverted should be 0xFF;
-    if ((state[i] ^ state[i + 1]) != 0xFF) return false;
-  }
-  return true;
+  const uint8_t kOffset = kMitsubishiHeavySigLength - 2;
+  return checkInvertedBytePairs(state + kOffset, length - kOffset);
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -388,7 +401,9 @@ uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishiHeavyCool: return stdAc::opmode_t::kCool;
@@ -590,7 +605,6 @@ String IRMitsubishiHeavy152Ac::toString(void) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-/// @return An IRMitsubishiHeavy88Ac object.
 IRMitsubishiHeavy88Ac::IRMitsubishiHeavy88Ac(const uint16_t pin,
                                              const bool inverted,
                                              const bool use_modulation)
@@ -799,6 +813,8 @@ bool IRMitsubishiHeavy88Ac::getEcono(void) {
   return this->getFan() == kMitsubishiHeavy88FanEcono;
 }
 
+/// Set the 3D mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::set3D(const bool on) {
   if (on)
     this->setSwingHorizontal(kMitsubishiHeavy88SwingH3D);
@@ -806,14 +822,20 @@ void IRMitsubishiHeavy88Ac::set3D(const bool on) {
     this->setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
 }
 
+/// Get the 3D mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy88Ac::get3D(void) {
   return this->getSwingHorizontal() == kMitsubishiHeavy88SwingH3D;
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setClean(const bool on) {
   setBit(&remote_state[5], kMitsubishiHeavy88CleanOffset, on);
 }
 
+/// Get the Clean mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRMitsubishiHeavy88Ac::getClean(void) {
   return GETBIT8(remote_state[5], kMitsubishiHeavy88CleanOffset);
 }
@@ -828,20 +850,18 @@ bool IRMitsubishiHeavy88Ac::checkZjsSig(const uint8_t *state) {
 }
 
 /// Calculate the checksum for the current internal state of the remote.
-/// Note: Technically it has no checksum, but does has inverted byte pairs.
+/// Note: Technically it has no checksum, but does have inverted byte pairs.
 void IRMitsubishiHeavy88Ac::checksum(void) {
-  for (uint8_t i = kMitsubishiHeavySigLength - 2;
-       i < kMitsubishiHeavy88StateLength;
-       i += 2) {
-    remote_state[i + 1] = ~remote_state[i];
-  }
+  const uint8_t kOffset = kMitsubishiHeavySigLength - 2;
+  invertBytePairs(remote_state + kOffset,
+                  kMitsubishiHeavy88StateLength - kOffset);
 }
 
 /// Verify the checksum is valid for a given state.
 /// @param[in] state The array to verify the checksum of.
 /// @param[in] length The length/size of the state array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
-/// Note: Technically it has no checksum, but does has inverted byte pairs.
+/// Note: Technically it has no checksum, but does have inverted byte pairs.
 bool IRMitsubishiHeavy88Ac::validChecksum(const uint8_t *state,
                                            const uint16_t length) {
   return IRMitsubishiHeavy152Ac::validChecksum(state, length);

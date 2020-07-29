@@ -25,7 +25,6 @@
 /// @param[in] use_modulation Do we do frequency modulation during transmission?
 ///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
 ///  duty cycle etc.
-/// @return An IRsend object.
 IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
     : IRpin(IRsendPin), periodOffset(kPeriodOffset) {
   if (inverted) {
@@ -520,9 +519,6 @@ void IRsend::sendManchester(const uint16_t headermark,
     // Header
     if (headermark) mark(headermark);
     if (headerspace) space(headerspace);
-    // Data Marker/sync
-    // This guarantees a double width half_period. i.e. a Period or T2.
-    sendManchesterData(half_period, 0b01, 2, true, GEThomas);
     // Data
     sendManchesterData(half_period, data, nbits, MSBfirst, GEThomas);
     // Footer
@@ -634,7 +630,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LG:
     case LG2:
       return 28;
-    case AIRWELL:
     case CARRIER_AC:
     case EPSON:
     case NEC:
@@ -643,6 +638,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SHERWOOD:
     case WHYNTER:
       return 32;
+    case AIRWELL:
+      return 34;
     case LUTRON:
     case TECO:
       return 35;
@@ -724,6 +721,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kNeoclimaBits;
     case SAMSUNG_AC:
       return kSamsungAcBits;
+    case SANYO_AC:
+      return kSanyoAcBits;
     case SHARP_AC:
       return kSharpAcBits;
     case TCL112AC:
@@ -1155,6 +1154,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendSamsungAC(state, nbytes);
       break;
 #endif  // SEND_SAMSUNG_AC
+#if SEND_SANYO_AC
+    case SANYO_AC:
+      sendSanyoAc(state, nbytes);
+      break;
+#endif  // SEND_SANYO_AC
 #if SEND_SHARP_AC
     case SHARP_AC:
       sendSharpAc(state, nbytes);

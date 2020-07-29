@@ -1,5 +1,12 @@
 // Copyright 2019 Fabien Valthier
 
+/// @file
+/// @brief Support for Teco protocols.
+
+// Supports:
+//   Brand: Alaska,  Model: SAC9010QC A/C
+//   Brand: Alaska,  Model: SAC9010QC remote
+
 #ifndef IR_TECO_H_
 #define IR_TECO_H_
 
@@ -11,10 +18,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Supports:
-//   Brand: Alaska,  Model: SAC9010QC A/C
-//   Brand: Alaska,  Model: SAC9010QC remote
 
 // Constants.
 const uint8_t kTecoAuto = 0;
@@ -100,14 +103,19 @@ const uint64_t kTecoReset =      0b01001010000000000000010000000000000;
 */
 
 // Classes
+/// Class for handling detailed Teco A/C messages.
 class IRTecoAc {
  public:
   explicit IRTecoAc(const uint16_t pin, const bool inverted = false,
                     const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_TECO
   void send(const uint16_t repeat = kTecoDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TECO
   void begin(void);
   void on(void);
@@ -155,12 +163,13 @@ class IRTecoAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint64_t remote_state;
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint64_t remote_state;  ///< The state of the IR remote in IR code form.
   bool getTimerEnabled(void);
 };
 

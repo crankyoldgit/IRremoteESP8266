@@ -1595,11 +1595,37 @@ TEST(TestManchesterCode, matchManchester) {
   IRrecv irrecv(0);
 
   const uint16_t rawData[163] = {
+  //           0
       2860, 3862,
+  //  11    00    11    00    1    0    11    0     1    0    1    0    1
+  //  0     1     0     1     0         0     1          1         1
+  //        1                           4
+  //  1     0     1     0     1         1     0          0         0
+  //        2                           B
       1924, 1952, 1926, 1952, 956, 984, 1924, 1028, 952, 958, 980, 956, 982,
+  //  00    1     0    11    00    11    0     1    0    1   0    1     0
+  //  1     0          0     1     0     1          1        1          1
+  //  F                            2                                    F
+  //  0     1          1     0     1     0          0        0          0
+  //  0                            D                                    0
       1882, 1016, 950, 1958, 1920, 1948, 1004, 954, 956, 984, 956, 952, 984,
+  //  1    0    1    0    1    00    1     0    11    0     1    0    1
+  //       1         1         1     0          0     1          1
+  //                                 E
+  //       0         0         0     1          1     0          0
+  //                                 1
       974, 966, 974, 964, 974, 1888, 1010, 960, 1948, 1002, 946, 962, 978,
+  //  0    1    0    1    0    1    00    1    0    11    00    1    0
+  //  1         1         1         1     0         0     1     0
+  //  7                                   E
+  //  0         0         0         0     1         1     0     1
+  //  8                                   1
       962, 976, 960, 948, 992, 978, 1886, 982, 984, 1924, 1954, 952, 986,
+  //  1
+  //  0
+  //  4
+  //  1
+  //  B
       3892, 3862,
       1924, 1954, 1924, 1954, 984, 952, 1956, 996, 954, 990, 948, 958, 980,
       1882, 1016, 952, 1958, 1920, 1956, 994, 944, 962, 986, 956, 972, 962,
@@ -1616,11 +1642,11 @@ TEST(TestManchesterCode, matchManchester) {
 
   uint16_t offset = 1;
   uint64_t result = 0;
-  uint16_t nbits = 32;
+  uint16_t nbits = 34;
   EXPECT_EQ(56, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
-                                       2860, 3800, 1000, 0, 3800));
-  EXPECT_EQ(0x4F2FE7E4, result);
+                                       2860, 2860, 1000, 2860, 2860));
+  EXPECT_EQ(0x14F2FE7E4, result);
 
   irsend.reset();
   irsend.sendRaw(rawData, 55, 38);  // Send just the bare minimum.
@@ -1628,8 +1654,8 @@ TEST(TestManchesterCode, matchManchester) {
 
   EXPECT_EQ(55, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
-                                       2860, 3800, 1000, 0, 3800));
-  EXPECT_EQ(0x4F2FE7E4, result);
+                                       2860, 2860, 1000, 2860, 2860));
+  EXPECT_EQ(0x14F2FE7E4, result);
 
   irsend.reset();
   irsend.sendRaw(rawData, 52, 38);  // Now, just too short.
@@ -1637,7 +1663,7 @@ TEST(TestManchesterCode, matchManchester) {
 
   EXPECT_EQ(0, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                       irsend.capture.rawlen - offset, nbits,
-                                      2860, 3800, 1000, 0, 0));
+                                      2860, 2860, 1000, 2860, 2860));
 }
 
 TEST(TestManchesterCode, ManchesterLoopBackGEThomasTest) {
@@ -1650,7 +1676,7 @@ TEST(TestManchesterCode, ManchesterLoopBackGEThomasTest) {
   irsend.reset();
   irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x12345678, nbits);
   irsend.makeDecodeResult();
-  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+  EXPECT_EQ(50, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
                                        5000, 7000, 1000, 0, 10000, true,
                                        kUseDefTol, kMarkExcess, true, true));
@@ -1659,7 +1685,7 @@ TEST(TestManchesterCode, ManchesterLoopBackGEThomasTest) {
   irsend.reset();
   irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x87654321, nbits);
   irsend.makeDecodeResult();
-  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+  EXPECT_EQ(50, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
                                        5000, 7000, 1000, 0, 10000, true,
                                        kUseDefTol, kMarkExcess, true, true));
@@ -1677,7 +1703,7 @@ TEST(TestManchesterCode, ManchesterLoopBackIEEE802_3Test) {
   irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x12345678, nbits, 38000,
                         true, kNoRepeat, kDutyDefault, false);
   irsend.makeDecodeResult();
-  EXPECT_EQ(52, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+  EXPECT_EQ(50, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
                                        5000, 7000, 1000, 0, 10000, true,
                                        kUseDefTol, kMarkExcess, true, false));
@@ -1687,9 +1713,198 @@ TEST(TestManchesterCode, ManchesterLoopBackIEEE802_3Test) {
   irsend.sendManchester(5000, 7000, 1000, 0, 10000, 0x87654321, nbits, 38000,
                         true, kNoRepeat, kDutyDefault, false);
   irsend.makeDecodeResult();
-  EXPECT_EQ(54, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
+  EXPECT_EQ(50, irrecv.matchManchester(irsend.capture.rawbuf + offset, &result,
                                        irsend.capture.rawlen - offset, nbits,
                                        5000, 7000, 1000, 0, 10000, true,
                                        kUseDefTol, kMarkExcess, true, false));
   EXPECT_EQ(0x87654321, result);
+}
+
+TEST(TestMatchManchesterData, Normal) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  irsend.begin();
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1111, 4);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(8, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1111, result);
+  EXPECT_EQ("f38000d50m1000s1000m1000s1000m1000s1000m1000s1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1011, 4);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(6, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1011, result);
+  EXPECT_EQ("f38000d50m1000s2000m2000s1000m1000s1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1010, 4);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(5, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1010, result);
+  EXPECT_EQ("f38000d50m1000s2000m2000s2000m1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1000, 4);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(7, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1000, result);
+  EXPECT_EQ("f38000d50m1000s2000m1000s1000m1000s1000m1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1001, 4);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(6, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1001, result);
+  EXPECT_EQ("f38000d50m1000s2000m1000s1000m2000s1000",
+            irsend.outputStr());
+}
+
+TEST(TestMatchManchesterData, SimulateAtEndOfARealMessage) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  irsend.begin();
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1111, 4);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(7, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1111, result);
+  EXPECT_EQ("f38000d50m1000s1000m1000s1000m1000s1000m1000s1000",
+            irsend.outputStr());
+
+  uint16_t rawData[7] = {1000, 1000, 1000, 1000, 1000, 1000, 1000};
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendRaw(rawData, 7, 38);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(7, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1111, result);
+  EXPECT_EQ("f38000d50m1000s1000m1000s1000m1000s1000m1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1011, 4);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(5, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1011, result);
+  EXPECT_EQ("f38000d50m1000s2000m2000s1000m1000s1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1010, 4);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(4, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1010, result);
+  EXPECT_EQ("f38000d50m1000s2000m2000s2000m1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1000, 4);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(6, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1000, result);
+  EXPECT_EQ("f38000d50m1000s2000m1000s1000m1000s1000m1000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1001, 4);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(5, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1001, result);
+  EXPECT_EQ("f38000d50m1000s2000m1000s1000m2000s1000",
+            irsend.outputStr());
+}
+
+TEST(TestMatchManchesterData, SimulateLongFooter) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  uint16_t offset = 1;
+  uint64_t result = 0;
+  irsend.begin();
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1110, 4);
+  irsend.mark(4000);
+  irsend.makeDecodeResult();
+  EXPECT_EQ(6, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset,
+                                          4, 1000));
+  EXPECT_EQ(0b1110, result);
+  EXPECT_EQ("f38000d50m1000s1000m1000s1000m1000s2000m5000",
+            irsend.outputStr());
+
+  irsend.reset();
+  irsend.enableIROut(38);
+  irsend.sendManchesterData(1000, 0b1001, 4);
+  irsend.space(4000);
+  irsend.makeDecodeResult();
+  // To simulate an normal (no space at the end) reduce the remaining by 1.
+  EXPECT_EQ(5, irrecv.matchManchesterData(irsend.capture.rawbuf + offset,
+                                          &result,
+                                          irsend.capture.rawlen - offset - 1,
+                                          4, 1000));
+  EXPECT_EQ(0b1001, result);
+  EXPECT_EQ("f38000d50m1000s2000m1000s1000m2000s5000",
+            irsend.outputStr());
 }

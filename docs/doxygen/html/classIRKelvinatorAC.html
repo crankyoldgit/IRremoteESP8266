@@ -89,7 +89,7 @@ Collaboration diagram for IRKelvinatorAC:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a111dd384b1898a4fb880a19b6d1b1635"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#a111dd384b1898a4fb880a19b6d1b1635">IRKelvinatorAC</a> (const uint16_t pin, const bool inverted=false, const bool use_modulation=true)</td></tr>
-<tr class="memdesc:a111dd384b1898a4fb880a19b6d1b1635"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Kelvinator A/C messages.  <a href="classIRKelvinatorAC.html#a111dd384b1898a4fb880a19b6d1b1635">More...</a><br /></td></tr>
+<tr class="memdesc:a111dd384b1898a4fb880a19b6d1b1635"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classIRKelvinatorAC.html#a111dd384b1898a4fb880a19b6d1b1635">More...</a><br /></td></tr>
 <tr class="separator:a111dd384b1898a4fb880a19b6d1b1635"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6fefe85023c3fc318b0e45924874f9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#ad6fefe85023c3fc318b0e45924874f9f">stateReset</a> (void)</td></tr>
 <tr class="memdesc:ad6fefe85023c3fc318b0e45924874f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internals of the object to a known good state.  <a href="classIRKelvinatorAC.html#ad6fefe85023c3fc318b0e45924874f9f">More...</a><br /></td></tr>
@@ -194,6 +194,7 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a22f561397c526ed6cc3f69a5d527d8d6"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#a22f561397c526ed6cc3f69a5d527d8d6">calcBlockChecksum</a> (const uint8_t *block, const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#af68545e8c2fe9af3719fb74c5d21f0c9">kKelvinatorStateLength</a>/2)</td></tr>
+<tr class="memdesc:a22f561397c526ed6cc3f69a5d527d8d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the checksum for a given block of state.  <a href="classIRKelvinatorAC.html#a22f561397c526ed6cc3f69a5d527d8d6">More...</a><br /></td></tr>
 <tr class="separator:a22f561397c526ed6cc3f69a5d527d8d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa915fa5eb3f7e5c7a3dc143b6fda826"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#aaa915fa5eb3f7e5c7a3dc143b6fda826">validChecksum</a> (const uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#af68545e8c2fe9af3719fb74c5d21f0c9">kKelvinatorStateLength</a>)</td></tr>
 <tr class="memdesc:aaa915fa5eb3f7e5c7a3dc143b6fda826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRKelvinatorAC.html#aaa915fa5eb3f7e5c7a3dc143b6fda826">More...</a><br /></td></tr>
@@ -217,10 +218,10 @@ Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:ae3571bf6de20e47f81ad1da8f1d13118"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#ae3571bf6de20e47f81ad1da8f1d13118">_irsend</a></td></tr>
+<tr class="memdesc:ae3571bf6de20e47f81ad1da8f1d13118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRKelvinatorAC.html#ae3571bf6de20e47f81ad1da8f1d13118">More...</a><br /></td></tr>
 <tr class="separator:ae3571bf6de20e47f81ad1da8f1d13118"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ab2ec64cc8651af13ff8168c5f9ae60"><td class="memItemLeft" align="right" valign="top">IRsendTest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#a9ab2ec64cc8651af13ff8168c5f9ae60">_irsend</a></td></tr>
-<tr class="separator:a9ab2ec64cc8651af13ff8168c5f9ae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70f75821274e53cc5ed64ac53a6e32b4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRKelvinatorAC.html#a70f75821274e53cc5ed64ac53a6e32b4">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#af68545e8c2fe9af3719fb74c5d21f0c9">kKelvinatorStateLength</a>]</td></tr>
+<tr class="memdesc:a70f75821274e53cc5ed64ac53a6e32b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in IR code form.  <a href="classIRKelvinatorAC.html#a70f75821274e53cc5ed64ac53a6e32b4">More...</a><br /></td></tr>
 <tr class="separator:a70f75821274e53cc5ed64ac53a6e32b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -266,7 +267,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Class for handling detailed Kelvinator A/C messages. </p>
+<p>Class constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pin</td><td>GPIO to be used when sending. </td></tr>
@@ -275,7 +276,6 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classIRKelvinatorAC.html" title="Class for handling detailed Kelvinator A/C messages.">IRKelvinatorAC</a> object. </dd></dl>
 
 </div>
 </div>
@@ -334,6 +334,17 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Calculate the checksum for a given block of state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">block</td><td>A pointer to a block to calc the checksum of. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>Length of the block array to checksum. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The calculated checksum value. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Many Bothans died to bring us this information. </dd></dl>
+
 </div>
 </div>
 <a id="aee8863c1678b09432618bb4ca734db95"></a>
@@ -361,6 +372,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Run the calibration to calculate uSec timing offsets for this platform. </p>
+<dl class="section return"><dt>Returns</dt><dd>The uSec timing offset needed per modulation of the IR Led. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This will produce a 65ms IR signal pulse at 38kHz. Only ever needs to be run once per object instantiation, if at all. </dd></dl>
 
 </div>
@@ -396,7 +408,6 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Many Bothans died to bring us this information. </dd></dl>
 
 </div>
 </div>
@@ -1267,7 +1278,7 @@ Private Attributes</h2></td></tr>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="ae3571bf6de20e47f81ad1da8f1d13118"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3571bf6de20e47f81ad1da8f1d13118">&#9670;&nbsp;</a></span>_irsend <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3571bf6de20e47f81ad1da8f1d13118">&#9670;&nbsp;</a></span>_irsend</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1286,27 +1297,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a9ab2ec64cc8651af13ff8168c5f9ae60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ab2ec64cc8651af13ff8168c5f9ae60">&#9670;&nbsp;</a></span>_irsend <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">IRsendTest IRKelvinatorAC::_irsend</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Instance of the IR send class. </p>
 
 </div>
 </div>
@@ -1329,6 +1320,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The state in IR code form. </p>
 
 </div>
 </div>
