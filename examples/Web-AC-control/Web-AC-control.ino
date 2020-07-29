@@ -10,7 +10,7 @@
 #include <LittleFS.h>
 #else
 #include <FS.h>
-#endif
+#endif // ESP8266
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -166,7 +166,11 @@ void setup() {
 
   // Serial.println("mounting FS...");
 
-  if (!LittleFS.begin()) {
+#if defined(ESP8266)
+  if (!LittleFS.begin()) {  // Did we fail?
+#else
+  if (!SPIFFS.begin()) {  // Did we fail?
+#endif // ESP8266
     // Serial.println("Failed to mount file system");
     return;
   }

@@ -337,7 +337,7 @@
 #include <LittleFS.h>
 #else
 #include <FS.h>
-#endif
+#endif // ESP8266
 #include <ArduinoJson.h>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -525,11 +525,19 @@ void saveWifiConfigCallback(void) {
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
   debug("Mounting SPIFFS...");
+#if defined(ESP8266)
   if (LittleFS.begin()) return true;  // We mounted it okay.
+#else
+  if (SPIFFS.begin()) return true;  // We mounted it okay.
+#endif // ESP8266
   // We failed the first time.
   debug("Failed to mount SPIFFS!\nFormatting SPIFFS and trying again...");
   SPIFFS.format();
+#if defined(ESP8266)
   if (!LittleFS.begin()) {  // Did we fail?
+#else
+  if (!SPIFFS.begin()) {  // Did we fail?
+#endif // ESP8266
     debug("DANGER: Failed to mount SPIFFS even after formatting!");
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
