@@ -6,7 +6,11 @@
   is selected (required for Coolix).
 
 */
+#if defined(ESP8266)
 #include <LittleFS.h>
+#else
+#include <FS.h>
+#endif
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>

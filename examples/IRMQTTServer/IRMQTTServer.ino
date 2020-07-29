@@ -333,7 +333,11 @@
 
 #include "IRMQTTServer.h"
 #include <Arduino.h>
+#if defined(ESP8266)
 #include <LittleFS.h>
+#else
+#include <FS.h>
+#endif
 #include <ArduinoJson.h>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -556,7 +560,7 @@ bool saveConfig(void) {
   }
 
   if (mountSpiffs()) {
-    File configFile = LittleFS.open(kConfigFile, "w");
+    File configFile = SPIFFS.open(kConfigFile, "w");
     if (!configFile) {
       debug("Failed to open config file for writing.");
     } else {
@@ -578,7 +582,7 @@ bool loadConfigFile(void) {
     if (SPIFFS.exists(kConfigFile)) {
       debug("config file exists");
 
-      File configFile = LittleFS.open(kConfigFile, "r");
+      File configFile = SPIFFS.open(kConfigFile, "r");
       if (configFile) {
         debug("Opened config file");
         size_t size = configFile.size();
