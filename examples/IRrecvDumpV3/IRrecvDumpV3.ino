@@ -74,10 +74,10 @@ const uint16_t kCaptureBufferSize = 1024;
 // Some A/C units have gaps in their protocols of ~40ms. e.g. Kelvinator
 // A value this large may swallow repeats of some protocols
 const uint8_t kTimeout = 50;
-#else   // DECODE_AC
+#else  // DECODE_AC
 // Suits most messages, while not swallowing many repeats.
 const uint8_t kTimeout = 15;
-#endif  // DECODE_AC
+#endif // DECODE_AC
 // Alternatives:
 // const uint8_t kTimeout = 90;
 // Suits messages with big gaps like XMP-1 & some aircon units, but can
@@ -113,54 +113,58 @@ const uint16_t kMinUnknownSize = 12;
 
 // Use turn on the save buffer feature for more complete capture coverage.
 IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
-decode_results results;  // Somewhere to store the results
+decode_results results; // Somewhere to store the results
 
 // This section of code runs only once at start-up.
-void setup() {
-  OTAwifi();  // start default wifi (previously saved on the ESP) for OTA
+void setup()
+{
+    OTAwifi(); // start default wifi (previously saved on the ESP) for OTA
 #if defined(ESP8266)
-  Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
-#else  // ESP8266
-  Serial.begin(kBaudRate, SERIAL_8N1);
-#endif  // ESP8266
-  while (!Serial)  // Wait for the serial connection to be establised.
-    delay(50);
-  Serial.printf("\n" D_STR_IRRECVDUMP_STARTUP "\n", kRecvPin);
-  OTAinit();  // setup OTA handlers and show IP
+    Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
+#else               // ESP8266
+    Serial.begin(kBaudRate, SERIAL_8N1);
+#endif              // ESP8266
+    while (!Serial) // Wait for the serial connection to be establised.
+        delay(50);
+    Serial.printf("\n" D_STR_IRRECVDUMP_STARTUP "\n", kRecvPin);
+    OTAinit(); // setup OTA handlers and show IP
 #if DECODE_HASH
-  // Ignore messages with less than minimum on or off pulses.
-  irrecv.setUnknownThreshold(kMinUnknownSize);
-#endif  // DECODE_HASH
-  irrecv.enableIRIn();  // Start the receiver
+    // Ignore messages with less than minimum on or off pulses.
+    irrecv.setUnknownThreshold(kMinUnknownSize);
+#endif                   // DECODE_HASH
+    irrecv.enableIRIn(); // Start the receiver
 }
 
 // The repeating section of the code
-void loop() {
-  // Check if the IR code has been received.
-  if (irrecv.decode(&results)) {
-    // Display a crude timestamp.
-    uint32_t now = millis();
-    Serial.printf(D_STR_TIMESTAMP " : %06u.%03u\n", now / 1000, now % 1000);
-    // Check if we got an IR message that was to big for our capture buffer.
-    if (results.overflow)
-      Serial.printf(D_WARN_BUFFERFULL "\n", kCaptureBufferSize);
-    // Display the library version the message was captured with.
-    Serial.println(D_STR_LIBRARY "   : v" _IRREMOTEESP8266_VERSION_ "\n");
-    // Display the basic output of what we found.
-    Serial.print(resultToHumanReadableBasic(&results));
-    // Display any extra A/C info if we have it.
-    String description = IRAcUtils::resultAcToString(&results);
-    if (description.length()) Serial.println(D_STR_MESGDESC ": " + description);
-    yield();  // Feed the WDT as the text output can take a while to print.
+void loop()
+{
+    // Check if the IR code has been received.
+    if (irrecv.decode(&results))
+    {
+        // Display a crude timestamp.
+        uint32_t now = millis();
+        Serial.printf(D_STR_TIMESTAMP " : %06u.%03u\n", now / 1000, now % 1000);
+        // Check if we got an IR message that was to big for our capture buffer.
+        if (results.overflow)
+            Serial.printf(D_WARN_BUFFERFULL "\n", kCaptureBufferSize);
+        // Display the library version the message was captured with.
+        Serial.println(D_STR_LIBRARY "   : v" _IRREMOTEESP8266_VERSION_ "\n");
+        // Display the basic output of what we found.
+        Serial.print(resultToHumanReadableBasic(&results));
+        // Display any extra A/C info if we have it.
+        String description = IRAcUtils::resultAcToString(&results);
+        if (description.length())
+            Serial.println(D_STR_MESGDESC ": " + description);
+        yield(); // Feed the WDT as the text output can take a while to print.
 #if LEGACY_TIMING_INFO
-    // Output legacy RAW timing info of the result.
-    Serial.println(resultToTimingInfo(&results));
-    yield();  // Feed the WDT (again)
-#endif  // LEGACY_TIMING_INFO
-    // Output the results as source code
-    Serial.println(resultToSourceCode(&results));
-    Serial.println();    // Blank line between entries
-    yield();             // Feed the WDT (again)
-  }
-  OTAloopHandler();
+        // Output legacy RAW timing info of the result.
+        Serial.println(resultToTimingInfo(&results));
+        yield(); // Feed the WDT (again)
+#endif           // LEGACY_TIMING_INFO
+        // Output the results as source code
+        Serial.println(resultToSourceCode(&results));
+        Serial.println(); // Blank line between entries
+        yield();          // Feed the WDT (again)
+    }
+    OTAloopHandler();
 }
