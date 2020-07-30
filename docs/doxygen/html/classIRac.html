@@ -74,13 +74,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A universal/common/generic interface for controling supported A/Cs.  
+ <a href="classIRac.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="IRac_8h_source.html">IRac.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for IRac:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRac__coll__graph.png" border="0" usemap="#IRac_coll__map" alt="Collaboration graph"/></div>
 <map name="IRac_coll__map" id="IRac_coll__map">
-<area shape="rect" title=" " alt="" coords="35,109,86,136"/>
+<area shape="rect" title="A universal/common/generic interface for controling supported A/Cs." alt="" coords="35,109,86,136"/>
 <area shape="rect" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state." alt="" coords="5,5,116,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -115,7 +118,7 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad9c2fc9d07db70704f78a2d5f7be5b1c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#ad9c2fc9d07db70704f78a2d5f7be5b1c">isProtocolSupported</a> (const <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a> protocol)</td></tr>
-<tr class="memdesc:ad9c2fc9d07db70704f78a2d5f7be5b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the given protocol supported by the <a class="el" href="classIRac.html">IRac</a> class?  <a href="classIRac.html#ad9c2fc9d07db70704f78a2d5f7be5b1c">More...</a><br /></td></tr>
+<tr class="memdesc:ad9c2fc9d07db70704f78a2d5f7be5b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the given protocol supported by the <a class="el" href="classIRac.html" title="A universal/common/generic interface for controling supported A/Cs.">IRac</a> class?  <a href="classIRac.html#ad9c2fc9d07db70704f78a2d5f7be5b1c">More...</a><br /></td></tr>
 <tr class="separator:ad9c2fc9d07db70704f78a2d5f7be5b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1c4ae70e61298c0be8d350d67e7c342"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#af1c4ae70e61298c0be8d350d67e7c342">initState</a> (<a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *state, const <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a> vendor, const int16_t model, const bool power, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const bool celsius, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const <a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147">stdAc::swingh_t</a> swingh, const bool quiet, const bool turbo, const bool econo, const bool light, const bool filter, const bool clean, const bool beep, const int16_t sleep, const int16_t clock)</td></tr>
 <tr class="memdesc:af1c4ae70e61298c0be8d350d67e7c342"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialse the given state with the supplied settings.  <a href="classIRac.html#af1c4ae70e61298c0be8d350d67e7c342">More...</a><br /></td></tr>
@@ -168,6 +171,9 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
+<tr class="memitem:a26cd62e09250d87b652d35406ebfb159"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a26cd62e09250d87b652d35406ebfb159">airwell</a> (<a class="el" href="classIRAirwellAc.html">IRAirwellAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan)</td></tr>
+<tr class="memdesc:a26cd62e09250d87b652d35406ebfb159"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an Airwell A/C message with the supplied settings.  <a href="classIRac.html#a26cd62e09250d87b652d35406ebfb159">More...</a><br /></td></tr>
+<tr class="separator:a26cd62e09250d87b652d35406ebfb159"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bad16621b232572e14fe4a53f678131"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a4bad16621b232572e14fe4a53f678131">amcor</a> (<a class="el" href="classIRAmcorAc.html">IRAmcorAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan)</td></tr>
 <tr class="memdesc:a4bad16621b232572e14fe4a53f678131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an Amcor A/C message with the supplied settings.  <a href="classIRac.html#a4bad16621b232572e14fe4a53f678131">More...</a><br /></td></tr>
 <tr class="separator:a4bad16621b232572e14fe4a53f678131"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -246,9 +252,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:afad31ecf9eae573882d53dd6629485fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#afad31ecf9eae573882d53dd6629485fb">lg</a> (<a class="el" href="classIRLgAc.html">IRLgAc</a> *ac, const <a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a> model, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan)</td></tr>
 <tr class="memdesc:afad31ecf9eae573882d53dd6629485fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a LG A/C message with the supplied settings.  <a href="classIRac.html#afad31ecf9eae573882d53dd6629485fb">More...</a><br /></td></tr>
 <tr class="separator:afad31ecf9eae573882d53dd6629485fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b9c72198497eca0121945b557691309"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a5b9c72198497eca0121945b557691309">midea</a> (<a class="el" href="classIRMideaAC.html">IRMideaAC</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const bool celsius, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const int16_t sleep=-1)</td></tr>
-<tr class="memdesc:a5b9c72198497eca0121945b557691309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Midea A/C message with the supplied settings.  <a href="classIRac.html#a5b9c72198497eca0121945b557691309">More...</a><br /></td></tr>
-<tr class="separator:a5b9c72198497eca0121945b557691309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b09ee99957a92d81e615676508b465a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a0b09ee99957a92d81e615676508b465a">midea</a> (<a class="el" href="classIRMideaAC.html">IRMideaAC</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const bool celsius, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool econo, const int16_t sleep=-1)</td></tr>
+<tr class="memdesc:a0b09ee99957a92d81e615676508b465a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Midea A/C message with the supplied settings.  <a href="classIRac.html#a0b09ee99957a92d81e615676508b465a">More...</a><br /></td></tr>
+<tr class="separator:a0b09ee99957a92d81e615676508b465a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa60bcac75dc5dda40c78f8c227b19a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#aaa60bcac75dc5dda40c78f8c227b19a3">mitsubishi</a> (<a class="el" href="classIRMitsubishiAC.html">IRMitsubishiAC</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const <a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147">stdAc::swingh_t</a> swingh, const bool quiet, const int16_t clock=-1)</td></tr>
 <tr class="memdesc:aaa60bcac75dc5dda40c78f8c227b19a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Mitsubishi A/C message with the supplied settings.  <a href="classIRac.html#aaa60bcac75dc5dda40c78f8c227b19a3">More...</a><br /></td></tr>
 <tr class="separator:aaa60bcac75dc5dda40c78f8c227b19a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -273,6 +279,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a619c659a11c258ea9623eaa37689ba4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a619c659a11c258ea9623eaa37689ba4c">samsung</a> (<a class="el" href="classIRSamsungAc.html">IRSamsungAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool quiet, const bool turbo, const bool light, const bool filter, const bool clean, const bool beep, const bool prevpower=true, const bool forcepower=true)</td></tr>
 <tr class="memdesc:a619c659a11c258ea9623eaa37689ba4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Samsung A/C message with the supplied settings.  <a href="classIRac.html#a619c659a11c258ea9623eaa37689ba4c">More...</a><br /></td></tr>
 <tr class="separator:a619c659a11c258ea9623eaa37689ba4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b0e12748dc25a1d224993b2a013e822"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a9b0e12748dc25a1d224993b2a013e822">sanyo</a> (<a class="el" href="classIRSanyoAc.html">IRSanyoAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool beep, const int16_t sleep=-1)</td></tr>
+<tr class="memdesc:a9b0e12748dc25a1d224993b2a013e822"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Toshiba A/C message with the supplied settings.  <a href="classIRac.html#a9b0e12748dc25a1d224993b2a013e822">More...</a><br /></td></tr>
+<tr class="separator:a9b0e12748dc25a1d224993b2a013e822"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b6d8b4e554a89f339f896fe4233ed15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a7b6d8b4e554a89f339f896fe4233ed15">sharp</a> (<a class="el" href="classIRSharpAc.html">IRSharpAc</a> *ac, const bool on, const bool prev_power, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool turbo, const bool filter, const bool clean)</td></tr>
 <tr class="memdesc:a7b6d8b4e554a89f339f896fe4233ed15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Sharp A/C message with the supplied settings.  <a href="classIRac.html#a7b6d8b4e554a89f339f896fe4233ed15">More...</a><br /></td></tr>
 <tr class="separator:a7b6d8b4e554a89f339f896fe4233ed15"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -282,9 +291,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a9e612e04e270dd5710e8a63a64b56064"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a9e612e04e270dd5710e8a63a64b56064">teco</a> (<a class="el" href="classIRTecoAc.html">IRTecoAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool light, const int16_t sleep=-1)</td></tr>
 <tr class="memdesc:a9e612e04e270dd5710e8a63a64b56064"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Teco A/C message with the supplied settings.  <a href="classIRac.html#a9e612e04e270dd5710e8a63a64b56064">More...</a><br /></td></tr>
 <tr class="separator:a9e612e04e270dd5710e8a63a64b56064"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a384e62cc56ebbdd790ebcd500ce56fc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a384e62cc56ebbdd790ebcd500ce56fc5">toshiba</a> (<a class="el" href="classIRToshibaAC.html">IRToshibaAC</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan)</td></tr>
-<tr class="memdesc:a384e62cc56ebbdd790ebcd500ce56fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Toshiba A/C message with the supplied settings.  <a href="classIRac.html#a384e62cc56ebbdd790ebcd500ce56fc5">More...</a><br /></td></tr>
-<tr class="separator:a384e62cc56ebbdd790ebcd500ce56fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bb89d95bd06eb04efb4999baee63725"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a9bb89d95bd06eb04efb4999baee63725">toshiba</a> (<a class="el" href="classIRToshibaAC.html">IRToshibaAC</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const bool turbo, const bool econo)</td></tr>
+<tr class="memdesc:a9bb89d95bd06eb04efb4999baee63725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Toshiba A/C message with the supplied settings.  <a href="classIRac.html#a9bb89d95bd06eb04efb4999baee63725">More...</a><br /></td></tr>
+<tr class="separator:a9bb89d95bd06eb04efb4999baee63725"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed1a012c0546c2b1d53e86871a42ba1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#aed1a012c0546c2b1d53e86871a42ba1a">trotec</a> (<a class="el" href="classIRTrotecESP.html">IRTrotecESP</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const int16_t sleep=-1)</td></tr>
 <tr class="memdesc:aed1a012c0546c2b1d53e86871a42ba1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Trotec A/C message with the supplied settings.  <a href="classIRac.html#aed1a012c0546c2b1d53e86871a42ba1a">More...</a><br /></td></tr>
 <tr class="separator:aed1a012c0546c2b1d53e86871a42ba1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -307,15 +316,21 @@ Static Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aba78a2510d8cdcaf4c601e8b0574ae6c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#aba78a2510d8cdcaf4c601e8b0574ae6c">_pin</a></td></tr>
+<tr class="memdesc:aba78a2510d8cdcaf4c601e8b0574ae6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The GPIO to use to transmit messages from.  <a href="classIRac.html#aba78a2510d8cdcaf4c601e8b0574ae6c">More...</a><br /></td></tr>
 <tr class="separator:aba78a2510d8cdcaf4c601e8b0574ae6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cfaa0b92819f06b3aa5b3e9e48b9d51"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a9cfaa0b92819f06b3aa5b3e9e48b9d51">_inverted</a></td></tr>
+<tr class="memdesc:a9cfaa0b92819f06b3aa5b3e9e48b9d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">IR LED is lit when GPIO is LOW (true) or HIGH (false)?  <a href="classIRac.html#a9cfaa0b92819f06b3aa5b3e9e48b9d51">More...</a><br /></td></tr>
 <tr class="separator:a9cfaa0b92819f06b3aa5b3e9e48b9d51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc6b7380f11c38d13fffa99ca2189a9b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#acc6b7380f11c38d13fffa99ca2189a9b">_modulation</a></td></tr>
+<tr class="memdesc:acc6b7380f11c38d13fffa99ca2189a9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is frequency modulation to be used?  <a href="classIRac.html#acc6b7380f11c38d13fffa99ca2189a9b">More...</a><br /></td></tr>
 <tr class="separator:acc6b7380f11c38d13fffa99ca2189a9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c63dc78c49f3714887fea0feefffd44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a8c63dc78c49f3714887fea0feefffd44">_prev</a></td></tr>
+<tr class="memdesc:a8c63dc78c49f3714887fea0feefffd44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state we expect the device to currently be in.  <a href="classIRac.html#a8c63dc78c49f3714887fea0feefffd44">More...</a><br /></td></tr>
 <tr class="separator:a8c63dc78c49f3714887fea0feefffd44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A universal/common/generic interface for controling supported A/Cs. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abb0864e277d4f6c68a92c2729112a40d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abb0864e277d4f6c68a92c2729112a40d">&#9670;&nbsp;</a></span>IRac()</h2>
 
@@ -369,6 +384,72 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a26cd62e09250d87b652d35406ebfb159"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26cd62e09250d87b652d35406ebfb159">&#9670;&nbsp;</a></span>airwell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRac::airwell </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classIRAirwellAc.html">IRAirwellAc</a> *&#160;</td>
+          <td class="paramname"><em>ac</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>degrees</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
+          <td class="paramname"><em>fan</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Send an Airwell A/C message with the supplied settings. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRAirwellAc.html" title="Class for handling detailed Airwell A/C messages.">IRAirwellAc</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a4bad16621b232572e14fe4a53f678131"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4bad16621b232572e14fe4a53f678131">&#9670;&nbsp;</a></span>amcor()</h2>
 
@@ -1118,7 +1199,7 @@ Private Attributes</h2></td></tr>
 <p>Send a Daikin 128-bit A/C message with the supplied settings. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRDaikin128.html" title="Class for handling detailed Daikin 128-bit A/C messages. Code by crankyoldgit. Analysis by Daniel Ven...">IRDaikin128</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRDaikin128.html" title="Class for handling detailed Daikin 128-bit A/C messages.">IRDaikin128</a> object to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
@@ -1497,7 +1578,7 @@ Private Attributes</h2></td></tr>
 <p>Send a Daikin2 A/C message with the supplied settings. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRDaikin2.html" title="Class for handling detailed Daikin 312-bit A/C messages. Code by crankyoldgit, Reverse engineering an...">IRDaikin2</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRDaikin2.html" title="Class for handling detailed Daikin 312-bit A/C messages.">IRDaikin2</a> object to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
@@ -3131,7 +3212,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Is the given protocol supported by the <a class="el" href="classIRac.html">IRac</a> class? </p>
+<p>Is the given protocol supported by the <a class="el" href="classIRac.html" title="A universal/common/generic interface for controling supported A/Cs.">IRac</a> class? </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">protocol</td><td>The vendor/protocol type. </td></tr>
@@ -3350,8 +3431,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5b9c72198497eca0121945b557691309"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b9c72198497eca0121945b557691309">&#9670;&nbsp;</a></span>midea()</h2>
+<a id="a0b09ee99957a92d81e615676508b465a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b09ee99957a92d81e615676508b465a">&#9670;&nbsp;</a></span>midea()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3404,6 +3485,12 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>econo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const int16_t&#160;</td>
           <td class="paramname"><em>sleep</em> = <code>-1</code>&#160;</td>
         </tr>
@@ -3430,10 +3517,12 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">swingv</td><td>The vertical swing setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">econo</td><td>Run the device in economical mode. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">sleep</td><td>Nr. of minutes for sleep mode. -1 is Off, &gt;= 0 is on. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>On Danby A/C units, swingv controls the Ion Filter instead. </dd></dl>
 
 </div>
 </div>
@@ -3516,7 +3605,7 @@ Private Attributes</h2></td></tr>
 <p>Send a Mitsubishi A/C message with the supplied settings. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRMitsubishiAC.html" title="Class for handling detailed Mitsubishi 144-bit A/C messages. Inspired and derived from the work done ...">IRMitsubishiAC</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRMitsubishiAC.html" title="Class for handling detailed Mitsubishi 144-bit A/C messages.">IRMitsubishiAC</a> object to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
@@ -3605,7 +3694,7 @@ Private Attributes</h2></td></tr>
 <p>Send a Mitsubishi 112-bit A/C message with the supplied settings. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRMitsubishi112.html">IRMitsubishi112</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRMitsubishi112.html" title="Class for handling detailed Mitsubishi 122-bit A/C messages.">IRMitsubishi112</a> object to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
@@ -4304,6 +4393,93 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">beep</td><td>Enable/Disable beeps when receiving IR messages. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">prevpower</td><td>The power setting from the previous A/C state. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">forcepower</td><td>Do we force send the special power message? </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9b0e12748dc25a1d224993b2a013e822"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b0e12748dc25a1d224993b2a013e822">&#9670;&nbsp;</a></span>sanyo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRac::sanyo </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classIRSanyoAc.html">IRSanyoAc</a> *&#160;</td>
+          <td class="paramname"><em>ac</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>degrees</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
+          <td class="paramname"><em>fan</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td>
+          <td class="paramname"><em>swingv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>beep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int16_t&#160;</td>
+          <td class="paramname"><em>sleep</em> = <code>-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Send a Toshiba A/C message with the supplied settings. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIRSanyoAc.html" title="Class for handling detailed Sanyo A/C messages.">IRSanyoAc</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">swingv</td><td>The vertical swing setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">beep</td><td>Enable/Disable beeps when receiving IR messages. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sleep</td><td>Nr. of minutes for sleep mode. -1 is Off, &gt; 0 is on. </td></tr>
   </table>
   </dd>
 </dl>
@@ -5169,8 +5345,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a384e62cc56ebbdd790ebcd500ce56fc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a384e62cc56ebbdd790ebcd500ce56fc5">&#9670;&nbsp;</a></span>toshiba()</h2>
+<a id="a9bb89d95bd06eb04efb4999baee63725"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bb89d95bd06eb04efb4999baee63725">&#9670;&nbsp;</a></span>toshiba()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -5206,7 +5382,25 @@ Private Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
-          <td class="paramname"><em>fan</em>&#160;</td>
+          <td class="paramname"><em>fan</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td>
+          <td class="paramname"><em>swingv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>turbo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>econo</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -5229,6 +5423,9 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">swingv</td><td>The vertical swing setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">turbo</td><td>Run the device in turbo/powerful mode. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">econo</td><td>Run the device in economical mode. </td></tr>
   </table>
   </dd>
 </dl>
@@ -5545,6 +5742,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>IR LED is lit when GPIO is LOW (true) or HIGH (false)? </p>
+
 </div>
 </div>
 <a id="acc6b7380f11c38d13fffa99ca2189a9b"></a>
@@ -5566,6 +5765,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Is frequency modulation to be used? </p>
 
 </div>
 </div>
@@ -5589,6 +5790,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>The GPIO to use to transmit messages from. </p>
+
 </div>
 </div>
 <a id="a8c63dc78c49f3714887fea0feefffd44"></a>
@@ -5610,6 +5813,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The state we expect the device to currently be in. </p>
 
 </div>
 </div>

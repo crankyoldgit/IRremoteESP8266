@@ -96,7 +96,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3d3c3df261b4db7a9d831c94cc206e8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the state of the remote to a known good state/sequence.  <a href="classIRToshibaAC.html#a3d3c3df261b4db7a9d831c94cc206e8a">More...</a><br /></td></tr>
 <tr class="separator:a3d3c3df261b4db7a9d831c94cc206e8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14b155d3a20fb9c127eb7f3fe1fd16cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a14b155d3a20fb9c127eb7f3fe1fd16cd">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a8fca6a7c3cd608ff49cab35f24af0546">kToshibaACMinRepeat</a>)</td></tr>
-<tr class="memdesc:a14b155d3a20fb9c127eb7f3fe1fd16cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRToshibaAC.html#a14b155d3a20fb9c127eb7f3fe1fd16cd">More...</a><br /></td></tr>
+<tr class="memdesc:a14b155d3a20fb9c127eb7f3fe1fd16cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as IR messages.  <a href="classIRToshibaAC.html#a14b155d3a20fb9c127eb7f3fe1fd16cd">More...</a><br /></td></tr>
 <tr class="separator:a14b155d3a20fb9c127eb7f3fe1fd16cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74c66bba288cb3cbb43008edb7b376bf"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a74c66bba288cb3cbb43008edb7b376bf">calibrate</a> (void)</td></tr>
 <tr class="memdesc:a74c66bba288cb3cbb43008edb7b376bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRToshibaAC.html#a74c66bba288cb3cbb43008edb7b376bf">More...</a><br /></td></tr>
@@ -128,18 +128,39 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afd2000b62b79afde107ebc8a513724ab"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#afd2000b62b79afde107ebc8a513724ab">getFan</a> (void)</td></tr>
 <tr class="memdesc:afd2000b62b79afde107ebc8a513724ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRToshibaAC.html#afd2000b62b79afde107ebc8a513724ab">More...</a><br /></td></tr>
 <tr class="separator:afd2000b62b79afde107ebc8a513724ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d1d6b00a9b99bf29496fbd6af5cce31"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a5d1d6b00a9b99bf29496fbd6af5cce31">setTurbo</a> (const bool <a class="el" href="classIRToshibaAC.html#abdc35338e4a18132d56bf6b46ddea590">on</a>)</td></tr>
+<tr class="memdesc:a5d1d6b00a9b99bf29496fbd6af5cce31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Turbo (Powerful) setting of the A/C.  <a href="classIRToshibaAC.html#a5d1d6b00a9b99bf29496fbd6af5cce31">More...</a><br /></td></tr>
+<tr class="separator:a5d1d6b00a9b99bf29496fbd6af5cce31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb6543a6a719eec73add60bf9e452a9d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#adb6543a6a719eec73add60bf9e452a9d">getTurbo</a> (void)</td></tr>
+<tr class="memdesc:adb6543a6a719eec73add60bf9e452a9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo (Powerful) setting of the A/C.  <a href="classIRToshibaAC.html#adb6543a6a719eec73add60bf9e452a9d">More...</a><br /></td></tr>
+<tr class="separator:adb6543a6a719eec73add60bf9e452a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a780040755a8061107f655e060f2da206"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a780040755a8061107f655e060f2da206">setEcono</a> (const bool <a class="el" href="classIRToshibaAC.html#abdc35338e4a18132d56bf6b46ddea590">on</a>)</td></tr>
+<tr class="memdesc:a780040755a8061107f655e060f2da206"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Economy mode setting of the A/C.  <a href="classIRToshibaAC.html#a780040755a8061107f655e060f2da206">More...</a><br /></td></tr>
+<tr class="separator:a780040755a8061107f655e060f2da206"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b46e64e8f0b0f74a37803ab93c91e10"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a3b46e64e8f0b0f74a37803ab93c91e10">getEcono</a> (void)</td></tr>
+<tr class="memdesc:a3b46e64e8f0b0f74a37803ab93c91e10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economy mode setting of the A/C.  <a href="classIRToshibaAC.html#a3b46e64e8f0b0f74a37803ab93c91e10">More...</a><br /></td></tr>
+<tr class="separator:a3b46e64e8f0b0f74a37803ab93c91e10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aa001cddc464d6cbcc342e5e4c7af13ff">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRToshibaAC.html#aa001cddc464d6cbcc342e5e4c7af13ff">More...</a><br /></td></tr>
 <tr class="separator:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba5db1f6c8665443f26875ee9716302f"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aba5db1f6c8665443f26875ee9716302f">getMode</a> (const bool useRaw=false)</td></tr>
-<tr class="memdesc:aba5db1f6c8665443f26875ee9716302f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRToshibaAC.html#aba5db1f6c8665443f26875ee9716302f">More...</a><br /></td></tr>
-<tr class="separator:aba5db1f6c8665443f26875ee9716302f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33b283fdae6824d181ff91becf6816b0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a33b283fdae6824d181ff91becf6816b0">getMode</a> (const bool raw=false)</td></tr>
+<tr class="memdesc:a33b283fdae6824d181ff91becf6816b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRToshibaAC.html#a33b283fdae6824d181ff91becf6816b0">More...</a><br /></td></tr>
+<tr class="separator:a33b283fdae6824d181ff91becf6816b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae74ff9241303eb4c7f3593f73e781c73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#ae74ff9241303eb4c7f3593f73e781c73">setRaw</a> (const uint8_t newState[])</td></tr>
 <tr class="memdesc:ae74ff9241303eb4c7f3593f73e781c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRToshibaAC.html#ae74ff9241303eb4c7f3593f73e781c73">More...</a><br /></td></tr>
 <tr class="separator:ae74ff9241303eb4c7f3593f73e781c73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3572a06423851d2c4da5f85133a1a8ff"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a3572a06423851d2c4da5f85133a1a8ff">getRaw</a> (void)</td></tr>
-<tr class="memdesc:a3572a06423851d2c4da5f85133a1a8ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRToshibaAC.html#a3572a06423851d2c4da5f85133a1a8ff">More...</a><br /></td></tr>
+<tr class="memdesc:a3572a06423851d2c4da5f85133a1a8ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol with all integrity checks passing.  <a href="classIRToshibaAC.html#a3572a06423851d2c4da5f85133a1a8ff">More...</a><br /></td></tr>
 <tr class="separator:a3572a06423851d2c4da5f85133a1a8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2d4b9d48e7e6b2f355eb4dea7f8c2d1"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aa2d4b9d48e7e6b2f355eb4dea7f8c2d1">getStateLength</a> (void)</td></tr>
+<tr class="memdesc:aa2d4b9d48e7e6b2f355eb4dea7f8c2d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of the current internal state per the protocol structure.  <a href="classIRToshibaAC.html#aa2d4b9d48e7e6b2f355eb4dea7f8c2d1">More...</a><br /></td></tr>
+<tr class="separator:aa2d4b9d48e7e6b2f355eb4dea7f8c2d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a760fb44333fd0d682ba7fff6ff6a32e7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a760fb44333fd0d682ba7fff6ff6a32e7">getSwing</a> (const bool raw=true)</td></tr>
+<tr class="memdesc:a760fb44333fd0d682ba7fff6ff6a32e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the swing setting of the A/C.  <a href="classIRToshibaAC.html#a760fb44333fd0d682ba7fff6ff6a32e7">More...</a><br /></td></tr>
+<tr class="separator:a760fb44333fd0d682ba7fff6ff6a32e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec1cf1c148197e22a30d578043ce1912"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aec1cf1c148197e22a30d578043ce1912">setSwing</a> (const uint8_t setting)</td></tr>
+<tr class="memdesc:aec1cf1c148197e22a30d578043ce1912"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the swing setting of the A/C.  <a href="classIRToshibaAC.html#aec1cf1c148197e22a30d578043ce1912">More...</a><br /></td></tr>
+<tr class="separator:aec1cf1c148197e22a30d578043ce1912"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cdcb695e128d57c721623cfdc9a8e8d"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a1cdcb695e128d57c721623cfdc9a8e8d">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:a1cdcb695e128d57c721623cfdc9a8e8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRToshibaAC.html#a1cdcb695e128d57c721623cfdc9a8e8d">More...</a><br /></td></tr>
 <tr class="separator:a1cdcb695e128d57c721623cfdc9a8e8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,6 +176,9 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a146624d75ab5f6c23a75fe87918edadd"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a146624d75ab5f6c23a75fe87918edadd">getInternalStateLength</a> (const uint8_t state[], const uint16_t size)</td></tr>
+<tr class="memdesc:a146624d75ab5f6c23a75fe87918edadd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of the supplied Toshiba state per it's protocol structure.  <a href="classIRToshibaAC.html#a146624d75ab5f6c23a75fe87918edadd">More...</a><br /></td></tr>
+<tr class="separator:a146624d75ab5f6c23a75fe87918edadd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc7c1eee14e4de896121ad06e88b61eb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#adc7c1eee14e4de896121ad06e88b61eb">validChecksum</a> (const uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a>)</td></tr>
 <tr class="memdesc:adc7c1eee14e4de896121ad06e88b61eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRToshibaAC.html#adc7c1eee14e4de896121ad06e88b61eb">More...</a><br /></td></tr>
 <tr class="separator:adc7c1eee14e4de896121ad06e88b61eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,6 +194,15 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a5aa2c6fc3b07830f872f98906df7e9ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a5aa2c6fc3b07830f872f98906df7e9ec">checksum</a> (const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a>)</td></tr>
 <tr class="memdesc:a5aa2c6fc3b07830f872f98906df7e9ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate &amp; set the checksum for the current internal state of the remote.  <a href="classIRToshibaAC.html#a5aa2c6fc3b07830f872f98906df7e9ec">More...</a><br /></td></tr>
 <tr class="separator:a5aa2c6fc3b07830f872f98906df7e9ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ee4c6cff9be72455b6133a6280c65c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a9ee4c6cff9be72455b6133a6280c65c4">setStateLength</a> (const uint16_t size)</td></tr>
+<tr class="memdesc:a9ee4c6cff9be72455b6133a6280c65c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal length of the current internal state per the protocol.  <a href="classIRToshibaAC.html#a9ee4c6cff9be72455b6133a6280c65c4">More...</a><br /></td></tr>
+<tr class="separator:a9ee4c6cff9be72455b6133a6280c65c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a108c23cb859a64228166e5385295a1e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a108c23cb859a64228166e5385295a1e5">_backupState</a> (void)</td></tr>
+<tr class="memdesc:a108c23cb859a64228166e5385295a1e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a copy of the internal code-form A/C state.  <a href="classIRToshibaAC.html#a108c23cb859a64228166e5385295a1e5">More...</a><br /></td></tr>
+<tr class="separator:a108c23cb859a64228166e5385295a1e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23fb190770159f8f1e9bf64df22e8a26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a23fb190770159f8f1e9bf64df22e8a26">_restoreState</a> (void)</td></tr>
+<tr class="memdesc:a23fb190770159f8f1e9bf64df22e8a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recover the internal code-form A/C state from the backup.  <a href="classIRToshibaAC.html#a23fb190770159f8f1e9bf64df22e8a26">More...</a><br /></td></tr>
+<tr class="separator:a23fb190770159f8f1e9bf64df22e8a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
@@ -182,11 +215,21 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a694609136a9cbdb9af5f8bb98411c2eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a694609136a9cbdb9af5f8bb98411c2eb">_irsend</a></td></tr>
 <tr class="memdesc:a694609136a9cbdb9af5f8bb98411c2eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRToshibaAC.html#a694609136a9cbdb9af5f8bb98411c2eb">More...</a><br /></td></tr>
 <tr class="separator:a694609136a9cbdb9af5f8bb98411c2eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab228aa6db2255dddf98a46a25cbb0f0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aab228aa6db2255dddf98a46a25cbb0f0">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a>]</td></tr>
-<tr class="memdesc:aab228aa6db2255dddf98a46a25cbb0f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in IR code form.  <a href="classIRToshibaAC.html#aab228aa6db2255dddf98a46a25cbb0f0">More...</a><br /></td></tr>
-<tr class="separator:aab228aa6db2255dddf98a46a25cbb0f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bb8b6cef598bb8273369b3fa7ade1b0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a5bb8b6cef598bb8273369b3fa7ade1b0">mode_state</a></td></tr>
-<tr class="separator:a5bb8b6cef598bb8273369b3fa7ade1b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6c99091be13e159d88a07a9222c9a7c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#ab6c99091be13e159d88a07a9222c9a7c">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a>]</td></tr>
+<tr class="memdesc:ab6c99091be13e159d88a07a9222c9a7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in code form.  <a href="classIRToshibaAC.html#ab6c99091be13e159d88a07a9222c9a7c">More...</a><br /></td></tr>
+<tr class="separator:ab6c99091be13e159d88a07a9222c9a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc8d8c6918cd110f524f6bedf6f2bb6e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#adc8d8c6918cd110f524f6bedf6f2bb6e">backup</a> [<a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a>]</td></tr>
+<tr class="memdesc:adc8d8c6918cd110f524f6bedf6f2bb6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A backup copy of the state.  <a href="classIRToshibaAC.html#adc8d8c6918cd110f524f6bedf6f2bb6e">More...</a><br /></td></tr>
+<tr class="separator:adc8d8c6918cd110f524f6bedf6f2bb6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac251884741fb8ad8280b55e99c23211e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#ac251884741fb8ad8280b55e99c23211e">prev_mode</a></td></tr>
+<tr class="memdesc:ac251884741fb8ad8280b55e99c23211e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store of the previously set mode.  <a href="classIRToshibaAC.html#ac251884741fb8ad8280b55e99c23211e">More...</a><br /></td></tr>
+<tr class="separator:ac251884741fb8ad8280b55e99c23211e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c0873667deefce7b13a051910d13046"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a3c0873667deefce7b13a051910d13046">_send_swing</a></td></tr>
+<tr class="memdesc:a3c0873667deefce7b13a051910d13046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag indicating if we need to send a swing message.  <a href="classIRToshibaAC.html#a3c0873667deefce7b13a051910d13046">More...</a><br /></td></tr>
+<tr class="separator:a3c0873667deefce7b13a051910d13046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d782a316cbadf2128a1392feda5c21b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a3d782a316cbadf2128a1392feda5c21b">_swing_mode</a></td></tr>
+<tr class="memdesc:a3d782a316cbadf2128a1392feda5c21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The saved swing state/mode/command.  <a href="classIRToshibaAC.html#a3d782a316cbadf2128a1392feda5c21b">More...</a><br /></td></tr>
+<tr class="separator:a3d782a316cbadf2128a1392feda5c21b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Toshiba A/C messages. </p>
@@ -244,6 +287,62 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a108c23cb859a64228166e5385295a1e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a108c23cb859a64228166e5385295a1e5">&#9670;&nbsp;</a></span>_backupState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::_backupState </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Make a copy of the internal code-form A/C state. </p>
+
+</div>
+</div>
+<a id="a23fb190770159f8f1e9bf64df22e8a26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23fb190770159f8f1e9bf64df22e8a26">&#9670;&nbsp;</a></span>_restoreState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::_restoreState </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Recover the internal code-form A/C state from the backup. </p>
+
+</div>
+</div>
 <a id="a41e847f399e42c91b0f4aa2ef5d36cba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a41e847f399e42c91b0f4aa2ef5d36cba">&#9670;&nbsp;</a></span>begin()</h2>
 
@@ -428,6 +527,27 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a3b46e64e8f0b0f74a37803ab93c91e10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b46e64e8f0b0f74a37803ab93c91e10">&#9670;&nbsp;</a></span>getEcono()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRToshibaAC::getEcono </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Economy mode setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the current setting is on. Otherwise, false. </dd></dl>
+
+</div>
+</div>
 <a id="afd2000b62b79afde107ebc8a513724ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afd2000b62b79afde107ebc8a513724ab">&#9670;&nbsp;</a></span>getFan()</h2>
 
@@ -449,8 +569,54 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aba5db1f6c8665443f26875ee9716302f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba5db1f6c8665443f26875ee9716302f">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a146624d75ab5f6c23a75fe87918edadd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a146624d75ab5f6c23a75fe87918edadd">&#9670;&nbsp;</a></span>getInternalStateLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t IRToshibaAC::getInternalStateLength </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>state</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the length of the supplied Toshiba state per it's protocol structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The array to get the built-in length from. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The physical size of the state array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Nr. of bytes in use for the provided state message. </dd></dl>
+
+</div>
+</div>
+<a id="a33b283fdae6824d181ff91becf6816b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33b283fdae6824d181ff91becf6816b0">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -459,7 +625,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint8_t IRToshibaAC::getMode </td>
           <td>(</td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>useRaw</em> = <code>false</code></td><td>)</td>
+          <td class="paramname"><em>raw</em> = <code>false</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -468,7 +634,7 @@ Private Attributes</h2></td></tr>
 <p>Get the operating mode setting of the A/C. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">useRaw</td><td>Indicate to get the mode from the internal state array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Get the value without any intelligent processing. </td></tr>
   </table>
   </dd>
 </dl>
@@ -513,8 +679,56 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get a PTR to the internal state/code for this protocol. </p>
+<p>Get a PTR to the internal state/code for this protocol with all integrity checks passing. </p>
 <dl class="section return"><dt>Returns</dt><dd>PTR to a code for this protocol based on the current internal state. </dd></dl>
+
+</div>
+</div>
+<a id="aa2d4b9d48e7e6b2f355eb4dea7f8c2d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2d4b9d48e7e6b2f355eb4dea7f8c2d1">&#9670;&nbsp;</a></span>getStateLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t IRToshibaAC::getStateLength </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the length of the current internal state per the protocol structure. </p>
+<dl class="section return"><dt>Returns</dt><dd>Nr. of bytes in use for the current internal state message. </dd></dl>
+
+</div>
+</div>
+<a id="a760fb44333fd0d682ba7fff6ff6a32e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a760fb44333fd0d682ba7fff6ff6a32e7">&#9670;&nbsp;</a></span>getSwing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRToshibaAC::getSwing </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>raw</em> = <code>true</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the swing setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>Calculate the answer from just the state data. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The current swing mode setting. </dd></dl>
 
 </div>
 </div>
@@ -536,6 +750,27 @@ Private Attributes</h2></td></tr>
 
 <p>Get the current temperature setting. </p>
 <dl class="section return"><dt>Returns</dt><dd>The current setting for temp. in degrees celsius. </dd></dl>
+
+</div>
+</div>
+<a id="adb6543a6a719eec73add60bf9e452a9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb6543a6a719eec73add60bf9e452a9d">&#9670;&nbsp;</a></span>getTurbo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRToshibaAC::getTurbo </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Turbo (Powerful) setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the current setting is on. Otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -595,10 +830,36 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Send the current internal state as an IR message. </p>
+<p>Send the current internal state as IR messages. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a780040755a8061107f655e060f2da206"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a780040755a8061107f655e060f2da206">&#9670;&nbsp;</a></span>setEcono()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::setEcono </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Economy mode setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. Note: Economy mode is mutually exclusive with Turbo mode. </td></tr>
   </table>
   </dd>
 </dl>
@@ -655,6 +916,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If we get an unexpected mode, default to AUTO. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-654446771">https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-654446771</a> </dd></dl>
 
 </div>
 </div>
@@ -710,6 +972,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a9ee4c6cff9be72455b6133a6280c65c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ee4c6cff9be72455b6133a6280c65c4">&#9670;&nbsp;</a></span>setStateLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::setStateLength </td>
+          <td>(</td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the internal length of the current internal state per the protocol. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>Nr. of bytes in use for the current internal state message. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aec1cf1c148197e22a30d578043ce1912"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec1cf1c148197e22a30d578043ce1912">&#9670;&nbsp;</a></span>setSwing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::setSwing </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>setting</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the swing setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">setting</td><td>The value of the desired setting. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a923fad1f637e1851a77a063978994604"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a923fad1f637e1851a77a063978994604">&#9670;&nbsp;</a></span>setTemp()</h2>
 
@@ -730,6 +1052,32 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature in degrees celsius. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5d1d6b00a9b99bf29496fbd6af5cce31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d1d6b00a9b99bf29496fbd6af5cce31">&#9670;&nbsp;</a></span>setTurbo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::setTurbo </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Turbo (Powerful) setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. Note: Turbo mode is mutually exclusive with Economy mode. </td></tr>
   </table>
   </dd>
 </dl>
@@ -940,8 +1288,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5bb8b6cef598bb8273369b3fa7ade1b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5bb8b6cef598bb8273369b3fa7ade1b0">&#9670;&nbsp;</a></span>mode_state</h2>
+<a id="a3c0873667deefce7b13a051910d13046"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c0873667deefce7b13a051910d13046">&#9670;&nbsp;</a></span>_send_swing</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -950,7 +1298,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t IRToshibaAC::mode_state</td>
+          <td class="memname">bool IRToshibaAC::_send_swing</td>
         </tr>
       </table>
   </td>
@@ -960,10 +1308,12 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Flag indicating if we need to send a swing message. </p>
+
 </div>
 </div>
-<a id="aab228aa6db2255dddf98a46a25cbb0f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab228aa6db2255dddf98a46a25cbb0f0">&#9670;&nbsp;</a></span>remote_state</h2>
+<a id="a3d782a316cbadf2128a1392feda5c21b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d782a316cbadf2128a1392feda5c21b">&#9670;&nbsp;</a></span>_swing_mode</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -972,7 +1322,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t IRToshibaAC::remote_state[<a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a>]</td>
+          <td class="memname">uint8_t IRToshibaAC::_swing_mode</td>
         </tr>
       </table>
   </td>
@@ -982,7 +1332,79 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>The state in IR code form. </p>
+<p>The saved swing state/mode/command. </p>
+
+</div>
+</div>
+<a id="adc8d8c6918cd110f524f6bedf6f2bb6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc8d8c6918cd110f524f6bedf6f2bb6e">&#9670;&nbsp;</a></span>backup</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRToshibaAC::backup[<a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A backup copy of the state. </p>
+
+</div>
+</div>
+<a id="ac251884741fb8ad8280b55e99c23211e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac251884741fb8ad8280b55e99c23211e">&#9670;&nbsp;</a></span>prev_mode</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRToshibaAC::prev_mode</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Store of the previously set mode. </p>
+
+</div>
+</div>
+<a id="ab6c99091be13e159d88a07a9222c9a7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6c99091be13e159d88a07a9222c9a7c">&#9670;&nbsp;</a></span>remote_state</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRToshibaAC::remote_state[<a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The state in code form. </p>
 
 </div>
 </div>

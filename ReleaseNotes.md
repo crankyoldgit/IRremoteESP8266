@@ -1,5 +1,24 @@
 # Release Notes
 
+## _v2.7.9 (20200730)_
+
+**[Bug Fixes]**
+- Fix mistake in `IRLGAc::convertFan()`. (#1214 #1215)
+
+**[Features]**
+- Add Sanyo A/C (72 bit) protocol with detailed support. (#1211 #1218)
+- Added modification to Midea unit to support Danby DAC AC units.  (#1213)
+- ToshibaAc: Rework to support Carrier models and add more settings. (#1205 #1212)
+- Add detailed support for Airwell A/C protocol. (#1202 #1204)
+
+**[Misc]**
+- Pioneer: Update timings based on user collected data. (#1220 #1222)
+- Samsung36: Adjust timings & update unit tests. (#1220 #1221)
+- Consolidate common code: Inverted byte pairs (#1219)
+- Remove duplicate code from `IRToshibaAC::calcChecksum()` (#1207)
+- Update missing/incorrect doxygen comments (#1203)
+
+
 ## _v2.7.8 (20200622)_
 
 **[BREAKING CHANGES]**
