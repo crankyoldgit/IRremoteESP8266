@@ -196,7 +196,8 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada59b5ac5c1d354e50932dc0208d9b0b43">MIDEA24</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1622e3d0835b4d47add716811c7bf797">ZEPEAL</a>, 
-<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = ZEPEAL
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaf85e76d33b94649a2ecc957acd214209">SANYO_AC</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = SANYO_AC
 <br />
  }</td></tr>
 <tr class="memdesc:ad5b287a488a8c1b7b8661f029ab56fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerator for defining and numbering of supported IR protocol.  <a href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">More...</a><br /></td></tr>
@@ -526,6 +527,10 @@ Variables</h2></td></tr>
 <tr class="separator:a296e700965e70a622fe99675ff0438af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a973f4e0189fc10805f67b67f708be1e4"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a973f4e0189fc10805f67b67f708be1e4">kSamsungAcDefaultRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></td></tr>
 <tr class="separator:a973f4e0189fc10805f67b67f708be1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3128c987a1571fb6b021ffe30079663"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ae3128c987a1571fb6b021ffe30079663">kSanyoAcStateLength</a> = 9</td></tr>
+<tr class="separator:ae3128c987a1571fb6b021ffe30079663"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3931645167deda3fd0ec72ba33a4034"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ad3931645167deda3fd0ec72ba33a4034">kSanyoAcBits</a> = <a class="el" href="IRremoteESP8266_8h.html#ae3128c987a1571fb6b021ffe30079663">kSanyoAcStateLength</a> * 8</td></tr>
+<tr class="separator:ad3931645167deda3fd0ec72ba33a4034"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c572c8bfa811b7dc3a8a537cc642b85"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a2c572c8bfa811b7dc3a8a537cc642b85">kSanyoSA8650BBits</a> = 12</td></tr>
 <tr class="separator:a2c572c8bfa811b7dc3a8a537cc642b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e15e988acbea0fb4dfaee6f5bfa12d0"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a> = 13</td></tr>
@@ -580,6 +585,14 @@ Variables</h2></td></tr>
 <tr class="separator:a172dde7867fa9a68902c3ad7ea9629b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fca6a7c3cd608ff49cab35f24af0546"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a8fca6a7c3cd608ff49cab35f24af0546">kToshibaACMinRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td></tr>
 <tr class="separator:a8fca6a7c3cd608ff49cab35f24af0546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fa111fa9d560834605eff2941c0cacc"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a5fa111fa9d560834605eff2941c0cacc">kToshibaACStateLengthShort</a> = <a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a> - 2</td></tr>
+<tr class="separator:a5fa111fa9d560834605eff2941c0cacc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7483cfe84003b0e24bfa846c240afc4c"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a7483cfe84003b0e24bfa846c240afc4c">kToshibaACBitsShort</a> = <a class="el" href="IRremoteESP8266_8h.html#a5fa111fa9d560834605eff2941c0cacc">kToshibaACStateLengthShort</a> * 8</td></tr>
+<tr class="separator:a7483cfe84003b0e24bfa846c240afc4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c0ebc01f8a61422c26b84e78fcec8f7"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a> = <a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a> + 1</td></tr>
+<tr class="separator:a3c0ebc01f8a61422c26b84e78fcec8f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf9e746cb8ee9e246f435ba4416a5428"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aaf9e746cb8ee9e246f435ba4416a5428">kToshibaACBitsLong</a> = <a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a> * 8</td></tr>
+<tr class="separator:aaf9e746cb8ee9e246f435ba4416a5428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1d2aa52fef81f03b92c35f4970728d2"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ae1d2aa52fef81f03b92c35f4970728d2">kTrotecStateLength</a> = 9</td></tr>
 <tr class="separator:ae1d2aa52fef81f03b92c35f4970728d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab819cb0a34937714dcb10059799c26e2"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ab819cb0a34937714dcb10059799c26e2">kTrotecBits</a> = <a class="el" href="IRremoteESP8266_8h.html#ae1d2aa52fef81f03b92c35f4970728d2">kTrotecStateLength</a> * 8</td></tr>
@@ -722,6 +735,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadaf61f2c360f487309cfa466a44fcae106"></a>CORONA_AC&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada59b5ac5c1d354e50932dc0208d9b0b43"></a>MIDEA24&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada1622e3d0835b4d47add716811c7bf797"></a>ZEPEAL&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadaf85e76d33b94649a2ecc957acd214209"></a>SANYO_AC&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59"></a>kLastDecodeType&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -2968,6 +2982,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ad3931645167deda3fd0ec72ba33a4034"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3931645167deda3fd0ec72ba33a4034">&#9670;&nbsp;</a></span>kSanyoAcBits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kSanyoAcBits = <a class="el" href="IRremoteESP8266_8h.html#ae3128c987a1571fb6b021ffe30079663">kSanyoAcStateLength</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3128c987a1571fb6b021ffe30079663"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3128c987a1571fb6b021ffe30079663">&#9670;&nbsp;</a></span>kSanyoAcStateLength</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kSanyoAcStateLength = 9</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a7e15e988acbea0fb4dfaee6f5bfa12d0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7e15e988acbea0fb4dfaee6f5bfa12d0">&#9670;&nbsp;</a></span>kSanyoLC7461AddressBits</h2>
 
@@ -3334,6 +3376,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aaf9e746cb8ee9e246f435ba4416a5428"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf9e746cb8ee9e246f435ba4416a5428">&#9670;&nbsp;</a></span>kToshibaACBitsLong</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kToshibaACBitsLong = <a class="el" href="IRremoteESP8266_8h.html#a3c0ebc01f8a61422c26b84e78fcec8f7">kToshibaACStateLengthLong</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7483cfe84003b0e24bfa846c240afc4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7483cfe84003b0e24bfa846c240afc4c">&#9670;&nbsp;</a></span>kToshibaACBitsShort</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kToshibaACBitsShort = <a class="el" href="IRremoteESP8266_8h.html#a5fa111fa9d560834605eff2941c0cacc">kToshibaACStateLengthShort</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a8fca6a7c3cd608ff49cab35f24af0546"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8fca6a7c3cd608ff49cab35f24af0546">&#9670;&nbsp;</a></span>kToshibaACMinRepeat</h2>
 
@@ -3356,6 +3426,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kToshibaACStateLength = 9</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3c0ebc01f8a61422c26b84e78fcec8f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c0ebc01f8a61422c26b84e78fcec8f7">&#9670;&nbsp;</a></span>kToshibaACStateLengthLong</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kToshibaACStateLengthLong = <a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a> + 1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5fa111fa9d560834605eff2941c0cacc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fa111fa9d560834605eff2941c0cacc">&#9670;&nbsp;</a></span>kToshibaACStateLengthShort</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kToshibaACStateLengthShort = <a class="el" href="IRremoteESP8266_8h.html#ad3be6a1b9241c20bb1464a2cb80b97d2">kToshibaACStateLength</a> - 2</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -3503,8 +3601,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:976</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:975</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:986</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:985</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
