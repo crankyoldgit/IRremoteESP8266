@@ -33,9 +33,11 @@
 
 #include <ir_Coolix.h>  //  replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
 
-// Uncomment one of the following to manually override what type of persistent storage is used.
-// Warning: Changing filesystems will cause all previous locally saved configuration data to be lost.
-// #define FILESYSTEM (SPIFFS)
+// Uncomment one of the following to manually override what
+//    type of persistent storage is used.
+// Warning: Changing filesystems will cause all previous locally
+//    saved configuration data to be lost.
+// #define FILESYSTEM SPIFFS
 // #define FILESYSTEM LittleFS
 
 #ifndef FILESYSTEM

@@ -385,8 +385,10 @@ using irutils::msToString;
 
 // Globals
 
-// Uncomment one of the following to manually override what type of persistent storage is used.
-// Warning: Changing filesystems will cause all previous locally saved configuration data to be lost.
+// Uncomment one of the following to manually override what
+//    type of persistent storage is used.
+// Warning: Changing filesystems will cause all previous locally
+//    saved configuration data to be lost.
 // #define FILESYSTEM SPIFFS
 // #define FILESYSTEM LittleFS
 #ifndef FILESYSTEM
@@ -540,7 +542,8 @@ bool mountSpiffs(void) {
   debug("Mounting FILESYSTEM...");
   if (FILESYSTEM.begin()) return true;  // We mounted it okay.
   // We failed the first time.
-  debug("Failed to mount FILESYSTEM!\nFormatting FILESYSTEM and trying again...");
+  debug("Failed to mount FILESYSTEM!\n"
+        "Formatting FILESYSTEM and trying again...");
   FILESYSTEM.format();
   if (!FILESYSTEM.begin()) {  // Did we fail?
     debug("DANGER: Failed to mount FILESYSTEM even after formatting!");
