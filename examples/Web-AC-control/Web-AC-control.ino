@@ -100,7 +100,8 @@ bool handleFileRead(String path) {
   String pathWithGz = path + ".gz";
   if (FILESYSTEM.exists(pathWithGz) || FILESYSTEM.exists(path)) {
     // If the file exists, either as a compressed archive, or normal
-    if (FILESYSTEM.exists(pathWithGz))  // If there's a compressed version available
+    // If there's a compressed version available
+    if (FILESYSTEM.exists(pathWithGz))
       path += ".gz";  // Use the compressed verion
     File file = FILESYSTEM.open(path, "r");
     //  Open the file
