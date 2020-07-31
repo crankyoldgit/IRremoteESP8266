@@ -38,7 +38,7 @@
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
- *   o Use the smallest non-zero SPIFFS size you can for your board.
+ *   o Use the smallest non-zero FILESYSTEM size you can for your board.
  *     (See the Tools -> Flash Size menu)
  *
  * - PlatformIO IDE:
@@ -336,7 +336,7 @@
 #if defined(ESP8266)
 #include <LittleFS.h>
 #else
-#include <FS.h>
+#include <SPIFFS.h>
 #endif
 #include <ArduinoJson.h>
 #if defined(ESP8266)
@@ -348,7 +348,6 @@
 #include <ESPmDNS.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#include <SPIFFS.h>
 #include <Update.h>
 #endif  // ESP32
 #include <WiFiClient.h>
@@ -385,6 +384,20 @@ using irutils::msToString;
 #endif  // REPORT_VCC
 
 // Globals
+
+// Uncomment one of the following to manually override what type of persistent storage is used.
+// Warning: Changing filesystems will cause all previous locally saved configuration data to be lost.
+// #define FILESYSTEM SPIFFS
+// #define FILESYSTEM LittleFS
+#ifndef FILESYSTEM
+// Set the default filesystem if none was specified.
+#if defined(ESP8266)
+#define FILESYSTEM LittleFS
+#else
+#define FILESYSTEM SPIFFS
+#endif  // defined(ESP8266)
+#endif  // FILESYSTEM
+
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
 #endif  // ESP8266
@@ -519,26 +532,18 @@ void saveWifiConfigCallback(void) {
   flagSaveWifiConfig = true;
 }
 
-// Forcibly mount the SPIFFS. Formatting the SPIFFS if needed.
+// Forcibly mount the FILESYSTEM. Formatting the FILESYSTEM if needed.
 //
 // Returns:
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
-  debug("Mounting SPIFFS...");
-#if defined(ESP8266)
-  if (LittleFS.begin()) return true;  // We mounted it okay.
-#else
-  if (SPIFFS.begin()) return true;
-#endif
+  debug("Mounting FILESYSTEM...");
+  if (FILESYSTEM.begin()) return true;  // We mounted it okay.
   // We failed the first time.
-  debug("Failed to mount SPIFFS!\nFormatting SPIFFS and trying again...");
-  SPIFFS.format();
-#if defined(ESP8266)
-  if (!LittleFS.begin()) {  // Did we fail?
-#else
-  if (!SPIFFS.begin()) {  // Did we fail?
-#endif
-    debug("DANGER: Failed to mount SPIFFS even after formatting!");
+  debug("Failed to mount FILESYSTEM!\nFormatting FILESYSTEM and trying again...");
+  FILESYSTEM.format();
+  if (!FILESYSTEM.begin()) {  // Did we fail?
+    debug("DANGER: Failed to mount FILESYSTEM even after formatting!");
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
   }
@@ -568,11 +573,7 @@ bool saveConfig(void) {
   }
 
   if (mountSpiffs()) {
-#if defined(ESP8266)
-    File configFile = LittleFS.open(kConfigFile, "w");
-#else
-    File configFile = SPIFFS.open(kConfigFile, "w");
-#endif
+    File configFile = FILESYSTEM.open(kConfigFile, "w");
     if (!configFile) {
       debug("Failed to open config file for writing.");
     } else {
@@ -582,7 +583,7 @@ bool saveConfig(void) {
       debug("Finished writing config file.");
       success = true;
     }
-    SPIFFS.end();
+    FILESYSTEM.end();
   }
   return success;
 }
@@ -591,13 +592,9 @@ bool loadConfigFile(void) {
   bool success = false;
   if (mountSpiffs()) {
     debug("mounted the file system");
-    if (SPIFFS.exists(kConfigFile)) {
+    if (FILESYSTEM.exists(kConfigFile)) {
       debug("config file exists");
-#if defined(ESP8266)
-      File configFile = LittleFS.open(kConfigFile, "r");
-#else
-      File configFile = SPIFFS.open(kConfigFile, "r");
-#endif
+      File configFile = FILESYSTEM.open(kConfigFile, "r");
       if (configFile) {
         debug("Opened config file");
         size_t size = configFile.size();
@@ -638,8 +635,8 @@ bool loadConfigFile(void) {
     } else {
       debug("Config file doesn't exist!");
     }
-    debug("Unmounting SPIFFS.");
-    SPIFFS.end();
+    debug("Unmounting FILESYSTEM.");
+    FILESYSTEM.end();
   }
   return success;
 }
@@ -1473,8 +1470,8 @@ void handleReset(void) {
 #endif  // MQTT_ENABLE
   if (mountSpiffs()) {
     debug("Removing JSON config file");
-    SPIFFS.remove(kConfigFile);
-    SPIFFS.end();
+    FILESYSTEM.remove(kConfigFile);
+    FILESYSTEM.end();
   }
   delay(1000);
   debug("Reseting wifiManager's settings.");
