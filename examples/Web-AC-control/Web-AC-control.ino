@@ -9,7 +9,7 @@
 #if defined(ESP8266)
 #include <LittleFS.h>
 #else
-#include <FS.h>
+#include <SPIFFS.h>
 #endif
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -21,7 +21,6 @@
 #include <ESPmDNS.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#include <SPIFFS.h>
 #include <Update.h>
 #endif  // ESP32
 #include <WiFiUdp.h>
@@ -33,6 +32,22 @@
 //// ###### User configuration space for AC library classes ##########
 
 #include <ir_Coolix.h>  //  replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
+
+// Uncomment one of the following to manually override what
+//    type of persistent storage is used.
+// Warning: Changing filesystems will cause all previous locally
+//    saved configuration data to be lost.
+// #define FILESYSTEM SPIFFS
+// #define FILESYSTEM LittleFS
+
+#ifndef FILESYSTEM
+// Set the default filesystem if none was specified.
+#if defined(ESP8266)
+#define FILESYSTEM LittleFS
+#else
+#define FILESYSTEM SPIFFS
+#endif
+#endif  // FILESYSTEM
 
 #define AUTO_MODE kCoolixAuto
 #define COOL_MODE kCoolixCool
@@ -83,15 +98,12 @@ bool handleFileRead(String path) {
   String contentType = getContentType(path);
   // Get the MIME type
   String pathWithGz = path + ".gz";
-  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
+  if (FILESYSTEM.exists(pathWithGz) || FILESYSTEM.exists(path)) {
     // If the file exists, either as a compressed archive, or normal
-    if (SPIFFS.exists(pathWithGz))  // If there's a compressed version available
+    // If there's a compressed version available
+    if (FILESYSTEM.exists(pathWithGz))
       path += ".gz";  // Use the compressed verion
-#if defined(ESP8266)
-    File file = LittleFS.open(path, "r");
-#else
-    File file = SPIFFS.open(path, "r");
-#endif
+    File file = FILESYSTEM.open(path, "r");
     //  Open the file
     server.streamFile(file, contentType);
     //  Send it to the client
@@ -115,11 +127,12 @@ String getContentType(String filename) {
   return "text/plain";
 }
 
-void handleFileUpload() {  // upload a new file to the SPIFFS
+void handleFileUpload() {  // upload a new file to the FILESYSTEM
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     if (!filename.startsWith("/")) filename = "/" + filename;
+<<<<<<< HEAD
     Serial.print("handleFileUpload Name: "); //Serial.println(filename);
 #if defined(ESP8266)
     fsUploadFile = LittleFS.open(filename, "w");
@@ -127,6 +140,11 @@ void handleFileUpload() {  // upload a new file to the SPIFFS
     fsUploadFile = SPIFFS.open(filename, "w");
 #endif
     // Open the file for writing in SPIFFS (create if it doesn't exist)
+=======
+    // Serial.print("handleFileUpload Name: "); //Serial.println(filename);
+    fsUploadFile = FILESYSTEM.open(filename, "w");
+    // Open the file for writing in FILESYSTEM (create if it doesn't exist)
+>>>>>>> 40da90731a3e2002a17d760afb73acff96ef88a0
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (fsUploadFile)
@@ -174,8 +192,13 @@ void setup() {
 
   Serial.println("mounting FS...");
 
+<<<<<<< HEAD
   if (!SPIFFS.begin()) {
     Serial.println("Failed to mount file system");
+=======
+  if (!FILESYSTEM.begin()) {
+    // Serial.println("Failed to mount file system");
+>>>>>>> 40da90731a3e2002a17d760afb73acff96ef88a0
     return;
   }
 
@@ -299,7 +322,7 @@ void setup() {
     ESP.restart();
   });
 
-  server.serveStatic("/", SPIFFS, "/", "max-age=86400");
+  server.serveStatic("/", FILESYSTEM, "/", "max-age=86400");
 
   server.onNotFound(handleNotFound);
 
