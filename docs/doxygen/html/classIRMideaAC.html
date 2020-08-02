@@ -160,6 +160,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7fce182bff4f5bc2c6679b20f344837b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50b260d69bc0df8851bfccb003971dfe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#a50b260d69bc0df8851bfccb003971dfe">getSwingVToggle</a> (void)</td></tr>
 <tr class="separator:a50b260d69bc0df8851bfccb003971dfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4785a691a6801b7d4b2c837e2055197"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#af4785a691a6801b7d4b2c837e2055197">isEconoToggle</a> (void)</td></tr>
+<tr class="memdesc:af4785a691a6801b7d4b2c837e2055197"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current state an Econo (energy saver) toggle message?  <a href="classIRMideaAC.html#af4785a691a6801b7d4b2c837e2055197">More...</a><br /></td></tr>
+<tr class="separator:af4785a691a6801b7d4b2c837e2055197"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef83db5c3d13273541039d9e03e3230e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#aef83db5c3d13273541039d9e03e3230e">setEconoToggle</a> (const bool <a class="el" href="classIRMideaAC.html#af8dde03cb641a5af4f2ef0dcf70f1ca0">on</a>)</td></tr>
+<tr class="memdesc:aef83db5c3d13273541039d9e03e3230e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the A/C to toggle the Econo (energy saver) mode for the next send.  <a href="classIRMideaAC.html#aef83db5c3d13273541039d9e03e3230e">More...</a><br /></td></tr>
+<tr class="separator:aef83db5c3d13273541039d9e03e3230e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69839c88534920e667e56750c83f926f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#a69839c88534920e667e56750c83f926f">getEconoToggle</a> (void)</td></tr>
+<tr class="separator:a69839c88534920e667e56750c83f926f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ca16c8bc2232be467baba8ea69b40d4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#a0ca16c8bc2232be467baba8ea69b40d4">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:a0ca16c8bc2232be467baba8ea69b40d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRMideaAC.html#a0ca16c8bc2232be467baba8ea69b40d4">More...</a><br /></td></tr>
 <tr class="separator:a0ca16c8bc2232be467baba8ea69b40d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,6 +215,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a8f122367cc407e7bb658fe7f3132effb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb4318940487aea09116fe6b9f061470"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#adb4318940487aea09116fe6b9f061470">_SwingVToggle</a></td></tr>
 <tr class="separator:adb4318940487aea09116fe6b9f061470"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30f184751948b4412da46577578b625a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMideaAC.html#a30f184751948b4412da46577578b625a">_EconoToggle</a></td></tr>
+<tr class="separator:a30f184751948b4412da46577578b625a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Midea A/C messages. </p>
@@ -432,6 +442,25 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a69839c88534920e667e56750c83f926f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69839c88534920e667e56750c83f926f">&#9670;&nbsp;</a></span>getEconoToggle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRMideaAC::getEconoToggle </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
+</div>
+</div>
 <a id="ab793e409c666e001242623a2607786e7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab793e409c666e001242623a2607786e7">&#9670;&nbsp;</a></span>getFan()</h2>
 
@@ -552,6 +581,7 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="section note"><dt>Note</dt><dd>On Danby A/C units, this is associated with the Ion Filter instead. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
@@ -604,6 +634,27 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="af4785a691a6801b7d4b2c837e2055197"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4785a691a6801b7d4b2c837e2055197">&#9670;&nbsp;</a></span>isEconoToggle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRMideaAC::isEconoToggle </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is the current state an Econo (energy saver) toggle message? </p>
+<dl class="section return"><dt>Returns</dt><dd>true, it is. false, it isn't. </dd></dl>
+
+</div>
+</div>
 <a id="a848076f02a38a32c691a4617586862cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a848076f02a38a32c691a4617586862cc">&#9670;&nbsp;</a></span>isSwingVToggle()</h2>
 
@@ -621,6 +672,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Is the current state a vertical swing toggle message? </p>
+<dl class="section note"><dt>Note</dt><dd>On Danby A/C units, this is associated with the Ion Filter instead. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>true, it is. false, it isn't. </dd></dl>
 
 </div>
@@ -685,6 +737,32 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aef83db5c3d13273541039d9e03e3230e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef83db5c3d13273541039d9e03e3230e">&#9670;&nbsp;</a></span>setEconoToggle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRMideaAC::setEconoToggle </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the A/C to toggle the Econo (energy saver) mode for the next send. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
   </table>
   </dd>
 </dl>
@@ -838,6 +916,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the A/C to toggle the vertical swing toggle for the next send. </p>
+<dl class="section note"><dt>Note</dt><dd>On Danby A/C units, this is associated with the Ion Filter instead. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
@@ -1084,6 +1163,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a30f184751948b4412da46577578b625a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30f184751948b4412da46577578b625a">&#9670;&nbsp;</a></span>_EconoToggle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRMideaAC::_EconoToggle</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ae2b6068355ecdc360c4c2ca2fd8d921b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae2b6068355ecdc360c4c2ca2fd8d921b">&#9670;&nbsp;</a></span>_irsend</h2>
 
