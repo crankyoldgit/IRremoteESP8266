@@ -38,7 +38,7 @@
  *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
  *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
  *     #define MQTT_MAX_PACKET_SIZE 768
- *   o Use the smallest non-zero FILESYSTEM size you can for your board.
+ *   o Use the smallest non-zero FILE_SYSTEM size you can for your board.
  *     (See the Tools -> Flash Size menu)
  *
  * - PlatformIO IDE:
@@ -333,11 +333,7 @@
 
 #include "IRMQTTServer.h"
 #include <Arduino.h>
-#if defined(ESP8266)
-#include <LittleFS.h>
-#else
-#include <SPIFFS.h>
-#endif
+
 #include <ArduinoJson.h>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -385,20 +381,7 @@ using irutils::msToString;
 
 // Globals
 
-// Uncomment one of the following to manually override what
-//    type of persistent storage is used.
-// Warning: Changing filesystems will cause all previous locally
-//    saved configuration data to be lost.
-// #define FILESYSTEM SPIFFS
-// #define FILESYSTEM LittleFS
-#ifndef FILESYSTEM
-// Set the default filesystem if none was specified.
-#if defined(ESP8266)
-#define FILESYSTEM LittleFS
-#else
-#define FILESYSTEM SPIFFS
-#endif  // defined(ESP8266)
-#endif  // FILESYSTEM
+
 
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
@@ -534,19 +517,19 @@ void saveWifiConfigCallback(void) {
   flagSaveWifiConfig = true;
 }
 
-// Forcibly mount the FILESYSTEM. Formatting the FILESYSTEM if needed.
+// Forcibly mount the FILE_SYSTEM. Formatting the FILE_SYSTEM if needed.
 //
 // Returns:
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
-  debug("Mounting FILESYSTEM...");
-  if (FILESYSTEM.begin()) return true;  // We mounted it okay.
+  debug("Mounting FILE_SYSTEM...");
+  if (FILE_SYSTEM.begin()) return true;  // We mounted it okay.
   // We failed the first time.
-  debug("Failed to mount FILESYSTEM!\n"
-        "Formatting FILESYSTEM and trying again...");
-  FILESYSTEM.format();
-  if (!FILESYSTEM.begin()) {  // Did we fail?
-    debug("DANGER: Failed to mount FILESYSTEM even after formatting!");
+  debug("Failed to mount FILE_SYSTEM!\n"
+        "Formatting FILE_SYSTEM and trying again...");
+  FILE_SYSTEM.format();
+  if (!FILE_SYSTEM.begin()) {  // Did we fail?
+    debug("DANGER: Failed to mount FILE_SYSTEM even after formatting!");
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
   }
@@ -576,7 +559,7 @@ bool saveConfig(void) {
   }
 
   if (mountSpiffs()) {
-    File configFile = FILESYSTEM.open(kConfigFile, "w");
+    File configFile = FILE_SYSTEM.open(kConfigFile, "w");
     if (!configFile) {
       debug("Failed to open config file for writing.");
     } else {
@@ -586,7 +569,7 @@ bool saveConfig(void) {
       debug("Finished writing config file.");
       success = true;
     }
-    FILESYSTEM.end();
+    FILE_SYSTEM.end();
   }
   return success;
 }
@@ -595,9 +578,9 @@ bool loadConfigFile(void) {
   bool success = false;
   if (mountSpiffs()) {
     debug("mounted the file system");
-    if (FILESYSTEM.exists(kConfigFile)) {
+    if (FILE_SYSTEM.exists(kConfigFile)) {
       debug("config file exists");
-      File configFile = FILESYSTEM.open(kConfigFile, "r");
+      File configFile = FILE_SYSTEM.open(kConfigFile, "r");
       if (configFile) {
         debug("Opened config file");
         size_t size = configFile.size();
@@ -638,8 +621,8 @@ bool loadConfigFile(void) {
     } else {
       debug("Config file doesn't exist!");
     }
-    debug("Unmounting FILESYSTEM.");
-    FILESYSTEM.end();
+    debug("Unmounting FILE_SYSTEM.");
+    FILE_SYSTEM.end();
   }
   return success;
 }
@@ -1473,8 +1456,8 @@ void handleReset(void) {
 #endif  // MQTT_ENABLE
   if (mountSpiffs()) {
     debug("Removing JSON config file");
-    FILESYSTEM.remove(kConfigFile);
-    FILESYSTEM.end();
+    FILE_SYSTEM.remove(kConfigFile);
+    FILE_SYSTEM.end();
   }
   delay(1000);
   debug("Reseting wifiManager's settings.");

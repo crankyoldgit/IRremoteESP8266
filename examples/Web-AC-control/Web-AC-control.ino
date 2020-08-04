@@ -6,11 +6,7 @@
   is selected (required for Coolix).
 
 */
-#if defined(ESP8266)
-#include <LittleFS.h>
-#else
-#include <SPIFFS.h>
-#endif
+#include "Web-AC-control.h"
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -32,22 +28,6 @@
 //// ###### User configuration space for AC library classes ##########
 
 #include <ir_Coolix.h>  //  replace library based on your AC unit model, check https://github.com/crankyoldgit/IRremoteESP8266
-
-// Uncomment one of the following to manually override what
-//    type of persistent storage is used.
-// Warning: Changing filesystems will cause all previous locally
-//    saved configuration data to be lost.
-// #define FILESYSTEM SPIFFS
-// #define FILESYSTEM LittleFS
-
-#ifndef FILESYSTEM
-// Set the default filesystem if none was specified.
-#if defined(ESP8266)
-#define FILESYSTEM LittleFS
-#else
-#define FILESYSTEM SPIFFS
-#endif
-#endif  // FILESYSTEM
 
 #define AUTO_MODE kCoolixAuto
 #define COOL_MODE kCoolixCool
@@ -132,19 +112,9 @@ void handleFileUpload() {  // upload a new file to the FILESYSTEM
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     if (!filename.startsWith("/")) filename = "/" + filename;
-<<<<<<< HEAD
-    Serial.print("handleFileUpload Name: "); //Serial.println(filename);
-#if defined(ESP8266)
-    fsUploadFile = LittleFS.open(filename, "w");
-#else
-    fsUploadFile = SPIFFS.open(filename, "w");
-#endif
-    // Open the file for writing in SPIFFS (create if it doesn't exist)
-=======
     // Serial.print("handleFileUpload Name: "); //Serial.println(filename);
     fsUploadFile = FILESYSTEM.open(filename, "w");
     // Open the file for writing in FILESYSTEM (create if it doesn't exist)
->>>>>>> 40da90731a3e2002a17d760afb73acff96ef88a0
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (fsUploadFile)
@@ -192,13 +162,8 @@ void setup() {
 
   Serial.println("mounting FS...");
 
-<<<<<<< HEAD
-  if (!SPIFFS.begin()) {
-    Serial.println("Failed to mount file system");
-=======
   if (!FILESYSTEM.begin()) {
     // Serial.println("Failed to mount file system");
->>>>>>> 40da90731a3e2002a17d760afb73acff96ef88a0
     return;
   }
 
