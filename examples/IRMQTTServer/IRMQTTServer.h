@@ -35,16 +35,16 @@
 //    type of persistent storage is used.
 // Warning: Changing filesystems will cause all previous locally
 //    saved configuration data to be lost.
-// #define FILE_SYSTEM SPIFFS
-// #define FILE_SYSTEM LittleFS
-#ifndef FILE_SYSTEM
+// #define FILESYSTEM SPIFFS
+// #define FILESYSTEM LittleFS
+#ifndef FILESYSTEM
 // Set the default filesystem if none was specified.
 #ifdef ESP8266
-#define FILE_SYSTEM LittleFS
+#define FILESYSTEM LittleFS
 #else
-#define FILE_SYSTEM SPIFFS
+#define FILESYSTEM SPIFFS
 #endif  // defined(ESP8266)
-#endif  // FILE_SYSTEM
+#endif  // FILESYSTEM
 // ---------------------- Board Related Settings -------------------------------
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
