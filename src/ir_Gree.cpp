@@ -36,8 +36,6 @@ using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_GREE
 /// Send a Gree Heat Pump formatted message.
@@ -117,49 +115,48 @@ IRGreeAC::IRGreeAC(const uint16_t pin, const gree_ac_remote_model_t model,
 }
 
 /// Reset the internal state to a fixed known good state.
-void IRGreeAC::stateReset(void) {
+void IRGreeAC::stateReset() {
   // This resets to a known-good state to Power Off, Fan Auto, Mode Auto, 25C.
-  for (uint8_t i = 0; i < kGreeStateLength; i++) remote_state[i] = 0x0;
-  remote_state[1] = 0x09;
-  remote_state[2] = 0x20;
-  remote_state[3] = 0x50;
-  remote_state[5] = 0x20;
-  remote_state[7] = 0x50;
+  std::memset(_.remote_state, 0, sizeof _.remote_state);
+  _.Temp = 9;  // _.remote_state[1] = 0x09;
+  _.Light = true;  // _.remote_state[2] = 0x20;
+  _.unknown1 = 5;  // _.remote_state[3] = 0x50;
+  _.unknown2 = 4;  // _.remote_state[5] = 0x20;
 }
 
 /// Fix up the internal state so it is correct.
 /// @note Internal use only.
-void IRGreeAC::fixup(void) {
-  setPower(getPower());  // Redo the power bits as they differ between models.
+void IRGreeAC::fixup() {
+  setPower(_.Power);  // Redo the power bits as they differ between models.
   checksum();  // Calculate the checksums
 }
 
 /// Set up hardware to be able to send a message.
-void IRGreeAC::begin(void) { _irsend.begin(); }
+void IRGreeAC::begin() { _irsend.begin(); }
 
 #if SEND_GREE
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRGreeAC::send(const uint16_t repeat) {
   fixup();  // Ensure correct settings before sending.
-  _irsend.sendGree(remote_state, kGreeStateLength, repeat);
+  _irsend.sendGree(_.remote_state, kGreeStateLength, repeat);
 }
 #endif  // SEND_GREE
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t* IRGreeAC::getRaw(void) {
+uint8_t* IRGreeAC::getRaw() {
   fixup();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.remote_state;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRGreeAC::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kGreeStateLength);
+  std::memcpy(_.remote_state, new_code, kGreeStateLength);
   // We can only detect the difference between models when the power is on.
-  if (getPower()) {
-    if (GETBIT8(remote_state[2], kGreePower2Offset))
+  if (_.Power) {
+    if (_.ModelA)
       _model = gree_ac_remote_model_t::YAW1F;
     else
       _model = gree_ac_remote_model_t::YBOFB;
@@ -170,8 +167,7 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
 /// @param[in] length The size/length of the state array to fix the checksum of.
 void IRGreeAC::checksum(const uint16_t length) {
   // Gree uses the same checksum alg. as Kelvinator's block checksum.
-  setBits(&remote_state[length - 1], kHighNibble, kNibbleSize,
-          IRKelvinatorAC::calcBlockChecksum(remote_state, length));
+  _.Sum = IRKelvinatorAC::calcBlockChecksum(_.remote_state, length);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -190,49 +186,48 @@ void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
     case gree_ac_remote_model_t::YBOFB: _model = model; break;
-    default: setModel(gree_ac_remote_model_t::YAW1F);
+    default: _model = gree_ac_remote_model_t::YAW1F;
   }
 }
 
 /// Get/Detect the model of the A/C.
 /// @return The enum of the compatible model.
-gree_ac_remote_model_t IRGreeAC::getModel(void) { return _model; }
+gree_ac_remote_model_t IRGreeAC::getModel() const { return _model; }
 
 /// Change the power setting to On.
-void IRGreeAC::on(void) { setPower(true); }
+void IRGreeAC::on() { setPower(true); }
 
 /// Change the power setting to Off.
-void IRGreeAC::off(void) { setPower(false); }
+void IRGreeAC::off() { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/814
 void IRGreeAC::setPower(const bool on) {
-  setBit(&remote_state[0], kGreePower1Offset, on);
+  _.Power = on;
   // May not be needed. See #814
-  setBit(&remote_state[2], kGreePower2Offset,
-         on && _model != gree_ac_remote_model_t::YBOFB);
+  _.ModelA = on && _model == gree_ac_remote_model_t::YAW1F;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/814
-bool IRGreeAC::getPower(void) {
-  //  See #814. Not checking/requiring: (remote_state[2] & kGreePower2Mask)
-  return GETBIT8(remote_state[0], kGreePower1Offset);
+bool IRGreeAC::getPower() const {
+  //  See #814. Not checking/requiring: (_.ModelA)
+  return _.Power;
 }
 
 /// Set the default temperature units to use.
 /// @param[in] on Use Fahrenheit as the units.
 ///   true is Fahrenheit, false is Celsius.
 void IRGreeAC::setUseFahrenheit(const bool on) {
-  setBit(&remote_state[3], kGreeUseFahrenheitOffset, on);
+  _.UseFahrenheit = on;
 }
 
 /// Get the default temperature units in use.
 /// @return true is Fahrenheit, false is Celsius.
-bool IRGreeAC::getUseFahrenheit(void) {
-  return GETBIT8(remote_state[3], kGreeUseFahrenheitOffset);
+bool IRGreeAC::getUseFahrenheit() const {
+  return _.UseFahrenheit;
 }
 
 /// Set the temp. in degrees
@@ -254,25 +249,22 @@ void IRGreeAC::setTemp(const uint8_t temp, const bool fahrenheit) {
   safecelsius = std::max(static_cast<float>(kGreeMinTempC), safecelsius);
   safecelsius = std::min(static_cast<float>(kGreeMaxTempC), safecelsius);
   // An operating mode of Auto locks the temp to a specific value. Do so.
-  if (getMode() == kGreeAuto) safecelsius = 25;
+  if (_.Mode == kGreeAuto) safecelsius = 25;
 
   // Set the "main" Celsius degrees.
-  setBits(&remote_state[1], kGreeTempOffset, kGreeTempSize,
-          safecelsius - kGreeMinTempC);
+  _.Temp = safecelsius - kGreeMinTempC;
   // Deal with the extra degree fahrenheit difference.
-  setBit(&remote_state[3], kGreeTempExtraDegreeFOffset,
-         (uint8_t)(safecelsius * 2) & 1);
+  _.TempExtraDegreeF = static_cast<uint8_t>(safecelsius * 2) & 1;
 }
 
 /// Get the set temperature
 /// @return The temperature in degrees in the current units (C/F) set.
-uint8_t IRGreeAC::getTemp(void) {
-  uint8_t deg = kGreeMinTempC + GETBITS8(remote_state[1], kGreeTempOffset,
-                                         kGreeTempSize);
-  if (getUseFahrenheit()) {
+uint8_t IRGreeAC::getTemp() const {
+  uint8_t deg = kGreeMinTempC + _.Temp;
+  if (_.UseFahrenheit) {
     deg = celsiusToFahrenheit(deg);
     // Retrieve the "extra" fahrenheit from elsewhere in the code.
-    if (GETBIT8(remote_state[3], kGreeTempExtraDegreeFOffset)) deg++;
+    if (_.TempExtraDegreeF) deg++;
     deg = std::max(deg, kGreeMinTempF);  // Cover the fact that 61F is < 16C
   }
   return deg;
@@ -281,16 +273,16 @@ uint8_t IRGreeAC::getTemp(void) {
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting. 0 is auto, 1-3 is the speed.
 void IRGreeAC::setFan(const uint8_t speed) {
-  uint8_t fan = std::min((uint8_t)kGreeFanMax, speed);  // Bounds check
-  if (getMode() == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
+  uint8_t fan = std::min(static_cast<uint8_t>(kGreeFanMax), speed);
+  if (_.Mode == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
   // Set the basic fan values.
-  setBits(&remote_state[0], kGreeFanOffset, kGreeFanSize, fan);
+  _.Fan = fan;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRGreeAC::getFan(void) {
-  return GETBITS8(remote_state[0], kGreeFanOffset, kGreeFanSize);
+uint8_t IRGreeAC::getFan() const {
+  return _.Fan;
 }
 
 /// Set the operating mode of the A/C.
@@ -308,92 +300,92 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
     // If we get an unexpected mode, default to AUTO.
     default: mode = kGreeAuto;
   }
-  setBits(&remote_state[0], kLowNibble, kModeBitsSize, mode);
+  _.Mode = mode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRGreeAC::getMode(void) {
-  return GETBITS8(remote_state[0], kLowNibble, kModeBitsSize);
+uint8_t IRGreeAC::getMode() const {
+  return _.Mode;
 }
 
 /// Set the Light (LED) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setLight(const bool on) {
-  setBit(&remote_state[2], kGreeLightOffset, on);
+  _.Light = on;
 }
 
 /// Get the Light (LED) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getLight(void) {
-  return GETBIT8(remote_state[2], kGreeLightOffset);
+bool IRGreeAC::getLight() const {
+  return _.Light;
 }
 
 /// Set the IFeel setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setIFeel(const bool on) {
-  setBit(&remote_state[5], kGreeIFeelOffset, on);
+  _.IFeel = on;
 }
 
 /// Get the IFeel setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getIFeel(void) {
-  return GETBIT8(remote_state[5], kGreeIFeelOffset);
+bool IRGreeAC::getIFeel() const {
+  return _.IFeel;
 }
 
 /// Set the Wifi (enabled) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setWiFi(const bool on) {
-  setBit(&remote_state[5], kGreeWiFiOffset, on);
+  _.WiFi = on;
 }
 
 /// Get the Wifi (enabled) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getWiFi(void) {
-  return GETBIT8(remote_state[5], kGreeWiFiOffset);
+bool IRGreeAC::getWiFi() const {
+  return _.WiFi;
 }
 
 /// Set the XFan (Mould) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setXFan(const bool on) {
-  setBit(&remote_state[2], kGreeXfanOffset, on);
+  _.Xfan = on;
 }
 
 /// Get the XFan (Mould) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getXFan(void) {
-  return GETBIT8(remote_state[2], kGreeXfanOffset);
+bool IRGreeAC::getXFan() const {
+  return _.Xfan;
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setSleep(const bool on) {
-  setBit(&remote_state[0], kGreeSleepOffset, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getSleep(void) {
-  return GETBIT8(remote_state[0], kGreeSleepOffset);
+bool IRGreeAC::getSleep() const {
+  return _.Sleep;
 }
 
 /// Set the Turbo setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setTurbo(const bool on) {
-  setBit(&remote_state[2], kGreeTurboOffset, on);
+  _.Turbo = on;
 }
 
 /// Get the Turbo setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getTurbo(void) {
-  return GETBIT8(remote_state[2], kGreeTurboOffset);
+bool IRGreeAC::getTurbo() const {
+  return _.Turbo;
 }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] automatic Do we use the automatic setting?
 /// @param[in] position The position/mode to set the vanes to.
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
-  setBit(&remote_state[0], kGreeSwingAutoOffset, automatic);
+  _.SwingAuto = automatic;
   uint8_t new_position = position;
   if (!automatic) {
     switch (position) {
@@ -417,41 +409,39 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
         new_position = kGreeSwingAuto;
     }
   }
-  setBits(&remote_state[4], kLowNibble, kGreeSwingSize, new_position);
+  _.Swing = new_position;
 }
 
 /// Get the Vertical Swing Automatic mode setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getSwingVerticalAuto(void) {
-  return GETBIT8(remote_state[0], kGreeSwingAutoOffset);
+bool IRGreeAC::getSwingVerticalAuto() const {
+  return _.SwingAuto;
 }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
-uint8_t IRGreeAC::getSwingVerticalPosition(void) {
-  return GETBITS8(remote_state[4], kLowNibble, kGreeSwingSize);
+uint8_t IRGreeAC::getSwingVerticalPosition() const {
+  return _.Swing;
 }
 
 /// Set the timer enable setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRGreeAC::setTimerEnabled(const bool on) {
-  setBit(&remote_state[1], kGreeTimerEnabledOffset, on);
+  _.TimerEnabled = on;
 }
 
 /// Get the timer enabled setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getTimerEnabled(void) {
-  return GETBIT8(remote_state[1], kGreeTimerEnabledOffset);
+bool IRGreeAC::getTimerEnabled() const {
+  return _.TimerEnabled;
 }
 
 /// Get the timer time value from the A/C.
 /// @return The number of minutes the timer is set for.
-uint16_t IRGreeAC::getTimer(void) {
-  uint16_t hrs = irutils::bcdToUint8(
-      (GETBITS8(remote_state[1], kGreeTimerTensHrOffset,
-                kGreeTimerTensHrSize) << kNibbleSize) |
-      GETBITS8(remote_state[2], kGreeTimerHoursOffset, kGreeTimerHoursSize));
-  return hrs * 60 + (GETBIT8(remote_state[1], kGreeTimerHalfHrOffset) ? 30 : 0);
+uint16_t IRGreeAC::getTimer() const {
+  uint16_t hrs = irutils::bcdToUint8((_.TimerTensHr << kNibbleSize) |
+    _.TimerHours);
+  return hrs * 60 + (_.TimerHalfHr ? 30 : 0);
 }
 
 /// Set the A/C's timer to turn off in X many minutes.
@@ -463,13 +453,11 @@ void IRGreeAC::setTimer(const uint16_t minutes) {
   setTimerEnabled(mins >= 30);  // Timer is enabled when >= 30 mins.
   uint8_t hours = mins / 60;
   // Set the half hour bit.
-  setBit(&remote_state[1], kGreeTimerHalfHrOffset, !((mins % 60) < 30));
+  _.TimerHalfHr = (mins % 60) >= 30;
   // Set the "tens" digit of hours.
-  setBits(&remote_state[1], kGreeTimerTensHrOffset, kGreeTimerTensHrSize,
-          hours / 10);
+  _.TimerTensHr = hours / 10;
   // Set the "units" digit of hours.
-  setBits(&remote_state[2], kGreeTimerHoursOffset, kGreeTimerHoursSize,
-          hours % 10);
+  _.TimerHours = hours % 10;
 }
 
 /// Set temperature display mode.
@@ -484,15 +472,14 @@ void IRGreeAC::setTimer(const uint16_t minutes) {
 ///   out of order.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1118#issuecomment-628242152
 void IRGreeAC::setDisplayTempSource(const uint8_t mode) {
-  setBits(&remote_state[5], kGreeDisplayTempOffset, kGreeDisplayTempSize, mode);
+  _.DisplayTemp = mode;
 }
 
 /// Get the temperature display mode.
 /// i.e. Internal, External temperature sensing.
 /// @return The current temp source being displayed.
-uint8_t IRGreeAC::getDisplayTempSource(void) {
-  return GETBITS8(remote_state[5], kGreeDisplayTempOffset,
-                  kGreeDisplayTempSize);
+uint8_t IRGreeAC::getDisplayTempSource() const {
+  return _.DisplayTemp;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -577,23 +564,23 @@ stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRGreeAC::toCommon(void) {
+stdAc::state_t IRGreeAC::toCommon() {
   stdAc::state_t result;
   result.protocol = decode_type_t::GREE;
-  result.model = this->getModel();
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = !this->getUseFahrenheit();
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  if (this->getSwingVerticalAuto())
+  result.model = getModel();
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
+  result.celsius = !getUseFahrenheit();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  if (getSwingVerticalAuto())
     result.swingv = stdAc::swingv_t::kAuto;
   else
-    result.swingv = this->toCommonSwingV(this->getSwingVerticalPosition());
-  result.turbo = this->getTurbo();
-  result.light = this->getLight();
-  result.clean = this->getXFan();
-  result.sleep = this->getSleep() ? 0 : -1;
+    result.swingv = toCommonSwingV(getSwingVerticalPosition());
+  result.turbo = getTurbo();
+  result.light = getLight();
+  result.clean = getXFan();
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
@@ -606,7 +593,7 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRGreeAC::toString(void) {
+String IRGreeAC::toString() {
   String result = "";
   result.reserve(220);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::GREE, getModel(), false);
