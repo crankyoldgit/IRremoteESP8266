@@ -947,4 +947,57 @@ namespace irutils {
     }
     return true;
   }
+
+  /// Perform a low lovel bit manipulation sanity check for the given cpu
+  /// architecture and the compiler operation. Calls to this should return
+  /// 0 if everything is as expected, anything else means the library won't work
+  /// as expected.
+  /// @return A bit mask value of potential issues.
+  ///   0: (e.g. 0b00000000) Everything appears okay.
+  ///   0th bit set: (0b1) Unexpected bit field/packing encountered.
+  ///                Try a different compiler.
+  ///   1st bit set: (0b10) Unexpected Endianness. Try a different compiler flag
+  ///                or use a CPU different architecture.
+  ///  e.g. A result of 3 (0b11) would mean both a bit field and an Endianness
+  ///       issue has been found.
+  uint8_t lowLevelSanityCheck(void) {
+    const uint64_t kExpectedBitFieldResult = 0x8000012340000039ULL;
+    volatile uint32_t EndianTest = 0x12345678;
+    const uint8_t kBitFieldError =   0b01;
+    const uint8_t kEndiannessError = 0b10;
+    uint8_t result = 0;
+    union bitpackdata {
+      struct {
+        uint64_t lowestbit:1;     // 0th bit
+        uint64_t next7bits:7;     // 1-7th bits
+        uint64_t _unused_1:20;    // 8-27th bits
+        // Cross the 32 bit boundary.
+        uint64_t crossbits:16;    // 28-43rd bits
+        uint64_t _usused_2:18;    // 44-61st bits
+        uint64_t highest2bits:2;  // 62-63rd bits
+      };
+     uint64_t all;
+    };
+
+    bitpackdata data;
+    data.lowestbit = true;
+    data.next7bits = 0b0011100;  // 0x1C
+    data._unused_1 = 0;
+    data.crossbits = 0x1234;
+    data._usused_2 = 0;
+    data.highest2bits = 0b10;  // 2
+
+    if (data.all != kExpectedBitFieldResult) result |= kBitFieldError;
+    // Check that we are using Little Endian for integers
+#if defined(BYTE_ORDER) && defined(LITTLE_ENDIAN)
+    if (BYTE_ORDER != LITTLE_ENDIAN) result |= kEndiannessError;
+#endif
+#if defined(__IEEE_BIG_ENDIAN) || defined(__IEEE_BYTES_BIG_ENDIAN)
+    result |= kEndiannessError;
+#endif
+    // Brute force check for little endian.
+    if (*((uint8_t*)(&EndianTest)) != 0x78)  // NOLINT(readability/casting)
+      result |= kEndiannessError;
+    return result;
+  }
 }  // namespace irutils

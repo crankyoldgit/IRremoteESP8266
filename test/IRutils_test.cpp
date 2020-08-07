@@ -776,3 +776,7 @@ TEST(TestUtils, InvertedBytePairs) {
   ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 6));
   EXPECT_STATE_EQ(correct, wrong, 6 * 8);
 }
+
+TEST(TestUtils, lowLevelSanityCheck) {
+  ASSERT_EQ(0, irutils::lowLevelSanityCheck());
+}
