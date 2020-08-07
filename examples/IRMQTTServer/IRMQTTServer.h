@@ -4,6 +4,7 @@
  */
 #ifndef EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 #define EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
+
 #if defined(ESP8266)
 #include <LittleFS.h>
 #else

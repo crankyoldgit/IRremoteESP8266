@@ -380,9 +380,6 @@ using irutils::msToString;
 #endif  // REPORT_VCC
 
 // Globals
-
-
-
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
 #endif  // ESP8266
@@ -522,14 +519,27 @@ void saveWifiConfigCallback(void) {
 // Returns:
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
-  debug("Mounting FILESYSTEM...");
+#if (FILESYSTEM == LittleFS)
+  debug("Mounting LittleFS ...");
+#else
+  debug("Mounting SPIFFS ...");
+#endif
   if (FILESYSTEM.begin()) return true;  // We mounted it okay.
   // We failed the first time.
-  debug("Failed to mount FILESYSTEM!\n"
-        "Formatting FILESYSTEM and trying again...");
+#if (FILESYSTEM == LittleFS)
+  debug("Failed to mount LittleFS!\n"
+        "Formatting LittleFS and trying again...");
+#else
+  debug("Failed to mount SPIFFS!\n"
+        "Formatting SPIFFS and trying again...");
+#endif
   FILESYSTEM.format();
   if (!FILESYSTEM.begin()) {  // Did we fail?
-    debug("DANGER: Failed to mount FILESYSTEM even after formatting!");
+#if (FILESYSTEM == LittleFS)
+  debug("DANGER: Failed to mount LittleFS even after formatting!");
+#else
+  debug("DANGER: Failed to mount SPIFFS even after formatting!");
+#endif
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
   }
@@ -621,7 +631,11 @@ bool loadConfigFile(void) {
     } else {
       debug("Config file doesn't exist!");
     }
-    debug("Unmounting FILESYSTEM.");
+#if (FILESYSTEM == LittleFS)
+    debug("Unmounting LittleFS.");
+#else
+    debug("Unmounting SPIFFS.");
+#endif
     FILESYSTEM.end();
   }
   return success;
