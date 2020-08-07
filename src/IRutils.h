@@ -109,5 +109,6 @@ namespace irutils {
                const uint64_t data);
   uint8_t * invertBytePairs(uint8_t *ptr, const uint16_t length);
   bool checkInvertedBytePairs(const uint8_t * const ptr, const uint16_t length);
+  uint8_t lowLevelSanityCheck(void);
 }  // namespace irutils
 #endif  // IRUTILS_H_
