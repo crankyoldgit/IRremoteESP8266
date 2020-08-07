@@ -25,6 +25,7 @@
  */
 
 #include <Arduino.h>
+#include <assert.h>
 #include <IRrecv.h>
 #include <IRremoteESP8266.h>
 #include <IRac.h>
