@@ -161,6 +161,7 @@ bool hasACState(const decode_type_t protocol) {
     case NEOCLIMA:
     case PANASONIC_AC:
     case SAMSUNG_AC:
+    case SANYO_AC:
     case SHARP_AC:
     case TCL112AC:
     case TOSHIBA_AC:
@@ -914,5 +915,89 @@ namespace irutils {
     *dst &= ~(mask << offset);
     // Merge in the data.
     *dst |= ((data & mask) << offset);
+  }
+
+  /// Create byte pairs where the second byte of the pair is a bit
+  /// inverted/flipped copy of the first/previous byte of the pair.
+  /// @param[in,out] ptr A pointer to the start of array to modify.
+  /// @param[in] length The byte size of the array.
+  /// @note A length of `<= 1` will do nothing.
+  /// @return A ptr to the modified array.
+  uint8_t * invertBytePairs(uint8_t *ptr, const uint16_t length) {
+    for (uint16_t i = 1; i < length; i += 2) {
+      // Code done this way to avoid a compiler warning bug.
+      uint8_t inv = ~*(ptr + i - 1);
+      *(ptr + i) = inv;
+    }
+    return ptr;
+  }
+
+  /// Check an array to see if every second byte of a pair is a bit
+  /// inverted/flipped copy of the first/previous byte of the pair.
+  /// @param[in] ptr A pointer to the start of array to check.
+  /// @param[in] length The byte size of the array.
+  /// @note A length of `<= 1` will always return true.
+  /// @return true, if every second byte is inverted. Otherwise false.
+  bool checkInvertedBytePairs(const uint8_t * const ptr,
+                              const uint16_t length) {
+    for (uint16_t i = 1; i < length; i += 2) {
+      // Code done this way to avoid a compiler warning bug.
+      uint8_t inv = ~*(ptr + i - 1);
+      if (*(ptr + i) != inv) return false;
+    }
+    return true;
+  }
+
+  /// Perform a low lovel bit manipulation sanity check for the given cpu
+  /// architecture and the compiler operation. Calls to this should return
+  /// 0 if everything is as expected, anything else means the library won't work
+  /// as expected.
+  /// @return A bit mask value of potential issues.
+  ///   0: (e.g. 0b00000000) Everything appears okay.
+  ///   0th bit set: (0b1) Unexpected bit field/packing encountered.
+  ///                Try a different compiler.
+  ///   1st bit set: (0b10) Unexpected Endianness. Try a different compiler flag
+  ///                or use a CPU different architecture.
+  ///  e.g. A result of 3 (0b11) would mean both a bit field and an Endianness
+  ///       issue has been found.
+  uint8_t lowLevelSanityCheck(void) {
+    const uint64_t kExpectedBitFieldResult = 0x8000012340000039ULL;
+    volatile uint32_t EndianTest = 0x12345678;
+    const uint8_t kBitFieldError =   0b01;
+    const uint8_t kEndiannessError = 0b10;
+    uint8_t result = 0;
+    union bitpackdata {
+      struct {
+        uint64_t lowestbit:1;     // 0th bit
+        uint64_t next7bits:7;     // 1-7th bits
+        uint64_t _unused_1:20;    // 8-27th bits
+        // Cross the 32 bit boundary.
+        uint64_t crossbits:16;    // 28-43rd bits
+        uint64_t _usused_2:18;    // 44-61st bits
+        uint64_t highest2bits:2;  // 62-63rd bits
+      };
+     uint64_t all;
+    };
+
+    bitpackdata data;
+    data.lowestbit = true;
+    data.next7bits = 0b0011100;  // 0x1C
+    data._unused_1 = 0;
+    data.crossbits = 0x1234;
+    data._usused_2 = 0;
+    data.highest2bits = 0b10;  // 2
+
+    if (data.all != kExpectedBitFieldResult) result |= kBitFieldError;
+    // Check that we are using Little Endian for integers
+#if defined(BYTE_ORDER) && defined(LITTLE_ENDIAN)
+    if (BYTE_ORDER != LITTLE_ENDIAN) result |= kEndiannessError;
+#endif
+#if defined(__IEEE_BIG_ENDIAN) || defined(__IEEE_BYTES_BIG_ENDIAN)
+    result |= kEndiannessError;
+#endif
+    // Brute force check for little endian.
+    if (*((uint8_t*)(&EndianTest)) != 0x78)  // NOLINT(readability/casting)
+      result |= kEndiannessError;
+    return result;
   }
 }  // namespace irutils

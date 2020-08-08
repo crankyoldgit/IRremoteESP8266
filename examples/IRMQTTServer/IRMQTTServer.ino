@@ -381,6 +381,7 @@ using irutils::msToString;
 #endif  // REPORT_VCC
 
 // Globals
+uint8_t _sanity = 0;
 #if defined(ESP8266)
 ESP8266WebServer server(kHttpPort);
 #endif  // ESP8266
@@ -1260,6 +1261,7 @@ void handleInfo(void) {
     "ESP32 SDK Version: " + ESP.getSdkVersion() + "<br>"
 #endif  // ESP32
     "Cpu Freq: " + String(ESP.getCpuFreqMHz()) + "MHz<br>"
+    "Sanity Check: " + String((_sanity == 0) ? "Ok" : "FAILED") + "<br>"
     "IR Send GPIO(s): " + listOfTxGpios() + "<br>"
     + irutils::addBoolToString(kInvertTxOutput,
                                "Inverting GPIO output", false) + "<br>"
@@ -2081,6 +2083,9 @@ void init_vars(void) {
 }
 
 void setup(void) {
+  // Perform a low level sanity checks that the compiler performs bit field
+  // packing as we expect and Endianness is as we expect.
+  _sanity = irutils::lowLevelSanityCheck();
 #if DEBUG
   if (!isSerialGpioUsedByIr()) {
 #if defined(ESP8266)

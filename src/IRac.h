@@ -29,6 +29,7 @@
 #include "ir_Neoclima.h"
 #include "ir_Panasonic.h"
 #include "ir_Samsung.h"
+#include "ir_Sanyo.h"
 #include "ir_Sharp.h"
 #include "ir_Tcl.h"
 #include "ir_Teco.h"
@@ -293,7 +294,8 @@ void electra(IRElectraAc *ac,
   void midea(IRMideaAC *ac,
              const bool on, const stdAc::opmode_t mode, const bool celsius,
              const float degrees, const stdAc::fanspeed_t fan,
-             const stdAc::swingv_t swingv, const int16_t sleep = -1);
+             const stdAc::swingv_t swingv, const bool econo,
+             const int16_t sleep = -1);
 #endif  // SEND_MIDEA
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,
@@ -357,6 +359,12 @@ void electra(IRElectraAc *ac,
                const bool beep, const bool prevpower = true,
                const bool forcepower = true);
 #endif  // SEND_SAMSUNG_AC
+#if SEND_SANYO_AC
+  void sanyo(IRSanyoAc *ac,
+             const bool on, const stdAc::opmode_t mode, const float degrees,
+             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+             const bool beep, const int16_t sleep = -1);
+#endif  // SEND_SANYO_AC
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac,
              const bool on, const bool prev_power, const stdAc::opmode_t mode,
@@ -381,7 +389,8 @@ void electra(IRElectraAc *ac,
 #if SEND_TOSHIBA_AC
   void toshiba(IRToshibaAC *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
-               const stdAc::fanspeed_t fan);
+               const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+               const bool turbo, const bool econo);
 #endif  // SEND_TOSHIBA_AC
 #if SEND_TROTEC
   void trotec(IRTrotecESP *ac,

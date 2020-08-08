@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>This class performs a simple timer in useconds since instantiated.  
+<p>This class offers a simple counter in micro-seconds since instantiated.  
  <a href="classIRtimer.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="IRtimer_8h_source.html">IRtimer.h</a>&gt;</code></p>
@@ -82,7 +82,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a09d64d689137ef8ca68973bb9e550e76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classIRtimer.html#a09d64d689137ef8ca68973bb9e550e76">More...</a><br /></td></tr>
 <tr class="separator:a09d64d689137ef8ca68973bb9e550e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaf886de2c9533a8c791242dc575db1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">reset</a> ()</td></tr>
-<tr class="memdesc:aaaf886de2c9533a8c791242dc575db1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the <a class="el" href="classIRtimer.html" title="This class performs a simple timer in useconds since instantiated.">IRtimer</a> object.  <a href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">More...</a><br /></td></tr>
+<tr class="memdesc:aaaf886de2c9533a8c791242dc575db1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the <a class="el" href="classIRtimer.html" title="This class offers a simple counter in micro-seconds since instantiated.">IRtimer</a> object. I.e. The counter starts again from now.  <a href="classIRtimer.html#aaaf886de2c9533a8c791242dc575db1a">More...</a><br /></td></tr>
 <tr class="separator:aaaf886de2c9533a8c791242dc575db1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad655e585f053580d49d8de7d52cd62a1"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">elapsed</a> ()</td></tr>
 <tr class="memdesc:ad655e585f053580d49d8de7d52cd62a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate how many microseconds have elapsed since the timer was started.  <a href="classIRtimer.html#ad655e585f053580d49d8de7d52cd62a1">More...</a><br /></td></tr>
@@ -97,10 +97,11 @@ Static Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aaa087b8688ff8150e0fc1ec6d5c4a52a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">start</a></td></tr>
+<tr class="memdesc:aaa087b8688ff8150e0fc1ec6d5c4a52a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Time in uSeconds when the class was instantiated/reset.  <a href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">More...</a><br /></td></tr>
 <tr class="separator:aaa087b8688ff8150e0fc1ec6d5c4a52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class performs a simple timer in useconds since instantiated. </p>
+<div class="textblock"><p>This class offers a simple counter in micro-seconds since instantiated. </p>
 <dl class="section note"><dt>Note</dt><dd>Handles when the system timer wraps around (once). </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a09d64d689137ef8ca68973bb9e550e76"></a>
@@ -193,7 +194,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Resets the <a class="el" href="classIRtimer.html" title="This class performs a simple timer in useconds since instantiated.">IRtimer</a> object. </p>
+<p>Resets the <a class="el" href="classIRtimer.html" title="This class offers a simple counter in micro-seconds since instantiated.">IRtimer</a> object. I.e. The counter starts again from now. </p>
 
 </div>
 </div>
@@ -217,6 +218,8 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Time in uSeconds when the class was instantiated/reset. </p>
 
 </div>
 </div>
