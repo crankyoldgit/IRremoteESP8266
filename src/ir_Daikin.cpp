@@ -2342,6 +2342,9 @@ uint8_t IRDaikin176::getMode(void) {
 /// @param[in] mode The desired operating mode.
 void IRDaikin176::setMode(const uint8_t mode) {
   uint8_t altmode = 0;
+  // Daikin172 has some alternate/additional mode bits that need to be changed
+  // in line with the operating mode. The following few lines match up these
+  // bits with the corresponding operating bits.
   switch (mode) {
     case kDaikin176Dry:  altmode = 2; break;
     case kDaikin176Fan:  altmode = 6; break;
@@ -2350,9 +2353,10 @@ void IRDaikin176::setMode(const uint8_t mode) {
     case kDaikin176Heat: altmode = 7; break;
     default: setMode(kDaikin176Cool); return;
   }
-  // Set the mode.
+  // Set the mode bits.
   setBits(&remote_state[kDaikin176ByteModePower], kHighNibble, kModeBitsSize,
           mode);
+  // Set the additional mode bits.
   setBits(&remote_state[kDaikin176ByteAltMode], kHighNibble, kModeBitsSize,
           altmode);
   setTemp(_saved_temp);
