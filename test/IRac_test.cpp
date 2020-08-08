@@ -368,7 +368,7 @@ TEST(TestIRac, Daikin176) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 7 (Cool), Temp: 26C, Fan: 1 (Low), Swing(H): 5 (Auto)";
+      "Power: On, Mode: 2 (Cool), Temp: 26C, Fan: 1 (Low), Swing(H): 5 (Auto)";
 
   ac.begin();
   irac.daikin176(&ac,

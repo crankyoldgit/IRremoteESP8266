@@ -2322,19 +2322,20 @@ void IRDaikin176::off(void) { setPower(false); }
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin176::setPower(const bool on) {
   remote_state[kDaikin176ByteModeButton] = 0;
-  setBit(&remote_state[kDaikin176BytePower], kDaikinBitPowerOffset, on);
+  setBit(&remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset, on);
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin176::getPower(void) {
-  return GETBIT8(remote_state[kDaikin176BytePower], kDaikinBitPowerOffset);
+  return GETBIT8(remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset);
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
 uint8_t IRDaikin176::getMode(void) {
-  return GETBITS8(remote_state[kDaikin176ByteMode], kHighNibble, kModeBitsSize);
+  return GETBITS8(remote_state[kDaikin176ByteModePower], kHighNibble,
+                  kModeBitsSize);
 }
 
 /// Set the operating mode of the A/C.
@@ -2342,14 +2343,17 @@ uint8_t IRDaikin176::getMode(void) {
 void IRDaikin176::setMode(const uint8_t mode) {
   uint8_t altmode = 0;
   switch (mode) {
-    case kDaikinFan: altmode = 0; break;
-    case kDaikinDry: altmode = 7; break;
-    case kDaikin176Cool: altmode = 2; break;
-    default: this->setMode(kDaikin176Cool); return;
+    case kDaikin176Dry:  altmode = 2; break;
+    case kDaikin176Fan:  altmode = 6; break;
+    case kDaikin176Auto:
+    case kDaikin176Cool:
+    case kDaikin176Heat: altmode = 7; break;
+    default: setMode(kDaikin176Cool); return;
   }
   // Set the mode.
-  setBits(&remote_state[kDaikin176ByteMode], kHighNibble, kModeBitsSize, mode);
-  setBits(&remote_state[kDaikin176BytePower], kHighNibble, kModeBitsSize,
+  setBits(&remote_state[kDaikin176ByteModePower], kHighNibble, kModeBitsSize,
+          mode);
+  setBits(&remote_state[kDaikin176ByteAltMode], kHighNibble, kModeBitsSize,
           altmode);
   setTemp(_saved_temp);
   // Needs to happen after setTemp() as it will clear it.
@@ -2361,10 +2365,11 @@ void IRDaikin176::setMode(const uint8_t mode) {
 /// @return The native equivilant of the enum.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kDry: return kDaikinDry;
-    case stdAc::opmode_t::kHeat:  // Heat not supported, but fan is the closest.
-    case stdAc::opmode_t::kFan: return kDaikinFan;
-    default: return kDaikin176Cool;
+    case stdAc::opmode_t::kDry:   return kDaikin176Dry;
+    case stdAc::opmode_t::kHeat:  return kDaikin176Heat;
+    case stdAc::opmode_t::kFan:   return kDaikin176Fan;
+    case stdAc::opmode_t::kAuto:  return kDaikin176Auto;
+    default:                      return kDaikin176Cool;
   }
 }
 
@@ -2373,9 +2378,10 @@ uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
 /// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinDry: return stdAc::opmode_t::kDry;
-    case kDaikinHeat:  // There is no heat mode, but fan is the closest.
-    case kDaikinFan: return stdAc::opmode_t::kFan;
+    case kDaikin176Dry:  return stdAc::opmode_t::kDry;
+    case kDaikin176Heat: return stdAc::opmode_t::kHeat;
+    case kDaikin176Fan:  return stdAc::opmode_t::kFan;
+    case kDaikin176Auto: return stdAc::opmode_t::kAuto;
     default: return stdAc::opmode_t::kCool;
   }
 }
@@ -2386,8 +2392,8 @@ void IRDaikin176::setTemp(const uint8_t temp) {
   uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
   _saved_temp = degrees;
   switch (getMode()) {
-    case kDaikinDry:
-    case kDaikinFan:
+    case kDaikin176Dry:
+    case kDaikin176Fan:
       degrees = kDaikin176DryFanTemp;
   }
   setBits(&remote_state[kDaikin176ByteTemp], kDaikin176TempOffset,

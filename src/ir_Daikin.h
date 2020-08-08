@@ -342,9 +342,13 @@ const uint16_t kDaikin176Sections = 2;
 const uint16_t kDaikin176Section1Length = 7;
 const uint16_t kDaikin176Section2Length = kDaikin176StateLength -
                                           kDaikin176Section1Length;
-const uint8_t kDaikin176Cool = 0b111;  // 7
-const uint8_t kDaikin176BytePower = 14;
-const uint8_t kDaikin176ByteMode = 12;
+const uint8_t kDaikin176ByteAltMode = 12;
+const uint8_t kDaikin176ByteModePower = 14;
+const uint8_t kDaikin176Fan =  0b000;  // 0
+const uint8_t kDaikin176Heat = 0b001;  // 1
+const uint8_t kDaikin176Cool = 0b010;  // 2
+const uint8_t kDaikin176Auto = 0b011;  // 3
+const uint8_t kDaikin176Dry =  0b111;  // 7
 const uint8_t kDaikin176MaskMode = 0b01110000;
 const uint8_t kDaikin176ByteModeButton = 13;
 const uint8_t kDaikin176ModeButton = 0b00000100;
