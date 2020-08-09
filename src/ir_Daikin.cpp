@@ -2205,7 +2205,7 @@ bool IRrecv::decodeDaikin160(decode_results *results, uint16_t offset,
 
 #if SEND_DAIKIN176
 /// Send a Daikin176 (176-bit) A/C formatted message.
-/// Status: Alpha / Untested on a real device.
+/// Status: STABLE / Working on a real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
