@@ -2529,8 +2529,8 @@ String IRDaikin176::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikin176Cool, kDaikinHeat,
-                            kDaikinDry, kDaikinFan);
+  result += addModeToString(getMode(), kDaikin176Auto, kDaikin176Cool,
+                            kDaikin176Heat, kDaikin176Dry, kDaikin176Fan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
