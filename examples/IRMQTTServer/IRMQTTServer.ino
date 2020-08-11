@@ -526,7 +526,7 @@ bool mountSpiffs(void) {
         "Formatting SPIFFS and trying again...");
   FILESYSTEM.format();
   if (!FILESYSTEM.begin()) {  // Did we fail?
-    debug("DANGER: Failed to mount " FILESYSTEMSTR "even after formatting!");
+    debug("DANGER: Failed to mount " FILESYSTEMSTR " even after formatting!");
 
     delay(10000);  // Make sure the debug message doesn't just float by.
     return false;
