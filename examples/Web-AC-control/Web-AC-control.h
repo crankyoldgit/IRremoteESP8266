@@ -28,4 +28,10 @@
 #define FILESYSTEM SPIFFS
 #endif  // defined(ESP8266)
 #endif  // FILESYSTEM
+
+#if (FILESYSTEM == LittleFS)
+#define FILESYSTEMSTR "LittleFS"
+#else
+#define FILESYSTEMSTR "SPIFFS"
+#endif
 #endif  // EXAMPLES_WEB_AC_CONTROL_WEB_AC_CONTROL_H_

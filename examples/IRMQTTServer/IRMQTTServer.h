@@ -46,6 +46,12 @@
 #define FILESYSTEM SPIFFS
 #endif  // defined(ESP8266)
 #endif  // FILESYSTEM
+
+#if (FILESYSTEM == LittleFS)
+#define FILESYSTEMSTR "LittleFS"
+#else
+#define FILESYSTEMSTR "SPIFFS"
+#endif
 // ---------------------- Board Related Settings -------------------------------
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.

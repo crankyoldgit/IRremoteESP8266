@@ -160,7 +160,7 @@ void setup() {
 
   delay(1000);
 
-  Serial.println("mounting FS...");
+  Serial.println("mounting " FILESYSTEMSTR "...");
 
   if (!FILESYSTEM.begin()) {
     // Serial.println("Failed to mount file system");
