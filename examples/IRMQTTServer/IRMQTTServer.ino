@@ -519,7 +519,7 @@ void saveWifiConfigCallback(void) {
 // Returns:
 //   A boolean indicating success or failure.
 bool mountSpiffs(void) {
-  debug("Mounting " FILESYSTEMSTR " ..." );
+  debug("Mounting " FILESYSTEMSTR " ...");
   if (FILESYSTEM.begin()) return true;  // We mounted it okay.
   // We failed the first time.
   debug("Failed to mount " FILESYSTEMSTR "!\n"
