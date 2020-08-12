@@ -6,6 +6,11 @@
 #define EXAMPLES_IRMQTTSERVER_IRMQTTSERVER_H_
 
 #if defined(ESP8266)
+#include <LittleFS.h>
+#else
+#include <SPIFFS.h>
+#endif
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #endif  // ESP8266
 #include <IRremoteESP8266.h>
@@ -27,6 +32,26 @@
 #define EXAMPLES_ENABLE true
 #endif  // EXAMPLES_ENABLE
 
+// Uncomment one of the following to manually override what
+//    type of persistent storage is used.
+// Warning: Changing filesystems will cause all previous locally
+//    saved configuration data to be lost.
+// #define FILESYSTEM SPIFFS
+// #define FILESYSTEM LittleFS
+#ifndef FILESYSTEM
+// Set the default filesystem if none was specified.
+#ifdef ESP8266
+#define FILESYSTEM LittleFS
+#else
+#define FILESYSTEM SPIFFS
+#endif  // defined(ESP8266)
+#endif  // FILESYSTEM
+
+#if (FILESYSTEM == LittleFS)
+#define FILESYSTEMSTR "LittleFS"
+#else
+#define FILESYSTEMSTR "SPIFFS"
+#endif
 // ---------------------- Board Related Settings -------------------------------
 // NOTE: Make sure you set your Serial Monitor to the same speed.
 #define BAUD_RATE 115200  // Serial port Baud rate.
