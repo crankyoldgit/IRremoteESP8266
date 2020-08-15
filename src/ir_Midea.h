@@ -34,8 +34,8 @@
     kSwingVToggleStr = kIonStr;
 #endif
 union MideaProtocol{
-  uint64_t remote_state;  /// < The state in native IR code form
-  //only use 48bits
+  uint64_t remote_state;  ///< The state in native IR code form
+  // only use 48bits
   struct {
     // Byte 0
     uint8_t Sum;
