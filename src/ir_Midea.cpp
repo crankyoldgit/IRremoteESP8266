@@ -109,8 +109,7 @@ void IRMideaAC::begin() { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMideaAC::send(const uint16_t repeat) {
-  checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMidea(_.remote_state, kMideaBits, repeat);
+  _irsend.sendMidea(getRaw(), kMideaBits, repeat);
   // Handle toggling the swing & econo mode if we need to.
   if (_SwingVToggle && !isSwingVToggle())
     _irsend.sendMidea(kMideaACToggleSwingV, kMideaBits, repeat);
@@ -125,7 +124,7 @@ void IRMideaAC::send(const uint16_t repeat) {
 /// Get a copy of the internal state/code for this protocol.
 /// @return The code for this protocol based on the current internal state.
 uint64_t IRMideaAC::getRaw() {
-  checksum();
+  checksum();  // Ensure correct checksum before sending.
   return _.remote_state;
 }
 
