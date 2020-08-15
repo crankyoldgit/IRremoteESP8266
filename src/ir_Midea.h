@@ -33,50 +33,48 @@
 #if DANBY_DAC
     kSwingVToggleStr = kIonStr;
 #endif
-
+union MideaProtocol{
+  uint64_t remote_state;  /// < The state in native IR code form
+  //only use 48bits
+  struct {
+    // Byte 0
+    uint8_t Sum;
+    // Byte 1
+    uint8_t :8;  // value=0xFF
+    // Byte 2
+    uint8_t :8;  // value=0xFF
+    // Byte 3
+    uint8_t Temp:5;
+    uint8_t useFahrenheit:1;
+    uint8_t :0;
+    // Byte 4
+    uint8_t Mode:3;
+    uint8_t Fan:2;
+    uint8_t :1;
+    uint8_t Sleep:1;
+    uint8_t Power:1;
+    // Byte 5
+    uint8_t :0;
+  };
+};
 // Constants
-const uint8_t kMideaACTempOffset = 24;
-const uint8_t kMideaACTempSize = 5;  // Bits
 const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
 const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
 const uint8_t kMideaACMinTempC = 17;  // Celsius
 const uint8_t kMideaACMaxTempC = 30;  // Celsius
-const uint8_t kMideaACCelsiusOffset = 29;
-const uint8_t kMideaACModeOffset = 32;
 const uint8_t kMideaACCool = 0;     // 0b000
 const uint8_t kMideaACDry = 1;      // 0b001
 const uint8_t kMideaACAuto = 2;     // 0b010
 const uint8_t kMideaACHeat = 3;     // 0b011
 const uint8_t kMideaACFan = 4;      // 0b100
-const uint8_t kMideaACFanOffset = 35;
-const uint8_t kMideaACFanSize = 2;  // Bits
 const uint8_t kMideaACFanAuto = 0;  // 0b00
 const uint8_t kMideaACFanLow = 1;   // 0b01
 const uint8_t kMideaACFanMed = 2;   // 0b10
 const uint8_t kMideaACFanHigh = 3;  // 0b11
-const uint8_t kMideaACSleepOffset = 38;
-const uint8_t kMideaACPowerOffset = 39;
 const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
 // For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
 // const uint64_t kMideaACToggleIonizer = 0x0000A201FFFFFF7C;
 const uint64_t kMideaACToggleEcono = 0x0000A202FFFFFF7E;
-
-// Legacy defines. (Deprecated)
-#define MIDEA_AC_COOL kMideaACCool
-#define MIDEA_AC_DRY kMideaACDry
-#define MIDEA_AC_AUTO kMideaACAuto
-#define MIDEA_AC_HEAT kMideaACHeat
-#define MIDEA_AC_FAN kMideaACFan
-#define MIDEA_AC_FAN_AUTO kMideaACFanAuto
-#define MIDEA_AC_FAN_LOW kMideaACFanLow
-#define MIDEA_AC_FAN_MED kMideaACFanMed
-#define MIDEA_AC_FAN_HI kMideaACFanHigh
-#define MIDEA_AC_POWER kMideaACPower
-#define MIDEA_AC_SLEEP kMideaACSleep
-#define MIDEA_AC_MIN_TEMP_F kMideaACMinTempF
-#define MIDEA_AC_MAX_TEMP_F kMideaACMaxTempF
-#define MIDEA_AC_MIN_TEMP_C kMideaACMinTempC
-#define MIDEA_AC_MAX_TEMP_C kMideaACMaxTempC
 
 // Classes
 /// Class for handling detailed Midea A/C messages.
@@ -85,45 +83,45 @@ class IRMideaAC {
  public:
   explicit IRMideaAC(const uint16_t pin, const bool inverted = false,
                      const bool use_modulation = true);
-  void stateReset(void);
+  void stateReset();
 #if SEND_MIDEA
   void send(const uint16_t repeat = kMideaMinRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
-  int8_t calibrate(void) { return _irsend.calibrate(); }
+  int8_t calibrate() { return _irsend.calibrate(); }
 #endif  // SEND_MIDEA
-  void begin(void);
-  void on(void);
-  void off(void);
+  void begin();
+  void on();
+  void off();
   void setPower(const bool on);
-  bool getPower(void);
-  bool getUseCelsius(void);
+  bool getPower() const;
+  bool getUseCelsius() const;
   void setUseCelsius(const bool celsius);
   void setTemp(const uint8_t temp, const bool useCelsius = false);
-  uint8_t getTemp(const bool useCelsius = false);
+  uint8_t getTemp(const bool useCelsius = false) const;
   void setFan(const uint8_t fan);
-  uint8_t getFan(void);
+  uint8_t getFan() const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode() const;
   void setRaw(const uint64_t newState);
-  uint64_t getRaw(void);
+  uint64_t getRaw();
   static bool validChecksum(const uint64_t state);
   void setSleep(const bool on);
-  bool getSleep(void);
-  bool isSwingVToggle(void);
+  bool getSleep() const;
+  bool isSwingVToggle() const;
   void setSwingVToggle(const bool on);
-  bool getSwingVToggle(void);
-  bool isEconoToggle(void);
+  bool getSwingVToggle();
+  bool isEconoToggle() const;
   void setEconoToggle(const bool on);
-  bool getEconoToggle(void);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  bool getEconoToggle();
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
-  String toString(void);
+  String toString();
 #ifndef UNIT_TEST
 
  private:
@@ -133,10 +131,10 @@ class IRMideaAC {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint64_t remote_state;  ///< The state of the IR remote in IR code form.
+  MideaProtocol _;
   bool _SwingVToggle;
   bool _EconoToggle;
-  void checksum(void);
+  void checksum();
   static uint8_t calcChecksum(const uint64_t state);
 };
 

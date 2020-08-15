@@ -42,8 +42,6 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_MIDEA
 /// Send a Midea message
@@ -97,22 +95,22 @@ IRMideaAC::IRMideaAC(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
-void IRMideaAC::stateReset(void) {
+void IRMideaAC::stateReset() {
   // Power On, Mode Auto, Fan Auto, Temp = 25C/77F
-  remote_state = 0xA1826FFFFF62;
+  _.remote_state = 0xA1826FFFFF62;
   _SwingVToggle = false;
   _EconoToggle = false;
 }
 
 /// Set up hardware to be able to send a message.
-void IRMideaAC::begin(void) { _irsend.begin(); }
+void IRMideaAC::begin() { _irsend.begin(); }
 
 #if SEND_MIDEA
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMideaAC::send(const uint16_t repeat) {
-  this->checksum();  // Ensure correct checksum before sending.
-  _irsend.sendMidea(remote_state, kMideaBits, repeat);
+  checksum();  // Ensure correct checksum before sending.
+  _irsend.sendMidea(_.remote_state, kMideaBits, repeat);
   // Handle toggling the swing & econo mode if we need to.
   if (_SwingVToggle && !isSwingVToggle())
     _irsend.sendMidea(kMideaACToggleSwingV, kMideaBits, repeat);
@@ -126,45 +124,45 @@ void IRMideaAC::send(const uint16_t repeat) {
 
 /// Get a copy of the internal state/code for this protocol.
 /// @return The code for this protocol based on the current internal state.
-uint64_t IRMideaAC::getRaw(void) {
-  this->checksum();
-  return GETBITS64(remote_state, 0, kMideaBits);
+uint64_t IRMideaAC::getRaw() {
+  checksum();
+  return _.remote_state;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
-void IRMideaAC::setRaw(const uint64_t newState) { remote_state = newState; }
+void IRMideaAC::setRaw(const uint64_t newState) { _.remote_state = newState; }
 
 /// Set the requested power state of the A/C to on.
-void IRMideaAC::on(void) { setPower(true); }
+void IRMideaAC::on() { setPower(true); }
 
 /// Set the requested power state of the A/C to off.
-void IRMideaAC::off(void) { setPower(false); }
+void IRMideaAC::off() { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setPower(const bool on) {
-  setBit(&remote_state, kMideaACPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMideaAC::getPower(void) {
-  return GETBIT64(remote_state, kMideaACPowerOffset);
+bool IRMideaAC::getPower() const {
+  return _.Power;
 }
 
 /// Is the device currently using Celsius or the Fahrenheit temp scale?
 /// @return true, the A/C unit uses Celsius natively, false, is Fahrenheit.
-bool IRMideaAC::getUseCelsius(void) {
-  return !GETBIT64(remote_state, kMideaACCelsiusOffset);
+bool IRMideaAC::getUseCelsius() const {
+  return !_.useFahrenheit;
 }
 
 /// Set the A/C unit to use Celsius natively.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setUseCelsius(const bool on) {
-  if (on != getUseCelsius()) {  // We need to change.
+  if (on == _.useFahrenheit) {  // We need to change.
     uint8_t native_temp = getTemp(!on);  // Get the old native temp.
-    setBit(&remote_state, kMideaACCelsiusOffset, !on);  // Cleared is on.
+    _.useFahrenheit = !on;  // Cleared is on.
     setTemp(native_temp, !on);  // Reset temp using the old native temp.
   }
 }
@@ -180,47 +178,46 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
     min_temp = kMideaACMinTempC;
   }
   uint8_t new_temp = std::min(max_temp, std::max(min_temp, temp));
-  if (getUseCelsius() && !useCelsius)  // Native is in C, new_temp is in F
+  if (!_.useFahrenheit && !useCelsius)  // Native is in C, new_temp is in F
     new_temp = fahrenheitToCelsius(new_temp) - kMideaACMinTempC;
-  else if (!getUseCelsius() && useCelsius)  // Native is in F, new_temp is in C
+  else if (_.useFahrenheit && useCelsius)  // Native is in F, new_temp is in C
     new_temp = celsiusToFahrenheit(new_temp) - kMideaACMinTempF;
   else  // Native and desired are the same units.
     new_temp -= min_temp;
   // Set the actual data.
-  setBits(&remote_state, kMideaACTempOffset, kMideaACTempSize, new_temp);
+  _.Temp = new_temp;
 }
 
 /// Get the current temperature setting.
 /// @param[in] celsius true, the results are in Celsius. false, in Fahrenheit.
 /// @return The current setting for temp. in the requested units/scale.
-uint8_t IRMideaAC::getTemp(const bool celsius) {
-  uint8_t temp = GETBITS64(remote_state, kMideaACTempOffset, kMideaACTempSize);
-  if (getUseCelsius())
+uint8_t IRMideaAC::getTemp(const bool celsius) const {
+  uint8_t temp = _.Temp;
+  if (!_.useFahrenheit)
     temp += kMideaACMinTempC;
   else
     temp += kMideaACMinTempF;
-  if (celsius && !getUseCelsius()) temp = fahrenheitToCelsius(temp) + 0.5;
-  if (!celsius && getUseCelsius()) temp = celsiusToFahrenheit(temp);
+  if (celsius && _.useFahrenheit) temp = fahrenheitToCelsius(temp) + 0.5;
+  if (!celsius && !_.useFahrenheit) temp = celsiusToFahrenheit(temp);
   return temp;
 }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting. 1-3 set the speed, 0 for auto.
 void IRMideaAC::setFan(const uint8_t fan) {
-  setBits(&remote_state, kMideaACFanOffset, kMideaACFanSize,
-          (fan > kMideaACFanHigh) ? kMideaACFanAuto : fan);
+  _.Fan = (fan > kMideaACFanHigh) ? kMideaACFanAuto : fan;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRMideaAC::getFan(void) {
-  return GETBITS64(remote_state, kMideaACFanOffset, kMideaACFanSize);
+uint8_t IRMideaAC::getFan() const {
+  return _.Fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMideaAC::getMode(void) {
-  return GETBITS64(remote_state, kMideaACModeOffset, kModeBitsSize);
+uint8_t IRMideaAC::getMode() const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -232,23 +229,23 @@ void IRMideaAC::setMode(const uint8_t mode) {
     case kMideaACHeat:
     case kMideaACDry:
     case kMideaACFan:
-      setBits(&remote_state, kMideaACModeOffset, kModeBitsSize, mode);
+      _.Mode = mode;
       break;
     default:
-      this->setMode(kMideaACAuto);
+      _.Mode = kMideaACAuto;
   }
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setSleep(const bool on) {
-  setBit(&remote_state, kMideaACSleepOffset, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMideaAC::getSleep(void) {
-  return GETBIT64(remote_state, kMideaACSleepOffset);
+bool IRMideaAC::getSleep() const {
+  return _.Sleep;
 }
 
 /// Set the A/C to toggle the vertical swing toggle for the next send.
@@ -259,14 +256,14 @@ void IRMideaAC::setSwingVToggle(const bool on) { _SwingVToggle = on; }
 /// Is the current state a vertical swing toggle message?
 /// @note On Danby A/C units, this is associated with the Ion Filter instead.
 /// @return true, it is. false, it isn't.
-bool IRMideaAC::isSwingVToggle(void) {
-  return remote_state == kMideaACToggleSwingV;
+bool IRMideaAC::isSwingVToggle() const {
+  return _.remote_state == kMideaACToggleSwingV;
 }
 
 // Get the vertical swing toggle state of the A/C.
 /// @note On Danby A/C units, this is associated with the Ion Filter instead.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMideaAC::getSwingVToggle(void) {
+bool IRMideaAC::getSwingVToggle() {
   _SwingVToggle |= isSwingVToggle();
   return _SwingVToggle;
 }
@@ -277,13 +274,13 @@ void IRMideaAC::setEconoToggle(const bool on) { _EconoToggle = on; }
 
 /// Is the current state an Econo (energy saver) toggle message?
 /// @return true, it is. false, it isn't.
-bool IRMideaAC::isEconoToggle(void) {
-  return remote_state == kMideaACToggleEcono;
+bool IRMideaAC::isEconoToggle() const {
+  return _.remote_state == kMideaACToggleEcono;
 }
 
 // Get the Econo (energy saver) toggle state of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMideaAC::getEconoToggle(void) {
+bool IRMideaAC::getEconoToggle() {
   _EconoToggle |= isEconoToggle();
   return _EconoToggle;
 }
@@ -311,9 +308,9 @@ bool IRMideaAC::validChecksum(const uint64_t state) {
 }
 
 /// Calculate & set the checksum for the current internal state of the remote.
-void IRMideaAC::checksum(void) {
+void IRMideaAC::checksum() {
   // Stored the checksum value in the last byte.
-  setBits(&remote_state, 0, 8, calcChecksum(remote_state));
+  _.Sum = calcChecksum(_.remote_state);
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -408,7 +405,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRMideaAC::toString(void) {
+String IRMideaAC::toString() {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   bool needComma = false;
