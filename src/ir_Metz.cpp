@@ -86,7 +86,7 @@ bool IRrecv::decodeMetz(decode_results *results, uint16_t offset,
     if (address != invertBits(GETBITS64(data, 0, kMetzAddressBits),
                               kMetzAddressBits) ||
         command != invertBits(GETBITS64(data, 2 * kMetzAddressBits,
-                                                 kMetzCommandBits),
+                                        kMetzCommandBits),
                               kMetzCommandBits)) return false;
   }
   // Success
