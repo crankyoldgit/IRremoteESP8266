@@ -864,6 +864,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   DPRINTLN("Attempting Voltas decode");
   if (decodeVoltas(results)) return true;
 #endif  // DECODE_VOLTAS
+#if DECODE_METZ
+    DPRINTLN("Attempting Metz decode");
+    if (decodeMetz(results, offset)) return true;
+#endif  // DECODE_METZ
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

@@ -601,6 +601,9 @@
 #ifndef D_STR_MAGIQUEST
 #define D_STR_MAGIQUEST "MAGIQUEST"
 #endif  // D_STR_MAGIQUEST
+#ifndef D_STR_METZ
+#define D_STR_METZ "METZ"
+#endif  // D_STR_METZ
 #ifndef D_STR_MIDEA
 #define D_STR_MIDEA "MIDEA"
 #endif  // D_STR_MIDEA

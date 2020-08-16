@@ -673,6 +673,11 @@ bool decodeZepeal(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kZepealBits,
                   const bool strict = true);
 #endif  // DECODE_ZEPEAL
+#if DECODE_METZ
+bool decodeMetz(decode_results *results, uint16_t offset = kStartOffset,
+                const uint16_t nbits = kMetzBits,
+                const bool strict = true);
+#endif  // DECODE_METZ
 };
 
 #endif  // IRRECV_H_
