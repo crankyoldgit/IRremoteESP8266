@@ -670,8 +670,12 @@
 #define SEND_ZEPEAL            _IR_ENABLE_DEFAULT_
 #endif  // SEND_ZEPEAL
 
-#define SEND_VOLTAS true
-#define DECODE_VOLTAS true
+#ifndef DECODE_VOLTAS
+#define DECODE_VOLTAS          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_VOLTAS
+#ifndef SEND_VOLTAS
+#define SEND_VOLTAS            _IR_ENABLE_DEFAULT_
+#endif  // SEND_VOLTAS
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -684,7 +688,8 @@
      DECODE_NEOCLIMA || DECODE_DAIKIN176 || DECODE_DAIKIN128 || \
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
-     DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC)
+     DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
+     DECODE_VOLTAS)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -813,7 +818,7 @@ enum decode_type_t {
   MIDEA24,
   ZEPEAL,
   SANYO_AC,
-  VOLTAS,
+  VOLTAS,  // 90
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = VOLTAS,
 };
