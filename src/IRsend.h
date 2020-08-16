@@ -640,7 +640,7 @@ class IRsend {
                        const uint16_t nbytes = kVoltasStateLength,
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_VOLTAS
-  
+
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH

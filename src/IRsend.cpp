@@ -597,8 +597,6 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 /// @return The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
-   	case VOLTAS:
-	  return kVoltasBits;
     case MULTIBRACKETS:
       return 8;
     case RC5:
@@ -733,6 +731,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kToshibaACBits;
     case TROTEC:
       return kTrotecBits;
+    case VOLTAS:
+      return kVoltasBits;
     case WHIRLPOOL_AC:
       return kWhirlpoolAcBits;
     // No default amount of bits.
