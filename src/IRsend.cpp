@@ -597,6 +597,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 /// @return The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
+   	case VOLTAS:
+	  return kVoltasBits;
     case MULTIBRACKETS:
       return 8;
     case RC5:
@@ -1001,6 +1003,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 bool IRsend::send(const decode_type_t type, const uint8_t *state,
                   const uint16_t nbytes) {
   switch (type) {
+#if SEND_VOLTAS
+    case VOLTAS:
+      sendVoltas(state, nbytes);
+      break;
+#endif  // SEND_VOLTAS
 #if SEND_AMCOR
     case AMCOR:
       sendAmcor(state, nbytes);
