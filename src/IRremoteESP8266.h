@@ -1023,6 +1023,8 @@ const uint16_t kWhynterBits = 32;
 const uint8_t  kVestelAcBits = 56;
 const uint16_t kZepealBits = 16;
 const uint16_t kZepealMinRepeat = 4;
+const uint16_t kVoltasBits = 80;
+const uint16_t kVoltasStateLength = 10;
 
 
 // Legacy defines. (Deprecated)
