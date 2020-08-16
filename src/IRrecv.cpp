@@ -860,6 +860,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Sanyo AC decode");
     if (decodeSanyoAc(results, offset)) return true;
 #endif  // DECODE_SANYO_AC
+#if DECODE_VOLTAS
+  DPRINTLN("Attempting Voltas decode");
+  if (decodeVoltas(results)) return true;
+#endif  // DECODE_VOLTAS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
