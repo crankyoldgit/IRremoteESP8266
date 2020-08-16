@@ -262,6 +262,12 @@ class IRrecv {
                            const bool GEThomas = true);
   void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
+#if DECODE_VOLTAS
+  bool decodeVoltas(decode_results *results,
+                         uint16_t offset = kStartOffset,
+                         const uint16_t nbits = kVoltasBits,
+                         const bool strict = true);
+#endif  // DECODE_VOLTAS
 #if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,
                  const uint16_t nbits = kNECBits, const bool strict = true);

@@ -635,6 +635,11 @@ class IRsend {
                   const uint16_t nbits = kZepealBits,
                   const uint16_t repeat = kZepealMinRepeat);
 #endif
+#if SEND_VOLTAS
+  void sendVoltas(const unsigned char data[],
+                       const uint16_t nbytes = kVoltasStateLength,
+                       const uint16_t repeat = kNoRepeat);
+#endif  // SEND_VOLTAS
 
  protected:
 #ifdef UNIT_TEST

@@ -731,6 +731,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kToshibaACBits;
     case TROTEC:
       return kTrotecBits;
+    case VOLTAS:
+      return kVoltasBits;
     case WHIRLPOOL_AC:
       return kWhirlpoolAcBits;
     // No default amount of bits.
@@ -1001,6 +1003,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 bool IRsend::send(const decode_type_t type, const uint8_t *state,
                   const uint16_t nbytes) {
   switch (type) {
+#if SEND_VOLTAS
+    case VOLTAS:
+      sendVoltas(state, nbytes);
+      break;
+#endif  // SEND_VOLTAS
 #if SEND_AMCOR
     case AMCOR:
       sendAmcor(state, nbytes);
