@@ -730,6 +730,9 @@
 #ifndef D_STR_VESTEL_AC
 #define D_STR_VESTEL_AC "VESTEL_AC"
 #endif  // D_STR_VESTEL_AC
+#ifndef D_STR_VOLTAS
+#define D_STR_VOLTAS "VOLTAS"
+#endif  // D_STR_VOLTAS
 #ifndef D_STR_WHIRLPOOL_AC
 #define D_STR_WHIRLPOOL_AC "WHIRLPOOL_AC"
 #endif  // D_STR_WHIRLPOOL_AC
