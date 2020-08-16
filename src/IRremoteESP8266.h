@@ -810,8 +810,9 @@ enum decode_type_t {
   MIDEA24,
   ZEPEAL,
   SANYO_AC,
+  VOLTAS,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SANYO_AC,
+  kLastDecodeType = VOLTAS,
 };
 
 // Message lengths & required repeat values
