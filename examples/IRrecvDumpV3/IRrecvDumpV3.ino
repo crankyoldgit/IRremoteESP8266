@@ -128,7 +128,7 @@ void setup() {
     delay(50);
   // Perform a low level sanity checks that the compiler performs bit field
   // packing as we expect and Endianness is as we expect.
-  assert(irutils::lowLevelSanityCheck());
+  assert(irutils::lowLevelSanityCheck() == 0);
 
   Serial.printf("\n" D_STR_IRRECVDUMP_STARTUP "\n", kRecvPin);
   OTAinit();  // setup OTA handlers and show IP
