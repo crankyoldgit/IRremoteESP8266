@@ -1,5 +1,6 @@
 // Copyright 2020 crankyoldgit
 
+#include "ir_Voltas.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -38,6 +39,11 @@ TEST(TestDecodeVoltas, RealExample) {
   ASSERT_EQ(decode_type_t::VOLTAS, irsend.capture.decode_type);
   ASSERT_EQ(kVoltasBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Turbo: Off, WiFi: On, Light: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 TEST(TestDecodeVoltas, SyntheticExample) {
@@ -64,4 +70,42 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::VOLTAS));
   ASSERT_EQ(kVoltasBits, IRsend::defaultBits(decode_type_t::VOLTAS));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::VOLTAS));
+}
+
+TEST(TestIRVoltasClass, Checksums) {
+  const uint8_t valid[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
+  EXPECT_TRUE(IRVoltas::validChecksum(valid));
+  EXPECT_FALSE(IRVoltas::validChecksum(valid, kVoltasStateLength - 1));
+  EXPECT_EQ(0xE6, IRVoltas::calcChecksum(valid));
+}
+
+TEST(TestIRVoltasClass, SetandGetRaw) {
+  const uint8_t valid[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
+  const uint8_t badchecksum[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
+  IRVoltas ac(kGpioUnused);
+
+  ac.setRaw(valid);
+  EXPECT_STATE_EQ(valid, ac.getRaw(), kVoltasBits);
+  ac.setRaw(badchecksum);
+  EXPECT_STATE_EQ(valid, ac.getRaw(), kVoltasBits);
+}
+
+TEST(TestIRVoltasClass, Power) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
 }

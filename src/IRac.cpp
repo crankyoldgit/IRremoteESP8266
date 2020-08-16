@@ -42,6 +42,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 
 /// Class constructor
@@ -3112,6 +3113,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_VESTEL_AC
+#if DECODE_VOLTAS
+      case decode_type_t::VOLTAS: {
+        IRVoltas ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_VOLTAS
 #if DECODE_TECO
       case decode_type_t::TECO: {
         IRTecoAc ac(kGpioUnused);
@@ -3513,6 +3521,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_VESTEL_AC
+#if DECODE_VOLTAS
+      case decode_type_t::VOLTAS: {
+        IRVestelAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_VOLTAS
 #if DECODE_WHIRLPOOL_AC
       case decode_type_t::WHIRLPOOL_AC: {
         IRWhirlpoolAc ac(kGpioUnused);
