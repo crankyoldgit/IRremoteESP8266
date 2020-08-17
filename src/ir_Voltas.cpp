@@ -91,7 +91,10 @@ IRVoltas::IRVoltas(const uint16_t pin, const bool inverted,
 // Reset the internal state to a fixed known good state.
 void IRVoltas::stateReset() {
   // This resets to a known-good state.
-  std::memset(_.raw, 0, sizeof _.raw);
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1238#issuecomment-674699746
+  const uint8_t kReset[kVoltasStateLength] = {
+      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xCB};
+  setRaw(kReset);
 }
 
 /// Set up hardware to be able to send a message.
@@ -163,8 +166,13 @@ bool IRVoltas::getPower(void) const { return _.Power; }
 void IRVoltas::setMode(const uint8_t mode) {
   switch (mode) {
     case kVoltasFan:
-    case kVoltasHeat:
+      setFan(kVoltasFanHigh);
+      break;
     case kVoltasDry:
+      setFan(kVoltasFanLow);
+      setTemp(kVoltasDryTemp);
+      break;
+    case kVoltasHeat:
     case kVoltasCool:
       break;
     default:
@@ -178,6 +186,30 @@ void IRVoltas::setMode(const uint8_t mode) {
 /// @return The current operating mode setting.
 uint8_t IRVoltas::getMode(void) { return _.Mode; }
 
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
+uint8_t IRVoltas::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kHeat: return kVoltasHeat;
+    case stdAc::opmode_t::kDry:  return kVoltasDry;
+    case stdAc::opmode_t::kFan:  return kVoltasFan;
+    default:                     return kVoltasCool;
+  }
+}
+
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
+stdAc::opmode_t IRVoltas::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kVoltasHeat: return stdAc::opmode_t::kHeat;
+    case kVoltasDry:  return stdAc::opmode_t::kDry;
+    case kVoltasFan:  return stdAc::opmode_t::kFan;
+    default:            return stdAc::opmode_t::kCool;
+  }
+}
+
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
 void IRVoltas::setTemp(const uint8_t temp) {
@@ -185,6 +217,10 @@ void IRVoltas::setTemp(const uint8_t temp) {
   new_temp = std::min(kVoltasMaxTemp, new_temp);
   _.Temp = new_temp - kVoltasMinTemp;
 }
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRVoltas::getTemp(void) { return _.Temp + kVoltasMinTemp; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
@@ -200,6 +236,10 @@ void IRVoltas::setFan(const uint8_t fan) {
       setFan(kVoltasFanAuto);
   }
 }
+
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
+uint8_t IRVoltas::getFan(void) { return _.FanSpeed; }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
@@ -227,13 +267,21 @@ stdAc::fanspeed_t IRVoltas::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-/// Get the current fan speed setting.
-/// @return The current fan speed/mode.
-uint8_t IRVoltas::getFan(void) { return _.FanSpeed; }
+/// Set the Vertical Swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setSwingV(const bool on) { _.SwingV = on ? 0b111 : 0b000; }
 
-/// Get the current temperature setting.
-/// @return The current setting for temp. in degrees celsius.
-uint8_t IRVoltas::getTemp(void) { return _.Temp + kVoltasMinTemp; }
+/// Get the Vertical Swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getSwingV(void) const { return _.SwingV == 0b111; }
+
+/// Set the Horizontal Swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setSwingH(const bool on) { _.SwingH = on; }
+
+/// Get the Horizontal Swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getSwingH(void) const { return _.SwingH; }
 
 /// Change the Wifi setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -273,29 +321,22 @@ stdAc::state_t IRVoltas::toCommon() {
   stdAc::state_t result;
   result.protocol = decode_type_t::VOLTAS;
   result.power = _.Power;
-  // result.mode = toCommonMode(getMode());
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.FanSpeed);
-  /*
-  if (getSwingVerticalAuto())
-    result.swingv = stdAc::swingv_t::kAuto;
-  else
-    result.swingv = toCommonSwingV(getSwingVerticalPosition());
-  */
+  result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.turbo = _.Turbo;
   result.econo = _.Econo;
   result.light = _.Light;
-  /*
-  result.clean = getXFan();
-  result.sleep = getSleep() ? 0 : -1;
-  */
   // Not supported.
   result.model = -1;
-  result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.filter = false;
+  result.clean = false;
   result.beep = false;
+  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -304,13 +345,15 @@ stdAc::state_t IRVoltas::toCommon() {
 /// @return A human readable string.
 String IRVoltas::toString() {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, 255, kVoltasCool, kVoltasHeat,
                             kVoltasDry, kVoltasFan);
   result += addTempToString(getTemp());
   result += addFanToString(_.FanSpeed, kVoltasFanHigh, kVoltasFanLow,
                            kVoltasFanAuto, kVoltasFanAuto, kVoltasFanMed);
+  result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(_.SwingH, kSwingHStr);
   result += addBoolToString(_.Turbo, kTurboStr);
   result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.Wifi, kWifiStr);

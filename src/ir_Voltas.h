@@ -75,10 +75,11 @@ const uint8_t kVoltasHeat  = 0b0010;  ///< 2
 const uint8_t kVoltasDry   = 0b0100;  ///< 4
 const uint8_t kVoltasCool  = 0b1000;  ///< 8
 const uint8_t kVoltasMinTemp = 16;  ///< Celsius
+const uint8_t kVoltasDryTemp = 24;  ///< Celsius
 const uint8_t kVoltasMaxTemp = 30;  ///< Celsius
-const uint8_t kVoltasFanLow =  0b001;  ///< 1
+const uint8_t kVoltasFanHigh = 0b001;  ///< 1
 const uint8_t kVoltasFanMed =  0b010;  ///< 2
-const uint8_t kVoltasFanHigh = 0b100;  ///< 4
+const uint8_t kVoltasFanLow =  0b100;  ///< 4
 const uint8_t kVoltasFanAuto = 0b111;  ///< 7
 
 // Classes
@@ -111,6 +112,10 @@ class IRVoltas {
   uint8_t getFan(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
+  void setSwingH(const bool on);
+  bool getSwingH(void) const;
+  void setSwingV(const bool on);
+  bool getSwingV(void) const;
   void setEcono(const bool on);
   bool getEcono(void) const;
   void setLight(const bool on);

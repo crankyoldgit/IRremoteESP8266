@@ -36,6 +36,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 
 // Constants
@@ -405,6 +406,13 @@ void electra(IRElectraAc *ac,
               const int16_t sleep = -1, const int16_t clock = -1,
               const bool sendNormal = true);
 #endif  // SEND_VESTEL_AC
+#if SEND_VOLTAS
+  void voltas(IRVoltas *ac,
+              const bool on, const stdAc::opmode_t mode,
+              const float degrees, const stdAc::fanspeed_t fan,
+              const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+              const bool turbo, const bool econo, const bool light);
+#endif  // SEND_VOLTAS
 #if SEND_WHIRLPOOL_AC
   void whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
                  const bool on, const stdAc::opmode_t mode, const float degrees,

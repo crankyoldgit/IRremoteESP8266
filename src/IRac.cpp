@@ -263,6 +263,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_VESTEL_AC
     case decode_type_t::VESTEL_AC:
 #endif
+#if SEND_VOLTAS
+    case decode_type_t::VOLTAS:
+#endif
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
@@ -1886,6 +1889,43 @@ void IRac::vestel(IRVestelAc *ac,
 }
 #endif  // SEND_VESTEL_AC
 
+#if SEND_VOLTAS
+/// Send a Voltas A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRVoltas object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Run the device in economical mode.
+/// @param[in] light Turn on the LED/Display mode.
+void IRac::voltas(IRVoltas *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                  const bool turbo, const bool econo, const bool light) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
+  // No Quiet setting available.
+  ac->setTurbo(turbo);
+  ac->setEcono(econo);
+  ac->setLight(light);
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_VOLTAS
+
 #if SEND_WHIRLPOOL_AC
 /// Send a Whirlpool A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRWhirlpoolAc object to use.
@@ -2451,6 +2491,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_VESTEL_AC
+#if SEND_VOLTAS
+    case VOLTAS:
+    {
+      IRVoltas ac(_pin, _inverted, _modulation);
+      voltas(&ac, send.power, send.mode, degC, send.fanspeed,
+             send.swingv, send.swingh, send.turbo, send.econo, send.light);
+      break;
+    }
+#endif  // SEND_VOLTAS
 #if SEND_WHIRLPOOL_AC
     case WHIRLPOOL_AC:
     {

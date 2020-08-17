@@ -40,7 +40,8 @@ TEST(TestDecodeVoltas, RealExample) {
   ASSERT_EQ(kVoltasBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (High), "
+      "Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
+      "Swing(V): Off, Swing(H): On, "
       "Turbo: Off, Econo: Off, WiFi: On, Light: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -68,7 +69,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("VOLTAS", typeToString(decode_type_t::VOLTAS));
   ASSERT_EQ(decode_type_t::VOLTAS, strToDecodeType("VOLTAS"));
   ASSERT_TRUE(hasACState(decode_type_t::VOLTAS));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::VOLTAS));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::VOLTAS));
   ASSERT_EQ(kVoltasBits, IRsend::defaultBits(decode_type_t::VOLTAS));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::VOLTAS));
 }
@@ -231,4 +232,32 @@ TEST(TestVoltasClass, FanSpeed) {
 
   ac.setFan(255);
   EXPECT_EQ(kVoltasFanAuto, ac.getFan());
+}
+
+TEST(TestVoltasClass, SwingV) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwingV(true);
+  EXPECT_TRUE(ac.getSwingV());
+
+  ac.setSwingV(false);
+  EXPECT_EQ(false, ac.getSwingV());
+
+  ac.setSwingV(true);
+  EXPECT_TRUE(ac.getSwingV());
+}
+
+TEST(TestVoltasClass, SwingH) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwingH(true);
+  EXPECT_TRUE(ac.getSwingH());
+
+  ac.setSwingH(false);
+  EXPECT_EQ(false, ac.getSwingH());
+
+  ac.setSwingH(true);
+  EXPECT_TRUE(ac.getSwingH());
 }

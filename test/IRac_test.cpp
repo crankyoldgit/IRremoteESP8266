@@ -29,6 +29,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
+#include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 #include "IRac.h"
 #include "IRrecv.h"
@@ -1554,6 +1555,44 @@ TEST(TestIRac, Vestel) {
       "m520s100000", ac._irsend.outputStr());
 }
 
+TEST(TestIRac, Voltas) {
+  IRVoltas ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 8 (Cool), Temp: 18C, Fan: 1 (High), "
+      "Swing(V): On, Swing(H): On, "
+      "Turbo: Off, Econo: Off, WiFi: Off, Light: On";
+
+  ac.begin();
+  irac.voltas(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kCool,      // Mode
+              18,                          // Celsius
+              stdAc::fanspeed_t::kHigh,    // Fan speed
+              stdAc::swingv_t::kAuto,      // Vertical Swing
+              stdAc::swingh_t::kAuto,      // Horizontal Swing
+              false,                       // Turbo
+              false,                       // Econo
+              true);                       // Light
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(kVoltasCool, ac.getMode());
+  EXPECT_EQ(18, ac.getTemp());
+  EXPECT_EQ(kVoltasFanHigh, ac.getFan());
+  EXPECT_FALSE(ac.getTurbo());
+  EXPECT_FALSE(ac.getEcono());
+  EXPECT_TRUE(ac.getLight());
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+/* TODO(crankyoldgit): Fix/enable this.
+  ASSERT_EQ(VOLTAS, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kVoltasBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+*/
+}
 
 TEST(TestIRac, Whirlpool) {
   IRWhirlpoolAc ac(kGpioUnused);
