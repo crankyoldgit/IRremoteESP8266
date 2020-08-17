@@ -5,6 +5,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1238
 
 #include "ir_Voltas.h"
+#include <algorithm>
 #include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
@@ -156,6 +157,116 @@ void IRVoltas::setPower(const bool on) { _.Power = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRVoltas::getPower(void) const { return _.Power; }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note If we get an unexpected mode, default to AUTO.
+void IRVoltas::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kVoltasFan:
+    case kVoltasHeat:
+    case kVoltasDry:
+    case kVoltasCool:
+      break;
+    default:
+      setMode(kVoltasCool);
+      return;
+  }
+  _.Mode = mode;
+}
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRVoltas::getMode(void) { return _.Mode; }
+
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
+void IRVoltas::setTemp(const uint8_t temp) {
+  uint8_t new_temp = std::max(kVoltasMinTemp, temp);
+  new_temp = std::min(kVoltasMaxTemp, new_temp);
+  _.Temp = new_temp - kVoltasMinTemp;
+}
+
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+void IRVoltas::setFan(const uint8_t fan) {
+  switch (fan) {
+    case kVoltasFanLow:
+    case kVoltasFanMed:
+    case kVoltasFanHigh:
+    case kVoltasFanAuto:
+      _.FanSpeed = fan;
+      break;
+    default:
+      setFan(kVoltasFanAuto);
+  }
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
+uint8_t IRVoltas::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:    return kVoltasFanLow;
+    case stdAc::fanspeed_t::kMedium: return kVoltasFanMed;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:    return kVoltasFanHigh;
+    default:                         return kVoltasFanAuto;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
+stdAc::fanspeed_t IRVoltas::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kVoltasFanHigh: return stdAc::fanspeed_t::kMax;
+    case kVoltasFanMed:  return stdAc::fanspeed_t::kMedium;
+    case kVoltasFanLow:  return stdAc::fanspeed_t::kMin;
+    default:             return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
+uint8_t IRVoltas::getFan(void) { return _.FanSpeed; }
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRVoltas::getTemp(void) { return _.Temp + kVoltasMinTemp; }
+
+/// Change the Wifi setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setWifi(const bool on) { _.Wifi = on; }
+
+/// Get the value of the current Wifi setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getWifi(void) const { return _.Wifi; }
+
+/// Change the Turbo setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setTurbo(const bool on) { _.Turbo = on; }
+
+/// Get the value of the current Turbo setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getTurbo(void) const { return _.Turbo; }
+
+/// Change the Econo setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setEcono(const bool on) { _.Econo = on; }
+
+/// Get the value of the current Econo setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getEcono(void) const { return _.Econo; }
+
+/// Change the Light setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setLight(const bool on) { _.Light = on; }
+
+/// Get the value of the current Light setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getLight(void) const { return _.Light; }
+
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRVoltas::toCommon() {
@@ -164,9 +275,9 @@ stdAc::state_t IRVoltas::toCommon() {
   result.power = _.Power;
   // result.mode = toCommonMode(getMode());
   result.celsius = true;
-  /*
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
+  result.fanspeed = toCommonFanSpeed(_.FanSpeed);
+  /*
   if (getSwingVerticalAuto())
     result.swingv = stdAc::swingv_t::kAuto;
   else
@@ -193,13 +304,15 @@ stdAc::state_t IRVoltas::toCommon() {
 /// @return A human readable string.
 String IRVoltas::toString() {
   String result = "";
-  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
-  /*
-  result += addModeToString(getMode(), kVoltasAuto, kVoltasCool, kVoltasHeat,
+  result += addModeToString(_.Mode, 255, kVoltasCool, kVoltasHeat,
                             kVoltasDry, kVoltasFan);
-  */
+  result += addTempToString(getTemp());
+  result += addFanToString(_.FanSpeed, kVoltasFanHigh, kVoltasFanLow,
+                           kVoltasFanAuto, kVoltasFanAuto, kVoltasFanMed);
   result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.Wifi, kWifiStr);
   result += addBoolToString(_.Light, kLightStr);
   return result;

@@ -70,6 +70,16 @@ union VoltasProtocol {
 };
 
 // Constants
+const uint8_t kVoltasFan   = 0b0001;  ///< 1
+const uint8_t kVoltasHeat  = 0b0010;  ///< 2
+const uint8_t kVoltasDry   = 0b0100;  ///< 4
+const uint8_t kVoltasCool  = 0b1000;  ///< 8
+const uint8_t kVoltasMinTemp = 16;  ///< Celsius
+const uint8_t kVoltasMaxTemp = 30;  ///< Celsius
+const uint8_t kVoltasFanLow =  0b001;  ///< 1
+const uint8_t kVoltasFanMed =  0b010;  ///< 2
+const uint8_t kVoltasFanHigh = 0b100;  ///< 4
+const uint8_t kVoltasFanAuto = 0b111;  ///< 7
 
 // Classes
 /// Class for handling detailed Voltas A/C messages.
@@ -93,6 +103,8 @@ class IRVoltas {
   bool getPower(void) const;
   void on(void);
   void off(void);
+  void setWifi(const bool on);
+  bool getWifi(void) const;
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
@@ -100,7 +112,11 @@ class IRVoltas {
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
   void setEcono(const bool on);
-  bool getEcono(void);
+  bool getEcono(void) const;
+  void setLight(const bool on);
+  bool getLight(void) const;
+  void setTurbo(const bool on);
+  bool getTurbo(void) const;
   void setOffTimer(const uint16_t nr_of_mins);
   uint16_t getOffTimer(void);
   uint8_t* getRaw(void);

@@ -40,7 +40,8 @@ TEST(TestDecodeVoltas, RealExample) {
   ASSERT_EQ(kVoltasBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Turbo: Off, WiFi: On, Light: Off",
+      "Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (High), "
+      "Turbo: Off, Econo: Off, WiFi: On, Light: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -108,4 +109,126 @@ TEST(TestIRVoltasClass, Power) {
 
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRVoltasClass, Wifi) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setWifi(false);
+  EXPECT_FALSE(ac.getWifi());
+  ac.setWifi(true);
+  EXPECT_TRUE(ac.getWifi());
+  ac.setWifi(false);
+  EXPECT_FALSE(ac.getWifi());
+}
+
+TEST(TestIRVoltasClass, Turbo) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+}
+
+TEST(TestIRVoltasClass, Econo) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+}
+
+TEST(TestIRVoltasClass, Light) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+}
+
+TEST(TestVoltasClass, OperatingMode) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kVoltasCool);
+  EXPECT_EQ(kVoltasCool, ac.getMode());
+  ac.setMode(kVoltasFan);
+  EXPECT_EQ(kVoltasFan, ac.getMode());
+  ac.setMode(kVoltasDry);
+  EXPECT_EQ(kVoltasDry, ac.getMode());
+  ac.setMode(kVoltasHeat);
+  EXPECT_EQ(kVoltasHeat, ac.getMode());
+
+  ac.setMode(kVoltasCool - 1);
+  EXPECT_EQ(kVoltasCool, ac.getMode());
+
+  ac.setMode(kVoltasCool + 1);
+  EXPECT_EQ(kVoltasCool, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kVoltasCool, ac.getMode());
+}
+
+TEST(TestVoltasClass, Temperature) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTemp(kVoltasMinTemp);
+  EXPECT_EQ(kVoltasMinTemp, ac.getTemp());
+
+  ac.setTemp(kVoltasMinTemp + 1);
+  EXPECT_EQ(kVoltasMinTemp + 1, ac.getTemp());
+
+  ac.setTemp(kVoltasMaxTemp);
+  EXPECT_EQ(kVoltasMaxTemp, ac.getTemp());
+
+  ac.setTemp(kVoltasMinTemp - 1);
+  EXPECT_EQ(kVoltasMinTemp, ac.getTemp());
+
+  ac.setTemp(kVoltasMaxTemp + 1);
+  EXPECT_EQ(kVoltasMaxTemp, ac.getTemp());
+
+  ac.setTemp(23);
+  EXPECT_EQ(23, ac.getTemp());
+
+  ac.setTemp(0);
+  EXPECT_EQ(kVoltasMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kVoltasMaxTemp, ac.getTemp());
+}
+
+TEST(TestVoltasClass, FanSpeed) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+  ac.setFan(kVoltasFanLow);
+
+  ac.setFan(kVoltasFanAuto);
+  EXPECT_EQ(kVoltasFanAuto, ac.getFan());
+
+  ac.setFan(kVoltasFanLow);
+  EXPECT_EQ(kVoltasFanLow, ac.getFan());
+  ac.setFan(kVoltasFanMed);
+  EXPECT_EQ(kVoltasFanMed, ac.getFan());
+  ac.setFan(kVoltasFanHigh);
+  EXPECT_EQ(kVoltasFanHigh, ac.getFan());
+
+  ac.setFan(0);
+  EXPECT_EQ(kVoltasFanAuto, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kVoltasFanAuto, ac.getFan());
 }
