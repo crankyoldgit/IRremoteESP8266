@@ -159,7 +159,7 @@ bool IRMideaAC::getUseCelsius(void) const {
 /// Set the A/C unit to use Celsius natively.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMideaAC::setUseCelsius(const bool on) {
-  if (on != getUseCelsius()) {  // We need to change.
+  if (on == _.useFahrenheit) {  // We need to change.
     uint8_t native_temp = getTemp(!on);  // Get the old native temp.
     _.useFahrenheit = !on;  // Cleared is on.
     setTemp(native_temp, !on);  // Reset temp using the old native temp.
@@ -177,9 +177,9 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
     min_temp = kMideaACMinTempC;
   }
   uint8_t new_temp = std::min(max_temp, std::max(min_temp, temp));
-  if (getUseCelsius() && !useCelsius)  // Native is in C, new_temp is in F
+  if (!_.useFahrenheit && !useCelsius)  // Native is in C, new_temp is in F
     new_temp = fahrenheitToCelsius(new_temp) - kMideaACMinTempC;
-  else if (!getUseCelsius() && useCelsius)  // Native is in F, new_temp is in C
+  else if (_.useFahrenheit && useCelsius)  // Native is in F, new_temp is in C
     new_temp = celsiusToFahrenheit(new_temp) - kMideaACMinTempF;
   else  // Native and desired are the same units.
     new_temp -= min_temp;
@@ -192,12 +192,12 @@ void IRMideaAC::setTemp(const uint8_t temp, const bool useCelsius) {
 /// @return The current setting for temp. in the requested units/scale.
 uint8_t IRMideaAC::getTemp(const bool celsius) const {
   uint8_t temp = _.Temp;
-  if (getUseCelsius())
+  if (!_.useFahrenheit)
     temp += kMideaACMinTempC;
   else
     temp += kMideaACMinTempF;
-  if (celsius && !getUseCelsius()) temp = fahrenheitToCelsius(temp) + 0.5;
-  if (!celsius && getUseCelsius()) temp = celsiusToFahrenheit(temp);
+  if (celsius && _.useFahrenheit) temp = fahrenheitToCelsius(temp) + 0.5;
+  if (!celsius && !_.useFahrenheit) temp = celsiusToFahrenheit(temp);
   return temp;
 }
 
@@ -231,7 +231,7 @@ void IRMideaAC::setMode(const uint8_t mode) {
       _.Mode = mode;
       break;
     default:
-      this->setMode(kMideaACAuto);
+      _.Mode = kMideaACAuto;
   }
 }
 
@@ -387,18 +387,18 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
     result.sleep = -1;
     result.clock = -1;
   }
-  if (this->isSwingVToggle()) {
+  if (isSwingVToggle()) {
     result.swingv = (result.swingv != stdAc::swingv_t::kOff) ?
         stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
     return result;
   }
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = this->getUseCelsius();
-  result.degrees = this->getTemp(result.celsius);
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.sleep = this->getSleep() ? 0 : -1;
-  result.econo = this->getEconoToggle();
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
+  result.celsius = !_.useFahrenheit;
+  result.degrees = getTemp(result.celsius);
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.sleep = _.Sleep ? 0 : -1;
+  result.econo = getEconoToggle();
   return result;
 }
 
@@ -409,17 +409,17 @@ String IRMideaAC::toString(void) {
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   bool needComma = false;
   if (!isSwingVToggle() && !isEconoToggle()) {
-    result += addBoolToString(getPower(), kPowerStr, false);
-    result += addModeToString(getMode(), kMideaACAuto, kMideaACCool,
+    result += addBoolToString(_.Power, kPowerStr, false);
+    result += addModeToString(_.Mode, kMideaACAuto, kMideaACCool,
                               kMideaACHeat, kMideaACDry, kMideaACFan);
-    result += addBoolToString(getUseCelsius(), kCelsiusStr);
+    result += addBoolToString(!_.useFahrenheit, kCelsiusStr);
     result += addTempToString(getTemp(true));
     result += '/';
     result += uint64ToString(getTemp(false));
     result += 'F';
-    result += addFanToString(getFan(), kMideaACFanHigh, kMideaACFanLow,
+    result += addFanToString(_.Fan, kMideaACFanHigh, kMideaACFanLow,
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
-    result += addBoolToString(getSleep(), kSleepStr);
+    result += addBoolToString(_.Sleep, kSleepStr);
     needComma = true;
   }
   result += addBoolToString(getSwingVToggle(), kSwingVToggleStr, needComma);

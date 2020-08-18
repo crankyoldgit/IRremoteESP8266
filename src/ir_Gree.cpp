@@ -154,7 +154,7 @@ uint8_t* IRGreeAC::getRaw(void) {
 void IRGreeAC::setRaw(const uint8_t new_code[]) {
   std::memcpy(_.remote_state, new_code, kGreeStateLength);
   // We can only detect the difference between models when the power is on.
-  if (getPower()) {
+  if (_.Power) {
     if (_.ModelA)
       _model = gree_ac_remote_model_t::YAW1F;
     else
@@ -185,7 +185,7 @@ void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
     case gree_ac_remote_model_t::YBOFB: _model = model; break;
-    default: setModel(gree_ac_remote_model_t::YAW1F);
+    default: _model = gree_ac_remote_model_t::YAW1F;
   }
 }
 
@@ -248,7 +248,7 @@ void IRGreeAC::setTemp(const uint8_t temp, const bool fahrenheit) {
   safecelsius = std::max(static_cast<float>(kGreeMinTempC), safecelsius);
   safecelsius = std::min(static_cast<float>(kGreeMaxTempC), safecelsius);
   // An operating mode of Auto locks the temp to a specific value. Do so.
-  if (getMode() == kGreeAuto) safecelsius = 25;
+  if (_.Mode == kGreeAuto) safecelsius = 25;
 
   // Set the "main" Celsius degrees.
   _.Temp = safecelsius - kGreeMinTempC;
@@ -260,7 +260,7 @@ void IRGreeAC::setTemp(const uint8_t temp, const bool fahrenheit) {
 /// @return The temperature in degrees in the current units (C/F) set.
 uint8_t IRGreeAC::getTemp(void) const {
   uint8_t deg = kGreeMinTempC + _.Temp;
-  if (getUseFahrenheit()) {
+  if (_.UseFahrenheit) {
     deg = celsiusToFahrenheit(deg);
     // Retrieve the "extra" fahrenheit from elsewhere in the code.
     if (_.TempExtraDegreeF) deg++;
@@ -273,7 +273,7 @@ uint8_t IRGreeAC::getTemp(void) const {
 /// @param[in] speed The desired setting. 0 is auto, 1-3 is the speed.
 void IRGreeAC::setFan(const uint8_t speed) {
   uint8_t fan = std::min(kGreeFanMax, speed);  // Bounds check
-  if (getMode() == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
+  if (_.Mode == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
   // Set the basic fan values.
   _.Fan = fan;
 }
@@ -566,20 +566,20 @@ stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
 stdAc::state_t IRGreeAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::GREE;
-  result.model = this->getModel();
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = !this->getUseFahrenheit();
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  if (this->getSwingVerticalAuto())
+  result.model = _model;
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
+  result.celsius = !_.UseFahrenheit;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  if (_.SwingAuto)
     result.swingv = stdAc::swingv_t::kAuto;
   else
-    result.swingv = this->toCommonSwingV(this->getSwingVerticalPosition());
-  result.turbo = this->getTurbo();
-  result.light = this->getLight();
-  result.clean = this->getXFan();
-  result.sleep = this->getSleep() ? 0 : -1;
+    result.swingv = toCommonSwingV(_.Swing);
+  result.turbo = _.Turbo;
+  result.light = _.Light;
+  result.clean = _.Xfan;
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
@@ -595,24 +595,24 @@ stdAc::state_t IRGreeAC::toCommon(void) {
 String IRGreeAC::toString(void) {
   String result = "";
   result.reserve(220);  // Reserve some heap for the string to reduce fragging.
-  result += addModelToString(decode_type_t::GREE, getModel(), false);
-  result += addBoolToString(getPower(), kPowerStr);
-  result += addModeToString(getMode(), kGreeAuto, kGreeCool, kGreeHeat,
+  result += addModelToString(decode_type_t::GREE, _model, false);
+  result += addBoolToString(_.Power, kPowerStr);
+  result += addModeToString(_.Mode, kGreeAuto, kGreeCool, kGreeHeat,
                             kGreeDry, kGreeFan);
-  result += addTempToString(getTemp(), !getUseFahrenheit());
-  result += addFanToString(getFan(), kGreeFanMax, kGreeFanMin, kGreeFanAuto,
+  result += addTempToString(getTemp(), !_.UseFahrenheit);
+  result += addFanToString(_.Fan, kGreeFanMax, kGreeFanMin, kGreeFanAuto,
                            kGreeFanAuto, kGreeFanMed);
-  result += addBoolToString(getTurbo(), kTurboStr);
-  result += addBoolToString(getIFeel(), kIFeelStr);
-  result += addBoolToString(getWiFi(), kWifiStr);
-  result += addBoolToString(getXFan(), kXFanStr);
-  result += addBoolToString(getLight(), kLightStr);
-  result += addBoolToString(getSleep(), kSleepStr);
-  result += addLabeledString(getSwingVerticalAuto() ? kAutoStr : kManualStr,
+  result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.IFeel, kIFeelStr);
+  result += addBoolToString(_.WiFi, kWifiStr);
+  result += addBoolToString(_.Xfan, kXFanStr);
+  result += addBoolToString(_.Light, kLightStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  result += addLabeledString(_.SwingAuto ? kAutoStr : kManualStr,
                              kSwingVModeStr);
-  result += addIntToString(getSwingVerticalPosition(), kSwingVStr);
+  result += addIntToString(_.Swing, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingVerticalPosition()) {
+  switch (_.Swing) {
     case kGreeSwingLastPos:
       result += kLastStr;
       break;
@@ -623,8 +623,8 @@ String IRGreeAC::toString(void) {
   }
   result += ')';
   result += addLabeledString(
-      getTimerEnabled() ? minsToString(getTimer()) : kOffStr, kTimerStr);
-  uint8_t src = getDisplayTempSource();
+      _.TimerEnabled ? minsToString(getTimer()) : kOffStr, kTimerStr);
+  uint8_t src = _.DisplayTemp;
   result += addIntToString(src, kDisplayTempStr);
   result += kSpaceLBraceStr;
   switch (src) {
