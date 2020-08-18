@@ -19,8 +19,8 @@ const uint16_t kMetzBitMark = 473;    ///< uSeconds.
 const uint16_t kMetzOneSpace = 1640;  ///< uSeconds.
 const uint16_t kMetzZeroSpace = 940;  ///< uSeconds.
 const uint16_t kMetzFreq = 38000;     ///< Hz.
-const uint8_t kMetzAddressBits = 6;
-const uint8_t kMetzCommandBits = 3;
+const uint8_t kMetzAddressBits = 3;
+const uint8_t kMetzCommandBits = 6;
 
 #if SEND_METZ
 /// Send a Metz formatted message.
@@ -40,17 +40,17 @@ void IRsend::sendMetz(const uint64_t data, const uint16_t nbits,
 
 /// Encode a Metz address, command, and toggle bits into a code suitable
 /// for use with sendMetz().
-/// @param[in] address A 6-bit address value.
-/// @param[in] command A 3-bit command value.
+/// @param[in] address A 3-bit address value.
+/// @param[in] command A 6-bit command value.
 /// @param[in] toggle Should the toggle bit be set in the result?
 /// @return A 19-bit value suitable for use with `sendMetz()`.
 uint32_t IRsend::encodeMetz(const uint8_t address, const uint8_t command,
                             const bool toggle) {
   return toggle << (2 * (kMetzAddressBits + kMetzCommandBits)) |
-      (command & 0x7) << (2 * kMetzAddressBits + kMetzCommandBits) |
-      (~command & 0x7) << (2 * kMetzAddressBits) |
-      (address & 0x3F) << kMetzAddressBits |
-      (~address & 0x3F);
+      (address & 0x7) << (2 * kMetzCommandBits + kMetzAddressBits) |
+      (~address & 0x7) << (2 * kMetzCommandBits) |
+      (command & 0x3F) << kMetzCommandBits |
+      (~command & 0x3F);
 }
 #endif  // SEND_METZ
 
@@ -78,16 +78,16 @@ bool IRrecv::decodeMetz(decode_results *results, uint16_t offset,
                     kMetzBitMark, kDefaultMessageGap,  // Footer
                     true, _tolerance, 0, true)) return false;
 
-  uint16_t address = GETBITS64(data, kMetzAddressBits, kMetzAddressBits);
-  uint16_t command = GETBITS64(data, 2 * kMetzAddressBits + kMetzCommandBits,
-                               kMetzCommandBits);
+  uint16_t command = GETBITS64(data, kMetzCommandBits, kMetzCommandBits);
+  uint16_t address = GETBITS64(data, 2 * kMetzCommandBits + kMetzAddressBits,
+                               kMetzAddressBits);
   // Compliance
   if (strict) {
-    if (address != invertBits(GETBITS64(data, 0, kMetzAddressBits),
-                              kMetzAddressBits) ||
-        command != invertBits(GETBITS64(data, 2 * kMetzAddressBits,
-                                        kMetzCommandBits),
-                              kMetzCommandBits)) return false;
+    if (command != invertBits(GETBITS64(data, 0, kMetzCommandBits),
+                              kMetzCommandBits) ||
+        address != invertBits(GETBITS64(data, 2 * kMetzCommandBits,
+                                        kMetzAddressBits),
+                              kMetzAddressBits)) return false;
   }
   // Success
   results->decode_type = decode_type_t::METZ;

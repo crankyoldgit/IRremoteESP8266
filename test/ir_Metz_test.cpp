@@ -33,8 +33,8 @@ TEST(TestDecodeMetz, RealExample) {
   ASSERT_EQ(decode_type_t::METZ, irsend.capture.decode_type);
   ASSERT_EQ(kMetzBits, irsend.capture.bits);
   EXPECT_EQ(0x5CA95, irsend.capture.value);
-  EXPECT_EQ(0x2A, irsend.capture.address);
-  EXPECT_EQ(0x3, irsend.capture.command);
+  EXPECT_EQ(0x2A, irsend.capture.command);
+  EXPECT_EQ(0x3, irsend.capture.address);
 }
 
 TEST(TestDecodeMetz, SyntheticExample) {
@@ -49,8 +49,8 @@ TEST(TestDecodeMetz, SyntheticExample) {
   EXPECT_EQ(decode_type_t::METZ, irsend.capture.decode_type);
   EXPECT_EQ(kMetzBits, irsend.capture.bits);
   EXPECT_EQ(0x5CA95, irsend.capture.value);
-  EXPECT_EQ(0x2A, irsend.capture.address);
-  EXPECT_EQ(0x3, irsend.capture.command);
+  EXPECT_EQ(0x2A, irsend.capture.command);
+  EXPECT_EQ(0x3, irsend.capture.address);
 
   EXPECT_EQ(
     "f38000d50"
@@ -70,11 +70,11 @@ TEST(TestEncodeMetz, BasicTests) {
   EXPECT_EQ(0x703F,  IRsend::encodeMetz(0, 0, false));
   EXPECT_EQ(0x4703F, IRsend::encodeMetz(0, 0, true));
 
-  EXPECT_EQ(0x1507E, IRsend::encodeMetz(1, 2, false));
-  EXPECT_EQ(0x5507E, IRsend::encodeMetz(1, 2, true));
+  EXPECT_EQ(0xE0BD, IRsend::encodeMetz(1, 2, false));
+  EXPECT_EQ(0x4E0BD, IRsend::encodeMetz(1, 2, true));
 
-  EXPECT_EQ(0x38FC0, IRsend::encodeMetz(0b111111, 0b111, false));
-  EXPECT_EQ(0x78FC0, IRsend::encodeMetz(0b111111, 0b111, true));
+  EXPECT_EQ(0x38FC0, IRsend::encodeMetz(0b111, 0b111111, false));
+  EXPECT_EQ(0x78FC0, IRsend::encodeMetz(0b111, 0b111111, true));
 
   // Out of range.
   EXPECT_EQ(0x38FC0, IRsend::encodeMetz(255, 255, false));
@@ -82,7 +82,7 @@ TEST(TestEncodeMetz, BasicTests) {
 }
 
 TEST(TestEncodeMetz, RealExamples) {
-  EXPECT_EQ(0x5CA95, IRsend::encodeMetz(0x2A, 0x3, true));
+  EXPECT_EQ(0x5CA95, IRsend::encodeMetz(0x3, 0x2A, true));
 }
 
 TEST(TestUtils, Housekeeping) {
