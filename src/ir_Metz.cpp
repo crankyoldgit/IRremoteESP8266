@@ -7,6 +7,7 @@
 //   Brand: Metz,  Model: RM16 remote
 //   Brand: Metz,  Model: RM17 remote
 //   Brand: Metz,  Model: RM19 remote
+//   Brand: Metz,  Model: CH610 TV
 
 #include "IRrecv.h"
 #include "IRsend.h"
