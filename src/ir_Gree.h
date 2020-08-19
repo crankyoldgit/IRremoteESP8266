@@ -105,6 +105,26 @@ const uint8_t kGreeDisplayTempSet     = 0b01;  // 1
 const uint8_t kGreeDisplayTempInside  = 0b10;  // 2
 const uint8_t kGreeDisplayTempOutside = 0b11;  // 3
 
+// Legacy defines.
+#define GREE_AUTO kGreeAuto
+#define GREE_COOL kGreeCool
+#define GREE_DRY kGreeDry
+#define GREE_FAN kGreeFan
+#define GREE_HEAT kGreeHeat
+#define GREE_MIN_TEMP kGreeMinTempC
+#define GREE_MAX_TEMP kGreeMaxTempC
+#define GREE_FAN_MAX kGreeFanMax
+#define GREE_SWING_LAST_POS kGreeSwingLastPos
+#define GREE_SWING_AUTO kGreeSwingAuto
+#define GREE_SWING_UP kGreeSwingUp
+#define GREE_SWING_MIDDLE_UP kGreeSwingMiddleUp
+#define GREE_SWING_MIDDLE kGreeSwingMiddle
+#define GREE_SWING_MIDDLE_DOWN kGreeSwingMiddleDown
+#define GREE_SWING_DOWN kGreeSwingDown
+#define GREE_SWING_DOWN_AUTO kGreeSwingDownAuto
+#define GREE_SWING_MIDDLE_AUTO kGreeSwingMiddleAuto
+#define GREE_SWING_UP_AUTO kGreeSwingUpAuto
+
 // Classes
 /// Class for handling detailed Gree A/C messages.
 class IRGreeAC {
@@ -113,61 +133,61 @@ class IRGreeAC {
       const uint16_t pin,
       const gree_ac_remote_model_t model = gree_ac_remote_model_t::YAW1F,
       const bool inverted = false, const bool use_modulation = true);
-  void stateReset();
+  void stateReset(void);
 #if SEND_GREE
   void send(const uint16_t repeat = kGreeDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
-  int8_t calibrate() { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GREE
-  void begin();
-  void on();
-  void off();
+  void begin(void);
+  void on(void);
+  void off(void);
   void setModel(const gree_ac_remote_model_t model);
-  gree_ac_remote_model_t getModel() const;
+  gree_ac_remote_model_t getModel(void) const;
   void setPower(const bool on);
-  bool getPower() const;
+  bool getPower(void) const;
   void setTemp(const uint8_t temp, const bool fahrenheit = false);
-  uint8_t getTemp()  const;
+  uint8_t getTemp(void) const;
   void setUseFahrenheit(const bool on);
-  bool getUseFahrenheit()  const;
+  bool getUseFahrenheit(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan() const;
+  uint8_t getFan(void) const;
   void setMode(const uint8_t new_mode);
-  uint8_t getMode() const;
+  uint8_t getMode(void) const;
   void setLight(const bool on);
-  bool getLight() const;
+  bool getLight(void) const;
   void setXFan(const bool on);
-  bool getXFan() const;
+  bool getXFan(void) const;
   void setSleep(const bool on);
-  bool getSleep() const;
+  bool getSleep(void) const;
   void setTurbo(const bool on);
-  bool getTurbo() const;
+  bool getTurbo(void) const;
   void setIFeel(const bool on);
-  bool getIFeel() const;
+  bool getIFeel(void) const;
   void setWiFi(const bool on);
-  bool getWiFi() const;
+  bool getWiFi(void) const;
   void setSwingVertical(const bool automatic, const uint8_t position);
-  bool getSwingVerticalAuto() const;
-  uint8_t getSwingVerticalPosition() const;
-  uint16_t getTimer() const;
+  bool getSwingVerticalAuto(void) const;
+  uint8_t getSwingVerticalPosition(void) const;
+  uint16_t getTimer(void) const;
   void setTimer(const uint16_t minutes);
   void setDisplayTempSource(const uint8_t mode);
-  uint8_t getDisplayTempSource() const;
+  uint8_t getDisplayTempSource(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t swingv);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
-  stdAc::state_t toCommon();
-  uint8_t* getRaw();
+  stdAc::state_t toCommon(void);
+  uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kGreeStateLength);
-  String toString();
+  String toString(void);
 #ifndef UNIT_TEST
 
  private:
@@ -180,9 +200,9 @@ class IRGreeAC {
   GreeProtocol _;
   gree_ac_remote_model_t _model;
   void checksum(const uint16_t length = kGreeStateLength);
-  void fixup();
+  void fixup(void);
   void setTimerEnabled(const bool on);
-  bool getTimerEnabled() const;
+  bool getTimerEnabled(void) const;
 };
 
 #endif  // IR_GREE_H_
