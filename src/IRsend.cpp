@@ -617,6 +617,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MITSUBISHI2:
     case ZEPEAL:
       return 16;
+    case METZ:
+      return 19;
     case RC6:
     case SONY:
     case SONY_38K:
@@ -987,7 +989,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case ZEPEAL:
       sendZepeal(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_ZEPEAL
+#if SEND_METZ
+    case METZ:
+      sendMetz(data, nbits, min_repeat);
+      break;
+#endif  // SEND_METZ
     default:
       return false;
   }

@@ -634,12 +634,19 @@ class IRsend {
   void sendZepeal(const uint64_t data,
                   const uint16_t nbits = kZepealBits,
                   const uint16_t repeat = kZepealMinRepeat);
-#endif
+#endif  // SEND_ZEPEAL
 #if SEND_VOLTAS
   void sendVoltas(const unsigned char data[],
                        const uint16_t nbytes = kVoltasStateLength,
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_VOLTAS
+#if SEND_METZ
+  void sendMetz(const uint64_t data,
+                const uint16_t nbits = kMetzBits,
+                const uint16_t repeat = kMetzMinRepeat);
+  static uint32_t encodeMetz(const uint8_t address, const uint8_t command,
+                             const bool toggle = false);
+#endif  // SEND_METZ
 
  protected:
 #ifdef UNIT_TEST

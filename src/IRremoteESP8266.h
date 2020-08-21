@@ -677,6 +677,13 @@
 #define SEND_VOLTAS            _IR_ENABLE_DEFAULT_
 #endif  // SEND_VOLTAS
 
+#ifndef DECODE_METZ
+#define DECODE_METZ          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_METZ
+#ifndef SEND_METZ
+#define SEND_METZ            _IR_ENABLE_DEFAULT_
+#endif  // SEND_METZ
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -819,8 +826,9 @@ enum decode_type_t {
   ZEPEAL,
   SANYO_AC,
   VOLTAS,  // 90
+  METZ,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = VOLTAS,
+  kLastDecodeType = METZ,
 };
 
 // Message lengths & required repeat values
@@ -936,6 +944,8 @@ const uint16_t kLg32Bits = 32;
 const uint16_t kLgDefaultRepeat = kNoRepeat;
 const uint16_t kLutronBits = 35;
 const uint16_t kMagiquestBits = 56;
+const uint16_t kMetzBits = 19;
+const uint16_t kMetzMinRepeat = kNoRepeat;
 const uint16_t kMideaBits = 48;
 const uint16_t kMideaMinRepeat = kNoRepeat;
 const uint16_t kMidea24Bits = 24;
