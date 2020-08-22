@@ -26,13 +26,47 @@
 #include "IRsend_test.h"
 #endif
 
+// Haier HSU07-HEA03 remote
+union HaierProtocol{
+  ///< The state in native IR code form
+  uint8_t remote_state[kHaierACStateLength];
+  struct {
+    // Byte 0
+    uint8_t Prefix;
+    // Byte 1
+    uint8_t Command:4;
+    uint8_t Temp   :4;
+    // Byte 2
+    uint8_t CurrHours:5;
+    uint8_t unknow   :1;  // value=1
+    uint8_t Swing    :2;
+    // Byte 3
+    uint8_t CurrMins:6;
+    uint8_t OffTimer:1;
+    uint8_t OnTimer :1;
+    // Byte 4
+    uint8_t OffHours:5;
+    uint8_t Health  :1;
+    uint8_t :0;
+    // Byte 5
+    uint8_t OffMins:6;
+    uint8_t Fan    :2;
+    // Byte 6
+    uint8_t OnHours:5;
+    uint8_t Mode   :3;
+    // Byte 7
+    uint8_t OnMins:6;
+    uint8_t Sleep :1;
+    uint8_t :0;
+    // Byte 8
+    uint8_t Sum;
+  };
+};
+
 // Constants
 
-// Haier HSU07-HEA03 remote
-// Byte 0
 const uint8_t kHaierAcPrefix = 0b10100101;
 
-// Byte 1
 const uint8_t kHaierAcMinTemp = 16;
 const uint8_t kHaierAcDefTemp = 25;
 const uint8_t kHaierAcMaxTemp = 30;
@@ -48,25 +82,11 @@ const uint8_t kHaierAcCmdTimerCancel = 0b1010;
 const uint8_t kHaierAcCmdHealth =      0b1100;
 const uint8_t kHaierAcCmdSwing =       0b1101;
 
-// Byte 2 (Clock Hours)
-
-// Byte 3 (Timer Flags & Clock Minutes)
-const uint8_t kHaierAcOffTimerOffset = 6;
-const uint8_t kHaierAcOnTimerOffset =  7;
-
-// Byte 4 (Health & Off Time Hours)
-const uint8_t kHaierAcHealthBitOffset =  5;
-
-// Byte 5 (Swing & Off Time Mins)
-const uint8_t kHaierAcSwingOffset = 6;
-const uint8_t kHaierAcSwingSize = 2;  // Bits
 const uint8_t kHaierAcSwingOff =  0b00;
 const uint8_t kHaierAcSwingUp =   0b01;
 const uint8_t kHaierAcSwingDown = 0b10;
 const uint8_t kHaierAcSwingChg =  0b11;
 
-// Byte 6 (Mode & On Time Hours)
-const uint8_t kHaierAcModeOffset = 5;
 const uint8_t kHaierAcAuto = 0;
 const uint8_t kHaierAcCool = 1;
 const uint8_t kHaierAcDry = 2;
@@ -78,17 +98,8 @@ const uint8_t kHaierAcFanLow = 1;
 const uint8_t kHaierAcFanMed = 2;
 const uint8_t kHaierAcFanHigh = 3;
 
-// Byte 7 (On Time Minutes)
-
-// Time
-const uint8_t kHaierAcTimeOffset = 0;  // Bits
-const uint8_t kHaierAcHoursSize = 5;  // Bits
-const uint8_t kHaierAcMinsSize = 6;  // Bits
-
 const uint16_t kHaierAcMaxTime = (23 * 60) + 59;
 
-// Byte 7
-const uint8_t kHaierAcSleepBitOffset = 6;
 const uint8_t kHaierAcSleepBit = 0b01000000;
 
 // Legacy Haier AC defines.
@@ -229,46 +240,46 @@ class IRHaierAC {
   void begin(void);
 
   void setCommand(const uint8_t command);
-  uint8_t getCommand(void);
+  uint8_t getCommand(void) const;
 
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
 
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
 
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setMode(const uint8_t mode);
 
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setSleep(const bool on);
-  bool getHealth(void);
+  bool getHealth(void) const;
   void setHealth(const bool on);
 
-  int16_t getOnTimer(void);
+  int16_t getOnTimer(void) const;
   void setOnTimer(const uint16_t mins);
-  int16_t getOffTimer(void);
+  int16_t getOffTimer(void) const;
   void setOffTimer(const uint16_t mins);
   void cancelTimers(void);
 
-  uint16_t getCurrTime(void);
+  uint16_t getCurrTime(void) const;
   void setCurrTime(const uint16_t mins);
 
-  uint8_t getSwing(void);
+  uint8_t getSwing(void) const;
   void setSwing(const uint8_t state);
 
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kHaierACStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -278,11 +289,11 @@ class IRHaierAC {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif
-  uint8_t remote_state[kHaierACStateLength];  ///< The state in native code form
+  HaierProtocol _;
   void stateReset(void);
   void checksum(void);
-  static uint16_t getTime(const uint8_t ptr[]);
-  static void setTime(uint8_t ptr[], const uint16_t nr_mins);
+  // static uint16_t getTime(const uint8_t ptr[]);
+  // static void setTime(uint8_t ptr[], const uint16_t nr_mins);
 };
 
 /// Class for handling detailed Haier ACYRW02 A/C messages.

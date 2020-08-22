@@ -36,6 +36,14 @@ using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
+#define GETTIME(x) _.x##Hours * 60 + _.x##Mins
+#define SETTIME(x, n) do { \
+  uint16_t mins = n;\
+  if (n > kHaierAcMaxTime) mins = kHaierAcMaxTime;\
+  _.x##Hours = mins / 60;\
+  _.x##Mins = mins % 60;\
+} while (0)
+
 #if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02)
 /// Send a Haier A/C formatted message. (HSU07-HEA03 remote)
 /// Status: STABLE / Known to be working.
@@ -92,7 +100,7 @@ void IRHaierAC::send(const uint16_t repeat) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRHaierAC::checksum(void) {
-  remote_state[8] = sumBytes(remote_state, kHaierACStateLength - 1);
+  _.Sum = sumBytes(_.remote_state, kHaierACStateLength - 1);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -106,29 +114,25 @@ bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Reset the internal state to a fixed known good state.
 void IRHaierAC::stateReset(void) {
-  for (uint8_t i = 1; i < kHaierACStateLength; i++) remote_state[i] = 0x0;
-  remote_state[0] = kHaierAcPrefix;
-  remote_state[2] = 0x20;
-  remote_state[4] = 0x0C;
-  remote_state[5] = 0xC0;
-
-  setTemp(kHaierAcDefTemp);
-  setFan(kHaierAcFanAuto);
-  setMode(kHaierAcAuto);
-  setCommand(kHaierAcCmdOn);
+  std::memset(_.remote_state, 0, sizeof _.remote_state);
+  _.Prefix = kHaierAcPrefix;
+  _.unknow = 1;
+  // _.OffHours = 12;  // remote_state[4] = 0x0C;
+  _.Temp = 9;
+  _.Command = kHaierAcCmdOn;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRHaierAC::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.remote_state;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRHaierAC::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kHaierACStateLength);
+  std::memcpy(_.remote_state, new_code, kHaierACStateLength);
 }
 
 /// Set the Command/Button setting of the A/C.
@@ -146,14 +150,14 @@ void IRHaierAC::setCommand(const uint8_t command) {
     case kHaierAcCmdTimerCancel:
     case kHaierAcCmdHealth:
     case kHaierAcCmdSwing:
-      setBits(&remote_state[1], kLowNibble, kNibbleSize, command);
+      _.Command = command;
   }
 }
 
 /// Get the Command/Button setting of the A/C.
 /// @return The value of the command/button that was pressed.
-uint8_t IRHaierAC::getCommand(void) {
-  return GETBITS8(remote_state[1], kLowNibble, kNibbleSize);
+uint8_t IRHaierAC::getCommand(void) const {
+  return _.Command;
 }
 
 /// Set the speed of the fan.
@@ -162,22 +166,22 @@ void IRHaierAC::setFan(const uint8_t speed) {
   uint8_t new_speed = kHaierAcFanAuto;
   switch (speed) {
     case kHaierAcFanLow:  new_speed = 3; break;
-    case kHaierAcFanMed:  new_speed = 1; break;
-    case kHaierAcFanHigh: new_speed = 2; break;
+    case kHaierAcFanMed:  new_speed = 2; break;
+    case kHaierAcFanHigh: new_speed = 1; break;
     // Default to auto for anything else.
     default:              new_speed = kHaierAcFanAuto;
   }
 
   if (speed != getFan()) setCommand(kHaierAcCmdFan);
-  setBits(&remote_state[5], kLowNibble, kHaierAcSwingSize, new_speed);
+  _.Fan = new_speed;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRHaierAC::getFan(void) {
-  switch (GETBITS8(remote_state[5], kLowNibble, kHaierAcSwingSize)) {
-    case 1:  return kHaierAcFanMed;
-    case 2:  return kHaierAcFanHigh;
+uint8_t IRHaierAC::getFan(void) const {
+  switch (_.Fan) {
+    case 1:  return kHaierAcFanHigh;
+    case 2:  return kHaierAcFanMed;
     case 3:  return kHaierAcFanLow;
     default: return kHaierAcFanAuto;
   }
@@ -185,18 +189,18 @@ uint8_t IRHaierAC::getFan(void) {
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
-void IRHaierAC::setMode(uint8_t mode) {
+void IRHaierAC::setMode(const uint8_t mode) {
   uint8_t new_mode = mode;
   setCommand(kHaierAcCmdMode);
   // If out of range, default to auto mode.
   if (mode > kHaierAcFan) new_mode = kHaierAcAuto;
-  setBits(&remote_state[6], kHaierAcModeOffset, kModeBitsSize, new_mode);
+  _.Mode = new_mode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRHaierAC::getMode(void) {
-  return GETBITS8(remote_state[6], kHaierAcModeOffset, kModeBitsSize);
+uint8_t IRHaierAC::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the temperature.
@@ -214,72 +218,72 @@ void IRHaierAC::setTemp(const uint8_t degrees) {
     setCommand(kHaierAcCmdTempDown);
   else
     setCommand(kHaierAcCmdTempUp);
-  setBits(&remote_state[1], kHighNibble, kNibbleSize, temp - kHaierAcMinTemp);
+  _.Temp = temp - kHaierAcMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRHaierAC::getTemp(void) {
-  return GETBITS8(remote_state[1], kHighNibble, kNibbleSize) + kHaierAcMinTemp;
+uint8_t IRHaierAC::getTemp(void) const {
+  return _.Temp + kHaierAcMinTemp;
 }
 
 /// Set the Health (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setHealth(const bool on) {
   setCommand(kHaierAcCmdHealth);
-  setBit(&remote_state[4], kHaierAcHealthBitOffset, on);
+  _.Health = on;
 }
 
 /// Get the Health (filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC::getHealth(void) {
-  return GETBIT8(remote_state[4], kHaierAcHealthBitOffset);
+bool IRHaierAC::getHealth(void) const {
+  return _.Health;
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setSleep(const bool on) {
   setCommand(kHaierAcCmdSleep);
-  setBit(&remote_state[7], kHaierAcSleepBitOffset, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC::getSleep(void) {
-  return GETBIT8(remote_state[7], kHaierAcSleepBitOffset);
+bool IRHaierAC::getSleep(void) const {
+  return _.Sleep;
 }
-
+/*
 /// Get the Time value at the given pointer.
 /// @param[in] ptr A Ptr to a location in the internal state to get the time.
 uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
   return GETBITS8(ptr[0], kHaierAcTimeOffset, kHaierAcHoursSize) * 60 +
          GETBITS8(ptr[1], kHaierAcTimeOffset, kHaierAcMinsSize);
-}
+}*/
 
 /// Get the On Timer value/setting of the A/C.
 /// @return Nr of minutes the timer is set to. -1 is Off/not set etc.
-int16_t IRHaierAC::getOnTimer(void) {
+int16_t IRHaierAC::getOnTimer(void) const {
   // Check if the timer is turned on.
-  if (GETBIT8(remote_state[3], kHaierAcOnTimerOffset))
-    return getTime(remote_state + 6);
+  if (_.OnTimer)
+    return GETTIME(On);
   else
     return -1;
 }
 
 /// Get the Off Timer value/setting of the A/C.
 /// @return Nr of minutes the timer is set to. -1 is Off/not set etc.
-int16_t IRHaierAC::getOffTimer(void) {
+int16_t IRHaierAC::getOffTimer(void) const {
   // Check if the timer is turned on.
-  if (GETBIT8(remote_state[3], kHaierAcOffTimerOffset))
-    return getTime(remote_state + 4);
+  if (_.OffTimer)
+    return GETTIME(Off);
   else
     return -1;
 }
 
 /// Get the clock value of the A/C.
 /// @return The clock time, in Nr of minutes past midnight.
-uint16_t IRHaierAC::getCurrTime(void) { return getTime(remote_state + 2); }
-
+uint16_t IRHaierAC::getCurrTime(void) const { return GETTIME(Curr); }
+/*
 /// Set the Time value at the given pointer.
 /// @param[out] ptr A Ptr to a location in the internal state to set the time.
 /// @param[in] nr_mins The time expressed in total number of minutes.
@@ -288,53 +292,56 @@ void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
   if (nr_mins > kHaierAcMaxTime) mins = kHaierAcMaxTime;
   setBits(ptr, kHaierAcTimeOffset, kHaierAcHoursSize, mins / 60);  // Hours
   setBits(ptr + 1, kHaierAcTimeOffset, kHaierAcMinsSize, mins % 60);  // Minutes
-}
+}*/
 
 /// Set & enable the On Timer.
 /// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  setBit(&remote_state[3], kHaierAcOnTimerOffset);
-  setTime(remote_state + 6, nr_mins);
+  _.OnTimer = 1;
+
+  SETTIME(On, nr_mins);
 }
 
 /// Set & enable the Off Timer.
 /// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
   setCommand(kHaierAcCmdTimerSet);
-  setBit(&remote_state[3], kHaierAcOffTimerOffset);
-  setTime(remote_state + 4, nr_mins);
+  _.OffTimer = 1;
+
+  SETTIME(Off, nr_mins);
 }
 
 /// Cancel/disable the On & Off timers.
 void IRHaierAC::cancelTimers(void) {
   setCommand(kHaierAcCmdTimerCancel);
-  setBits(&remote_state[3], kHaierAcOffTimerOffset, 2, 0);
+  _.OffTimer = 0;
+  _.OnTimer = 0;
 }
 
 /// Set the clock value for the A/C.
 /// @param[in] nr_mins The clock time, in Nr of minutes past midnight.
 void IRHaierAC::setCurrTime(const uint16_t nr_mins) {
-  setTime(remote_state + 2, nr_mins);
+  SETTIME(Curr, nr_mins);
 }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native swing mode.
-uint8_t IRHaierAC::getSwing(void) {
-  return GETBITS8(remote_state[2], kHaierAcSwingOffset, kHaierAcSwingSize);
+uint8_t IRHaierAC::getSwing(void) const {
+  return _.Swing;
 }
 
 /// Set the Vertical Swing mode of the A/C.
-/// @param[in] cmd The mode to set the vanes to.
-void IRHaierAC::setSwing(const uint8_t cmd) {
-  if (cmd == getSwing()) return;  // Nothing to do.
-  switch (cmd) {
+/// @param[in] state The mode to set the vanes to.
+void IRHaierAC::setSwing(const uint8_t state) {
+  if (state == _.Swing) return;  // Nothing to do.
+  switch (state) {
     case kHaierAcSwingOff:
     case kHaierAcSwingUp:
     case kHaierAcSwingDown:
     case kHaierAcSwingChg:
       setCommand(kHaierAcCmdSwing);
-      setBits(&remote_state[2], kHaierAcSwingOffset, kHaierAcSwingSize, cmd);
+      _.Swing = state;
       break;
   }
 }
@@ -420,19 +427,19 @@ stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRHaierAC::toCommon(void) {
+stdAc::state_t IRHaierAC::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HAIER_AC;
   result.model = -1;  // No models used.
   result.power = true;
-  if (this->getCommand() == kHaierAcCmdOff) result.power = false;
-  result.mode = this->toCommonMode(this->getMode());
+  if (_.Command == kHaierAcCmdOff) result.power = false;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwing());
-  result.filter = this->getHealth();
-  result.sleep = this->getSleep() ? 0 : -1;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(_.Swing);
+  result.filter = _.Health;
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
@@ -447,10 +454,10 @@ stdAc::state_t IRHaierAC::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRHaierAC::toString(void) {
+String IRHaierAC::toString(void) const {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  uint8_t cmd = getCommand();
+  uint8_t cmd = _.Command;
   result += addIntToString(cmd, kCommandStr, false);
   result += kSpaceLBraceStr;
   switch (cmd) {
@@ -495,14 +502,14 @@ String IRHaierAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addModeToString(getMode(), kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
+  result += addModeToString(_.Mode, kHaierAcAuto, kHaierAcCool, kHaierAcHeat,
                             kHaierAcDry, kHaierAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kHaierAcFanHigh, kHaierAcFanLow,
                            kHaierAcFanAuto, kHaierAcFanAuto, kHaierAcFanMed);
-  result += addIntToString(getSwing(), kSwingStr);
+  result += addIntToString(_.Swing, kSwingStr);
   result += kSpaceLBraceStr;
-  switch (getSwing()) {
+  switch (_.Swing) {
     case kHaierAcSwingOff:
       result += kOffStr;
       break;
@@ -519,8 +526,8 @@ String IRHaierAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), kSleepStr);
-  result += addBoolToString(getHealth(), kHealthStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  result += addBoolToString(_.Health, kHealthStr);
   result += addLabeledString(minsToString(getCurrTime()), kClockStr);
   result += addLabeledString(
       getOnTimer() >= 0 ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
