@@ -30,7 +30,7 @@ union VoltasProtocol {
   struct {
     // Byte 0
     uint8_t SwingH         :1;
-    uint8_t Unknown0       :7;
+    uint8_t SwingHChange   :7;
     // Byte 1
     uint8_t Mode           :4;
     uint8_t                :1;
@@ -81,6 +81,8 @@ const uint8_t kVoltasFanHigh = 0b001;  ///< 1
 const uint8_t kVoltasFanMed =  0b010;  ///< 2
 const uint8_t kVoltasFanLow =  0b100;  ///< 4
 const uint8_t kVoltasFanAuto = 0b111;  ///< 7
+const uint8_t kVoltasSwingHChange =   0b1111100;  ///< 0x7D
+const uint8_t kVoltasSwingHNoChange = 0b0011001;  ///< 0x19
 
 // Classes
 /// Class for handling detailed Voltas A/C messages.
@@ -114,6 +116,8 @@ class IRVoltas {
   uint8_t getMode(void);
   void setSwingH(const bool on);
   bool getSwingH(void) const;
+  void setSwingHChange(const bool on);
+  bool getSwingHChange(void) const;
   void setSwingV(const bool on);
   bool getSwingV(void) const;
   void setEcono(const bool on);
@@ -130,7 +134,7 @@ class IRVoltas {
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
   String toString(void);
 #ifndef UNIT_TEST
 

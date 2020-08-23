@@ -3572,9 +3572,9 @@ namespace IRAcUtils {
 #endif  // DECODE_VESTEL_AC
 #if DECODE_VOLTAS
       case decode_type_t::VOLTAS: {
-        IRVestelAc ac(kGpioUnused);
+        IRVoltas ac(kGpioUnused);
         ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_VOLTAS

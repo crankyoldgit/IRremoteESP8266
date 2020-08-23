@@ -15,6 +15,7 @@
 using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
+using irutils::addLabeledString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
@@ -277,11 +278,28 @@ bool IRVoltas::getSwingV(void) const { return _.SwingV == 0b111; }
 
 /// Set the Horizontal Swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRVoltas::setSwingH(const bool on) { _.SwingH = on; }
+void IRVoltas::setSwingH(const bool on) {
+  _.SwingH = on;
+  setSwingHChange(true);
+}
 
 /// Get the Horizontal Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRVoltas::getSwingH(void) const { return _.SwingH; }
+
+/// Set the bits for changing the Horizontal Swing setting of the A/C.
+/// @param[in] on true, the change bits are set.
+///            false, the "no change" bits are set.
+void IRVoltas::setSwingHChange(const bool on) {
+  _.SwingHChange = on ? kVoltasSwingHChange : kVoltasSwingHNoChange;
+  if (!on) _.SwingH = true;  // "No Change" also sets SwingH to 1.
+}
+
+/// Are the Horizontal Swing change bits set in the message?
+/// @return true, the correct bits are set. false, the correct bits are not set.
+bool IRVoltas::getSwingHChange(void) const {
+  return _.SwingHChange == kVoltasSwingHChange;
+}
 
 /// Change the Wifi setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -316,9 +334,18 @@ void IRVoltas::setLight(const bool on) { _.Light = on; }
 bool IRVoltas::getLight(void) const { return _.Light; }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to the previous state if available.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRVoltas::toCommon() {
+stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    result.swingh = stdAc::swingh_t::kOff;
+  }
   result.protocol = decode_type_t::VOLTAS;
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
@@ -326,7 +353,8 @@ stdAc::state_t IRVoltas::toCommon() {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.FanSpeed);
   result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
-  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
+  if (getSwingHChange())
+    result.swingh = _.SwingH ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.turbo = _.Turbo;
   result.econo = _.Econo;
   result.light = _.Light;
@@ -353,7 +381,10 @@ String IRVoltas::toString() {
   result += addFanToString(_.FanSpeed, kVoltasFanHigh, kVoltasFanLow,
                            kVoltasFanAuto, kVoltasFanAuto, kVoltasFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
-  result += addBoolToString(_.SwingH, kSwingHStr);
+  if (getSwingHChange())
+    result += addBoolToString(_.SwingH, kSwingHStr);
+  else
+    result += addLabeledString(kNAStr, kSwingHStr);
   result += addBoolToString(_.Turbo, kTurboStr);
   result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.Wifi, kWifiStr);

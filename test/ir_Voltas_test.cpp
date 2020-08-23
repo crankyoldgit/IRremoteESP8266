@@ -41,7 +41,7 @@ TEST(TestDecodeVoltas, RealExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
-      "Swing(V): Off, Swing(H): On, "
+      "Swing(V): Off, Swing(H): N/A, "
       "Turbo: Off, Econo: Off, WiFi: On, Light: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -251,13 +251,19 @@ TEST(TestVoltasClass, SwingV) {
 TEST(TestVoltasClass, SwingH) {
   IRVoltas ac(kGpioUnused);
   ac.begin();
+  ac.setSwingHChange(false);
+  EXPECT_FALSE(ac.getSwingHChange());
 
   ac.setSwingH(true);
   EXPECT_TRUE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingHChange());
 
+  ac.setSwingHChange(false);
   ac.setSwingH(false);
   EXPECT_EQ(false, ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingHChange());
 
   ac.setSwingH(true);
   EXPECT_TRUE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingHChange());
 }
