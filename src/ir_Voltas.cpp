@@ -124,7 +124,7 @@ void IRVoltas::setRaw(const uint8_t new_code[]) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRVoltas::checksum(void) {
-  _.Checksum = calcChecksum(_.raw, kVoltasStateLength - 1);
+  _.Checksum = calcChecksum(_.raw);
 }
 
 /// Verify the checksum is valid for a given state.

@@ -1585,13 +1585,11 @@ TEST(TestIRac, Voltas) {
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
-/* TODO(crankyoldgit): Fix/enable this.
   ASSERT_EQ(VOLTAS, ac._irsend.capture.decode_type);
   ASSERT_EQ(kVoltasBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
-*/
 }
 
 TEST(TestIRac, Whirlpool) {

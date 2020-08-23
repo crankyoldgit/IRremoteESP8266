@@ -80,13 +80,17 @@ TEST(TestIRVoltasClass, Checksums) {
   EXPECT_TRUE(IRVoltas::validChecksum(valid));
   EXPECT_FALSE(IRVoltas::validChecksum(valid, kVoltasStateLength - 1));
   EXPECT_EQ(0xE6, IRVoltas::calcChecksum(valid));
+  const uint8_t badchecksum[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0x00};
+  EXPECT_FALSE(IRVoltas::validChecksum(badchecksum));
+  EXPECT_EQ(0xE6, IRVoltas::calcChecksum(badchecksum));
 }
 
 TEST(TestIRVoltasClass, SetandGetRaw) {
   const uint8_t valid[kVoltasStateLength] = {
       0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
   const uint8_t badchecksum[kVoltasStateLength] = {
-      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0x00};
   IRVoltas ac(kGpioUnused);
 
   ac.setRaw(valid);
@@ -158,6 +162,19 @@ TEST(TestIRVoltasClass, Light) {
   EXPECT_TRUE(ac.getLight());
   ac.setLight(false);
   EXPECT_FALSE(ac.getLight());
+
+  const uint8_t light_off[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xE6};
+  ac.setRaw(light_off);
+  EXPECT_FALSE(ac.getLight());
+  const uint8_t light_on[kVoltasStateLength] = {
+      0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x20, 0xC6};
+  ac.setRaw(light_on);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_STATE_EQ(light_off, ac.getRaw(), kVoltasBits);
+  ac.setLight(true);
+  EXPECT_STATE_EQ(light_on, ac.getRaw(), kVoltasBits);
 }
 
 TEST(TestVoltasClass, OperatingMode) {
