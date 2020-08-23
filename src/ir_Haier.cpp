@@ -117,8 +117,9 @@ void IRHaierAC::stateReset(void) {
   std::memset(_.remote_state, 0, sizeof _.remote_state);
   _.Prefix = kHaierAcPrefix;
   _.unknow = 1;
-  // _.OffHours = 12;  // remote_state[4] = 0x0C;
+  _.OffHours = 12;
   _.Temp = 9;
+  _.Fan = 0b11;
   _.Command = kHaierAcCmdOn;
 }
 
@@ -172,7 +173,7 @@ void IRHaierAC::setFan(const uint8_t speed) {
     default:              new_speed = kHaierAcFanAuto;
   }
 
-  if (speed != getFan()) setCommand(kHaierAcCmdFan);
+  if (speed != getFan()) _.Command = kHaierAcCmdFan;
   _.Fan = new_speed;
 }
 
@@ -191,7 +192,7 @@ uint8_t IRHaierAC::getFan(void) const {
 /// @param[in] mode The desired operating mode.
 void IRHaierAC::setMode(const uint8_t mode) {
   uint8_t new_mode = mode;
-  setCommand(kHaierAcCmdMode);
+  _.Command = kHaierAcCmdMode;
   // If out of range, default to auto mode.
   if (mode > kHaierAcFan) new_mode = kHaierAcAuto;
   _.Mode = new_mode;
@@ -215,9 +216,9 @@ void IRHaierAC::setTemp(const uint8_t degrees) {
   uint8_t old_temp = getTemp();
   if (old_temp == temp) return;
   if (old_temp > temp)
-    setCommand(kHaierAcCmdTempDown);
+    _.Command = kHaierAcCmdTempDown;
   else
-    setCommand(kHaierAcCmdTempUp);
+    _.Command = kHaierAcCmdTempUp;
   _.Temp = temp - kHaierAcMinTemp;
 }
 
@@ -230,7 +231,7 @@ uint8_t IRHaierAC::getTemp(void) const {
 /// Set the Health (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setHealth(const bool on) {
-  setCommand(kHaierAcCmdHealth);
+  _.Command = kHaierAcCmdHealth;
   _.Health = on;
 }
 
@@ -243,7 +244,7 @@ bool IRHaierAC::getHealth(void) const {
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRHaierAC::setSleep(const bool on) {
-  setCommand(kHaierAcCmdSleep);
+  _.Command = kHaierAcCmdSleep;
   _.Sleep = on;
 }
 
@@ -297,7 +298,7 @@ void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
 /// Set & enable the On Timer.
 /// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
-  setCommand(kHaierAcCmdTimerSet);
+  _.Command = kHaierAcCmdTimerSet;
   _.OnTimer = 1;
 
   SETTIME(On, nr_mins);
@@ -306,7 +307,7 @@ void IRHaierAC::setOnTimer(const uint16_t nr_mins) {
 /// Set & enable the Off Timer.
 /// @param[in] nr_mins The time expressed in total number of minutes.
 void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
-  setCommand(kHaierAcCmdTimerSet);
+  _.Command = kHaierAcCmdTimerSet;
   _.OffTimer = 1;
 
   SETTIME(Off, nr_mins);
@@ -314,7 +315,7 @@ void IRHaierAC::setOffTimer(const uint16_t nr_mins) {
 
 /// Cancel/disable the On & Off timers.
 void IRHaierAC::cancelTimers(void) {
-  setCommand(kHaierAcCmdTimerCancel);
+  _.Command = kHaierAcCmdTimerCancel;
   _.OffTimer = 0;
   _.OnTimer = 0;
 }
@@ -340,7 +341,7 @@ void IRHaierAC::setSwing(const uint8_t state) {
     case kHaierAcSwingUp:
     case kHaierAcSwingDown:
     case kHaierAcSwingChg:
-      setCommand(kHaierAcCmdSwing);
+      _.Command = kHaierAcCmdSwing;
       _.Swing = state;
       break;
   }
