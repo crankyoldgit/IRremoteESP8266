@@ -148,6 +148,12 @@ enum panasonic_ac_remote_model_t {
   kPanasonicRkr = 6,
 };
 
+/// Voltas A/C model numbers
+enum voltas_ac_remote_model_t {
+  kVoltasUnknown = 0,  // Full Function
+  kVoltas122LZF = 1,   // (1) 122LZF (No SwingH support) (Default)
+};
+
 /// Whirlpool A/C model numbers
 enum whirlpool_ac_remote_model_t {
   DG11J13A = 1,  // DG11J1-04 too

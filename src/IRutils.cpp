@@ -544,6 +544,12 @@ namespace irutils {
           default: return kUnknownStr;
         }
         break;
+      case decode_type_t::VOLTAS:
+        switch (model) {
+          case voltas_ac_remote_model_t::kVoltas122LZF: return F("122LZF");
+          default: return kUnknownStr;
+        }
+        break;
       case decode_type_t::WHIRLPOOL_AC:
         switch (model) {
           case whirlpool_ac_remote_model_t::DG11J13A: return F("DG11J13A");

@@ -13,6 +13,7 @@
 #include "IRutils.h"
 
 using irutils::addBoolToString;
+using irutils::addModelToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addLabeledString;
@@ -109,6 +110,34 @@ void IRVoltas::send(const uint16_t repeat) {
 }
 #endif  // SEND_VOLTAS
 
+/// Get the model information currently known.
+/// @param[in] raw Work out the model info from the current raw state.
+/// @return The known model number.
+voltas_ac_remote_model_t IRVoltas::getModel(const bool raw) const {
+  if (raw) {
+    switch (_.SwingHChange) {
+      case kVoltasSwingHNoChange:
+        return voltas_ac_remote_model_t::kVoltas122LZF;
+      default:
+        return voltas_ac_remote_model_t::kVoltasUnknown;
+    }
+  } else {
+    return _model;
+  }
+}
+
+/// Set the current model for the remote.
+/// @param[in] model The model number.
+void IRVoltas::setModel(const voltas_ac_remote_model_t model) {
+  switch (model) {
+    case voltas_ac_remote_model_t::kVoltas122LZF:
+      _model = model;
+      setSwingHChange(false);
+      break;
+    default: _model = voltas_ac_remote_model_t::kVoltasUnknown;
+  }
+}
+
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRVoltas::getRaw(void) {
@@ -120,6 +149,7 @@ uint8_t* IRVoltas::getRaw(void) {
 /// @param[in] new_code A valid code for this protocol.
 void IRVoltas::setRaw(const uint8_t new_code[]) {
   std::memcpy(_.raw, new_code, kVoltasStateLength);
+  setModel(getModel(true));
 }
 
 /// Calculate and set the checksum values for the internal state.
@@ -279,13 +309,25 @@ bool IRVoltas::getSwingV(void) const { return _.SwingV == 0b111; }
 /// Set the Horizontal Swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVoltas::setSwingH(const bool on) {
-  _.SwingH = on;
-  setSwingHChange(true);
+  switch (_model) {
+    case voltas_ac_remote_model_t::kVoltas122LZF:
+      break;  // unsupported on these models.
+    default:
+      _.SwingH = on;
+      setSwingHChange(true);
+  }
 }
 
 /// Get the Horizontal Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVoltas::getSwingH(void) const { return _.SwingH; }
+bool IRVoltas::getSwingH(void) const {
+  switch (_model) {
+    case voltas_ac_remote_model_t::kVoltas122LZF:
+      return false;  // unsupported on these models.
+    default:
+      return _.SwingH;
+  }
+}
 
 /// Set the bits for changing the Horizontal Swing setting of the A/C.
 /// @param[in] on true, the change bits are set.
@@ -346,6 +388,7 @@ stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
     // there is no previous state.
     result.swingh = stdAc::swingh_t::kOff;
   }
+  result.model = getModel();
   result.protocol = decode_type_t::VOLTAS;
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
@@ -359,7 +402,6 @@ stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
   result.econo = _.Econo;
   result.light = _.Light;
   // Not supported.
-  result.model = -1;
   result.quiet = false;
   result.filter = false;
   result.clean = false;
@@ -374,7 +416,8 @@ stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
 String IRVoltas::toString() {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModelToString(decode_type_t::VOLTAS, getModel(), false);
+  result += addBoolToString(_.Power, kPowerStr);
   result += addModeToString(_.Mode, 255, kVoltasCool, kVoltasHeat,
                             kVoltasDry, kVoltasFan);
   result += addTempToString(getTemp());

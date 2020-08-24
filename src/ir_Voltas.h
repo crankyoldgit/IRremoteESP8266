@@ -102,6 +102,8 @@ class IRVoltas {
   void begin();
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kVoltasStateLength);
+  void setModel(const voltas_ac_remote_model_t model);
+  voltas_ac_remote_model_t getModel(const bool raw = false) const;
   void setPower(const bool on);
   bool getPower(void) const;
   void on(void);
@@ -146,6 +148,7 @@ class IRVoltas {
   /// @endcond
 #endif
   VoltasProtocol _;  ///< The state of the IR remote.
+  voltas_ac_remote_model_t _model;  ///< Model type.
   void checksum(void);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kVoltasStateLength);

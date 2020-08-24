@@ -40,7 +40,7 @@ TEST(TestDecodeVoltas, RealExample) {
   ASSERT_EQ(kVoltasBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
+      "Model: 1 (122LZF), Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
       "Swing(V): Off, Swing(H): N/A, "
       "Turbo: Off, Econo: Off, WiFi: On, Light: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
@@ -268,6 +268,9 @@ TEST(TestVoltasClass, SwingV) {
 TEST(TestVoltasClass, SwingH) {
   IRVoltas ac(kGpioUnused);
   ac.begin();
+  // This model allows full control.
+  ac.setModel(voltas_ac_remote_model_t::kVoltasUnknown);
+
   ac.setSwingHChange(false);
   EXPECT_FALSE(ac.getSwingHChange());
 
@@ -277,10 +280,21 @@ TEST(TestVoltasClass, SwingH) {
 
   ac.setSwingHChange(false);
   ac.setSwingH(false);
-  EXPECT_EQ(false, ac.getSwingH());
+  EXPECT_FALSE(ac.getSwingH());
   EXPECT_TRUE(ac.getSwingHChange());
 
   ac.setSwingH(true);
   EXPECT_TRUE(ac.getSwingH());
   EXPECT_TRUE(ac.getSwingHChange());
+
+  // Switch to a model that does not allow SwingH control.
+  ac.setModel(voltas_ac_remote_model_t::kVoltas122LZF);
+  EXPECT_FALSE(ac.getSwingHChange());
+  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(true);
+  EXPECT_FALSE(ac.getSwingHChange());
+  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(false);
+  EXPECT_FALSE(ac.getSwingHChange());
+  EXPECT_FALSE(ac.getSwingH());
 }

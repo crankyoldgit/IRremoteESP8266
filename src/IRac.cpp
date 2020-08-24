@@ -1892,6 +1892,7 @@ void IRac::vestel(IRVestelAc *ac,
 #if SEND_VOLTAS
 /// Send a Voltas A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRVoltas object to use.
+/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
@@ -1902,11 +1903,13 @@ void IRac::vestel(IRVestelAc *ac,
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] light Turn on the LED/Display mode.
 void IRac::voltas(IRVoltas *ac,
+                  const voltas_ac_remote_model_t model,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool turbo, const bool econo, const bool light) {
   ac->begin();
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -2495,8 +2498,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case VOLTAS:
     {
       IRVoltas ac(_pin, _inverted, _modulation);
-      voltas(&ac, send.power, send.mode, degC, send.fanspeed,
-             send.swingv, send.swingh, send.turbo, send.econo, send.light);
+      voltas(&ac, (voltas_ac_remote_model_t)send.model, send.power, send.mode,
+             degC, send.fanspeed, send.swingv, send.swingh, send.turbo,
+             send.econo, send.light);
       break;
     }
 #endif  // SEND_VOLTAS
@@ -2716,6 +2720,11 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return fujitsu_ac_remote_model_t::ARJW2;
   } else if (!strcasecmp(str, "ARRY4")) {
     return fujitsu_ac_remote_model_t::ARRY4;
+  // LG A/C models
+  } else if (!strcasecmp(str, "GE6711AR2853M")) {
+    return lg_ac_remote_model_t::GE6711AR2853M;
+  } else if (!strcasecmp(str, "AKB75215403")) {
+    return lg_ac_remote_model_t::AKB75215403;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
@@ -2730,6 +2739,9 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
   } else if (!strcasecmp(str, "RKR") || !strcasecmp(str, "PANASONICRKR")) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
+  // Voltas A/C models
+  } else if (!strcasecmp(str, "122LZF")) {
+    return voltas_ac_remote_model_t::kVoltas122LZF;
   // Whirlpool A/C models
   } else if (!strcasecmp(str, "DG11J13A") || !strcasecmp(str, "DG11J104") ||
              !strcasecmp(str, "DG11J1-04")) {
