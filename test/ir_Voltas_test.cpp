@@ -143,12 +143,18 @@ TEST(TestIRVoltasClass, Turbo) {
 TEST(TestIRVoltasClass, Econo) {
   IRVoltas ac(kGpioUnused);
   ac.begin();
-
+  // Control of econo mode is only available in cool.
+  ac.setMode(kVoltasCool);
   ac.setEcono(false);
   EXPECT_FALSE(ac.getEcono());
   ac.setEcono(true);
   EXPECT_TRUE(ac.getEcono());
   ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  ac.setMode(kVoltasHeat);  // Control of econo mode should now be disabled.
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
   EXPECT_FALSE(ac.getEcono());
 }
 

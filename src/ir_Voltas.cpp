@@ -211,6 +211,7 @@ void IRVoltas::setMode(const uint8_t mode) {
       return;
   }
   _.Mode = mode;
+  setEcono(getEcono());  // Reset the econo setting if needed.
 }
 
 /// Get the operating mode setting of the A/C.
@@ -361,7 +362,13 @@ bool IRVoltas::getTurbo(void) const { return _.Turbo; }
 
 /// Change the Econo setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRVoltas::setEcono(const bool on) { _.Econo = on; }
+void IRVoltas::setEcono(const bool on) {
+  // The econo setting is only available in cool mode.
+  if (on && _.Mode == kVoltasCool)
+    _.Econo = true;
+  else
+    _.Econo = false;
+}
 
 /// Get the value of the current Econo setting.
 /// @return true, the setting is on. false, the setting is off.
