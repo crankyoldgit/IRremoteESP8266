@@ -551,7 +551,7 @@ void IRac::daikin(IRDaikinESP *ac,
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] econo Run the device in economical mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::daikin128(IRDaikin128 *ac,
                   const bool on, const stdAc::opmode_t mode,
@@ -675,7 +675,7 @@ void IRac::daikin176(IRDaikin176 *ac,
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 /// @param[in] beep Enable/Disable beeps when receiving IR messages.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::daikin2(IRDaikin2 *ac,
                    const bool on, const stdAc::opmode_t mode,
@@ -744,7 +744,7 @@ void IRac::daikin216(IRDaikin216 *ac,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Run the device in turbo/powerful mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::daikin64(IRDaikin64 *ac,
                   const bool on, const stdAc::opmode_t mode,
@@ -1458,7 +1458,7 @@ void IRac::mitsubishiHeavy88(IRMitsubishiHeavy88Ac *ac,
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
                               const bool on, const stdAc::opmode_t mode,
                               const float degrees,
@@ -1500,7 +1500,7 @@ void IRac::mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::neoclima(IRNeoclimaAc *ac,
                     const bool on, const stdAc::opmode_t mode,
                     const float degrees, const stdAc::fanspeed_t fan,
@@ -1625,7 +1625,7 @@ void IRac::samsung(IRSamsungAc *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] beep Enable/Disable beeps when receiving IR messages.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::sanyo(IRSanyoAc *ac,
                  const bool on, const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
@@ -1755,7 +1755,7 @@ void IRac::tcl112(IRTcl112Ac *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] light Turn on the LED/Display mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::teco(IRTecoAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
@@ -1823,7 +1823,7 @@ void IRac::toshiba(IRToshibaAC *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::trotec(IRTrotecESP *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
@@ -1857,7 +1857,7 @@ void IRac::trotec(IRTrotecESP *ac,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 /// @param[in] sendNormal Do we send a Normal settings message at all?
 ///  i.e In addition to the clock/time/timer message
@@ -1902,12 +1902,14 @@ void IRac::vestel(IRVestelAc *ac,
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] light Turn on the LED/Display mode.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::voltas(IRVoltas *ac,
                   const voltas_ac_remote_model_t model,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                  const bool turbo, const bool econo, const bool light) {
+                  const bool turbo, const bool econo, const bool light,
+                  const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -1923,7 +1925,7 @@ void IRac::voltas(IRVoltas *ac,
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
-  // No Sleep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
   // No Clock setting available.
   ac->send();
 }
@@ -1940,7 +1942,7 @@ void IRac::voltas(IRVoltas *ac,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, > 0 is on.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
                      const bool on, const stdAc::opmode_t mode,
@@ -2500,7 +2502,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRVoltas ac(_pin, _inverted, _modulation);
       voltas(&ac, (voltas_ac_remote_model_t)send.model, send.power, send.mode,
              degC, send.fanspeed, send.swingv, send.swingh, send.turbo,
-             send.econo, send.light);
+             send.econo, send.light, send.sleep);
       break;
     }
 #endif  // SEND_VOLTAS

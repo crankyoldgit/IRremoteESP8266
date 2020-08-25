@@ -1565,7 +1565,7 @@ TEST(TestIRac, Voltas) {
   char expected_unknown[] =
       "Model: 0 (UNKNOWN), Power: On, Mode: 8 (Cool), Temp: 18C, "
       "Fan: 1 (High), Swing(V): On, Swing(H): On, "
-      "Turbo: Off, Econo: Off, WiFi: Off, Light: On";
+      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On";
   irac.voltas(&ac,
               voltas_ac_remote_model_t::kVoltasUnknown,  // Model
               true,                                      // Power
@@ -1576,7 +1576,8 @@ TEST(TestIRac, Voltas) {
               stdAc::swingh_t::kAuto,                    // Horizontal Swing
               false,                                     // Turbo
               false,                                     // Econo
-              true);                                     // Light
+              true,                                      // Light
+              3 * 60);                                   // Sleep
   EXPECT_EQ(voltas_ac_remote_model_t::kVoltasUnknown, ac.getModel());
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(kVoltasCool, ac.getMode());
@@ -1585,6 +1586,7 @@ TEST(TestIRac, Voltas) {
   EXPECT_FALSE(ac.getTurbo());
   EXPECT_FALSE(ac.getEcono());
   EXPECT_TRUE(ac.getLight());
+  EXPECT_TRUE(ac.getSleep());
   ASSERT_EQ(expected_unknown, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -1599,7 +1601,7 @@ TEST(TestIRac, Voltas) {
   char expected_122LZF[] =
       "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 18C, "
       "Fan: 1 (High), Swing(V): On, Swing(H): N/A, "
-      "Turbo: Off, Econo: Off, WiFi: Off, Light: On";
+      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On";
   irac.voltas(&ac,
               voltas_ac_remote_model_t::kVoltas122LZF,   // Model
               true,                                      // Power
@@ -1610,7 +1612,8 @@ TEST(TestIRac, Voltas) {
               stdAc::swingh_t::kAuto,                    // Horizontal Swing
               false,                                     // Turbo
               false,                                     // Econo
-              true);                                     // Light
+              true,                                      // Light
+              3 * 60);                                   // Sleep
   EXPECT_EQ(voltas_ac_remote_model_t::kVoltas122LZF, ac.getModel());
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(kVoltasCool, ac.getMode());
@@ -1619,6 +1622,7 @@ TEST(TestIRac, Voltas) {
   EXPECT_FALSE(ac.getTurbo());
   EXPECT_FALSE(ac.getEcono());
   EXPECT_TRUE(ac.getLight());
+  EXPECT_TRUE(ac.getSleep());
   ASSERT_EQ(expected_122LZF, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

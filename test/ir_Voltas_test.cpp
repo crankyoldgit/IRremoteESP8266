@@ -42,7 +42,7 @@ TEST(TestDecodeVoltas, RealExample) {
   EXPECT_EQ(
       "Model: 1 (122LZF), Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
       "Swing(V): Off, Swing(H): N/A, "
-      "Turbo: Off, Econo: Off, WiFi: On, Light: Off",
+      "Turbo: Off, Econo: Off, WiFi: On, Light: Off, Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -138,6 +138,18 @@ TEST(TestIRVoltasClass, Turbo) {
   EXPECT_TRUE(ac.getTurbo());
   ac.setTurbo(false);
   EXPECT_FALSE(ac.getTurbo());
+}
+
+TEST(TestIRVoltasClass, Sleep) {
+  IRVoltas ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
 }
 
 TEST(TestIRVoltasClass, Econo) {

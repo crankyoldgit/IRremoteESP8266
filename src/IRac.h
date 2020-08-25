@@ -411,7 +411,8 @@ void electra(IRElectraAc *ac,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-              const bool turbo, const bool econo, const bool light);
+              const bool turbo, const bool econo, const bool light,
+              const int16_t sleep = -1);
 #endif  // SEND_VOLTAS
 #if SEND_WHIRLPOOL_AC
   void whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,

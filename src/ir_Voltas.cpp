@@ -382,6 +382,14 @@ void IRVoltas::setLight(const bool on) { _.Light = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRVoltas::getLight(void) const { return _.Light; }
 
+/// Change the Sleep setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRVoltas::setSleep(const bool on) { _.Sleep = on; }
+
+/// Get the value of the current Sleep setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRVoltas::getSleep(void) const { return _.Sleep; }
+
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @param[in] prev Ptr to the previous state if available.
 /// @return The stdAc equivilant of the native settings.
@@ -408,12 +416,12 @@ stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
   result.turbo = _.Turbo;
   result.econo = _.Econo;
   result.light = _.Light;
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.quiet = false;
   result.filter = false;
   result.clean = false;
   result.beep = false;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -422,7 +430,7 @@ stdAc::state_t IRVoltas::toCommon(const stdAc::state_t *prev) {
 /// @return A human readable string.
 String IRVoltas::toString() {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::VOLTAS, getModel(), false);
   result += addBoolToString(_.Power, kPowerStr);
   result += addModeToString(_.Mode, 255, kVoltasCool, kVoltasHeat,
@@ -439,5 +447,6 @@ String IRVoltas::toString() {
   result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.Wifi, kWifiStr);
   result += addBoolToString(_.Light, kLightStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
   return result;
 }

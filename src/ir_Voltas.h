@@ -38,7 +38,7 @@ union VoltasProtocol {
     // Byte 2
     uint8_t SwingV         :3;
     uint8_t Wifi           :1;
-    uint8_t                :1;
+    uint8_t                :1;  // Unknown/Unused
     uint8_t Turbo          :1;
     uint8_t Sleep          :1;
     uint8_t Power          :1;
@@ -128,6 +128,8 @@ class IRVoltas {
   bool getLight(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
+  void setSleep(const bool on);
+  bool getSleep(void) const;
   void setOffTimer(const uint16_t nr_of_mins);
   uint16_t getOffTimer(void);
   uint8_t* getRaw(void);
