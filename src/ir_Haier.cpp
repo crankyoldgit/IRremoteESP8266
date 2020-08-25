@@ -116,10 +116,10 @@ bool IRHaierAC::validChecksum(uint8_t state[], const uint16_t length) {
 void IRHaierAC::stateReset(void) {
   std::memset(_.remote_state, 0, sizeof _.remote_state);
   _.Prefix = kHaierAcPrefix;
-  _.unknow = 1;
-  _.OffHours = 12;
-  _.Temp = 9;
-  _.Fan = 0b11;
+  _.unknown = 1;  // const value
+  _.OffHours = 12;  // default initial state
+  _.Temp = kHaierAcDefTemp - kHaierAcMinTemp;
+  _.Fan = 3;  // kHaierAcFanLow;
   _.Command = kHaierAcCmdOn;
 }
 
@@ -253,13 +253,6 @@ void IRHaierAC::setSleep(const bool on) {
 bool IRHaierAC::getSleep(void) const {
   return _.Sleep;
 }
-/*
-/// Get the Time value at the given pointer.
-/// @param[in] ptr A Ptr to a location in the internal state to get the time.
-uint16_t IRHaierAC::getTime(const uint8_t ptr[]) {
-  return GETBITS8(ptr[0], kHaierAcTimeOffset, kHaierAcHoursSize) * 60 +
-         GETBITS8(ptr[1], kHaierAcTimeOffset, kHaierAcMinsSize);
-}*/
 
 /// Get the On Timer value/setting of the A/C.
 /// @return Nr of minutes the timer is set to. -1 is Off/not set etc.
@@ -284,16 +277,6 @@ int16_t IRHaierAC::getOffTimer(void) const {
 /// Get the clock value of the A/C.
 /// @return The clock time, in Nr of minutes past midnight.
 uint16_t IRHaierAC::getCurrTime(void) const { return GETTIME(Curr); }
-/*
-/// Set the Time value at the given pointer.
-/// @param[out] ptr A Ptr to a location in the internal state to set the time.
-/// @param[in] nr_mins The time expressed in total number of minutes.
-void IRHaierAC::setTime(uint8_t ptr[], const uint16_t nr_mins) {
-  uint16_t mins = nr_mins;
-  if (nr_mins > kHaierAcMaxTime) mins = kHaierAcMaxTime;
-  setBits(ptr, kHaierAcTimeOffset, kHaierAcHoursSize, mins / 60);  // Hours
-  setBits(ptr + 1, kHaierAcTimeOffset, kHaierAcMinsSize, mins % 60);  // Minutes
-}*/
 
 /// Set & enable the On Timer.
 /// @param[in] nr_mins The time expressed in total number of minutes.

@@ -38,7 +38,7 @@ union HaierProtocol{
     uint8_t Temp   :4;
     // Byte 2
     uint8_t CurrHours:5;
-    uint8_t unknow   :1;  // value=1
+    uint8_t unknown  :1;  // value=1
     uint8_t Swing    :2;
     // Byte 3
     uint8_t CurrMins:6;
@@ -292,8 +292,6 @@ class IRHaierAC {
   HaierProtocol _;
   void stateReset(void);
   void checksum(void);
-  // static uint16_t getTime(const uint8_t ptr[]);
-  // static void setTime(uint8_t ptr[], const uint16_t nr_mins);
 };
 
 /// Class for handling detailed Haier ACYRW02 A/C messages.
