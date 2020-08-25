@@ -33,7 +33,7 @@ union VoltasProtocol {
     uint8_t SwingHChange   :7;
     // Byte 1
     uint8_t Mode           :4;
-    uint8_t                :1;
+    uint8_t                :1;  // Unknown/Unused
     uint8_t FanSpeed       :3;
     // Byte 2
     uint8_t SwingV         :3;
@@ -44,16 +44,16 @@ union VoltasProtocol {
     uint8_t Power          :1;
     // Byte 3
     uint8_t Temp           :4;
-    uint8_t Unknown3       :2;  // Typically 0b01
+    uint8_t                :2;  // Typically 0b01
     uint8_t Econo          :1;
     uint8_t TempSet        :1;
     // Byte 4
-    uint8_t TimerEnable_4  :1;
-    uint8_t                :6;  // Typically 0b011101
+    uint8_t OnTimerMins    :6;  // 0-59
+    uint8_t                :1;  // Unknown/Unused
     uint8_t OnTimer12Hr    :1;  // 1 if Timer is >= 12 hrs.
     // Byte 5
-    uint8_t TimerEnable_5  :1;
-    uint8_t                :6;  // Typically 0b011101
+    uint8_t OffTimerMins   :6;  // 0-59
+    uint8_t                :1;  // Unknown/Unused
     uint8_t OffTimer12Hr   :1;  // 1 if Timer is >= 12 hrs.
     // Byte 6
     uint8_t                :8;  // Typically 0b00111011(0x3B)

@@ -410,70 +410,53 @@ void IRVoltas::setSleep(const bool on) {
 bool IRVoltas::getSleep(void) const { return _.Sleep; }
 
 /// Get the value of the On Timer time.
-/// @note Rounded down to the hour mark.
 /// @return Number of minutes before the timer activates.
 uint16_t IRVoltas::getOnTime(void) const {
-  return (12 * _.OnTimer12Hr + _.OnTimerHrs) * 60;
+  return (12 * _.OnTimer12Hr + _.OnTimerHrs) * 60 + _.OnTimerMins;
 }
 
 /// Is the On Timer enabled?
 /// @return true, A timer is on. false, A timer is off.
 bool IRVoltas::getOnTimerEnabled(void) const {
-  return _.TimerEnable_4 && _.TimerEnable_5 && _.OnTimerEnable && getOnTime();
+  return _.OnTimerEnable && getOnTime();
 }
 
 /// Set the value of the On Timer time.
-/// @note Rounded down to the hour mark. Enables timer if >= 60 mins.
 /// @param[in] nr_of_mins Number of minutes before the timer activates.
+/// 0 disables the timer. Max is 23 hrs & 59 mins (1439 mins)
 void IRVoltas::setOnTime(const uint16_t nr_of_mins) {
-  uint16_t hrs = std::min(nr_of_mins / 60, 23);  // Cap to 23 hrs.
+  // Cap the total number of mins.
+  uint16_t mins = std::min(nr_of_mins, (uint16_t)(23 * 60 + 59));
+  uint16_t hrs = mins / 60;
+  _.OnTimerMins = mins % 60;
   _.OnTimer12Hr = hrs >= 12;
   _.OnTimerHrs = hrs % 12;
-  if (hrs) {  // The timer is to be enabled.
-    _.TimerEnable_4 = true;
-    _.TimerEnable_5 = true;
-    _.OnTimerEnable = true;
-  } else {
-    _.OnTimerEnable = false;
-    if (!getOffTimerEnabled()) {  // Can we disable the timer(s)?
-      _.TimerEnable_4 = false;
-      _.TimerEnable_5 = false;
-    }
-  }
+  _.OnTimerEnable = (mins > 0);  // Is the timer is to be enabled?
 }
 
 /// Get the value of the On Timer time.
-/// @note Rounded down to the hour mark.
 /// @return Number of minutes before the timer activates.
 uint16_t IRVoltas::getOffTime(void) const {
-  return (12 * _.OffTimer12Hr + _.OffTimerHrs) * 60;
+  return (12 * _.OffTimer12Hr + _.OffTimerHrs) * 60 + _.OffTimerMins;
 }
 
 /// Set the value of the Off Timer time.
-/// @note Rounded down to the hour mark. Enables timer if >= 60 mins.
 /// @param[in] nr_of_mins Number of minutes before the timer activates.
+/// 0 disables the timer. Max is 23 hrs & 59 mins (1439 mins)
 void IRVoltas::setOffTime(const uint16_t nr_of_mins) {
-  uint16_t hrs = std::min(nr_of_mins / 60, 23);  // Cap to 23 hrs.
-
+  // Cap the total number of mins.
+  uint16_t mins = std::min(nr_of_mins, (uint16_t)(23 * 60 + 59));
+  uint16_t hrs = mins / 60;
+  _.OffTimerMins = mins % 60;
   _.OffTimer12Hr = hrs >= 12;
   _.OffTimerHrs = hrs % 12;
-  if (hrs) {  // The timer is to be enabled.
-    _.TimerEnable_4 = true;
-    _.TimerEnable_5 = true;
-    _.OffTimerEnable = true;
-  } else {
-    _.OffTimerEnable = false;
-    if (!getOnTimerEnabled()) {  // Can we disable the timer(s)?
-      _.TimerEnable_4 = false;
-      _.TimerEnable_5 = false;
-    }
-  }
+  _.OffTimerEnable = (mins > 0);  // Is the timer is to be enabled?
 }
 
 /// Is the Off Timer enabled?
 /// @return true, A timer is on. false, A timer is off.
 bool IRVoltas::getOffTimerEnabled(void) const {
-  return _.TimerEnable_4 && _.TimerEnable_5 && _.OffTimerEnable && getOffTime();
+  return _.OffTimerEnable && getOffTime();
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.

@@ -351,14 +351,14 @@ TEST(TestVoltasClass, HumanReadable) {
   ac.setTurbo(true);
   ac.setSleep(true);
   ac.setEcono(true);
-  ac.setOnTime(2 * 60);
+  ac.setOnTime(2 * 60 + 17);
   ac.setMode(kVoltasHeat);  // Heat mode should cancel Sleep, Turbo, & Econo.
   EXPECT_EQ(
       "Model: 1 (122LZF), Power: On, Mode: 2 (Heat), Temp: 21C, "
       "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: Off, Econo: Off, "
-      "WiFi: On, Light: On, Sleep: Off, On Timer: 02:00, Off Timer: Off",
+      "WiFi: On, Light: On, Sleep: Off, On Timer: 02:17, Off Timer: Off",
       ac.toString());
-  ac.setOffTime(13 * 60);
+  ac.setOffTime(13 * 60 + 37);
   ac.setMode(kVoltasCool);
   ac.setTurbo(true);
   ac.setSleep(true);
@@ -366,21 +366,21 @@ TEST(TestVoltasClass, HumanReadable) {
   EXPECT_EQ(
       "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 21C, "
       "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
-      "WiFi: On, Light: On, Sleep: On, On Timer: 02:00, Off Timer: 13:00",
+      "WiFi: On, Light: On, Sleep: On, On Timer: 02:17, Off Timer: 13:37",
       ac.toString());
   ac.setModel(voltas_ac_remote_model_t::kVoltasUnknown);
   ac.setSwingH(true);
   EXPECT_EQ(
       "Model: 0 (UNKNOWN), Power: On, Mode: 8 (Cool), Temp: 21C, "
       "Fan: 7 (Auto), Swing(V): On, Swing(H): On, Turbo: On, Econo: On, "
-      "WiFi: On, Light: On, Sleep: On, On Timer: 02:00, Off Timer: 13:00",
+      "WiFi: On, Light: On, Sleep: On, On Timer: 02:17, Off Timer: 13:37",
       ac.toString());
   ac.setModel(voltas_ac_remote_model_t::kVoltas122LZF);
   ac.setOnTime(0);
   EXPECT_EQ(
       "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 21C, "
       "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
-      "WiFi: On, Light: On, Sleep: On, On Timer: Off, Off Timer: 13:00",
+      "WiFi: On, Light: On, Sleep: On, On Timer: Off, Off Timer: 13:37",
       ac.toString());
   ac.setOffTime(0);
   EXPECT_EQ(
