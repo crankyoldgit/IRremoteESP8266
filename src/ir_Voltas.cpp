@@ -210,7 +210,10 @@ void IRVoltas::setMode(const uint8_t mode) {
       setMode(kVoltasCool);
       return;
   }
-  setEcono(getEcono());  // Reset the econo setting if needed.
+  // Reset some settings if needed.
+  setEcono(getEcono());
+  setTurbo(getTurbo());
+  setSleep(getSleep());
 }
 
 /// Get the operating mode setting of the A/C.
@@ -358,16 +361,22 @@ bool IRVoltas::getWifi(void) const { return _.Wifi; }
 
 /// Change the Turbo setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRVoltas::setTurbo(const bool on) { _.Turbo = on; }
+/// @note The Turbo setting is only available in Cool mode.
+void IRVoltas::setTurbo(const bool on) {
+  if (on && _.Mode == kVoltasCool)
+    _.Turbo = true;
+  else
+    _.Turbo = false;
+}
 
 /// Get the value of the current Turbo setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRVoltas::getTurbo(void) const { return _.Turbo; }
 
-/// Change the Econo setting.
+/// Change the Economy setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
+/// @note The Economy setting is only available in Cool mode.
 void IRVoltas::setEcono(const bool on) {
-  // The econo setting is only available in cool mode.
   if (on && _.Mode == kVoltasCool)
     _.Econo = true;
   else
@@ -388,7 +397,13 @@ bool IRVoltas::getLight(void) const { return _.Light; }
 
 /// Change the Sleep setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRVoltas::setSleep(const bool on) { _.Sleep = on; }
+/// @note The Sleep setting is only available in Cool mode.
+void IRVoltas::setSleep(const bool on) {
+  if (on && _.Mode == kVoltasCool)
+    _.Sleep = true;
+  else
+    _.Sleep = false;
+}
 
 /// Get the value of the current Sleep setting.
 /// @return true, the setting is on. false, the setting is off.
