@@ -194,9 +194,10 @@ bool IRVoltas::getPower(void) const { return _.Power; }
 /// @param[in] mode The desired operating mode.
 /// @note If we get an unexpected mode, default to AUTO.
 void IRVoltas::setMode(const uint8_t mode) {
+  _.Mode = mode;
   switch (mode) {
     case kVoltasFan:
-      setFan(kVoltasFanHigh);
+      setFan(getFan());  // Force the fan speed to a correct one fo the mode.
       break;
     case kVoltasDry:
       setFan(kVoltasFanLow);
@@ -209,7 +210,6 @@ void IRVoltas::setMode(const uint8_t mode) {
       setMode(kVoltasCool);
       return;
   }
-  _.Mode = mode;
   setEcono(getEcono());  // Reset the econo setting if needed.
 }
 
@@ -257,10 +257,15 @@ uint8_t IRVoltas::getTemp(void) { return _.Temp + kVoltasMinTemp; }
 /// @param[in] fan The desired setting.
 void IRVoltas::setFan(const uint8_t fan) {
   switch (fan) {
+    case kVoltasFanAuto:
+      if (_.Mode == kVoltasFan) {  // Auto speed is not available in fan mode.
+        setFan(kVoltasFanHigh);
+        return;
+      }
+      // FALL-THRU
     case kVoltasFanLow:
     case kVoltasFanMed:
     case kVoltasFanHigh:
-    case kVoltasFanAuto:
       _.FanSpeed = fan;
       break;
     default:

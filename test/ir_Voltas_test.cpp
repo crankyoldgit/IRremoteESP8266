@@ -255,6 +255,7 @@ TEST(TestVoltasClass, Temperature) {
 TEST(TestVoltasClass, FanSpeed) {
   IRVoltas ac(kGpioUnused);
   ac.begin();
+  ac.setMode(kVoltasCool);  // All fan speeds are allowed in cool mode.
   ac.setFan(kVoltasFanLow);
 
   ac.setFan(kVoltasFanAuto);
@@ -272,6 +273,18 @@ TEST(TestVoltasClass, FanSpeed) {
 
   ac.setFan(255);
   EXPECT_EQ(kVoltasFanAuto, ac.getFan());
+
+  // Confirm auto speed isn't operable in Fan mode.
+  ac.setMode(kVoltasFan);
+  EXPECT_NE(kVoltasFanAuto, ac.getFan());
+  ac.setFan(kVoltasFanLow);
+  EXPECT_EQ(kVoltasFanLow, ac.getFan());
+  ac.setFan(kVoltasFanMed);
+  EXPECT_EQ(kVoltasFanMed, ac.getFan());
+  ac.setFan(kVoltasFanHigh);
+  EXPECT_EQ(kVoltasFanHigh, ac.getFan());
+  ac.setFan(kVoltasFanAuto);
+  EXPECT_NE(kVoltasFanAuto, ac.getFan());
 }
 
 TEST(TestVoltasClass, SwingV) {
