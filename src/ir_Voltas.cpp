@@ -28,7 +28,7 @@ const uint16_t kVoltasFreq = 38000;     ///< Hz.
 
 #if SEND_VOLTAS
 /// Send a Voltas formatted message.
-/// Status: ALPHA / Untested.
+/// Status: STABLE / Working on real device.
 /// @param[in] data An array of bytes containing the IR command.
 ///                 It is assumed to be in MSB order for this code.
 /// e.g.
@@ -51,7 +51,7 @@ void IRsend::sendVoltas(const uint8_t data[], const uint16_t nbytes,
 
 #if DECODE_VOLTAS
 /// Decode the supplied Voltas message.
-/// Status: ALPHA / Untested.
+/// Status: STABLE / Working on real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
