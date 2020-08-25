@@ -43,7 +43,7 @@ TEST(TestDecodeVoltas, RealExample) {
       "Model: 1 (122LZF), Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
       "Swing(V): Off, Swing(H): N/A, "
       "Turbo: Off, Econo: Off, WiFi: On, Light: Off, Sleep: Off, "
-      "On Timer: 01:00, Off Timer: 01:00",
+      "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));

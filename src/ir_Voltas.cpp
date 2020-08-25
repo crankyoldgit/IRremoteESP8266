@@ -404,7 +404,7 @@ uint16_t IRVoltas::getOnTime(void) const {
 /// Is the On Timer enabled?
 /// @return true, A timer is on. false, A timer is off.
 bool IRVoltas::getOnTimerEnabled(void) const {
-  return _.TimerEnable_4 && _.TimerEnable_5 && getOnTime();
+  return _.TimerEnable_4 && _.TimerEnable_5 && _.OnTimerEnable && getOnTime();
 }
 
 /// Set the value of the On Timer time.
@@ -417,9 +417,13 @@ void IRVoltas::setOnTime(const uint16_t nr_of_mins) {
   if (hrs) {  // The timer is to be enabled.
     _.TimerEnable_4 = true;
     _.TimerEnable_5 = true;
-  } else if (!getOffTimerEnabled()) {  // Can we disable the timer(s)?
-    _.TimerEnable_4 = false;
-    _.TimerEnable_5 = false;
+    _.OnTimerEnable = true;
+  } else {
+    _.OnTimerEnable = false;
+    if (!getOffTimerEnabled()) {  // Can we disable the timer(s)?
+      _.TimerEnable_4 = false;
+      _.TimerEnable_5 = false;
+    }
   }
 }
 
@@ -441,16 +445,20 @@ void IRVoltas::setOffTime(const uint16_t nr_of_mins) {
   if (hrs) {  // The timer is to be enabled.
     _.TimerEnable_4 = true;
     _.TimerEnable_5 = true;
-  } else if (!getOnTimerEnabled()) {  // Can we disable the timer(s)?
-    _.TimerEnable_4 = false;
-    _.TimerEnable_5 = false;
+    _.OffTimerEnable = true;
+  } else {
+    _.OffTimerEnable = false;
+    if (!getOnTimerEnabled()) {  // Can we disable the timer(s)?
+      _.TimerEnable_4 = false;
+      _.TimerEnable_5 = false;
+    }
   }
 }
 
 /// Is the Off Timer enabled?
 /// @return true, A timer is on. false, A timer is off.
 bool IRVoltas::getOffTimerEnabled(void) const {
-  return _.TimerEnable_4 && _.TimerEnable_5 && getOffTime();
+  return _.TimerEnable_4 && _.TimerEnable_5 && _.OffTimerEnable && getOffTime();
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.

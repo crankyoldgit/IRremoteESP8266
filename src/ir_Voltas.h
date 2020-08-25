@@ -64,7 +64,7 @@ union VoltasProtocol {
     uint8_t                :5;  // Typically 0b00000
     uint8_t Light          :1;
     uint8_t OffTimerEnable :1;
-    uint8_t                :1;  // Typically 0b0
+    uint8_t OnTimerEnable  :1;
     // Byte 9
     uint8_t Checksum       :8;
   };
