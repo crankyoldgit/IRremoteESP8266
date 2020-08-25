@@ -42,7 +42,8 @@ TEST(TestDecodeVoltas, RealExample) {
   EXPECT_EQ(
       "Model: 1 (122LZF), Power: On, Mode: 4 (Dry), Temp: 24C, Fan: 4 (Low), "
       "Swing(V): Off, Swing(H): N/A, "
-      "Turbo: Off, Econo: Off, WiFi: On, Light: Off, Sleep: Off",
+      "Turbo: Off, Econo: Off, WiFi: On, Light: Off, Sleep: Off, "
+      "On Timer: 01:00, Off Timer: 01:00",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -84,6 +85,10 @@ TEST(TestIRVoltasClass, Checksums) {
       0x33, 0x84, 0x88, 0x18, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0x00};
   EXPECT_FALSE(IRVoltas::validChecksum(badchecksum));
   EXPECT_EQ(0xE6, IRVoltas::calcChecksum(badchecksum));
+  const uint8_t kReset[kVoltasStateLength] = {
+      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3A, 0x3A, 0x00, 0x00, 0xDE};
+  EXPECT_TRUE(IRVoltas::validChecksum(kReset));
+  EXPECT_EQ(0xDE, IRVoltas::calcChecksum(kReset));
 }
 
 TEST(TestIRVoltasClass, SetandGetRaw) {
@@ -315,4 +320,56 @@ TEST(TestVoltasClass, SwingH) {
   ac.setSwingH(false);
   EXPECT_FALSE(ac.getSwingHChange());
   EXPECT_FALSE(ac.getSwingH());
+}
+
+TEST(TestVoltasClass, HumanReadable) {
+  IRVoltas ac(kGpioUnused);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: Off, Mode: 8 (Cool), Temp: 23C, "
+      "Fan: 1 (High), Swing(V): Off, Swing(H): N/A, Turbo: Off, Econo: Off, "
+      "WiFi: Off, Light: Off, Sleep: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.on();
+  ac.setMode(kVoltasHeat);
+  ac.setTemp(21);
+  ac.setFan(kVoltasFanAuto);
+  ac.setSwingV(true);
+  ac.setTurbo(true);
+  ac.setWifi(true);
+  ac.setLight(true);
+  ac.setSleep(true);
+  ac.setOnTime(2 * 60);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: On, Mode: 2 (Heat), Temp: 21C, "
+      "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: Off, "
+      "WiFi: On, Light: On, Sleep: On, On Timer: 02:00, Off Timer: Off",
+      ac.toString());
+  ac.setOffTime(13 * 60);
+  ac.setMode(kVoltasCool);
+  ac.setEcono(true);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 21C, "
+      "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
+      "WiFi: On, Light: On, Sleep: On, On Timer: 02:00, Off Timer: 13:00",
+      ac.toString());
+  ac.setModel(voltas_ac_remote_model_t::kVoltasUnknown);
+  ac.setSwingH(true);
+  EXPECT_EQ(
+      "Model: 0 (UNKNOWN), Power: On, Mode: 8 (Cool), Temp: 21C, "
+      "Fan: 7 (Auto), Swing(V): On, Swing(H): On, Turbo: On, Econo: On, "
+      "WiFi: On, Light: On, Sleep: On, On Timer: 02:00, Off Timer: 13:00",
+      ac.toString());
+  ac.setModel(voltas_ac_remote_model_t::kVoltas122LZF);
+  ac.setOnTime(0);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 21C, "
+      "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
+      "WiFi: On, Light: On, Sleep: On, On Timer: Off, Off Timer: 13:00",
+      ac.toString());
+  ac.setOffTime(0);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 21C, "
+      "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
+      "WiFi: On, Light: On, Sleep: On, On Timer: Off, Off Timer: Off",
+      ac.toString());
 }

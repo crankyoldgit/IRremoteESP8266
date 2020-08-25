@@ -1565,7 +1565,8 @@ TEST(TestIRac, Voltas) {
   char expected_unknown[] =
       "Model: 0 (UNKNOWN), Power: On, Mode: 8 (Cool), Temp: 18C, "
       "Fan: 1 (High), Swing(V): On, Swing(H): On, "
-      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On";
+      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On, "
+      "On Timer: Off, Off Timer: Off";
   irac.voltas(&ac,
               voltas_ac_remote_model_t::kVoltasUnknown,  // Model
               true,                                      // Power
@@ -1601,7 +1602,8 @@ TEST(TestIRac, Voltas) {
   char expected_122LZF[] =
       "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 18C, "
       "Fan: 1 (High), Swing(V): On, Swing(H): N/A, "
-      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On";
+      "Turbo: Off, Econo: Off, WiFi: Off, Light: On, Sleep: On, "
+      "On Timer: Off, Off Timer: Off";
   irac.voltas(&ac,
               voltas_ac_remote_model_t::kVoltas122LZF,   // Model
               true,                                      // Power
