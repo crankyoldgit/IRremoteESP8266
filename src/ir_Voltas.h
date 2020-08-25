@@ -50,16 +50,16 @@ union VoltasProtocol {
     // Byte 4
     uint8_t OnTimerMins    :6;  // 0-59
     uint8_t                :1;  // Unknown/Unused
-    uint8_t OnTimer12Hr    :1;  // 1 if Timer is >= 12 hrs.
+    uint8_t OnTimer12Hr    :1;  // (Nr of Hours + 1) % 12.
     // Byte 5
     uint8_t OffTimerMins   :6;  // 0-59
     uint8_t                :1;  // Unknown/Unused
-    uint8_t OffTimer12Hr   :1;  // 1 if Timer is >= 12 hrs.
+    uint8_t OffTimer12Hr   :1;  // (Nr of Hours + 1) % 12.
     // Byte 6
     uint8_t                :8;  // Typically 0b00111011(0x3B)
     // Byte 7
-    uint8_t OnTimerHrs     :4;  // Nr of Hours.
-    uint8_t OffTimerHrs    :4;  // Nr of Hours.
+    uint8_t OnTimerHrs     :4;  // (Nr of Hours + 1) % 12.
+    uint8_t OffTimerHrs    :4;  // (Nr of Hours + 1) % 12.
     // Byte 8
     uint8_t                :5;  // Typically 0b00000
     uint8_t Light          :1;
@@ -133,10 +133,8 @@ class IRVoltas {
   bool getSleep(void) const;
   uint16_t getOnTime(void) const;
   void setOnTime(const uint16_t nr_of_mins);
-  bool getOnTimerEnabled(void) const;
   uint16_t getOffTime(void) const;
   void setOffTime(const uint16_t nr_of_mins);
-  bool getOffTimerEnabled(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
   uint8_t convertMode(const stdAc::opmode_t mode);

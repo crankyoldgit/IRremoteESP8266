@@ -86,9 +86,9 @@ TEST(TestIRVoltasClass, Checksums) {
   EXPECT_FALSE(IRVoltas::validChecksum(badchecksum));
   EXPECT_EQ(0xE6, IRVoltas::calcChecksum(badchecksum));
   const uint8_t kReset[kVoltasStateLength] = {
-      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3A, 0x3A, 0x00, 0x00, 0xDE};
+      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xCB};
   EXPECT_TRUE(IRVoltas::validChecksum(kReset));
-  EXPECT_EQ(0xDE, IRVoltas::calcChecksum(kReset));
+  EXPECT_EQ(0xCB, IRVoltas::calcChecksum(kReset));
 }
 
 TEST(TestIRVoltasClass, SetandGetRaw) {
@@ -388,4 +388,33 @@ TEST(TestVoltasClass, HumanReadable) {
       "Fan: 7 (Auto), Swing(V): On, Swing(H): N/A, Turbo: On, Econo: On, "
       "WiFi: On, Light: On, Sleep: On, On Timer: Off, Off Timer: Off",
       ac.toString());
+}
+
+TEST(TestVoltasClass, Timers) {
+  IRVoltas ac(kGpioUnused);
+  const uint8_t off_7hrs[10] = {
+      0x33, 0x28, 0x80, 0x1B, 0x3B, 0x3B, 0x3B, 0x71, 0x40, 0xA7};
+  ac.setRaw(off_7hrs);
+  EXPECT_EQ(
+      "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 27C, Fan: 1 (High), "
+      "Swing(V): Off, Swing(H): N/A, Turbo: Off, Econo: Off, WiFi: Off, "
+      "Light: Off, Sleep: Off, On Timer: Off, Off Timer: 06:59",
+      ac.toString());
+  const uint8_t off_16hrs[10] = {
+      0x33, 0x28, 0x80, 0x1B, 0x3B, 0xBB, 0x3B, 0x41, 0x40, 0x57};
+  ac.setRaw(off_16hrs);
+  EXPECT_EQ(
+    "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 27C, Fan: 1 (High), "
+    "Swing(V): Off, Swing(H): N/A, Turbo: Off, Econo: Off, WiFi: Off, "
+    "Light: Off, Sleep: Off, On Timer: Off, Off Timer: 15:59",
+    ac.toString());
+  ac.setOffTime(23 * 60 + 59);
+  EXPECT_EQ(
+    "Model: 1 (122LZF), Power: On, Mode: 8 (Cool), Temp: 27C, Fan: 1 (High), "
+    "Swing(V): Off, Swing(H): N/A, Turbo: Off, Econo: Off, WiFi: Off, "
+    "Light: Off, Sleep: Off, On Timer: Off, Off Timer: 23:59",
+    ac.toString());
+  const uint8_t off_24hrs[10] = {  // Guess only
+      0x33, 0x28, 0x80, 0x1B, 0x3B, 0x3B, 0x3B, 0x01, 0x40, 0x17};
+  EXPECT_STATE_EQ(off_24hrs, ac.getRaw(), kVoltasBits);
 }

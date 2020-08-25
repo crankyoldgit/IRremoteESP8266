@@ -93,8 +93,9 @@ IRVoltas::IRVoltas(const uint16_t pin, const bool inverted,
 // Reset the internal state to a fixed known good state.
 void IRVoltas::stateReset() {
   // This resets to a known-good state.
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1238#issuecomment-674699746
   const uint8_t kReset[kVoltasStateLength] = {
-      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3A, 0x3A, 0x00, 0x00, 0xDE};
+      0x33, 0x28, 0x00, 0x17, 0x3B, 0x3B, 0x3B, 0x11, 0x00, 0xCB};
   setRaw(kReset);
 }
 
@@ -412,13 +413,8 @@ bool IRVoltas::getSleep(void) const { return _.Sleep; }
 /// Get the value of the On Timer time.
 /// @return Number of minutes before the timer activates.
 uint16_t IRVoltas::getOnTime(void) const {
-  return (12 * _.OnTimer12Hr + _.OnTimerHrs) * 60 + _.OnTimerMins;
-}
-
-/// Is the On Timer enabled?
-/// @return true, A timer is on. false, A timer is off.
-bool IRVoltas::getOnTimerEnabled(void) const {
-  return _.OnTimerEnable && getOnTime();
+  return std::min((unsigned)(12 * _.OnTimer12Hr + _.OnTimerHrs - 1), 23U) * 60 +
+      _.OnTimerMins;
 }
 
 /// Set the value of the On Timer time.
@@ -427,9 +423,9 @@ bool IRVoltas::getOnTimerEnabled(void) const {
 void IRVoltas::setOnTime(const uint16_t nr_of_mins) {
   // Cap the total number of mins.
   uint16_t mins = std::min(nr_of_mins, (uint16_t)(23 * 60 + 59));
-  uint16_t hrs = mins / 60;
+  uint16_t hrs = (mins / 60) + 1;
   _.OnTimerMins = mins % 60;
-  _.OnTimer12Hr = hrs >= 12;
+  _.OnTimer12Hr = hrs / 12;
   _.OnTimerHrs = hrs % 12;
   _.OnTimerEnable = (mins > 0);  // Is the timer is to be enabled?
 }
@@ -437,7 +433,8 @@ void IRVoltas::setOnTime(const uint16_t nr_of_mins) {
 /// Get the value of the On Timer time.
 /// @return Number of minutes before the timer activates.
 uint16_t IRVoltas::getOffTime(void) const {
-  return (12 * _.OffTimer12Hr + _.OffTimerHrs) * 60 + _.OffTimerMins;
+  return std::min((unsigned)(12 * _.OffTimer12Hr + _.OffTimerHrs - 1), 23U) *
+      60 + _.OffTimerMins;
 }
 
 /// Set the value of the Off Timer time.
@@ -446,17 +443,11 @@ uint16_t IRVoltas::getOffTime(void) const {
 void IRVoltas::setOffTime(const uint16_t nr_of_mins) {
   // Cap the total number of mins.
   uint16_t mins = std::min(nr_of_mins, (uint16_t)(23 * 60 + 59));
-  uint16_t hrs = mins / 60;
+  uint16_t hrs = (mins / 60) + 1;
   _.OffTimerMins = mins % 60;
-  _.OffTimer12Hr = hrs >= 12;
+  _.OffTimer12Hr = hrs / 12;
   _.OffTimerHrs = hrs % 12;
   _.OffTimerEnable = (mins > 0);  // Is the timer is to be enabled?
-}
-
-/// Is the Off Timer enabled?
-/// @return true, A timer is on. false, A timer is off.
-bool IRVoltas::getOffTimerEnabled(void) const {
-  return _.OffTimerEnable && getOffTime();
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
@@ -517,9 +508,9 @@ String IRVoltas::toString() {
   result += addBoolToString(_.Wifi, kWifiStr);
   result += addBoolToString(_.Light, kLightStr);
   result += addBoolToString(_.Sleep, kSleepStr);
-  result += addLabeledString(getOnTimerEnabled() ? minsToString(getOnTime())
-                                                 : kOffStr, kOnTimerStr);
-  result += addLabeledString(getOffTimerEnabled() ? minsToString(getOffTime())
-                                                  : kOffStr, kOffTimerStr);
+  result += addLabeledString(_.OnTimerEnable ? minsToString(getOnTime())
+                                             : kOffStr, kOnTimerStr);
+  result += addLabeledString(_.OffTimerEnable ? minsToString(getOffTime())
+                                              : kOffStr, kOffTimerStr);
   return result;
 }
