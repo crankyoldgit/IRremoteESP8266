@@ -1791,7 +1791,6 @@ void IRac::toshiba(IRToshibaAC *ac,
                    const stdAc::swingv_t swingv,
                    const bool turbo, const bool econo) {
   ac->begin();
-  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -1808,6 +1807,8 @@ void IRac::toshiba(IRToshibaAC *ac,
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
+  // Do this last because Toshiba A/C has an odd quirk with how power off works.
+  ac->setPower(on);
   ac->send();
 }
 #endif  // SEND_TOSHIBA_AC
