@@ -2072,3 +2072,82 @@ TEST(TestIRac, Issue1035) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &result, &prev));
   ASSERT_FALSE(result.power);
 }
+
+TEST(TestIRac, Issue1250) {
+  IRToshibaAC ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  ac.begin();
+  irac.next.protocol = decode_type_t::TOSHIBA_AC;  // Set a protocol to use.
+  irac.next.model = 1;  // Some A/Cs have different models. Try just the first.
+  irac.next.mode = stdAc::opmode_t::kFan;  // Run in Fan mode initially.
+  irac.next.celsius = true;  // Use Celsius for temp units. False = Fahrenheit
+  irac.next.degrees = 19;  // 19 degrees.
+  irac.next.fanspeed = stdAc::fanspeed_t::kAuto;  // Start the fan at Auto.
+  irac.next.swingv = stdAc::swingv_t::kOff;  // Don't swing the fan up or down.
+  irac.next.swingh = stdAc::swingh_t::kOff;  // Don't swing the fan left/right.
+  irac.next.light = true;  // Turn off any LED/Lights/Display that we can.
+  irac.next.beep = false;  // Turn off any beep from the A/C if we can.
+  irac.next.econo = false;  // Turn off any economy modes if we can.
+  irac.next.filter = false;  // Turn off any Ion/Mold/Health filters if we can.
+  irac.next.turbo = false;  // Don't use any turbo/powerful/etc modes.
+  irac.next.quiet = false;  // Don't use any quiet/silent/etc modes.
+  irac.next.sleep = -1;  // Don't set any sleep time or modes.
+  irac.next.clean = false;  // Turn off any Cleaning options if we can.
+  irac.next.clock = -1;  // Don't set any current time if we can avoid it.
+  irac.next.power = true;  // Initially start with the unit on.
+
+  stdAc::state_t copy_of_next_pre_send = irac.next;
+  irac.sendAc();
+  // Confirm nothing in the state changed with the send.
+  ASSERT_FALSE(IRac::cmpStates(irac.next, copy_of_next_pre_send));
+
+  // Now send the state so we can actually decode/capture what we sent.
+  char expected_on[] =
+      "Temp: 19C, Power: On, Mode: 4 (Fan), Fan: 0 (Auto), "
+      "Turbo: Off, Econo: Off";
+  ac._irsend.reset();
+  irac.toshiba(&ac,
+               irac.next.power,     // Power
+               irac.next.mode,      // Mode
+               irac.next.degrees,   // Celsius
+               irac.next.fanspeed,  // Fan speed
+               irac.next.swingv,    // Vertical Swing
+               irac.next.turbo,     // Turbo
+               irac.next.econo);    // Econo
+  ASSERT_EQ(expected_on, ac.toString());
+  ASSERT_EQ(kToshibaACStateLength, ac.getStateLength());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TOSHIBA_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kToshibaACBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_on, IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+
+  irac.next.power = false;
+  ASSERT_TRUE(IRac::cmpStates(irac.next, copy_of_next_pre_send));
+  copy_of_next_pre_send = irac.next;
+  irac.sendAc();
+  // Now send the state so we can actually decode/capture what we sent.
+  char expected_off[] =
+      "Temp: 19C, Power: Off, Fan: 0 (Auto), Turbo: Off, Econo: Off";
+  ac._irsend.reset();
+  irac.toshiba(&ac,
+               irac.next.power,     // Power
+               irac.next.mode,      // Mode
+               irac.next.degrees,   // Celsius
+               irac.next.fanspeed,  // Fan speed
+               irac.next.swingv,    // Vertical Swing
+               irac.next.turbo,     // Turbo
+               irac.next.econo);    // Econo
+  ASSERT_EQ(expected_off, ac.toString());
+  ASSERT_EQ(kToshibaACStateLength, ac.getStateLength());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TOSHIBA_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kToshibaACBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_off, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // Confirm nothing in the state changed with the send.
+  ASSERT_FALSE(IRac::cmpStates(irac.next, copy_of_next_pre_send));
+}
