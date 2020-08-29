@@ -20,8 +20,6 @@ using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_AIRWELL
 /// Send an Airwell Manchester Code formatted message.
@@ -94,14 +92,14 @@ void IRAirwellAc::begin(void) { _irsend.begin(); }
 /// Get the raw state of the object, suitable to be sent with the appropriate
 /// IRsend object method.
 /// @return A copy of the internal state.
-uint64_t IRAirwellAc::getRaw(void) {
-  return remote_state;
+uint64_t IRAirwellAc::getRaw(void) const {
+  return _.raw;
 }
 
 /// Set the raw state of the object.
 /// @param[in] state The raw state from the native IR message.
 void IRAirwellAc::setRaw(const uint64_t state) {
-  remote_state = state;
+  _.raw = state;
 }
 
 #if SEND_AIRWELL
@@ -114,25 +112,25 @@ void IRAirwellAc::send(const uint16_t repeat) {
 
 /// Reset the internals of the object to a known good state.
 void IRAirwellAc::stateReset(void) {
-  remote_state = kAirwellKnownGoodState;
+  _.raw = kAirwellKnownGoodState;
 }
 
 /// Turn on/off the Power Airwell setting.
 /// @param[in] on The desired setting state.
 void IRAirwellAc::setPowerToggle(const bool on) {
-  setBit(&remote_state, kAirwellPowerToggleBit, on);
+  _.PowerToggle = on;
 }
 
 /// Get the power toggle setting from the internal state.
 /// @return A boolean indicating the setting.
-bool IRAirwellAc::getPowerToggle(void) {
-  return GETBIT64(remote_state, kAirwellPowerToggleBit);
+bool IRAirwellAc::getPowerToggle(void) const {
+  return _.PowerToggle;
 }
 
 /// Get the current operation mode setting.
 /// @return The current operation mode.
-uint8_t IRAirwellAc::getMode(void) {
-  return GETBITS64(remote_state, kAirwellModeOffset, kAirwellModeSize);
+uint8_t IRAirwellAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the desired operation mode.
@@ -144,10 +142,10 @@ void IRAirwellAc::setMode(const uint8_t mode) {
     case kAirwellHeat:
     case kAirwellDry:
     case kAirwellAuto:
-      setBits(&remote_state, kAirwellModeOffset, kAirwellModeSize, mode);
+      _.Mode = mode;
       break;
     default:
-      setMode(kAirwellAuto);
+      _.Mode = kAirwellAuto;
   }
   setFan(getFan());  // Ensure the fan is at the correct speed for the new mode.
 }
@@ -182,15 +180,14 @@ stdAc::opmode_t IRAirwellAc::toCommonMode(const uint8_t mode) {
 /// @param[in] speed The desired setting.
 /// @note The speed is locked to Low when in Dry mode.
 void IRAirwellAc::setFan(const uint8_t speed) {
-  setBits(&remote_state, kAirwellFanOffset, kAirwellFanSize,
-          (getMode() == kAirwellDry) ? kAirwellFanLow
-                                     : std::min(speed, kAirwellFanAuto));
+  _.Fan = (_.Mode == kAirwellDry) ? kAirwellFanLow
+                                  : std::min(speed, kAirwellFanAuto);
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRAirwellAc::getFan(void) {
-  return GETBITS64(remote_state, kAirwellFanOffset, kAirwellFanSize);
+uint8_t IRAirwellAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -228,27 +225,25 @@ stdAc::fanspeed_t IRAirwellAc::toCommonFanSpeed(const uint8_t speed) {
 void IRAirwellAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kAirwellMinTemp, degrees);
   temp = std::min(kAirwellMaxTemp, temp);
-  setBits(&remote_state, kAirwellTempOffset, kAirwellTempSize,
-          temp - kAirwellMinTemp + 1);
+  _.Temp = (temp - kAirwellMinTemp + 1);
 }
 
 /// Get the current temperature setting.
 /// @return Get current setting for temp. in degrees celsius.
-uint8_t IRAirwellAc::getTemp(void) {
-  return GETBITS64(remote_state, kAirwellTempOffset,
-                  kAirwellTempSize) + kAirwellMinTemp - 1;
+uint8_t IRAirwellAc::getTemp(void) const {
+  return _.Temp + kAirwellMinTemp - 1;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRAirwellAc::toCommon(void) {
+stdAc::state_t IRAirwellAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::AIRWELL;
-  result.power = getPowerToggle();
-  result.mode = toCommonMode(getMode());
+  result.power = _.PowerToggle;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
+  result.fanspeed = toCommonFanSpeed(_.Fan);
   // Not supported.
   result.model = -1;
   result.turbo = false;
@@ -267,13 +262,13 @@ stdAc::state_t IRAirwellAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRAirwellAc::toString(void) {
+String IRAirwellAc::toString(void) const {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
-  result += addModeToString(getMode(), kAirwellAuto, kAirwellCool,
+  result += addBoolToString(_.PowerToggle, kPowerToggleStr, false);
+  result += addModeToString(_.Mode, kAirwellAuto, kAirwellCool,
                             kAirwellHeat, kAirwellDry, kAirwellFan);
-  result += addFanToString(getFan(), kAirwellFanHigh, kAirwellFanLow,
+  result += addFanToString(_.Fan, kAirwellFanHigh, kAirwellFanLow,
                            kAirwellFanAuto, kAirwellFanAuto,
                            kAirwellFanMedium);
   result += addTempToString(getTemp());
