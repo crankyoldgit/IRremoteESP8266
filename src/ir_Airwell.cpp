@@ -118,13 +118,13 @@ void IRAirwellAc::stateReset(void) {
 /// Turn on/off the Power Airwell setting.
 /// @param[in] on The desired setting state.
 void IRAirwellAc::setPowerToggle(const bool on) {
-  _.Power = on;
+  _.PowerToggle = on;
 }
 
 /// Get the power toggle setting from the internal state.
 /// @return A boolean indicating the setting.
 bool IRAirwellAc::getPowerToggle(void) const {
-  return _.Power;
+  return _.PowerToggle;
 }
 
 /// Get the current operation mode setting.
@@ -239,7 +239,7 @@ uint8_t IRAirwellAc::getTemp(void) const {
 stdAc::state_t IRAirwellAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::AIRWELL;
-  result.power = _.Power;
+  result.power = _.PowerToggle;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
@@ -265,7 +265,7 @@ stdAc::state_t IRAirwellAc::toCommon(void) const {
 String IRAirwellAc::toString(void) const {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerToggleStr, false);
+  result += addBoolToString(_.PowerToggle, kPowerToggleStr, false);
   result += addModeToString(_.Mode, kAirwellAuto, kAirwellCool,
                             kAirwellHeat, kAirwellDry, kAirwellFan);
   result += addFanToString(_.Fan, kAirwellFanHigh, kAirwellFanLow,

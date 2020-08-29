@@ -26,13 +26,13 @@
 union AirwellProtocol{
   uint64_t raw;  // The state of the IR remote in native IR code form.
   struct {
-    uint64_t      :19;
-    uint64_t Temp :4;
-    uint64_t      :5;
-    uint64_t Fan  :2;
-    uint64_t Mode :3;
-    uint64_t Power:1;
-    uint64_t      :0;
+    uint64_t            :19;
+    uint64_t Temp       :4;
+    uint64_t            :5;
+    uint64_t Fan        :2;
+    uint64_t Mode       :3;
+    uint64_t PowerToggle:1;
+    uint64_t            :0;
   };
 };
 // Constants
@@ -95,6 +95,5 @@ class IRAirwellAc {
   /// @endcond
 #endif
   AirwellProtocol _;
-  void checksum(void);
 };
 #endif  // IR_AIRWELL_H_
