@@ -1,5 +1,30 @@
 # Release Notes
 
+## _v2.7.10 (20200831)_
+
+**[BREAKING CHANGES]**
+- move SPIFFS to LittleFS for ESP8266 (#1182 #1226)
+- Daikin176: Change & increase operating mode values. (#1233 #1235)
+
+**[Bug Fixes]**
+- TOSHIBA_AC: not turning off when using `IRac` class. (#1250 #1251)
+- Haier: change position of Fan speed bits. (#1246 #1247)
+
+**[Features]**
+- Voltas: Add detailed support for Voltas A/Cs (#1238 #1248)
+- Add support for Metz protocol. (#1241 #1242)
+- Basic support for Voltas A/C protocol (#1238 #1243)
+- Add low level bit formatting sanity checks. (#1232)
+
+**[Misc]**
+- Rewrite Airwell by using bit fields (#1254)
+- Rewrite Haier YRW02 using bit fields (#1253)
+- rewrite Haier HSU07-HEA03 (#1246 #1247)
+- rewrite ir_Gree & ir_Midea by using bit field (#1240)
+- Incorrect usage of `assert()` (#1244 #1245 #1232)
+- rewrite Gree (#1210)
+
+
 ## _v2.7.9 (20200730)_
 
 **[Bug Fixes]**

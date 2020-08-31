@@ -64,7 +64,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classIRAirwellAc-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -81,8 +80,9 @@ Collaboration diagram for IRAirwellAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRAirwellAc__coll__graph.png" border="0" usemap="#IRAirwellAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRAirwellAc_coll__map" id="IRAirwellAc_coll__map">
-<area shape="rect" title="Class for handling detailed Airwell A/C messages." alt="" coords="5,95,101,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="20,5,87,32"/>
+<area shape="rect" title="Class for handling detailed Airwell A/C messages." alt="" coords="49,95,145,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionAirwellProtocol.html" title=" " alt="" coords="96,5,216,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -106,48 +106,48 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1b6aa498d9766b041d39a7b3d73653e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a1b6aa498d9766b041d39a7b3d73653e7">setPowerToggle</a> (const bool on)</td></tr>
 <tr class="memdesc:a1b6aa498d9766b041d39a7b3d73653e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn on/off the Power Airwell setting.  <a href="classIRAirwellAc.html#a1b6aa498d9766b041d39a7b3d73653e7">More...</a><br /></td></tr>
 <tr class="separator:a1b6aa498d9766b041d39a7b3d73653e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a59d3c911f8a183d0692a9fc9a35459"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a7a59d3c911f8a183d0692a9fc9a35459">getPowerToggle</a> ()</td></tr>
-<tr class="memdesc:a7a59d3c911f8a183d0692a9fc9a35459"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the power toggle setting from the internal state.  <a href="classIRAirwellAc.html#a7a59d3c911f8a183d0692a9fc9a35459">More...</a><br /></td></tr>
-<tr class="separator:a7a59d3c911f8a183d0692a9fc9a35459"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73ae0827f0235788d5d6149ea4de8eb0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a73ae0827f0235788d5d6149ea4de8eb0">getPowerToggle</a> () const</td></tr>
+<tr class="memdesc:a73ae0827f0235788d5d6149ea4de8eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the power toggle setting from the internal state.  <a href="classIRAirwellAc.html#a73ae0827f0235788d5d6149ea4de8eb0">More...</a><br /></td></tr>
+<tr class="separator:a73ae0827f0235788d5d6149ea4de8eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30883e7b4f7933b6fa2258736995d295"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a30883e7b4f7933b6fa2258736995d295">setTemp</a> (const uint8_t temp)</td></tr>
 <tr class="memdesc:a30883e7b4f7933b6fa2258736995d295"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRAirwellAc.html#a30883e7b4f7933b6fa2258736995d295">More...</a><br /></td></tr>
 <tr class="separator:a30883e7b4f7933b6fa2258736995d295"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa50c4670e40fe138225c91956d3acd47"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#aa50c4670e40fe138225c91956d3acd47">getTemp</a> ()</td></tr>
-<tr class="memdesc:aa50c4670e40fe138225c91956d3acd47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRAirwellAc.html#aa50c4670e40fe138225c91956d3acd47">More...</a><br /></td></tr>
-<tr class="separator:aa50c4670e40fe138225c91956d3acd47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee52deba26ba5b217704667d159d1110"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#aee52deba26ba5b217704667d159d1110">getTemp</a> () const</td></tr>
+<tr class="memdesc:aee52deba26ba5b217704667d159d1110"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRAirwellAc.html#aee52deba26ba5b217704667d159d1110">More...</a><br /></td></tr>
+<tr class="separator:aee52deba26ba5b217704667d159d1110"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b3acc1670d7057e7c36fc2bd0a71232"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a3b3acc1670d7057e7c36fc2bd0a71232">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a3b3acc1670d7057e7c36fc2bd0a71232"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRAirwellAc.html#a3b3acc1670d7057e7c36fc2bd0a71232">More...</a><br /></td></tr>
 <tr class="separator:a3b3acc1670d7057e7c36fc2bd0a71232"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d90acb984773ee449610640f160db55"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a3d90acb984773ee449610640f160db55">getFan</a> ()</td></tr>
-<tr class="memdesc:a3d90acb984773ee449610640f160db55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRAirwellAc.html#a3d90acb984773ee449610640f160db55">More...</a><br /></td></tr>
-<tr class="separator:a3d90acb984773ee449610640f160db55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa24f7ff64fcb1cea358f7b5288eb7aa1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#aa24f7ff64fcb1cea358f7b5288eb7aa1">getFan</a> () const</td></tr>
+<tr class="memdesc:aa24f7ff64fcb1cea358f7b5288eb7aa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRAirwellAc.html#aa24f7ff64fcb1cea358f7b5288eb7aa1">More...</a><br /></td></tr>
+<tr class="separator:aa24f7ff64fcb1cea358f7b5288eb7aa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cbc12fee37b9b2b19aa5455ace9d46e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a3cbc12fee37b9b2b19aa5455ace9d46e">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a3cbc12fee37b9b2b19aa5455ace9d46e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the desired operation mode.  <a href="classIRAirwellAc.html#a3cbc12fee37b9b2b19aa5455ace9d46e">More...</a><br /></td></tr>
 <tr class="separator:a3cbc12fee37b9b2b19aa5455ace9d46e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bf9d0cd007b45a7d9a9e6fab128ec2a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a5bf9d0cd007b45a7d9a9e6fab128ec2a">getMode</a> ()</td></tr>
-<tr class="memdesc:a5bf9d0cd007b45a7d9a9e6fab128ec2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operation mode setting.  <a href="classIRAirwellAc.html#a5bf9d0cd007b45a7d9a9e6fab128ec2a">More...</a><br /></td></tr>
-<tr class="separator:a5bf9d0cd007b45a7d9a9e6fab128ec2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad627bd6e29f6a347d38d7356ecd780a0"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#ad627bd6e29f6a347d38d7356ecd780a0">getRaw</a> ()</td></tr>
-<tr class="memdesc:ad627bd6e29f6a347d38d7356ecd780a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the raw state of the object, suitable to be sent with the appropriate <a class="el" href="classIRsend.html" title="Class for sending all basic IR protocols.">IRsend</a> object method.  <a href="classIRAirwellAc.html#ad627bd6e29f6a347d38d7356ecd780a0">More...</a><br /></td></tr>
-<tr class="separator:ad627bd6e29f6a347d38d7356ecd780a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a1d651c8b71703212207888ddb4be14"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a9a1d651c8b71703212207888ddb4be14">getMode</a> () const</td></tr>
+<tr class="memdesc:a9a1d651c8b71703212207888ddb4be14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operation mode setting.  <a href="classIRAirwellAc.html#a9a1d651c8b71703212207888ddb4be14">More...</a><br /></td></tr>
+<tr class="separator:a9a1d651c8b71703212207888ddb4be14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec84bac505703ad872cd4b6391fbe748"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#aec84bac505703ad872cd4b6391fbe748">getRaw</a> () const</td></tr>
+<tr class="memdesc:aec84bac505703ad872cd4b6391fbe748"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the raw state of the object, suitable to be sent with the appropriate <a class="el" href="classIRsend.html" title="Class for sending all basic IR protocols.">IRsend</a> object method.  <a href="classIRAirwellAc.html#aec84bac505703ad872cd4b6391fbe748">More...</a><br /></td></tr>
+<tr class="separator:aec84bac505703ad872cd4b6391fbe748"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56e90d8b7e902be15c5db12be872d0fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a56e90d8b7e902be15c5db12be872d0fb">setRaw</a> (const uint64_t state)</td></tr>
 <tr class="memdesc:a56e90d8b7e902be15c5db12be872d0fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the raw state of the object.  <a href="classIRAirwellAc.html#a56e90d8b7e902be15c5db12be872d0fb">More...</a><br /></td></tr>
 <tr class="separator:a56e90d8b7e902be15c5db12be872d0fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20f9a804b2f8774165befc43d434ad84"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a20f9a804b2f8774165befc43d434ad84">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:a20f9a804b2f8774165befc43d434ad84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRAirwellAc.html#a20f9a804b2f8774165befc43d434ad84">More...</a><br /></td></tr>
-<tr class="separator:a20f9a804b2f8774165befc43d434ad84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44091f4d58b8078df1a93170cb9900d8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a44091f4d58b8078df1a93170cb9900d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">More...</a><br /></td></tr>
-<tr class="separator:a44091f4d58b8078df1a93170cb9900d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4227c5c4105a0f535c00fdbbced33d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#ad4227c5c4105a0f535c00fdbbced33d2">toCommon</a> (void)</td></tr>
-<tr class="memdesc:ad4227c5c4105a0f535c00fdbbced33d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRAirwellAc.html#ad4227c5c4105a0f535c00fdbbced33d2">More...</a><br /></td></tr>
-<tr class="separator:ad4227c5c4105a0f535c00fdbbced33d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af867a573f780e980d679e937a56c8188"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#af867a573f780e980d679e937a56c8188">toString</a> ()</td></tr>
-<tr class="memdesc:af867a573f780e980d679e937a56c8188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRAirwellAc.html#af867a573f780e980d679e937a56c8188">More...</a><br /></td></tr>
-<tr class="separator:af867a573f780e980d679e937a56c8188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a137eddf9177b7746f23f32f27e26a9e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a137eddf9177b7746f23f32f27e26a9e7">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a137eddf9177b7746f23f32f27e26a9e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRAirwellAc.html#a137eddf9177b7746f23f32f27e26a9e7">More...</a><br /></td></tr>
+<tr class="separator:a137eddf9177b7746f23f32f27e26a9e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbd6772f93e897308db4f606d1f56eac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#acbd6772f93e897308db4f606d1f56eac">toString</a> () const</td></tr>
+<tr class="memdesc:acbd6772f93e897308db4f606d1f56eac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRAirwellAc.html#acbd6772f93e897308db4f606d1f56eac">More...</a><br /></td></tr>
+<tr class="separator:acbd6772f93e897308db4f606d1f56eac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a20f9a804b2f8774165befc43d434ad84"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a20f9a804b2f8774165befc43d434ad84">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a20f9a804b2f8774165befc43d434ad84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRAirwellAc.html#a20f9a804b2f8774165befc43d434ad84">More...</a><br /></td></tr>
+<tr class="separator:a20f9a804b2f8774165befc43d434ad84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44091f4d58b8078df1a93170cb9900d8"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a44091f4d58b8078df1a93170cb9900d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">More...</a><br /></td></tr>
+<tr class="separator:a44091f4d58b8078df1a93170cb9900d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2c717b7750e43894197ee8b292ba23b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#ad2c717b7750e43894197ee8b292ba23b">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:ad2c717b7750e43894197ee8b292ba23b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRAirwellAc.html#ad2c717b7750e43894197ee8b292ba23b">More...</a><br /></td></tr>
 <tr class="separator:ad2c717b7750e43894197ee8b292ba23b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,18 +155,13 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a38a93fc115fbe4deb0a5ee82a913c166"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRAirwellAc.html#a38a93fc115fbe4deb0a5ee82a913c166">More...</a><br /></td></tr>
 <tr class="separator:a38a93fc115fbe4deb0a5ee82a913c166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:ac4334c1c68dfaf2450af37b67d34b747"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#ac4334c1c68dfaf2450af37b67d34b747">checksum</a> (void)</td></tr>
-<tr class="separator:ac4334c1c68dfaf2450af37b67d34b747"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a57a01d6e65f6fa1127f8d3dc86ff8071"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a57a01d6e65f6fa1127f8d3dc86ff8071">_irsend</a></td></tr>
 <tr class="memdesc:a57a01d6e65f6fa1127f8d3dc86ff8071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRAirwellAc.html#a57a01d6e65f6fa1127f8d3dc86ff8071">More...</a><br /></td></tr>
 <tr class="separator:a57a01d6e65f6fa1127f8d3dc86ff8071"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af86534078a053182a0592fae56000cea"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#af86534078a053182a0592fae56000cea">remote_state</a></td></tr>
-<tr class="separator:af86534078a053182a0592fae56000cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5675d200cdc571911162ecf8c74fdc0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionAirwellProtocol.html">AirwellProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#af5675d200cdc571911162ecf8c74fdc0">_</a></td></tr>
+<tr class="separator:af5675d200cdc571911162ecf8c74fdc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Airwell A/C messages. </p>
@@ -273,37 +268,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac4334c1c68dfaf2450af37b67d34b747"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac4334c1c68dfaf2450af37b67d34b747">&#9670;&nbsp;</a></span>checksum()</h2>
+<a id="a44091f4d58b8078df1a93170cb9900d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44091f4d58b8078df1a93170cb9900d8">&#9670;&nbsp;</a></span>convertFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IRAirwellAc::checksum </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a44091f4d58b8078df1a93170cb9900d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44091f4d58b8078df1a93170cb9900d8">&#9670;&nbsp;</a></span>convertFan()</h2>
-
-<div class="memitem">
-<div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRAirwellAc::convertFan </td>
@@ -313,6 +285,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
@@ -331,6 +308,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRAirwellAc::convertMode </td>
@@ -340,6 +320,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -353,8 +338,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3d90acb984773ee449610640f160db55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d90acb984773ee449610640f160db55">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="aa24f7ff64fcb1cea358f7b5288eb7aa1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa24f7ff64fcb1cea358f7b5288eb7aa1">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -363,7 +348,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint8_t IRAirwellAc::getFan </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -373,8 +358,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5bf9d0cd007b45a7d9a9e6fab128ec2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5bf9d0cd007b45a7d9a9e6fab128ec2a">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a9a1d651c8b71703212207888ddb4be14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a1d651c8b71703212207888ddb4be14">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -383,7 +368,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint8_t IRAirwellAc::getMode </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -393,8 +378,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7a59d3c911f8a183d0692a9fc9a35459"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a59d3c911f8a183d0692a9fc9a35459">&#9670;&nbsp;</a></span>getPowerToggle()</h2>
+<a id="a73ae0827f0235788d5d6149ea4de8eb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73ae0827f0235788d5d6149ea4de8eb0">&#9670;&nbsp;</a></span>getPowerToggle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -403,7 +388,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">bool IRAirwellAc::getPowerToggle </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -413,8 +398,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad627bd6e29f6a347d38d7356ecd780a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad627bd6e29f6a347d38d7356ecd780a0">&#9670;&nbsp;</a></span>getRaw()</h2>
+<a id="aec84bac505703ad872cd4b6391fbe748"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec84bac505703ad872cd4b6391fbe748">&#9670;&nbsp;</a></span>getRaw()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +408,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint64_t IRAirwellAc::getRaw </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -433,8 +418,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa50c4670e40fe138225c91956d3acd47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa50c4670e40fe138225c91956d3acd47">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="aee52deba26ba5b217704667d159d1110"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee52deba26ba5b217704667d159d1110">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -443,7 +428,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint8_t IRAirwellAc::getTemp </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -629,8 +614,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad4227c5c4105a0f535c00fdbbced33d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4227c5c4105a0f535c00fdbbced33d2">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a137eddf9177b7746f23f32f27e26a9e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a137eddf9177b7746f23f32f27e26a9e7">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -640,7 +625,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -720,8 +705,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af867a573f780e980d679e937a56c8188"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af867a573f780e980d679e937a56c8188">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="acbd6772f93e897308db4f606d1f56eac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbd6772f93e897308db4f606d1f56eac">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -730,7 +715,7 @@ Private Attributes</h2></td></tr>
           <td class="memname"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> IRAirwellAc::toString </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -741,6 +726,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="af5675d200cdc571911162ecf8c74fdc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5675d200cdc571911162ecf8c74fdc0">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionAirwellProtocol.html">AirwellProtocol</a> IRAirwellAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a57a01d6e65f6fa1127f8d3dc86ff8071"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a57a01d6e65f6fa1127f8d3dc86ff8071">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -762,28 +769,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Instance of the IR send class. </p>
-
-</div>
-</div>
-<a id="af86534078a053182a0592fae56000cea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af86534078a053182a0592fae56000cea">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t IRAirwellAc::remote_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>
