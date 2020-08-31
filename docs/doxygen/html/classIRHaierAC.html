@@ -65,7 +65,6 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-static-methods">Static Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classIRHaierAC-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -82,8 +81,9 @@ Collaboration diagram for IRHaierAC:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRHaierAC__coll__graph.png" border="0" usemap="#IRHaierAC_coll__map" alt="Collaboration graph"/></div>
 <map name="IRHaierAC_coll__map" id="IRHaierAC_coll__map">
-<area shape="rect" title="Class for handling detailed Haier A/C messages." alt="" coords="5,95,93,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="16,5,83,32"/>
+<area shape="rect" title="Class for handling detailed Haier A/C messages." alt="" coords="51,95,139,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionHaierProtocol.html" title=" " alt="" coords="97,5,207,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -104,63 +104,63 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ade34c951e72a794c2ff7fa0d1595d68f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ade34c951e72a794c2ff7fa0d1595d68f">setCommand</a> (const uint8_t command)</td></tr>
 <tr class="memdesc:ade34c951e72a794c2ff7fa0d1595d68f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Command/Button setting of the A/C.  <a href="classIRHaierAC.html#ade34c951e72a794c2ff7fa0d1595d68f">More...</a><br /></td></tr>
 <tr class="separator:ade34c951e72a794c2ff7fa0d1595d68f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a291fccea5f4b32f83da2605d2a82e0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a3a291fccea5f4b32f83da2605d2a82e0">getCommand</a> (void)</td></tr>
-<tr class="memdesc:a3a291fccea5f4b32f83da2605d2a82e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Command/Button setting of the A/C.  <a href="classIRHaierAC.html#a3a291fccea5f4b32f83da2605d2a82e0">More...</a><br /></td></tr>
-<tr class="separator:a3a291fccea5f4b32f83da2605d2a82e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e9bea37c9f3a43ad205994b396d5cd2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a0e9bea37c9f3a43ad205994b396d5cd2">getCommand</a> (void) const</td></tr>
+<tr class="memdesc:a0e9bea37c9f3a43ad205994b396d5cd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Command/Button setting of the A/C.  <a href="classIRHaierAC.html#a0e9bea37c9f3a43ad205994b396d5cd2">More...</a><br /></td></tr>
+<tr class="separator:a0e9bea37c9f3a43ad205994b396d5cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fb2a375cc1b8692fe4d5dcdd765cc46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a9fb2a375cc1b8692fe4d5dcdd765cc46">setTemp</a> (const uint8_t temp)</td></tr>
 <tr class="memdesc:a9fb2a375cc1b8692fe4d5dcdd765cc46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRHaierAC.html#a9fb2a375cc1b8692fe4d5dcdd765cc46">More...</a><br /></td></tr>
 <tr class="separator:a9fb2a375cc1b8692fe4d5dcdd765cc46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af137371c6766ee068a0200ff1facd8b0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#af137371c6766ee068a0200ff1facd8b0">getTemp</a> (void)</td></tr>
-<tr class="memdesc:af137371c6766ee068a0200ff1facd8b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRHaierAC.html#af137371c6766ee068a0200ff1facd8b0">More...</a><br /></td></tr>
-<tr class="separator:af137371c6766ee068a0200ff1facd8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6f23534e63039527bf92fc85fed2e2c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa6f23534e63039527bf92fc85fed2e2c">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:aa6f23534e63039527bf92fc85fed2e2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRHaierAC.html#aa6f23534e63039527bf92fc85fed2e2c">More...</a><br /></td></tr>
+<tr class="separator:aa6f23534e63039527bf92fc85fed2e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42ee1c5889f07bf7615c8f853bca2261"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a42ee1c5889f07bf7615c8f853bca2261">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a42ee1c5889f07bf7615c8f853bca2261"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRHaierAC.html#a42ee1c5889f07bf7615c8f853bca2261">More...</a><br /></td></tr>
 <tr class="separator:a42ee1c5889f07bf7615c8f853bca2261"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b15678e94acc14a0bb86bff61230e93"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a5b15678e94acc14a0bb86bff61230e93">getFan</a> (void)</td></tr>
-<tr class="memdesc:a5b15678e94acc14a0bb86bff61230e93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRHaierAC.html#a5b15678e94acc14a0bb86bff61230e93">More...</a><br /></td></tr>
-<tr class="separator:a5b15678e94acc14a0bb86bff61230e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa180c60030d9972807238cceba886ff5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa180c60030d9972807238cceba886ff5">getMode</a> (void)</td></tr>
-<tr class="memdesc:aa180c60030d9972807238cceba886ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRHaierAC.html#aa180c60030d9972807238cceba886ff5">More...</a><br /></td></tr>
-<tr class="separator:aa180c60030d9972807238cceba886ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20efaa79ca7ead0b08f19a4b41c198aa"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a20efaa79ca7ead0b08f19a4b41c198aa">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a20efaa79ca7ead0b08f19a4b41c198aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRHaierAC.html#a20efaa79ca7ead0b08f19a4b41c198aa">More...</a><br /></td></tr>
+<tr class="separator:a20efaa79ca7ead0b08f19a4b41c198aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ddf59c6ce732c23a9898dfc6679be02"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a2ddf59c6ce732c23a9898dfc6679be02">getMode</a> (void) const</td></tr>
+<tr class="memdesc:a2ddf59c6ce732c23a9898dfc6679be02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRHaierAC.html#a2ddf59c6ce732c23a9898dfc6679be02">More...</a><br /></td></tr>
+<tr class="separator:a2ddf59c6ce732c23a9898dfc6679be02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ad0317f2fd4f57d8ce61353ab3e48c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a3ad0317f2fd4f57d8ce61353ab3e48c7">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a3ad0317f2fd4f57d8ce61353ab3e48c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRHaierAC.html#a3ad0317f2fd4f57d8ce61353ab3e48c7">More...</a><br /></td></tr>
 <tr class="separator:a3ad0317f2fd4f57d8ce61353ab3e48c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ac7155d5ba294ce50b9436a35aa166b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a0ac7155d5ba294ce50b9436a35aa166b">getSleep</a> (void)</td></tr>
-<tr class="memdesc:a0ac7155d5ba294ce50b9436a35aa166b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRHaierAC.html#a0ac7155d5ba294ce50b9436a35aa166b">More...</a><br /></td></tr>
-<tr class="separator:a0ac7155d5ba294ce50b9436a35aa166b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af88bef780a4f14f44cd7d2549f3838b3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#af88bef780a4f14f44cd7d2549f3838b3">getSleep</a> (void) const</td></tr>
+<tr class="memdesc:af88bef780a4f14f44cd7d2549f3838b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRHaierAC.html#af88bef780a4f14f44cd7d2549f3838b3">More...</a><br /></td></tr>
+<tr class="separator:af88bef780a4f14f44cd7d2549f3838b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb72b89fa53b565f9d32db4d8960f988"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#acb72b89fa53b565f9d32db4d8960f988">setSleep</a> (const bool on)</td></tr>
 <tr class="memdesc:acb72b89fa53b565f9d32db4d8960f988"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Sleep setting of the A/C.  <a href="classIRHaierAC.html#acb72b89fa53b565f9d32db4d8960f988">More...</a><br /></td></tr>
 <tr class="separator:acb72b89fa53b565f9d32db4d8960f988"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c69955fe18f4ddb0286084f3fb39228"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a5c69955fe18f4ddb0286084f3fb39228">getHealth</a> (void)</td></tr>
-<tr class="memdesc:a5c69955fe18f4ddb0286084f3fb39228"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Health (filter) setting of the A/C.  <a href="classIRHaierAC.html#a5c69955fe18f4ddb0286084f3fb39228">More...</a><br /></td></tr>
-<tr class="separator:a5c69955fe18f4ddb0286084f3fb39228"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff4e7de97c375daf881249eefc1c60f8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aff4e7de97c375daf881249eefc1c60f8">getHealth</a> (void) const</td></tr>
+<tr class="memdesc:aff4e7de97c375daf881249eefc1c60f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Health (filter) setting of the A/C.  <a href="classIRHaierAC.html#aff4e7de97c375daf881249eefc1c60f8">More...</a><br /></td></tr>
+<tr class="separator:aff4e7de97c375daf881249eefc1c60f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48c9ae91809d63156eeb3889f2e908f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a48c9ae91809d63156eeb3889f2e908f4">setHealth</a> (const bool on)</td></tr>
 <tr class="memdesc:a48c9ae91809d63156eeb3889f2e908f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Health (filter) setting of the A/C.  <a href="classIRHaierAC.html#a48c9ae91809d63156eeb3889f2e908f4">More...</a><br /></td></tr>
 <tr class="separator:a48c9ae91809d63156eeb3889f2e908f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99d3339eb5ecdbf1c86e85408507af7b"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a99d3339eb5ecdbf1c86e85408507af7b">getOnTimer</a> (void)</td></tr>
-<tr class="memdesc:a99d3339eb5ecdbf1c86e85408507af7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On Timer value/setting of the A/C.  <a href="classIRHaierAC.html#a99d3339eb5ecdbf1c86e85408507af7b">More...</a><br /></td></tr>
-<tr class="separator:a99d3339eb5ecdbf1c86e85408507af7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c71cd51382036c4548b460a13072e91"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a1c71cd51382036c4548b460a13072e91">getOnTimer</a> (void) const</td></tr>
+<tr class="memdesc:a1c71cd51382036c4548b460a13072e91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On Timer value/setting of the A/C.  <a href="classIRHaierAC.html#a1c71cd51382036c4548b460a13072e91">More...</a><br /></td></tr>
+<tr class="separator:a1c71cd51382036c4548b460a13072e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5e95aa05749f6d35dd31b021fea2f5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa5e95aa05749f6d35dd31b021fea2f5b">setOnTimer</a> (const uint16_t mins)</td></tr>
 <tr class="memdesc:aa5e95aa05749f6d35dd31b021fea2f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set &amp; enable the On Timer.  <a href="classIRHaierAC.html#aa5e95aa05749f6d35dd31b021fea2f5b">More...</a><br /></td></tr>
 <tr class="separator:aa5e95aa05749f6d35dd31b021fea2f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b5c970b3204aa447d86dc2941dbd7b1"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a8b5c970b3204aa447d86dc2941dbd7b1">getOffTimer</a> (void)</td></tr>
-<tr class="memdesc:a8b5c970b3204aa447d86dc2941dbd7b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off Timer value/setting of the A/C.  <a href="classIRHaierAC.html#a8b5c970b3204aa447d86dc2941dbd7b1">More...</a><br /></td></tr>
-<tr class="separator:a8b5c970b3204aa447d86dc2941dbd7b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4760af54cbc1618b2dc4c1bf57884ebb"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a4760af54cbc1618b2dc4c1bf57884ebb">getOffTimer</a> (void) const</td></tr>
+<tr class="memdesc:a4760af54cbc1618b2dc4c1bf57884ebb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off Timer value/setting of the A/C.  <a href="classIRHaierAC.html#a4760af54cbc1618b2dc4c1bf57884ebb">More...</a><br /></td></tr>
+<tr class="separator:a4760af54cbc1618b2dc4c1bf57884ebb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa16b36aa7ef07628343dbd2dfe5157a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa16b36aa7ef07628343dbd2dfe5157a2">setOffTimer</a> (const uint16_t mins)</td></tr>
 <tr class="memdesc:aa16b36aa7ef07628343dbd2dfe5157a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set &amp; enable the Off Timer.  <a href="classIRHaierAC.html#aa16b36aa7ef07628343dbd2dfe5157a2">More...</a><br /></td></tr>
 <tr class="separator:aa16b36aa7ef07628343dbd2dfe5157a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cccc733f74232751f95c32e47795638"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a1cccc733f74232751f95c32e47795638">cancelTimers</a> (void)</td></tr>
 <tr class="memdesc:a1cccc733f74232751f95c32e47795638"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel/disable the On &amp; Off timers.  <a href="classIRHaierAC.html#a1cccc733f74232751f95c32e47795638">More...</a><br /></td></tr>
 <tr class="separator:a1cccc733f74232751f95c32e47795638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0e05983088035f6d85c520843922c25"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa0e05983088035f6d85c520843922c25">getCurrTime</a> (void)</td></tr>
-<tr class="memdesc:aa0e05983088035f6d85c520843922c25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the clock value of the A/C.  <a href="classIRHaierAC.html#aa0e05983088035f6d85c520843922c25">More...</a><br /></td></tr>
-<tr class="separator:aa0e05983088035f6d85c520843922c25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace3a6ad8816dbf5d4a9f8595cc621b09"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ace3a6ad8816dbf5d4a9f8595cc621b09">getCurrTime</a> (void) const</td></tr>
+<tr class="memdesc:ace3a6ad8816dbf5d4a9f8595cc621b09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the clock value of the A/C.  <a href="classIRHaierAC.html#ace3a6ad8816dbf5d4a9f8595cc621b09">More...</a><br /></td></tr>
+<tr class="separator:ace3a6ad8816dbf5d4a9f8595cc621b09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53500ebdec058d27396e5906a572fe15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a53500ebdec058d27396e5906a572fe15">setCurrTime</a> (const uint16_t mins)</td></tr>
 <tr class="memdesc:a53500ebdec058d27396e5906a572fe15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the clock value for the A/C.  <a href="classIRHaierAC.html#a53500ebdec058d27396e5906a572fe15">More...</a><br /></td></tr>
 <tr class="separator:a53500ebdec058d27396e5906a572fe15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa18839d213e4cd46405c683ec67fa23e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aa18839d213e4cd46405c683ec67fa23e">getSwing</a> (void)</td></tr>
-<tr class="memdesc:aa18839d213e4cd46405c683ec67fa23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing position setting of the A/C.  <a href="classIRHaierAC.html#aa18839d213e4cd46405c683ec67fa23e">More...</a><br /></td></tr>
-<tr class="separator:aa18839d213e4cd46405c683ec67fa23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1192427f02d7f77bb88105d74fc8276"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ac1192427f02d7f77bb88105d74fc8276">getSwing</a> (void) const</td></tr>
+<tr class="memdesc:ac1192427f02d7f77bb88105d74fc8276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing position setting of the A/C.  <a href="classIRHaierAC.html#ac1192427f02d7f77bb88105d74fc8276">More...</a><br /></td></tr>
+<tr class="separator:ac1192427f02d7f77bb88105d74fc8276"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28c8bf6e0f45e074bf5eb13c25805627"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a28c8bf6e0f45e074bf5eb13c25805627">setSwing</a> (const uint8_t state)</td></tr>
 <tr class="memdesc:a28c8bf6e0f45e074bf5eb13c25805627"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Vertical Swing mode of the A/C.  <a href="classIRHaierAC.html#a28c8bf6e0f45e074bf5eb13c25805627">More...</a><br /></td></tr>
 <tr class="separator:a28c8bf6e0f45e074bf5eb13c25805627"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,27 +170,27 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a152961e20b5a5bed2ea03cbc65d65ce9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a152961e20b5a5bed2ea03cbc65d65ce9">setRaw</a> (const uint8_t new_code[])</td></tr>
 <tr class="memdesc:a152961e20b5a5bed2ea03cbc65d65ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRHaierAC.html#a152961e20b5a5bed2ea03cbc65d65ce9">More...</a><br /></td></tr>
 <tr class="separator:a152961e20b5a5bed2ea03cbc65d65ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6188dbed5cae022b4fd1eef358f594c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#af6188dbed5cae022b4fd1eef358f594c">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:af6188dbed5cae022b4fd1eef358f594c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRHaierAC.html#af6188dbed5cae022b4fd1eef358f594c">More...</a><br /></td></tr>
-<tr class="separator:af6188dbed5cae022b4fd1eef358f594c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58628dd19a7247fc5358c0dc8c30baba"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a58628dd19a7247fc5358c0dc8c30baba">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a58628dd19a7247fc5358c0dc8c30baba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRHaierAC.html#a58628dd19a7247fc5358c0dc8c30baba">More...</a><br /></td></tr>
-<tr class="separator:a58628dd19a7247fc5358c0dc8c30baba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34053c32ba50ff3b81b208d068efe2a4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a34053c32ba50ff3b81b208d068efe2a4">convertSwingV</a> (const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> position)</td></tr>
-<tr class="memdesc:a34053c32ba50ff3b81b208d068efe2a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting.  <a href="classIRHaierAC.html#a34053c32ba50ff3b81b208d068efe2a4">More...</a><br /></td></tr>
-<tr class="separator:a34053c32ba50ff3b81b208d068efe2a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e74862d6ab7e65108a7b1a3b7af7e91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a1e74862d6ab7e65108a7b1a3b7af7e91">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a1e74862d6ab7e65108a7b1a3b7af7e91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRHaierAC.html#a1e74862d6ab7e65108a7b1a3b7af7e91">More...</a><br /></td></tr>
-<tr class="separator:a1e74862d6ab7e65108a7b1a3b7af7e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7effff64e7c9c20b7d9e6c2c10e0ffbc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a7effff64e7c9c20b7d9e6c2c10e0ffbc">toString</a> (void)</td></tr>
-<tr class="memdesc:a7effff64e7c9c20b7d9e6c2c10e0ffbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRHaierAC.html#a7effff64e7c9c20b7d9e6c2c10e0ffbc">More...</a><br /></td></tr>
-<tr class="separator:a7effff64e7c9c20b7d9e6c2c10e0ffbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a738de44369e3322d264c8ee78cc72ab6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a738de44369e3322d264c8ee78cc72ab6">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a738de44369e3322d264c8ee78cc72ab6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRHaierAC.html#a738de44369e3322d264c8ee78cc72ab6">More...</a><br /></td></tr>
+<tr class="separator:a738de44369e3322d264c8ee78cc72ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af52b438cc7c6b0600793a0eb3c8f6419"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#af52b438cc7c6b0600793a0eb3c8f6419">toString</a> (void) const</td></tr>
+<tr class="memdesc:af52b438cc7c6b0600793a0eb3c8f6419"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRHaierAC.html#af52b438cc7c6b0600793a0eb3c8f6419">More...</a><br /></td></tr>
+<tr class="separator:af52b438cc7c6b0600793a0eb3c8f6419"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad7aae554b8f0a76493efc2a43ac0f780"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ad7aae554b8f0a76493efc2a43ac0f780">validChecksum</a> (uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#afb4cd0c1a9c689d862e7095f0ab6dbe5">kHaierACStateLength</a>)</td></tr>
 <tr class="memdesc:ad7aae554b8f0a76493efc2a43ac0f780"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRHaierAC.html#ad7aae554b8f0a76493efc2a43ac0f780">More...</a><br /></td></tr>
 <tr class="separator:ad7aae554b8f0a76493efc2a43ac0f780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6188dbed5cae022b4fd1eef358f594c"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#af6188dbed5cae022b4fd1eef358f594c">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:af6188dbed5cae022b4fd1eef358f594c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRHaierAC.html#af6188dbed5cae022b4fd1eef358f594c">More...</a><br /></td></tr>
+<tr class="separator:af6188dbed5cae022b4fd1eef358f594c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58628dd19a7247fc5358c0dc8c30baba"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a58628dd19a7247fc5358c0dc8c30baba">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a58628dd19a7247fc5358c0dc8c30baba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRHaierAC.html#a58628dd19a7247fc5358c0dc8c30baba">More...</a><br /></td></tr>
+<tr class="separator:a58628dd19a7247fc5358c0dc8c30baba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34053c32ba50ff3b81b208d068efe2a4"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a34053c32ba50ff3b81b208d068efe2a4">convertSwingV</a> (const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> position)</td></tr>
+<tr class="memdesc:a34053c32ba50ff3b81b208d068efe2a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting.  <a href="classIRHaierAC.html#a34053c32ba50ff3b81b208d068efe2a4">More...</a><br /></td></tr>
+<tr class="separator:a34053c32ba50ff3b81b208d068efe2a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d73f75516afff0ef18bdbb7ed9c26ed"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a4d73f75516afff0ef18bdbb7ed9c26ed">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a4d73f75516afff0ef18bdbb7ed9c26ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRHaierAC.html#a4d73f75516afff0ef18bdbb7ed9c26ed">More...</a><br /></td></tr>
 <tr class="separator:a4d73f75516afff0ef18bdbb7ed9c26ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,23 +210,13 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:ab7faae274ff7f30bf7df3c58d6e7e210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and set the checksum values for the internal state.  <a href="classIRHaierAC.html#ab7faae274ff7f30bf7df3c58d6e7e210">More...</a><br /></td></tr>
 <tr class="separator:ab7faae274ff7f30bf7df3c58d6e7e210"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
-Static Private Member Functions</h2></td></tr>
-<tr class="memitem:a60e891775fbc3a77ee487cde26f650c5"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a60e891775fbc3a77ee487cde26f650c5">getTime</a> (const uint8_t ptr[])</td></tr>
-<tr class="memdesc:a60e891775fbc3a77ee487cde26f650c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Time value at the given pointer.  <a href="classIRHaierAC.html#a60e891775fbc3a77ee487cde26f650c5">More...</a><br /></td></tr>
-<tr class="separator:a60e891775fbc3a77ee487cde26f650c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81ca00cf5b49308c2609b717d34958ad"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a81ca00cf5b49308c2609b717d34958ad">setTime</a> (uint8_t ptr[], const uint16_t nr_mins)</td></tr>
-<tr class="memdesc:a81ca00cf5b49308c2609b717d34958ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Time value at the given pointer.  <a href="classIRHaierAC.html#a81ca00cf5b49308c2609b717d34958ad">More...</a><br /></td></tr>
-<tr class="separator:a81ca00cf5b49308c2609b717d34958ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aec69643fe633a57d635754690225fdd1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#aec69643fe633a57d635754690225fdd1">_irsend</a></td></tr>
 <tr class="memdesc:aec69643fe633a57d635754690225fdd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRHaierAC.html#aec69643fe633a57d635754690225fdd1">More...</a><br /></td></tr>
 <tr class="separator:aec69643fe633a57d635754690225fdd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a609abaeab9df642fdaccd77235a84eed"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a609abaeab9df642fdaccd77235a84eed">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#afb4cd0c1a9c689d862e7095f0ab6dbe5">kHaierACStateLength</a>]</td></tr>
-<tr class="memdesc:a609abaeab9df642fdaccd77235a84eed"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in native code form.  <a href="classIRHaierAC.html#a609abaeab9df642fdaccd77235a84eed">More...</a><br /></td></tr>
-<tr class="separator:a609abaeab9df642fdaccd77235a84eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a523b6e63f16c5f817d82bcdbf351d7e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionHaierProtocol.html">HaierProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a523b6e63f16c5f817d82bcdbf351d7e7">_</a></td></tr>
+<tr class="separator:a523b6e63f16c5f817d82bcdbf351d7e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Haier A/C messages. </p>
@@ -387,6 +377,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRHaierAC::convertFan </td>
@@ -396,6 +389,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
@@ -414,6 +412,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRHaierAC::convertMode </td>
@@ -423,6 +424,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -441,6 +447,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRHaierAC::convertSwingV </td>
@@ -450,6 +459,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting. </p>
@@ -463,8 +477,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3a291fccea5f4b32f83da2605d2a82e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a291fccea5f4b32f83da2605d2a82e0">&#9670;&nbsp;</a></span>getCommand()</h2>
+<a id="a0e9bea37c9f3a43ad205994b396d5cd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e9bea37c9f3a43ad205994b396d5cd2">&#9670;&nbsp;</a></span>getCommand()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -474,7 +488,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -484,8 +498,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0e05983088035f6d85c520843922c25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0e05983088035f6d85c520843922c25">&#9670;&nbsp;</a></span>getCurrTime()</h2>
+<a id="ace3a6ad8816dbf5d4a9f8595cc621b09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace3a6ad8816dbf5d4a9f8595cc621b09">&#9670;&nbsp;</a></span>getCurrTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -495,7 +509,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -505,8 +519,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5b15678e94acc14a0bb86bff61230e93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b15678e94acc14a0bb86bff61230e93">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a20efaa79ca7ead0b08f19a4b41c198aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20efaa79ca7ead0b08f19a4b41c198aa">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -516,7 +530,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -526,8 +540,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5c69955fe18f4ddb0286084f3fb39228"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c69955fe18f4ddb0286084f3fb39228">&#9670;&nbsp;</a></span>getHealth()</h2>
+<a id="aff4e7de97c375daf881249eefc1c60f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff4e7de97c375daf881249eefc1c60f8">&#9670;&nbsp;</a></span>getHealth()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -537,7 +551,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -547,8 +561,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa180c60030d9972807238cceba886ff5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa180c60030d9972807238cceba886ff5">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a2ddf59c6ce732c23a9898dfc6679be02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ddf59c6ce732c23a9898dfc6679be02">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -558,7 +572,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -568,8 +582,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a8b5c970b3204aa447d86dc2941dbd7b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b5c970b3204aa447d86dc2941dbd7b1">&#9670;&nbsp;</a></span>getOffTimer()</h2>
+<a id="a4760af54cbc1618b2dc4c1bf57884ebb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4760af54cbc1618b2dc4c1bf57884ebb">&#9670;&nbsp;</a></span>getOffTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -579,7 +593,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -589,8 +603,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a99d3339eb5ecdbf1c86e85408507af7b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99d3339eb5ecdbf1c86e85408507af7b">&#9670;&nbsp;</a></span>getOnTimer()</h2>
+<a id="a1c71cd51382036c4548b460a13072e91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c71cd51382036c4548b460a13072e91">&#9670;&nbsp;</a></span>getOnTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -600,7 +614,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -631,8 +645,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0ac7155d5ba294ce50b9436a35aa166b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ac7155d5ba294ce50b9436a35aa166b">&#9670;&nbsp;</a></span>getSleep()</h2>
+<a id="af88bef780a4f14f44cd7d2549f3838b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af88bef780a4f14f44cd7d2549f3838b3">&#9670;&nbsp;</a></span>getSleep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -642,7 +656,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -652,8 +666,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa18839d213e4cd46405c683ec67fa23e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa18839d213e4cd46405c683ec67fa23e">&#9670;&nbsp;</a></span>getSwing()</h2>
+<a id="ac1192427f02d7f77bb88105d74fc8276"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1192427f02d7f77bb88105d74fc8276">&#9670;&nbsp;</a></span>getSwing()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -663,7 +677,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -673,8 +687,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af137371c6766ee068a0200ff1facd8b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af137371c6766ee068a0200ff1facd8b0">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="aa6f23534e63039527bf92fc85fed2e2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6f23534e63039527bf92fc85fed2e2c">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -684,47 +698,13 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Get the current temperature setting. </p>
 <dl class="section return"><dt>Returns</dt><dd>The current setting for temp. in degrees celsius. </dd></dl>
-
-</div>
-</div>
-<a id="a60e891775fbc3a77ee487cde26f650c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60e891775fbc3a77ee487cde26f650c5">&#9670;&nbsp;</a></span>getTime()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t IRHaierAC::getTime </td>
-          <td>(</td>
-          <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>ptr</em>[]</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the Time value at the given pointer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">ptr</td><td>A Ptr to a location in the internal state to get the time. </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -998,7 +978,7 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRHaierAC::setSwing </td>
           <td>(</td>
           <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>cmd</em></td><td>)</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1007,7 +987,7 @@ Private Attributes</h2></td></tr>
 <p>Set the Vertical Swing mode of the A/C. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmd</td><td>The mode to set the vanes to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The mode to set the vanes to. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1034,51 +1014,6 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature in degrees celsius. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a81ca00cf5b49308c2609b717d34958ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81ca00cf5b49308c2609b717d34958ad">&#9670;&nbsp;</a></span>setTime()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IRHaierAC::setTime </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>ptr</em>[], </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const uint16_t&#160;</td>
-          <td class="paramname"><em>nr_mins</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set the Time value at the given pointer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">ptr</td><td>A Ptr to a location in the internal state to set the time. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nr_mins</td><td>The time expressed in total number of minutes. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1113,8 +1048,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a1e74862d6ab7e65108a7b1a3b7af7e91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e74862d6ab7e65108a7b1a3b7af7e91">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a738de44369e3322d264c8ee78cc72ab6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a738de44369e3322d264c8ee78cc72ab6">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1124,7 +1059,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1239,8 +1174,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7effff64e7c9c20b7d9e6c2c10e0ffbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7effff64e7c9c20b7d9e6c2c10e0ffbc">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="af52b438cc7c6b0600793a0eb3c8f6419"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af52b438cc7c6b0600793a0eb3c8f6419">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1250,7 +1185,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1307,6 +1242,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a523b6e63f16c5f817d82bcdbf351d7e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523b6e63f16c5f817d82bcdbf351d7e7">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionHaierProtocol.html">HaierProtocol</a> IRHaierAC::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aec69643fe633a57d635754690225fdd1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aec69643fe633a57d635754690225fdd1">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -1328,30 +1285,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Instance of the IR send class. </p>
-
-</div>
-</div>
-<a id="a609abaeab9df642fdaccd77235a84eed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a609abaeab9df642fdaccd77235a84eed">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t IRHaierAC::remote_state[<a class="el" href="IRremoteESP8266_8h.html#afb4cd0c1a9c689d862e7095f0ab6dbe5">kHaierACStateLength</a>]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The state in native code form. </p>
 
 </div>
 </div>
