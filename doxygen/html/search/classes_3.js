@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['state_5ft_3688',['state_t',['../structstdAc_1_1state__t.html',1,'stdAc']]]
+  ['haierprotocol_3689',['HaierProtocol',['../unionHaierProtocol.html',1,'']]],
+  ['haieryrw02protocol_3690',['HaierYRW02Protocol',['../unionHaierYRW02Protocol.html',1,'']]]
 ];

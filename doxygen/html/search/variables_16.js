@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zonefollowflag_7197',['zoneFollowFlag',['../classIRCoolixAC.html#a9cb37ed201fcf842c153f0414d9bfd9f',1,'IRCoolixAC']]]
+  ['xfan_7298',['Xfan',['../unionGreeProtocol.html#a3fbf66dfc2043710c5e00f8230eddb48',1,'GreeProtocol']]]
 ];
