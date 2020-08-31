@@ -3,7 +3,7 @@
 ## _v2.7.10 (20200831)_
 
 **[BREAKING CHANGES]**
-- move SPIFFS to LittleFS for ESP8266 (#1182 #1226)
+- IRMQTTServer & Web-AC-Control: move SPIFFS to LittleFS for ESP8266 (#1182 #1226)
 - Daikin176: Change & increase operating mode values. (#1233 #1235)
 
 **[Bug Fixes]**
