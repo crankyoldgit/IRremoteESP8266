@@ -678,6 +678,11 @@ bool decodeMetz(decode_results *results, uint16_t offset = kStartOffset,
                 const uint16_t nbits = kMetzBits,
                 const bool strict = true);
 #endif  // DECODE_METZ
+#if DECODE_TRANSCOLD
+bool decodeTranscold(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kTranscoldBits,
+                     const bool strict = true);
+#endif  // DECODE_TRANSCOLD
 };
 
 #endif  // IRRECV_H_

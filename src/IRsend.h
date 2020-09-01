@@ -653,6 +653,10 @@ class IRsend {
   static uint32_t encodeMetz(const uint8_t address, const uint8_t command,
                              const bool toggle = false);
 #endif  // SEND_METZ
+#if SEND_TRANSCOLD
+  void sendTranscold(const uint64_t data, const uint16_t nbits = kTranscoldBits,
+                     const uint16_t repeat = kNoRepeat);
+#endif  // SEND_TRANSCOLD
 
  protected:
 #ifdef UNIT_TEST

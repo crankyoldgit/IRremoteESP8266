@@ -678,11 +678,18 @@
 #endif  // SEND_VOLTAS
 
 #ifndef DECODE_METZ
-#define DECODE_METZ          _IR_ENABLE_DEFAULT_
+#define DECODE_METZ            _IR_ENABLE_DEFAULT_
 #endif  // DECODE_METZ
 #ifndef SEND_METZ
-#define SEND_METZ            _IR_ENABLE_DEFAULT_
+#define SEND_METZ              _IR_ENABLE_DEFAULT_
 #endif  // SEND_METZ
+
+#ifndef DECODE_TRANSCOLD
+#define DECODE_TRANSCOLD       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TRANSCOLD
+#ifndef SEND_TRANSCOLD
+#define SEND_TRANSCOLD         _IR_ENABLE_DEFAULT_
+#endif  // SEND_TRANSCOLD
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -827,8 +834,9 @@ enum decode_type_t {
   SANYO_AC,
   VOLTAS,  // 90
   METZ,
+  TRANSCOLD,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = METZ,
+  kLastDecodeType = TRANSCOLD,
 };
 
 // Message lengths & required repeat values
@@ -1032,6 +1040,7 @@ const uint16_t kToshibaACStateLengthShort = kToshibaACStateLength - 2;
 const uint16_t kToshibaACBitsShort = kToshibaACStateLengthShort * 8;
 const uint16_t kToshibaACStateLengthLong = kToshibaACStateLength + 1;
 const uint16_t kToshibaACBitsLong = kToshibaACStateLengthLong * 8;
+const uint16_t kTranscoldBits = 48;
 const uint16_t kTrotecStateLength = 9;
 const uint16_t kTrotecBits = kTrotecStateLength * 8;
 const uint16_t kTrotecDefaultRepeat = kNoRepeat;
