@@ -724,6 +724,9 @@
 #ifndef D_STR_TOSHIBA_AC
 #define D_STR_TOSHIBA_AC "TOSHIBA_AC"
 #endif  // D_STR_TOSHIBA_AC
+#ifndef D_STR_TRANSCOLD
+#define D_STR_TRANSCOLD "TRANSCOLD"
+#endif  // D_STR_TRANSCOLD
 #ifndef D_STR_TROTEC
 #define D_STR_TROTEC "TROTEC"
 #endif  // D_STR_TROTEC
