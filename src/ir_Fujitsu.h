@@ -6,20 +6,23 @@
 /// Fujitsu A/C support added by Jonny Graham
 
 // Supports:
-//   Brand: Fujitsu,  Model: AR-RAH2E remote
+//   Brand: Fujitsu,  Model: AR-RAH2E remote (ARRAH2E)
 //   Brand: Fujitsu,  Model: ASYG30LFCA A/C (ARRAH2E)
-//   Brand: Fujitsu,  Model: AR-DB1 remote
+//   Brand: Fujitsu General,  Model: AR-RCE1E remote (ARRAH2E)
+//   Brand: Fujitsu General,  Model: ASHG09LLCA A/C (ARRAH2E)
+//   Brand: Fujitsu General,  Model: AOHG09LLC A/C (ARRAH2E)
+//   Brand: Fujitsu,  Model: AR-DB1 remote (ARDB1)
 //   Brand: Fujitsu,  Model: AST9RSGCW A/C (ARDB1)
-//   Brand: Fujitsu,  Model: AR-REB1E remote
+//   Brand: Fujitsu,  Model: AR-REB1E remote (ARREB1E)
 //   Brand: Fujitsu,  Model: ASYG7LMCA A/C (ARREB1E)
-//   Brand: Fujitsu,  Model: AR-RAE1E remote
-//   Brand: Fujitsu,  Model: AGTV14LAC A/C
-//   Brand: Fujitsu,  Model: AR-RAC1E remote
-//   Brand: Fujitsu,  Model: ASTB09LBC A/C
-//   Brand: Fujitsu,  Model: AR-RY4 remote
-//   Brand: Fujitsu General,  Model: AR-JW2 remote
-//   Brand: Fujitsu,  Model: AR-DL10 remote
-//   Brand: Fujitsu,  Model: ASU30C1 A/C
+//   Brand: Fujitsu,  Model: AR-RAE1E remote (ARRAH2E)
+//   Brand: Fujitsu,  Model: AGTV14LAC A/C (ARRAH2E)
+//   Brand: Fujitsu,  Model: AR-RAC1E remote (ARRAH2E)
+//   Brand: Fujitsu,  Model: ASTB09LBC A/C (ARRY4)
+//   Brand: Fujitsu,  Model: AR-RY4 remote (ARRY4)
+//   Brand: Fujitsu General,  Model: AR-JW2 remote (ARJW2)
+//   Brand: Fujitsu,  Model: AR-DL10 remote (ARDB1)
+//   Brand: Fujitsu,  Model: ASU30C1 A/C (ARDB1)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
