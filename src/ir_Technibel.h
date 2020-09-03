@@ -1,4 +1,7 @@
-// Technibel A/C
+// Copyright 2020 Quentin Briollant
+
+/// @file
+/// @brief Support for Technibel protocol.
 
 #ifndef IR_TECHNIBEL_H_
 #define IR_TECHNIBEL_H_
@@ -18,7 +21,7 @@
 //   Brand: TECHNIBEL,  Model: IRO PLUS
 
 // Ref:
-//   
+//
 
 // Kudos:
 //   : For the breakdown and mapping of the bit values.
@@ -54,8 +57,10 @@ const uint8_t kTechnibelAcCool =   0b0001;
 const uint8_t kTechnibelAcDry =    0b0010;
 const uint8_t kTechnibelAcFan =    0b0100;
 const uint8_t kTechnibelAcHeat =   0b1000;
-const uint8_t kTechnibelAcTimerEnableBit = kTechnibelAcModeOffset + kTechnibelAcModeSize;  // 16
-const uint8_t kTechnibelAcTempUnitBit = kTechnibelAcTimerEnableBit + 1;  // 17 (0 = Celsius, 1 = Fahrenheit)
+const uint8_t kTechnibelAcTimerEnableBit = kTechnibelAcModeOffset
+                                          + kTechnibelAcModeSize;  // 16
+const uint8_t kTechnibelAcTempUnitBit = kTechnibelAcTimerEnableBit + 1;
+                                      // 17 (0 = Celsius, 1 = Fahrenheit)
 const uint8_t kTechnibelAcSwingBit = kTechnibelAcTempUnitBit + 1;  // 18
 const uint8_t kTechnibelAcSleepBit = kTechnibelAcSwingBit + 1;  // 19
 // '0' bit
@@ -65,7 +70,8 @@ const uint8_t kTechnibelAcFanLow =    0b001;
 const uint8_t kTechnibelAcFanMedium = 0b010;
 const uint8_t kTechnibelAcFanHigh =   0b100;
 // '0' bit
-const uint8_t kTechnibelAcTempOffset = kTechnibelAcFanOffset + kTechnibelAcFanSize + 1; // 25
+const uint8_t kTechnibelAcTempOffset = kTechnibelAcFanOffset
+                                      + kTechnibelAcFanSize + 1;  // 25
 const uint8_t kTechnibelAcTempSize = 7;
 const uint8_t kTechnibelAcTempMinC = 16;  // Deg C
 const uint8_t kTechnibelAcTempMaxC = 31;  // Deg C
@@ -74,12 +80,15 @@ const uint8_t kTechnibelAcTempMaxF = 88;  // Deg F
 // '0' bit
 // '0' bit
 // '0' bit
-const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcTempOffset + kTechnibelAcTempSize + 3;  // 35
+const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcTempOffset
+                                            + kTechnibelAcTempSize + 3;  // 35
 const uint8_t kTechnibelAcHoursSize = 5;  // Max 24 hrs
 const uint8_t kTechnibelAcTimerMax = 24;
-const uint8_t kTechnibelAcFooterOffset = kTechnibelAcTimerHoursOffset + kTechnibelAcHoursSize;  // 40
+const uint8_t kTechnibelAcFooterOffset = kTechnibelAcTimerHoursOffset
+                                        + kTechnibelAcHoursSize;  // 40
 const uint8_t kTechnibelAcFooterSize = 8;
-const uint8_t kTechnibelAcChecksumOffset = kTechnibelAcFooterOffset + kTechnibelAcFooterSize;  // 48
+const uint8_t kTechnibelAcChecksumOffset = kTechnibelAcFooterOffset
+                                          + kTechnibelAcFooterSize;  // 48
 const uint8_t kTechnibelAcChecksumSize = 8;
 
 

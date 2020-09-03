@@ -38,7 +38,7 @@ void printState() {
   Serial.printf("  %s\n", ac.toString().c_str());
   // Display the encoded IR sequence.
   Serial.print("IR Code: 0x");
-  serialPrintUint64(ac.getRaw(),16);
+  serialPrintUint64(ac.getRaw(), 16);
   Serial.println();
 }
 

@@ -664,7 +664,8 @@ class IRrecv {
                            const bool strict = true);
 #endif  // DECODE_MULTIBRACKETS
 #if DECODE_TECHNIBEL_AC
-  bool decodeTechnibelAc(decode_results *results, uint16_t offset = kStartOffset,
+  bool decodeTechnibelAc(decode_results *results,
+                     uint16_t offset = kStartOffset,
                      const uint16_t nbits = kTechnibelAcBits,
                      const bool strict = true);
 #endif  // DECODE_TECHNIBEL_AC

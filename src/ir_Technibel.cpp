@@ -1,4 +1,7 @@
-// Technibel based protocol.
+// Copyright 2020 Quentin Briollant
+
+/// @file
+/// @brief Support for Technibel protocol.
 
 #include "ir_Technibel.h"
 #include "IRrecv.h"
@@ -62,12 +65,10 @@ void IRsend::sendTechnibelAc(const uint64_t data, const uint16_t nbits,
 // Status: STABLE / Expected to be working.
 bool IRrecv::decodeTechnibelAc(decode_results *results, uint16_t offset,
                               const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kTechnibelAcOverhead - offset)
-  {
+  if (results->rawlen < 2 * nbits + kTechnibelAcOverhead - offset) {
     return false;  // Too short a message to match.
   }
-  if (strict && nbits != kTechnibelAcBits)
-  {
+  if (strict && nbits != kTechnibelAcBits) {
     return false;
   }
 
@@ -110,12 +111,13 @@ void IRTechnibelAc::send(const uint16_t repeat) {
 uint8_t IRTechnibelAc::calcChecksum(const uint64_t state) {
   uint8_t sum = 0;
   // Add up all the 8 bit data chunks.
-  for (uint8_t offset = kTechnibelAcPowerBit; offset < kTechnibelAcFooterOffset; offset += 8) {
-    sum += reverseBits(GETBITS64(state, offset, 8),8);
+  for (uint8_t offset = kTechnibelAcPowerBit;
+        offset < kTechnibelAcFooterOffset; offset += 8) {
+    sum += reverseBits(GETBITS64(state, offset, 8), 8);
   }
   sum -= 1;
-  sum = invertBits(sum,8);
-  sum = reverseBits(sum,8);
+  sum = invertBits(sum, 8);
+  sum = reverseBits(sum, 8);
 
   return sum;
 }
@@ -191,36 +193,39 @@ void IRTechnibelAc::setTemp(const uint8_t degrees, const bool fahrenheit) {
   _saved_temp = temp;
   _saved_temp_units = fahrenheit;
 
-  uint8_t temp_reversed = reverseBits(temp,kTechnibelAcTempSize);
+  uint8_t temp_reversed = reverseBits(temp, kTechnibelAcTempSize);
   setBits(&remote_state, kTechnibelAcTempOffset, kTechnibelAcTempSize,
           temp_reversed);
 }
 
 uint8_t IRTechnibelAc::getTemp(void) {
-  uint8_t temp = GETBITS64(remote_state, kTechnibelAcTempOffset, kTechnibelAcTempSize);
+  uint8_t temp = GETBITS64(remote_state, kTechnibelAcTempOffset,
+                            kTechnibelAcTempSize);
   return reverseBits(temp, kTechnibelAcTempSize);
 }
 
 // Set the speed of the fan
 void IRTechnibelAc::setFan(const uint8_t speed) {
   // Mode fan speed rules.
-  if(getMode() == kTechnibelAcDry && speed != kTechnibelAcFanLow) {
+  if (getMode() == kTechnibelAcDry && speed != kTechnibelAcFanLow) {
     setFan(kTechnibelAcFanLow);
     return;
   }
   // Bounds check enforcement
-  if (speed > kTechnibelAcFanHigh)
+  if (speed > kTechnibelAcFanHigh) {
     setFan(kTechnibelAcFanHigh);
-  else if (speed < kTechnibelAcFanLow)
+  } else if (speed < kTechnibelAcFanLow) {
     setFan(kTechnibelAcFanLow);
-  else {
+  } else {
     uint8_t speed_reversed = reverseBits(speed, kTechnibelAcFanSize);
-    setBits(&remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize, speed_reversed);
+    setBits(&remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize,
+            speed_reversed);
   }
 }
 
 uint8_t IRTechnibelAc::getFan(void) {
-  uint8_t speed = GETBITS64(remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize);
+  uint8_t speed = GETBITS64(remote_state, kTechnibelAcFanOffset,
+                            kTechnibelAcFanSize);
   return reverseBits(speed, kTechnibelAcFanSize);
 }
 
@@ -251,7 +256,8 @@ stdAc::fanspeed_t IRTechnibelAc::toCommonFanSpeed(const uint8_t speed) {
 }
 
 uint8_t IRTechnibelAc::getMode(void) {
-  uint8_t mode = GETBITS64(remote_state, kTechnibelAcModeOffset, kTechnibelAcModeSize);
+  uint8_t mode = GETBITS64(remote_state, kTechnibelAcModeOffset,
+                            kTechnibelAcModeSize);
   return reverseBits(mode, kTechnibelAcModeSize);
 }
 
@@ -267,7 +273,8 @@ void IRTechnibelAc::setMode(const uint8_t mode) {
       return;
   }
   uint8_t mode_reversed = reverseBits(mode, kTechnibelAcModeSize);
-  setBits(&remote_state, kTechnibelAcModeOffset, kTechnibelAcModeSize, mode_reversed);
+  setBits(&remote_state, kTechnibelAcModeOffset, kTechnibelAcModeSize,
+          mode_reversed);
   setFan(getFan());  // Re-force any fan speed constraints.
   // Restore previous temp settings for cool mode.
   setTemp(_saved_temp, _saved_temp_units);
@@ -322,7 +329,7 @@ bool IRTechnibelAc::convertSwing(const stdAc::swingv_t swing) {
 
 // Convert a native swing to it's common equivalent.
 stdAc::swingv_t IRTechnibelAc::toCommonSwing(const bool swing) {
-  if(swing)
+  if (swing)
     return stdAc::swingv_t::kAuto;
   else
     return stdAc::swingv_t::kOff;
@@ -351,13 +358,15 @@ bool IRTechnibelAc::getTimerEnabled(void) {
 void IRTechnibelAc::setTimer(const uint8_t nr_of_hours) {
   uint8_t value = std::min(kTechnibelAcTimerMax, nr_of_hours);
   uint8_t value_reversed = reverseBits(value, kTechnibelAcHoursSize);
-  setBits(&remote_state, kTechnibelAcTimerHoursOffset, kTechnibelAcHoursSize, value_reversed); 
+  setBits(&remote_state, kTechnibelAcTimerHoursOffset, kTechnibelAcHoursSize,
+          value_reversed);
   // Enable or not?
   setTimerEnabled(value > 0);
 }
 
 uint8_t IRTechnibelAc::getTimer(void) {
-  uint8_t timer = GETBITS64(remote_state, kTechnibelAcTimerHoursOffset, kTechnibelAcHoursSize);
+  uint8_t timer = GETBITS64(remote_state, kTechnibelAcTimerHoursOffset,
+                            kTechnibelAcHoursSize);
   return reverseBits(timer, kTechnibelAcHoursSize);
 }
 
@@ -389,10 +398,11 @@ stdAc::state_t IRTechnibelAc::toCommon(void) {
 // Convert the internal state into a human readable string.
 String IRTechnibelAc::toString(void) {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging. //80
+  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kTechnibelAcCool, kTechnibelAcCool,
-                            kTechnibelAcHeat, kTechnibelAcDry, kTechnibelAcFan);
+                            kTechnibelAcHeat, kTechnibelAcDry,
+                            kTechnibelAcFan);
   result += addFanToString(getFan(), kTechnibelAcFanHigh, kTechnibelAcFanLow,
                            kTechnibelAcFanLow, kTechnibelAcFanLow,
                            kTechnibelAcFanMedium);
@@ -400,6 +410,7 @@ String IRTechnibelAc::toString(void) {
   result += addBoolToString(getSleep(), kSleepStr);
   result += addBoolToString(getSwing(), kSwingVStr);
   uint8_t hours = getTimer();
-  result += addLabeledString((hours && getTimerEnabled()) ? minsToString(hours * 60) : kOffStr, kTimerStr);
+  result += addLabeledString((hours && getTimerEnabled()) ?
+                              minsToString(hours * 60) : kOffStr, kTimerStr);
   return result;
 }
