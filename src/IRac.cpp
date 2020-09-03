@@ -34,6 +34,7 @@
 #include "ir_Samsung.h"
 #include "ir_Sharp.h"
 #include "ir_Tcl.h"
+#include "ir_Technibel.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
@@ -193,6 +194,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_TCL112AC
     case decode_type_t::TCL112AC:
+#endif
+#if SEND_TECO
+    case decode_type_t::TECHNIBEL_AC:
 #endif
 #if SEND_TECO
     case decode_type_t::TECO:
@@ -2335,6 +2339,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_VESTEL_AC
+#if DECODE_TECHNIBEL_AC
+      case decode_type_t::TECHNIBEL_AC: {
+        IRTechnibelAc ac(0);
+        ac.setRaw(result->value);  // TechnibelAc uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_TECHNIBEL_AC
 #if DECODE_TECO
       case decode_type_t::TECO: {
         IRTecoAc ac(0);

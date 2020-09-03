@@ -809,6 +809,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Carrier 64bit decode");
     if (decodeCarrierAC64(results, offset)) return true;
 #endif  // DECODE_CARRIER_AC64
+#if DECODE_TECHNIBEL_AC
+    DPRINTLN("Attempting Technibel AC decode");
+    if (decodeTechnibelAc(results, offset)) return true;
+#endif  // DECODE_TECHNIBEL_AC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

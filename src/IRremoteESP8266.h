@@ -635,6 +635,13 @@
 #define SEND_MULTIBRACKETS     _IR_ENABLE_DEFAULT_
 #endif  // SEND_MULTIBRACKETS
 
+#ifndef DECODE_TECHNIBEL_AC
+#define DECODE_TECHNIBEL_AC     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TECHNIBEL_AC
+#ifndef SEND_TECHNIBEL_AC
+#define SEND_TECHNIBEL_AC       _IR_ENABLE_DEFAULT_
+#endif  // SEND_TECHNIBEL_AC
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -767,8 +774,9 @@ enum decode_type_t {
   MULTIBRACKETS,
   CARRIER_AC40,
   CARRIER_AC64,
+  TECHNIBEL_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CARRIER_AC64,
+  kLastDecodeType = TECHNIBEL_AC,
 };
 
 // Message lengths & required repeat values
@@ -821,6 +829,8 @@ const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
 const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
 const uint16_t kDelonghiAcBits = 64;
 const uint16_t kDelonghiAcDefaultRepeat = kNoRepeat;
+const uint16_t kTechnibelAcBits = 56;
+const uint16_t kTechnibelAcDefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;
 const uint16_t kDenon48Bits = 48;
 const uint16_t kDenonLegacyBits = 14;
